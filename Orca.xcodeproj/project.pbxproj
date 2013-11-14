@@ -639,6 +639,8 @@
 		841E0A4217F46296009E4190 /* ORCaen792Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 841E0A4017F46295009E4190 /* ORCaen792Decoders.h */; };
 		841E0A4317F46296009E4190 /* ORCaen792Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 841E0A4117F46295009E4190 /* ORCaen792Decoders.m */; };
 		841E0A4717F46468009E4190 /* ORCAEN792Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 841E0A4517F46468009E4190 /* ORCAEN792Readout.hh */; };
+		841EBDE71831645E00450A3C /* ORMJDSegmentGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 841EBDE51831645E00450A3C /* ORMJDSegmentGroup.h */; };
+		841EBDE81831645E00450A3C /* ORMJDSegmentGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 841EBDE61831645E00450A3C /* ORMJDSegmentGroup.m */; };
 		84200CA206764C120048DFB4 /* ORSubPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84200CA006764C120048DFB4 /* ORSubPlotController.h */; };
 		84200CA306764C120048DFB4 /* ORSubPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84200CA106764C120048DFB4 /* ORSubPlotController.m */; };
 		842042070F0C082D00720846 /* Continue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842042060F0C082D00720846 /* Continue.tif */; };
@@ -707,7 +709,6 @@
 		8428BC3107CBC05600C53671 /* ORDGF4cDefaultParams.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8428BC3007CBC05600C53671 /* ORDGF4cDefaultParams.plist */; };
 		8428E5E70820678A00F1CF6E /* StopLightView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428E5E50820678A00F1CF6E /* StopLightView.h */; };
 		8428E5E80820678A00F1CF6E /* StopLightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8428E5E60820678A00F1CF6E /* StopLightView.m */; };
-		8429C8F90665661100213F1E /* Message.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8429C8F80665661100213F1E /* Message.framework */; };
 		8429F89905DD8C7D00FB3485 /* Wizard.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8465BF6605DC43B500870151 /* Wizard.tif */; };
 		842A634F0700A81C007536B6 /* ORShaperDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 842A634D0700A81C007536B6 /* ORShaperDecoders.h */; };
 		842A63500700A81C007536B6 /* ORShaperDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 842A634E0700A81C007536B6 /* ORShaperDecoders.m */; };
@@ -1450,6 +1451,7 @@
 		846F4D4209900F2B00BF0031 /* RunVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4D4109900F2B00BF0031 /* RunVetoed.tif */; };
 		84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AC90E0342F200195E3E /* ORCARoot.tif */; };
 		84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AD30E0344CF00195E3E /* ORCARootService.tif */; };
+		8470D01518241FEE0054F7D4 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8470D01418241FEE0054F7D4 /* Accelerate.framework */; };
 		8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */; };
 		8471C30F1250D456003A8DFB /* ORCAEN260Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */; };
 		8471C3101250D456003A8DFB /* ORCAEN260Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */; };
@@ -2381,7 +2383,6 @@
 		84B6CD4C14B37E9700386BE1 /* ORRGA300Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */; };
 		84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4314B37E9700386BE1 /* RGA300.nib */; };
 		84B6CD4E14B37E9700386BE1 /* RGA300.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B6CD4414B37E9700386BE1 /* RGA300.tif */; };
-		84B71FF5175CC43800BFA972 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84B71FF4175CC43800BFA972 /* Accelerate.framework */; };
 		84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84B74ACF0FEAAB460033E658 /* ftpExpectScript */; };
 		84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE10FEBE9B90033E658 /* Caen965.gif */; };
 		84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B74CE20FEBE9B90033E658 /* Caen965.nib */; };
@@ -3952,6 +3953,8 @@
 		841E0A4117F46295009E4190 /* ORCaen792Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCaen792Decoders.m; sourceTree = "<group>"; };
 		841E0A4417F46468009E4190 /* ORCAEN792Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORCAEN792Readout.cc; sourceTree = "<group>"; };
 		841E0A4517F46468009E4190 /* ORCAEN792Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORCAEN792Readout.hh; sourceTree = "<group>"; };
+		841EBDE51831645E00450A3C /* ORMJDSegmentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDSegmentGroup.h; sourceTree = "<group>"; };
+		841EBDE61831645E00450A3C /* ORMJDSegmentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDSegmentGroup.m; sourceTree = "<group>"; };
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
 		842042060F0C082D00720846 /* Continue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Continue.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Continue.tif"; sourceTree = SOURCE_ROOT; };
@@ -4023,7 +4026,6 @@
 		8428BC3007CBC05600C53671 /* ORDGF4cDefaultParams.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = ORDGF4cDefaultParams.plist; path = Source/Objects/Hardware/Camac/DGF4c/ORDGF4cDefaultParams.plist; sourceTree = SOURCE_ROOT; };
 		8428E5E50820678A00F1CF6E /* StopLightView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = StopLightView.h; sourceTree = "<group>"; };
 		8428E5E60820678A00F1CF6E /* StopLightView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = StopLightView.m; sourceTree = "<group>"; };
-		8429C8F80665661100213F1E /* Message.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Message.framework; path = /System/Library/Frameworks/Message.framework; sourceTree = "<absolute>"; };
 		842A634D0700A81C007536B6 /* ORShaperDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORShaperDecoders.h; sourceTree = "<group>"; };
 		842A634E0700A81C007536B6 /* ORShaperDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORShaperDecoders.m; sourceTree = "<group>"; };
 		842A63540700A951007536B6 /* ORVmeCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeCardDecoder.h; sourceTree = "<group>"; };
@@ -4527,6 +4529,7 @@
 		846F4D4109900F2B00BF0031 /* RunVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunVetoed.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/RunVetoed.tif; sourceTree = SOURCE_ROOT; };
 		84701AC90E0342F200195E3E /* ORCARoot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARoot.tif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.tif"; sourceTree = SOURCE_ROOT; };
 		84701AD30E0344CF00195E3E /* ORCARootService.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARootService.tif; path = "Source/Main Document/ORCARootService.tif"; sourceTree = SOURCE_ROOT; };
+		8470D01418241FEE0054F7D4 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = ../../../../System/Library/Frameworks/Accelerate.framework; sourceTree = "<group>"; };
 		8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN260Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN260Readout.cc; sourceTree = SOURCE_ROOT; };
 		8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN260Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN260Readout.hh; sourceTree = SOURCE_ROOT; };
 		8471D4731588DF3C0039894D /* ORRemoteSocketController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRemoteSocketController.h; path = "Source/Objects/Misc Objects/RemoteSocket/ORRemoteSocketController.h"; sourceTree = SOURCE_ROOT; };
@@ -5485,7 +5488,6 @@
 		84B6CD4214B37E9700386BE1 /* ORRGA300Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRGA300Model.m; path = Source/Objects/Hardware/Serial/RGA300/ORRGA300Model.m; sourceTree = SOURCE_ROOT; };
 		84B6CD4314B37E9700386BE1 /* RGA300.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RGA300.nib; path = Source/Objects/Hardware/Serial/RGA300/RGA300.nib; sourceTree = SOURCE_ROOT; };
 		84B6CD4414B37E9700386BE1 /* RGA300.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RGA300.tif; path = Source/Objects/Hardware/Serial/RGA300/RGA300.tif; sourceTree = SOURCE_ROOT; };
-		84B71FF4175CC43800BFA972 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Accelerate.framework; sourceTree = "<group>"; };
 		84B74ACF0FEAAB460033E658 /* ftpExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectScript; sourceTree = "<group>"; };
 		84B74CE10FEBE9B90033E658 /* Caen965.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Caen965.gif; sourceTree = "<group>"; };
 		84B74CE20FEBE9B90033E658 /* Caen965.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen965.nib; path = Source/Objects/Hardware/Vme/CAEN/CV965/Caen965.nib; sourceTree = SOURCE_ROOT; };
@@ -6353,8 +6355,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8434A359055B3287002D3102 /* Cocoa.framework in Frameworks */,
+				8470D01518241FEE0054F7D4 /* Accelerate.framework in Frameworks */,
 				8439D5EF05BEFF3A0077EFF2 /* Carbon.framework in Frameworks */,
-				8429C8F90665661100213F1E /* Message.framework in Frameworks */,
 				840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */,
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
@@ -6364,7 +6366,6 @@
 				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
 				8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */,
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
-				84B71FF5175CC43800BFA972 /* Accelerate.framework in Frameworks */,
 				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
 				4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */,
 			);
@@ -6377,12 +6378,11 @@
 			isa = PBXGroup;
 			children = (
 				8481E67817653766001AB905 /* SystemConfiguration.framework */,
+				8470D01418241FEE0054F7D4 /* Accelerate.framework */,
 				8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */,
-				84B71FF4175CC43800BFA972 /* Accelerate.framework */,
 				EF37879112DFFF81003C814E /* YAJL.framework */,
 				840F5B181222C90000D49A75 /* QTKit.framework */,
 				84F5E11A0A151E0B00707A0F /* OpenGL.framework */,
-				8429C8F80665661100213F1E /* Message.framework */,
 				84AA7A540545B1B2005F64B1 /* Cocoa.framework */,
 				F539C97C03A7C80D015F64B1 /* IOKit.framework */,
 				847599850B5FF26500123411 /* QuartzCore.framework */,
@@ -12254,6 +12254,8 @@
 				84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */,
 				84E966CD11848BEF008D9119 /* MajoranaModel.h */,
 				84E966CE11848BEF008D9119 /* MajoranaModel.m */,
+				841EBDE51831645E00450A3C /* ORMJDSegmentGroup.h */,
+				841EBDE61831645E00450A3C /* ORMJDSegmentGroup.m */,
 			);
 			name = Majorana;
 			path = Source/Experiments/Majorana;
@@ -13516,6 +13518,7 @@
 				84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */,
 				849F4C790768DA930087E9A8 /* ORDataExplorerModel.h in Headers */,
 				849F4C7B0768DA930087E9A8 /* ORHeaderItem.h in Headers */,
+				841EBDE71831645E00450A3C /* ORMJDSegmentGroup.h in Headers */,
 				84F7FA81077896B000E8A6DA /* ORColorScale.h in Headers */,
 				841DA00A0780D7CA0099BBF6 /* ORTRS1Model.h in Headers */,
 				841DA01E0780D8E20099BBF6 /* ORCamacIOCard.h in Headers */,
@@ -15844,6 +15847,7 @@
 				84A8B1490D35702300263D31 /* ORSBC_LAMModel.m in Sources */,
 				84A8B14E0D35703300263D31 /* SBCLamView.m in Sources */,
 				84A5CD5C0D464F4600D9833C /* ORFilterController.m in Sources */,
+				841EBDE81831645E00450A3C /* ORMJDSegmentGroup.m in Sources */,
 				84A5CD5E0D464F4600D9833C /* ORFilterModel.m in Sources */,
 				9C2595B10D5172180039C5DF /* ORHashTable.m in Sources */,
 				9C2595B80D5172460039C5DF /* FilterScript.ym in Sources */,
@@ -16492,7 +16496,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					/Users/markhowe/Dev/Orca,
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -16567,7 +16572,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					/Users/markhowe/Dev/Orca,
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -16634,7 +16640,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					/Users/markhowe/Dev/Orca,
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
