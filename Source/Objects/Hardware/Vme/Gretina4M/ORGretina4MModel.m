@@ -875,6 +875,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	ledThreshold[chan] = aValue;
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MLEDThresholdChanged object:self userInfo:userInfo];
+	[self postAdcInfoProvidingValueChanged];
 }
 
 - (void) setTrapThreshold:(short)chan withValue:(int)aValue
@@ -2548,6 +2549,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	 postNotificationName:ORAdcInfoProvidingValueChanged
 	 object:self
 	 userInfo: nil];
+}
+- (void) setThreshold:(short)chan withValue:(int)aValue
+{
+    [self setLEDThreshold:chan withValue:aValue];
 }
 
 @end

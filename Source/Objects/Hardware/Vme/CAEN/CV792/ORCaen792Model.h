@@ -25,6 +25,7 @@
 #import "ORCaenCardModel.h"
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
+#import "ORAdcInfoProviding.h"
 
 // Declaration of constants for module.
 enum {
@@ -76,7 +77,7 @@ enum {
 
 
 // Class definition
-@interface ORCaen792Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface ORCaen792Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     int modelType;
 	unsigned long onlineMask;
@@ -114,7 +115,12 @@ enum {
 - (BOOL)            swReset: (short) anIndex;
 - (BOOL)            hwReset: (short) anIndex;
 
-#pragma mark ***Hardware Access
+#pragma mark ¥¥¥AdcProviding Protocol
+- (BOOL) partOfEvent:(unsigned short)aChannel;
+- (unsigned long) eventCount:(int)aChannel;
+- (void) clearEventCounts;
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan;
+- (unsigned short) gainForDisplay:(unsigned short) aChan;
 
 @end
 

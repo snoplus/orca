@@ -436,5 +436,51 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 	[anEncoder encodeInt:modelType			forKey:@"modelType"];
 	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];
 }
+
+#pragma mark ¥¥¥AdcProviding Protocol
+
+- (BOOL) partOfEvent:(unsigned short)aChannel
+{
+	//included to satisfy the protocal... change if needed
+	return NO;
+}
+
+- (unsigned long) eventCount:(int)aChannel
+{
+    if(aChannel>=0 && aChannel<[self numberOfChannels]){
+        return eventCounter[aChannel];
+    }
+    else return 0;
+}
+
+- (void) clearEventCounts
+{
+    int i;
+    int n = [self numberOfChannels];
+    for(i=0;i<n;i++){
+		eventCounter[i]=0;
+    }
+}
+
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+	return [self threshold:aChan];
+}
+
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+	return 0;
+}
+- (void) postAdcInfoProvidingValueChanged
+{
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORAdcInfoProvidingValueChanged
+	 object:self
+	 userInfo: nil];
+}
+- (void) initBoard
+{
+    [self writeThresholds];
+}
 @end
 

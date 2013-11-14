@@ -353,6 +353,7 @@ enum Gretina4MFIFOStates {
 - (void) setPZTraceEnabled:(short)chan withValue:(BOOL)aValue;		
 - (void) setDebug:(short)chan withValue:(BOOL)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
+- (void) setThreshold:(short)chan withValue:(int)aValue;
 - (void) setTrapThreshold:(short)chan withValue:(int)aValue;
 - (void) setMrpsrt:(short)chan withValue:(short)aValue;
 - (void) setFtCnt:(short)chan withValue:(short)aValue;
