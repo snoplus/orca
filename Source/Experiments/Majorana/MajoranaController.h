@@ -54,6 +54,10 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
+- (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
+- (void) secondaryMapFileChanged:(NSNotification*)aNote;
+- (void) vetoMapLockChanged:(NSNotification*)aNote;
 
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;
