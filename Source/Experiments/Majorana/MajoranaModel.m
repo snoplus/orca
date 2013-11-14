@@ -96,6 +96,38 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
 	return mapEntries;
 }
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
+    int aSet;
+    int numGroups = [segmentGroups count];
+    for(aSet=0;aSet<numGroups;aSet++){
+        NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
+        NSMutableArray* thresholdArray  = [NSMutableArray array];
+        NSMutableArray* totalCountArray = [NSMutableArray array];
+        NSMutableArray* rateArray       = [NSMutableArray array];
+        
+        ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+        int numSegments = [self numberSegmentsInGroup:aSet];
+        int i;
+        for(i = 0; i<numSegments; i++){
+            [thresholdArray     addObject:[NSNumber numberWithFloat:[segmentGroup getThreshold:i]]];
+            [totalCountArray    addObject:[NSNumber numberWithFloat:[segmentGroup getTotalCounts:i]]];
+            [rateArray          addObject:[NSNumber numberWithFloat:[segmentGroup getRate:i]]];
+        }
+        
+        NSArray* mapEntries = [[segmentGroup paramsAsString] componentsSeparatedByString:@"\n"];
+        
+        if([thresholdArray count])  [aDictionary setObject:thresholdArray   forKey: @"thresholds"];
+        if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
+        if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
+        if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
+        
+        [values setObject:aDictionary forKey:[segmentGroup groupName]];
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
