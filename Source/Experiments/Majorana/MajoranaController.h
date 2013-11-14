@@ -28,11 +28,27 @@
  
     IBOutlet NSTextField*	detectorTitle;
     IBOutlet NSPopUpButton*	viewTypePU;
+    IBOutlet ORColorScale*	secondaryColorScale;
+    IBOutlet NSButton*		secondaryColorAxisLogCB;
+    IBOutlet NSTextField*	secondaryRateField;
 
+    //items in the  HW map tab view
+	IBOutlet NSPopUpButton* secondaryAdcClassNamePopup;
+	IBOutlet NSTextField*	secondaryMapFileTextField;
+    IBOutlet NSButton*		readSecondaryMapFileButton;
+    IBOutlet NSButton*		saveSecondaryMapFileButton;
+    IBOutlet NSTableView*	secondaryTableView;
+	IBOutlet NSButton*		vetoMapLockButton;
+
+    //items in the  details tab view
+    IBOutlet NSTableView*	secondaryValuesView;
+    IBOutlet NSTabView*     viewTabView;
+    
 	NSView *blankView;
     NSSize detectorSize;
     NSSize detailsSize;
-    NSSize focalPlaneSize;
+    NSSize detectorMapViewSize;
+    NSSize vetoMapViewSize;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -40,6 +56,11 @@
 - (void) updateWindow;
 
 - (IBAction) viewTypeAction:(id)sender;
+- (IBAction) vetoMapLockAction:(id)sender;
+- (IBAction) secondaryAdcClassNameAction:(id)sender;
+- (IBAction) saveSecondaryMapFileAction:(id)sender;
+- (IBAction) readSecondaryMapFileAction:(id)sender;
+- (IBAction) autoscaleSecondayColorScale:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;

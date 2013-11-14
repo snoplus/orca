@@ -22,23 +22,26 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
 
-#define kUseTubeView 0
-#define kUseCrateView 1
-#define kNumTubes	 35*2*2 //2 cryostats of 35 detectors, 2 channels per detector
+#define kUseDetectorView    0
+#define kUseCrateView       1
+#define kNumDetectors       2*35*2 //2 cryostats of 35 detectors * 2 (low and hi channels)
+#define kNumVetoSegments    32
 
 @interface MajoranaModel :  ORExperimentModel
 {
 	int		  viewType;
 }
-#pragma mark ¥¥¥Accessors
+#pragma mark ¥¥¥Accessorsg
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
+- (NSString*) getValueForPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
+- (NSString*) vetoMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
 @end

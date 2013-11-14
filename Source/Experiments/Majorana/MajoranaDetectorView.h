@@ -19,7 +19,8 @@
 
 @interface MajoranaDetectorView : ORDetectorView
 {	
-    IBOutlet ORColorScale* focalPlaneColorScale;
+    IBOutlet ORColorScale* detectorColorScale;
+    IBOutlet ORColorScale* vetoColorScale;
 	BOOL viewType;
 }
 - (void) setViewType:(int)aViewType;
