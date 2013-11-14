@@ -67,6 +67,10 @@
 - (void) vetoMaskChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
 - (void) delayedRefresh;
+- (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
+- (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
+- (void) secondaryMapFileChanged:(NSNotification*)aNote;
+- (void) vetoMapLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) showGridAction:(id)sender;
