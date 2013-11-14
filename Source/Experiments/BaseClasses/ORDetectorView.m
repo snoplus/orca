@@ -130,8 +130,10 @@
 			if([aPath containsPoint:localPoint]){
 				selectedSet  = setIndex;
 				selectedPath = segmentIndex;
+                break;
 			}
 		}
+        if(selectedSet>=0)break;
 	}
 	[delegate selectedSet:selectedSet segment:selectedPath];
 	if(selectedSet>=0 && selectedPath>=0 && [anEvent clickCount] >= 2){
@@ -224,7 +226,10 @@
 				}
 			}
 		}
-	} 
+	}
+    
+    [super drawRect:rect];
+
 }
 
 - (void)setFrameSize:(NSSize)newSize
