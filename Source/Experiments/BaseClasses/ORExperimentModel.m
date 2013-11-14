@@ -48,7 +48,6 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 @interface ORExperimentModel (private)
 - (void) checkCardOld:(NSDictionary*)oldCardRecord new:(NSDictionary*)newCardRecord  check:(SEL)checkSelector exclude:(NSSet*)exclusionSet;
 - (void) delayedHistogram;
-- (void) postCouchDBRecord;
 @end
 
 @implementation ORExperimentModel
@@ -134,7 +133,14 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 {
     for(id aGroup in segmentGroups)[aGroup setCrateIndex:aValue];
 }
-
+- (void) setCardIndex:(int)aValue
+{
+    for(id aGroup in segmentGroups)[aGroup setCardIndex:aValue];
+}
+- (void) setChannelIndex:(int)aValue
+{
+    for(id aGroup in segmentGroups)[aGroup setChannelIndex:aValue];
+}
 - (void) registerForRates
 {
 	[segmentGroups makeObjectsPerformSelector:@selector(registerForRates)];
@@ -294,12 +300,6 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 
 	}
 	[self performSelector:@selector(collectRates) withObject:nil afterDelay:1.0];
-    
-    if(rateCounter%10 == 0){
-        [self postCouchDBRecord];
-    }
-    
-    rateCounter++;
 }
 
 #pragma mark •••Specific Dialog Lock Methods
@@ -812,6 +812,41 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 	return s;
 }
 
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
+    int aSet;
+    int numGroups = [segmentGroups count];
+    for(aSet=0;aSet<numGroups;aSet++){
+        NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
+        NSMutableArray* thresholdArray  = [NSMutableArray array];
+        NSMutableArray* gainArray       = [NSMutableArray array];
+        NSMutableArray* totalCountArray = [NSMutableArray array];
+        NSMutableArray* rateArray       = [NSMutableArray array];
+
+        ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+        int numSegments = [self numberSegmentsInGroup:aSet];
+        int i;
+        for(i = 0; i<numSegments; i++){
+            [thresholdArray     addObject:[NSNumber numberWithFloat:[segmentGroup getThreshold:i]]];
+            [gainArray          addObject:[NSNumber numberWithFloat:[segmentGroup getGain:i]]];
+            [totalCountArray    addObject:[NSNumber numberWithFloat:[segmentGroup getTotalCounts:i]]];
+            [rateArray          addObject:[NSNumber numberWithFloat:[segmentGroup getRate:i]]];
+        }
+        
+        NSArray* mapEntries = [[segmentGroup paramsAsString] componentsSeparatedByString:@"\n"];
+        
+        if([thresholdArray count])  [aDictionary setObject:thresholdArray   forKey: @"thresholds"];
+        if([gainArray count])       [aDictionary setObject:gainArray        forKey: @"gains"];
+        if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
+        if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
+        if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
+        
+        [values setObject:aDictionary forKey:[segmentGroup groupName]];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
 
 
 - (NSMutableData*) gainDataForSet:(int)aSet
@@ -896,21 +931,6 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 @end
 
 @implementation ORExperimentModel (private)
-- (void) postCouchDBRecord
-{
-  
-    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-	id aSegmentGroup;
-	NSEnumerator* e = [segmentGroups objectEnumerator];
-    int groupIndex = 0;
-	while(aSegmentGroup = [e nextObject]){
-		NSArray* mapEntries = [[aSegmentGroup paramsAsString] componentsSeparatedByString:@"\n"];
-        [objDictionary setObject:mapEntries forKey:[NSString stringWithFormat:@"geometry%d",groupIndex]];
-        groupIndex++;
-	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:objDictionary];
-
-}
 
 - (void) checkCardOld:(NSDictionary*)oldRecord new:(NSDictionary*)newRecord  check:(SEL)checkSelector exclude:(NSSet*)exclusionSet
 {

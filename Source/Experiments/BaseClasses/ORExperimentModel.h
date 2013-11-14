@@ -39,7 +39,6 @@
     int             colorScaleType;
     NSColor*        customColor1;
     NSColor*        customColor2;
-    unsigned long   rateCounter;
 }
 
 - (id) init;
@@ -128,6 +127,9 @@
 - (void) initHardware;
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index;
 - (void) setCrateIndex:(int)aValue;
+- (void) setCardIndex:(int)aValue;
+- (void) setChannelIndex:(int)aValue;
+- (void) postCouchDBRecord;
 
 #pragma mark •••Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
