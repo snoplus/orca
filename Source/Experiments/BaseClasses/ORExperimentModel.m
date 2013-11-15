@@ -120,6 +120,8 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 - (NSMutableArray*) setupMapEntries:(int) index
 {
 	//default set -- subsclasses can override
+    [self setCardIndex:kCardSlot];
+    [self setChannelIndex:kChannel];
 	NSMutableArray* mapEntries = [NSMutableArray array];
 	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
 	[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];

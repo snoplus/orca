@@ -295,6 +295,8 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 
 - (NSMutableArray*) setupMapEntries:(int)index
 {
+    [self setCardIndex:kCardSlot];
+    [self setChannelIndex:kChannel];
 	if(index==1){
 		NSMutableArray* mapEntries = [NSMutableArray array];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];

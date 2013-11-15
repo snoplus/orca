@@ -91,7 +91,9 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 
 - (NSMutableArray*) setupMapEntries:(int) index
 {
-    [self setCrateIndex:6]; //default is no crate
+    [self setCrateIndex:6];             //default is no crate
+    [self setCardIndex:kCardSlot];
+    [self setChannelIndex:kChannel];  
 	if(index==0){
         //default set -- subsclasses can override. first four items and the VME crate should not be moved
         NSMutableArray* mapEntries = [NSMutableArray array];
