@@ -88,10 +88,6 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     [aConnector release];
 }
 
-//- (NSString*) helpURL
-//{
-//	return @"Halo/Index.html";
-//}
 
 - (NSMutableArray*) setupMapEntries:(int) index
 {
@@ -131,8 +127,51 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
         return mapEntries;
     }
     else return nil;
-    
+}
 
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary*  values = [NSMutableDictionary dictionary];
+    int aSet;
+    int numGroups = [segmentGroups count];
+    
+    for(aSet = 0; aSet < numGroups; aSet++){
+        NSMutableDictionary* aDictionary = [NSMutableDictionary dictionary];
+        NSMutableArray* thresholdArray   = [NSMutableArray array];
+        NSMutableArray* totalCountArray  = [NSMutableArray array];
+        NSMutableArray* rateArray        = [NSMutableArray array];
+        NSMutableArray* gainArray        = [NSMutableArray array];
+        
+        ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+        int numSegments = [self numberSegmentsInGroup:aSet];
+        
+        int i;
+        for(i = 0; i < numSegments; i++){
+            [thresholdArray     addObject:[NSNumber numberWithFloat:[segmentGroup getThreshold:i]]];
+            [totalCountArray    addObject:[NSNumber numberWithFloat:[segmentGroup getTotalCounts:i]]];
+            [rateArray          addObject:[NSNumber numberWithFloat:[segmentGroup getRate:i]]];
+            [gainArray          addObject:[NSNumber numberWithFloat:[segmentGroup getGain:i]]];
+        }
+        
+        NSArray* mapEntries = [[segmentGroup paramsAsString] componentsSeparatedByString:@"\n"];
+        
+        if([thresholdArray count])  [aDictionary setObject:thresholdArray   forKey: @"thresholds"];
+        if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
+        if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
+        if([gainArray count])       [aDictionary setObject:gainArray        forKey: @"gains"];
+        if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
+        
+        
+        [values setObject:aDictionary forKey:[segmentGroup groupName]];
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
+- (int) numberSegmentsInGroup:(int)aGroup
+{
+	if(aGroup == 0) return kNumTubes;
+	else			return kNumTestTubes;
 }
 
 - (void) setCrateIndex:(int)aValue
@@ -209,11 +248,11 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {
-    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Halo Tubes" numSegments:kNumTubes mapEntries:[self setupMapEntries:0]];
+    ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Detector" numSegments:kNumTubes mapEntries:[self setupMapEntries:0]];
 	[self addGroup:group];
 	[group release];
     
-    ORSegmentGroup* group2 = [[ORSegmentGroup alloc] initWithName:@"Test Tubes" numSegments:4 mapEntries:[self setupMapEntries:1]];
+    ORSegmentGroup* group2 = [[ORSegmentGroup alloc] initWithName:@"TestStand" numSegments:4 mapEntries:[self setupMapEntries:1]];
 	[self addGroup:group2];
 	[group2 release];
     [self setupSegmentIds];

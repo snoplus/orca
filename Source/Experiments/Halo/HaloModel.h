@@ -25,6 +25,7 @@
 #define kUseTubeView 0
 #define kUseCrateView 1
 #define kNumTubes	 128
+#define kNumTestTubes 4
 
 @class HaloSentry;
 
