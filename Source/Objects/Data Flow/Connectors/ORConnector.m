@@ -136,9 +136,6 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [self setLineType:[[defaults objectForKey: ORLineType] intValue]];
 }
 
-
-
-
 #pragma mark ¥¥¥Accessors
 - (id) guardian
 {
@@ -148,6 +145,10 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 - (void) setGuardian:(id)aGuardian
 {
     guardian = aGuardian; //don't retain guardian. avoids a retain cycle.
+}
+- (void) setSameGuardianIsOK: (BOOL)aFlag
+{
+    sameGuardianIsOK = aFlag;
 }
 
 - (id) objectLink
@@ -384,7 +385,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 - (void) connectTo:(ORConnector*)aConnector
 {
 
-    if(aConnector!=nil && aConnector != self  && [aConnector objectLink] != objectLink && [self guardian] != [aConnector guardian]){
+    if(aConnector!=nil && aConnector != self  && [aConnector objectLink] != objectLink && (([self guardian] != [aConnector guardian]) || sameGuardianIsOK)){
 		if( [self acceptsConnectionType:[aConnector connectorType]] && [aConnector acceptsConnectionType:connectorType] && 
 			[self acceptsIoType:[aConnector ioType]] && [aConnector acceptsIoType:ioType] ){
 			//first disconnect if needed
@@ -560,6 +561,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [self setIdentifer:[decoder decodeIntForKey:@"ORConnectorID"]];
     [self setRestrictedList:[decoder decodeObjectForKey:@"ORConnectorRestrictedList"]];
     [self setHidden:[decoder decodeBoolForKey:@"Hidden"]];
+    [self setSameGuardianIsOK:[decoder decodeBoolForKey:@"sameGuardianIsOK"]];
     if(!onColor)[self setOnColor:[NSColor greenColor]];
     if(!offColor)[self setOffColor:[NSColor redColor]];
     [connector setConnection:self];
@@ -587,6 +589,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [encoder encodeInt:identifer forKey:@"ORConnectorID"];
     [encoder encodeObject:restrictedList forKey:@"ORConnectorRestrictedList"];
     [encoder encodeBool:hidden forKey:@"Hidden"];
+    [encoder encodeBool:sameGuardianIsOK forKey:@"sameGuardianIsOK"];
 }
 
 

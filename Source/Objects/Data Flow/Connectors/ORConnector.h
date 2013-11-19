@@ -35,6 +35,7 @@
 
 @interface ORConnector : NSObject <NSCoding> {
 	id			 guardian;
+    BOOL         sameGuardianIsOK;
 	id  		 objectLink;
 	NSRect		 localFrame;
 	ORConnector* connector;
@@ -80,6 +81,7 @@
 - (id)          connectedObject;
 - (id) 			guardian;
 - (void) 		setGuardian: (id)aGuardian;
+- (void) 		setSameGuardianIsOK: (BOOL)aFlag;
 - (id) 			objectLink;
 - (void) 		setObjectLink: (id)anObject;
 - (NSColor*) 	lineColor;
