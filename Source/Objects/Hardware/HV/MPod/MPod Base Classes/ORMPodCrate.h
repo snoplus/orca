@@ -20,7 +20,39 @@
 
 #import "ORCrate.h"
 
-@interface ORMPodCrate : ORCrate {
+@interface ORMPodCrate : ORCrate
+{
+	BOOL polledOnce;
+    NSMutableDictionary* hvConstraints;
 }
 
+#pragma mark •••Initialization
+- (void) makeConnectors;
+- (void) connected;
+- (void) disconnected;
+
+#pragma mark •••Accessors
+- (NSString*) adapterArchiveKey;
+- (NSString*) crateAdapterConnectorKey;
+- (int) numberChannelsWithNonZeroVoltage;
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers;
+- (void) powerFailed:(NSNotification*)aNotification;
+- (void) powerRestored:(NSNotification*)aNotification;
+
+#pragma mark •••All card cmds
+- (void) panicAllChannels;
+
+#pragma mark •••Constraints
+- (void) addHvConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeHvConstraint:(NSString*)aName;
+- (NSDictionary*)hvConstraints;
 @end
+
+@interface ORMPodCrate (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+@end
+
+extern NSString* ORMPodCrateConstraintsChanged;

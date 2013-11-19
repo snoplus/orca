@@ -26,17 +26,19 @@
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORSNMP.h"
+#import "ORMPodCrate.h"
 
 NSString* ORiSegHVCardShipRecordsChanged		= @"ORiSegHVCardShipRecordsChanged";
-NSString* ORiSegHVCardMaxCurrentChanged		= @"ORiSegHVCardMaxCurrentChanged";
+NSString* ORiSegHVCardMaxCurrentChanged         = @"ORiSegHVCardMaxCurrentChanged";
 NSString* ORiSegHVCardSelectedChannelChanged	= @"ORiSegHVCardSelectedChannelChanged";
 NSString* ORiSegHVCardSettingsLock				= @"ORiSegHVCardSettingsLock";
-NSString* ORiSegHVCardHwGoalChanged			= @"ORiSegHVCardHwGoalChanged";
-NSString* ORiSegHVCardTargetChanged			= @"ORiSegHVCardTargetChanged";
+NSString* ORiSegHVCardHwGoalChanged             = @"ORiSegHVCardHwGoalChanged";
+NSString* ORiSegHVCardTargetChanged             = @"ORiSegHVCardTargetChanged";
 NSString* ORiSegHVCardCurrentChanged			= @"ORiSegHVCardCurrentChanged";
 NSString* ORiSegHVCardOutputSwitchChanged		= @"ORiSegHVCardOutputSwitchChanged";
 NSString* ORiSegHVCardRiseRateChanged			= @"ORiSegHVCardRiseRateChanged";
-NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParamsChanged";
+NSString* ORiSegHVCardChannelReadParamsChanged  = @"ORiSegHVCardChannelReadParamsChanged";
+NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountChanged";
 
 @implementation ORiSegHVCard
 
@@ -88,6 +90,47 @@ NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParams
 
 
 #pragma mark ***Accessors
+- (id)	adapter
+{
+	id anAdapter = [guardian adapter];
+	if(anAdapter)return anAdapter;
+	else {
+		NSLogColor([NSColor redColor],@"You must place a MPod adaptor card into the crate.\n");
+		//[NSException raise:@"No adapter" format:@"You must place a MPod adaptor card into the crate."];
+	}
+	return nil;
+}
+
+- (unsigned long)   exceptionCount
+{
+    return exceptionCount;
+}
+
+- (void)clearExceptionCount
+{
+    exceptionCount = 0;
+    
+	[[NSNotificationCenter defaultCenter]
+     postNotificationName:ORiSegHVCardExceptionCountChanged
+     object:self];
+    
+}
+
+- (void)incExceptionCount
+{
+    ++exceptionCount;
+    
+	[[NSNotificationCenter defaultCenter]
+     postNotificationName:ORiSegHVCardExceptionCountChanged
+     object:self];
+}
+- (NSMutableDictionary*) rdParams:(int)i
+{
+    if(i>=0 && i<[self numberOfChannels]){
+        return rdParams[i];
+    }
+    else return nil;
+}
 
 - (BOOL) shipRecords
 {
@@ -663,14 +706,20 @@ NSString* ORiSegHVCardChannelReadParamsChanged = @"ORiSegHVCardChannelReadParams
 	}
 }
 
+- (BOOL) constraintsInPlace
+{
+    return [[(ORMPodCrate*)[self crate] hvConstraints] count] != 0;
+}
 
 #pragma mark ¥¥¥Hardware Access
 - (void) loadAllValues
 {
-	[self commitTargetsToHwGoals];
-	[self writeRiseTime];
-	[self writeMaxCurrents];
-	[self writeVoltages];
+    if([[(ORMPodCrate*)[self crate] hvConstraints] count] == 0){
+        [self commitTargetsToHwGoals];
+        [self writeRiseTime];
+        [self writeMaxCurrents];
+        [self writeVoltages];
+    }
 }
 
 - (void) writeVoltages

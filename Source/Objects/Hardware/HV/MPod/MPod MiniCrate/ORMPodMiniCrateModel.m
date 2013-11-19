@@ -19,15 +19,10 @@
 //-------------------------------------------------------------
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodMiniCrateModel.h"
-#import "ORMPodCard.h"
 
 @implementation ORMPodMiniCrateModel
 
 #pragma mark ¥¥¥initialization
-- (void) makeConnectors
-{	
-}
-
 - (void) setUpImage
 {
     //---------------------------------------------------------------------------------------------------
@@ -45,6 +40,11 @@
                                                                      [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
                                                                      nil]] autorelease]; 
         [s drawAtPoint:NSMakePoint(90,0)];
+    }
+    
+    if([[self hvConstraints] count]){
+        NSImage* constraintImage = [NSImage imageNamed:@"smallLock"];
+        [constraintImage drawAtPoint:NSMakePoint([[self image] size].width/2 - [constraintImage size].width/2,35) fromRect:[constraintImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
     
     if([[self orcaObjects] count]){
@@ -79,132 +79,9 @@
 {
 	return @"MPod/MiniCrate.html";
 }
-
-- (void) connected
-{
-	[[self orcaObjects] makeObjectsPerformSelector:@selector(connected)];
-}
-
-- (void) disconnected
-{
-	[[self orcaObjects] makeObjectsPerformSelector:@selector(disconnected)];
-}
-
-#pragma mark ¥¥¥Accessors
-- (NSString*) adapterArchiveKey
-{
-	return @"MPod Adapter";
-}
-
-- (NSString*) crateAdapterConnectorKey
-{
-	return @"MPod Crate Adapter Connector";
-}
-
-- (void) setAdapter:(id)anAdapter
-{
-	[super setAdapter:anAdapter];
-}
-
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
-	[super registerNotificationObservers];
-	   
-    [notifyCenter addObserver : self
-                     selector : @selector(viewChanged:)
-                         name : ORMPodCardSlotChangedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(powerFailed:)
-                         name : @"MPodPowerFailedNotification"
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(powerRestored:)
-                         name : @"MPodPowerRestoredNotification"
-                       object : nil];
-}
-
-- (id) controllerCard
-{
-	return adapter;
-}
-
-
-- (void) pollCratePower
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCratePower) object:nil];
-    @try {
-        if(polledOnce)[[self controllerCard] checkCratePower];
-		polledOnce = YES;
-    }
-	@catch(NSException* localException) {
-    }
-    [self performSelector:@selector(pollCratePower) withObject:nil afterDelay:1];
-}
-
-- (void) powerFailed:(NSNotification*)aNotification
-{
-    if([aNotification object] == [self controllerCard]){
-        [self setPowerOff:YES];
-		if(!cratePowerAlarm){
-			cratePowerAlarm = [[ORAlarm alloc] initWithName:@"No MPod Communication" severity:0];
-			[cratePowerAlarm setSticky:YES];
-			[cratePowerAlarm setHelpStringFromFile:@"NoMPodCratePowerHelp"];
-			[cratePowerAlarm postAlarm];
-		} 
-    }
-}
-
-- (void) powerRestored:(NSNotification*)aNotification
-{
-    if([aNotification object] == [self controllerCard]){
-        [self setPowerOff:NO];
-		[cratePowerAlarm clearAlarm];
-		[cratePowerAlarm release];
-		cratePowerAlarm = nil;
-    }
-}
 @end
 
 
 @implementation ORMPodMiniCrateModel (OROrderedObjHolding)
-- (int) slotAtPoint:(NSPoint)aPoint 
-{
-	//fist slot is special and half width
-	if(aPoint.x<15)	return 0;
-	else			return floor(((int)aPoint.x - 15)/[self objWidth]) + 1;
-}
-
-- (NSPoint) pointForSlot:(int)aSlot 
-{
-	if(aSlot==0) return NSMakePoint(0,0);
-	else		 return NSMakePoint((aSlot-1)*[self objWidth] + 15,0);
-}
-
-
-- (NSRange) legalSlotsForObj:(id)anObj
-{
-	if( [anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")]){
-		return NSMakeRange(0,1);
-	}
-	else {
-		return  NSMakeRange(1,[self maxNumberOfObjects]);
-	}
-}
-
-- (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
-{ 
-	if(![anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")] && (aSlot==0)){
-		return YES;
-	}
-	else return NO;
-}
-
 - (int) maxNumberOfObjects	{ return 5; }
-- (int) objWidth			{ return 30; }
 @end

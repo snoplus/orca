@@ -26,6 +26,7 @@
 #import "ORTimeRate.h"
 #import "ORTimeLinePlot.h"
 #import "ORTimedTextField.h"
+#import "ORMPodCrate.h"
 
 @interface ORiSegHVCardController (private)
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
@@ -171,7 +172,12 @@
                      selector : @selector(timeoutHappened:)
                          name : @"Timeout"
 						object: nil];
-	
+    
+	[notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORMPodCrateConstraintsChanged
+						object: [model guardian]];
+
 }
 
 - (void) updateWindow
@@ -187,9 +193,21 @@
 	[self selectedChannelChanged:nil];
 	[self maxCurrentChanged:nil];
 	[self shipRecordsChanged:nil];
+	[self constraintsChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) constraintsChanged:(NSNotification*)aNote
+{
+	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+    ORMPodCrate* theCrate = (ORMPodCrate*)[model guardian];
+	if([[theCrate hvConstraints] count]){
+		[hvConstraintImage setImage:smallLockImage];
+	}
+	else [hvConstraintImage setImage:nil];
+}
+
 - (void) timeoutHappened:(NSNotification*)aNote
 {
 	if([aNote object] ==model || [aNote object]==[model adapter])[timeoutField setStringValue:@"Timeout -- Cmds Flushed!"];
@@ -332,6 +350,7 @@
 	float voltage	= [model channel:selectedChannel readParamAsFloat:@"outputMeasurementSenseVoltage"];
 	//float hwGoal	= [model hwGoal:selectedChannel];
 	//float voltDiff  = fabs(voltage - hwGoal);
+    BOOL constrainstsInPlace = [model constraintsInPlace];
 	BOOL cratePower = YES;
 	if([[model adapter] respondsToSelector:@selector(power)])cratePower = [[model adapter] power];
 	if(cratePower){ 
@@ -371,7 +390,7 @@
 			if([model voltage:selectedChannel]<10 && ![model channelIsRamping:selectedChannel]) [powerOffButton setEnabled:YES];
 			else [powerOffButton setEnabled:NO];
 			[panicButton setEnabled:YES];
-			[loadButton setEnabled:YES];
+			[loadButton setEnabled:!constrainstsInPlace];
 			[stopRampButton setEnabled:[model channelIsRamping:selectedChannel]];
 			[rampToZeroButton setEnabled:voltage > 0];
 			[stateField setStringValue:@"ON"];

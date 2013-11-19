@@ -21,29 +21,18 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORMPodCrate.h"
 
-@interface ORMPodMiniCrateModel : ORMPodCrate   {
-	BOOL polledOnce;
+@interface ORMPodMiniCrateModel : ORMPodCrate
+{
 }
 
-- (void) makeConnectors;
+#pragma mark ¥¥¥Initialization
 - (void) setUpImage;
 - (void) makeMainController;
-- (void) connected;
-- (void) disconnected;
 
-#pragma mark ¥¥¥Accessors
-- (NSString*) adapterArchiveKey;
-- (NSString*) crateAdapterConnectorKey;
-
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
-- (void) powerFailed:(NSNotification*)aNotification;
-- (void) powerRestored:(NSNotification*)aNotification;
 @end
 
 @interface ORMPodMiniCrateModel (OROrderedObjHolding)
 - (int) maxNumberOfObjects;
-- (int) objWidth;
 @end
 
 

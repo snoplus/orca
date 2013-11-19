@@ -105,6 +105,10 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 }
 
 #pragma mark ***Accessors
+- (NSMutableDictionary*) systemParams
+{
+    return systemParams;
+}
 
 - (BOOL) verbose
 {

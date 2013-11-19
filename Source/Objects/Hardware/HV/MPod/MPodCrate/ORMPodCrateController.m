@@ -1,6 +1,6 @@
 
 //
-//  ORMPodAdapterModel.h
+//  ORMPodCrateController.m
 //  Orca
 //
 //  Created by Mark Howe on Thurs Jan 6,2011
@@ -33,7 +33,7 @@
 
 - (void) setCrateTitle
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"MPod Minicrate %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MPod Crate %lu",[model uniqueIdNumber]]];
 }
 
 #pragma mark •••Notifications
@@ -52,11 +52,26 @@
                      selector : @selector(powerRestored:)
                          name : @"MPodPowerRestoredNotification"
                        object : nil];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORMPodCrateConstraintsChanged
+						object: model];
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
+	[self constraintsChanged:nil];
+}
+
+- (void) constraintsChanged:(NSNotification*)aNote
+{
+	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+	if([[model hvConstraints] count]){
+		[hvConstraintImage setImage:smallLockImage];
+	}
+	else [hvConstraintImage setImage:nil];
 }
 
 @end

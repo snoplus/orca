@@ -21,16 +21,13 @@
 
 #pragma mark ¥¥¥Imported Files
 
-#import "ORCrateController.h"
+#import "ORMPodCrateController.h"
 
-@interface ORMPodMiniCrateController : ORCrateController
+@interface ORMPodMiniCrateController : ORMPodCrateController
 {
 }
 
 #pragma mark ¥¥¥Initialization
 - (id) init;
-- (void) updateWindow;
-
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
+- (void) setCrateTitle;
 @end

@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ¥¥¥Imported Files
-#import "ORMPodHVCard.h"
+#import "ORMPodCard.h"
 #import "ORHWWizard.h"
 
 @class ORTimeRate;
@@ -57,9 +57,10 @@ enum {
 
 #define kiSegHVCardProblemMask (outputFailureMaxTerminalVoltageMask | outputFailureMaxCurrentMask | outputFailureMaxTemperatureMask | outputFailureMaxPowerMask | outputFailureTimeoutMask | outputCurrentLimitedMask)
 
-@interface ORiSegHVCard : ORMPodHVCard <ORHWWizard>
+@interface ORiSegHVCard : ORMPodCard <ORHWWizard>
 {
   @protected
+    unsigned long	exceptionCount;
 	unsigned long   dataId;
     short			hwGoal[16];		//value to send to hw
     short			target[16];		//input by user
@@ -81,6 +82,10 @@ enum {
 - (BOOL) polarity;
 
 #pragma mark ***Accessors
+- (id)				adapter;
+- (unsigned long)   exceptionCount;
+- (void)			incExceptionCount;
+- (void)			clearExceptionCount;
 - (NSString*) settingsLock;
 - (NSString*) name;
 - (BOOL)	shipRecords;
@@ -115,6 +120,8 @@ enum {
 - (unsigned long) failureEvents;
 - (BOOL) channelInBounds:(short)aChan;
 - (BOOL) isOn:(short)aChannel;
+- (NSMutableDictionary*) rdParams:(int)i;
+- (BOOL) constraintsInPlace;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
@@ -199,3 +206,4 @@ extern NSString* ORiSegHVCardCurrentChanged;
 extern NSString* ORiSegHVCardSettingsLock;
 extern NSString* ORiSegHVCardOutputSwitchChanged;
 extern NSString* ORiSegHVCardChannelReadParamsChanged;
+extern NSString* ORiSegHVCardExceptionCountChanged;

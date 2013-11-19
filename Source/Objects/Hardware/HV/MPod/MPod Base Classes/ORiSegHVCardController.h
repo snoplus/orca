@@ -38,6 +38,7 @@
 	IBOutlet NSTextField*   temperatureField;
 	IBOutlet NSTextField*   slotField;
 	IBOutlet NSTextField*	hwGoalField;
+	IBOutlet NSImageView*   hvConstraintImage;
 	
 	//details 
 	IBOutlet NSTextField*	targetField;
@@ -64,15 +65,15 @@
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
 	IBOutlet ORTimedTextField*    timeoutField;
-	
+    
 	BOOL scheduledForUpdate;
 }
 
+#pragma mark •••Interface Management
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) updateButtons;
-
-#pragma mark •••Interface Management
+- (void) constraintsChanged:(NSNotification*)aNote;
 - (void) timeoutHappened:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) maxCurrentChanged:(NSNotification*)aNote;

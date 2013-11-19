@@ -1,5 +1,5 @@
 //
-//  ORMPodAdapterModel.h
+//  ORMPodCrateController.h
 //  Orca
 //
 //  Created by Mark Howe on Thurs Jan 6,2011
@@ -25,6 +25,7 @@
 
 @interface ORMPodCrateController : ORCrateController
 {
+	IBOutlet NSImageView*   hvConstraintImage;
 }
 
 #pragma mark •••Initialization
@@ -33,4 +34,5 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) constraintsChanged:(NSNotification*)aNote;
 @end

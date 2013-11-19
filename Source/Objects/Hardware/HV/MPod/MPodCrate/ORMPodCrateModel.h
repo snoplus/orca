@@ -1,5 +1,5 @@
 //
-//  ORPxiAdapterModel.h
+//  ORMPodCrate.h
 //  Orca
 //
 //  Created by Mark Howe on Thurs Jan 6,2011
@@ -22,28 +22,11 @@
 #import "ORMPodCrate.h"
 
 @interface ORMPodCrateModel : ORMPodCrate   {
-	BOOL polledOnce;
 }
 
-- (void) makeConnectors;
+#pragma mark •••Initialization
 - (void) setUpImage;
 - (void) makeMainController;
-- (void) connected;
-- (void) disconnected;
-
-#pragma mark •••Accessors
-- (NSString*) adapterArchiveKey;
-- (NSString*) crateAdapterConnectorKey;
-
-#pragma mark •••Notifications
-- (void) registerNotificationObservers;
-- (void) powerFailed:(NSNotification*)aNotification;
-- (void) powerRestored:(NSNotification*)aNotification;
-@end
-
-@interface ORMPodCrateModel (OROrderedObjHolding)
-- (int) maxNumberOfObjects;
-- (int) objWidth;
 @end
 
 
