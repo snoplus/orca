@@ -223,6 +223,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) dealloc 
 {
     [spiConnector release];
+    [linkConnector release];
     [mainFPGADownLoadState release];
     [fpgaFilePath release];
     [waveFormRateGroup release];
@@ -267,6 +268,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[spiConnector setConnectorType: 'SPIO' ];
 	[spiConnector addRestrictedConnectionType: 'SPII' ]; //can only connect to SPI inputs
 	[spiConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
+
+    [self setLinkConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
+    
+    [linkConnector setSameGuardianIsOK:YES];
+	[linkConnector setConnectorImageType:kSmallDot];
+	[linkConnector setConnectorType: 'LNKI' ];
+	[linkConnector addRestrictedConnectionType: 'LNKO' ]; //can only connect to Link inputs
+	[linkConnector setOffColor:[NSColor colorWithCalibratedRed:1 green:1 blue:.3 alpha:1.]];
 }
 
 - (void) setSlot:(int)aSlot
@@ -283,10 +292,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) positionConnector:(ORConnector*)aConnector
 {
     NSRect aFrame = [aConnector localFrame];
-    float x =  17 + [self slot] * 16*.62 ;
-    float y =  75;
-    aFrame.origin = NSMakePoint(x,y);
-    [aConnector setLocalFrame:aFrame];
+    if(aConnector == spiConnector){
+        float x =  17 + [self slot] * 16*.62 ;
+        float y =  75;
+        aFrame.origin = NSMakePoint(x,y);
+        [aConnector setLocalFrame:aFrame];
+    }
+    else if(aConnector == linkConnector){
+        float x =  17 + [self slot] * 16*.62 ;
+        float y =  100;
+        aFrame.origin = NSMakePoint(x,y);
+        [aConnector setLocalFrame:aFrame];
+    }
 }
 
 
@@ -298,29 +315,44 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
     if(oldGuardian != aGuardian){
         [oldGuardian removeDisplayOf:spiConnector];
+        [oldGuardian removeDisplayOf:linkConnector];
     }
 	
     [aGuardian assumeDisplayOf:spiConnector];
+    [aGuardian assumeDisplayOf:linkConnector];
     [self guardian:aGuardian positionConnectorsForCard:self];
 }
 
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
 {
     [aGuardian positionConnector:spiConnector forCard:self];
+    [aGuardian positionConnector:linkConnector forCard:self];
 }
 
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian
 {
     [aGuardian removeDisplayOf:spiConnector];
+    [aGuardian removeDisplayOf:linkConnector];
 }
 
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian
 {
     [aGuardian assumeDisplayOf:spiConnector];
+    [aGuardian assumeDisplayOf:linkConnector];
 }
 
 #pragma mark ***Accessors
+- (ORConnector*) linkConnector
+{
+    return linkConnector;
+}
 
+- (void) setLinkConnector:(ORConnector*)aConnector
+{
+    [aConnector retain];
+    [linkConnector release];
+    linkConnector = aConnector;
+}
 - (int) ccLowRes
 {
     return ccLowRes;
@@ -2305,6 +2337,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setExternalWindow:            [decoder decodeIntForKey:@"externalWindow"]];
     [self setClockSource:               [decoder decodeIntForKey:@"clockSource"]];
     [self setSpiConnector:              [decoder decodeObjectForKey:@"spiConnector"]];
+    [self setLinkConnector:             [decoder decodeObjectForKey:@"linkConnector"]];
     [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
     [self setRegisterIndex:				[decoder decodeIntForKey:@"registerIndex"]];
     [self setRegisterWriteValue:		[decoder decodeInt32ForKey:@"registerWriteValue"]];
@@ -2364,6 +2397,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt:externalWindow               forKey:@"externalWindow"];
     [encoder encodeInt:clockSource                  forKey:@"clockSource"];
     [encoder encodeObject:spiConnector				forKey:@"spiConnector"];
+    [encoder encodeObject:linkConnector				forKey:@"linkConnector"];
     [encoder encodeInt:downSample					forKey:@"downSample"];
     [encoder encodeInt:registerIndex				forKey:@"registerIndex"];
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];

@@ -254,6 +254,7 @@ enum Gretina4MFIFOStates {
     unsigned long spiWriteValue;
 	
 	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
+	ORConnector*  linkConnector; //we won't draw this connector so we have to keep a reference to it
 
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
@@ -286,6 +287,8 @@ enum Gretina4MFIFOStates {
 - (void) setClockSource:(short)aClockMux;
 - (ORConnector*) spiConnector;
 - (void) setSpiConnector:(ORConnector*)aConnector;
+- (ORConnector*) linkConnector;
+- (void) setLinkConnector:(ORConnector*)aConnector;
 - (short) downSample;
 - (void) setDownSample:(short)aDownSample;
 - (short) registerIndex;
