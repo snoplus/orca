@@ -241,6 +241,7 @@ enum Gretina4FIFOStates {
     unsigned long spiWriteValue;
 	
 	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
+	ORConnector*  linkConnector; //we won't draw this connector so we have to keep a reference to it
 
 }
 
@@ -253,6 +254,8 @@ enum Gretina4FIFOStates {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (ORConnector*) linkConnector;
+- (void) setLinkConnector:(ORConnector*)aConnector;
 - (ORConnector*) spiConnector;
 - (void) setSpiConnector:(ORConnector*)aConnector;
 - (int) downSample;
