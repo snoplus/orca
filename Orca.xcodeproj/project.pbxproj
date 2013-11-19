@@ -276,6 +276,12 @@
 		8402B5B614C708A1007999C1 /* ORMJDPreAmpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402B5B014C708A1007999C1 /* ORMJDPreAmpController.m */; };
 		8402B5B714C708A1007999C1 /* ORMJDPreAmpModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8402B5B114C708A1007999C1 /* ORMJDPreAmpModel.h */; };
 		8402B5B814C708A1007999C1 /* ORMJDPreAmpModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8402B5B214C708A1007999C1 /* ORMJDPreAmpModel.m */; };
+		840463C1183515AC00F69B23 /* GretinaTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840463B9183515AC00F69B23 /* GretinaTrigger.nib */; };
+		840463C3183515AC00F69B23 /* ORGretinaTriggerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */; };
+		840463C4183515AC00F69B23 /* ORGretinaTriggerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */; };
+		840463C7183515AC00F69B23 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840463BF183515AC00F69B23 /* ORGretinaTriggerModel.h */; };
+		840463C8183515AC00F69B23 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840463C0183515AC00F69B23 /* ORGretinaTriggerModel.m */; };
+		840463CA183515FF00F69B23 /* GretinaTrigger.gif in Resources */ = {isa = PBXBuildFile; fileRef = 840463C9183515FF00F69B23 /* GretinaTrigger.gif */; };
 		84052A2C13106B65007607A4 /* CouchDB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2613106B65007607A4 /* CouchDB.nib */; };
 		84052A2D13106B65007607A4 /* CouchDB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2713106B65007607A4 /* CouchDB.tif */; };
 		84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84052A2813106B65007607A4 /* ORCouchDBController.h */; };
@@ -1471,9 +1477,7 @@
 		8472AA7412DB44B400DEEB02 /* ORMPodCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5612DB44B400DEEB02 /* ORMPodCard.m */; };
 		8472AA7512DB44B400DEEB02 /* ORMPodCrate.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5712DB44B400DEEB02 /* ORMPodCrate.h */; };
 		8472AA7612DB44B400DEEB02 /* ORMPodCrate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5812DB44B400DEEB02 /* ORMPodCrate.m */; };
-		8472AA7712DB44B400DEEB02 /* ORMPodHVCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */; };
 		8472AA7812DB44B400DEEB02 /* ORMPodProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */; };
-		8472AA7912DB44B400DEEB02 /* ORMPodHVCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */; };
 		8472AA7A12DB44B400DEEB02 /* MPodC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8472AA5D12DB44B400DEEB02 /* MPodC.nib */; };
 		8472AA7B12DB44B400DEEB02 /* MPodC.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8472AA5E12DB44B400DEEB02 /* MPodC.tif */; };
 		8472AA7C12DB44B400DEEB02 /* ORMPodCController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AA5F12DB44B400DEEB02 /* ORMPodCController.h */; };
@@ -3573,6 +3577,12 @@
 		840340270427CEEA005F64B1 /* ORDataSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataSet.m; sourceTree = "<group>"; };
 		8403F4A50508F1BE005F64B1 /* ORGenericView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGenericView.h; path = Source/Misc/ORGenericView.h; sourceTree = SOURCE_ROOT; };
 		8403F4A60508F1BE005F64B1 /* ORGenericView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGenericView.m; path = Source/Misc/ORGenericView.m; sourceTree = SOURCE_ROOT; };
+		840463B9183515AC00F69B23 /* GretinaTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = GretinaTrigger.nib; sourceTree = "<group>"; };
+		840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerController.h; sourceTree = "<group>"; };
+		840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerController.m; sourceTree = "<group>"; };
+		840463BF183515AC00F69B23 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
+		840463C0183515AC00F69B23 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
+		840463C9183515FF00F69B23 /* GretinaTrigger.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = GretinaTrigger.gif; sourceTree = "<group>"; };
 		84052A2613106B65007607A4 /* CouchDB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CouchDB.nib; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.nib"; sourceTree = SOURCE_ROOT; };
 		84052A2713106B65007607A4 /* CouchDB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CouchDB.tif; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.tif"; sourceTree = SOURCE_ROOT; };
 		84052A2813106B65007607A4 /* ORCouchDBController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCouchDBController.h; path = "Source/Objects/Misc Objects/CouchDB/ORCouchDBController.h"; sourceTree = SOURCE_ROOT; };
@@ -4548,9 +4558,7 @@
 		8472AA5612DB44B400DEEB02 /* ORMPodCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMPodCard.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCard.m"; sourceTree = SOURCE_ROOT; };
 		8472AA5712DB44B400DEEB02 /* ORMPodCrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodCrate.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCrate.h"; sourceTree = SOURCE_ROOT; };
 		8472AA5812DB44B400DEEB02 /* ORMPodCrate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMPodCrate.m; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodCrate.m"; sourceTree = SOURCE_ROOT; };
-		8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodHVCard.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodHVCard.h"; sourceTree = SOURCE_ROOT; };
 		8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodProtocol.h; path = "Source/Objects/Hardware/HV/MPod/MPod Base Classes/ORMPodProtocol.h"; sourceTree = SOURCE_ROOT; };
-		8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMPodHVCard.m; sourceTree = "<group>"; };
 		8472AA5D12DB44B400DEEB02 /* MPodC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MPodC.nib; path = "Source/Objects/Hardware/HV/MPod/MPod Controller/MPodC.nib"; sourceTree = SOURCE_ROOT; };
 		8472AA5E12DB44B400DEEB02 /* MPodC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MPodC.tif; path = "Source/Objects/Hardware/HV/MPod/MPod Controller/MPodC.tif"; sourceTree = SOURCE_ROOT; };
 		8472AA5F12DB44B400DEEB02 /* ORMPodCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMPodCController.h; path = "Source/Objects/Hardware/HV/MPod/MPod Controller/ORMPodCController.h"; sourceTree = SOURCE_ROOT; };
@@ -6798,6 +6806,19 @@
 			name = MJDPreAmp;
 			path = "Source/Objects/Custom Hardware/Majorana Hardware/MJDPreAmp";
 			sourceTree = SOURCE_ROOT;
+		};
+		840463B8183515AC00F69B23 /* GretinaTrigger */ = {
+			isa = PBXGroup;
+			children = (
+				840463B9183515AC00F69B23 /* GretinaTrigger.nib */,
+				840463C9183515FF00F69B23 /* GretinaTrigger.gif */,
+				840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */,
+				840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */,
+				840463BF183515AC00F69B23 /* ORGretinaTriggerModel.h */,
+				840463C0183515AC00F69B23 /* ORGretinaTriggerModel.m */,
+			);
+			path = GretinaTrigger;
+			sourceTree = "<group>";
 		};
 		8405283D13102C96007607A4 /* CouchDB */ = {
 			isa = PBXGroup;
@@ -9083,8 +9104,6 @@
 				8472AA5712DB44B400DEEB02 /* ORMPodCrate.h */,
 				8472AA5812DB44B400DEEB02 /* ORMPodCrate.m */,
 				8472AA5A12DB44B400DEEB02 /* ORMPodProtocol.h */,
-				8472AA5912DB44B400DEEB02 /* ORMPodHVCard.h */,
-				8472AA5B12DB44B400DEEB02 /* ORMPodHVCard.m */,
 				84997893174BA2F500BFEE3E /* ORiSegHVCard.h */,
 				84997894174BA2F500BFEE3E /* ORiSegHVCard.m */,
 				8457D25312F9986E00D3E3B4 /* ORiSegHVCardController.h */,
@@ -13121,6 +13140,7 @@
 				845115E104030088005F64B1 /* IPCarrier */,
 				84DF49FF162DCE6B00261144 /* Gretina4M */,
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
+				840463B8183515AC00F69B23 /* GretinaTrigger */,
 				844445FE0E815C0D00A1440D /* XYCom */,
 				84E2063C11AD7841007D757F /* SIS3800 */,
 				8457BE2C11B0183500C4082D /* SIS3820 */,
@@ -13418,6 +13438,7 @@
 				8434A21C055B3287002D3102 /* NcdModel.h in Headers */,
 				8434A21D055B3287002D3102 /* ORRate.h in Headers */,
 				8434A21E055B3287002D3102 /* ORRateGroup.h in Headers */,
+				840463C3183515AC00F69B23 /* ORGretinaTriggerController.h in Headers */,
 				8434A21F055B3287002D3102 /* ORValueBar.h in Headers */,
 				8434A220055B3287002D3102 /* ORDataPacket.h in Headers */,
 				8434A221055B3287002D3102 /* NcdDetector.h in Headers */,
@@ -13425,6 +13446,7 @@
 				8434A223055B3287002D3102 /* TubeMapData.h in Headers */,
 				8434A224055B3287002D3102 /* ORGenericView.h in Headers */,
 				8434A227055B3287002D3102 /* ORTimeRate.h in Headers */,
+				840463C7183515AC00F69B23 /* ORGretinaTriggerModel.h in Headers */,
 				8434A228055B3287002D3102 /* MuxScopeMap.h in Headers */,
 				8434A229055B3287002D3102 /* ORCaenCardModel.h in Headers */,
 				8434A22A055B3287002D3102 /* ORCaenDataDecoder.h in Headers */,
@@ -14184,7 +14206,6 @@
 				8472AA7112DB44B400DEEB02 /* OREHQ8060nModel.h in Headers */,
 				8472AA7312DB44B400DEEB02 /* ORMPodCard.h in Headers */,
 				8472AA7512DB44B400DEEB02 /* ORMPodCrate.h in Headers */,
-				8472AA7712DB44B400DEEB02 /* ORMPodHVCard.h in Headers */,
 				8472AA7812DB44B400DEEB02 /* ORMPodProtocol.h in Headers */,
 				8472AA7C12DB44B400DEEB02 /* ORMPodCController.h in Headers */,
 				8472AA7E12DB44B400DEEB02 /* ORMPodCModel.h in Headers */,
@@ -14517,6 +14538,7 @@
 				8434A27B055B3287002D3102 /* Catalog.nib in Resources */,
 				8434A27D055B3287002D3102 /* DataFile.nib in Resources */,
 				8434A27E055B3287002D3102 /* eCPU147.gif in Resources */,
+				840463C1183515AC00F69B23 /* GretinaTrigger.nib in Resources */,
 				8434A27F055B3287002D3102 /* eCPU147.nib in Resources */,
 				8434A280055B3287002D3102 /* Trigger.nib in Resources */,
 				8434A282055B3287002D3102 /* 620Card.gif in Resources */,
@@ -14918,6 +14940,7 @@
 				84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */,
 				84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */,
 				84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */,
+				840463CA183515FF00F69B23 /* GretinaTrigger.gif in Resources */,
 				8491E6C60EB9DFD30084BAD6 /* XL1.nib in Resources */,
 				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
 				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
@@ -15580,6 +15603,7 @@
 				841DAAC507846CC20099BBF6 /* ORCamacControllerCard.m in Sources */,
 				84D9809A0795C5AC0074A035 /* ORAD811Model.m in Sources */,
 				84D9809C0795C5AC0074A035 /* ORAD811Controller.m in Sources */,
+				840463C8183515AC00F69B23 /* ORGretinaTriggerModel.m in Sources */,
 				84D980F60795DCC80074A035 /* ORAD811Decoders.m in Sources */,
 				84D98264079605CD0074A035 /* ORL2551Model.m in Sources */,
 				84D98266079605CD0074A035 /* ORL2551Decoders.m in Sources */,
@@ -16158,7 +16182,6 @@
 				8472AA7212DB44B400DEEB02 /* OREHQ8060nModel.m in Sources */,
 				8472AA7412DB44B400DEEB02 /* ORMPodCard.m in Sources */,
 				8472AA7612DB44B400DEEB02 /* ORMPodCrate.m in Sources */,
-				8472AA7912DB44B400DEEB02 /* ORMPodHVCard.m in Sources */,
 				8472AA7D12DB44B400DEEB02 /* ORMPodCController.m in Sources */,
 				8472AA7F12DB44B400DEEB02 /* ORMPodCModel.m in Sources */,
 				8472AA8412DB44B400DEEB02 /* ORMPodMiniCrateController.m in Sources */,
@@ -16180,6 +16203,7 @@
 				8494C0281316CEBA00151E7B /* ORBootBarModel.m in Sources */,
 				8494C1381317E2E200151E7B /* ORCouchDB.m in Sources */,
 				8494C13A1317E2E200151E7B /* ORSqlConnection.m in Sources */,
+				840463C4183515AC00F69B23 /* ORGretinaTriggerController.m in Sources */,
 				8494C13C1317E2E200151E7B /* ORSqlResult.m in Sources */,
 				EFEBD8931327588F00C96C86 /* ORXLGPSController.m in Sources */,
 				EFEBD8951327588F00C96C86 /* ORXLGPSModel.m in Sources */,
