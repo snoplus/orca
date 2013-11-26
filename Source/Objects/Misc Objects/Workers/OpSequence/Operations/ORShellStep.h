@@ -52,5 +52,8 @@
 
 - (void) pipeOutputInto:(ORShellStep*)destination;
 - (void) pipeErrorInto:(ORShellStep*) destination;
+- (void)taskComplete:(ORTaskHandler*)aTaskHandler;
+- (void)receiveOutputData:(NSData *)data fromTaskHandler:(ORTaskHandler *)handler;
+- (void)receiveErrorData:(NSData *)data fromTaskHandler:(ORTaskHandler *)handler;
 
 @end
