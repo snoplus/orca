@@ -28,6 +28,8 @@
 	NSInteger                   lastKnownStepIndex;
 }
 
+- (void) stepsChanged:(NSNotification*)aNote;
+
 - (IBAction)start:(id)sender;
 - (IBAction)cancel:(id)sender;
 - (NSArray*)steps;

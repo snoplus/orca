@@ -30,6 +30,9 @@
 - (void) remoteHostNameChanged:(NSNotification*)aNote;
 - (void) remotePortChanged:(NSNotification*)aNote;
 - (void) remoteSocketLockChanged:(NSNotification*)aNote;
+- (void)standardOutNotification: (NSNotification *) aNote;
+- (void)standardErrorNotification: (NSNotification *) aNote;
+- (void)terminatedNotification: (NSNotification *)aNote;
 
 #pragma mark •••Actions
 - (IBAction) remoteHostNameAction:(id)sender;

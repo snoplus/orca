@@ -62,6 +62,7 @@
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
 - (void) vetoMapLockChanged:(NSNotification*)aNote;
+- (void) groupChanged:(NSNotification*)aNote;
 
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;
