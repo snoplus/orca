@@ -57,4 +57,8 @@ typedef NSInteger TaskHandlerTerminationReason;
 - (void)launch;
 - (void)terminate;
 
+- (void)standardOutNotification: (NSNotification *) aNote;
+- (void)standardErrorNotification: (NSNotification *) aNote;
+- (void)terminatedNotification: (NSNotification *)aNote;
+
 @end
