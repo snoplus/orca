@@ -29,6 +29,7 @@
 }
 
 - (void) stepsChanged:(NSNotification*)aNote;
+- (void)updateProgressDisplay;
 
 - (IBAction)start:(id)sender;
 - (IBAction)cancel:(id)sender;
