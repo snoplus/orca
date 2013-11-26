@@ -30,13 +30,6 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 
 @implementation ORRemoteSocketModel
 #pragma mark ***Initialization
-- (id) init
-{
-	self=[super init];
- //   [[self undoManager] disableUndoRegistration];
-//    [[self undoManager] enableUndoRegistration];
-	return self;
-}
 
 - (void) dealloc
 {
@@ -60,6 +53,10 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 }
 
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"MajoranaModel")];
+}
 
 #pragma mark ***Accessors
 - (SimpleCocoaConnection*)c
@@ -76,7 +73,6 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 
 - (void) setNewHost:(NSString*)newHost andPort:(int)newPort
 {
-	if(isConnected) return;
 	[self setRemoteHost:newHost];
 	[self setRemotePort:newPort];
 }
@@ -102,7 +98,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 
 - (void) setRemoteHost:(NSString *)newHost
 {
-	if(isConnected)	return;
+    if([newHost isEqualToString:remoteHost])return;
 	if(newHost)	{	
 		[[[self undoManager] prepareWithInvocationTarget:self] setRemoteHost:remoteHost];
 		
@@ -121,6 +117,8 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 
 - (void) setRemotePort:(int)newPort
 {
+    if(newPort==0)newPort = 4667;
+    if(newPort == remotePort)return;
 	if(isConnected) return;
 	[[[self undoManager] prepareWithInvocationTarget:self] setRemotePort:remotePort];
 	remotePort = newPort;
@@ -157,11 +155,6 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 - (void) setDefaultStringEncoding:(NSStringEncoding)encoding
 {
 	defaultStringEncoding = encoding;
-}
-
-- (unsigned long) heartbeatCount
-{
-	return heartbeatCount;
 }
 
 #pragma mark Connecting
@@ -281,12 +274,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	}
 	else return nil;
 }
-- (void) incHeartbeat
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	heartbeatCount++;
-	[self performSelector:@selector(incHeartbeat) withObject:nil afterDelay:1];
-}
+
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -295,8 +283,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
     [[self undoManager] disableUndoRegistration];
     [self setRemoteHost:[decoder decodeObjectForKey:@"remoteHost"]];
     [self setRemotePort:[decoder decodeIntForKey:@"remotePort"]];
-	[self performSelector:@selector(incHeartbeat) withObject:nil afterDelay:1];
-    [[self undoManager] enableUndoRegistration];    
+    [[self undoManager] enableUndoRegistration];
     return self;
 }
 

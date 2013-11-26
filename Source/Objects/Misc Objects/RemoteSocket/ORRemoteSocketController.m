@@ -31,17 +31,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-    [super dealloc];
-}
-
--(void) awakeFromNib
-{
-	[super awakeFromNib];
-}
-
-
 #pragma mark •••Registration
 - (void) registerNotificationObservers
 {
@@ -57,12 +46,12 @@
     [notifyCenter addObserver : self
                      selector : @selector(remoteSocketLockChanged:)
                          name : ORRemoteSocketLock
-                       object : nil];
+                       object : model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(remotePortChanged:)
                          name : ORRSRemotePortChanged
-                       object : nil];
+                       object : model];
 	
 }
 
