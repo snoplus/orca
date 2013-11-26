@@ -22,11 +22,6 @@
 @interface ORCouchDBController : OrcaObjectController 
 {	
 	IBOutlet NSTextField* remoteHostNameField;
-	IBOutlet NSTextField* changedCountTextField;
-	IBOutlet NSTextField* processCountTextField;
-	IBOutlet NSTextField* sweepInProgressTextField;
-	IBOutlet NSTextField* betterNameTextField;
-	IBOutlet NSTextField* oldNameTextField;
 	IBOutlet NSTextField* replicationRunningTextField;
 	IBOutlet NSButton*	  keepHistoryCB;
 	IBOutlet NSTextField* userNameField;
@@ -40,18 +35,11 @@
 	IBOutlet NSTextField* dbHistorySizeField;
 	IBOutlet NSTextField* keepHistoryStatusField;
 	IBOutlet NSTextField* dbStatusField;
-	IBOutlet NSButton*	  renameButton;
-	IBOutlet NSButton*	  stopButton;
 
 	double queueCount;
 }
 
 #pragma mark ***Interface Management
-- (void) changedCountChanged:(NSNotification*)aNote;
-- (void) processCountChanged:(NSNotification*)aNote;
-- (void) sweepInProgressChanged:(NSNotification*)aNote;
-- (void) betterNameChanged:(NSNotification*)aNote;
-- (void) oldNameChanged:(NSNotification*)aNote;
 - (void) replicationRunningChanged:(NSNotification*)aNote;
 - (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
@@ -65,8 +53,6 @@
 - (void) dataBaseInfoChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) betterNameTextFieldAction:(id)sender;
-- (IBAction) oldNameTextFieldAction:(id)sender;
 - (IBAction) startReplicationAction:(id)sender;
 - (IBAction) createRemoteDBAction:(id)sender;
 - (IBAction) keepHistoryAction:(id)sender;
@@ -81,9 +67,6 @@
 - (IBAction) infoAction:(id)sender;
 - (IBAction) compactAction:(id)sender;
 - (IBAction) listTasks:(id)sender;
-- (IBAction) listDocumentsAction:(id)sender;
-- (IBAction) renameAction:(id)sender;
-- (IBAction) stopSweep:(id)sender;
 
 
 @end

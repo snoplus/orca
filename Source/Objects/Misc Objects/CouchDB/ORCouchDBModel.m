@@ -36,11 +36,6 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
-NSString* ORCouchDBModelChangedCountChanged = @"ORCouchDBModelChangedCountChanged";
-NSString* ORCouchDBModelProcessCountChanged = @"ORCouchDBModelProcessCountChanged";
-NSString* ORCouchDBModelSweepInProgressChanged	= @"ORCouchDBModelSweepInProgressChanged";
-NSString* ORCouchDBModelBetterNameChanged			= @"ORCouchDBModelBetterNameChanged";
-NSString* ORCouchDBModelOldNameChanged			= @"ORCouchDBModelOldNameChanged";
 NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationRunningChanged";
 NSString* ORCouchDBModelKeepHistoryChanged		= @"ORCouchDBModelKeepHistoryChanged";
 NSString* ORCouchDBModelStealthModeChanged		= @"ORCouchDBModelStealthModeChanged";
@@ -66,9 +61,6 @@ NSString* ORCouchDBLock							= @"ORCouchDBLock";
 #define kInfoInternalDB  @"kInfoInternalDB"
 #define kAttachmentAdded @"kAttachmentAdded"
 #define kInfoHistoryDB   @"kInfoHistoryDB"
-#define kListDocuments	 @"kListDocuments"
-#define kRenameAdc		 @"kRenameAdc"
-#define kAdcRenamed		 @"kAdcRenamed"
 
 #define kCouchDBPort 5984
 #define kUpdateStatsInterval 30
@@ -98,8 +90,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [betterName release];
-    [oldName release];
     [password release];
     [userName release];
     [remoteHostName release];
@@ -249,96 +239,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 }
 
 #pragma mark ***Accessors
-
-- (int) changedCount
-{
-    return changedCount;
-}
-
-- (void) setChangedCount:(int)aChangedCount
-{
-	changedCount = aChangedCount;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelChangedCountChanged object:self];
-}
-
-- (int) processCount
-{
-    return processCount;
-}
-
-- (void) setProcessCount:(int)aProcessCount
-{
-    processCount = aProcessCount;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelProcessCountChanged object:self];
-}
-
-- (void) cancelSweep
-{
-    cancelSweep = YES;
-}
-
-- (BOOL) sweepInProgress
-{
-    return sweepInProgress;
-}
-
-- (void) startingSweep
-{
-	[self setProcessCount:0];
-	[self setChangedCount:0];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-	[self setSweepInProgress:YES];
-}
-
-- (void) sweepDone
-{
-	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:5];
-	[self setSweepInProgress:NO];
-}
-
-- (void) incChangeCounter
-{
-	[self setChangedCount:changedCount+1];
-}
-
-- (void) setSweepInProgress:(BOOL)aSweepInProgress
-{
-	sweepInProgress = aSweepInProgress;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelSweepInProgressChanged object:self];
-}
-
-- (NSString*) betterName
-{
-    return betterName;
-}
-
-- (void) setBetterName:(NSString*)aBetterName
-{
-	if([aBetterName length]==0)aBetterName = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setBetterName:betterName];
-    
-    [betterName autorelease];
-    betterName = [aBetterName copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelBetterNameChanged object:self];
-}
-
-- (NSString*) oldName
-{
-    return oldName;
-}
-
-- (void) setOldName:(NSString*)aOldName
-{
- 	if([aOldName length]==0)aOldName = @"";
-   [[[self undoManager] prepareWithInvocationTarget:self] setOldName:oldName];
-    
-    [oldName autorelease];
-    oldName = [aOldName copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelOldNameChanged object:self];
-}
 
 - (BOOL) replicationRunning
 {
@@ -643,46 +543,45 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProcesses) object:nil];
-		if(!sweepInProgress){
-			NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
-			
-			NSMutableArray* arrayForDoc = [NSMutableArray array];
-			if([theProcesses count]){
-				for(id aProcess in theProcesses){
-					NSString* shortName     = [aProcess shortName];
-					
-					NSDate *localDate = [aProcess lastSampleTime];
-					
-					NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-					dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-					
-					NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-					[dateFormatter setTimeZone:gmt];
-					NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
-					NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
-					unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
-					[dateFormatter release];
-					
-					if(![lastTimeStamp length]) lastTimeStamp = @"0";
-					if(![shortName length]) shortName = @"Untitled";
-					
-					NSString* s = [aProcess report];
-					
-					NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-												 [aProcess fullID],@"name",
-												 shortName,@"title",
-												 lastTimeStamp,@"timestamp",
-												 [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-												 s,@"data",
-												 [NSNumber numberWithUnsignedLong:[aProcess processRunning]] ,@"state",
-												 nil];
-					[arrayForDoc addObject:processInfo];
-				}
-			}
-			
-			NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
-			[[self statusDBRef] updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
-		}
+        NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
+        
+        NSMutableArray* arrayForDoc = [NSMutableArray array];
+        if([theProcesses count]){
+            for(id aProcess in theProcesses){
+                NSString* shortName     = [aProcess shortName];
+                
+                NSDate *localDate = [aProcess lastSampleTime];
+                
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+                
+                NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+                [dateFormatter setTimeZone:gmt];
+                NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
+                NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+                unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+                [dateFormatter release];
+                
+                if(![lastTimeStamp length]) lastTimeStamp = @"0";
+                if(![shortName length]) shortName = @"Untitled";
+                
+                NSString* s = [aProcess report];
+                
+                NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [aProcess fullID],@"name",
+                                             shortName,@"title",
+                                             lastTimeStamp,@"timestamp",
+                                             [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                             s,@"data",
+                                             [NSNumber numberWithUnsignedLong:[aProcess processRunning]] ,@"state",
+                                             nil];
+                [arrayForDoc addObject:processInfo];
+            }
+        }
+        
+        NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
+        [[self statusDBRef] updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
+		
 		[self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];	
 	}
 }
@@ -747,44 +646,43 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	historyUpdateScheduled = NO;
 	if(!stealthMode && keepHistory){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateHistory) object:nil];
-		if(!sweepInProgress){
-			NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
-					
-			for(id aProcess in theProcesses){
-				if([aProcess processRunning]){
-					NSString* shortName     = [aProcess shortName];
-					NSDate *localDate = [aProcess lastSampleTime];
-					
-					NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-					dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-					
-					NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-					[dateFormatter setTimeZone:gmt];
-					NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
-					NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
-					unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
-					[dateFormatter release];
-					
-					
-					if(![lastTimeStamp length]) lastTimeStamp = @"0";
-					if(![shortName length]) shortName = @"Untitled";
-					
-					NSMutableDictionary* processDictionary = [aProcess processDictionary];
-					if([processDictionary count]){
-						
-						NSMutableDictionary* processInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-													[aProcess fullID],	@"name",
-													shortName,			@"title",
-													lastTimeStamp,		@"timestamp",
-													[NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-													nil];
-						
-						[processInfo addEntriesFromDictionary:processDictionary];
-						[[self historyDBRef] addDocument:processInfo tag:kDocumentAdded];
-					}
-				}
-			}
-		}
+        NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
+                
+        for(id aProcess in theProcesses){
+            if([aProcess processRunning]){
+                NSString* shortName     = [aProcess shortName];
+                NSDate *localDate = [aProcess lastSampleTime];
+                
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+                
+                NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+                [dateFormatter setTimeZone:gmt];
+                NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
+                NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+                unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+                [dateFormatter release];
+                
+                
+                if(![lastTimeStamp length]) lastTimeStamp = @"0";
+                if(![shortName length]) shortName = @"Untitled";
+                
+                NSMutableDictionary* processDictionary = [aProcess processDictionary];
+                if([processDictionary count]){
+                    
+                    NSMutableDictionary* processInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                [aProcess fullID],	@"name",
+                                                shortName,			@"title",
+                                                lastTimeStamp,		@"timestamp",
+                                                [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                                nil];
+                    
+                    [processInfo addEntriesFromDictionary:processDictionary];
+                    [[self historyDBRef] addDocument:processInfo tag:kDocumentAdded];
+                }
+            }
+        }
+		
 	}
 }
 
@@ -829,11 +727,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-		if(!sweepInProgress){
-			[[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
-			if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
-			[self getRemoteInfo:NO];
-		}
+        [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
+        if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
+        [self getRemoteInfo:NO];
 		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
 	}
 }
@@ -910,17 +806,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				}
 				else if([aTag isEqualToString:kInfoHistoryDB]){
 					[self performSelectorOnMainThread:@selector(setDBHistoryInfo:) withObject:aResult waitUntilDone:NO];
-				}
-				else if([aTag isEqualToString:kListDocuments]){
-					[self performSelectorOnMainThread:@selector(setDocuments:) withObject:aResult waitUntilDone:NO];
-				}
-				else if([aTag isEqualToString:kRenameAdc]){
-					if(cancelSweep)[anOp cancel];
-					else {
-						[self setProcessCount:processCount+1];
-						//[self performSelectorOnMainThread:@selector(renameAdc:) withObject:aResult waitUntilDone:YES];
-						[self renameAdc:aResult];
-					}
 				}
 				
 				else if([aTag isEqualToString:@"Message"]){
@@ -1019,32 +904,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) compactDatabase
 {
-	if(!sweepInProgress){
-        [[self statusDBRef]  compactDatabase:self tag:kCompactDB];
-        [[self historyDBRef] compactDatabase:self tag:kCompactDB];
-    }
+    [[self statusDBRef]  compactDatabase:self tag:kCompactDB];
+    [[self historyDBRef] compactDatabase:self tag:kCompactDB];
+    
 	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 }
 
 - (void) listDatabases
 {
 	[[self statusDBRef] listDatabases:self tag:kListDB];
-}
-
-- (void) listDocuments
-{
-	[[self historyDBRef] listDocuments:self tag:kListDocuments];
-}
-
-- (void) getEachDocForRenamingAdc
-{
-	cancelSweep = NO;
-	[[self historyDBRef] processEachDoc:self tag:kRenameAdc];
-}
-
-- (void) renameAdc:(id)aDoc
-{
-	[[self historyDBRef] renameDoc:aDoc adc:oldName to:betterName delegate:self tag:kAdcRenamed];
 }
 
 - (void) getRemoteInfo:(BOOL)verbose
@@ -1274,7 +1142,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) statusLogChanged:(NSNotification*)aNote
 {
 	if(!stealthMode){
-		if(!statusUpdateScheduled && !sweepInProgress){
+		if(!statusUpdateScheduled){
 			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
 			statusUpdateScheduled = YES;
 		}
@@ -1323,74 +1191,73 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
-		if(!sweepInProgress){
-			NSUInteger n = [ORCouchDBQueue operationCount];
-			if(n<10){
-                NSMutableArray* dataSetNames = [NSMutableArray array];
-				for(id aMonitor in dataMonitors){
-					NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
-                    NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
-					@try {
-                        
-                        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-                        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-                        
-                        NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-                        [dateFormatter setTimeZone:gmt];
-                        NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
-                        NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
-                        unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
-                        [dateFormatter release];
+        NSUInteger n = [ORCouchDBQueue operationCount];
+        if(n<10){
+            NSMutableArray* dataSetNames = [NSMutableArray array];
+            for(id aMonitor in dataMonitors){
+                NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
+                NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
+                @try {
+                    
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+                    
+                    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+                    [dateFormatter setTimeZone:gmt];
+                    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+                    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+                    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+                    [dateFormatter release];
 
-						for(OR1DHisto* aDataSet in objs1d){
-							unsigned long start,end;
-							NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
-                            NSString* dataSetName = [baseMonitorName stringByAppendingFormat:@",%@",[aDataSet fullName]];
-							NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                        dataSetName,                                                @"name",
-														[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
-                                                        [NSNumber numberWithUnsignedLong:start],					@"start",
-                                                        [NSNumber numberWithUnsignedLong:end],                      @"end",
-														[NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
-														s,															@"PlotData",
-                                                        lastTimeStamp,                                              @"timestamp",
-                                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                    for(OR1DHisto* aDataSet in objs1d){
+                        unsigned long start,end;
+                        NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
+                        NSString* dataSetName = [baseMonitorName stringByAppendingFormat:@",%@",[aDataSet fullName]];
+                        NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                    dataSetName,                                                @"name",
+                                                    [NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
+                                                    [NSNumber numberWithUnsignedLong:start],					@"start",
+                                                    [NSNumber numberWithUnsignedLong:end],                      @"end",
+                                                    [NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
+                                                    s,															@"PlotData",
+                                                    lastTimeStamp,                                              @"timestamp",
+                                                    [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
 
-														@"Histogram1D",												@"type",
-														 nil];
-							NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
-                            [dataSetNames addObject:
-                                [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
-                             ];
+                                                    @"Histogram1D",												@"type",
+                                                     nil];
+                        NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
+                        [dataSetNames addObject:
+                            [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
+                         ];
 
-							[[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
-							
-						}
+                        [[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
                         
-                        if([dataSetNames count]){
-  							NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                      @"HistogramCatalog",              @"name",
-                                                      dataSetNames,                     @"list",
-                                                      lastTimeStamp,                                            @"timestamp",
-                                                      [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-                                                      nil];
-                            
-							[[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentUpdated];
-                          
-                        }
-                        else {
-                            [[self statusDBRef] deleteDocumentId:@"HistogramCatalog" tag:kDocumentDeleted];
-                        }
+                    }
+                    
+                    if([dataSetNames count]){
+                        NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"HistogramCatalog",              @"name",
+                                                  dataSetNames,                     @"list",
+                                                  lastTimeStamp,                                            @"timestamp",
+                                                  [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                                  nil];
                         
-					}
-					@catch(NSException* e){
-					}
-					@finally {
-						[objs1d release];
-					}
-				}
-			}
-		}
+                        [[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentUpdated];
+                      
+                    }
+                    else {
+                        [[self statusDBRef] deleteDocumentId:@"HistogramCatalog" tag:kDocumentDeleted];
+                    }
+                    
+                }
+                @catch(NSException* e){
+                }
+                @finally {
+                    [objs1d release];
+                }
+            }
+        }
+		
 		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
 	}
 }
@@ -1400,8 +1267,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setBetterName:[decoder decodeObjectForKey:@"betterName"]];
-    [self setOldName:[decoder decodeObjectForKey:@"oldName"]];
     [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
@@ -1424,8 +1289,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:betterName forKey:@"betterName"];
-    [encoder encodeObject:oldName forKey:@"oldName"];
     [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeBool:stealthMode forKey:@"stealthMode"];
     [encoder encodeObject:password forKey:@"Password"];

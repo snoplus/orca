@@ -64,9 +64,6 @@
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 	
-	[renameButton setEnabled:![model sweepInProgress]];
-	[stopButton setEnabled:[model sweepInProgress]];
-
 }
 
 - (void) setQueCount:(NSNumber*)n
@@ -130,33 +127,6 @@
                      selector : @selector(replicationRunningChanged:)
                          name : ORCouchDBModelReplicationRunningChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(oldNameChanged:)
-                         name : ORCouchDBModelOldNameChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(betterNameChanged:)
-                         name : ORCouchDBModelBetterNameChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(sweepInProgressChanged:)
-                         name : ORCouchDBModelSweepInProgressChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(processCountChanged:)
-                         name : ORCouchDBModelProcessCountChanged
-						object: model];
-
- 
-    [notifyCenter addObserver : self
-                     selector : @selector(changedCountChanged:)
-                         name : ORCouchDBModelChangedCountChanged
-						object: model];
-
 }
 
 - (void) updateWindow
@@ -170,45 +140,12 @@
 	[self stealthModeChanged:nil];
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
-	[self oldNameChanged:nil];
-	[self betterNameChanged:nil];
-	[self sweepInProgressChanged:nil];
-	[self processCountChanged:nil];
-	[self changedCountChanged:nil];
-}
-
-- (void) changedCountChanged:(NSNotification*)aNote
-{
-	[changedCountTextField setIntValue: [model changedCount]];
-}
-
-- (void) processCountChanged:(NSNotification*)aNote
-{
-	[processCountTextField setIntValue: [model processCount]];
-}
-
-- (void) sweepInProgressChanged:(NSNotification*)aNote
-{
-	[sweepInProgressTextField setStringValue: [model sweepInProgress]?@"Running":@"Idle"];
-	[renameButton setEnabled:![model sweepInProgress]];
-	[stopButton setEnabled:[model sweepInProgress]];
-}
-
-- (void) betterNameChanged:(NSNotification*)aNote
-{
-	[betterNameTextField setStringValue: [model betterName]];
-}
-
-- (void) oldNameChanged:(NSNotification*)aNote
-{
-	[oldNameTextField setStringValue: [model oldName]];
 }
 
 - (void) replicationRunningChanged:(NSNotification*)aNote
 {
 	[replicationRunningTextField setStringValue: [model replicationRunning]?@"Replicating":@"NOT Replicating"];
 }
-
 
 - (void) keepHistoryChanged:(NSNotification*)aNote
 {
@@ -281,15 +218,6 @@
 
 #pragma mark •••Actions
 
-- (void) betterNameTextFieldAction:(id)sender
-{
-	[model setBetterName:[sender stringValue]];	
-}
-
-- (void) oldNameTextFieldAction:(id)sender
-{
-	[model setOldName:[sender stringValue]];	
-}
 - (IBAction) startReplicationAction:(id)sender
 {
     [model createRemoteDataBases];
@@ -394,11 +322,6 @@
 	[model getRemoteInfo:YES];
 }
 
-- (IBAction) listDocumentsAction:(id)sender
-{
-	[model listDocuments];
-}
-
 - (IBAction) infoAction:(id)sender
 {
 	[model databaseInfo:YES];
@@ -407,17 +330,6 @@
 - (IBAction) compactAction:(id)sender
 {
 	[model compactDatabase];
-}
-
-- (IBAction) renameAction:(id)sender
-{
-	[self endEditing];
-	[model getEachDocForRenamingAdc];
-}
-
-- (IBAction) stopSweep:(id)sender
-{
-	[model cancelSweep];
 }
 
 @end

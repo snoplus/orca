@@ -39,12 +39,6 @@
 	unsigned long subRunNumber;
     BOOL replicationRunning;
 	NSDictionary* docList;
-    NSString* oldName;
-    NSString* betterName;
-    BOOL sweepInProgress;
-    BOOL cancelSweep;
-    int processCount;
-    int changedCount;
     BOOL wasReplicationRunning;
     int replicationCheckCount;
     ORAlarm* replicationAlarm;
@@ -71,17 +65,6 @@
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef;
 
 #pragma mark ***Accessors
-- (int) changedCount;
-- (void) setChangedCount:(int)aChangedCount;
-- (int) processCount;
-- (void) setProcessCount:(int)aProcessCount;
-- (void) cancelSweep;
-- (BOOL) sweepInProgress;
-- (void) setSweepInProgress:(BOOL)aSweepInProgress;
-- (NSString*) betterName;
-- (void) setBetterName:(NSString*)aBetterName;
-- (NSString*) oldName;
-- (void) setOldName:(NSString*)aOldName;
 - (BOOL) replicationRunning;
 - (void) setReplicationRunning:(BOOL)aReplicationRunning;
 - (BOOL) couchRunning;
@@ -103,9 +86,6 @@
 - (void) setDBHistoryInfo:(NSDictionary*)someInfo;
 - (NSDictionary*) dBHistoryInfo;
 - (NSDictionary*) dBInfo;
-- (void) startingSweep;
-- (void) sweepDone;
-- (void) incChangeCounter;
 - (void) checkReplication;
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment;
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp;
@@ -133,25 +113,17 @@
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;
 - (void) listDatabases;
-- (void) listDocuments;
 - (void) getRemoteInfo:(BOOL)verbose;
 - (void) processRemoteTaskList:(NSArray*)aList verbose:(BOOL)verbose;
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
 - (void) updateRunInfo;
-- (void) getEachDocForRenamingAdc;
-- (void) renameAdc:(id)aDoc;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
-extern NSString* ORCouchDBModelChangedCountChanged;
-extern NSString* ORCouchDBModelProcessCountChanged;
-extern NSString* ORCouchDBModelSweepInProgressChanged;
-extern NSString* ORCouchDBModelBetterNameChanged;
-extern NSString* ORCouchDBModelOldNameChanged;
 extern NSString* ORCouchDBModelReplicationRunningChanged;
 extern NSString* ORCouchDBModelKeepHistoryChanged;
 extern NSString* ORCouchDBPasswordChanged;
