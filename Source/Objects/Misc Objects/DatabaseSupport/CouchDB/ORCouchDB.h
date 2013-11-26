@@ -52,9 +52,6 @@
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag informingDelegate:(BOOL)ok;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
-- (void) listDocuments:(id)aDelegate tag:(NSString*)aTag;
-- (void) processEachDoc:(id)aDelegate tag:(NSString*)aTag;
-- (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)newName delegate:(id)aDelegate tag:(NSString*)aTag;
 - (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (NSOperation*) changesFeedMode:(NSString*)mode Tag:(NSString*)aTag;
 - (NSOperation*) changesFeedMode:(NSString*)mode Heartbeat:(NSUInteger)heartbeat Tag:(NSString*)aTag;
@@ -127,9 +124,6 @@
 -(void) main;
 @end
 
-@interface ORCouchDBProcessEachDocOp :ORCouchDBOperation
-- (void) main;
-@end
 
 @interface ORCouchDBListDBOp :ORCouchDBOperation
 - (void) main;
@@ -180,16 +174,6 @@
 }
 - (void) setDocumentId:(NSString*)anID;
 - (void) main;
-@end
-
-@interface ORCouchDBRenameAdcOp :ORCouchDBPutDocumentOp
-{	
-	NSString* oldName;
-	NSString* replacementName;
-}
-- (void) main;
-@property (copy) NSString* oldName;
-@property (copy) NSString* replacementName;
 @end
 
 @interface ORCouchDBDeleteDocumentOp :ORCouchDBGetDocumentOp

@@ -93,30 +93,6 @@
 	[anOp release];
 }
 
-- (void) listDocuments:(id)aDelegate tag:(NSString*)aTag
-{
-	ORCouchDBListDocsOp* anOp = [[ORCouchDBListDocsOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
-	[ORCouchDBQueue addOperation:anOp];
-	[anOp release];
-}
-
-- (void) processEachDoc:(id)aDelegate tag:(NSString*)aTag
-{
-	ORCouchDBProcessEachDocOp* anOp = [[ORCouchDBProcessEachDocOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
-	[ORCouchDBQueue addOperation:anOp];
-	[anOp release];
-}
-
-- (void) renameDoc:(id)aDoc adc:(NSString*)oldName to:(NSString*)aReplacementName delegate:(id)aDelegate tag:(NSString*)aTag
-{
-	ORCouchDBRenameAdcOp* anOp = [[ORCouchDBRenameAdcOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
-	[anOp setDocument:aDoc documentID:[aDoc objectForKey:@"_id"]];
-	[anOp setOldName: oldName];
-	[anOp setReplacementName: aReplacementName];
-	[ORCouchDBQueue addOperation:anOp];
-	[anOp release];
-}
-
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag
 {
 	ORCouchDBListTasksOp* anOp = [[ORCouchDBListTasksOp alloc] initWithHost:host port:port database:nil delegate:delegate tag:aTag];
@@ -394,66 +370,6 @@
         NSLog([NSString stringWithFormat:@"%@\n",name]);
 	}
 	[self sendToDelegate:result];
-}
-@end
-
-@implementation ORCouchDBProcessEachDocOp
--(void) main
-{
-	if([self isCancelled])return;
-	if([delegate respondsToSelector:@selector(startingSweep)]){
-		[delegate performSelectorOnMainThread:@selector(startingSweep) withObject:nil waitUntilDone:NO ];
-	}
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/_all_docs", host, port,database]];
-	
-	id theDocArray = [result objectForKey:@"rows"];
-	for(id aDoc in theDocArray){
-		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		id docId = [aDoc objectForKey:@"id"];
-		if([docId rangeOfString:@"/"].location == NSNotFound){
-			NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, docId];
-			id result = [self send:httpString];
-			[self sendToDelegate:result];
-		}
-		[pool release];
-		if([self isCancelled])break;
-	}
-	if([delegate respondsToSelector:@selector(sweepDone)]){
-		[delegate performSelectorOnMainThread:@selector(sweepDone) withObject:nil waitUntilDone:NO ];
-	}
-}
-@end
-
-@implementation ORCouchDBRenameAdcOp
-@synthesize oldName,replacementName;
-- (void) main
-{
-	if([self isCancelled])return;
-	if([replacementName length]==0)return;
-	if([oldName length]==0)return;
-	NSArray* adcs = [document objectForKey:@"adcs"];
-	for(id anAdc in adcs){
-		for(id aKey in anAdc){
-			if([aKey isEqualToString:oldName]){
-				id theValue = [anAdc objectForKey:aKey];
-				[anAdc setObject:theValue forKey:replacementName];
-				[anAdc removeObjectForKey:oldName];
-				NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-				[self send:httpString type:@"PUT" body:document];
-				if([delegate respondsToSelector:@selector(incChangeCounter)]){
-					[delegate performSelectorOnMainThread:@selector(incChangeCounter) withObject:nil waitUntilDone:NO ];
-				}
-			}
-		}
-	}
-	
-}
-
-- (void) dealloc
-{
-	self.replacementName=nil;
-	self.oldName=nil;
-	[super dealloc];
 }
 @end
 
