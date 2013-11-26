@@ -1125,6 +1125,14 @@
 		843828AF0B43413500B7F417 /* ORScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 843828AC0B43413500B7F417 /* ORScriptInterface.h */; };
 		843828B00B43413500B7F417 /* ORScriptInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 843828AD0B43413500B7F417 /* ORScriptInterface.m */; };
 		843828B10B43413500B7F417 /* ScriptInterfaceTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 843828AE0B43413500B7F417 /* ScriptInterfaceTask.nib */; };
+		8438C3691845092600A6F4D6 /* ORBlockStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438C35D1845092600A6F4D6 /* ORBlockStep.h */; };
+		8438C36A1845092600A6F4D6 /* ORBlockStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438C35E1845092600A6F4D6 /* ORBlockStep.m */; };
+		8438C36D1845092600A6F4D6 /* ORConditionalStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438C3611845092600A6F4D6 /* ORConditionalStep.h */; };
+		8438C36E1845092600A6F4D6 /* ORConditionalStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438C3621845092600A6F4D6 /* ORConditionalStep.m */; };
+		8438C3731845092600A6F4D6 /* ORRegexConditionalStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438C3671845092600A6F4D6 /* ORRegexConditionalStep.h */; };
+		8438C3741845092600A6F4D6 /* ORRegexConditionalStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438C3681845092600A6F4D6 /* ORRegexConditionalStep.m */; };
+		8438C37718451D6500A6F4D6 /* ORInvocationStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 8438C37518451D6500A6F4D6 /* ORInvocationStep.h */; };
+		8438C37818451D6500A6F4D6 /* ORInvocationStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438C37618451D6500A6F4D6 /* ORInvocationStep.m */; };
 		8439D5EF05BEFF3A0077EFF2 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */; };
 		8439D65905BF31480077EFF2 /* SubviewTableViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8439D65405BF31480077EFF2 /* SubviewTableViewController.h */; };
 		8439D65A05BF31480077EFF2 /* SubviewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8439D65505BF31480077EFF2 /* SubviewTableViewCell.m */; };
@@ -2596,6 +2604,28 @@
 		84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258620FA7340B00626276 /* ORMotionNodeController.m */; };
 		84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D258630FA7340B00626276 /* ORMotionNodeModel.h */; };
 		84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258640FA7340B00626276 /* ORMotionNodeModel.m */; };
+		84D29FDE1843EAC800D320DB /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D29FC61843EAC800D320DB /* check.png */; };
+		84D29FDF1843EAC800D320DB /* cross.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D29FC71843EAC800D320DB /* cross.png */; };
+		84D29FE01843EAC800D320DB /* warn.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D29FC81843EAC800D320DB /* warn.png */; };
+		84D29FE11843EAC800D320DB /* OROpSeqStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FCA1843EAC800D320DB /* OROpSeqStep.h */; };
+		84D29FE21843EAC800D320DB /* OROpSeqStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FCB1843EAC800D320DB /* OROpSeqStep.m */; };
+		84D29FE31843EAC800D320DB /* ORRemoteSocketStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FCC1843EAC800D320DB /* ORRemoteSocketStep.h */; };
+		84D29FE41843EAC800D320DB /* ORRemoteSocketStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FCD1843EAC800D320DB /* ORRemoteSocketStep.m */; };
+		84D29FE51843EAC800D320DB /* ORShellStep.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FCE1843EAC800D320DB /* ORShellStep.h */; };
+		84D29FE61843EAC800D320DB /* ORShellStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FCF1843EAC800D320DB /* ORShellStep.m */; };
+		84D29FE71843EAC800D320DB /* OROpSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FD01843EAC800D320DB /* OROpSequence.h */; };
+		84D29FE81843EAC800D320DB /* OROpSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FD11843EAC800D320DB /* OROpSequence.m */; };
+		84D29FE91843EAC800D320DB /* OROpSequenceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FD21843EAC800D320DB /* OROpSequenceController.h */; };
+		84D29FEA1843EAC800D320DB /* OROpSequenceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FD31843EAC800D320DB /* OROpSequenceController.m */; };
+		84D29FEB1843EAC800D320DB /* OROpSequenceQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FD41843EAC800D320DB /* OROpSequenceQueue.h */; };
+		84D29FEC1843EAC800D320DB /* OROpSequenceQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FD51843EAC800D320DB /* OROpSequenceQueue.m */; };
+		84D29FED1843EAC800D320DB /* ORTaskHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FD61843EAC800D320DB /* ORTaskHandler.h */; };
+		84D29FEE1843EAC800D320DB /* ORTaskHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FD71843EAC800D320DB /* ORTaskHandler.m */; };
+		84D29FEF1843EAC800D320DB /* OpSequence.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84D29FD91843EAC800D320DB /* OpSequence.xib */; };
+		84D29FF01843EAC800D320DB /* OROpSeqStepView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */; };
+		84D29FF11843EAC800D320DB /* OROpSeqStepView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */; };
+		84D29FF21843EAC800D320DB /* OROpSeqStepViewItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */; };
+		84D29FF31843EAC800D320DB /* OROpSeqStepViewItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FDD1843EAC800D320DB /* OROpSeqStepViewItem.m */; };
 		84D34B0410B1D6C90013473E /* ORSIS3302Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D34AFC10B1D6C90013473E /* ORSIS3302Controller.h */; };
 		84D34B0510B1D6C90013473E /* ORSIS3302Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D34AFD10B1D6C90013473E /* ORSIS3302Controller.m */; };
 		84D34B0610B1D6C90013473E /* ORSIS3302Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D34AFE10B1D6C90013473E /* ORSIS3302Decoders.h */; };
@@ -4170,6 +4200,14 @@
 		843828AC0B43413500B7F417 /* ORScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptInterface.h; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ORScriptInterface.h"; sourceTree = SOURCE_ROOT; };
 		843828AD0B43413500B7F417 /* ORScriptInterface.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptInterface.m; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ORScriptInterface.m"; sourceTree = SOURCE_ROOT; };
 		843828AE0B43413500B7F417 /* ScriptInterfaceTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ScriptInterfaceTask.nib; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ScriptInterfaceTask.nib"; sourceTree = SOURCE_ROOT; };
+		8438C35D1845092600A6F4D6 /* ORBlockStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORBlockStep.h; sourceTree = "<group>"; };
+		8438C35E1845092600A6F4D6 /* ORBlockStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORBlockStep.m; sourceTree = "<group>"; };
+		8438C3611845092600A6F4D6 /* ORConditionalStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORConditionalStep.h; sourceTree = "<group>"; };
+		8438C3621845092600A6F4D6 /* ORConditionalStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORConditionalStep.m; sourceTree = "<group>"; };
+		8438C3671845092600A6F4D6 /* ORRegexConditionalStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRegexConditionalStep.h; sourceTree = "<group>"; };
+		8438C3681845092600A6F4D6 /* ORRegexConditionalStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRegexConditionalStep.m; sourceTree = "<group>"; };
+		8438C37518451D6500A6F4D6 /* ORInvocationStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORInvocationStep.h; sourceTree = "<group>"; };
+		8438C37618451D6500A6F4D6 /* ORInvocationStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORInvocationStep.m; sourceTree = "<group>"; };
 		8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		8439D65405BF31480077EFF2 /* SubviewTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SubviewTableViewController.h; path = "Source/Main Dialogs/HardwareWizard/SubviewTableViewController.h"; sourceTree = SOURCE_ROOT; };
 		8439D65505BF31480077EFF2 /* SubviewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SubviewTableViewCell.m; path = "Source/Main Dialogs/HardwareWizard/SubviewTableViewCell.m"; sourceTree = SOURCE_ROOT; };
@@ -5768,6 +5806,28 @@
 		84D258620FA7340B00626276 /* ORMotionNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotionNodeController.m; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeController.m; sourceTree = SOURCE_ROOT; };
 		84D258630FA7340B00626276 /* ORMotionNodeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotionNodeModel.h; sourceTree = "<group>"; };
 		84D258640FA7340B00626276 /* ORMotionNodeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMotionNodeModel.m; sourceTree = "<group>"; };
+		84D29FC61843EAC800D320DB /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = check.png; sourceTree = "<group>"; };
+		84D29FC71843EAC800D320DB /* cross.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cross.png; sourceTree = "<group>"; };
+		84D29FC81843EAC800D320DB /* warn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = warn.png; sourceTree = "<group>"; };
+		84D29FCA1843EAC800D320DB /* OROpSeqStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSeqStep.h; sourceTree = "<group>"; };
+		84D29FCB1843EAC800D320DB /* OROpSeqStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSeqStep.m; sourceTree = "<group>"; };
+		84D29FCC1843EAC800D320DB /* ORRemoteSocketStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRemoteSocketStep.h; sourceTree = "<group>"; };
+		84D29FCD1843EAC800D320DB /* ORRemoteSocketStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRemoteSocketStep.m; sourceTree = "<group>"; };
+		84D29FCE1843EAC800D320DB /* ORShellStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORShellStep.h; sourceTree = "<group>"; };
+		84D29FCF1843EAC800D320DB /* ORShellStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORShellStep.m; sourceTree = "<group>"; };
+		84D29FD01843EAC800D320DB /* OROpSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSequence.h; sourceTree = "<group>"; };
+		84D29FD11843EAC800D320DB /* OROpSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSequence.m; sourceTree = "<group>"; };
+		84D29FD21843EAC800D320DB /* OROpSequenceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSequenceController.h; sourceTree = "<group>"; };
+		84D29FD31843EAC800D320DB /* OROpSequenceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSequenceController.m; sourceTree = "<group>"; };
+		84D29FD41843EAC800D320DB /* OROpSequenceQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSequenceQueue.h; sourceTree = "<group>"; };
+		84D29FD51843EAC800D320DB /* OROpSequenceQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSequenceQueue.m; sourceTree = "<group>"; };
+		84D29FD61843EAC800D320DB /* ORTaskHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTaskHandler.h; sourceTree = "<group>"; };
+		84D29FD71843EAC800D320DB /* ORTaskHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTaskHandler.m; sourceTree = "<group>"; };
+		84D29FD91843EAC800D320DB /* OpSequence.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OpSequence.xib; sourceTree = "<group>"; };
+		84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSeqStepView.h; sourceTree = "<group>"; };
+		84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSeqStepView.m; sourceTree = "<group>"; };
+		84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSeqStepViewItem.h; sourceTree = "<group>"; };
+		84D29FDD1843EAC800D320DB /* OROpSeqStepViewItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSeqStepViewItem.m; sourceTree = "<group>"; };
 		84D34AFC10B1D6C90013473E /* ORSIS3302Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3302Controller.h; sourceTree = "<group>"; };
 		84D34AFD10B1D6C90013473E /* ORSIS3302Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3302Controller.m; sourceTree = "<group>"; };
 		84D34AFE10B1D6C90013473E /* ORSIS3302Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3302Decoders.h; sourceTree = "<group>"; };
@@ -11935,6 +11995,67 @@
 			path = Source/Objects/Hardware/Serial/MotionNode;
 			sourceTree = SOURCE_ROOT;
 		};
+		84D29FC41843EAC800D320DB /* OpSequence */ = {
+			isa = PBXGroup;
+			children = (
+				84D29FC51843EAC800D320DB /* Images */,
+				84D29FC91843EAC800D320DB /* Operations */,
+				84D29FD01843EAC800D320DB /* OROpSequence.h */,
+				84D29FD11843EAC800D320DB /* OROpSequence.m */,
+				84D29FD21843EAC800D320DB /* OROpSequenceController.h */,
+				84D29FD31843EAC800D320DB /* OROpSequenceController.m */,
+				84D29FD41843EAC800D320DB /* OROpSequenceQueue.h */,
+				84D29FD51843EAC800D320DB /* OROpSequenceQueue.m */,
+				84D29FD61843EAC800D320DB /* ORTaskHandler.h */,
+				84D29FD71843EAC800D320DB /* ORTaskHandler.m */,
+				84D29FD81843EAC800D320DB /* Views */,
+			);
+			path = OpSequence;
+			sourceTree = "<group>";
+		};
+		84D29FC51843EAC800D320DB /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				84D29FC61843EAC800D320DB /* check.png */,
+				84D29FC71843EAC800D320DB /* cross.png */,
+				84D29FC81843EAC800D320DB /* warn.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		84D29FC91843EAC800D320DB /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				84D29FCA1843EAC800D320DB /* OROpSeqStep.h */,
+				84D29FCB1843EAC800D320DB /* OROpSeqStep.m */,
+				84D29FCC1843EAC800D320DB /* ORRemoteSocketStep.h */,
+				84D29FCD1843EAC800D320DB /* ORRemoteSocketStep.m */,
+				8438C37518451D6500A6F4D6 /* ORInvocationStep.h */,
+				8438C37618451D6500A6F4D6 /* ORInvocationStep.m */,
+				84D29FCE1843EAC800D320DB /* ORShellStep.h */,
+				84D29FCF1843EAC800D320DB /* ORShellStep.m */,
+				8438C35D1845092600A6F4D6 /* ORBlockStep.h */,
+				8438C35E1845092600A6F4D6 /* ORBlockStep.m */,
+				8438C3611845092600A6F4D6 /* ORConditionalStep.h */,
+				8438C3621845092600A6F4D6 /* ORConditionalStep.m */,
+				8438C3671845092600A6F4D6 /* ORRegexConditionalStep.h */,
+				8438C3681845092600A6F4D6 /* ORRegexConditionalStep.m */,
+			);
+			path = Operations;
+			sourceTree = "<group>";
+		};
+		84D29FD81843EAC800D320DB /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				84D29FD91843EAC800D320DB /* OpSequence.xib */,
+				84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */,
+				84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */,
+				84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */,
+				84D29FDD1843EAC800D320DB /* OROpSeqStepViewItem.m */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		84D34AFB10B1D6C90013473E /* SIS3302 */ = {
 			isa = PBXGroup;
 			children = (
@@ -12572,6 +12693,7 @@
 				84BAA72A0E964ED900E19946 /* ORSelectorSequence.h */,
 				84BAA72B0E964ED900E19946 /* ORSelectorSequence.m */,
 				84BB920107E210090092B367 /* MotorWorker */,
+				84D29FC41843EAC800D320DB /* OpSequence */,
 			);
 			name = Workers;
 			path = "Source/Objects/Misc Objects/Workers";
@@ -13389,6 +13511,7 @@
 				8434A1CF055B3287002D3102 /* NcdMuxController.h in Headers */,
 				8434A1D1055B3287002D3102 /* NcdMuxModel.h in Headers */,
 				8434A1D2055B3287002D3102 /* NcdMuxHWModel.h in Headers */,
+				8438C3731845092600A6F4D6 /* ORRegexConditionalStep.h in Headers */,
 				8434A1D3055B3287002D3102 /* ORVmeIPCard.h in Headers */,
 				8434A1D5055B3287002D3102 /* NcdMuxBoxModel.h in Headers */,
 				8434A1D6055B3287002D3102 /* NcdMuxBoxController.h in Headers */,
@@ -13597,6 +13720,7 @@
 				840AF86D0819924D005B750D /* SourceMask.h in Headers */,
 				8428E5E70820678A00F1CF6E /* StopLightView.h in Headers */,
 				84F4B4D20822A875001F48F5 /* ORTimedTextField.h in Headers */,
+				8438C3691845092600A6F4D6 /* ORBlockStep.h in Headers */,
 				844048AE08350BEE000D03DB /* MemoryWatcher.h in Headers */,
 				844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */,
 				2A556A370842A69900BBCB17 /* ORDGF4cDecoders.h in Headers */,
@@ -13624,6 +13748,7 @@
 				2AAB08FB08E36CCE00BB0792 /* ORTest.h in Headers */,
 				8434150D08EE0378009B7659 /* ORCrateController.h in Headers */,
 				849DDE6308F466630052AFC6 /* ORAD3511Controller.h in Headers */,
+				84D29FE91843EAC800D320DB /* OROpSequenceController.h in Headers */,
 				849DDE6508F466630052AFC6 /* ORAD3511Decoders.h in Headers */,
 				849DDE6708F466630052AFC6 /* ORAD3511Model.h in Headers */,
 				849DE3EF08F597410052AFC6 /* ORK3655Controller.h in Headers */,
@@ -13701,6 +13826,7 @@
 				84B63CE609783832005B20A5 /* ORPushButtonModel.h in Headers */,
 				846F4B95098FDA7B00BF0031 /* ORRunVetoController.h in Headers */,
 				846F4B97098FDA7B00BF0031 /* ORRunVetoModel.h in Headers */,
+				84D29FE11843EAC800D320DB /* OROpSeqStep.h in Headers */,
 				84B7FBDD0993CF7300255787 /* ORScaleTask.h in Headers */,
 				84C12E780993E3FA006F2901 /* ORProcessHistoryController.h in Headers */,
 				84C12E7A0993E3FA006F2901 /* ORProcessHistoryModel.h in Headers */,
@@ -13852,6 +13978,7 @@
 				84AB8BB60D2314A500EC39F2 /* ORCmdHistory.h in Headers */,
 				84AB8BC20D2314CD00EC39F2 /* crate_lib.h in Headers */,
 				84AB8BC50D2314CD00EC39F2 /* ORC111CController.h in Headers */,
+				84D29FE71843EAC800D320DB /* OROpSequence.h in Headers */,
 				84AB8BC70D2314CD00EC39F2 /* ORC111CModel.h in Headers */,
 				84AB8BD20D2314DD00EC39F2 /* ORJAMFController.h in Headers */,
 				84AB8BD40D2314DD00EC39F2 /* ORJAMFModel.h in Headers */,
@@ -13923,6 +14050,8 @@
 				84BAA2A70E92A81A00E19946 /* ORSIS3300Model.h in Headers */,
 				84BAA72C0E964ED900E19946 /* ORSelectorSequence.h in Headers */,
 				84CEA36F0EA4EB2E0060076A /* ORFec32Controller.h in Headers */,
+				84D29FED1843EAC800D320DB /* ORTaskHandler.h in Headers */,
+				84D29FF21843EAC800D320DB /* OROpSeqStepViewItem.h in Headers */,
 				84CEA3710EA4EB2E0060076A /* ORFec32Model.h in Headers */,
 				84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */,
 				84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */,
@@ -14146,6 +14275,7 @@
 				84762027118CD53D00016A8D /* OR1DHistoPlot.h in Headers */,
 				84762029118CD53D00016A8D /* OR2DHistoPlot.h in Headers */,
 				8476202B118CD53D00016A8D /* ORAxis.h in Headers */,
+				84D29FF01843EAC800D320DB /* OROpSeqStepView.h in Headers */,
 				8476202D118CD53D00016A8D /* ORBitStrip.h in Headers */,
 				8476202F118CD53D00016A8D /* ORPlot.h in Headers */,
 				84762031118CD53D00016A8D /* ORPlotAttributeStrings.h in Headers */,
@@ -14209,6 +14339,7 @@
 				8472AA7812DB44B400DEEB02 /* ORMPodProtocol.h in Headers */,
 				8472AA7C12DB44B400DEEB02 /* ORMPodCController.h in Headers */,
 				8472AA7E12DB44B400DEEB02 /* ORMPodCModel.h in Headers */,
+				8438C37718451D6500A6F4D6 /* ORInvocationStep.h in Headers */,
 				8472AA8312DB44B400DEEB02 /* ORMPodMiniCrateController.h in Headers */,
 				8472AA8512DB44B400DEEB02 /* ORMPodMiniCrateModel.h in Headers */,
 				84BDF04312DC943700B974F8 /* ORSNMP.h in Headers */,
@@ -14318,6 +14449,7 @@
 				2D12EEB3150FEB6600EBD8A2 /* OREdelweissSLTDefs.h in Headers */,
 				2D12EEB4150FEB6600EBD8A2 /* OREdelweissSLTModel.h in Headers */,
 				CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */,
+				84D29FE51843EAC800D320DB /* ORShellStep.h in Headers */,
 				CE0216BF1512139A00456EB7 /* ORnEDMCoilModel.h in Headers */,
 				8499A7581518D85800CD7AAC /* ORCP8CryopumpController.h in Headers */,
 				8499A75A1518D85800CD7AAC /* ORCP8CryopumpDecoders.h in Headers */,
@@ -14360,6 +14492,7 @@
 				2D51C60C15B5A115000F0ACD /* OREdelweissFLTController.h in Headers */,
 				2D51C60E15B5A115000F0ACD /* OREdelweissFLTDecoder.h in Headers */,
 				2D51C61015B5A115000F0ACD /* OREdelweissFLTDefs.h in Headers */,
+				84D29FE31843EAC800D320DB /* ORRemoteSocketStep.h in Headers */,
 				2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */,
 				848604C615C2CAFC00E3A209 /* ORSerialPortWithQueueModel.h in Headers */,
 				8432B6C115D92D4700C5FB5D /* ORMJDPumpCartController.h in Headers */,
@@ -14384,6 +14517,7 @@
 				8434C37B167FB0F40068DB04 /* ORFileMoverOp.h in Headers */,
 				2D2AED651696283D0057E424 /* ipe4reader.h in Headers */,
 				2D2AED671696284D0057E424 /* ipe4structure.h in Headers */,
+				8438C36D1845092600A6F4D6 /* ORConditionalStep.h in Headers */,
 				2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */,
 				8449A53816AEDF5B00296104 /* ORCV1721Controller.h in Headers */,
 				8449A53A16AEDF5B00296104 /* ORCV1721Decoder.h in Headers */,
@@ -14407,6 +14541,7 @@
 				84997878174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh in Headers */,
 				8499788D174BA11400BFEE3E /* OREHS130nController.h in Headers */,
 				84997891174BA11400BFEE3E /* OREHS130nModel.h in Headers */,
+				84D29FEB1843EAC800D320DB /* OROpSequenceQueue.h in Headers */,
 				84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */,
 				84BF74C117590CB000AF1F56 /* OR3DScanPlatformController.h in Headers */,
 				84BF74C317590CB000AF1F56 /* OR3DScanPlatformModel.h in Headers */,
@@ -15012,6 +15147,7 @@
 				84B28E650F4C835500E2B056 /* UnivVoltHVCrateSmall.gif in Resources */,
 				84EBBEE50F52D9A700F57BDD /* Caen419.nib in Resources */,
 				84EBBEE60F52D9A700F57BDD /* Caen419.tif in Resources */,
+				84D29FEF1843EAC800D320DB /* OpSequence.xib in Resources */,
 				84BA5DE60F6E8C8900CF92D6 /* HVRampItem.nib in Resources */,
 				84BA5F2F0F70388D00CF92D6 /* Zup.nib in Resources */,
 				84BA5F300F70388D00CF92D6 /* ZupIcon.tif in Resources */,
@@ -15178,6 +15314,7 @@
 				842544EA12F1FF9F00472314 /* BamDetector.nib in Resources */,
 				842544EB12F1FF9F00472314 /* BamDetector.tif in Resources */,
 				842544F312F1FF9F00472314 /* edu.washington.npl.orca.BamDetector.plist in Resources */,
+				84D29FDF1843EAC800D320DB /* cross.png in Resources */,
 				8457D11F12F8816900D3E3B4 /* EHS8260p.tif in Resources */,
 				84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */,
 				EFB39FCE130BA1C5001220AC /* SNOP.gif in Resources */,
@@ -15273,6 +15410,7 @@
 				8491303115334EAA00597004 /* BitProcessor.nib in Resources */,
 				8491303215334EAA00597004 /* BitProcessor.tif in Resources */,
 				8491303B15334EAA00597004 /* TwoBitProcessor.nib in Resources */,
+				84D29FE01843EAC800D320DB /* warn.png in Resources */,
 				8491303C15334EAA00597004 /* TwoBitProcessor.tif in Resources */,
 				84913CA61538698000597004 /* OutputCallBack.nib in Resources */,
 				84913CA71538698000597004 /* OutputCallBack.tif in Resources */,
@@ -15331,6 +15469,7 @@
 				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
 				843EB6F01741208D005CE36C /* CouchHistoryEventsMap.txt in Resources */,
 				849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */,
+				84D29FDE1843EAC800D320DB /* check.png in Resources */,
 				8499788B174BA11400BFEE3E /* EHS130n.nib in Resources */,
 				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
 				84BF74BE17590CB000AF1F56 /* 3DScanPlatform.nib in Resources */,
@@ -15456,6 +15595,7 @@
 				8434A2FD055B3287002D3102 /* ORDataTaskController.m in Sources */,
 				8434A2FF055B3287002D3102 /* ORDataTaskModel.m in Sources */,
 				8434A300055B3287002D3102 /* ORDataFileModel.m in Sources */,
+				84D29FEE1843EAC800D320DB /* ORTaskHandler.m in Sources */,
 				8434A301055B3287002D3102 /* ORDataFileController.m in Sources */,
 				8434A303055B3287002D3102 /* OReCPU147Model.m in Sources */,
 				8434A305055B3287002D3102 /* OReCPU147Controller.m in Sources */,
@@ -15506,6 +15646,7 @@
 				8434A344055B3287002D3102 /* ORCaen785Controller.m in Sources */,
 				8434A346055B3287002D3102 /* ORCaen785Model.m in Sources */,
 				8434A347055B3287002D3102 /* ORHWWizardController.m in Sources */,
+				8438C3741845092600A6F4D6 /* ORRegexConditionalStep.m in Sources */,
 				8434A349055B3287002D3102 /* ORDataSetModel.m in Sources */,
 				8434A34A055B3287002D3102 /* ORPulserDistribController.m in Sources */,
 				8434A34C055B3287002D3102 /* ORPulserDistribModel.m in Sources */,
@@ -15554,6 +15695,7 @@
 				844567280687A7C80055DDFA /* ORIP320Model.m in Sources */,
 				84456C6C068A35070055DDFA /* ORIP320Channel.m in Sources */,
 				8468E6F5069321DA00B57CE8 /* NcdPDSStepTask.m in Sources */,
+				84D29FF31843EAC800D320DB /* OROpSeqStepViewItem.m in Sources */,
 				8468E6FB06932C4000B57CE8 /* NcdLogAmpTask.m in Sources */,
 				846798EA069488AE00DF8B2A /* NcdLinearityTask.m in Sources */,
 				846799580694B82200DF8B2A /* NcdThresholdTask.m in Sources */,
@@ -15576,6 +15718,7 @@
 				843CDF66071C9DB3009D7D30 /* ORRandomPulserController.m in Sources */,
 				8491917F0725B43500F454F1 /* ORToolbarFactory.m in Sources */,
 				8484811C07288C26009EDCE2 /* ORDotImage.m in Sources */,
+				8438C36A1845092600A6F4D6 /* ORBlockStep.m in Sources */,
 				847946D307330E5300C5E1FA /* ORPciBit3Controller.m in Sources */,
 				847946D507330E5300C5E1FA /* ORPciBit3Model.m in Sources */,
 				847946D707330E5300C5E1FA /* ORPciBit3View.m in Sources */,
@@ -15645,10 +15788,13 @@
 				844049C408353B65000D03DB /* MemoryWatcherController.m in Sources */,
 				2A556A380842A69900BBCB17 /* ORDGF4cDecoders.m in Sources */,
 				2A5D2A300870836F00C969E0 /* xiaUtilities.m in Sources */,
+				84D29FEC1843EAC800D320DB /* OROpSequenceQueue.m in Sources */,
 				54F5B70B087206D9003AC228 /* KatrinModel.m in Sources */,
+				84D29FEA1843EAC800D320DB /* OROpSequenceController.m in Sources */,
 				546D9DB20874BDD60072A274 /* OR2228AController.m in Sources */,
 				546D9DB40874BDD60072A274 /* OR2228ADecoders.m in Sources */,
 				546D9DB60874BDD60072A274 /* OR2228AModel.m in Sources */,
+				84D29FE81843EAC800D320DB /* OROpSequence.m in Sources */,
 				2A41A2B6089AB2A0003D77DD /* ORScalerSum.m in Sources */,
 				2A943A6508A8194B00D04541 /* ORSerialPort.m in Sources */,
 				2A943A6708A8194B00D04541 /* ORSerialPortAdditions.m in Sources */,
@@ -15870,6 +16016,7 @@
 				84A8B1470D35702300263D31 /* ORSBC_LAMController.m in Sources */,
 				84A8B1490D35702300263D31 /* ORSBC_LAMModel.m in Sources */,
 				84A8B14E0D35703300263D31 /* SBCLamView.m in Sources */,
+				84D29FF11843EAC800D320DB /* OROpSeqStepView.m in Sources */,
 				84A5CD5C0D464F4600D9833C /* ORFilterController.m in Sources */,
 				841EBDE81831645E00450A3C /* ORMJDSegmentGroup.m in Sources */,
 				84A5CD5E0D464F4600D9833C /* ORFilterModel.m in Sources */,
@@ -15898,6 +16045,7 @@
 				841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */,
 				84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */,
 				84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */,
+				8438C36E1845092600A6F4D6 /* ORConditionalStep.m in Sources */,
 				8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */,
 				8499FE910DC8E9B700E82DB4 /* ORSNOCrateModel.m in Sources */,
 				8499FF920DC9090400E82DB4 /* ORSNOCard.m in Sources */,
@@ -16041,6 +16189,7 @@
 				84D7913E0FFA4CD000DC81D2 /* ORKeithley6487Controller.m in Sources */,
 				84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */,
 				84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */,
+				84D29FE41843EAC800D320DB /* ORRemoteSocketStep.m in Sources */,
 				84AFC24E1029F35E009F4139 /* ORVHQ224LController.m in Sources */,
 				84AFC2501029F35E009F4139 /* ORVHQ224LDecoders.m in Sources */,
 				84AFC2521029F35E009F4139 /* ORVHQ224LModel.m in Sources */,
@@ -16085,6 +16234,7 @@
 				84DCB61B110E116E0062A95C /* ORiTransGasSensorDecoder.m in Sources */,
 				84693F741121BB4C008B5DB2 /* ORRunNotesController.m in Sources */,
 				84693F761121BB4C008B5DB2 /* ORRunNotesModel.m in Sources */,
+				84D29FE21843EAC800D320DB /* OROpSeqStep.m in Sources */,
 				848285B2112C5AD700BA30ED /* ORVHS4030Controller.m in Sources */,
 				848285B4112C5AD700BA30ED /* ORVHS4030Decoders.m in Sources */,
 				848285B6112C5AD700BA30ED /* ORVHS4030Model.m in Sources */,
@@ -16127,6 +16277,7 @@
 				8476202C118CD53D00016A8D /* ORAxis.m in Sources */,
 				8476202E118CD53D00016A8D /* ORBitStrip.m in Sources */,
 				84762030118CD53D00016A8D /* ORPlot.m in Sources */,
+				84D29FE61843EAC800D320DB /* ORShellStep.m in Sources */,
 				84762032118CD53D00016A8D /* ORPlotAttributeStrings.m in Sources */,
 				84762034118CD53D00016A8D /* ORPlotView.m in Sources */,
 				84762036118CD53D00016A8D /* ORPlotWithROI.m in Sources */,
@@ -16181,6 +16332,7 @@
 				8472AA6E12DB44B400DEEB02 /* OREHQ8060nController.m in Sources */,
 				8472AA7212DB44B400DEEB02 /* OREHQ8060nModel.m in Sources */,
 				8472AA7412DB44B400DEEB02 /* ORMPodCard.m in Sources */,
+				8438C37818451D6500A6F4D6 /* ORInvocationStep.m in Sources */,
 				8472AA7612DB44B400DEEB02 /* ORMPodCrate.m in Sources */,
 				8472AA7D12DB44B400DEEB02 /* ORMPodCController.m in Sources */,
 				8472AA7F12DB44B400DEEB02 /* ORMPodCModel.m in Sources */,
