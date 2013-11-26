@@ -369,7 +369,8 @@
     }
     [invocation setTarget:target];
     [invocation setSelector:aSelector];
-    for (int index = 2; index < [signature numberOfArguments]; index++) {
+    int index;
+    for (index = 2; index < [signature numberOfArguments]; index++) {
         const char *type = [signature getArgumentTypeAtIndex:index];
         NSUInteger size, align;
         NSGetSizeAndAlignment(type, &size, &align);
