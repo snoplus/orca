@@ -143,6 +143,16 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
     }
 }
 
+- (BOOL) hvOnAnyChannel
+{
+    for(id anObj in [self orcaObjects]){
+        if([anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+            if([anObj hvOnAnyChannel])return YES;
+        }
+    }
+    return NO;
+}
+
 - (int) numberChannelsWithNonZeroVoltage
 {
     int count=0;

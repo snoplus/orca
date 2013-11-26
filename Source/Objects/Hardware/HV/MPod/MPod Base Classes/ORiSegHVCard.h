@@ -120,6 +120,7 @@ enum {
 - (unsigned long) failureEvents;
 - (BOOL) channelInBounds:(short)aChan;
 - (BOOL) isOn:(short)aChannel;
+- (BOOL) hvOnAnyChannel;
 - (NSMutableDictionary*) rdParams:(int)i;
 - (BOOL) constraintsInPlace;
 

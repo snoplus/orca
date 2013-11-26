@@ -35,6 +35,7 @@
 - (NSString*) adapterArchiveKey;
 - (NSString*) crateAdapterConnectorKey;
 - (int) numberChannelsWithNonZeroVoltage;
+- (BOOL) hvOnAnyChannel;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

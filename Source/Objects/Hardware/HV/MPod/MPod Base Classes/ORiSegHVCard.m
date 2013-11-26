@@ -521,6 +521,15 @@ NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountCh
 	else return NO;
 }
 
+- (BOOL) hvOnAnyChannel
+{
+ 	int i;
+	for(i=0;i<[self numberOfChannels];i++){
+        if([self isOn:i] && [self voltage:i]>10)return YES;
+    }
+    return NO;
+}
+
 - (void) turnAllChannelsOn
 {
 	int i;
