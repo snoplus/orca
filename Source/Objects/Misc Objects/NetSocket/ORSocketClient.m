@@ -130,7 +130,7 @@
 - (void)netsocketDisconnected:(NetSocket*)insocket
 {	
 	if([delegate respondsToSelector:@selector(clientDisconnected:)]){
-        NSLog(@"%@ disconnected from %@.\n",name,[self className]);
+        //NSLog(@"%@ disconnected from %@.\n",name,[self className]);
 		//the disconnect process will destroy this object so we put
 		//it into the autorelease pool temporarily.
 		[[self retain] autorelease];
