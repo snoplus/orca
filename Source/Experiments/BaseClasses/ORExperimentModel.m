@@ -86,6 +86,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 - (void) wakeUp
 {
     if([self aWake])return;
+	[self collectRates];
     [super wakeUp];
 }
 
@@ -93,7 +94,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 {
     [super sleep];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(collectRates) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
         
 }
 

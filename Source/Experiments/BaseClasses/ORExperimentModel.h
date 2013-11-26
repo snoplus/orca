@@ -21,7 +21,7 @@
 @class ORSegmentGroup;
 @class ORAlarm;
 
-@interface ORExperimentModel : OrcaObject {
+@interface ORExperimentModel : ORGroup {
 	NSMutableArray* segmentGroups;
 	int				hardwareCheck;
 	int				cardCheck;
