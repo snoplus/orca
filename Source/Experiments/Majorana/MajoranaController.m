@@ -51,14 +51,15 @@
 
 -(void) awakeFromNib
 {
-	
-	detectorSize		= NSMakeSize(770,770);
-	detailsSize			= NSMakeSize(560,600);
-	detectorMapViewSize	= NSMakeSize(550,565);
-	vetoMapViewSize		= NSMakeSize(460,565);
+	detectorSize		 = NSMakeSize(770,770);
+	detailsSize			 = NSMakeSize(560,600);
+	subComponentViewSize = NSMakeSize(500,700);
+	detectorMapViewSize	 = NSMakeSize(550,565);
+	vetoMapViewSize		 = NSMakeSize(460,565);
 	
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+	[subComponentsView setGroup:model];
 
     [super awakeFromNib];
 	
@@ -87,6 +88,8 @@
 	[aPlot1 release];
     [(ORPlot*)[valueHistogramsPlot plotWithTag: 10] setName:@"Detectors"];
     [valueHistogramsPlot setShowLegend:YES];
+
+
 }
 
 
@@ -126,6 +129,27 @@
                      selector : @selector(vetoMapLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupSelectionChanged
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : OROrcaObjectMoved
+                       object : nil];
+
 }
 
 - (void) updateWindow
@@ -151,6 +175,13 @@
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:[model vetoMapLock] to:secure];
     [vetoMapLockButton setEnabled: secure];
+}
+
+-(void) groupChanged:(NSNotification*)note
+{
+	if(note == nil || [note object] == model || [[note object] guardian] == model){
+		[subComponentsView setNeedsDisplay:YES];
+	}
 }
 
 - (void) vetoMapLockChanged:(NSNotification*)aNotification
@@ -372,10 +403,15 @@
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:detectorMapViewSize];
+		[self resizeWindowToSize:subComponentViewSize];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:detectorMapViewSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 4){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:vetoMapViewSize];
 		[[self window] setContentView:tabView];

@@ -24,17 +24,40 @@
 #import "MajoranaController.h"
 #import "ORSegmentGroup.h"
 #import "ORMJDSegmentGroup.h"
+#import "ORRemoteSocketModel.h"
+#import "SynthesizeSingleton.h"
+#import "ORTaskSequence.h"
+#import "OROpSequence.h"
+#import "ORShellStep.h"
+#import "ORRemoteSocketStep.h"
+#import "OROpSequenceQueue.h"
+#import "ORInvocationStep.h"
+#import "ORMPodCrateModel.h"
 
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
+@interface  MajoranaModel (private)
+- (void) checkConstraints;
+@end
+
 @implementation MajoranaModel
 
 #pragma mark ¥¥¥Initialization
-- (void) setUpImage
+- (void) dealloc
 {
-    [self setImage:[NSImage imageNamed:@"Majorana"]];
+    [scriptModel setDelegate:nil];
+    [scriptModel cancel:nil];
+    [scriptModel release];
+    [super dealloc];
 }
+- (void) wakeUp
+{
+    [super wakeUp];
+    [self checkConstraints];
+}
+
+- (void) setUpImage { [self setImage:[NSImage imageNamed:@"Majorana"]]; }
 
 - (void) makeMainController
 {
@@ -90,12 +113,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",       @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHV",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCrate",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCard",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVChan",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
     }
 	return mapEntries;
 }
+
 - (void) postCouchDBRecord
 {
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
@@ -190,26 +214,19 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	return [NSString stringWithFormat:@"Gretina4M,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 
+- (id) scriptModel
+{
+    if(!scriptModel){
+        scriptModel = [[OROpSequence alloc] init];
+    }
+    return scriptModel;
+}
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
-- (NSString*) experimentMapLock
-{
-	return @"MajoranaMapLock";
-}
-
-- (NSString*) vetoMapLock
-{
-	return @"MajoranaVetoMapLock";
-}
-
-- (NSString*) experimentDetectorLock
-{
-	return @"MajoranaDetectorLock";
-}
-
-- (NSString*) experimentDetailsLock	
-{
-	return @"MajoranaDetailsLock";
-}
+- (NSString*) experimentMapLock     { return @"MajoranaMapLock";      }
+- (NSString*) vetoMapLock           { return @"MajoranaVetoMapLock";  }
+- (NSString*) experimentDetectorLock{ return @"MajoranaDetectorLock"; }
+- (NSString*) experimentDetailsLock	{ return @"MajoranaDetailsLock";  }
 
 - (void) setViewType:(int)aViewType
 {
@@ -218,9 +235,38 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMajoranaModelViewTypeChanged object:self userInfo:nil];
 }
 
-- (int) viewType
+- (int) viewType { return viewType; }
+
+- (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate
 {
-	return viewType;
+    for(id obj in [self orcaObjects]){
+        if([obj tag] == aVMECrate)return obj;
+    }
+    return nil;
+}
+
+- (BOOL) anyHvOnCrate:(int)aCrate
+{
+    //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
+    //But we don't care about the Veto system (group 1).
+    ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
+    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
+    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+
+    ORSegmentGroup* group = [self segmentGroup:0];
+    int n = [group numSegments];
+    int i;
+    for(i=0;i<n;i++){
+        ORDetectorSegment* seg =  [group segment:i];        //get a segment from the group
+		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
+        if(vmeCrate == aCrate){
+            int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
+            if(hvCrate<2){
+                if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
+            }
+        }
+    }
+    return NO;
 }
 
 - (id)initWithCoder:(NSCoder*)decoder
@@ -228,8 +274,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
+    
+    scriptModel = [[OROpSequence alloc] initWithDelegate:self];
+    [scriptModel setSteps:[self scriptSteps]];
+    
 	[[self undoManager] enableUndoRegistration];
 
     return self;
@@ -313,5 +362,103 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	}
 	return @"";
 }
+
+#pragma mark ¥¥¥CardHolding Protocol
+- (int) maxNumberOfObjects              { return 2; }
+- (int) objWidth                        { return 50; }	//In this case, this is really the obj height.
+- (int) groupSeparation                 { return 0; }
+- (NSString*) nameForSlot:(int)aSlot    { return [NSString stringWithFormat:@"Slot %d",aSlot]; }
+- (int) slotForObj:(id)anObj            { return [anObj tag]; }
+- (int) numberSlotsNeededFor:(id)anObj  { return 1;           }
+- (int) slotAtPoint:(NSPoint)aPoint     { return floor(((int)aPoint.y)/[self objWidth]); }
+- (NSPoint) pointForSlot:(int)aSlot     { return NSMakePoint(0,aSlot*[self objWidth]); }
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if([anObj isKindOfClass:NSClassFromString(@"ORRemoteSocketModel")])			return NSMakeRange(0,2);
+    else return NSMakeRange(0,0);
+}
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj
+{
+	if([anObj isKindOfClass:NSClassFromString(@"ORRemoteSocketModel")])	return NO;
+    else return YES;
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+    [anObj setTag:aSlot];
+	NSPoint slotPoint = [self pointForSlot:aSlot];
+	[anObj moveTo:slotPoint];
+}
+
+- (void) openDialogForComponent:(int)i
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj tag] == i){
+			[anObj makeMainController];
+			break;
+		}
+	}
+}
+
+
+//
+// ScriptSteps
+//
+// returns the array of steps used in the ScriptQueue.
+//
+- (NSArray*) scriptSteps
+{
+	NSMutableArray *steps = [NSMutableArray array];
+    
+    ORRemoteSocketModel* remObj1 = [self remoteSocket:1];
+    NSString* ip1 = [remObj1 remoteHost];
+    
+    //---------------------ping machine---------------------
+    [steps addObject: [ORShellStep shellStepWithCommandLine: @"/sbin/ping",@"-c",@"1",@"-t",@"1",@"-q",ip1,nil]];
+	[[steps lastObject] setTrimNewlines:YES];
+	[[steps lastObject] setErrorStringErrorPattern:@".+"];
+    [[steps lastObject] setOutputStringErrorPattern:@".* 100.0%.*"];
+	[[steps lastObject] setOutputStateKey:@"cryoVacAReachable"];
+	[[steps lastObject] setTitle:@"Ping: CryoVacA"];
+    
+  
+	
+    //---------------------invocation test---------------------
+    NSInvocation* i = [NSInvocation invocationWithTarget:self
+                                                selector:@selector(anyHvOnCrate:)
+                                         retainArguments:NO, (NSUInteger)0];
+    [steps addObject: [ORInvocationStep invocation: i]];
+	[[steps lastObject] setOutputStateKey:@"result"];
+	[[steps lastObject] setTitle:@"Check Bias"];
+
+    
+    //---------------------check vacuuum conditions---------------------
+    NSArray* cmds = [NSArray arrayWithObjects:
+                     @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
+                     @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
+                     @"[ORMJDVacuumModel,1 setDetectorsBiased:0];",
+                     nil];
+    
+    [steps addObject: [ORRemoteSocketStep remoteCommands:cmds remoteSocket:remObj1]];
+	[[steps lastObject] require:@"shouldUnbias" value:@"0"];
+	[[steps lastObject] require:@"okToBias"     value:@"1"];
+	[[steps lastObject] setErrorTitle:@"CryoA Vacuum Bad."];
+	[[steps lastObject] setTitle:  @"Check CryoVacA"];
+
+	return steps;
+}
+
 @end
+
+@implementation MajoranaModel (private)
+- (void) checkConstraints
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkConstraints) object:nil];
+
+    [self performSelector:@selector(checkConstraints) withObject:nil afterDelay:30];
+}
+@end
+
 

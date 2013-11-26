@@ -21,19 +21,33 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
+#import "OROrderedObjHolding.h"
 
 #define kUseDetectorView    0
 #define kUseCrateView       1
 #define kNumDetectors       2*35*2 //2 cryostats of 35 detectors * 2 (low and hi channels)
 #define kNumVetoSegments    32
 
-@interface MajoranaModel :  ORExperimentModel
+//component tag numbers
+#define kVacAComponent			0
+#define kVacBComponent			1
+
+@class ORRemoteSocketModel;
+@class OROpSequence;
+
+@interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
-	int		  viewType;
+	int             viewType;
+    OROpSequence*   scriptModel;
 }
-#pragma mark ¥¥¥Accessorsg
+
+#pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
+- (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate;
+- (BOOL) anyHvOnCrate:(int)aCrate;
+- (id) scriptModel;
+- (NSArray*) scriptSteps;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -44,6 +58,18 @@
 - (NSString*) vetoMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
+
+#pragma mark ¥¥¥OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (NSString*) nameForSlot:(int)aSlot;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 @end
 
 extern NSString* ORMajoranaModelViewTypeChanged;

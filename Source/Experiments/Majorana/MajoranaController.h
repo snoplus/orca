@@ -43,9 +43,13 @@
     //items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
     IBOutlet NSTabView*     viewTabView;
-    
+
+    //items in the  subComponet tab view
+    IBOutlet ORGroupView*   subComponentsView;
+
 	NSView *blankView;
     NSSize detectorSize;
+    NSSize subComponentViewSize;
     NSSize detailsSize;
     NSSize detectorMapViewSize;
     NSSize vetoMapViewSize;

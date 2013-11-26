@@ -80,16 +80,16 @@
             
             [[NSColor grayColor]set];
             float dx = inside.size.width/21.;
-            float dy = inside.size.height/10.;
+            //float dy = inside.size.height/10.;
             [NSBezierPath setDefaultLineWidth:.5];
             int i;
             for(i=0;i<21;i++){
                 [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y) toPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y + inside.size.height)];
             }
             
-            for(i=0;i<10;i++){
-                [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x,inside.origin.y+i*dy) toPoint:NSMakePoint(inside.origin.x + inside.size.width,inside.origin.y+i*dy)];
-            }
+//            for(i=0;i<10;i++){
+//                [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x,inside.origin.y+i*dy) toPoint:NSMakePoint(inside.origin.x + inside.size.width,inside.origin.y+i*dy)];
+//            }
             
             NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Crate %d",crate] attributes:attrsDictionary];
             float sw = [s size].width;
@@ -130,10 +130,12 @@
 	
 	if(viewType == kUseCrateView){
 		float dx = kCrateInsideWidth/21.;
-		float dy = kCrateInsideHeight/10.;
         int numSets = [delegate numberOfSegmentGroups];
         int set;
         for(set=0;set<numSets;set++){
+            float dy;
+            if(set==0)  dy= kCrateInsideHeight/10.;
+            else        dy= kCrateInsideHeight/16.;
             NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumDetectors];
             NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumDetectors];
 
