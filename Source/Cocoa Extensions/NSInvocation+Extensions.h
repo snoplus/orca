@@ -27,6 +27,10 @@
 + (SEL) makeSelectorFromString:(NSString*) aSelectorString;
 + (SEL) makeSelectorFromArray:(NSArray*)cmdItems;
 + (id) invoke:(NSString*)args withTarget:(id)aTarget;
++ (NSInvocation*) invocationWithTarget:(id)target
+                              selector:(SEL)aSelector
+                       retainArguments:(BOOL)retainArguments, ...;
+
 - (BOOL) setArgument:(int)argIndex to:(id)aVal;
 - (id) returnValue;
 - (void) invokeWithNoUndoOnTarget:(id)aTarget;
