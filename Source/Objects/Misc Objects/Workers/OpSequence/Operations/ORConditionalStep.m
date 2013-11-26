@@ -67,7 +67,8 @@
 			NSInteger operationsCount = [operations count];
 			NSInteger stepIndex = [operations indexOfObject:predicatedStep];
 			if (stepIndex > 0 && stepIndex != NSNotFound){
-				for (NSInteger i = stepIndex + 1; i < operationsCount; i++){
+                NSInteger i;
+				for (i = stepIndex + 1; i < operationsCount; i++){
 					NSOperation *currentStep = [operations objectAtIndex:i];
 					if ([[currentStep dependencies] containsObject:predicatedStep]){
 						for (NSOperation *dependency in [predicatedStep dependencies]){
