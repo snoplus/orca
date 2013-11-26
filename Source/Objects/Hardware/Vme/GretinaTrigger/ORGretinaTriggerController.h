@@ -63,6 +63,8 @@
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) setRegisterDisplay:(unsigned int)index;
 - (void) isMasterChanged:(NSNotification*)aNote;
+- (void) registerLockChanged:(NSNotification*)aNote;
+- (void) registerWriteValueChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) baseAddressAction:(id)sender;
