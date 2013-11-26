@@ -233,7 +233,7 @@
 					<object class="NSButton" id="418784170">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{248, 288}, {102, 32}}</string>
+						<string key="NSFrame">{{247, 288}, {102, 32}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
 						<reference key="NSWindow"/>
 						<string key="NSHuggingPriority">{250, 750}</string>
