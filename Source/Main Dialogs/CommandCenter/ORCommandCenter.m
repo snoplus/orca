@@ -239,7 +239,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 - (void)netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket
 {
     
-    NSLog( @"ORCommand: New connection established\n" );
+    //NSLog( @"ORCommand: New connection established\n" );
     
     ORCommandClient* client = [[[ORCommandClient alloc] initWithNetSocket:inNewNetSocket] autorelease];
     [client setDelegate:self];
