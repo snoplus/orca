@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.SystemVersion">11G63</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1138.51</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSArrayController</string>
@@ -83,7 +83,7 @@
 							<int key="NSCellFlags2">272630784</int>
 							<string key="NSContents">X errors, Y warnings</string>
 							<object class="NSFont" key="NSSupport">
-								<string key="NSName">.LucidaGrandeUI</string>
+								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">9</double>
 								<int key="NSfFlags">3614</int>
 							</object>
@@ -107,8 +107,6 @@
 								</object>
 							</object>
 						</object>
-						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 					</object>
 					<object class="NSImageView" id="692716328">
 						<reference key="NSNextResponder" ref="750423723"/>
@@ -138,7 +136,6 @@
 							<int key="NSStyle">0</int>
 							<bool key="NSAnimates">NO</bool>
 						</object>
-						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						<bool key="NSEditable">YES</bool>
 					</object>
 					<object class="NSProgressIndicator" id="237499523">
@@ -158,13 +155,14 @@
 						<string key="NSFrame">{{33, 3}, {149, 16}}</string>
 						<reference key="NSSuperview" ref="750423723"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="38382529">
 							<int key="NSCellFlags">67108928</int>
 							<int key="NSCellFlags2">272894464</int>
 							<string key="NSContents">Multiline Label</string>
 							<object class="NSFont" key="NSSupport">
-								<string key="NSName">.LucidaGrandeUI-Bold</string>
+								<string key="NSName">LucidaGrande-Bold</string>
 								<double key="NSSize">11</double>
 								<int key="NSfFlags">3357</int>
 							</object>
@@ -172,8 +170,6 @@
 							<reference key="NSBackgroundColor" ref="531849094"/>
 							<reference key="NSTextColor" ref="107940670"/>
 						</object>
-						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 					</object>
 				</array>
 				<string key="NSFrameSize">{200, 36}</string>
@@ -183,7 +179,7 @@
 				<string key="NSClassName">OROpSeqStepView</string>
 			</object>
 			<object class="NSCustomView" id="268208396">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSCollectionView" id="900901386">
@@ -191,7 +187,6 @@
 						<int key="NSvFlags">274</int>
 						<string key="NSFrame">{{20, 12}, {324, 246}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSWindow"/>
 						<string key="NSMinGridSize">{0, 0}</string>
 						<string key="NSMaxGridSize">{0, 0}</string>
 						<int key="NSMaxNumberOfGridRows">0</int>
@@ -216,7 +211,6 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{22, 302}, {171, 14}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="418784170"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="476481129">
@@ -224,7 +218,7 @@
 							<int key="NSCellFlags2">4326400</int>
 							<string key="NSContents">Running step X of Y:</string>
 							<object class="NSFont" key="NSSupport">
-								<string key="NSName">.LucidaGrandeUI</string>
+								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">11</double>
 								<int key="NSfFlags">3100</int>
 							</object>
@@ -232,15 +226,12 @@
 							<reference key="NSBackgroundColor" ref="531849094"/>
 							<reference key="NSTextColor" ref="107940670"/>
 						</object>
-						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 					</object>
 					<object class="NSButton" id="418784170">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">265</int>
 						<string key="NSFrame">{{247, 288}, {102, 32}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="162490054"/>
 						<string key="NSHuggingPriority">{250, 750}</string>
 						<bool key="NSEnabled">YES</bool>
@@ -249,7 +240,7 @@
 							<int key="NSCellFlags2">134217728</int>
 							<string key="NSContents">Cancel</string>
 							<object class="NSFont" key="NSSupport">
-								<string key="NSName">.LucidaGrandeUI</string>
+								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
 								<int key="NSfFlags">1044</int>
 							</object>
@@ -257,7 +248,7 @@
 							<int key="NSButtonFlags">-2038284288</int>
 							<int key="NSButtonFlags2">129</int>
 							<object class="NSFont" key="NSAlternateImage">
-								<string key="NSName">.LucidaGrandeUI</string>
+								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
 								<int key="NSfFlags">16</int>
 							</object>
@@ -266,22 +257,18 @@
 							<int key="NSPeriodicDelay">400</int>
 							<int key="NSPeriodicInterval">75</int>
 						</object>
-						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 					</object>
 					<object class="NSProgressIndicator" id="162490054">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{23, 268}, {323, 20}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="900901386"/>
 						<int key="NSpiFlags">16396</int>
 						<double key="NSMaxValue">100</double>
 					</object>
 				</array>
 				<string key="NSFrameSize">{364, 331}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="699510110"/>
 				<string key="NSClassName">NSView</string>
 			</object>
@@ -352,6 +339,22 @@
 						<reference key="destination" ref="750423723"/>
 					</object>
 					<string key="id">48</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">contentArray: steps</string>
+						<reference key="source" ref="28258754"/>
+						<reference key="destination" ref="696877998"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="28258754"/>
+							<reference key="NSDestination" ref="696877998"/>
+							<string key="NSLabel">contentArray: steps</string>
+							<string key="NSBinding">contentArray</string>
+							<string key="NSKeyPath">steps</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<string key="id">hAV-ic-stI</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -644,27 +647,6 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">NSCollectionViewItem</string>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="imageView">NSImageView</string>
-						<string key="textField">NSTextField</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="imageView">
-							<string key="name">imageView</string>
-							<string key="candidateClassName">NSImageView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="textField">
-							<string key="name">textField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSCollectionViewItem.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">OROpSeqStepView</string>
 					<string key="superclassName">NSView</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
@@ -769,14 +751,9 @@
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
-		<bool key="IBDocument.previouslyAttemptedUpgradeToXcode5">YES</bool>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1090" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
@@ -786,7 +763,7 @@
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="NS.key.0">cross</string>
-			<string key="NS.object.0">{40.909090909090914, 40.909090909090914}</string>
+			<string key="NS.object.0">{41.13345678796027, 41.13345678796027}</string>
 		</object>
 	</data>
 </archive>
