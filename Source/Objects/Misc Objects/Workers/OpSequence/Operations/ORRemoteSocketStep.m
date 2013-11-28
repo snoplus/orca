@@ -20,7 +20,6 @@
 
 @synthesize commands;
 @synthesize socketObject;
-@synthesize requirements;
 @synthesize cmdIndexToExecute;
 
 // remoteSocketStep:
@@ -31,18 +30,22 @@
     
 	ORRemoteSocketStep* step    = [[[self alloc] init] autorelease];
 	step.socketObject           = aSocketObj;
-    step.commands               = [NSMutableArray array];
     
+    NSMutableArray *anArgumentsArray = [[NSMutableArray alloc] init];
+    [anArgumentsArray addObject:aCmd];
+   
     va_list args;
     va_start(args, aCmd);
     for (NSString *arg = va_arg(args, NSString*);
          arg != nil;
-         arg = va_arg(args, NSString*)) {
-        [step.commands addObject:arg];
+         arg = va_arg(args, NSString*))
+    {
+        [anArgumentsArray addObject:arg];
     }
     va_end(args);
-        
+    step.commands           = anArgumentsArray;
     step.cmdIndexToExecute  = anIndex;
+    
 	return step;
 }
 
@@ -52,8 +55,6 @@
     socketObject = nil;
 	[commands release];
     commands = nil;
-    [requirements release];
-    requirements = nil;
     [cmdIndexToExecute release];
     cmdIndexToExecute = nil;
 	[super dealloc];
@@ -83,24 +84,13 @@
                 for(id aCmd in commands){
                     if([self isCancelled])break;
                     [self executeCmd:aCmd];
-                    if([self isCancelled])break;
                 }
             }
             [socketObject disconnect];
         }
     }
-    NSInteger err=0;
-    for(id aKey in requirements){
-        NSString* aValue = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
-        NSString* requiredValue = [requirements objectForKey:aKey];
-        if(![aValue isEqualToString:requiredValue]){
-            err++;
-        }
-    }
-    self.errorCount=err;
-    if(self.errorCount) [currentQueue setErrorBit:self.stepId];
-    else                [currentQueue setSuccessBit:self.stepId];
-    if(self.errorCount && self.errorTitle)self.title = errorTitle;
+    
+     self.errorCount = [self checkRequirements];
 }
 
 - (void) executeCmd:(NSString*)aCmd
@@ -119,7 +109,8 @@
             totalTime += 0.1;
             if(totalTime>2)break;
             if([socketObject responseExistsForKey:outputStateKey]){
-                [currentQueue setStateValue:[socketObject responseForKey:outputStateKey] forKey:outputStateKey];
+                id aValue = [socketObject responseForKey:outputStateKey];
+                [currentQueue setStateValue:aValue forKey:outputStateKey];
                 break;
             }
         }
@@ -127,10 +118,6 @@
 
 }
 
-- (void) require:(NSString*)aKey value:(NSString*)aValue
-{
-    if(!requirements)self.requirements = [NSMutableDictionary dictionary];
-    [requirements setObject:aValue forKey:aKey];
-}
+
 
 @end

@@ -37,17 +37,17 @@
 	}
 	
 	if (newState == kSeqStepSuccess){
-		[imageView setImage:[NSImage imageNamed:@"check"]];
+		[imageView setImage:[NSImage imageNamed:@"checkMark"]];
 		[imageView setHidden:NO];
 		[errorsWarningsLabel setHidden:NO];
 	}
 	else if (newState == kSeqStepFailed){
-		[imageView setImage:[NSImage imageNamed:@"cross"]];
+		[imageView setImage:[NSImage imageNamed:@"exMark"]];
 		[imageView setHidden:NO];
 		[errorsWarningsLabel setHidden:NO];
 	}
 	else if (newState == kSeqStepSuccessWithWarnings){
-		[imageView setImage:[NSImage imageNamed:@"warn"]];
+		[imageView setImage:[NSImage imageNamed:@"questionMark"]];
 		[imageView setHidden:NO];
 		[errorsWarningsLabel setHidden:NO];
 	}

@@ -221,12 +221,8 @@
 			currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
 			NSString *paragraph = [outputString substringWithRange:currentRange];
 
-			if ([errorPredicate evaluateWithObject:paragraph]){
-				errors++;
-			}
-			else if ([warningPredicate evaluateWithObject:paragraph]){
-				warnings++;
-			}
+			if ([errorPredicate evaluateWithObject:paragraph])          errors++;
+			else if ([warningPredicate evaluateWithObject:paragraph])   warnings++;
 		}
 	}
 
@@ -268,11 +264,8 @@
 		}
 	}
 	
-	self.errorCount = errors;
+	self.errorCount   = errors;
 	self.warningCount = warnings;
-    
-    if(self.errorCount) [currentQueue setErrorBit:self.stepId];
-    else                [currentQueue setSuccessBit:self.stepId];
 
 }
 
@@ -289,11 +282,9 @@
 	}
 	else [self parseWarningsAndErrors];
 
-    if (outputStateKey){
-        NSString *string = [self outputString];
-        if (trimNewlines)string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-        [currentQueue setStateValue:string forKey:outputStateKey];
-	}
+    if(outputStateKey){
+        [currentQueue setStateValue:self.errorCount==0 ? @"1" : @"0" forKey:outputStateKey];
+    }
     
 	[taskHandler release];
 	taskHandler = nil;

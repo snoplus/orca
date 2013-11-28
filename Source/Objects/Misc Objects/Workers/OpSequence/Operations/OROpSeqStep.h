@@ -26,33 +26,33 @@
 	NSInteger           warningCount;
 	NSString*           title;
 	NSString*           errorTitle;
-    NSInteger           stepId;
-    BOOL                continueOnError;
-    BOOL                useContinueMask;
-    unsigned long long  continueMask;
-    unsigned long long  quitMask;
+	NSString*           successTitle;
+	NSMutableDictionary*   requirements;
+	NSMutableDictionary*   preConditions;
 }
 
 @property (nonatomic, copy) NSString*       title;
 @property (nonatomic, copy) NSString*       errorTitle;
+@property (nonatomic, copy) NSString*       successTitle;
 @property (readonly)        NSTextStorage*  outputStringStorage;
 @property (readonly)        NSTextStorage*  errorStringStorage;
 @property (retain)          OROpSequenceQueue* currentQueue;
 @property (retain)          OROpSeqStep*    concurrentStep;
 @property (readwrite)       NSInteger       errorCount;
 @property (readwrite)       NSInteger       warningCount;
-@property (readwrite)       NSInteger       stepId;
-@property (readwrite)       BOOL            continueOnError;
+@property (retain) NSMutableDictionary*   requirements;
+@property (retain) NSMutableDictionary*   preConditions;
 
 - (NSString *)outputString;
 - (NSString *)errorString;
+- (void) require:(NSString*)aKey value:(NSString*)aValue;
+- (void) preCondition:(NSString*)aKey value:(NSString*)aValue;
+- (NSInteger) checkRequirements;
+- (BOOL) checkPreConditions;
 
 - (NSArray *)resolvedScriptArrayForArray:(NSArray *)array;
 - (NSDictionary *)resolvedScriptDictionaryForDictionary:(NSDictionary *)dictionary;
 - (NSString *)resolvedScriptValueForValue:(id)value;
-- (void) requiredSuccessfullSteps:(int)aBit,... NS_REQUIRES_NIL_TERMINATION;
-- (void) setSuccess;
-- (void) setError;
 
 - (void)appendOutputString:(NSString *)string;
 - (void)replaceOutputString:(NSString *)string;

@@ -268,7 +268,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
     return NO;
 }
-
+- (BOOL) rampDownHV:(int)aCrate
+{
+    return YES;
+}
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -411,9 +414,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (NSArray*) scriptSteps
 {
     
-#define kPingedId  0
-#define kHVCheckId 1
-    
+    //steps are executed in order, but may be skipped under certain conditions
 	NSMutableArray *steps = [NSMutableArray array];
     
     ORRemoteSocketModel* remObj1 = [self remoteSocket:1];
@@ -422,44 +423,66 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //---------------------ping machine---------------------
     [steps addObject: [ORShellStep shellStepWithCommandLine: @"/sbin/ping",@"-c",@"1",@"-t",@"1",@"-q",ip1,nil]];
 	[[steps lastObject] setTrimNewlines:YES];
-	[[steps lastObject] setErrorStringErrorPattern:@".+"];
-    [[steps lastObject] setOutputStringErrorPattern:@".* 100.0%.*"];
-	[[steps lastObject] setOutputStateKey:@"cryoVacAReachable"];
-	[[steps lastObject] setContinueOnError:YES];
-	[[steps lastObject] setStepId:kPingedId];
-	[[steps lastObject] setTitle:@"Ping: CryoVacA"];
-    
+	[[steps lastObject] setErrorStringErrorPattern:  @".+"];
+    [[steps lastObject] setOutputStringErrorPattern: @".* 100.0%.*"];
+	[[steps lastObject] setOutputStateKey:           @"vacSystemPingOK"];
+	[[steps lastObject] setSuccessTitle:             @"Ping: OK"];
+	[[steps lastObject] setErrorTitle:               @"Ping: Failed"];
+	[[steps lastObject] setTitle:                    @"Ping: CryoVacA"];
+    //----------------------------------------------------------
 
-    //---------------------invocation test---------------------
-    NSInvocation* i = [NSInvocation invocationWithTarget:self
-                                                selector:@selector(anyHvOnCrate:)
-                                         retainArguments:NO, (NSUInteger)0];
-    [steps addObject: [ORInvocationStep invocation: i]];
+    //---------------------check if HV is on---------------------
+    [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
+                                                                              selector:@selector(anyHvOnCrate:)
+                                                                       retainArguments:NO, (NSUInteger)0]]];
 	[[steps lastObject] setOutputStateKey:@"HVOn"];
-	[[steps lastObject] setStepId:kHVCheckId];
 	[[steps lastObject] setTitle:@"Check HV Bias"];
+    //----------------------------------------------------------
 
-    //---------------------check vacuuum conditions---------------------
+    //-------set the bias condition in the Vac system-----------
+    //can only execute if the vac system was pinged successfully
+    //the command sent is based on the HV state from the kHVOnId step
     [steps addObject: [ORRemoteSocketStep remoteSocket: remObj1
                                       commandSelection: [ScriptValue scriptValueWithKey:@"HVOn"]
                                               commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];",
                                                         @"[ORMJDVacuumModel,1 setDetectorsBiased:1];",
                                                         nil]];
-	[[steps lastObject] setTitle:  @"Set HV Bias State"];
+    [[steps lastObject] preCondition: @"vacSystemPingOK" value: @"1"];
 
+	[[steps lastObject] setTitle:  @"Set HV Bias State"];
+    //----------------------------------------------------------
     
-    //---------------------check vacuuum conditions---------------------    
+    //-----------------check vacuuum conditions-----------------    
+    //can only execute if the vac system was pinged successfully
     [steps addObject: [ORRemoteSocketStep remoteSocket: remObj1
                                       commandSelection: nil
                                               commands: @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
                                                         @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
                                                         nil]];
+    
+    [[steps lastObject] preCondition: @"vacSystemPingOK" value: @"1"];
+    
+    //this step state is error free ONLY if the following values are met.
+	[[steps lastObject] require:        @"shouldUnbias" value:@"0"];
+	[[steps lastObject] require:        @"okToBias"     value:@"1"];
+	[[steps lastObject] setSuccessTitle:@"Vac: OK"];
+	[[steps lastObject] setErrorTitle:  @"Vac: BAD"];
+	[[steps lastObject] setTitle:       @"Check CryoVacA"];
+    //----------------------------------------------------------
 
-    [[steps lastObject] requiredSuccessfullSteps:1,kPingedId,nil];
-	[[steps lastObject] require:@"shouldUnbias" value:@"0"];
-	[[steps lastObject] require:@"okToBias"     value:@"1"];
-	[[steps lastObject] setErrorTitle:@"CryoA Vacuum Bad."];
-	[[steps lastObject] setTitle:  @"Check CryoVacA"];
+    //---------------------Ramp Down HV---------------------
+
+    [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
+                                                                              selector:@selector(rampDownHV:)
+                                                                       retainArguments:NO, (NSUInteger)0]]];
+    
+    [[steps lastObject] preCondition: @"shouldUnbias"    value: @"1"];
+    [[steps lastObject] preCondition: @"okToBias"        value: @"0"];
+    
+	[[steps lastObject] setSuccessTitle:@"Ramping Down"];
+	[[steps lastObject] setOutputStateKey:  @"HVRamped"];
+	[[steps lastObject] setTitle:           @"Ramp Down HV"];
+    //----------------------------------------------------------
 
 	return steps;
 }

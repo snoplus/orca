@@ -19,23 +19,22 @@
 
 @synthesize title;
 @synthesize errorTitle;
+@synthesize successTitle;
 @synthesize outputStringStorage;
 @synthesize errorStringStorage;
 @synthesize currentQueue;
 @synthesize concurrentStep;
 @synthesize errorCount;
 @synthesize warningCount;
-@synthesize stepId;
-@synthesize continueOnError;
+@synthesize requirements;
+@synthesize preConditions;
 
 - (id)init
 {
 	self = [super init];
 	if (self != nil) {
-        continueMask = 0;
 		outputStringStorage = [[NSTextStorage alloc] init];
 		errorStringStorage  = [[NSTextStorage alloc] init];
-        stepId = -1;
 	}
 	return self;
 }
@@ -62,14 +61,6 @@
 	return [[[NSAttributedString alloc] initWithString:aString
                                             attributes:currentQueue.textAttributes] autorelease];
 }
-- (void) setSuccess
-{
-    if(stepId>=0)[currentQueue setSuccessBit:stepId];
-}
-- (void) setError;
-{
-    if(stepId>=0)[currentQueue setErrorBit:stepId];
-}
 
 - (NSString*) title
 {
@@ -94,16 +85,16 @@
 {
 	self.currentQueue = [NSOperationQueue currentQueue];
     
-	if(!useContinueMask || (currentQueue.successMask & continueMask)){
+	if([self checkPreConditions]){
         [self runStep];
     }
 	else {
         [self cancel];
     }
     
-	if  (([self errorCount] > 0) && !continueOnError) {
-		[[NSOperationQueue currentQueue] cancelAllOperations];
-	}
+	//if  (([self errorCount] > 0) ) {
+	//	[[NSOperationQueue currentQueue] cancelAllOperations];
+	//}
 	self.currentQueue = nil;
 }
 
@@ -114,8 +105,51 @@
 	[concurrentStep release];
 	[currentQueue release];
 	[title release];
+    [requirements release];
+    requirements = nil;
+    [preConditions release];
+    preConditions = nil;
+
     
 	[super dealloc];
+}
+
+- (void) require:(NSString*)aKey value:(NSString*)aValue
+{
+    if(!requirements)self.requirements = [NSMutableDictionary dictionary];
+    [requirements setObject:aValue forKey:aKey];
+}
+
+- (void) preCondition:(NSString*)aKey value:(NSString*)aValue
+{
+    if(!preConditions)self.preConditions = [NSMutableDictionary dictionary];
+    [preConditions setObject:aValue forKey:aKey];
+}
+
+- (BOOL) checkPreConditions
+{
+    if(!preConditions)return YES;
+    for(id aKey in preConditions){
+        NSString* aValue = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
+        NSString* requiredValue = [preConditions objectForKey:aKey];
+        if(![aValue isEqualToString:requiredValue]){
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (NSInteger) checkRequirements
+{
+    NSInteger err=0;
+    for(id aKey in requirements){
+        NSString* aValue = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
+        NSString* requiredValue = [requirements objectForKey:aKey];
+        if(![aValue isEqualToString:requiredValue]){
+            err++;
+        }
+    }
+    return err;
 }
 
 #pragma mark -- Methods for appending/setting the outputStringStorage
@@ -491,18 +525,6 @@
 	[self applyWarningAttributesToErrorStringStorageRange:
      NSMakeRange(0, [string length])];
 	self.warningCount++;
-}
-
-- (void) requiredSuccessfullSteps:(int)num,...
-{
-    useContinueMask = YES;
-    va_list valist;
-    va_start(valist, num);
-    int i;
-    for (i = 0; i < num; i++){
-        continueMask |= (1LL << va_arg(valist, int));
-    }
-    va_end(valist);
 }
 
 

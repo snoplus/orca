@@ -17,19 +17,16 @@
 
 @interface ORRemoteSocketStep : OROpSeqStep
 {
-	NSMutableDictionary*   requirements;
 	NSMutableArray*        commands;
 	ORRemoteSocketModel*   socketObject;
     NSNumber*              cmdIndexToExecute;
 }
 
-@property (retain) NSMutableDictionary*   requirements;
 @property (retain) ORRemoteSocketModel*   socketObject;
 @property (retain) NSMutableArray*        commands;
 @property (retain) NSNumber*              cmdIndexToExecute;
 
 + (ORRemoteSocketStep*)remoteSocket:(ORRemoteSocketModel*)aSocketObj commandSelection:(id)anIndex commands:(NSString *)aCmd, ... NS_REQUIRES_NIL_TERMINATION;
-- (void) require:(NSString*)aKey value:(NSString*)aValue;
 - (void) executeCmd:(NSString*)aCmd;
 
 @end

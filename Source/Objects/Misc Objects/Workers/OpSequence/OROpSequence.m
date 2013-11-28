@@ -98,11 +98,11 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
                                                         name:ScriptQueueCancelledNotification
                                                       object:scriptQueue];
 		[scriptQueue cancelAllOperations];
-//		while ([[scriptQueue operations] count] > 0) {
-//			[[NSRunLoop currentRunLoop]
-  //           runMode:NSDefaultRunLoopMode
-    //         beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-	//	}
+		while ([[scriptQueue operations] count] > 0) {
+			[[NSRunLoop currentRunLoop]
+             runMode:NSDefaultRunLoopMode
+             beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+		}
 		[scriptQueue clearState];
 	}
 
