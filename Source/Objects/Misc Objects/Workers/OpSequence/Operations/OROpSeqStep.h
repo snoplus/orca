@@ -26,6 +26,11 @@
 	NSInteger           warningCount;
 	NSString*           title;
 	NSString*           errorTitle;
+    NSInteger           stepId;
+    BOOL                continueOnError;
+    BOOL                useContinueMask;
+    unsigned long long  continueMask;
+    unsigned long long  quitMask;
 }
 
 @property (nonatomic, copy) NSString*       title;
@@ -36,6 +41,8 @@
 @property (retain)          OROpSeqStep*    concurrentStep;
 @property (readwrite)       NSInteger       errorCount;
 @property (readwrite)       NSInteger       warningCount;
+@property (readwrite)       NSInteger       stepId;
+@property (readwrite)       BOOL            continueOnError;
 
 - (NSString *)outputString;
 - (NSString *)errorString;
@@ -43,6 +50,9 @@
 - (NSArray *)resolvedScriptArrayForArray:(NSArray *)array;
 - (NSDictionary *)resolvedScriptDictionaryForDictionary:(NSDictionary *)dictionary;
 - (NSString *)resolvedScriptValueForValue:(id)value;
+- (void) requiredSuccessfullSteps:(int)aBit,... NS_REQUIRES_NIL_TERMINATION;
+- (void) setSuccess;
+- (void) setError;
 
 - (void)appendOutputString:(NSString *)string;
 - (void)replaceOutputString:(NSString *)string;

@@ -29,7 +29,6 @@ typedef enum
 - (void) start;
 - (void)cancel:(id)parameter;
 - (NSArray*) operations;
-- (void) report;
 
 @property (nonatomic, assign) enumOpSeqQueueState  state;
 @property (nonatomic, retain) NSArray*             steps;

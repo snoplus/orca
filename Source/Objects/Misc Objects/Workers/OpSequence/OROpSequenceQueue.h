@@ -23,11 +23,9 @@
     NSDictionary*           textAttributes;
     NSDictionary*           errorAttributes;
     NSDictionary*           warningAttributes;
+    unsigned long long      errorMask;
+    unsigned long long      successMask;
 }
-
-@property (nonatomic, copy) NSDictionary* textAttributes;
-@property (nonatomic, copy) NSDictionary* errorAttributes;
-@property (nonatomic, copy) NSDictionary* warningAttributes;
 
 - (void) setStateValue:(id)value forKey:(NSString *)key;
 - (id)   stateValueForKey:(NSString *)  key;
@@ -37,6 +35,16 @@
 - (void) removeCleanupStep:(OROpSeqStep*)cleanupStep;
 - (void) insertStepToRunImmediately:(OROpSeqStep*)scriptStep
 	blockingDependentsOfStep:(OROpSeqStep*)dependeeStep;
+- (void) setErrorBit:(NSInteger)aBit;
+- (void) setSuccessBit:(NSInteger)aBit;
+
+
+@property (nonatomic, copy) NSDictionary* textAttributes;
+@property (nonatomic, copy) NSDictionary* errorAttributes;
+@property (nonatomic, copy) NSDictionary* warningAttributes;
+@property (readonly)        unsigned long long errorMask;
+@property (readonly)        unsigned long long successMask;
+
 
 @end
 

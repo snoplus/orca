@@ -19,7 +19,7 @@ typedef enum
 	kSeqStepPending,
 	kSeqStepActive,
 	kSeqStepSuccess,
-	ScriptStepCancelled,
+	kSeqStepCancelled,
 	kSeqStepSuccessWithWarnings,
 	kSeqStepFailed
 } enumScriptStepState;

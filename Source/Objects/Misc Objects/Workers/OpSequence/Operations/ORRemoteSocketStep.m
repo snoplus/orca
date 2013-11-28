@@ -21,14 +21,28 @@
 @synthesize commands;
 @synthesize socketObject;
 @synthesize requirements;
+@synthesize cmdIndexToExecute;
 
 // remoteSocketStep:
 // sends a command to a remote ORCA and stores the response
-+ (ORRemoteSocketStep*)remoteCommands:(NSArray*)cmds remoteSocket:(ORRemoteSocketModel*)aSocketObj;
++ (ORRemoteSocketStep*)remoteSocket:(ORRemoteSocketModel*)aSocketObj commandSelection:(NSNumber*)anIndex commands:(NSString *)aCmd, ...;
+
 {
+    
 	ORRemoteSocketStep* step    = [[[self alloc] init] autorelease];
-	step.socketObject = aSocketObj;
-	step.commands      = cmds;
+	step.socketObject           = aSocketObj;
+    step.commands               = [NSMutableArray array];
+    
+    va_list args;
+    va_start(args, aCmd);
+    for (NSString *arg = va_arg(args, NSString*);
+         arg != nil;
+         arg = va_arg(args, NSString*)) {
+        [step.commands addObject:arg];
+    }
+    va_end(args);
+        
+    step.cmdIndexToExecute  = anIndex;
 	return step;
 }
 
@@ -40,6 +54,8 @@
     commands = nil;
     [requirements release];
     requirements = nil;
+    [cmdIndexToExecute release];
+    cmdIndexToExecute = nil;
 	[super dealloc];
 }
 
@@ -51,32 +67,24 @@
 
 - (void)runStep
 {
+    
 	if (self.concurrentStep) [NSThread sleepForTimeInterval:5.0];
     if(socketObject){
         [socketObject connect];
         if([socketObject isConnected]){
-            for(id aCmd in commands){
-                if([self isCancelled])break;
-                [socketObject sendString:aCmd];
-                NSTimeInterval totalTime = 0;
-                NSString* outputStateKey = nil;
-                NSArray* parts = [aCmd componentsSeparatedByString:@"="];
-                if([parts count]==2){
-                    outputStateKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
+            NSNumber* indexNum = (NSNumber*)[self resolvedScriptValueForValue:cmdIndexToExecute];
+            if(indexNum){
+                NSInteger index = [indexNum intValue];
+                if([commands count] > index){
+                    [self executeCmd:[commands objectAtIndex:index]];
                 }
-                while (![self isCancelled]){
-                    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                         beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
-                    totalTime += 0.25;
-                    if(totalTime>2){
-                        break;
-                    }
-                    if([socketObject responseExistsForKey:outputStateKey]){
-                        [currentQueue setStateValue:[socketObject responseForKey:outputStateKey] forKey:outputStateKey];
-                        break;
-                    }
+            }
+            else {
+                for(id aCmd in commands){
+                    if([self isCancelled])break;
+                    [self executeCmd:aCmd];
+                    if([self isCancelled])break;
                 }
-                if([self isCancelled])break;
             }
             [socketObject disconnect];
         }
@@ -90,7 +98,33 @@
         }
     }
     self.errorCount=err;
+    if(self.errorCount) [currentQueue setErrorBit:self.stepId];
+    else                [currentQueue setSuccessBit:self.stepId];
     if(self.errorCount && self.errorTitle)self.title = errorTitle;
+}
+
+- (void) executeCmd:(NSString*)aCmd
+{
+    [socketObject sendString:aCmd];
+    NSTimeInterval totalTime = 0;
+    NSString* outputStateKey = nil;
+    NSArray* parts = [aCmd componentsSeparatedByString:@"="];
+    if([parts count]==2){
+        outputStateKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
+    }
+    if(outputStateKey){
+        while (![self isCancelled]){
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                     beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+            totalTime += 0.1;
+            if(totalTime>2)break;
+            if([socketObject responseExistsForKey:outputStateKey]){
+                [currentQueue setStateValue:[socketObject responseForKey:outputStateKey] forKey:outputStateKey];
+                break;
+            }
+        }
+    }
+
 }
 
 - (void) require:(NSString*)aKey value:(NSString*)aValue

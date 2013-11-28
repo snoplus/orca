@@ -72,12 +72,14 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
         [self cancel:nil];
     }
     else {
-        if([delegate respondsToSelector:@selector(scriptSteps)]){
-            self.steps = [delegate scriptSteps];
-            for (OROpSeqStep *step in steps){
-                [scriptQueue addOperation:step];
+        if([scriptQueue operationCount]==0){
+            if([delegate respondsToSelector:@selector(scriptSteps)]){
+                self.steps = [delegate scriptSteps];
+                for (OROpSeqStep *step in steps){
+                    [scriptQueue addOperation:step];
+                }
+                state = kOpSeqQueueRunning;
             }
-            state = kOpSeqQueueRunning;
         }
     }
 }
@@ -96,16 +98,14 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
                                                         name:ScriptQueueCancelledNotification
                                                       object:scriptQueue];
 		[scriptQueue cancelAllOperations];
-		while ([[scriptQueue operations] count] > 0) {
-			[[NSRunLoop currentRunLoop]
-             runMode:NSDefaultRunLoopMode
-             beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-		}
+//		while ([[scriptQueue operations] count] > 0) {
+//			[[NSRunLoop currentRunLoop]
+  //           runMode:NSDefaultRunLoopMode
+    //         beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+	//	}
 		[scriptQueue clearState];
 	}
-	else if ([parameter isKindOfClass:[NSButton class]]){
-		[self start];
-	}
+
 	else {
 		state = kOpSeqQueueFailed;
 	} 
@@ -120,19 +120,12 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
 {
 	if ([keyPath isEqual:@"operationCount"]) {
         if([[scriptQueue operations] count]==0){
-            [self report];
+           // [self report];
         }
 		return;
 	}
 	[super observeValueForKeyPath:keyPath ofObject:object change:change
                           context:context];
-}
-
-- (void) report
-{
-    for (OROpSeqStep* step in steps){
-        
-    }
 }
 
 @end

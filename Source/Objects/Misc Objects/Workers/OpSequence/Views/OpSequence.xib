@@ -155,7 +155,6 @@
 						<string key="NSFrame">{{33, 3}, {149, 16}}</string>
 						<reference key="NSSuperview" ref="750423723"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="38382529">
 							<int key="NSCellFlags">67108928</int>
@@ -179,14 +178,15 @@
 				<string key="NSClassName">OROpSeqStepView</string>
 			</object>
 			<object class="NSCustomView" id="268208396">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSCollectionView" id="900901386">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">274</int>
-						<string key="NSFrame">{{20, 12}, {324, 246}}</string>
+						<string key="NSFrame">{{8, 13}, {324, 246}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
+						<reference key="NSWindow"/>
 						<string key="NSMinGridSize">{0, 0}</string>
 						<string key="NSMaxGridSize">{0, 0}</string>
 						<int key="NSMaxNumberOfGridRows">0</int>
@@ -209,9 +209,10 @@
 					<object class="NSTextField" id="699510110">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{22, 302}, {171, 14}}</string>
+						<string key="NSFrame">{{7, 285}, {133, 14}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSNextKeyView" ref="418784170"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="162490054"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="476481129">
 							<int key="NSCellFlags">68157504</int>
@@ -230,9 +231,10 @@
 					<object class="NSButton" id="418784170">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">265</int>
-						<string key="NSFrame">{{247, 288}, {102, 32}}</string>
+						<string key="NSFrame">{{233, 274}, {102, 32}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSNextKeyView" ref="162490054"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="900901386"/>
 						<string key="NSHuggingPriority">{250, 750}</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="286783454">
@@ -261,14 +263,17 @@
 					<object class="NSProgressIndicator" id="162490054">
 						<reference key="NSNextResponder" ref="268208396"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{23, 268}, {323, 20}}</string>
+						<string key="NSFrame">{{7, 265}, {323, 12}}</string>
 						<reference key="NSSuperview" ref="268208396"/>
-						<reference key="NSNextKeyView" ref="900901386"/>
-						<int key="NSpiFlags">16396</int>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="418784170"/>
+						<int key="NSpiFlags">16652</int>
 						<double key="NSMaxValue">100</double>
 					</object>
 				</array>
-				<string key="NSFrameSize">{364, 331}</string>
+				<string key="NSFrameSize">{342, 314}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="699510110"/>
 				<string key="NSClassName">NSView</string>
 			</object>
@@ -538,9 +543,9 @@
 						<string key="id">141</string>
 						<reference key="object" ref="268208396"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="162490054"/>
-							<reference ref="418784170"/>
 							<reference ref="699510110"/>
+							<reference ref="418784170"/>
+							<reference ref="162490054"/>
 							<reference ref="900901386"/>
 						</array>
 						<reference key="parent" ref="0"/>
@@ -684,64 +689,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">OROpSequenceController</string>
 					<string key="superclassName">NSObject</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="cancel:">id</string>
-						<string key="start:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="cancel:">
-							<string key="name">cancel:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="start:">
-							<string key="name">start:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="cancelButton">NSButton</string>
-						<string key="collectionView">NSCollectionView</string>
-						<string key="owner">id</string>
-						<string key="portControlsContent">NSView</string>
-						<string key="portControlsView">NSBox</string>
-						<string key="progressIndicator">NSProgressIndicator</string>
-						<string key="progressLabel">NSTextField</string>
-						<string key="stepsController">NSArrayController</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="cancelButton">
-							<string key="name">cancelButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="collectionView">
-							<string key="name">collectionView</string>
-							<string key="candidateClassName">NSCollectionView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="owner">
-							<string key="name">owner</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="portControlsContent">
-							<string key="name">portControlsContent</string>
-							<string key="candidateClassName">NSView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="portControlsView">
-							<string key="name">portControlsView</string>
-							<string key="candidateClassName">NSBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="progressIndicator">
-							<string key="name">progressIndicator</string>
-							<string key="candidateClassName">NSProgressIndicator</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="progressLabel">
-							<string key="name">progressLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="stepsController">
-							<string key="name">stepsController</string>
-							<string key="candidateClassName">NSArrayController</string>
-						</object>
-					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/OROpSequenceController.h</string>

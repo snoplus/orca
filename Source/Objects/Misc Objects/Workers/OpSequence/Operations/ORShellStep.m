@@ -270,6 +270,10 @@
 	
 	self.errorCount = errors;
 	self.warningCount = warnings;
+    
+    if(self.errorCount) [currentQueue setErrorBit:self.stepId];
+    else                [currentQueue setSuccessBit:self.stepId];
+
 }
 
 - (void)taskComplete:(ORTaskHandler*)aTaskHandler

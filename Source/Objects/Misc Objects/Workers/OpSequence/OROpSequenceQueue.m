@@ -21,6 +21,8 @@ NSString * const ScriptQueueCancelledNotification = @"ScriptQueueCancelledNotifi
 @synthesize textAttributes;
 @synthesize errorAttributes;
 @synthesize warningAttributes;
+@synthesize errorMask;
+@synthesize successMask;
 
 - (id) init
 {
@@ -53,6 +55,20 @@ NSString * const ScriptQueueCancelledNotification = @"ScriptQueueCancelledNotifi
 		value = [[[queueState valueForKey:key] retain] autorelease];
 	}
 	return value;
+}
+
+- (void) setErrorBit:(NSInteger)aBit
+{
+ 	@synchronized(self){
+        if(aBit>=0) errorMask|=(1LL<<aBit);
+    }
+}
+
+- (void) setSuccessBit:(NSInteger)aBit
+{
+ 	@synchronized(self){
+        if(aBit>=0) successMask|=(1LL<<aBit);
+    }
 }
 
 - (void) postCancelledNotification

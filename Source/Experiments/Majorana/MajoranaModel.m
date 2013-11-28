@@ -410,6 +410,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //
 - (NSArray*) scriptSteps
 {
+    
+#define kPingedId  0
+#define kHVCheckId 1
+    
 	NSMutableArray *steps = [NSMutableArray array];
     
     ORRemoteSocketModel* remObj1 = [self remoteSocket:1];
@@ -421,27 +425,37 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	[[steps lastObject] setErrorStringErrorPattern:@".+"];
     [[steps lastObject] setOutputStringErrorPattern:@".* 100.0%.*"];
 	[[steps lastObject] setOutputStateKey:@"cryoVacAReachable"];
+	[[steps lastObject] setContinueOnError:YES];
+	[[steps lastObject] setStepId:kPingedId];
 	[[steps lastObject] setTitle:@"Ping: CryoVacA"];
     
-  
-	
+
     //---------------------invocation test---------------------
     NSInvocation* i = [NSInvocation invocationWithTarget:self
                                                 selector:@selector(anyHvOnCrate:)
                                          retainArguments:NO, (NSUInteger)0];
     [steps addObject: [ORInvocationStep invocation: i]];
-	[[steps lastObject] setOutputStateKey:@"result"];
-	[[steps lastObject] setTitle:@"Check Bias"];
+	[[steps lastObject] setOutputStateKey:@"HVOn"];
+	[[steps lastObject] setStepId:kHVCheckId];
+	[[steps lastObject] setTitle:@"Check HV Bias"];
+
+    //---------------------check vacuuum conditions---------------------
+    [steps addObject: [ORRemoteSocketStep remoteSocket: remObj1
+                                      commandSelection: [ScriptValue scriptValueWithKey:@"HVOn"]
+                                              commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];",
+                                                        @"[ORMJDVacuumModel,1 setDetectorsBiased:1];",
+                                                        nil]];
+	[[steps lastObject] setTitle:  @"Set HV Bias State"];
 
     
-    //---------------------check vacuuum conditions---------------------
-    NSArray* cmds = [NSArray arrayWithObjects:
-                     @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
-                     @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
-                     @"[ORMJDVacuumModel,1 setDetectorsBiased:0];",
-                     nil];
-    
-    [steps addObject: [ORRemoteSocketStep remoteCommands:cmds remoteSocket:remObj1]];
+    //---------------------check vacuuum conditions---------------------    
+    [steps addObject: [ORRemoteSocketStep remoteSocket: remObj1
+                                      commandSelection: nil
+                                              commands: @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
+                                                        @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
+                                                        nil]];
+
+    [[steps lastObject] requiredSuccessfullSteps:1,kPingedId,nil];
 	[[steps lastObject] require:@"shouldUnbias" value:@"0"];
 	[[steps lastObject] require:@"okToBias"     value:@"1"];
 	[[steps lastObject] setErrorTitle:@"CryoA Vacuum Bad."];

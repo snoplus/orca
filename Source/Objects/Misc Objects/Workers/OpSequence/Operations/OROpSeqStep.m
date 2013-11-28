@@ -25,13 +25,17 @@
 @synthesize concurrentStep;
 @synthesize errorCount;
 @synthesize warningCount;
+@synthesize stepId;
+@synthesize continueOnError;
 
 - (id)init
 {
 	self = [super init];
 	if (self != nil) {
+        continueMask = 0;
 		outputStringStorage = [[NSTextStorage alloc] init];
 		errorStringStorage  = [[NSTextStorage alloc] init];
+        stepId = -1;
 	}
 	return self;
 }
@@ -58,6 +62,14 @@
 	return [[[NSAttributedString alloc] initWithString:aString
                                             attributes:currentQueue.textAttributes] autorelease];
 }
+- (void) setSuccess
+{
+    if(stepId>=0)[currentQueue setSuccessBit:stepId];
+}
+- (void) setError;
+{
+    if(stepId>=0)[currentQueue setErrorBit:stepId];
+}
 
 - (NSString*) title
 {
@@ -81,10 +93,15 @@
 - (void) main
 {
 	self.currentQueue = [NSOperationQueue currentQueue];
-	
-	[self runStep];
-	
-	if ([self errorCount] > 0) {
+    
+	if(!useContinueMask || (currentQueue.successMask & continueMask)){
+        [self runStep];
+    }
+	else {
+        [self cancel];
+    }
+    
+	if  (([self errorCount] > 0) && !continueOnError) {
 		[[NSOperationQueue currentQueue] cancelAllOperations];
 	}
 	self.currentQueue = nil;
@@ -476,8 +493,20 @@
 	self.warningCount++;
 }
 
-#pragma mark -- Resolving ScriptValues
+- (void) requiredSuccessfullSteps:(int)num,...
+{
+    useContinueMask = YES;
+    va_list valist;
+    va_start(valist, num);
+    int i;
+    for (i = 0; i < num; i++){
+        continueMask |= (1LL << va_arg(valist, int));
+    }
+    va_end(valist);
+}
 
+
+#pragma mark -- Resolving ScriptValues
 //
 // resolvedScriptValueForValue:
 //

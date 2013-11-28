@@ -47,7 +47,7 @@
 		[view setErrorsWarningsString:s];
 		if ([step errorCount] != 0)         [view setState:kSeqStepFailed];
 		else if ([step warningCount] != 0)  [view setState:kSeqStepSuccessWithWarnings];
-		else if ([step isCancelled])        [view setState:ScriptStepCancelled];
+		else if ([step isCancelled])        [view setState:kSeqStepCancelled];
 		else                                [view setState:kSeqStepSuccess];
 	}
 	else [view setState:kSeqStepPending];
