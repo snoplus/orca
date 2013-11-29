@@ -1,16 +1,24 @@
 //
-//  ScriptStep.m
-//  CocoaScript
+//  OROpSeqStep.m
+//  Orca
 //
 //  Created by Matt Gallagher on 2010/11/01.
-//  Copyright 2010 Matt Gallagher. All rights reserved.
-//
-//  Permission is given to use this source code file, free of charge, in any
-//  project, commercial or otherwise, entirely at your risk, with the condition
-//  that any redistribution (in part or whole) of source code must retain
-//  this copyright and permission notice. Attribution in compiled projects is
-//  appreciated but not required.
-//
+//  Found on web and heavily modified by Mark Howe on Fri Nov 28, 2013.
+//  Copyright (c) 2013  University of North Carolina. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of
+//Washington at the Center for Experimental Nuclear Physics and
+//Astrophysics (CENPA) sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
+//for the use of this software.
+//-------------------------------------------------------------
+
 
 #import "OROpSeqStep.h"
 #import "OROpSequenceQueue.h"
@@ -26,7 +34,8 @@
 @synthesize concurrentStep;
 @synthesize errorCount;
 @synthesize requirements;
-@synthesize preConditions;
+@synthesize andConditions;
+@synthesize orConditions;
 
 - (id)init
 {
@@ -84,7 +93,7 @@
 {
 	self.currentQueue = [NSOperationQueue currentQueue];
     
-	if([self checkPreConditions]){
+	if([self checkConditions]){
         [self runStep];
     }
 	else {
@@ -106,8 +115,10 @@
 	[title release];
     [requirements release];
     requirements = nil;
-    [preConditions release];
-    preConditions = nil;
+    [andConditions release];
+    andConditions = nil;
+    [orConditions release];
+    orConditions = nil;
 
     
 	[super dealloc];
@@ -119,23 +130,46 @@
     [requirements setObject:aValue forKey:aKey];
 }
 
-- (void) preCondition:(NSString*)aKey value:(NSString*)aValue
+- (void) addAndCondition:(NSString*)aKey value:(NSString*)aValue
 {
-    if(!preConditions)self.preConditions = [NSMutableDictionary dictionary];
-    [preConditions setObject:aValue forKey:aKey];
+    if(!andConditions)self.andConditions = [NSMutableDictionary dictionary];
+    [andConditions setObject:aValue forKey:aKey];
 }
 
-- (BOOL) checkPreConditions
+- (void) addOrCondition:(NSString*)aKey value:(NSString*)aValue
 {
-    if(!preConditions)return YES;
-    for(id aKey in preConditions){
-        NSString* aValue = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
-        NSString* requiredValue = [preConditions objectForKey:aKey];
-        if([aValue length]==0 || [aValue isEqualToString:requiredValue]){
-            return YES;
+    if(!orConditions)self.orConditions = [NSMutableDictionary dictionary];
+    [orConditions setObject:aValue forKey:aKey];
+}
+
+
+- (BOOL) checkConditions
+{
+    if(!andConditions && !orConditions)return YES;
+    //if any And conditions are present they ALL must be true
+    
+    BOOL andValue = YES;
+    for(id aKey in andConditions){
+        NSString* aValue        = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
+        NSString* requiredValue = [andConditions objectForKey:aKey];
+        if(![aValue isEqualToString:requiredValue]){
+            andValue = NO;
+            break;
         }
     }
-    return NO;
+    
+    //if ANY of the or conditions are present
+    BOOL orValue = NO;
+    if(!orConditions)orValue = YES;
+    else {
+        for(id aKey in orConditions){
+            NSString* aValue        = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
+            NSString* requiredValue = [orConditions objectForKey:aKey];
+            orValue |= ![aValue isEqualToString:requiredValue];
+        }
+    }
+
+    return andValue & orValue;
 }
 
 - (NSInteger) checkRequirements

@@ -1,16 +1,22 @@
 //
-//  TaskStep.m
-//  CocoaScript
+//  ORRemoteSocketStep.m
+//  Orca
 //
-//  Created by Matt Gallagher on 2010/11/01.
-//  Copyright 2010 Matt Gallagher. All rights reserved.
-//
-//  Permission is given to use this source code file, free of charge, in any
-//  project, commercial or otherwise, entirely at your risk, with the condition
-//  that any redistribution (in part or whole) of source code must retain
-//  this copyright and permission notice. Attribution in compiled projects is
-//  appreciated but not required.
-//
+//  Created by Mark Howe on Fri Nov 28, 2013.
+//  Copyright (c) 2013  University of North Carolina. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of
+//Washington at the Center for Experimental Nuclear Physics and
+//Astrophysics (CENPA) sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
+//for the use of this software.
+//-------------------------------------------------------------
 
 #import "ORRemoteSocketStep.h"
 #import "OROpSequenceQueue.h"
@@ -21,6 +27,7 @@
 @synthesize commands;
 @synthesize socketObject;
 @synthesize cmdIndexToExecute;
+@synthesize outputStateKey;
 
 // remoteSocketStep:
 // sends a command to a remote ORCA and stores the response
@@ -90,28 +97,34 @@
         }
         else self.errorCount=1;
     }
-    
      self.errorCount += [self checkRequirements];
+    if (outputStateKey){
+        NSString* result;
+        if(self.errorCount) result = @"1";
+        else                result = @"0";
+        [currentQueue setStateValue:result forKey:outputStateKey];
+	}
+
 }
 
 - (void) executeCmd:(NSString*)aCmd
 {
     [socketObject sendString:aCmd];
     NSTimeInterval totalTime = 0;
-    NSString* outputStateKey = nil;
+    NSString* aKey = nil;
     NSArray* parts = [aCmd componentsSeparatedByString:@"="];
     if([parts count]==2){
-        outputStateKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
+        aKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
     }
     while (![self isCancelled]){
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                  beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         totalTime += 0.1;
         if(totalTime>2)break;
-        if(outputStateKey){
-            if([socketObject responseExistsForKey:outputStateKey]){
-                id aValue = [socketObject responseForKey:outputStateKey];
-                [currentQueue setStateValue:aValue forKey:outputStateKey];
+        if(aKey){
+            if([socketObject responseExistsForKey:aKey]){
+                id aValue = [socketObject responseForKey:aKey];
+                [currentQueue setStateValue:aValue forKey:aKey];
                 break;
             }
         }
