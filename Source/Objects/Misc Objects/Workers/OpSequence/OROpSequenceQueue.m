@@ -20,7 +20,6 @@ NSString * const ScriptQueueCancelledNotification = @"ScriptQueueCancelledNotifi
 @implementation OROpSequenceQueue
 @synthesize textAttributes;
 @synthesize errorAttributes;
-@synthesize warningAttributes;
 
 - (id) init
 {

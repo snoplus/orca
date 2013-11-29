@@ -25,7 +25,6 @@
 @synthesize currentQueue;
 @synthesize concurrentStep;
 @synthesize errorCount;
-@synthesize warningCount;
 @synthesize requirements;
 @synthesize preConditions;
 
@@ -132,11 +131,11 @@
     for(id aKey in preConditions){
         NSString* aValue = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
         NSString* requiredValue = [preConditions objectForKey:aKey];
-        if(![aValue isEqualToString:requiredValue]){
-            return NO;
+        if([aValue length]==0 || [aValue isEqualToString:requiredValue]){
+            return YES;
         }
     }
-    return YES;
+    return NO;
 }
 
 - (NSInteger) checkRequirements
@@ -258,27 +257,6 @@
 }
 
 //
-// applyWarningAttributesToOutputStringStorageRange:
-//
-// Set a range within the output string to the warning attributes.
-//
-// Parameters:
-//    aRange - the range to change
-//
-- (void)applyWarningAttributesToOutputStringStorageRange:(NSRange)aRange
-{
-	NSAssert1(currentQueue,
-              @"Method %@ should only be invoked while currentQueue is set.",
-              NSStringFromSelector(_cmd));
-    
-	[self applyOutputAttributesToRange:
-     [NSDictionary dictionaryWithObjectsAndKeys:
-      currentQueue.warningAttributes, @"attributes",
-      [NSValue valueWithRange:aRange], @"range",
-      nil]];
-}
-
-//
 // appendOutputString:
 //
 // Appends an NSString to the outputStringStorage
@@ -321,22 +299,6 @@
 	self.errorCount++;
 }
 
-//
-// replaceAndApplyWarningToOutputString:
-//
-// Replace the outputStringStorage with an NSString and flag the whole string
-// as an error
-//
-// Parameters:
-//    string - the NSString
-//
-- (void)replaceAndApplyWarningToOutputString:(NSString *)string
-{
-	[self replaceAttributedOutputString:[self attributedStringForString:string]];
-	[self applyWarningAttributesToOutputStringStorageRange:
-     NSMakeRange(0, [string length])];
-	self.warningCount++;
-}
 
 #pragma mark -- Methods for appending/setting the errorStringStorage
 
@@ -445,26 +407,6 @@
       nil]];
 }
 
-//
-// applyWarningAttributesToErrorStringStorageRange:
-//
-// Set a range within the error string to the warning attributes.
-//
-// Parameters:
-//    aRange - the range to change
-//
-- (void)applyWarningAttributesToErrorStringStorageRange:(NSRange)aRange
-{
-	NSAssert1(currentQueue,
-              @"Method %@ should only be invoked while currentQueue is set.",
-              NSStringFromSelector(_cmd));
-    
-	[self applyErrorAttributesToRange:
-     [NSDictionary dictionaryWithObjectsAndKeys:
-      currentQueue.warningAttributes, @"attributes",
-      [NSValue valueWithRange:aRange], @"range",
-      nil]];
-}
 
 //
 // appendErrorString:
@@ -509,24 +451,6 @@
      NSMakeRange(0, [string length])];
 	self.errorCount++;
 }
-
-//
-// replaceAndApplyWarningToErrorString:
-//
-// Replace the errorStringStorage with an NSString and flag the whole string
-// as a warning
-//
-// Parameters:
-//    string - the NSString
-//
-- (void)replaceAndApplyWarningToErrorString:(NSString *)string
-{
-	[self replaceAttributedErrorString:[self attributedStringForString:string]];
-	[self applyWarningAttributesToErrorStringStorageRange:
-     NSMakeRange(0, [string length])];
-	self.warningCount++;
-}
-
 
 #pragma mark -- Resolving ScriptValues
 //

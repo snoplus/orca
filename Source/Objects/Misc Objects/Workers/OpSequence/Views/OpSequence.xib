@@ -363,14 +363,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">errorsWarningsLabel</string>
-						<reference key="source" ref="750423723"/>
-						<reference key="destination" ref="536403886"/>
-					</object>
-					<string key="id">135</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">imageView</string>
 						<reference key="source" ref="750423723"/>
 						<reference key="destination" ref="692716328"/>
@@ -384,6 +376,14 @@
 						<reference key="destination" ref="237499523"/>
 					</object>
 					<string key="id">117</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">errorLabel</string>
+						<reference key="source" ref="750423723"/>
+						<reference key="destination" ref="536403886"/>
+					</object>
+					<string key="id">lk1-M8-ARl</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -652,16 +652,37 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
+					<string key="className">NSCollectionViewItem</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="imageView">NSImageView</string>
+						<string key="textField">NSTextField</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="imageView">
+							<string key="name">imageView</string>
+							<string key="candidateClassName">NSImageView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="textField">
+							<string key="name">textField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/NSCollectionViewItem.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">OROpSeqStepView</string>
 					<string key="superclassName">NSView</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="errorsWarningsLabel">NSTextField</string>
+						<string key="errorLabel">NSTextField</string>
 						<string key="imageView">NSImageView</string>
 						<string key="progressIndicator">NSProgressIndicator</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="errorsWarningsLabel">
-							<string key="name">errorsWarningsLabel</string>
+						<object class="IBToOneOutletInfo" key="errorLabel">
+							<string key="name">errorLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="imageView">

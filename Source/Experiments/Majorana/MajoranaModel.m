@@ -435,6 +435,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
                                                                               selector:@selector(anyHvOnCrate:)
                                                                        retainArguments:NO, (NSUInteger)0]]];
+    [[steps lastObject] setOutputStringErrorPattern: @"0"];
+	[[steps lastObject] setSuccessTitle:@"HV On"];
+	[[steps lastObject] setErrorTitle:  @"HV Off"];
 	[[steps lastObject] setOutputStateKey:@"HVOn"];
 	[[steps lastObject] setTitle:@"Check HV Bias"];
     //----------------------------------------------------------
@@ -459,27 +462,29 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                               commands: @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
                                                         @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
                                                         nil]];
-    
     [[steps lastObject] preCondition: @"vacSystemPingOK" value: @"1"];
-    
+
     //this step state is error free ONLY if the following values are met.
 	[[steps lastObject] require:        @"shouldUnbias" value:@"0"];
 	[[steps lastObject] require:        @"okToBias"     value:@"1"];
+    
 	[[steps lastObject] setSuccessTitle:@"Vac: OK"];
 	[[steps lastObject] setErrorTitle:  @"Vac: BAD"];
 	[[steps lastObject] setTitle:       @"Check CryoVacA"];
     //----------------------------------------------------------
 
     //---------------------Ramp Down HV---------------------
-
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
                                                                               selector:@selector(rampDownHV:)
                                                                        retainArguments:NO, (NSUInteger)0]]];
+
     
+    [[steps lastObject] preCondition: @"vacSystemPingOK" value: @"0"];
+    [[steps lastObject] preCondition: @"HVOn"            value: @"1"];
     [[steps lastObject] preCondition: @"shouldUnbias"    value: @"1"];
     [[steps lastObject] preCondition: @"okToBias"        value: @"0"];
     
-	[[steps lastObject] setSuccessTitle:@"Ramping Down"];
+	[[steps lastObject] setSuccessTitle:    @"Ramping Down"];
 	[[steps lastObject] setOutputStateKey:  @"HVRamped"];
 	[[steps lastObject] setTitle:           @"Ramp Down HV"];
     //----------------------------------------------------------

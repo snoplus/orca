@@ -26,8 +26,6 @@
 @synthesize argumentsArray;
 @synthesize outputStringErrorPattern;
 @synthesize errorStringErrorPattern;
-@synthesize outputStringWarningPattern;
-@synthesize errorStringWarningPattern;
 @synthesize trimNewlines;
 //
 // shellStepWithCommandLine:
@@ -36,7 +34,7 @@
 // arguments.
 // 
 // There are a few options that are possible with TaskStep
-//	- it can process the stdout or stderr strings for errors or warnings
+//	- it can process the stdout or stderr strings for errors
 //	- you can pipe into another TaskStep (which must be scheduled in the
 //		queue ahead of this step)
 //	- you can trim newlines off the stdout (useful for many command line
@@ -83,8 +81,6 @@
 	[errorStateKey release];
 	[outputStringErrorPattern release];
 	[errorStringErrorPattern release];
-	[outputStringWarningPattern release];
-	[errorStringWarningPattern release];
     
 	[super dealloc];
 }
@@ -183,15 +179,13 @@
 
 
 // Perform line-by-line parsing of the stderr and stdout. Each line is
-// compared to the error and warning patterns to see if there are any errors
-// or warnings for this task.
+// compared to the error  patterns to see if there are any errors for this task.
 //
-- (void)parseWarningsAndErrors
+- (void)parseErrors
 {
 	NSInteger errors    = 0;
-	NSInteger warnings  = 0;
 	
-	if (outputStringErrorPattern || outputStringWarningPattern) {
+	if (outputStringErrorPattern) {
 		NSPredicate *errorPredicate = [NSComparisonPredicate
 			predicateWithLeftExpression:[NSExpression expressionForEvaluatedObject]
 			rightExpression:[NSExpression expressionForConstantValue:outputStringErrorPattern]
@@ -199,12 +193,6 @@
 			type:NSMatchesPredicateOperatorType
 			options:0];
         
-		NSPredicate *warningPredicate = [NSComparisonPredicate
-			predicateWithLeftExpression:[NSExpression expressionForEvaluatedObject]
-			rightExpression:[NSExpression expressionForConstantValue:outputStringWarningPattern]
-			modifier:NSDirectPredicateModifier
-			type:NSMatchesPredicateOperatorType
-			options:0];
 	
 		NSString *outputString  = [self outputString];
 		NSUInteger length       = [outputString length];
@@ -222,23 +210,17 @@
 			NSString *paragraph = [outputString substringWithRange:currentRange];
 
 			if ([errorPredicate evaluateWithObject:paragraph])          errors++;
-			else if ([warningPredicate evaluateWithObject:paragraph])   warnings++;
 		}
 	}
 
-	if (errorStringErrorPattern || errorStringWarningPattern){
+	if (errorStringErrorPattern){
 		NSPredicate *errorPredicate = [NSComparisonPredicate
 			predicateWithLeftExpression:[NSExpression expressionForEvaluatedObject]
 			rightExpression:[NSExpression expressionForConstantValue:errorStringErrorPattern]
 			modifier:NSDirectPredicateModifier
 			type:NSMatchesPredicateOperatorType
 			options:0];
-		NSPredicate *warningPredicate = [NSComparisonPredicate
-			predicateWithLeftExpression:[NSExpression expressionForEvaluatedObject]
-			rightExpression:[NSExpression expressionForConstantValue:errorStringWarningPattern]
-			modifier:NSDirectPredicateModifier
-			type:NSMatchesPredicateOperatorType
-			options:0];
+
 		
 		NSString *errorString = [self errorString];
 
@@ -258,14 +240,11 @@
 			if ([errorPredicate evaluateWithObject:paragraph]){
 				errors++;
 			}
-			else if ([warningPredicate evaluateWithObject:paragraph]){
-				warnings++;
-			}
+
 		}
 	}
 	
 	self.errorCount   = errors;
-	self.warningCount = warnings;
 
 }
 
@@ -280,7 +259,7 @@
 		NSString* message = [NSString stringWithFormat: NSLocalizedString(@"Could not launch task %@", ""), [self title]];
 		[self replaceAndApplyErrorToErrorString:message];
 	}
-	else [self parseWarningsAndErrors];
+	else [self parseErrors];
 
     if(outputStateKey){
         [currentQueue setStateValue:self.errorCount==0 ? @"1" : @"0" forKey:outputStateKey];

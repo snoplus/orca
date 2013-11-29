@@ -496,7 +496,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     
     NSEnumerator* e = [allCmds objectEnumerator];
     NSString* string;
-    NSString* returnStringCode;
+    NSString* returnStringCode = nil;
     while(string = [e nextObject]){
         returnStringCode = nil;
         if([string length]){
@@ -600,13 +600,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
                             if(aClient && aClient!=self)[aClient sendCmd:returnStringCode withString:returnValueAsString];
                             else NSLog(@"%@: %@\n",returnStringCode,returnValueAsString);
                         }
+                        else {
+                          if(aClient && aClient!=self)[aClient sendCmd:@"Success" withString:@"1"];
+                        }
                     }
                 }
                 else {
+                    [aClient sendCmd:@"Error" withString:@"cmd not found"];
                     NSLog(@"Command not recognized: <%@>.\n",NSStringFromSelector(theSelector));
                 }
             }
             if([allObjs count]==0){
+                [aClient sendCmd:@"Error" withString:@"obj not found"];
                 NSLog(@"unable to parse: %@\n",oneCmd);
             }
         }

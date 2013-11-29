@@ -22,7 +22,6 @@
 	NSMutableArray*         cleanupSteps;
     NSDictionary*           textAttributes;
     NSDictionary*           errorAttributes;
-    NSDictionary*           warningAttributes;
 }
 
 - (void) setStateValue:(id)value forKey:(NSString *)key;
@@ -37,7 +36,6 @@
 
 @property (nonatomic, copy) NSDictionary* textAttributes;
 @property (nonatomic, copy) NSDictionary* errorAttributes;
-@property (nonatomic, copy) NSDictionary* warningAttributes;
 
 
 @end

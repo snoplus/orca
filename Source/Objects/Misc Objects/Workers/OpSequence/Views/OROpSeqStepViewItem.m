@@ -38,24 +38,18 @@
 	else if ([step isFinished]) {
         NSString* s;
         NSInteger ec = [step errorCount];
-        NSInteger wc = [step warningCount];
         
-        if(ec==0 && wc==0){
+        if(ec==0){
             if(step.successTitle)s = step.successTitle;
             else s = @"Success";
         }
         else {
+            s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
             if(step.errorString) s = step.errorTitle;
-            else {
-                if(ec!=0 && wc!=0)s = [NSString stringWithFormat: @"%ld error%s, %ld warning%s", (long)ec,ec>1?"s":"", (long)wc,wc>1?"s":""];
-                else if(ec!=0)s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
-                else          s = [NSString stringWithFormat: @"%ld warning%s", (long)wc,wc>1?"s":""];
-            }
         }
-        [view setErrorsWarningsString:s];
+        [view setErrorsString:s];
 
         if ([step errorCount] != 0)         [view setState:kSeqStepFailed];
-        else if ([step warningCount] != 0)  [view setState:kSeqStepSuccessWithWarnings];
         else if ([step isCancelled])        [view setState:kSeqStepCancelled];
         else                                [view setState:kSeqStepSuccess];
 	}

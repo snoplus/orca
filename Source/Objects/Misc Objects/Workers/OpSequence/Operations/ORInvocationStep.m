@@ -20,6 +20,7 @@
 
 @synthesize invocation;
 @synthesize outputStateKey;
+@synthesize outputStringErrorPattern;
 
 + (ORInvocationStep*)invocation:(NSInvocation*)anInvocation;
 {
@@ -32,6 +33,8 @@
 {
     [invocation release];
     invocation = nil;
+	[outputStringErrorPattern release];
+    outputStringErrorPattern=nil;
 	[super dealloc];
 }
 
@@ -42,10 +45,48 @@
     [invocation invokeWithNoUndoOnTarget:[invocation target]];
     id result = [invocation returnValue];
     
+    [self parseErrors:[NSString stringWithFormat:@"%@",result]];
     if (outputStateKey && result){
-        [currentQueue setStateValue:result forKey:outputStateKey];
+        [currentQueue setStateValue:[NSString stringWithFormat:@"%@",result] forKey:outputStateKey];
 	}
 }
+
+- (void) parseErrors:(id)outputString
+{
+	NSInteger errors    = 0;
+	
+	if (outputStringErrorPattern) {
+		NSPredicate *errorPredicate = [NSComparisonPredicate
+                                       predicateWithLeftExpression:[NSExpression expressionForEvaluatedObject]
+                                       rightExpression:[NSExpression expressionForConstantValue:outputStringErrorPattern]
+                                       modifier:NSDirectPredicateModifier
+                                       type:NSMatchesPredicateOperatorType
+                                       options:0];
+        
+        
+		NSUInteger length       = [outputString length];
+		NSUInteger paraStart    = 0;
+		NSUInteger paraEnd      = 0;
+		NSUInteger contentsEnd  = 0;
+        
+		NSRange currentRange;
+		while (paraEnd < length){
+			[outputString getParagraphStart:&paraStart
+                                        end:&paraEnd
+                                contentsEnd:&contentsEnd
+                                   forRange:NSMakeRange(paraEnd, 0)];
+			currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
+			NSString *paragraph = [outputString substringWithRange:currentRange];
+            
+			if ([errorPredicate evaluateWithObject:paragraph])          errors++;
+		}
+	}
+
+	self.errorCount   = errors;
+    
+}
+
+
 
 
 @end

@@ -18,10 +18,13 @@
 {
     NSInvocation* invocation;
     NSString* outputStateKey;
+	NSString*               outputStringErrorPattern;
 }
 
 + (ORInvocationStep*)invocation:(NSInvocation*)anInvocation;
+- (void) parseErrors:(id)outputString;
 
 @property (retain) NSInvocation* invocation;
 @property (copy)   NSString*      outputStateKey;
+@property (copy) NSString*      outputStringErrorPattern;
 @end

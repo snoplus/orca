@@ -88,9 +88,10 @@
             }
             [socketObject disconnect];
         }
+        else self.errorCount=1;
     }
     
-     self.errorCount = [self checkRequirements];
+     self.errorCount += [self checkRequirements];
 }
 
 - (void) executeCmd:(NSString*)aCmd
@@ -102,20 +103,29 @@
     if([parts count]==2){
         outputStateKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
     }
-    if(outputStateKey){
-        while (![self isCancelled]){
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                     beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-            totalTime += 0.1;
-            if(totalTime>2)break;
+    while (![self isCancelled]){
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                 beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        totalTime += 0.1;
+        if(totalTime>2)break;
+        if(outputStateKey){
             if([socketObject responseExistsForKey:outputStateKey]){
                 id aValue = [socketObject responseForKey:outputStateKey];
                 [currentQueue setStateValue:aValue forKey:outputStateKey];
                 break;
             }
         }
+        if([socketObject responseExistsForKey:@"Error"]){
+            id aValue = [socketObject responseForKey:@"Error"];  //clear the error
+            [self setErrorTitle:aValue];
+            self.errorCount = 1;
+            break;
+        }
+        if([socketObject responseExistsForKey:@"Success"]){
+            [socketObject responseForKey:@"Success"]; //clear the success flag
+            break;
+        }
     }
-
 }
 
 

@@ -32,8 +32,6 @@
 	
 	NSString*       outputStringErrorPattern;
 	NSString*       errorStringErrorPattern;
-	NSString*       outputStringWarningPattern;
-	NSString*       errorStringWarningPattern;
 }
 
 @property (assign) BOOL         trimNewlines;
@@ -45,8 +43,6 @@
 @property (copy) NSArray*       argumentsArray;
 @property (copy) NSString*      outputStringErrorPattern;
 @property (copy) NSString*      errorStringErrorPattern;
-@property (copy) NSString*      outputStringWarningPattern;
-@property (copy) NSString*      errorStringWarningPattern;
 
 + (ORShellStep *)shellStepWithCommandLine:(NSString *)aLaunchPath, ... NS_REQUIRES_NIL_TERMINATION;
 

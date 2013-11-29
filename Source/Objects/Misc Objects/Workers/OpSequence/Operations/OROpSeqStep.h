@@ -23,7 +23,6 @@
 	NSTextStorage*      outputStringStorage;
 	NSTextStorage*      errorStringStorage;
 	NSInteger           errorCount;
-	NSInteger           warningCount;
 	NSString*           title;
 	NSString*           errorTitle;
 	NSString*           successTitle;
@@ -39,7 +38,6 @@
 @property (retain)          OROpSequenceQueue* currentQueue;
 @property (retain)          OROpSeqStep*    concurrentStep;
 @property (readwrite)       NSInteger       errorCount;
-@property (readwrite)       NSInteger       warningCount;
 @property (retain) NSMutableDictionary*   requirements;
 @property (retain) NSMutableDictionary*   preConditions;
 
@@ -67,16 +65,12 @@
 - (void)replaceAttributedErrorString:(NSAttributedString *)string;
 
 - (void)applyErrorAttributesToOutputStringStorageRange:(NSRange)aRange;
-- (void)applyWarningAttributesToOutputStringStorageRange:(NSRange)aRange;
 
 - (void)applyErrorAttributesToErrorStringStorageRange:(NSRange)aRange;
-- (void)applyWarningAttributesToErrorStringStorageRange:(NSRange)aRange;
 
 - (void)replaceAndApplyErrorToOutputString:(NSString *)string;
-- (void)replaceAndApplyWarningToOutputString:(NSString *)string;
 
 - (void)replaceAndApplyErrorToErrorString:(NSString *)string;
-- (void)replaceAndApplyWarningToErrorString:(NSString *)string;
 @end
 
 @interface ScriptValue : NSObject

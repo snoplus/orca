@@ -39,21 +39,16 @@
 	if (newState == kSeqStepSuccess){
 		[imageView setImage:[NSImage imageNamed:@"checkMark"]];
 		[imageView setHidden:NO];
-		[errorsWarningsLabel setHidden:NO];
+		[errorLabel setHidden:NO];
 	}
 	else if (newState == kSeqStepFailed){
 		[imageView setImage:[NSImage imageNamed:@"exMark"]];
 		[imageView setHidden:NO];
-		[errorsWarningsLabel setHidden:NO];
-	}
-	else if (newState == kSeqStepSuccessWithWarnings){
-		[imageView setImage:[NSImage imageNamed:@"questionMark"]];
-		[imageView setHidden:NO];
-		[errorsWarningsLabel setHidden:NO];
+		[errorLabel setHidden:NO];
 	}
 	else { // cancelled and pending
 		[imageView setHidden:YES];
-		[errorsWarningsLabel setHidden:YES];
+		[errorLabel setHidden:YES];
 	}
 
 	state = newState;
@@ -61,9 +56,9 @@
 	[self setNeedsDisplay:YES];
 }
 
-- (void)setErrorsWarningsString:(NSString *)string
+- (void)setErrorsString:(NSString *)string
 {
-	[errorsWarningsLabel setStringValue:string];
+	[errorLabel setStringValue:string];
 }
 
 - (NSArray *)currentGradientColors
@@ -129,7 +124,7 @@
 	if (self) {
 	    progressIndicator   = [decoder decodeObjectForKey:@"progressIndicator"];
 	    imageView           = [decoder decodeObjectForKey:@"imageView"];
-	    errorsWarningsLabel = [decoder decodeObjectForKey:@"errorsWarningsLabel"];
+	    errorLabel          = [decoder decodeObjectForKey:@"errorLabel"];
 	}
 	return self;
 }
@@ -140,6 +135,6 @@
     [super encodeWithCoder:encoder];
     [encoder encodeObject:progressIndicator     forKey:@"progressIndicator"];
     [encoder encodeObject:imageView             forKey:@"imageView"];
-    [encoder encodeObject:errorsWarningsLabel   forKey:@"errorsWarningsLabel"];
+    [encoder encodeObject:errorLabel   forKey:@"errorLabel"];
 }
 @end

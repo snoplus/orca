@@ -20,7 +20,6 @@ typedef enum
 	kSeqStepActive,
 	kSeqStepSuccess,
 	kSeqStepCancelled,
-	kSeqStepSuccessWithWarnings,
 	kSeqStepFailed
 } enumScriptStepState;
 
@@ -30,12 +29,12 @@ typedef enum
 	enumScriptStepState state;
 	IBOutlet NSProgressIndicator*   progressIndicator;
 	IBOutlet NSImageView*           imageView;
-	IBOutlet NSTextField*           errorsWarningsLabel;
+	IBOutlet NSTextField*           errorLabel;
 }
 
 @property (nonatomic,readwrite) enumScriptStepState state;
 @property (nonatomic,readwrite) BOOL                selected;
 
-- (void)setErrorsWarningsString:(NSString *)string;
+- (void)setErrorsString:(NSString *)string;
 
 @end
