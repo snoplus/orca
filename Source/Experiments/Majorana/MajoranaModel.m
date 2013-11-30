@@ -35,6 +35,8 @@
 #import "ORMPodCrateModel.h"
 
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
+NSString* ORMajoranaModelPollTimeChanged	= @"ORMajoranaModelPollTimeChanged";
+
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 @interface  MajoranaModel (private)
@@ -54,9 +56,15 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void) wakeUp
 {
     [super wakeUp];
-    [self checkConstraints];
+	if(pollTime){
+        [self checkConstraints];
+	}
 }
-
+- (void) sleep
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [super sleep];
+}
 - (void) setUpImage { [self setImage:[NSImage imageNamed:@"Majorana"]]; }
 
 - (void) makeMainController
@@ -79,6 +87,28 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //{
 //	return @"Majorana/Index.html";
 //}
+
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMajoranaModelPollTimeChanged object:self];
+	
+	if(pollTime){
+		[self performSelector:@selector(checkConstraints) withObject:nil afterDelay:.2];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkConstraints) object:nil];
+	}
+}
+
+
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
@@ -282,6 +312,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     scriptModel = [[OROpSequence alloc] initWithDelegate:self];
     [scriptModel setSteps:[self scriptSteps]];
     
+    pollTime = [decoder decodeIntForKey:	@"pollTime"];
+
 	[[self undoManager] enableUndoRegistration];
 
     return self;
@@ -291,6 +323,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:viewType forKey:@"viewType"];
+	[encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -452,7 +485,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                         nil]];
     [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
 
-	[[steps lastObject] setTitle:  @"Set HV Bias State"];
+	[[steps lastObject] setTitle:  @"Send HV --> Vac System"];
     //----------------------------------------------------------
     
     //-----------------check vacuuum conditions-----------------    
@@ -498,9 +531,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void) checkConstraints
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkConstraints) object:nil];
-
-    [self performSelector:@selector(checkConstraints) withObject:nil afterDelay:30];
+    [scriptModel start];
+    if(pollTime)[self performSelector:@selector(checkConstraints) withObject:nil afterDelay:pollTime*60];
 }
+
 @end
 
 

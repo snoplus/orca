@@ -99,6 +99,11 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORMajoranaModelPollTimeChanged
+                       object : nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
@@ -155,6 +160,7 @@
 - (void) updateWindow
 {
     [super updateWindow];
+	[self pollTimeChanged:nil];
 	[self viewTypeChanged:nil];
     //detector
     [self secondaryColorAxisAttributesChanged:nil];
@@ -182,6 +188,10 @@
 	if(note == nil || [note object] == model || [[note object] guardian] == model){
 		[subComponentsView setNeedsDisplay:YES];
 	}
+}
+- (void) pollTimeChanged:(NSNotification*)aNotification
+{
+	[pollTimePopup selectItemAtIndex:[model pollTime]];
 }
 
 - (void) vetoMapLockChanged:(NSNotification*)aNotification
@@ -278,7 +288,11 @@
     [initButton setEnabled: !lockedOrRunningMaintenance];
 
 }
-
+#pragma mark ***Actions
+- (IBAction) pollTimeAction:(id)sender
+{
+	[model setPollTime:[sender indexOfSelectedItem]];
+}
 - (IBAction) viewTypeAction:(id)sender
 {
 	[model setViewType:[sender indexOfSelectedItem]];

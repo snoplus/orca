@@ -38,10 +38,13 @@
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
 	int             viewType;
+    int				pollTime;
     OROpSequence*   scriptModel;
 }
 
 #pragma mark ¥¥¥Accessors
+- (int)  pollTime;
+- (void) setPollTime:(int)aPollTime;
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate;
@@ -74,4 +77,5 @@
 @end
 
 extern NSString* ORMajoranaModelViewTypeChanged;
+extern NSString* ORMajoranaModelPollTimeChanged;
 

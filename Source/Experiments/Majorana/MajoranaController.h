@@ -46,6 +46,7 @@
 
     //items in the  subComponet tab view
     IBOutlet ORGroupView*   subComponentsView;
+    IBOutlet NSPopUpButton* pollTimePopup;
 
 	NSView *blankView;
     NSSize detectorSize;
@@ -63,6 +64,7 @@
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
 - (void) vetoMapLockChanged:(NSNotification*)aNote;
 - (void) groupChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
 
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;
@@ -70,6 +72,7 @@
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) autoscaleSecondayColorScale:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
