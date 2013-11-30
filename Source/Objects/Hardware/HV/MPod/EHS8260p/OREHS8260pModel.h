@@ -34,7 +34,7 @@
 }
 
 #pragma mark ***Initialization
-- (void) setUpImage;
+- (NSString*) imageName;
 - (void) makeMainController;
 
 #pragma mark ***Accessors

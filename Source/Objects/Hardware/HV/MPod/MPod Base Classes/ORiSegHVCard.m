@@ -39,6 +39,7 @@ NSString* ORiSegHVCardOutputSwitchChanged		= @"ORiSegHVCardOutputSwitchChanged";
 NSString* ORiSegHVCardRiseRateChanged			= @"ORiSegHVCardRiseRateChanged";
 NSString* ORiSegHVCardChannelReadParamsChanged  = @"ORiSegHVCardChannelReadParamsChanged";
 NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountChanged";
+NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 
 @implementation ORiSegHVCard
 
@@ -59,14 +60,38 @@ NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountCh
 		[voltageHistory[i] release];
 		[currentHistory[i] release];
 	}
+    [hvConstraints release];
+
      [super dealloc];
 }
 
-
+- (NSString*) imageName
+{
+    return nil;
+}
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"iSegHVCard"]];	
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so that each crate can have its own version for drawing into.
+    //---------------------------------------------------------------------------------------------------
+    NSImage* aCachedImage = [NSImage imageNamed:[self imageName]];
+    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    [i lockFocus];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+     
+    if([[self hvConstraints] count]){
+        NSImage* constraintImage = [NSImage imageNamed:@"smallLock"];
+        [constraintImage drawAtPoint:NSMakePoint([i size].width/2 - [constraintImage size].width/2,[i size].height-[constraintImage size].height-15) fromRect:[constraintImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    }
+
+    [i unlockFocus];
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
 }
+
 
 - (void) makeMainController
 {
@@ -997,5 +1022,25 @@ NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountCh
 {
     return nil; //subclasses MUST override
 }
-
+#pragma mark ¥¥¥Constraints
+- (void) addHvConstraint:(NSString*)aName reason:(NSString*)aReason
+{
+	if(!hvConstraints)hvConstraints = [[NSMutableDictionary dictionary] retain];
+    if(![hvConstraints objectForKey:aName]){
+        [hvConstraints setObject:aReason forKey:aName];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardConstraintsChanged object:self];
+        [self setUpImage];
+        NSLogColor([NSColor redColor],@"%@: HV constraint added: %@ -- %@\n",[self fullID],aName,aReason);
+    }
+}
+- (void) removeHvConstraint:(NSString*)aName
+{
+    if([hvConstraints objectForKey:aName]){
+        [hvConstraints removeObjectForKey:aName];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardConstraintsChanged object:self];
+        [self setUpImage];
+        NSLog(@"%@: HV constraint removed: %@\n",[self fullID],aName);
+    }
+}
+- (NSDictionary*)hvConstraints		 { return hvConstraints;}
 @end

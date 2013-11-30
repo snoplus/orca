@@ -178,6 +178,12 @@
                          name : ORMPodCrateConstraintsChanged
 						object: [model guardian]];
 
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORiSegHVCardConstraintsChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -194,6 +200,7 @@
 	[self maxCurrentChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self constraintsChanged:nil];
+	[self constraintsChanged:nil];
 }
 
 #pragma mark •••Interface Management
@@ -202,7 +209,7 @@
 {
 	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
     ORMPodCrate* theCrate = (ORMPodCrate*)[model guardian];
-	if([[theCrate hvConstraints] count]){
+	if([[theCrate hvConstraints] count] || [[model hvConstraints] count]){
 		[hvConstraintImage setImage:smallLockImage];
 	}
 	else [hvConstraintImage setImage:nil];

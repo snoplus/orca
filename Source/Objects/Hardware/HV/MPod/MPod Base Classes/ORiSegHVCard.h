@@ -72,11 +72,13 @@ enum {
 	ORTimeRate*		voltageHistory[16];
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
+    NSMutableDictionary* hvConstraints;
 }
 
 #pragma mark ***Initialization
 - (id) init;
 - (void) dealloc;
+- (NSString*) imageName;
 - (void) setUpImage;
 - (void) makeMainController;
 - (BOOL) polarity;
@@ -191,6 +193,11 @@ enum {
 - (int) numberOfChannels;
 - (NSArray*) wizardSelections;
 
+#pragma mark ¥¥¥Constraints
+- (void) addHvConstraint:(NSString*)aName reason:(NSString*)aReason;
+- (void) removeHvConstraint:(NSString*)aName;
+- (NSDictionary*)hvConstraints;
+
 @end
 
 @interface NSObject (ORiSegHVCard)
@@ -208,3 +215,4 @@ extern NSString* ORiSegHVCardSettingsLock;
 extern NSString* ORiSegHVCardOutputSwitchChanged;
 extern NSString* ORiSegHVCardChannelReadParamsChanged;
 extern NSString* ORiSegHVCardExceptionCountChanged;
+extern NSString* ORiSegHVCardConstraintsChanged;

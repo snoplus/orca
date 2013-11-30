@@ -28,11 +28,11 @@ NSString*  OREHQ8060nSettingsLock = @"OREHQ8060nSettingsLock";
 @implementation OREHQ8060nModel
 
 #pragma mark ***Initialization
-- (void) setUpImage
-{
-    [self setImage:[NSImage imageNamed:@"EHQ8060n"]];	
-}
 
+- (NSString*) imageName
+{
+    return @"EHQ8060n";
+}
 - (void) makeMainController
 {
     [self linkToController:@"OREHQ8060nController"];

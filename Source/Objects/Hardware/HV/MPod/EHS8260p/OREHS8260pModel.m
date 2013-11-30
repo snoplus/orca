@@ -57,11 +57,10 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
     [super sleep];
 }
 
-- (void) setUpImage
+- (NSString*) imageName
 {
-    [self setImage:[NSImage imageNamed:@"EHS8260p"]];	
+    return @"EHS8260p";
 }
-
 - (void) makeMainController
 {
     [self linkToController:@"OREHS8260pController"];

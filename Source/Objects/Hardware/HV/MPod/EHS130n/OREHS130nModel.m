@@ -28,9 +28,9 @@ NSString*  OREHS130nSettingsLock = @"OREHS130nSettingsLock";
 @implementation OREHS130nModel
 
 #pragma mark ***Initialization
-- (void) setUpImage
+- (NSString*) imageName
 {
-    [self setImage:[NSImage imageNamed:@"EHS130n"]];	
+    return @"EHS130n";
 }
 
 - (void) makeMainController
