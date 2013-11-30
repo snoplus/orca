@@ -36,6 +36,7 @@
 - (NSString*) crateAdapterConnectorKey;
 - (int) numberChannelsWithNonZeroVoltage;
 - (BOOL) hvOnAnyChannel;
+- (id) cardInSlot:(int)aSlot;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

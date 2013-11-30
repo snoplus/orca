@@ -164,6 +164,16 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
     return count;
 }
 
+- (id) cardInSlot:(int)aSlot
+{
+    for(id anObj in [self orcaObjects]){
+        if([(ORiSegHVCard*)anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+            if([(ORiSegHVCard*)anObj slot] == aSlot)return anObj;
+        }
+    }
+    return nil;
+}
+
 #pragma mark •••All card cmds
 - (void) panicAllChannels
 {
