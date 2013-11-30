@@ -77,7 +77,6 @@
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateAllAction:(id)sender;
-- (IBAction) pollTimeAction:(id)sender;
 - (IBAction) pwmAction:(id)sender;
 - (IBAction) pinTypeAction:(id)sender;
 - (IBAction) pinNameAction:(id)sender;
