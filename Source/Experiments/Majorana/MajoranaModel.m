@@ -298,10 +298,56 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
     return NO;
 }
-- (BOOL) rampDownHV:(int)aCrate
+
+- (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState
 {
-    return YES;
+    //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
+    //But we don't care about the Veto system (group 1).
+    ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
+    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
+    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    
+    ORSegmentGroup* group = [self segmentGroup:0];
+    int n = [group numSegments];
+    int i;
+    for(i=0;i<n;i++){
+        ORDetectorSegment* seg =  [group segment:i];        //get a segment from the group
+		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
+        if(vmeCrate == aCrate){
+            int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
+            int hvCard    = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
+            if(hvCrate<2){
+                if(aState)[[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:@"Vac Is Bad"];
+                else [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
+            }
+        }
+    }
 }
+
+- (void) rampDownHV:(int)aCrate
+{
+    //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
+    //But we don't care about the Veto system (group 1).
+    ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
+    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
+    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    
+    ORSegmentGroup* group = [self segmentGroup:0];
+    int n = [group numSegments];
+    int i;
+    for(i=0;i<n;i++){
+        ORDetectorSegment* seg = [group segment:i];                    //get a segment from the group
+		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
+        if(vmeCrate == aCrate){
+            int hvCrate   = [[seg objectForKey:@"kHVCrate"]intValue];     //pull out the crate
+            int hvCard    = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
+            if(hvCrate<2){
+                [[hvCrateObj[hvCrate] cardInSlot:hvCard] panicAllChannels];
+            }
+        }
+    }
+}
+
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -520,6 +566,29 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	[[steps lastObject] setSuccessTitle:    @"Ramping Down"];
 	[[steps lastObject] setOutputStateKey:  @"HVRamped"];
 	[[steps lastObject] setTitle:           @"Ramp Down HV"];
+    //----------------------------------------------------------
+    
+    //---------------------Constrain HV---------------------
+    [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
+                                                                              selector:@selector(setVmeCrateHVConstraint:state:)
+                                                                       retainArguments:YES,
+                                                                            (NSUInteger)0,
+                                                                            (NSUInteger)1]]];
+            
+    [[steps lastObject] addOrCondition: @"OKForHV"         value: @"0"];
+	[[steps lastObject] setTitle:       @"Add Constraints"];
+    //----------------------------------------------------------
+
+    
+    //---------------------Constrain HV---------------------
+    [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
+                                                                              selector:@selector(setVmeCrateHVConstraint:state:)
+                                                                       retainArguments:YES,
+                                                     (NSUInteger)0,
+                                                     (NSUInteger)0]]];
+    
+    [[steps lastObject] addOrCondition: @"OKForHV"         value: @"1"];
+	[[steps lastObject] setTitle:       @"Remove Constraints"];
     //----------------------------------------------------------
 
 	return steps;

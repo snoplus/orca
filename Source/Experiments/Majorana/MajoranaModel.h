@@ -49,7 +49,8 @@
 - (int) viewType;
 - (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate;
 - (BOOL) anyHvOnCrate:(int)aCrate;
-- (BOOL) rampDownHV:(int)aCrate;
+- (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
+- (void) rampDownHV:(int)aCrate;
 - (id) scriptModel;
 - (NSArray*) scriptSteps;
 
