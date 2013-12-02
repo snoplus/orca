@@ -58,6 +58,7 @@
 
 - (void)setErrorsString:(NSString *)string
 {
+    if(string==nil)string = @"";
 	[errorLabel setStringValue:string];
 }
 
