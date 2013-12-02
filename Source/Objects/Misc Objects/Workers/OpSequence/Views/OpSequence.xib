@@ -44,7 +44,7 @@
 				<int key="NSvFlags">268</int>
 				<object class="NSMutableArray" key="NSSubviews">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<object class="NSCollectionView" id="690865474">
+					<object class="NSCollectionView" id="887756327">
 						<reference key="NSNextResponder" ref="1005"/>
 						<int key="NSvFlags">274</int>
 						<string key="NSFrame">{{6, 7}, {301, 232}}</string>
@@ -148,7 +148,7 @@
 							<object class="NSTextField" id="387066219">
 								<reference key="NSNextResponder" ref="262853429"/>
 								<int key="NSvFlags">268</int>
-								<string key="NSFrame">{{28, 0}, {109, 19}}</string>
+								<string key="NSFrame">{{27, 0}, {109, 19}}</string>
 								<reference key="NSSuperview" ref="262853429"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="1048595896">
@@ -362,10 +362,10 @@
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">content: arrangedObjects</string>
-						<reference key="source" ref="690865474"/>
+						<reference key="source" ref="887756327"/>
 						<reference key="destination" ref="698494775"/>
-						<object class="NSNibBindingConnector" key="connector" id="869157454">
-							<reference key="NSSource" ref="690865474"/>
+						<object class="NSNibBindingConnector" key="connector" id="265975108">
+							<reference key="NSSource" ref="887756327"/>
 							<reference key="NSDestination" ref="698494775"/>
 							<string key="NSLabel">content: arrangedObjects</string>
 							<string key="NSBinding">content</string>
@@ -378,15 +378,15 @@
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">selectionIndexes: selectionIndexes</string>
-						<reference key="source" ref="690865474"/>
+						<reference key="source" ref="887756327"/>
 						<reference key="destination" ref="698494775"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="690865474"/>
+							<reference key="NSSource" ref="887756327"/>
 							<reference key="NSDestination" ref="698494775"/>
 							<string key="NSLabel">selectionIndexes: selectionIndexes</string>
 							<string key="NSBinding">selectionIndexes</string>
 							<string key="NSKeyPath">selectionIndexes</string>
-							<reference key="NSPreviousConnector" ref="869157454"/>
+							<reference key="NSPreviousConnector" ref="265975108"/>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
@@ -395,7 +395,7 @@
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">itemPrototype</string>
-						<reference key="source" ref="690865474"/>
+						<reference key="source" ref="887756327"/>
 						<reference key="destination" ref="811561839"/>
 					</object>
 					<int key="connectionID">107</int>
@@ -428,7 +428,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">collectionView</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="690865474"/>
+						<reference key="destination" ref="887756327"/>
 					</object>
 					<int key="connectionID">115</int>
 				</object>
@@ -467,7 +467,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="304043282"/>
 							<reference ref="210166478"/>
-							<reference ref="690865474"/>
+							<reference ref="887756327"/>
 							<reference ref="670311165"/>
 						</object>
 						<reference key="parent" ref="0"/>
@@ -586,7 +586,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">103</int>
-						<reference key="object" ref="690865474"/>
+						<reference key="object" ref="887756327"/>
 						<reference key="parent" ref="1005"/>
 					</object>
 				</object>
