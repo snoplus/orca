@@ -2457,7 +2457,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self addCurrentState:objDictionary cArray:chpsrt forKey:@"Chpsrt"];
 	[self addCurrentState:objDictionary cArray:chpsdv forKey:@"Chpsdv"];
 	[self addCurrentState:objDictionary cArray:prerecnt forKey:@"Prerecnt"];
-	[self addCurrentState:objDictionary cArray:postrecnt forKey:@"Prerecnt"];
+	[self addCurrentState:objDictionary cArray:postrecnt forKey:@"Postrecnt"];
 	[self addCurrentState:objDictionary cArray:tpol forKey:@"TPol"];
 	[self addCurrentState:objDictionary cArray:(short*)presumEnabled forKey:@"PreSum Enabled"];
     
