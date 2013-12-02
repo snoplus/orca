@@ -43,7 +43,8 @@
    
     va_list args;
     va_start(args, aCmd);
-    for (NSString *arg = va_arg(args, NSString*);
+    NSString *arg;
+    for (arg = va_arg(args, NSString*);
          arg != nil;
          arg = va_arg(args, NSString*))
     {
