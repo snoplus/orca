@@ -2621,7 +2621,6 @@
 		84D29FEC1843EAC800D320DB /* OROpSequenceQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FD51843EAC800D320DB /* OROpSequenceQueue.m */; };
 		84D29FED1843EAC800D320DB /* ORTaskHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FD61843EAC800D320DB /* ORTaskHandler.h */; };
 		84D29FEE1843EAC800D320DB /* ORTaskHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FD71843EAC800D320DB /* ORTaskHandler.m */; };
-		84D29FEF1843EAC800D320DB /* OpSequence.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84D29FD91843EAC800D320DB /* OpSequence.xib */; };
 		84D29FF01843EAC800D320DB /* OROpSeqStepView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */; };
 		84D29FF11843EAC800D320DB /* OROpSeqStepView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */; };
 		84D29FF21843EAC800D320DB /* OROpSeqStepViewItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */; };
@@ -2815,6 +2814,7 @@
 		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
 		84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE03BE120AFA4400B804B3 /* ORInverterModel.m */; };
+		84EE77EA184CDD670081BD15 /* OpSequenceView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EE77E9184CDD670081BD15 /* OpSequenceView.xib */; };
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
 		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
 		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
@@ -5823,7 +5823,6 @@
 		84D29FD51843EAC800D320DB /* OROpSequenceQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSequenceQueue.m; sourceTree = "<group>"; };
 		84D29FD61843EAC800D320DB /* ORTaskHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTaskHandler.h; sourceTree = "<group>"; };
 		84D29FD71843EAC800D320DB /* ORTaskHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTaskHandler.m; sourceTree = "<group>"; };
-		84D29FD91843EAC800D320DB /* OpSequence.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OpSequence.xib; sourceTree = "<group>"; };
 		84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSeqStepView.h; sourceTree = "<group>"; };
 		84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROpSeqStepView.m; sourceTree = "<group>"; };
 		84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROpSeqStepViewItem.h; sourceTree = "<group>"; };
@@ -6047,6 +6046,7 @@
 		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
 		84EE03BE120AFA4400B804B3 /* ORInverterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORInverterModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.m; sourceTree = SOURCE_ROOT; };
+		84EE77E9184CDD670081BD15 /* OpSequenceView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OpSequenceView.xib; sourceTree = "<group>"; };
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
 		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
 		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
@@ -12047,8 +12047,8 @@
 		84D29FD81843EAC800D320DB /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				84D29FD91843EAC800D320DB /* OpSequence.xib */,
 				84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */,
+				84EE77E9184CDD670081BD15 /* OpSequenceView.xib */,
 				84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */,
 				84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */,
 				84D29FDD1843EAC800D320DB /* OROpSeqStepViewItem.m */,
@@ -15147,7 +15147,6 @@
 				84B28E650F4C835500E2B056 /* UnivVoltHVCrateSmall.gif in Resources */,
 				84EBBEE50F52D9A700F57BDD /* Caen419.nib in Resources */,
 				84EBBEE60F52D9A700F57BDD /* Caen419.tif in Resources */,
-				84D29FEF1843EAC800D320DB /* OpSequence.xib in Resources */,
 				84BA5DE60F6E8C8900CF92D6 /* HVRampItem.nib in Resources */,
 				84BA5F2F0F70388D00CF92D6 /* Zup.nib in Resources */,
 				84BA5F300F70388D00CF92D6 /* ZupIcon.tif in Resources */,
@@ -15248,6 +15247,7 @@
 				84F50A2C116B7151000275F2 /* CmdLabel.nib in Resources */,
 				84F50A2D116B7151000275F2 /* CmdLabel.tif in Resources */,
 				84F50E14116CCAEE000275F2 /* loginExpectScript in Resources */,
+				84EE77EA184CDD670081BD15 /* OpSequenceView.xib in Resources */,
 				8490D2951177532C00D25B1F /* IpeV4MiniCrate.nib in Resources */,
 				8490D2961177532C00D25B1F /* IpeV4MiniCrate.tif in Resources */,
 				8490D2971177532C00D25B1F /* IpeV4MiniCrateBig.tif in Resources */,
