@@ -47,7 +47,7 @@
 
     [self registerNotificationObservers];
     
-	[collectionView setMinItemSize:NSMakeSize(198, 40)];
+	[collectionView setMinItemSize:NSMakeSize(150, 40)];
 	[collectionView setMaxItemSize:NSMakeSize(CGFLOAT_MAX, 40)];
     [collectionView setBackgroundColors:[NSArray arrayWithObject:[NSColor clearColor]]];
 }
