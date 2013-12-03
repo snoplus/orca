@@ -56,24 +56,27 @@
 - (BOOL) valueValidForRegion:(int)aRegion;
 - (BOOL) region:(int)aRegion valueHigherThan:(double)aValue;
 - (void) postCouchRecord;
+- (void) resetHvTimer;
 
-- (ORMks660BModel*)    findBaratron;
-- (ORRGA300Model*)     findRGA;
-- (ORTM700Model*)      findTurboPump;
-- (ORTPG256AModel*)    findPressureGauge;
+- (ORMks660BModel*)     findBaratron;
+- (ORRGA300Model*)      findRGA;
+- (ORTM700Model*)       findTurboPump;
+- (ORTPG256AModel*)     findPressureGauge;
 - (ORCP8CryopumpModel*) findCryoPump;
-- (id)findObject:(NSString*)aClassName;
-
+- (id)                  findObject:(NSString*)aClassName;
 @end
 
-
-NSString* ORMJDVacuumModelVetoMaskChanged           = @"ORMJDVacuumModelVetoMaskChanged";
-NSString* ORMJDVacuumModelShowGridChanged           = @"ORMJDVacuumModelShowGridChanged";
-NSString* ORMJCVacuumLock                           = @"ORMJCVacuumLock";
-NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged = @"ORMJDVacuumModelShouldUnbiasDetectorChanged";
-NSString* ORMJDVacuumModelOkToBiasDetectorChanged   = @"ORMJDVacuumModelOkToBiasDetectorChanged";
-NSString* ORMJDVacuumModelDetectorsBiasedChanged    = @"ORMJDVacuumModelDetectorsBiasedChanged";
-NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsChanged";
+NSString* ORMJDVacuumModelNoHvInfoChanged               = @"ORMJDVacuumModelNoHvInfoChanged";
+NSString* ORMJDVacuumModelVetoMaskChanged               = @"ORMJDVacuumModelVetoMaskChanged";
+NSString* ORMJDVacuumModelShowGridChanged               = @"ORMJDVacuumModelShowGridChanged";
+NSString* ORMJCVacuumLock                               = @"ORMJCVacuumLock";
+NSString* ORMJDVacuumModelShouldUnbiasDetectorChanged   = @"ORMJDVacuumModelShouldUnbiasDetectorChanged";
+NSString* ORMJDVacuumModelOkToBiasDetectorChanged       = @"ORMJDVacuumModelOkToBiasDetectorChanged";
+NSString* ORMJDVacuumModelDetectorsBiasedChanged        = @"ORMJDVacuumModelDetectorsBiasedChanged";
+NSString* ORMJDVacuumModelConstraintsChanged            = @"ORMJDVacuumModelConstraintsChanged";
+NSString* ORMJDVacuumModelNextHvUpdateTimeChanged       = @"ORMJDVacuumModelNextHvUpdateTimeChanged";
+NSString* ORMJDVacuumModelLastHvUpdateTimeChanged       = @"ORMJDVacuumModelLastHvUpdateTimeChanged";
+NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUpdateTimeChanged";
 
 @implementation ORMJDVacuumModel
 
@@ -93,6 +96,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 
 - (void) dealloc
 {
+    [nextHvUpdateTime release];
+    [lastHvUpdateTime release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[parts release];
@@ -219,9 +224,6 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
                      selector : @selector(portClosedAfterTimeout:)
                          name : ORSerialPortWithQueueModelPortClosedAfterTimeout
 						object: nil];
-	
-	
-	
 }
 
 - (void) portClosedAfterTimeout:(NSNotification*)aNote
@@ -311,29 +313,70 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 }
 
 #pragma mark ***Accessors
-- (BOOL) shouldUnbiasDetector	
-{ 
-	return [continuedBiasConstraints count] != 0;
-}
-- (BOOL) okToBiasDetector		
-{
-	return [okToBiasConstraints count] == 0;
-}
-- (BOOL) detectorsBiased		{ return detectorsBiased; }
+- (BOOL)    noHvInfo         { return noHvInfo;         }
+- (NSDate*) nextHvUpdateTime { return nextHvUpdateTime; }
+- (NSDate*) lastHvUpdateTime { return lastHvUpdateTime; }
+- (int)     hvUpdateTime     { return hvUpdateTime;     }
 
+- (void)    setNoHvInfo      { [self setNoHvInfo:YES];  }
+- (void)    clearNoHvInfo    { [self setNoHvInfo:NO];   }
+
+- (void) setNoHvInfo:(BOOL)aNoHvInfo
+{
+    noHvInfo = aNoHvInfo;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelNoHvInfoChanged object:self];
+}
+
+- (void) setNextHvUpdateTime:(NSDate*)aNextHvUpdateTime
+{
+    [aNextHvUpdateTime retain];
+    [nextHvUpdateTime release];
+    nextHvUpdateTime = aNextHvUpdateTime;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelNextHvUpdateTimeChanged object:self];
+}
+
+- (void) setLastHvUpdateTime:(NSDate*)aLastHvUpdateTime
+{
+    [aLastHvUpdateTime retain];
+    [lastHvUpdateTime release];
+    lastHvUpdateTime = aLastHvUpdateTime;
+
+    [self resetHvTimer];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelLastHvUpdateTimeChanged object:self];
+}
+
+
+- (void) setHvUpdateTime:(int)aHvUpdateTime
+{
+    hvUpdateTime = aHvUpdateTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelHvUpdateTimeChanged object:self];
+}
+
+- (BOOL)    shouldUnbiasDetector	{ return [continuedBiasConstraints count] != 0; }
+- (BOOL)    okToBiasDetector		{ return [okToBiasConstraints count] == 0; }
+- (BOOL)    detectorsBiased         { return detectorsBiased;       }
+
+//-------------------------------------------------------------------
+//This method is typically only called from a remote ORCA to tell us
+//the state of the HV so we will use it to clear a deadman timeout
 - (void) setDetectorsBiased:(BOOL)aState
 {
+    [self clearNoHvInfo];
+    [self resetHvTimer];
+    NSDate* now = [NSDate date];
+    [self setLastHvUpdateTime:now];
+    
 	if(detectorsBiased!=aState){
 		detectorsBiased = aState;
 		[self checkDetectorConstraints];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelDetectorsBiasedChanged object:self];
 	}
 }
+//-------------------------------------------------------------------
 
-- (unsigned long) vetoMask
-{
-    return vetoMask;
-}
+- (unsigned long) vetoMask { return vetoMask; }
 
 - (void) setVetoMask:(unsigned long)aVetoMask
 {
@@ -349,10 +392,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	}
 }
 
-- (BOOL) showGrid
-{
-    return showGrid;
-}
+- (void) toggleGrid { [self setShowGrid:!showGrid]; }
+- (BOOL) showGrid   { return showGrid; }
 
 - (void) setShowGrid:(BOOL)aShowGrid
 {
@@ -361,10 +402,6 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelShowGridChanged object:self];
 }
 
-- (void) toggleGrid
-{
-	[self setShowGrid:!showGrid];
-}
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -680,17 +717,8 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
 }
 
-- (NSDictionary*) okToBiasConstraints
-{
-	return okToBiasConstraints;
-}
-
-- (NSDictionary*) continuedBiasConstraints
-{
-	return continuedBiasConstraints;
-}
-
-
+- (NSDictionary*) okToBiasConstraints       { return okToBiasConstraints;      }
+- (NSDictionary*) continuedBiasConstraints  { return continuedBiasConstraints; }
 @end
 
 
@@ -709,6 +737,14 @@ NSString* ORMJDVacuumModelConstraintsChanged		= @"ORMJDVacuumModelConstraintsCha
 	return nil;
 }
 
+- (void) resetHvTimer
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetHvTimer) object:nil];
+    if(hvUpdateTime>0) {
+        [self setNextHvUpdateTime:[NSDate dateWithTimeIntervalSinceNow:hvUpdateTime*60]];
+        [self performSelector:@selector(setNoHvInfo) withObject:nil afterDelay:hvUpdateTime*60];
+    }
+}
 
 - (void) makeParts
 {

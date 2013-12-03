@@ -24,6 +24,10 @@
 @interface ORMJDVacuumController : OrcaObjectController
 {
     IBOutlet ORMJDVacuumView*   vacuumView;
+	IBOutlet NSTextField*   noHVInfoField;
+	IBOutlet NSTextField*   nextHvUpdateTimeField;
+	IBOutlet NSTextField*   lastHvUpdateTimeField;
+	IBOutlet NSTextField*   hvUpdateTimeField;
 	IBOutlet NSButton*		setShowGridCB;
 	IBOutlet NSPanel*		gvControlPanel;
 	IBOutlet NSPanel*		gvConstraintPanel;
@@ -62,6 +66,10 @@
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
+- (void) noHVInfoChanged:(NSNotification*)aNote;
+- (void) nextHvUpdateTimeChanged:(NSNotification*)aNote;
+- (void) lastHvUpdateTimeChanged:(NSNotification*)aNote;
+- (void) hvUpdateTimeChanged:(NSNotification*)aNote;
 - (void) detectorsBiasedChanged:(NSNotification*)aNote;
 - (void) localConstraintsChanged:(NSNotification*)aNote;
 - (void) vetoMaskChanged:(NSNotification*)aNote;

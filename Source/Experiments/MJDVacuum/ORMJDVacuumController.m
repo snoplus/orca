@@ -115,6 +115,27 @@
                      selector : @selector(localConstraintsChanged:)
                          name : ORMJDVacuumModelConstraintsChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hvUpdateTimeChanged:)
+                         name : ORMJDVacuumModelHvUpdateTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lastHvUpdateTimeChanged:)
+                         name : ORMJDVacuumModelLastHvUpdateTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(nextHvUpdateTimeChanged:)
+                         name : ORMJDVacuumModelNextHvUpdateTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(noHVInfoChanged:)
+                         name : ORMJDVacuumModelNoHvInfoChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -126,10 +147,33 @@
 	[self lockChanged:nil];
 	[self detectorsBiasedChanged:nil];
 	[self localConstraintsChanged:nil];
+	[self hvUpdateTimeChanged:nil];
+	[self lastHvUpdateTimeChanged:nil];
+	[self nextHvUpdateTimeChanged:nil];
+	[self noHVInfoChanged:nil];
 }
 
 #pragma mark •••Interface Management
 
+- (void) noHVInfoChanged:(NSNotification*)aNote
+{
+	[noHVInfoField setObjectValue: [model noHvInfo]];
+}
+
+- (void) nextHvUpdateTimeChanged:(NSNotification*)aNote
+{
+	[nextHvUpdateTimeField setObjectValue: [model nextHvUpdateTime]];
+}
+
+- (void) lastHvUpdateTimeChanged:(NSNotification*)aNote
+{
+	[lastHvUpdateTimeField setObjectValue: [model lastHvUpdateTime]];
+}
+
+- (void) hvUpdateTimeChanged:(NSNotification*)aNote
+{
+	[hvUpdateTimeField setIntValue: [model hvUpdateTime]];
+}
 - (void) localConstraintsChanged:(NSNotification*)aNote
 {
 	if([model detectorsBiased]){

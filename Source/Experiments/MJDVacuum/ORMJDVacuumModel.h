@@ -125,13 +125,28 @@
 	NSMutableDictionary* continuedBiasConstraints;
 	BOOL				 checkCF6Now;
 	BOOL				 couchPostScheduled;
+    int                  remoteOrcaTimeout;
+    int                  hvUpdateTime;
+    NSDate*              lastHvUpdateTime;
+    NSDate*              nextHvUpdateTime;
+    BOOL                 noHvInfo;
 }
 
 #pragma mark ***Accessors
+- (BOOL) noHvInfo;
+- (void) setNoHvInfo:(BOOL)aNoHvInfo;
+- (NSDate*) nextHvUpdateTime;
+- (void) setNextHvUpdateTime:(NSDate*)aNextHvUpdateTime;
+- (NSDate*) lastHvUpdateTime;
+- (void) setLastHvUpdateTime:(NSDate*)aLastHvUpdateTime;
+- (int) hvUpdateTime;
+- (void) setHvUpdateTime:(int)aHvUpdateTime;
 - (BOOL) shouldUnbiasDetector;
 - (BOOL) okToBiasDetector;
 - (BOOL) detectorsBiased;
 - (void) setDetectorsBiased:(BOOL)aDetectorsBiased;
+- (void) setNoHvInfo;
+- (void) clearNoHvInfo;
 
 - (unsigned long) vetoMask;
 - (void) setVetoMask:(unsigned long)aVetoMask;
@@ -205,6 +220,10 @@
 
 @end
 
+extern NSString* ORMJDVacuumModelNoHvInfoChanged;
+extern NSString* ORMJDVacuumModelNextHvUpdateTimeChanged;
+extern NSString* ORMJDVacuumModelLastHvUpdateTimeChanged;
+extern NSString* ORMJDVacuumModelHvUpdateTimeChanged;
 extern NSString* ORMJDVacuumModelDetectorsBiasedChanged;
 extern NSString* ORMJDVacuumModelVetoMaskChanged;
 extern NSString* ORMJDVacuumModelShowGridChanged;
