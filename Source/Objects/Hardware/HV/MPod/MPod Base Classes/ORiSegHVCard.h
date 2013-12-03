@@ -197,6 +197,7 @@ enum {
 - (void) addHvConstraint:(NSString*)aName reason:(NSString*)aReason;
 - (void) removeHvConstraint:(NSString*)aName;
 - (NSDictionary*)hvConstraints;
+- (NSString*) constraintReport;
 
 @end
 

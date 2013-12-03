@@ -74,4 +74,14 @@
 	else [hvConstraintImage setImage:nil];
 }
 
+#pragma mark •••Actions
+- (IBAction) listConstraintsAction:(id)sender
+{
+	if([[model hvConstraints] count]){
+        NSRunAlertPanel(@"Constraints", @"The Following Constraints are in place:\n%@", @"OK", nil, nil,
+                        @"test constraint");
+ 
+    }
+}
+
 @end

@@ -206,6 +206,15 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 }
 - (NSDictionary*)hvConstraints		 { return hvConstraints;}
 
+- (NSString*) constraintReport
+{
+    NSString* s = @"";
+    for(id aKey in hvConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[hvConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
 @end
 
 @implementation ORMPodCrate (private)

@@ -50,7 +50,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{213, 107}</string>
 				<object class="NSView" key="NSWindowView" id="672222250">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSImageView" id="644564861">
@@ -66,7 +66,6 @@
 							</set>
 							<string key="NSFrame">{{0, 21}, {379, 268}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="632080436"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="292112285">
@@ -97,7 +96,6 @@
 							</set>
 							<string key="NSFrame">{{181, 228}, {16, 21}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="307987623"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="868239113">
@@ -120,7 +118,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{31, 34}, {317, 175}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="962082114"/>
 							<string key="NSClassName">ORCardContainerView</string>
 							<string key="NSExtension">NSView</string>
@@ -130,8 +127,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{3, 13}, {125, 13}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="507674570">
 								<int key="NSCellFlags">67108864</int>
@@ -165,7 +160,6 @@
 							<int key="NSvFlags">256</int>
 							<string key="NSFrame">{{3, 28}, {67, 17}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="679016295"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="443776322">
@@ -189,8 +183,6 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{379, 289}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="644564861"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
@@ -241,6 +233,14 @@
 						<reference key="destination" ref="632080436"/>
 					</object>
 					<string key="id">y48-PD-GUy</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">listConstraintsAction:</string>
+						<reference key="source" ref="1060718700"/>
+						<reference key="destination" ref="632080436"/>
+					</object>
+					<string key="id">OSm-Ci-hat</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">

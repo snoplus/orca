@@ -35,4 +35,8 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) constraintsChanged:(NSNotification*)aNote;
+
+#pragma mark •••Actions
+- (IBAction) listConstraintsAction:(id)sender;
+
 @end

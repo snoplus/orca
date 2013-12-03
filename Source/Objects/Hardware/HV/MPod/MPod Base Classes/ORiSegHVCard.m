@@ -80,7 +80,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
     [i lockFocus];
     [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
      
-    if([[self hvConstraints] count]){
+    if([self constraintsInPlace]){
         NSImage* constraintImage = [NSImage imageNamed:@"smallLock"];
         [constraintImage drawAtPoint:NSMakePoint([i size].width/2 - [constraintImage size].width/2,[i size].height-[constraintImage size].height-15) fromRect:[constraintImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
@@ -742,13 +742,13 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 
 - (BOOL) constraintsInPlace
 {
-    return [[(ORMPodCrate*)[self crate] hvConstraints] count] != 0;
+    return ([[(ORMPodCrate*)[self crate] hvConstraints] count] != 0) || ([[self hvConstraints] count] !=0);
 }
 
 #pragma mark ¥¥¥Hardware Access
 - (void) loadAllValues
 {
-    if([[(ORMPodCrate*)[self crate] hvConstraints] count] == 0){
+    if(![self constraintsInPlace]){
         [self commitTargetsToHwGoals];
         [self writeRiseTime];
         [self writeMaxCurrents];
@@ -1042,5 +1042,16 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
         NSLog(@"%@: HV constraint removed: %@\n",[self fullID],aName);
     }
 }
+
 - (NSDictionary*)hvConstraints		 { return hvConstraints;}
+
+- (NSString*) constraintReport
+{
+    NSString* s = [(ORMPodCrate*)[self crate] constraintReport] ;
+    for(id aKey in hvConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[hvConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
 @end

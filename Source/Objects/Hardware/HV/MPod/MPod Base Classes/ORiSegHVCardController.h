@@ -38,7 +38,7 @@
 	IBOutlet NSTextField*   temperatureField;
 	IBOutlet NSTextField*   slotField;
 	IBOutlet NSTextField*	hwGoalField;
-	IBOutlet NSImageView*   hvConstraintImage;
+	IBOutlet NSButton*      hvConstraintImage;
 	
 	//details 
 	IBOutlet NSTextField*	targetField;
@@ -105,6 +105,7 @@
 - (IBAction) clearPanicAction:(id)sender;
 - (IBAction) incChannelAction:(id)sender;
 - (IBAction) decChannelAction:(id)sender;
+- (IBAction) listConstraintsAction:(id)sender;
 
 #pragma mark •••Actions for All
 - (IBAction) powerAllOnAction:(id)sender;

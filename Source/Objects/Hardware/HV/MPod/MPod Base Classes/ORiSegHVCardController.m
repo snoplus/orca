@@ -210,9 +210,13 @@
 	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
     ORMPodCrate* theCrate = (ORMPodCrate*)[model guardian];
 	if([[theCrate hvConstraints] count] || [[model hvConstraints] count]){
+        [hvConstraintImage setEnabled:YES];
 		[hvConstraintImage setImage:smallLockImage];
 	}
-	else [hvConstraintImage setImage:nil];
+	else {
+        [hvConstraintImage setEnabled:NO];
+        [hvConstraintImage setImage:nil];
+    }
 }
 
 - (void) timeoutHappened:(NSNotification*)aNote
@@ -811,6 +815,15 @@
 					  nil,
 					  nil,
 					  @"This will set the target voltages to the actual hw voltages. The actual hw voltages will not change until you 'load' the values.\n\nReally sync these values?\n\n");
+}
+
+- (IBAction) listConstraintsAction:(id)sender
+{
+	if([model constraintsInPlace]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model constraintReport]);
+        
+    }
 }
 
 
