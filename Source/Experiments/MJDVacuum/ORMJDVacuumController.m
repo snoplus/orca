@@ -166,8 +166,7 @@
     [dateFormatter setDateFormat:@"MMM dd hh:mm a"];
     NSString* dateString  = [dateFormatter stringFromDate:[model nextHvUpdateTime]];
     [dateFormatter release];
-
-	[nextHvUpdateTimeField setStringValue: [NSString stringWithFormat:@"Done @ %@",dateString]];
+	[nextHvUpdateTimeField setStringValue: [NSString stringWithFormat:@"%@",dateString]];
 }
 
 - (void) lastHvUpdateTimeChanged:(NSNotification*)aNote
@@ -176,7 +175,7 @@
     [dateFormatter setDateFormat:@"MMM dd hh:mm a"];
     NSString* dateString  = [dateFormatter stringFromDate:[model lastHvUpdateTime]];
     [dateFormatter release];
-	[lastHvUpdateTimeField setObjectValue: dateString];
+	[lastHvUpdateTimeField setStringValue: dateString];
 }
 
 - (void) hvUpdateTimeChanged:(NSNotification*)aNote
