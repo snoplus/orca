@@ -113,7 +113,12 @@
 		switch ([(OROpSequence*)[[owner model] scriptModel]state]){
 			case kOpSeqQueueRunning:
 			case kOpSeqQueueFinished:
-				[progressLabel setStringValue:@"All steps complete."];
+                {
+                    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+                    NSString* dateString           = [dateFormatter stringFromDate:[NSDate date]];
+                    [dateFormatter release];
+                    [progressLabel setStringValue:[NSString stringWithFormat:@"Done @ %@",dateString]];
+                }
 				break;
 			case kOpSeqQueueFailed:
 				[progressLabel setStringValue:@"Failed with error."];
