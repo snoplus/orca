@@ -184,79 +184,79 @@
 																		<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																		<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																	</object>
-																	<object class="NSTextField" id="67390072">
+																	<object class="NSTextField" id="20295673">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{97, 14}, {79, 14}}</string>
+																		<string key="NSFrame">{{97, 14}, {120, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
 																		<bool key="NSEnabled">YES</bool>
-																		<object class="NSTextFieldCell" key="NSCell" id="699459845">
+																		<object class="NSTextFieldCell" key="NSCell" id="663745638">
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">272761856</int>
 																			<string key="NSContents">---</string>
 																			<reference key="NSSupport" ref="26"/>
-																			<reference key="NSControlView" ref="67390072"/>
+																			<reference key="NSControlView" ref="20295673"/>
 																			<reference key="NSBackgroundColor" ref="276406613"/>
 																			<reference key="NSTextColor" ref="214445494"/>
 																		</object>
 																		<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																		<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																	</object>
-																	<object class="NSTextField" id="533404085">
+																	<object class="NSTextField" id="526835083">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{97, 29}, {61, 14}}</string>
+																		<string key="NSFrame">{{97, 29}, {125, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="436178356"/>
+																		<reference key="NSNextKeyView" ref="881305695"/>
 																		<bool key="NSEnabled">YES</bool>
-																		<object class="NSTextFieldCell" key="NSCell" id="58735847">
+																		<object class="NSTextFieldCell" key="NSCell" id="645456218">
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">272761856</int>
 																			<string key="NSContents">---</string>
 																			<reference key="NSSupport" ref="26"/>
-																			<reference key="NSControlView" ref="533404085"/>
+																			<reference key="NSControlView" ref="526835083"/>
 																			<reference key="NSBackgroundColor" ref="276406613"/>
 																			<reference key="NSTextColor" ref="214445494"/>
 																		</object>
 																		<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																		<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																	</object>
-																	<object class="NSTextField" id="672187672">
+																	<object class="NSTextField" id="545616025">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
 																		<string key="NSFrame">{{10, 29}, {85, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="533404085"/>
+																		<reference key="NSNextKeyView" ref="526835083"/>
 																		<bool key="NSEnabled">YES</bool>
-																		<object class="NSTextFieldCell" key="NSCell" id="466656562">
+																		<object class="NSTextFieldCell" key="NSCell" id="421037893">
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">71435264</int>
 																			<string key="NSContents">Last HV Info:</string>
 																			<reference key="NSSupport" ref="26"/>
-																			<reference key="NSControlView" ref="672187672"/>
+																			<reference key="NSControlView" ref="545616025"/>
 																			<reference key="NSBackgroundColor" ref="276406613"/>
 																			<reference key="NSTextColor" ref="214445494"/>
 																		</object>
 																		<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																		<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																	</object>
-																	<object class="NSTextField" id="436178356">
+																	<object class="NSTextField" id="881305695">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
 																		<string key="NSFrame">{{10, 14}, {85, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="67390072"/>
+																		<reference key="NSNextKeyView" ref="20295673"/>
 																		<bool key="NSEnabled">YES</bool>
-																		<object class="NSTextFieldCell" key="NSCell" id="414657671">
+																		<object class="NSTextFieldCell" key="NSCell" id="814390444">
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">71435264</int>
 																			<string key="NSContents">Next HV Info:</string>
 																			<reference key="NSSupport" ref="26"/>
-																			<reference key="NSControlView" ref="436178356"/>
+																			<reference key="NSControlView" ref="881305695"/>
 																			<reference key="NSBackgroundColor" ref="276406613"/>
 																			<reference key="NSTextColor" ref="214445494"/>
 																		</object>
@@ -2464,7 +2464,7 @@ wGw</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">lastHvUpdateTimeField</string>
 						<reference key="source" ref="53635385"/>
-						<reference key="destination" ref="533404085"/>
+						<reference key="destination" ref="526835083"/>
 					</object>
 					<string key="id">lh4-qb-Vxn</string>
 				</object>
@@ -2472,7 +2472,7 @@ wGw</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">nextHvUpdateTimeField</string>
 						<reference key="source" ref="53635385"/>
-						<reference key="destination" ref="67390072"/>
+						<reference key="destination" ref="20295673"/>
 					</object>
 					<string key="id">Kg4-Ac-5QX</string>
 				</object>
@@ -3217,10 +3217,10 @@ wGw</bytes>
 							<reference ref="285444675"/>
 							<reference ref="404349313"/>
 							<reference ref="890025080"/>
-							<reference ref="67390072"/>
-							<reference ref="533404085"/>
-							<reference ref="672187672"/>
-							<reference ref="436178356"/>
+							<reference ref="20295673"/>
+							<reference ref="526835083"/>
+							<reference ref="545616025"/>
+							<reference ref="881305695"/>
 						</array>
 						<reference key="parent" ref="926429161"/>
 					</object>
@@ -3486,55 +3486,55 @@ wGw</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">UEP-Gz-TGw</string>
-						<reference key="object" ref="67390072"/>
+						<reference key="object" ref="20295673"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="699459845"/>
+							<reference ref="663745638"/>
 						</array>
 						<reference key="parent" ref="537997527"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">8Ck-zk-Vvo</string>
-						<reference key="object" ref="533404085"/>
+						<reference key="object" ref="526835083"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="58735847"/>
+							<reference ref="645456218"/>
 						</array>
 						<reference key="parent" ref="537997527"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">ubk-cQ-wjT</string>
-						<reference key="object" ref="672187672"/>
+						<reference key="object" ref="545616025"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="466656562"/>
+							<reference ref="421037893"/>
 						</array>
 						<reference key="parent" ref="537997527"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">1Uu-Zp-Tu7</string>
-						<reference key="object" ref="436178356"/>
+						<reference key="object" ref="881305695"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="414657671"/>
+							<reference ref="814390444"/>
 						</array>
 						<reference key="parent" ref="537997527"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">UD2-IB-meA</string>
-						<reference key="object" ref="414657671"/>
-						<reference key="parent" ref="436178356"/>
+						<reference key="object" ref="814390444"/>
+						<reference key="parent" ref="881305695"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">LiR-NP-Zi9</string>
-						<reference key="object" ref="466656562"/>
-						<reference key="parent" ref="672187672"/>
+						<reference key="object" ref="421037893"/>
+						<reference key="parent" ref="545616025"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">xo3-M4-1cG</string>
-						<reference key="object" ref="58735847"/>
-						<reference key="parent" ref="533404085"/>
+						<reference key="object" ref="645456218"/>
+						<reference key="parent" ref="526835083"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">VXp-gd-75w</string>
-						<reference key="object" ref="699459845"/>
-						<reference key="parent" ref="67390072"/>
+						<reference key="object" ref="663745638"/>
+						<reference key="parent" ref="20295673"/>
 					</object>
 				</array>
 			</object>
