@@ -135,6 +135,12 @@
                      selector : @selector(detectorsBiasedChanged:)
                          name : ORMJDVacuumModelNoHvInfoChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(constraintsDisabledChanged:)
+                         name : ORMJDVacuumModelConstraintsDisabledChanged
+						object: model];
+    
 }
 
 - (void) updateWindow
@@ -152,6 +158,14 @@
 }
 
 #pragma mark •••Interface Management
+- (void) constraintsDisabledChanged:(NSNotification*)aNote
+{
+    if([model disableConstraints])[overRideButton setTitle:@"Re-enable Constraints"];
+    else                          [overRideButton setTitle:@"Disable Constraints..."];
+    [constraintOverrideField setStringValue:[model disableConstraints]?@"Constraints DISABLED":@""];
+	[vacuumView setNeedsDisplay:YES];
+    
+}
 
 - (void) nextHvUpdateTimeChanged:(NSNotification*)aNote
 {
@@ -274,7 +288,7 @@
 	int currentValveState = [gv state];
 	
 	BOOL constraintsInPlace = [[gv constraints] count]>0;
-	if(constraintsInPlace){
+	if(constraintsInPlace && ![model disableConstraints]){
 		NSArray* allKeys = [[gv constraints] allKeys];
 		int n = [allKeys count];
 		[constraintTitleField setStringValue:[NSString stringWithFormat:@"%@ can not be opened because it has %d constraint%@ in effect. See below for more info.",
@@ -401,6 +415,30 @@
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORMJCVacuumLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) overRideAction:(id)sender
+{
+    if(![model disableConstraints]){
+        NSBeginCriticalAlertSheet(@"REALLY disable constraints?",
+                          @"Cancel",
+                          @"Yes/Disable Constraints!",
+                          nil,[self window],
+                          self,
+                          @selector(toggleSheetDidEnd:returnCode:contextInfo:),
+                          nil,
+                          nil,@"This is a dangerous operation. If you are NOT an expert -- CANCEL this operation.\n\nIf you continue, constraints will be disabled for 60 seconds.");
+    }
+    else {
+        [model enableConstraints];
+    }
+}
+
+- (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [model disableContraintsFor60Seconds];
+    }
 }
 
 

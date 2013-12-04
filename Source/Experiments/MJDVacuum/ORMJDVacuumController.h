@@ -48,6 +48,8 @@
 	IBOutlet NSTextField*   constraintTitleField;
 	IBOutlet NSTextField*   detectorStatusField;
 	IBOutlet NSTextField*   constraintStatusField;
+	IBOutlet NSTextField*   constraintOverrideField;
+    IBOutlet NSButton*      overRideButton;
 
 	BOOL					updateScheduled;
 }
@@ -74,6 +76,7 @@
 - (void) vetoMaskChanged:(NSNotification*)aNote;
 - (void) stateChanged:(NSNotification*)aNote;
 - (void) delayedRefresh;
+- (void) constraintsDisabledChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) showGridAction:(id)sender;
@@ -82,6 +85,7 @@
 - (IBAction) changeGVAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) closeGVConstraintPanel:(id)sender;
+- (IBAction) overRideAction:(id)sender;
 
 #pragma mark •••Data Source For Tables
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;

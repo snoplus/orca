@@ -76,6 +76,67 @@
 												<reference key="NSNextResponder" ref="1065202230"/>
 												<int key="NSvFlags">274</int>
 												<array class="NSMutableArray" key="NSSubviews">
+													<object class="NSTextField" id="78754600">
+														<reference key="NSNextResponder" ref="926429161"/>
+														<int key="NSvFlags">268</int>
+														<string key="NSFrame">{{553, 581}, {199, 22}}</string>
+														<reference key="NSSuperview" ref="926429161"/>
+														<reference key="NSWindow"/>
+														<string key="NSHuggingPriority">{251, 750}</string>
+														<bool key="NSEnabled">YES</bool>
+														<object class="NSTextFieldCell" key="NSCell" id="1050577072">
+															<int key="NSCellFlags">68157504</int>
+															<int key="NSCellFlags2">138413056</int>
+															<string key="NSContents"/>
+															<object class="NSFont" key="NSSupport">
+																<string key="NSName">.LucidaGrandeUI-Bold</string>
+																<double key="NSSize">16</double>
+																<int key="NSfFlags">2072</int>
+															</object>
+															<reference key="NSControlView" ref="78754600"/>
+															<object class="NSColor" key="NSBackgroundColor" id="276406613">
+																<int key="NSColorSpace">6</int>
+																<string key="NSCatalogName">System</string>
+																<string key="NSColorName">controlColor</string>
+																<object class="NSColor" key="NSColor" id="204715855">
+																	<int key="NSColorSpace">3</int>
+																	<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+																</object>
+															</object>
+															<object class="NSColor" key="NSTextColor">
+																<int key="NSColorSpace">1</int>
+																<bytes key="NSRGB">MC41MjIzNDg4NzMgMC4wMjE3MjI1Mzk3NyAwLjAyMjA4MjI1NTk4AA</bytes>
+															</object>
+														</object>
+														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+														<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
+													</object>
+													<object class="NSButton" id="315251024">
+														<reference key="NSNextResponder" ref="926429161"/>
+														<int key="NSvFlags">268</int>
+														<string key="NSFrame">{{590, 602}, {154, 28}}</string>
+														<reference key="NSSuperview" ref="926429161"/>
+														<reference key="NSWindow"/>
+														<bool key="NSEnabled">YES</bool>
+														<object class="NSButtonCell" key="NSCell" id="588305877">
+															<int key="NSCellFlags">67108864</int>
+															<int key="NSCellFlags2">134348800</int>
+															<string key="NSContents">Disable Constraints...</string>
+															<object class="NSFont" key="NSSupport" id="26">
+																<string key="NSName">.LucidaGrandeUI</string>
+																<double key="NSSize">11</double>
+																<int key="NSfFlags">3100</int>
+															</object>
+															<reference key="NSControlView" ref="315251024"/>
+															<int key="NSButtonFlags">-2038284288</int>
+															<int key="NSButtonFlags2">129</int>
+															<string key="NSAlternateContents"/>
+															<string key="NSKeyEquivalent"/>
+															<int key="NSPeriodicDelay">200</int>
+															<int key="NSPeriodicInterval">25</int>
+														</object>
+														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+													</object>
 													<object class="NSBox" id="537997527">
 														<reference key="NSNextResponder" ref="926429161"/>
 														<int key="NSvFlags">36</int>
@@ -96,21 +157,9 @@
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">272761856</int>
 																			<string key="NSContents">---</string>
-																			<object class="NSFont" key="NSSupport" id="26">
-																				<string key="NSName">.LucidaGrandeUI</string>
-																				<double key="NSSize">11</double>
-																				<int key="NSfFlags">3100</int>
-																			</object>
+																			<reference key="NSSupport" ref="26"/>
 																			<reference key="NSControlView" ref="890025080"/>
-																			<object class="NSColor" key="NSBackgroundColor" id="276406613">
-																				<int key="NSColorSpace">6</int>
-																				<string key="NSCatalogName">System</string>
-																				<string key="NSColorName">controlColor</string>
-																				<object class="NSColor" key="NSColor" id="204715855">
-																					<int key="NSColorSpace">3</int>
-																					<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-																				</object>
-																			</object>
+																			<reference key="NSBackgroundColor" ref="276406613"/>
 																			<object class="NSColor" key="NSTextColor" id="214445494">
 																				<int key="NSColorSpace">6</int>
 																				<string key="NSCatalogName">System</string>
@@ -270,7 +319,7 @@
 																<reference key="NSNextKeyView" ref="285444675"/>
 															</object>
 														</array>
-														<string key="NSFrame">{{44, 542}, {208, 96}}</string>
+														<string key="NSFrame">{{11, 542}, {208, 96}}</string>
 														<reference key="NSSuperview" ref="926429161"/>
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="820678157"/>
@@ -2478,6 +2527,30 @@ wGw</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
+						<string key="label">overRideButton</string>
+						<reference key="source" ref="53635385"/>
+						<reference key="destination" ref="315251024"/>
+					</object>
+					<string key="id">AwH-lL-OlI</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">overRideAction:</string>
+						<reference key="source" ref="53635385"/>
+						<reference key="destination" ref="315251024"/>
+					</object>
+					<string key="id">vSQ-ff-wtW</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">constraintOverrideField</string>
+						<reference key="source" ref="53635385"/>
+						<reference key="destination" ref="78754600"/>
+					</object>
+					<string key="id">18z-uB-J1U</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="111836233"/>
 						<reference key="destination" ref="53635385"/>
@@ -2909,6 +2982,8 @@ wGw</bytes>
 						<array class="NSMutableArray" key="children">
 							<reference ref="663491425"/>
 							<reference ref="537997527"/>
+							<reference ref="78754600"/>
+							<reference ref="315251024"/>
 						</array>
 						<reference key="parent" ref="1065202230"/>
 					</object>
@@ -3536,6 +3611,32 @@ wGw</bytes>
 						<reference key="object" ref="663745638"/>
 						<reference key="parent" ref="20295673"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">mN0-ry-yfn</string>
+						<reference key="object" ref="315251024"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="588305877"/>
+						</array>
+						<reference key="parent" ref="926429161"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">bLd-1C-e58</string>
+						<reference key="object" ref="588305877"/>
+						<reference key="parent" ref="315251024"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">dhf-bw-83x</string>
+						<reference key="object" ref="78754600"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="1050577072"/>
+						</array>
+						<reference key="parent" ref="926429161"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">LeQ-wg-Fow</string>
+						<reference key="object" ref="1050577072"/>
+						<reference key="parent" ref="78754600"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -3681,10 +3782,14 @@ wGw</bytes>
 				<string key="8Ck-zk-Vvo.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="91.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="92.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="LeQ-wg-Fow.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="LiR-NP-Zi9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="UD2-IB-meA.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="UEP-Gz-TGw.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="VXp-gd-75w.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="bLd-1C-e58.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="dhf-bw-83x.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="mN0-ry-yfn.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ubk-cQ-wjT.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="xo3-M4-1cG.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
@@ -3696,6 +3801,27 @@ wGw</bytes>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
+					<string key="className">NSTextView</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="orderFrontSharingServicePicker:">id</string>
+						<string key="toggleQuickLookPreviewPanel:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="orderFrontSharingServicePicker:">
+							<string key="name">orderFrontSharingServicePicker:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleQuickLookPreviewPanel:">
+							<string key="name">toggleQuickLookPreviewPanel:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/NSTextView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">ORCardContainerView</string>
 					<string key="superclassName">ORGroupView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -3706,6 +3832,95 @@ wGw</bytes>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORGroupView</string>
 					<string key="superclassName">NSView</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="alignBottom:">id</string>
+						<string key="alignHorizontalCenters:">id</string>
+						<string key="alignLeft:">id</string>
+						<string key="alignRight:">id</string>
+						<string key="alignTop:">id</string>
+						<string key="alignVerticalCenters:">id</string>
+						<string key="arrangeInCircle:">id</string>
+						<string key="bringToFront:">id</string>
+						<string key="clearBackgroundImage:">id</string>
+						<string key="copy:">id</string>
+						<string key="cut:">id</string>
+						<string key="delete:">id</string>
+						<string key="getInfo:">id</string>
+						<string key="paste:">id</string>
+						<string key="selectAll:">id</string>
+						<string key="selectBackgroundImage:">id</string>
+						<string key="sendToBack:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="alignBottom:">
+							<string key="name">alignBottom:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignHorizontalCenters:">
+							<string key="name">alignHorizontalCenters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignLeft:">
+							<string key="name">alignLeft:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignRight:">
+							<string key="name">alignRight:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignTop:">
+							<string key="name">alignTop:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignVerticalCenters:">
+							<string key="name">alignVerticalCenters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="arrangeInCircle:">
+							<string key="name">arrangeInCircle:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="bringToFront:">
+							<string key="name">bringToFront:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clearBackgroundImage:">
+							<string key="name">clearBackgroundImage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="cut:">
+							<string key="name">cut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="delete:">
+							<string key="name">delete:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="getInfo:">
+							<string key="name">getInfo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="paste:">
+							<string key="name">paste:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectAll:">
+							<string key="name">selectAll:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectBackgroundImage:">
+							<string key="name">selectBackgroundImage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="sendToBack:">
+							<string key="name">sendToBack:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ORGroupView.h</string>
@@ -3720,6 +3935,7 @@ wGw</bytes>
 						<string key="closeGVConstraintPanel:">id</string>
 						<string key="lockAction:">id</string>
 						<string key="openGVControlPanel:">id</string>
+						<string key="overRideAction:">id</string>
 						<string key="showGridAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
@@ -3743,12 +3959,17 @@ wGw</bytes>
 							<string key="name">openGVControlPanel:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="overRideAction:">
+							<string key="name">overRideAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="showGridAction:">
 							<string key="name">showGridAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="constraintOverrideField">NSTextField</string>
 						<string key="constraintStatusField">NSTextField</string>
 						<string key="constraintTitleField">NSTextField</string>
 						<string key="detectorStatusField">NSTextField</string>
@@ -3769,6 +3990,7 @@ wGw</bytes>
 						<string key="lockButton">NSButton</string>
 						<string key="nextHvUpdateTimeField">NSTextField</string>
 						<string key="noHVInfoField">NSTextField</string>
+						<string key="overRideButton">NSButton</string>
 						<string key="setShowGridCB">NSButton</string>
 						<string key="statusTableView">NSTableView</string>
 						<string key="subComponentsView">ORGroupView</string>
@@ -3776,6 +3998,10 @@ wGw</bytes>
 						<string key="valueTableView">NSTableView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="constraintOverrideField">
+							<string key="name">constraintOverrideField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="constraintStatusField">
 							<string key="name">constraintStatusField</string>
 							<string key="candidateClassName">NSTextField</string>
@@ -3855,6 +4081,10 @@ wGw</bytes>
 						<object class="IBToOneOutletInfo" key="noHVInfoField">
 							<string key="name">noHVInfoField</string>
 							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="overRideButton">
+							<string key="name">overRideButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="setShowGridCB">
 							<string key="name">setShowGridCB</string>

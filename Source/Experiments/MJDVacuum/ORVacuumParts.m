@@ -380,6 +380,12 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 			if(controlPreference == kControlAbove)lockPoint = NSMakePoint(location.x-dx,location.y - kPipeRadius-kPipeThickness - dy);
 			else								  lockPoint = NSMakePoint(location.x-dx,location.y + kPipeRadius+kPipeThickness+5);
             [lockImage drawAtPoint:lockPoint fromRect:[lockImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+            if([dataSource disableConstraints]){
+                [[NSColor redColor] set];
+                [NSBezierPath setDefaultLineWidth:2];
+                [NSBezierPath strokeLineFromPoint:NSMakePoint(lockPoint.x,lockPoint.y) toPoint:NSMakePoint(lockPoint.x+lockSize.width,lockPoint.y+lockSize.height)];
+                [NSBezierPath strokeLineFromPoint:NSMakePoint(lockPoint.x,lockPoint.y+lockSize.height) toPoint:NSMakePoint(lockPoint.x+lockSize.width,lockPoint.y)];
+            }
             [lockImage release];
 		}
 	}
@@ -450,7 +456,13 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 			if(controlPreference == kControlRight)lockPoint  = NSMakePoint(location.x-kPipeRadius-kPipeThickness-dx,location.y - dy);
 			else								  lockPoint = NSMakePoint(location.x+kPipeRadius+kPipeThickness+5,  location.y - dy);
             [lockImage drawAtPoint:lockPoint fromRect:[lockImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-			[lockImage release];
+            if([dataSource disableConstraints]){
+                [[NSColor redColor] set];
+                [NSBezierPath setDefaultLineWidth:2];
+                [NSBezierPath strokeLineFromPoint:NSMakePoint(lockPoint.x,lockPoint.y) toPoint:NSMakePoint(lockPoint.x+lockSize.width,lockPoint.y+lockSize.height)];
+                [NSBezierPath strokeLineFromPoint:NSMakePoint(lockPoint.x,lockPoint.y+lockSize.height) toPoint:NSMakePoint(lockPoint.x+lockSize.width,lockPoint.y)];
+            }
+            [lockImage release];
 		}
 	}
 	
@@ -707,6 +719,12 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		NSSize lockSize = [lockImage size];
 		NSPoint lockPoint = NSMakePoint(bounds.origin.x + bounds.size.width - lockSize.width, bounds.origin.y + bounds.size.height + 5);
         [lockImage drawAtPoint:lockPoint fromRect:[lockImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        if([dataSource disableConstraints]){
+            [[NSColor redColor] set];
+            [NSBezierPath setDefaultLineWidth:2];
+            [NSBezierPath strokeLineFromPoint:NSMakePoint(lockPoint.x,lockPoint.y) toPoint:NSMakePoint(lockPoint.x+lockSize.width,lockPoint.y+lockSize.height)];
+            [NSBezierPath strokeLineFromPoint:NSMakePoint(lockPoint.x,lockPoint.y+lockSize.height) toPoint:NSMakePoint(lockPoint.x+lockSize.width,lockPoint.y)];
+        }
 		[lockImage release];
 	}
 }

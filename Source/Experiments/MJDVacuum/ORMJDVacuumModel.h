@@ -132,6 +132,7 @@
     NSDate*              lastHvUpdateTime;
     NSDate*              nextHvUpdateTime;
     BOOL                 noHvInfo;
+    BOOL                 disableConstraints;
 }
 
 #pragma mark ***Accessors
@@ -219,7 +220,9 @@
 - (void) removeContinuedBiasConstraints:(NSString*)aName;
 - (NSDictionary*) okToBiasConstraints;
 - (NSDictionary*) continuedBiasConstraints;
-
+- (void) disableContraintsFor60Seconds;
+- (void) enableConstraints;
+- (BOOL) disableConstraints;
 @end
 
 extern NSString* ORMJDVacuumModelNoHvInfoChanged;
@@ -231,6 +234,7 @@ extern NSString* ORMJDVacuumModelVetoMaskChanged;
 extern NSString* ORMJDVacuumModelShowGridChanged;
 extern NSString* ORMJCVacuumLock;
 extern NSString* ORMJDVacuumModelConstraintsChanged;
+extern NSString* ORMJDVacuumModelConstraintsDisabledChanged;
 
 
 @interface ORMJDVacuumModel (hidden)

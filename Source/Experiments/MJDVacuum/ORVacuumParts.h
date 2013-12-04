@@ -295,6 +295,7 @@ extern NSString* ORVacuumConstraintChanged;
 
 @interface NSObject (VacuumParts)
 - (BOOL) showGrid;
+- (BOOL) disableConstraints;
 - (void) addPart:(id)aPart;
 - (void) colorRegions;
 - (NSString*) auxStatusString:(int)aChannel;

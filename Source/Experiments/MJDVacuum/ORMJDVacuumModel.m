@@ -77,6 +77,7 @@ NSString* ORMJDVacuumModelConstraintsChanged            = @"ORMJDVacuumModelCons
 NSString* ORMJDVacuumModelNextHvUpdateTimeChanged       = @"ORMJDVacuumModelNextHvUpdateTimeChanged";
 NSString* ORMJDVacuumModelLastHvUpdateTimeChanged       = @"ORMJDVacuumModelLastHvUpdateTimeChanged";
 NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUpdateTimeChanged";
+NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelConstraintsDisabledChanged";
 
 @implementation ORMJDVacuumModel
 
@@ -720,6 +721,26 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
 
 - (NSDictionary*) okToBiasConstraints       { return okToBiasConstraints;      }
 - (NSDictionary*) continuedBiasConstraints  { return continuedBiasConstraints; }
+
+- (void) disableContraintsFor60Seconds
+{
+    disableConstraints = YES;
+    [self performSelector:@selector(enableConstraints) withObject:nil afterDelay:60];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsDisabledChanged object:self];
+}
+
+- (void) enableConstraints
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(enableConstraints) object:nil];
+    disableConstraints = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsDisabledChanged object:self];
+}
+
+- (BOOL) disableConstraints
+{
+    return disableConstraints;
+}
+
 @end
 
 
