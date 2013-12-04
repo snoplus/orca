@@ -863,6 +863,36 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 - (NSDictionary*)purgeOpenConstraints	 { return purgeOpenConstraints;		}
 - (NSDictionary*)roughingOpenConstraints { return roughingOpenConstraints;	}
 
+- (NSString*) pumpOnOffConstraintReport
+{
+    NSString* s = @"";
+    for(id aKey in pumpOnConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[pumpOnConstraints objectForKey:aKey]];
+    }
+    for(id aKey in pumpOffConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[pumpOffConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
+- (NSString*) purgeOpenConstraintReport
+{
+    NSString* s=@"";
+    for(id aKey in purgeOpenConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[purgeOpenConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+- (NSString*) roughingOpenConstraintReport
+{
+    NSString* s=@"";
+    for(id aKey in roughingOpenConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[roughingOpenConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
+
 #pragma mark ••• Commands
 - (void) addCmdToQueue:(NSString *)aCmd
 {

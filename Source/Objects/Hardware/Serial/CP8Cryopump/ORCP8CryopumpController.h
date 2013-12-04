@@ -107,9 +107,9 @@
 	IBOutlet BiStateView*   powerFailureOccurredBiStateView;
     IBOutlet ORSerialPortController* serialPortController;
 	
-	IBOutlet NSImageView*   powerConstraintImage;
-	IBOutlet NSImageView*   purgeConstraintImage;
-	IBOutlet NSImageView*   roughingConstraintImage;
+	IBOutlet NSButton*      powerConstraintButton;
+	IBOutlet NSButton*      purgeConstraintButton;
+	IBOutlet NSButton*      roughingConstraintButton;
 	IBOutlet NSPanel*		constraintPanel;
 	IBOutlet NSTextField*   constraintTitleField;
 	IBOutlet NSTextView*    constraintView;
@@ -232,6 +232,9 @@
 - (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
+- (IBAction) listPumpOnOffConstraintsAction:(id)sender;
+- (IBAction) listPurgeOpenConstraintsAction:(id)sender;
+- (IBAction) listRoughingOpenConstraintsAction:(id)sender;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

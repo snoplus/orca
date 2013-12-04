@@ -264,6 +264,10 @@
 - (NSDictionary*)purgeOpenConstraints;
 - (NSDictionary*)roughingOpenConstraints;
 
+- (NSString*) pumpOnOffConstraintReport;
+- (NSString*) purgeOpenConstraintReport;
+- (NSString*) roughingOpenConstraintReport;
+
 @end
 
 @interface ORCP8CryopumpCmd : NSObject

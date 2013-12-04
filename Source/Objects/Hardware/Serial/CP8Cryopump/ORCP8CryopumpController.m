@@ -453,19 +453,31 @@
 {
 	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
 	if([[model pumpOnConstraints] count] || [[model pumpOffConstraints] count]){
-		[powerConstraintImage setImage:smallLockImage];
+		[powerConstraintButton setImage:smallLockImage];
+        [powerConstraintButton setEnabled:YES];
 	}
-	else [powerConstraintImage setImage:nil];
+	else {
+        [powerConstraintButton setImage:nil];
+        [powerConstraintButton setEnabled:NO];
+   }
 	
 	if([[model purgeOpenConstraints] count]){
-		[purgeConstraintImage setImage:smallLockImage];
+		[purgeConstraintButton setImage:smallLockImage];
+        [purgeConstraintButton setEnabled:YES];
 	}
-	else [purgeConstraintImage setImage:nil];
+	else {
+        [purgeConstraintButton setImage:nil];
+        [purgeConstraintButton setEnabled:NO];
+    }
 	
 	if([[model roughingOpenConstraints] count]){
-		[roughingConstraintImage setImage:smallLockImage];
+		[roughingConstraintButton setImage:smallLockImage];
+        [roughingConstraintButton setEnabled:YES];
 	}
-	else [roughingConstraintImage setImage:nil];
+	else {
+        [roughingConstraintButton setImage:nil];
+        [roughingConstraintButton setEnabled:NO];
+    }
 	
 }
 
@@ -1091,6 +1103,34 @@
 - (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:NO];
+}
+
+
+- (IBAction) listPumpOnOffConstraintsAction:(id)sender
+{
+	if([[model pumpOnConstraints]count] || [[model pumpOffConstraints]count]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model pumpOnOffConstraintReport]);
+        
+    }
+}
+
+- (IBAction) listPurgeOpenConstraintsAction:(id)sender
+{
+	if([[model pumpOnConstraints]count]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model purgeOpenConstraintReport]);
+        
+    }
+}
+
+- (IBAction) listRoughingOpenConstraintsAction:(id)sender
+{
+	if([[model pumpOnConstraints]count]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model roughingOpenConstraintReport]);
+        
+    }
 }
 
 

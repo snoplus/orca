@@ -272,6 +272,8 @@
 - (void) removeCEMConstraint:(NSString*)aName;
 - (NSDictionary*)filamentConstraints;
 - (NSDictionary*)cemConstraints;
+- (NSString*) filamentConstraintReport;
+- (NSString*) cemConstraintReport;
 
 @end
 

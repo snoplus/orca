@@ -82,8 +82,8 @@
     IBOutlet NSButton*      removeAmuButton;
     IBOutlet NSButton*		plotLogCB;
 	
-	IBOutlet NSImageView*   filamentConstraintImage;
-	IBOutlet NSImageView*   cemConstraintImage;
+	IBOutlet NSButton*      filamentConstraintButton;
+	IBOutlet NSButton*      cemConstraintButton;
 	IBOutlet NSPanel*		constraintPanel;
 	IBOutlet NSTextField*   constraintTitleField;
 	IBOutlet NSTextView*    constraintView;
@@ -178,6 +178,8 @@
 - (IBAction) useIonizerDefaultsAction:(id)sender;
 - (IBAction) useDectorDefaultsAction:(id)sender;
 - (IBAction) closeConstraintPanel:(id)sender;
+- (IBAction) listFilamentConstraintsAction:(id)sender;
+- (IBAction) listCemConstraintsAction:(id)sender;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

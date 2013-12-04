@@ -391,14 +391,22 @@
 {
 	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
 	if([[model filamentConstraints] count]){
-		[filamentConstraintImage setImage:smallLockImage];
+		[filamentConstraintButton setImage:smallLockImage];
+        [filamentConstraintButton setEnabled:YES];
 	}
-	else [filamentConstraintImage setImage:nil];
+	else {
+        [filamentConstraintButton setImage:nil];
+        [filamentConstraintButton setEnabled:NO];
+   }
 	
 	if([[model cemConstraints] count]){
-		[cemConstraintImage setImage:smallLockImage];
+		[cemConstraintButton setImage:smallLockImage];
+        [cemConstraintButton setEnabled:YES];
 	}
-	else [cemConstraintImage setImage:nil];
+	else {
+        [cemConstraintButton setImage:nil];
+        [cemConstraintButton setEnabled:NO];
+    }
 }
 
 - (void) sensitivityFactorChanged:(NSNotification*)aNote
@@ -1047,8 +1055,9 @@
 {
 	NSArray* allKeys = [constraints allKeys];
 	int n = [allKeys count];
-	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %d constraint%@ in effect. See below for more info.",
+	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %@ %d constraint%@ in effect. See below for more info.",
 										  aTitle,
+                                          n==1?@"is":@"are",
 										  n,
 										  n==1?@"":@"s"]];
 	NSMutableString* s = [NSMutableString string];
@@ -1063,6 +1072,23 @@
 {
     [constraintPanel orderOut:nil];
     [NSApp endSheet:constraintPanel];
+}
+
+- (IBAction) listFilamentConstraintsAction:(id)sender
+{
+  	if([[model filamentConstraints]count]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model filamentConstraintReport]);
+        
+    }
+}
+- (IBAction) listCemConstraintsAction:(id)sender
+{
+   	if([[model cemConstraints]count]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model cemConstraintReport]);
+        
+    }
 }
 
 @end

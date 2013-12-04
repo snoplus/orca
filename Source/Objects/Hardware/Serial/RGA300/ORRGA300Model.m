@@ -767,6 +767,24 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
 - (NSDictionary*) filamentConstraints { return filamentConstraints;		}
 - (NSDictionary*) cemConstraints	  { return cemConstraints;		}
 
+- (NSString*) filamentConstraintReport
+{
+    NSString* s=@"";
+    for(id aKey in filamentConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[filamentConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
+- (NSString*) cemConstraintReport
+{
+    NSString* s=@"";
+    for(id aKey in cemConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[cemConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
 @end
 
 @implementation ORRGA300Model (private)
