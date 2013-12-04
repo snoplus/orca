@@ -162,6 +162,7 @@
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
+		36905ADC184F0F1800959A52 /* OpSequence.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36905ADB184F0F1800959A52 /* OpSequence.xib */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
@@ -2814,7 +2815,6 @@
 		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
 		84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE03BE120AFA4400B804B3 /* ORInverterModel.m */; };
-		84EE77EA184CDD670081BD15 /* OpSequenceView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EE77E9184CDD670081BD15 /* OpSequenceView.xib */; };
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
 		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
 		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
@@ -3509,6 +3509,7 @@
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
+		36905ADB184F0F1800959A52 /* OpSequence.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OpSequence.xib; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
@@ -6046,7 +6047,6 @@
 		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
 		84EE03BE120AFA4400B804B3 /* ORInverterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORInverterModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.m; sourceTree = SOURCE_ROOT; };
-		84EE77E9184CDD670081BD15 /* OpSequenceView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OpSequenceView.xib; sourceTree = "<group>"; };
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
 		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
 		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
@@ -12047,8 +12047,8 @@
 		84D29FD81843EAC800D320DB /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				36905ADB184F0F1800959A52 /* OpSequence.xib */,
 				84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */,
-				84EE77E9184CDD670081BD15 /* OpSequenceView.xib */,
 				84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */,
 				84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */,
 				84D29FDD1843EAC800D320DB /* OROpSeqStepViewItem.m */,
@@ -15247,7 +15247,6 @@
 				84F50A2C116B7151000275F2 /* CmdLabel.nib in Resources */,
 				84F50A2D116B7151000275F2 /* CmdLabel.tif in Resources */,
 				84F50E14116CCAEE000275F2 /* loginExpectScript in Resources */,
-				84EE77EA184CDD670081BD15 /* OpSequenceView.xib in Resources */,
 				8490D2951177532C00D25B1F /* IpeV4MiniCrate.nib in Resources */,
 				8490D2961177532C00D25B1F /* IpeV4MiniCrate.tif in Resources */,
 				8490D2971177532C00D25B1F /* IpeV4MiniCrateBig.tif in Resources */,
@@ -15495,6 +15494,7 @@
 				2D7731A2181188F400070A4A /* LanNetio230.nib in Resources */,
 				2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */,
 				2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */,
+				36905ADC184F0F1800959A52 /* OpSequence.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
