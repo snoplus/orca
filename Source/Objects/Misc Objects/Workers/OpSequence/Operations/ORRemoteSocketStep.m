@@ -101,8 +101,8 @@
      self.errorCount += [self checkRequirements];
     if (outputStateKey){
         NSString* result;
-        if(self.errorCount) result = @"1";
-        else                result = @"0";
+        if(self.errorCount) result = @"0";
+        else                result = @"1";
         [currentQueue setStateValue:result forKey:outputStateKey];
 	}
 

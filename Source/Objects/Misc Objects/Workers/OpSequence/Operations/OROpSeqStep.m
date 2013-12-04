@@ -152,10 +152,7 @@
     for(id aKey in andConditions){
         NSString* aValue        = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
         NSString* requiredValue = [andConditions objectForKey:aKey];
-        if(![aValue isEqualToString:requiredValue]){
-            andValue = NO;
-            break;
-        }
+        andValue &= [aValue isEqualToString:requiredValue];
     }
     
     //if ANY of the or conditions are present
@@ -165,7 +162,7 @@
         for(id aKey in orConditions){
             NSString* aValue        = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
             NSString* requiredValue = [orConditions objectForKey:aKey];
-            orValue |= ![aValue isEqualToString:requiredValue];
+            orValue |= [aValue isEqualToString:requiredValue];
         }
     }
 
