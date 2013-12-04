@@ -317,7 +317,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             int hvCard    = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
             if(hvCrate<2){
-                if(aState)[[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:@"Vac Is Bad"];
+                if(aState)[[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:[NSString stringWithFormat:@"HV Card mapped to Cryo %d and Vac Is Bad",aCrate]];
                 else [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
             }
         }
@@ -540,6 +540,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                       commandSelection: nil
                                               commands: @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
                                                         @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
+                                                        [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",pollTime],
                                                         nil]];
     [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
 
@@ -575,6 +576,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                                             (NSUInteger)0,
                                                                             (NSUInteger)1]]];
             
+    [[steps lastObject] addOrCondition: @"vacSystemPingOK" value: @"1"];
     [[steps lastObject] addOrCondition: @"OKForHV"         value: @"0"];
 	[[steps lastObject] setTitle:       @"Add Constraints"];
     //----------------------------------------------------------
@@ -587,7 +589,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                      (NSUInteger)0,
                                                      (NSUInteger)0]]];
     
-    [[steps lastObject] addOrCondition: @"OKForHV"         value: @"1"];
+    [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
+    [[steps lastObject] addAndCondition: @"OKForHV"         value: @"1"];
 	[[steps lastObject] setTitle:       @"Remove Constraints"];
     //----------------------------------------------------------
 

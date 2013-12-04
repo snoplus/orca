@@ -808,36 +808,40 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORRGA300Lock];
-	//BOOL portOpen = [[model serialPort] isOpen];
+	BOOL portOpen = [[model serialPort] isOpen];
+    BOOL notLockedAndPortOpen = !locked && portOpen;
 	BOOL opIsRunning = [model currentActivity] != kRGAIdle;
 	BOOL opModeIsTable = [model opMode] == 1;
+    
     [lockButton setState: locked];
+    
 	[serialPortController updateButtons:locked];
+    
     BOOL useDetectorDefaults = [model useDetectorDefaults];
-	[noiseFloorSettingField		setEnabled: !useDetectorDefaults && !locked];
-	[elecMultHVBiasField		setEnabled: !useDetectorDefaults && [model electronMultiOption] && !locked];
-	[elecMultHVBiasOnOffButton	setEnabled: [model electronMultiOption] && !locked];
+	[noiseFloorSettingField		setEnabled: !useDetectorDefaults && notLockedAndPortOpen];
+	[elecMultHVBiasField		setEnabled: !useDetectorDefaults && [model electronMultiOption] && notLockedAndPortOpen];
+	[elecMultHVBiasOnOffButton	setEnabled: [model electronMultiOption] && notLockedAndPortOpen];
 	
     BOOL useIonizerDefaults = [model useIonizerDefaults];
-	[ionizerIonEnergyPU				setEnabled:!useIonizerDefaults && !locked];
-	[ionizerElectronEnergyField		setEnabled:!useIonizerDefaults && !locked];
-	[ionizerFocusPlateVoltageField	setEnabled:!useIonizerDefaults && !locked];
-	[ionizerEmissionCurrentField	setEnabled:!useIonizerDefaults && !locked];
+	[ionizerIonEnergyPU				setEnabled:!useIonizerDefaults && notLockedAndPortOpen];
+	[ionizerElectronEnergyField		setEnabled:!useIonizerDefaults && notLockedAndPortOpen];
+	[ionizerFocusPlateVoltageField	setEnabled:!useIonizerDefaults && notLockedAndPortOpen];
+	[ionizerEmissionCurrentField	setEnabled:!useIonizerDefaults && notLockedAndPortOpen];
 
-	[filamentOnOffButton			setEnabled:!locked];
+	[filamentOnOffButton			setEnabled:notLockedAndPortOpen];
 
-	[useIonizerDefaultsMatrix       setEnabled: [model ionizerFilamentCurrentRB]==0 && !locked];
-	[useDetectorDefaultsMatrix      setEnabled: [model elecMultHVBiasRB] ==0 && !locked];
+	[useIonizerDefaultsMatrix       setEnabled: [model ionizerFilamentCurrentRB]==0 && notLockedAndPortOpen];
+	[useDetectorDefaultsMatrix      setEnabled: [model elecMultHVBiasRB] ==0 && notLockedAndPortOpen];
 
-	[initialMassField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
-	[finalMassField     setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
-	[stepsPerAmuField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode];
-	[opModePU           setEnabled: !opIsRunning];
-	[addAmuButton       setEnabled: !locked && !opIsRunning && opModeIsTable];
-	[removeAmuButton    setEnabled: !locked && !opIsRunning && opModeIsTable];
-    [amuTable           setEnabled: !locked && !opIsRunning && opModeIsTable];
-    [startMeasurementButton setEnabled:!locked && !opIsRunning];
-    [stopMeasurementButton  setEnabled:!locked && opIsRunning && opModeIsTable];
+	[initialMassField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode && portOpen];
+	[finalMassField     setEnabled:	!opIsRunning && [model opMode] != kRGATableMode && portOpen];
+	[stepsPerAmuField   setEnabled:	!opIsRunning && [model opMode] != kRGATableMode && portOpen];
+	[opModePU           setEnabled: !opIsRunning && portOpen];
+	[addAmuButton       setEnabled: !locked && !opIsRunning && opModeIsTable && portOpen];
+	[removeAmuButton    setEnabled: !locked && !opIsRunning && opModeIsTable && portOpen];
+    [amuTable           setEnabled: !locked && !opIsRunning && opModeIsTable && portOpen];
+    [startMeasurementButton setEnabled:!locked && !opIsRunning && portOpen];
+    [stopMeasurementButton  setEnabled:!locked && opIsRunning && opModeIsTable && portOpen];
     
     
 }

@@ -135,6 +135,7 @@
 - (void) addPumpOffConstraint:(NSString*)aName reason:(NSString*)aReason;
 - (void) removePumpOffConstraint:(NSString*)aName;
 - (NSDictionary*) pumpOffConstraints;
+- (NSString*) pumpOffConstraintReport;
 
 @end
 

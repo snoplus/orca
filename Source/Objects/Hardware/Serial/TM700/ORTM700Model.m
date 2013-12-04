@@ -667,6 +667,15 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 - (NSDictionary*)pumpOffConstraints		 { return pumpOffConstraints; }
 
+- (NSString*) pumpOffConstraintReport
+{
+    NSString* s=@"";
+    for(id aKey in pumpOffConstraints){
+        s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[pumpOffConstraints objectForKey:aKey]];
+    }
+    return s;
+}
+
 @end
 
 @implementation ORTM700Model (private)

@@ -45,7 +45,7 @@
     IBOutlet StopLightView* lightBoardView;
     IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet ORSerialPortController* serialPortController;
-	IBOutlet NSImageView*   constraintImage;
+	IBOutlet NSButton*      constraintButton;
 	IBOutlet NSPanel*		constraintPanel;
 	IBOutlet NSTextField*   constraintTitleField;
 	IBOutlet NSTextView*    constraintView;
@@ -106,6 +106,7 @@
 - (IBAction) initAction:(id)sender;
 - (IBAction) closeConstraintPanel:(id)sender;
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle;
+- (IBAction) listConstraintsAction:(id)sender;
 
 @end
 

@@ -192,8 +192,13 @@
 - (void) detectorsBiasedChanged:(NSNotification*)aNote
 {
 	[vacuumView setNeedsDisplay:YES];
-	if([model noHvInfo]) [detectorStatusField setStringValue: @"UnKnown! Assume Biased"];
-	else				 [detectorStatusField setStringValue: [model detectorsBiased]?@"Biased":@"Unbiased"];
+    if([model lastHvUpdateTime]){
+        if([model noHvInfo]) [detectorStatusField setStringValue: @"UnKnown! Assume Biased"];
+        else				 [detectorStatusField setStringValue: [model detectorsBiased]?@"Biased":@"Unbiased"];
+    }
+    else {
+        [detectorStatusField setStringValue: @"UnKnown!"];
+    }
  }
 
 -(void) groupChanged:(NSNotification*)note

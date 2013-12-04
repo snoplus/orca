@@ -204,9 +204,13 @@
 {
 	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
 	if([[model pumpOffConstraints] count]){
-		[constraintImage setImage:smallLockImage];
+		[constraintButton setImage:smallLockImage];
+        [constraintButton setEnabled:YES];
 	}
-	else [constraintImage setImage:nil];
+	else {
+        [constraintButton setImage:nil];
+        [constraintButton setEnabled:NO];
+    }
 }
 
 - (void) errorCodeChanged:(NSNotification*)aNote
@@ -418,6 +422,15 @@
 {
 	[self endEditing];
 	[model initUnit];
+}
+
+- (IBAction) listConstraintsAction:(id)sender
+{
+	if([[model pumpOffConstraints]count]){
+        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+                        [model pumpOffConstraintReport]);
+        
+    }
 }
 
 

@@ -26,6 +26,7 @@
 #import "ORTimeRate.h"
 #import "BiStateView.h"
 #import "ORSerialPortController.h"
+#import "ORSerialPort.h"
 
 @implementation ORCP8CryopumpController
 
@@ -819,52 +820,53 @@
 
 - (void) updateButtons
 {
-    BOOL locked = [gSecurity isLocked:ORCP8CryopumpLock];
-
+    BOOL locked     = [gSecurity isLocked:ORCP8CryopumpLock];
+	BOOL portOpen   = [[model serialPort] isOpen];
+    BOOL notLockedAndPortOpen = !locked && portOpen;
+    
 	[serialPortController updateButtons:locked];
 
-	
     [pollTimePopup					setEnabled:!locked];
     [shipTemperaturesButton			setEnabled:!locked];
  
-	[secondStageTempControlField	setEnabled:!locked];
-	[roughingInterlockPU			setEnabled:!locked];
-	[standbyModePU					setEnabled:!locked];
-	[repurgeTimeField				setEnabled:!locked];
-	[pumpsPerCompressorField		setEnabled:!locked];
-	[restartTemperatureField		setEnabled:!locked];
-	[rateOfRiseCyclesField			setEnabled:!locked];
-	[rateOfRiseField				setEnabled:!locked];
-	[roughToPressureField			setEnabled:!locked];
-	[repurgeCyclesField				setEnabled:!locked];
-	[extendedPurgeTimeField			setEnabled:!locked];
-	[pumpRestartDelayField			setEnabled:!locked];
-	[regenerationTimeField			setEnabled:!locked];
-	[regenerationStepTimerField		setEnabled:!locked];
-	[regenerationStartDelayField	setEnabled:!locked];
-	[powerFailureRecoveryPU			setEnabled:!locked];
-	[firstStageControlMethodPU		setEnabled:!locked];
-	[firstStageControlTempField		setEnabled:!locked];
-    [initHardwareButton				setEnabled:!locked];
-	[regenAbortButton				setEnabled:!locked];
-	[regenStartFullButton			setEnabled:!locked];
-	[regenStartFastButton			setEnabled:!locked];
-	[regenActivateNormalPumpingButton setEnabled:!locked];
-	[regenWarmAndStopButton			setEnabled:!locked];
-	[initHardwareButton				setEnabled:!locked];
+	[secondStageTempControlField	setEnabled:notLockedAndPortOpen];
+	[roughingInterlockPU			setEnabled:notLockedAndPortOpen];
+	[standbyModePU					setEnabled:notLockedAndPortOpen];
+	[repurgeTimeField				setEnabled:notLockedAndPortOpen];
+	[pumpsPerCompressorField		setEnabled:notLockedAndPortOpen];
+	[restartTemperatureField		setEnabled:notLockedAndPortOpen];
+	[rateOfRiseCyclesField			setEnabled:notLockedAndPortOpen];
+	[rateOfRiseField				setEnabled:notLockedAndPortOpen];
+	[roughToPressureField			setEnabled:notLockedAndPortOpen];
+	[repurgeCyclesField				setEnabled:notLockedAndPortOpen];
+	[extendedPurgeTimeField			setEnabled:notLockedAndPortOpen];
+	[pumpRestartDelayField			setEnabled:notLockedAndPortOpen];
+	[regenerationTimeField			setEnabled:notLockedAndPortOpen];
+	[regenerationStepTimerField		setEnabled:notLockedAndPortOpen];
+	[regenerationStartDelayField	setEnabled:notLockedAndPortOpen];
+	[powerFailureRecoveryPU			setEnabled:notLockedAndPortOpen];
+	[firstStageControlMethodPU		setEnabled:notLockedAndPortOpen];
+	[firstStageControlTempField		setEnabled:notLockedAndPortOpen];
+    [initHardwareButton				setEnabled:notLockedAndPortOpen];
+	[regenAbortButton				setEnabled:notLockedAndPortOpen];
+	[regenStartFullButton			setEnabled:notLockedAndPortOpen];
+	[regenStartFastButton			setEnabled:notLockedAndPortOpen];
+	[regenActivateNormalPumpingButton setEnabled:notLockedAndPortOpen];
+	[regenWarmAndStopButton			setEnabled:notLockedAndPortOpen];
+	[initHardwareButton				setEnabled:notLockedAndPortOpen];
 	
 	int mask = [model roughingInterlockStatus];
 	
 	[roughValveInterlockButton		setEnabled:!locked && (mask & 0x2)];
 
-	[pumpOnButton					setEnabled:!locked && [model pumpStatus]==NO];
-	[pumpOffButton					setEnabled:!locked && [model pumpStatus]==YES];
-	[purgeOnButton					setEnabled:!locked && [model purgeStatus]==NO];
-	[purgeOffButton					setEnabled:!locked && [model purgeStatus]==YES];
-	[roughingValveOpenButton		setEnabled:!locked && [model roughValveStatus]==NO];
-	[roughingValveClosedButton		setEnabled:!locked && [model roughValveStatus]==YES];
-	[thermocoupleOnButton			setEnabled:!locked  && [model thermocoupleStatus]==NO];
-	[thermocoupleOffButton			setEnabled:!locked  && [model thermocoupleStatus]==YES];
+	[pumpOnButton					setEnabled:notLockedAndPortOpen && [model pumpStatus]==NO];
+	[pumpOffButton					setEnabled:notLockedAndPortOpen && [model pumpStatus]==YES];
+	[purgeOnButton					setEnabled:notLockedAndPortOpen && [model purgeStatus]==NO];
+	[purgeOffButton					setEnabled:notLockedAndPortOpen && [model purgeStatus]==YES];
+	[roughingValveOpenButton		setEnabled:notLockedAndPortOpen && [model roughValveStatus]==NO];
+	[roughingValveClosedButton		setEnabled:notLockedAndPortOpen && [model roughValveStatus]==YES];
+	[thermocoupleOnButton			setEnabled:notLockedAndPortOpen && [model thermocoupleStatus]==NO];
+	[thermocoupleOffButton			setEnabled:notLockedAndPortOpen && [model thermocoupleStatus]==YES];
 	
 }
 
