@@ -157,7 +157,7 @@
 
 - (void) noHVInfoChanged:(NSNotification*)aNote
 {
-	[noHVInfoField setObjectValue: [model noHvInfo]];
+	//[noHVInfoField setObjectValue: [model noHvInfo]];
 }
 
 - (void) nextHvUpdateTimeChanged:(NSNotification*)aNote
