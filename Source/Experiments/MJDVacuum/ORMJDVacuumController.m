@@ -132,10 +132,9 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(noHVInfoChanged:)
+                     selector : @selector(detectorsBiasedChanged:)
                          name : ORMJDVacuumModelNoHvInfoChanged
 						object: model];
-
 }
 
 - (void) updateWindow
@@ -150,15 +149,9 @@
 	[self hvUpdateTimeChanged:nil];
 	[self lastHvUpdateTimeChanged:nil];
 	[self nextHvUpdateTimeChanged:nil];
-	[self noHVInfoChanged:nil];
 }
 
 #pragma mark •••Interface Management
-
-- (void) noHVInfoChanged:(NSNotification*)aNote
-{
-	//[noHVInfoField setObjectValue: [model noHvInfo]];
-}
 
 - (void) nextHvUpdateTimeChanged:(NSNotification*)aNote
 {
@@ -166,6 +159,7 @@
     [dateFormatter setDateFormat:@"MMM dd hh:mm a"];
     NSString* dateString  = [dateFormatter stringFromDate:[model nextHvUpdateTime]];
     [dateFormatter release];
+	if([dateString length]==0)dateString = @"?";
 	[nextHvUpdateTimeField setStringValue: [NSString stringWithFormat:@"%@",dateString]];
 }
 
@@ -175,6 +169,7 @@
     [dateFormatter setDateFormat:@"MMM dd hh:mm a"];
     NSString* dateString  = [dateFormatter stringFromDate:[model lastHvUpdateTime]];
     [dateFormatter release];
+	if([dateString length]==0)dateString = @"?";
 	[lastHvUpdateTimeField setStringValue: dateString];
 }
 
@@ -197,7 +192,8 @@
 - (void) detectorsBiasedChanged:(NSNotification*)aNote
 {
 	[vacuumView setNeedsDisplay:YES];
-	[detectorStatusField setStringValue: [model detectorsBiased]?@"Biased":@"Unbiased"];
+	if([model noHvInfo]) [detectorStatusField setStringValue: @"UnKnown! Assume Biased"];
+	else				 [detectorStatusField setStringValue: [model detectorsBiased]?@"Biased":@"Unbiased"];
  }
 
 -(void) groupChanged:(NSNotification*)note

@@ -324,6 +324,7 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
 - (void) setNoHvInfo:(BOOL)aNoHvInfo
 {
     noHvInfo = aNoHvInfo;
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelNoHvInfoChanged object:self];
 }
 
@@ -742,7 +743,7 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetHvTimer) object:nil];
     if(hvUpdateTime>0) {
         [self setNextHvUpdateTime:[NSDate dateWithTimeIntervalSinceNow:hvUpdateTime*60]];
-        [self performSelector:@selector(setNoHvInfo) withObject:nil afterDelay:hvUpdateTime*60];
+        [self performSelector:@selector(setNoHvInfo) withObject:nil afterDelay:1.5*(hvUpdateTime*60)];
     }
 }
 
@@ -1575,7 +1576,7 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
 {
 	//---------------------------------------------------------------------------
 	//Detector Biased: Detector must be protected from regions with pressure higher than 1E-5
-    if([self detectorsBiased]){
+    if([self detectorsBiased] || [self noHvInfo]){
         for(ORVacuumGateValve* aGateValve in [self gateValves]){
             if([aGateValve isClosed]){
                 int side1		= [aGateValve connectingRegion1];
@@ -1585,19 +1586,31 @@ NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUp
                 
                 if([self regionColor:side1 sameAsRegion:side2]){
                     [aGateValve removeConstraintName:kDetectorBiasedConstraint];
+                    [aGateValve removeConstraintName:kHVStatusIsUnknownConstraint];
                 }
                 else if([self regionColor:side1 sameAsRegion:kRegionCryostat] && side2High ){
-                    [self addConstraintName:kDetectorBiasedConstraint reason:kDetectorBiasedReason toGateValve:aGateValve];
+                    if([self detectorsBiased])[self addConstraintName:kDetectorBiasedConstraint    reason:kDetectorBiasedReason    toGateValve:aGateValve];
+					else if([self noHvInfo])  [self addConstraintName:kHVStatusIsUnknownConstraint reason:kHVStatusIsUnknownReason toGateValve:aGateValve];
                 }
                 else if([self regionColor:side2 sameAsRegion:kRegionCryostat] && side1High){
-                    [self addConstraintName:kDetectorBiasedConstraint reason:kDetectorBiasedReason toGateValve:aGateValve];
+                    if([self detectorsBiased])[self addConstraintName:kDetectorBiasedConstraint    reason:kDetectorBiasedReason    toGateValve:aGateValve];
+					else if([self noHvInfo])  [self addConstraintName:kHVStatusIsUnknownConstraint reason:kHVStatusIsUnknownReason toGateValve:aGateValve];
                 }
-                else [self removeConstraintName:kDetectorBiasedConstraint fromGateValve:aGateValve];
+                else {
+					[self removeConstraintName:kDetectorBiasedConstraint    fromGateValve:aGateValve];
+					[self removeConstraintName:kHVStatusIsUnknownConstraint fromGateValve:aGateValve];
+				}
             }
-            else [self removeConstraintName:kDetectorBiasedConstraint fromGateValve:aGateValve];
+            else {
+				[self removeConstraintName:kDetectorBiasedConstraint    fromGateValve:aGateValve];
+				[self removeConstraintName:kHVStatusIsUnknownConstraint fromGateValve:aGateValve];
+			}
         }
     }
-    else [self onAllGateValvesremoveConstraintName:kDetectorBiasedConstraint];
+    else {
+		[self onAllGateValvesremoveConstraintName:kDetectorBiasedConstraint];
+		[self onAllGateValvesremoveConstraintName:kHVStatusIsUnknownConstraint];
+	}
 	
 	//---------------------------------------------------------------------------
 	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing

@@ -105,6 +105,8 @@
 #define kNegPumpPressConstraint					@"Press Too high for NEG Pump"
 #define kNegPumpPressReason						@"Opening that valve would expose the NEG to pressures higher than 1E-4."
 
+#define kHVStatusIsUnknownConstraint		    @"HV Bias State is unknown"
+#define kHVStatusIsUnknownReason			    @"No Communication from DAQ. Detector Bias Assumed."
 
 //-----------------------------------
 @interface ORMJDVacuumModel : ORGroup <OROrderedObjHolding,ORAdcProcessor,ORBitProcessor,ORCallBackBitProcessor>

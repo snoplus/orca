@@ -66,7 +66,6 @@
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
-- (void) noHVInfoChanged:(NSNotification*)aNote;
 - (void) nextHvUpdateTimeChanged:(NSNotification*)aNote;
 - (void) lastHvUpdateTimeChanged:(NSNotification*)aNote;
 - (void) hvUpdateTimeChanged:(NSNotification*)aNote;
