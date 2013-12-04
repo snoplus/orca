@@ -162,7 +162,6 @@
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
-		36905ADC184F0F1800959A52 /* OpSequence.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36905ADB184F0F1800959A52 /* OpSequence.xib */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
@@ -179,6 +178,7 @@
 		4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */; };
 		4398E7E011B81BBD00FC4DDE /* ORCaen775Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 4398E7DE11B81BBD00FC4DDE /* ORCaen775Decoders.h */; };
 		4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 4398E7DF11B81BBD00FC4DDE /* ORCaen775Decoders.m */; };
+		43A8F955184F69320064BB5A /* OpSequence.xib in Resources */ = {isa = PBXBuildFile; fileRef = 43A8F954184F69320064BB5A /* OpSequence.xib */; };
 		43ADFE3F10B6DAF90044617C /* readout_code.h in Headers */ = {isa = PBXBuildFile; fileRef = 43ADFE3B10B6DAF90044617C /* readout_code.h */; };
 		43ADFE4010B6DAF90044617C /* ORVCard.hh in Headers */ = {isa = PBXBuildFile; fileRef = 43ADFE3C10B6DAF90044617C /* ORVCard.hh */; };
 		43ADFE5110B6DB240044617C /* readout_code.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 43ADFE3B10B6DAF90044617C /* readout_code.h */; };
@@ -3509,7 +3509,6 @@
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
-		36905ADB184F0F1800959A52 /* OpSequence.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OpSequence.xib; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
@@ -3524,6 +3523,7 @@
 		4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Controller.m; sourceTree = SOURCE_ROOT; };
 		4398E7DE11B81BBD00FC4DDE /* ORCaen775Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen775Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Decoders.h; sourceTree = SOURCE_ROOT; };
 		4398E7DF11B81BBD00FC4DDE /* ORCaen775Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Decoders.m; sourceTree = SOURCE_ROOT; };
+		43A8F954184F69320064BB5A /* OpSequence.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = OpSequence.xib; path = "Source/Objects/Misc Objects/Workers/OpSequence/Views/OpSequence.xib"; sourceTree = SOURCE_ROOT; };
 		43ADFE3B10B6DAF90044617C /* readout_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = readout_code.h; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.h; sourceTree = SOURCE_ROOT; };
 		43ADFE3C10B6DAF90044617C /* ORVCard.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORVCard.hh; path = Source/Objects/Hardware/SBC/SBC_Code/ORVCard.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE3D10B6DAF90044617C /* readout_code.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = readout_code.cc; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.cc; sourceTree = SOURCE_ROOT; };
@@ -12047,7 +12047,7 @@
 		84D29FD81843EAC800D320DB /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				36905ADB184F0F1800959A52 /* OpSequence.xib */,
+				43A8F954184F69320064BB5A /* OpSequence.xib */,
 				84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */,
 				84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */,
 				84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */,
@@ -15494,7 +15494,7 @@
 				2D7731A2181188F400070A4A /* LanNetio230.nib in Resources */,
 				2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */,
 				2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */,
-				36905ADC184F0F1800959A52 /* OpSequence.xib in Resources */,
+				43A8F955184F69320064BB5A /* OpSequence.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16673,7 +16673,6 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(SRCROOT)",
-					/Users/markhowe/Dev/Orca,
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
