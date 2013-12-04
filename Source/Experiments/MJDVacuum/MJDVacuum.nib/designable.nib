@@ -95,7 +95,7 @@
 																		<object class="NSTextFieldCell" key="NSCell" id="323857274">
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">272761856</int>
-																			<string key="NSContents">Unbias NOW</string>
+																			<string key="NSContents">---</string>
 																			<object class="NSFont" key="NSSupport" id="26">
 																				<string key="NSName">.LucidaGrandeUI</string>
 																				<double key="NSSize">11</double>
@@ -127,7 +127,7 @@
 																	<object class="NSTextField" id="789034764">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{88, 56}, {135, 14}}</string>
+																		<string key="NSFrame">{{88, 56}, {97, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
 																		<reference key="NSNextKeyView" ref="404349313"/>
@@ -135,7 +135,7 @@
 																		<object class="NSTextFieldCell" key="NSCell" id="869917176">
 																			<int key="NSCellFlags">68157504</int>
 																			<int key="NSCellFlags2">272761856</int>
-																			<string key="NSContents">Biased</string>
+																			<string key="NSContents">---</string>
 																			<reference key="NSSupport" ref="26"/>
 																			<reference key="NSControlView" ref="789034764"/>
 																			<reference key="NSBackgroundColor" ref="276406613"/>
@@ -264,13 +264,13 @@
 																		<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																	</object>
 																</array>
-																<string key="NSFrame">{{1, 1}, {227, 80}}</string>
+																<string key="NSFrame">{{1, 1}, {206, 80}}</string>
 																<reference key="NSSuperview" ref="537997527"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="285444675"/>
 															</object>
 														</array>
-														<string key="NSFrame">{{17, 542}, {229, 96}}</string>
+														<string key="NSFrame">{{44, 542}, {208, 96}}</string>
 														<reference key="NSSuperview" ref="926429161"/>
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="820678157"/>
@@ -3696,27 +3696,6 @@ wGw</bytes>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">NSTextView</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="orderFrontSharingServicePicker:">id</string>
-						<string key="toggleQuickLookPreviewPanel:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="orderFrontSharingServicePicker:">
-							<string key="name">orderFrontSharingServicePicker:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleQuickLookPreviewPanel:">
-							<string key="name">toggleQuickLookPreviewPanel:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSTextView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">ORCardContainerView</string>
 					<string key="superclassName">ORGroupView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -3727,95 +3706,6 @@ wGw</bytes>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORGroupView</string>
 					<string key="superclassName">NSView</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="alignBottom:">id</string>
-						<string key="alignHorizontalCenters:">id</string>
-						<string key="alignLeft:">id</string>
-						<string key="alignRight:">id</string>
-						<string key="alignTop:">id</string>
-						<string key="alignVerticalCenters:">id</string>
-						<string key="arrangeInCircle:">id</string>
-						<string key="bringToFront:">id</string>
-						<string key="clearBackgroundImage:">id</string>
-						<string key="copy:">id</string>
-						<string key="cut:">id</string>
-						<string key="delete:">id</string>
-						<string key="getInfo:">id</string>
-						<string key="paste:">id</string>
-						<string key="selectAll:">id</string>
-						<string key="selectBackgroundImage:">id</string>
-						<string key="sendToBack:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="alignBottom:">
-							<string key="name">alignBottom:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="alignHorizontalCenters:">
-							<string key="name">alignHorizontalCenters:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="alignLeft:">
-							<string key="name">alignLeft:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="alignRight:">
-							<string key="name">alignRight:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="alignTop:">
-							<string key="name">alignTop:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="alignVerticalCenters:">
-							<string key="name">alignVerticalCenters:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="arrangeInCircle:">
-							<string key="name">arrangeInCircle:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="bringToFront:">
-							<string key="name">bringToFront:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="clearBackgroundImage:">
-							<string key="name">clearBackgroundImage:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="copy:">
-							<string key="name">copy:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="cut:">
-							<string key="name">cut:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="delete:">
-							<string key="name">delete:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="getInfo:">
-							<string key="name">getInfo:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="paste:">
-							<string key="name">paste:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="selectAll:">
-							<string key="name">selectAll:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="selectBackgroundImage:">
-							<string key="name">selectBackgroundImage:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="sendToBack:">
-							<string key="name">sendToBack:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ORGroupView.h</string>
