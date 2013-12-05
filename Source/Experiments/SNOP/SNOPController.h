@@ -34,7 +34,7 @@
 	NSSize focalPlaneSize;
 	NSSize couchDBSize;
 	NSSize hvMasterSize;
-	NSSize slowControlSize;
+	NSSize runsSize;
     
     IBOutlet NSComboBox *orcaDBIPAddressPU;
     IBOutlet NSComboBox *debugDBIPAddressPU;

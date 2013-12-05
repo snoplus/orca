@@ -55,7 +55,7 @@ runStopImg = _runStopImg;
 	focalPlaneSize		= NSMakeSize(450,589);
 	couchDBSize		= NSMakeSize(450,480);
 	hvMasterSize		= NSMakeSize(620,595);
-	slowControlSize		= NSMakeSize(620,595);
+	runsSize		= NSMakeSize(620,595);
 	
 	blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
@@ -363,33 +363,32 @@ runStopImg = _runStopImg;
 		[self resizeWindowToSize:detectorSize];
 		[[self window] setContentView:tabView];
     }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:runsSize];
+        [[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:detailsSize];
 		[[self window] setContentView:tabView];
     }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:focalPlaneSize];
 		[[self window] setContentView:tabView];
     }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+    else if([tabView indexOfTabViewItem:tabViewItem] == 4){
 	    [[self window] setContentView:blankView];
 	    [self resizeWindowToSize:couchDBSize];
 	    [[self window] setContentView:tabView];
     }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 4){
+    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
 	    [[self window] setContentView:blankView];
 	    [self resizeWindowToSize:hvMasterSize];
 	    [[self window] setContentView:tabView];
     }
-/*
-    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
-	    [[self window] setContentView:blankView];
-	    [self resizeWindowToSize:slowControlSize];
-	    [[self window] setContentView:tabView];
-    }
-*/	
+
 	int index = [tabView indexOfTabViewItem:tabViewItem];
 	[[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
