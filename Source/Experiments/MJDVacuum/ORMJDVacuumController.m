@@ -437,7 +437,7 @@
 - (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
-        [model disableContraintsFor60Seconds];
+        [model disableConstraintsFor60Seconds];
     }
 }
 

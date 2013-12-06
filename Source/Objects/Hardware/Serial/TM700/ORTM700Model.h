@@ -41,7 +41,9 @@
 		NSString*		errorCode;
 		BOOL            delay;
 		NSMutableDictionary* pumpOffConstraints;
-    BOOL inStandBy;
+        BOOL            inStandBy;
+        BOOL            constraintsDisabled;
+
 }
 
 #pragma mark •••Initialization
@@ -82,6 +84,9 @@
 - (void) setDeviceAddress:(int)aDeviceAddress;
 - (NSString*) auxStatusString:(int)aChannel;
 - (BOOL) isOn:(int)aChannel;
+- (void) disableConstraints;
+- (void) enableConstraints;
+- (BOOL) constraintsDisabled;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -159,3 +164,5 @@ extern NSString* ORTM700TurboStateChanged;
 extern NSString* ORTM700ModelDeviceAddressChanged;
 extern NSString* ORTM700Lock;
 extern NSString* ORTM700ModelPollTimeChanged;
+extern NSString* ORTM700ConstraintsDisabledChanged;
+

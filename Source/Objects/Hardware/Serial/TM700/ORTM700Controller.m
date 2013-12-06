@@ -151,13 +151,21 @@
                      selector : @selector(constraintsChanged:)
                          name : ORTM700ConstraintsChanged
 						object: model];
-	   
-	[serialPortController registerNotificationObservers];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(inStandByChanged:)
                          name : ORTM700ModelInStandByChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORTM700ConstraintsDisabledChanged
+						object: model];
+   
+    
+
+    
+	[serialPortController registerNotificationObservers];
 
 }
 
@@ -202,15 +210,27 @@
 
 - (void) constraintsChanged:(NSNotification*)aNote
 {
-	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+    NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
 	if([[model pumpOffConstraints] count]){
-		[constraintButton setImage:smallLockImage];
+        
+        if([model constraintsDisabled]){
+ 			NSSize lockSize = [lockImage size];
+           [lockImage lockFocus];
+            [[NSColor redColor] set];
+            [NSBezierPath setDefaultLineWidth:2];
+            [NSBezierPath strokeLineFromPoint:NSMakePoint(0,0) toPoint:NSMakePoint(lockSize.width,lockSize.height)];
+            [NSBezierPath strokeLineFromPoint:NSMakePoint(0,lockSize.height) toPoint:NSMakePoint(lockSize.width,0)];
+            [lockImage unlockFocus];
+        }
+        
+		[constraintButton setImage:lockImage];
         [constraintButton setEnabled:YES];
 	}
 	else {
         [constraintButton setImage:nil];
         [constraintButton setEnabled:NO];
     }
+    [lockImage release];
 }
 
 - (void) errorCodeChanged:(NSNotification*)aNote
@@ -362,11 +382,15 @@
 
 - (IBAction) turnOffAction:(id)sender
 {
-	if([[model pumpOffConstraints] count]!=0){
+	if([[model pumpOffConstraints] count] && ![model constraintsDisabled]){
 		[self beginConstraintPanel:[model pumpOffConstraints]  actionTitle:@"Turn Turbo OFF"];
 	}
-	else { 
-		NSBeginAlertSheet(@"Turning Off Pumping Station!",
+	else {
+        NSString* s = @"Turn Off Pumping Station?";
+        if([[model pumpOffConstraints] count] && [model constraintsDisabled]){
+            s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+        }
+		NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Turn it OFF",
                       nil,[self window],

@@ -42,6 +42,7 @@ NSString* ORTM700DriveOverTempChanged		= @"ORTM700DriveOverTempChanged";
 NSString* ORTM700ModelErrorCodeChanged		= @"ORTM700ModelErrorCodeChanged";
 NSString* ORTM700Lock						= @"ORTM700Lock";
 NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
+NSString* ORTM700ConstraintsDisabledChanged    = @"ORTM700ConstraintsDisabledChanged";
 
 #pragma mark •••Status Parameters
 
@@ -455,6 +456,12 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
 
 - (void) turnStationOff
 {
+    
+    if([[self pumpOffConstraints]count] && constraintsDisabled){
+        NSLogColor([NSColor redColor],@"The turbopump was turned off with constraints in place:\n");
+        NSLogColor([NSColor redColor],@"%@",[self pumpOffConstraintReport]);
+    }
+    
 	[self sendMotorPower:NO];
 	[self sendStationPower:NO];
 	[self sendStandby:NO];
@@ -675,6 +682,24 @@ NSString* ORTM700ConstraintsChanged			= @"ORTM700ConstraintsChanged";
     }
     return s;
 }
+
+- (void) disableConstraints
+{
+    constraintsDisabled = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ConstraintsDisabledChanged object:self];
+}
+
+- (void) enableConstraints
+{
+    constraintsDisabled = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTM700ConstraintsDisabledChanged object:self];
+}
+
+- (BOOL) constraintsDisabled
+{
+    return constraintsDisabled;
+}
+
 
 @end
 

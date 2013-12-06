@@ -220,7 +220,7 @@
 - (void) removeContinuedBiasConstraints:(NSString*)aName;
 - (NSDictionary*) okToBiasConstraints;
 - (NSDictionary*) continuedBiasConstraints;
-- (void) disableContraintsFor60Seconds;
+- (void) disableConstraintsFor60Seconds;
 - (void) enableConstraints;
 - (BOOL) disableConstraints;
 @end
