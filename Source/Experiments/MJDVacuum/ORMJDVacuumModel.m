@@ -727,6 +727,8 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
     disableConstraints = YES;
     
     [[self findTurboPump] disableConstraints];
+    [[self findCryoPump] disableConstraints];
+    [[self findRGA] disableConstraints];
 
     [self performSelector:@selector(enableConstraints) withObject:nil afterDelay:60];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsDisabledChanged object:self];
@@ -738,6 +740,8 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
     disableConstraints = NO;
 
     [[self findTurboPump] enableConstraints];
+    [[self findCryoPump] enableConstraints];
+    [[self findRGA] enableConstraints];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsDisabledChanged object:self];
 }
@@ -1265,9 +1269,8 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 - (void) deferredConstraintCheck
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(deferredConstraintCheck) object:nil];
-    ORTM700Model* turbo = [self findTurboPump];
 
-	[self checkTurboRelatedConstraints:turbo];
+	[self checkTurboRelatedConstraints:[self findTurboPump]];
 	[self checkRGARelatedConstraints:  [self findRGA]];
 	[self checkCryoPumpRelatedConstraints:[self findCryoPump]];
 	[self checkPressureConstraints];

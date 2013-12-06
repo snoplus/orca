@@ -74,6 +74,7 @@ NSString* ORCP8CryopumpLock									= @"ORCP8CryopumpLock";
 NSString* ORCP8CryopumpModelCmdErrorChanged					= @"ORCP8CryopumpModelCmdErrorChanged";
 NSString* ORCP8CryopumpModelWasPowerFailireChanged          = @"ORCP8CryopumpModelWasPowerFailireChanged";
 NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstraintsChanged";
+NSString* ORCP8CryopumpConstraintsDisabledChanged    = @"ORCP8CryopumpConstraintsDisabledChanged";
 
 @interface ORCP8CryopumpModel (private)
 - (void) processOneCommandFromQueue;
@@ -856,6 +857,22 @@ NSString* ORCP8CryopumpModelConstraintsChanged				= @"ORCP8CryopumpModelConstrai
 - (void) removeRoughingConstraint:(NSString*)aName
 {
 	[roughingOpenConstraints removeObjectForKey:aName];
+}
+- (void) disableConstraints
+{
+    constraintsDisabled = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpConstraintsDisabledChanged object:self];
+}
+
+- (void) enableConstraints
+{
+    constraintsDisabled = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCP8CryopumpConstraintsDisabledChanged object:self];
+}
+
+- (BOOL) constraintsDisabled
+{
+    return constraintsDisabled;
 }
 
 - (NSDictionary*)pumpOnConstraints		 { return pumpOnConstraints;		}

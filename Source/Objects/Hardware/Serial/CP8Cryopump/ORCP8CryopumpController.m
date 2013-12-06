@@ -353,6 +353,12 @@
                          name : ORCP8CryopumpModelConstraintsChanged
 						object: model];
 	
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORCP8CryopumpConstraintsDisabledChanged
+						object: model];
+
 	[serialPortController registerNotificationObservers];
 
 }
@@ -452,9 +458,12 @@
 
 - (void) constraintsChanged:(NSNotification*)aNote
 {
-	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+    NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
 	if([[model pumpOnConstraints] count] || [[model pumpOffConstraints] count]){
-		[powerConstraintButton setImage:smallLockImage];
+        if([model constraintsDisabled]){
+            [self addDisableSymbol:lockImage];
+        }
+		[powerConstraintButton setImage:lockImage];
         [powerConstraintButton setEnabled:YES];
 	}
 	else {
@@ -463,7 +472,10 @@
    }
 	
 	if([[model purgeOpenConstraints] count]){
-		[purgeConstraintButton setImage:smallLockImage];
+        if([model constraintsDisabled]){
+            [self addDisableSymbol:lockImage];
+        }
+		[purgeConstraintButton setImage:lockImage];
         [purgeConstraintButton setEnabled:YES];
 	}
 	else {
@@ -472,14 +484,28 @@
     }
 	
 	if([[model roughingOpenConstraints] count]){
-		[roughingConstraintButton setImage:smallLockImage];
+        if([model constraintsDisabled]){
+            [self addDisableSymbol:lockImage];
+        }
+		[roughingConstraintButton setImage:lockImage];
         [roughingConstraintButton setEnabled:YES];
 	}
 	else {
         [roughingConstraintButton setImage:nil];
         [roughingConstraintButton setEnabled:NO];
     }
-	
+    [lockImage release];
+}
+
+- (void)addDisableSymbol:(NSImage*)lockImage
+{
+    NSSize lockSize = [lockImage size];
+    [lockImage lockFocus];
+    [[NSColor redColor] set];
+    [NSBezierPath setDefaultLineWidth:2];
+    [NSBezierPath strokeLineFromPoint:NSMakePoint(0,0) toPoint:NSMakePoint(lockSize.width,lockSize.height)];
+    [NSBezierPath strokeLineFromPoint:NSMakePoint(0,lockSize.height) toPoint:NSMakePoint(lockSize.width,0)];
+    [lockImage unlockFocus];
 }
 
 - (void) firstStageControlMethodRBChanged:(NSNotification*)aNote
@@ -914,11 +940,16 @@
 - (IBAction) turnCryoPumpOnAction:(id)sender
 {
 	[self endEditing];
-	if([[model pumpOnConstraints] count]!=0){
+	if([[model pumpOnConstraints] count] && ![model constraintsDisabled]){
 		[self beginConstraintPanel:[model pumpOnConstraints]  actionTitle:@"Turn Cryo ON"];
 	}
-	else { 
-		NSBeginAlertSheet(@"Turn ON Cryo Pump",
+	else {
+        NSString* s = @"Turn ON Cryo Pump?";
+        if([[model pumpOnConstraints] count] && [model constraintsDisabled]){
+            s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+        }
+
+		NSBeginAlertSheet(s,
 						  @"YES/Turn ON Cryopump",
 						  @"Cancel",
 						  nil,[self window],
@@ -944,11 +975,15 @@
 - (IBAction) turnCryoPumpOffAction:(id)sender
 {
     [self endEditing];
-	if([[model pumpOffConstraints] count]!=0){
+	if([[model pumpOffConstraints] count] && ![model constraintsDisabled]){
 		[self beginConstraintPanel:[model pumpOffConstraints]  actionTitle:@"Turn Cryo OFF"];
 	}
 	else { 
-		NSBeginAlertSheet(@"Turn OFF Cryo Pump",
+        NSString* s = @"Turn OFF Cryo Pump?";
+        if([[model pumpOffConstraints] count] && [model constraintsDisabled]){
+            s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+        }
+		NSBeginAlertSheet(s,
 					  @"YES/Turn OFF Cryopump",
 					  @"Cancel",
 					  nil,[self window],
@@ -968,11 +1003,15 @@
 - (IBAction) openPurgeValveAction:(id)sender
 {
 	[self endEditing];
-	if([[model purgeOpenConstraints] count]!=0){
+	if([[model purgeOpenConstraints] count] && ![model constraintsDisabled]){
 		[self beginConstraintPanel:[model purgeOpenConstraints]  actionTitle:@"Open Purge Valve"];
 	}
 	else {
-		NSBeginAlertSheet(@"Open Purge Valve",
+        NSString* s = @"Open Purge Valve";
+        if([[model purgeOpenConstraints] count] && [model constraintsDisabled]){
+            s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+        }
+		NSBeginAlertSheet(s,
 						  @"YES/OPEN Purge Valve",
 						  @"Cancel",
 						  nil,[self window],
@@ -1029,11 +1068,15 @@
 - (IBAction) openRoughingValveAction:(id)sender
 {
 	[self endEditing];
-	if([[model roughingOpenConstraints] count]!=0){
+	if([[model roughingOpenConstraints] count] && ![model constraintsDisabled]){
 		[self beginConstraintPanel:[model roughingOpenConstraints]  actionTitle:@"Open Roughing Valve"];
 	}
 	else {
-		NSBeginAlertSheet(@"Open Roughing Valve",
+        NSString* s = @"Open Roughing Valve?";
+        if([[model roughingOpenConstraints] count] && [model constraintsDisabled]){
+            s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+        }
+		NSBeginAlertSheet(s,
 					  @"YES/OPEN Roughing Valve",
 					  @"Cancel",
 					  nil,[self window],

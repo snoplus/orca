@@ -79,6 +79,7 @@
 		NSMutableDictionary* pumpOffConstraints;
 		NSMutableDictionary* purgeOpenConstraints;
 		NSMutableDictionary* roughingOpenConstraints;
+        BOOL                constraintsDisabled;
 }
 
 
@@ -263,6 +264,9 @@
 - (NSDictionary*)pumpOffConstraints;
 - (NSDictionary*)purgeOpenConstraints;
 - (NSDictionary*)roughingOpenConstraints;
+- (void) disableConstraints;
+- (void) enableConstraints;
+- (BOOL) constraintsDisabled;
 
 - (NSString*) pumpOnOffConstraintReport;
 - (NSString*) purgeOpenConstraintReport;
@@ -326,4 +330,4 @@ extern NSString* ORCP8CryopumpLock;
 extern NSString* ORCP8CryopumpModelCmdErrorChanged;
 extern NSString* ORCP8CryopumpModelWasPowerFailireChanged;
 extern NSString* ORCP8CryopumpModelConstraintsChanged;
-
+extern NSString* ORCP8CryopumpConstraintsDisabledChanged;

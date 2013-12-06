@@ -100,6 +100,7 @@
 - (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void)addDisableSymbol:(NSImage*)lockImage;
 - (void) constraintsChanged:(NSNotification*)aNote;
 - (void) sensitivityFactorChanged:(NSNotification*)aNote;
 - (void) drawDidOpen:(NSNotification*)aNote;
@@ -180,6 +181,10 @@
 - (IBAction) closeConstraintPanel:(id)sender;
 - (IBAction) listFilamentConstraintsAction:(id)sender;
 - (IBAction) listCemConstraintsAction:(id)sender;
+
+
+- (void) turnOnIonizerDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) turnDetectorOnDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

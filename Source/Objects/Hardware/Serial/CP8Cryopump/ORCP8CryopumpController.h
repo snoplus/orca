@@ -183,6 +183,7 @@
 - (void) windowDidResize:(NSNotification *)aNote;
 - (void) updateButtons;
 - (BOOL) portLocked;
+- (void)addDisableSymbol:(NSImage*)lockImage;
 
 #pragma mark ***Actions
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle;

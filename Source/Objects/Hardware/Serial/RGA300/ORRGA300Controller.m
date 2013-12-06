@@ -309,7 +309,13 @@
                      selector : @selector(constraintsChanged:)
                          name : ORRGA300ModelConstraintsChanged
 						object: model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(constraintsChanged:)
+                         name : ORRGA300ConstraintsDisabledChanged
+						object: model];
+
+    
 	[serialPortController registerNotificationObservers];
 
 }
@@ -389,9 +395,12 @@
 
 - (void) constraintsChanged:(NSNotification*)aNote
 {
-	NSImage* smallLockImage = [NSImage imageNamed:@"smallLock"];
+    NSImage* lockImage = [[NSImage imageNamed:@"smallLock"] copy];
 	if([[model filamentConstraints] count]){
-		[filamentConstraintButton setImage:smallLockImage];
+        if([model constraintsDisabled]){
+            [self addDisableSymbol:lockImage];
+        }
+		[filamentConstraintButton setImage:lockImage];
         [filamentConstraintButton setEnabled:YES];
 	}
 	else {
@@ -400,13 +409,26 @@
    }
 	
 	if([[model cemConstraints] count]){
-		[cemConstraintButton setImage:smallLockImage];
+        if([model constraintsDisabled]){
+            [self addDisableSymbol:lockImage];
+        }
+		[cemConstraintButton setImage:lockImage];
         [cemConstraintButton setEnabled:YES];
 	}
 	else {
         [cemConstraintButton setImage:nil];
         [cemConstraintButton setEnabled:NO];
     }
+}
+- (void)addDisableSymbol:(NSImage*)lockImage
+{
+    NSSize lockSize = [lockImage size];
+    [lockImage lockFocus];
+    [[NSColor redColor] set];
+    [NSBezierPath setDefaultLineWidth:2];
+    [NSBezierPath strokeLineFromPoint:NSMakePoint(0,0) toPoint:NSMakePoint(lockSize.width,lockSize.height)];
+    [NSBezierPath strokeLineFromPoint:NSMakePoint(0,lockSize.height) toPoint:NSMakePoint(lockSize.width,0)];
+    [lockImage unlockFocus];
 }
 
 - (void) sensitivityFactorChanged:(NSNotification*)aNote
@@ -864,26 +886,62 @@
 { 
 	if([model elecMultHVBiasRB]>0) [model turnDetectorOff];
 	else {
-		if([[model cemConstraints] count]!=0){
+		if([[model cemConstraints] count] && ![model constraintsDisabled]){
 			[self beginConstraintPanel:[model cemConstraints]  actionTitle:@"CEM Enable"];
 		}
-		else {
-			[model sendDetectorParameters];
-		}
+        else {
+            NSString* s = @"Turn ON Detector?";
+            if([[model cemConstraints] count] && [model constraintsDisabled]){
+                s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+            }
+            NSBeginAlertSheet(s,
+                              @"YES/Turn On Detector",
+                              @"Cancel",
+                              nil,[self window],
+                              self,
+                              @selector(turnOnIonizerDidFinish:returnCode:contextInfo:),
+                              nil,
+                              nil,
+                              @"Really turn ON Detector?");
+        }
 	}
+
+}
+
+
+- (void) turnDetectorOnDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertDefaultReturn)[model sendDetectorParameters];
 }
 
 - (IBAction) toggleIonizerAction:(id)sender		
 { 
 	if([model ionizerFilamentCurrentRB]>0) [model turnIonizerOff];
 	else {
-		if([[model filamentConstraints] count]!=0){
+		if([[model filamentConstraints] count] && ![model constraintsDisabled]){
 			[self beginConstraintPanel:[model filamentConstraints]  actionTitle:@"Turn Filament ON"];
 		}
-		else {
-			[model sendIonizerParameters];
-		}
+        else {
+            NSString* s = @"Turn ON Ionizer?";
+            if([[model filamentConstraints] count] && [model constraintsDisabled]){
+                s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
+            }
+            NSBeginAlertSheet(s,
+                              @"YES/Turn On Ionizer",
+                              @"Cancel",
+                              nil,[self window],
+                              self,
+                              @selector(turnOnIonizerDidFinish:returnCode:contextInfo:),
+                              nil,
+                              nil,
+                              @"Really turn ON Ionizer?");
+        }
 	}
+}
+
+- (void) turnOnIonizerDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertDefaultReturn)[model sendIonizerParameters];
 }
 
 - (IBAction) lockAction:(id) sender						

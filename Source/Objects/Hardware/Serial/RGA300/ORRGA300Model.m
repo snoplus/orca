@@ -69,7 +69,7 @@ NSString* ORRGA300ModelCurrentAmuIndexChanged		= @"ORRGA300ModelCurrentAmuIndexC
 NSString* ORRGA300ModelUseIonizerDefaultsChanged	= @"ORRGA300ModelUseIonizerDefaultsChanged";
 NSString* ORRGA300ModelUseDetectorDefaultsChanged	= @"ORRGA300ModelUseDetectorDefaultsChanged";
 NSString* ORRGA300ModelConstraintsChanged			= @"ORRGA300ModelConstraintsChanged";
-
+NSString* ORRGA300ConstraintsDisabledChanged        = @"ORRGA300ConstraintsDisabledChanged";
 NSString* ORRGA300Lock								= @"ORRGA300Lock";
 
 @interface ORRGA300Model (private)
@@ -783,6 +783,22 @@ NSString* ORRGA300Lock								= @"ORRGA300Lock";
         s = [s stringByAppendingFormat:@"%@ : %@\n",aKey,[cemConstraints objectForKey:aKey]];
     }
     return s;
+}
+- (void) disableConstraints
+{
+    constraintsDisabled = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ConstraintsDisabledChanged object:self];
+}
+
+- (void) enableConstraints
+{
+    constraintsDisabled = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRGA300ConstraintsDisabledChanged object:self];
+}
+
+- (BOOL) constraintsDisabled
+{
+    return constraintsDisabled;
 }
 
 @end

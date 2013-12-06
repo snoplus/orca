@@ -130,7 +130,8 @@
         float   sensitivityFactor;
 		NSMutableDictionary* filamentConstraints;
 		NSMutableDictionary* cemConstraints;
-        BOOL scheduledForCouchPost;
+        BOOL    scheduledForCouchPost;
+        BOOL    constraintsDisabled;
 }
 
 #pragma mark •••Initialization
@@ -274,6 +275,9 @@
 - (NSDictionary*)cemConstraints;
 - (NSString*) filamentConstraintReport;
 - (NSString*) cemConstraintReport;
+- (void) disableConstraints;
+- (void) enableConstraints;
+- (BOOL) constraintsDisabled;
 
 @end
 
@@ -336,4 +340,5 @@ extern NSString* ORRGA300Lock;
 extern NSString* ORRGA300ModelUseIonizerDefaultsChanged;
 extern NSString* ORRGA300ModelUseDetectorDefaultsChanged;
 extern NSString* ORRGA300ModelConstraintsChanged;
+extern NSString* ORRGA300ConstraintsDisabledChanged;
 
