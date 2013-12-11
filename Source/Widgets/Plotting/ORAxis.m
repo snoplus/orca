@@ -135,11 +135,16 @@ enum {
 - (void) dealloc
 {
     [attributes release];
+    attributes = nil;
     [labelAttributes release];
+    labelAttributes =nil;
 	[[preferenceController window] close];
 	[preferenceController release];
-    if(ownViewToScale)[viewToScale release];
-
+    preferenceController = nil;
+    if(ownViewToScale){
+        [viewToScale release];
+        viewToScale=nil;
+    }
     [super dealloc];
 }
 
