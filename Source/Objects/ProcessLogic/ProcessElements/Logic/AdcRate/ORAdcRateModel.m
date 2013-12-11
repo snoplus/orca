@@ -152,8 +152,8 @@ NSString* ORAdcRatePassThruConnection           = @"ORAdcRatePassThruConnection"
             NSTimeInterval t1 = -[firstTime timeIntervalSinceNow];
             if(t1>integrationTime) {
                 [self adjustBufferLength];
+                rate = [self calculateRate];
             }
-            rate = [self calculateRate];
             valid = YES;
         }
 		
