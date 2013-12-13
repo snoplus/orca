@@ -44,6 +44,9 @@ kCodeVersion history:
 after all major changes in HW_Readout.cc, FLTv4Readout.cc, FLTv4Readout.hh, SLTv4Readout.cc, SLTv4Readout.hh
 kCodeVersion should be increased!
 
+kCodeVersion 3:
+2013-12-13 readout code ships now 'fltEventID' event records
+
 kCodeVersion 2:
 2011-06-16 readout code ships now new register value 'fifoEventID'
 
@@ -801,13 +804,14 @@ void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply)
 //currently we have only Linux, but we want to run simulation mode on all OSs -tb-
 #ifdef __linux__
 #define DRIVERNAME "fzk_ipe_slt"
+#define KIT_DRIVERNAME "kit_ipe_slt"
 int getSltLinuxKernelDriverVersion(void)
 {
 	char buf[1024 * 4];
 	char *cptr;
 	FILE *p;
 	int version = -2;
-	p = popen("cat /proc/devices | grep fzk_ipe_slt","r");
+	p = popen("cat /proc/devices | grep ipe_slt","r");
 	if(p==0){ fprintf(stderr, "could not start popen... -tb-\n"); return version; }
 	
 	while (!feof(p)){
@@ -819,6 +823,10 @@ int getSltLinuxKernelDriverVersion(void)
 			 cptr = cptr + strlen(DRIVERNAME);                               // vX, (X+1)nd version "fzk_ipe_sltX" -> go to string after basename
 			 version = atoi(cptr);
 			 //alternative: version = strtol(cptr, (char **) NULL, 10);
+			 break;
+		}
+		if( (cptr=strstr(buf, KIT_DRIVERNAME)) ){  // dont use strncmp, it finds fzk_ipe_slt1, too, which does not exist -tb-
+		     version = 4;
 			 break;
 		}
 		if(feof(p)) break; //??? is this necessary??? -tb-
