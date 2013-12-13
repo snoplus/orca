@@ -26,6 +26,11 @@
 //#define kNumEWTriggFLTChannels 18  //use kNumEWFLTHeatIonChannels
 
 
+//SLT revisions which require special handling ...
+#define kSLTRev20131212_5WordsPerEvent	0x41950242
+//FLT events in SLT Event FIFO consists now of 5 instead of 4 words
+//+ new driver necessary (kit_ipe_slt)
+
 #define kReadWaveForms	0x1 << 0
 
 //Edelweiss SLT DAQ modes  -> for sltDAQMode -tb-
