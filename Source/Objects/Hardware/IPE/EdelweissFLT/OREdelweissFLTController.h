@@ -63,6 +63,8 @@
 		IBOutlet NSTextField*	hitRateLengthTextField;
 		IBOutlet NSButton*		hitRateAllButton;
 		IBOutlet NSButton*		hitRateNoneButton;
+	IBOutlet   NSMatrix*    heatWindowStartMatrix;
+	IBOutlet   NSMatrix*    heatWindowEndMatrix;
     
     //BB access tab
 	IBOutlet   NSTextField* RgTextField;
@@ -451,6 +453,8 @@
 - (IBAction) downSamplingMatrixAction:(id)sender;
 - (IBAction) shapingLengthMatrixAction:(id)sender;
 
+- (IBAction) heatWindowStartMatrixAction:(id)sender;
+- (IBAction) heatWindowEndMatrixAction:(id)sender;
 
 - (IBAction) selectFiberTrigPUAction:(id)sender;
 - (IBAction) BBv1MaskMatrixAction:(id)sender;

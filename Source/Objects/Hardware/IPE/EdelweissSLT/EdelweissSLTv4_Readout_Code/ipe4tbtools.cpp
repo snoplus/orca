@@ -433,7 +433,15 @@ uint32_t FLTTriggParReg(int numFLT, int numChan){
     return FLTIonTriggParRegBase | ((numFLT & 0x3f) <<17);
 }
 
+uint32_t FLTReadPageNumReg(int numFLT){
+    return FLTReadPageNumRegBase | ((numFLT & 0x3f) <<17);  
+}
 
+uint32_t FLTRegAddr(uint32_t regAddrBase, int numFLT){
+    return regAddrBase | ((numFLT & 0x3f) <<17);  
+}
+
+//TODO: write standard function, which takes addr and FLT num ...
 
 
 
@@ -857,7 +865,10 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	b=0x200;  pbus->write(CmdFIFOReg, b);  //fin de commande 
 	//-tb- old code: b=0x200;  write_word(driver_fpga,REG_CMD, b);  //fin de commande 
 	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
-	printf("on attend 2 pour terminer : ");
+	//printf("on attend 2 pour terminer : ");
+    
+    if(sendChargeBBStatusFunctionPtr) sendChargeBBStatusFunctionPtr(   *numserie + (101<<8)  , numFifo);
+
 //TODO: test -tb-
 return 0;
     //removed this: -tb-
@@ -895,7 +906,8 @@ if( (mon_fichier = fopen(filename,"rw")) )
 	for(j=0;j<10;j++)		// j'essaye 10 fois
 		{
 		//envoie_commande_standard_BBv2();
-	    envoie_commande_horloge( 20,  0,  3,  8,  2, 3);
+	    //changed 2013-11-11 -tb- envoie_commande_horloge( 20,  0,  3,  8,  2, 3);
+	    envoie_commande_horloge( 20,  0,  1,  8,  2, 3);
 		err=chargeBBWithFILEPtr(mon_fichier,&numserie,fromFifo);
 		if(!err) break;
 		}
@@ -912,7 +924,8 @@ printf("***********   bilan de chargement :  numserie=%d  j=%d  err=%d  ********
 
 //try:
 	//envoie_commande_horloge( 30,  0,  1,  8,  2, 3); //2013-07 changed to X=20 -tb-
-	envoie_commande_horloge( 20,  0,  3,  8,  2, 3);
+	    //changed 2013-11-11 -tb- envoie_commande_horloge( 20,  0,  3,  8,  2, 3);
+	envoie_commande_horloge( 20,  0,  1,  8,  2, 3);
 
 //int Table_nb_synchro[8]=_valeur_synchro;
 //Nb_synchro=Table_nb_synchro[Code_synchro&0x3];//this was in void envoie_commande_horloge(void) but is probably not necessary (?) -tb-

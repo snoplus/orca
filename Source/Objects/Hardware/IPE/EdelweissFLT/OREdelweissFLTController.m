@@ -62,8 +62,8 @@
     rateSize			= NSMakeSize(670,790);
     BBAccessSize		= NSMakeSize(670,790);
     ficSize             = NSMakeSize(670,790);
-    testSize			= NSMakeSize(450,420);
-    lowlevelSize		= NSMakeSize(450,420);
+    testSize			= NSMakeSize(550,420);
+    lowlevelSize		= NSMakeSize(550,420);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -1186,6 +1186,11 @@
     for(i=0;i<kNumEWFLTHeatIonChannels;i++){
         [[shapingLengthMatrix cellAtRow:i column:0] setIntValue: [model shapingLength:i]];
     }    
+	//heat trigger window pos start/end Matrix
+    for(i=0;i<kNumEWFLTHeatChannels;i++){
+        [[heatWindowStartMatrix cellAtRow:i column:0] setIntValue: [model windowPosStart:i]];
+        [[heatWindowEndMatrix cellAtRow:i column:0] setIntValue: [model windowPosEnd:i]];
+    }    
 
 }
 
@@ -1747,10 +1752,10 @@
 		case  1: [self resizeWindowToSize:triggerSize];	    break;
 		case  2: [self resizeWindowToSize:rateSize];	    break;
 		case  3: [self resizeWindowToSize:BBAccessSize];	break;
-		case  4: [self resizeWindowToSize:ficSize];	break;
+		case  4: [self resizeWindowToSize:ficSize];	        break;
 		case  5: [self resizeWindowToSize:testSize];        break;
 		case  6: [self resizeWindowToSize:lowlevelSize];	break;
-		default: [self resizeWindowToSize:testSize];	    break;
+		default: [self resizeWindowToSize:settingSize];	    break;
     }
     [[self window] setContentView:totalView];
 	
@@ -2883,6 +2888,39 @@
     if(row>=kNumEWFLTHeatIonChannels) return;
     [model setShapingLength:row withValue:state];
 }
+
+- (IBAction) heatWindowStartMatrixAction:(id)sender
+{
+    //DEBUG: OUTPUT:  
+    	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[heatWindowStartMatrix selectedColumn],[heatWindowStartMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    unsigned int col, row, state;
+    col=[heatWindowStartMatrix selectedColumn];
+    row=[heatWindowStartMatrix selectedRow];
+    //state = [[gapMatrix selectedCell] intValue];
+    state = [[heatWindowStartMatrix selectedCell] intValue];
+    //DEBUG: OUTPUT:  	
+            NSLog(@"%@::%@: UNDER CONSTRUCTION!  selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state);//TODO : DEBUG testing ...-tb-
+    if(row>=kNumEWFLTHeatChannels) return;
+    [model setWindowPosStart:row withValue:state];
+}
+
+- (IBAction) heatWindowEndMatrixAction:(id)sender
+{
+    //DEBUG: OUTPUT:  
+    	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[heatWindowEndMatrix selectedColumn],[heatWindowEndMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    unsigned int col, row, state;
+    col=[heatWindowEndMatrix selectedColumn];
+    row=[heatWindowEndMatrix selectedRow];
+    //state = [[gapMatrix selectedCell] intValue];
+    state = [[heatWindowEndMatrix selectedCell] intValue];
+    //DEBUG: OUTPUT:  	
+            NSLog(@"%@::%@: UNDER CONSTRUCTION!  selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state);//TODO : DEBUG testing ...-tb-
+    if(row>=kNumEWFLTHeatChannels) return;
+    [model setWindowPosEnd:row withValue:state];
+}
+
+
+
 
 
 - (void) selectFiberTrigPUAction:(id)sender

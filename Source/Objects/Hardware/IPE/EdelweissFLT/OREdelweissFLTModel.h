@@ -440,6 +440,10 @@
 - (void) setDownSampling:(unsigned short) aChan withValue:(int) aValue;
 - (int) shapingLength:(unsigned short) aChan;
 - (void) setShapingLength:(unsigned short) aChan withValue:(int) aLength;
+- (int) windowPosStart:(unsigned short) aChan;
+- (void) setWindowPosStart:(unsigned short) aChan withValue:(int) aLength;
+- (int) windowPosEnd:(unsigned short) aChan;
+- (void) setWindowPosEnd:(unsigned short) aChan withValue:(int) aLength;
 
 - (void) enableAllHitRates:(BOOL)aState;
 - (void) enableAllTriggers:(BOOL)aState;

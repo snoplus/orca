@@ -48,6 +48,10 @@
 #define kEWFlt_ControlReg_tpix_Mask	0x1
 
 // Trigger Parameter register bits
+#define kEWFlt_TriggParReg_WinStart_Shift   24
+#define kEWFlt_TriggParReg_WinStart_Mask	0xff
+#define kEWFlt_TriggParReg_WinEnd_Shift     16
+#define kEWFlt_TriggParReg_WinEnd_Mask	    0xff
 #define kEWFlt_TriggParReg_Enable_Shift	    15
 #define kEWFlt_TriggParReg_Enable_Mask		0x1
 #define kEWFlt_TriggParReg_Polarity_Shift	13

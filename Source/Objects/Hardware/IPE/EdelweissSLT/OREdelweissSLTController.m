@@ -1491,6 +1491,7 @@ return;
 	    if(SltPciDriverVersion<0) NSLog(@"%@: unknown SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
         else if(SltPciDriverVersion==0) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt)\n",[model fullID],SltPciDriverVersion);
         else if(SltPciDriverVersion==1) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt_dma)\n",[model fullID],SltPciDriverVersion);
+        else if(SltPciDriverVersion==4) NSLog(@"%@: SBC running with SLT PCI driver version: %i (kit_ipe_slt)\n",[model fullID],SltPciDriverVersion);
         else NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt%i)\n",[model fullID],SltPciDriverVersion,SltPciDriverVersion);
         
 		unsigned long presentFLTsMap = [model getPresentFLTsMap];

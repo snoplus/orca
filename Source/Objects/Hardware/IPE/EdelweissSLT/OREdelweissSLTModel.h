@@ -116,6 +116,7 @@
 		unsigned long	eventDataId;//TODO: remove or change -tb-
 		unsigned long	multiplicityId;//TODO: remove -tb-
 		unsigned long	waveFormId;
+		unsigned long	fltEventId;
 		unsigned long   eventCounter;
 		int				actualPageIndex;
         TimedWorker*    poller;
@@ -317,6 +318,7 @@
 - (unsigned long) projectVersion;
 - (unsigned long) documentVersion;
 - (unsigned long) implementation;
+- (unsigned long) hwVersion;//=SLT FPGA version/revision
 - (void) setHwVersion:(unsigned long) aVersion;
 
 - (NSString*) patternFilePath;
@@ -476,6 +478,8 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+- (unsigned long) fltEventId;
+- (void) setFltEventId: (unsigned long) DataId;
 - (unsigned long) waveFormId;
 - (void) setWaveFormId: (unsigned long) DataId;
 - (unsigned long) eventDataId;

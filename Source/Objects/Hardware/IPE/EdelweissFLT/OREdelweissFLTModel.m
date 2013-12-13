@@ -183,6 +183,7 @@ enum IpeFLTV4Enum{
 	//kFLTV4ThresholdReg,
 
 	kFLTV4TriggChannelsReg,
+	kFLTV4ReadPageNumReg,
 	kFLTV4TriggEnergyReg,
 	kFLTV4TotalTriggerNReg,
 
@@ -240,15 +241,16 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	*/
 	{@"HeatTriggerMask_1",  0x000048>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 	{@"HeatTriggerMask_2",  0x00004C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"HeatTriggPar",       0x000050>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"IonTriggPar",		0x000054>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HeatTriggPar",       0x000050>>2,		 6,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"IonTriggPar",		0x000054>>2,		12,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 
-	{@"HeatThresholds",     0x000058>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
-	{@"IonThresholds",      0x00005C>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"HeatThresholds",     0x000058>>2,		 6,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"IonThresholds",      0x00005C>>2,		12,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	//{@"Threshold",          0x002080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	
 	{@"TriggerChannels",	0x000078>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
-	{@"TriggerEnergy",  	0x000080>>2,		-1,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"ReadPageNum",     	0x00007c>>2,		16,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
+	{@"TriggerEnergy",  	0x000080>>2,		12,				kIpeRegReadable | kIpeRegWriteable | kIpeRegNeedsChannel},
 	{@"TotalTriggerN",		0x000084>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
 
 	{@"Delays120meas",		0x000088>>2,		-1,				kIpeRegReadable },
@@ -2396,6 +2398,43 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 
 
+- (int) windowPosStart:(unsigned short) aChan
+{
+	if(aChan<kNumEWFLTHeatChannels) return (triggerPar[aChan] >> kEWFlt_TriggParReg_WinStart_Shift) & kEWFlt_TriggParReg_WinStart_Mask;
+	return 0;
+}
+
+- (void) setWindowPosStart:(unsigned short) aChan withValue:(int) aLength
+{
+    if(aChan>=kNumEWFLTHeatChannels) return ;
+
+    [[[self undoManager] prepareWithInvocationTarget:self] setShapingLength:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_WinStart_Shift) & kEWFlt_TriggParReg_WinStart_Mask];
+	triggerPar[aChan] &= ~(kEWFlt_TriggParReg_WinStart_Mask<<kEWFlt_TriggParReg_WinStart_Shift);
+	triggerPar[aChan] |=  ((aLength & kEWFlt_TriggParReg_WinStart_Mask)<<kEWFlt_TriggParReg_WinStart_Shift);
+	
+    [[NSNotificationCenter defaultCenter]postNotificationName:OREdelweissFLTModelTriggerParameterChanged object:self];
+	//??? [self postAdcInfoProvidingValueChanged];
+}
+
+- (int) windowPosEnd:(unsigned short) aChan
+{
+	if(aChan<kNumEWFLTHeatChannels) return (triggerPar[aChan] >> kEWFlt_TriggParReg_WinEnd_Shift) & kEWFlt_TriggParReg_WinEnd_Mask;
+	return 0;
+}
+
+- (void) setWindowPosEnd:(unsigned short) aChan withValue:(int) aLength
+{
+    if(aChan>=kNumEWFLTHeatChannels) return ;
+
+    [[[self undoManager] prepareWithInvocationTarget:self] setShapingLength:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_WinEnd_Shift) & kEWFlt_TriggParReg_WinEnd_Mask];
+	triggerPar[aChan] &= ~(kEWFlt_TriggParReg_WinEnd_Mask<<kEWFlt_TriggParReg_WinEnd_Shift);
+	triggerPar[aChan] |=  ((aLength & kEWFlt_TriggParReg_WinEnd_Mask)<<kEWFlt_TriggParReg_WinEnd_Shift);
+	
+    [[NSNotificationCenter defaultCenter]postNotificationName:OREdelweissFLTModelTriggerParameterChanged object:self];
+	//??? [self postAdcInfoProvidingValueChanged];
+}
+
+
 
 
 
@@ -2940,7 +2979,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     {
 	ORSNMP*  ss = [[ORSNMP alloc] initWithMib: @"GUDEADS-EPC1200-MIB"];
 	[ss openSession:@"192.168.1.104"  community:@"private"];// I cannot use ORSNMPWriteOperation as I need community "private" (ORSNMPWriteOperation uses "guru") -tb- 2013
-    NSString *valueName= @"epc1200PortState.1 i 0";
+    NSString *valueName= [NSString stringWithString:@"epc1200PortState.1 i 0"];
 	NSArray* response = [ss writeValue: valueName];
     for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[ss release];

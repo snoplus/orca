@@ -1202,6 +1202,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 - (unsigned long) projectVersion  { return (hwVersion & kRevisionProject)>>28;}
 - (unsigned long) documentVersion { return (hwVersion & kDocRevision)>>16;}
 - (unsigned long) implementation  { return hwVersion & kImplemention;}
+- (unsigned long) hwVersion       { return hwVersion ;}//=SLT FPGA version/revision
 
 - (void) setHwVersion:(unsigned long) aVersion
 {
@@ -3300,9 +3301,20 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	
     [dataDictionary setObject:aDictionary forKey:@"EdelweissSLTWaveForm"];
     
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"OREdelweissSLTDecoderForFLTEvent",			@"decoder",
+				   [NSNumber numberWithLong:fltEventId],        @"dataId",
+				   [NSNumber numberWithBool:YES],				@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"EdelweissSLTFLTEvent"];
+    
     return dataDictionary;
 }
 
+- (unsigned long) fltEventId	     { return fltEventId; }
+- (void) setFltEventId: (unsigned long) aDataId    { fltEventId = aDataId; }
 - (unsigned long) eventDataId        { return eventDataId; }
 - (unsigned long) multiplicityId	 { return multiplicityId; }
 - (unsigned long) waveFormId	     { return waveFormId; }
@@ -3315,6 +3327,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
     eventDataId     = [assigner assignDataIds:kLongForm];
     multiplicityId  = [assigner assignDataIds:kLongForm];
     waveFormId  = [assigner assignDataIds:kLongForm];
+    fltEventId  = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
@@ -3322,6 +3335,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
     [self setEventDataId:[anotherCard eventDataId]];
     [self setMultiplicityId:[anotherCard multiplicityId]];
     [self setWaveFormId:[anotherCard waveFormId]];
+    [self setFltEventId:[anotherCard fltEventId]];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -4096,6 +4110,7 @@ if((len % 4) != 0){
 	configStruct->card_info[index].hw_type_id	= kSLTv4EW;	//should be unique
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
 	configStruct->card_info[index].hw_mask[1] 	= waveFormId;
+	configStruct->card_info[index].hw_mask[2] 	= fltEventId;
 	configStruct->card_info[index].slot			= [self stationNumber];
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
@@ -4107,6 +4122,15 @@ if((len % 4) != 0){
     if(takeEventData)  runFlagsMask |= kTakeEventDataFlag;
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
     
+    //for handling of different firmware versions
+    if(hwVersion==0) [self readHwVersion];
+    NSLog(@"IPE-DAQ EW SLT FPGA version 0x%08x (build %s %s)\n", hwVersion, __DATE__, __TIME__);
+    if(hwVersion <= kSLTRev20131212_5WordsPerEvent /*is 0x41950242*/){
+        NSLog(@"WARNING: You use a old SLT firmware - consider a update!\n");
+        NSLog(@"WARNING: This version is supported, but you will miss some features!\n");
+        NSLog(@"WARNING: KIT-IPE\n");
+    }						  
+	configStruct->card_info[index].deviceSpecificData[7] = hwVersion;	
 
 	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by SLT
     int nextIndex = index+1;
