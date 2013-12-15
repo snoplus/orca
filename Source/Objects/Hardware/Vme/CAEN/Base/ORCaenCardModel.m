@@ -54,9 +54,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     self = [super init];
     
     // Initialization internal variables.
-    errorCount 		= 0;
-    memset(eventCounter, 0, sizeof(unsigned long) * 32);
-    
+    errorCount 		= 0;    
     return self;
 }
 

@@ -323,6 +323,8 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 						if(dataType == 0x000){
 							dataRecord[index] = dataValue;
 							index++;
+                            int channel = ShiftAndExtract(dataValue,16,0x3f);
+                            if(channel>=0 && channel<32) eventCounter[channel]++;
 						}
 						else {
 							validData = NO;
