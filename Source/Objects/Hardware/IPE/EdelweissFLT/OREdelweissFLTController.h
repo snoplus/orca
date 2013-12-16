@@ -40,12 +40,16 @@
 	IBOutlet   NSTextField* wCmdCodeTextField;
     
     //FIC Tab
+    //regs
 	IBOutlet   NSTextField* ficCardTriggerCmdTextField;
 	IBOutlet   NSTextField* ficCardADC23CtrlRegTextField;
 	IBOutlet   NSTextField* ficCardADC01CtrlRegTextField;
 	IBOutlet   NSTextField* ficCardCtrlReg2TextField;
 	IBOutlet   NSTextField* ficCardCtrlReg1TextField;
     IBOutlet   NSPopUpButton* fiberSelectForFICCardPU;
+    //subelements
+	IBOutlet   NSTextField* ficCardCtrlReg1BlockLenTextField;
+	IBOutlet   NSMatrix*    ficCardCtrlReg1ChanEnableMatrix;
     
     //Trigger Tab
 	IBOutlet   NSTextField* heatChannelsTextField;
@@ -226,11 +230,13 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+//FIC card
 - (void) ficCardTriggerCmdChanged:(NSNotification*)aNote;
 - (void) ficCardADC23CtrlRegChanged:(NSNotification*)aNote;
 - (void) ficCardADC01CtrlRegChanged:(NSNotification*)aNote;
 - (void) ficCardCtrlReg2Changed:(NSNotification*)aNote;
 - (void) ficCardCtrlReg1Changed:(NSNotification*)aNote;
+
 - (void) pollBBStatusIntervallChanged:(NSNotification*)aNote;
 - (void) progressOfChargeBBChanged:(NSNotification*)aNote;
 - (void) chargeBBFileForFiberChanged:(NSNotification*)aNote;
@@ -321,11 +327,16 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+//FIC cards
 - (IBAction) ficCardTriggerCmdTextFieldAction:(id)sender;
 - (IBAction) ficCardADC23CtrlRegTextFieldAction:(id)sender;
 - (IBAction) ficCardADC01CtrlRegTextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg1TextFieldAction:(id)sender;
+//subelements
+- (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
+
 - (IBAction) pollBBStatusIntervallPUAction:(id)sender;
 - (IBAction) devTabButtonAction:(id) sender;
 - (IBAction) killChargeBBJobButtonAction:(id) sender;

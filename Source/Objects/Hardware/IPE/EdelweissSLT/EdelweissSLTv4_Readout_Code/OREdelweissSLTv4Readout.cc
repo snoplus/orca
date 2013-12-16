@@ -136,15 +136,27 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                         wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
                                 uint32_t waveformLength = 2048; 
 								uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
-								
+/*								
+int itmp;
+for(itmp=0; itmp<16; itmp++){
+//int32_t tmpNumPage=numPage+itmp;
+int32_t tmpNumPage=itmp;
+if(tmpNumPage<0) tmpNumPage+=16;
+if(tmpNumPage>15) tmpNumPage-=16;
+pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
+*/
 
                                 uint32_t address=  FLTRAMDataReg(flt+1, chan)  ;
                                 //ensure to wait until FLT has written the trace ...
                                 pbus->readBlock(address, (unsigned long *) readbuffer32, waveformLength);//read 2048 word32s
-                                {   int i;
-                                    for(i=0; i<waveformLength; i++){
-                                        shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[i] & 0xffff));
-                                        shipdebugbuffer16[i]=(uint16_t)((uint32_t)((readbuffer32[i]>>16) & 0xffff));
+                                //rearrange (could do it later, copiing into ring buffer ...)
+                                triggerAddr =  eventFifo4 & 0xfff;
+                                {   int i,ioffset=0;
+                                    ioffset=triggerAddr+1023;
+                                    for(i=0; i<waveformLength; i++,ioffset++){
+                                        ioffset = ioffset % 2048;
+                                        shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[ioffset] & 0xffff));
+                                        shipdebugbuffer16[i]=(uint16_t)((uint32_t)((readbuffer32[ioffset]>>16) & 0xffff));
                                     }
                                 }
 
@@ -172,7 +184,7 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                                 data[dataIndex++] =  (wfRecordVersion & 0xf);//eventFlags
                                 //data[dataIndex++] = ((traceStart16 & 0x7ff)<<8) |  (wfRecordVersion & 0xf);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
-                                data[dataIndex++] = shapingLength;//0;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
+                                data[dataIndex++] = 0;//tmpNumPage; //shapingLength;//0;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
                                 
                                 //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
                                 
@@ -181,7 +193,11 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                                     //TESTING data[dataIndex++] = chan;//adctrace32[col][eventchan][i];
                                     data[dataIndex++] = shipbuffer32[i];
                                 }
-                                
+/*
+}                                
+pbus->write(FLTReadPageNumReg(flt+1),numPage);
+*/
+
                                 uint32_t debugFlag=1;
                                 if(debugFlag && (chan>=6) && (chan<=17)){
                                     //ship data record

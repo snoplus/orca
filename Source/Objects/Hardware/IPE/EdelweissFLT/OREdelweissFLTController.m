@@ -560,7 +560,14 @@
 - (void) ficCardCtrlReg1Changed:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardCtrlReg1TextField setIntValue: [model ficCardCtrlReg1ForFiber:fiber]];
+    uint32_t val = [model ficCardCtrlReg1ForFiber:fiber];
+	[ficCardCtrlReg1TextField setIntValue: val];
+    //sub elements
+	[ficCardCtrlReg1BlockLenTextField setIntValue: val & 0xfff];
+    int i;
+    for(i=0;i<4; i++){
+        [[ficCardCtrlReg1ChanEnableMatrix cellAtRow:0 column:i] setIntValue: (val & (0x1<<(12+i)))];
+    }
 }
 
 - (void) pollBBStatusIntervallChanged:(NSNotification*)aNote
@@ -936,6 +943,9 @@
     //we need to update the FIC section, too -tb-
 	[fiberSelectForFICCardPU selectItemAtIndex: fiber];
     [self ficCardTriggerCmdChanged:nil];
+    [self ficCardADC23CtrlRegChanged:nil];
+    [self ficCardADC01CtrlRegChanged:nil];
+    [self ficCardCtrlReg2Changed:nil];
     [self ficCardCtrlReg1Changed:nil];
 }
 
@@ -1163,7 +1173,7 @@
 
 - (void) triggerParameterChanged:(NSNotification*)aNote
 {
-    //DEBUG: OUTPUT:      	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:          	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
 	//[selectFiberTrigPU setIntValue: [model selectFiberTrig]];
 	
     //[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
@@ -1188,6 +1198,7 @@
     }    
 	//heat trigger window pos start/end Matrix
     for(i=0;i<kNumEWFLTHeatChannels;i++){
+    //DEBUG OUTPUT: 	    NSLog(@"%@::%@: UNDER CONSTRUCTION! heatWindowStartMatrix: index 0x%08x winPosStart %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[model windowPosStart:i]);//TODO: DEBUG testing ...-tb-
         [[heatWindowStartMatrix cellAtRow:i column:0] setIntValue: [model windowPosStart:i]];
         [[heatWindowEndMatrix cellAtRow:i column:0] setIntValue: [model windowPosEnd:i]];
     }    
@@ -1390,6 +1401,10 @@
 	[self chargeBBFileForFiberChanged:nil];
 	[self progressOfChargeBBChanged:nil];
 	[self pollBBStatusIntervallChanged:nil];
+    
+    //we need to update the FIC section, too -tb-
+    int fiber = [model fiberSelectForBBAccess];
+	[fiberSelectForFICCardPU selectItemAtIndex: fiber];
 	[self ficCardCtrlReg1Changed:nil];
 	[self ficCardCtrlReg2Changed:nil];
 	[self ficCardADC01CtrlRegChanged:nil];
@@ -1795,6 +1810,28 @@
 {
     int fiber = [model fiberSelectForBBAccess];
 	[model setFicCardCtrlReg1:[sender intValue] forFiber:fiber];	
+}
+
+- (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t reg = [model ficCardCtrlReg1ForFiber: fiber] & 0xf000;
+    reg = reg | ([sender intValue] & 0xfff);
+	[model setFicCardCtrlReg1:reg forFiber:fiber];	
+}
+
+- (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender
+{
+    uint32_t mask = [[ficCardCtrlReg1ChanEnableMatrix cellAtRow:0 column:0] intValue]  |
+                    ([[ficCardCtrlReg1ChanEnableMatrix cellAtRow:0 column:1] intValue] <<1) |
+                    ([[ficCardCtrlReg1ChanEnableMatrix cellAtRow:0 column:2] intValue] <<2) |
+                    ([[ficCardCtrlReg1ChanEnableMatrix cellAtRow:0 column:3] intValue] <<3) ;
+    mask = mask << 12;
+    //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! mask: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),mask);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t reg = ([model ficCardCtrlReg1ForFiber: fiber] & 0xfff) | mask;
+	[model setFicCardCtrlReg1:reg forFiber:fiber];	
 }
 
 - (void) pollBBStatusIntervallPUAction:(id)sender
@@ -2891,23 +2928,30 @@
 
 - (IBAction) heatWindowStartMatrixAction:(id)sender
 {
-    //DEBUG: OUTPUT:  
-    	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[heatWindowStartMatrix selectedColumn],[heatWindowStartMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:      	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[heatWindowStartMatrix selectedColumn],[heatWindowStartMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
     unsigned int col, row, state;
+    
+    col=[sender selectedColumn];
+    row=[sender selectedRow];
+    state = [[sender selectedCell] intValue];
+    //DEBUG: OUTPUT:      	       NSLog(@"%@::%@: UNDER CONSTRUCTION!    selectedCell %@ , state %i ,col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state,col,row);//TODO : DEBUG testing ...-tb-
+
+/*
     col=[heatWindowStartMatrix selectedColumn];
     row=[heatWindowStartMatrix selectedRow];
     //state = [[gapMatrix selectedCell] intValue];
     state = [[heatWindowStartMatrix selectedCell] intValue];
     //DEBUG: OUTPUT:  	
             NSLog(@"%@::%@: UNDER CONSTRUCTION!  selectedCell %@ , state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state);//TODO : DEBUG testing ...-tb-
+*/
     if(row>=kNumEWFLTHeatChannels) return;
     [model setWindowPosStart:row withValue:state];
+    //DEBUG: OUTPUT:  	            NSLog(@"%@::%@: UNDER CONSTRUCTION!  setting winStart for index %i to state %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),row,state);//TODO : DEBUG testing ...-tb-
 }
 
 - (IBAction) heatWindowEndMatrixAction:(id)sender
 {
-    //DEBUG: OUTPUT:  
-    	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[heatWindowEndMatrix selectedColumn],[heatWindowEndMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:      	       NSLog(@"%@::%@: UNDER CONSTRUCTION!  col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[heatWindowEndMatrix selectedColumn],[heatWindowEndMatrix selectedRow]);//TODO : DEBUG testing ...-tb-
     unsigned int col, row, state;
     col=[heatWindowEndMatrix selectedColumn];
     row=[heatWindowEndMatrix selectedRow];
@@ -2925,8 +2969,7 @@
 
 - (void) selectFiberTrigPUAction:(id)sender
 {
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@: UNDER CONSTRUCTION! %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
 	//[model setSelectFiberTrig:[sender intValue]];	
 	[model setSelectFiberTrig:[sender indexOfSelectedItem]];	
 }
@@ -3222,8 +3265,7 @@
     col=[sender selectedColumn];
     row=[sender selectedRow];
     state = [[sender selectedCell] intValue];
-    //DEBUG: OUTPUT:  
-    	       NSLog(@"%@::%@: UNDER CONSTRUCTION!    selectedCell %@ , state %i ,col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state,col,row);//TODO : DEBUG testing ...-tb-
+    //DEBUG: OUTPUT:      	       NSLog(@"%@::%@: UNDER CONSTRUCTION!    selectedCell %@ , state %i ,col is %i, row is %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender selectedCell],state,col,row);//TODO : DEBUG testing ...-tb-
     if(row>=kNumEWFLTHeatIonChannels) return;
     [model setThreshold:row withValue:state];
 

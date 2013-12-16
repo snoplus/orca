@@ -399,7 +399,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 			   specialBits:0x0000	
 				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
-				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
+				  withKeys: @"IPE-SLT-EW", @"FLT-Event-old",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
 }else{
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
@@ -669,6 +669,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 	#endif
 //TODO: no offset -tb-
 //startIndex=traceStart16;
+//2013-12-16: from now on I save the shifted trace -tb- startIndex+=1023;
 startIndex=0;
 
 //TODO: what is the best value for the 'mask'? 0xFFFF is appropriate for shorts ... -tb-
@@ -786,13 +787,15 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     uint32_t sec            = ptr[2];
     uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
     uint32_t timelo         = ptr[2];
-    uint32_t timehi         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
-    uint64_t timestamp=timelo | ((timehi & 0xffff)<<23);
+    uint64_t timehi         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
+    uint64_t timestamp=timelo | ((timehi & 0xffff)<<32);
     uint32_t chmap          = ptr[4];
     uint32_t energy         = ptr[5] & 0x00ffffff;
     uint32_t eventID        = ptr[6];
+    uint32_t eventFifo4       = ptr[6];
 //    uint32_t numfifo        = ptr[6];
     uint32_t eventFlags     = ptr[7];
+    uint32_t spareWord      = ptr[8];
     //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     uint32_t traceStart16 = ShiftAndExtract(ptr[6],0,0xfff);//start of trace in short array
 
@@ -815,10 +818,10 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     }
         secStr    = [NSString stringWithFormat:@"Time 0..31 = 0x%08x\n", sec];
         subsecStr = [NSString stringWithFormat:@"Time32..47 = 0x%08x\n", subsec];
-        timeStr   = [NSString stringWithFormat:@"Timestamp  = %li\n", timestamp];
+        timeStr   = [NSString stringWithFormat:@"Timestamp  = %lli\n", timestamp];
         energyStr = [NSString stringWithFormat:@"Energy     = 0x%08x\n", energy];
     NSString* chmapStr  = [NSString stringWithFormat:@"ChannelMap = 0x%x\n", chmap];
-    NSString* eventIDStr= [NSString stringWithFormat:@"ReadPtr,Pg#= %d,%d\n", ShiftAndExtract(eventID,0,0x3ff),ShiftAndExtract(eventID,10,0x3f)];
+    NSString* eventIDStr= [NSString stringWithFormat:@"Pg#,offset= %d,%d\n", ShiftAndExtract(eventFifo4,12,0xf),ShiftAndExtract(eventFifo4,0,0xfff)];
     NSString* offsetStr = [NSString stringWithFormat:@"Offset16   = %d\n", traceStart16];
     NSString* versionStr= [NSString stringWithFormat:@"RecVersion = %d\n", ShiftAndExtract(eventFlags,0,0xf)];
     NSString* eventFlagsStr
@@ -827,9 +830,10 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     
     
     NSString* evFlagsStr= [NSString stringWithFormat:@"EventFlags = 0x%x\n", eventFlags ];
+    NSString* spareStr= [NSString stringWithFormat:@"spare      = 0x%x\n", spareWord ];
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
-                secStr, subsecStr, timeStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr]; 
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,  
+                secStr, subsecStr, timeStr, energyStr, chmapStr, eventIDStr, offsetStr, versionStr, eventFlagsStr, lengthStr,   evFlagsStr, spareStr]; 
 }
 
 @end

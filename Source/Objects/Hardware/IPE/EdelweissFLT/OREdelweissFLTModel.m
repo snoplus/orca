@@ -2381,11 +2381,14 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) shapingLength:(unsigned short) aChan
 {
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! aChan %i,  s-length %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan, (triggerPar[aChan] >> kEWFlt_TriggParReg_ShapingL_Shift) & kEWFlt_TriggParReg_ShapingL_Mask);//TODO: DEBUG testing ...-tb-
 	if(aChan<kNumEWFLTHeatIonChannels) return (triggerPar[aChan] >> kEWFlt_TriggParReg_ShapingL_Shift) & kEWFlt_TriggParReg_ShapingL_Mask;
 	return 0;
 }
 - (void) setShapingLength:(unsigned short) aChan withValue:(int) aLength
 {
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! aChan %i,  aLength %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan, aLength);//TODO: DEBUG testing ...-tb-
+
     if(aChan>=kNumEWFLTHeatIonChannels) return ;
 
     [[[self undoManager] prepareWithInvocationTarget:self] setShapingLength:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_ShapingL_Shift) & kEWFlt_TriggParReg_ShapingL_Mask];
@@ -2400,6 +2403,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (int) windowPosStart:(unsigned short) aChan
 {
+//DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! aChan %i,  winPosStart %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aChan, (triggerPar[aChan] >> kEWFlt_TriggParReg_WinStart_Shift) & kEWFlt_TriggParReg_WinStart_Mask);//TODO: DEBUG testing ...-tb-
 	if(aChan<kNumEWFLTHeatChannels) return (triggerPar[aChan] >> kEWFlt_TriggParReg_WinStart_Shift) & kEWFlt_TriggParReg_WinStart_Mask;
 	return 0;
 }
@@ -2408,7 +2412,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     if(aChan>=kNumEWFLTHeatChannels) return ;
 
-    [[[self undoManager] prepareWithInvocationTarget:self] setShapingLength:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_WinStart_Shift) & kEWFlt_TriggParReg_WinStart_Mask];
+    [[[self undoManager] prepareWithInvocationTarget:self] setWindowPosStart:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_WinStart_Shift) & kEWFlt_TriggParReg_WinStart_Mask];
 	triggerPar[aChan] &= ~(kEWFlt_TriggParReg_WinStart_Mask<<kEWFlt_TriggParReg_WinStart_Shift);
 	triggerPar[aChan] |=  ((aLength & kEWFlt_TriggParReg_WinStart_Mask)<<kEWFlt_TriggParReg_WinStart_Shift);
 	
@@ -2426,7 +2430,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     if(aChan>=kNumEWFLTHeatChannels) return ;
 
-    [[[self undoManager] prepareWithInvocationTarget:self] setShapingLength:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_WinEnd_Shift) & kEWFlt_TriggParReg_WinEnd_Mask];
+    [[[self undoManager] prepareWithInvocationTarget:self] setWindowPosEnd:aChan withValue:(triggerPar[aChan] >> kEWFlt_TriggParReg_WinEnd_Shift) & kEWFlt_TriggParReg_WinEnd_Mask];
 	triggerPar[aChan] &= ~(kEWFlt_TriggParReg_WinEnd_Mask<<kEWFlt_TriggParReg_WinEnd_Shift);
 	triggerPar[aChan] |=  ((aLength & kEWFlt_TriggParReg_WinEnd_Mask)<<kEWFlt_TriggParReg_WinEnd_Shift);
 	
