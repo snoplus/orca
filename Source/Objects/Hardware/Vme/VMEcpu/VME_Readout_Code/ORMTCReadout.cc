@@ -22,9 +22,9 @@ bool ORMTCReadout::is_next_stop_hard = false;
 bool ORMTCReadout::Start() {
 
     const bool resetFifoOnStart = GetDeviceSpecificData()[5];
+    uint32_t trigger_mask = 0;
     if (resetFifoOnStart) { //aka hard start
         //zero the trigger mask
-        uint32_t trigger_mask = 0;
         if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
                      sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
             LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
@@ -34,7 +34,7 @@ bool ORMTCReadout::Start() {
         if (!ZeroTheGtCounter()) {
             LogError("MTCD: zero the counter failed.");
         }
-        
+
         //set trigger crate mask
         uint32_t crate_mask = GetDeviceSpecificData()[7];
         if (VMEWrite(GetBaseAddress() + 0x3CUL, GetAddressModifier(),
@@ -47,7 +47,7 @@ bool ORMTCReadout::Start() {
             //takes care of last_good_gtid and simm_empty_space
             LogError("MTCD: reset the memory failed.");
         }
-        
+
         //set correct trigger mask, and soft gt
         trigger_mask = GetDeviceSpecificData()[6];
         trigger_mask |= 0x02000000; //soft gt
@@ -82,7 +82,7 @@ bool ORMTCReadout::Start() {
             LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
             return false;
         }
-    }
+    }    
     //else soft run start and do nothing the two softgt's were fired at the end of the prev run
     
 	last_good_10mhz_upper = 0;
@@ -101,11 +101,18 @@ bool ORMTCReadout::Start() {
 bool ORMTCReadout::Stop()
 {
     //set correct trigger mask, and soft gt
-    uint32_t trigger_mask = GetDeviceSpecificData()[6];
-    trigger_mask |= 0x02000000; //soft gt
-    if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+    uint32_t trigger_mask;
+    if (VMERead(GetBaseAddress() + 0x34UL, GetAddressModifier(),
                  sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
-        LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+        LogBusError("BusError: read trigger_mask", trigger_mask);
+        return false;
+    }
+    trigger_mask &= 0x03FFFFFF;
+
+    uint32_t temp_trigger_mask = trigger_mask | 0x02000000; //soft gt
+    if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
+                 sizeof(temp_trigger_mask), temp_trigger_mask) < (int32_t) sizeof(temp_trigger_mask)){
+        LogBusError("BusError: set trigger_mask to 0x%08x\n", temp_trigger_mask);
         return false;
     }
     
@@ -127,10 +134,10 @@ bool ORMTCReadout::Stop()
 
     if (is_next_stop_hard) {
         //zero the trigger mask
-        uint32_t trigger_mask = 0;
+        uint32_t zero_trigger_mask = 0;
         if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
-                     sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
-            LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
+                     sizeof(zero_trigger_mask), zero_trigger_mask) < (int32_t) sizeof(zero_trigger_mask)){
+            LogBusError("BusError: set trigger_mask to 0x%08x\n", zero_trigger_mask);
             return false;
         }
     }
@@ -181,7 +188,6 @@ bool ORMTCReadout::Stop()
         }
 
         //remove the soft gt bit if we set it
-        trigger_mask = GetDeviceSpecificData()[6];
         if (VMEWrite(GetBaseAddress() + 0x34UL, GetAddressModifier(),
                      sizeof(trigger_mask), trigger_mask) < (int32_t) sizeof(trigger_mask)){
             LogBusError("BusError: set trigger_mask to 0x%08x\n", trigger_mask);
