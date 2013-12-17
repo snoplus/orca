@@ -20,9 +20,6 @@
 
 //  Modified from ORSerialPortList.h by Andreas Mayer
 
-#define ORSerialDebug FALSE
-
-
 #import "ORSerialPortAdditions.h"
 
 
@@ -36,50 +33,47 @@
 
 - (void)doRead:(NSTimer *)timer;
 {
-#if ORSerialDebug
-    NSLog(@"doRead\n");
-#endif
     int res;
     FD_ZERO(readfds);
     FD_SET(fileDescriptor, readfds);
     timeout->tv_sec = 0;
     timeout->tv_usec = 1;
     res = select(fileDescriptor+1, readfds, nil, nil, timeout);
-    if (res >= 1)
-    {
+    if (res >= 1) {
         [readTarget performSelector:readSelector withObject:[self readString]];
 		[readTarget release];
 		readTarget = nil;
     }
-    else
-    {
+    else {
         readTimer = [[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(doRead:) userInfo:self  repeats:NO] retain];
     }
 }
 
 -(NSString *)readString
 {
-#if ORSerialDebug
-    NSLog(@"readString\n");
-#endif
     if (buffer == nil) buffer = malloc(AMSER_MAXBUFSIZE);
     int len = read(fileDescriptor, buffer, AMSER_MAXBUFSIZE);
 	return [[[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding] autorelease];
 }
 
--(int)writeString:(NSString *)string
+- (int) writeString:(NSString *)string
 {
-#if ORSerialDebug
-    NSLog(@"writeString\n");
-#endif
-    return write(fileDescriptor, [string cStringUsingEncoding:NSASCIIStringEncoding], [string length]);
+    int totalWritten = 0;
+    int totalNeedToWrite = [string length];
+    int i;
+    for(i=0;i<totalNeedToWrite;i++){
+        NSString* stringToWrite = [string substringFromIndex:totalWritten];
+        int len = [stringToWrite length];
+        const char* cString = [stringToWrite cStringUsingEncoding:NSASCIIStringEncoding];
+        totalWritten  +=  write(fileDescriptor, cString, len);
+        if(totalWritten >= totalNeedToWrite)break;
+    }
+    
+    return totalWritten;
 }
 
 - (int) checkRead
 {
-#if ORSerialDebug
-    NSLog(@"checkRead\n");
-#endif
     FD_ZERO(readfds);
     FD_SET(fileDescriptor, readfds);
     timeout->tv_sec = 0;
@@ -89,9 +83,6 @@
 
 - (void) waitForInput:(id)target selector:(SEL)selector
 {
-#if ORSerialDebug
-    NSLog(@"waitForInput\n");
-#endif
     readTarget = [target retain];
     readSelector = selector;
     if (readTimer) [readTimer release];
@@ -106,9 +97,6 @@
 
 - (void)readDataInBackground
 {
-#if ORSerialDebug
-    NSLog(@"readDataInBackground\n");
-#endif
     //if (delegateHandlesReadInBackground) {
     [countReadInBackgroundThreadsLock lock];
     countReadInBackgroundThreads++;
@@ -121,9 +109,6 @@
 
 - (void)stopReadInBackground
 {
-#if ORSerialDebug
-    NSLog(@"stopReadInBackground\n");
-#endif
     [stopReadInBackgroundLock lock];
     stopReadInBackground = YES;
     //NSLog(@"stopReadInBackground set to YES\n");
@@ -132,9 +117,6 @@
 
 - (void)writeDataInBackground:(NSData *)data
 {
-#if ORSerialDebug
-    NSLog(@"writeDataInBackground\n");
-#endif
     if (delegateHandlesWriteInBackground) {
         [countWriteInBackgroundThreadsLock lock];
         countWriteInBackgroundThreads++;
@@ -147,9 +129,6 @@
 
 - (void)stopWriteInBackground
 {
-#if ORSerialDebug
-    NSLog(@"stopWriteInBackground\n");
-#endif
     [stopWriteInBackgroundLock lock];
     stopWriteInBackground = YES;
     [stopWriteInBackgroundLock unlock];
@@ -178,9 +157,6 @@
     int bytesRead = 0;
     fd_set *localReadFDs;
     
-#if ORSerialDebug
-    NSLog(@"readDataInBackgroundThread: %@", [NSThread currentThread]);
-#endif
     localBuffer = malloc(AMSER_MAXBUFSIZE);
     [stopReadInBackgroundLock lock];
     stopReadInBackground = NO;
@@ -199,19 +175,10 @@
         [closeLock lock];
         //NSLog(@"closeLock locked: %@", [NSThread currentThread]);
         if ((res >= 1) && (fileDescriptor >= 0)) {
-#if ORSerialDebug
-            NSLog(@"attempt read: %@", [NSThread currentThread]);
-#endif
             bytesRead = read(fileDescriptor, localBuffer, AMSER_MAXBUFSIZE);
         }
-#if ORSerialDebug
-        NSLog(@"data read: %@", [NSThread currentThread]);
-#endif
 		if(bytesRead>0){
 			data = [NSData dataWithBytes:localBuffer length:bytesRead];
-#if ORSerialDebug
-			NSLog(@"send ORSerialReadInBackgroundDataMessage\n");
-#endif
 			[self performSelectorOnMainThread:@selector(serialPortReadData:) withObject:[NSDictionary dictionaryWithObjectsAndKeys: self, @"serialPort", data, @"data", nil] waitUntilDone:NO];
 		}
 		[closeLock unlock];
@@ -221,9 +188,6 @@
 		//NSLog(@"closeLock unlocked: %@", [NSThread currentThread]);
 		
     } else {
-#if ORSerialDebug
-        NSLog(@"read stopped: %@", [NSThread currentThread]);
-#endif
     }
     
     [readLock unlock];
@@ -239,9 +203,6 @@
 
 -(void) reportProgress:(int) progress dataLen:(unsigned int)dataLen
 {
-#if ORSerialDebug
-    NSLog(@"send ORSerialWriteInBackgroundProgressMessage\n");
-#endif
     [delegate performSelectorOnMainThread:@selector(serialPortWriteProgress:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:self, @"serialPort", [NSNumber numberWithInt:progress], @"value", [NSNumber numberWithInt:dataLen], @"total", nil] waitUntilDone:NO];
 }
 
@@ -249,9 +210,6 @@
 - (void)writeDataInBackgroundThread:(NSData *)data
 {
     
-#if ORSerialDebug
-    NSLog(@"writeDataInBackgroundThread\n");
-#endif
     void *localBuffer;
     unsigned int pos;
     unsigned int bufferLen;
