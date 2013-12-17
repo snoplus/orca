@@ -327,15 +327,21 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
-//FIC cards
+//FIC card regs
 - (IBAction) ficCardTriggerCmdTextFieldAction:(id)sender;
 - (IBAction) ficCardADC23CtrlRegTextFieldAction:(id)sender;
 - (IBAction) ficCardADC01CtrlRegTextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg1TextFieldAction:(id)sender;
-//subelements
+//FIC subelements
 - (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
+//FIC buttons
+- (IBAction) sendFICCtrl1RegButtonAction:(id)sender;
+- (IBAction) sendFICCtrl2RegButtonAction:(id)sender;
+- (IBAction) sendFICADC01CtrlRegButtonAction:(id)sender;
+- (IBAction) sendFICADC23CtrlRegButtonAction:(id)sender;
+- (IBAction) sendFICTriggerCmdButtonAction:(id)sender;
 
 - (IBAction) pollBBStatusIntervallPUAction:(id)sender;
 - (IBAction) devTabButtonAction:(id) sender;

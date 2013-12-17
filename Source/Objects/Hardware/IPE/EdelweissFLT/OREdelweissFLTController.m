@@ -1834,6 +1834,72 @@
 	[model setFicCardCtrlReg1:reg forFiber:fiber];	
 }
 
+
+
+//FIC buttons
+
+- (IBAction) sendFICCtrl1RegButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    uint32_t val = [model ficCardCtrlReg1ForFiber:fiber];
+    [model sendWCommandIdBB:idBB  cmd:0x71 arg1: ((val>>8) & 0xff)  arg2:(val & 0xff)];
+}
+
+- (IBAction) sendFICCtrl2RegButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    uint32_t val = [model ficCardCtrlReg2ForFiber:fiber];
+    [model sendWCommandIdBB:idBB  cmd:0x72 arg1: ((val>>8) & 0xff)  arg2:(val & 0xff)];
+}
+
+- (IBAction) sendFICADC01CtrlRegButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    uint32_t val = [model ficCardADC01CtrlRegForFiber:fiber];
+    [model sendWCommandIdBB:idBB  cmd:0x73 arg1: ((val>>8) & 0xff)  arg2:(val & 0xff)];
+}
+
+- (IBAction) sendFICADC23CtrlRegButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    uint32_t val = [model ficCardADC23CtrlRegForFiber:fiber];
+    [model sendWCommandIdBB:idBB  cmd:0x74 arg1: ((val>>8) & 0xff)  arg2:(val & 0xff)];
+}
+
+- (IBAction) sendFICTriggerCmdButtonAction:(id)sender
+{
+    [self endEditing];
+	//debug     NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int fiber = [model fiberSelectForBBAccess];
+    int idBB=[model idBBforBBAccessForFiber:fiber];
+    if([model useBroadcastIdforBBAccess]) idBB=0xff;
+    uint32_t val = [model ficCardTriggerCmdForFiber:fiber];
+    [model sendWCommandIdBB:idBB  cmd:0x70 arg1: ((val>>8) & 0xff)  arg2:(val & 0xff)];
+}
+
+
+
+
+
+
+
+
 - (void) pollBBStatusIntervallPUAction:(id)sender
 {
 	//[model setPollBBStatusIntervall:[sender intValue]];	

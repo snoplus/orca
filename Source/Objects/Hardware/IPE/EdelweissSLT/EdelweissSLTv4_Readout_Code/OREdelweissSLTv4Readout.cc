@@ -123,7 +123,8 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
 
             //set the page number on FLT
             pbus->write(FLTReadPageNumReg(flt+1),numPage);
-            usleep(10000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
+            //usleep(10000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
+            usleep(21000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
             
             uint32_t chan,chanBit,chanMap; 
             chanMap=eventFifo2 & 0x3ffff;
