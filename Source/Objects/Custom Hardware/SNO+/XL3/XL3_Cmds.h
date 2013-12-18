@@ -477,6 +477,13 @@ typedef struct{
 } screwed_packet_t;
 
 typedef struct{
+    uint32_t mode;
+    uint32_t debugging_mode;
+    uint32_t data_avail_mask;
+    uint64_t xl3_clock;
+} check_xl3_state_results;
+
+typedef struct{
     uint32_t slot_mask;
 	uint32_t channel_masks[16];
 } multi_set_crate_peds_args_t;
