@@ -26,6 +26,9 @@
 #define CHANGE_MODE_ID            (0x02) //change to INIT or NORMAL mode
 #define STATE_MACHINE_RESET_ID    (0x03) //reset the state machine
 #define DEBUGGING_MODE_ID         (0x04) //turn on verbose printout (not used in ORCA)
+#define CHECK_STATE_MACHINE_ID    (0x05) //Read the state machine status regs (not used in ORCA)
+#define CHECK_XL3_STATE_ID        (0x06) //Get the mode, slot mask, clock
+
 // XL3/FEC Level Tasks
 #define FAST_CMD_ID               (0x20) //do one command, immediately respond with same packet (daq numbered)
 #define MULTI_FAST_CMD_ID         (0x21) //do multiple commands, immediately respond with same packet (daq numbered)
@@ -44,12 +47,16 @@
 #define CHECK_TOTAL_COUNT_ID      (0x2E) //readout cmos total count register 
 #define SET_ALARM_DAC_ID          (0x2F) //???Set alarm dac
 #define SET_VLT_THRESHOLD_ID      (0x30) //set voltage thresholds for slow control alarms
+#define MULTI_SET_CRATE_PEDS_ID   (0x31) //Unlike set_crate_pedestals_id, allows different mask per slot, and doesn't change slots not in the mask
+
 // HV Tasks
 #define SET_HV_RELAYS_ID          (0x40) //turns on/off hv relays
 #define GET_HV_STATUS_ID          (0x41) //checks voltage and current readback
 #define HV_READBACK_ID            (0x42) //reads voltage and current 
 #define READ_PMT_CURRENT_ID       (0x43) //reads pmt current from FEC hv csr 
 #define SETUP_CHARGE_INJ_ID       (0x44) //setup charge injection in FEC hv csr
+#define MULTI_SETUP_CHARGE_INJ_ID (0x45) //setup charge injection for multiple fecs and set dac level
+
 // Tests
 #define FEC_TEST_ID               (0x60) //check read/write to FEC registers
 #define MEM_TEST_ID               (0x61) //check read/write to FEC ram, address lines
@@ -468,3 +475,23 @@ typedef struct{
 typedef struct{
     uint32_t screwed[16];
 } screwed_packet_t;
+
+typedef struct{
+    uint32_t slot_mask;
+	uint32_t channel_masks[16];
+} multi_set_crate_peds_args_t;
+
+typedef struct{
+    uint32_t error_mask;
+} multi_set_crate_peds_results;
+
+typedef struct{
+    uint32_t slot_mask;
+    uint32_t channel_masks[16];
+    uint32_t dac_values[16];
+} multi_set_up_charge_inj_args;
+
+typedef struct{
+    uint32_t error_flags;
+} multi_set_up_charge_inj_results;
+
