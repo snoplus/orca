@@ -32,7 +32,7 @@
 
 #define kStopOnLimit	0
 #define kRestartOnLimit 1
-#define kMinDiskSpace   500 //MBytes
+#define kMinDiskSpace   2 //GBytes
 
 @interface ORDataFileModel :  ORDataChainObject <ORDataProcessing,ORAdcProcessing>
 {

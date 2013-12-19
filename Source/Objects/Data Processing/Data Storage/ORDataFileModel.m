@@ -695,17 +695,17 @@ static const int currentVersion = 1;           // Current version
 			long long totalSpace = [[diskInfo objectForKey:NSFileSystemSize] longLongValue]; 
 			percentFull = 100 - 100*freeSpace/(double)totalSpace;
 									
-			if(freeSpace < kMinDiskSpace * 1024 * 1024){
+			if(freeSpace < (long long)kMinDiskSpace * 1024 * 1024 * 1024){
 				if(!diskFullAlarm){
 					diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
 					[diskFullAlarm setSticky:YES];
-					[diskFullAlarm setHelpString:[NSString stringWithFormat:@"The data disk is dangerously full. Less than %d MB Left. Runs will not be possible until space is available.", kMinDiskSpace]];
+					[diskFullAlarm setHelpString:[NSString stringWithFormat:@"The data disk is dangerously full. Less than %d GB Left. Runs will not be possible until space is available.", kMinDiskSpace]];
 				}
 					
 				[diskFullAlarm setAcknowledged:NO];
 				[diskFullAlarm postAlarm];
 					
-				NSString* reason = [NSString stringWithFormat:@"Disk Space size less than %d MB",kMinDiskSpace];
+				NSString* reason = [NSString stringWithFormat:@"Disk Space size less than %d GB",kMinDiskSpace];
 				[[NSNotificationCenter defaultCenter]
 					 postNotificationName:ORRequestRunHalt
 									object:self
