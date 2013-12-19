@@ -2983,8 +2983,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     {
 	ORSNMP*  ss = [[ORSNMP alloc] initWithMib: @"GUDEADS-EPC1200-MIB"];
 	[ss openSession:@"192.168.1.104"  community:@"private"];// I cannot use ORSNMPWriteOperation as I need community "private" (ORSNMPWriteOperation uses "guru") -tb- 2013
-    NSString *valueName= [NSString stringWithString:@"epc1200PortState.1 i 0"];
-	NSArray* response = [ss writeValue: valueName];
+    NSString* valueName= @"epc1200PortState.1 i 0";
+	NSArray*  response = [ss writeValue: valueName];
     for(id anEntry in response) NSLog(@"Reponse: %@\n",anEntry);
 	[ss release];
     }

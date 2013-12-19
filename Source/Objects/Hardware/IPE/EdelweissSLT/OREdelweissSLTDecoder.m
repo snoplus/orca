@@ -791,7 +791,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     uint64_t timestamp=timelo | ((timehi & 0xffff)<<32);
     uint32_t chmap          = ptr[4];
     uint32_t energy         = ptr[5] & 0x00ffffff;
-    uint32_t eventID        = ptr[6];
+  //  uint32_t eventID        = ptr[6];
     uint32_t eventFifo4       = ptr[6];
 //    uint32_t numfifo        = ptr[6];
     uint32_t eventFlags     = ptr[7];
@@ -809,7 +809,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     NSString* card      = [NSString stringWithFormat:@"Station    = %lu\n",(*ptr>>16) & 0x1f];
     //NSString* fiber     = [NSString stringWithFormat:@"Fiber      = %lu\n",(*ptr>>12) & 0xf];
     //NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",(*ptr>>8) & 0xf];
-    NSString* chan      = [NSString stringWithFormat:@"Channel    = %lu\n",trigChan];
+    NSString* chan      = [NSString stringWithFormat:@"Channel    = %u\n",trigChan];
     NSString* timeStr    = 0; 
     NSString* secStr    = 0;//[NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = 0;//[NSString stringWithFormat:@"SubSec     = %d\n", subsec];
