@@ -337,7 +337,13 @@ void registryChanged(
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
-    self = [super initWithCoder:decoder];
+    @try {
+        self = [super initWithCoder:decoder];
+
+    }
+    @catch (NSException *exception) {
+        
+    }
 	
     [[self undoManager] disableUndoRegistration];
     [self setEolType:[decoder decodeIntForKey:@"ORMacModelEolType"]];
