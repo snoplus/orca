@@ -178,7 +178,6 @@
                          name : ORMPodCrateConstraintsChanged
 						object: [model guardian]];
 
-    
     [notifyCenter addObserver : self
                      selector : @selector(constraintsChanged:)
                          name : ORiSegHVCardConstraintsChanged
@@ -199,7 +198,6 @@
 	[self selectedChannelChanged:nil];
 	[self maxCurrentChanged:nil];
 	[self shipRecordsChanged:nil];
-	[self constraintsChanged:nil];
 	[self constraintsChanged:nil];
 }
 

@@ -89,6 +89,17 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                      selector : @selector(viewChanged:)
                          name : ORMPodCardSlotChangedNotification
                        object : nil];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(viewChanged:)
+                         name : ORiSegHVCardConstraintsChanged
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(viewChanged:)
+                         name : ORMPodCrateConstraintsChanged
+                       object : nil];
+
     
     [notifyCenter addObserver : self
                      selector : @selector(powerFailed:)
@@ -190,8 +201,8 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 	if(!hvConstraints)hvConstraints = [[NSMutableDictionary dictionary] retain];
     if(![hvConstraints objectForKey:aName]){
         [hvConstraints setObject:aReason forKey:aName];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCrateConstraintsChanged object:self];
         [self setUpImage];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCrateConstraintsChanged object:self];
         NSLogColor([NSColor redColor],@"%@: HV constraint added: %@ -- %@\n",[self fullID],aName,aReason);
     }
 }
@@ -199,8 +210,8 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 {
     if([hvConstraints objectForKey:aName]){
         [hvConstraints removeObjectForKey:aName];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCrateConstraintsChanged object:self];
         [self setUpImage];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCrateConstraintsChanged object:self];
         NSLog(@"%@: HV constraint removed: %@\n",[self fullID],aName);
     }
 }

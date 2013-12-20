@@ -89,7 +89,6 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
     [self setImage:i];
     [i release];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaObjectImageChanged object:self];
 }
 
 
@@ -1028,8 +1027,9 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	if(!hvConstraints)hvConstraints = [[NSMutableDictionary dictionary] retain];
     if(![hvConstraints objectForKey:aName]){
         [hvConstraints setObject:aReason forKey:aName];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardConstraintsChanged object:self];
         [self setUpImage];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardConstraintsChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCrateConstraintsChanged object:self];
         NSLogColor([NSColor redColor],@"%@: HV constraint added: %@ -- %@\n",[self fullID],aName,aReason);
     }
 }
@@ -1037,8 +1037,9 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 {
     if([hvConstraints objectForKey:aName]){
         [hvConstraints removeObjectForKey:aName];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardConstraintsChanged object:self];
         [self setUpImage];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardConstraintsChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCrateConstraintsChanged object:self];
         NSLog(@"%@: HV constraint removed: %@\n",[self fullID],aName);
     }
 }

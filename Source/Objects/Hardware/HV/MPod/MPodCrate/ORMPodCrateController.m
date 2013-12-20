@@ -33,7 +33,7 @@
 
 - (void) setCrateTitle
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"MPod Crate %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MPod Crate %d",[model crateNumber]]];
 }
 
 #pragma mark •••Notifications
@@ -56,13 +56,19 @@
 	[notifyCenter addObserver : self
                      selector : @selector(constraintsChanged:)
                          name : ORMPodCrateConstraintsChanged
-						object: model];
+						object: nil];
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
 	[self constraintsChanged:nil];
+}
+
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+    [self setCrateTitle];
 }
 
 - (void) constraintsChanged:(NSNotification*)aNote
@@ -72,6 +78,8 @@
 		[hvConstraintImage setImage:smallLockImage];
 	}
 	else [hvConstraintImage setImage:nil];
+    [groupView setNeedsDisplay:YES];
+    
 }
 
 #pragma mark •••Actions
