@@ -619,17 +619,40 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                     break;
                 }
             }
-            NSDictionary* machineInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+            
+            NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                          @"machineinfo",@"type",
                                          [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
-                                          computerName(),@"name",
-                                          macAddress(),@"hw_address",
-                                          thisHostAdress,@"ip_address",
-                                          fullVersion(),@"version",nil];	
+                                         computerName(),@"name",
+                                         macAddress(),@"hw_address",
+                                         thisHostAdress,@"ip_address",
+                                         fullVersion(),@"version",nil];
+            
+            NSFileManager* fm = [NSFileManager defaultManager];
+            
+            NSArray* diskInfo = [fm mountedVolumeURLsIncludingResourceValuesForKeys:0 options:NSVolumeEnumerationSkipHiddenVolumes];
+            NSMutableArray* diskStats = [NSMutableArray array];
+            for(id aVolume in diskInfo){
+                NSError *fsError = nil;
+                aVolume = [aVolume relativePath];
+                NSDictionary *fsDictionary = [fm attributesOfFileSystemForPath:aVolume error:&fsError];
                 
+                if (fsDictionary != nil){
+                    double freeSpace   = [[fsDictionary objectForKey:@"NSFileSystemFreeSize"] doubleValue]/1E9;
+                    double totalSpace  = [[fsDictionary objectForKey:@"NSFileSystemSize"] doubleValue]/1E9;
+                    double percentUsed   = 100*(totalSpace-freeSpace)/totalSpace;
+                    if([aVolume rangeOfString:@"Volumes"].location !=NSNotFound){
+                        aVolume = [aVolume substringFromIndex:9];
+                    }
+                    NSDictionary* dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.02f%% Full",percentUsed] forKey:aVolume];
+                    [diskStats addObject:dict];
+                 }
+            }
+            if([diskStats count]>0) [machineInfo setObject:diskStats forKey:@"diskInfo"];
+
             [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
 		}
-		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:5];	
+		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
 	}
 }
 
