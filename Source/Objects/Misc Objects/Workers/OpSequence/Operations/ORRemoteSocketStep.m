@@ -53,6 +53,8 @@
     va_end(args);
     step.commands           = anArgumentsArray;
     step.cmdIndexToExecute  = anIndex;
+
+    [anArgumentsArray release];
     
 	return step;
 }

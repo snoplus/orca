@@ -419,6 +419,7 @@
         [cemConstraintButton setImage:nil];
         [cemConstraintButton setEnabled:NO];
     }
+    [lockImage release];
 }
 - (void)addDisableSymbol:(NSImage*)lockImage
 {

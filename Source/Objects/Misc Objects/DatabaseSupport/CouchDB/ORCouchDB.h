@@ -185,7 +185,6 @@
 {
 @private
     NSMutableData* _inputBuffer;
-    NSURLConnection* _connection;
     int _status;
     BOOL _waitingForResponse;
     id listeningMode;
