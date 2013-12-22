@@ -217,12 +217,45 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     NSString* fullLocalPath = [localPath stringByExpandingTildeInPath];
     NSStringEncoding* en=nil;
     NSString* contents = [NSString stringWithContentsOfFile:fullLocalPath usedEncoding:en error:nil];
-    //NSArray* lines = [contents componentsSeparatedByString:@"\n"];
-    //for(id aLine in lines){
-    //    aLine = [aLine removeExtraSpaces];
-   // }
-    //[self setResultString: [lines componentsJoinedByString:@"\n"]];
     [self setResultString: contents];
+
+    NSMutableDictionary* resultDict = [NSMutableDictionary dictionary];
+    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
+    int lineNumber = 0;
+    for(id aLine in lines){
+        lineNumber++;
+        if(lineNumber == 2) continue;
+        if(lineNumber == 3) continue;
+        if([aLine rangeOfString:@"Usage"].location      != NSNotFound) continue;
+        if([aLine rangeOfString:@"Filesystem"].location != NSNotFound) continue;
+        if([aLine rangeOfString:@""].location           != NSNotFound) continue;
+        aLine = [aLine removeExtraSpaces];
+        if([aLine length]==0)continue;
+
+        if(lineNumber ==1){
+            //must be the time
+            [resultDict setObject:aLine forKey:@"Time"];
+        }
+        else if(lineNumber == [lines count]-1){
+            NSArray* parts = [aLine componentsSeparatedByString:@" "];
+            if([parts count] == 6){
+                [resultDict setObject:[parts objectAtIndex:0] forKey:@"Filesystem"];
+                [resultDict setObject:[parts objectAtIndex:1] forKey:@"Size"];
+                [resultDict setObject:[parts objectAtIndex:2] forKey:@"Used"];
+                [resultDict setObject:[parts objectAtIndex:3] forKey:@"Avail"];
+                [resultDict setObject:[parts objectAtIndex:4] forKey:@"Used"];
+                [resultDict setObject:[parts objectAtIndex:5] forKey:@"Mounted Point"];
+            }
+        }
+        else {
+            NSArray* parts = [aLine componentsSeparatedByString:@":"];
+            if([parts count] == 2){
+                [resultDict setObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
+            }
+         }
+    }
+    NSLog(@"Debugging Info:\n");
+    NSLog(@"%@\n",resultDict);
 }
 
 
