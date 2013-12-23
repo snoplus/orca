@@ -226,6 +226,8 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     NSString* contents = [NSString stringWithContentsOfFile:fullLocalPath usedEncoding:en error:nil];
     
     if([contents length]==0){
+        [resultDict release];
+        resultDict = nil;
         if(!noConnectionAlarm){
             NSString* alarmName = [NSString stringWithFormat:@"No RAID%ld Status Data",[self uniqueIdNumber]];
             noConnectionAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
@@ -241,6 +243,7 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     }
     
     if(!resultDict) resultDict = [[NSMutableDictionary dictionary]retain];
+
     NSArray* lines = [contents componentsSeparatedByString:@"\n"];
     int lineNumber = 0;
     for(id aLine in lines){
