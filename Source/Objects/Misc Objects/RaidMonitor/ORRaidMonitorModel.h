@@ -19,18 +19,23 @@
 #pragma mark ***Imported Files
 
 #import "OrcaObject.h"
+@class ORAlarm;
 
 @interface ORRaidMonitorModel : OrcaObject
 {
   @private
     NSOperationQueue*	fileQueue;
-    NSString* userName;
-    NSString* password;
-    NSString* ipAddress;
-    NSString* remotePath;
-    NSString* localPath;
-    NSMutableString* allOutput;
-    NSString* resultString;
+    NSString*           userName;
+    NSString*           password;
+    NSString*           ipAddress;
+    NSString*           remotePath;
+    NSString*           localPath;
+    NSMutableString*    allOutput;
+    NSMutableDictionary* resultDict;
+    BOOL                running;
+    NSDate*             nextTime;
+	ORAlarm*            noConnectionAlarm;
+	ORAlarm*            diskFullAlarm;
 }
 
 #pragma mark ***Initialization
@@ -38,8 +43,7 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
-- (NSString*)   resultString;
-- (void)        setResultString:(NSString*)aResultString;
+- (NSDictionary*)   resultDictionary;
 - (NSString*)   localPath;
 - (void)        setLocalPath:(NSString*)aLocalPath;
 - (NSString*)   remotePath;
@@ -60,7 +64,7 @@
 - (void) fileGetterIsDone;
 @end
 
-extern NSString* ORRaidMonitorModelResultStringChanged;
+extern NSString* ORRaidMonitorModelResultDictionaryChanged;
 extern NSString* ORRaidMonitorModelLocalPathChanged;
 extern NSString* ORRaidMonitorModelRemotePathChanged;
 extern NSString* ORRaidMonitorIpAddressChanged;

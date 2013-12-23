@@ -20,13 +20,17 @@
 #import "ORRaidMonitorModel.h"
 #import "ORFileGetterOp.h"
 
-NSString* ORRaidMonitorModelResultStringChanged = @"ORRaidMonitorModelResultStringChanged";
+NSString* ORRaidMonitorModelResultDictionaryChanged = @"ORRaidMonitorModelResultDictionaryChanged";
 NSString* ORRaidMonitorModelLocalPathChanged    = @"ORRaidMonitorModelLocalPathChanged";
 NSString* ORRaidMonitorModelRemotePathChanged   = @"ORRaidMonitorModelRemotePathChanged";
 NSString* ORRaidMonitorIpAddressChanged         = @"ORRaidMonitorIpAddressChanged";
 NSString* ORRaidMonitorPasswordChanged          = @"ORRaidMonitorPasswordChanged";
 NSString* ORRaidMonitorUserNameChanged          = @"ORRaidMonitorUserNameChanged";
 NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
+
+@interface ORRaidMonitorModel (private)
+- (void) postCouchDBRecord;
+@end
 
 @implementation ORRaidMonitorModel
 
@@ -39,7 +43,7 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 
 - (void) dealloc 
 {
-    [resultString release];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:self name:nil object:nil];
     [localPath release];
@@ -50,6 +54,9 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [fileQueue cancelAllOperations];
     [fileQueue release];
     [allOutput release];
+    [resultDict release];
+	[noConnectionAlarm release];
+	[diskFullAlarm release];
     [super dealloc];
 }
 
@@ -64,19 +71,9 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 }
 
 #pragma mark ***Accessors
-
-- (NSString*) resultString
+- (NSDictionary*) resultDictionary
 {
-    if(!resultString)return @"";
-    else return resultString;
-}
-
-- (void) setResultString:(NSString*)aResultString
-{
-    [resultString autorelease];
-    resultString = [aResultString copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRaidMonitorModelResultStringChanged object:self];
+    return resultDict;
 }
 
 - (NSString*) localPath
@@ -170,7 +167,9 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [self setIpAddress: [decoder decodeObjectForKey:@"ipAddress"]];
     [self setPassword:  [decoder decodeObjectForKey:@"password"]];
     [self setUserName:  [decoder decodeObjectForKey:@"userName"]];
-    [[self undoManager] enableUndoRegistration];    
+    [[self undoManager] enableUndoRegistration];
+    
+    [self performSelector:@selector(getStatus) withObject:nil afterDelay:20];
 
     return self;
 }
@@ -188,6 +187,8 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 
 -(void) getStatus
 {
+    if(running)return;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     if(!fileQueue){
         fileQueue = [[NSOperationQueue alloc] init];
         [fileQueue setMaxConcurrentOperationCount:1];
@@ -201,6 +202,7 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [mover setParams:remotePath localPath:localPath ipAddress:ipAddress userName:userName passWord:password];
 
     [fileQueue addOperation:mover];
+    [self performSelector:@selector(getStatus) withObject:nil afterDelay:60*60];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
@@ -208,18 +210,37 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 {
     if (object == fileQueue && [keyPath isEqual:@"operations"]) {
         if([fileQueue operationCount]==0){
+            running = NO;
         }
-//        [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileQueueRunningChangedNotification object: self];
+        else {
+            running = YES;
+        }
     }
 }
+
 - (void) fileGetterIsDone
 {
+    
     NSString* fullLocalPath = [localPath stringByExpandingTildeInPath];
     NSStringEncoding* en=nil;
     NSString* contents = [NSString stringWithContentsOfFile:fullLocalPath usedEncoding:en error:nil];
-    [self setResultString: contents];
-
-    NSMutableDictionary* resultDict = [NSMutableDictionary dictionary];
+    
+    if([contents length]==0){
+        if(!noConnectionAlarm){
+            NSString* alarmName = [NSString stringWithFormat:@"No RAID%ld Status Data",[self uniqueIdNumber]];
+            noConnectionAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+            [noConnectionAlarm setSticky:YES];
+            [noConnectionAlarm setHelpString:@"Could not retrieve status from RAID drive."];
+            [noConnectionAlarm postAlarm];
+        }
+    }
+    else {
+        [noConnectionAlarm clearAlarm];
+        [noConnectionAlarm release];
+        noConnectionAlarm = nil;
+    }
+    
+    if(!resultDict) resultDict = [[NSMutableDictionary dictionary]retain];
     NSArray* lines = [contents componentsSeparatedByString:@"\n"];
     int lineNumber = 0;
     for(id aLine in lines){
@@ -243,19 +264,50 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
                 [resultDict setObject:[parts objectAtIndex:1] forKey:@"Size"];
                 [resultDict setObject:[parts objectAtIndex:2] forKey:@"Used"];
                 [resultDict setObject:[parts objectAtIndex:3] forKey:@"Avail"];
-                [resultDict setObject:[parts objectAtIndex:4] forKey:@"Used"];
-                [resultDict setObject:[parts objectAtIndex:5] forKey:@"Mounted Point"];
+                [resultDict setObject:[parts objectAtIndex:4] forKey:@"Used%"];
+                [resultDict setObject:[parts objectAtIndex:5] forKey:@"Mount Point"];
             }
         }
         else {
             NSArray* parts = [aLine componentsSeparatedByString:@":"];
             if([parts count] == 2){
-                [resultDict setObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
+                [resultDict setObject:[parts objectAtIndex:1] forKey:[[parts objectAtIndex:0] trimSpacesFromEnds]];
             }
-         }
+        }
     }
-    NSLog(@"Debugging Info:\n");
-    NSLog(@"%@\n",resultDict);
+    
+    if([[resultDict objectForKey:@"Used%"]floatValue]>=90){
+        if(!diskFullAlarm){
+            NSString* alarmName = [NSString stringWithFormat:@"RAID%ld > 90%% Used",[self uniqueIdNumber]];
+            diskFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+            [diskFullAlarm setSticky:YES];
+            [diskFullAlarm setHelpString:@"Clear space from the RAID drive."];
+            [diskFullAlarm postAlarm];
+        }
+    }
+    else {
+        [diskFullAlarm clearAlarm];
+        [diskFullAlarm release];
+        diskFullAlarm = nil;
+    }
+    
+    [self postCouchDBRecord];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRaidMonitorModelResultDictionaryChanged object:self];
+}
+@end
+
+@implementation ORRaidMonitorModel (private)
+- (void) postCouchDBRecord
+{
+    NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:resultDict];
+    if([[values allKeys] count]>0){
+        [values setObject:@"YES" forKey:@"valid"];
+        [values setObject:[NSNumber numberWithInt:60*60] forKey:@"pollTime"];
+    }
+    else [values setObject:@"NO" forKey:@"valid"];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
 

@@ -22,12 +22,26 @@
 @interface ORRaidMonitorController : OrcaObjectController {
 @private
 	IBOutlet NSTextField*       userNameField;
-	IBOutlet NSTextField*       resultStringField;
 	IBOutlet NSTextField*       localPathField;
 	IBOutlet NSTextField*       remotePathField;
 	IBOutlet NSTextField*       ipAddressField;
 	IBOutlet NSSecureTextField* passwordField;
     IBOutlet NSButton*          lockButton;
+    
+    IBOutlet NSTextField*       timeCheckedField;
+    IBOutlet NSTextField*       availableField;
+    IBOutlet NSTextField*       sizeField;
+    IBOutlet NSTextField*       usedPercentField;
+    IBOutlet NSTextField*       usedField;
+    
+    IBOutlet NSTextField*       devicesField;
+    IBOutlet NSTextField*       numFailedField;
+    IBOutlet NSTextField*       numCriticalField;
+
+    IBOutlet NSTextField*       virtualDrivesField;
+    IBOutlet NSTextField*       numOfflineField;
+    IBOutlet NSTextField*       numDegradedField;
+
 
 }
 
@@ -36,7 +50,8 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) resultStringChanged:(NSNotification*)aNote;
+- (void) fillIn:(NSTextField*)aField with:(NSString*)aString;
+- (void) resultDictionaryChanged:(NSNotification*)aNote;
 - (void) localPathChanged:(NSNotification*)aNote;
 - (void) remotePathChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
@@ -53,4 +68,6 @@
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 
+#pragma mark •••Helpers
+- (void) fillIn:(NSTextField*)aField with:(NSString*)aString;
 @end

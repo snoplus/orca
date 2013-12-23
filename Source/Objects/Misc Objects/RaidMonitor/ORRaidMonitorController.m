@@ -29,6 +29,12 @@
     return self;
 }
 
+- (void) setModel:(id)aModel
+{
+    [super setModel:aModel];
+    [[self window] setTitle: [NSString stringWithFormat:@"RAID %lu",[model uniqueIdNumber]]];
+}
+
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
@@ -66,8 +72,8 @@
 						object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(resultStringChanged:)
-                         name : ORRaidMonitorModelResultStringChanged
+                     selector : @selector(resultDictionaryChanged:)
+                         name : ORRaidMonitorModelResultDictionaryChanged
 						object: model];
 
 }
@@ -81,16 +87,33 @@
     [self lockChanged:nil];
 	[self remotePathChanged:nil];
 	[self localPathChanged:nil];
-	[self resultStringChanged:nil];
+	[self resultDictionaryChanged:nil];
 }
 
 #pragma mark •••Interface Management
-
-- (void) resultStringChanged:(NSNotification*)aNote
+- (void) resultDictionaryChanged:(NSNotification*)aNote
 {
-	[resultStringField setStringValue: [model resultString]];
+    [self fillIn:timeCheckedField   with:@"Time"];
+    [self fillIn:availableField     with:@"Avail"];
+    [self fillIn:sizeField          with:@"Size"];
+    [self fillIn:usedPercentField   with:@"Used%"];
+    [self fillIn:usedField          with:@"Used"];
+    [self fillIn:devicesField       with:@"Disks"];
+    [self fillIn:numFailedField     with:@"Failed Disks"];
+    [self fillIn:numCriticalField   with:@"Critical Disks"];
+    [self fillIn:virtualDrivesField with:@"Virtual Drives"];
+    [self fillIn:numOfflineField    with:@"Offline"];
+    [self fillIn:numDegradedField   with:@"Degraded"];
 }
 
+- (void) fillIn:(NSTextField*)aField with:(NSString*)aString
+{
+    NSDictionary* resultDict = [model resultDictionary];
+    NSString* s = [resultDict objectForKey:aString];
+    if([s length]==0)s = @"?";
+    [aField setStringValue: s];
+    
+}
 - (void) localPathChanged:(NSNotification*)aNote
 {
 	[localPathField setStringValue: [model localPath]];
