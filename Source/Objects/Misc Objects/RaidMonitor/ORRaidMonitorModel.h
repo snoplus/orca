@@ -37,6 +37,7 @@
 	ORAlarm*            noConnectionAlarm;
 	ORAlarm*            diskFullAlarm;
 	ORAlarm*            scriptNotRunningAlarm;
+	ORAlarm*            badDiskAlarm;
     NSDateFormatter*    dateFormatter;
     NSDateFormatter*    dateConvertFormatter;
 }

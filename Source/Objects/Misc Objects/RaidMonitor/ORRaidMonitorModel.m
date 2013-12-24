@@ -59,6 +59,7 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 	[diskFullAlarm release];
     [scriptNotRunningAlarm release];
     [dateFormatter release];
+    [badDiskAlarm release];
     [dateConvertFormatter release];
     [super dealloc];
 }
@@ -272,28 +273,24 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         if(lineNumber ==1){
             //must be the time line
             //first get the time last stored so we know if we are over due or not
-            NSString* timeString = [resultDict objectForKey:@"scriptRan"];
-            if(timeString){
-                NSDate* scriptLastRan = [dateFormatter dateFromString:timeString];
-                NSTimeInterval dt = -[scriptLastRan timeIntervalSinceNow];
-                if(fabs(dt)>60*60){
-                    if(!scriptNotRunningAlarm){
-                        NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Status Script NOT Running",[self uniqueIdNumber]];
-                        scriptNotRunningAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
-                        [scriptNotRunningAlarm setSticky:YES];
-                        [scriptNotRunningAlarm setHelpString:@"Check the status script on the RAID system. It has not reported status more than an hour."];
-                        [scriptNotRunningAlarm postAlarm];
-                    }
-                    else {
-                        [scriptNotRunningAlarm clearAlarm];
-                        [scriptNotRunningAlarm release];
-                        scriptNotRunningAlarm = nil;
-                    }
-                }
-            }
             NSDate* scriptLastRan = [dateConvertFormatter dateFromString:aLine];
             [resultDict setObject:[dateFormatter stringFromDate:scriptLastRan] forKey:@"scriptRan"];
-            
+
+            NSTimeInterval dt = -[scriptLastRan timeIntervalSinceNow];
+            if(fabs(dt)>60*60){
+                if(!scriptNotRunningAlarm){
+                    NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Status Script NOT Running",[self uniqueIdNumber]];
+                    scriptNotRunningAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+                    [scriptNotRunningAlarm setSticky:YES];
+                    [scriptNotRunningAlarm setHelpString:@"Check the status script on the RAID system. It has not reported status more than an hour."];
+                    [scriptNotRunningAlarm postAlarm];
+                }
+                else {
+                    [scriptNotRunningAlarm clearAlarm];
+                    [scriptNotRunningAlarm release];
+                    scriptNotRunningAlarm = nil;
+                }
+            }
         }
         else if(lineNumber == [lines count]-1){
             NSArray* parts = [aLine componentsSeparatedByString:@" "];
@@ -327,6 +324,23 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         [diskFullAlarm clearAlarm];
         [diskFullAlarm release];
         diskFullAlarm = nil;
+    }
+    int criticalCount = [[resultDict objectForKey:@"Critical Disks"]intValue];
+    int failedCount   = [[resultDict objectForKey:@"Failed Disks"]intValue];
+
+    if( (criticalCount>1) || (failedCount>1)){
+        if(!badDiskAlarm){
+            NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Disk Problems",[self uniqueIdNumber]];
+            badDiskAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+            [badDiskAlarm setSticky:YES];
+            [badDiskAlarm setHelpString:@"The RAID system has one or more Critical or Failed drives. Replace them with a spare."];
+            [badDiskAlarm postAlarm];
+        }
+    }
+    else {
+        [badDiskAlarm clearAlarm];
+        [badDiskAlarm release];
+        badDiskAlarm = nil;
     }
 
     
