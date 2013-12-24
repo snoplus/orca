@@ -93,7 +93,8 @@
 #pragma mark •••Interface Management
 - (void) resultDictionaryChanged:(NSNotification*)aNote
 {
-    [self fillIn:timeCheckedField   with:@"Time"];
+    [self fillIn:lastCheckedField   with:@"lastChecked"];
+    [self fillIn:scriptRanField     with:@"scriptRan"];
     [self fillIn:availableField     with:@"Avail"];
     [self fillIn:sizeField          with:@"Size"];
     [self fillIn:usedPercentField   with:@"Used%"];

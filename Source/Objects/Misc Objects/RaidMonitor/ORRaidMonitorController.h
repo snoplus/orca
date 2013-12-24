@@ -22,13 +22,14 @@
 @interface ORRaidMonitorController : OrcaObjectController {
 @private
 	IBOutlet NSTextField*       userNameField;
+	IBOutlet NSTextField*       scriptRanField;
+	IBOutlet NSTextField*       lastCheckedField;
 	IBOutlet NSTextField*       localPathField;
 	IBOutlet NSTextField*       remotePathField;
 	IBOutlet NSTextField*       ipAddressField;
 	IBOutlet NSSecureTextField* passwordField;
     IBOutlet NSButton*          lockButton;
     
-    IBOutlet NSTextField*       timeCheckedField;
     IBOutlet NSTextField*       availableField;
     IBOutlet NSTextField*       sizeField;
     IBOutlet NSTextField*       usedPercentField;

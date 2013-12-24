@@ -57,6 +57,9 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [resultDict release];
 	[noConnectionAlarm release];
 	[diskFullAlarm release];
+    [scriptNotRunningAlarm release];
+    [dateFormatter release];
+    [dateConvertFormatter release];
     [super dealloc];
 }
 
@@ -71,6 +74,7 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 }
 
 #pragma mark ***Accessors
+
 - (NSDictionary*) resultDictionary
 {
     return resultDict;
@@ -242,6 +246,15 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         noConnectionAlarm = nil;
     }
     
+    if(!dateFormatter){
+        dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+    }
+    if(!dateConvertFormatter){
+        dateConvertFormatter = [[NSDateFormatter alloc] init];
+        dateConvertFormatter.dateFormat = @"eee MM dd HH:mm:ss zzz yyyy";
+    }
+
     if(!resultDict) resultDict = [[NSMutableDictionary dictionary]retain];
 
     NSArray* lines = [contents componentsSeparatedByString:@"\n"];
@@ -257,8 +270,30 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         if([aLine length]==0)continue;
 
         if(lineNumber ==1){
-            //must be the time
-            [resultDict setObject:aLine forKey:@"Time"];
+            //must be the time line
+            //first get the time last stored so we know if we are over due or not
+            NSString* timeString = [resultDict objectForKey:@"scriptRan"];
+            if(timeString){
+                NSDate* scriptLastRan = [dateFormatter dateFromString:timeString];
+                NSTimeInterval dt = -[scriptLastRan timeIntervalSinceNow];
+                if(fabs(dt)>60*60){
+                    if(!scriptNotRunningAlarm){
+                        NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Status Script NOT Running",[self uniqueIdNumber]];
+                        scriptNotRunningAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+                        [scriptNotRunningAlarm setSticky:YES];
+                        [scriptNotRunningAlarm setHelpString:@"Check the status script on the RAID system. It has not reported status more than an hour."];
+                        [scriptNotRunningAlarm postAlarm];
+                    }
+                    else {
+                        [scriptNotRunningAlarm clearAlarm];
+                        [scriptNotRunningAlarm release];
+                        scriptNotRunningAlarm = nil;
+                    }
+                }
+            }
+            NSDate* scriptLastRan = [dateConvertFormatter dateFromString:aLine];
+            [resultDict setObject:[dateFormatter stringFromDate:scriptLastRan] forKey:@"scriptRan"];
+            
         }
         else if(lineNumber == [lines count]-1){
             NSArray* parts = [aLine componentsSeparatedByString:@" "];
@@ -293,11 +328,15 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         [diskFullAlarm release];
         diskFullAlarm = nil;
     }
+
+    
+    [resultDict setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"lastChecked"];
     
     [self postCouchDBRecord];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRaidMonitorModelResultDictionaryChanged object:self];
 }
+
 @end
 
 @implementation ORRaidMonitorModel (private)

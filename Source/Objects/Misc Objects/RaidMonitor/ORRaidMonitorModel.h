@@ -36,6 +36,9 @@
     NSDate*             nextTime;
 	ORAlarm*            noConnectionAlarm;
 	ORAlarm*            diskFullAlarm;
+	ORAlarm*            scriptNotRunningAlarm;
+    NSDateFormatter*    dateFormatter;
+    NSDateFormatter*    dateConvertFormatter;
 }
 
 #pragma mark ***Initialization
