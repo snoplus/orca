@@ -1289,6 +1289,13 @@
 		844BF9E90B1E2FC20047C9BF /* smalldottopmask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844BF9E60B1E2FC20047C9BF /* smalldottopmask.tif */; };
 		844BF9EA0B1E2FC20047C9BF /* smalldotcolormask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844BF9E70B1E2FC20047C9BF /* smalldotcolormask.tif */; };
 		844BF9EB0B1E2FC20047C9BF /* smalldotshadow.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844BF9E80B1E2FC20047C9BF /* smalldotshadow.tif */; };
+		844CBDCB1866010F0012AA3B /* ORRaidMonitorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844CBDC41866010F0012AA3B /* ORRaidMonitorModel.h */; };
+		844CBDCC1866010F0012AA3B /* ORRaidMonitorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 844CBDC51866010F0012AA3B /* ORRaidMonitorModel.m */; };
+		844CBDCD1866010F0012AA3B /* ORRaidMonitorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844CBDC61866010F0012AA3B /* ORRaidMonitorController.h */; };
+		844CBDCE1866010F0012AA3B /* ORRaidMonitorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844CBDC71866010F0012AA3B /* ORRaidMonitorController.m */; };
+		844CBDCF1866010F0012AA3B /* RaidMonitor.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844CBDC81866010F0012AA3B /* RaidMonitor.gif */; };
+		844CBDD01866010F0012AA3B /* RaidMonitor.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844CBDC91866010F0012AA3B /* RaidMonitor.nib */; };
+		844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */ = {isa = PBXBuildFile; fileRef = 844CBDCA1866010F0012AA3B /* scpExpectGetScript */; };
 		844D8CC80A069CA200E83C57 /* MCarrier.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84749D1207D6526F001553EC /* MCarrier.gif */; };
 		844D93020A0A79AA00E83C57 /* ORPulser33220Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 844D92FA0A0A79AA00E83C57 /* ORPulser33220Model.h */; };
 		844D93030A0A79AA00E83C57 /* ORPulser33220Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 844D92FB0A0A79AA00E83C57 /* ORPulser33220Model.m */; };
@@ -2740,6 +2747,8 @@
 		84DF4CA1162F1B2100261144 /* ORArduinoUNOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4C9B162F1B2100261144 /* ORArduinoUNOController.m */; };
 		84DF4CA2162F1B2100261144 /* ORArduinoUNOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DF4C9C162F1B2100261144 /* ORArduinoUNOModel.h */; };
 		84DF4CA3162F1B2100261144 /* ORArduinoUNOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DF4C9D162F1B2100261144 /* ORArduinoUNOModel.m */; };
+		84E00577186637F9002E38F7 /* ORFileGetterOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E00575186637F9002E38F7 /* ORFileGetterOp.h */; };
+		84E00578186637F9002E38F7 /* ORFileGetterOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E00576186637F9002E38F7 /* ORFileGetterOp.m */; };
 		84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C493B204059AEA005F64B1 /* ORTek754DModel.m */; };
 		84E099620CC934CC00EFBC8F /* play.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099600CC934CB00EFBC8F /* play.tiff */; };
 		84E099630CC934CC00EFBC8F /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099610CC934CB00EFBC8F /* stop.tiff */; };
@@ -4373,6 +4382,13 @@
 		844BF9E60B1E2FC20047C9BF /* smalldottopmask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = smalldottopmask.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/smalldottopmask.tif"; sourceTree = SOURCE_ROOT; };
 		844BF9E70B1E2FC20047C9BF /* smalldotcolormask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = smalldotcolormask.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/smalldotcolormask.tif"; sourceTree = SOURCE_ROOT; };
 		844BF9E80B1E2FC20047C9BF /* smalldotshadow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = smalldotshadow.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/smalldotshadow.tif"; sourceTree = SOURCE_ROOT; };
+		844CBDC41866010F0012AA3B /* ORRaidMonitorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRaidMonitorModel.h; sourceTree = "<group>"; };
+		844CBDC51866010F0012AA3B /* ORRaidMonitorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRaidMonitorModel.m; sourceTree = "<group>"; };
+		844CBDC61866010F0012AA3B /* ORRaidMonitorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRaidMonitorController.h; sourceTree = "<group>"; };
+		844CBDC71866010F0012AA3B /* ORRaidMonitorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRaidMonitorController.m; sourceTree = "<group>"; };
+		844CBDC81866010F0012AA3B /* RaidMonitor.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RaidMonitor.gif; sourceTree = "<group>"; };
+		844CBDC91866010F0012AA3B /* RaidMonitor.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = RaidMonitor.nib; sourceTree = "<group>"; };
+		844CBDCA1866010F0012AA3B /* scpExpectGetScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = scpExpectGetScript; sourceTree = "<group>"; };
 		844D2B100455BFD7005F64B1 /* ORGenericData.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORGenericData.h; sourceTree = "<group>"; };
 		844D2B110455BFD7005F64B1 /* ORGenericData.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORGenericData.m; sourceTree = "<group>"; };
 		844D92FA0A0A79AA00E83C57 /* ORPulser33220Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulser33220Model.h; sourceTree = "<group>"; };
@@ -5951,6 +5967,8 @@
 		84DF4C9D162F1B2100261144 /* ORArduinoUNOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORArduinoUNOModel.m; sourceTree = "<group>"; };
 		84DF917204D6D53C005F64B1 /* ORFileMover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileMover.h; sourceTree = "<group>"; };
 		84DF917304D6D53C005F64B1 /* ORFileMover.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileMover.m; sourceTree = "<group>"; };
+		84E00575186637F9002E38F7 /* ORFileGetterOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileGetterOp.h; sourceTree = "<group>"; };
+		84E00576186637F9002E38F7 /* ORFileGetterOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileGetterOp.m; sourceTree = "<group>"; };
 		84E099600CC934CB00EFBC8F /* play.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = play.tiff; path = Source/Objects/Control/RunControl/play.tiff; sourceTree = SOURCE_ROOT; };
 		84E099610CC934CB00EFBC8F /* stop.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = stop.tiff; path = Source/Objects/Control/RunControl/stop.tiff; sourceTree = SOURCE_ROOT; };
 		84E09A200CCD1AA400EFBC8F /* dec.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dec.tif; path = Source/Objects/OrcaObject/dec.tif; sourceTree = SOURCE_ROOT; };
@@ -7928,6 +7946,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				844CBDC31866010F0012AA3B /* RaidMonitor */,
 				B3808A931700F85C0019C27D /* CouchDBListener */,
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
@@ -8701,6 +8720,22 @@
 			name = CV1724;
 			path = Source/Objects/Hardware/Vme/CAEN/CV1724;
 			sourceTree = SOURCE_ROOT;
+		};
+		844CBDC31866010F0012AA3B /* RaidMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				844CBDC41866010F0012AA3B /* ORRaidMonitorModel.h */,
+				844CBDC51866010F0012AA3B /* ORRaidMonitorModel.m */,
+				844CBDC61866010F0012AA3B /* ORRaidMonitorController.h */,
+				844CBDC71866010F0012AA3B /* ORRaidMonitorController.m */,
+				84E00575186637F9002E38F7 /* ORFileGetterOp.h */,
+				84E00576186637F9002E38F7 /* ORFileGetterOp.m */,
+				844CBDC81866010F0012AA3B /* RaidMonitor.gif */,
+				844CBDC91866010F0012AA3B /* RaidMonitor.nib */,
+				844CBDCA1866010F0012AA3B /* scpExpectGetScript */,
+			);
+			path = RaidMonitor;
+			sourceTree = "<group>";
 		};
 		844D2B0E0455BFD7005F64B1 /* Generic */ = {
 			isa = PBXGroup;
@@ -14571,6 +14606,9 @@
 				8497E614180C640D00CE974A /* ORV2718Model.h in Headers */,
 				2D7731A5181188F400070A4A /* ORLanNetio230Controller.h in Headers */,
 				2D7731A7181188F400070A4A /* ORLanNetio230Model.h in Headers */,
+				844CBDCB1866010F0012AA3B /* ORRaidMonitorModel.h in Headers */,
+				844CBDCD1866010F0012AA3B /* ORRaidMonitorController.h in Headers */,
+				84E00577186637F9002E38F7 /* ORFileGetterOp.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15495,6 +15533,9 @@
 				2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */,
 				2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */,
 				43A8F955184F69320064BB5A /* OpSequence.xib in Resources */,
+				844CBDCF1866010F0012AA3B /* RaidMonitor.gif in Resources */,
+				844CBDD01866010F0012AA3B /* RaidMonitor.nib in Resources */,
+				844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16537,6 +16578,9 @@
 				8497E615180C640D00CE974A /* ORV2718Model.m in Sources */,
 				2D7731A6181188F400070A4A /* ORLanNetio230Controller.m in Sources */,
 				2D7731A8181188F400070A4A /* ORLanNetio230Model.m in Sources */,
+				844CBDCC1866010F0012AA3B /* ORRaidMonitorModel.m in Sources */,
+				844CBDCE1866010F0012AA3B /* ORRaidMonitorController.m in Sources */,
+				84E00578186637F9002E38F7 /* ORFileGetterOp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
