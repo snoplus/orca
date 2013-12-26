@@ -327,13 +327,14 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     }
     int criticalCount = [[resultDict objectForKey:@"Critical Disks"]intValue];
     int failedCount   = [[resultDict objectForKey:@"Failed Disks"]intValue];
+    int degradedCount = [[resultDict objectForKey:@"Degraded"]intValue];
 
-    if( (criticalCount>1) || (failedCount>1)){
+    if( (criticalCount>1) || (failedCount>1) || (degradedCount>1)){
         if(!badDiskAlarm){
             NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Disk Problems",[self uniqueIdNumber]];
             badDiskAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
             [badDiskAlarm setSticky:YES];
-            [badDiskAlarm setHelpString:@"The RAID system has one or more Critical or Failed drives. Replace them with a spare."];
+            [badDiskAlarm setHelpString:@"The RAID system has one or more degraded, critical, or failed drives. Replace them with a spare."];
             [badDiskAlarm postAlarm];
         }
     }
