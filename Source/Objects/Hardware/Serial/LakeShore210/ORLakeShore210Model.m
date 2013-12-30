@@ -54,7 +54,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
     int i;
 	for(i=0;i<8;i++){
 		lowLimit[i]  = 0; 
-		highLimit[i] = 300.0; 
+		highLimit[i] = 400.0;
 		lowAlarm[i]  = 0; 
 		highAlarm[i] = 300.0; 
 	}	return self;
