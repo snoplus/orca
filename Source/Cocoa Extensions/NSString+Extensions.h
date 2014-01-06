@@ -32,7 +32,8 @@ typedef enum {
 @interface NSString (OR_NSStringWithExtensions)
 - (NSString*) trimSpacesFromEnds;
 - (NSString*) removeExtraSpaces;
-- (NSString*) removeNLandCRs; 
+-(NSString*) removeSpaces;
+- (NSString*) removeNLandCRs;
 - (NSArray*)  getValuesSeparatedByString:(NSString*)aDelimiter;
 - (NSArray *) tokensSeparatedByCharactersFromSet:(NSCharacterSet *)set;
 - (NSArray *)lines;
@@ -53,6 +54,17 @@ typedef enum {
 - (unsigned long) unsignedLongValue;
 
 + (NSString*) stringWithUSBDesc:(char*)aDesc;
+@end
+
+@interface NSString (HTML_Extensions)
+
++ (NSMutableArray *) extractArrayFromString:(NSString *)string
+                                   startTag:(NSString *)startTag
+                                     endTag:(NSString *)endTag;
+
++ (NSString*)scanString:(NSString *)string
+               startTag:(NSString *)startTag
+                 endTag:(NSString *)endTag;
 @end
 
 @interface NSMutableString (NSStringWithExtensions)

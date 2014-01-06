@@ -36,6 +36,13 @@
     return [[result copy] autorelease];
 }
 
+-(NSString*) removeSpaces
+{
+    NSArray* parts = [self tokensSeparatedByCharactersFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString* result = [parts componentsJoinedByString:@""];
+    return [[result copy] autorelease];
+}
+
 - (NSString*) removeNLandCRs
 {
     NSString* result = [[self componentsSeparatedByString:@"\r"]componentsJoinedByString:@" "];
@@ -209,5 +216,66 @@
 {
 	if(!replacement)replacement = @"";
     return [self replaceOccurrencesOfString:target withString:replacement options:NSLiteralSearch range:NSMakeRange(0,[self length])];
+}
+@end
+
+@implementation NSString (HTML_Extensions)
+
++ (NSMutableArray *) extractArrayFromString:(NSString *)string
+                                   startTag:(NSString *)startTag
+                                     endTag:(NSString *)endTag
+{
+    NSMutableArray* allStrings = [NSMutableArray array];
+    NSScanner* scanner = [[NSScanner alloc] initWithString:string];
+    if (string.length >0){
+        while(1){
+            @try {
+                NSString* scanString = nil;
+                
+                [scanner scanUpToString:startTag intoString:nil];
+                scanner.scanLocation += [startTag length];
+                [scanner scanUpToString:endTag intoString:&scanString];
+                if([scanString length]){
+                    //remove the end of the start tag
+                    NSRange r = [scanString rangeOfString:@">"];
+                    NSString* s;
+                    if(r.location != NSNotFound)s = [scanString substringFromIndex:r.location+1];
+                    else s = scanString;
+                    if(s)[allStrings addObject:s];
+                }
+                else break;
+            }
+            @catch(NSException* e){
+                break;
+            }
+        }
+    }
+    
+    return allStrings;
+    
+}
+
++ (NSString*)scanString:(NSString *)string
+               startTag:(NSString *)startTag
+                 endTag:(NSString *)endTag;
+{
+    NSScanner* scanner = [[NSScanner alloc] initWithString:string];
+    NSString* scanString = @"";
+    if (string.length >0){
+        @try {
+            [scanner scanUpToString:startTag intoString:nil];
+            scanner.scanLocation += [startTag length];
+            [scanner scanUpToString:endTag intoString:&scanString];
+            //remove the end of the start tag
+            NSRange r = [scanString rangeOfString:@">"];
+            if(r.location != NSNotFound)scanString = [scanString substringFromIndex:r.location+1];
+            
+        }
+        @catch(NSException* e){
+        }
+    }
+    
+    return scanString;
+    
 }
 @end
