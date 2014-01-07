@@ -50,6 +50,7 @@
     //subelements
 	IBOutlet   NSTextField* ficCardCtrlReg1BlockLenTextField;
 	IBOutlet   NSMatrix*    ficCardCtrlReg1ChanEnableMatrix;
+	IBOutlet   NSSlider*    ficCardCtrlReg2AddrOffsetSlider;
     
     //Trigger Tab
 	IBOutlet   NSTextField* heatChannelsTextField;
@@ -336,6 +337,7 @@
 //FIC subelements
 - (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
+- (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender;
 //FIC buttons
 - (IBAction) sendFICCtrl1RegButtonAction:(id)sender;
 - (IBAction) sendFICCtrl2RegButtonAction:(id)sender;

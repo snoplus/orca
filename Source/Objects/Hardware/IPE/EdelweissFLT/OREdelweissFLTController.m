@@ -1835,6 +1835,14 @@
 }
 
 
+- (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender
+{
+    [self endEditing];
+	//debug     
+    NSLog(@"Called %@::%@ intValue %i  floatValue %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue],[sender floatValue]);//TODO: DEBUG -tb-
+}
+
+
 
 //FIC buttons
 
