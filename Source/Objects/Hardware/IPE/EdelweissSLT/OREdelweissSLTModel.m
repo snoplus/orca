@@ -230,6 +230,7 @@ typedef struct{
     int  hasDataBytes[2];
     int  numfifo[2];
     int  numADCsInDataStream[2];
+    int  udpDataPacketSize[2];
     
     int isSynchronized,wrIndex, rdIndex;
     uint32_t dataPacketCounter;
@@ -407,6 +408,12 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     if(numADCsInDataStream>0) NSLog(@"  numfifo: %i    numADCs In Data Stream: %i \n",numfifo, numADCsInDataStream);
                     dataReplyThreadData->numfifo[*wrIndex]=numfifo;
                     dataReplyThreadData->numADCsInDataStream[*wrIndex]=numADCsInDataStream;
+                    //udpDataPacketSize
+                    uint32_t udpDataPacketSize=crateStatusBlock->spare2 & 0xffff;
+                    NSLog(@"  numfifo: %i    udpDataPacketSize: %i \n",numfifo, udpDataPacketSize);
+                    if(udpDataPacketSize == 0) udpDataPacketSize=1444;
+                    dataReplyThreadData->udpDataPacketSize[*wrIndex]=udpDataPacketSize;
+
                     //    we buffer the whole crate status block ...
                     memcpy(&(dataReplyThreadData->crateStatusBlock[*wrIndex]), crateStatusBlock, sizeof(TypeIpeCrateStatusBlock));
                     //if we are synchronized, "reset" write buffer (reset flags)
@@ -3602,12 +3609,13 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                 
                     //read out data
                     //    reorder UDP packets to build ADC traces according to one channel
-                    const int MaxUDPPacketSizeBytes=1444;
+                    //const int MaxUDPPacketSizeBytes=1444; made variable 2014 -01
+                    int MaxUDPPacketSizeBytes==dataReplyThreadData.udpDataPacketSize[*rdIndex];;
                     int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
 
 
-if(NA==0) NA=6;//TODO: dirty workaround -tb-
+if(NA==0) NA=6;//TODO: dirty workaround, for unused channels -tb-
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-
