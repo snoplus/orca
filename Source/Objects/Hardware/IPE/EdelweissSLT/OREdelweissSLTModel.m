@@ -3611,7 +3611,6 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                     //    reorder UDP packets to build ADC traces according to one channel
                     //const int MaxUDPPacketSizeBytes=1444; made variable 2014 -01
                     int MaxUDPPacketSizeBytes=dataReplyThreadData.udpDataPacketSize[*rdIndex];;
-                    int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
 
 
@@ -3620,6 +3619,7 @@ if(NA==0) NA=6;//TODO: dirty workaround, for unused channels -tb-
                       if(MaxUDPPacketSizeBytes != mupsb) MaxUDPPacketSizeBytes = mupsb;
                       
                       NSLog(@"  --------->  parser correction:  udpDataPacketSize: %i \n", MaxUDPPacketSizeBytes);
+                      int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
 
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-
