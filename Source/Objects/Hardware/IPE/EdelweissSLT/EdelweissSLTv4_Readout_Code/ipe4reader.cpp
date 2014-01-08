@@ -3560,8 +3560,15 @@ void FIFOREADER::scanFIFObuffer(void)
             if(!oldisSynchronized && isSynchronized){
                 numADCsInDataStream = rereadNumADCsInDataStream();
                 printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
-                int numFullSamples = (maxUdpDataPacketSize-4)/numADCsInDataStream;
-                setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream);//this is now <= 1440
+                if(numADCsInDataStream==0){
+                    //FIFO unused, set to default
+                    setUdpDataPacketSize(maxUdpDataPacketSize);//1444
+                    newPacketSize = 
+                }else{
+                    int numFullSamples = udpDataPacketPayloadSize()/numADCsInDataStream;
+                    setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream);//this is now <= 1440
+                }
+                printf("Using UDP Packet size: %i\n",udpDataPacketSize());
             }
             #endif
             
