@@ -3563,7 +3563,6 @@ void FIFOREADER::scanFIFObuffer(void)
                 if(numADCsInDataStream==0){
                     //FIFO unused, set to default
                     setUdpDataPacketSize(maxUdpDataPacketSize);//1444
-                    newPacketSize = 
                 }else{
                     int numFullSamples = udpDataPacketPayloadSize()/numADCsInDataStream;
                     setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream);//this is now <= 1440
