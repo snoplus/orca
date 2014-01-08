@@ -3616,6 +3616,8 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 
 
 if(NA==0) NA=6;//TODO: dirty workaround, for unused channels -tb-
+                      int mupsb = (1440 / (2*NA)) * 2 * NA + 4;
+                      if(MaxUDPPacketSizeBytes != mupsb) MaxUDPPacketSizeBytes = mupsb;
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-

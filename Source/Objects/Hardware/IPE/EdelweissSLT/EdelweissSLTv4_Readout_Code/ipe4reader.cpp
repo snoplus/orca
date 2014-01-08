@@ -3653,7 +3653,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
                 crateStatusBlock.numFIFOnumADCs = ((numfifo & 0xffff)<<16) | (numADCsInDataStream & 0xffff);
-                crateStatusBlock.spare2 = 2;
+                crateStatusBlock.spare2 = 2;// now used to assign the current UDP packet size
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
 
@@ -3672,7 +3672,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 BBStatusPayload.crateIndex = 0xcc;  //TODO: read from crate backplane
                 BBStatusPayload.fltIndex   = 0;
                 BBStatusPayload.fiberIndex = 0;
-                BBStatusPayload.spare = udpDataPacketSize();// now used to assign the current UDP packet size ... was 0x87654321;//32 bit
+                BBStatusPayload.spare = 0x87654321;//32 bit
                 BBStatusPayload.spare_for_alignment = 0x4321;//16 bit
                 
 			    int idx;//index, not ID
