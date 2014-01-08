@@ -3610,7 +3610,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                     //read out data
                     //    reorder UDP packets to build ADC traces according to one channel
                     //const int MaxUDPPacketSizeBytes=1444; made variable 2014 -01
-                    int MaxUDPPacketSizeBytes==dataReplyThreadData.udpDataPacketSize[*rdIndex];;
+                    int MaxUDPPacketSizeBytes=dataReplyThreadData.udpDataPacketSize[*rdIndex];;
                     int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
 
