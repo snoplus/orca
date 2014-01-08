@@ -3564,8 +3564,8 @@ void FIFOREADER::scanFIFObuffer(void)
                     //FIFO unused, set to default
                     setUdpDataPacketSize(maxUdpDataPacketSize);//1444
                 }else{
-                    int numFullSamples = udpDataPacketPayloadSize()/numADCsInDataStream;
-                    setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream);//this is now <= 1440
+                    int numFullSamples = udpDataPacketPayloadSize()/(numADCsInDataStream*2);
+                    setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream *2);//this is now <= 1440
                 }
                 printf("Using UDP Packet size: %i\n",udpDataPacketSize());
             }
