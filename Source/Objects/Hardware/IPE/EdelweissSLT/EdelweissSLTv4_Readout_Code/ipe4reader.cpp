@@ -3567,7 +3567,7 @@ void FIFOREADER::scanFIFObuffer(void)
                     int numFullSamples = (maxUdpDataPacketSize-4)/(numADCsInDataStream*2);
                     setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream *2);//this is now <= 1440 and sets packet size, too
                 }
-                printf("Using UDP Packet size: %i payload size:%i (words:%i\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
+                printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
             }
             #endif
             
