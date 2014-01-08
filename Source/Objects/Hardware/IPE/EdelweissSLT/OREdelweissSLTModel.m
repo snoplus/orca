@@ -3618,6 +3618,9 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 if(NA==0) NA=6;//TODO: dirty workaround, for unused channels -tb-
                       int mupsb = (1440 / (2*NA)) * 2 * NA + 4;
                       if(MaxUDPPacketSizeBytes != mupsb) MaxUDPPacketSizeBytes = mupsb;
+                      
+                      NSLog(@"  --------->  parser correction:  udpDataPacketSize: %i \n", MaxUDPPacketSizeBytes);
+
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-
 //TODO: dirty workaround -tb-
@@ -3629,7 +3632,7 @@ if(NA==0) NA=6;//TODO: dirty workaround, for unused channels -tb-
                     int     i, j, j_swapit, toffset;
                     int64_t K,t;
                     //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
-                    for(i=0; i<720; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;
+                    for(i=0; i<720; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;// I clear the max. possible length (could use (MaxUDPPacketSizeBytes-4)/2)
                     uint16_t *P;
                     uint16_t *data16;
                     int packetCounter=0;
