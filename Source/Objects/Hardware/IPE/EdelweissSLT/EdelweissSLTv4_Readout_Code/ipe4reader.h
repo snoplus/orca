@@ -391,6 +391,7 @@ public:
 	    FIFObuf32counterlast=0;
         synchroWordPosHint=0;
 
+        //maxUdpDataPacketSize = 1444; static const 
         defaultUdpDataPacketSize = 1444;
 	    udpdata16 = (uint16_t *)udpdata;
 	    udpdata32 = (uint32_t *)udpdata;
@@ -613,6 +614,7 @@ public:
 	 --------------------------------------------------------------------*/
 	
 	//global vars for udp packet handling
+    static const int maxUdpDataPacketSize = 1444;//max, packet size (to avoid UDP packed splitting, must be <1480!, 1444 to be on the safe side)
     int defaultUdpDataPacketSize;//packet size (variable, must be <1480!)
 	static const int udpdatalen = 2*1500;//buffer size
 	char udpdata[udpdatalen];
@@ -629,6 +631,7 @@ public:
         defaultUdpDataPacketSize=size;
         if(defaultUdpDataPacketSize %4 != 0) printf("ERROR: setUdpPacketSize: must be multiple of 4!\n");
     }
+    void setUdpDataPacketPayloadSize(int size){ setUdpDataPacketSize(size+4); }
     int udpDataPacketSize(){ return defaultUdpDataPacketSize;}
     int udpDataPacketPayloadSize(){ return defaultUdpDataPacketSize-4;}
     int udpDataPacketPayloadSize32(){ return udpDataPacketPayloadSize()/4;}

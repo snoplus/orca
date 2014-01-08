@@ -3359,7 +3359,7 @@ void FIFOREADER::scanFIFObuffer(void)
 
 
 
-    if( (FIFObuf32avail < 360) ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
+    if( (FIFObuf32avail < udpDataPacketPayloadSize32() /*360*/) ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
     
     //TODO: if globalHeaderWordCounter==0 don't send UDP packets: we are maybe in the middle of FIFO -tb-
 	
@@ -3379,13 +3379,13 @@ void FIFOREADER::scanFIFObuffer(void)
 
     
     //compute packet size (360 uint32's are 1440 bytes)
-    int numWord32=360;
+    int numWord32=udpDataPacketPayloadSize32()/*360*/;
     
     
     
 #if 1
     if(flagToSendDataAndResetBuffer){
-        if(FIFObuf32avail<=360){//we have the last 'maybe not full' UDP packet (before the magic pattern)
+        if(FIFObuf32avail<=udpDataPacketPayloadSize32()/*360*/){//we have the last 'maybe not full' UDP packet (before the magic pattern)
             numWord32=FIFObuf32avail;//in all other cases FIFObuf32avail is >360
             //if(flagToSendDataAndResetBuffer)
             
@@ -3560,6 +3560,8 @@ void FIFOREADER::scanFIFObuffer(void)
             if(!oldisSynchronized && isSynchronized){
                 numADCsInDataStream = rereadNumADCsInDataStream();
                 printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
+                int numFullSamples = (maxUdpDataPacketSize-4)/numADCsInDataStream;
+                setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream);//this is now <= 1440
             }
             #endif
             
@@ -3664,7 +3666,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 BBStatusPayload.crateIndex = 0xcc;  //TODO: read from crate backplane
                 BBStatusPayload.fltIndex   = 0;
                 BBStatusPayload.fiberIndex = 0;
-                BBStatusPayload.spare = 0x87654321;//32 bit
+                BBStatusPayload.spare = udpDataPacketSize();// now used to assign the current UDP packet size ... was 0x87654321;//32 bit
                 BBStatusPayload.spare_for_alignment = 0x4321;//16 bit
                 
 			    int idx;//index, not ID
