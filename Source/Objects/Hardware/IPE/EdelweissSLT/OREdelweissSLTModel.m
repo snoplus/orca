@@ -410,7 +410,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     dataReplyThreadData->numADCsInDataStream[*wrIndex]=numADCsInDataStream;
                     //udpDataPacketSize
                     uint32_t udpDataPacketSize=crateStatusBlock->spare2 & 0xffff;
-                    NSLog(@"  numfifo: %i    udpDataPacketSize: %i \n",numfifo, udpDataPacketSize);
+                    NSLog(@"  ---------> numfifo: %i    udpDataPacketSize: %i \n",numfifo, udpDataPacketSize);
                     if(udpDataPacketSize == 0) udpDataPacketSize=1444;
                     dataReplyThreadData->udpDataPacketSize[*wrIndex]=udpDataPacketSize;
 
