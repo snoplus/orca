@@ -391,6 +391,7 @@ public:
 	    FIFObuf32counterlast=0;
         synchroWordPosHint=0;
 
+        defaultUdpDataPacketSize = 1444;
 	    udpdata16 = (uint16_t *)udpdata;
 	    udpdata32 = (uint32_t *)udpdata;
 	    udpdataCounter = 0;
@@ -603,7 +604,7 @@ public:
 	int mon_indice_status_bbv2;// <----   each FIFO (in multi-FIFO readout) needs own counter! //TODO: obsolete, remove! -tb-
     
     //misc vars
-    int flagToSendDataAndResetBuffer;
+    int flagToSendDataAndResetBuffer;//obsolete - unused - remove it -tb-
     int waitingForSynchroWord;
     int isSynchronized; //means: has received a TS pattern in the data stream (will be set to false e.g. at start/stop StreamLoop)
 	
@@ -612,7 +613,8 @@ public:
 	 --------------------------------------------------------------------*/
 	
 	//global vars for udp packet handling
-	static const int udpdatalen = 2*1500;
+    int defaultUdpDataPacketSize;//packet size (variable, must be <1480!)
+	static const int udpdatalen = 2*1500;//buffer size
 	char udpdata[udpdatalen];
 	uint16_t *udpdata16;// = (int16_t *)udpdata;
 	uint32_t *udpdata32;// = (int32_t *)udpdata;
@@ -623,6 +625,14 @@ public:
     int numADCsInDataStream;
 	
 
+    void setUdpDataPacketSize(int size){
+        defaultUdpDataPacketSize=size;
+        if(defaultUdpDataPacketSize %4 != 0) printf("ERROR: setUdpPacketSize: must be multiple of 4!\n");
+    }
+    int udpDataPacketSize(){ return defaultUdpDataPacketSize;}
+    int udpDataPacketPayloadSize(){ return defaultUdpDataPacketSize-4;}
+    int udpDataPacketPayloadSize32(){ return udpDataPacketPayloadSize()/4;}
+    
 	/*--------------------------------------------------------------------
 	 vars for FIFO list and initialization
 	 --------------------------------------------------------------------*/
