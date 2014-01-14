@@ -61,12 +61,12 @@ NSString*  OREHQ8060nSettingsLock = @"OREHQ8060nSettingsLock";
 - (NSArray*) channelUpdateList
 {
 	NSArray* channelReadParams = [NSArray arrayWithObjects:
-		@"outputStatus",
-		@"outputMeasurementSenseVoltage",	
+		//@"outputStatus",
+		//@"outputMeasurementSenseVoltage",	
 		@"outputMeasurementCurrent",	
 		@"outputSwitch",
-		@"outputVoltage",
-		@"outputCurrent",
+		//@"outputVoltage",
+		//@"outputCurrent",
 		nil];
 	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
 	return cmds;
@@ -74,11 +74,16 @@ NSString*  OREHQ8060nSettingsLock = @"OREHQ8060nSettingsLock";
 
 - (NSArray*) commonChannelUpdateList
 {
-	NSArray* channelReadParams = [NSArray arrayWithObjects:
-								  @"outputVoltageRiseRate",
-								  @"outputMeasurementTemperature",	
-								  nil];
-	NSArray* cmds = [self addChannel:0 toParams:channelReadParams];
+	NSArray* cmds = nil;
+	if(commonParamQueryCount==0){
+		NSArray* channelReadParams = [NSArray arrayWithObjects:
+									  //@"outputVoltageRiseRate",
+									  @"outputMeasurementTemperature",	
+									  nil];
+		cmds = [self addChannel:0 toParams:channelReadParams];
+	}
+	commonParamQueryCount++;
+	if(commonParamQueryCount>60)commonParamQueryCount = 0;
 	return cmds;
 }
 

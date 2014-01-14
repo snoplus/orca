@@ -133,25 +133,34 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
 - (NSArray*) channelUpdateList
 {
-	NSArray* channelReadParams = [NSArray arrayWithObjects:
-		@"outputStatus",
-		@"outputMeasurementSenseVoltage",	
-		@"outputMeasurementCurrent",	
-		@"outputSwitch",
-		@"outputVoltage",
-		@"outputCurrent",
-		@"outputSupervisionBehavior",
-		@"outputTripTimeMaxCurrent",
-		//@"outputSupervisionMinSenseVoltage",
-		//@"outputSupervisionMaxSenseVoltage",
-		//@"outputSupervisionMaxTerminalVoltage",	
-		//@"outputSupervisionMaxCurrent",
-		//@"outputSupervisionMaxTemperature",	
-		//@"outputConfigMaxSenseVoltage",
-		//@"outputConfigMaxTerminalVoltage",	
-		//@"outputConfigMaxCurrent",
-		//@"outputConfigMaxPower",
-		nil];
+	NSMutableArray* channelReadParams = [NSMutableArray arrayWithObjects:
+										 @"outputMeasurementSenseVoltage",	
+										 @"outputMeasurementCurrent",	
+										 @"outputSwitch",
+										 //@"outputVoltage",
+										 //@"outputCurrent",
+										 //@"outputStatus",
+										 //@"outputSupervisionMinSenseVoltage",
+										 //@"outputSupervisionMaxSenseVoltage",
+										 //@"outputSupervisionMaxTerminalVoltage",	
+										 //@"outputSupervisionMaxCurrent",
+										 //@"outputSupervisionMaxTemperature",	
+										 //@"outputConfigMaxSenseVoltage",
+										 //@"outputConfigMaxTerminalVoltage",	
+										 //@"outputConfigMaxCurrent",
+										 //@"outputConfigMaxPower",
+										 nil];
+	
+	if(channelUpdateQueryCount==0){
+		[channelReadParams addObject:@"outputSupervisionBehavior"];
+		[channelReadParams addObject:@"outputTripTimeMaxCurrent"];
+	}
+	else if(channelUpdateQueryCount>2){
+		if(channelUpdateQueryCount%2)	[channelReadParams addObject:@"outputSupervisionBehavior"];
+		else							[channelReadParams addObject:@"outputTripTimeMaxCurrent"];
+	}
+	channelUpdateQueryCount++;
+	
 	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
 	return cmds;
 }
@@ -180,11 +189,17 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
 - (NSArray*) commonChannelUpdateList
 {
-	NSArray* channelReadParams = [NSArray arrayWithObjects:
-								  @"outputVoltageRiseRate",
-								  @"outputMeasurementTemperature",	
-								  nil];
-	NSArray* cmds = [self addChannel:0 toParams:channelReadParams];
+	NSArray* cmds = nil;
+	if(commonParamQueryCount==0){
+		NSArray* channelReadParams = [NSArray arrayWithObjects:
+									  //@"outputVoltageRiseRate",
+									  @"outputMeasurementTemperature",	
+									  nil];
+		cmds = [self addChannel:0 toParams:channelReadParams];
+	}
+	commonParamQueryCount++;
+	if(commonParamQueryCount>60)commonParamQueryCount = 0;
+	
 	return cmds;
 }
 

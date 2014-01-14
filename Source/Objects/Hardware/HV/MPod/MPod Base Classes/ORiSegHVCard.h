@@ -73,6 +73,8 @@ enum {
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
     NSMutableDictionary* hvConstraints;
+	int				commonParamQueryCount;
+	int				channelUpdateQueryCount;
 }
 
 #pragma mark ***Initialization

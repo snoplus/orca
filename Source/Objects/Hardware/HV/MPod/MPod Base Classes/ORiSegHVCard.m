@@ -666,7 +666,11 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 			int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
 			if(theChannel>=0 && theChannel<[self numberOfChannels]){
 				NSString* name = [anEntry objectForKey:@"Name"];
-				if([name isEqualToString:@"outputMeasurementSenseVoltage"])	[self setTarget:theChannel withValue:[[anEntry objectForKey:@"Value"] intValue]];
+				if([name isEqualToString:@"outputMeasurementSenseVoltage"]){
+					int theTarget = fabs([[anEntry objectForKey:@"Value"] floatValue])+ 0.5;
+					
+					[self setTarget:theChannel withValue:theTarget];
+				}
 				if([name isEqualToString:@"outputCurrent"])	[self setMaxCurrent:theChannel withValue:[[anEntry objectForKey:@"Value"] floatValue]*1000000.];
 			}
 		}
@@ -731,7 +735,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 - (void) setTarget:(short)chan withValue:(int)aValue 
 { 
 	if([self channelInBounds:chan]){
-		if(aValue<0)aValue=0;
+		if(aValue<0)aValue = -aValue;
 		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
 		[[[self undoManager] prepareWithInvocationTarget:self] setTarget:chan withValue:target[chan]];
 		target[chan] = aValue;

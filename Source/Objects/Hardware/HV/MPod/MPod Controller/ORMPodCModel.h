@@ -32,6 +32,7 @@
 	BOOL			oldPower;
 	double			queueCount;
     BOOL			verbose;
+	NSMutableDictionary* dictionaryFromWebPage;
 }
 
 #pragma mark ***Accessors
@@ -55,7 +56,6 @@
 - (void) writeMaxTerminalVoltage;
 - (void) writeMaxTemperature;
 - (NSMutableDictionary*) systemParams;
-
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard;
 - (void) ping;
@@ -91,5 +91,24 @@ extern NSString* ORMPodCQueueCountChanged;
 @interface NSObject (ORMpodCModel)
 - (void) precessReadResponseArray:(NSArray*)response;
 - (void) processSystemResponseArray:(NSArray*)response;
+- (void) setDictionaryFromWebPage:(NSMutableDictionary*)aDictionary;
 
 @end
+
+@interface ORHvUrlParseOp : NSOperation {
+	id                  delegate;
+	NSString*           ipAddress;
+}
+- (id) initWithDelegate:(id)aDelegate;
+- (void) dealloc;
+
+#pragma mark ¥¥¥Move Methods
+- (void) main;
+- (void) processSystemTable:(NSString*)aTable;
+- (NSMutableDictionary*) processHVTable:(NSString*)aTable;
+
+@property (copy)    NSString*   ipAddress;
+@property (assign)  id          delegate;
+
+@end
+
