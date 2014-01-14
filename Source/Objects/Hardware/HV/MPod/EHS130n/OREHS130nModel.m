@@ -66,10 +66,10 @@ NSString*  OREHS130nSettingsLock = @"OREHS130nSettingsLock";
 - (NSArray*) channelUpdateList
 {
 	NSArray* channelReadParams = [NSArray arrayWithObjects:
-		//@"outputStatus",
+		@"outputStatus",
+		@"outputSwitch",
 		@"outputMeasurementSenseVoltage",	
 		@"outputMeasurementCurrent",	
-		@"outputSwitch",
 		//@"outputVoltage",
 		//@"outputCurrent",
 		nil];
@@ -96,9 +96,9 @@ NSString*  OREHS130nSettingsLock = @"OREHS130nSettingsLock";
 - (NSArray*) wizardSelections
 {
     NSMutableArray* a = [NSMutableArray array];
-    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORMPodCrate"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"OREHS130nModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"OREHS130nModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel	name:@"Crate"	className:@"ORMPodCrate"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel		name:@"Card"	className:@"OREHS130nModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel	name:@"Channel" className:@"OREHS130nModel"]];
     return a;
 }
 @end

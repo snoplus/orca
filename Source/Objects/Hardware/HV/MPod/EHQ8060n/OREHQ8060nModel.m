@@ -61,13 +61,13 @@ NSString*  OREHQ8060nSettingsLock = @"OREHQ8060nSettingsLock";
 - (NSArray*) channelUpdateList
 {
 	NSArray* channelReadParams = [NSArray arrayWithObjects:
-		//@"outputStatus",
-		//@"outputMeasurementSenseVoltage",	
-		@"outputMeasurementCurrent",	
-		@"outputSwitch",
-		//@"outputVoltage",
-		//@"outputCurrent",
-		nil];
+								  @"outputMeasurementSenseVoltage",	
+								  @"outputMeasurementCurrent",	
+								  @"outputSwitch",
+								  @"outputStatus",
+								  //@"outputVoltage",
+								  //@"outputCurrent",
+								  nil];
 	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
 	return cmds;
 }
@@ -90,9 +90,9 @@ NSString*  OREHQ8060nSettingsLock = @"OREHQ8060nSettingsLock";
 - (NSArray*) wizardSelections
 {
     NSMutableArray* a = [NSMutableArray array];
-    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORMPodCrate"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"OREHQ8060nModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"OREHQ8060nModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel	name:@"Crate"	className:@"ORMPodCrate"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel		name:@"Card"	className:@"OREHQ8060nModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel	name:@"Channel" className:@"OREHQ8060nModel"]];
     return a;
 	
 }

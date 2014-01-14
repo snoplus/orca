@@ -511,8 +511,8 @@
 		if(state & outputRampUpMask)		[hvStatusImage setImage:[NSImage imageNamed:@"upRamp"]];
 		else if(state & outputRampDownMask)	[hvStatusImage setImage:[NSImage imageNamed:@"downRamp"]];
 		else {
-			if(voltage < 100){
-				if(voltage > 5)[hvStatusImage setImage:[NSImage imageNamed:@"lowVoltage"]];
+			if(fabs(voltage) < 100){
+				if(fabs(voltage) > 5)[hvStatusImage setImage:[NSImage imageNamed:@"lowVoltage"]];
 				else			[hvStatusImage setImage:nil];
 			}
 			else [hvStatusImage setImage:[NSImage imageNamed:@"highVoltage"]];

@@ -310,7 +310,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	
 	for(id aCmd in cmds){
 		if(aSelector != NSSelectorFromString(@"processSyncResponseArray:")){
-			//before staring a operation on the queue, see if the parameter is in the web page results
+			//before starting a operation on the queue, see if the parameter is in the web page results
 			@synchronized(self){
 				NSRange r = [aCmd rangeOfString:@"."];
 				if(r.location!=NSNotFound){
@@ -318,7 +318,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 					NSString* chanKey  = [aCmd substringFromIndex:r.location+1];
 					id cardDict = [dictionaryFromWebPage objectForKey:chanKey];
 					id val  = [cardDict objectForKey:paramKey];
-					if([paramKey isEqualToString:@"outputStatus"]){
+					if([paramKey isEqualToString:@"OutputSwitch"]){
 						if([val isEqualToString:@"ON"])val = @"1";
 						else val = @"0";
 					}
@@ -582,7 +582,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 - (NSMutableDictionary*) processHVTable:(NSString*)aTable
 {
 	NSDictionary* translateDict = [NSDictionary dictionaryWithObjectsAndKeys:
-								  @"outputSwitch",					@"outputStatus",
+								  @"OutputSwitch",					@"OutputStatus",
 								  @"outputCurrent",					@"Measured Current",
 								  @"outputVoltage",					@"Voltage",
 								  @"outputMeasurementSenseVoltage",	@"Measured Sense Voltage",

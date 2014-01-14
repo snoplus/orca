@@ -797,7 +797,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORiSegHVCardDecoderForHV",          @"decoder",
+								 @"ORiSegHVCardDecoderForHV",			@"decoder",
 								 [NSNumber numberWithLong:dataId],      @"dataId",
 								 [NSNumber numberWithBool:NO],          @"variable",
 								 [NSNumber numberWithLong:21],			@"length",
@@ -814,13 +814,13 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
     
     [[self undoManager] disableUndoRegistration];
 		
-    [self setShipRecords:		[decoder decodeBoolForKey:@"shipRecords"]];
+    [self setShipRecords:		[decoder decodeBoolForKey:	@"shipRecords"]];
     [self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
 	[self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
-		//[self setHwGoal:i withValue: [decoder decodeIntForKey:   [@"hwGoal" stringByAppendingFormat:@"%d",i]]];
-		[self setTarget:i withValue: [decoder decodeIntForKey:   [@"target" stringByAppendingFormat:@"%d",i]]];
+		//[self setHwGoal:i withValue: [decoder decodeIntForKey:	[@"hwGoal" stringByAppendingFormat:@"%d",i]]];
+		[self setTarget:i withValue: [decoder decodeIntForKey:		[@"target" stringByAppendingFormat:@"%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey: [@"maxCurrent" stringByAppendingFormat:@"%d",i]]];
 	}
 	[[self undoManager] enableUndoRegistration];
