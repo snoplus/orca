@@ -68,9 +68,21 @@
 					 selector : @selector(onlineMaskChanged:)
 						 name : ORCaen792ModelOnlineMaskChanged
 					   object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(iPedChanged:)
+                         name : ORCaen792ModelIPedChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+
+- (void) iPedChanged:(NSNotification*)aNote
+{
+	[iPedField setIntValue: [model iPed]];
+}
+
 //--------------------------------------------------------------------------------
 /*!\method  updateWindow
  * \brief	Sets all GUI values to current model values.
@@ -82,6 +94,7 @@
    [ super updateWindow ];
 	[self modelTypeChanged:nil];
 	[self onlineMaskChanged:nil];
+	[self iPedChanged:nil];
 }
 
 #pragma mark ***Interface Management - Module specific
@@ -90,7 +103,7 @@
 
 - (NSSize) thresholdDialogSize
 {
-	return NSMakeSize(310,640);
+	return NSMakeSize(410,640);
 }
 
 - (void) modelTypeChanged:(NSNotification*)aNote
@@ -149,13 +162,31 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) initBoard:(id) sender
+{
+    [model initBoard];
+}
+
+- (void) iPedAction:(id)sender
+{
+	[model setIPed:[sender intValue]];	
+}
+
 - (void) modelTypePUAction:(id)sender
 {
 	[model setModelType:[sender indexOfSelectedItem]];
 }
+
 - (IBAction) onlineAction:(id)sender
 {
 	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
+
+- (IBAction) report: (id) pSender
+{
+    [model readThresholds];
+    [model logThresholds];
+    NSLog(@"IPed Value: 0x%0x\n",[model readIPed]);
+ }
 
 @end

@@ -28,8 +28,9 @@
 // Definition of class.
 @interface ORCaen792Controller : ORCaenCardController {
 	IBOutlet NSPopUpButton* modelTypePU;
-    IBOutlet NSMatrix*	onlineMaskMatrixA;
-    IBOutlet NSMatrix*	onlineMaskMatrixB;
+	IBOutlet NSTextField*   iPedField;
+    IBOutlet NSMatrix*      onlineMaskMatrixA;
+    IBOutlet NSMatrix*      onlineMaskMatrixB;
 }
 
 #pragma mark ***Initialization
@@ -39,6 +40,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) iPedChanged:(NSNotification*)aNote;
 - (NSSize) thresholdDialogSize;
 - (void) updateWindow;
 - (void) modelTypeChanged:(NSNotification*)aNote;
@@ -46,7 +48,10 @@
 
 
 #pragma mark ***Actions
+- (IBAction) iPedAction:  (id)sender;
 - (IBAction) modelTypePUAction:(id)sender;
-- (IBAction) onlineAction:(id)sender;
+- (IBAction) onlineAction:(id) sender;
+- (IBAction) initBoard:   (id) sender;
+- (IBAction) report:      (id) sender;
 
 @end

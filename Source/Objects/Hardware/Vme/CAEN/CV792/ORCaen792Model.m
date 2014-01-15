@@ -67,6 +67,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 NSString* ORCaen792ModelModelTypeChanged  = @"ORCaen792ModelModelTypeChanged";
 NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
+NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
 
 @implementation ORCaen792Model
 
@@ -105,6 +106,24 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 	return NSMakeRange(baseAddress,0x10BF);
 }
 #pragma mark ***Accessors
+
+- (unsigned short) iPed
+{
+    return iPed;
+}
+
+- (void) setIPed:(unsigned short)aIPed
+{
+    if(aIPed < 0 )aIPed = 0;
+    else if(aIPed >= 0xff)aIPed = 0xff;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setIPed:iPed];
+    
+    iPed = aIPed;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelIPedChanged object:self];
+}
+
 - (int) modelType
 {
     return modelType;
@@ -240,6 +259,27 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 }
 
 
+- (void) writeIPed
+{
+    unsigned short aValue = [self iPed] & 0xff;
+    [[self adapter] writeWordBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kIpedReg].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+	
+}
+- (unsigned short) readIPed
+{
+    unsigned short aValue = 0;
+    [[self adapter] readWordBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kIpedReg].addressOffset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    return aValue & 0xff;
+   
+}
 #pragma mark ***DataTaker
 - (void) setDataIds:(id)assigner
 {
@@ -431,6 +471,7 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
+    [self setIPed:              [aDecoder decodeIntForKey:@"iPed"]];
     [self setModelType:			[aDecoder decodeIntForKey:@"modelType"]];
    	[self setOnlineMask:		[aDecoder decodeInt32ForKey:@"onlineMask"]];
 
@@ -442,6 +483,7 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+	[anEncoder encodeInt:iPed               forKey:@"iPed"];
 	[anEncoder encodeInt:modelType			forKey:@"modelType"];
 	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];
 }
@@ -487,9 +529,11 @@ NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
 	 object:self
 	 userInfo: nil];
 }
+
 - (void) initBoard
 {
     [self writeThresholds];
+    [self writeIPed];
 }
 @end
 

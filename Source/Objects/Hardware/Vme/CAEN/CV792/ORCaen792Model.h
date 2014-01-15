@@ -83,9 +83,12 @@ enum {
 	unsigned long onlineMask;
 	unsigned long dataIdN;
 	unsigned long location;
+    unsigned short iPed;
 }
 
 #pragma mark ***Accessors
+- (unsigned short)  iPed;
+- (void)            setIPed:(unsigned short)aIPed;
 - (unsigned long)   dataIdN;
 - (void)            setDataIdN: (unsigned long) DataId;
 - (int)             modelType;
@@ -105,6 +108,8 @@ enum {
 - (short)           getThresholdIndex;
 - (short)           getOutputBufferIndex;
 - (void)            writeThresholds;
+- (void)            writeIPed;
+- (unsigned short)  readIPed;
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) 		getRegisterName: (short) anIndex;
@@ -122,7 +127,13 @@ enum {
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan;
 - (unsigned short) gainForDisplay:(unsigned short) aChan;
 
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
+extern NSString* ORCaen792ModelIPedChanged;
 extern NSString* ORCaen792ModelModelTypeChanged;
 extern NSString* ORCaen792ModelOnlineMaskChanged;
