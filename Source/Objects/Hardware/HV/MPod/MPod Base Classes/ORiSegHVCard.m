@@ -304,13 +304,11 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 					if([self channelInBounds:theChannel]){
 						if(!rdParams[theChannel])rdParams[theChannel] = [[NSMutableDictionary dictionary] retain];
 						if(name){
-                            if([rdParams[theChannel] objectForKey:@"outputSwitch"] != nil){
-                                int startingOnOffState		= [self channel:theChannel readParamAsInt:@"outputSwitch"];
-                                [rdParams[theChannel] setObject:anEntry forKey:name];
-                                int endingOnOffState		= [self channel:theChannel readParamAsInt:@"outputSwitch"];
-                                if(startingOnOffState != endingOnOffState){
+                            id startingOnOffState	= [rdParams[theChannel] objectForKey:@"outputSwitch"];
+                            [rdParams[theChannel] setObject:anEntry forKey:name];
+                            id endingOnOffState		= [rdParams[theChannel] objectForKey:@"outputSwitch"];
+                            if(startingOnOffState && endingOnOffState && ([startingOnOffState intValue] != [endingOnOffState intValue])){
                                     NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], theChannel,startingOnOffState?@"ON":@"OFF",endingOnOffState?@"ON":@"OFF");
-                                }
                             }
                         }
 					}
