@@ -303,19 +303,35 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 					NSString* name = [anEntry objectForKey:@"Name"];
 					if([self channelInBounds:theChannel]){
 						if(!rdParams[theChannel])rdParams[theChannel] = [[NSMutableDictionary dictionary] retain];
+						id oldOnOffState = nil;
+						id currentOnOffState   = nil;
 						if(name){
-                            id startingOnOffState	= [rdParams[theChannel] objectForKey:@"outputSwitch"];
-                            [rdParams[theChannel] setObject:anEntry forKey:name];
-                            id endingOnOffState		= [rdParams[theChannel] objectForKey:@"outputSwitch"];
-                            if(startingOnOffState && endingOnOffState && ([startingOnOffState intValue] != [endingOnOffState intValue])){
-                                    NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], theChannel,startingOnOffState?@"ON":@"OFF",endingOnOffState?@"ON":@"OFF");
-                            }
+							BOOL checkForStateChange = [name isEqualToString:@"outputSwitch"];
+							
+							//get the orginal state
+							if(checkForStateChange) oldOnOffState	= [[[[rdParams[theChannel] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
+							
+							[rdParams[theChannel] setObject:anEntry forKey:name];
+							
+							if(checkForStateChange){
+								//get the new state
+								currentOnOffState	 = [[rdParams[theChannel] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
+								if(oldOnOffState!=nil && currentOnOffState!=nil){
+									int oldState	 = [oldOnOffState intValue];
+									int currentState = [currentOnOffState intValue];
+									
+									if(oldState != currentState){
+										NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], theChannel,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
+									}
+								}
+							}
                         }
 					}
 				}
 			}
 		}
 	}
+	
     
 	if([[self adapter] respondsToSelector:@selector(power)]){
 		if(![[self adapter] power]){
