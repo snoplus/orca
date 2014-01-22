@@ -309,7 +309,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
                                 [rdParams[theChannel] setObject:anEntry forKey:name];
                                 int endingOnOffState		= [self channel:theChannel readParamAsInt:@"outputSwitch"];
                                 if(startingOnOffState != endingOnOffState){
-                                    NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@",[[self guardian]uniqueIdNumber],[self slot], theChannel,startingOnOffState?@"ON":@"OFF",endingOnOffState?@"ON":@"OFF");
+                                    NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], theChannel,startingOnOffState?@"ON":@"OFF",endingOnOffState?@"ON":@"OFF");
                                 }
                             }
                         }
@@ -488,7 +488,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Turned ON MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Turned ON MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) turnChannelOff:(short)channel
@@ -497,28 +497,28 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Turned OFF MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Turned OFF MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) panicChannel:(short)channel
 {
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputSetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Paniced MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Paniced MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) clearPanicChannel:(short)channel
 {
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputResetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Clear Panic MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Clear Panic MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) clearEventsChannel:(short)channel
 {
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputClearEvents];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Clear Events MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Clear Events MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) stopRamping:(short)channel
