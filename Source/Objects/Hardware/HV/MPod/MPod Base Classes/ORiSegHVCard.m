@@ -5,16 +5,16 @@
 //  Created by Mark Howe on Wed Feb 2,2011
 //  Copyright (c) 2011 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//North Carolina Department of Physics and Astrophysics 
-//sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
+//This program was prepared for the Regents of the University of
+//North Carolina Department of Physics and Astrophysics
+//sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
 //North Carolina reserve all rights in the program. Neither the authors,
-//University of North Carolina, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//University of North Carolina, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -47,13 +47,13 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 #define kMaxCurrent 1000.
 
 #pragma mark ***Initialization
-- (id) init 
+- (id) init
 {
     self = [super init];
     return self;
 }
 
-- (void) dealloc 
+- (void) dealloc
 {
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
@@ -61,8 +61,8 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 		[currentHistory[i] release];
 	}
     [hvConstraints release];
-
-     [super dealloc];
+    
+    [super dealloc];
 }
 
 - (NSString*) imageName
@@ -79,12 +79,12 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
     [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
-     
+    
     if([self constraintsInPlace]){
         NSImage* constraintImage = [NSImage imageNamed:@"smallLock"];
         [constraintImage drawAtPoint:NSMakePoint([i size].width/2 - [constraintImage size].width/2,[i size].height-[constraintImage size].height-15) fromRect:[constraintImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     }
-
+    
     [i unlockFocus];
     [self setImage:i];
     [i release];
@@ -184,7 +184,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
     if(aSelectedChannel<0)aSelectedChannel=0;
     else if(aSelectedChannel>[self numberOfChannels])aSelectedChannel=[self numberOfChannels];
     selectedChannel = aSelectedChannel;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardSelectedChannelChanged object:self];
 }
 
@@ -237,7 +237,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 						   @"outputMeasurementSenseVoltage",
 						   @"outputCurrent",
 						   nil];
-
+    
 	syncParams = [self addChannelNumbersToParams:syncParams];
 	syncParams = [syncParams arrayByAddingObjectsFromArray:[self commonChannelUpdateList]];
 	
@@ -303,7 +303,16 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 					NSString* name = [anEntry objectForKey:@"Name"];
 					if([self channelInBounds:theChannel]){
 						if(!rdParams[theChannel])rdParams[theChannel] = [[NSMutableDictionary dictionary] retain];
-						if(name)[rdParams[theChannel] setObject:anEntry forKey:name];
+						if(name){
+                            if([rdParams[theChannel] objectForKey:@"outputSwitch"] != nil){
+                                int startingOnOffState		= [self channel:theChannel readParamAsInt:@"outputSwitch"];
+                                [rdParams[theChannel] setObject:anEntry forKey:name];
+                                int endingOnOffState		= [self channel:theChannel readParamAsInt:@"outputSwitch"];
+                                if(startingOnOffState != endingOnOffState){
+                                    NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@",[[self guardian]uniqueIdNumber],[self slot], theChannel,startingOnOffState?@"ON":@"OFF",endingOnOffState?@"ON":@"OFF");
+                                }
+                            }
+                        }
 					}
 				}
 			}
@@ -327,7 +336,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
 	
-
+    
 }
 
 - (void) processWriteResponseArray:(NSArray*)response
@@ -438,19 +447,19 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 }
 
 - (void) writeRiseTime
-{  
+{
 	[self writeRiseTime:riseRate];
 }
 
 - (void) writeRiseTime:(float)aValue
-{    
+{
 	int channel = 0; //in this firmware version all the risetimes and falltimes get set to this value. So no need to send for all channels.
 	NSString* cmd = [NSString stringWithFormat:@"outputVoltageRiseRate.u%d F %f",[self slotChannelValue:channel],aValue];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
 }
 
 - (void) writeVoltage:(short)channel
-{    
+{
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputVoltage.u%d F %f",[self slotChannelValue:channel],(float)hwGoal[channel]];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
@@ -458,7 +467,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 }
 
 - (void) writeMaxCurrent:(short)channel
-{    
+{
 	if([self channelInBounds:channel]){
 		NSString* cmd = [NSString stringWithFormat:@"outputCurrent.u%d F %f",[self slotChannelValue:channel],maxCurrent[channel]/1000000.];
 		[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
@@ -479,32 +488,37 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+    NSLog(@"Turned ON MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) turnChannelOff:(short)channel
-{    
+{
 	[self setHwGoal:channel withValue:0];
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+    NSLog(@"Turned OFF MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) panicChannel:(short)channel
-{    
+{
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputSetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+    NSLog(@"Paniced MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) clearPanicChannel:(short)channel
-{    
+{
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputResetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+    NSLog(@"Clear Panic MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) clearEventsChannel:(short)channel
-{    
+{
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputClearEvents];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+    NSLog(@"Clear Events MPod (%lu), Card %d Channel %d",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) stopRamping:(short)channel
@@ -583,7 +597,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 - (void) clearAllEventsChannels
 {
 	int i;
-	for(i=0;i<[self numberOfChannels];i++)[self clearEventsChannel:i];	
+	for(i=0;i<[self numberOfChannels];i++)[self clearEventsChannel:i];
 }
 
 - (void) stopAllRamping
@@ -607,8 +621,8 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 - (unsigned long) failureEvents:(short)channel
 {
 	int events = [self channel:selectedChannel readParamAsInt:@"outputStatus"];
-	events &= (outputFailureMinSenseVoltageMask    | outputFailureMaxSenseVoltageMask | 
-			   outputFailureMaxTerminalVoltageMask | outputFailureMaxCurrentMask | 
+	events &= (outputFailureMinSenseVoltageMask    | outputFailureMaxSenseVoltageMask |
+			   outputFailureMaxTerminalVoltageMask | outputFailureMaxCurrentMask |
 			   outputFailureMaxTemperatureMask     | outputFailureMaxPowerMask |
 			   outputFailureTimeoutMask            | outputCurrentLimitedMask |
 			   outputEmergencyOffMask);
@@ -626,7 +640,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 }
 
 - (NSString*) channelState:(short)channel
-{ 
+{
 	int outputSwitch = [self channel:channel readParamAsInt:@"outputSwitch"];
 	int outputStatus = [self channel:channel readParamAsInt:@"outputStatus"];
 	
@@ -662,7 +676,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 				break;
 			}
 		}
-		else {			
+		else {
 			int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
 			if(theChannel>=0 && theChannel<[self numberOfChannels]){
 				NSString* name = [anEntry objectForKey:@"Name"];
@@ -678,8 +692,8 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 }
 
 - (float) riseRate{ return riseRate; }
-- (void) setRiseRate:(float)aValue 
-{ 
+- (void) setRiseRate:(float)aValue
+{
 	if(aValue<2)aValue=2;
 	else if(aValue>1200)aValue=1200; //20% of max
     [[[self undoManager] prepareWithInvocationTarget:self] setRiseRate:riseRate];
@@ -687,13 +701,13 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRiseRateChanged object:self];
 }
 
-- (int) hwGoal:(short)chan	
-{ 
-	if([self channelInBounds:chan])return hwGoal[chan]; 
+- (int) hwGoal:(short)chan
+{
+	if([self channelInBounds:chan])return hwGoal[chan];
 	else return 0;
 }
-- (void) setHwGoal:(short)chan withValue:(int)aValue 
-{ 
+- (void) setHwGoal:(short)chan withValue:(int)aValue
+{
 	if([self channelInBounds:chan]){
 		if(aValue<0)aValue=0;
 		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
@@ -710,9 +724,9 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	else return @"";
 }
 
-- (float) maxCurrent:(short)chan 
-{ 
-	if([self channelInBounds:chan])return maxCurrent[chan]; 
+- (float) maxCurrent:(short)chan
+{
+	if([self channelInBounds:chan])return maxCurrent[chan];
 	else return 0;
 }
 
@@ -727,13 +741,13 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 	}
 }
 
-- (int) target:(short)chan	
-{ 
-	if([self channelInBounds:chan])return target[chan]; 
+- (int) target:(short)chan
+{
+	if([self channelInBounds:chan])return target[chan];
 	else return 0;
 }
-- (void) setTarget:(short)chan withValue:(int)aValue 
-{ 
+- (void) setTarget:(short)chan withValue:(int)aValue
+{
 	if([self channelInBounds:chan]){
 		if(aValue<0)aValue = -aValue;
 		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
@@ -813,7 +827,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-		
+    
     [self setShipRecords:		[decoder decodeBoolForKey:	@"shipRecords"]];
     [self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
 	[self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
@@ -831,7 +845,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-
+    
 	[encoder encodeBool:shipRecords		forKey:@"shipRecords"];
 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
 	[encoder encodeFloat:riseRate		forKey:@"riseRate"];
@@ -908,9 +922,9 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 		unsigned long data[21];
 		data[0] = dataId | 21;
 		data[1] = (([self crateNumber] & 0xf) << 20) |
-                  (([self slot]&0xf)<<16)            |
-                  (([self numberOfChannels])<<4)     |
-                  ([self polarity] & 0x1);
+        (([self slot]&0xf)<<16)            |
+        (([self numberOfChannels])<<4)     |
+        ([self polarity] & 0x1);
 		data[2] = 0x0; //spare
 		data[3] = 0x0; //spare
 		data[4] = ut_Time;
@@ -919,17 +933,17 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 			float asFloat;
 			unsigned long asLong;
 		}theData;
-			
+        
 		for(i=0;i<[self numberOfChannels];i++){
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
 			data[5+i] = theData.asLong;
 			
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementCurrent"];
 			data[6+i] = theData.asLong;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
 																object:[NSData dataWithBytes:data length:sizeof(long)*21]];
 		}
-	}	
+	}
 }
 #pragma mark ¥¥¥Convenience Methods
 - (float) voltage:(short)aChannel
@@ -959,21 +973,21 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 {
     NSMutableArray* a = [NSMutableArray array];
     ORHWWizParam* p;
-		
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Turn On"];
     [p setUseValue:NO];
     [p setSetMethod:@selector(turnChannelOn:) getMethod:nil];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-
+    
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Turn Off"];
     [p setUseValue:NO];
     [p setSetMethod:@selector(turnChannelOff:) getMethod:nil];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-
+    
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clear Events"];
     [p setUseValue:NO];
