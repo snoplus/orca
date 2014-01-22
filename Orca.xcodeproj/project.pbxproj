@@ -2831,6 +2831,12 @@
 		84F03CDA059A145E00275624 /* ORGlobal.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F03CD8059A145E00275624 /* ORGlobal.h */; };
 		84F03CDB059A145E00275624 /* ORGlobal.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F03CD9059A145E00275624 /* ORGlobal.m */; };
 		84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F03E6605A0995400275624 /* muxBoxSmall.gif */; };
+		84F16AF318900D530074B787 /* ORXTR6Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F16AED18900D530074B787 /* ORXTR6Controller.h */; };
+		84F16AF418900D530074B787 /* ORXTR6Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F16AEE18900D530074B787 /* ORXTR6Controller.m */; };
+		84F16AF518900D530074B787 /* ORXTR6Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F16AEF18900D530074B787 /* ORXTR6Model.h */; };
+		84F16AF618900D530074B787 /* ORXTR6Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F16AF018900D530074B787 /* ORXTR6Model.m */; };
+		84F16AF718900D530074B787 /* XTR6.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F16AF118900D530074B787 /* XTR6.nib */; };
+		84F16AF818900D530074B787 /* XTR6Icon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84F16AF218900D530074B787 /* XTR6Icon.tif */; };
 		84F18E6705AF49A8001799E6 /* ORHeartBeat.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F18E6505AF49A8001799E6 /* ORHeartBeat.h */; };
 		84F18E6805AF49A8001799E6 /* ORHeartBeat.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F18E6605AF49A8001799E6 /* ORHeartBeat.m */; };
 		84F3085015483A4000663573 /* Mks660B.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F3084815483A4000663573 /* Mks660B.nib */; };
@@ -6072,6 +6078,12 @@
 		84F03CD8059A145E00275624 /* ORGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGlobal.h; sourceTree = "<group>"; };
 		84F03CD9059A145E00275624 /* ORGlobal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGlobal.m; sourceTree = "<group>"; };
 		84F03E6605A0995400275624 /* muxBoxSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = muxBoxSmall.gif; path = Source/Experiments/Ncd/Detector/muxBoxSmall.gif; sourceTree = SOURCE_ROOT; };
+		84F16AED18900D530074B787 /* ORXTR6Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXTR6Controller.h; sourceTree = "<group>"; };
+		84F16AEE18900D530074B787 /* ORXTR6Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXTR6Controller.m; sourceTree = "<group>"; };
+		84F16AEF18900D530074B787 /* ORXTR6Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXTR6Model.h; sourceTree = "<group>"; };
+		84F16AF018900D530074B787 /* ORXTR6Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXTR6Model.m; sourceTree = "<group>"; };
+		84F16AF118900D530074B787 /* XTR6.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = XTR6.nib; sourceTree = "<group>"; };
+		84F16AF218900D530074B787 /* XTR6Icon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = XTR6Icon.tif; sourceTree = "<group>"; };
 		84F18E6505AF49A8001799E6 /* ORHeartBeat.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORHeartBeat.h; sourceTree = "<group>"; };
 		84F18E6605AF49A8001799E6 /* ORHeartBeat.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORHeartBeat.m; sourceTree = "<group>"; };
 		84F3084815483A4000663573 /* Mks660B.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Mks660B.nib; path = Source/Objects/Hardware/Serial/Mks660B/Mks660B.nib; sourceTree = SOURCE_ROOT; };
@@ -11070,6 +11082,7 @@
 				840E72E2103DA7BC0070AD70 /* AmrelHV */,
 				8472AA4A12DB44B300DEEB02 /* MPod */,
 				84E9F68E123FE4D600116607 /* NHQ226L */,
+				84F16AEC18900D530074B787 /* XTR6 */,
 			);
 			name = HV;
 			path = Source/Objects/Hardware/HV;
@@ -12496,6 +12509,19 @@
 			name = CV419;
 			path = Source/Objects/Hardware/Vme/CAEN/CV419;
 			sourceTree = SOURCE_ROOT;
+		};
+		84F16AEC18900D530074B787 /* XTR6 */ = {
+			isa = PBXGroup;
+			children = (
+				84F16AED18900D530074B787 /* ORXTR6Controller.h */,
+				84F16AEE18900D530074B787 /* ORXTR6Controller.m */,
+				84F16AEF18900D530074B787 /* ORXTR6Model.h */,
+				84F16AF018900D530074B787 /* ORXTR6Model.m */,
+				84F16AF118900D530074B787 /* XTR6.nib */,
+				84F16AF218900D530074B787 /* XTR6Icon.tif */,
+			);
+			path = XTR6;
+			sourceTree = "<group>";
 		};
 		84F18E6405AF49A8001799E6 /* HeartBeat */ = {
 			isa = PBXGroup;
@@ -14086,6 +14112,7 @@
 				84BAA72C0E964ED900E19946 /* ORSelectorSequence.h in Headers */,
 				84CEA36F0EA4EB2E0060076A /* ORFec32Controller.h in Headers */,
 				84D29FED1843EAC800D320DB /* ORTaskHandler.h in Headers */,
+				84F16AF518900D530074B787 /* ORXTR6Model.h in Headers */,
 				84D29FF21843EAC800D320DB /* OROpSeqStepViewItem.h in Headers */,
 				84CEA3710EA4EB2E0060076A /* ORFec32Model.h in Headers */,
 				84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */,
@@ -14539,6 +14566,7 @@
 				8458EA3F15DBCFF6005C43A9 /* ORMPodCrateModel.h in Headers */,
 				84DF4A0A162DCE6B00261144 /* ORGretina4MController.h in Headers */,
 				84DF4A0C162DCE6B00261144 /* ORGretina4MDecoders.h in Headers */,
+				84F16AF318900D530074B787 /* ORXTR6Controller.h in Headers */,
 				84DF4A0E162DCE6B00261144 /* ORGretina4MModel.h in Headers */,
 				84DF4CA0162F1B2100261144 /* ORArduinoUNOController.h in Headers */,
 				84DF4CA2162F1B2100261144 /* ORArduinoUNOModel.h in Headers */,
@@ -14906,6 +14934,7 @@
 				840E00230944B29000049827 /* SPSTRelay.nib in Resources */,
 				840E00270944B29000049827 /* AndGate.tif in Resources */,
 				840E002F0944B29000049827 /* ORGate.tif in Resources */,
+				84F16AF718900D530074B787 /* XTR6.nib in Resources */,
 				840E00360944B29000049827 /* RSFlipFlop.tif in Resources */,
 				840E00370944B29000049827 /* AlarmElement.nib in Resources */,
 				840E00380944B29000049827 /* AlarmElementOff.tif in Resources */,
@@ -15117,6 +15146,7 @@
 				8491E6C60EB9DFD30084BAD6 /* XL1.nib in Resources */,
 				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
 				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
+				84F16AF818900D530074B787 /* XTR6Icon.tif in Resources */,
 				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
 				84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */,
 				84C37D2B0EF834DD00E77E09 /* SNO.gif in Resources */,
@@ -16213,6 +16243,7 @@
 				84098F5B0F964F0100036BE8 /* ORPDcuModel.m in Sources */,
 				84BC88DF0F9CDB5600336DF1 /* ORSerialPortController.m in Sources */,
 				84BC89130F9CDDAC00336DF1 /* ORSerialPortModel.m in Sources */,
+				84F16AF618900D530074B787 /* ORXTR6Model.m in Sources */,
 				840823CD0F9F83DC007E6061 /* ORFlippedView.m in Sources */,
 				84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */,
 				84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */,
@@ -16462,6 +16493,7 @@
 				848F6CAB14C75F690093E502 /* ORSIS3150Controller.m in Sources */,
 				848F6CAD14C75F690093E502 /* ORSIS3150Model.m in Sources */,
 				8407398314CDD91F00BAD105 /* ORMet637Controller.m in Sources */,
+				84F16AF418900D530074B787 /* ORXTR6Controller.m in Sources */,
 				8407398514CDD91F00BAD105 /* ORMet637Model.m in Sources */,
 				B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */,
 				B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */,
