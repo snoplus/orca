@@ -316,6 +316,7 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 			}
 		}
 	}
+    
 	if([[self adapter] respondsToSelector:@selector(power)]){
 		if(![[self adapter] power]){
 			int i;
