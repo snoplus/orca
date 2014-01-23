@@ -66,6 +66,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Thresholds",			false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
+// Bit Set 2 Register Masks
+#define kClearData	0x04
+
 @implementation ORCaen862Model
 
 #pragma mark ***Initialization
@@ -179,7 +182,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
     // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];			// Clear data, 
+    [self write:kBitSet2 sendValue:kClearData];			// Clear data,
     [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
     [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
 

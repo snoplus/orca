@@ -30,12 +30,6 @@
 #import "SBC_Config.h"
 #import "VME_HW_Definitions.h"
 
-// Bit Set 2 Register Masks
-#define kMemTest	0x01
-#define kOffline	0x02
-#define kClearData	0x04
-#define kOverRange	0x08
-#define kLowThres	0x10
 
 enum {
 	kReadOnly,

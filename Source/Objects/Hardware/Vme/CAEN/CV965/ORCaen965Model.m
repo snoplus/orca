@@ -70,6 +70,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Low Thresholds",		false,	false, 	false,	0x1082,		kReadWrite,	kD16},
 };
 
+// Bit Set 2 Register Masks
+#define kClearData	0x04
+
 
 NSString* ORCaen965ModelModelTypeChanged = @"ORCaen965ModelModelTypeChanged";
 NSString* ORCaen965ModelOnlineMaskChanged   = @"ORCaen965ModelOnlineMaskChanged";

@@ -849,6 +849,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 {
     return 32;
 }
+
 -(BOOL) hasParmetersToRamp
 {
 	return YES;
