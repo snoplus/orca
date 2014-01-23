@@ -83,9 +83,18 @@ enum {
     BOOL            eventCounterInc;
     BOOL            slidingScaleEnable;
     unsigned short  slideConstant;
+    BOOL            cycleZeroSuppression;
+    int             percentZeroOff;
+    int             totalCycleZTime;
 }
 
 #pragma mark ***Accessors
+- (int)             totalCycleZTime;
+- (void)            setTotalCycleZTime:(int)aTotalCycleZTime;
+- (int)             percentZeroOff;
+- (void)            setPercentZeroOff:(int)aPercentZeroOff;
+- (BOOL)            cycleZeroSuppression;
+- (void)            setCycleZeroSuppression:(BOOL)aCycleZeroSuppression;
 - (unsigned short)  slideConstant;
 - (void)            setSlideConstant:(unsigned short)aSlideConstant;
 - (BOOL)            slidingScaleEnable;
@@ -122,7 +131,7 @@ enum {
 - (void)            writeIPed;
 - (void)            writeBit2Register;
 - (void)            writeSlideConstReg;
-
+- (void)            setToDefaults;
 - (unsigned short)  readIPed;
 
 #pragma mark ***Register - Register specific routines
@@ -144,10 +153,11 @@ enum {
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
 @end
 
-
+extern NSString* ORCaen792ModelTotalCycleZTimeChanged;
+extern NSString* ORCaen792ModelPercentZeroOffChanged;
+extern NSString* ORCaen792ModelCycleZeroSuppressionChanged;
 extern NSString* ORCaen792ModelSlideConstantChanged;
 extern NSString* ORCaen792ModelSlidingScaleEnableChanged;
 extern NSString* ORCaen792ModelEventCounterIncChanged;

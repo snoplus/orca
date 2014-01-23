@@ -63,6 +63,9 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Thresholds",         false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
+NSString* ORCaen792ModelTotalCycleZTimeChanged        = @"ORCaen792ModelTotalCycleZTimeChanged";
+NSString* ORCaen792ModelPercentZeroOffChanged         = @"ORCaen792ModelPercentZeroOffChanged";
+NSString* ORCaen792ModelCycleZeroSuppressionChanged   = @"ORCaen792ModelCycleZeroSuppressionChanged";
 NSString* ORCaen792ModelModelTypeChanged              = @"ORCaen792ModelModelTypeChanged";
 NSString* ORCaen792ModelOnlineMaskChanged             = @"ORCaen792ModelOnlineMaskChanged";
 NSString* ORCaen792ModelIPedChanged                   = @"ORCaen792ModelIPedChanged";
@@ -86,6 +89,10 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 #define kSlideSubEnable 0x2000 //used
 #define kAllTrg         0x4000 //used
 
+@interface ORCaen792Model (private)
+- (void) startCyclingZeroSuppression;
+- (void) stopCyclingZeroSuppression;
+@end
 
 @implementation ORCaen792Model
 
@@ -102,6 +109,12 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     [[self undoManager] enableUndoRegistration];
    
     return self;
+}
+
+- (void) dealloc
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [super dealloc];
 }
 
 - (void) setUpImage
@@ -123,7 +136,54 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 {
 	return NSMakeRange(baseAddress,0x10BF);
 }
+
 #pragma mark ***Accessors
+- (int) totalCycleZTime
+{
+    return totalCycleZTime;
+}
+
+- (void) setTotalCycleZTime:(int)aValue
+{
+    if(aValue < 1) aValue=1;
+
+    [[[self undoManager] prepareWithInvocationTarget:self] setTotalCycleZTime:totalCycleZTime];
+    
+    totalCycleZTime = aValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelTotalCycleZTimeChanged object:self];
+}
+
+- (int) percentZeroOff
+{
+    return percentZeroOff;
+}
+
+- (void) setPercentZeroOff:(int)aValue
+{
+    if(aValue < 1)       aValue = 1;
+    else if(aValue > 99) aValue = 99;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setPercentZeroOff:percentZeroOff];
+    
+    percentZeroOff = aValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelPercentZeroOffChanged object:self];
+}
+
+- (BOOL) cycleZeroSuppression
+{
+    return cycleZeroSuppression;
+}
+
+- (void) setCycleZeroSuppression:(BOOL)aCycleZeroSuppression
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCycleZeroSuppression:cycleZeroSuppression];
+    
+    cycleZeroSuppression = aCycleZeroSuppression;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelCycleZeroSuppressionChanged object:self];
+}
 
 - (unsigned short) slideConstant
 {
@@ -478,10 +538,13 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 
     // Set thresholds in unit
-    [self writeThresholds];
+    [self initBoard];
     
     [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
    
+    if(cycleZeroSuppression){
+        [self startCyclingZeroSuppression];
+    }
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -580,6 +643,8 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+    [self stopCyclingZeroSuppression];
+
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
 
@@ -638,6 +703,9 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
+    [self setTotalCycleZTime:       [aDecoder decodeIntForKey:  @"totalCycleZTime"]];
+    [self setPercentZeroOff:        [aDecoder decodeIntForKey:  @"percentZeroOff"]];
+    [self setCycleZeroSuppression:  [aDecoder decodeBoolForKey: @"cycleZeroSuppression"]];
     [self setSlideConstant:         [aDecoder decodeIntForKey:  @"slideConstant"]];
     [self setSlidingScaleEnable:    [aDecoder decodeBoolForKey: @"slidingScaleEnable"]];
     [self setEventCounterInc:       [aDecoder decodeBoolForKey: @"eventCounterInc"]];
@@ -656,6 +724,9 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+	[anEncoder encodeInt:totalCycleZTime          forKey:@"totalCycleZTime"];
+	[anEncoder encodeInt:percentZeroOff           forKey:@"percentZeroOff"];
+	[anEncoder encodeBool:cycleZeroSuppression    forKey:@"cycleZeroSuppression"];
 	[anEncoder encodeInt:  slideConstant          forKey:@"slideConstant"];
 	[anEncoder encodeBool: slidingScaleEnable     forKey:@"slidingScaleEnable"];
 	[anEncoder encodeBool: eventCounterInc        forKey:@"eventCounterInc"];
@@ -762,3 +833,33 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 }
 @end
 
+@implementation ORCaen792Model (private)
+- (void) startCyclingZeroSuppression
+{
+    [self setZeroSuppressEnable:NO];
+    [self doCycle];
+}
+
+- (void) doCycle
+{
+    [self setZeroSuppressEnable:!zeroSuppressEnable];
+    [self writeBit2Register];
+    
+    float timeUntilNextCycle;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycle) object:nil];
+    if(zeroSuppressEnable == YES){ //YES is actually zero suppression OFF
+        timeUntilNextCycle = totalCycleZTime * (percentZeroOff/100.);
+    }
+    else {
+        timeUntilNextCycle = totalCycleZTime * (1. - (percentZeroOff/100.));
+    }
+    [self performSelector:@selector(doCycle) withObject:nil afterDelay:timeUntilNextCycle];
+
+}
+
+- (void) stopCyclingZeroSuppression
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startCyclingZeroSuppression) object:nil];
+    
+}
+@end

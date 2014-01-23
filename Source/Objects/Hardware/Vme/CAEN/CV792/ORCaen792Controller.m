@@ -92,9 +92,41 @@
                          name : ORCaen792ModelSlideConstantChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(cycleZeroSuppressionChanged:)
+                         name : ORCaen792ModelCycleZeroSuppressionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(percentZeroOffChanged:)
+                         name : ORCaen792ModelPercentZeroOffChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(totalCycleZTimeChanged:)
+                         name : ORCaen792ModelTotalCycleZTimeChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+
+- (void) totalCycleZTimeChanged:(NSNotification*)aNote
+{
+	[totalCycleZTimeField setIntValue: [model totalCycleZTime]];
+}
+
+- (void) percentZeroOffChanged:(NSNotification*)aNote
+{
+	[percentZeroOffField setIntValue: [model percentZeroOff]];
+}
+
+- (void) cycleZeroSuppressionChanged:(NSNotification*)aNote
+{
+	[cycleZeroSuppressionCB setIntValue: [model cycleZeroSuppression]];
+    [self setUpButtons];
+}
+
 - (void) updateWindow
 {
     [super updateWindow];
@@ -107,6 +139,9 @@
 	[self eventCounterIncChanged:nil];
 	[self slidingScaleEnableChanged:nil];
 	[self slideConstantChanged:nil];
+	[self cycleZeroSuppressionChanged:nil];
+	[self percentZeroOffChanged:nil];
+	[self totalCycleZTimeChanged:nil];
 }
 
 - (void) slideConstantChanged:(NSNotification*)aNote
@@ -204,11 +239,13 @@
 	[slideConstantField           setEnabled: !lockedOrRunningMaintenance && ![model slidingScaleEnable]];
 	[slidingScaleEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
 	[eventCounterIncMatrix        setEnabled: !lockedOrRunningMaintenance];
-	[zeroSuppressEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
 	[overflowSuppressEnableMatrix setEnabled: !lockedOrRunningMaintenance];
 	[iPedField                    setEnabled: !lockedOrRunningMaintenance];
 	[defaultsButton               setEnabled: !lockedOrRunningMaintenance];
-
+	[zeroSuppressEnableMatrix     setEnabled: !lockedOrRunningMaintenance && ![model cycleZeroSuppression]];
+    [percentZeroOffField          setEnabled: !lockedOrRunningMaintenance &&  [model cycleZeroSuppression]];
+    [totalCycleZTimeField         setEnabled: !lockedOrRunningMaintenance &&  [model cycleZeroSuppression]];
+    
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
 		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
@@ -226,6 +263,21 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) totalCycleZTimeAction:(id)sender
+{
+	[model setTotalCycleZTime:[sender intValue]];	
+}
+
+- (IBAction) percentZeroOffAction:(id)sender
+{
+	[model setPercentZeroOff:[sender intValue]];	
+}
+
+- (IBAction) cycleZeroSuppressionAction:(id)sender
+{
+	[model setCycleZeroSuppression:[sender intValue]];
+}
+
 - (IBAction) slideConstantAction:(id)sender
 {
 	[model setSlideConstant:[sender intValue]];

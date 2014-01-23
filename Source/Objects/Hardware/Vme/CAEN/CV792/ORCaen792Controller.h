@@ -22,6 +22,9 @@
 // Definition of class.
 @interface ORCaen792Controller : ORCaenCardController {
 	IBOutlet NSPopUpButton* modelTypePU;
+	IBOutlet NSTextField*   totalCycleZTimeField;
+	IBOutlet NSTextField*   percentZeroOffField;
+	IBOutlet NSButton*      cycleZeroSuppressionCB;
 	IBOutlet NSButton*      defaultsButton;
 	IBOutlet NSTextField*   slideConstantField;
 	IBOutlet NSMatrix*      slidingScaleEnableMatrix;
@@ -41,6 +44,9 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) totalCycleZTimeChanged:(NSNotification*)aNote;
+- (void) percentZeroOffChanged:(NSNotification*)aNote;
+- (void) cycleZeroSuppressionChanged:(NSNotification*)aNote;
 - (void) setUpButtons;
 - (void) slideConstantChanged:(NSNotification*)aNote;
 - (void) slidingScaleEnableChanged:(NSNotification*)aNote;
@@ -56,6 +62,9 @@
 
 
 #pragma mark ***Actions
+- (IBAction) totalCycleZTimeAction:(id)sender;
+- (IBAction) percentZeroOffAction:(id)sender;
+- (IBAction) cycleZeroSuppressionAction:(id)sender;
 - (IBAction) slideConstantAction:(id)sender;
 - (IBAction) slidingScaleEnableAction:(id)sender;
 - (IBAction) eventCounterIncAction:(id)sender;
