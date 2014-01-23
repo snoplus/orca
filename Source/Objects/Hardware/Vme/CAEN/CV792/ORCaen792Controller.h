@@ -22,6 +22,7 @@
 // Definition of class.
 @interface ORCaen792Controller : ORCaenCardController {
 	IBOutlet NSPopUpButton* modelTypePU;
+	IBOutlet NSButton*      defaultsButton;
 	IBOutlet NSTextField*   slideConstantField;
 	IBOutlet NSMatrix*      slidingScaleEnableMatrix;
 	IBOutlet NSMatrix*      eventCounterIncMatrix;
@@ -61,10 +62,11 @@
 //- (IBAction) zeroSuppressThresResAction:(id)sender; //v5.1 only
 - (IBAction) zeroSuppressEnableAction:(id)sender;
 - (IBAction) overflowSuppressEnableAction:(id)sender;
-- (IBAction) iPedAction:  (id)sender;
+- (IBAction) iPedAction:   (id)sender;
 - (IBAction) modelTypePUAction:(id)sender;
-- (IBAction) onlineAction:(id) sender;
-- (IBAction) initBoard:   (id) sender;
-- (IBAction) report:      (id) sender;
+- (IBAction) onlineAction: (id) sender;
+- (IBAction) initBoard:    (id) sender;
+- (IBAction) report:       (id) sender;
+- (IBAction) setToDefaults:(id) sender;
 
 @end

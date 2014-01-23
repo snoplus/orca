@@ -207,9 +207,8 @@
 	[zeroSuppressEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
 	[overflowSuppressEnableMatrix setEnabled: !lockedOrRunningMaintenance];
 	[iPedField                    setEnabled: !lockedOrRunningMaintenance];
+	[defaultsButton               setEnabled: !lockedOrRunningMaintenance];
 
-    
-    
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
 		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
@@ -227,34 +226,33 @@
 }
 
 #pragma mark ¥¥¥Actions
-
-- (void) slideConstantAction:(id)sender
+- (IBAction) slideConstantAction:(id)sender
 {
 	[model setSlideConstant:[sender intValue]];
 }
 
-- (void) slidingScaleEnableAction:(id)sender
+- (IBAction) slidingScaleEnableAction:(id)sender
 {
 	[model setSlidingScaleEnable:[[sender selectedCell]tag]];
 }
 
-- (void) eventCounterIncAction:(id)sender
+- (IBAction) eventCounterIncAction:(id)sender
 {
 	[model setEventCounterInc:[[sender selectedCell]tag]];
 }
 
 /* v5.1 only
- - (void) zeroSuppressThresResAction:(id)sender
+ - (IBAction) zeroSuppressThresResAction:(id)sender
 {
 	[model setZeroSuppressThresRes:[[sender selectedCell]tag]];
 }
 */
-- (void) zeroSuppressEnableAction:(id)sender
+- (IBAction) zeroSuppressEnableAction:(id)sender
 {
 	[model setZeroSuppressEnable:[[sender selectedCell]tag]];
 }
 
-- (void) overflowSuppressEnableAction:(id)sender
+- (IBAction) overflowSuppressEnableAction:(id)sender
 {
 	[model setOverflowSuppressEnable:[[sender selectedCell]tag]];
 }
@@ -284,6 +282,10 @@
     [model readThresholds];
     [model logThresholds];
     NSLog(@"IPed Value: 0x%0x\n",[model readIPed]);
- }
+}
+- (IBAction) setToDefaults:(id) sender
+{
+    [model setToDefaults];
+}
 
 @end

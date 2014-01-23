@@ -132,6 +132,8 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 
 - (void) setSlideConstant:(unsigned short)aSlideConstant
 {
+    if(aSlideConstant > 0xff)aSlideConstant=0xff;
+    
     [[[self undoManager] prepareWithInvocationTarget:self] setSlideConstant:slideConstant];
     
     slideConstant = aSlideConstant;
@@ -428,6 +430,22 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     return aValue & 0xff;
    
 }
+
+- (void) setToDefaults
+{
+    [self setOverflowSuppressEnable:NO];
+    [self setZeroSuppressEnable:NO];
+    [self setEventCounterInc:YES];
+    [self setSlidingScaleEnable:YES];
+}
+
+- (void) initBoard
+{
+    [self writeThresholds];
+    [self writeIPed];
+    [self writeBit2Register];
+    [self writeSlideConstReg];
+}
 #pragma mark ***DataTaker
 - (void) setDataIds:(id)assigner
 {
@@ -689,14 +707,6 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 	 postNotificationName:ORAdcInfoProvidingValueChanged
 	 object:self
 	 userInfo: nil];
-}
-
-- (void) initBoard
-{
-    [self writeThresholds];
-    [self writeIPed];
-    [self writeBit2Register];
-    [self writeSlideConstReg];
 }
 
 - (NSArray*) wizardParameters
