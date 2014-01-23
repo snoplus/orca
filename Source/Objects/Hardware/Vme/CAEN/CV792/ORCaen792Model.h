@@ -1,23 +1,16 @@
 //--------------------------------------------------------------------------------
-/*!\class	ORCaen792Model
- * \brief	Handles all access to CAEN CV792 ADC module.
- * \methods
- *			\li \b 			- Constructor
- *			\li \b 
- * \note
- * \author	Mark A. Howe
- * \history	2004-04-21 (MAH) - Original
- */
+// ORCaen792Model.h
+//  Created by Mark Howe on Tues June 1 2010.
+//  Copyright © 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
+//North Carolina sponsored in part by the United States
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
@@ -80,13 +73,31 @@ enum {
 @interface ORCaen792Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
     int modelType;
-	unsigned long onlineMask;
-	unsigned long dataIdN;
-	unsigned long location;
-    unsigned short iPed;
+	unsigned long   onlineMask;
+	unsigned long   dataIdN;
+	unsigned long   location;
+    unsigned short  iPed;
+    BOOL            overflowSuppressEnable;
+    BOOL            zeroSuppressEnable;
+    //BOOL            zeroSuppressThresRes; //v5.1 only
+    BOOL            eventCounterInc;
+    BOOL            slidingScaleEnable;
+    unsigned short  slideConstant;
 }
 
 #pragma mark ***Accessors
+- (unsigned short)  slideConstant;
+- (void)            setSlideConstant:(unsigned short)aSlideConstant;
+- (BOOL)            slidingScaleEnable;
+- (void)            setSlidingScaleEnable:(BOOL)aSlidingScaleEnable;
+- (BOOL)            eventCounterInc;
+- (void)            setEventCounterInc:(BOOL)aEventCounterInc;
+//- (BOOL)            zeroSuppressThresRes; v5.1 only
+//- (void)            setZeroSuppressThresRes:(BOOL)aZeroSuppressThresRes; v5.1 only
+- (BOOL)            zeroSuppressEnable;
+- (void)            setZeroSuppressEnable:(BOOL)aZeroSuppressEnable;
+- (BOOL)            overflowSuppressEnable;
+- (void)            setOverflowSuppressEnable:(BOOL)aOverflowSuppressEnable;
 - (unsigned short)  iPed;
 - (void)            setIPed:(unsigned short)aIPed;
 - (unsigned long)   dataIdN;
@@ -103,12 +114,15 @@ enum {
 - (short)           getNumberRegisters;
 - (unsigned long) 	getBufferOffset;
 - (unsigned short) 	getDataBufferSize;
-- (unsigned long)  getThresholdOffset:(int)aChan;
+- (unsigned long)   getThresholdOffset:(int)aChan;
 - (short)           getStatusRegisterIndex: (short) aRegister;
 - (short)           getThresholdIndex;
 - (short)           getOutputBufferIndex;
 - (void)            writeThresholds;
 - (void)            writeIPed;
+- (void)            writeBit2Register;
+- (void)            writeSlideConstReg;
+
 - (unsigned short)  readIPed;
 
 #pragma mark ***Register - Register specific routines
@@ -134,6 +148,12 @@ enum {
 @end
 
 
+extern NSString* ORCaen792ModelSlideConstantChanged;
+extern NSString* ORCaen792ModelSlidingScaleEnableChanged;
+extern NSString* ORCaen792ModelEventCounterIncChanged;
+//extern NSString* ORCaen792ModelZeroSuppressThresResChanged; //v5.1 only
+extern NSString* ORCaen792ModelZeroSuppressEnableChanged;
+extern NSString* ORCaen792ModelOverflowSuppressEnableChanged;
 extern NSString* ORCaen792ModelIPedChanged;
 extern NSString* ORCaen792ModelModelTypeChanged;
 extern NSString* ORCaen792ModelOnlineMaskChanged;

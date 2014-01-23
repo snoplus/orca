@@ -1,20 +1,20 @@
+//--------------------------------------------------------------------------------
+// ORCaen792Controller.m
+//  Created by Mark Howe on Tues June 1 2010.
+//  Copyright © 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//This program was prepared for the Regents of the University of
+//North Carolina sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
-//--------------------------------------------------------------------------------
-// CLASS:		ORCaen792Controller
-// Purpose:		Handles the interaction between the user and the VC792 module.
-//--------------------------------------------------------------------------------
+
 #import "ORCaen792Controller.h"
 #import "ORCaenDataDecoder.h"
 #import "ORCaen792Model.h"
@@ -22,13 +22,6 @@
 
 @implementation ORCaen792Controller
 #pragma mark ***Initialization
-//--------------------------------------------------------------------------------
-/*!
- * \method	init
- * \brief	Initialize interface with hardware object.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) init
 {
     self = [ super initWithWindowNibName: @"Caen792" ];
@@ -39,22 +32,16 @@
 {
 	int i;
 	for(i=0;i<16;i++){
-		[[onlineMaskMatrixA cellAtRow:i column:0] setTag:i];
-		[[onlineMaskMatrixB cellAtRow:i column:0] setTag:i+16];
-		[[thresholdA cellAtRow:i column:0] setTag:i];
-		[[thresholdB cellAtRow:i column:0] setTag:i+16];
+		[[onlineMaskMatrixA cellAtRow:i column:0]   setTag:i];
+		[[onlineMaskMatrixB cellAtRow:i column:0]   setTag:i+16];
+		[[thresholdA cellAtRow:i column:0]          setTag:i];
+		[[thresholdB cellAtRow:i column:0]          setTag:i+16];
 	}
 	[super awakeFromNib];
 }
 
 
 #pragma mark ¥¥¥Notifications
-//--------------------------------------------------------------------------------
-/*!\method  registerNotificationObservers
- * \brief	Register notices that we want to receive.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) registerNotificationObservers
 {
     [ super registerNotificationObservers ];
@@ -74,27 +61,90 @@
                          name : ORCaen792ModelIPedChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(overflowSuppressEnableChanged:)
+                         name : ORCaen792ModelOverflowSuppressEnableChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(zeroSuppressEnableChanged:)
+                         name : ORCaen792ModelZeroSuppressEnableChanged
+						object: model];
+
+/* v5.1 only
+ [notifyCenter addObserver : self
+                     selector : @selector(zeroSuppressThresResChanged:)
+                         name : ORCaen792ModelZeroSuppressThresResChanged
+						object: model];
+*/
+    [notifyCenter addObserver : self
+                     selector : @selector(eventCounterIncChanged:)
+                         name : ORCaen792ModelEventCounterIncChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(slidingScaleEnableChanged:)
+                         name : ORCaen792ModelSlidingScaleEnableChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(slideConstantChanged:)
+                         name : ORCaen792ModelSlideConstantChanged
+						object: model];
+
 }
 
 #pragma mark ***Interface Management
+- (void) updateWindow
+{
+    [super updateWindow];
+	[self modelTypeChanged:nil];
+	[self onlineMaskChanged:nil];
+	[self iPedChanged:nil];
+	[self overflowSuppressEnableChanged:nil];
+	[self zeroSuppressEnableChanged:nil];
+	//[self zeroSuppressThresResChanged:nil];//v5.1 only
+	[self eventCounterIncChanged:nil];
+	[self slidingScaleEnableChanged:nil];
+	[self slideConstantChanged:nil];
+}
+
+- (void) slideConstantChanged:(NSNotification*)aNote
+{
+	[slideConstantField setIntValue: [model slideConstant]];
+}
+
+- (void) slidingScaleEnableChanged:(NSNotification*)aNote
+{
+	[slidingScaleEnableMatrix selectCellWithTag: [model slidingScaleEnable]];
+    [self setUpButtons];
+}
+
+- (void) eventCounterIncChanged:(NSNotification*)aNote
+{
+	[eventCounterIncMatrix selectCellWithTag: [model eventCounterInc]];
+}
+
+/* v5.1 only
+ - (void) zeroSuppressThresResChanged:(NSNotification*)aNote
+{
+	[zeroSuppressThresResMatrix selectCellWithTag: [model zeroSuppressThresRes]];
+}
+*/
+
+- (void) zeroSuppressEnableChanged:(NSNotification*)aNote
+{
+	[zeroSuppressEnableMatrix selectCellWithTag: [model zeroSuppressEnable]];
+}
+
+- (void) overflowSuppressEnableChanged:(NSNotification*)aNote
+{
+	[overflowSuppressEnableMatrix selectCellWithTag: [model overflowSuppressEnable]];
+}
 
 - (void) iPedChanged:(NSNotification*)aNote
 {
 	[iPedField setIntValue: [model iPed]];
-}
-
-//--------------------------------------------------------------------------------
-/*!\method  updateWindow
- * \brief	Sets all GUI values to current model values.
- * \note	
- */
-//--------------------------------------------------------------------------------
-- (void) updateWindow
-{
-   [ super updateWindow ];
-	[self modelTypeChanged:nil];
-	[self onlineMaskChanged:nil];
-	[self iPedChanged:nil];
 }
 
 #pragma mark ***Interface Management - Module specific
@@ -103,7 +153,7 @@
 
 - (NSSize) thresholdDialogSize
 {
-	return NSMakeSize(410,640);
+	return NSMakeSize(550,610);
 }
 
 - (void) modelTypeChanged:(NSNotification*)aNote
@@ -121,11 +171,17 @@
 	}
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
+
 - (void) thresholdLockChanged:(NSNotification*)aNotification
 {
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    [self setUpButtons];
+}
+
+- (void) setUpButtons
+{
+    BOOL runInProgress              = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
-    BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
+    BOOL locked                     = [gSecurity isLocked:[self thresholdLockName]];
     
 	[modelTypePU setEnabled:!runInProgress];
     [thresholdLockButton setState: locked];
@@ -145,6 +201,15 @@
     [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
     [thresholdReadButton setEnabled:!lockedOrRunningMaintenance];
 	
+	[slideConstantField           setEnabled: !lockedOrRunningMaintenance && ![model slidingScaleEnable]];
+	[slidingScaleEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
+	[eventCounterIncMatrix        setEnabled: !lockedOrRunningMaintenance];
+	[zeroSuppressEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
+	[overflowSuppressEnableMatrix setEnabled: !lockedOrRunningMaintenance];
+	[iPedField                    setEnabled: !lockedOrRunningMaintenance];
+
+    
+    
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
 		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
@@ -162,6 +227,38 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) slideConstantAction:(id)sender
+{
+	[model setSlideConstant:[sender intValue]];
+}
+
+- (void) slidingScaleEnableAction:(id)sender
+{
+	[model setSlidingScaleEnable:[[sender selectedCell]tag]];
+}
+
+- (void) eventCounterIncAction:(id)sender
+{
+	[model setEventCounterInc:[[sender selectedCell]tag]];
+}
+
+/* v5.1 only
+ - (void) zeroSuppressThresResAction:(id)sender
+{
+	[model setZeroSuppressThresRes:[[sender selectedCell]tag]];
+}
+*/
+- (void) zeroSuppressEnableAction:(id)sender
+{
+	[model setZeroSuppressEnable:[[sender selectedCell]tag]];
+}
+
+- (void) overflowSuppressEnableAction:(id)sender
+{
+	[model setOverflowSuppressEnable:[[sender selectedCell]tag]];
+}
+
 - (IBAction) initBoard:(id) sender
 {
     [model initBoard];

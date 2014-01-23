@@ -1,28 +1,26 @@
 //--------------------------------------------------------------------------------
-// CLASS:		ORCaen792Model
-// Purpose:		Handles hardware interface for those commands specific to the 792.
-// Author:		Mark A. Howe
+// ORCaen792Model.m
+//  Created by Mark Howe on Tues June 1 2010.
+//  Copyright © 2010 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//This program was prepared for the Regents of the University of
+//North Carolina sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORCaen792Model.h"
+#import "ORHWWizParam.h"
+#import "ORHWWizSelection.h"
 
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x9
 
-//NSString* OR792SelectedRegIndexChanged 	= @"792 Selected Register Index Changed";
-//NSString* OR792SelectedChannelChanged 	= @"792 Selected Channel Changed";
-//NSString* OR792WriteValueChanged          = @"792 Write Value Changed";
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
@@ -65,9 +63,29 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Thresholds",         false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
-NSString* ORCaen792ModelModelTypeChanged  = @"ORCaen792ModelModelTypeChanged";
-NSString* ORCaen792ModelOnlineMaskChanged = @"ORCaen792ModelOnlineMaskChanged";
-NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
+NSString* ORCaen792ModelModelTypeChanged              = @"ORCaen792ModelModelTypeChanged";
+NSString* ORCaen792ModelOnlineMaskChanged             = @"ORCaen792ModelOnlineMaskChanged";
+NSString* ORCaen792ModelIPedChanged                   = @"ORCaen792ModelIPedChanged";
+NSString* ORCaen792ModelSlideConstantChanged          = @"ORCaen792ModelSlideConstantChanged";
+NSString* ORCaen792ModelSlidingScaleEnableChanged     = @"ORCaen792ModelSlidingScaleEnableChanged";
+NSString* ORCaen792ModelEventCounterIncChanged        = @"ORCaen792ModelEventCounterIncChanged";
+//NSString* ORCaen792ModelZeroSuppressThresResChanged   = @"ORCaen792ModelZeroSuppressThresResChanged"; //v5.1 only
+NSString* ORCaen792ModelZeroSuppressEnableChanged     = @"ORCaen792ModelZeroSuppressEnableChanged";
+NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflowSuppressEnableChanged";
+
+// Bit Set 2 Register Masks
+#define kTestMem        0x0001
+#define kOffline        0x0002
+#define kClearData      0x0004
+#define kOverRange      0x0008 //used
+#define kLowThres       0x0010 //used
+#define kTestAcq        0x0040
+#define kSlideEnable    0x0080
+#define kAutoInc        0x0800
+#define kEmptyEnable    0x1000
+#define kSlideSubEnable 0x2000 //used
+#define kAllTrg         0x4000 //used
+
 
 @implementation ORCaen792Model
 
@@ -77,8 +95,8 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setBaseAddress:k792DefaultBaseAddress];
-    [self setAddressModifier:k792DefaultAddressModifier];
+    [self setBaseAddress:     k792DefaultBaseAddress];
+    [self setAddressModifier: k792DefaultAddressModifier];
 	[self setOnlineMask:0];
 	
     [[self undoManager] enableUndoRegistration];
@@ -106,6 +124,92 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
 	return NSMakeRange(baseAddress,0x10BF);
 }
 #pragma mark ***Accessors
+
+- (unsigned short) slideConstant
+{
+    return slideConstant;
+}
+
+- (void) setSlideConstant:(unsigned short)aSlideConstant
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlideConstant:slideConstant];
+    
+    slideConstant = aSlideConstant;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelSlideConstantChanged object:self];
+}
+
+- (BOOL) slidingScaleEnable
+{
+    return slidingScaleEnable;
+}
+
+- (void) setSlidingScaleEnable:(BOOL)aSlidingScaleEnable
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlidingScaleEnable:slidingScaleEnable];
+    
+    slidingScaleEnable = aSlidingScaleEnable;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelSlidingScaleEnableChanged object:self];
+}
+
+- (BOOL) eventCounterInc
+{
+    return eventCounterInc;
+}
+
+- (void) setEventCounterInc:(BOOL)aEventCounterInc
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventCounterInc:eventCounterInc];
+    
+    eventCounterInc = aEventCounterInc;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelEventCounterIncChanged object:self];
+}
+
+/* v5.1 only
+ - (BOOL) zeroSuppressThresRes
+{
+    return zeroSuppressThresRes;
+}
+
+- (void) setZeroSuppressThresRes:(BOOL)aZeroSuppressThresRes
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setZeroSuppressThresRes:zeroSuppressThresRes];
+    
+    zeroSuppressThresRes = aZeroSuppressThresRes;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelZeroSuppressThresResChanged object:self];
+}
+*/
+
+- (BOOL) zeroSuppressEnable
+{
+    return zeroSuppressEnable;
+}
+
+- (void) setZeroSuppressEnable:(BOOL)aZeroSuppressEnable
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setZeroSuppressEnable:zeroSuppressEnable];
+    
+    zeroSuppressEnable = aZeroSuppressEnable;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelZeroSuppressEnableChanged object:self];
+}
+
+- (BOOL) overflowSuppressEnable
+{
+    return overflowSuppressEnable;
+}
+
+- (void) setOverflowSuppressEnable:(BOOL)aOverflowSuppressEnable
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOverflowSuppressEnable:overflowSuppressEnable];
+    
+    overflowSuppressEnable = aOverflowSuppressEnable;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelOverflowSuppressEnableChanged object:self];
+}
 
 - (unsigned short) iPed
 {
@@ -180,8 +284,8 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
 
 - (int) numberOfChannels
 {
-	if([self modelType] == kModel792) return 16;
-	else							  return 32;
+	if([self modelType] == kModel792) return 32;
+	else							  return 16;
 }
 
 - (unsigned long) getThresholdOffset:(int)aChan
@@ -258,6 +362,50 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
 	}
 }
 
+- (void) writeBit2Register
+{
+    unsigned short setBitMask = 0;
+    unsigned short clrBitMask = 0;
+    
+    if(overflowSuppressEnable)  setBitMask |= kOverRange;
+    else                        clrBitMask |= kOverRange;
+    
+    if(zeroSuppressEnable)      setBitMask |= kLowThres;
+    else                        clrBitMask |= kLowThres;
+
+    //if(zeroSuppressThresRes)    setBitMask |= kLowThres; //v5.1 only
+    //else                        clrBitMask |= kLowThres;
+ 
+    if(eventCounterInc)         setBitMask |= kAllTrg;
+    else                        clrBitMask |= kAllTrg;
+
+    if(slidingScaleEnable)      setBitMask |= kSlideSubEnable;
+    else                        clrBitMask |= kSlideSubEnable;
+
+    
+    [[self adapter] writeWordBlock:&setBitMask
+                         atAddress:[self baseAddress] + reg[kBitSet2].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+ 
+    [[self adapter] writeWordBlock:&clrBitMask
+                         atAddress:[self baseAddress] + reg[kBitClear2].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) writeSlideConstReg
+{
+    unsigned short aValue = slideConstant;
+    [[self adapter] writeWordBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kSlideConsReg].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
+}
 
 - (void) writeIPed
 {
@@ -305,9 +453,8 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
     // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];		// Clear data, 
+    [self write:kBitSet2 sendValue:kClearData];		// Clear data,
     [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
-    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
 
     // Set options
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
@@ -315,6 +462,8 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
     // Set thresholds in unit
     [self writeThresholds];
     
+    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
+   
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -471,9 +620,15 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
-    [self setIPed:              [aDecoder decodeIntForKey:@"iPed"]];
-    [self setModelType:			[aDecoder decodeIntForKey:@"modelType"]];
-   	[self setOnlineMask:		[aDecoder decodeInt32ForKey:@"onlineMask"]];
+    [self setSlideConstant:         [aDecoder decodeIntForKey:  @"slideConstant"]];
+    [self setSlidingScaleEnable:    [aDecoder decodeBoolForKey: @"slidingScaleEnable"]];
+    [self setEventCounterInc:       [aDecoder decodeBoolForKey: @"eventCounterInc"]];
+    //[self setZeroSuppressThresRes:  [aDecoder decodeBoolForKey: @"zeroSuppressThresRes"]]; //v5.1 only
+    [self setZeroSuppressEnable:    [aDecoder decodeBoolForKey: @"zeroSuppressEnable"]];
+    [self setOverflowSuppressEnable:[aDecoder decodeBoolForKey: @"overflowSuppressEnable"]];
+    [self setIPed:                  [aDecoder decodeIntForKey:  @"iPed"]];
+    [self setModelType:             [aDecoder decodeIntForKey:  @"modelType"]];
+   	[self setOnlineMask:            [aDecoder decodeInt32ForKey:@"onlineMask"]];
 
     
     [[self undoManager] enableUndoRegistration];
@@ -483,9 +638,15 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
-	[anEncoder encodeInt:iPed               forKey:@"iPed"];
-	[anEncoder encodeInt:modelType			forKey:@"modelType"];
-	[anEncoder encodeInt32:onlineMask		forKey:@"onlineMask"];
+	[anEncoder encodeInt:  slideConstant          forKey:@"slideConstant"];
+	[anEncoder encodeBool: slidingScaleEnable     forKey:@"slidingScaleEnable"];
+	[anEncoder encodeBool: eventCounterInc        forKey:@"eventCounterInc"];
+	//[anEncoder encodeBool: zeroSuppressThresRes   forKey:@"zeroSuppressThresRes"]; //v5.1 only
+	[anEncoder encodeBool: zeroSuppressEnable     forKey:@"zeroSuppressEnable"];
+	[anEncoder encodeBool: overflowSuppressEnable forKey:@"overflowSuppressEnable"];
+	[anEncoder encodeInt:  iPed                   forKey:@"iPed"];
+	[anEncoder encodeInt:  modelType              forKey:@"modelType"];
+	[anEncoder encodeInt32:onlineMask             forKey:@"onlineMask"];
 }
 
 #pragma mark ¥¥¥AdcProviding Protocol
@@ -534,6 +695,60 @@ NSString* ORCaen792ModelIPedChanged       = @"ORCaen792ModelIPedChanged";
 {
     [self writeThresholds];
     [self writeIPed];
+    [self writeBit2Register];
+    [self writeSlideConstReg];
+}
+
+- (NSArray*) wizardParameters
+{
+    NSMutableArray* a = [NSMutableArray array];
+    ORHWWizParam* p;
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Threshold"];
+    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setThreshold:threshold:) getMethod:@selector(threshold:)];
+	[p setCanBeRamped:YES];
+	[p setInitMethodSelector:@selector(writeThresholds)];
+    [a addObject:p];
+    
+	p = [[[ORHWWizParam alloc] init] autorelease];
+	[p setUseValue:NO];
+	[p setName:@"Init"];
+	[p setSetMethodSelector:@selector(writeThresholds)];
+	[a addObject:p];
+    
+    return a;
+}
+
+- (NSArray*) wizardSelections
+{
+    NSMutableArray* a = [NSMutableArray array];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel  name:@"Crate" className:@"ORVmeCrateModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel     name:@"Card" className:NSStringFromClass([self class])]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel    name:@"Channel" className:NSStringFromClass([self class])]];
+    return a;
+    
+}
+
+- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
+{
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
+    if([param isEqualToString:@"Threshold"])return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+    else return nil;
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+
+    [objDictionary setObject:[NSNumber numberWithInt:slideConstant]           forKey:@"slideConstant"];
+    [objDictionary setObject:[NSNumber numberWithBool:slidingScaleEnable]     forKey:@"slidingScaleEnable"];
+    [objDictionary setObject:[NSNumber numberWithBool:overflowSuppressEnable] forKey:@"overflowSuppressEnable"];
+    [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressEnable]     forKey:@"zeroSuppressEnable"];
+    [objDictionary setObject:[NSNumber numberWithBool:eventCounterInc]        forKey:@"eventCounterInc"];
+
+    return objDictionary;
 }
 @end
 
