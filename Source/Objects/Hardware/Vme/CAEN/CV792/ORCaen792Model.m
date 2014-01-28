@@ -72,7 +72,7 @@ NSString* ORCaen792ModelIPedChanged                   = @"ORCaen792ModelIPedChan
 NSString* ORCaen792ModelSlideConstantChanged          = @"ORCaen792ModelSlideConstantChanged";
 NSString* ORCaen792ModelSlidingScaleEnableChanged     = @"ORCaen792ModelSlidingScaleEnableChanged";
 NSString* ORCaen792ModelEventCounterIncChanged        = @"ORCaen792ModelEventCounterIncChanged";
-//NSString* ORCaen792ModelZeroSuppressThresResChanged   = @"ORCaen792ModelZeroSuppressThresResChanged"; //v5.1 only
+NSString* ORCaen792ModelZeroSuppressThresResChanged   = @"ORCaen792ModelZeroSuppressThresResChanged";
 NSString* ORCaen792ModelZeroSuppressEnableChanged     = @"ORCaen792ModelZeroSuppressEnableChanged";
 NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflowSuppressEnableChanged";
 
@@ -84,6 +84,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 #define kLowThres       0x0010 //used
 #define kTestAcq        0x0040
 #define kSlideEnable    0x0080
+#define kZeroThresRes   0x0100 //used
 #define kAutoInc        0x0800
 #define kEmptyEnable    0x1000
 #define kSlideSubEnable 0x2000 //used
@@ -229,7 +230,6 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelEventCounterIncChanged object:self];
 }
 
-/* v5.1 only
  - (BOOL) zeroSuppressThresRes
 {
     return zeroSuppressThresRes;
@@ -243,7 +243,6 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelZeroSuppressThresResChanged object:self];
 }
-*/
 
 - (BOOL) zeroSuppressEnable
 {
@@ -435,8 +434,8 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     if(zeroSuppressEnable)      setBitMask |= kLowThres;
     else                        clrBitMask |= kLowThres;
 
-    //if(zeroSuppressThresRes)    setBitMask |= kLowThres; //v5.1 only
-    //else                        clrBitMask |= kLowThres;
+    if(zeroSuppressThresRes)    setBitMask |= kZeroThresRes;
+    else                        clrBitMask |= kZeroThresRes;
  
     if(eventCounterInc)         setBitMask |= kAllTrg;
     else                        clrBitMask |= kAllTrg;
@@ -497,6 +496,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     [self setZeroSuppressEnable:NO];
     [self setEventCounterInc:YES];
     [self setSlidingScaleEnable:YES];
+    [self setZeroSuppressThresRes:NO];
 }
 
 - (void) initBoard
@@ -709,7 +709,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     [self setSlideConstant:         [aDecoder decodeIntForKey:  @"slideConstant"]];
     [self setSlidingScaleEnable:    [aDecoder decodeBoolForKey: @"slidingScaleEnable"]];
     [self setEventCounterInc:       [aDecoder decodeBoolForKey: @"eventCounterInc"]];
-    //[self setZeroSuppressThresRes:  [aDecoder decodeBoolForKey: @"zeroSuppressThresRes"]]; //v5.1 only
+    [self setZeroSuppressThresRes:  [aDecoder decodeBoolForKey: @"zeroSuppressThresRes"]];
     [self setZeroSuppressEnable:    [aDecoder decodeBoolForKey: @"zeroSuppressEnable"]];
     [self setOverflowSuppressEnable:[aDecoder decodeBoolForKey: @"overflowSuppressEnable"]];
     [self setIPed:                  [aDecoder decodeIntForKey:  @"iPed"]];
@@ -730,7 +730,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 	[anEncoder encodeInt:  slideConstant          forKey:@"slideConstant"];
 	[anEncoder encodeBool: slidingScaleEnable     forKey:@"slidingScaleEnable"];
 	[anEncoder encodeBool: eventCounterInc        forKey:@"eventCounterInc"];
-	//[anEncoder encodeBool: zeroSuppressThresRes   forKey:@"zeroSuppressThresRes"]; //v5.1 only
+	[anEncoder encodeBool: zeroSuppressThresRes   forKey:@"zeroSuppressThresRes"];
 	[anEncoder encodeBool: zeroSuppressEnable     forKey:@"zeroSuppressEnable"];
 	[anEncoder encodeBool: overflowSuppressEnable forKey:@"overflowSuppressEnable"];
 	[anEncoder encodeInt:  iPed                   forKey:@"iPed"];

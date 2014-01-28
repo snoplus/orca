@@ -29,7 +29,7 @@
 	IBOutlet NSTextField*   slideConstantField;
 	IBOutlet NSMatrix*      slidingScaleEnableMatrix;
 	IBOutlet NSMatrix*      eventCounterIncMatrix;
-//	IBOutlet NSMatrix*      zeroSuppressThresResMatrix; //v5.1 only
+	IBOutlet NSMatrix*      zeroSuppressThresResMatrix;
 	IBOutlet NSMatrix*      zeroSuppressEnableMatrix;
 	IBOutlet NSMatrix*      overflowSuppressEnableMatrix;
 	IBOutlet NSTextField*   iPedField;
@@ -51,7 +51,7 @@
 - (void) slideConstantChanged:(NSNotification*)aNote;
 - (void) slidingScaleEnableChanged:(NSNotification*)aNote;
 - (void) eventCounterIncChanged:(NSNotification*)aNote;
-//- (void) zeroSuppressThresResChanged:(NSNotification*)aNote;  //v5.1 only
+- (void) zeroSuppressThresResChanged:(NSNotification*)aNote;
 - (void) zeroSuppressEnableChanged:(NSNotification*)aNote;
 - (void) overflowSuppressEnableChanged:(NSNotification*)aNote;
 - (void) iPedChanged:(NSNotification*)aNote;
@@ -68,7 +68,7 @@
 - (IBAction) slideConstantAction:(id)sender;
 - (IBAction) slidingScaleEnableAction:(id)sender;
 - (IBAction) eventCounterIncAction:(id)sender;
-//- (IBAction) zeroSuppressThresResAction:(id)sender; //v5.1 only
+- (IBAction) zeroSuppressThresResAction:(id)sender;
 - (IBAction) zeroSuppressEnableAction:(id)sender;
 - (IBAction) overflowSuppressEnableAction:(id)sender;
 - (IBAction) iPedAction:   (id)sender;

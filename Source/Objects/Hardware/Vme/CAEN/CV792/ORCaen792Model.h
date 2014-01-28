@@ -79,7 +79,7 @@ enum {
     unsigned short  iPed;
     BOOL            overflowSuppressEnable;
     BOOL            zeroSuppressEnable;
-    //BOOL            zeroSuppressThresRes; //v5.1 only
+    BOOL            zeroSuppressThresRes; //v5.1 only
     BOOL            eventCounterInc;
     BOOL            slidingScaleEnable;
     unsigned short  slideConstant;
@@ -101,8 +101,8 @@ enum {
 - (void)            setSlidingScaleEnable:(BOOL)aSlidingScaleEnable;
 - (BOOL)            eventCounterInc;
 - (void)            setEventCounterInc:(BOOL)aEventCounterInc;
-//- (BOOL)            zeroSuppressThresRes; v5.1 only
-//- (void)            setZeroSuppressThresRes:(BOOL)aZeroSuppressThresRes; v5.1 only
+- (BOOL)            zeroSuppressThresRes;
+- (void)            setZeroSuppressThresRes:(BOOL)aZeroSuppressThresRes;
 - (BOOL)            zeroSuppressEnable;
 - (void)            setZeroSuppressEnable:(BOOL)aZeroSuppressEnable;
 - (BOOL)            overflowSuppressEnable;
@@ -161,7 +161,8 @@ extern NSString* ORCaen792ModelCycleZeroSuppressionChanged;
 extern NSString* ORCaen792ModelSlideConstantChanged;
 extern NSString* ORCaen792ModelSlidingScaleEnableChanged;
 extern NSString* ORCaen792ModelEventCounterIncChanged;
-//extern NSString* ORCaen792ModelZeroSuppressThresResChanged; //v5.1 only
+extern NSString* ORCaen792ModelZeroSuppressThresResChanged;
+
 extern NSString* ORCaen792ModelZeroSuppressEnableChanged;
 extern NSString* ORCaen792ModelOverflowSuppressEnableChanged;
 extern NSString* ORCaen792ModelIPedChanged;

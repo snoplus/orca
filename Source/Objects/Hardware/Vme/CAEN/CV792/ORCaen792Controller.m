@@ -71,12 +71,11 @@
                          name : ORCaen792ModelZeroSuppressEnableChanged
 						object: model];
 
-/* v5.1 only
- [notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(zeroSuppressThresResChanged:)
                          name : ORCaen792ModelZeroSuppressThresResChanged
 						object: model];
-*/
+    
     [notifyCenter addObserver : self
                      selector : @selector(eventCounterIncChanged:)
                          name : ORCaen792ModelEventCounterIncChanged
@@ -135,7 +134,7 @@
 	[self iPedChanged:nil];
 	[self overflowSuppressEnableChanged:nil];
 	[self zeroSuppressEnableChanged:nil];
-	//[self zeroSuppressThresResChanged:nil];//v5.1 only
+	[self zeroSuppressThresResChanged:nil];
 	[self eventCounterIncChanged:nil];
 	[self slidingScaleEnableChanged:nil];
 	[self slideConstantChanged:nil];
@@ -160,12 +159,10 @@
 	[eventCounterIncMatrix selectCellWithTag: [model eventCounterInc]];
 }
 
-/* v5.1 only
  - (void) zeroSuppressThresResChanged:(NSNotification*)aNote
 {
 	[zeroSuppressThresResMatrix selectCellWithTag: [model zeroSuppressThresRes]];
 }
-*/
 
 - (void) zeroSuppressEnableChanged:(NSNotification*)aNote
 {
@@ -293,12 +290,10 @@
 	[model setEventCounterInc:[[sender selectedCell]tag]];
 }
 
-/* v5.1 only
  - (IBAction) zeroSuppressThresResAction:(id)sender
 {
 	[model setZeroSuppressThresRes:[[sender selectedCell]tag]];
 }
-*/
 - (IBAction) zeroSuppressEnableAction:(id)sender
 {
 	[model setZeroSuppressEnable:[[sender selectedCell]tag]];
