@@ -26,13 +26,15 @@
 
 
 
-
+//
+//     =====> moved to ipe4reader.cpp -tb-
+//
 //This is the version of the IPE4 readout code (display is: version/1000, so cew_controle will display 1934003 as 1934.003) -tb-
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
-#define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW           10
-#define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
+//#define VERSION_IPE4_HW      1934200
+//#define VERSION_IPE4_SW           10
+//#define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
 
 /* History:
 version 2: 2013 June
@@ -187,6 +189,17 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
     if(availableNumFIFO==4){//mapping: fifo0=FLT0,1,2,3,4; fifo1=FLT5,6,7,8,9; fifo2=FLT10,11,12,13,14; fifo3=FLT15,16,17,18,19
         if(fltIndex>=0 && fltIndex<maxNumFIFO){
             return (fltIndex / 5) == numfifo;
+        }else
+            return 0;
+    }
+    
+    //2014-01-27: new 4+4+4+4+3+1 configuration -tb-
+    if(availableNumFIFO==6){//mapping: fifo0=FLT0,1,2,3; fifo1=FLT4,5,6,7; fifo2=FLT8,9,10,11; fifo3=FLT12,13,14,15; fifo4=FLT16,17,18; fifo5=19
+        if(fltIndex>=0 && fltIndex<maxNumFIFO){
+			if(fltIndex>=0 && fltIndex<=15) return (fltIndex / 4) == numfifo;
+			if(numfifo==4 && fltIndex>=16 && fltIndex<=18) return 1;
+			if(numfifo==5 && fltIndex==19) return 1;
+            return 0;
         }else
             return 0;
     }
@@ -867,6 +880,8 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)
 	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
 	//printf("on attend 2 pour terminer : ");
     
+  	printf("100%c - DONE\n",'%');
+
     if(sendChargeBBStatusFunctionPtr) sendChargeBBStatusFunctionPtr(   *numserie + (101<<8)  , numFifo);
 
 //TODO: test -tb-

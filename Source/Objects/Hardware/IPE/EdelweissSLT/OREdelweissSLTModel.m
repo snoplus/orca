@@ -207,6 +207,8 @@ volatile int vflag = 0;
 
 #define kMaxNumUDPDataPackets 100000
 #define kMaxNumUDPStatusPackets 100  // currently (2013) we expect max. 9 packets; but size might increase and legacy opera status may appear: use min 30 -tb-
+#define kMaxUDPSizeDim 1500     //see comment below
+#define kMaxNumADCChan 720      //see comment below
 typedef struct{
 	    int started;
 	    int stopNow;
@@ -216,13 +218,13 @@ typedef struct{
         int isListeningOnDataServerSocket;
 
     //status packet buffer (I expect max. 
-    char statusBuf[2][kMaxNumUDPStatusPackets][1500];//store the status UDP packets
+    char statusBuf[2][kMaxNumUDPStatusPackets][kMaxUDPSizeDim/*1500*/];//store the status UDP packets
     int statusBufSize[2][kMaxNumUDPStatusPackets];//store the size in bytes of the according status UDP packet
     int  numStatusPackets[2];
     TypeIpeCrateStatusBlock  crateStatusBlock[2]; //extra buffer for crate status
     //ADC buffer: 2 seconds buffer; 20 FLT * 36 chan = 720 ADCs -> 2*720=1440 Bytes; 100 000 samples per ADC channel -> 144 000 000 Bytes / 1440 Bytes (UDP Packet Size) = 100000 Pakete bzw. 144 MB
     //increased from 1440 to 1500 (packet size)
-    char adcBuf[2][kMaxNumUDPDataPackets][1500];//store the UDP packets
+    char adcBuf[2][kMaxNumUDPDataPackets][kMaxUDPSizeDim/*1500*/];//store the UDP packets
     int adcBufSize[2][kMaxNumUDPDataPackets];//store the size in bytes of the according UDP packet
     int  numDataPackets[2];
     char adcBufReceivedFlag[2][kMaxNumUDPDataPackets];//flag which marks that this packet was received
@@ -230,13 +232,12 @@ typedef struct{
     int  hasDataBytes[2];
     int  numfifo[2];
     int  numADCsInDataStream[2];
-    int  udpDataPacketSize[2];
     
     int isSynchronized,wrIndex, rdIndex;
     uint32_t dataPacketCounter;
     //trace buffer: reorganized adcBuf to store all 100000 samples of one ADC channel (of 720 ADC channels)
-    uint16_t adcTraceBuf[2][720][100000];//TODO: allocate dynamically? (I want to use pure C to be able to use it in Obj-C and C++) -tb-
-    int32_t adcTraceBufCount[2][720];//count filled in shorts in accordingadcTraceBuf[2][720][100000]  -tb-
+    uint16_t adcTraceBuf[2][kMaxNumADCChan/*720*/][100000];//TODO: allocate dynamically? (I want to use pure C to be able to use it in Obj-C and C++) -tb-
+    int32_t adcTraceBufCount[2][kMaxNumADCChan/*720*/];//count filled in shorts in accordingadcTraceBuf[2][720][100000]  -tb-
     
 } THREAD_DATA;
 
@@ -305,11 +306,12 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	    //printf("recvfromGlobalServer retval:  %i, maxSize %i\n",retval,maxSizeOfReadbuffer);
 		//if(retval==-1) break;
 		if(retval==-1) continue;
-	    if(retval>=0 && retval != 1444){
+	    if(retval>=0 && retval != 1444){ //TODO: warning if a packet is too small - outdated since 2014-01-08, when UDP size is variable -tb-
 	        //printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
 			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
 			//NSLog(@"Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
-	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+	        //TODO: this overloads now the Orca display ... NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
+	        //TODO: this overloads now the Orca display ... NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data from %s!  \n", inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			
 	    }
         
@@ -374,6 +376,8 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 				    NSLog(@"                              SLT time: %llu \n",((((unsigned long long) crateStatusBlock->SLTTimeHigh) << 32) | crateStatusBlock->SLTTimeLow) );
 				    NSLog(@"      OperaStatus1 0x%08x (d0: %i)\n",crateStatusBlock->OperaStatus1,crateStatusBlock->OperaStatus1 & 0xfff);
 				    NSLog(@"      size_bytes: %i \n",crateStatusBlock->size_bytes);
+				    NSLog(@"      version: %i \n",crateStatusBlock->version);
+				    NSLog(@"      numFIFOnumADCs: 0x%08x (%i,%i)\n",crateStatusBlock->numFIFOnumADCs,(crateStatusBlock->numFIFOnumADCs&0xffff0000)>>16,crateStatusBlock->numFIFOnumADCs % 0xffff);
                     uint32_t ps=crateStatusBlock->prog_status;
 				    if(ps>0)NSLog(@"      prog_status: 0x%08x: stat: %i  percent:%i%c \n",ps,ps&0xf, (ps>>8)&0xfff,'%');
                     //if not a prog_status packet, prepare write buffer
@@ -408,12 +412,6 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
                     if(numADCsInDataStream>0) NSLog(@"  numfifo: %i    numADCs In Data Stream: %i \n",numfifo, numADCsInDataStream);
                     dataReplyThreadData->numfifo[*wrIndex]=numfifo;
                     dataReplyThreadData->numADCsInDataStream[*wrIndex]=numADCsInDataStream;
-                    //udpDataPacketSize
-                    uint32_t udpDataPacketSize=crateStatusBlock->spare2 & 0xffff;
-                    NSLog(@"  ---------> numfifo: %i    udpDataPacketSize: %i \n",numfifo, udpDataPacketSize);
-                    if(udpDataPacketSize == 0) udpDataPacketSize=1444;
-                    dataReplyThreadData->udpDataPacketSize[*wrIndex]=udpDataPacketSize;
-
                     //    we buffer the whole crate status block ...
                     memcpy(&(dataReplyThreadData->crateStatusBlock[*wrIndex]), crateStatusBlock, sizeof(TypeIpeCrateStatusBlock));
                     //if we are synchronized, "reset" write buffer (reset flags)
@@ -3609,30 +3607,36 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
                 
                     //read out data
                     //    reorder UDP packets to build ADC traces according to one channel
-                    //const int MaxUDPPacketSizeBytes=1444; made variable 2014 -01
-                    int MaxUDPPacketSizeBytes=dataReplyThreadData.udpDataPacketSize[*rdIndex];;
+                    //TODO: submit maxPacketSize in status packet ... (extend crate status struct in ipe4reader) -tb- 
+                    int ipe4readerVersion = dataReplyThreadData.crateStatusBlock[*rdIndex].version;
+                    int ipe4readerSWVersion = ipe4readerVersion % 100;
+                    NSLog(@"    statusPacket from ipe4reader version:   %i (sw version: %i)\n",ipe4readerVersion,ipe4readerSWVersion);
+
+                    int MaxUDPPacketSizeBytes=1444;
+                    int M=(-4) / 2;//max. number of shorts (1444-4)/2=720
                     int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
 
-
-if(NA==0) NA=6;//TODO: dirty workaround, for unused channels -tb-
-                      int mupsb = (1440 / (2*NA)) * 2 * NA + 4;
-                      if(MaxUDPPacketSizeBytes != mupsb) MaxUDPPacketSizeBytes = mupsb;
-                      
-                      NSLog(@"  --------->  parser correction:  udpDataPacketSize: %i \n", MaxUDPPacketSizeBytes);
-                      int M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
-
-//TODO: dirty workaround -tb-
-//TODO: dirty workaround -tb-
-//TODO: dirty workaround -tb-
-//TODO: dirty workaround -tb-
-//TODO: dirty workaround -tb-
+//TODO:
+if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
 //TODO: I could try to detect num of ADCs by checking number of bytes in buffer - need to sum up all UDP data packet size (without header) -tb-
 
+
+                    if(ipe4readerSWVersion < 10){//version before 2014-01-08, fixed UDP packed size 1444
+                        MaxUDPPacketSizeBytes=1444;
+                        M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
+                    }else{//we have variable packet size
+                        int mupsb = (1440 / (2*NA)) * 2 * NA + 4;
+                        //mupsb = 1444; //this should become standard, quick fix
+                        if(MaxUDPPacketSizeBytes != mupsb) NSLog(@"  --------->  parser correction:  udpDataPacketSize: old: %i new:%i\n", MaxUDPPacketSizeBytes,mupsb);
+                        if(MaxUDPPacketSizeBytes != mupsb) MaxUDPPacketSizeBytes = mupsb;
+                        
+                        M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
+                    }
                     int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
                     int     i, j, j_swapit, toffset;
                     int64_t K,t;
                     //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
-                    for(i=0; i<720; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;// I clear the max. possible length (could use (MaxUDPPacketSizeBytes-4)/2)
+                    for(i=0; i<kMaxNumADCChan/*720*/; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;
                     uint16_t *P;
                     uint16_t *data16;
                     int packetCounter=0;

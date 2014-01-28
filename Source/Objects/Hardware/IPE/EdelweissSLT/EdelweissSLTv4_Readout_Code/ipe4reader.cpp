@@ -12,10 +12,20 @@
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW            9
+#define VERSION_IPE4_SW           10
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
 
 /* History:
+
+-----SOFTWARE VERSION:
+version 10:2014 January
+           added variable UDP packet size
+           until 2013 December:
+           added multififo support: read number of FIFOs from SLT reg, provide according UDP sockets;
+                                    added stop/startFIFO_X K command;
+           added blocking command FIFO K command;
+           slightly changed chargeBB function (+added 101% charging done)
+ 
 version 9: 2013 January
            changed name from ipe4reader6 to ipe4reader;
            added ipe4reader to Orca svn repository
@@ -72,7 +82,23 @@ version 2: 2011 September(?)
 		   
 version 1: 2011 July
            first version, which was able to deliver UDP packets to cew_controle
-		   
+	
+           
+               
+                   
+                       	   
+-----HARDWARE VERSION:
+version 200: 2013 June
+           multi FIFO on SLT; FLT-Trigger; FIC support
+version 100: ???
+
+
+
+-----COMMENTS:
+               in shell use:
+               (cd ORCA;make -f Makefile.ipe4reader; cd ..)
+               (cd ORCA; ./ipe4reader ; cd ..)
+
 */
 
 #include <stdio.h>
@@ -2238,7 +2264,8 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
 	          if(  (foundPos=strstr(buffer,"chargeBBFile"))  ){
 	              printf("handleKCommand: KWC >%s< command 9!\n",foundPos);//DEBUG
                   if(len >= sizeof("KWC_chargeBBFile_"))//filename must be at least one character
-                      chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
+                      //2014-01-27 use version without horloge command ... chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
+                      chargeBBWithFile( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                   else
                       printf("   ERROR: KWC >%s< command without filename!\n",buffer);//DEBUG
               }
@@ -2911,6 +2938,13 @@ int parseConfigFileLine(char *line, int flags)
 				  if(fr.numfifo != iFifo) printf("WARNING! YOU CHANGED numfifo from %i to %i - ARE YOU SURE? WARNING!\n",iFifo,fr.numfifo);
 				  if(wasFound) return wasFound;
 				  
+                  #if 1
+				  sprintf(pattern,"max_udp_size_config(%i):",iFifo);
+				  wasFound = searchIntInString(mystring,pattern,&fr.max_udp_size_config);
+				  if(wasFound) printf("%s %i\n",pattern,fr.max_udp_size_config);
+				  if(wasFound) return wasFound;
+				  #endif
+                  
 				  sprintf(pattern,"send_status_udp_packet(%i):",iFifo);
 				  wasFound = searchIntInString(mystring,pattern,&fr.send_status_udp_packet);
 				  if(wasFound) printf("%s %i\n",pattern,fr.send_status_udp_packet);
@@ -3300,7 +3334,11 @@ int FIFOREADER::rereadNumADCsInDataStream()
 
 int FIFOREADER::fifoReadsFLTIndex(int fltIndex)
 {
-    return fifoReadsFLTIndexChecker(fltIndex, numfifo, availableNumFIFO, maxNumFIFO);
+    //return fifoReadsFLTIndexChecker(fltIndex, numfifo, availableNumFIFO, maxNumFIFO);
+    int retval=fifoReadsFLTIndexChecker(fltIndex, numfifo, availableNumFIFO, maxNumFIFO);
+    //debug output
+	printf("fifoReadsFLTIndexChecker(fltIndex:%i,numfifo:%i,availableNumFIFO:%i,maxNumFIFO:%i) is %i\n",fltIndex, numfifo, availableNumFIFO, maxNumFIFO,retval);
+    return retval;
 #if 0
     //this is now in ipe4tbtools.h/.cpp as int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, int maxNumFIFO); -tb-
     if(availableNumFIFO==0) return 1;//this was the 'old' firmware: all FLTs to one FIFO (however, 'availableNumFIFO' should be 1)
@@ -3356,6 +3394,7 @@ void FIFOREADER::scanFIFObuffer(void)
 //TODO: remove flagToSendDataAndResetBuffer!!!!!!!! waitingForSynchroWord too??? -tb-
 
 
+   //if(show_debug_info>1) printf("FIFOREADER(%i)::scanFIFObuffer - FIFObuf32avail is %i, udpDataPacketPayloadSize32()is %i)\n",FIFOREADER::numfifo, FIFObuf32avail,udpDataPacketPayloadSize32());//DEBUG output -tb-
 
 
 
@@ -3390,11 +3429,6 @@ void FIFOREADER::scanFIFObuffer(void)
             //if(flagToSendDataAndResetBuffer)
             
             //TODO: REMOVE THIS WHOLE IF CLAUSE -tb-
-            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
-            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
-            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
-            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
-            printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
             printf("scanFIFObuffer: start LAST udp packet with sec %i, counter %i (preferred size 360, use numWord32:%i)  (flagToSendDataAndResetBuffer:%i)\n",udpdataSec ,udpdataCounter,numWord32,flagToSendDataAndResetBuffer);//TODO: DEBUG output -tb-
             //flagToSendDataAndResetBuffer=2;
             flagToSendDataAndResetBuffer = 0;//
@@ -3560,6 +3594,14 @@ void FIFOREADER::scanFIFObuffer(void)
             if(!oldisSynchronized && isSynchronized){
                 numADCsInDataStream = rereadNumADCsInDataStream();
                 printf("counting ADC channels: total sum #ADCs: %i\n",numADCsInDataStream);
+//TODO:
+//TODO:
+//TODO:
+//TODO:
+//TODO:  take into account setting of max_udp_size_config -tb-
+//TODO:
+//TODO:
+//TODO:
                 if(numADCsInDataStream==0){
                     //FIFO unused, set to default
                     setUdpDataPacketSize(maxUdpDataPacketSize);//1444
@@ -3642,6 +3684,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 crateStatusBlock.PPS_count = udpdataSec;
                 crateStatusBlock.size_bytes = sizeof(crateStatusBlock);            // 
                 crateStatusBlock.version = VERSION_IPE4READOUT;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
+
                 //SLT register:
                 uint32_t OperaStatus1 =  pbus->read(OperaStatusReg1);
                 crateStatusBlock.SLTTimeLow    =  pbus->read(SLTTimeLowReg);       // the according SLT register
@@ -3653,7 +3696,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
                 crateStatusBlock.numFIFOnumADCs = ((numfifo & 0xffff)<<16) | (numADCsInDataStream & 0xffff);
-                crateStatusBlock.spare2 = 2;// now used to assign the current UDP packet size
+                crateStatusBlock.spare2 = max_udp_size_config;//2;// now used to assign the current UDP packet size
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
 
@@ -4961,6 +5004,8 @@ int32_t main(int32_t argc, char *argv[])
         
         //if in streaming state
         //-----------------------
+    	//if(show_debug_info>1) printf("main: FIFOREADER::State: %i) (frSTREAMING is %i)\n",FIFOREADER::State, frSTREAMING);//DEBUG output -tb-
+
         if(FIFOREADER::State == frSTREAMING){
 			for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++) if(FIFOREADER::FifoReader[iFifo].readfifo){
 				//check FIFObuf

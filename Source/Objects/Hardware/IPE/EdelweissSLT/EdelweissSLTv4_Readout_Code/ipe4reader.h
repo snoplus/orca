@@ -370,7 +370,9 @@ public:
         //static client ----------
         //struct sockaddr_in si_other;
 		si_other_len=sizeof(si_other);
-		
+        
+		max_udp_size_config = 1444;
+        
 		send_status_udp_packet = 1;
 		skip_num_status_bits = 0; //skip this number of status bits (we observed offsets between 0 and 2)
 		
@@ -493,8 +495,11 @@ public:
     int si_other_len;//=sizeof(si_other);
 	
 	
-	int send_status_udp_packet;
+	int max_udp_size_config;  //max. size of UDP (data) packet: default 1444; 0=default; -1=automatic detection ("only send full samples in one packet"); 
+                              //                                other values: use exactly this value, take 4 byte header into account
 	int skip_num_status_bits; //skip this number of status bits (we observed offsets between 0 and 2)
+
+	int send_status_udp_packet;
 	
 	
 	//for use of dummy status bits
@@ -605,7 +610,7 @@ public:
 	int mon_indice_status_bbv2;// <----   each FIFO (in multi-FIFO readout) needs own counter! //TODO: obsolete, remove! -tb-
     
     //misc vars
-    int flagToSendDataAndResetBuffer;//obsolete - unused - remove it -tb-
+    int flagToSendDataAndResetBuffer;//TODO: obsolete - unused - remove flagToSendDataAndResetBuffer everywhere-tb-
     int waitingForSynchroWord;
     int isSynchronized; //means: has received a TS pattern in the data stream (will be set to false e.g. at start/stop StreamLoop)
 	
