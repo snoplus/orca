@@ -264,6 +264,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 - (void) togglePower
 {
     BOOL powerState = [self power];
+    NSLog(@"MPod (%d) main power switched %@\n",[self uniqueIdNumber],!powerState?@"ON":@"OFF");
 	NSString* cmd = [NSString stringWithFormat:@"sysMainSwitch.0 i %d",!powerState];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processSystemResponseArray:)];
     if(!powerState){
@@ -283,6 +284,10 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	NSString* noteName;
 	BOOL currentPower = [self power];
 	if(currentPower != oldPower){
+        
+        NSLog(@"MPod (%d) power changed state from %@ to %@\n",[self uniqueIdNumber],
+              oldPower?@"ON":@"OFF",currentPower?@"ON":@"OFF");
+
 		if([self power]) noteName = MPodPowerRestoredNotification;
 		else			 noteName = MPodPowerFailedNotification;
 		[[NSNotificationCenter defaultCenter] postNotificationName:noteName object:self];
