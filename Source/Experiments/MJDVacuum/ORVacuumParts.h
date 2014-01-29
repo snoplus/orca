@@ -262,6 +262,7 @@ typedef struct  {
 - (BOOL) isClosed;
 - (BOOL) isOpen;
 - (int) constraintCount;
+- (NSString*) stateName:(int)aValue;
 @end
 
 @interface ORVacuumVGateValve	: ORVacuumGateValve { } @end;

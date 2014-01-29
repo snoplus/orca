@@ -300,6 +300,10 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 - (void) setState:(int)aState
 {
 	if(aState != state || firstTime){
+        
+        if(firstTime)NSLog(@"Value %@ state is now %@\n",[self stateName:aState]);
+        else NSLog(@"Value %@ changed from %@ to %@\n",[self stateName:state],[self stateName:aState]);
+        
 		state = aState;
 		
 		[dataSource colorRegions];
@@ -309,6 +313,21 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		firstTime = NO;
 	}
 }
+
+- (NSString*) stateName:(int)aValue
+{
+    if([self controlType] == k1BitReadBack){
+        if(aValue==1)return @"Closed";
+        else		  return @"Open";
+    }
+    else {
+        if(aValue==3)		return @"Changing";
+        else if(aValue==1)	return @"Open";
+        else if(aValue==2)	return @"Closed";
+        else                return @"Impossible";
+    }
+}
+
 - (void) cancelStuckValveTimer
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];

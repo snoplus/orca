@@ -1181,6 +1181,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 		id aController = [self findGateValveControlObj:aGateValve];
 		[aController setOutputBit:aGateValve.controlChannel value:0];
 		[aGateValve setCommandedState:kGVCommandClosed];
+        NSLog(@"Valve %@ commanded to close\n",[aGateValve label]);
 	}
 }
 
@@ -1191,6 +1192,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 		id aController = [self findGateValveControlObj:aGateValve];
 		[aController setOutputBit:aGateValve.controlChannel value:1];
 		[aGateValve setCommandedState:kGVCommandOpen];
+        NSLog(@"Valve %@ commanded to open\n",[aGateValve label]);
 	}
 }
 
