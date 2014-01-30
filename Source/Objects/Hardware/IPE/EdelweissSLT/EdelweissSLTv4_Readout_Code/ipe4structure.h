@@ -707,8 +707,13 @@ typedef struct {
 	uint32_t internal_error_info;
 	uint32_t ipe4reader_status;
 	uint32_t version;          // _may_ be useful in some particular cases (version of C code/firmware/hardware?) 
-	uint32_t numFIFOnumADCs;           // total number of ADCs in the UDP data packets
+	uint32_t numFIFOnumADCs;   // numfifo (& 0xffff0000)  and total number of ADCs in the UDP data packets (&0xffff)
+	uint32_t maxUDPSize;       // variable UDP packet size: this is the size dedicated to this FIFO
+	uint32_t spare1;           // reserved for future usage
 	uint32_t spare2;           // reserved for future usage
+	uint32_t spare3;           // reserved for future usage
+	uint32_t spare4;           // reserved for future usage
+	uint32_t spare5;           // reserved for future usage
 } TypeIpeCrateStatusBlock;
 
 

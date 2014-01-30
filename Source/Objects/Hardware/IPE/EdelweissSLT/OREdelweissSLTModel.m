@@ -3614,7 +3614,9 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 
                     int MaxUDPPacketSizeBytes=1444;
                     int M=(-4) / 2;//max. number of shorts (1444-4)/2=720
-                    int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb-
+                    //int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb- DONE
+                    int NA=dataReplyThreadData.crateStatusBlock[*rdIndex].numFIFOnumADCs & 0xffff;//take from crate status packet -tb-
+                    int maxUDPSizeSetting=dataReplyThreadData.crateStatusBlock[*rdIndex].maxUDPSize;//take from crate status packet -tb-
 
 //TODO:
 if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
@@ -3625,10 +3627,16 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
                         MaxUDPPacketSizeBytes=1444;
                         M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     }else{//we have variable packet size
-                        int mupsb = (1440 / (2*NA)) * 2 * NA + 4;
-                        //mupsb = 1444; //this should become standard, quick fix
-                        if(MaxUDPPacketSizeBytes != mupsb) NSLog(@"  --------->  parser correction:  udpDataPacketSize: old: %i new:%i\n", MaxUDPPacketSizeBytes,mupsb);
-                        if(MaxUDPPacketSizeBytes != mupsb) MaxUDPPacketSizeBytes = mupsb;
+                        int mupsb = (720/NA)*NA*2+4 ;//(1440 / (2*NA)) * 2 * NA + 4;
+                        //maxUDPSizeSetting==0 is ipe4reader version <10 and should already have been handled (see above)
+                        if(maxUDPSizeSetting==-1){//auto mode: compute size by numADCs
+                            if(MaxUDPPacketSizeBytes != mupsb) NSLog(@"  --------->  parser correction:  udpDataPacketSize: old: %i new:%i\n", MaxUDPPacketSizeBytes,mupsb);
+                            MaxUDPPacketSizeBytes = mupsb;
+                        }else{
+                            //mupsb = 1444; //this should become standard, quick fix
+                            if(MaxUDPPacketSizeBytes != maxUDPSizeSetting) NSLog(@"  --------->  parser correction:  udpDataPacketSize: old: %i new:%i\n", MaxUDPPacketSizeBytes,maxUDPSizeSetting);
+                            MaxUDPPacketSizeBytes = maxUDPSizeSetting;
+                        }
                         
                         M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     }

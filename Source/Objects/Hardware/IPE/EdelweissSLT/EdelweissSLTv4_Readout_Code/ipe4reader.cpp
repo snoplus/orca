@@ -3606,8 +3606,14 @@ void FIFOREADER::scanFIFObuffer(void)
                     //FIFO unused, set to default
                     setUdpDataPacketSize(maxUdpDataPacketSize);//1444
                 }else{
-                    int numFullSamples = (maxUdpDataPacketSize-4)/(numADCsInDataStream*2);
-                    setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream *2);//this is now <= 1440 and sets packet size, too
+                    if(max_udp_size_config==-1){ //this is: "compute automatically", full samples
+                        int numFullSamples = (maxUdpDataPacketSize-4)/(numADCsInDataStream*2);
+                        setUdpDataPacketPayloadSize(numFullSamples * numADCsInDataStream *2);//this is now <= 1440 and sets packet size, too
+                    }else if(max_udp_size_config==0){
+                        setUdpDataPacketSize(maxUdpDataPacketSize);//1444 (=default, fill as large packets as possible)
+                    }else{
+                        setUdpDataPacketSize(max_udp_size_config);
+                    }
                 }
                 printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
             }
@@ -3696,6 +3702,7 @@ void FIFOREADER::scanFIFObuffer(void)
                 crateStatusBlock.internal_error_info = 0;
                 crateStatusBlock.ipe4reader_status   = FIFOREADER::State;
                 crateStatusBlock.numFIFOnumADCs = ((numfifo & 0xffff)<<16) | (numADCsInDataStream & 0xffff);
+                crateStatusBlock.maxUDPSize     = udpDataPacketSize();//2;// now used to assign the current UDP packet size
                 crateStatusBlock.spare2 = max_udp_size_config;//2;// now used to assign the current UDP packet size
                 //append status to payload
                 statusScheduler.appendDataSendIfFull((char*)&crateStatusBlock,sizeof(crateStatusBlock));
