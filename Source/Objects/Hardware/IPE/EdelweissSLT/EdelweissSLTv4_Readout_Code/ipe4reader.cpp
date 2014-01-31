@@ -3337,7 +3337,7 @@ int FIFOREADER::fifoReadsFLTIndex(int fltIndex)
     //return fifoReadsFLTIndexChecker(fltIndex, numfifo, availableNumFIFO, maxNumFIFO);
     int retval=fifoReadsFLTIndexChecker(fltIndex, numfifo, availableNumFIFO, maxNumFIFO);
     //debug output
-	printf("fifoReadsFLTIndexChecker(fltIndex:%i,numfifo:%i,availableNumFIFO:%i,maxNumFIFO:%i) is %i\n",fltIndex, numfifo, availableNumFIFO, maxNumFIFO,retval);
+	//printf("fifoReadsFLTIndexChecker(fltIndex:%i,numfifo:%i,availableNumFIFO:%i,maxNumFIFO:%i) is %i\n",fltIndex, numfifo, availableNumFIFO, maxNumFIFO,retval);
     return retval;
 #if 0
     //this is now in ipe4tbtools.h/.cpp as int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, int maxNumFIFO); -tb-
@@ -3729,7 +3729,7 @@ void FIFOREADER::scanFIFObuffer(void)
 			    for(idx=0; idx<FLTSETTINGS::maxNumFLT; idx++){
 			        FLTSETTINGS &flt = FLTSETTINGS::FLT[idx];
 					//FLTSETTINGS &FLT = FLTSETTINGS::FLT[numfifo]; //TODO: each FLT has its own SLT FIFO; move status packet sending elsewhere? -tb-
-					if(flt.isPresent)
+					if(flt.isPresent && fifoReadsFLTIndex(idx))//TODO: maybe build a buffer for the bits? -tb-
 					{
 						int numFLT = flt.fltID;
 						int fiber;
