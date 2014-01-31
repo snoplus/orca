@@ -2822,6 +2822,7 @@
 		84EC3461079D973300188ED3 /* No617DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3460079D973300188ED3 /* No617DriverHelp.plist */; };
 		84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */; };
 		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
+		84ED10A01896F6C700C1AA71 /* ftpExpectGetScript in Resources */ = {isa = PBXBuildFile; fileRef = 84ED109F1896F6C700C1AA71 /* ftpExpectGetScript */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
 		84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE03BE120AFA4400B804B3 /* ORInverterModel.m */; };
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
@@ -6069,6 +6070,7 @@
 		84EC3460079D973300188ED3 /* No617DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No617DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No617DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoBit3DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoBit3DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
+		84ED109F1896F6C700C1AA71 /* ftpExpectGetScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectGetScript; sourceTree = "<group>"; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
 		84EE03BE120AFA4400B804B3 /* ORInverterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORInverterModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.m; sourceTree = SOURCE_ROOT; };
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
@@ -8745,6 +8747,7 @@
 				844CBDC81866010F0012AA3B /* RaidMonitor.gif */,
 				844CBDC91866010F0012AA3B /* RaidMonitor.nib */,
 				844CBDCA1866010F0012AA3B /* scpExpectGetScript */,
+				84ED109F1896F6C700C1AA71 /* ftpExpectGetScript */,
 			);
 			path = RaidMonitor;
 			sourceTree = "<group>";
@@ -15434,6 +15437,7 @@
 				8475EC431475A66F003A165D /* LabJackUE9.nib in Resources */,
 				8475EC441475A66F003A165D /* LabJackUE9.tif in Resources */,
 				CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */,
+				84ED10A01896F6C700C1AA71 /* ftpExpectGetScript in Resources */,
 				84B6CD4D14B37E9700386BE1 /* RGA300.nib in Resources */,
 				84B6CD4E14B37E9700386BE1 /* RGA300.tif in Resources */,
 				840D0ECE14BBC56A008FAC82 /* snopluslogooff.tiff in Resources */,
