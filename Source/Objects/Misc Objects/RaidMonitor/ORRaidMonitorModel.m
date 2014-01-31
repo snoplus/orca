@@ -205,7 +205,7 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     mover.delegate     = self;
 
     [mover setParams:remotePath localPath:localPath ipAddress:ipAddress userName:userName passWord:password];
-
+    [mover setDoneSelectorName:@"fileGetterIsDone"];
     [fileQueue addOperation:mover];
     [self performSelector:@selector(getStatus) withObject:nil afterDelay:60*60];
 }

@@ -33,7 +33,6 @@
     NSMutableString*    allOutput;
     NSMutableDictionary* resultDict;
     BOOL                running;
-    NSDate*             nextTime;
 	ORAlarm*            noConnectionAlarm;
 	ORAlarm*            diskFullAlarm;
 	ORAlarm*            scriptNotRunningAlarm;
