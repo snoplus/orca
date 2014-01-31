@@ -73,8 +73,8 @@
     [plotter0 setShowLegend:YES];
     [plotter1 setShowLegend:YES];
 
-    [[plotter0 yAxis] setRngLow:0.0 withHigh:300];
-	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:300 withMinRng:4];
+    [[plotter0 yAxis] setRngLow:0.0 withHigh:150];
+	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4];
     [[plotter1 yAxis] setRngLow:0.0 withHigh:150.];
 	[[plotter1 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4];
 }
@@ -158,8 +158,12 @@
 					 selector : @selector(refreshProcessTable:)
 						 name : ORApcUpsHiLimitChanged
 					   object : model];
-
     
+    [notifyCenter addObserver : self
+                     selector : @selector(eventLogChanged:)
+                         name : ORApcUpsModelEventLogChanged
+						object: model];
+
 }
 
 
@@ -177,6 +181,17 @@
 	[self dataValidChanged:nil];
 	[self updateTimePlot:nil];
     [self refreshProcessTable:nil];
+	[self eventLogChanged:nil];
+}
+
+- (void) eventLogChanged:(NSNotification*)aNote
+{
+    NSSet* events = [model eventLog];
+    NSMutableString* eventLog = [NSMutableString stringWithString:@""];
+    for (NSString *anEvent in events) {
+        [eventLog appendFormat:@"%@\n",anEvent];
+    }
+    if([eventLog length])[eventLogTextView setString:eventLog];
 }
 
 - (void) checkGlobalSecurity
@@ -244,7 +259,9 @@
 {
     [timedOutField setStringValue:@"No Response"];
 }
-
+- (void) connectionChanged:(NSNotification*)aNote
+{
+}
 - (void) dataValidChanged:(NSNotification*)aNote
 {
     if([model dataValid]){
@@ -275,7 +292,7 @@
 
 - (void) refreshTables:(NSNotification*)aNote
 {
-    NSString* name = [[model singleValueDictionary] objectForKey:@"NAME"];
+    NSString* name = [[model valueDictionary] objectForKey:@"Name"];
     if([name length]!=0)[[self window] setTitle:[NSString stringWithFormat:@"UPS : %@",name]];
     [powerTableView reloadData];
     [loadTableView reloadData];
@@ -342,10 +359,11 @@
         else {
             if([model dataValid]){
                 if(rowIndex==4){
-                    if([[aTableColumn identifier] isEqualToString:@"L1"]) return [model valueForKeyInSingleValueDictionary:[model keyForIndexInPowerTable:rowIndex]];
+                    //special case, just one value in the first column
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"Freq"];
                     else return @"";
                 }
-                else return [model phaseKey:[aTableColumn identifier] valueKey:[model keyForIndexInPowerTable:rowIndex]];
+                else return [model valueForPowerPhase:[[aTableColumn identifier] intValue] powerTableIndex:rowIndex];
             }
             else return @"?";
         }
@@ -354,10 +372,11 @@
         if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameForIndexInLoadTable:rowIndex];
         else {
             if([model dataValid]){
-                if(rowIndex==4){
-                    if([[aTableColumn identifier] isEqualToString:@"L1"]) return [model valueForKeyInSingleValueDictionary:[model keyForIndexInLoadTable:rowIndex]];
-                }
-               else return [model phaseKey:[aTableColumn identifier] valueKey:[model keyForIndexInLoadTable:rowIndex]];
+                if(rowIndex==2){
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"TupsC"];
+                    else return @"";
+              }
+            else return [model valueForLoadPhase:[[aTableColumn identifier] intValue] loadTableIndex:rowIndex];
             }
             else return @"?";
         }
@@ -366,7 +385,7 @@
         if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameForIndexInBatteryTable:rowIndex];
         else {
             if([model dataValid]){
-                return [model valueForKeyInSingleValueDictionary:[model keyForIndexInBatteryTable:rowIndex]];
+                return [model valueForBattery:[[aTableColumn identifier] intValue] batteryTableIndex:rowIndex];
             }
             else return @"?";           
         }
@@ -380,10 +399,11 @@
 
     return nil;
 }
+
 - (void) tableView:(NSTableView *) aTableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if(aTableView == processTableView){
-        if([[aTableColumn identifier] isEqualToString:@"LowLimit"])      [model setLowLimit:rowIndex value:[object floatValue]];
+        if([[aTableColumn identifier]      isEqualToString:@"LowLimit"])      [model setLowLimit:rowIndex value:[object floatValue]];
         else if([[aTableColumn identifier] isEqualToString:@"HiLimit"])  [model setHiLimit:rowIndex value:[object floatValue]];
     }
 }
@@ -392,11 +412,14 @@
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    if(aTableView == powerTableView || aTableView == loadTableView){
+    if(aTableView == powerTableView){
         return 5;
     }
+    else if(aTableView == loadTableView){
+        return 3;
+    }
     else if(aTableView == batteryTableView){
-        return 4;
+        return 3;
     }
     else if(aTableView == processTableView){
         return kNumApcUpsAdcChannels;

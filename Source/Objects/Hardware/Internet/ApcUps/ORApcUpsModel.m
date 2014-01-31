@@ -23,7 +23,9 @@
 #import "ORApcUpsModel.h"
 #import "NetSocket.h"
 #import "ORTimeRate.h"
+#import "ORFileGetterOp.h"
 
+NSString* ORApcUpsModelEventLogChanged  = @"ORApcUpsModelEventLogChanged";
 NSString* ORApcUpsIsConnectedChanged	= @"ORApcUpsIsConnectedChanged";
 NSString* ORApcUpsIpAddressChanged		= @"ORApcUpsIpAddressChanged";
 NSString* ORApcUpsRefreshTables         = @"ORApcUpsRefreshTables";
@@ -37,20 +39,15 @@ NSString* ORApcUpsHiLimitChanged		= @"ORApcUpsHiLimitChanged";
 NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 @interface ORApcUpsModel (private)
-- (void) clearInputBuffer;
-- (void) parse:(NSString*)aResponse;
-- (void) parseLine:(NSString*)aLine;
-- (void) add:(NSString*)aName value:(NSString*)aValue;
-- (void) startTimeout;
-- (void) cancelTimeout;
-- (void) timeout;
 - (void) postCouchDBRecord;
 @end
 
+#define kApcEventsPath [@"~/ApcEvents.txt" stringByExpandingTildeInPath]
+#define kApcDataPath   [@"~/ApcData.txt"   stringByExpandingTildeInPath]
 
 @implementation ORApcUpsModel
 
-@synthesize phaseDictionary,singleValueDictionary,lastTimePolled,nextPollScheduled,dataValid,password,username;
+@synthesize valueDictionary,lastTimePolled,nextPollScheduled,dataValid,password,username;
 
 - (void) makeMainController
 {
@@ -59,11 +56,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (void) dealloc
 {
+    [eventLog release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[socket close];
-    [socket setDelegate:nil];
-	[socket release];
-    [inputBuffer release];
     [dataInValidAlarm clearAlarm];
     [dataInValidAlarm release];
     
@@ -72,19 +66,20 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         [timeRate[i] release];
     }
     
-    [nameFromChannelTable release];
     [channelFromNameTable release];
     
-    self.singleValueDictionary  = nil;
-    self.phaseDictionary        = nil;
+    self.valueDictionary        = nil;
     
+    [fileQueue cancelAllOperations];
+    [fileQueue release];
+
     [super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
-        [self pollHardware];
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:3];
 	}
 	@catch(NSException* localException) {
 	}
@@ -105,23 +100,18 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 #pragma mark ***Accessors
 
-- (NetSocket*) socket
+- (NSMutableSet*) eventLog
 {
-	return socket;
-}
-- (void) setSocket:(NetSocket*)aSocket
-{
-	if(aSocket != socket)[socket close];
-	[aSocket retain];
-	[socket release];
-	socket = aSocket;
-    [socket setDelegate:self];
+    return eventLog;
 }
 
-- (void) setIsConnected:(BOOL)aFlag
+- (void) setEventLog:(NSMutableSet*)aEventLog
 {
-    isConnected = aFlag;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIsConnectedChanged object:self];
+    [aEventLog retain];
+    [eventLog release];
+    eventLog = aEventLog;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
 }
 
 - (NSString*) ipAddress
@@ -133,40 +123,41 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (void) setIpAddress:(NSString*)aIpAddress
 {
 	if(!aIpAddress)aIpAddress = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
-    
     if(![aIpAddress isEqualToString:ipAddress]){
-        [singleValueDictionary release];
-        singleValueDictionary = nil;
-        [phaseDictionary release];
-        phaseDictionary = nil;
-    }
-    
-    [ipAddress autorelease];
-    ipAddress = [aIpAddress copy];    
+        [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
+        
+        [ipAddress autorelease];
+        ipAddress = [aIpAddress copy];
 	
-    [self pollHardware];
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
     
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIpAddressChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIpAddressChanged object:self];
+    }
 }
 
 - (void) setUsername:(NSString *)aName
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setUsername:username];
-    [username autorelease];
-    username = [aName copy];
-    [self pollHardware];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsUsernameChanged object:self];
+	if(!aName)aName = @"";
+    if(![aName isEqualToString:username]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setUsername:username];
+        [username autorelease];
+        username = [aName copy];
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsUsernameChanged object:self];
+    }
 }
 
 - (void) setPassword:(NSString *)aPassword
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPassword:password];
-    [password autorelease];
-    password = [aPassword copy];
-    [self pollHardware];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsPasswordChanged object:self];
+ 	if(!aPassword)aPassword = @"";
+    if(![aPassword isEqualToString:password]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setPassword:password];
+        [password autorelease];
+        password = [aPassword copy];
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsPasswordChanged object:self];
+    }
 }
 
 
@@ -176,15 +167,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [self checkAlarms];
     if(!dataValid){
         //clear the variables that are being monitored
-        [singleValueDictionary release];
-        singleValueDictionary = nil;
-        [phaseDictionary release];
-        phaseDictionary = nil;
-
-        int i;
-        for(i=0;i<kNumApcUpsAdcChannels;i++){
-            [self add:[self nameForChannel:i] value:@"0"];
-       }
+        [valueDictionary release];
+        valueDictionary = nil;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsDataValidChanged object:self];
 }
@@ -209,37 +193,152 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     }
 }
 
-- (void) connect
-{
-	if(!isConnected){
-		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kApcUpsPort]];	
-	}
-}
-
-- (void) disconnect
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(disconnect) object:nil];
-    [self setSocket:nil];
-    [self setIsConnected:[socket isConnected]];
-    statusSentOnce = NO;	
-}
-
-- (BOOL) isConnected
-{
-	return isConnected;
-}
-
 - (void) pollHardware
 {
     if([ipAddress length]!=0 && [password length]!=0 && [username length]!=0){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-        [self connect];
-        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:30];
-        [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:30]];
-        [self performSelector:@selector(disconnect) withObject:nil afterDelay:5];
-        [self postCouchDBRecord];
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:kApcPollTime];
+        [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:kApcPollTime]];
+        [self setLastTimePolled:[NSDate date]];
+        
+        [self getEvents];
+        [self getData];
     }
     else [self setDataValid:NO];
+}
+
+- (void) setUpQueue
+{
+    if(!fileQueue){
+        fileQueue = [[NSOperationQueue alloc] init];
+        [fileQueue setMaxConcurrentOperationCount:1];
+        [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+    }
+}
+
+- (void) getEvents
+{
+    [self setUpQueue];
+   
+    ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
+    mover.delegate     = self;
+    [mover setUseFTP:YES];
+    [mover setParams:@"logs/event.txt" localPath:kApcEventsPath ipAddress:ipAddress userName:username passWord:password];
+    [mover setDoneSelectorName:@"eventsFileArrived"];
+    [fileQueue addOperation:mover];
+}
+
+- (void) getData
+{
+    [self setUpQueue];
+    
+    ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
+     mover.delegate     = self;
+    [mover setUseFTP:YES];
+    [mover setParams:@"logs/data.txt" localPath:kApcDataPath ipAddress:ipAddress userName:username passWord:password];
+    [mover setDoneSelectorName:@"dataFileArrived"];
+    [fileQueue addOperation:mover];
+    
+}
+
+- (BOOL) isConnected
+{
+    return [fileQueue operationCount]!=0;
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                         change:(NSDictionary *)change context:(void *)context
+{
+    if (object == fileQueue && [keyPath isEqual:@"operations"]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIsConnectedChanged object:self];
+    }
+}
+- (void) eventsFileArrived
+{
+    NSStringEncoding* en=nil;
+    NSString* contents = [NSString stringWithContentsOfFile:kApcEventsPath usedEncoding:en error:nil];
+    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
+    int i=0;
+    for(id aLine in lines){
+        if(i>=7){
+            if([aLine rangeOfString:@"logged"].location != NSNotFound) continue;
+            else {
+                if(!eventLog)eventLog = [[NSMutableSet alloc] init];
+                [eventLog addObject:aLine];
+            }
+        }
+        i++;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
+
+}
+
+- (void) dataFileArrived
+{
+    NSStringEncoding* en=nil;
+    NSString* contents = [NSString stringWithContentsOfFile:kApcDataPath usedEncoding:en error:nil];
+    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
+    NSArray* headerNames = nil;
+    NSArray* values      = nil;
+    NSArray* header0Names = nil;
+    NSArray* values0      = nil;
+    if([lines count]==0)[self setDataValid:NO];
+    for(id aLine in lines){
+        aLine = [aLine trimSpacesFromEnds];
+        NSArray* parts = [aLine componentsSeparatedByString:@"\t"];
+        int numParts = [parts count];
+        if(numParts == 6){
+            if(!header0Names){
+                header0Names = parts ;
+            }
+            else {
+                values0 = parts;
+                if(header0Names){
+                    if(!valueDictionary)self.valueDictionary = [NSMutableDictionary dictionary];
+                    
+                    int i;
+                    for(i=0;i<numParts;i++){
+                        NSString* key = [header0Names objectAtIndex:i];
+                        key = [key trimSpacesFromEnds];
+                        if([key isEqualToString:@"Date"])continue;
+                        if([key isEqualToString:@"Date"])continue;
+                        [valueDictionary setObject:[values0 objectAtIndex:i] forKey:key];
+                    }
+                    
+                }
+            }
+
+        }
+        else if(numParts == 31){
+            if(!headerNames){
+                headerNames = parts ;
+            }
+            else {
+                values = parts;
+                if(headerNames){
+                    if(!valueDictionary)self.valueDictionary = [NSMutableDictionary dictionary];
+                    [self setDataValid:YES];
+
+                    int i;
+                    for(i=0;i<numParts;i++){
+                        NSString* key = [headerNames objectAtIndex:i];
+                        key = [key trimSpacesFromEnds];
+                        [valueDictionary setObject:[values objectAtIndex:i] forKey:key];
+                    }
+
+                }
+                break;
+            }
+        }
+        int i;
+        for(i=0;i<8;i++){
+            if(timeRate[i] == nil){
+                timeRate[i] = [[ORTimeRate alloc] init];
+                [timeRate[i] setSampleTime: kApcPollTime];
+            }
+            [timeRate[i] addDataToTimeAverage:[self valueForChannel:i]];
+        }
+    }
 }
 
 - (ORTimeRate*)timeRate:(int)aChannel
@@ -248,83 +347,62 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     else return nil;
 }
 
-#pragma mark ***Delegate Methods
-- (void) netsocketConnected:(NetSocket*)inNetSocket
+- (NSString*) valueForPowerPhase:(int)aPhaseIndex powerTableIndex:(int)aRowIndex
 {
-    if(inNetSocket == socket){
-        [self setIsConnected:[socket isConnected]];
-    }
+    switch (aRowIndex){
+        case 0:
+            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Vmin%d",aPhaseIndex]];
+            break;
+        case 1:
+            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Vbp%d",aPhaseIndex]];
+            break;
+        case 2:
+            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Vout%d",aPhaseIndex]];
+            break;
+        case 3:
+            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Iin%d",aPhaseIndex]];
+            break;
+   }
+    return @"?";
 }
 
-- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+- (NSString*) valueForLoadPhase:(int)aLoadIndex loadTableIndex:(int)aRowIndex
 {
-    if(inNetSocket == socket){
-        [self setIsConnected:NO];
-		[socket autorelease];
-		socket = nil;
+    switch (aRowIndex){
+        case 0:
+            return [valueDictionary objectForKey:[NSString stringWithFormat:@"kVAout%d",aLoadIndex]];
+            break;
+        case 1:
+            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Iout%d",aLoadIndex]];
+            break;
     }
+    return @"?";
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex
 {
-    if(inNetSocket == socket){        
-		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-        if(!inputBuffer)inputBuffer = [[NSMutableString alloc]initWithString:theString];
-        else [inputBuffer appendString:theString];
-        
-        if([theString rangeOfString:@"USER NAME"].location != NSNotFound){
-            [inNetSocket writeString:[NSString stringWithFormat:@"%@\r",username] encoding:NSASCIIStringEncoding];
-            [self clearInputBuffer];
-        }
-        else if([theString rangeOfString:@"PASSWORD"].location != NSNotFound){
-            [inNetSocket writeString:[NSString stringWithFormat:@"%@\r",password] encoding:NSASCIIStringEncoding];
-            [self clearInputBuffer];
-        }
-        else if([theString rangeOfString:@"APC>"].location != NSNotFound){
-            if(!statusSentOnce){
-                statusSentOnce = YES;
-                [inNetSocket writeString:@"detstatus -all\r" encoding:NSASCIIStringEncoding];
-                [self startTimeout];
-            }
-            [self parse:inputBuffer];
-            [self clearInputBuffer];
-                        
-        }
+    switch (aRowIndex){
+        case 0:
+            return [valueDictionary objectForKey:@"%Cap"];
+            break;
+        case 1:
+            return [valueDictionary objectForKey:@"Vbat"];
+            break;
+        case 2:
+            return [valueDictionary objectForKey:@"Ibat"];
+            break;
     }
-} 
-
-- (NSString*) keyForIndexInPowerTable:(int)i
-{
-    switch(i){
-        case 0: return @"INPUT VOLTAGE";
-        case 1: return @"BYPASS INPUT VOLTAGE";
-        case 2: return @"OUTPUT VOLTAGE";
-        case 3: return @"INPUT CURRENT";
-        case 4: return @"INPUT FREQUENCY";
-        default: return @"";
-    }
+    return @"?";
 }
 
 - (NSString*) nameAtIndexInPowerTable:(int)i;
 {
     switch(i){
-        case 0: return @"Input Voltage";
-        case 1: return @"Bypass Input Voltage";
-        case 2: return @"Output Voltage";
-        case 3: return @"Input Current";
-        case 4: return @"Input Frequency";
-        default: return @"";
-    }
-}
-
-- (NSString*) keyForIndexInLoadTable:(int)i
-{
-    switch(i){
-        case 0: return @"OUTPUT KVA";
-        case 1: return @"OUTPUT VA PERCENT";
-        case 2: return @"OUTPUT WATTS PERCENT";
-        case 3: return @"OUTPUT CURRENT";
-        case 4: return @"OUTPUT FREQUENCY";
+        case 0: return @"Input Voltage (VAC)";
+        case 1: return @"Bypass Voltage (VAC)";
+        case 2: return @"Output Voltage (VAC)";
+        case 3: return @"Input Current (A)";
+        case 4: return @"Input Frequency (Hz)";
         default: return @"";
     }
 }
@@ -332,33 +410,19 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (NSString*) nameForIndexInLoadTable:(int)i
 {
     switch(i){
-        case 0: return @"Output Load";
-        case 1: return @"Output Percent Load";
-        case 2: return @"Output Percent Power";
-        case 3: return @"Output Current";
-        case 4: return @"Output Frequency";
+        case 0: return @"Output Load (KVA)";
+        case 1: return @"Output Current (A)";
+        case 2: return @"Temperature (C)";
         default: return @"";
     }
-}
-
-- (NSString*) keyForIndexInBatteryTable:(int)i
-{
-    switch(i){
-        case 0: return @"RUNTIME REMAINING";
-        case 1: return @"BATTERY STATE OF CHARGE";
-        case 2: return @"BATTERY VOLTAGE";
-        case 3: return @"BATTERY CURRENT";
-        default: return @"";
-    } 
 }
 
 - (NSString*) nameForIndexInBatteryTable:(int)i
 {
     switch(i){
-        case 0: return @"Runtime Remaining";
-        case 1: return @"Capacity";
-        case 2: return @"Battery Voltage";
-        case 3: return @"Battery Current";
+        case 0: return @"Capacity (%)";
+        case 1: return @"Battery Voltage (VDC)";
+        case 2: return @"Battery Current (A)";
         default: return @"";
     }
 }
@@ -366,8 +430,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (NSString*) nameForIndexInProcessTable:(int)i
 {
     switch(i){
-        case 0: return @"Runtime Remaining";
-        case 1: return @"Battery Current";
+        case 0: return @"Battery Current";
+        case 1: return @"Battery Voltage";
         case 2: return @"Input Voltage L1";
         case 3: return @"Input Voltage L2";
         case 4: return @"Input Voltage L3";
@@ -378,68 +442,48 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     }
 }
 
-
-- (void) setUpTagDictionaries
-{
-    if(!nameFromChannelTable){
-        //order must be the same in these tables
-        channelFromNameTable = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 [NSNumber numberWithInt:0], @"RUNTIME REMAINING",
-                                 [NSNumber numberWithInt:1], @"BATTERY CURRENT",
-                                 [NSNumber numberWithInt:2], @"INPUT VOLTAGE L1",
-                                 [NSNumber numberWithInt:3], @"INPUT VOLTAGE L2",
-                                 [NSNumber numberWithInt:4], @"INPUT VOLTAGE L3",
-                                 [NSNumber numberWithInt:5], @"OUTPUT CURRENT L1",
-                                 [NSNumber numberWithInt:6], @"OUTPUT CURRENT L2",
-                                 [NSNumber numberWithInt:7], @"OUTPUT CURRENT L3",
-                                 nil] retain];
-        
-        nameFromChannelTable = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 @"RUNTIME REMAINING",  [NSNumber numberWithInt:0], 
-                                 @"BATTERY CURRENT",    [NSNumber numberWithInt:1], 
-                                 @"INPUT VOLTAGE L1",   [NSNumber numberWithInt:2], 
-                                 @"INPUT VOLTAGE L2",   [NSNumber numberWithInt:3], 
-                                 @"INPUT VOLTAGE L3",   [NSNumber numberWithInt:4], 
-                                 @"OUTPUT CURRENT L1",  [NSNumber numberWithInt:5], 
-                                 @"OUTPUT CURRENT L2",  [NSNumber numberWithInt:6], 
-                                 @"OUTPUT CURRENT L3",  [NSNumber numberWithInt:7], 
-                                nil] retain];
-    }
-}
-
 - (id) nameForChannel:(int)aChannel
 {
-    [self setUpTagDictionaries];
-    return [nameFromChannelTable objectForKey:[NSNumber numberWithInt:aChannel]];
+    switch(aChannel){
+        case 0:return @"BATTERY CURRENT"; break;
+        case 1:return @"BATTERY VOLTAGE"; break;
+        case 2:return @"INPUT VOLTAGE L1"; break;
+        case 3:return @"INPUT VOLTAGE L2"; break;
+        case 4:return @"INPUT VOLTAGE L3"; break;
+        case 5:return @"OUTPUT CURRENT L1"; break;
+        case 6:return @"OUTPUT CURRENT L2"; break;
+        case 7:return @"OUTPUT CURRENT L3"; break;
+        default: return @"";
+    }
 }
 
 - (float) valueForChannel:(int)aChannel
 {
-    NSString* aName = [self nameForChannel:aChannel];
-    if([aName hasSuffix:@"L1"] || [aName hasSuffix:@"L2"] || [aName hasSuffix:@"L3"]){
-        NSString* aShortName = [[aName substringToIndex:[aName length]-2] trimSpacesFromEnds];
-        NSString* aKey = [[aName substringFromIndex:[aName length]-2] trimSpacesFromEnds];
-        return [[[phaseDictionary objectForKey:aKey] objectForKey:aShortName] floatValue];
+    NSString* key = nil;
+    switch(aChannel){
+        case 0:key = @"Ibat"; break;
+        case 1:key = @"Vbat"; break;
+        case 2:key = @"Vmin1"; break;
+        case 3:key = @"Vmin2"; break;
+        case 4:key = @"Vmin3"; break;
+        case 5:key = @"Iout1"; break;
+        case 6:key = @"Iout2"; break;
+        case 7:key = @"Iout3"; break;
     }
-    else return [[singleValueDictionary objectForKey:aName] floatValue];
+    if(key)return [[valueDictionary objectForKey:key]floatValue];
+    else return 0;
 }
 
 - (int) channelForName:(NSString*)aName
 {
-    [self setUpTagDictionaries];
     NSNumber* aChannelNumber = [channelFromNameTable objectForKey:aName];
     if(aChannelNumber)return [aChannelNumber intValue];
     else return -1;
 }
 
-- (id) phaseKey:(NSString*)aPhaseKey valueKey:(NSString*)aValueKey
+- (id) valueForKeyInValueDictionary:(NSString*)aKey
 {
-    return [[phaseDictionary objectForKey:aPhaseKey] objectForKey:aValueKey];
-}
-
-- (id) valueForKeyInSingleValueDictionary:(NSString*)aKey
-{
-    return [singleValueDictionary objectForKey:aKey];
+    return [valueDictionary objectForKey:aKey];
 }
 
 #pragma mark •••Process Limits
@@ -534,16 +578,15 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (double) maxValueForChan:(int)aChan
 {
     switch(aChan){
-        case 0: return 120; //run time remaining
-        case 1: return 50;  //battery amps
+        case 0: return 50;  //battery amps
             
+        case 1:
         case 2:
-        case 3:
-        case 4: return 130; //Input voltages
+        case 3: return 130; //Input voltages
 
+        case 4:
         case 5:
-        case 6:
-        case 7: return 50; //Output current
+        case 6: return 50; //Output current
             
         default: return 0;
     }
@@ -570,9 +613,10 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setEventLog: [decoder decodeObjectForKey:@"eventLog"]];
 	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
-	[self setUsername:[decoder decodeObjectForKey:@"username"]];
-	[self setPassword:[decoder decodeObjectForKey:@"password"]];
+	[self setUsername: [decoder decodeObjectForKey:@"username"]];
+	[self setPassword: [decoder decodeObjectForKey:@"password"]];
     int i;
     for(i=0;i<kNumApcUpsAdcChannels;i++) {
 
@@ -588,9 +632,10 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:eventLog  forKey:@"eventLog"];
     [encoder encodeObject:ipAddress forKey:@"ipAddress"];
-    [encoder encodeObject:username forKey:@"username"];
-    [encoder encodeObject:password forKey:@"password"];
+    [encoder encodeObject:username  forKey:@"username"];
+    [encoder encodeObject:password  forKey:@"password"];
     int i;
 	for(i=0;i<kNumApcUpsAdcChannels;i++) {
 		[encoder encodeFloat:lowLimit[i] forKey:[NSString stringWithFormat:@"lowLimit%d",i]];
@@ -603,142 +648,10 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 @implementation ORApcUpsModel (private)
 - (void) postCouchDBRecord
 {
-    NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:phaseDictionary];
-    [values addEntriesFromDictionary:singleValueDictionary];
+    NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:valueDictionary];
     [values setObject:[NSNumber numberWithInt:30] forKey:@"pollTime"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
-
-- (void) clearInputBuffer
-{
-    [inputBuffer release];
-    inputBuffer = nil;
-    
-}
-- (void) parse:(NSString*)aResponse
-{
-    if(!phaseDictionary){
-        self.phaseDictionary = [NSMutableDictionary dictionary];
-        [phaseDictionary setObject:[NSMutableDictionary dictionary] forKey:@"L1"];
-        [phaseDictionary setObject:[NSMutableDictionary dictionary] forKey:@"L2"];
-        [phaseDictionary setObject:[NSMutableDictionary dictionary] forKey:@"L3"];
-    }
-    
-    if(!singleValueDictionary)self.singleValueDictionary = [NSMutableDictionary dictionary];
-
-    aResponse = [aResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-    NSArray* lines = [aResponse componentsSeparatedByString:@"\r"];
-    for(NSString* aLine in lines){
-        aLine = [aLine removeNLandCRs];
-        if([aLine rangeOfString:@":"].location != NSNotFound){
-            //special cases
-            if([aLine hasPrefix:@"NAME"]     ||
-               [aLine hasPrefix:@"CONTACT"]  ||
-               [aLine hasPrefix:@"LOCATION"] ||
-               [aLine hasPrefix:@"UP TIME"]){
-                [self parseLine:[aLine substringToIndex:46]];
-                [self parseLine:[aLine substringFromIndex:46]];
-            }
-            else [self parseLine:aLine];
-        }
-    }
-}
-- (void) parseLine:(NSString*)aLine
-{
-    NSArray* parts = [aLine componentsSeparatedByString:@":"];
-    if([parts count]==2){
-        NSString* varName = [[parts objectAtIndex:0] removeNLandCRs];
-        varName = [varName trimSpacesFromEnds];
-        
-        NSString* value = [[parts objectAtIndex:1] removeNLandCRs];
-        value = [value trimSpacesFromEnds];
-        
-        [self add:varName value:value];
-    }
-    else  if([parts count]==4){
-        //special case TIME
-        NSString* varName = [[parts objectAtIndex:0] trimSpacesFromEnds];
-        varName = [varName removeNLandCRs];
-        if([varName isEqualToString:@"TIME"]){
-            NSString* time = [NSString stringWithFormat:@"%@:%@:%@",
-                              [[parts objectAtIndex:1] trimSpacesFromEnds],
-                              [[parts objectAtIndex:2] trimSpacesFromEnds],
-                              [[parts objectAtIndex:3] trimSpacesFromEnds]
-                              ];
-            time = [time removeNLandCRs];
-            [self add:varName value:time];
-        }
-    }
-}
-
-- (void) add:(NSString*)aName value:(NSString*)aValue
-{
-    //collect L1,L2,L3 parameters into an Array
-    if([aName hasSuffix:@"L1"]){
-        NSString* aShortName = [[aName substringToIndex:[aName length]-2] trimSpacesFromEnds] ;
-        [[phaseDictionary objectForKey:@"L1"] setObject:aValue forKey:aShortName];
-    }
-    else if([aName hasSuffix:@"L2"]){
-        NSString* aShortName = [[aName substringToIndex:[aName length]-2] trimSpacesFromEnds] ;
-        [[phaseDictionary objectForKey:@"L2"] setObject:aValue forKey:aShortName];
-    }
-    else if([aName hasSuffix:@"L3"]){
-        NSString* aShortName = [[aName substringToIndex:[aName length]-2] trimSpacesFromEnds] ;
-        [[phaseDictionary objectForKey:@"L3"] setObject:aValue forKey:aShortName];
-    }
-    //do the other parameters
-    else  {
-        //a couple of special cases
-        if([aName rangeOfString:@"RUNTIME REMAINING"].location!=NSNotFound){
-            int hr = 0;
-            int min = 0;
-            if([aValue length]>4){
-                hr = [aValue intValue];
-                min = [[aValue substringFromIndex:4] intValue];
-            }
-            aValue = [NSString stringWithFormat:@"%d min",(60*hr)+min];
-                
-            //we'll use this important parameter as a successfull poll indicator
-            [self setLastTimePolled:[NSDate date]];
-            [self cancelTimeout];
-            [self setDataValid:YES];
-        }
-        else if([aName rangeOfString:@"INTERNAL TEMPERATURE"].location!=NSNotFound){
-            NSArray* parts = [aValue componentsSeparatedByString:@","];
-            if([parts count]>=1){
-                aValue = [parts objectAtIndex:0];
-                aValue = [aValue trimSpacesFromEnds];
-            }
-        }
-        
-        [singleValueDictionary setObject:aValue forKey:aName];
-    }
-    int i = [self channelForName:aName];
-    if(i>=0 && i<8){
-        if(timeRate[i] == nil) timeRate[i] = [[ORTimeRate alloc] init];
-        [timeRate[i] addDataToTimeAverage:[self valueForChannel:i]];
-    }
-}
-
-- (void) startTimeout
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-   	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
-}
-
-- (void) cancelTimeout
-{
-   	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-}
-
-- (void) timeout
-{
-    [self setDataValid:NO];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"command timeout",[self fullID],nil);
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsTimedOut object:self];
-}
-
 @end
 

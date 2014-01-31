@@ -22,32 +22,29 @@
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
 
+#define kApcPollTime            60*10
 #define kApcUpsPort             23
-#define kNumApcUpsAdcChannels    8 
+#define kNumApcUpsAdcChannels    7
 
-@class NetSocket;
 @class ORAlarm;
 @class ORTimeRate;
 
 @interface ORApcUpsModel : OrcaObject <ORAdcProcessing>
 {
-	NSLock*     localLock;
     NSString*   ipAddress;
     NSString*   password;
     NSString*   username;
-    BOOL        isConnected;
-	NetSocket*  socket;
     BOOL        statusSentOnce;
-    NSMutableDictionary* singleValueDictionary;
-    NSMutableDictionary* phaseDictionary;
-    NSMutableDictionary* nameFromChannelTable;
+    NSMutableDictionary* valueDictionary;
+
     NSMutableDictionary* channelFromNameTable;
-    NSMutableString* inputBuffer;
-    NSDate*     lastTimePolled;
-    NSDate*     nextPollScheduled;
-    ORTimeRate*		timeRate[8];
-    BOOL        dataValid;
-    ORAlarm*    dataInValidAlarm;
+    NSDate*              lastTimePolled;
+    NSDate*              nextPollScheduled;
+    ORTimeRate*          timeRate[8];
+    BOOL                 dataValid;
+    ORAlarm*             dataInValidAlarm;
+    NSOperationQueue*    fileQueue;
+    NSMutableSet*        eventLog;
     
     float lowLimit[kNumApcUpsAdcChannels];
     float hiLimit[kNumApcUpsAdcChannels];
@@ -55,36 +52,33 @@
 }
 
 #pragma mark ***Accessors
-- (NetSocket*) socket;
-- (void) setSocket:(NetSocket*)aSocket;
-- (BOOL) isConnected;
-- (void) setIsConnected:(BOOL)aFlag;
+- (NSMutableSet*) eventLog;
+- (void) setEventLog:(NSMutableSet*)aEventLog;
 - (NSString*) ipAddress;
 - (void) setIpAddress:(NSString*)aIpAddress;
 - (ORTimeRate*)timeRate:(int)aChannel;
 - (void) setDataValid:(BOOL)aState;
 
 #pragma mark ***Utilities
-- (void) connect;
-- (void) disconnect;
 - (void) pollHardware;
-- (NSString*) keyForIndexInPowerTable:(int)i;
 - (NSString*) nameAtIndexInPowerTable:(int)i;
-- (NSString*) keyForIndexInLoadTable:(int)i;
 - (NSString*) nameForIndexInLoadTable:(int)i;
-- (NSString*) keyForIndexInBatteryTable:(int)i;
 - (NSString*) nameForIndexInBatteryTable:(int)i;
-- (void) setUpTagDictionaries;
 - (id) nameForChannel:(int)aChannel;
 - (float) valueForChannel:(int)aChannel;
 - (int) channelForName:(NSString*)aName;
-- (id) phaseKey:(NSString*)aPhaseKey valueKey:(NSString*)aValueKey;
-- (id) valueForKeyInSingleValueDictionary:(NSString*)aKey;
 - (NSString*) nameForIndexInProcessTable:(int)i;
 
-- (id) phaseKey:(NSString*)aPhaseKey valueKey:(NSString*)aValueKey;
-- (id) valueForKeyInSingleValueDictionary:(NSString*)aKey;
+- (id) valueForKeyInValueDictionary:(NSString*)aKey;
+- (NSString*) valueForPowerPhase:(int)aPhaseIndex powerTableIndex:(int)aRowIndex;
+- (NSString*) valueForLoadPhase:(int)aLoadIndex loadTableIndex:(int)aRowIndex;
+- (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex;
+
 - (void) checkAlarms;
+- (BOOL) isConnected;
+- (void) setUpQueue;
+- (void) getEvents;
+- (void) getData;
 
 #pragma mark •••Process Limits
 - (float) lowLimit:(int)i;
@@ -110,8 +104,7 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-@property (retain) NSMutableDictionary* singleValueDictionary;
-@property (retain) NSMutableDictionary* phaseDictionary;
+@property (retain) NSMutableDictionary* valueDictionary;
 @property (assign,nonatomic) BOOL dataValid;
 @property (retain,nonatomic) NSString* username;
 @property (retain,nonatomic) NSString* password;
@@ -119,6 +112,7 @@
 @property (retain,nonatomic) NSDate* nextPollScheduled;
 @end
 
+extern NSString* ORApcUpsModelEventLogChanged;
 extern NSString* ORApcUpsIsConnectedChanged;
 extern NSString* ORApcUpsIpAddressChanged;
 extern NSString* ORApcUpsUsernameChanged;

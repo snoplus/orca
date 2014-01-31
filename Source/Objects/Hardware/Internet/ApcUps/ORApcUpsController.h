@@ -24,6 +24,7 @@
 @interface ORApcUpsController : OrcaObjectController 
 {
     IBOutlet NSTableView*   powerTableView;
+	IBOutlet NSTextView*    eventLogTextView;
     IBOutlet NSTableView*   loadTableView;
     IBOutlet NSTableView*   batteryTableView;
 	IBOutlet NSTextField*	ipConnectedField;
@@ -43,6 +44,7 @@
 }
 
 #pragma mark ***Interface Management
+- (void) eventLogChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) refreshTables:(NSNotification*)aNote;
