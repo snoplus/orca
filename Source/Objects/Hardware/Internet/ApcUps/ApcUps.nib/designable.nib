@@ -1263,7 +1263,7 @@
 															<object class="NSTextView" id="647480572">
 																<reference key="NSNextResponder" ref="1071819634"/>
 																<int key="NSvFlags">2322</int>
-																<string key="NSFrameSize">{738, 269}</string>
+																<string key="NSFrameSize">{738, 233}</string>
 																<reference key="NSSuperview" ref="1071819634"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="325838354"/>
@@ -1328,7 +1328,7 @@
 																<nil key="NSDelegate"/>
 															</object>
 														</array>
-														<string key="NSFrame">{{1, 1}, {738, 269}}</string>
+														<string key="NSFrame">{{1, 1}, {738, 233}}</string>
 														<reference key="NSSuperview" ref="431312449"/>
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="647480572"/>
@@ -1367,9 +1367,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 													<object class="NSScroller" id="325838354">
 														<reference key="NSNextResponder" ref="431312449"/>
 														<int key="NSvFlags">256</int>
-														<string key="NSFrame">{{739, 1}, {15, 269}}</string>
+														<string key="NSFrame">{{739, 1}, {15, 233}}</string>
 														<reference key="NSSuperview" ref="431312449"/>
 														<reference key="NSWindow"/>
+														<reference key="NSNextKeyView" ref="582654751"/>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														<reference key="NSTarget" ref="431312449"/>
 														<string key="NSAction">_doScroller:</string>
@@ -1391,7 +1392,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 														<double key="NSPercent">0.94565218687057495</double>
 													</object>
 												</array>
-												<string key="NSFrame">{{17, 17}, {755, 271}}</string>
+												<string key="NSFrame">{{17, 53}, {755, 235}}</string>
 												<reference key="NSSuperview" ref="296536645"/>
 												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="371367766"/>
@@ -1424,6 +1425,28 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 												<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 											</object>
+											<object class="NSButton" id="582654751">
+												<reference key="NSNextResponder" ref="296536645"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{639, 23}, {133, 17}}</string>
+												<reference key="NSSuperview" ref="296536645"/>
+												<reference key="NSWindow"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSButtonCell" key="NSCell" id="72709129">
+													<int key="NSCellFlags">-2080374784</int>
+													<int key="NSCellFlags2">134348800</int>
+													<string key="NSContents">Clear This Event Log...</string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="582654751"/>
+													<int key="NSButtonFlags">-2038153216</int>
+													<int key="NSButtonFlags2">164</int>
+													<string key="NSAlternateContents"/>
+													<string key="NSKeyEquivalent"/>
+													<int key="NSPeriodicDelay">400</int>
+													<int key="NSPeriodicInterval">75</int>
+												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+											</object>
 										</array>
 										<string key="NSFrame">{{10, 25}, {789, 439}}</string>
 										<reference key="NSSuperview" ref="814559822"/>
@@ -1453,6 +1476,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 																<int key="NSvFlags">256</int>
 																<string key="NSFrameSize">{341, 132}</string>
 																<reference key="NSSuperview" ref="337688534"/>
+																<reference key="NSNextKeyView" ref="782382002"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1650,13 +1674,12 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 												</array>
 												<string key="NSFrame">{{232, 208}, {343, 151}}</string>
 												<reference key="NSSuperview" ref="674707808"/>
-												<reference key="NSNextKeyView" ref="782382002"/>
+												<reference key="NSNextKeyView" ref="337688534"/>
 												<int key="NSsFlags">133633</int>
 												<reference key="NSVScroller" ref="782382002"/>
 												<reference key="NSHScroller" ref="2797809"/>
 												<reference key="NSContentView" ref="337688534"/>
 												<reference key="NSHeaderClipView" ref="1005066958"/>
-												<reference key="NSCornerView" ref="186777121"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -1906,6 +1929,14 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="destination" ref="647480572"/>
 					</object>
 					<string key="id">MGb-mA-vgf</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">clearEventLogAction:</string>
+						<reference key="source" ref="930329033"/>
+						<reference key="destination" ref="582654751"/>
+					</object>
+					<string key="id">G9x-cu-AP8</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2309,6 +2340,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="235977278"/>
 							<reference ref="431312449"/>
 							<reference ref="853573545"/>
+							<reference ref="582654751"/>
 						</array>
 						<reference key="parent" ref="602395113"/>
 					</object>
@@ -2700,6 +2732,19 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<reference key="object" ref="909243545"/>
 						<reference key="parent" ref="853573545"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">uPP-dn-tlf</string>
+						<reference key="object" ref="582654751"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="72709129"/>
+						</array>
+						<reference key="parent" ref="296536645"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">jts-tU-PA5</string>
+						<reference key="object" ref="72709129"/>
+						<reference key="parent" ref="582654751"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2811,6 +2856,8 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 				<string key="NS2-OC-Glo.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="RDn-gh-8Oc.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="dFK-Bi-Pyu.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="jts-tU-PA5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="uPP-dn-tlf.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="vpS-Qr-a6H.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="xDp-eO-xI6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
@@ -2846,6 +2893,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					<string key="className">ORApcUpsController</string>
 					<string key="superclassName">OrcaObjectController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="clearEventLogAction:">id</string>
 						<string key="connectAction:">id</string>
 						<string key="dialogLockAction:">id</string>
 						<string key="ipAddressAction:">id</string>
@@ -2853,6 +2901,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<string key="usernameAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="clearEventLogAction:">
+							<string key="name">clearEventLogAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="connectAction:">
 							<string key="name">connectAction:</string>
 							<string key="candidateClassName">id</string>

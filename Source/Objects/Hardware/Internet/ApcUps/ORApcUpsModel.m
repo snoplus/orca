@@ -341,6 +341,16 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     }
 }
 
+- (void) clearEventLog
+{
+    NSLog(@"Cleared UPS Event Log\n");
+    [eventLog release];
+    eventLog = nil;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
+
+}
+
 - (ORTimeRate*)timeRate:(int)aChannel
 {
     if(aChannel>=0 && aChannel<8) return timeRate[aChannel];

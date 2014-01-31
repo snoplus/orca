@@ -325,6 +325,24 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) clearEventLogAction:(id)sender
+{
+    NSBeginAlertSheet(@"Clear the Event Log.",
+                      @"Cancel",
+                      @"Yes, Clear Event Log",
+                      nil,[self window],
+                      self,
+                      @selector(clearEventActionDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"This will clear the persistant UPS event log kept by ORCA. Is that really what you want to do?");
+}
+
+- (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){
+		[model clearEventLog];
+	}
+}
 - (IBAction) ipAddressAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	

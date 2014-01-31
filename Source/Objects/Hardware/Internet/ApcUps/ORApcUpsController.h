@@ -60,11 +60,14 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) clearEventLogAction:(id)sender;
 - (IBAction) ipAddressAction:(id)sender;
 - (IBAction) usernameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) dialogLockAction:(id)sender;
+
+- (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter;

@@ -58,6 +58,7 @@
 - (void) setIpAddress:(NSString*)aIpAddress;
 - (ORTimeRate*)timeRate:(int)aChannel;
 - (void) setDataValid:(BOOL)aState;
+- (void) clearEventLog;
 
 #pragma mark ***Utilities
 - (void) pollHardware;
