@@ -31,6 +31,8 @@
 	NSString*           passWord;
 	NSString*           localPath;
 	NSString*           fullPath;
+    NSString*           doneSelectorName;
+    BOOL                useFTP;   //default. If false will use SCP
 }
 - (id)   init;
 - (void) dealloc;
@@ -42,7 +44,6 @@
 #pragma mark •••Move Methods
 - (void) main;
 - (void) readOutput:(NSFileHandle*)fileHandle;
-- (void) checkOutput;
 
 @property (copy)    NSString*   ipAddress;
 @property (copy)    NSString*   remotePath;
@@ -53,11 +54,8 @@
 @property (copy)    NSString*   fullPath;
 @property (assign)  id          delegate;
 @property (retain)  NSTask*     task;
+@property (assign)  BOOL        useFTP;
+@property (copy)    NSString*   doneSelectorName;
 
 @end
 
-@interface NSObject (ORFileMoverOpDelegate)
-- (void) fileGetterPercentChanged:(NSNumber*)aNumber;
-- (void) fileGetterIsDone;
-
-@end

@@ -27,7 +27,7 @@
 
 @synthesize task,scriptFilePath,ipAddress;
 @synthesize userName,remotePath,localPath,fullPath;
-@synthesize passWord,delegate;
+@synthesize passWord,delegate,useFTP,doneSelectorName;
 
 - (id) init
 {
@@ -93,15 +93,26 @@
     free(scriptFileName);
     if(scriptPath){
         [self setScriptFilePath:scriptPath];            
-                NSString* bp = [[NSBundle mainBundle ]resourcePath];
-                NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
-                [theScript replace:@"<remotePath>" with:remotePath];
-                [theScript replace:@"<userName>"   with:userName];
-                [theScript replace:@"<host>"       with:ipAddress];
-                [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
-                [theScript replace:@"<password>"   with:passWord];
-                [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-                
+        NSString* bp = [[NSBundle mainBundle ]resourcePath];
+        if(useFTP){
+            NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
+            [theScript replace:@"<remotePath>" with:remotePath];
+            [theScript replace:@"<userName>"   with:userName];
+            [theScript replace:@"<host>"       with:ipAddress];
+            [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
+            [theScript replace:@"<password>"   with:passWord];
+            [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+        }
+        else {
+            NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
+            [theScript replace:@"<remotePath>" with:remotePath];
+            [theScript replace:@"<userName>"   with:userName];
+            [theScript replace:@"<host>"       with:ipAddress];
+            [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
+            [theScript replace:@"<password>"   with:passWord];
+            [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+       }
+        
     }
         
     //make the script executable
@@ -122,22 +133,14 @@
         [task launch];
         
         [self readOutput:readHandle];
-        [self checkOutput];
-        if ([delegate respondsToSelector:@selector(fileGetterIsDone)]){
-            [delegate performSelectorOnMainThread:@selector(fileGetterIsDone) withObject:nil waitUntilDone:NO];
+        SEL theDoneSelector = NSSelectorFromString(doneSelectorName);
+        if ([delegate respondsToSelector:theDoneSelector]){
+            [delegate performSelectorOnMainThread:theDoneSelector withObject:nil waitUntilDone:NO];
         }
     }
     @catch (NSException* e){
         NSLog(@"File Getter exception.. stopped during launch\n");
     }
-}
-
-- (void) checkOutput
-{
-    BOOL transferOK = NO;
-    [[NSFileManager defaultManager] removeItemAtPath:scriptFilePath error:nil];
-    NSRange range = [allOutput rangeOfString:@"100%"];
-    if(range.location != NSNotFound)transferOK = YES;
 }
 
 - (void) readOutput:(NSFileHandle*)fileHandle
