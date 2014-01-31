@@ -236,11 +236,12 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (void) lostFocus:(NSNotification*)aNotification
 {
-    id controller = [[aNotification object]windowController];
-    if([controller isKindOfClass:NSClassFromString(@"OrcaObjectController")]){
-        [(OrcaObjectController*)controller endEditing];
-    }
-    [groupView setEnableIconControls:NO];
+    //this was a bad idea... removed 1/28/14
+    //id controller = [[aNotification object]windowController];
+    //if([controller isKindOfClass:NSClassFromString(@"OrcaObjectController")]){
+     //   [(OrcaObjectController*)controller endEditing];
+   // }
+   // [groupView setEnableIconControls:NO];
 }
 
 - (void) statusTextChanged:(NSNotification*)aNotification

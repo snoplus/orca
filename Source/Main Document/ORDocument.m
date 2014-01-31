@@ -673,7 +673,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[orcaControllers addObject:controller];
 
         [controller showWindow:self];
-		[[controller window] makeFirstResponder:[controller window]];
+		//[[controller window] makeFirstResponder:[controller window]];
     }
     [controller release];
 }
