@@ -335,7 +335,7 @@
                       self,
                       @selector(clearEventActionDidEnd:returnCode:contextInfo:),
                       nil,
-                      nil,@"This will clear the persistant UPS event log kept by ORCA. Is that really what you want to do?");
+                      nil,@"This will clear the persistant history event log kept by ORCA and refresh with only the latest events recorded by the UPS. Is that really what you want to do?");
 }
 
 - (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo

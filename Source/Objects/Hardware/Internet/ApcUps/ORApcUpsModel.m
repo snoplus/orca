@@ -345,7 +345,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 {
     NSLog(@"Cleared UPS Event Log\n");
     [self setEventLog:nil];
-    
+    [self pollHardware];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
 
 }
