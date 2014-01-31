@@ -192,6 +192,7 @@
         [eventLog appendFormat:@"%@\n",anEvent];
     }
     if([eventLog length])[eventLogTextView setString:eventLog];
+    else [eventLogTextView setString:@""];
 }
 
 - (void) checkGlobalSecurity

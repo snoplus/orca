@@ -263,7 +263,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         if(i>=7){
             if([aLine rangeOfString:@"logged"].location != NSNotFound) continue;
             else {
-                if(!eventLog)eventLog = [[NSMutableSet alloc] init];
+                if(!eventLog)[self setEventLog:[NSMutableSet setWithCapacity:500]];
                 [eventLog addObject:aLine];
             }
         }
@@ -344,8 +344,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (void) clearEventLog
 {
     NSLog(@"Cleared UPS Event Log\n");
-    [eventLog release];
-    eventLog = nil;
+    [self setEventLog:nil];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
 
