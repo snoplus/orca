@@ -203,6 +203,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         
         [self getEvents];
         [self getData];
+
     }
     else [self setDataValid:NO];
 }
@@ -253,23 +254,28 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIsConnectedChanged object:self];
     }
 }
+
 - (void) eventsFileArrived
 {
     NSStringEncoding* en=nil;
     NSString* contents = [NSString stringWithContentsOfFile:kApcEventsPath usedEncoding:en error:nil];
     NSArray* lines = [contents componentsSeparatedByString:@"\n"];
     int i=0;
+    if(!eventLog)[self setEventLog:[NSMutableSet setWithCapacity:500]];
     for(id aLine in lines){
         if(i>=7){
             if([aLine rangeOfString:@"logged"].location != NSNotFound) continue;
             else {
-                if(!eventLog)[self setEventLog:[NSMutableSet setWithCapacity:500]];
+                aLine = [aLine stringByReplacingOccurrencesOfString:@"\t" withString:@" "];
+                int len = [aLine length];
+                if(len>6) aLine = [aLine substringToIndex:len-6];
                 [eventLog addObject:aLine];
             }
         }
         i++;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
+    [self postCouchDBRecord];
 
 }
 
@@ -301,10 +307,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                         NSString* key = [header0Names objectAtIndex:i];
                         key = [key trimSpacesFromEnds];
                         if([key isEqualToString:@"Date"])continue;
-                        if([key isEqualToString:@"Date"])continue;
                         [valueDictionary setObject:[values0 objectAtIndex:i] forKey:key];
                     }
-                    
                 }
             }
 
@@ -323,13 +327,16 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                     for(i=0;i<numParts;i++){
                         NSString* key = [headerNames objectAtIndex:i];
                         key = [key trimSpacesFromEnds];
-                        [valueDictionary setObject:[values objectAtIndex:i] forKey:key];
+                        key = [key stringByReplacingOccurrencesOfString:@"%" withString:@""];
+                       [valueDictionary setObject:[values objectAtIndex:i] forKey:key];
                     }
 
                 }
                 break;
             }
         }
+        [self postCouchDBRecord];
+
         int i;
         for(i=0;i<8;i++){
             if(timeRate[i] == nil){
@@ -392,7 +399,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 {
     switch (aRowIndex){
         case 0:
-            return [valueDictionary objectForKey:@"%Cap"];
+            return [valueDictionary objectForKey:@"Cap"];
             break;
         case 1:
             return [valueDictionary objectForKey:@"Vbat"];
@@ -660,6 +667,13 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:valueDictionary];
     [values setObject:[NSNumber numberWithInt:30] forKey:@"pollTime"];
     
+    NSSet* events = [self eventLog];
+    NSMutableString* eventLogString = [NSMutableString stringWithString:@""];
+    for (NSString *anEvent in events) {
+        [eventLogString appendFormat:@"%@\n",anEvent];
+    }
+    [values setObject:eventLogString forKey:@"eventLog"];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 @end
