@@ -46,6 +46,11 @@
 #define kEWFlt_ControlReg_ModeFlags_Mask	0x3
 #define kEWFlt_ControlReg_tpix_Shift	6
 #define kEWFlt_ControlReg_tpix_Mask	0x1
+#define kEWFlt_ControlReg_tpix_Shift	6
+#define kEWFlt_ControlReg_statusBitPos_Mask     0x1
+#define kEWFlt_ControlReg_statusBitPos_Shift	30
+#define kEWFlt_ControlReg_FIConFib_Mask     0x3f
+#define kEWFlt_ControlReg_FIConFib_Shift	24
 
 // Trigger Parameter register bits
 #define kEWFlt_TriggParReg_WinStart_Shift   24

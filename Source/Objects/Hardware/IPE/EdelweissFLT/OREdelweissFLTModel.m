@@ -1640,10 +1640,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	//OREdelweissFLTModelFiberEnableMaskChanged, OREdelweissFLTModelSelectFiberTrigChanged
 }
 
-- (int) statusLatency
+- (int) statusLatency//obsolete 2014 -tb-
 {    return (controlRegister >> kEWFlt_ControlReg_StatusLatency_Shift) & kEWFlt_ControlReg_StatusLatency_Mask;   }
 
-- (void) setStatusLatency:(int)aValue
+- (void) setStatusLatency:(int)aValue//obsolete 2014 -tb-
 {
     uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_StatusLatency_Mask << kEWFlt_ControlReg_StatusLatency_Shift);
     cr = cr | ((aValue & kEWFlt_ControlReg_StatusLatency_Mask) << kEWFlt_ControlReg_StatusLatency_Shift);
@@ -1662,13 +1662,13 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 
 
-- (int) selectFiberTrig
+- (int) selectFiberTrig//obsolete 2014 -tb-
 {
     uint32_t aselectFiberTrig = (controlRegister >> kEWFlt_ControlReg_SelectFiber_Shift) & kEWFlt_ControlReg_SelectFiber_Mask;
     return aselectFiberTrig;
 }
 
-- (void) setSelectFiberTrig:(int)aSelectFiberTrig
+- (void) setSelectFiberTrig:(int)aSelectFiberTrig//obsolete 2014 -tb-
 {
     //[[[self undoManager] prepareWithInvocationTarget:self] setSelectFiberTrig:selectFiberTrig];
     uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_SelectFiber_Mask << kEWFlt_ControlReg_SelectFiber_Shift);
@@ -1739,11 +1739,11 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 
 
-- (int) tpix
+- (int) tpix//obsolete 2014 -tb-
 {    return (controlRegister >> kEWFlt_ControlReg_tpix_Shift) & kEWFlt_ControlReg_tpix_Mask;   }
 
 
-- (void) setTpix:(int)aTpix
+- (void) setTpix:(int)aTpix//obsolete 2014 -tb-
 {
     //[[[self undoManager] prepareWithInvocationTarget:self] setTpix:tpix];
     //tpix = aTpix;
@@ -1751,6 +1751,33 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     //tpix = aTpix;
     uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_tpix_Mask << kEWFlt_ControlReg_tpix_Shift);
     cr = cr |              ((aTpix & kEWFlt_ControlReg_tpix_Mask) << kEWFlt_ControlReg_tpix_Shift);
+	[self setControlRegister:cr];
+}
+
+
+- (int) statusBitPos//new 2014 -tb-
+{    return (controlRegister >> kEWFlt_ControlReg_statusBitPos_Shift) & kEWFlt_ControlReg_statusBitPos_Mask;   }
+
+- (void) setStatusBitPos:(int)aValue//new 2014 -tb-
+{
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_statusBitPos_Mask << kEWFlt_ControlReg_statusBitPos_Shift);
+    cr = cr |              ((aValue & kEWFlt_ControlReg_statusBitPos_Mask) << kEWFlt_ControlReg_statusBitPos_Shift);
+	[self setControlRegister:cr];
+}
+
+- (int) ficOnFiberMask
+{    return (controlRegister >> kEWFlt_ControlReg_FIConFib_Shift) & kEWFlt_ControlReg_FIConFib_Mask;   }
+
+
+- (int) ficOnFiberMaskForChan:(int)i
+{
+    return ([self ficOnFiberMask] & (0x1 <<i)) != 0;
+}
+
+- (void) setFicOnFiberMask:(int)aMask
+{
+    uint32_t cr = controlRegister & ~(kEWFlt_ControlReg_FIConFib_Mask << kEWFlt_ControlReg_FIConFib_Shift);
+    cr = cr | ((aMask & kEWFlt_ControlReg_FIConFib_Mask) << kEWFlt_ControlReg_FIConFib_Shift);
 	[self setControlRegister:cr];
 }
 

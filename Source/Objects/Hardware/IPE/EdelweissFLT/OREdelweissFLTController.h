@@ -117,7 +117,7 @@
 	IBOutlet   NSTextField* statusAlimBBTextField;
         
         
-	    IBOutlet NSButton*      tpixCB;//TODO: obsolete? -tb-
+	    IBOutlet NSButton*      tpixCB;//TODO: obsolete 2014 -tb-
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
 		
 	IBOutlet   NSTextField* repeatSWTriggerModeTextField;
@@ -127,6 +127,8 @@
 		//control register
 	    IBOutlet   NSTextField* controlRegisterTextField;
 		IBOutlet NSPopUpButton* fltModeFlagsPU;
+		IBOutlet NSPopUpButton* statusBitPosPU;
+	    IBOutlet   NSMatrix*    ficOnFiberMaskMatrix;
 		IBOutlet NSPopUpButton* statusLatencyPU;
 	    IBOutlet NSButton*      vetoFlagCB;
 	IBOutlet   NSTextField* totalTriggerNRegisterTextField;
@@ -291,6 +293,9 @@
 - (void) fiberEnableMaskChanged:(NSNotification*)aNote;
 - (void) fltModeFlagsChanged:(NSNotification*)aNote;
 - (void) tpixChanged:(NSNotification*)aNote;
+- (void) statusBitPosChanged:(NSNotification*)aNote;
+- (void) ficOnFiberMaskChanged:(NSNotification*)aNote;
+
 - (void) targetRateChanged:(NSNotification*)aNote;
 - (void) noiseFloorChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
@@ -413,6 +418,9 @@
 - (IBAction) readFiberOutMaskButtonAction:(id)sender;
 - (IBAction) writeFiberOutMaskButtonAction:(id)sender;
 - (IBAction) tpixCBAction:(id)sender;
+- (IBAction) statusBitPosPUAction:(id)sender;
+- (IBAction) ficOnFiberMaskMatrixAction:(id)sender;
+
 - (IBAction) repeatSWTriggerModePUAction:(id)sender;
 - (IBAction) repeatSWTriggerModeTextFieldAction:(id)sender;
 - (IBAction) controlRegisterTextFieldAction:(id)sender;

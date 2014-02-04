@@ -1016,8 +1016,11 @@
     [self fiberEnableMaskChanged:nil];
     [self selectFiberTrigChanged:nil];
     [self BBv1MaskChanged:nil];
+    [self statusBitPosChanged:nil];
+    [self ficOnFiberMaskChanged:nil];
     [self fltModeFlagsChanged:nil];
-    [self tpixChanged:nil];
+    //[self selectFiberTrigChanged:nil]; obsolete 2014 -tb-
+    //[self tpixChanged:nil];
 
 	//[selectFiberTrigPU selectItemAtIndex: [model selectFiberTrig]];
 	[statusLatencyPU selectItemAtIndex: [model statusLatency]];
@@ -1254,6 +1257,22 @@
 {
 	[tpixCB setIntValue: [model tpix]];
 }
+
+- (void) statusBitPosChanged:(NSNotification*)aNote
+{
+	[statusBitPosPU selectItemAtIndex: [model statusBitPos]];
+}
+
+- (void) ficOnFiberMaskChanged:(NSNotification*)aNote
+{
+	int i;
+	for(i=0;i<6;i++){
+		[[ficOnFiberMaskMatrix cellAtRow:0 column:i] setIntValue: [model ficOnFiberMaskForChan:i] ];
+	}    
+}
+
+
+
 
 
 - (void) targetRateChanged:(NSNotification*)aNote
@@ -3088,6 +3107,21 @@
 	[model setTpix:[tpixCB intValue]];	
 }
 
+- (void) statusBitPosPUAction:(id)sender
+{
+    //DEBUG OUTPUT:
+ 	NSLog(@"%@::%@ is %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[statusBitPosPU intValue]);//TODO: DEBUG testing ...-tb-
+	[model setStatusBitPos:[statusBitPosPU indexOfSelectedItem]];	// or [sender intValue]
+}
+
+- (IBAction) ficOnFiberMaskMatrixAction:(id)sender
+{
+	int i, val=0;
+	for(i=0;i<6;i++){
+		if([[sender cellWithTag:i] intValue]) val |= (0x1<<i);
+	}
+	[model setFicOnFiberMask:val];
+}
 
 
 

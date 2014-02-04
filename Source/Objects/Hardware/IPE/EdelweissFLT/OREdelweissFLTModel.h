@@ -317,12 +317,12 @@
 - (void) setRepeatSWTriggerMode:(int)aRepeatSWTriggerMode;
 - (uint32_t) controlRegister;
 - (void) setControlRegister:(uint32_t)aControlRegister;
-- (int) statusLatency;
-- (void) setStatusLatency:(int)aValue;
+- (int) statusLatency;//obsolete 2014 -tb-
+- (void) setStatusLatency:(int)aValue;//obsolete 2014 -tb-
 - (int) vetoFlag;
 - (void) setVetoFlag:(int)aValue;
-- (int) selectFiberTrig;
-- (void) setSelectFiberTrig:(int)aSelectFiberTrig;
+- (int) selectFiberTrig;//obsolete 2014 -tb-
+- (void) setSelectFiberTrig:(int)aSelectFiberTrig;//obsolete 2014 -tb-
 - (int) BBv1Mask;
 - (BOOL) BBv1MaskForChan:(int)i;
 - (void) setBBv1Mask:(int)aBBv1Mask;
@@ -331,8 +331,13 @@
 - (void) setFiberEnableMask:(int)aFiberEnableMask;
 - (int) fltModeFlags;
 - (void) setFltModeFlags:(int)aFltModeFlags;
-- (int) tpix;
-- (void) setTpix:(int)aTpix;
+- (int) tpix;//obsolete 2014 -tb-
+- (void) setTpix:(int)aTpix;//obsolete 2014 -tb-
+- (int) statusBitPos;//new 2014 -tb-
+- (void) setStatusBitPos:(int)aValue;//new 2014 -tb-
+- (int) ficOnFiberMask;
+- (int) ficOnFiberMaskForChan:(int)i;
+- (void) setFicOnFiberMask:(int)aMask;
 
 
 - (int) totalTriggerNRegister;
