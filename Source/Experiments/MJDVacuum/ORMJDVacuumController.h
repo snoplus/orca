@@ -64,7 +64,7 @@
 - (void) registerNotificationObservers;
 - (void) showGridChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
--(void) groupChanged:(NSNotification*)aNote;
+- (void) groupChanged:(NSNotification*)aNote;
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
@@ -77,6 +77,7 @@
 - (void) stateChanged:(NSNotification*)aNote;
 - (void) delayedRefresh;
 - (void) constraintsDisabledChanged:(NSNotification*)aNote;
+- (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark •••Actions
 - (IBAction) showGridAction:(id)sender;
