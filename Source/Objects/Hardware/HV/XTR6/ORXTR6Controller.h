@@ -66,6 +66,8 @@
 - (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
+- (void) connectionProtocolChanged:(NSNotification*)aNote;
+- (void) updateButtons;
 
 #pragma mark •••Actions
 - (IBAction) targetVoltageAction:(id)sender;

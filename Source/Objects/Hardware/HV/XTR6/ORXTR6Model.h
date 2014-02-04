@@ -112,6 +112,7 @@
 - (void) netsocketConnected:(NetSocket*)inNetSocket;
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket;
+- (BOOL) isConnected;
 
 #pragma mark ***Commands
 - (void) selectDevice;
