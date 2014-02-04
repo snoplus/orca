@@ -73,8 +73,8 @@
     [plotter0 setShowLegend:YES];
     [plotter1 setShowLegend:YES];
 
-    [[plotter0 yAxis] setRngLow:0.0 withHigh:150];
-	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4];
+    [[plotter0 yAxis] setRngLow:0.0 withHigh:250];
+	[[plotter0 yAxis] setRngLimitsLow:0.0 withHigh:250 withMinRng:4];
     [[plotter1 yAxis] setRngLow:0.0 withHigh:150.];
 	[[plotter1 yAxis] setRngLimitsLow:0.0 withHigh:150 withMinRng:4];
 }
