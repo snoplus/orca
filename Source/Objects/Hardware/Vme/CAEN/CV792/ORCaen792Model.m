@@ -93,6 +93,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 @interface ORCaen792Model (private)
 - (void) startCyclingZeroSuppression;
 - (void) stopCyclingZeroSuppression;
+- (void) doCycle;
 @end
 
 @implementation ORCaen792Model
@@ -279,8 +280,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 
 - (void) setIPed:(unsigned short)aIPed
 {
-    if(aIPed < 0 )aIPed = 0;
-    else if(aIPed >= 0xff)aIPed = 0xff;
+    if(aIPed >= 0xff)aIPed = 0xff;
     
     [[[self undoManager] prepareWithInvocationTarget:self] setIPed:iPed];
     
