@@ -1050,7 +1050,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(aValue > 0) aValue = 0.01*pow(2., 23)/aValue;
 	[self setPoleZeroMultiplier:chan withValue:aValue]; 	//us -> raw
 }
-- (void) setNoiseWindowConverted:(float)aValue      { [self setNoiseWindow:     aValue*0x40/640.]; } //us -> raw
+- (void) setNoiseWindowConverted:(float)aValue      { [self setNoiseWindow:     aValue*0x40/640.]; } //ns -> raw
 - (void) setExternalWindowConverted:(float)aValue   { [self setExternalWindow:  aValue*0x190/4.0]; } //us -> raw
 - (void) setPileUpWindowConverted:(float)aValue     { [self setPileUpWindow:    aValue*0x400/10.0];  } //us -> raw
 - (void) setExtTrigLengthConverted:(float)aValue    { [self setExtTrigLength:   aValue*0x190/4.0];  } //us -> raw
