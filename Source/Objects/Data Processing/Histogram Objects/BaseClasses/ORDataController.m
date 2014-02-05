@@ -52,7 +52,26 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 {
     NSSize minSize = [[self window] minSize];
     minSize.height = 300;
+    
+    NSSize maxSize = [[self window] maxSize];
+    CGFloat smallestScreenWidth  = 9E99;
+    CGFloat smallestScreenHeight = 9E99;
+    NSArray* screenArray = [NSScreen screens];
+    unsigned screenCount = [screenArray count];
+    unsigned index;
+    
+    for (index=0; index < screenCount; index++) {
+        NSScreen* aScreen = [screenArray objectAtIndex: index];
+        NSRect screenRect = [aScreen visibleFrame];
+        if(screenRect.size.width<smallestScreenWidth)  smallestScreenWidth  = screenRect.size.width;
+        if(screenRect.size.height<smallestScreenHeight)smallestScreenHeight = screenRect.size.height;
+    }
+
+    maxSize.height = smallestScreenHeight-200;
+    maxSize.width  = smallestScreenWidth;
+
     [[self window] setMinSize:minSize];
+    [[self window] setMaxSize:maxSize];
     [super awakeFromNib];
 }
 
