@@ -88,9 +88,9 @@ NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChang
 - (void) testFlashStatusRegisterWithNoFlashCmd;
 - (void) testFlashStatusRegisterWithFlashCmd;
 - (void) blockEraseFlashAtBlock:(unsigned long)blockNumber;
-- (void) programFlashBufferAtAddress:(const void*)theData 
-						startAddress:(unsigned long)anAddress 
-				numberOfBytesToWrite:(unsigned long)aNumber;
+- (void) programFlashBufferWithData:(NSData*)theData
+                       startAddress:(unsigned long)anAddress 
+               numberOfBytesToWrite:(unsigned long)aNumber;
 - (void) blockEraseFlash;					   
 - (void) programFlashBuffer:(NSData*)theData;
 - (BOOL) verifyFlashBuffer:(NSData*)theData;
@@ -2655,11 +2655,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self setFpgaDownProgress:0.];
 	while (address < totalSize ) {
 		@try {
-			[ self programFlashBufferAtAddress:([theData bytes] + address)
-								  startAddress:address
-						  numberOfBytesToWrite:( ( ([theData length]-address) > kGretina4MFlashBufferBytes) 
-												? kGretina4MFlashBufferBytes : ([theData length]-address) )];
-			address += kGretina4MFlashBufferBytes;
+            unsigned long numberBytesToWrite;
+            if([theData length]-address >= kGretina4MFlashBufferBytes) numberBytesToWrite = kGretina4MFlashBufferBytes;
+            else                                                        numberBytesToWrite = [theData length]-address;
+			
+            [self programFlashBufferWithData:theData
+                                startAddress:address
+                        numberOfBytesToWrite:numberBytesToWrite];
+            
+			address += numberBytesToWrite;
 			if(stopDownLoadingMainFPGA)break;
 			
 			if(address%(totalSize/1000) == 0){
@@ -2751,27 +2755,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	isFlashWriteEnabled = NO;
 }
 
-- (void) programFlashBufferAtAddress:(const void*)theData 
-						startAddress:(unsigned long)anAddress 
-				numberOfBytesToWrite:(unsigned long)aNumber
+- (void) programFlashBufferWithData:(NSData*)theData
+                       startAddress:(unsigned long)anAddress 
+               numberOfBytesToWrite:(unsigned long)aNumber
 {
-	static char bufferToWrite[kGretina4MFlashBufferBytes];
 	if ( aNumber > kGretina4MFlashBufferBytes ) {
 		[NSException raise:@"Gretina4M Exception" format:@"Trying to program too many bytes in flash memory."];
 	}
 	if ( !isFlashWriteEnabled ) {
 		[NSException raise:@"Gretina4M Exception" format:@"Programming flash is not enabled."];
 	}
-	/* Load the words into the bufferToWrite */
 	
-	memcpy(bufferToWrite, theData, aNumber);
-	
-	if ( aNumber < kGretina4MFlashBufferBytes ) {
-		unsigned int i;
-		for ( i=aNumber; i<kGretina4MFlashBufferBytes; i++ ) {
-			bufferToWrite[i] = 0;
-		}
-	} 	
+
 	unsigned long tempToWrite = anAddress;
 	[[self adapter] writeLongBlock:&tempToWrite
 						 atAddress:[self baseAddress] + fpga_register_information[kFlashAddress].offset
@@ -2816,12 +2811,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 	
 	// Loading all the words in
+    /* Load the words into the bufferToWrite */
+	unsigned char* dataPtr = ((unsigned char*) [theData bytes]) + anAddress;
+	//memcpy(bufferToWrite, theData, aNumber);
+
 	unsigned long i;
 	for ( i=0; i<aNumber; i+=4 ) {
-		tempToWrite =   (((unsigned long)bufferToWrite[i]) & 0xFF) |    
-		(((unsigned long)(bufferToWrite[i+1]) <<  8) & 0xFF00) |    
-		(((unsigned long)(bufferToWrite[i+2]) << 16) & 0xFF0000)|    
-		(((unsigned long)(bufferToWrite[i+3]) << 24) & 0xFF000000);
+		tempToWrite =   (((unsigned long)dataPtr[i]) & 0xFF) |    
+		(((unsigned long)(dataPtr[i+1]) <<  8) & 0xFF00) |    
+		(((unsigned long)(dataPtr[i+2]) << 16) & 0xFF0000)|    
+		(((unsigned long)(dataPtr[i+3]) << 24) & 0xFF000000);
 		[[self adapter] writeLongBlock:&tempToWrite
 							 atAddress:[self baseAddress] + fpga_register_information[kFlashDataWithAddrIncr].offset
 							numToWrite:1
