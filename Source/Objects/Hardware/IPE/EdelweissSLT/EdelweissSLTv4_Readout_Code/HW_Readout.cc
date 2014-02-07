@@ -428,10 +428,11 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
         //do the job
         //usleep(100000);
         //we write bunches of 1000 bytes to the comand FIFO
-        for(n=data_start; n<data_end; n+=2){
+        for(n=data_start; n<data_end; n+=1){
             blo = charData[n];
-            bhi = charData[n+1];
-			b=(((unsigned short) bhi)<<8) | ((unsigned short) blo); 
+            //bhi = charData[n+1];
+			//b=(((unsigned short) bhi)<<8) | ((unsigned short) blo); 
+			b= ((unsigned short) blo); 
             pbus->write(CmdFIFOReg, 0xf0);
             pbus->write(CmdFIFOReg, 0xff);//BB id
             pbus->write(CmdFIFOReg, 0x76);//charge FIC cmd
