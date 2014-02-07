@@ -40,6 +40,8 @@ extern "C" {
 void processHWCommand(SBC_Packet* aPacket);
 void processChargeBBCommand(SBC_Packet* aPacket);
 void chargeBB(SBC_Packet* aPacket);
+void processChargeFICCommand(SBC_Packet* aPacket);
+void chargeFIC(SBC_Packet* aPacket);
 
 void FindHardware(void);
 void ReleaseHardware(void);

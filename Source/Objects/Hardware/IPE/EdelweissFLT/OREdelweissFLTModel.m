@@ -39,6 +39,8 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelChargeFICFileChanged = @"OREdelweissFLTModelChargeFICFileChanged";
+NSString* OREdelweissFLTModelProgressOfChargeFICChanged = @"OREdelweissFLTModelProgressOfChargeFICChanged";
 NSString* OREdelweissFLTModelFicCardTriggerCmdChanged = @"OREdelweissFLTModelFicCardTriggerCmdChanged";
 NSString* OREdelweissFLTModelFicCardADC23CtrlRegChanged = @"OREdelweissFLTModelFicCardADC23CtrlRegChanged";
 NSString* OREdelweissFLTModelFicCardADC01CtrlRegChanged = @"OREdelweissFLTModelFicCardADC01CtrlRegChanged";
@@ -285,6 +287,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (void) dealloc
 {	
+    [chargeFICFile release];
     [chargeBBFileForFiber[0] release];//sorry, this is awfuel, but it was a quick hack -tb-
     [chargeBBFileForFiber[1] release];
     [chargeBBFileForFiber[2] release];
@@ -344,6 +347,34 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (NSString*) chargeFICFile
+{
+    if(!chargeFICFile) return @"";
+    return chargeFICFile;
+}
+
+- (void) setChargeFICFile:(NSString*)aChargeFICFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setChargeFICFile:chargeFICFile];
+    
+    [chargeFICFile autorelease];
+    chargeFICFile = [aChargeFICFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelChargeFICFileChanged object:self];
+}
+
+- (int) progressOfChargeFIC
+{
+    return progressOfChargeFIC;
+}
+
+- (void) setProgressOfChargeFIC:(int)aProgressOfChargeFIC
+{
+    progressOfChargeFIC = aProgressOfChargeFIC;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelProgressOfChargeFICChanged object:self];
+}
 
 - (uint32_t) ficCardTriggerCmdForFiber:(int)aFiber
 {
@@ -3049,6 +3080,41 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 
+
+- (void) killChargeFICJobButtonAction
+{
+    //DEBUG 	    
+    NSLog(@"%@::%@   \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+    
+    [[[self crate] adapter] killSBCJob];
+}
+
+
+
+- (int) chargeFICWithDataFromFile:(NSString*)aFilename
+{
+    NSLog(@"%@::%@  \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+	NSData* theData = [NSData dataWithContentsOfFile:aFilename];
+	if(![theData length]){
+		//[NSException raise:@"No FIC FPGA Configuration Data" format:@"Couldn't open FIC ConfigurationFile: %@",[aFilename stringByAbbreviatingWithTildeInPath]];
+		NSLog(@"%@::%@ ERROR: No FIC FPGA Configuration Data - Couldn't open FIC ConfigurationFile: %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[aFilename stringByAbbreviatingWithTildeInPath]);
+		return 0;
+	}
+    
+    OREdelweissSLTModel *slt=0;
+    slt=[[self crate] adapter];
+
+    [slt chargeFICusingSBCinBackgroundWithData:theData forFLT:self];
+
+
+    return [theData length];
+}
+
+
+
+
+
+
 - (void) sendWCommand
 {
     OREdelweissSLTModel *slt=0;
@@ -3648,6 +3714,7 @@ for(chan=0; chan<6;chan++)
     
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
+    [self setChargeFICFile:[decoder decodeObjectForKey:@"chargeFICFile"]];
         [self setFicCardTriggerCmd:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]] forFiber:i];
         [self setFicCardADC23CtrlReg:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]] forFiber:i]; 
         [self setFicCardADC01CtrlReg:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardADC01CtrlReg%i",i]] forFiber:i];  
@@ -3775,6 +3842,7 @@ for(chan=0; chan<6;chan++)
 	
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
+        [encoder encodeObject:chargeFICFile forKey:@"chargeFICFile"];
         [encoder encodeInt:ficCardTriggerCmd[i] forKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]];
         [encoder encodeInt:ficCardADC23CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]];
         [encoder encodeInt:ficCardADC01CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC01CtrlReg%i",i]]; 

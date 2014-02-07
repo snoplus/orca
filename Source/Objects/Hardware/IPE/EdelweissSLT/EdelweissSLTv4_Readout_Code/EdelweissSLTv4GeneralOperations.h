@@ -36,6 +36,7 @@
 
 //SLT commands
 #define kEdelweissSLTchargeBB		0x01
+#define kEdelweissSLTchargeFIC		0x02
 
 
 

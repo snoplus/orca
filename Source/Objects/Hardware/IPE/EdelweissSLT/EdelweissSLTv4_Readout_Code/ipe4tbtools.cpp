@@ -753,7 +753,7 @@ int32_t  fsize(FILE* fd)
 */
 
 #define _attente_cmd_vide	{int timeout=100; do b=pbus->read(CmdFIFOStatusReg);	while ( (!(b&0x8000)) && (timeout--) ) ;\
-							if(timeout<1) printf("erreur timeout attente commande vide \n");}
+							if(timeout<1) printf("erreur timeout attente commande vide _attente_cmd_vide\n");}
 
 
 /*

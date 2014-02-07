@@ -139,6 +139,7 @@ void processHWCommand(SBC_Packet* aPacket)
     
     switch(aCmdID){
 		case kEdelweissSLTchargeBB:		processChargeBBCommand(aPacket); break;
+		case kEdelweissSLTchargeFIC:	processChargeFICCommand(aPacket); break;
 		default:			break;
         //        default:              processUnknownCommand(aPacket); break;
     }
@@ -335,6 +336,142 @@ void chargeBB_template_without_HW_access(SBC_Packet* aPacket)// see void loadXL2
 
 
 }
+
+
+
+
+
+
+
+
+void processChargeFICCommand(SBC_Packet* aPacket)
+{
+    printf("Called SLT::processChargeFICCommand(SBC_Packet* aPacket)\n");
+    startJob(&chargeFIC,aPacket);
+}
+
+//this should maybe go to OREdelweissSLTv4Readout.cc (?) -tb-
+//see tbtools.c, function "int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)"
+void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aPacket)
+{
+	//
+	//this function is meant to be launched as a job
+	//
+	EdelweissSLTchargeBBStruct* p = (EdelweissSLTchargeBBStruct*)aPacket->payload;
+	//swap if needed, but note that we don't swap the data file part
+	if(needToSwap) SwapLongBlock(p,sizeof(EdelweissSLTchargeBBStruct)/sizeof(int32_t));
+	
+	//pull the addresses and other data from the payload
+	uint32_t length					= p->fileSize;
+	uint8_t* charData				= (uint8_t*)p;			//recast p so we can treat it like a char ptr.
+	charData += sizeof(EdelweissSLTchargeBBStruct);				//point to the clock file data
+	
+	char  errorMessage[80];
+	memset(errorMessage,'\0',80);		
+	uint32_t  errorFlag	 = 0;
+	uint32_t  finalStatus = 0; //assume failure
+    
+    //request semaphore
+    //TODO:
+    //TODO:
+    //TODO:
+    //TODO:
+    
+    //prepare loading
+	usleep(500000);
+	usleep(100000);
+    pbus->write(CmdFIFOReg ,  235);
+
+	printf("Switch FIC to microprocessor mode ...\n");
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(100000);	// laisser le temps (0.1sec) pour que le biphase se rende compte que l'horloge est arretee
+    
+    
+	uint32_t  b,i;
+	b=0x0120;
+	for(i=0;i<10;i++)	pbus->write(CmdFIFOReg ,  b++);  // ici avec _attente_cmd_vide ca ne marche pas
+    
+    uint32_t  size=length;
+	printf("fichier de programmation : %d octets \n",(int)size);
+	b=(size & 0xff) + 0x0100;         pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	b=( (size>>8) & 0xff ) + 0x0100;  pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	b=( (size>>16) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	b=( (size>>24) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
+	usleep(10000);	// attente pour mise en mode conf du fpga (10 msec)
+
+    //now do the loading
+    uint32_t n,data_start, data_end;
+    data_start=0;
+    data_end=1000;
+    for(i=0; i<1000; i++){
+			
+        if(sbc_job.killJobNow){
+            //FATAL_ERROR(666,"Job Killed. Early Exit.")
+            strncpy(errorMessage,"Job Killed. Early Exit.",80);	errorFlag = 666; finalStatus = errorFlag;	goto earlyExit;
+        }
+        
+        //do the job
+        //usleep(100000);
+        //we write bunches of 1000 bytes to the comand FIFO
+        for(n=data_start; n<data_end; n++){
+			b=( (unsigned short) charData[n] ) + 0x0100; 
+            pbus->write(CmdFIFOReg, b);
+			_attente_cmd_vide
+        }
+        
+        //job monitoring
+        strcpy(errorMessage,"chargeFIC: loop running.");	
+        printf("SBC job loop: i=%i; job message: %s\n",i,errorMessage);	
+	    strncpy(sbc_job.message,errorMessage,255);
+        pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+        sbc_job.progress = ((double)i)/2.5;			        //percent done
+	    sbc_job.finalStatus = finalStatus;
+        pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+        
+        if(data_end==size) break;//end loop: this was the last block
+        data_start=data_end;
+        data_end+=1000; if(data_end>size) data_end=size;
+    }
+    
+    //finish loading
+	printf("Charging BB finished ... \n");
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
+	//usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	//usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
+	
+	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
+	b=0x200;  pbus->write(CmdFIFOReg, b);  //fin de commande 
+	//-tb- old code: b=0x200;  write_word(driver_fpga,REG_CMD, b);  //fin de commande 
+	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
+	printf("on attend 2 pour terminer : ");
+    
+    //job done -> success
+    finalStatus=1;//flags success
+    strcpy(errorMessage,"chargeFIC: loop finished.");		
+
+
+	earlyExit://no success
+
+    //house keeping
+
+	pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+	sbc_job.progress    = 100;
+	sbc_job.running     = 0;
+	sbc_job.killJobNow  = 0;
+	sbc_job.finalStatus = finalStatus;
+	strncpy(sbc_job.message,errorMessage,255);
+	sbc_job.message[255] = '\0';
+    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+	
+
+
+}
+
+
 
 
 

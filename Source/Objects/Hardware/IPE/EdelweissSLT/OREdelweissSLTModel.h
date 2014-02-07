@@ -216,6 +216,9 @@
     
     //BB charging
     OREdelweissFLTModel *fltChargingBB;
+    //FIC charging
+    OREdelweissFLTModel *fltChargingFIC;
+    
     int resetEventCounterAtRunStart;
 }
 
@@ -410,6 +413,8 @@
 - (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes;
 - (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
 - (void)          chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus;
+- (int)           chargeFICusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
+- (void)          chargeFICStatus:(ORSBCLinkJobStatus*) jobStatus;
 - (void)          killSBCJob;
 - (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
 - (void)		  readAllControlSettingsFromHW;

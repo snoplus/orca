@@ -2517,6 +2517,89 @@ for(l=0;l<2500;l++){
 }
 
 
+
+
+
+- (int)           chargeFICusingSBCinBackgroundWithData:(NSData*)theData forFLT:(OREdelweissFLTModel*) aFLT
+{
+
+    fltChargingFIC = aFLT;
+
+    //DEBUG 	    
+    NSLog(@"%@::%@ data length: %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[theData length]);//TODO: DEBUG testing ...-tb-
+
+	if(![pmcLink isConnected]){
+		NSLog(@"   ERROR: Crate Computer (PMC) Not Connected!\n"); 
+		//[NSException raise:@"Not Connected" format:@"Socket not connected."];
+        return 0;
+	}
+   
+   
+	
+	NSLog(@"Charge FIC FPGA\n");
+	
+	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination			= kPMC;//kSBC_Command;//kSBC_Process;
+	aPacket.cmdHeader.cmdID					= kEdelweissSLTchargeFIC;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(EdelweissSLTchargeBBStruct) + numLongs*sizeof(long);
+	
+	EdelweissSLTchargeBBStruct* payloadPtr	= (EdelweissSLTchargeBBStruct*)aPacket.payload;
+	payloadPtr->fileSize					= [theData length];
+	
+	const char* dataPtr						= (const char*)[theData bytes];
+	//really should be an error check here that the file isn't bigger than the max payload size
+	char* p = (char*)payloadPtr + sizeof(EdelweissSLTchargeBBStruct);
+	bcopy(dataPtr, p, [theData length]);
+	
+	@try {
+		//launch the load job. The response will be a job status record
+		[pmcLink send:&aPacket receive:&aPacket];
+		SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
+		long running = responsePtr->running;
+		if(running){
+			NSLog(@"FIC charge in progress on the SBC on the IPE crate.\n");
+			[pmcLink monitorJobFor:self statusSelector:@selector(chargeFICStatus:)];
+		}
+//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
+//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+//		}
+//		else NSLog(@"Looks like success.\n");
+	}
+	@catch(NSException* localException) {
+		NSLog(@"FIC charge failed. %@\n",localException);
+		[NSException raise:@"FIC charge Failed" format:@"%@",localException];
+	}
+   
+   
+   
+   
+   
+   return 0;
+}
+
+- (void) chargeFICStatus:(ORSBCLinkJobStatus*) jobStatus
+{
+	if(![jobStatus running]){
+		NSLog(@"SLT job NOT running: job message: %@   progress: %i finalStatus: %i\n",[jobStatus message],[jobStatus  progress],[jobStatus  finalStatus]);
+        if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: [jobStatus  progress]];
+        if([jobStatus  finalStatus]==666){//job killed
+            if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: 101];
+        }
+        usleep(10000);
+        if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: 0];
+	}
+    else{
+		//NSLog(@"SLT: %@   progress: %i\n",[jobStatus message],[jobStatus  progress]);
+		NSLog(@"SLT job running: job message: %@   progress: %i finalStatus: %i\n",[jobStatus message],[jobStatus  progress],[jobStatus  finalStatus]);
+        if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: [jobStatus  progress]];
+    }
+}
+
+
+
+
+
 - (void) killSBCJob
 {
 	SBC_Packet aPacket;

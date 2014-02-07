@@ -94,6 +94,7 @@
     [ionChannelsTextField2 setFrameCenterRotation:90.0];
     
     [progressOfChargeBBIndicator setIndeterminate:NO];
+    [progressOfChargeFICIndicator setIndeterminate:NO];
 
 
 }
@@ -529,9 +530,51 @@
                          name : OREdelweissFLTModelFicCardTriggerCmdChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(progressOfChargeFICChanged:)
+                         name : OREdelweissFLTModelProgressOfChargeFICChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(chargeFICFileChanged:)
+                         name : OREdelweissFLTModelChargeFICFileChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) chargeFICFileChanged:(NSNotification*)aNote
+{
+	[chargeFICFileTextField setStringValue: [model chargeFICFile]];
+}
+
+- (void) progressOfChargeFICChanged:(NSNotification*)aNote
+{
+	//[progressOfChargeFICIndicator setIntValue: [model progressOfChargeFIC]];
+
+    if([model progressOfChargeFIC]==0){
+	    //[progressOfChargeFICIndicator startAnimation: self];
+        [progressOfChargeFICIndicator setDoubleValue: 0.0];
+        //[progressOfChargeFICTextField setIntValue: [model progressOfChargeFIC]];
+    }
+    else if([model progressOfChargeFIC]==100){
+	    //[progressOfChargeFICIndicator startAnimation: self];
+        [progressOfChargeFICIndicator setDoubleValue: 100.0];
+        [progressOfChargeFICTextField setStringValue: @"OK"];
+    }
+    else if([model progressOfChargeFIC]>100){
+	    //[progressOfChargeFICIndicator startAnimation: self];
+        [progressOfChargeFICIndicator setDoubleValue: 0.0];
+        [progressOfChargeFICTextField setStringValue: @"Killed"];
+    }
+    else
+    {
+	    //[progressOfChargeFICIndicator startAnimation: self];
+        [progressOfChargeFICIndicator setDoubleValue: (double)[model progressOfChargeFIC]];
+        [progressOfChargeFICTextField setIntValue: [model progressOfChargeFIC]];
+    }
+}
 
 - (void) ficCardTriggerCmdChanged:(NSNotification*)aNote
 {
@@ -621,7 +664,7 @@
 	}    
 }
 
-- (void) chargeBBFileChanged:(NSNotification*)aNote
+- (void) chargeBBFileChanged:(NSNotification*)aNote //currently unused 2014-01 -tb-
 {
 	[chargeBBFileTextField setStringValue: [model chargeBBFile]];
 }
@@ -937,6 +980,7 @@
     [self temperatureChanged:nil];
     
     [self chargeBBFileForFiberChanged:nil];
+    //[self chargeFICFileChanged:nil]; not necessary any more, done at updateWWindow ... -tb-
     
     [statusAlimBBTextField setIntValue: [model statusBB16forFiber: fiber atIndex:kBBstatusAlim] ];
 
@@ -1429,6 +1473,8 @@
 	[self ficCardADC01CtrlRegChanged:nil];
 	[self ficCardADC23CtrlRegChanged:nil];
 	[self ficCardTriggerCmdChanged:nil];
+	[self progressOfChargeFICChanged:nil];
+	[self chargeFICFileChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1800,6 +1846,81 @@
 }
 
 #pragma mark •••Actions
+- (void) selectChargeFICFileButtonAction:(id) sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	
+	NSString* fullPath = [[model chargeFICFile] stringByExpandingTildeInPath];
+    if(fullPath)	startingDir = [[model chargeFICFile] stringByDeletingLastPathComponent];
+    else			startingDir = NSHomeDirectory();
+	
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setChargeFICFile:[[openPanel URL] path] ];
+            NSLog(@"FIC FPGA config file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+       }
+    }];
+#else 	
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(selectChargeFICFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+#endif
+}
+
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
+- (void) selectChargeFICFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setChargeBBFile:[[sheet filenames] objectAtIndex:0]];
+		NSLog(@"BB FPGA config file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+    }
+}
+#endif
+
+
+
+- (void) chargeFICFileTextFieldAction:(id)sender
+{
+	[model setChargeFICFile:[sender stringValue]];	
+}
+
+#if 0
+- (void) progressOfChargeFIC<custom>Action:(id)sender
+{
+	[model setProgressOfChargeFIC:[sender intValue]];	
+}
+#endif
+
+
+- (void) chargeFICFileButtonAction:(id) sender
+{
+    NSLog(@"%@::%@  string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model chargeFICFile]);//TODO: DEBUG testing ...-tb-
+    int len = [model chargeFICWithDataFromFile: [model chargeFICFile]];
+    NSLog(@"%@::%@ bytes loaded: %i \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),len);//TODO: DEBUG testing ...-tb-
+}
+
+
+- (IBAction) killChargeFICJobButtonAction:(id) sender
+{  [model killChargeFICJobButtonAction]; }
+
+
+
+
+
+
+
+
 
 - (void) ficCardTriggerCmdTextFieldAction:(id)sender
 {
@@ -1974,8 +2095,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) selectChargeBBFile
-:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         int fiber = [model fiberSelectForBBAccess];
@@ -2000,8 +2120,6 @@
     NSLog(@"%@::%@ fiber is %i string is %@\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),fiber,[model chargeBBFileForFiber:fiber]);//TODO: DEBUG testing ...-tb-
     int len = [model chargeBBWithDataFromFile: [model chargeBBFileForFiber:fiber]];
     NSLog(@"%@::%@ bytes loaded: %i \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),len);//TODO: DEBUG testing ...-tb-
-     
-
 }
 
 

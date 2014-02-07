@@ -40,6 +40,9 @@
 	IBOutlet   NSTextField* wCmdCodeTextField;
     
     //FIC Tab
+	IBOutlet   NSTextField* chargeFICFileTextField;
+	IBOutlet   NSProgressIndicator* progressOfChargeFICIndicator;
+	IBOutlet   NSTextField* progressOfChargeFICTextField;
     //regs
 	IBOutlet   NSTextField* ficCardTriggerCmdTextField;
 	IBOutlet   NSTextField* ficCardADC23CtrlRegTextField;
@@ -233,6 +236,8 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) chargeFICFileChanged:(NSNotification*)aNote;
+- (void) progressOfChargeFICChanged:(NSNotification*)aNote;
 //FIC card
 - (void) ficCardTriggerCmdChanged:(NSNotification*)aNote;
 - (void) ficCardADC23CtrlRegChanged:(NSNotification*)aNote;
@@ -333,6 +338,12 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) chargeFICFileTextFieldAction:(id)sender;
+//- (IBAction) progressOfChargeFICIndicatorAction:(id)sender;
+- (IBAction) selectChargeFICFileButtonAction:(id) sender;
+- (IBAction) chargeFICFileButtonAction:(id) sender;
+- (IBAction) killChargeFICJobButtonAction:(id) sender;
+
 //FIC card regs
 - (IBAction) ficCardTriggerCmdTextFieldAction:(id)sender;
 - (IBAction) ficCardADC23CtrlRegTextFieldAction:(id)sender;

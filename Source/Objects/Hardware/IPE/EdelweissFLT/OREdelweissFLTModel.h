@@ -173,11 +173,15 @@
     uint64_t ionTriggerMask;
     uint64_t heatTriggerMask;
     int ionToHeatDelay;
-    NSString* chargeBBFile;
     uint32_t BB0x0ACmdMask;
+    int pollBBStatusIntervall;
+    
+    NSString* chargeBBFile;
     NSString* chargeBBFileForFiber[kNumEWFLTFibers];
     int progressOfChargeBB;
-    int pollBBStatusIntervall;
+    
+    int progressOfChargeFIC;
+    NSString* chargeFICFile;
     
     uint32_t ficCardCtrlReg1[kNumEWFLTFibers];
     uint32_t ficCardCtrlReg2[kNumEWFLTFibers];
@@ -194,6 +198,10 @@
 - (short) getNumberRegisters;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (NSString*) chargeFICFile;
+- (void) setChargeFICFile:(NSString*)aChargeFICFile;
+- (int) progressOfChargeFIC;
+- (void) setProgressOfChargeFIC:(int)aProgressOfChargeFIC;
 - (uint32_t) ficCardTriggerCmdForFiber:(int)aFiber;
 - (void) setFicCardTriggerCmd:(uint32_t)aFicCardTriggerCmd forFiber:(int)aFiber;
 - (uint32_t) ficCardADC23CtrlRegForFiber:(int)aFiber;
@@ -539,6 +547,10 @@
 
 - (void) killChargeBBJobButtonAction;
 - (void) chargeBBWithFile:(NSString*) aFile;	
+
+- (void) killChargeFICJobButtonAction;
+- (int) chargeFICWithDataFromFile:(NSString*)aFilename;
+
 - (void) sendWCommand;
 - (void) sendWCommandIdBB:(int) idBB cmd:(int) cmd arg1:(int) arg1  arg2:(int) arg2;
 - (void) readBBStatusForBBAccess;//BB access tab
@@ -622,6 +634,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelChargeFICFileChanged;
+extern NSString* OREdelweissFLTModelProgressOfChargeFICChanged;
 extern NSString* OREdelweissFLTModelFicCardTriggerCmdChanged;
 extern NSString* OREdelweissFLTModelFicCardADC23CtrlRegChanged;
 extern NSString* OREdelweissFLTModelFicCardADC01CtrlRegChanged;
