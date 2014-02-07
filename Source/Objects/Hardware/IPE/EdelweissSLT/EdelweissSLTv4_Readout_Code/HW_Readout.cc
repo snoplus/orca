@@ -403,12 +403,17 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
 	b=( (size>>24) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
 	usleep(10000);	// attente pour mise en mode conf du fpga (10 msec)
 #endif
+    uint32_t  size=length;
+    uint8_t blo,bhi;
 
     //as start sequence: W command (see sendCommandFifo(...))
-    b=0xf0; //this is either 255/0xff (command 'h') or 240/0xf0 (commande 'W')
-    pbus->write(CmdFIFOReg, b);
-    usleep(50000);
-    
+    //b=0xf0; //this is either 255/0xff (command 'h') or 240/0xf0 (commande 'W')
+    //pbus->write(CmdFIFOReg, b);
+    //usleep(50000);
+
+    //gve some time to wait until cmd fifo empty ....
+    _attente_cmd_vide
+
     //now do the loading
     uint32_t n,data_start, data_end;
     data_start=0;
@@ -423,9 +428,15 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
         //do the job
         //usleep(100000);
         //we write bunches of 1000 bytes to the comand FIFO
-        for(n=data_start; n<data_end; n++){
-			b=( (unsigned short) charData[n] ) + 0x0100; 
-            pbus->write(CmdFIFOReg, b);
+        for(n=data_start; n<data_end; n+=2){
+            blo = charData[n];
+            bhi = charData[n+1];
+			b=(((unsigned short) bhi)<<8) | ((unsigned short) blo); 
+            pbus->write(CmdFIFOReg, 0xf0);
+            pbus->write(CmdFIFOReg, 0xff);//BB id
+            pbus->write(CmdFIFOReg, 0x76);//charge FIC cmd
+            pbus->write(CmdFIFOReg, b);//data
+            pbus->write(CmdFIFOReg, 0x200);//end cmd
 			_attente_cmd_vide
         }
         
