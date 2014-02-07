@@ -376,7 +376,10 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
     //TODO:
     //TODO:
     //TODO:
-    
+	uint32_t  b,i;
+
+//this is the "chargeBB" code start sequence, removed -tb-
+#if 0
     //prepare loading
 	usleep(500000);
 	usleep(100000);
@@ -389,8 +392,6 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
 	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
 	usleep(100000);	// laisser le temps (0.1sec) pour que le biphase se rende compte que l'horloge est arretee
     
-    
-	uint32_t  b,i;
 	b=0x0120;
 	for(i=0;i<10;i++)	pbus->write(CmdFIFOReg ,  b++);  // ici avec _attente_cmd_vide ca ne marche pas
     
@@ -401,7 +402,13 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
 	b=( (size>>16) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
 	b=( (size>>24) & 0xff ) + 0x0100; pbus->write(CmdFIFOReg, b);//_attente_cmd_vide
 	usleep(10000);	// attente pour mise en mode conf du fpga (10 msec)
+#endif
 
+    //as start sequence: W command (see sendCommandFifo(...))
+    b=0xf0; //this is either 255/0xff (command 'h') or 240/0xf0 (commande 'W')
+    pbus->write(CmdFIFOReg, b);
+    usleep(50000);
+    
     //now do the loading
     uint32_t n,data_start, data_end;
     data_start=0;
@@ -437,7 +444,7 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
     }
     
     //finish loading
-	printf("Charging BB finished ... \n");
+	printf("Charging FIC finished ... \n");
 	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
 	usleep(50000);	pbus->write(CmdFIFOReg ,  256);//  une data a zero
 	//usleep(50000);	write_word(driver_fpga,REG_CMD, (uint32_t) 256);	//  une data a zero
