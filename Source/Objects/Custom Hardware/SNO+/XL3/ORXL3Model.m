@@ -4314,8 +4314,11 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvANextStepValue] > [self hvAVoltageDACSetValue] + 10 / 3000. * 4096) {
                 aValueToSet = [self hvAVoltageDACSetValue] + 10 / 3000. * 4096;
             }
-            if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - 10 / 3000. * 4096) {
-                aValueToSet = [self hvAVoltageDACSetValue] - 10 / 3000. * 4096;
+            if ([self hvANextStepValue] < [self hvAVoltageDACSetValue] - 50 / 3000. * 4096) {
+                aValueToSet = [self hvAVoltageDACSetValue] - 50 / 3000. * 4096;
+            }
+            if ([self hvPanicFlag] && [self hvANextStepValue] < [self hvAVoltageDACSetValue] - 100 / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] - 100 / 3000. * 4096;
             }
             if (aValueToSet > [self hvAVoltageTargetValue]) {
                 aValueToSet = [self hvAVoltageTargetValue];
@@ -4334,9 +4337,6 @@ void SwapLongBlock(void* p, int32_t n)
             [self setCalcCMOSRatesFromCounts:NO];
             [self setHvCMOSReadsCounter:0];
             lastCMOSCountProcessed = 0;
-            
-            usleep(200000);
-            if (![self hvPanicFlag]) [self readHVStatus];
         }
         if ([self hvBNextStepValue] != [self hvBVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvBNextStepValue];
@@ -4344,8 +4344,11 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvBNextStepValue] > [self hvBVoltageDACSetValue] + 10 / 3000. * 4096) {
                 aValueToSet = [self hvBVoltageDACSetValue] + 10 / 3000. * 4096;
             }
-            if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 10 / 3000. * 4096) {
-                aValueToSet = [self hvBVoltageDACSetValue] - 10 / 3000. * 4096;
+            if ([self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 50 / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] - 50 / 3000. * 4096;
+            }
+            if ([self hvPanicFlag] && [self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 100 / 3000. * 4096) {
+                aValueToSet = [self hvBVoltageDACSetValue] - 100 / 3000. * 4096;
             }
             if (aValueToSet > [self hvBVoltageTargetValue]) {
                 aValueToSet = [self hvBVoltageTargetValue];
@@ -4361,11 +4364,17 @@ void SwapLongBlock(void* p, int32_t n)
             @catch (NSException *exception) {
                 NSLog(@"%@ HV B failed to set HV!\n", [[self xl3Link] crateName]);
             }
-            
-            usleep(200000);
-            if (![self hvPanicFlag]) [self readHVStatus];
         }
-        
+
+        if (([self hvANextStepValue] != [self hvAVoltageDACSetValue]) ||
+            ([self hvBNextStepValue] != [self hvBVoltageDACSetValue])) {
+
+            usleep(200000);
+            //try to read back HV even in panic mode, do not care what it is
+            //if (![self hvPanicFlag]) [self readHVStatus];
+            [self readHVStatus];
+        }
+
         //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
         //    usleep(100000);
         //}
@@ -4402,10 +4411,20 @@ void SwapLongBlock(void* p, int32_t n)
                 
         //if panic mode switch off power supply when done
         if ([self hvPanicFlag] && [self hvASwitch] && [self hvAVoltageDACSetValue] == 0){
-            [self setHVSwitch:NO forPowerSupply:0];
+            @try {
+                [self setHVSwitch:NO forPowerSupply:0];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@ FAILED to turn OFF HV for power supply A!\n", [[self xl3Link] crateName]);
+            }
         }
         if ([self hvPanicFlag] && [self hvBSwitch] && [self hvBVoltageDACSetValue] == 0){
-            [self setHVSwitch:NO forPowerSupply:1];
+            @try {
+                [self setHVSwitch:NO forPowerSupply:1];
+            }
+            @catch (NSException *exception) {
+                NSLog(@"%@ FAILED to turn OFF HV for power supply B!\n", [[self xl3Link] crateName]);
+            }
         }
                 
         if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
