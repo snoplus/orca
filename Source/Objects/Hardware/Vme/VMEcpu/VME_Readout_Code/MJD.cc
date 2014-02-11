@@ -280,10 +280,11 @@ void blockEraseFlash()
 
     //step 2 erase each block
 	uint32_t blockNumber;
+    char str[255];
 	for (blockNumber=0; blockNumber<kGretina4MUsedFlashBlocks; blockNumber++ ) {
 		if(sbc_job.killJobNow)break;
-        
-        setJobStatus("Block Erase",100. * (blockNumber+1)/(float)kGretina4MUsedFlashBlocks);
+        sprintf(str,"Block Erase$On Block %d",blockNumber);
+        setJobStatus(str,100. * (blockNumber+1)/(float)kGretina4MUsedFlashBlocks);
         uint32_t valueToWrite = 0x0;
         write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashAddress);
 
@@ -292,7 +293,8 @@ void blockEraseFlash()
 
         
         /* Now denote which block we're going to do. */
-        valueToWrite = blockNumber*kGretina4MFlashBlockSize;
+       // valueToWrite = blockNumber*kGretina4MFlashBlockSize;
+        valueToWrite = blockNumber;
         write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashAddress);
         
         /* And confirm. */
@@ -301,16 +303,13 @@ void blockEraseFlash()
  				 
         /* Now make sure that it finishes correctly. We don't need to issue the flash command to
          read the status register because the confirm command already sets that.  */
-        uint32_t valueToRead;
-        while(1) {
+        uint32_t stat;
+        read_device(fpgaDevice,(char*)(&stat),4,kMainFPGAStatus);
+        while(stat & 0x80) {
             if(sbc_job.killJobNow)break;
-            
             // Checking status to make sure that flash is ready
-            read_device(fpgaDevice,(char*)(&valueToRead),4,kFlashData);
-
-            if ( (valueToRead & kGretina4MFlashReady) != 0 ) break;
+            read_device(fpgaDevice,(char*)(&stat),4,kMainFPGAStatus);
 		}
-
 	}
     
     if(sbc_job.killJobNow)return;
