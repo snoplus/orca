@@ -490,3 +490,5 @@ void setJobStatus(const char* message,uint32_t progress)
     sbc_job.progress = progress;                   //percent done
     pthread_mutex_unlock (&jobInfoMutex);   //end critical section
 }
+
+
