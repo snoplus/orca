@@ -2316,7 +2316,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	else if (selectionResult == kSelectionTimeout) {
 		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out (A)",[self crateName],IPNumber,portNumber];
 	}
-	if(aPacket->message[0])NSLog(@"socket message:%s\n",aPacket->message);
+	if(aPacket->message[0] && (aPacket->cmdHeader.cmdID != kSBC_JobStatus))NSLog(@"socket message:%s\n",aPacket->message);
 } 
 
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket
