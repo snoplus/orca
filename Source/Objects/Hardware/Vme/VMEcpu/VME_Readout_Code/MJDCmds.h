@@ -26,6 +26,7 @@
 
 #define kMJDReadPreamps         0x01
 #define kMJDSingleAuxIO         0x02
+#define kMJDFlashGretinaFPGA    0x03
 
 typedef struct {
     uint32_t baseAddress;
@@ -41,5 +42,12 @@ typedef struct {
     uint32_t spiData;           /*spiData to SBC .. result upon return*/
 }
 GRETINA4_SingleAuxIOStruct;
+
+typedef struct {
+	int32_t baseAddress;
+	int32_t addressModifier;
+	int32_t programRegOffset;
+	uint32_t errorCode;		/*filled on return*/
+} MJDFlashGretinaFPGAStruct;
 
 #endif

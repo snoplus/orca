@@ -22,10 +22,22 @@
 #ifndef __MJD_H__
 #define __MJD_H__
 
-#include "MJDCmds.h"
 void processMJDCommand(SBC_Packet* aPacket);
 void readPreAmpAdcs(SBC_Packet* inputPacket);
 void singleAuxIO(SBC_Packet* aPacket);
 uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData);
 
-#endif // __SNO_H__
+void flashGretinaFPGA(SBC_Packet* aPacket);
+void setJobStatus(const char* message,uint32_t progress);
+
+void blockEraseFlash();
+void programFlashBuffer(uint8_t* theData, uint32_t numBytes);
+uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t numBytes);
+void enableFlashEraseAndProg(void);
+void disableFlashEraseAndProg(void);
+void programFlashBufferBlock(uint8_t* theData,uint32_t anAddress,uint32_t aNumber);
+void testFlashStatusRegisterWithNoFlashCmd(void);
+void resetFlash(void);
+void reloadMainFPGAFromFlash(void);
+
+#endif //__MJD_H__
