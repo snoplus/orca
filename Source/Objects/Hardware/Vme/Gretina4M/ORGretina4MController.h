@@ -29,7 +29,8 @@
 
 @interface ORGretina4MController : OrcaObjectController 
 {
-    IBOutlet NSTabView* 	tabView;
+    IBOutlet   NSTabView* 	tabView;
+	IBOutlet   NSTextField* firmwareStatusStringField;
 	IBOutlet   NSTextField* ccLowResField;
 	IBOutlet   NSTextField* noiseWindowField;
     
@@ -139,6 +140,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 - (void) ccLowResChanged:(NSNotification*)aNote;
 - (void) noiseWindowChanged:(NSNotification*)aNote;
 - (void) chpsdvChanged:(NSNotification*)aNote;

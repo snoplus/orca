@@ -383,6 +383,11 @@
                          name : ORGretina4MModelCcLowResChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareStatusStringChanged:)
+                         name : ORGretina4MModelFirmwareStatusStringChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -460,9 +465,15 @@
     [self postrecntChanged:nil];
 	[self noiseWindowChanged:nil];
 	[self ccLowResChanged:nil];
+	[self firmwareStatusStringChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote
+{
+	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];
+}
 
 - (void) ccLowResChanged:(NSNotification*)aNote
 {

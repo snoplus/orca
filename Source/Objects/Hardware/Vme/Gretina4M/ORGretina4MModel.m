@@ -29,9 +29,13 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
+#import "ORFileMoverOp.h"
+#import "MJDCmds.h"
 
 #define kCurrentFirmwareVersion 0x107
+#define kFPGARemotePath @"GretinaFPGA.bin"
 
+NSString* ORGretina4MModelFirmwareStatusStringChanged = @"ORGretina4MModelFirmwareStatusStringChanged";
 NSString* ORGretina4MModelCcLowResChanged       = @"ORGretina4MModelCcLowResChanged";
 NSString* ORGretina4MNoiseWindowChanged         = @"ORGretina4MNoiseWindowChanged";
 NSString* ORGretina4MIntegrateTimeChanged		= @"ORGretina4MIntegrateTimeChanged";
@@ -100,6 +104,9 @@ NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChang
 - (void) downloadingMainFPGADone;
 - (void) fpgaDownLoadThread:(NSData*)dataFromFile;
 - (void) configureFPGA;
+- (void) copyFirmwareFileToSBC:(NSString*)firmwarePath;
+- (BOOL) controllerIsSBC;
+- (void) setFpgaDownProgress:(short)aFpgaDownProgress;
 @end
 
 
@@ -222,6 +229,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) dealloc 
 {
+    [firmwareStatusString release];
     [spiConnector release];
     [linkConnector release];
     [mainFPGADownLoadState release];
@@ -230,6 +238,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[fifoFullAlarm clearAlarm];
 	[fifoFullAlarm release];
 	[progressLock release];
+    [fileQueue cancelAllOperations];
+    [fileQueue release];
     [super dealloc];
 }
 
@@ -342,6 +352,21 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) firmwareStatusString
+{
+    if([firmwareStatusString length]==0)return @"";
+    else return firmwareStatusString;
+}
+
+- (void) setFirmwareStatusString:(NSString*)aState
+{
+	if(!aState)aState = @"--";
+    [firmwareStatusString autorelease];
+    firmwareStatusString = [aState copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelFirmwareStatusStringChanged object:self];
+}
 - (ORConnector*) linkConnector
 {
     return linkConnector;
@@ -1859,22 +1884,79 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MFpgaDownProgressChanged object:self];
 	
 	stopDownLoadingMainFPGA = NO;
-	NSData* dataFromFile = [NSData dataWithContentsOfFile:fpgaFilePath];
 	
 	//to minimize disruptions to the download thread we'll check and update the progress from the main thread via a timer.
 	fpgaDownProgress = 0;
 	
-	[self setDownLoadMainFPGAInProgress: YES];
 	[self updateDownLoadProgress];
-	
-	[NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:dataFromFile];
+    if(![self controllerIsSBC]){
+        [self setDownLoadMainFPGAInProgress: YES];
+        [NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:[NSData dataWithContentsOfFile:fpgaFilePath]];
+    }
+    else {
+        if([[[self adapter]sbcLink]isConnected]){
+            [self setDownLoadMainFPGAInProgress: YES];
+            NSLog(@"Gretina4M (%d) beginning firmware load via SBC, File: %@\n",[self uniqueIdNumber],fpgaFilePath);
+            [self copyFirmwareFileToSBC:fpgaFilePath];
+        }
+        else {
+            [self setDownLoadMainFPGAInProgress: NO];
+            NSLog(@"Gretina4M (%d) unable to load firmware. SBC not connected.\n",[self uniqueIdNumber]);
+        }
+    }
+}
+
+- (void) flashFpgaStatus:(ORSBCLinkJobStatus*) jobStatus
+{
+    [self setDownLoadMainFPGAInProgress: [jobStatus running]];
+    [self setFpgaDownProgress:           [jobStatus progress]];
+    NSArray* parts = [[jobStatus message] componentsSeparatedByString:@"$"];
+    NSString* stateString   = @"";
+    NSString* verboseString = @"";
+    if([parts count]>=1)stateString   = [parts objectAtIndex:0];
+    if([parts count]>=2)verboseString = [parts objectAtIndex:1];
+    [self setProgressStateOnMainThread:  stateString];
+    [self setFirmwareStatusString:       verboseString];
+	[self updateDownLoadProgress];
+    if(![jobStatus running]){
+        NSLog(@"Gretina4M (%d) firmware load job in SBC finished (%@)\n",[self uniqueIdNumber],[jobStatus finalStatus]?@"Success":@"Failed");
+        if([jobStatus finalStatus]){
+            [self readFPGAVersions];
+            [self checkFirmwareVersion:YES];
+        }
+    }
+
 }
 
 - (void) stopDownLoadingMainFPGA
 {
-	if(downLoadMainFPGAInProgress){
-		stopDownLoadingMainFPGA = YES;
-	}
+    if(downLoadMainFPGAInProgress){
+        if(![self controllerIsSBC]){
+            stopDownLoadingMainFPGA = YES;
+        }
+        else {
+            SBC_Packet aPacket;
+            aPacket.cmdHeader.destination			= kSBC_Process;//kSBC_Command;//kSBC_Process;
+            aPacket.cmdHeader.cmdID					= kSBC_KillJob;
+            aPacket.cmdHeader.numberBytesinPayload	= 0;
+            
+            @try {
+
+                //send a kill packet. The response will be a job status record
+                [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+                NSLog(@"Told SBC to stop FPGA load.\n");
+                //NSLog(@"Error Code: %s\n",aPacket.message);
+                //[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+               // }
+                		//else NSLog(@"Looks like success.\n");
+            }
+            @catch(NSException* localException) {
+                NSLog(@"kSBC_KillJob command failed. %@\n",localException);
+                [NSException raise:@"kSBC_KillJob command failed" format:@"%@",localException];
+            }
+
+        }
+    }
 }
 
 
@@ -2293,6 +2375,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
+- (void) tasksCompleted: (NSNotification*)aNote
+{
+    
+}
+- (BOOL) queueIsRunning
+{
+    return [fileQueue operationCount];
+}
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	
@@ -2590,6 +2680,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 @end
+
 @implementation ORGretina4MModel (private)
 
 - (void) updateDownLoadProgress
@@ -2634,8 +2725,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setProgressStateOnMainThread:@"Loading FPGA"];
 		if(!stopDownLoadingMainFPGA) [self reloadMainFPGAFromFlash];
 		[self setProgressStateOnMainThread:@"--"];
-		//[self setBuffer:(const unsigned short*)[dataFromFile bytes] length:[dataFromFile length]/2];		
-		//[self performSelector:@selector(programFlashBuffer) withObject:self afterDelay:0.1];
 	}
 	@catch(NSException* localException) {
 		[self setProgressStateOnMainThread:@"Exception"];
@@ -3012,4 +3101,89 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
 }
 
+- (void) copyFirmwareFileToSBC:(NSString*)firmwarePath
+{
+    if(!fileQueue){
+        fileQueue = [[NSOperationQueue alloc] init];
+        [fileQueue setMaxConcurrentOperationCount:1];
+        [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+    }
+
+    fpgaFileMover = [[[ORFileMoverOp alloc] init] autorelease];
+    
+    [fpgaFileMover setDelegate:self];
+    
+    [fpgaFileMover setMoveParams:[firmwarePath stringByExpandingTildeInPath]
+                              to:kFPGARemotePath
+                      remoteHost:[[[self adapter] sbcLink] IPNumber]
+                        userName:[[[self adapter] sbcLink] userName]
+                        passWord:[[[self adapter] sbcLink] passWord]];
+    
+    [fpgaFileMover setVerbose:YES];
+    [fpgaFileMover doNotMoveFilesToSentFolder];
+    [fpgaFileMover setTransferType:eOpUseSCP];
+    [fileQueue addOperation:fpgaFileMover];
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                         change:(NSDictionary *)change context:(void *)context
+{
+    if (object == fileQueue && [keyPath isEqual:@"operations"]) {
+        if([fileQueue operationCount]==0){
+        }
+    }
+}
+
+- (BOOL) controllerIsSBC
+{
+    if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")])return YES;
+    else return NO;
+}
+
+- (void) fileMoverIsDone
+{
+    BOOL transferOK;
+    if ([[fpgaFileMover task] terminationStatus] == 0) {
+        NSLog(@"Transferred FPGA Code: %@ to %@:%@\n",[fpgaFileMover fileName],[fpgaFileMover remoteHost],kFPGARemotePath);
+        transferOK = YES;
+    }
+    else {
+        NSLogColor([NSColor redColor], @"Failed to transfer FPGA Code to %@\n",[fpgaFileMover remoteHost]);
+        transferOK = YES;
+    }
+    
+    [fpgaFileMover release];
+    fpgaFileMover  = nil;
+
+    [self setDownLoadMainFPGAInProgress: NO];
+    if(transferOK){
+        //the FPGA file is now on the SBC, next step is to start the flash process on the SBC
+
+        [self loadFPGAUsingSBC];
+    }
+}
+- (void) loadFPGAUsingSBC
+{
+    if([self controllerIsSBC]){
+        //if an SBC is available we pass the request to flash the fpga. this assumes the .bin file is already there
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination           = kMJD;
+        aPacket.cmdHeader.cmdID                 = kMJDFlashGretinaFPGA;
+        aPacket.cmdHeader.numberBytesinPayload	= sizeof(MJDFlashGretinaFPGAStruct);
+        
+        MJDFlashGretinaFPGAStruct* p = (MJDFlashGretinaFPGAStruct*) aPacket.payload;
+        p->baseAddress      = [self baseAddress];
+        @try {
+            NSLog(@"Gretina4M (%d) launching firmware load job in SBC\n",[self uniqueIdNumber]);
+
+            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+            
+            [[[self adapter] sbcLink] monitorJobFor:self statusSelector:@selector(flashFpgaStatus:)];
+
+        }
+        @catch(NSException* e){
+            
+        }
+    }
+}
 @end

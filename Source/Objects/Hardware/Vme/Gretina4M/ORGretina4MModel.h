@@ -26,9 +26,12 @@
 #import "SBC_Config.h"
 #import "AutoTesting.h"
 #import "ORAdcInfoProviding.h"
+#import "SBC_Link.h"
 
 @class ORRateGroup;
 @class ORConnector;
+@class ORFileMoverOp;
+@class SBC_Link;
 
 #define kNumGretina4MChannels		10
 #define kNumGretina4MCardParams		6
@@ -253,13 +256,16 @@ enum Gretina4MFIFOStates {
     int registerIndex;
     unsigned long spiWriteValue;
 	
-	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
-	ORConnector*  linkConnector; //we won't draw this connector so we have to keep a reference to it
-
+	ORConnector*    spiConnector; //we won't draw this connector so we have to keep a reference to it
+	ORConnector*    linkConnector; //we won't draw this connector so we have to keep a reference to it
+    ORFileMoverOp*  fpgaFileMover;
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
 	BOOL			isRunning;
-
+    NSString*       firmwareStatusString;
+    
+    //------------------internal use only
+    NSOperationQueue*	fileQueue;
 }
 
 - (id) init;
@@ -271,6 +277,8 @@ enum Gretina4MFIFOStates {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (NSString*) firmwareStatusString;
+- (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
 - (int)  ccLowRes;
 - (void) setCcLowRes:(int)aCcLowRes;
 - (short) integrateTime;
@@ -453,6 +461,8 @@ enum Gretina4MFIFOStates {
 - (void) writeIntegrateTime;
 - (void) writeCCLowRes;
 
+- (void) tasksCompleted: (NSNotification*)aNote;
+- (BOOL) queueIsRunning;
 
 
 #pragma mark •••FPGA download
@@ -504,6 +514,14 @@ enum Gretina4MFIFOStates {
 
 @end
 
+@interface NSObject (Gretina4M)
+- (NSString*) IPNumber;
+- (NSString*) userName;
+- (NSString*) passWord;
+- (SBC_Link*) sbcLink;
+@end
+
+extern NSString* ORGretina4MModelFirmwareStatusStringChanged;
 extern NSString* ORGretina4MModelCcLowResChanged;
 extern NSString* ORGretina4MNoiseWindowChanged;
 extern NSString* ORGretina4MClockSourceChanged;
