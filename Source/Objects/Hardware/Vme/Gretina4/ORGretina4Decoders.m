@@ -94,10 +94,10 @@
 	NSString* cardKey	 = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
-	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
-	if(integrationTime) energy /= integrationTime; 
 	int histEMultiplier = [[self objectForNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil] intValue];
         if(histEMultiplier) energy *= histEMultiplier;
+	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
+	if(integrationTime) energy /= integrationTime; 
 	
     [aDataSet histogram:energy numBins:0x1fff*histEMultiplier sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
