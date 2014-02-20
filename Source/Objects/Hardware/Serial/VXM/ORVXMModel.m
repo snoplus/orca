@@ -636,11 +636,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) sendMotorType:(int)motorIndex
 {
-    NSString* aCmd = [NSString stringWithFormat:@"setM%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
+//    NSString* aCmd = [NSString stringWithFormat:@"setM%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
     
-    [self addCmdToQueue:aCmd
-            description:[NSString stringWithFormat:@"Set Motor %d type to %d",motorIndex,[[self motor: motorIndex] motorType]]
-             waitToSend:YES];
+//    [self addCmdToQueue:aCmd
+ //           description:[NSString stringWithFormat:@"Set Motor %d type to %d",motorIndex,[[self motor: motorIndex] motorType]]
+//             waitToSend:YES];
    
 }
 
@@ -859,6 +859,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) addCmdToQueue:(NSString*)aCmdString description:(NSString*)aDescription waitToSend:(BOOL)waitToSendNextCmd
 {
+    if(![aCmdString hasPrefix:@"F,"]){
+        aCmdString = [@"F," stringByAppendingString:aCmdString];
+    }
+
 	if(useCmdQueue){
 		if(!cmdList)cmdList	= [[NSMutableArray array] retain];
 		ORVXMMotorCmd* aCmd		= [[ORVXMMotorCmd alloc] init];
@@ -866,7 +870,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		aCmd.description		= aDescription;
 		aCmd.waitToSendNextCmd	= waitToSendNextCmd;
         
-		[self  addItem:aCmd atIndex:[cmdList count]];
+		[self  addItem:aCmd atIndex:[cmdList gcount]];
         
 		[aCmd release];
 		
