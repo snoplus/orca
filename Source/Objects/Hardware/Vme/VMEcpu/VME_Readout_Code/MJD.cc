@@ -50,29 +50,6 @@ extern SBC_JOB          sbc_job;
 
 TUVMEDevice* fpgaDevice = NULL;
 
-#define kGretina4MFlashDisableWrite     0x0
-#define kGretina4MFlashEnableWrite      0x10
-#define kGretina4MFlashBlocks           128
-#define kGretina4MUsedFlashBlocks       ( kGretina4MFlashBlocks / 4 )
-#define kGretina4MFlashBlockEraseCmd	0x20
-#define kGretina4MFlashConfirmCmd       0xD0
-#define kGretina4MFlashReady			0x80
-#define kGretina4MFlashClearSRCmd       0x50
-#define kGretina4MFlashReadArrayCmd     0xFF
-#define kGretina4MFlashBlockSize		( 128 * 1024 )
-#define kGretina4MFlashBufferBytes      32
-#define kGretina4MFlashWriteCmd         0xE8
-#define kGretina4MResetMainFPGACmd      0x30
-#define kGretina4MReloadMainFPGACmd     0x3
-#define kGretina4MMainFPGAIsLoaded      0x41
-
-#define kMainFPGAControl        0x900
-#define kMainFPGAStatus         0x904
-#define kVMEGPControl           0x910
-#define kFlashAddress           0x980
-#define kFlashData              0x988
-#define kFlashCommandRegister   0x98C
-#define kFlashDataWithAddrIncr  0x984
 
 void processMJDCommand(SBC_Packet* aPacket)
 {
@@ -186,11 +163,11 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
 
 void flashGretinaFPGA(SBC_Packet* aPacket)
 {
+    
 #define FILEPATH "/home/daq/GretinaFPGA.bin"
 #define NUMINTS  (1000)
 #define FILESIZE (NUMINTS * sizeof(int))
-    
-    
+
 	char  errorMessage[255];
 	memset(errorMessage,'\0',80);
 	uint8_t  finalStatus = 0; //assume failure
@@ -205,7 +182,6 @@ void flashGretinaFPGA(SBC_Packet* aPacket)
     pthread_mutex_lock (&jobInfoMutex);     //begin critical section
     sbc_job.running = 1;
     pthread_mutex_unlock (&jobInfoMutex);   //end critical section
-    
     
     if(fpgaDevice!=0){
         blockEraseFlash();
@@ -227,14 +203,19 @@ void flashGretinaFPGA(SBC_Packet* aPacket)
             else {
                 programFlashBuffer(map,sb.st_size);
                 if(verifyFlashBuffer(map,sb.st_size)&& !sbc_job.killJobNow){
-                    reloadMainFPGAFromFlash();
+                    strcpy(errorMessage,"Done$No Errors Reported");
+                    reloadMainFpgaFromFlash();
+                    finalStatus = 1;
                 }
-                else  strcpy(errorMessage,"Error");
-
+                else {
+                    if(sbc_job.killJobNow){
+                        strcpy(errorMessage,"User Halted");
+                    }
+                    else strcpy(errorMessage,"Error");
+                    finalStatus = 0;
+                }
                 if (munmap(map, FILESIZE) == -1) strcpy(errorMessage,"Error");
                 
-                strcpy(errorMessage,"");
-                finalStatus = 1;
             }
             close(fd);
         }
@@ -254,115 +235,55 @@ void flashGretinaFPGA(SBC_Packet* aPacket)
     pthread_mutex_unlock (&jobInfoMutex);   //end critical section
 }
 
-void reloadMainFPGAFromFlash(void)
-{
-	int32_t valueToWrite = kGretina4MResetMainFPGACmd;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kMainFPGAControl);
-
-	
-	valueToWrite = kGretina4MReloadMainFPGACmd;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kMainFPGAControl);
-	
-	/* Now check if it is done reloading before releasing. */
-    int32_t valueToRead;
-    do {
-        read_device(fpgaDevice, (char*)(&valueToRead), 4, kMainFPGAStatus);
-    }while ( ( valueToRead & kGretina4MMainFPGAIsLoaded ) != kGretina4MMainFPGAIsLoaded );
-}
 
 void blockEraseFlash()
 {
     setJobStatus("Block Erase",0);
-    /* We only erase the blocks currently used in the Gretina4M specification. */
+    /* We only erase the blocks currently used in the  specification. */
     
-    //step 1 enable flashEraseWrite
-    enableFlashEraseAndProg();
-
-    //step 2 erase each block
-	uint32_t blockNumber;
-    char str[255];
-	for (blockNumber=0; blockNumber<kGretina4MUsedFlashBlocks; blockNumber++ ) {
-		if(sbc_job.killJobNow)break;
-        sprintf(str,"Block Erase$On Block %d",blockNumber);
-        setJobStatus(str,100. * (blockNumber+1)/(float)kGretina4MUsedFlashBlocks);
-        uint32_t valueToWrite = 0x0;
-        write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashAddress);
-
-        valueToWrite = kGretina4MFlashBlockEraseCmd;
-        write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-
+    // Set VPEN signal == 1
+    writeDevice(kVMEGPControlReg, kFlashEnableWrite);
+	
+    // Erase [first quarter of] flash
+    int32_t count = 0;
+    int32_t end = (kFlashBlocks / 4) * kFlashBlockSize;
+    for (int32_t addr = 0; addr < end; addr += kFlashBlockSize) {
+        if(sbc_job.killJobNow)break;
+        char str[255];
+        sprintf(str,"Block Erase$%d of %d Blocks Erased",count++,kFlashBufferBytes);
+        setJobStatus(str,100. * (count+1)/(float)kFlashBufferBytes);
         
-        /* Now denote which block we're going to do. */
-       // valueToWrite = blockNumber*kGretina4MFlashBlockSize;
-        valueToWrite = blockNumber;
-        write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashAddress);
+        writeDevice(kFlashAddressReg, addr);
+        writeDevice(kFlashCommandReg, kFlashBlockEraseCmd);
+        writeDevice(kFlashCommandReg, kFlashConfirmCmd);
         
-        /* And confirm. */
-        valueToWrite = kGretina4MFlashConfirmCmd;
-        write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
- 				 
-        /* Now make sure that it finishes correctly. We don't need to issue the flash command to
-         read the status register because the confirm command already sets that.  */
         uint32_t stat;
-        read_device(fpgaDevice,(char*)(&stat),4,kMainFPGAStatus);
-        while(stat & 0x80) {
+        readDevice(kMainFPGAStatusReg, &stat);
+        while (stat & kFlashBusy) {
             if(sbc_job.killJobNow)break;
-            // Checking status to make sure that flash is ready
-            read_device(fpgaDevice,(char*)(&stat),4,kMainFPGAStatus);
-		}
-	}
-    
-    if(sbc_job.killJobNow)return;
-    
-    //step 3 disable the ability to erase
-    disableFlashEraseAndProg();
-    
-    //step 4 reset
-    resetFlash();
-    setJobStatus("Block Erase",0);
-
-}
-
-void resetFlash(void)
-{
-    uint32_t valueToWrite = kGretina4MFlashClearSRCmd;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-	
-	valueToWrite = kGretina4MFlashReadArrayCmd;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-	
-	valueToWrite = 0x0;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashAddress);
-}
-
-void enableFlashEraseAndProg(void)
-{
-    uint32_t valueToWrite = kGretina4MFlashEnableWrite;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kVMEGPControl);
-}
-
-void disableFlashEraseAndProg(void)
-{
-    uint32_t valueToWrite = kGretina4MFlashDisableWrite;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kVMEGPControl);
+            readDevice(kMainFPGAStatusReg, &stat);
+        }
+    }
+	   
+    if(sbc_job.killJobNow){
+        setJobStatus("User Halted",0);
+    }
 }
 
 void programFlashBuffer(uint8_t* theData, uint32_t totalSize)
 {
     char statusString[255];
-    sprintf(statusString,"Programming$FPGA File Size: %d",totalSize);
+    sprintf(statusString,"Programming");
     setJobStatus(statusString,0);
-	enableFlashEraseAndProg();
+    
+    writeDevice(kFlashAddressReg,0x0);
+    writeDevice(kFlashCommandReg,kFlashReadArrayCmd);    //set to array mode
     
 	uint32_t address = 0x0;
 	while (address < totalSize ) {
         uint32_t numberBytesToWrite;
-        if(totalSize-address >= kGretina4MFlashBufferBytes){
-            numberBytesToWrite = kGretina4MFlashBufferBytes; //whole block
-        }
-        else {
-            numberBytesToWrite = totalSize - address; //near eof, so partial block
-        }
+        if(totalSize-address >= kFlashBufferBytes)  numberBytesToWrite = kFlashBufferBytes;   //whole block
+        else                                        numberBytesToWrite = totalSize - address; //near eof -- partial block
         
         programFlashBufferBlock(theData,address,numberBytesToWrite);
         
@@ -370,35 +291,85 @@ void programFlashBuffer(uint8_t* theData, uint32_t totalSize)
         if(sbc_job.killJobNow)break;
         
         if(address%(totalSize/1000) == 0){
+            sprintf(statusString,"Programming$Flashed: %d/%d KB",address/1000,totalSize/1000);
             setJobStatus(statusString,100. * address/(float)totalSize);
         }
         if(sbc_job.killJobNow)break;;
 
 	}
     if(sbc_job.killJobNow)return;
-	disableFlashEraseAndProg();
-    resetFlash();
+    writeDevice(kFlashAddressReg, 0x00);
+    writeDevice(kFlashCommandReg, kFlashReadArrayCmd);    //set to array mode
+    writeDevice(kVMEGPControlReg, 0x0);
     setJobStatus("Programming Done",0);
 }
 
+void programFlashBufferBlock(uint8_t* theData,uint32_t anAddress,uint32_t aNumber)
+{
+    uint32_t statusRegValue;
+
+    //issue the set-up command at the starting address
+    writeDevice(kFlashAddressReg,anAddress);
+    writeDevice(kFlashCommandReg,kFlashWriteCmd);
+    
+	while(1) {
+        if(sbc_job.killJobNow)return;
+		
+		// Checking status to make sure that flash is ready
+        readDevice(0x904,&statusRegValue);
+		
+		if ( (statusRegValue & kFlashBusy)  == kFlashBusy ) {
+            //not ready, so re-issue the set-up command
+            writeDevice(kFlashAddressReg,anAddress);
+            writeDevice(kFlashCommandReg, kFlashWriteCmd);
+		}
+        else break;
+	}
+    
+	//Set the word count. Max is 0xF.
+	uint32_t valueToWrite = (aNumber/2) - 1;
+    writeDevice(kFlashCommandReg,valueToWrite );
+	
+	// Loading all the words in
+    /* Load the words into the bufferToWrite */
+	uint32_t i;
+	for ( i=0; i<aNumber; i+=4 ) {
+        uint32_t* lPtr = (uint32_t*)&theData[anAddress+i];
+        writeDevice(kFlashDataAutoIncReg, lPtr[0]);
+	}
+	
+    // Confirm the write
+    writeDevice(kFlashCommandReg, kFlashConfirmCmd);
+    
+    readDevice(kMainFPGAStatusReg,&statusRegValue);
+    while(statusRegValue & kFlashBusy) {
+        if(sbc_job.killJobNow)return;
+        readDevice(kMainFPGAStatusReg,&statusRegValue);
+    }
+
+}
+
+
 uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t totalSize)
 {
+    char statusString[255];
     setJobStatus("Verifying",0);
 	/* First reset to make sure it is read mode. */
-    resetFlash();
     
-	uint32_t address = 0;
+    writeDevice(kFlashAddressReg,0x0);
+    writeDevice(kFlashCommandReg,kFlashReadArrayCmd);    //set to array mode
+    
+    uint32_t errorCount =   0;
+	uint32_t address    =   0;
 	uint32_t valueToRead;
-	unsigned long valueToCompare;
+	uint32_t valueToCompare;
 	while ( address < totalSize ) {
-        read_device(fpgaDevice,(char*)(&valueToRead),4,kFlashDataWithAddrIncr);
+        readDevice(0x984,&valueToRead);
 
 		/* Now compare to file*/
 		if ( address + 3 < totalSize) {
-			valueToCompare = (((unsigned long)theData[address]) & 0xFF) |
-			(((unsigned long)(theData[address+1]) <<  8) & 0xFF00) |
-			(((unsigned long)(theData[address+2]) << 16) & 0xFF0000)|
-			(((unsigned long)(theData[address+3]) << 24) & 0xFF000000);
+            uint32_t* ptr = (uint32_t*)&theData[address];
+            valueToCompare = ptr[0];
 		}
         else {
             //less than four bytes left
@@ -410,73 +381,34 @@ uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t totalSize)
 			}
 		}
 		if ( valueToRead != valueToCompare ) {
-            setJobStatus("Error$Comparision Error", 0);
-            return 0;
+            errorCount++;
 		}
 		if(address%(totalSize/1000) == 0){
-			setJobStatus("Verifying", 100. * address/(float)totalSize);
+            sprintf(statusString,"Verifying$Verified: %d/%d KB Errors: %d",address/1000,totalSize/1000,errorCount);
+			setJobStatus(statusString, 100. * address/(float)totalSize);
 		}
 		address += 4;
 	}
-    setJobStatus("Done$No Errors", 0);
-    return 1;
+    if(errorCount==0){
+        setJobStatus("Done$No Errors", 0);
+        return 1;
+    }
+    else {
+        setJobStatus("Error$Comparision Error", 0);
+        return 0;
+    }
 }
-
-void programFlashBufferBlock(uint8_t* theData,uint32_t anAddress,uint32_t aNumber)
+void reloadMainFpgaFromFlash(void)
 {
-	uint32_t valueToWrite = anAddress;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashAddress);
-	
-	valueToWrite = kGretina4MFlashWriteCmd;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-    
-	while(1) {
+    writeDevice(kMainFPGAControlReg,kResetMainFPGACmd);
+    writeDevice(kMainFPGAControlReg,kReloadMainFPGACmd);
+    setJobStatus("Finishing$Flash Memory-->FPGA", 0);
+    //wait until done
+    uint32_t statusRegValue;
+    readDevice(kMainFPGAStatusReg,&statusRegValue);
+    while(!(statusRegValue & kMainFPGAIsLoaded)) {
         if(sbc_job.killJobNow)return;
-		
-		// Checking status to make sure that flash is ready
-		/* This is slightly different since we give another command if the status hasn't updated. */
-        uint32_t valueToRead;
-        read_device(fpgaDevice,(char*)(&valueToRead),4,kFlashData);
-		
-		if ( (valueToRead & kGretina4MFlashReady)  == 0 ) {
-			valueToWrite = kGretina4MFlashWriteCmd;
-            write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-		}
-        else break;
-	}
-    
-	// Setting how many we are trying to write
-	valueToWrite = (aNumber/2) - 1;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-	
-	// Loading all the words in
-    /* Load the words into the bufferToWrite */
-	uint8_t* dataPtr = theData+anAddress;
-    
-	uint32_t i;
-	for ( i=0; i<aNumber; i+=4 ) {
-		valueToWrite =   (((uint32_t)dataPtr[i]) & 0xFF)                 |
-                        (((uint32_t)(dataPtr[i+1]) <<  8) & 0xFF00)     |
-                        (((uint32_t)(dataPtr[i+2]) << 16) & 0xFF0000)   |
-                        (((uint32_t)(dataPtr[i+3]) << 24) & 0xFF000000);
-        write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashDataWithAddrIncr);
-	}
-	
-	// Finishing the write
-	valueToWrite = kGretina4MFlashConfirmCmd;
-    write_device(fpgaDevice, (char*)(&valueToWrite), 4, kFlashCommandRegister);
-	
-	testFlashStatusRegisterWithNoFlashCmd();
-}
-
-void testFlashStatusRegisterWithNoFlashCmd(void)
-{
-    uint32_t valueToRead;
-    while(1) {
-        if(sbc_job.killJobNow)return;
-        read_device(fpgaDevice,(char*)(&valueToRead),4,kFlashData);
-		
-        if ( (valueToRead & kGretina4MFlashReady) != 0 ) break;
+        readDevice(kMainFPGAStatusReg,&statusRegValue);
     }
 }
 
@@ -484,10 +416,20 @@ void setJobStatus(const char* message,uint32_t progress)
 {
 	char  errorMessage[255];
     strcpy(errorMessage,message);
-    pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+    pthread_mutex_lock (&jobInfoMutex);         //begin critical section
     strncpy(sbc_job.message,errorMessage,255);
-    sbc_job.progress = progress;                   //percent done
-    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+    sbc_job.progress = progress;                //percent done
+    pthread_mutex_unlock (&jobInfoMutex);       //end critical section
 }
 
+void readDevice(uint32_t address,uint32_t* retValue)
+{
+    uint32_t stat;
+    read_device(fpgaDevice,(char*)(&stat),4,address);
+    *retValue = stat;
+}
 
+void writeDevice(uint32_t address,uint32_t aValue)
+{
+    write_device(fpgaDevice,(char*)(&aValue),4,address);
+}

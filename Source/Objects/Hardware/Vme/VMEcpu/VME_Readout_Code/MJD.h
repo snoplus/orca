@@ -22,6 +22,33 @@
 #ifndef __MJD_H__
 #define __MJD_H__
 
+#define kFlashBlocks                128
+#define kFlashBlockSize             (kFlashBlocks * 1024)
+#define kFlashBufferBytes           32
+
+#define kMainFPGAControlReg         0x900
+#define kMainFPGAStatusReg          0x904
+#define kVMEGPControlReg            0x910
+#define kFlashAddressReg            0x980
+#define kFlashDataAutoIncReg        0x984
+#define kFlashDataReg               0x988
+#define kFlashCommandReg            0x98C
+
+#define kFlashBusy                  0x80
+#define kFlashEnableWrite           0x10
+#define kFlashDisableWrite          0x0
+#define kFlashConfirmCmd            0xD0
+#define kFlashWriteCmd              0xE8
+#define kFlashBlockEraseCmd         0x20
+#define kFlashReadArrayCmd          0xFF
+#define kFlashStatusRegCmd          0x70
+#define kFlashClearSRCmd            0x50
+
+#define kResetMainFPGACmd           0x30
+#define kReloadMainFPGACmd          0x3
+#define kMainFPGAIsLoaded           0x41
+
+
 void processMJDCommand(SBC_Packet* aPacket);
 void readPreAmpAdcs(SBC_Packet* inputPacket);
 void singleAuxIO(SBC_Packet* aPacket);
@@ -33,11 +60,10 @@ void setJobStatus(const char* message,uint32_t progress);
 void blockEraseFlash();
 void programFlashBuffer(uint8_t* theData, uint32_t numBytes);
 uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t numBytes);
-void enableFlashEraseAndProg(void);
-void disableFlashEraseAndProg(void);
 void programFlashBufferBlock(uint8_t* theData,uint32_t anAddress,uint32_t aNumber);
-void testFlashStatusRegisterWithNoFlashCmd(void);
-void resetFlash(void);
-void reloadMainFPGAFromFlash(void);
+void readDevice(uint32_t address,uint32_t* retValue);
+void writeDevice(uint32_t address,uint32_t aValue);
+void reloadMainFpgaFromFlash(void);
+
 
 #endif //__MJD_H__

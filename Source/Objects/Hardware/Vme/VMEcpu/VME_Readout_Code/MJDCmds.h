@@ -44,9 +44,7 @@ typedef struct {
 GRETINA4_SingleAuxIOStruct;
 
 typedef struct {
-	int32_t baseAddress;
-	int32_t addressModifier;
-	int32_t programRegOffset;
+	uint32_t baseAddress;
 	uint32_t errorCode;		/*filled on return*/
 } MJDFlashGretinaFPGAStruct;
 
