@@ -51,7 +51,7 @@
 #define kGretina4MUsedFlashBlocks	32
 #define kGretina4MFlashBufferBytes	32
 #define kGretina4MTotalFlashBytes	( kGretina4MFlashBlocks * kGretina4MFlashBlockSize)
-#define kGretina4MFlashReady			0x80
+#define kFlashBusy                  0x80
 #define kGretina4MFlashEnableWrite	0x10
 #define kGretina4MFlashDisableWrite	0x0
 #define kGretina4MFlashConfirmCmd	0xD0
