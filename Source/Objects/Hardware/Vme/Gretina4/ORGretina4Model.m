@@ -29,8 +29,11 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 #import "ORVmeTests.h"
+#import "ORFileMoverOp.h"
+#import "MJDCmds.h"
 
 #define kCurrentFirmwareVersion 0x106
+#define kFPGARemotePath @"GretinaFPGA.bin"
 
 NSString* ORGretina4ModelDownSampleChanged			= @"ORGretina4ModelDownSampleChanged";
 NSString* ORGretina4ModelHistEMultiplierChanged			= @"ORGretina4ModelHistEMultiplierChanged";
@@ -67,7 +70,8 @@ NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged		= @"ORGretina4ModelM
 NSString* ORGretina4CardInited					= @"ORGretina4CardInited";
 NSString* ORGretina4SettingsLock				= @"ORGretina4SettingsLock";
 NSString* ORGretina4RegisterLock				= @"ORGretina4RegisterLock";
-NSString* ORGretina4ModelSetEnableStatusChanged				= @"ORGretina4ModelSetEnableStatusChanged";
+NSString* ORGretina4odelSetEnableStatusChanged		= @"ORGretina4odelSetEnableStatusChanged";
+NSString* ORGretina4ModelFirmwareStatusStringChanged= @"ORGretina4ModelFirmwareStatusStringChanged";
 
 @interface ORGretina4Model (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -88,7 +92,10 @@ NSString* ORGretina4ModelSetEnableStatusChanged				= @"ORGretina4ModelSetEnableS
 - (void) updateDownLoadProgress;
 - (void) downloadingMainFPGADone;
 - (void) fpgaDownLoadThread:(NSData*)dataFromFile;
-- (void) setExtraFPGADownloadInformation:(NSString*)downInfo;
+- (void) fileMoverIsDone;
+- (void) loadFPGAUsingSBC;
+- (void) resetFlash;
+- (void) setFpgaDownProgress:(int)aFpgaDownProgress;
 @end
 
 
@@ -562,12 +569,6 @@ static struct {
     return temp;
 }
 
-- (NSString*) extraFPGADownloadInformation
-{
-    if (!extraFPGADownloadInformation) return @"";
-    return extraFPGADownloadInformation;
-}
-
 - (NSString*) mainFPGADownLoadState
 {
 	if(!mainFPGADownLoadState) return @"--";
@@ -663,6 +664,46 @@ static struct {
     return [waveFormRateGroup rateObject:channel];
 }
 
+- (BOOL) controllerIsSBC
+{
+    //    long removeReturn;
+    //    return NO; //<<----- temp for testing
+    if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")])return YES;
+    else return NO;
+}
+- (void) copyFirmwareFileToSBC:(NSString*)firmwarePath
+{
+    if(!fileQueue){
+        fileQueue = [[NSOperationQueue alloc] init];
+        [fileQueue setMaxConcurrentOperationCount:1];
+        [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+    }
+    
+    fpgaFileMover = [[[ORFileMoverOp alloc] init] autorelease];
+    
+    [fpgaFileMover setDelegate:self];
+    
+    [fpgaFileMover setMoveParams:[firmwarePath stringByExpandingTildeInPath]
+                              to:kFPGARemotePath
+                      remoteHost:[[[self adapter] sbcLink] IPNumber]
+                        userName:[[[self adapter] sbcLink] userName]
+                        passWord:[[[self adapter] sbcLink] passWord]];
+    
+    [fpgaFileMover setVerbose:YES];
+    [fpgaFileMover doNotMoveFilesToSentFolder];
+    [fpgaFileMover setTransferType:eOpUseSCP];
+    [fileQueue addOperation:fpgaFileMover];
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
+                         change:(NSDictionary *)change context:(void *)context
+{
+    if (object == fileQueue && [keyPath isEqual:@"operations"]) {
+        if([fileQueue operationCount]==0){
+        }
+    }
+}
+
 - (void) initParams
 {
 	
@@ -745,6 +786,21 @@ static struct {
 	else return 0;
 }
 #pragma mark ¥¥¥specific accessors
+- (NSString*) firmwareStatusString
+{
+    if([firmwareStatusString length]==0)return @"";
+    else return firmwareStatusString;
+}
+
+- (void) setFirmwareStatusString:(NSString*)aState
+{
+	if(!aState)aState = @"--";
+    [firmwareStatusString autorelease];
+    firmwareStatusString = [aState copy];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFirmwareStatusStringChanged object:self];
+}
+
 - (void) setExternalWindow:(int)aValue { [self cardInfo:kExternalWindowIndex  setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setPileUpWindow:(int)aValue   { [self cardInfo:kPileUpWindowIndex    setObject:[NSNumber numberWithInt:aValue]]; }
 - (void) setNoiseWindow:(int)aValue    { [self cardInfo:kNoiseWindowIndex     setObject:[NSNumber numberWithInt:aValue]]; }
@@ -1667,31 +1723,141 @@ static struct {
 
 - (void) startDownLoadingMainFPGA
 {
-	if(!progressLock)progressLock = [[NSLock alloc] init];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaDownProgressChanged object:self];
-	
-	stopDownLoadingMainFPGA = NO;
-	NSData* dataFromFile = [NSData dataWithContentsOfFile:fpgaFilePath];
-	
-	//to minimize disruptions to the download thread we'll check and update the progress from the main thread via a timer.
-	fpgaDownProgress = 0;
-	
-	[self setDownLoadMainFPGAInProgress: YES];
+    {
+        if(!progressLock)progressLock = [[NSLock alloc] init];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaDownProgressChanged object:self];
+        
+        stopDownLoadingMainFPGA = NO;
+        
+        //to minimize disruptions to the download thread we'll check and update the progress from the main thread via a timer.
+        fpgaDownProgress = 0;
+        
+        if(![self controllerIsSBC]){
+            [self setDownLoadMainFPGAInProgress: YES];
+            [self updateDownLoadProgress];
+            [NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:[NSData dataWithContentsOfFile:fpgaFilePath]];
+        }
+        else {
+            if([[[self adapter]sbcLink]isConnected]){
+                [self setDownLoadMainFPGAInProgress: YES];
+                NSLog(@"Gretina4 (%d) beginning firmware load via SBC, File: %@\n",[self uniqueIdNumber],fpgaFilePath);
+                [self copyFirmwareFileToSBC:fpgaFilePath];
+            }
+            else {
+                [self setDownLoadMainFPGAInProgress: NO];
+                NSLog(@"Gretina4 (%d) unable to load firmware. SBC not connected.\n",[self uniqueIdNumber]);
+            }
+        }
+    }
+}
+- (void) flashFpgaStatus:(ORSBCLinkJobStatus*) jobStatus
+{
+    [self setDownLoadMainFPGAInProgress: [jobStatus running]];
+    [self setFpgaDownProgress:           [jobStatus progress]];
+    NSArray* parts = [[jobStatus message] componentsSeparatedByString:@"$"];
+    NSString* stateString   = @"";
+    NSString* verboseString = @"";
+    if([parts count]>=1)stateString   = [parts objectAtIndex:0];
+    if([parts count]>=2)verboseString = [parts objectAtIndex:1];
+    [self setProgressStateOnMainThread:  stateString];
+    [self setFirmwareStatusString:       verboseString];
 	[self updateDownLoadProgress];
+    if(![jobStatus running]){
+        NSLog(@"Gretina4M (%d) firmware load job in SBC finished (%@)\n",[self uniqueIdNumber],[jobStatus finalStatus]?@"Success":@"Failed");
+        if([jobStatus finalStatus]){
+            [self readFPGAVersions];
+            [self checkFirmwareVersion:YES];
+        }
+    }
+}
 
-	if(fpgaProgrammingThread)[fpgaProgrammingThread release];
-	fpgaProgrammingThread = [[NSThread alloc] initWithTarget:self selector:@selector(fpgaDownLoadThread:) object:dataFromFile];
-	[fpgaProgrammingThread setStackSize:4*1024*1024];
-	[fpgaProgrammingThread start];
-	
-	//[NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:dataFromFile];
+- (void) readFPGAVersions
+{
+    //find out the VME FPGA version
+	unsigned long vmeVersion = 0x00;
+	[[self adapter] readLongBlock:&vmeVersion
+                        atAddress:[self baseAddress] + fpga_register_information[kVMEFPGAVersionStatus].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+	NSLog(@"VME FPGA serial number: 0x%x \n", (vmeVersion & 0x0000FFFF));
+	NSLog(@"BOARD Revision number: 0x%x \n", ((vmeVersion & 0x00FF0000) >> 16));
+	NSLog(@"VHDL Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
+}
+- (BOOL) checkFirmwareVersion
+{
+    return [self checkFirmwareVersion:NO];
+}
+
+- (BOOL) checkFirmwareVersion:(BOOL)verbose
+{
+	//find out the Main FPGA version
+	unsigned long mainVersion = 0x00;
+	[[self adapter] readLongBlock:&mainVersion
+						atAddress:[self baseAddress] + register_information[kBoardID].offset
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
+	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
+	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+    
+	if (mainVersion != kCurrentFirmwareVersion){
+		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
+		return NO;
+	}
+    else return YES;
+}
+
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue
+{
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + anAddress
+                        numToWrite:1
+					    withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+    
+}
+- (unsigned long) readFromAddress:(unsigned long)anAddress
+{
+    unsigned long value = 0;
+    [[self adapter] readLongBlock:&value
+                        atAddress:[self baseAddress] + anAddress
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return value;
 }
 
 - (void) stopDownLoadingMainFPGA
 {
-	if(downLoadMainFPGAInProgress){
-		stopDownLoadingMainFPGA = YES;
-	}
+    if(downLoadMainFPGAInProgress){
+        if(![self controllerIsSBC]){
+            stopDownLoadingMainFPGA = YES;
+        }
+        else {
+            SBC_Packet aPacket;
+            aPacket.cmdHeader.destination			= kSBC_Process;//kSBC_Command;//kSBC_Process;
+            aPacket.cmdHeader.cmdID					= kSBC_KillJob;
+            aPacket.cmdHeader.numberBytesinPayload	= 0;
+            
+            @try {
+                
+                //send a kill packet. The response will be a job status record
+                [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+                NSLog(@"Told SBC to stop FPGA load.\n");
+                //NSLog(@"Error Code: %s\n",aPacket.message);
+                //[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+                // }
+                //else NSLog(@"Looks like success.\n");
+            }
+            @catch(NSException* localException) {
+                NSLog(@"kSBC_KillJob command failed. %@\n",localException);
+                [NSException raise:@"kSBC_KillJob command failed" format:@"%@",localException];
+            }
+            
+        }
+    }
 }
 
 
@@ -2321,7 +2487,6 @@ static struct {
 	
 	@try {
 		[dataFromFile retain];
-        [self setExtraFPGADownloadInformation:@""];
 		[self setProgressStateOnMainThread:@"Block Erase"];
 		if(!stopDownLoadingMainFPGA) [self blockEraseFlash];
 		[self setProgressStateOnMainThread:@"Programming"];
@@ -2340,7 +2505,6 @@ static struct {
 	}
 	@catch(NSException* localException) {
 		[self setProgressStateOnMainThread:@"Exception"];
-        [self setExtraFPGADownloadInformation:@""];
 	}
 	@finally {
 		[self performSelectorOnMainThread:@selector(downloadingMainFPGADone) withObject:nil waitUntilDone:NO];
@@ -2351,9 +2515,14 @@ static struct {
 
 - (void) programFlashBuffer:(NSData*)theData 
 {
+    unsigned long totalSize = [theData length];
+    
+    [self setProgressStateOnMainThread:@"Programming"];
+    [self setFirmwareStatusString: [NSString stringWithFormat:@"FPGA File Size %lu KB",totalSize/1000]];
+    [self setFpgaDownProgress:0.];
+
 	[self enableFlashEraseAndProg];
 	unsigned long address = 0x0;
-	long totalSize = [theData length];
 	[self setFpgaDownProgress:0.];
     int percentSeen = 0;
 	while (address < totalSize ) {
@@ -2368,14 +2537,16 @@ static struct {
                 percentSeen = (int)(100*address/(float)totalSize);
 				[self setFpgaDownProgress:(float)percentSeen];
 			}
-            [self setExtraFPGADownloadInformation:[NSString stringWithFormat:@"%lu of %lu KB programmed",address/1000,totalSize/1000]];
+            if(address%(totalSize/10) == 0){
+                [self setFirmwareStatusString: [NSString stringWithFormat:@"Flashed: %lu/%lu KB",address/1000,totalSize/1000]];
+                [self setFpgaDownProgress:100. * address/(float)totalSize];
+            }
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Gretina4 exception programming flash.\n");
 			break;
 		}
 	}
-    [self setExtraFPGADownloadInformation:@""];
 	//if(!stopDownLoadingMainFPGA)
 	[self disableFlashEraseAndProg];
 	//if(!stopDownLoadingMainFPGA) 
@@ -2397,7 +2568,6 @@ static struct {
 			[self blockEraseFlashAtBlock:i];
 			//[ORTimer delayNanoseconds:10000];
 			[self setFpgaDownProgress: 100. * (i+1)/(float)kGretina4UsedFlashBlocks];
-            [self setExtraFPGADownloadInformation:[NSString stringWithFormat:@"%i of %i blocks erased",i+1,kGretina4UsedFlashBlocks]];
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Gretina4 exception erasing flash.\n");
@@ -2622,59 +2792,64 @@ static struct {
 
 - (BOOL) verifyFlashBuffer:(NSData*)theData
 {
-	/* First reset to make sure it is read mode. */
-	//[ORTimer delayNanoseconds:100000];
-	[self resetFlashStatus];
-	//[ORTimer delayNanoseconds:100000];
+    unsigned long totalSize = [theData length];
+    unsigned char* theDataBytes = (unsigned char*)[theData bytes];
 
-	unsigned int position = 0;
-	unsigned long tempToRead;
-	const char* dataPtr = (const char*)[theData bytes];
-	unsigned long tempToCompare;
-	[self setFpgaDownProgress:0.];
-    int percentSeen = 0;
-	while ( position < [theData length] ) {
-		[[self adapter] readLongBlock:&tempToRead
-							atAddress:[self baseAddress] + fpga_register_information[kFlashDataWithAddrIncr].offset
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];	
-		/* Now check with */
-		if ( position + 3 < [theData length] ) {
-			tempToCompare = (((unsigned long)dataPtr[position]) & 0xFF) |    
-			(((unsigned long)(dataPtr[position+1]) <<  8) & 0xFF00) |    
-			(((unsigned long)(dataPtr[position+2]) << 16) & 0xFF0000)|    
-			(((unsigned long)(dataPtr[position+3]) << 24) & 0xFF000000);
-		} else {
-			unsigned int numBytes = [theData length] - position - 1;
-			tempToCompare = 0;
-			unsigned int i;
-			for ( i=0;i<numBytes;i++) {
-				tempToCompare += (((unsigned long)dataPtr[position]) << i*8) & (0xFF << i*8); 
-			}
-		}
-		if ( tempToRead != tempToCompare ) {
-			[self setFpgaDownProgress: 0];
-            [self setExtraFPGADownloadInformation:@""];            
-			return NO;
-		}
-        if ((int)(100*position/(float)[theData length]) > percentSeen) {
-            percentSeen = (int)(100*position/(float)[theData length]);
-            [self setFpgaDownProgress:(float)percentSeen];
+    [self setProgressStateOnMainThread:@"Verifying"];
+    [self setFirmwareStatusString: [NSString stringWithFormat:@"FPGA File Size %lu KB",totalSize/1000]];
+    [self setFpgaDownProgress:0.];
+
+
+    /* First reset to make sure it is read mode. */
+    [self resetFlash];
+
+    unsigned long errorCount =   0;
+    unsigned long address    =   0;
+    unsigned long valueToCompare;
+    while ( address < totalSize ) {
+        unsigned long valueToRead = [self readFromAddress:0x984];
+        
+        /* Now compare to file*/
+        if ( address + 3 < totalSize) {
+            unsigned long* ptr = (unsigned long*)&theDataBytes[address];
+            valueToCompare = ptr[0];
         }
-        [self setExtraFPGADownloadInformation:[NSString stringWithFormat:@"%u of %u KB verified",position/1000,[theData length]/1000]];
-		if(position%([theData length]/1000) == 0){
-			[self setFpgaDownProgress: 100. * position/(float)[theData length]];
-		}
-		position += 4;
-	}
-    [self setExtraFPGADownloadInformation:@""];
-	[self setFpgaDownProgress: 100];
-	//[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
-	[self setFpgaDownProgress: 0];
-	return YES;
+        else {
+            //less than four bytes left
+            unsigned long numBytes = totalSize - address - 1;
+            valueToCompare = 0;
+            unsigned long i;
+            for ( i=0;i<numBytes;i++) {
+                valueToCompare += (((unsigned long)theDataBytes[address]) << i*8) & (0xFF << i*8);
+            }
+        }
+        if ( valueToRead != valueToCompare ) {
+            [self setProgressStateOnMainThread:@"Error"];
+            [self setFirmwareStatusString: @"Comparision Error"];
+            [self setFpgaDownProgress:0.];
+            errorCount++;
+            return NO;
+        }
+        if(address%(totalSize/1000) == 0){
+            [self setFirmwareStatusString: [NSString stringWithFormat:@"Verified: %lu/%lu KB Errors: %lu",address/1000,totalSize/1000,errorCount]];
+            [self setFpgaDownProgress:100. * address/(float)totalSize];
+        }
+        address += 4;
+    }
+    if(errorCount==0){
+        [self setProgressStateOnMainThread:@"Done"];
+        [self setFirmwareStatusString: @"No Errors"];
+        [self setFpgaDownProgress:0.];
+        return YES;
+    }
+    else return NO;
 }
-
+-(void) resetFlash
+{
+    [self writeToAddress:0x98C aValue:0x30];
+    [self writeToAddress:0x98C aValue:0xFF];
+    [self writeToAddress:0x980 aValue:0x0];
+}
 - (void) reloadMainFPGAFromFlash
 {
 	unsigned long tempToWrite = kGretina4ResetMainFPGACmd;
@@ -2720,11 +2895,52 @@ static struct {
 	
 }
 
-- (void) setExtraFPGADownloadInformation:(NSString*)downInfo
+
+- (void) fileMoverIsDone
 {
-    [downInfo retain];
-    [extraFPGADownloadInformation release];
-    extraFPGADownloadInformation = downInfo;
+    BOOL transferOK;
+    if ([[fpgaFileMover task] terminationStatus] == 0) {
+        NSLog(@"Transferred FPGA Code: %@ to %@:%@\n",[fpgaFileMover fileName],[fpgaFileMover remoteHost],kFPGARemotePath);
+        transferOK = YES;
+    }
+    else {
+        NSLogColor([NSColor redColor], @"Failed to transfer FPGA Code to %@\n",[fpgaFileMover remoteHost]);
+        transferOK = YES;
+    }
+    
+    [fpgaFileMover release];
+    fpgaFileMover  = nil;
+    
+    [self setDownLoadMainFPGAInProgress: NO];
+    if(transferOK){
+        //the FPGA file is now on the SBC, next step is to start the flash process on the SBC
+        
+        [self loadFPGAUsingSBC];
+    }
+}
+- (void) loadFPGAUsingSBC
+{
+    if([self controllerIsSBC]){
+        //if an SBC is available we pass the request to flash the fpga. this assumes the .bin file is already there
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination           = kMJD;
+        aPacket.cmdHeader.cmdID                 = kMJDFlashGretinaFPGA;
+        aPacket.cmdHeader.numberBytesinPayload	= sizeof(MJDFlashGretinaFPGAStruct);
+        
+        MJDFlashGretinaFPGAStruct* p = (MJDFlashGretinaFPGAStruct*) aPacket.payload;
+        p->baseAddress      = [self baseAddress];
+        @try {
+            NSLog(@"Gretina4M (%d) launching firmware load job in SBC\n",[self uniqueIdNumber]);
+            
+            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+            
+            [[[self adapter] sbcLink] monitorJobFor:self statusSelector:@selector(flashFpgaStatus:)];
+            
+        }
+        @catch(NSException* e){
+            
+        }
+    }
 }
 
 @end

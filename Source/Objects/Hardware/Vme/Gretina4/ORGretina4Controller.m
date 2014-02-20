@@ -337,6 +337,12 @@
                          name : ORGretina4ModelHistEMultiplierChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareStatusStringChanged:)
+                         name : ORGretina4ModelFirmwareStatusStringChanged
+						object: model];
+
+    
 	[self registerRates];
 }
 
@@ -405,9 +411,16 @@
 	[self spiWriteValueChanged:nil];
 	[self downSampleChanged:nil];
 	[self histEMultiplierChanged:nil];
+    
+	[self firmwareStatusStringChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote
+{
+	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];
+}
+
 - (void) downSampleChanged:(NSNotification*)aNote
 {
 	[downSamplePU selectItemAtIndex:[model downSample]];
@@ -443,7 +456,6 @@
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote
 {
 	[loadFPGAProgress setDoubleValue:(double)[model fpgaDownProgress]];
-    [extraFPGADownloadInfoField setStringValue:[model extraFPGADownloadInformation]];
 }
 
 - (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote
@@ -1119,14 +1131,22 @@
     @try {
         unsigned short theID = [model readBoardID];
         NSLog(@"Gretina BoardID (slot %d): 0x%x\n",[model slot],theID);
-        if(theID == ([model baseAddress]>>16))NSLog(@"Gretina BoardID looks correct\n");
-        else NSLogColor([NSColor redColor],@"Gretina BoardID 0x%x doesn't match dip settings 0x%x\n", theID, [model baseAddress]>>16);
+        if(theID == ([model baseAddress]>>16)){
+            NSLog(@"VME slot matches the ORCA configuration\n");
+            [model readFPGAVersions];
+            [model checkFirmwareVersion:YES];
+        }
+        else {
+            NSLogColor([NSColor redColor],@"Gretina Board 0x%x doesn't match dip settings 0x%x\n", theID, [model baseAddress]>>16);
+            NSLogColor([NSColor redColor],@"Apparently it is not in the right slot in the ORCA configuration\n");
+        }
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4 Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
+
 }
 
 - (IBAction) openNoiseFloorPanel:(id)sender

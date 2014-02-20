@@ -25,9 +25,11 @@
 #import "ORHWWizard.h"
 #import "SBC_Config.h"
 #import "AutoTesting.h"
+#import "SBC_Link.h"
 
 @class ORRateGroup;
 @class ORAlarm;
+@class ORFileMoverOp;
 
 #define kNumGretina4Channels		10 
 #define kNumGretina4CardParams		6
@@ -228,7 +230,6 @@ enum Gretina4FIFOStates {
     float noiseFloorIntegrationTime;
 	
     NSString* mainFPGADownLoadState;
-    NSString* extraFPGADownloadInformation;
 	BOOL isFlashWriteEnabled;
     NSString* fpgaFilePath;
 	BOOL stopDownLoadingMainFPGA;
@@ -243,6 +244,11 @@ enum Gretina4FIFOStates {
 	ORConnector*  spiConnector; //we won't draw this connector so we have to keep a reference to it
 	ORConnector*  linkConnector; //we won't draw this connector so we have to keep a reference to it
 
+    NSString*       firmwareStatusString;
+    ORFileMoverOp*  fpgaFileMover;
+    
+    //------------------internal use only
+    NSOperationQueue*	fileQueue;
 }
 
 - (id) init;
@@ -273,7 +279,6 @@ enum Gretina4FIFOStates {
 - (int) fpgaDownProgress;
 - (NSString*) mainFPGADownLoadState;
 - (void) setMainFPGADownLoadState:(NSString*)aMainFPGADownLoadState;
-- (NSString*) extraFPGADownloadInformation;
 - (NSString*) fpgaFilePath;
 - (void) setFpgaFilePath:(NSString*)aFpgaFilePath;
 - (float) noiseFloorIntegrationTime;
@@ -402,11 +407,20 @@ enum Gretina4FIFOStates {
 - (int) readCollectionTime;
 - (int) readIntegrationTime;
 - (int) readDownSample;
+- (BOOL) controllerIsSBC;
+- (void) copyFirmwareFileToSBC:(NSString*)firmwarePath;
 
 
 #pragma mark ¥¥¥FPGA download
 - (void) startDownLoadingMainFPGA;
 - (void) stopDownLoadingMainFPGA;
+- (NSString*) firmwareStatusString;
+- (void) flashFpgaStatus:(ORSBCLinkJobStatus*) jobStatus;
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
+- (unsigned long) readFromAddress:(unsigned long)anAddress;
+- (void) readFPGAVersions;
+- (BOOL) checkFirmwareVersion;
+- (BOOL) checkFirmwareVersion:(BOOL)verbose;
 
 #pragma mark ¥¥¥Data Taker
 - (unsigned long) dataId;
@@ -446,6 +460,13 @@ enum Gretina4FIFOStates {
 
 @end
 
+@interface NSObject (Gretina4)
+- (NSString*) IPNumber;
+- (NSString*) userName;
+- (NSString*) passWord;
+- (SBC_Link*) sbcLink;
+@end
+
 extern NSString* ORGretina4ModelDownSampleChanged;
 extern NSString* ORGretina4ModelHistEMultiplierChanged;
 extern NSString* ORGretina4ModelRegisterIndexChanged;
@@ -482,3 +503,4 @@ extern NSString* ORGretina4NoiseFloorChanged;
 extern NSString* ORGretina4ModelFIFOCheckChanged;
 extern NSString* ORGretina4CardInited;
 extern NSString* ORGretina4ModelSetEnableStatusChanged;
+extern NSString* ORGretina4ModelFirmwareStatusStringChanged;
