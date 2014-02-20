@@ -31,7 +31,6 @@
 @class ORRateGroup;
 @class ORConnector;
 @class ORFileMoverOp;
-@class SBC_Link;
 
 #define kNumGretina4MChannels		10
 #define kNumGretina4MCardParams		6
