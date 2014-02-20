@@ -49,9 +49,9 @@
 #define kGretina4MFlashMaxWordCount	0xF
 #define kGretina4MFlashBlockSize		( 128 * 1024 )
 #define kGretina4MFlashBlocks		128
-#define kGretina4MUsedFlashBlocks	( kGretina4MFlashBlocks / 4 )
+#define kGretina4MUsedFlashBlocks	32
 #define kGretina4MFlashBufferBytes	32
-#define kGretina4MTotalFlashBytes	( kGretina4MUsedFlashBlocks * kGretina4MFlashBlockSize)
+#define kGretina4MTotalFlashBytes	( kGretina4MFlashBlocks * kGretina4MFlashBlockSize)
 #define kGretina4MFlashReady			0x80
 #define kGretina4MFlashEnableWrite	0x10
 #define kGretina4MFlashDisableWrite	0x0
@@ -245,7 +245,6 @@ enum Gretina4MFIFOStates {
     float noiseFloorIntegrationTime;
 	
     NSString* mainFPGADownLoadState;
-	BOOL isFlashWriteEnabled;
     NSString* fpgaFilePath;
 	BOOL stopDownLoadingMainFPGA;
 	BOOL downLoadMainFPGAInProgress;
@@ -463,7 +462,6 @@ enum Gretina4MFIFOStates {
 
 - (void) tasksCompleted: (NSNotification*)aNote;
 - (BOOL) queueIsRunning;
-
 
 #pragma mark •••FPGA download
 - (void) startDownLoadingMainFPGA;
