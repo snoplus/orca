@@ -316,7 +316,7 @@ void programFlashBufferBlock(uint8_t* theData,uint32_t anAddress,uint32_t aNumbe
         if(sbc_job.killJobNow)return;
 		
 		// Checking status to make sure that flash is ready
-        readDevice(0x904,&statusRegValue);
+        readDevice(kMainFPGAStatusReg,&statusRegValue);
 		
 		if ( (statusRegValue & kFlashBusy)  == kFlashBusy ) {
             //not ready, so re-issue the set-up command
