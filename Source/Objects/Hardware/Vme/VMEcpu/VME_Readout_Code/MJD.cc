@@ -288,12 +288,10 @@ void programFlashBuffer(uint8_t* theData, uint32_t totalSize)
         programFlashBufferBlock(theData,address,numberBytesToWrite);
         
         address += numberBytesToWrite;
-        if(sbc_job.killJobNow)break;
         
-        if(address%(totalSize/1000) == 0){
-            sprintf(statusString,"Programming$Flashed: %d/%d KB",address/1000,totalSize/1000);
-            setJobStatus(statusString,100. * address/(float)totalSize);
-        }
+        sprintf(statusString,"Programming$Flashed: %d/%d KB",address/1000,totalSize/1000);
+        setJobStatus(statusString,100. * address/(float)totalSize);
+        
         if(sbc_job.killJobNow)break;;
 
 	}
@@ -364,7 +362,7 @@ uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t totalSize)
 	uint32_t valueToRead;
 	uint32_t valueToCompare;
 	while ( address < totalSize ) {
-        readDevice(0x984,&valueToRead);
+        readDevice(kFlashDataAutoIncReg,&valueToRead);
 
 		/* Now compare to file*/
 		if ( address + 3 < totalSize) {
@@ -383,10 +381,8 @@ uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t totalSize)
 		if ( valueToRead != valueToCompare ) {
             errorCount++;
 		}
-		if(address%(totalSize/1000) == 0){
-            sprintf(statusString,"Verifying$Verified: %d/%d KB Errors: %d",address/1000,totalSize/1000,errorCount);
-			setJobStatus(statusString, 100. * address/(float)totalSize);
-		}
+        sprintf(statusString,"Verifying$Verified: %d/%d KB Errors: %d",address/1000,totalSize/1000,errorCount);
+        setJobStatus(statusString, 100. * address/(float)totalSize);
 		address += 4;
 	}
     if(errorCount==0){
