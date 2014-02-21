@@ -96,7 +96,6 @@ NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChang
 - (void) updateDownLoadProgress;
 - (void) downloadingMainFPGADone;
 - (void) fpgaDownLoadThread:(NSData*)dataFromFile;
-- (void) configureFPGA;
 - (void) copyFirmwareFileToSBC:(NSString*)firmwarePath;
 - (BOOL) controllerIsSBC;
 - (void) setFpgaDownProgress:(short)aFpgaDownProgress;
@@ -2740,7 +2739,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) blockEraseFlash
 {
 	/* We only erase the blocks currently used in the Gretina4M specification. */
-    [self writeToAddress:0x910 aValue:0x10]; //Enable programming
+    [self writeToAddress:0x910 aValue:kGretina4MFlashEnableWrite]; //Enable programming
 	[self setFpgaDownProgress:0.];
     unsigned long count = 0;
     unsigned long end = (kGretina4MFlashBlocks / 4) * kGretina4MFlashBlockSize;
@@ -2799,10 +2798,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
          address += numberBytesToWrite;
          if(stopDownLoadingMainFPGA)break;
          
-         if(address%(totalSize/10) == 0){
-             [self setFirmwareStatusString: [NSString stringWithFormat:@"Flashed: %lu/%lu KB",address/1000,totalSize/1000]];
-            [self setFpgaDownProgress:100. * address/(float)totalSize];
-         }
+
+         [self setFirmwareStatusString: [NSString stringWithFormat:@"Flashed: %lu/%lu KB",address/1000,totalSize/1000]];
+         
+         [self setFpgaDownProgress:100. * address/(float)totalSize];
+
          if(stopDownLoadingMainFPGA)break;
          
      }
@@ -2819,7 +2819,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     //issue the set-up command at the starting address
     [self writeToAddress:0x980 aValue:anAddress];
-    [self writeToAddress:0x98C aValue:0xE8];
+    [self writeToAddress:0x98C aValue:kGretina4MFlashWriteCmd];
     unsigned char* theDataBytes = (unsigned char*)[theData bytes];
     unsigned long statusRegValue;
 	while(1) {
@@ -2831,7 +2831,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		if ( (statusRegValue & kFlashBusy)  == kFlashBusy ) {
             //not ready, so re-issue the set-up command
             [self writeToAddress:0x980 aValue:anAddress];
-            [self writeToAddress:0x98C aValue:0xE8];
+            [self writeToAddress:0x98C aValue:kGretina4MFlashWriteCmd];
 		}
         else break;
 	}
@@ -2849,7 +2849,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
 	
 	// Confirm the write
-    [self writeToAddress:0x98C aValue:0xD0];
+    [self writeToAddress:0x98C aValue:kGretina4MFlashConfirmCmd];
 	
     //wait until the buffer is available again
     statusRegValue = [self readFromAddress:0x904];
@@ -2907,12 +2907,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self setFirmwareStatusString: @"Comparision Error"];
             [self setFpgaDownProgress:0.];
             errorCount++;
-            return NO;
         }
-        if(address%(totalSize/1000) == 0){
-            [self setFirmwareStatusString: [NSString stringWithFormat:@"Verified: %lu/%lu KB Errors: %lu",address/1000,totalSize/1000,errorCount]];
-            [self setFpgaDownProgress:100. * address/(float)totalSize];
-       }
+        
+        [self setFirmwareStatusString: [NSString stringWithFormat:@"Verified: %lu/%lu KB Errors: %lu",address/1000,totalSize/1000,errorCount]];
+        [self setFpgaDownProgress:100. * address/(float)totalSize];
+        
         address += 4;
     }
     if(errorCount==0){
@@ -2921,52 +2920,27 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         [self setFpgaDownProgress:0.];
         return YES;
     }
-    else return NO;
+    else {
+        [self setProgressStateOnMainThread:@"Errors"];
+        [self setFirmwareStatusString: @"Comparision Errors"];
+
+        return NO;
+    }
 }
 
 
 - (void) reloadMainFPGAFromFlash
 {
-	unsigned long tempToWrite = kGretina4MResetMainFPGACmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+    
+    [self writeToAddress:0x900 aValue:kGretina4MResetMainFPGACmd];
+    [self writeToAddress:0x900 aValue:kGretina4MReloadMainFPGACmd];
 	
-	tempToWrite = kGretina4MReloadMainFPGACmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	/* Now check if it is done reloading before releasing. */	
-	 do {
-		
-		[[self adapter] readLongBlock:&tempToWrite
-							atAddress:[self baseAddress] + fpga_register_information[kMainFPGAStatus].offset
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-     }while ( ( tempToWrite & kGretina4MMainFPGAIsLoaded ) != kGretina4MMainFPGAIsLoaded );
-}
+    unsigned long statusRegValue=[self readFromAddress:0x904];
 
-- (void) configureFPGA
-{
-    unsigned long aValue = 0x1;
-    [[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-    [ORTimer delay:0.5];
-    aValue = 0x0;
-    [[self adapter] writeLongBlock:&aValue
-						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+    while(!(statusRegValue & kGretina4MMainFPGAIsLoaded)) {
+        if(stopDownLoadingMainFPGA)return;
+        statusRegValue=[self readFromAddress:0x904];
+    }
 }
 
 - (void) downloadingMainFPGADone

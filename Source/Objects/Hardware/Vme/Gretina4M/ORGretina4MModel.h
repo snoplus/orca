@@ -32,6 +32,7 @@
 @class ORConnector;
 @class ORFileMoverOp;
 
+
 #define kNumGretina4MChannels		10
 #define kNumGretina4MCardParams		6
 #define kGretina4MHeaderLengthLongs	7
