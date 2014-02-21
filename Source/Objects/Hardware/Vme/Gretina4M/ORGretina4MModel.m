@@ -1085,7 +1085,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                     usingAddSpace:0x01];
 	NSLog(@"VME FPGA serial number: 0x%x \n", (vmeVersion & 0x0000FFFF));
 	NSLog(@"BOARD Revision number: 0x%x \n", ((vmeVersion & 0x00FF0000) >> 16));
-	NSLog(@"VHDL Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
+	NSLog(@"VME FPGA Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
 }
 
 - (short) readBoardID
