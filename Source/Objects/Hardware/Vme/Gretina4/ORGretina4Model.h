@@ -44,13 +44,13 @@
 
 #define kGretina4NumberWordsMask	0x7FF0000
 
-#define kGretina4FlashMaxWordCount	0xF
 #define kGretina4FlashBlockSize		( 128 * 1024 )
 #define kGretina4FlashBlocks		128
-#define kGretina4UsedFlashBlocks	( kGretina4FlashBlocks / 4 )
+#define kGretina4UsedFlashBlocks	32
 #define kGretina4FlashBufferBytes	32
-#define kGretina4TotalFlashBytes	( kGretina4UsedFlashBlocks * kGretina4FlashBlockSize)
-#define kGretina4FlashReady			0x80
+#define kGretina4TotalFlashBytes	( kGretina4FlashBlocks * kGretina4FlashBlockSize)
+#define kGretina4FlashMaxWordCount	0xF
+#define kFlashBusy                  0x80
 #define kGretina4FlashEnableWrite	0x10
 #define kGretina4FlashDisableWrite	0x0
 #define kGretina4FlashConfirmCmd	0xD0

@@ -85,7 +85,6 @@ NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdCh
 NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
 
 @interface ORGretina4MModel (private)
-- (void) resetFlash;
 - (void) programFlashBuffer:(NSData*)theData;
 - (void) programFlashBufferBlock:(NSData*)theData address:(unsigned long)address numberBytes:(unsigned long)numberBytesToWrite;
 - (void) blockEraseFlash;
@@ -1878,6 +1877,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(![self controllerIsSBC]){
         [self setDownLoadMainFPGAInProgress: YES];
         [self updateDownLoadProgress];
+        NSLog(@"Gretina4M (%d) beginning firmware load via Mac, File: %@\n",[self uniqueIdNumber],fpgaFilePath);
+
         [NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:[NSData dataWithContentsOfFile:fpgaFilePath]];
     }
     else {
@@ -2719,11 +2720,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                     if(stopDownLoadingMainFPGA)return;
                     statusRegValue = [self readFromAddress:0x904];
                 }
+                NSLog(@"Gretina4(%d): FPGA Load Finished - No Errors\n",[self uniqueIdNumber]);
 
             }
 		}
 		[self setProgressStateOnMainThread:@"Loading FPGA"];
 		if(!stopDownLoadingMainFPGA) [self reloadMainFPGAFromFlash];
+        else NSLog(@"Gretina4(%d): FPGA Load Manually Stopped\n",[self uniqueIdNumber]);
 		[self setProgressStateOnMainThread:@"--"];
 	}
 	@catch(NSException* localException) {
@@ -2859,15 +2862,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
-
--(void) resetFlash
-{
-    [self writeToAddress:0x98C aValue:0x30];
-    [self writeToAddress:0x98C aValue:0xFF];
-    [self writeToAddress:0x980 aValue:0x0];
-}
-
-
 - (BOOL) verifyFlashBuffer:(NSData*)theData
 {
     unsigned long totalSize = [theData length];
@@ -2927,7 +2921,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         return NO;
     }
 }
-
 
 - (void) reloadMainFPGAFromFlash
 {
