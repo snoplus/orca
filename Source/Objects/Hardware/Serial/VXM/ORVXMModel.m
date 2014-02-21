@@ -870,7 +870,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		aCmd.description		= aDescription;
 		aCmd.waitToSendNextCmd	= waitToSendNextCmd;
         
-		[self  addItem:aCmd atIndex:[cmdList gcount]];
+		[self  addItem:aCmd atIndex:[cmdList count]];
         
 		[aCmd release];
 		
