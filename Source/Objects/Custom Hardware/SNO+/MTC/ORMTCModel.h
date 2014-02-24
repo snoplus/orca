@@ -77,6 +77,7 @@
 		NSString*		triggerName;
 		//NSArray*		dataTakers;       //cache of data takers.
     unsigned long _mtcStatusGTID;
+    double _mtcStatusGTIDRate;
     unsigned long long _mtcStatusCnt10MHz;
     NSString* _mtcStatusTime10Mhz;
     unsigned long _mtcStatusReadPtr;
@@ -99,6 +100,7 @@
 @property (nonatomic,assign) unsigned long dataId;
 @property (nonatomic,assign) unsigned long mtcStatusDataId;
 @property (nonatomic,assign) unsigned long mtcStatusGTID;
+@property (nonatomic,assign) double mtcStatusGTIDRate;
 @property (nonatomic,assign) unsigned long long mtcStatusCnt10MHz;
 @property (nonatomic,copy) NSString* mtcStatusTime10Mhz;
 @property (nonatomic,assign) unsigned long mtcStatusReadPtr;

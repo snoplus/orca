@@ -208,6 +208,7 @@ kPEDCrateMask
 dataId = _dataId,
 mtcStatusDataId = _mtcStatusDataId,
 mtcStatusGTID = _mtcStatusGTID,
+mtcStatusGTIDRate = _mtcStatusGTIDRate,
 mtcStatusCnt10MHz = _mtcStatusCnt10MHz,
 mtcStatusTime10Mhz = _mtcStatusTime10Mhz,
 mtcStatusReadPtr = _mtcStatusReadPtr,
@@ -939,7 +940,17 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (BOOL) bumpRateFromDecodeStage:(NSDictionary*) mtcStatus
 {
+    unsigned long oldGTID = [self mtcStatusGTID];
+    
     [self setMtcStatusGTID:[[mtcStatus objectForKey:@"GTID"] unsignedLongValue]];
+    
+    unsigned long newGTID = [self mtcStatusGTID];
+
+    double mtcStatusGTIDRate = 2 * (newGTID - oldGTID);
+    
+    [self setMtcStatusGTIDRate: mtcStatusGTIDRate];
+    
+    //[self setMtcStatusGTIDRate: [[mtcStatus objectForKey:@"GTIDRate"] unsignedLongValue ]];
     [self setMtcStatusCnt10MHz:[[mtcStatus objectForKey:@"cnt10MHz"] unsignedLongLongValue]];
     [self setMtcStatusTime10Mhz:[mtcStatus objectForKey:@"time10MHz"]];
     [self setMtcStatusReadPtr:[[mtcStatus objectForKey:@"readPtr"] unsignedLongValue]];
@@ -951,6 +962,7 @@ resetFifoOnStart = _resetFifoOnStart;
     }
     [self setMtcStatusNumEventsInMem:(unsigned long)numEventsInMem];
 
+    
     return YES;
 }
 

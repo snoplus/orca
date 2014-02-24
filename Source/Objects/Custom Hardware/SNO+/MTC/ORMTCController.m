@@ -59,7 +59,7 @@
 {
     basicOpsSize    = NSMakeSize(400,350);
     //standardOpsSize	= NSMakeSize(390,530);
-	standardOpsSize	= NSMakeSize(560,500);
+	standardOpsSize	= NSMakeSize(560,510);
     settingsSize	= NSMakeSize(790,610);
     triggerSize		= NSMakeSize(790,630);
   
