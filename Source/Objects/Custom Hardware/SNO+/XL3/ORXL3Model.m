@@ -1792,7 +1792,7 @@ void SwapLongBlock(void* p, int32_t n)
             if (aXilinxFlag == YES) aMbId[1] = 1;
             else aMbId[1] = 0;
             
-            // hv reset, talk to Rob first
+            // hv reset, always pass 0
             aMbId[2] = 0;
             
             // slot mask
@@ -1816,7 +1816,7 @@ void SwapLongBlock(void* p, int32_t n)
             // cmos shift regs only if != 0
             aMbId[5] = 0;
             if (registersFlag) {
-                aMbId[5] = 1;
+                aMbId[5] = 2; // 0 everything, 1 shift only, 2 shift and dac
             }
             
             if ([xl3Link needToSwap]) {
@@ -4318,7 +4318,7 @@ void SwapLongBlock(void* p, int32_t n)
                 aValueToSet = [self hvAVoltageDACSetValue] - 50 / 3000. * 4096;
             }
             if ([self hvPanicFlag] && [self hvANextStepValue] < [self hvAVoltageDACSetValue] - 100 / 3000. * 4096) {
-                aValueToSet = [self hvBVoltageDACSetValue] - 100 / 3000. * 4096;
+                aValueToSet = [self hvAVoltageDACSetValue] - 100 / 3000. * 4096;
             }
             if (aValueToSet > [self hvAVoltageTargetValue]) {
                 aValueToSet = [self hvAVoltageTargetValue];
@@ -4369,7 +4369,7 @@ void SwapLongBlock(void* p, int32_t n)
         if (([self hvANextStepValue] != [self hvAVoltageDACSetValue]) ||
             ([self hvBNextStepValue] != [self hvBVoltageDACSetValue])) {
 
-            usleep(200000);
+            usleep(500000);
             //try to read back HV even in panic mode, do not care what it is
             //if (![self hvPanicFlag]) [self readHVStatus];
             [self readHVStatus];
