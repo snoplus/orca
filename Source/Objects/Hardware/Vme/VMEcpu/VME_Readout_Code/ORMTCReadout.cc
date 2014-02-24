@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <sys/time.h>
+#include <dlfcn.h>
 
 using namespace std;
 
@@ -94,12 +95,31 @@ bool ORMTCReadout::Start() {
 
     struct timezone tz;
     gettimeofday(&timestamp, &tz);
-    
+
+    //HV E-Stop
+
+    hv_stop_ok = NULL;
+    hdl = dlopen("libmtcat_lj.so", RTLD_LAZY);
+    if (hdl == NULL) {
+        return true;
+    }
+    dlerror();
+
+    hv_stop_ok = (int (*)())dlsym(hdl, "hv_stop_ok");
+    if ((dl_err = dlerror()) != NULL) {
+        hv_stop_ok = NULL;
+        LogError("HV E Stop not accessible\n");
+    }
+
 	return true;
 }
 
 bool ORMTCReadout::Stop()
 {
+    //E-Stop
+    if (hdl) dlclose(hdl);
+    hv_stop_ok = NULL;
+
     //set correct trigger mask, and soft gt
     uint32_t trigger_mask;
     if (VMERead(GetBaseAddress() + 0x34UL, GetAddressModifier(),
@@ -200,9 +220,9 @@ bool ORMTCReadout::Stop()
 
 bool ORMTCReadout::UpdateStatus() {
     
-    ensureDataCanHold(7);
+    ensureDataCanHold(8);
     int32_t savedIndex = dataIndex;
-    data[dataIndex++] = GetHardwareMask()[1] | 7;
+    data[dataIndex++] = GetHardwareMask()[1] | 8;
     dataIndex++;
     
     uint32_t aValue;
@@ -251,6 +271,10 @@ bool ORMTCReadout::UpdateStatus() {
 		return false;
 	}
     data[dataIndex++] = aValue;
+
+    int err = -1;
+    if (hv_stop_ok) err = hv_stop_ok();
+    data[dataIndex++] = (long)err;
 
     return true;
 }

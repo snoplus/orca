@@ -35,6 +35,10 @@ protected:
     uint32_t last_good_10mhz_upper;
     uint32_t mem_write_ptr_stop;
     bool is_mem_write_ptr_stop;
+
+    char* dl_err;
+    void* hdl;
+    int (*hv_stop_ok) ();
 };
 
 #endif /* _ORMTCReadout_hh_*/
