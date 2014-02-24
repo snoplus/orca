@@ -30,6 +30,7 @@
 @interface ORGretina4MController : OrcaObjectController 
 {
     IBOutlet   NSTabView* 	tabView;
+	IBOutlet   NSTextField* baselineRestoredDelayField;
 	IBOutlet   NSTextField* firmwareStatusStringField;
 	IBOutlet   NSTextField* ccLowResField;
 	IBOutlet   NSTextField* noiseWindowField;
@@ -140,6 +141,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) baselineRestoredDelayChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 - (void) ccLowResChanged:(NSNotification*)aNote;
 - (void) noiseWindowChanged:(NSNotification*)aNote;
@@ -196,6 +198,7 @@
 - (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark •••Actions
+- (IBAction) baselineRestoredDelayAction:(id)sender;
 - (IBAction) ccLowResAction:(id)sender;
 - (IBAction) noiseWindowAction:(id)sender;
 - (IBAction) integrateTimeFieldAction:(id)sender;

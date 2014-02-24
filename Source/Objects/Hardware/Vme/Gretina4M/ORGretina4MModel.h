@@ -210,6 +210,7 @@ enum Gretina4MFIFOStates {
     short			postrecnt[kNumGretina4MChannels];
     short			tpol[kNumGretina4MChannels];
     BOOL			easySelected[kNumGretina4MChannels];
+    unsigned short  baselineRestoredDelay;
 
     short           clockSource;
     short           externalWindow;
@@ -276,6 +277,8 @@ enum Gretina4MFIFOStates {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (unsigned short) baselineRestoredDelay;
+- (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay;
 - (NSString*) firmwareStatusString;
 - (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
 - (int)  ccLowRes;
@@ -352,7 +355,6 @@ enum Gretina4MFIFOStates {
 - (short) integrateTime;
 - (void) setNoiseWindow:(short)aNoiseWindow;
 - (short) noiseWindow;
-
 
 - (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
@@ -519,6 +521,7 @@ enum Gretina4MFIFOStates {
 - (SBC_Link*) sbcLink;
 @end
 
+extern NSString* ORGretina4MModelBaselineRestoredDelayChanged;
 extern NSString* ORGretina4MModelFirmwareStatusStringChanged;
 extern NSString* ORGretina4MModelCcLowResChanged;
 extern NSString* ORGretina4MNoiseWindowChanged;

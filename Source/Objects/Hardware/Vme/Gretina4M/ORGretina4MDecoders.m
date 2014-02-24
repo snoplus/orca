@@ -102,7 +102,7 @@
 
             NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
               
-            int dataLength = 1024 - headerSize;
+            int dataLength = 1024 - headerSize -1;
             [tmpData setLength:dataLength*sizeof(long)];
             short* dPtr = (short*)[tmpData bytes];
             int i;
@@ -157,8 +157,8 @@
     
     NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
-	ptr++;
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",*ptr&0x7];
+	ptr+=2;
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",*ptr&0xf];
 	ptr+=2;
 	unsigned long energy = *ptr >> 16;
 	ptr++;	  //point to Energy second word

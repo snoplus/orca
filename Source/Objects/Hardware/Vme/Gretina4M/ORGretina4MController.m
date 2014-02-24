@@ -58,7 +58,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(1000,460);
+    settingSize     = NSMakeSize(940,460);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,287);
 	firmwareTabSize = NSMakeSize(340,187);
@@ -388,6 +388,11 @@
                          name : ORGretina4MModelFirmwareStatusStringChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(baselineRestoredDelayChanged:)
+                         name : ORGretina4MModelBaselineRestoredDelayChanged
+						object: model];
+
 }
 
 - (void) registerRates
@@ -466,9 +471,15 @@
 	[self noiseWindowChanged:nil];
 	[self ccLowResChanged:nil];
 	[self firmwareStatusStringChanged:nil];
+	[self baselineRestoredDelayChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) baselineRestoredDelayChanged:(NSNotification*)aNote
+{
+	[baselineRestoredDelayField setIntValue: [model baselineRestoredDelay]];
+}
 
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote
 {
@@ -748,7 +759,7 @@
 
 - (void) presumEnabledChanged:(NSNotification*)aNote
 {
-   if(aNote == nil){
+    if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4MChannels;i++){
             [[presumEnabledMatrix cellWithTag:i] setState:[model presumEnabled:i]];
@@ -875,45 +886,45 @@
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
     
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL runInProgress              = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORGretina4MSettingsLock];
-    BOOL locked = [gSecurity isLocked:ORGretina4MSettingsLock];
-    BOOL downloading = [model downLoadMainFPGAInProgress];
+    BOOL locked                     = [gSecurity isLocked:ORGretina4MSettingsLock];
+    BOOL downloading                = [model downLoadMainFPGAInProgress];
 	
     	
-    [settingLockButton setState: locked];
-    [initButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [clearFIFOButton setEnabled:!locked && !runInProgress && !downloading];
-	[noiseFloorButton setEnabled:!locked && !runInProgress && !downloading];
-	[statusButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[probeButton setEnabled:!locked && !runInProgress && !downloading];
-	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[poleZeroTauMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[pzTraceEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[presumEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[trapEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[loadMainFPGAButton setEnabled:!locked && !downloading];
-	[stopFPGALoadButton setEnabled:!locked && downloading];
-	[downSamplePU setEnabled:!lockedOrRunningMaintenance && !downloading];
-	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [settingLockButton      setState: locked];
+    [initButton             setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [clearFIFOButton        setEnabled:!locked && !runInProgress && !downloading];
+	[noiseFloorButton       setEnabled:!locked && !runInProgress && !downloading];
+	[statusButton           setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[probeButton            setEnabled:!locked && !runInProgress && !downloading];
+	[poleZeroEnabledMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[poleZeroTauMatrix      setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pzTraceEnabledMatrix   setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[presumEnabledMatrix    setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[enabledMatrix          setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[trapEnabledMatrix      setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[resetButton            setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[loadMainFPGAButton     setEnabled:!locked && !downloading];
+	[stopFPGALoadButton     setEnabled:!locked && downloading];
+	[downSamplePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [tpolMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [triggerModeMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [tpolMatrix             setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [triggerModeMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
     
-    [easySetButton      setEnabled:!locked && !runInProgress && !downloading];
-    [easySelectMatrix   setEnabled:!locked && !runInProgress && !downloading];
-    [postReStepperUp    setEnabled:!locked && !runInProgress && !downloading];
-    [postReStepperDwn   setEnabled:!locked && !runInProgress && !downloading];
-    [postReStepperUp    setEnabled:!locked && !runInProgress && !downloading];
-    [postReStepperDwn   setEnabled:!locked && !runInProgress && !downloading];
-    [flatTopStepperUp   setEnabled:!locked && !runInProgress && !downloading];
-    [flatTopStepperDwn  setEnabled:!locked && !runInProgress && !downloading];
-    [flatTopField       setEnabled:!locked && !runInProgress && !downloading];
-    [postCountField     setEnabled:!locked && !runInProgress && !downloading];
-    [preCountField      setEnabled:!locked && !runInProgress && !downloading];
+    [easySetButton      setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [easySelectMatrix   setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postReStepperUp    setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postReStepperDwn   setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postReStepperUp    setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postReStepperDwn   setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [flatTopStepperUp   setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [flatTopStepperDwn  setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [flatTopField       setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postCountField     setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [preCountField      setEnabled:!lockedOrRunningMaintenance && !downloading];
 
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
@@ -1079,12 +1090,17 @@
 
 #pragma mark •••Actions
 
-- (void) ccLowResAction:(id)sender
+- (IBAction) baselineRestoredDelayAction:(id)sender
+{
+	[model setBaselineRestoredDelay:[sender intValue]];
+}
+
+- (IBAction) ccLowResAction:(id)sender
 {
 	[model setCcLowRes:[sender intValue]];	
 }
 
-- (void) noiseWindowAction:(id)sender
+- (IBAction) noiseWindowAction:(id)sender
 {
 	[model setNoiseWindowConverted:[sender floatValue]];
 }
@@ -1235,6 +1251,7 @@
 		[model setPresumEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
+
 
 - (IBAction) tpolAction:(id)sender
 {
@@ -1464,11 +1481,12 @@
 			else if(pol==2) polString = @" Neg";
 			else if(pol==3) polString = @"Both";
 			
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Pileup: %@ Presum: %@  Pole-zero: %@ Polarity: [%@] TriggerMode: %@\n",
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Pileup: %@ Presum: %@ BL-Restorer: %@ Pole-zero: %@ Polarity: [%@] TriggerMode: %@\n",
                       chan, 
                       (value&0x1)?@"[YES]":@"[ NO]",		//enabled
                       ((value>>2)&0x1)?@"[YES]":@"[ NO]",   //pile up
                       ((value>>3)&0x1)?@"[YES]":@"[ NO]",   //presum
+                      ((value>>22)&0x1)?@"[YES]":@"[ NO]",  //baseline restorer
                       ((value>>13)&0x1)?@"[YES]":@"[ NO]",  //pole-zero
                       polString, (value>>4)&0x1?@"[External]":@"[Internal]");
         }

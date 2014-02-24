@@ -35,6 +35,7 @@
 #define kCurrentFirmwareVersion 0x107
 #define kFPGARemotePath @"GretinaFPGA.bin"
 
+NSString* ORGretina4MModelBaselineRestoredDelayChanged = @"ORGretina4MModelBaselineRestoredDelayChanged";
 NSString* ORGretina4MModelFirmwareStatusStringChanged = @"ORGretina4MModelFirmwareStatusStringChanged";
 NSString* ORGretina4MModelCcLowResChanged       = @"ORGretina4MModelCcLowResChanged";
 NSString* ORGretina4MNoiseWindowChanged         = @"ORGretina4MNoiseWindowChanged";
@@ -129,7 +130,7 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x30,	@"External FIFO monitor", YES, NO, NO, NO}, //new for version 102b
     {0x40,  @"Control/Status", YES, YES, YES, YES},                
     {0x80,  @"LED Threshold", YES, YES, YES, YES},
-    {0xC0,  @"TRAP Threshold", YES, YES, YES, YES},
+    {0x1C0,  @"TRAP Threshold", YES, YES, YES, YES},
     {0xE8,  @"Central Contact low resolution", YES, YES, YES, YES},
     {0x100, @"Window Timing", YES, YES, YES, YES},
     {0x140, @"Rising Edge Window", YES, YES, YES, YES},        
@@ -343,6 +344,20 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 #pragma mark ***Accessors
+
+- (unsigned short) baselineRestoredDelay
+{
+    return baselineRestoredDelay;
+}
+
+- (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBaselineRestoredDelay:baselineRestoredDelay];
+    
+    baselineRestoredDelay = aBaselineRestoredDelay;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelBaselineRestoredDelayChanged object:self];
+}
 
 - (NSString*) firmwareStatusString
 {
@@ -1174,7 +1189,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
-	sleep(1); //wait for 1 second:
+	//sleep(1); //wait for 1 second:
 	
 	theValue = 0x11;
 	[[self adapter] writeLongBlock:&theValue
@@ -1184,6 +1199,29 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 }
 
+- (void) resetAndHoldClock
+{
+	//reset DCM clock while keeping SerDes driver off
+	// To reset the DCM, assert bit 9 of this register.
+	unsigned long theValue = 0x211;
+	[[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+}
+- (void) releaseClock
+{
+	//reset DCM clock while keeping SerDes driver off
+	// To reset the DCM, assert bit 9 of this register.
+	unsigned long theValue = 0x11;
+	[[self adapter] writeLongBlock:&theValue
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
 - (void) resetBoard
 {
     /* First disable all channels. This does not affect the model state,
@@ -1351,7 +1389,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         [self writeControlReg:i enabled:NO];
     }
     [self resetFIFO];
-
+    
     //write the card level params
     [self writeClockSource];
 	[self writeExternalWindow];
@@ -1372,13 +1410,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeRisingEdgeWindow:i];
         }
     }
-    [ORTimer delay:.1];
+    //[ORTimer delay:.1];
     //enable channels
     for(i=0;i<kNumGretina4MChannels;i++){
         if([self enabled:i]){
             [self writeControlReg:i enabled:YES];
         }
     }
+    [self resetDCM];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
@@ -1405,12 +1444,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
 
-    unsigned long theValue = ((pzTraceEnabled[chan] & 0x1)  << 14)  |
-                             ((poleZeroEnabled[chan]& 0x1)  << 13)  |
-                             ((tpol[chan]           & 0x3)  << 10)  |
-                             ((triggerMode[chan]    & 0x1)  << 4)   |
+    unsigned long theValue = (poleZeroEnabled[chan]         << 22)  | //the baselinerestorer enable is tied to the polezero enable
+                             (pzTraceEnabled[chan]          << 14)  |
+                             (poleZeroEnabled[chan]         << 13)  |
+                             ((tpol[chan] & 0x3)            << 10)  |
+                             (triggerMode[chan]             << 4)   |
 							 (presumEnabled[chan]           << 3)   |
-							 (pileUp[chan]                  << 2)	  |
+							 (pileUp[chan]                  << 2)   |
                              startStop;
     
     [[self adapter] writeLongBlock:&theValue
@@ -1475,7 +1515,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writePileUpWindow
 {
-    unsigned long theValue = pileUpWindow;
+    unsigned long theValue = (baselineRestoredDelay<<16) &  pileUpWindow;
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_information[kPileupWindow].offset
                         numToWrite:1
@@ -2158,7 +2198,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setPresumEnabled:withValue:) getMethod:@selector(presumEnabled:)];
     [a addObject:p];
-    
+        
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
@@ -2406,6 +2446,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setBaselineRestoredDelay:     [decoder decodeIntForKey:@"baselineRestoredDelay"]];
     [self setCcLowRes:                  [decoder decodeIntForKey:@"ccLowRes"]];
     [self setNoiseWindow:               [decoder decodeIntForKey:@"noiseWindow"]];
     [self setIntegrateTime:             [decoder decodeIntForKey:@"integrateTime"]];
@@ -2466,6 +2507,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:baselineRestoredDelay forKey:@"baselineRestoredDelay"];
     [encoder encodeInt:ccLowRes                     forKey:@"ccLowRes"];
     [encoder encodeInt:noiseWindow                  forKey:@"noiseWindow"];
     [encoder encodeInt:integrateTime                forKey:@"integrateTime"];
@@ -2629,7 +2671,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (BOOL) partOfEvent:(unsigned short)aChannel
 {
-	//included to satisfy the protocal... change if needed
+	//included to satisfy the protocol... change if needed
 	return NO;
 }
 
