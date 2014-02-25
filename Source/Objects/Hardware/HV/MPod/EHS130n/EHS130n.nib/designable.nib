@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
+		<string key="IBDocument.SystemVersion">13B42</string>
 		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
 		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.HIToolboxVersion">696.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">4514</string>
@@ -192,7 +192,6 @@
 							<int key="NSvFlags">292</int>
 							<string key="NSFrame">{{59, 3}, {651, 636}}</string>
 							<reference key="NSSuperview" ref="225729368"/>
-							<reference key="NSNextKeyView" ref="784919653"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="680595405">
 									<string key="NSIdentifier">1</string>
@@ -419,7 +418,7 @@
 																			<bool key="NS.raise.dividebyzero">YES</bool>
 																		</object>
 																		<string key="NS.decimal">.</string>
-																		<string key="NS.thousand"/>
+																		<string key="NS.thousand">,</string>
 																		<bool key="NS.hasthousands">NO</bool>
 																		<bool key="NS.localized">YES</bool>
 																		<bool key="NS.allowsfloats">YES</bool>
@@ -671,7 +670,7 @@
 																			<bool key="NS.raise.dividebyzero">YES</bool>
 																		</object>
 																		<string key="NS.decimal">.</string>
-																		<string key="NS.thousand"/>
+																		<string key="NS.thousand">,</string>
 																		<bool key="NS.hasthousands">NO</bool>
 																		<bool key="NS.localized">YES</bool>
 																		<bool key="NS.allowsfloats">YES</bool>
@@ -713,7 +712,7 @@
 																<object class="NSTextFieldCell" key="NSCell" id="473619163">
 																	<int key="NSCellFlags">67108864</int>
 																	<int key="NSCellFlags2">4194304</int>
-																	<string key="NSContents">mA</string>
+																	<string key="NSContents">µA</string>
 																	<reference key="NSSupport" ref="87067441"/>
 																	<reference key="NSControlView" ref="769793196"/>
 																	<reference key="NSBackgroundColor" ref="125656912"/>
@@ -763,7 +762,7 @@
 																			<bool key="NS.raise.dividebyzero">YES</bool>
 																		</object>
 																		<string key="NS.decimal">.</string>
-																		<string key="NS.thousand"/>
+																		<string key="NS.thousand">,</string>
 																		<bool key="NS.hasthousands">NO</bool>
 																		<bool key="NS.localized">YES</bool>
 																		<bool key="NS.allowsfloats">YES</bool>
@@ -981,7 +980,6 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{123, 49}, {28, 27}}</string>
 																<reference key="NSSuperview" ref="64413853"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="475511848">
 																	<int key="NSCellFlags">67108864</int>
@@ -1387,7 +1385,7 @@
 																<int key="NSvFlags">256</int>
 																<string key="NSFrameSize">{428, 304}</string>
 																<reference key="NSSuperview" ref="430694715"/>
-																<reference key="NSNextKeyView" ref="442028624"/>
+																<reference key="NSNextKeyView" ref="969502596"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1400,10 +1398,9 @@
 																	<reference key="NSTableView" ref="260760146"/>
 																</object>
 																<object class="_NSCornerView" key="NSCornerView" id="289169824">
-																	<reference key="NSNextResponder" ref="953458585"/>
+																	<nil key="NSNextResponder"/>
 																	<int key="NSvFlags">-2147483392</int>
 																	<string key="NSFrame">{{414, 0}, {16, 17}}</string>
-																	<reference key="NSSuperview" ref="953458585"/>
 																	<reference key="NSNextKeyView" ref="430694715"/>
 																</object>
 																<array class="NSMutableArray" key="NSTableColumns">
@@ -1550,7 +1547,7 @@
 																					<bool key="NS.raise.dividebyzero">YES</bool>
 																				</object>
 																				<string key="NS.decimal">.</string>
-																				<string key="NS.thousand"/>
+																				<string key="NS.thousand">,</string>
 																				<bool key="NS.hasthousands">NO</bool>
 																				<bool key="NS.localized">YES</bool>
 																				<bool key="NS.allowsfloats">YES</bool>
@@ -1569,7 +1566,7 @@
 																		<object class="NSTableHeaderCell" key="NSHeaderCell">
 																			<int key="NSCellFlags">75497536</int>
 																			<int key="NSCellFlags2">134219776</int>
-																			<string key="NSContents">I (uA)</string>
+																			<string key="NSContents">I (µA)</string>
 																			<reference key="NSSupport" ref="26"/>
 																			<reference key="NSBackgroundColor" ref="337423116"/>
 																			<reference key="NSTextColor" ref="1001528900"/>
@@ -1593,7 +1590,7 @@
 																		<object class="NSTableHeaderCell" key="NSHeaderCell">
 																			<int key="NSCellFlags">75497536</int>
 																			<int key="NSCellFlags2">134219776</int>
-																			<string key="NSContents">Max I (mA)</string>
+																			<string key="NSContents">Max I (µA)</string>
 																			<reference key="NSSupport" ref="26"/>
 																			<reference key="NSBackgroundColor" ref="337423116"/>
 																			<reference key="NSTextColor" ref="1001528900"/>
@@ -1632,7 +1629,7 @@
 																					<bool key="NS.raise.dividebyzero">YES</bool>
 																				</object>
 																				<string key="NS.decimal">.</string>
-																				<string key="NS.thousand"/>
+																				<string key="NS.thousand">,</string>
 																				<bool key="NS.hasthousands">NO</bool>
 																				<bool key="NS.localized">YES</bool>
 																				<bool key="NS.allowsfloats">YES</bool>
@@ -1721,17 +1718,15 @@
 														<string key="NSAction">_doScroller:</string>
 														<double key="NSPercent">0.86464646464646466</double>
 													</object>
-													<reference ref="289169824"/>
 												</array>
 												<string key="NSFrame">{{6, 256}, {430, 322}}</string>
 												<reference key="NSSuperview" ref="784919653"/>
-												<reference key="NSNextKeyView" ref="969502596"/>
+												<reference key="NSNextKeyView" ref="430694715"/>
 												<int key="NSsFlags">133682</int>
 												<reference key="NSVScroller" ref="442028624"/>
 												<reference key="NSHScroller" ref="587733114"/>
 												<reference key="NSContentView" ref="430694715"/>
 												<reference key="NSHeaderClipView" ref="969502596"/>
-												<reference key="NSCornerView" ref="289169824"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -2012,7 +2007,7 @@
 					<string key="NSFrameSize">{716, 642}</string>
 					<reference key="NSNextKeyView" ref="1053253060"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
