@@ -21,6 +21,8 @@
 
 #define kNMon5085RateMode   0
 #define kNMon5085Integrate  1
+#define kNMon5085CountsPerS 2
+#define kNMon5085Scaler     3
 
 @class ORTimeRate;
 
@@ -84,12 +86,11 @@
 - (void)    setIsLog:(BOOL)aIsLog;
 - (ORTimeRate*)timeRate;
 - (void)    runTimeOut;
-- (int) processHHMMSS:(NSString*)aString;
+- (int)     processHHMMSS:(NSString*)aString;
 
 #pragma mark •••Commands
 - (void) initHW;
 - (void) toggleRun;
-- (void) sendSorQCommand;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

@@ -26,7 +26,7 @@
 	
     IBOutlet NSButton*               lockButton;
 	IBOutlet NSTextField*            maxRadValueField;
-	IBOutlet NSTextField*           dateOfMaxRadValueField;
+	IBOutlet NSTextField*            dateOfMaxRadValueField;
 	IBOutlet NSTextField*            highVoltageField;
 	IBOutlet NSTextField*            deadtimeField;
 	IBOutlet NSTextField*            actualModeField;
@@ -40,13 +40,12 @@
 	IBOutlet NSTextField*            radValueField;
 	IBOutlet NSTextField*            modeTimeField;
 	IBOutlet NSTextField*            hhmmssField;
-    IBOutlet ORCompositeTimeLineView*	 plotter;
+    IBOutlet ORCompositeTimeLineView* plotter;
     IBOutlet ORSerialPortController* serialPortController;
     IBOutlet NSButton*		         plotLogCB;
     IBOutlet NSButton*		         runButton;
     IBOutlet NSPopUpButton*          modePU;
     IBOutlet NSButton*               isLogCB;
-    IBOutlet NSButton*               sendSorQButton;
 }
 
 #pragma mark •••Initialization
@@ -87,7 +86,6 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) initHWAction:(id) sender;
 - (IBAction) toggleRun:(id) sender;
-- (IBAction) sendSorQAction:(id) sender;
 
 #pragma mark •••Data Source
 

@@ -25,21 +25,21 @@
 
 #pragma mark •••External Strings
 
-NSString* ORNMon5085ModelMaxRadValueChanged = @"ORNMon5085ModelMaxRadValueChanged";
+NSString* ORNMon5085ModelMaxRadValueChanged       = @"ORNMon5085ModelMaxRadValueChanged";
 NSString* ORNMon5085ModelDateOfMaxRadValueChanged = @"ORNMon5085ModelDateOfMaxRadValueChanged";
-NSString* ORNMon5085ModelHighVoltageChanged = @"ORNMon5085ModelHighVoltageChanged";
-NSString* ORNMon5085ModelDeadtimeChanged = @"ORNMon5085ModelDeadtimeChanged";
-NSString* ORNMon5085ModelActualModeChanged = @"ORNMon5085ModelActualModeChanged";
-NSString* ORNMon5085ModelDiscriminatorChanged = @"ORNMon5085ModelDiscriminatorChanged";
-NSString* ORNMon5085ModelCalibrationValueChanged = @"ORNMon5085ModelCalibrationValueChanged";
-NSString* ORNMon5085ModelTimeUtilStopChanged = @"ORNMon5085ModelTimeUtilStopChanged";
-NSString* ORNMon5085ModelIsRunningChanged    = @"ORNMon5085ModelIsRunningChanged";
-NSString* ORNMon5085ModelUnitsChanged       = @"ORNMon5085ModelUnitsChanged";
-NSString* ORNMon5085ModelRadValueChanged    = @"ORNMon5085ModelRadValueChanged";
-NSString* ORNMon5085ModelModeTimeChanged    = @"ORNMon5085ModelModeTimeChanged";
-NSString* ORNMon5085ModelModeChanged        = @"ORNMon5085ModelModeChanged";
-NSString* ORNMon5085Lock                    = @"ORNMon5085Lock";
-NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
+NSString* ORNMon5085ModelHighVoltageChanged       = @"ORNMon5085ModelHighVoltageChanged";
+NSString* ORNMon5085ModelDeadtimeChanged          = @"ORNMon5085ModelDeadtimeChanged";
+NSString* ORNMon5085ModelActualModeChanged        = @"ORNMon5085ModelActualModeChanged";
+NSString* ORNMon5085ModelDiscriminatorChanged     = @"ORNMon5085ModelDiscriminatorChanged";
+NSString* ORNMon5085ModelCalibrationValueChanged  = @"ORNMon5085ModelCalibrationValueChanged";
+NSString* ORNMon5085ModelTimeUtilStopChanged      = @"ORNMon5085ModelTimeUtilStopChanged";
+NSString* ORNMon5085ModelIsRunningChanged         = @"ORNMon5085ModelIsRunningChanged";
+NSString* ORNMon5085ModelUnitsChanged             = @"ORNMon5085ModelUnitsChanged";
+NSString* ORNMon5085ModelRadValueChanged          = @"ORNMon5085ModelRadValueChanged";
+NSString* ORNMon5085ModelModeTimeChanged          = @"ORNMon5085ModelModeTimeChanged";
+NSString* ORNMon5085ModelModeChanged              = @"ORNMon5085ModelModeChanged";
+NSString* ORNMon5085Lock                          = @"ORNMon5085Lock";
+NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 
 @interface ORNMon5085Model (private)
 - (void) send:(NSString*)aCmd;
@@ -351,7 +351,7 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
 #pragma mark •••Commands
 - (void) sendMode
 {
-    NSString* modeCmd[4] = {@"R",@"I"};
+    NSString* modeCmd[4] = {@"R",@"I",@"C",@"S"};
     if(mode>=0 && mode<4){
         [self enqueueCmd:@"M"];
         [self enqueueCmd:modeCmd[mode]];
@@ -360,7 +360,7 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
 
 - (void) sendTime
 {
-    if(mode == kNMon5085Integrate){
+    if(mode == kNMon5085Integrate || mode == kNMon5085Scaler){
         
         int t = modeTime;
         int h = t / 3600;
@@ -384,21 +384,20 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
 
 - (void) toggleRun
 {
-    if(isRunning){
-        if([actualMode isEqual:@"Integrate"])[self enqueueCmd:@"S"];
-        else[self enqueueCmd:@"Q"];
-    }
     [self initHW];
-    [self sendSorQCommand];
-}
+    //if(isRunning){
 
-- (void) sendSorQCommand
-{
-    if(mode == kNMon5085Integrate){
-        [self enqueueCmd:@"S"];
-        [self pollHW];
+    switch([self mode]){
+        case kNMon5085Scaler:
+        case kNMon5085Integrate:
+            [self enqueueCmd:@"S"];
+            break;
+        case kNMon5085RateMode:
+        case kNMon5085CountsPerS:
+            [self enqueueCmd:@"Q"];
+            break;
+            
     }
-    else [self enqueueCmd:@"Q"];
 }
 
 - (void) pollHW
@@ -438,7 +437,7 @@ NSString* ORNMon5085IsLogChanged            = @"ORNMon5085IsLogChanged";
         int i;
         for(i=0;i<[inComingData length];i++){
             unsigned char* p = (unsigned char*)[inComingData bytes];
-            if(*p == '\n' || *p == '\n' || *p == ' ' || *p == '*'){
+            if(*p == '\n' || *p == '\r' || *p == ' ' || *p == '*'){
                 [inComingData replaceBytesInRange:NSMakeRange(0,1) withBytes:nil length:0];
             }
             else break;

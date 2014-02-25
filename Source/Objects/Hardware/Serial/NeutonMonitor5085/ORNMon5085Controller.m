@@ -336,7 +336,6 @@
 - (void) modeChanged:(NSNotification*)aNotification
 {
     [modePU selectItemAtIndex:[model mode]];
-    [sendSorQButton setTitle:[model mode] == kNMon5085RateMode?@"Send Q":@"Send S"];
 	[self updateButtons];
 }
 
@@ -392,10 +391,6 @@
 	[model setIsLog:[sender intValue]];
 }
 
-- (IBAction) sendSorQAction:(id) sender
-{
-    [model sendSorQCommand];
-}
 
 #pragma mark •••Data Source
 
