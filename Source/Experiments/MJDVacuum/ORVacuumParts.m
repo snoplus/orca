@@ -301,8 +301,8 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 {
 	if(aState != state || firstTime){
         
-        if(firstTime)NSLog(@"Value %@ state is now %@\n",[self stateName:aState]);
-        else NSLog(@"Value %@ changed from %@ to %@\n",[self stateName:state],[self stateName:aState]);
+        if(firstTime)NSLog(@"Value %@ state is now %@\n",[self label],[self stateName:aState]);
+        else NSLog(@"Value %@ changed from %@ to %@\n",[self label],[self stateName:state],[self stateName:aState]);
         
 		state = aState;
 		
