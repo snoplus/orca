@@ -248,6 +248,7 @@
 {
 	[isRunningField setStringValue: [model isRunning]?@"Running":@"NOT Running"];
     [self timeUtilStopChanged:nil];
+    [self updateButtons];
 }
 
 - (void) isLogChanged:(NSNotification*)aNote
@@ -355,7 +356,9 @@
 	//BOOL portOpen = [[model serialPort] isOpen];
     [lockButton setState: locked];
 	[serialPortController updateButtons:locked];
-    [modeTimeField setEnabled:!locked && [model mode]>=kNMon5085Integrate];
+    [modeTimeField setEnabled:!locked && ([model mode]==kNMon5085Integrate)];
+    [modePU setEnabled:![model isRunning]];
+    [runButton setTitle:[model isRunning]?@"Stop":@"Load HW/Start"];
  }
 
 #pragma mark •••Actions
@@ -372,12 +375,6 @@
 - (IBAction) modeAction:(id) sender
 {
     [model setMode:[sender indexOfSelectedItem]];
-}
-
-- (IBAction) initHWAction:(id) sender
-{
-    [self endEditing];
-    [model initHW];
 }
 
 - (IBAction) toggleRun:(id) sender

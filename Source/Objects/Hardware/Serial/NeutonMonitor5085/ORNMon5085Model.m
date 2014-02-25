@@ -360,7 +360,7 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 
 - (void) sendTime
 {
-    if(mode == kNMon5085Integrate || mode == kNMon5085Scaler){
+    if(mode == kNMon5085Integrate){
         
         int t = modeTime;
         int h = t / 3600;
@@ -388,7 +388,6 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
     //if(isRunning){
 
     switch([self mode]){
-        case kNMon5085Scaler:
         case kNMon5085Integrate:
             [self enqueueCmd:@"S"];
             break;
@@ -474,6 +473,18 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
                 if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:6]];
                 
                 [self setIsRunning:YES];
+                [self performSelector:@selector(runTimeOut) withObject:nil afterDelay:3];
+                //no polling in this mode
+                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
+            }
+            
+            else if([aString rangeOfString:@"CPS"].location!= NSNotFound){
+                [self setRadValue:[aString floatValue]];
+                NSArray* parts = [aString componentsSeparatedByString:@" "];
+                if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:3]];
+                
+                [self setIsRunning:YES];
+                [self setActualMode:@"Counts/Sec"];
                 [self performSelector:@selector(runTimeOut) withObject:nil afterDelay:3];
                 //no polling in this mode
                 [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];

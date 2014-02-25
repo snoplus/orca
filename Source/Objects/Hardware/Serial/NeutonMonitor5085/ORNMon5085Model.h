@@ -22,7 +22,6 @@
 #define kNMon5085RateMode   0
 #define kNMon5085Integrate  1
 #define kNMon5085CountsPerS 2
-#define kNMon5085Scaler     3
 
 @class ORTimeRate;
 

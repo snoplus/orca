@@ -84,7 +84,6 @@
 - (IBAction) modeTimeAction:(id)sender;
 - (IBAction) modeAction:(id) sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) initHWAction:(id) sender;
 - (IBAction) toggleRun:(id) sender;
 
 #pragma mark •••Data Source
