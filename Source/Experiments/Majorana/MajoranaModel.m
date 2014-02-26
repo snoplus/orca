@@ -189,9 +189,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
         if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
         if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
-        
+
         [values setObject:aDictionary forKey:[segmentGroup groupName]];
     }
+    NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
+    NSString* stringGeometry = [self mapFileAsString];
+    [aDictionary setObject:stringGeometry       forKey: @"geometry"];
+    [values setObject:aDictionary forKey:@"Strings"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
