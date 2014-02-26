@@ -510,6 +510,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                               [item objectForKey:@"kDet4"],
                               [item objectForKey:@"kDet5"]
                               ];
+    [stringRep deleteCharactersInRange:NSMakeRange([stringRep length]-1,1)];
     return stringRep;
 }
 
