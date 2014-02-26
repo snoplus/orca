@@ -39,6 +39,7 @@
     IBOutlet NSButton*		saveSecondaryMapFileButton;
     IBOutlet NSTableView*	secondaryTableView;
 	IBOutlet NSButton*		vetoMapLockButton;
+    IBOutlet NSTableView*	stringMapTableView;
 
     //items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
@@ -65,6 +66,7 @@
 - (void) vetoMapLockChanged:(NSNotification*)aNote;
 - (void) groupChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) stringMapChanged:(NSNotification*)aNote;
 
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;

@@ -22,6 +22,7 @@
     IBOutlet ORColorScale* detectorColorScale;
     IBOutlet ORColorScale* vetoColorScale;
 	BOOL viewType;
+    NSMutableArray* detectorOutlines;
 }
 - (void) setViewType:(int)aViewType;
 

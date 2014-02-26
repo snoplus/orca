@@ -30,6 +30,12 @@
 
 @implementation MajoranaDetectorView
 
+- (void) dealloc
+{
+    [detectorOutlines release];
+    [super dealloc];
+}
+
 - (void) awakeFromNib
 {
 	[[detectorColorScale colorAxis] setLabel:@"Detectors"];
@@ -37,7 +43,6 @@
 	[[vetoColorScale colorAxis] setOppositePosition:YES];
 	[detectorColorScale setExcludeZero:YES];
 	[vetoColorScale setExcludeZero:YES];
-    
 }
 - (void) setViewType:(int)aViewType
 {
@@ -98,7 +103,13 @@
         }
 	}
     [super drawRect:rect];
-
+    
+    if(viewType != kUseCrateView){
+        [[NSColor blackColor]set];
+        for(id aDetector in detectorOutlines){
+            [aDetector stroke];
+        }
+    }
 }
 
 - (NSColor*) getColorForSet:(int)setIndex value:(unsigned long)aValue
@@ -148,12 +159,14 @@
                 int cardSlot = [aSegment cardSlot];
                 int channel  = [aSegment channel];
                 if(channel < 0)cardSlot = -1; //we have to make the segment, but we'll draw off screen when not mapped
+                
                 float yOffset;
                 if(cardSlot<0)yOffset = -50000;
                 else {
                     if(crate==0) yOffset = 50+kCrateInsideY;
                     else yOffset = 50+[crateImage imageRect].size.height+kCrateSeparation+kCrateInsideY;
                 }
+                
                 NSRect channelRect = NSMakeRect(kCrateInsideX+cardSlot*dx, yOffset + (channel*dy),dx,dy);
                 
                 [segmentPaths addObject:[NSBezierPath bezierPathWithRect:channelRect]];
@@ -185,13 +198,14 @@
         if(selectedSet == 0)selectedPath = kNumDetectors-1;
         else if(selectedSet == 1)selectedPath = kNumVetoSegments-1;
 	}
-	
 }
 
 - (void) makeDetectors
 {
-    NSMutableArray* segmentPaths = [NSMutableArray arrayWithCapacity:kNumDetectors];
-    NSMutableArray* errorPaths   = [NSMutableArray arrayWithCapacity:kNumDetectors];
+    NSMutableArray* segmentPaths     = [NSMutableArray arrayWithCapacity:kNumDetectors];
+    NSMutableArray* errorPaths       = [NSMutableArray arrayWithCapacity:kNumDetectors];
+    [detectorOutlines release];
+    detectorOutlines = [[NSMutableArray arrayWithCapacity:kNumDetectors] retain];
     
     float height = [self bounds].size.height;
     float detWidth = 35;
@@ -214,6 +228,8 @@
                 [segmentPaths   addObject:[NSBezierPath bezierPathWithRect:r]];
                 [errorPaths     addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
                 
+                r = NSMakeRect(x-1,y-1,detWidth+2,detHeight+2);
+                [detectorOutlines   addObject:[NSBezierPath bezierPathWithRect:r]];
                 
                 y -= detHeight+5;
             }

@@ -50,16 +50,18 @@
                 NSArray* parts = [aLine componentsSeparatedByString:@","];
 
                 if(detectorIndex>=0 && detectorIndex < [segments count]){
-                    NSString* loGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@",
-                                              [parts objectAtIndex:0],
-                                              [parts objectAtIndex:1],
-                                              [parts objectAtIndex:2],
-                                              [parts objectAtIndex:3],
-                                              [parts objectAtIndex:5],
-                                              [parts objectAtIndex:6],
-                                              [parts objectAtIndex:7],
-                                              [parts objectAtIndex:8]
-                                              ];
+                    NSString* loGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
+                                              [parts objectAtIndex:0],  //segment
+                                              [parts objectAtIndex:1],  //VME
+                                              [parts objectAtIndex:2],  //Card
+                                              [parts objectAtIndex:3],  //Lo Chan
+                                              [parts objectAtIndex:5],  //Preamp Chan
+                                              [parts objectAtIndex:6],  //HV Crate
+                                              [parts objectAtIndex:7],  //HV Card
+                                              [parts objectAtIndex:8],  //HV Chan
+                                              [parts objectAtIndex:9],  //Det Name
+                                              [parts objectAtIndex:10]  //Det Type
+                                             ];
                     ORDetectorSegment* aSegment = [segments objectAtIndex:detectorIndex*2];
                     [aSegment decodeLine:loGainLine];
                     [aSegment setObject:[NSNumber numberWithInt:detectorIndex*2] forKey:@"kSegmentNumber"];
@@ -67,15 +69,18 @@
                     [aSegment setObject:[NSNumber numberWithInt:0] forKey:@"kGainType"];
                 }
                 if(detectorIndex>=0 && detectorIndex+1 < [segments count]){
-                    NSString* hiGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@",
-                                              [parts objectAtIndex:0],
-                                              [parts objectAtIndex:1],
-                                              [parts objectAtIndex:2],
-                                              [parts objectAtIndex:4],
-                                              [parts objectAtIndex:5],
-                                              [parts objectAtIndex:6],
-                                              [parts objectAtIndex:7],
-                                              [parts objectAtIndex:8]
+                    NSString* hiGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
+                                              [parts objectAtIndex:0], //segment
+                                              [parts objectAtIndex:1], //VME
+                                              [parts objectAtIndex:2], //Card
+                                              [parts objectAtIndex:4], //Hi Chan
+                                              [parts objectAtIndex:5], //Hi Preamp
+                                              [parts objectAtIndex:6], //HV Crate
+                                              [parts objectAtIndex:7], //HV Card
+                                              [parts objectAtIndex:8], //HV Chan
+                                              [parts objectAtIndex:9], //Det Name
+                                              [parts objectAtIndex:10] //Det Type
+
                                               ];
                     ORDetectorSegment* aSegment = [segments objectAtIndex:detectorIndex*2+1];
                     [aSegment decodeLine:hiGainLine];
@@ -105,19 +110,19 @@
         NSArray* loGainPart = [loGainLine componentsSeparatedByString:@","];
         NSArray* hiGainPart = [hiGainLine componentsSeparatedByString:@","];
         int segNum = [[loGainPart objectAtIndex:0] intValue]/2;
-        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@",
+        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                              segNum,
-                             [loGainPart objectAtIndex:1],
-                             [loGainPart objectAtIndex:2],
-                             [loGainPart objectAtIndex:3],
-                             [hiGainPart objectAtIndex:3], //fold in the hi gain channel
-                             [loGainPart objectAtIndex:4],
-                             [loGainPart objectAtIndex:5],
-                             [loGainPart objectAtIndex:6],
-                             [loGainPart objectAtIndex:7]
+                             [loGainPart objectAtIndex:1],  //VME
+                             [loGainPart objectAtIndex:2],  //Card
+                             [loGainPart objectAtIndex:3],  //Lo Chan
+                             [hiGainPart objectAtIndex:3],  //fold in the hi gain channel
+                             [loGainPart objectAtIndex:4],  //Preamp Chan
+                             [loGainPart objectAtIndex:5],  //HV Crate
+                             [loGainPart objectAtIndex:6],  //HV Card
+                             [loGainPart objectAtIndex:7],  //HV Chan
+                             [loGainPart objectAtIndex:8],  //Detector Name
+                             [loGainPart objectAtIndex:9]   //Detector type
                    ];
-
-        
         [theContents appendData:[aLine dataUsingEncoding:NSASCIIStringEncoding]];
         [theContents appendData:[@"\n" dataUsingEncoding:NSASCIIStringEncoding]];
     }
@@ -145,6 +150,8 @@
         if(!headerDone){
             NSString* paramHeader = [loGainSeg paramHeader];
             paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kChannel" withString:@"kChanLo,kChanHi"];
+            paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kPreAmpChan" withString:@"kPreAmpLo,kPreAmpHi"];
+            
             [theContents appendString:paramHeader];
             headerDone = YES;
         }
@@ -153,16 +160,18 @@
         NSArray* loGainPart = [loGainLine componentsSeparatedByString:@","];
         NSArray* hiGainPart = [hiGainLine componentsSeparatedByString:@","];
         int segNum = i/2;
-        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@",
+        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                              segNum,
-                             [loGainPart objectAtIndex:1],
-                             [loGainPart objectAtIndex:2],
-                             [loGainPart objectAtIndex:3],
-                             [hiGainPart objectAtIndex:3], //fold in the hi gain channel
-                             [loGainPart objectAtIndex:4],
-                             [loGainPart objectAtIndex:5],
-                             [loGainPart objectAtIndex:6],
-                             [loGainPart objectAtIndex:7]
+                             [loGainPart objectAtIndex:1],  //VME
+                             [loGainPart objectAtIndex:2],  //Card
+                             [loGainPart objectAtIndex:3],  //Lo Chan
+                             [hiGainPart objectAtIndex:3],  //fold in the hi gain channel
+                             [loGainPart objectAtIndex:4],  //Preamp Chan
+                             [loGainPart objectAtIndex:5],  //HV Crate
+                             [loGainPart objectAtIndex:6],  //HV Card
+                             [loGainPart objectAtIndex:7],  //HV Chan
+                             [loGainPart objectAtIndex:8],  //Detector Name
+                             [loGainPart objectAtIndex:9]   //Detector Type
                              ];
 
         [theContents appendString:aLine];

@@ -54,7 +54,7 @@
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(500,700);
-	detectorMapViewSize	 = NSMakeSize(550,565);
+	detectorMapViewSize	 = NSMakeSize(950,565);
 	vetoMapViewSize		 = NSMakeSize(460,565);
 	
     blankView = [[NSView alloc] init];
@@ -155,6 +155,11 @@
                          name : OROrcaObjectMoved
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(stringMapChanged:)
+                         name : ORMJDAuxTablesChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -164,7 +169,8 @@
 	[self viewTypeChanged:nil];
     //detector
     [self secondaryColorAxisAttributesChanged:nil];
-    
+    [self stringMapChanged:nil];
+
 	//veto hw map
     [self vetoMapLockChanged:nil];
 	[self secondaryMapFileChanged:nil];
@@ -173,6 +179,10 @@
 	//details
 	[secondaryValuesView reloadData];
 
+}
+- (void) stringMapChanged:(NSNotification*)aNote
+{
+	[stringMapTableView reloadData];
 }
 
 - (void) checkGlobalSecurity
@@ -270,8 +280,13 @@
 	[[model segmentGroup:1] setColorAxisAttributes:[[secondaryColorScale colorAxis] attributes]];
 }
 
-#pragma mark ¥¥¥Details Interface Management
+- (void) mapFileRead:(NSNotification*)mapFileRead
+{
+	[super mapFileRead:mapFileRead];
+	[self stringMapChanged:nil];
+}
 
+#pragma mark ¥¥¥Details Interface Management
 - (void) refreshSegmentTables:(NSNotification*)aNote
 {
 	[super refreshSegmentTables:aNote];
@@ -445,6 +460,7 @@
         else if([[aTableColumn identifier] isEqualToString:@"kChanHi"]){
            return [[model segmentGroup:0] segment:rowIndex*2+1 objectForKey:@"kChannel"];
         }
+ 
         else if([[aTableColumn identifier] isEqualToString:@"kSegmentNumber"]){
             return [NSNumber numberWithInt:rowIndex];
         }
@@ -469,6 +485,9 @@
         }
 		else return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
+    else if(aTableView == stringMapTableView){
+		return [model stringMap:rowIndex objectForKey:[aTableColumn identifier]];
+	}
 	else return nil;
 }
 
@@ -478,12 +497,16 @@
         aTableView == secondaryValuesView){
         return [[model segmentGroup:1] numSegments];
     }
+    else if(aTableView == stringMapTableView)return kMaxNumStrings;
+
 
 	else return [super numberOfRowsInTableView:aTableView]/2;
 }
 
 - (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
+    if(!anObject)anObject= @"--";
+    
 	ORDetectorSegment* aSegment;
 	if(aTableView == primaryTableView){
         if([[aTableColumn identifier] isEqualToString:@"kChanLo"]){
@@ -495,11 +518,11 @@
         }
         else if([[aTableColumn identifier] isEqualToString:@"kChanHi"]){
             aSegment = [[model segmentGroup:0] segment:rowIndex*2+1];
-            [aSegment setObject:[NSNumber numberWithInt:rowIndex*2+1] forKey:@"kSegmentNumber"];
             [aSegment setObject:anObject forKey:@"kChannel"];
+            [aSegment setObject:[NSNumber numberWithInt:rowIndex*2+1] forKey:@"kSegmentNumber"];
             [aSegment setObject:[NSNumber numberWithInt:rowIndex] forKey:@"kDetector"];
             [aSegment setObject:[NSNumber numberWithInt:1] forKey:@"kGainType"];
-       }
+        }
         else {
             aSegment = [[model segmentGroup:0] segment:rowIndex*2];
             [aSegment setObject:anObject forKey:[aTableColumn identifier]];
@@ -507,14 +530,17 @@
             [aSegment setObject:[NSNumber numberWithInt:rowIndex*2] forKey:@"kSegmentNumber"];
           
             aSegment = [[model segmentGroup:0] segment:rowIndex*2+1];
-            [aSegment setObject:[NSNumber numberWithInt:rowIndex*2+1] forKey:@"kSegmentNumber"];
             [aSegment setObject:anObject forKey:[aTableColumn identifier]];
+            [aSegment setObject:[NSNumber numberWithInt:rowIndex*2+1] forKey:@"kSegmentNumber"];
             [aSegment setObject:[NSNumber numberWithInt:rowIndex] forKey:@"kDetector"];
-
         }
         [[model segmentGroup:0] configurationChanged:nil];
-
 	}
+    
+    else if(aTableView == stringMapTableView){
+		[model stringMap:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+	}
+    
 	else if(aTableView == primaryValuesView){
         if([[aTableColumn identifier] isEqualToString:@"loThreshold"]){
             aSegment = [[model segmentGroup:0] segment:rowIndex*2];
@@ -525,11 +551,13 @@
  			[aSegment setThreshold:anObject];
        }
   	}
+    
     else if(aTableView == secondaryTableView){
 		aSegment = [[model segmentGroup:1] segment:rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
 		[[model segmentGroup:1] configurationChanged:nil];
 	}
+    
 	else if(aTableView == secondaryValuesView){
 		aSegment = [[model segmentGroup:1] segment:rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){

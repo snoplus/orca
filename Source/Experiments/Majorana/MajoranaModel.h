@@ -27,6 +27,7 @@
 #define kUseCrateView       1
 #define kNumDetectors       2*35*2 //2 cryostats of 35 detectors * 2 (low and hi channels)
 #define kNumVetoSegments    32
+#define kMaxNumStrings      14
 
 //component tag numbers
 #define kVacAComponent			0
@@ -38,8 +39,9 @@
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
 	int             viewType;
-    int				pollTime;
+    int             pollTime;
     OROpSequence*   scriptModel;
+    NSMutableArray* stringMap;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -57,6 +59,9 @@
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
 - (NSString*) getValueForPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts;
+- (id)   stringMap:(int)i objectForKey:(id)aKey;
+- (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey;
+- (NSString*) mapFileAsString;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
@@ -79,4 +84,5 @@
 
 extern NSString* ORMajoranaModelViewTypeChanged;
 extern NSString* ORMajoranaModelPollTimeChanged;
+extern NSString* ORMJDAuxTablesChanged;
 

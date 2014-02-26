@@ -36,11 +36,17 @@
 
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 NSString* ORMajoranaModelPollTimeChanged	= @"ORMajoranaModelPollTimeChanged";
+NSString* ORMJDAuxTablesChanged             = @"ORMJDAuxTablesChanged";
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
+#define MJDStringMapFile(aPath)		[NSString stringWithFormat:@"%@_StringMap",	aPath]
+
+
 @interface  MajoranaModel (private)
-- (void) checkConstraints;
+- (void)     checkConstraints;
+- (void)     validateStringMap;
+- (NSArray*) linesInFile:(NSString*)aPath;
 @end
 
 @implementation MajoranaModel
@@ -115,8 +121,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	
 	[[segmentGroups objectAtIndex:0] addParametersToDictionary:objDictionary useName:@"DetectorGeometry" addInGroupName:NO];
 	[[segmentGroups objectAtIndex:1] addParametersToDictionary:objDictionary useName:@"VetoGeometry" addInGroupName:NO];
-	
+    
+    NSString* theContents = [self mapFileAsString];
+    if([theContents length]) [objDictionary setObject:theContents forKey:@"StringGeometry"];
+
+    
     [aDictionary setObject:objDictionary forKey:[self className]];
+
     return aDictionary;
 }
 
@@ -137,6 +148,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCrate",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCard",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVChan",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorName",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
     }
     else if(groupIndex == 1){
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber", @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
@@ -358,7 +371,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     scriptModel = [[OROpSequence alloc] initWithDelegate:self];
     [scriptModel setSteps:[self scriptSteps]];
     
-    pollTime = [decoder decodeIntForKey:	@"pollTime"];
+    pollTime  = [decoder decodeIntForKey:	@"pollTime"];
+    stringMap = [[decoder decodeObjectForKey:@"stringMap"] retain];
+
+	[self validateStringMap];
 
 	[[self undoManager] enableUndoRegistration];
 
@@ -368,8 +384,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:viewType forKey:@"viewType"];
-	[encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeInt:viewType     forKey: @"viewType"];
+	[encoder encodeInt:pollTime		forKey: @"pollTime"];
+    [encoder encodeObject:stringMap	forKey: @"stringMap"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -443,6 +460,77 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         }
 	}
 	return @"";
+}
+
+- (void) readAuxFiles:(NSString*)aPath
+{
+	aPath = MJDStringMapFile([aPath stringByDeletingPathExtension]);
+    
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:aPath]){
+		NSArray* lines  = [self linesInFile:aPath];
+		for(id aLine in lines){
+			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
+				NSArray* parts =  [aLine componentsSeparatedByString:@","];
+				if([parts count]>=3){
+					int index = [[parts objectAtIndex:0] intValue];
+					if(index<14){
+						NSMutableDictionary* dict = [stringMap objectAtIndex:index];
+						[dict setObject:[parts objectAtIndex:0] forKey:@"kStringNum"];
+						[dict setObject:[parts objectAtIndex:1] forKey:@"kDet1"];
+						[dict setObject:[parts objectAtIndex:2] forKey:@"kDet2"];
+						[dict setObject:[parts objectAtIndex:3] forKey:@"kDet3"];
+						[dict setObject:[parts objectAtIndex:4] forKey:@"kDet4"];
+						[dict setObject:[parts objectAtIndex:5] forKey:@"kDet5"];
+					}
+				}
+			}
+		}
+	}
+}
+
+- (void) saveAuxFiles:(NSString*)aPath
+{
+	aPath = MJDStringMapFile([aPath stringByDeletingPathExtension]);
+	NSFileManager*   fm       = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath: aPath])[fm removeItemAtPath:aPath error:nil];
+	NSData* data = [[self mapFileAsString] dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:aPath contents:data attributes:nil];
+}
+
+- (NSString*) mapFileAsString
+{
+   	NSMutableString* stringRep = [NSMutableString string];
+	for(id item in stringMap)[stringRep appendFormat:@"%@,%@,%@,%@,%@,%@\n",
+                              [item objectForKey:@"kStringNum"],
+                              [item objectForKey:@"kDet1"],
+                              [item objectForKey:@"kDet2"],
+                              [item objectForKey:@"kDet3"],
+                              [item objectForKey:@"kDet4"],
+                              [item objectForKey:@"kDet5"]
+                              ];
+    return stringRep;
+}
+
+#pragma mark ¥¥¥String Map Access Methods
+- (id) stringMap:(int)i objectForKey:(id)aKey
+{
+	if(i>=0 && i<kMaxNumStrings){
+		return [[stringMap objectAtIndex:i] objectForKey:aKey];
+	}
+	else return @"";
+}
+
+- (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey
+{
+	if(i>=0 && i<kMaxNumStrings){
+		id entry = [stringMap objectAtIndex:i];
+		id oldValue = [self stringMap:i objectForKey:aKey];
+		if(oldValue)[[[self undoManager] prepareWithInvocationTarget:self] stringMap:i setObject:oldValue forKey:aKey];
+		[entry setObject:anObject forKey:aKey];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDAuxTablesChanged object:self userInfo:nil];
+		
+	}
 }
 
 #pragma mark ¥¥¥CardHolding Protocol
@@ -607,6 +695,30 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(pollTime)[self performSelector:@selector(checkConstraints) withObject:nil afterDelay:pollTime*60];
 }
 
-@end
+- (void) validateStringMap
+{
+	if(!stringMap){
+		stringMap = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<14;i++){
+			[stringMap addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+							   [NSNumber numberWithInt:i], @"kStringNum",
+							      @"-",						 @"kDet1",
+                                  @"-",						 @"kDet2",
+                                  @"-",						 @"kDet3",
+                                  @"-",						 @"kDet4",
+                                  @"-",						 @"kDet5",
+                                  nil]];
+		}
+	}
+}
+- (NSArray*) linesInFile:(NSString*)aPath
+{
+	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];
+	contents = [[contents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
+	contents = [[contents componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
+    return [contents componentsSeparatedByString:@"\n"];
+}
 
+@end
 
