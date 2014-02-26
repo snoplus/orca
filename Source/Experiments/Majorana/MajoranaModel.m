@@ -501,6 +501,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (NSString*) mapFileAsString
 {
    	NSMutableString* stringRep = [NSMutableString string];
+    [stringRep appendFormat:@"String,Det1,Det2,Det3,Det4,Det5\n"];
 	for(id item in stringMap)[stringRep appendFormat:@"%@,%@,%@,%@,%@,%@\n",
                               [item objectForKey:@"kStringNum"],
                               [item objectForKey:@"kDet1"],
