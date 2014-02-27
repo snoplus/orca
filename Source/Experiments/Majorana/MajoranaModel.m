@@ -193,8 +193,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [values setObject:aDictionary forKey:[segmentGroup groupName]];
     }
     NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
-    NSString* stringGeometry = [self mapFileAsString];
-    [aDictionary setObject:stringGeometry       forKey: @"geometry"];
+    NSArray* stringMapEntries = [[self mapFileAsString] componentsSeparatedByString:@"\n"];
+    [aDictionary setObject:stringMapEntries       forKey: @"geometry"];
     [values setObject:aDictionary forKey:@"Strings"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
