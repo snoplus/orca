@@ -266,11 +266,14 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
         }
     }
     
-    NSMutableDictionary* values = [NSMutableDictionary dictionary];
-    if([systemParams count])[values setObject:systemParams forKey:@"system"];
-    if([theSupplies count]) [values setObject:theSupplies forKey:@"supplies"];
-    [values setObject:[NSNumber numberWithInt:numChannelsWithVoltage] forKey:@"numberChannelsOn"];
-    [values setObject:[NSNumber numberWithInt:numChannelsRamping] forKey:@"numberChannelsRamping"];
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            systemParams, @"system",
+                            theSupplies,  @"supplies",
+                            [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
+                            [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
+                            nil];
+
+    
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
