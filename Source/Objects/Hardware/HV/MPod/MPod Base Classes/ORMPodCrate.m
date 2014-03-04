@@ -258,7 +258,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
             }
             numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
             numChannelsRamping     += [anHVCard numberChannelsRamping];
-            if(theChannels)[theSupplies setObject:theChannels forKey:[NSNumber numberWithInt:[anHVCard slot]]];
+            if(theChannels)[theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
         }
         else if([anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")]){
             ORMPodCModel* aControllerCard = (ORMPodCModel*)anObj;
@@ -266,12 +266,11 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
         }
     }
     
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            systemParams, @"system",
-                            theSupplies,  @"supplies",
-                            [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
-                            [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
-                            nil];
+    NSMutableDictionary* values = [NSMutableDictionary dictionary];
+    if([systemParams count])[values setObject:systemParams forKey:@"system"];
+    if([theSupplies count]) [values setObject:theSupplies forKey:@"supplies"];
+    [values setObject:[NSNumber numberWithInt:numChannelsWithVoltage] forKey:@"numberChannelsOn"];
+    [values setObject:[NSNumber numberWithInt:numChannelsRamping] forKey:@"numberChannelsRamping"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
