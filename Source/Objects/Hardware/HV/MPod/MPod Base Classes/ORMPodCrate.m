@@ -251,6 +251,8 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
             for(i=0;i<[anHVCard numberOfChannels];i++){
                 NSMutableDictionary* params = [[anHVCard rdParams:i]mutableCopy];
                 if(params){
+					[params setObject:[NSNumber numberWithInt:[anHVCard target:i]]     forKey:@"target"];
+					[params setObject:[NSNumber numberWithFloat:[anHVCard maxCurrent:i]] forKey:@"maxCurrent"];
                     [params setObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
                     [theChannels addObject:params];
                 }
