@@ -357,7 +357,7 @@
 	//BOOL portOpen = [[model serialPort] isOpen];
     [lockButton setState: locked];
 	[serialPortController updateButtons:locked];
-    [modeTimeField setEnabled:!locked && ([model mode]==kNMon5085Integrate)];
+    [modeTimeField setEnabled:!locked && (([model mode]==kNMon5085Integrate) || ([model mode]==kNMon5085Scaler))];
     [modePU setEnabled:![model isRunning]];
     [runButton setTitle:[model isRunning]?@"Stop":@"Load HW/Start"];
  }
