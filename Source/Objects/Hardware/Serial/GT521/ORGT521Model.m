@@ -28,7 +28,6 @@
 #pragma mark ***External Strings
 NSString* ORGT521ModelProbeAttachedChanged  = @"ORGT521ModelProbeAttachedChanged";
 NSString* ORGT521ModelCorrectionTypeChanged = @"ORGT521ModelCorrectionTypeChanged";
-NSString* ORGT521ModelUsingCentigradeChanged = @"ORGT521ModelUsingCentigradeChanged";
 NSString* ORGT521ModelAutoCountChanged      = @"ORGT521ModelAutoCountChanged";
 NSString* ORGT521ModelTemperatureChanged    = @"ORGT521ModelTemperatureChanged";
 NSString* ORGT521ModelHumidityChanged       = @"ORGT521ModelHumidityChanged";
@@ -160,18 +159,6 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     correctionType = aCorrectionType;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelCorrectionTypeChanged object:self];
-}
-
-- (BOOL) usingCentigrade
-{
-    return usingCentigrade;
-}
-
-- (void) setUsingCentigrade:(BOOL)aUsingCentigrade
-{
-    usingCentigrade = aUsingCentigrade;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelUsingCentigradeChanged object:self];
 }
 
 - (BOOL) autoCount

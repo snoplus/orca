@@ -60,7 +60,6 @@
         float       humidity;
         float       temperature;
         BOOL        restart;
-        BOOL        usingCentigrade;
         BOOL        autoCount;
         int         correctionType;
         BOOL        probeAttached;
@@ -80,8 +79,6 @@
 - (void) setProbeAttached:(BOOL)aProbeAttached;
 - (int)  correctionType;
 - (void) setCorrectionType:(int)aCorrectionType;
-- (BOOL) usingCentigrade;
-- (void) setUsingCentigrade:(BOOL)aUsingCentigrade;
 - (BOOL) autoCount;
 - (void) setAutoCount:(BOOL)aAutoCount;
 - (float) temperature;
@@ -156,7 +153,6 @@
 
 extern NSString* ORGT521ModelProbeAttachedChanged;
 extern NSString* ORGT521ModelCorrectionTypeChanged;
-extern NSString* ORGT521ModelUsingCentigradeChanged;
 extern NSString* ORGT521ModelAutoCountChanged;
 extern NSString* ORGT521ModelTemperatureChanged;
 extern NSString* ORGT521ModelHumidityChanged;

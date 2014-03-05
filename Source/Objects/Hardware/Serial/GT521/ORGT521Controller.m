@@ -210,12 +210,6 @@
                          name : ORGT521ModelTemperatureChanged
 						object: model];
 
-
-    [notifyCenter addObserver : self
-                     selector : @selector(usingCentigradeChanged:)
-                         name : ORGT521ModelUsingCentigradeChanged
-						object: model];
-
     [notifyCenter addObserver : self
                      selector : @selector(correctionTypeChanged:)
                          name : ORGT521ModelCorrectionTypeChanged
@@ -251,7 +245,6 @@
 	[self locationChanged:nil];
 	[self humidityChanged:nil];
 	[self temperatureChanged:nil];
-	[self usingCentigradeChanged:nil];
 	[self correctionTypeChanged:nil];
 	[self probeAttachedChanged:nil];
 }
@@ -269,12 +262,6 @@
         else if([model correctionType] == kGT521CubicLiter) [measurementTitleField setStringValue:@"Counts/Liter"];
     }
 }
-
-- (void) usingCentigradeChanged:(NSNotification*)aNote
-{
-	[usingCentigradeTextField setStringValue: [model usingCentigrade]?@"C":@"F"];
-}
-
 
 - (void) temperatureChanged:(NSNotification*)aNote
 {

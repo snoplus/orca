@@ -26,7 +26,6 @@
     IBOutlet NSTextField* lockDocField;
 	IBOutlet NSTextField* probeAttachedTextField;
 	IBOutlet NSTextField* correctionTypeTextField;
-	IBOutlet NSTextField* usingCentigradeTextField;
 	IBOutlet NSTextField* temperatureTextField;
 	IBOutlet NSTextField* humidityTextField;
 	IBOutlet NSTextField* locationField;
@@ -65,7 +64,6 @@
 #pragma mark ***Interface Management
 - (void) probeAttachedChanged:(NSNotification*)aNote;
 - (void) correctionTypeChanged:(NSNotification*)aNote;
-- (void) usingCentigradeChanged:(NSNotification*)aNote;
 - (void) temperatureChanged:(NSNotification*)aNote;
 - (void) humidityChanged:(NSNotification*)aNote;
 - (void) locationChanged:(NSNotification*)aNote;
