@@ -179,12 +179,7 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 
 - (void) setTimeUtilStop:(int)aTimeUtilStop
 {
-    if(timeUtilStop != aTimeUtilStop){
-        [self setIsRunning:YES];
-        [self performSelector:@selector(runTimeOut) withObject:nil afterDelay:kHWPollTime+3];
-    }
-    
-    timeUtilStop = aTimeUtilStop;
+     timeUtilStop = aTimeUtilStop;
     
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNMon5085ModelTimeUtilStopChanged object:self];
@@ -197,7 +192,6 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 
 - (void) setIsRunning:(BOOL)aVaue
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(runTimeOut) object:nil];
     isRunning = aVaue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNMon5085ModelIsRunningChanged object:self];
 }
@@ -285,11 +279,6 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNMon5085ModelRadValueChanged object:self];
 }
 
-- (void) runTimeOut
-{
-    [self setIsRunning:NO];
-}
-
 - (int) modeTime
 {
     return modeTime;
@@ -324,6 +313,7 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 
 - (void) firstActionAfterOpeningPort
 {
+    firstPoll = YES;
     [self pollHW];
 }
 
@@ -351,6 +341,7 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 #pragma mark •••Commands
 - (void) sendMode
 {
+    
     NSString* modeCmd[4] = {@"R",@"I",@"C",@"S"};
     if(mode>=0 && mode<4){
         [self enqueueCmd:@"M"];
@@ -358,9 +349,60 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
     }
 }
 
+- (NSString*) modeString
+{
+    switch(mode){
+        case kNMon5085RateMode:     return @"Rate Mode";
+        case kNMon5085Integrate:    return @"Integrate Mode";
+        case kNMon5085CountsPerS:   return @"Counts/Sec";
+        case kNMon5085Scaler:       return @"Scaler Mode";
+        default: return @"?";
+    }
+    return @"?";
+}
+
+- (void) sendStart
+{
+    NSLog(@"Started Neutron Monitor (%@)\n",[self modeString]);
+    
+    if(mode == kNMon5085Scaler || 
+       mode == kNMon5085Integrate) autoRestart  = YES;
+    else                           autoRestart  = NO;
+    
+    if(mode == kNMon5085Scaler || mode == kNMon5085Integrate){
+        [self enqueueCmd:@"S"];
+        [self startCountDown];
+    }
+    else {
+        [self enqueueCmd:@"Q"];
+    }
+}
+
+- (void) startCountDown
+{
+    [self setTimeUtilStop:modeTime];
+    [self performSelector:@selector(countDown) withObject:nil afterDelay:1];
+}
+
+- (void) cancelCountDown
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(countDown) object:nil];  
+    [self setTimeUtilStop:0];
+}
+
+- (void) countDown
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(countDown) object:nil];
+    int newTime = timeUtilStop-1;
+    if(newTime<=0)newTime=0;
+    [self setTimeUtilStop:newTime];
+    if(newTime!=0){
+        [self performSelector:@selector(countDown) withObject:nil afterDelay:1];     
+    }
+}
 - (void) sendTime
 {
-    if(mode == kNMon5085Integrate){
+    if(mode == kNMon5085Integrate || mode == kNMon5085Scaler){
         
         int t = modeTime;
         int h = t / 3600;
@@ -376,35 +418,41 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
     }
 }
 
-- (void) initHW
-{
-    [self sendMode];
-    [self sendTime];
-}
-
 - (void) toggleRun
 {
-    [self initHW];
-    //if(isRunning){
+    if(!isRunning){
+        forcedStop = NO;
+        [self sendMode];
+        [self sendTime];
+        [self sendStart];
+        [self setIsRunning:YES];
+        [self pollHW];
+    }
+    
+    else {
+        switch([self mode]){
+            case kNMon5085Integrate:
+            case kNMon5085Scaler:
+                autoRestart = NO;
+                [self enqueueCmd:@"S"];
+            break;
+            case kNMon5085RateMode:
+            case kNMon5085CountsPerS:
+                [self enqueueCmd:@"Q"];
+            break;
+        }
+        forcedStop = YES;
+        [self setIsRunning:NO];
+        [self cancelCountDown];
+        NSLog(@"Stopped Neutron Monitor (%@)\n",[self modeString]);
 
-    switch([self mode]){
-        case kNMon5085Integrate:
-        case kNMon5085Scaler:
-            [self enqueueCmd:@"S"];
-            break;
-        case kNMon5085RateMode:
-        case kNMon5085CountsPerS:
-            [self enqueueCmd:@"Q"];
-            break;
-            
+
     }
 }
 
 - (void) pollHW
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
     [self enqueueCmd:@"V"];
-    [self performSelector:@selector(pollHW) withObject:nil afterDelay:kHWPollTime];
 }
 
 - (void) enqueueCmd:(id)aCmd
@@ -468,53 +516,89 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
     else if([aString rangeOfString:@"?"].location != NSNotFound)return;
     else {
         @try {
-            if([aString rangeOfString:@"mrem/h"].location!= NSNotFound){                            
+            if([aString hasPrefix:@"rate mode"]){
+                [self setActualMode:@"Rate"];
+                if(firstPoll){
+                    firstPoll = NO;
+                    [[self undoManager] disableUndoRegistration];
+                    [self setMode:kNMon5085RateMode];
+                    [[self undoManager] enableUndoRegistration];
+                }
+            }
+            else if([aString hasPrefix:@"integrate mode"]) {
+                [self setActualMode:@"Integrate"];
+                if(firstPoll){
+                    firstPoll = NO;
+                    [[self undoManager] disableUndoRegistration];
+                    [self setMode:kNMon5085Integrate];
+                    [[self undoManager] enableUndoRegistration];
+                }
+            }
+            
+            else if([aString hasPrefix:@"scaler mode"]) {
+                [self setActualMode:@"Scaler"];
+                if(firstPoll){
+                    firstPoll = NO;
+                    [[self undoManager] disableUndoRegistration];
+                    [self setMode:kNMon5085Scaler];
+                    [[self undoManager] enableUndoRegistration];
+                }
+            }
+            
+            else if([aString hasPrefix:@"CPS mode"]) {
+                [self setActualMode:@"CPS"];
+                if(firstPoll){
+                    firstPoll = NO;
+                    [[self undoManager] disableUndoRegistration];
+                    [self setMode:kNMon5085CountsPerS];
+                    [[self undoManager] enableUndoRegistration];
+                }
+            }
+            else if([aString rangeOfString:@"uSv/h"].location!= NSNotFound){                            
+                [self setRadValue:[aString floatValue]];
+                NSArray* parts = [aString componentsSeparatedByString:@" "];
+                if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:5]];
+                if(!forcedStop)[self setIsRunning:YES];
+            }
+            else if([aString rangeOfString:@"mrem/h"].location!= NSNotFound){                            
                 [self setRadValue:[aString floatValue]];
                 NSArray* parts = [aString componentsSeparatedByString:@" "];
                 if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:6]];
-                
-                [self setIsRunning:YES];
-                [self performSelector:@selector(runTimeOut) withObject:nil afterDelay:3];
-                //no polling in this mode
-                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
+                if(!forcedStop)[self setIsRunning:YES];
             }
             
+            else if([aString rangeOfString:@"running"].location!= NSNotFound){
+                [self setIsRunning:YES];
+            }
+                
             else if([aString rangeOfString:@"CPS"].location!= NSNotFound){
                 [self setRadValue:[aString floatValue]];
+                if(!forcedStop)[self setIsRunning:YES];
                 NSArray* parts = [aString componentsSeparatedByString:@" "];
                 if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:3]];
-                
-                [self setIsRunning:YES];
-                [self setActualMode:@"Counts/Sec"];
-                //no polling in this mode
-                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
             }
-            else if([aString rangeOfString:@"cts"].location!= NSNotFound){
+            
+            else if([aString rangeOfString:@"cts"].location!= NSNotFound ||
+                    [aString rangeOfString:@"nSv"].location!= NSNotFound){
                 [self setRadValue:[[aString substringFromIndex:5] floatValue]];
                 NSArray* parts = [aString componentsSeparatedByString:@" "];
-                if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:3]];
-                [self setIsRunning:YES];
+                if([parts count]>=3) [self setUnits:[[parts objectAtIndex:2] substringToIndex:3]];
                 [self enqueueCmd:@"S"]; //reset
-                [self toggleRun];
-                //no polling in this mode
-                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
+                if(autoRestart){
+                    [self enqueueCmd:@"S"]; //restart
+                    [self startCountDown];
+                }
+                else [self setIsRunning:NO];
             }
-            else if([aString hasPrefix:@"rate mode"])      [self setActualMode:@"Rate"];
-            else if([aString hasPrefix:@"integrate mode"]) [self setActualMode:@"Integrate"];
-            else if([aString hasPrefix:@"scaler mode"])    [self setActualMode:@"Scaler"];
+ 
             else if([aString hasPrefix:@"discriminator:"]) [self setDiscriminator:[[aString substringFromIndex:14] intValue]];
             else if([aString hasPrefix:@"deadtime:"])      [self setDeadtime:[[aString substringFromIndex:9] intValue]];
             else if([aString hasPrefix:@"HV:"])            [self setHighVoltage:[[aString substringFromIndex:4] intValue]];
             else if([aString hasPrefix:@"calibration:"])   [self setCalibrationValue:[[aString substringFromIndex:12] floatValue]];
-            else if([aString hasPrefix:@"time ="])         [self setTimeUtilStop:[self processHHMMSS:[aString substringWithRange:NSMakeRange(7,8)]]];
-            else if([aString rangeOfString:@"stop time:"].location!=NSNotFound){
-                [self setTimeUtilStop:[self processHHMMSS:[aString substringFromIndex:[aString rangeOfString:@"stop time:"].location+10]]];
-                
-            }
+  
             else if([aString hasPrefix:@"data:"]){
                 [self setRadValue:[[aString substringWithRange:NSMakeRange(5,6)] floatValue]];
                 [self setUnits:[aString substringWithRange:NSMakeRange(10,4)]];
-                if(timeUtilStop==0)[self toggleRun];
 
             }
         }

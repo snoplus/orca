@@ -231,7 +231,8 @@
 
 - (void) timeUtilStopChanged:(NSNotification*)aNote
 {
-    if([model mode] == kNMon5085Integrate){
+    if(([model mode] == kNMon5085Integrate) || 
+       ([model mode] == kNMon5085Scaler)){
         int t = [model timeUtilStop];
         int h = t / 3600;
         t = t % 3600;

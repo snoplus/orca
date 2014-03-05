@@ -47,6 +47,9 @@
         int             highVoltage;
         NSDate*         dateOfMaxRadValue;
         float           maxRadValue;
+        BOOL            autoRestart;
+        BOOL            firstPoll;
+        BOOL            forcedStop;
 }
 
 #pragma mark •••Initialization
@@ -85,12 +88,16 @@
 - (BOOL)    isLog;
 - (void)    setIsLog:(BOOL)aIsLog;
 - (ORTimeRate*)timeRate;
-- (void)    runTimeOut;
 - (int)     processHHMMSS:(NSString*)aString;
-
+- (void)    startCountDown;
+- (void)    cancelCountDown;
+- (void)    countDown;
+- (NSString*) modeString
+;
 #pragma mark •••Commands
-- (void) initHW;
 - (void) toggleRun;
+- (void) sendMode;
+- (void) sendStart;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
