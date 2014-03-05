@@ -389,6 +389,7 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
 
     switch([self mode]){
         case kNMon5085Integrate:
+        case kNMon5085Scaler:
             [self enqueueCmd:@"S"];
             break;
         case kNMon5085RateMode:
@@ -485,12 +486,22 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
                 
                 [self setIsRunning:YES];
                 [self setActualMode:@"Counts/Sec"];
-                [self performSelector:@selector(runTimeOut) withObject:nil afterDelay:3];
+                //no polling in this mode
+                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
+            }
+            else if([aString rangeOfString:@"cts"].location!= NSNotFound){
+                [self setRadValue:[[aString substringFromIndex:5] floatValue]];
+                NSArray* parts = [aString componentsSeparatedByString:@" "];
+                if([parts count]>=2) [self setUnits:[[parts objectAtIndex:1] substringToIndex:3]];
+                [self setIsRunning:YES];
+                [self enqueueCmd:@"S"]; //reset
+                [self toggleRun];
                 //no polling in this mode
                 [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHW) object:nil];
             }
             else if([aString hasPrefix:@"rate mode"])      [self setActualMode:@"Rate"];
             else if([aString hasPrefix:@"integrate mode"]) [self setActualMode:@"Integrate"];
+            else if([aString hasPrefix:@"scaler mode"])    [self setActualMode:@"Scaler"];
             else if([aString hasPrefix:@"discriminator:"]) [self setDiscriminator:[[aString substringFromIndex:14] intValue]];
             else if([aString hasPrefix:@"deadtime:"])      [self setDeadtime:[[aString substringFromIndex:9] intValue]];
             else if([aString hasPrefix:@"HV:"])            [self setHighVoltage:[[aString substringFromIndex:4] intValue]];
