@@ -470,7 +470,6 @@
     [self postrecntChanged:nil];
 	[self noiseWindowChanged:nil];
 	[self ccLowResChanged:nil];
-	[self firmwareStatusStringChanged:nil];
 	[self baselineRestoredDelayChanged:nil];
 }
 
