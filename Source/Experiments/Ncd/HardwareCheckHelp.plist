@@ -7,7 +7,7 @@ At the start of a run the state of the hardware is checked against an earlier sn
 
 Something has changed as compared to the snapshot. See the status log for more information.
 
-This alarm will go away when the current state matches the snapshot. You can capture the current state using the controls on the NCD dialog.
+This alarm will go away when the current state matches the snapshot. You can capture the current state using the controls on the Experiment dialog.
 
 Acknowledging this alarm will silence it. 
 </string>
