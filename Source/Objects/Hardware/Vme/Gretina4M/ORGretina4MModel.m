@@ -361,7 +361,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (NSString*) firmwareStatusString
 {
-    if([firmwareStatusString length]==0)return @"--";
+    if(!firmwareStatusString)return @"--";
     else return firmwareStatusString;
 }
 
