@@ -185,7 +185,7 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(maxVoltageChanged:)
-                         name : ORiSegHVCardRequestHVMaxValues
+                         name : ORiSegHVCardMaxVoltageChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -516,7 +516,6 @@
 		[panicAllButton setTitle:@"All HV OFF"];
 		[clearAllPanicButton setEnabled:NO];
 	}
-    [targetField setEnabled:YES]; //temp
 
 }
 

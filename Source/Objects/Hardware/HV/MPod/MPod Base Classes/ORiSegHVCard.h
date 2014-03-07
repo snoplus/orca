@@ -229,3 +229,4 @@ extern NSString* ORiSegHVCardExceptionCountChanged;
 extern NSString* ORiSegHVCardConstraintsChanged;
 extern NSString* ORiSegHVCardRequestHVMaxValues;
 extern NSString* ORiSegHVCardChanNameChanged;
+
