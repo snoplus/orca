@@ -30,6 +30,7 @@
 #import "OR1DHistoPlot.h"
 #import "ORPlotView.h"
 #import "ORCompositePlotView.h"
+#import "ORiSegHVCard.h"
 
 @implementation MajoranaController
 #pragma mark ¥¥¥Initialization
@@ -178,8 +179,9 @@
     
 	//details
 	[secondaryValuesView reloadData];
-
 }
+
+
 - (void) stringMapChanged:(NSNotification*)aNote
 {
 	[stringMapTableView reloadData];
@@ -284,6 +286,11 @@
 {
 	[super mapFileRead:mapFileRead];
 	[self stringMapChanged:nil];
+    int n = [[model segmentGroup:0] numSegments];
+    int i;
+    for(i=0;i<n;i++){
+        [self forceHVUpdate:i];
+    }
 }
 
 #pragma mark ¥¥¥Details Interface Management
@@ -573,9 +580,19 @@
 }
 - (void) forceHVUpdate:(int)segIndex
 {
-//    ORDetectorSegment* aSegment = [[model segmentGroup:0] segment:segIndex];
+    ORDetectorSegment* aSegment = [[model segmentGroup:0] segment:segIndex];
     //find the HV card
-//    NSArray* objs = [[model document] collectObjectsOfClass:NSClassFromString(@"ORiSegHVCard")];
-//    NSLog(@"%@\n",objs);
+    NSArray* hvCards = [[model document] collectObjectsOfClass:NSClassFromString(@"ORiSegHVCard")];
+    for(ORiSegHVCard* aHVCard in hvCards){
+        int crateNum  = [[[aSegment params] objectForKey:@"kHVCrate"] intValue];
+		int cardNum   = [[[aSegment params] objectForKey:@"kHVCard"] intValue];
+		int chanNum   = [[[aSegment params] objectForKey:@"kHVChan"] intValue];
+        NSLog(@"%d: %d   %d; %d\n",[aHVCard crateNumber],crateNum,[aHVCard slot],cardNum);
+        if([aHVCard crateNumber] != crateNum) continue;
+        if([aHVCard slot]        != cardNum) continue;
+        [aHVCard setMaxVoltage:chanNum withValue:[[[aSegment params] objectForKey:@"kMaxVoltage"] intValue] ];
+        [aHVCard setChan:chanNum name:[[aSegment params] objectForKey:@"kDetectorName"]];
+        break;
+    }
 }
 @end
