@@ -68,7 +68,8 @@ enum {
 	NSMutableDictionary* rdParams[16];
     int				selectedChannel;
     float			maxCurrent[16];
-	
+    int             maxVoltage[16];
+	NSString*       chanName[16];
 	ORTimeRate*		voltageHistory[16];
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
@@ -94,6 +95,11 @@ enum {
 - (NSString*) name;
 - (BOOL)	shipRecords;
 - (void)	setShipRecords:(BOOL)aShipRecords;
+- (int)     maxVoltage:(short)chan;
+- (void)	setMaxVoltage:(short)chan withValue:(int)aValue;
+- (NSString*) chanName:(short)chan;
+- (void)	setChan:(short)chan name:(NSString*)aName;
+- (int)     supplyVoltageLimit;
 - (float)	maxCurrent:(short)chan;
 - (void)	setMaxCurrent:(short)chan withValue:(float)aMaxCurrent;
 - (int)		selectedChannel;
@@ -127,6 +133,7 @@ enum {
 - (BOOL) hvOnAnyChannel;
 - (NSMutableDictionary*) rdParams:(int)i;
 - (BOOL) constraintsInPlace;
+- (void) requestMaxValues:(int)aChannel;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
@@ -208,6 +215,7 @@ enum {
 @end
 
 extern NSString* ORiSegHVCardShipRecordsChanged;
+extern NSString* ORiSegHVCardMaxVoltageChanged;
 extern NSString* ORiSegHVCardMaxCurrentChanged;
 extern NSString* ORiSegHVCardSelectedChannelChanged;
 extern NSString* ORiSegHVCardRiseRateChanged;
@@ -219,3 +227,5 @@ extern NSString* ORiSegHVCardOutputSwitchChanged;
 extern NSString* ORiSegHVCardChannelReadParamsChanged;
 extern NSString* ORiSegHVCardExceptionCountChanged;
 extern NSString* ORiSegHVCardConstraintsChanged;
+extern NSString* ORiSegHVCardRequestHVMaxValues;
+extern NSString* ORiSegHVCardChanNameChanged;

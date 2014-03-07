@@ -183,6 +183,16 @@
                          name : ORiSegHVCardConstraintsChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(maxVoltageChanged:)
+                         name : ORiSegHVCardRequestHVMaxValues
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(chanNameChanged:)
+                         name : ORiSegHVCardChanNameChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -199,9 +209,20 @@
 	[self maxCurrentChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self constraintsChanged:nil];
+	[self maxVoltageChanged:nil];
+	[self chanNameChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) maxVoltageChanged:(NSNotification*)aNote
+{
+    [maxVoltageField setStringValue:[NSString stringWithFormat:@"Max: %d",[model maxVoltage:[model selectedChannel]]]];
+}
+
+- (void) chanNameChanged:(NSNotification*)aNote
+{
+    [chanNameField setStringValue:[model chanName:[model selectedChannel]]];
+}
 
 - (void) constraintsChanged:(NSNotification*)aNote
 {
@@ -495,6 +516,8 @@
 		[panicAllButton setTitle:@"All HV OFF"];
 		[clearAllPanicButton setEnabled:NO];
 	}
+    [targetField setEnabled:YES]; //temp
+
 }
 
 - (void) outputStatusChanged:(NSNotification*)aNote

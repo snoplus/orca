@@ -30,6 +30,7 @@
 
 NSString* ORiSegHVCardShipRecordsChanged		= @"ORiSegHVCardShipRecordsChanged";
 NSString* ORiSegHVCardMaxCurrentChanged         = @"ORiSegHVCardMaxCurrentChanged";
+NSString* ORiSegHVCardMaxVoltageChanged         = @"ORiSegHVCardMaxVoltageChanged";
 NSString* ORiSegHVCardSelectedChannelChanged	= @"ORiSegHVCardSelectedChannelChanged";
 NSString* ORiSegHVCardSettingsLock				= @"ORiSegHVCardSettingsLock";
 NSString* ORiSegHVCardHwGoalChanged             = @"ORiSegHVCardHwGoalChanged";
@@ -39,7 +40,9 @@ NSString* ORiSegHVCardOutputSwitchChanged		= @"ORiSegHVCardOutputSwitchChanged";
 NSString* ORiSegHVCardRiseRateChanged			= @"ORiSegHVCardRiseRateChanged";
 NSString* ORiSegHVCardChannelReadParamsChanged  = @"ORiSegHVCardChannelReadParamsChanged";
 NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountChanged";
-NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
+NSString* ORiSegHVCardConstraintsChanged		= @"ORiSegHVCardConstraintsChanged";
+NSString* ORiSegHVCardRequestHVMaxValues		= @"ORiSegHVCardRequestHVMaxValues";
+NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged";
 
 @implementation ORiSegHVCard
 
@@ -110,6 +113,12 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 - (BOOL) polarity
 {
 	return kPositivePolarity;
+}
+
+- (int) supplyVoltageLimit
+{
+    //subclassed should override
+    return kMaxVoltage;
 }
 
 
@@ -183,9 +192,28 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 {
     if(aSelectedChannel<0)aSelectedChannel=0;
     else if(aSelectedChannel>[self numberOfChannels])aSelectedChannel=[self numberOfChannels];
-    selectedChannel = aSelectedChannel;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardSelectedChannelChanged object:self];
+    if(aSelectedChannel != selectedChannel){
+    
+        selectedChannel = aSelectedChannel;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardSelectedChannelChanged object:self];
+        
+        [self requestMaxValues:selectedChannel];
+        
+    }
+}
+- (void) requestMaxValues:(int)aChannel
+{
+ 	if([self channelInBounds:aChannel]){
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:[self crateNumber]],      @"crate",
+                                  [NSNumber numberWithInt:[self slot]],             @"card",
+                                  [NSNumber numberWithInt:aChannel],                @"channel",
+                                  nil];
+    
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRequestHVMaxValues object:self userInfo:userInfo];
+    }
 }
 
 - (int) channel:(short)i readParamAsInt:(NSString*)name
@@ -725,7 +753,10 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 {
 	if([self channelInBounds:chan]){
 		if(aValue<0)aValue=0;
-		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
+		else {
+            int theMax = MIN([self supplyVoltageLimit],[self maxVoltage:chan]);
+            if(aValue>theMax)aValue = theMax;
+        }
 		hwGoal[chan] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardHwGoalChanged object:self];
 	}
@@ -755,6 +786,40 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardMaxCurrentChanged object:self];
 	}
 }
+- (NSString*) chanName:(short)chan
+{
+    if([self channelInBounds:chan]){
+        if(chanName[chan])return chanName[chan];
+        else return @"";
+    }
+    return @"";
+}
+
+- (void) setChan:(short)chan name:(NSString*)aName
+{
+    if([self channelInBounds:chan]){
+        [chanName[chan] autorelease];
+        chanName[chan] = [aName copy];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChanNameChanged object:self];
+    }
+}
+
+
+- (int) maxVoltage:(short)chan
+{
+	if([self channelInBounds:chan])return MIN([self supplyVoltageLimit],maxVoltage[chan]);
+	else return 0;
+}
+
+- (void) setMaxVoltage:(short)chan withValue:(int)aValue
+{
+	if([self channelInBounds:chan]){
+		if(aValue<0)aValue=0;
+		else if(aValue>[self supplyVoltageLimit])aValue = [self supplyVoltageLimit];
+		maxVoltage[chan] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardMaxVoltageChanged object:self];
+	}
+}
 
 - (int) target:(short)chan
 {
@@ -764,8 +829,14 @@ NSString* ORiSegHVCardConstraintsChanged				= @"ORiSegHVCardConstraintsChanged";
 - (void) setTarget:(short)chan withValue:(int)aValue
 {
 	if([self channelInBounds:chan]){
+        
+        [self requestMaxValues:chan];
+
 		if(aValue<0)aValue = -aValue;
-		else if(aValue>kMaxVoltage)aValue = kMaxVoltage;
+		else {
+            int theMax = MIN([self supplyVoltageLimit],[self maxVoltage:chan]);
+            if(aValue>theMax)aValue = theMax;
+        }
 		[[[self undoManager] prepareWithInvocationTarget:self] setTarget:chan withValue:target[chan]];
 		target[chan] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardTargetChanged object:self];

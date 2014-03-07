@@ -23,6 +23,7 @@
 #import "MajoranaModel.h"
 #import "MajoranaController.h"
 #import "ORSegmentGroup.h"
+#import "ORDetectorSegment.h"
 #import "ORMJDSegmentGroup.h"
 #import "ORRemoteSocketModel.h"
 #import "SynthesizeSingleton.h"
@@ -33,6 +34,7 @@
 #import "OROpSequenceQueue.h"
 #import "ORInvocationStep.h"
 #import "ORMPodCrateModel.h"
+#import "ORiSegHVCard.h"
 
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 NSString* ORMajoranaModelPollTimeChanged	= @"ORMajoranaModelPollTimeChanged";
@@ -94,6 +96,49 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //	return @"Majorana/Index.html";
 //}
 
+- (void) registerNotificationObservers
+{
+    [super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hvInfoRequest:)
+                         name : ORiSegHVCardRequestHVMaxValues
+                       object : nil];
+}
+
+- (void) hvInfoRequest:(NSNotification*)aNote
+{
+    if([[aNote object] isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+        ORiSegHVCard* anHVCard = [aNote object];
+        id userInfo     = [aNote userInfo];
+        int aCrate      = [[userInfo objectForKey:@"crate"]     intValue];
+        int aCard       = [[userInfo objectForKey:@"card"]      intValue];
+        int aChannel    = [[userInfo objectForKey:@"channel"]   intValue];
+        BOOL foundIt    = NO;
+        int aSet = 0; //for now only the detector can make this request
+        ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+        int numSegments = [self numberSegmentsInGroup:aSet];
+        int i;
+        for(i = 0; i<numSegments; i++){
+            NSDictionary* params = [[segmentGroup segment:i]params];
+            if(!params)break;
+            if([[params objectForKey:@"kHVCrate"]intValue] != aCrate)continue;
+            if([[params objectForKey:@"kHVCard"]intValue] != aCard)continue;
+            if([[params objectForKey:@"kHVChan"]intValue] != aChannel)continue;
+            //get here and it's a match
+            [anHVCard setMaxVoltage:aChannel withValue:[[params objectForKey:@"kMaxVoltage"] intValue] ];
+            [anHVCard setChan:aChannel name:[params objectForKey:@"kDetectorName"]];
+            foundIt = YES;
+            break;
+            
+        }
+        if(!foundIt){
+            [anHVCard setChan:aChannel name:@""];
+        }
+    }
+}
+
 - (int) pollTime
 {
     return pollTime;
@@ -148,6 +193,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCrate",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCard",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVChan",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kMaxVoltage",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorName",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
     }

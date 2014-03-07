@@ -50,7 +50,7 @@
                 NSArray* parts = [aLine componentsSeparatedByString:@","];
 
                 if(detectorIndex>=0 && detectorIndex < [segments count]){
-                    NSString* loGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
+                    NSString* loGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                                               [parts objectAtIndex:0],  //segment
                                               [parts objectAtIndex:1],  //VME
                                               [parts objectAtIndex:2],  //Card
@@ -59,8 +59,9 @@
                                               [parts objectAtIndex:6],  //HV Crate
                                               [parts objectAtIndex:7],  //HV Card
                                               [parts objectAtIndex:8],  //HV Chan
-                                              [parts objectAtIndex:9],  //Det Name
-                                              [parts objectAtIndex:10]  //Det Type
+                                              [parts objectAtIndex:9],  //Det Max Voltage
+                                              [parts objectAtIndex:10],  //Det Name
+                                              [parts objectAtIndex:11]  //Det Type
                                              ];
                     ORDetectorSegment* aSegment = [segments objectAtIndex:detectorIndex*2];
                     [aSegment decodeLine:loGainLine];
@@ -69,7 +70,7 @@
                     [aSegment setObject:[NSNumber numberWithInt:0] forKey:@"kGainType"];
                 }
                 if(detectorIndex>=0 && detectorIndex+1 < [segments count]){
-                    NSString* hiGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
+                    NSString* hiGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                                               [parts objectAtIndex:0], //segment
                                               [parts objectAtIndex:1], //VME
                                               [parts objectAtIndex:2], //Card
@@ -79,7 +80,8 @@
                                               [parts objectAtIndex:7], //HV Card
                                               [parts objectAtIndex:8], //HV Chan
                                               [parts objectAtIndex:9], //Det Name
-                                              [parts objectAtIndex:10] //Det Type
+                                              [parts objectAtIndex:10], //Det Max Voltage
+                                              [parts objectAtIndex:11] //Det Type
 
                                               ];
                     ORDetectorSegment* aSegment = [segments objectAtIndex:detectorIndex*2+1];
@@ -110,7 +112,7 @@
         NSArray* loGainPart = [loGainLine componentsSeparatedByString:@","];
         NSArray* hiGainPart = [hiGainLine componentsSeparatedByString:@","];
         int segNum = [[loGainPart objectAtIndex:0] intValue]/2;
-        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
+        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                              segNum,
                              [loGainPart objectAtIndex:1],  //VME
                              [loGainPart objectAtIndex:2],  //Card
@@ -121,7 +123,8 @@
                              [loGainPart objectAtIndex:6],  //HV Card
                              [loGainPart objectAtIndex:7],  //HV Chan
                              [loGainPart objectAtIndex:8],  //Detector Name
-                             [loGainPart objectAtIndex:9]   //Detector type
+                             [loGainPart objectAtIndex:9],  //Detector max Voltage
+                             [loGainPart objectAtIndex:10]   //Detector type
                    ];
         [theContents appendData:[aLine dataUsingEncoding:NSASCIIStringEncoding]];
         [theContents appendData:[@"\n" dataUsingEncoding:NSASCIIStringEncoding]];
@@ -160,7 +163,7 @@
         NSArray* loGainPart = [loGainLine componentsSeparatedByString:@","];
         NSArray* hiGainPart = [hiGainLine componentsSeparatedByString:@","];
         int segNum = i/2;
-        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
+        NSString* aLine =   [NSString stringWithFormat:@"%d,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                              segNum,
                              [loGainPart objectAtIndex:1],  //VME
                              [loGainPart objectAtIndex:2],  //Card
@@ -171,7 +174,8 @@
                              [loGainPart objectAtIndex:6],  //HV Card
                              [loGainPart objectAtIndex:7],  //HV Chan
                              [loGainPart objectAtIndex:8],  //Detector Name
-                             [loGainPart objectAtIndex:9]   //Detector Type
+                             [loGainPart objectAtIndex:9],  //Detector Max Voltage
+                             [loGainPart objectAtIndex:10]   //Detector Type
                              ];
 
         [theContents appendString:aLine];

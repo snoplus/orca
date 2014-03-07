@@ -54,7 +54,7 @@
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(500,700);
-	detectorMapViewSize	 = NSMakeSize(950,565);
+	detectorMapViewSize	 = NSMakeSize(990,565);
 	vetoMapViewSize		 = NSMakeSize(460,565);
 	
     blankView = [[NSView alloc] init];
@@ -526,6 +526,9 @@
         else {
             aSegment = [[model segmentGroup:0] segment:rowIndex*2];
             [aSegment setObject:anObject forKey:[aTableColumn identifier]];
+            if([[aTableColumn identifier] isEqualToString:@"kMaxVoltage"]){
+                [self forceHVUpdate:rowIndex*2];
+            }
             [aSegment setObject:[NSNumber numberWithInt:rowIndex] forKey:@"kDetector"];
             [aSegment setObject:[NSNumber numberWithInt:rowIndex*2] forKey:@"kSegmentNumber"];
           
@@ -568,5 +571,11 @@
 		}
 	}
 }
-
+- (void) forceHVUpdate:(int)segIndex
+{
+//    ORDetectorSegment* aSegment = [[model segmentGroup:0] segment:segIndex];
+    //find the HV card
+//    NSArray* objs = [[model document] collectObjectsOfClass:NSClassFromString(@"ORiSegHVCard")];
+//    NSLog(@"%@\n",objs);
+}
 @end

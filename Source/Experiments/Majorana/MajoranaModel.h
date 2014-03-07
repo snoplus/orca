@@ -55,6 +55,7 @@
 - (void) rampDownHV:(int)aCrate;
 - (id) scriptModel;
 - (NSArray*) scriptSteps;
+- (void) hvInfoRequest:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

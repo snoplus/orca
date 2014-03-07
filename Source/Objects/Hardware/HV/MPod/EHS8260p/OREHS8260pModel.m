@@ -61,6 +61,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 {
     return @"EHS8260p";
 }
+
 - (void) makeMainController
 {
     [self linkToController:@"OREHS8260pController"];
@@ -466,31 +467,31 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Low Voltage Threshold"];
-    [p setFormat:@"##0" upperLimit:5000 lowerLimit:1 stepSize:1 units:@"s"];
+    [p setFormat:@"##0" upperLimit:5000 lowerLimit:1 stepSize:1 units:@"V"];
     [p setSetMethod:@selector(setLowVoltageThreshold:withValue:) getMethod:@selector(lowVoltageThreshold:)];
     [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Low Voltage Step"];
-    [p setFormat:@"##0" upperLimit:500 lowerLimit:1 stepSize:1 units:@"s"];
+    [p setFormat:@"##0" upperLimit:500 lowerLimit:1 stepSize:1 units:@"V"];
     [p setSetMethod:@selector(setLowVoltageStep:withValue:) getMethod:@selector(lowVoltageStep)];
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Voltage Step"];
-    [p setFormat:@"##0" upperLimit:500 lowerLimit:1 stepSize:1 units:@"s"];
+    [p setFormat:@"##0" upperLimit:500 lowerLimit:1 stepSize:1 units:@"V"];
     [p setSetMethod:@selector(setVoltageStep:withValue:) getMethod:@selector(voltageStep)];
     [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Max Voltage"];
-    [p setFormat:@"##0" upperLimit:500 lowerLimit:1 stepSize:1 units:@"s"];
+    [p setFormat:@"##0" upperLimit:500 lowerLimit:1 stepSize:1 units:@"V"];
     [p setSetMethod:@selector(setMaxVoltage:withValue:) getMethod:@selector(maxVoltage)];
     [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Min Voltage"];
-    [p setFormat:@"##0" upperLimit:3300 lowerLimit:1 stepSize:1 units:@"s"];
+    [p setFormat:@"##0" upperLimit:3300 lowerLimit:1 stepSize:1 units:@"V"];
     [p setSetMethod:@selector(setMinVoltage:withValue:) getMethod:@selector(minVoltage)];
     [a addObject:p];
 
@@ -516,12 +517,17 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 - (int) lowVoltagestep:(int)i { return [self ramper:i].lowVoltageStep; }
 - (void) setVoltageStep:(int)i withValue:(int)aValue { [self ramper:i].voltageStep = aValue; }
 - (int) voltagestep:(int)i { return [self ramper:i].voltageStep; }
-- (void) setMaxVoltage:(int)i withValue:(int)aValue { [self ramper:i].maxVoltage = aValue; }
-- (int) maxVoltage:(int)i { return [self ramper:i].maxVoltage; }
 - (void) setMinVoltage:(int)i withValue:(int)aValue { [self ramper:i].minVoltage = aValue; }
 - (int) minVoltage:(int)i { return [self ramper:i].minVoltage; }
 - (void) setStepRampEnabled:(int)i withValue:(int)aValue { [self ramper:i].enabled = aValue; }
 - (int) stepRampEnabled:(int)i { return [self ramper:i].enabled; }
+- (void) setMaxVoltage:(int)i withValue:(int)aValue
+{
+    [self ramper:i].maxVoltage = MIN([self supplyVoltageLimit],aValue);
+    [super setMaxVoltage:i withValue:aValue];
+}
+- (int) maxVoltage:(int)i { return [self ramper:i].maxVoltage; }
+
 //----------------------------------------------------------------------------------------------
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
@@ -548,7 +554,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		ORDetectorRamper* aRamper = [[ORDetectorRamper alloc] initWithDelegate:self channel:i];
 		
 		//defaults
-		aRamper.maxVoltage    = 3300;
+		aRamper.maxVoltage    = [self maxVoltage:i];
 		aRamper.minVoltage    = 0;
 		aRamper.voltageStep   = 150;
 		aRamper.stepWait      = 10;

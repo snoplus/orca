@@ -39,7 +39,9 @@
 	IBOutlet NSTextField*   slotField;
 	IBOutlet NSTextField*	hwGoalField;
 	IBOutlet NSButton*      hvConstraintImage;
-	
+	IBOutlet NSTextField*   chanNameField;
+    IBOutlet NSTextField*   maxVoltageField;
+    
 	//details 
 	IBOutlet NSTextField*	targetField;
 	IBOutlet NSTextField*	voltageField;
@@ -88,6 +90,8 @@
 - (void) updateHistoryPlots:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
 - (void) deferedReadParamsUpdate:(NSNotification*)aNote;
+- (void) maxVoltageChanged:(NSNotification*)aNote;
+- (void) chanNameChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) shipRecordsAction:(id)sender;
