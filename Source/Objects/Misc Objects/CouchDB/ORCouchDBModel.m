@@ -40,10 +40,12 @@ NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationR
 NSString* ORCouchDBModelKeepHistoryChanged		= @"ORCouchDBModelKeepHistoryChanged";
 NSString* ORCouchDBModelStealthModeChanged		= @"ORCouchDBModelStealthModeChanged";
 NSString* ORCouchDBPasswordChanged				= @"ORCouchDBPasswordChanged";
+NSString* ORCouchDBPortNumberChanged            = @"ORCouchDBPortNumberChanged";
 NSString* ORCouchDBUserNameChanged				= @"ORCouchDBUserNameChanged";
 NSString* ORCouchDBRemoteHostNameChanged		= @"ORCouchDBRemoteHostNameChanged";
 NSString* ORCouchDBModelDBInfoChanged			= @"ORCouchDBModelDBInfoChanged";
 NSString* ORCouchDBLock							= @"ORCouchDBLock";
+NSString* ORCouchDBLocalHostNameChanged         = @"ORCouchDBLocalHostNameChanged";
 
 #define kCreateDB		 @"kCreateDB"
 #define kReplicateDB	 @"kReplicateDB"
@@ -86,12 +88,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 #pragma mark ***Initialization
 
+- (id) init
+{
+    self = [super init];
+    [self setPortNumber:kCouchDBPort];
+    return self;
+}
+
 - (void) dealloc
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [password release];
     [userName release];
+    [localHostName release];
     [remoteHostName release];
 	[docList release];
     [replicationAlarm release];
@@ -322,10 +332,24 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[[[self undoManager] prepareWithInvocationTarget:self] setPassword:password];
 		
 		[password autorelease];
-		password = [aPassword copy];    
+		password = ([aPassword length] == 0) ? nil : [aPassword copy];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBPasswordChanged object:self];
 	}
+}
+
+- (NSUInteger) portNumber
+{
+    return portNumber;
+}
+
+- (void) setPortNumber:(NSUInteger)aPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPortNumber:portNumber];
+    
+    portNumber = aPort;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBPortNumberChanged object:self];
 }
 
 - (NSString*) userName
@@ -339,7 +363,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		[[[self undoManager] prepareWithInvocationTarget:self] setUserName:userName];
 		
 		[userName autorelease];
-		userName = [aUserName copy];    
+		userName = ([aUserName length] == 0) ? nil : [aUserName copy];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBUserNameChanged object:self];
 	}
@@ -359,6 +383,23 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		remoteHostName = [aHostName copy];    
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBRemoteHostNameChanged object:self];
+	}
+}
+
+- (NSString*) localHostName
+{
+    return localHostName;
+}
+
+- (void) setLocalHostName:(NSString*)aHostName
+{
+	if(aHostName){
+		[[[self undoManager] prepareWithInvocationTarget:self] setLocalHostName:localHostName];
+		
+		[localHostName autorelease];
+		localHostName = [aHostName copy];
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBLocalHostNameChanged object:self];
 	}
 }
 
@@ -386,7 +427,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (ORCouchDB*) statusDBRef:(NSString*)aDatabaseName
 {
-	return [ORCouchDB couchHost:@"localhost" port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
+    if (localHostName == nil) {
+        [self setLocalHostName:@"localhost"];
+    }
+	return [ORCouchDB couchHost:localHostName port:portNumber username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (ORCouchDB*) historyDBRef
@@ -396,7 +440,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (ORCouchDB*) historyDBRef:(NSString*)aDatabaseName
 {
-	return [ORCouchDB couchHost:@"localhost" port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
+    if (localHostName == nil) {
+        [self setLocalHostName:@"localhost"];
+    }
+	return [ORCouchDB couchHost:localHostName port:portNumber username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (ORCouchDB*) remoteHistoryDBRef
@@ -407,7 +454,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName
 {
     if([remoteHostName length]==0)return nil;
-	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
+	else return [ORCouchDB couchHost:remoteHostName port:portNumber username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (ORCouchDB*) remoteDBRef
@@ -418,7 +465,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (ORCouchDB*) remoteDBRef:(NSString*)aDatabaseName
 {
     if([remoteHostName length]==0)return nil;
-	else return [ORCouchDB couchHost:remoteHostName port:kCouchDBPort username:userName pwd:password database:aDatabaseName delegate:self];
+	else return [ORCouchDB couchHost:remoteHostName port:portNumber username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
 - (void) createDatabase
@@ -1292,9 +1339,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [[self undoManager] disableUndoRegistration];
     [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
+    [self setLocalHostName:[decoder decodeObjectForKey:@"LocalHostName"]];
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
     [self setRemoteHostName:[decoder decodeObjectForKey:@"RemoteHostName"]];
     [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
+    [self setPortNumber:[decoder decodeIntegerForKey:@"PortNumber"]];
     
     customDataBases = [[decoder decodeObjectForKey:@"customDataBases"] retain];
     
@@ -1315,7 +1364,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeBool:stealthMode forKey:@"stealthMode"];
     [encoder encodeObject:password forKey:@"Password"];
+    [encoder encodeInteger:portNumber forKey:@"PortNumber"];
     [encoder encodeObject:userName forKey:@"UserName"];
+    [encoder encodeObject:localHostName forKey:@"LocalHostName"];
     [encoder encodeObject:remoteHostName forKey:@"RemoteHostName"];
     [encoder encodeBool:wasReplicationRunning forKey:@"wasReplicationRunning"];
     [encoder encodeObject:customDataBases forKey:@"customDataBases"];

@@ -22,10 +22,12 @@
 @interface ORCouchDBController : OrcaObjectController 
 {	
 	IBOutlet NSTextField* remoteHostNameField;
+	IBOutlet NSTextField* localHostNameField;
 	IBOutlet NSTextField* replicationRunningTextField;
 	IBOutlet NSButton*	  keepHistoryCB;
 	IBOutlet NSTextField* userNameField;
 	IBOutlet NSTextField* passwordField;
+	IBOutlet NSTextField* portField;
 	IBOutlet NSTextField* dataBaseNameField;
 	IBOutlet NSTextField* historyDataBaseNameField;
     IBOutlet NSButton*    couchDBLockButton;
@@ -45,8 +47,10 @@
 - (void) registerNotificationObservers;
 - (void) stealthModeChanged:(NSNotification*)aNote;
 - (void) remoteHostNameChanged:(NSNotification*)aNote;
+- (void) localHostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
+- (void) portChanged:(NSNotification*)aNote;
 - (void) dataBaseNameChanged:(NSNotification*)aNote;
 - (void) couchDBLockChanged:(NSNotification*)aNote;
 - (void) setQueCount:(NSNumber*)n;
@@ -58,8 +62,10 @@
 - (IBAction) keepHistoryAction:(id)sender;
 - (IBAction) stealthModeAction:(id)sender;
 - (IBAction) remoteHostNameAction:(id)sender;
+- (IBAction) localHostNameAction:(id)sender;
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passwordAction:(id)sender;
+- (IBAction) portAction:(id)sender;
 - (IBAction) couchDBLockAction:(id)sender;
 - (IBAction) createAction:(id)sender;
 - (IBAction) deleteAction:(id)sender;

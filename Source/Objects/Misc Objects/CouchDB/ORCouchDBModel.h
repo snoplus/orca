@@ -27,7 +27,9 @@
 	NSString*	remoteHostName;
     NSString*	userName;
     NSString*	password;
+    NSString*   localHostName;
 	BOOL		stealthMode;
+    NSUInteger  portNumber;
 	NSDictionary* dBInfo;
 	NSDictionary* dBHistoryInfo;
 	NSMutableArray* dataMonitors;
@@ -46,6 +48,7 @@
 }
 
 #pragma mark ***Initialization
+- (id) init;
 - (void) dealloc;
 
 #pragma mark ***Notifications
@@ -73,11 +76,15 @@
 - (BOOL) stealthMode;
 - (void) setStealthMode:(BOOL)aStealthMode;
 - (NSString*) password;
+- (void) setPortNumber:(NSUInteger)aPort;
+- (NSUInteger) portNumber;
 - (void) setPassword:(NSString*)aPassword;
 - (NSString*) userName;
 - (void) setUserName:(NSString*)aUserName;
 - (NSString*) remoteHostName;
 - (void) setRemoteHostName:(NSString*)aHostName;
+- (NSString*) localHostName;
+- (void) setLocalHostName:(NSString*)aHostName;
 - (id) nextObject;
 - (NSString*) databaseName;
 - (NSString*) historyDatabaseName;
@@ -127,10 +134,12 @@
 extern NSString* ORCouchDBModelReplicationRunningChanged;
 extern NSString* ORCouchDBModelKeepHistoryChanged;
 extern NSString* ORCouchDBPasswordChanged;
+extern NSString* ORCouchDBPortNumberChanged;
 extern NSString* ORCouchDBUserNameChanged;
 extern NSString* ORCouchDBRemoteHostNameChanged;
 extern NSString* ORCouchDBModelStealthModeChanged;
 extern NSString* ORCouchDBModelDBInfoChanged;
+extern NSString* ORCouchDBLocalHostNameChanged;
 extern NSString* ORCouchDBLock;
 
 

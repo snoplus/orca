@@ -88,7 +88,12 @@
                      selector : @selector(remoteHostNameChanged:)
                          name : ORCouchDBRemoteHostNameChanged
                        object : model];
-	
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(localHostNameChanged:)
+                         name : ORCouchDBLocalHostNameChanged
+                       object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(userNameChanged:)
                          name : ORCouchDBUserNameChanged
@@ -98,7 +103,12 @@
                      selector : @selector(passwordChanged:)
                          name : ORCouchDBPasswordChanged
                        object : model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(portChanged:)
+                         name : ORCouchDBPortNumberChanged
+                       object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(couchDBLockChanged:)
                          name : ORCouchDBLock
@@ -133,8 +143,10 @@
 {
 	[super updateWindow];
 	[self remoteHostNameChanged:nil];
+	[self localHostNameChanged:nil];
 	[self userNameChanged:nil];
 	[self passwordChanged:nil];
+	[self portChanged:nil];
 	[self dataBaseNameChanged:nil];
     [self couchDBLockChanged:nil];
 	[self stealthModeChanged:nil];
@@ -165,6 +177,11 @@
 	if([model remoteHostName])[remoteHostNameField setStringValue:[model remoteHostName]];
 }
 
+- (void) localHostNameChanged:(NSNotification*)aNote
+{
+	if([model localHostName])[localHostNameField   setStringValue:[model localHostName]];
+}
+
 - (void) userNameChanged:(NSNotification*)aNote
 {
 	if([model userName])[userNameField setStringValue:[model userName]];
@@ -173,6 +190,11 @@
 - (void) passwordChanged:(NSNotification*)aNote
 {
 	if([model password])[passwordField setStringValue:[model password]];
+}
+
+- (void) portChanged:(NSNotification*)aNote
+{
+    [portField setIntegerValue:[model portNumber]];
 }
 
 - (void) dataBaseNameChanged:(NSNotification*)aNote
@@ -187,6 +209,10 @@
     [couchDBLockButton setState: locked];
     
     [remoteHostNameField setEnabled:!locked];
+    [localHostNameField setEnabled:!locked];
+    [userNameField setEnabled:!locked];
+    [passwordField setEnabled:!locked];
+    [portField setEnabled:!locked];
     [keepHistoryCB setEnabled:!locked];
     [stealthModeButton setEnabled:!locked];
 }
@@ -272,6 +298,11 @@
 	[model setRemoteHostName:[sender stringValue]];
 }
 
+- (IBAction) localHostNameAction:(id)sender
+{
+	[model setLocalHostName:[sender stringValue]];
+}
+
 - (IBAction) userNameAction:(id)sender
 {
 	[model setUserName:[sender stringValue]];
@@ -282,6 +313,10 @@
 	[model setPassword:[sender stringValue]];
 }
 
+- (IBAction) portAction:(id)sender
+{
+	[model setPortNumber:[sender integerValue]];
+}
 
 - (IBAction) createAction:(id)sender
 {
