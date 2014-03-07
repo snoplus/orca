@@ -64,7 +64,7 @@
 
 - (void) version:(id)aDelegate tag:(NSString*)aTag
 {
-	ORCouchDBVersionOp* anOp = [[ORCouchDBVersionOp alloc] initWithHost:host port:port database:nil delegate:aDelegate tag:aTag];
+	ORCouchDBVersionOp* anOp = [[ORCouchDBVersionOp alloc] initWithHost:host username:username pwd:pwd port:port database:nil delegate:aDelegate tag:aTag];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -72,38 +72,34 @@
 #pragma mark •••DataBase API
 - (void) compactDatabase:(id)aDelegate tag:(NSString*)aTag
 {
-	ORCouchDBCompactDBOp* anOp = [[ORCouchDBCompactDBOp alloc] initWithHost:host port:port database:database delegate:aDelegate tag:aTag];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
+	ORCouchDBCompactDBOp* anOp = [[ORCouchDBCompactDBOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:aDelegate tag:aTag];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) databaseInfo:(id)aDelegate tag:(NSString*)aTag
 {
-	ORCouchDBInfoDBOp* anOp = [[ORCouchDBInfoDBOp alloc] initWithHost:host port:port database:database delegate:aDelegate tag:aTag];
+	ORCouchDBInfoDBOp* anOp = [[ORCouchDBInfoDBOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:aDelegate tag:aTag];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) listDatabases:(id)aDelegate tag:(NSString*)aTag
 {
-	ORCouchDBListDBOp* anOp = [[ORCouchDBListDBOp alloc] initWithHost:host port:port database:nil delegate:delegate tag:aTag];
+	ORCouchDBListDBOp* anOp = [[ORCouchDBListDBOp alloc] initWithHost:host username:username pwd:pwd port:port database:nil delegate:aDelegate tag:aTag];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag
 {
-	ORCouchDBListTasksOp* anOp = [[ORCouchDBListTasksOp alloc] initWithHost:host port:port database:nil delegate:delegate tag:aTag];
+	ORCouchDBListTasksOp* anOp = [[ORCouchDBListTasksOp alloc] initWithHost:host username:username pwd:pwd port:port database:nil delegate:aDelegate tag:aTag];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 - (void) createDatabase:(NSString*)aTag views:(NSDictionary*)theViews
 {
-	ORCouchDBCreateDBOp* anOp = [[ORCouchDBCreateDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
+	ORCouchDBCreateDBOp* anOp = [[ORCouchDBCreateDBOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	if(theViews)[anOp setViews:theViews];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
@@ -111,18 +107,14 @@
 
 - (void) deleteDatabase:(NSString*)aTag;
 {
-	ORCouchDBDeleteDBOp* anOp = [[ORCouchDBDeleteDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
+	ORCouchDBDeleteDBOp* anOp = [[ORCouchDBDeleteDBOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) replicateLocalDatabase:(NSString*)aTag continous:(BOOL)continuous
 {
-	ORCouchDBReplicateDBOp* anOp = [[ORCouchDBReplicateDBOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
+	ORCouchDBReplicateDBOp* anOp = [[ORCouchDBReplicateDBOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setContinuous:continuous];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
@@ -132,10 +124,8 @@
 #pragma mark •••Document API
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 {
-	ORCouchDBDeleteDocumentOp* anOp = [[ORCouchDBDeleteDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	ORCouchDBDeleteDocumentOp* anOp = [[ORCouchDBDeleteDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocumentId:anId];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -147,62 +137,50 @@
 
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
-	ORCouchDBPutDocumentOp* anOp = [[ORCouchDBPutDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	ORCouchDBPutDocumentOp* anOp = [[ORCouchDBPutDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
-	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
 {
-	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
 	[anOp setAttachment:someData];
 	[anOp setAttachmentName:aName];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) updateDocument:(NSDictionary *)aDict documentId:(NSString *)anId tag:(NSString *)aTag informingDelegate:(BOOL)ok
 {
-    ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+    ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
     [anOp setInformDelegate:ok];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 - (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
-	ORCouchDBUpdateEventCatalogOp* anOp = [[ORCouchDBUpdateEventCatalogOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	ORCouchDBUpdateEventCatalogOp* anOp = [[ORCouchDBUpdateEventCatalogOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocument:aDict documentID:anId];
-	[anOp setUsername:username];
-	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
 
 - (void) getDocumentId:(NSString*)anId  tag:(NSString*)aTag
 {
-	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag];
+	ORCouchDBGetDocumentOp* anOp = [[ORCouchDBGetDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
 	[anOp setDocumentId:anId];
-    [anOp setUsername:username];
-	[anOp setPwd:pwd];
 	[ORCouchDBQueue addOperation:anOp];
 	[anOp release];
 }
@@ -213,9 +191,7 @@
 }
 
 - (NSOperation*) changesFeedMode:(NSString*)mode Heartbeat:(NSUInteger)heartbeat Tag:(NSString*)aTag{
-    ORCouchDBChangesfeedOp* anOp=[[[ORCouchDBChangesfeedOp alloc] initWithHost:host port:port database:database delegate:delegate tag:aTag] autorelease];
-    [anOp setUsername:username];
-	[anOp setPwd:pwd];
+    ORCouchDBChangesfeedOp* anOp=[[[ORCouchDBChangesfeedOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag] autorelease];
     [anOp setListeningMode:mode];
     [anOp setHeartbeat:heartbeat];
 	[ORCouchDBQueue addOperation:anOp];
@@ -275,20 +251,25 @@
 
 @synthesize username,pwd;
 
-- (id) initWithHost:(NSString*)aHost port:(NSInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate tag:(NSString*)aTag;
+- (id) initWithHost:(NSString*)aHost username:(NSString*)aUN pwd:(NSString*)aPwd port:(NSInteger)aPort database:(NSString*)aDB delegate:(id)aDelegate tag:(NSString*)aTag
 {
 	self = [super init];
 	//normally a delegate would not be retained. In this case, we have
 	//to ensure that the delegate is still around when the op executes
 	//out of a thread
-	delegate = [aDelegate retain]; 
-	database = [aDatabase copy];
+	delegate = [aDelegate retain];
+	database = [aDB copy];
 	tag		 = [aTag copy];
 	host	 = [aHost copy];
 	port	 = aPort;
-	pwd = nil;
-	username = nil;
+	pwd      = [aPwd copy];
+	username = [aUN copy];
 	return self;
+}
+
+- (id) initWithHost:(NSString*)aHost port:(NSInteger)aPort database:(NSString*)aDatabase delegate:(id)aDelegate tag:(NSString*)aTag;
+{
+    return [self initWithHost:aHost username:nil pwd:nil port:aPort database:aDatabase delegate:aDelegate tag:aTag];
 }
 
 - (void) dealloc

@@ -80,6 +80,7 @@
 	NSHTTPURLResponse*	response;
 }
 - (id) initWithHost:(NSString*)aHost port:(NSInteger)aPort database:(NSString*)database delegate:(id)aDelegate tag:(NSString*)aTag;
+- (id) initWithHost:(NSString*)aHost username:(NSString*)aUN pwd:(NSString*)aPwd port:(NSInteger)aPort database:(NSString*)database delegate:(id)aDelegate tag:(NSString*)aTag;
 - (void) dealloc;
 - (id) send:(NSString*)httpString;
 - (id) send:(NSString*)httpString type:(NSString*)aType;
