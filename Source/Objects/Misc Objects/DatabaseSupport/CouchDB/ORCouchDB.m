@@ -255,6 +255,22 @@
 @end
 
 #pragma mark •••Threaded Ops
+@interface ORCouchDBOperation (private)
+- (void) _updateAuthentication:(NSMutableURLRequest*)request;
+@end
+
+@implementation ORCouchDBOperation (private)
+- (void) _updateAuthentication:(NSMutableURLRequest*)request
+{
+ 	if(username && pwd){
+        // Add username/password to header
+        NSString *authStr = [NSString stringWithFormat:@"%@:%@", username, pwd];
+        NSData *authData = [authStr dataUsingEncoding:NSASCIIStringEncoding];
+        NSString *authValue = [authData base64Encoding];
+        [request setValue:[NSString stringWithFormat:@"Basic %@",authValue] forHTTPHeaderField:@"Authorization"];
+	}
+}
+@end
 @implementation ORCouchDBOperation
 
 @synthesize username,pwd;
@@ -298,10 +314,6 @@
 
 - (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody
 {
-	if(username && pwd){
-		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
-	}
-    
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
     //[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
     [request setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
@@ -313,6 +325,7 @@
 		}
 	}
 	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
+    [self _updateAuthentication:request];
 	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
     
 	if (data) {
@@ -337,7 +350,6 @@
 }
 @end
 
-
 #pragma mark •••Database API
 
 
@@ -346,12 +358,10 @@
 {	
 	if([self isCancelled])return;
 	NSString* httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_compact", host, port,database];
-	if(username && pwd){
-		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
-	}
 	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
 	[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
 	[request setHTTPMethod:@"POST"];
+    [self _updateAuthentication:request];
 	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];	
 	YAJLDocument *document = nil;
 	if (data) {
@@ -500,11 +510,9 @@
 	if([self isCancelled])return;
 	NSString* escaped   = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSString* httpString = [NSString stringWithFormat:@"http://127.0.0.1:%u/_replicate", port];
-	if(username && pwd){
-		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
-	}
 	
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+    [self _updateAuthentication:request];
 	[request setHTTPMethod:@"POST"];
 	[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
 	NSString* target = [NSString stringWithFormat:@"http://%@:%d/%@",host,port,escaped];
@@ -574,9 +582,7 @@
 	else {
 		action = @"POST";
 		httpString = [NSString stringWithFormat:@"http://%@:%u/%@", host, port, database];
-	}	
-	
-	
+	}
 	id result = [self send:httpString type:action body:document];
 	if(!result){
 		result = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -599,11 +605,9 @@
 	NSString* rev = [self revision:documentId];
 	if(rev){
 		NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-		if(username && pwd){
-			httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
-		}
 		httpString = [httpString stringByAppendingFormat:@"/%@?rev=%@",attachmentName,rev];
 		NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+        [self _updateAuthentication:request];
 		[request setHTTPMethod:@"PUT"];
 		[request setHTTPBody:attachmentData];
 		
@@ -817,9 +821,6 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
     
     //get the current last_seq so we only receive changes from now on. if we want the complete history, set last_seq to 0
     NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_changes", host, port,database];
-    if(username && pwd){
-		httpString = [httpString stringByReplacingOccurrencesOfString:@"://" withString:[NSString stringWithFormat:@"://%@:%@@",username,pwd]];
-	}
     id result = [self send:httpString];
     NSNumber* last_seq;
     last_seq=(NSNumber*)[result objectForKey:@"last_seq"];
@@ -851,11 +852,20 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
     
     CFHTTPMessageSetBody(theRequest, bodyData);
     CFHTTPMessageSetHeaderFieldValue(theRequest, headerFieldName, headerFieldValue);
+    CFHTTPMessageRef msg = CFHTTPMessageCreateEmpty(NULL,FALSE);
+    if(username && pwd){
+        CFHTTPMessageAddAuthentication(theRequest,msg,
+                                       (__bridge CFStringRef)username,
+                                       (__bridge CFStringRef)pwd,
+                                       NULL,
+                                       FALSE);
+	}
     
     CFReadStreamRef _stream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, theRequest);
     
     CFRelease(bodyData);
     CFRelease(theURL);
+    CFRelease(msg);
     CFRelease(theRequest);
     
     CFStreamClientContext theContext={0,self,NULL,NULL,NULL};
