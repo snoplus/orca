@@ -275,6 +275,8 @@ enum Gretina4MFIFOStates {
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (unsigned short) baselineRestoredDelay;

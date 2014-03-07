@@ -31,6 +31,7 @@
 #import "ORVmeTests.h"
 #import "ORFileMoverOp.h"
 #import "MJDCmds.h"
+#import "ORRunModel.h"
 
 #define kCurrentFirmwareVersion 0x107
 #define kFPGARemotePath @"GretinaFPGA.bin"
@@ -232,6 +233,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[progressLock release];
     [fileQueue cancelAllOperations];
     [fileQueue release];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -278,6 +280,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[linkConnector setConnectorType: 'LNKI' ];
 	[linkConnector addRestrictedConnectionType: 'LNKO' ]; //can only connect to Link inputs
 	[linkConnector setOffColor:[NSColor colorWithCalibratedRed:1 green:1 blue:.3 alpha:1.]];
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self];
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+
 }
 
 - (void) setSlot:(int)aSlot
@@ -1167,7 +1180,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSLog(@"Gretina: 0x%0x   HV1: 0x%0x   HV2: 0x%0x\n",theValue1,theValue2,theValue3);
 }
 
+- (void) resetClock
+{
+    //this routine is temporary to see if we can reset the clock via software
+    [self writeRegister:kAuxIOConfig withValue:0x1001];
+    [self writeRegister:kAuxIOConfig withValue:0x1000];
 
+}
 
 - (void) resetDCM
 {
@@ -1388,7 +1407,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];
     }
-    [self resetFIFO];
     
     //write the card level params
     [self writeClockSource];
@@ -1412,12 +1430,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     //[ORTimer delay:.1];
     //enable channels
+    [self resetFIFO];
+
     for(i=0;i<kNumGretina4MChannels;i++){
         if([self enabled:i]){
             [self writeControlReg:i enabled:YES];
         }
     }
-    [self resetDCM];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
@@ -2227,6 +2246,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     else return [[cardDictionary objectForKey:param] objectAtIndex:aChannel];
 }
 
+
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     if(![[self adapter] controllerCard]){
@@ -2252,9 +2272,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self initBoard];
    
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
+}
 
-
-
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    //temporary until the trigger card is ready
+    [self resetClock];
 }
 
 //**************************************************************************************
@@ -2498,7 +2521,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setPresumEnabled:i withValue:[decoder decodeIntForKey:[@"PresumEnabled"         stringByAppendingFormat:@"%d",i]]];
         [self setEasySelected:i		withValue:[decoder decodeIntForKey:[@"easySelected"	    stringByAppendingFormat:@"%d",i]]];
 	}
-	
+    
+    [self registerNotificationObservers];
+
     [[self undoManager] enableUndoRegistration];
     
     return self;
