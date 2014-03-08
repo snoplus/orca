@@ -88,7 +88,6 @@
 - (void) readbackChanged:(NSNotification*)aNote;
 - (void) setValuesChanged:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
-- (void) hwFinderChanged:(NSNotification*)aNote;
 - (void) verbosityChanged:(NSNotification*)aNote;
 - (void) hardwareErrorSeen:(NSNotification*)aNote;
 - (void) channelModeChanged:(NSNotification*)aNote;

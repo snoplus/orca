@@ -20,7 +20,6 @@
 
 #import "ORTTCPX400DPController.h"
 #import "ORTTCPX400DPModel.h"
-#import "ORVXI11HardwareFinder.h"
 
 @interface ORTTCPX400DPController (private)
 - (void) _buildPopUpButtons;
@@ -49,11 +48,6 @@
 	[notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
 						 name : ORRunStatusChangedNotification
-					   object : nil];
-
-	[notifyCenter addObserver : self
-					 selector : @selector(hwFinderChanged:)
-						 name : ORHardwareFinderAvailableHardwareChanged
 					   object : nil];
     
     [notifyCenter addObserver : self
@@ -152,6 +146,7 @@
     [self outputStatusChanged:nil];
     [self channelModeChanged:nil];
     [self verbosityChanged:nil];
+    [self serialChanged:nil];
 }
 
 - (void) updateButtons
@@ -282,42 +277,6 @@
     [outputOnTwo setState:[model writeToSetOutputWithOutput:1]];    
 }
 
-- (void) hwFinderChanged:(NSNotification*)aNote
-{
-    NSString* serialNumber = [model serialNumber];
-    NSString* ipAddress = [model ipAddress];
-    if ([serialNumber isEqualToString:@""]) {
-        if([ipAddress isEqualToString:@""]) return;
-        // Otherwise try to set the serial Number
-        NSDictionary* dict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];
-        for (NSString* key in dict) {
-            ORVXI11IPDevice* dev = [dict objectForKey:key];
-            if ([[dev ipAddress] isEqualToString:ipAddress]) {
-                [model setSerialNumber:[dev serialNumber]];
-                break;
-            }
-        }
-    } else {
-        // Otherwise try to change the IP address
-        NSDictionary* dict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];
-        for (NSString* key in dict) {
-            ORVXI11IPDevice* dev = [dict objectForKey:key];
-            if ([[dev serialNumber] isEqualToString:serialNumber]) {
-                if ([ipAddress isEqualToString:[dev ipAddress]]) return;
-                
-                // Otherwise we need to ask for confirmation
-                if (NSRunAlertPanel(@"IP Address changed",
-                                [NSString stringWithFormat:@"The IP (%@) of %@,%@ has changed to %@.  Do you wish to allow this?",
-                                 [model ipAddress],[model objectName],[model serialNumber],[dev ipAddress]],
-                                    @"OK",@"Cancel", nil) == NSAlertDefaultReturn) {
-                    [model setIpAddress:[dev ipAddress]];
-                }
-                break;
-            }
-        }
-    }
-}
-
 - (void) hardwareErrorSeen:(NSNotification *)aNote
 {
     if ([aNote object] != model) return;
@@ -408,7 +367,7 @@
 
 - (IBAction)readBackAction:(id)sender
 {
-    [model readback];
+    [model readback:NO];
     [self checkAndClearErrorsAction:sender];
 }
 
@@ -445,8 +404,10 @@
     if ([outputOnOne state] == [outputOnTwo state]) {
         [model setAllOutputToBeOn:[outputOnOne state]];
     } else {
-        [model setOutput:0 toBeOn:[outputOnOne state]];
-        [model setOutput:1 toBeOn:[outputOnTwo state]];        
+        BOOL oneState = [outputOnOne state];
+        BOOL twoState = [outputOnTwo state];
+        [model setOutput:0 toBeOn:oneState];
+        [model setOutput:1 toBeOn:twoState];
     }
     [self performSelector:@selector(readBackAction:)
                withObject:nil

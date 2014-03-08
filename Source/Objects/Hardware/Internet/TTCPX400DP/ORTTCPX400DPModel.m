@@ -20,6 +20,7 @@
 
 #import "ORTTCPX400DPModel.h"
 #import "NetSocket.h"
+#import "ORVXI11HardwareFinder.h"
 
 #define ORTTCPX400DPPort 9221
 
@@ -52,6 +53,8 @@ struct ORTTCPX400DPCmdInfo;
 - (void) _connectSocket:(NSString*)anIpAddress;
 - (void) _setSocket:(NetSocket*)aSocket;
 - (void) _syncReadoutSetToModel;
+- (void) _registerNotificationObservers;
+- (void) _hwFinderChanged:(NSNotification*)aNote;
 
 @end
 
@@ -128,6 +131,7 @@ ORTTCPX_GEN_IMPLEMENT(CMD, TYPE,_, R, r, eadBack)                           \
 {                                                                           \
     assert(gORTTCPXCmds[k ## CMD].responds);                                \
     [self waitUntilCommandsDone];                                           \
+    if (![self isConnected]) return (TYPE)0;                                \
     [self _write ## CMD ## WithOutput:output];                              \
     [self waitUntilCommandsDone];                                           \
     return [self readBack ## CMD ## WithOutput:output];                     \
@@ -155,6 +159,7 @@ ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearLSR)
 ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearEER)
 ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearESR)
 ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearQER)
+ORTTCPX_READ_IMPLEMENT_NOTIFY(GetSTB)
 
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementVoltage)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(IncrementVoltageAndVerify)
@@ -191,7 +196,6 @@ ORTTCPX_READ_IMPLEMENT_NOTIFY(QueryAndClearQER)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(ResetToRemoteDflt)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(SetSRE)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetSRE)
-//ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetSTB)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetID)
 //ORTTCPX_WRITE_IMPLEMENT_NOTIFY(GetBusAddress)
 
@@ -258,7 +262,7 @@ static struct ORTTCPX400DPCmdInfo gORTTCPXCmds[kNumTTCPX400Cmds] = {
     {@"Get Ratio", @"RATIO?", YES, NO, NO, @"%f"}, //kGetRatio,
     {@"Clear Status", @"*CLS", NO, NO, NO, @""}, //kClearStatus,
     {@"Query and Clear EER", @"EER?", YES, NO, NO, @"%f"}, //kQueryAndClearEER,
-    {@"Set ESE", @"*ESE %i", NO, NO, YES, @""}, //kSetESE,
+    {@"Set ESE", @"*ESE %f", NO, NO, YES, @""}, //kSetESE,
     {@"Get ESE", @"*ESE?", YES, NO, NO, @"%i"}, //kGetESE,
     {@"Get and clear ESR", @"*ESR?", YES, NO, NO, @"%f"}, //kQueryAndClearESR,
     {@"Get IST Local", @"*IST?", YES, NO, NO, @"%f"}, //kGetISTLocalMsg,
@@ -297,6 +301,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearEER, int)
 ORTTCPX_READ_IMPLEMENT(QueryAndClearQER, int)
 ORTTCPX_READ_IMPLEMENT(QueryAndClearLSR, int)
 ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
+ORTTCPX_READ_IMPLEMENT(GetSTB, int)
 
 //ORTTCPX_WRITE_IMPLEMENT(IncrementVoltage, float)
 //ORTTCPX_WRITE_IMPLEMENT(IncrementVoltageAndVerify, float)
@@ -333,7 +338,6 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 //ORTTCPX_WRITE_IMPLEMENT(ResetToRemoteDflt, float)
 //ORTTCPX_WRITE_IMPLEMENT(SetSRE, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetSRE, float)
-//ORTTCPX_WRITE_IMPLEMENT(GetSTB, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetID, float)
 //ORTTCPX_WRITE_IMPLEMENT(GetBusAddress, float)
 
@@ -347,6 +351,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     [self setIpAddress:@""];
     [self setSerialNumber:@""];
     readConditionLock = [[NSCondition alloc] init];
+    [self _registerNotificationObservers];
     return self;
 }
 
@@ -457,12 +462,30 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
     [self reset];
     [self clearStatus];
     [self readback];
+    
+    // Make sure the error registers are set properly.
+    [self writeCommand:kSetESE
+              withInput:(float)0x3C
+         withOutputNumber:0];
+    
+    [self writeCommand:kSetEventStatusRegister
+              withInput:(float)0x4C
+         withOutputNumber:0];
+    
+    [self writeCommand:kSetEventStatusRegister
+              withInput:(float)0x4C
+         withOutputNumber:1];
+    
+    [self writeCommand:kSetSRE
+             withInput:(float)0x33
+      withOutputNumber:0];
+    
     [self performSelectorInBackground:@selector(_syncReadoutSetToModel) withObject:nil];
 }
 
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
 {
-	if(inNetSocket != socket) return;
+	//if(inNetSocket != socket) return;
     
 	NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding]
                            stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -500,7 +523,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 - (void) writeCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output
 {
 
-    [self _writeCommand:cmd withInput:input withOutputNum:output withSelectorName:nil];
+    [self _writeCommand:cmd withInput:input withOutputNum:output+1 withSelectorName:nil];
 }
 
 - (NSString*) commandStringForCommand:(ETTCPX400DPCmds)cmd withInput:(float)input withOutputNumber:(int)output
@@ -630,6 +653,11 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 
 - (void) readback
 {
+    [self readback:YES];
+}
+
+- (void) readback:(BOOL)block
+{
     if (![self isConnected]) return;
     int output;
     for (output=0; output<kORTTCPX400DPOutputChannels; output++) {
@@ -638,7 +666,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
         [self sendCommandReadBackGetVoltageReadbackWithOutput:output];
         [self sendCommandReadBackGetVoltageTripSetWithOutput:output];
     }
-    if (readoutThread != [NSThread currentThread]) {
+    if (block && readoutThread != [NSThread currentThread]) {
         [self waitUntilCommandsDone];
     }
 }
@@ -660,13 +688,32 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 
 - (BOOL) checkAndClearErrors
 {
+    return [self checkAndClearErrors:YES];
+}
+
+- (BOOL) checkAndClearErrors:(BOOL)block
+{
     assert(readoutThread !=[NSThread currentThread]);
+    [self sendCommandReadBackGetSTBWithOutput:0];
+    if (!block) return NO;
+    
     [self waitUntilCommandsDone];
-    [self sendCommandReadBackQueryAndClearEERWithOutput:0];
-    [self sendCommandReadBackQueryAndClearESRWithOutput:0];
-    [self sendCommandReadBackQueryAndClearQERWithOutput:0];
-    [self sendCommandReadBackQueryAndClearLSRWithOutput:0];
-    [self sendCommandReadBackQueryAndClearLSRWithOutput:1];
+    
+    int stbStatus = [self readBackGetSTBWithOutput:0];
+    BOOL retValue = NO;
+    if ((stbStatus & 0x33) == 0) return NO;
+    if ((stbStatus & 0x20) != 0) {
+        retValue = YES;
+        [self sendCommandReadBackQueryAndClearESRWithOutput:0];
+    }
+    if ((stbStatus & 0x2) != 0) {
+        retValue = YES;
+        [self sendCommandReadBackQueryAndClearLSRWithOutput:1];
+    }
+    if ((stbStatus & 0x1) != 0) {
+        retValue = YES;
+        [self sendCommandReadBackQueryAndClearLSRWithOutput:0];
+    }
     [self waitUntilCommandsDone];
     if ([self currentErrorCondition]) {
         [[NSNotificationCenter defaultCenter]
@@ -674,12 +721,13 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
          object:self];
         return YES;
     }
-    return NO;
+    return retValue;
 }
 
 - (BOOL) currentErrorCondition
 {
     // returns if there is a current error condition.
+    if (([self readBackGetSTBWithOutput:0] & 0x33) == 0) return NO;
     BOOL retVal =
     (([self readBackValueESR] & 0x3c) != 0 ||
      ([self readBackValueEER] != 0)        ||
@@ -770,6 +818,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
     readConditionLock = [[NSCondition alloc] init];
+    [self _registerNotificationObservers];
 	
 	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
 	[self setSerialNumber:[decoder decodeObjectForKey:@"serialNumber"]];    
@@ -832,13 +881,7 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 - (void) _setIsConnected:(BOOL)connected
 {
     if (isConnected == connected) return;
-    [readConditionLock lock];
-    // Also release the dataQueue
-    [dataQueue release];
-    dataQueue = [[NSMutableArray array] retain];
-    isProcessingCommands = NO;
     isConnected = connected;
-    [readConditionLock unlock];
     [[NSNotificationCenter defaultCenter]
      postNotificationOnMainThreadWithName:ORTTCPX400DPConnectionHasChanged
      object:self];
@@ -907,8 +950,14 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 {
     
     [readConditionLock lock];
-    assert(readoutThread == [NSThread currentThread] && isProcessingCommands);
-    assert([dataQueue count] != 0 && [[[dataQueue objectAtIndex:0] objectAtIndex:2] length] != 0);
+    
+    // This can happen if the socket is opened and closed quickly, just ignore.
+    if (readoutThread == nil || !isProcessingCommands ||
+        [dataQueue count] == 0) {
+        [readConditionLock unlock];
+        return;
+    }
+    assert(readoutThread == [NSThread currentThread]);    
     
     struct ORTTCPX400DPCmdInfo* cmd = (struct ORTTCPX400DPCmdInfo*)[[[dataQueue objectAtIndex:0] objectAtIndex:0] longValue];
     SEL callSelector = NSSelectorFromString([[dataQueue objectAtIndex:0] objectAtIndex:2]);
@@ -1004,10 +1053,18 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
                                                               port:ORTTCPX400DPPort];
     if (currentSocket == nil) return;
     
-    readoutThread = [NSThread currentThread];
     // schedule the socket on the current run loop.
     [currentSocket scheduleOnCurrentRunLoop];
     [self _setSocket:currentSocket];
+    
+    [readConditionLock lock];
+    readoutThread = [NSThread currentThread];
+    // Also release the dataQueue
+    [dataQueue release];
+    dataQueue = [[NSMutableArray array] retain];
+    isProcessingCommands = NO;
+    [readConditionLock broadcast];    
+    [readConditionLock unlock];
     
     // perform the run loop
     // This ends whenever the socket changes
@@ -1022,8 +1079,11 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
                    [self objectName],[self ipAddress],[self serialNumber]);
         NSLogColor([NSColor redColor], @"%@\n",e);
     }
-    readoutThread = nil;
+
     [readConditionLock lock];
+    readoutThread = nil;    
+    [dataQueue release];
+    dataQueue = nil;
     isProcessingCommands = NO;
     [readConditionLock broadcast];
     [readConditionLock unlock];
@@ -1075,8 +1135,10 @@ ORTTCPX_READ_IMPLEMENT(QueryAndClearESR, int)
 }
 
 #define SYNC_MODEL_VARS(setVar, readBackVar)   \
+    if( ![self isConnected]) return;           \
 [self setAndNotifyWriteTo ## setVar:[self readAndBlock ## readBackVar ## WithOutput:0]  \
     withOutput:0 sendCommand:NO];                                                       \
+    if( ![self isConnected]) return;           \
 [self setAndNotifyWriteTo ## setVar:[self readAndBlock ## readBackVar ## WithOutput:1]  \
     withOutput:1 sendCommand:NO];
 
@@ -1092,4 +1154,48 @@ SYNC_MODEL_VARS(Set ## var, Get ## var ## Set)
     SYNC_MODEL_VARS(SetCurrentLimit, GetCurrentSet); // Current Trip
     SYNC_MODEL_VARS(SetOutput, GetOutputStatus); // Current Trip
 }
+
+- (void) _registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];
+	[notifyCenter addObserver : self
+					 selector : @selector(_hwFinderChanged:)
+						 name : ORHardwareFinderAvailableHardwareChanged
+					   object : nil];
+}
+
+- (void) _hwFinderChanged:(NSNotification*)aNote
+{
+    if ([serialNumber isEqualToString:@""]) {
+        if([ipAddress isEqualToString:@""]) return;
+        // Otherwise try to set the serial Number
+        NSDictionary* dict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];
+        for (NSString* key in dict) {
+            ORVXI11IPDevice* dev = [dict objectForKey:key];
+            if ([[dev ipAddress] isEqualToString:ipAddress]) {
+                [self setSerialNumber:[dev serialNumber]];
+                break;
+            }
+        }
+    } else {
+        // Otherwise try to change the IP address
+        NSDictionary* dict = [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] availableHardware];
+        for (NSString* key in dict) {
+            ORVXI11IPDevice* dev = [dict objectForKey:key];
+            if ([[dev serialNumber] isEqualToString:serialNumber]) {
+                if ([ipAddress isEqualToString:[dev ipAddress]]) return;
+                
+                // Otherwise we need to ask for confirmation
+                if (NSRunAlertPanel(@"IP Address changed",
+                                    [NSString stringWithFormat:@"The IP (%@) of %@,%@ has changed to %@.  Do you wish to allow this?",
+                                     [self ipAddress],[self objectName],[self serialNumber],[dev ipAddress]],
+                                    @"OK",@"Cancel", nil) == NSAlertDefaultReturn) {
+                    [self setIpAddress:[dev ipAddress]];
+                }
+                break;
+            }
+        }
+    }
+}
+
 @end

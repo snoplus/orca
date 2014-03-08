@@ -154,6 +154,7 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
     ORTTCPX_DEFINE_READ_VAR(QueryAndClearEER, int)
     ORTTCPX_DEFINE_READ_VAR(QueryAndClearESR, int)
     ORTTCPX_DEFINE_READ_VAR(QueryAndClearQER, int)
+    ORTTCPX_DEFINE_READ_VAR(GetSTB, int)
     
     //ORTTCPX_DEFINE_WRITE_VAR(IncrementVoltage, float)
     //ORTTCPX_DEFINE_WRITE_VAR(IncrementVoltageAndVerify, float)
@@ -190,7 +191,6 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
     //ORTTCPX_DEFINE_WRITE_VAR(ResetToRemoteDflt, float)
     //ORTTCPX_DEFINE_WRITE_VAR(SetSRE, float)
     //ORTTCPX_DEFINE_WRITE_VAR(GetSRE, float)
-    //ORTTCPX_DEFINE_WRITE_VAR(GetSTB, float)
     //ORTTCPX_DEFINE_WRITE_VAR(GetID, float)
     //ORTTCPX_DEFINE_WRITE_VAR(GetBusAddress, float)
 }
@@ -229,10 +229,12 @@ ORTTCPX_GEN_DEFINE_VAR(writeTo, CMD, TYPE)
 - (BOOL) commandTakesOutputNumber:(ETTCPX400DPCmds)cmd;
 
 - (void) readback;
+- (void) readback:(BOOL)block;
 - (void) reset;
 - (void) resetTrips;
 - (void) clearStatus;
 - (BOOL) checkAndClearErrors;
+- (BOOL) checkAndClearErrors:(BOOL)block;
 - (BOOL) currentErrorCondition;
 
 - (unsigned int) readBackValueLSR:(int)outputNum;
@@ -266,6 +268,7 @@ ORTTCPX_DEFINE_READ_FUNCTIONS(QueryAndClearLSR, int)
 ORTTCPX_DEFINE_READ_FUNCTIONS(QueryAndClearEER, int)
 ORTTCPX_DEFINE_READ_FUNCTIONS(QueryAndClearESR, int)
 ORTTCPX_DEFINE_READ_FUNCTIONS(QueryAndClearQER, int)
+ORTTCPX_DEFINE_READ_FUNCTIONS(GetSTB, int)
 
 // The following are for later implementation (if at all)
 //ORTTCPX_DEFINE_WRITE_FUNCTIONS(IncrementVoltage, float)
@@ -303,7 +306,6 @@ ORTTCPX_DEFINE_READ_FUNCTIONS(QueryAndClearQER, int)
 //ORTTCPX_DEFINE_WRITE_FUNCTIONS(ResetToRemoteDflt, float)
 //ORTTCPX_DEFINE_WRITE_FUNCTIONS(SetSRE, float)
 //ORTTCPX_DEFINE_WRITE_FUNCTIONS(GetSRE, float)
-//ORTTCPX_DEFINE_WRITE_FUNCTIONS(GetSTB, float)
 //ORTTCPX_DEFINE_WRITE_FUNCTIONS(GetID, float)
 //ORTTCPX_DEFINE_WRITE_FUNCTIONS(GetBusAddress, float)
 
@@ -340,6 +342,7 @@ ORTTCPX_NOTIFY_READ_DEFINE(QueryAndClearLSR)
 ORTTCPX_NOTIFY_READ_DEFINE(QueryAndClearEER)
 ORTTCPX_NOTIFY_READ_DEFINE(QueryAndClearESR)
 ORTTCPX_NOTIFY_READ_DEFINE(QueryAndClearQER)
+ORTTCPX_NOTIFY_READ_DEFINE(GetSTB)
 
 //ORTTCPX_NOTIFY_WRITE_DEFINE(ResetToRemoteDflt)
 
@@ -377,7 +380,6 @@ ORTTCPX_NOTIFY_READ_DEFINE(QueryAndClearQER)
 
 //ORTTCPX_NOTIFY_WRITE_DEFINE(SetSRE)
 //ORTTCPX_NOTIFY_WRITE_DEFINE(GetSRE)
-//ORTTCPX_NOTIFY_WRITE_DEFINE(GetSTB)
 //ORTTCPX_NOTIFY_WRITE_DEFINE(GetID)
 //ORTTCPX_NOTIFY_WRITE_DEFINE(GetBusAddress)
 
