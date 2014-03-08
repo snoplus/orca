@@ -66,6 +66,9 @@
 - (void) addAdcsToHistoryRecord:(NSNotification*)aNote;
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary;
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef;
+- (void) postOrPutCustomRecord:(NSNotification*)aNote;
+- (void) postOrPutCustomRecord:(NSDictionary*)aRecord toAddress:(NSString*)anAddr;
+- (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef;
 
 #pragma mark ***Accessors
 - (BOOL) replicationRunning;

@@ -231,6 +231,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 						 name : @"ORCouchDBAddHistoryAdcRecord"
 					   object : nil];
 
+    [notifyCenter addObserver : self
+					 selector : @selector(postOrPutCustomRecord:)
+						 name : @"ORCouchDBPostOrPutCustomRecord"
+					   object : nil];
     
 }
 
@@ -1082,6 +1086,45 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         [aRecord addEntriesFromDictionary:aDictionary];
         [aDataBaseRef updateDocument:aRecord documentId:anId tag:kDocumentAdded];
     }
+}
+
+- (void) postOrPutCustomRecord:(NSNotification*)aNote
+{
+    // Notifications can be sent to post or put a document to a particular address.
+    // The address may be a combination of database name and name of documents, so that, e.g.
+    // one may post to update handlers or other parts of the couch API.
+    // The document is sent in the body in the http request.
+    // The userInfo of the notification should be formulated like:
+    //
+    // {
+    //   "Address" : "path/to/destination",
+    //   "Document"   : { ... }.
+    // }
+    //
+    // (NSDictionary).
+    
+    NSDictionary* aDict = [aNote userInfo];
+    NSString* postToAddress = [aDict objectForKey:@"Address"];
+    NSDictionary* document = [aDict objectForKey:@"Document"];
+    if (postToAddress && document) {
+        [self postOrPutCustomRecord:document toAddress:postToAddress];
+    } else {
+        NSLog(@"postOrPutCustomRecord notification not properly constructed\n");
+    }
+}
+
+- (void) postOrPutCustomRecord:(NSDictionary*)aRecord toAddress:(NSString*)anAddr
+{
+    // See documentation for postOrPutCustomRecord:(NSNotification*)aNote
+    
+    [self postOrPutCustomRecord:aRecord dataBaseRef:[self statusDBRef:anAddr]];
+}
+
+- (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef
+{
+    // See documentation for postOrPutCustomRecord:(NSNotification*)aNote
+    
+    [aDataBaseRef addDocument:aRecord tag:nil];
 }
 
 - (void) checkDataBaseExists:(ORCouchDB*)aDataBase

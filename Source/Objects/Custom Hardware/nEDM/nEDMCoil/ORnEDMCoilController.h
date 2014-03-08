@@ -60,11 +60,13 @@
     IBOutlet NSTableView*   targetFieldValues;
     
     IBOutlet NSTextField*   coilText;
+    IBOutlet NSTextField*   postToDBText;
     
 	IBOutlet NSButton*      refreshIPsButton;
     IBOutlet NSProgressIndicator* refreshIPIndicate;
     
     IBOutlet NSButton*      processVerbose;
+    IBOutlet NSButton*      postDataToDBButton;
     
     NSView *blankView;    
     NSSize controlSize;
