@@ -31,12 +31,19 @@ NSString* ORnEDMCoilADCListChanged = @"ORnEDMCoilADCListChanged";
 NSString* ORnEDMCoilHWMapChanged   = @"ORnEDMCoilHWMapChanged";
 NSString* ORnEDMCoilDebugRunningHasChanged = @"ORnEDMCoilDebugRunningHasChanged";
 NSString* ORnEDMCoilVerboseHasChanged = @"ORnEDMCoilVerboseHasChanged";
+NSString* ORnEDMCoilRealProcessTimeHasChanged = @"ORnEDMCoilRealProcessTimeHasChanged";
+NSString* ORnEDMCoilTargetFieldHasChanged = @"ORnEDMCoilTargetFieldHasChanged";
 
-#define kADCChannelNumber 128
+bool useIntegralTerm=TRUE;
+int currentMemorySize=40;
+double integralTermFraction=0.3;
+NSMutableArray* CurrentMemory;
 
 @interface ORnEDMCoilModel (private) // Private interface
 #pragma mark •••Running
 - (void) _runThread;
+- (void) _setFieldTargetWithArray:(NSArray*)array;
+- (void) _setFieldTarget:(NSMutableData*)data;
 - (void) _runProcess;
 - (void) _stopRunning;
 - (void) _startRunning;
@@ -47,18 +54,21 @@ NSString* ORnEDMCoilVerboseHasChanged = @"ORnEDMCoilVerboseHasChanged";
 //- (void) _writeValuesToDatabase;
 - (NSData*) _calcPowerSupplyValues;
 - (NSData*) _readCurrentValues;
-- (void) _syncPowerSupplyValues:(NSData*)currentVector;
-- (double) _fieldAtMagnetometer:(int)index;
-- (void) _setCurrent:(double)current forSupply:(int)index;
-- (double) _getCurrent:(int)supply;
-
-- (void) _setADCList:(NSMutableArray*)anArray;
+- (void)    _syncPowerSupplyValues:(NSData*)currentVector;
+- (double)  _fieldAtMagnetometer:(int)index;
+- (void)    _setCurrent:(double)current forSupply:(int)index;
+- (double)  _getCurrent:(int)supply;
+- (void)    _setADCList:(NSMutableArray*)anArray;
+- (void)    _setRealProcessingTime:(NSTimeInterval)interv;
 
 - (void) _setOrientationMatrix:(NSMutableArray*)anArray;
 - (void) _setMagnetometerMatrix:(NSMutableArray*)anArray;
 - (void) _setConversionMatrix:(NSMutableData*)anArray;
 
 - (BOOL) _verifyMatrixSizes:(NSArray*)feedBackMatrix orientationMatrix:(NSArray*)orMax magnetometerMap:(NSArray*)magMap;
+
+- (void) _checkForErrors; // throws exceptions
+- (void) _runAlertOnMainThread:(NSException *)exc;
 @end
 
 #define CALL_SELECTOR_ONALL_POWERSUPPLIES(x)      \
@@ -67,51 +77,118 @@ NSEnumerator* anEnum = [objMap objectEnumerator]; \
 for (id obj in anEnum) [obj x];                   \
 }
 
+#define CALL_SELECTOR_ONALL_ADCS(x)               \
+{                                                 \
+for (id obj in listOfADCs) [obj x];               \
+}
+
+
 #define ORnEDMCoil_DEBUG 1
 
-@implementation ORnEDMCoilModel (private) 
+@implementation ORnEDMCoilModel (private)
 
 - (void) _runThread
 {
-    CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:YES withString:@"nEDM Coil Process");
+    [self initializeForRunning];
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(resetTrips);
+    
+    // Actively shut everything off.
+    if (debugRunning) {
+        CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:NO);
+    } else {
+        CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:YES);
+    };
 
+    //Wait for everything to start up.
+    [NSThread sleepForTimeInterval:1.0];
+    
     NSRunLoop* rl = [NSRunLoop currentRunLoop];
+    
+    [lastProcessStartDate release];
+    lastProcessStartDate = nil;
+    [self _setRealProcessingTime:0.0];
     // make sure we schedule the run
     [self performSelector:@selector(_runProcess) withObject:nil afterDelay:0.5];
-    // perform the run loop
-    while( isRunning && [rl runMode:NSDefaultRunLoopMode
-                         beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]); // Cancel the run loop every second
     
-    CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:NO withString:@"nEDM Coil Process");
+    // perform the run loop, but cancel every second to check whether we should still run.
+    while( isRunning && [rl runMode:NSDefaultRunLoopMode
+                         beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+    
+    [self cleanupForRunning];
+    [self _setRealProcessingTime:0.0];
     
     // Finally notify that we've finished.
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORnEDMCoilPollingActivityChanged
-                                                        object:self];
+    [[NSNotificationCenter defaultCenter]
+     postNotificationOnMainThreadWithName:ORnEDMCoilPollingActivityChanged
+                                   object:self];
+}
+- (void) _setFieldTarget:(NSMutableData*)data
+{
+    [data retain];
+    [FieldTarget release];
+    FieldTarget = data;
+    [[NSNotificationCenter defaultCenter]
+     postNotificationOnMainThreadWithName:ORnEDMCoilTargetFieldHasChanged
+                                   object:self];
+}
+
+- (void) _setFieldTargetWithArray:(NSArray *)anArray
+{
+    //Possibility to grab field values and set a target of a fraction of the background field
+    NSMutableData* ft = [NSMutableData dataWithLength:(NumberOfChannels*sizeof(double))];
+    double* ptr = (double*)[ft bytes];
+    if (anArray != nil && [anArray count] != NumberOfChannels) NSLog(@"Array doesn't have the correct channels!\n");
+    if (anArray == nil || [anArray count] != NumberOfChannels) {
+        // means we are resetting
+        memset(ptr, 0, sizeof(ptr[0])*NumberOfChannels);
+    } else {
+        int i;
+        for (i=0; i<NumberOfChannels;i++) ptr[i] = [[anArray objectAtIndex:i] floatValue];
+    }
+    [self _setFieldTarget:ft];
+
 }
 
 - (void) _runProcess
 {
     // The current calculation process
     @try {
-        [self _readADCValues];
+        NSDate* now = [[NSDate date] retain];
+        if (lastProcessStartDate != nil){
+            [self _setRealProcessingTime:[now timeIntervalSinceDate:lastProcessStartDate]];
+            [lastProcessStartDate release];
+        }
+        lastProcessStartDate = now;
+        for (id adc in listOfADCs) {
+            if (![adc isPolling]) {
+                [NSException raise:@"nEDM Coil" format:@"ADC %@, Crate: %d, Slot: %d not polling.",[adc objectName],[adc crateNumber],[adc slot]];
+            }
+        }
         NSData* currentVector = [self _calcPowerSupplyValues];
+        if (verbose) NSLog(@"Currents updated\n");
+
         [self _syncPowerSupplyValues:currentVector];
-    }
-    @catch(NSException* localException) { 
-        NSLog(@"%@\n",[localException reason]);
-        [self _stopRunning];
-        //catch this here to prevent it from falling thru, but nothing to do.
-        return;
-    }
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
-    if(pollingFrequency!=0){
+
         // Force a readback of all values.
-        //CALL_SELECTOR_ONALL_POWERSUPPLIES(readback);
-        // Wait until every command has completed so that we stay synchronized with the device.
-        CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
-        [self performSelector:@selector(_runProcess) withObject:nil afterDelay:(float) 1.0/pollingFrequency];        
-    } else {
+        CALL_SELECTOR_ONALL_POWERSUPPLIES(readback:NO);
+        if(pollingFrequency!=0){
+            // Wait until every command has completed so that we stay synchronized with the device.
+            [self _checkForErrors];
+            NSTimeInterval delay = (1.0/pollingFrequency) + [lastProcessStartDate timeIntervalSinceNow];
+            if (delay < 0) delay = 0.0;
+            [self performSelector:@selector(_runProcess)
+                       withObject:nil
+                       afterDelay:delay];
+        } else {
+            [self _stopRunning];
+        }
+    }
+    @catch(NSException* localException) {
+        [self performSelectorOnMainThread:@selector(_runAlertOnMainThread:)
+                               withObject:localException
+                            waitUntilDone:NO];
         [self _stopRunning];
+        return;
     }
 }
 
@@ -120,20 +197,25 @@ for (id obj in anEnum) [obj x];                   \
 {
     // Reads current ADC values, creating a list of channels (128 for each ADC)
 
-    long sizeOfArray = kADCChannelNumber*sizeof(float)*[listOfADCs count];
+
+    unsigned long sizeOfArray = 0;
+    for (id obj in listOfADCs) {
+        sizeOfArray += [obj numberOfChannels];
+    }
+    assert(NumberOfChannels <= sizeOfArray);
+    
+    sizeOfArray *= sizeof(double);
+
     if (!currentADCValues || [currentADCValues length] != sizeOfArray) {
         [currentADCValues release];
-        currentADCValues = [[NSMutableData dataWithLength:kADCChannelNumber*sizeof(float)] retain];
+        currentADCValues = [[NSMutableData dataWithLength:sizeOfArray] retain];
     }
-    float* ptr = (float*)[currentADCValues bytes];
-    memset(ptr, 0, kADCChannelNumber*sizeof(ptr[0]));
-    
-    NSEnumerator* e = [[self listOfADCs] objectEnumerator];
-    id obj;
+    double* ptr = (double*)[currentADCValues bytes];
     int j = 0;
-    while(obj = [e nextObject]){
+    for (id obj in listOfADCs){
         int i;
-        for (i=0; i<kADCChannelNumber; i++) ptr[i+j] = (float)[obj getAdcValueAtChannel:i];
+        for (i=0; i<[obj numberOfChannels]; i++) ptr[i+j] = [obj convertedValue:i];
+        j += [obj numberOfChannels];
     }        
     
 }
@@ -145,12 +227,17 @@ for (id obj in anEnum) [obj x];                   \
     // current using [self _setCurrent:currentValue forSupply:index];
     
     //init FieldVectormutabl
-    NSData* FieldVector = [NSMutableData dataWithLength:(NumberOfChannels*sizeof(double))];    
+    
     NSData* CurrentVector = [self _readCurrentValues];
+    
+    //Grab field values (including subtraction of target field)
+    NSData* FieldVector = [NSMutableData dataWithLength:(NumberOfChannels*sizeof(double))];
     double* ptr = (double*)[FieldVector bytes];
-    //Grab field values
+    [self _readADCValues];    
     int i;
-    for (i=0; i<NumberOfChannels;i++) ptr[i] = [self _fieldAtMagnetometer:i];
+    for (i=0; i<NumberOfChannels;i++) ptr[i] = [self _fieldAtMagnetometer:i] -  [self targetFieldAtMagnetometer:i];
+    
+    
     // Perform multiplication with FeedbackMatrix, product is automatically added to CurrentVector
     // Y = alpha*A*X + beta*Y
     cblas_dgemv(CblasRowMajor,      // Row-major ordering
@@ -166,8 +253,73 @@ for (id obj in anEnum) [obj x];                   \
                 (double*)[CurrentVector bytes],// vector Y
                 1                   // Stride (should be 1)
                 );
+    
+    // Proportional-Integral Control Loop
+    if(!useIntegralTerm){
+        return CurrentVector;        
+    }
+    else{
+        
+        NSData* retCur=[NSData dataWithData:CurrentVector];
+        double* ptr = (double*)[retCur bytes];
 
-    return CurrentVector;
+        // Find average past current values
+        NSData* avrCur=[NSData dataWithData:CurrentVector]; //initialized for size and no-memory case
+        double* avrCurptr = (double*)[avrCur bytes];
+ 
+        if(CurrentMemory){
+            double *memptr[[CurrentMemory count]];
+            
+            int i;
+            for(i=0; i<[CurrentMemory count];i++){
+                memptr[i]=(double*)[[CurrentMemory objectAtIndex:i] bytes];
+            }
+            int j;
+            //NSLog(@"Values read from current memory:\n");
+            for(i=0;i<NumberOfCoils;i++){
+                double sum=0;
+                for(j=0;j<[CurrentMemory count];j++){
+                    sum+= memptr[j][i];
+                    //NSLog(@"%f\t",memptr[j][i]);
+                }
+                avrCurptr[i]=sum/[CurrentMemory count];
+                //NSLog(@"\t%f\n",avrCurptr[i]);
+            }
+        }
+        // Calculate PI-value for next current
+        for (i=0; i<NumberOfCoils;i++) ptr[i] = (1-integralTermFraction)*ptr[i]+integralTermFraction*avrCurptr[i];
+
+        // Adding current to memory, deleting oldest current if necessary
+        if(CurrentMemory){
+            [CurrentMemory addObject:retCur];
+        }
+        else{
+            CurrentMemory=[[NSMutableArray arrayWithObject:retCur] retain];
+        }
+        if([CurrentMemory count]>currentMemorySize){
+            [CurrentMemory removeObjectAtIndex:0]; 
+        }
+        
+        // For testing: print out CurrentMemory
+        /*double *memptr[[CurrentMemory count]];
+        
+        int i;
+        for(i=0; i<[CurrentMemory count];i++){
+            memptr[i]=(double*)[[CurrentMemory objectAtIndex:i] bytes];
+        }
+        int j;
+        NSLog(@"Current Memory: \n");
+        for(j=0;j<[CurrentMemory count];j++){
+            for(i=0;i<NumberOfCoils;i++){
+                NSLog(@"%f, ",memptr[j][i]);
+            }
+            NSLog(@"\n");
+        }
+         */
+
+        
+        return retCur;
+    }
     
 }
 
@@ -180,7 +332,8 @@ for (id obj in anEnum) [obj x];                   \
     NSData* CurrentVector = [[[NSMutableData alloc] initWithLength:(NumberOfCoils*sizeof(double))] autorelease];
     double* ptr = (double*)[CurrentVector bytes];
     
-    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
+    // Also waits to ensure that the commands have finished
+    [self _checkForErrors];
     
 	int i;
     for (i=0; i<NumberOfCoils;i++){
@@ -192,43 +345,21 @@ for (id obj in anEnum) [obj x];                   \
 - (void) _syncPowerSupplyValues:(NSData*) currentVector
 {
     // Will write the saved power supply values to the hardware
-    /*
-    NSEnumerator* e = [self objectEnumerator];
-    id anObject;
-    int i;
-    for (i=0;i<[objMap count]; i++){
-        [[objMap objectForKey:[NSNumber numberWithInt:i]] 
-    }
-    while (anObject = [e nextObject]) {
-        [objMap setObject:anObject forKey:[NSNumber numberWithInt:[anObject tag]]];
-    }*/
+
     
-    if ([self debugRunning]) CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:NO);
-    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
     double* dblPtr = (double*)[currentVector bytes];
     double Current[NumberOfCoils];
-    int i;    
-    //Account for reversed wiring in PowerSupplies
-    for (i=0;i<NumberOfCoils;i++) {
-        Current[i]=dblPtr[i]*[[OrientationMatrix objectAtIndex:i] intValue];    
+    int i;
+    for(i=0;i<NumberOfCoils;i++)
+    {
+        Current[i]=dblPtr[i];
     }
-    // Check if current ranges of power supplies are exceeded, cancel
-    for (i=0;i<NumberOfCoils;i++) {
-        if (Current[i]>MaxCurrent) {
-            //[NSException raise:@"Current Exceeded in Coil" format:@"Current Exceeded in Coil Channel: %d",i];
-            Current[i] = MaxCurrent;
-        }
-        if (Current[i]<0) {
-            //[NSException raise:@"Current Negative in Coil" format:@"Current Negative in Coil Channel: %d",i];
-            Current[i] = 0.0;
-        }
-    }
+  
     for (i=0; i<NumberOfCoils;i++){
-        [self _setCurrent:Current[i] forSupply:i];
+        [self _setCurrent:dblPtr[i] forSupply:i];
     }
-    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);    
-    if (![self debugRunning]) CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:YES);
-    CALL_SELECTOR_ONALL_POWERSUPPLIES(waitUntilCommandsDone);
+    [self _checkForErrors];
+
 }
 
 - (double) _fieldAtMagnetometer:(int)index
@@ -239,25 +370,16 @@ for (id obj in anEnum) [obj x];                   \
     // Channel values are as in currentADCValues: 128 slots for each ADC
     
     // ToBeFixed: in current setup, z-channels are reading inverted values. Where to account for orientation? -> FluxGate object will be created
-    //  Read proper units!
-    //FOR TESTING
-    //return (float)0;
-    //return [[currentADCValues objectAtIndex:[[MagnetometerMap objectAtIndex:index] intValue]] floatValue];
-    //For Testing: ACD-output units are manually converted to Volt
-    const float* ptr = [currentADCValues bytes];
+    if (index >= [MagnetometerMap count]) {
+        NSLog(@"Index (%i) out of range of magnetometer map (%i)\n",index,[MagnetometerMap count]);
+        return 0.0;
+    }
+    const double* ptr = [currentADCValues bytes];
     assert([[MagnetometerMap objectAtIndex:index] intValue] < [currentADCValues length]/sizeof(ptr[0]));
-    float raw = ptr[[[MagnetometerMap objectAtIndex:index] intValue]];
-    if (raw < 32768) {
-        raw += 32768;
-		} else {
-        raw -= 32768;
-        }
-    double volrange = 20; // +-10V
-    double adcrange = 65536; // 16bit
-    double vol = raw -32768; // offset
-    double vol2 = vol * volrange / adcrange; //scaling
-    if (verbose) NSLog(@"Field %i: %f\n",index,vol2);
-    return vol2;
+    double raw = ptr[[[MagnetometerMap objectAtIndex:index] intValue]];
+
+    if (verbose) NSLog(@"Field %i: %f\n",index,raw);
+    return raw;
     
 }
 
@@ -266,15 +388,39 @@ for (id obj in anEnum) [obj x];                   \
     // Will save the current for a given supply,
     // magnetometers and channels naturally ordered
     // Mapping will be taken care of at GUI level
-    [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] setWriteToSetCurrentLimit:current withOutput:(index%2)];
     
-    if (verbose) NSLog(@"Set Current (%@,%@): %f\n",[[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] ipAddress],
-          [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] serialNumber],current);
+    //Account for reversed wiring in PowerSupplies
+    current=current*[[OrientationMatrix objectAtIndex:index] intValue];
+
+    // Check if current ranges of power supplies are exceeded, cancel
+    if (current>MaxCurrent) {
+        //[NSException raise:@"Current Exceeded in Coil" format:@"Current Exceeded in Coil Channel: %d",index];
+        current = MaxCurrent;
+    }
+    if (current<0) {
+        //[NSException raise:@"Current Negative in Coil" format:@"Current Negative in Coil Channel:%d",index];
+        current = 0.0;
+    }
+    
+
+    
+    [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]]
+     setWriteToSetCurrentLimit:current
+                    withOutput:(index%2)];
+    
+    if (verbose) NSLog(@"Set Current (%@,%@): %f\n",
+                       [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] ipAddress],
+                       [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] serialNumber],
+                       current);
 }
 
 - (double) _getCurrent:(int)index
 {
     double retVal = [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] readBackGetCurrentSetWithOutput:(index%2)];
+    
+    //Account for reversed wiring in PowerSupplies
+    retVal=retVal*[[OrientationMatrix objectAtIndex:index] intValue];
+    
     if (verbose) NSLog(@"Read back current (%@,%@): %f\n",[[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] ipAddress],
           [[objMap objectForKey:[NSNumber numberWithInt:(index/2)]] serialNumber],retVal);
     return retVal;
@@ -284,7 +430,9 @@ for (id obj in anEnum) [obj x];                   \
 #pragma mark •••Running
 - (void) _stopRunning
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runProcess) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self
+                                             selector:@selector(_runProcess)
+                                               object:nil];
 	isRunning = NO;
     NSLog(@"Stopping nEDM Coil Compensation processing.\n");
 }
@@ -421,6 +569,44 @@ for (id obj in anEnum) [obj x];                   \
     return YES;
 }
 
+- (void) _checkForErrors
+{
+    NSEnumerator* e = [objMap objectEnumerator];
+    for (ORTTCPX400DPModel* i in e) {
+        if (![i isConnected]) {
+            [NSException raise:@"Not connected"
+                        format:@"Not connected: (%@,%@,%@)",[i objectName],[i ipAddress],[i serialNumber]];
+        }
+        [i checkAndClearErrors:NO];
+
+    }
+    e = [objMap objectEnumerator];    
+    for (ORTTCPX400DPModel* i in e) {
+        [i waitUntilCommandsDone];
+        if ([i currentErrorCondition]) {
+            [NSException raise:@"Error in nEDM Coil"
+                        format:@"Error in nEDM Coil (%@,%@,%@)",[i objectName],[i ipAddress],[i serialNumber]];
+        }
+    }
+}
+
+- (void) _runAlertOnMainThread:(NSException*) exc
+{
+    [[NSAlert alertWithMessageText:nil
+                    defaultButton:nil
+                  alternateButton:nil
+                      otherButton:nil
+        informativeTextWithFormat:@"%@",exc] runModal];
+}
+
+- (void) _setRealProcessingTime:(NSTimeInterval)timeint
+{
+    realProcessingTime = timeint;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationOnMainThreadWithName:ORnEDMCoilRealProcessTimeHasChanged
+	 object: self];
+}
+
 @end
 
 @implementation ORnEDMCoilModel
@@ -430,6 +616,7 @@ for (id obj in anEnum) [obj x];                   \
 - (id) init
 {
     self = [super init];
+    [self _setFieldTargetWithArray:nil];
     return self;
 }
 
@@ -439,6 +626,9 @@ for (id obj in anEnum) [obj x];                   \
     [listOfADCs release];
     [currentADCValues release];  
     [FeedbackMatData release];
+    [lastProcessStartDate release];
+    [CurrentMemory release];
+    [FieldTarget release];
     [super dealloc];
 }
 
@@ -462,6 +652,11 @@ for (id obj in anEnum) [obj x];                   \
     return isRunning;
 }
 
+- (float) realProcessingTime
+{
+    return realProcessingTime;
+}
+
 - (float) pollingFrequency
 {
     return pollingFrequency;
@@ -476,7 +671,6 @@ for (id obj in anEnum) [obj x];                   \
 {
     if (debug == debugRunning) return;
     debugRunning = debug;
-    if (debugRunning) CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:NO);
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilDebugRunningHasChanged
 	 object: self];     
@@ -536,13 +730,12 @@ for (id obj in anEnum) [obj x];                   \
 
 - (void) setPollingFrequency:(float)aFrequency
 {
-    
+    if (pollingFrequency == aFrequency) return;
     pollingFrequency = aFrequency;
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilPollingFrequencyChanged
 	 object: self];
 }
-
 
 - (BOOL) verbose
 {
@@ -556,6 +749,34 @@ for (id obj in anEnum) [obj x];                   \
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilVerboseHasChanged
 	 object: self];
+}
+
+- (void) initializeForRunning
+{
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:YES withString:@"nEDM Coil Process");
+    for (int i=0; i<NumberOfCoils;i++){
+        [self _setCurrent:0 forSupply:i];
+        [self setVoltage:MaxVoltage atCoil:i];
+    }
+    
+    CALL_SELECTOR_ONALL_ADCS(setUserLock:YES withString:@"nEDM Coil Process");
+    CALL_SELECTOR_ONALL_ADCS(startPollingActivity);
+}
+
+- (void) cleanupForRunning
+{
+    CALL_SELECTOR_ONALL_ADCS(stopPollingActivity);
+    CALL_SELECTOR_ONALL_ADCS(setUserLock:NO withString:@"nEDM Coil Process");
+    
+    for (int i=0; i<NumberOfCoils;i++){
+        [self _setCurrent:0 forSupply:i];
+        [self setVoltage:1.0 atCoil:i];
+    }
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(setAllOutputToBeOn:NO);
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:NO withString:@"nEDM Coil Process");
+    CALL_SELECTOR_ONALL_POWERSUPPLIES(readback);
+    [CurrentMemory release];
+    CurrentMemory = nil;
 }
 
 - (void) toggleRunState
@@ -641,6 +862,29 @@ for (id obj in anEnum) [obj x];                   \
     }
 #endif
 }
+
+- (void) saveCurrentFieldInPlistFile:(NSString*)plistFile
+{
+    NSMutableArray* tempArray = [NSMutableArray arrayWithCapacity:NumberOfChannels];
+    
+    int i;
+    for(i=0;i<NumberOfChannels;i++) [tempArray insertObject:[NSNumber numberWithDouble:[self fieldAtMagnetometer:i]] atIndex:i];
+    
+    [tempArray writeToFile:plistFile atomically:YES];
+}
+
+- (void) loadTargetFieldWithPlistFile:(NSString*)plistFile
+{
+    NSArray* targetField = [NSArray arrayWithContentsOfFile:plistFile];
+    if( ![self _verifyMatrixSizes:nil orientationMatrix:OrientationMatrix magnetometerMap:targetField] ) return;
+    [self _setFieldTargetWithArray:targetField];
+}
+
+- (void) setTargetFieldToZero
+{
+    [self _setFieldTargetWithArray:nil];
+}
+
 - (void) resetConversionMatrix
 {
     [self _setConversionMatrix:nil];
@@ -671,12 +915,6 @@ for (id obj in anEnum) [obj x];                   \
 - (NSData*)  feedbackMatData
 {
     return FeedbackMatData;
-}
-
-#pragma mark •••Notifications
-- (void) registerNotificationObservers
-{
-    //NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 }
 
 #pragma mark •••ORGroup
@@ -778,10 +1016,12 @@ for (id obj in anEnum) [obj x];                   \
     [self _setMagnetometerMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilMagnetometerMap"]];
     [self _setOrientationMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilOrientationMatrix"]];
     [self _setConversionMatrix:[decoder decodeObjectForKey:@"kORnEDMCoilFeedbackMatrixData"]];
+    [self _setFieldTarget:[decoder decodeObjectForKey:@"kORnEDMCoilFieldTarget"]];
     NumberOfChannels = [decoder decodeIntForKey:@"kORnEDMCoilNumChannels"];    
     NumberOfCoils = [decoder decodeIntForKey:@"kORnEDMCoilNumCoils"]; 
     
     [self _setADCList:[decoder decodeObjectForKey:@"kORnEDMCoilListOfADCs"]];
+    [self _setADCList:[decoder decodeObjectForKey:@"kORnEDMCoilListOfADCs"]];    
     [self setVerbose:[decoder decodeIntForKey:@"kORnEDMCoilVerbose"]];
     [[self undoManager] enableUndoRegistration];
     
@@ -799,13 +1039,69 @@ for (id obj in anEnum) [obj x];                   \
     [encoder encodeInt:NumberOfChannels forKey:@"kORnEDMCoilNumChannels"];    
     [encoder encodeInt:NumberOfCoils forKey:@"kORnEDMCoilNumCoils"];        
     [encoder encodeInt:verbose forKey:@"kORnEDMCoilVerbose"];
-    [encoder encodeObject:listOfADCs forKey:@"kORnEDMCoilListOfADCs"];       
+    [encoder encodeObject:listOfADCs forKey:@"kORnEDMCoilListOfADCs"];
+    [encoder encodeObject:FieldTarget forKey:@"kORnEDMCoilFieldTarget"];
 }
 
 #pragma mark •••Holding ADCs
 - (NSArray*) validObjects
 {
     return [[self document] collectObjectsConformingTo:@protocol(ORAdcProcessing)];
+}
+
+#pragma mark •••Held objects
+- (int) magnetometerChannels
+{
+    [self _readADCValues];
+    return (int)([currentADCValues length]/sizeof(double));
+}
+
+- (int) coilChannels
+{
+    return [objMap count]*kORTTCPX400DPOutputChannels;
+}
+
+- (void) enableOutput:(BOOL)enab atCoil:(int)coil
+{
+    [[objMap objectForKey:[NSNumber numberWithInt:(coil/2)]]
+     setWriteToSetOutput:(int)enab withOutput:(coil%2)];
+}
+
+- (void) setVoltage:(double)volt atCoil:(int)coil
+{
+    [[objMap objectForKey:[NSNumber numberWithInt:(coil/2)]]
+     setWriteToSetVoltage:volt withOutput:(coil%2)];
+}
+
+- (void) setCurrent:(double)current atCoil:(int)coil
+{
+    [self _setCurrent:current forSupply:coil];
+}
+
+- (double) readBackSetCurrentAtCoil:(int)coil
+{
+    return [[objMap objectForKey:[NSNumber numberWithInt:(coil/2)]]
+            readAndBlockGetCurrentSetWithOutput:coil%2];
+}
+
+- (double) readBackSetVoltageAtCoil:(int)coil
+{
+    return [[objMap objectForKey:[NSNumber numberWithInt:(coil/2)]]
+            readAndBlockGetVoltageSetWithOutput:coil%2];
+
+}
+
+- (double) fieldAtMagnetometer:(int)magn
+{
+    [self _readADCValues];
+    return [self _fieldAtMagnetometer:magn];
+}
+
+- (double) targetFieldAtMagnetometer:(int)magn
+{
+    if (magn >= [FieldTarget length]/sizeof(double)) return 0.0;
+    double* ptr2= (double*)[FieldTarget bytes];
+    return ptr2[magn];
 }
 
 @end

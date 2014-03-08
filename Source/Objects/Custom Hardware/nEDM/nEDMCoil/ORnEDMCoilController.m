@@ -30,6 +30,7 @@
 @interface ORnEDMCoilController (private)
 - (void) _buildPopUpButtons;
 - (void) _readFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message;
+- (void) _saveFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message;
 @end
 
 @implementation ORnEDMCoilController
@@ -145,6 +146,10 @@
 						 name : ORnEDMCoilVerboseHasChanged
 					   object : nil];
     
+    [notifyCenter addObserver : self
+					 selector : @selector(realProcessFrequencyChanged:)
+						 name : ORnEDMCoilRealProcessTimeHasChanged
+					   object : nil];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -184,9 +189,11 @@
     if ([model isRunning]) {
         [startStopButton setTitle:@"Stop Process"];
         [processIndicate startAnimation:self];
+        [realProcessFrequencyField setHidden:NO];
     } else {
         [startStopButton setTitle:@"Start Process"];
         [processIndicate stopAnimation:self];
+        [realProcessFrequencyField setHidden:YES];
     }
     
     [startStopButton setEnabled:YES];
@@ -220,6 +227,7 @@
 	[self runStatusChanged:nil];
     [self debugRunningChanged:nil];
     [self processVerboseChanged:nil];
+    [self realProcessFrequencyChanged:nil];
     [groupView setNeedsDisplay:YES];
 }
 
@@ -270,6 +278,8 @@
     if (aTableView == listOfRegisteredADCs) return [[model listOfADCs] count];
     if (aTableView == hardwareMap) return [[model magnetometerMap] count];
     if (aTableView == orientationMatrix) return [[model orientationMatrix] count];
+    if (aTableView == currentValues) return [model coilChannels];
+    if (aTableView == fieldValues || aTableView == targetFieldValues) return [model numberOfChannels];
     if (aTableView == feedbackMatrix) {
         if ([aTableView numberOfColumns] != [model numberOfChannels]) {
             while ([aTableView numberOfColumns] > [model numberOfChannels] &&
@@ -312,6 +322,21 @@
     if (aTableView == feedbackMatrix) {
         return [NSNumber numberWithDouble:[model conversionMatrix:[[aTableColumn identifier] intValue] coil:rowIndex]];
     }
+    if (aTableView == currentValues) {
+        NSString* ident = [aTableColumn identifier];
+        if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithInt:0.0];
+    }
+    if (aTableView == fieldValues) {
+        NSString* ident = [aTableColumn identifier];
+        if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithFloat:[model fieldAtMagnetometer:rowIndex]];
+    }
+    if (aTableView == targetFieldValues) {
+        NSString* ident = [aTableColumn identifier];
+        if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithFloat:[model targetFieldAtMagnetometer:rowIndex]];
+    }
     return @"";
 }
 
@@ -322,6 +347,21 @@
     } else {
         [deleteADCButton setEnabled:YES];
     }
+}
+
+- (void) realProcessFrequencyChanged:(NSNotification *)aNote
+{
+    NSTimeInterval atime = [model realProcessingTime];
+    if (atime == 0.0) {
+        [realProcessFrequencyField setStringValue:[NSString stringWithFormat:@"%.1f Hz",0.0]];
+    } else {
+        [realProcessFrequencyField setStringValue:[NSString stringWithFormat:@"%.1f Hz",1./atime]];
+    }
+}
+
+- (void) targetFieldChanged:(NSNotification*)aNote
+{
+    [targetFieldValues reloadData];
 }
 
 #pragma mark •••Accessors
@@ -429,14 +469,38 @@
     [[ORVXI11HardwareFinder sharedVXI11HardwareFinder] refresh];
 }
 
-- (void) _readFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message;
+- (void) _readFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseDirectories:NO];
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setAllowedFileTypes:[NSArray arrayWithObjects:@"plist",nil]];    
     [openPanel setPrompt:@"Choose"];
     [openPanel setMessage:message];
+    
+    NSString* startingDir = (startingDirectory!=nil) ? startingDirectory: NSHomeDirectory();
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model performSelector:asel withObject:[[openPanel URL] path]];
+            // Also reset the starting directory if this was successful
+            [startingDirectory release];
+            startingDirectory = [[[[openPanel URL] path] stringByDeletingLastPathComponent] retain];
+        }
+    }];
+#endif
+    
+}
+
+- (void) _saveFile:(id)sender withSelector:(SEL)asel withMessage:(NSString*)message
+{
+    NSSavePanel *openPanel = [NSSavePanel savePanel];
+    [openPanel setPrompt:@"Save"];
+    [openPanel setMessage:message];
+    [openPanel setAllowsOtherFileTypes:NO];
+    [openPanel setAllowedFileTypes:[NSArray arrayWithObjects:@"plist",nil]];
     
     NSString* startingDir = (startingDirectory!=nil) ? startingDirectory: NSHomeDirectory();
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
@@ -527,6 +591,30 @@
 - (IBAction) processVerboseAction:(id)sender
 {
     [model setVerbose:[processVerbose state]];
+}
+
+- (IBAction) refreshCurrentAndFieldValuesAction:(id)sender
+{
+    [currentValues reloadData];
+    [fieldValues reloadData];
+}
+
+- (IBAction) loadTargetFieldValuesAction:(id)sender
+{
+    [self _readFile:sender
+       withSelector:@selector(loadTargetFieldWithPlistFile:)
+        withMessage:@"Choose Target Field File"];
+}
+- (IBAction) saveCurrentFieldAsTargetFieldAction:(id)sender
+{
+    [self _saveFile:sender
+       withSelector:@selector(saveCurrentFieldInPlistFile:)
+        withMessage:@"Save Current Fields As"];
+}
+
+- (IBAction) setTargetFieldToZeroAction:(id)sender
+{
+    [model setTargetFieldToZero];
 }
 
 //---------------------------------------------------------------

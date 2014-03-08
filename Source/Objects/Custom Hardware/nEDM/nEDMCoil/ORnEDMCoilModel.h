@@ -28,18 +28,23 @@
 #define MaxNumberOfChannels 3*MaxNumberOfMagnetometers
 #define MaxNumberOfCoils 24
 #define MaxCurrent 20.0
+#define MaxVoltage 30.0
 
 @interface ORnEDMCoilModel : ORGroup <OROrderedObjHolding> {
     NSMutableDictionary* objMap;
     BOOL isRunning;
     float pollingFrequency;
+    NSTimeInterval realProcessingTime;
     int NumberOfChannels;
     int NumberOfCoils;
     BOOL debugRunning;
     BOOL verbose;
+    NSDate* lastProcessStartDate;
     
     
-    NSMutableData* FeedbackMatData;    
+    NSMutableData* FeedbackMatData;
+    
+    NSData* FieldTarget;
     
     NSMutableArray* listOfADCs;
     NSMutableData*  currentADCValues;
@@ -53,6 +58,7 @@
 - (BOOL) isRunning;
 - (BOOL) debugRunning;
 - (void) setDebugRunning:(BOOL)debug;
+- (float) realProcessingTime;
 - (float) pollingFrequency;
 - (void) setPollingFrequency:(float)aFrequency;
 - (void) toggleRunState;
@@ -71,6 +77,10 @@
 - (void) initializeMagnetometerMapWithPlistFile:(NSString*)plistFile;
 - (void) initializeOrientationMatrixWithPlistFile:(NSString*)plistFile;
 
+- (void) saveCurrentFieldInPlistFile:(NSString*)plistFile;
+- (void) loadTargetFieldWithPlistFile:(NSString*)plistFile;
+- (void) setTargetFieldToZero;
+
 - (void) resetConversionMatrix;
 - (void) resetMagnetometerMap;
 - (void) resetOrientationMatrix;
@@ -82,8 +92,20 @@
 - (BOOL) verbose;
 - (void) setVerbose:(BOOL)aVerb;
 
-#pragma mark •••Notifications
-- (void) registerNotificationObservers;
+- (void) initializeForRunning;
+- (void) cleanupForRunning;
+
+#pragma mark •••Held objects
+- (int) magnetometerChannels;
+- (int) coilChannels;
+
+- (void) enableOutput:(BOOL)enab atCoil:(int)coil;
+- (void) setVoltage:(double)volt atCoil:(int)coil;
+- (void) setCurrent:(double)current atCoil:(int)coil;
+- (double) readBackSetCurrentAtCoil:(int)coil;
+- (double) readBackSetVoltageAtCoil:(int)coil;
+- (double) fieldAtMagnetometer:(int)magn;
+- (double) targetFieldAtMagnetometer:(int)magn;
 
 #pragma mark •••ORGroup
 - (void) objectCountChanged;
@@ -111,3 +133,5 @@ extern NSString* ORnEDMCoilADCListChanged;
 extern NSString* ORnEDMCoilHWMapChanged;
 extern NSString* ORnEDMCoilDebugRunningHasChanged;
 extern NSString* ORnEDMCoilVerboseHasChanged;
+extern NSString* ORnEDMCoilRealProcessTimeHasChanged;
+extern NSString* ORnEDMCoilTargetFieldHasChanged;

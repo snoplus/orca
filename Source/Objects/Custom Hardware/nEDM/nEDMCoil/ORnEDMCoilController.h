@@ -36,6 +36,7 @@
     IBOutlet NSTextField*   runRateField;   
     IBOutlet NSPopUpButton* listOfAdcs;
     IBOutlet NSProgressIndicator* processIndicate;
+    IBOutlet NSTextField*   realProcessFrequencyField;
     
     IBOutlet NSPopUpButton* commandPopUp;
     IBOutlet NSPopUpButton* outputNumberPopUp;    
@@ -54,6 +55,9 @@
     IBOutlet NSTableView*   hardwareMap;
     IBOutlet NSTableView*   orientationMatrix;
     IBOutlet NSTableView*   feedbackMatrix;
+    IBOutlet NSTableView*   currentValues;
+    IBOutlet NSTableView*   fieldValues;
+    IBOutlet NSTableView*   targetFieldValues;
     
     IBOutlet NSTextField*   coilText;
     
@@ -93,6 +97,8 @@
 - (void) debugRunningChanged:(NSNotification*)aNote;
 - (void) refreshIPAddressesDone:(NSNotification*)aNote;
 - (void) processVerboseChanged:(NSNotification*)aNote;
+- (void) realProcessFrequencyChanged:(NSNotification*)aNote;
+- (void) targetFieldChanged:(NSNotification*)aNote;
 
 - (void) populateListADCs;
 
@@ -109,6 +115,10 @@
 - (IBAction) handleToBeAddedADC:(id)sender;
 - (IBAction) refreshIPsAction:(id)sender;
 - (IBAction) processVerboseAction:(id)sender;
+- (IBAction) refreshCurrentAndFieldValuesAction:(id)sender;
+- (IBAction) loadTargetFieldValuesAction:(id)sender;
+- (IBAction) saveCurrentFieldAsTargetFieldAction:(id)sender;
+- (IBAction) setTargetFieldToZeroAction:(id)sender;
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
