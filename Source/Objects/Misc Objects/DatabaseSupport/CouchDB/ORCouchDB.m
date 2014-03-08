@@ -836,8 +836,13 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
     CFHTTPMessageRef msg = CFHTTPMessageCreateEmpty(NULL,FALSE);
     if(username && pwd){
         CFHTTPMessageAddAuthentication(theRequest,msg,
+#if __has_feature(objc_arc)
                                        (__bridge CFStringRef)username,
                                        (__bridge CFStringRef)pwd,
+#else
+                                       (CFStringRef)username,
+                                       (CFStringRef)pwd,
+#endif
                                        NULL,
                                        FALSE);
 	}
