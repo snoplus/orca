@@ -37,7 +37,7 @@
 	IBOutlet NSTextField* dbHistorySizeField;
 	IBOutlet NSTextField* keepHistoryStatusField;
 	IBOutlet NSTextField* dbStatusField;
-
+    IBOutlet NSTextField* usingUpdateHandlerField;
 	double queueCount;
 }
 

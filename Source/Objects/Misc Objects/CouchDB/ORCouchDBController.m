@@ -133,9 +133,15 @@
                      selector : @selector(keepHistoryChanged:)
                          name : ORCouchDBModelKeepHistoryChanged
 						object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(replicationRunningChanged:)
                          name : ORCouchDBModelReplicationRunningChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(usingUpdateHandlerChanged:)
+                         name : ORCouchDBModelUsingUpdateHandleChanged
 						object: model];
 }
 
@@ -152,7 +158,14 @@
 	[self stealthModeChanged:nil];
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
+	[self usingUpdateHandlerChanged:nil];
 }
+
+- (void) usingUpdateHandlerChanged:(NSNotification*)aNote
+{
+	[usingUpdateHandlerField setStringValue: [model usingUpdateHandler]?@"Using Update Handler":@""];
+}
+
 
 - (void) replicationRunningChanged:(NSNotification*)aNote
 {

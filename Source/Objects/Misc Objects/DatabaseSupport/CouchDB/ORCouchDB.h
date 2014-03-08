@@ -42,6 +42,7 @@
 - (void) listDatabases:(id)aDelegate tag:(NSString*)aTag;
 - (void) databaseInfo:(id)aDelegate tag:(NSString*)aTag;
 - (void) createDatabase:(NSString*)aTag views:(NSDictionary*)theViews;
+- (void) addUpdateHandler:(NSString*)aTag updateHandler:(NSString*)anUpdateHandler;
 - (void) replicateLocalDatabase:(NSString*)aTag continous:(BOOL)continuous;
 - (void) deleteDatabase:(NSString*)aTag;
 - (void) addDocument:(NSDictionary*)aDict tag:(NSString*)aTag;
@@ -104,6 +105,15 @@
 -(void) main;
 @property (retain)	NSDictionary*	views;
 @end
+
+@interface ORCouchDBAddUpdateHandlerOp : ORCouchDBOperation
+{
+    NSString* updateHandler;
+}
+-(void) main;
+@property (copy) NSString* updateHandler;
+@end
+
 
 @interface ORCouchDBDeleteDBOp : ORCouchDBOperation
 -(void) main;
@@ -227,6 +237,7 @@
 - (void) startingSweep;
 - (void) sweepDone;
 - (void) incChangeCounter;
+- (BOOL) usingUpdateHandler;
 @end
 
 

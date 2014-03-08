@@ -46,6 +46,7 @@ NSString* ORCouchDBRemoteHostNameChanged		= @"ORCouchDBRemoteHostNameChanged";
 NSString* ORCouchDBModelDBInfoChanged			= @"ORCouchDBModelDBInfoChanged";
 NSString* ORCouchDBLock							= @"ORCouchDBLock";
 NSString* ORCouchDBLocalHostNameChanged         = @"ORCouchDBLocalHostNameChanged";
+NSString* ORCouchDBModelUsingUpdateHandleChanged = @"ORCouchDBModelUsingUpdateHandleChanged";
 
 #define kCreateDB		 @"kCreateDB"
 #define kReplicateDB	 @"kReplicateDB"
@@ -63,6 +64,7 @@ NSString* ORCouchDBLocalHostNameChanged         = @"ORCouchDBLocalHostNameChange
 #define kInfoInternalDB  @"kInfoInternalDB"
 #define kAttachmentAdded @"kAttachmentAdded"
 #define kInfoHistoryDB   @"kInfoHistoryDB"
+#define kAddUpdateHandler @"kAddUpdateHandler"
 
 #define kCouchDBPort 5984
 #define kUpdateStatsInterval 30
@@ -114,6 +116,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) wakeUp
 {
     if(![self aWake]){
+        [self createDatabase];
 		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
 		[self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
 		[self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
@@ -253,6 +256,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 }
 
 #pragma mark ***Accessors
+- (BOOL) usingUpdateHandler
+{
+    return usingUpdateHandler;
+}
+- (void) setUsingUpdateHandler:(BOOL)aState
+{
+    usingUpdateHandler = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelUsingUpdateHandleChanged object:self];
+}
 
 - (BOOL) replicationRunning
 {
@@ -350,6 +362,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) setPortNumber:(NSUInteger)aPort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPortNumber:portNumber];
+    if(aPort == 0)aPort = 5984;
     
     portNumber = aPort;
     
@@ -475,48 +488,30 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) createDatabase
 {
     [self createDatabase:[self statusDBRef]];
+    [self addUpdateHandler:[self statusDBRef]];
 }
 
 - (void) createDatabase:(ORCouchDB*)aDBRef;
 {
-	//set up the views
-	NSString* aMap;
-	NSDictionary* aMapDictionary;
-	NSMutableDictionary* aViewDictionary = [NSMutableDictionary dictionary];
-    
-	aMap            = @"function(doc) { if(doc.type == 'Histogram1D') { emit(doc.name, { 'name': doc.name, 'counts': doc.counts }); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
-	[aViewDictionary setObject:aMapDictionary forKey:@"counts"];
-    
-    
-	aMap            = @"function(doc) { if(doc.type == 'alarms') { emit(doc.type, {'alarmlist': doc.alarmlist}); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"alarms"];
-
-	aMap            = @"function(doc) { if(doc.type == 'processes') { emit(doc.type, {'processlist': doc.processlist}); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"processes"];
-	
-	
-	aMap            = @"function(doc) { if(doc.type == 'machineinfo') { emit(doc.type, doc); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"];
-	[aViewDictionary setObject:aMapDictionary forKey:@"machineinfo"];
-
-	aMap            = @"function(doc) { if(doc.type == 'runinfo') { emit(doc._id, doc); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"runinfo"];
-
-	aMap            = @"function(doc) { if(doc.type == 'StatusLog') { emit(doc._id, doc); } }";
-	aMapDictionary  = [NSDictionary dictionaryWithObject:aMap forKey:@"map"]; 
-	[aViewDictionary setObject:aMapDictionary forKey:@"statuslog"];	
-	
-	NSDictionary* dbViews = [NSDictionary dictionaryWithObjectsAndKeys:
-				  @"javascript",@"language",
-				  aViewDictionary,@"views",
-				  nil];	
-		
-	[aDBRef createDatabase:kCreateDB views:dbViews];
+	[aDBRef createDatabase:kCreateDB views:nil];
 }
+
+- (void) addUpdateHandler
+{
+    [self addUpdateHandler:[self statusDBRef]];
+}
+
+- (void) addUpdateHandler:(ORCouchDB*)aDBRef;
+{
+    NSBundle* mainBundle = [NSBundle mainBundle];
+    
+	NSString*  filePath = [mainBundle pathForResource: @"CouchUpdateHandler" ofType: @"txt"];
+    if([[NSFileManager defaultManager] fileExistsAtPath:filePath] ){
+		NSString* aHandler  = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
+        [aDBRef addUpdateHandler:kAddUpdateHandler updateHandler:aHandler];
+    }
+}
+
 
 - (void) createHistoryDatabase
 {
@@ -630,7 +625,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
             }
         }
         
-        NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
+        NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"_id",@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
         [[self statusDBRef] updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
 		
 		[self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];	
@@ -672,7 +667,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
             }
             
             NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                         @"machineinfo",@"type",
+                                        @"machineinfo",@"_id",
+                                        @"machineinfo",@"type",
                                          [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
                                          computerName(),@"name",
                                          macAddress(),@"hw_address",
@@ -872,7 +868,14 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					[aResult prettyPrint:@"Remote Create Action:"];
 				}
 				else if([aTag isEqualToString:kDeleteDB]){
-					[aResult prettyPrint:@"CouchDB Message:"];
+                    if(![aResult objectForKey:@"error"]){
+                        [aResult prettyPrint:@"Deleted Main Database:"];
+                        [self setUsingUpdateHandler:NO];
+
+                    }
+                    else {
+                        [aResult prettyPrint:@"Deleted Main Database FAILED:"];
+                    }
 				}
 				
 				else if([aTag isEqualToString:kInfoInternalDB]){
@@ -888,6 +891,21 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				else if([aTag isEqualToString:kCompactDB]){
 					//[aResult prettyPrint:@"CouchDB Compacted:"];
 				}
+                else if([aTag isEqualToString:kAddUpdateHandler]){
+                    if([[aResult objectForKey:@"error"] isEqualToString:@"conflict"]){
+                        NSLog(@"CouchDB: Update handler already installed\n");
+                        [self setUsingUpdateHandler:YES];
+                    }
+                    else if(![aResult objectForKey:@"error"]){
+                        [aResult prettyPrint:@"CouchDB Update Handler Installation:"];
+                        [self setUsingUpdateHandler:YES];
+                   }
+                    else {
+                        [aResult prettyPrint:@"CouchDB Update Handler Installation Error:"];
+                        [self setUsingUpdateHandler:NO];
+                    }
+				}
+
 				else {
 					[aResult prettyPrint:@"CouchDB"];
 				}
@@ -1077,6 +1095,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         if(![lastTimeStamp length]) lastTimeStamp = @"0";
         
         NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                            anId,           @"_id",
                                             anId,           @"name",
                                             anId,			@"title",
                                             lastTimeStamp,	@"timestamp",
@@ -1227,8 +1246,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				runNumber=0;
 				subRunNumber=0;
 			}
-			[runInfo setObject:@"runinfo" forKey:@"type"];	
-			[runInfo setObject:experimentName forKey:@"experiment"];	
+            [runInfo setObject:@"runinfo" forKey:@"_id"];
+			[runInfo setObject:@"runinfo" forKey:@"type"];
+			[runInfo setObject:experimentName forKey:@"experiment"];
 			
 			[[self statusDBRef] updateDocument:runInfo documentId:@"runinfo" tag:kDocumentUpdated];
 			
@@ -1282,6 +1302,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	statusUpdateScheduled = NO;
 	NSString* s = [[ORStatusController sharedStatusController] contentsTail:24*60*60 includeDurationHeader:NO];
 	NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+							  @"statuslog",		@"_id",
 							  s,				@"statuslog",
 							  @"StatusLog",		@"type",
 							  nil];
@@ -1299,7 +1320,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		if([theAlarms count]){
 			for(id anAlarm in theAlarms)[arrayForDoc addObject:[anAlarm alarmInfo]];
 		}
-		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"alarms",@"name",arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
+		NSDictionary* alarmInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"alarms",@"_id",@"alarms",@"name",arrayForDoc,@"alarmlist",@"alarms",@"type",nil];
 		[[self statusDBRef] updateDocument:alarmInfo documentId:@"alarms" tag:kDocumentUpdated];
 	}
 }
@@ -1344,7 +1365,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                                                      nil];
                         NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
                         [dataSetNames addObject:
-                            [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
+                            [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"_id",dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
                          ];
 
                         [[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
@@ -1353,6 +1374,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                     
                     if([dataSetNames count]){
                         NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"HistogramCatalog",              @"_id",
                                                   @"HistogramCatalog",              @"name",
                                                   dataSetNames,                     @"list",
                                                   lastTimeStamp,                                            @"timestamp",
@@ -1389,7 +1411,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [self setLocalHostName:[decoder decodeObjectForKey:@"LocalHostName"]];
     [self setUserName:[decoder decodeObjectForKey:@"UserName"]];
     [self setRemoteHostName:[decoder decodeObjectForKey:@"RemoteHostName"]];
-    [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
     [self setPortNumber:[decoder decodeIntegerForKey:@"PortNumber"]];
     
     customDataBases = [[decoder decodeObjectForKey:@"customDataBases"] retain];
@@ -1399,7 +1420,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         [self performSelector:@selector(startReplication) withObject:nil afterDelay:4];
     }
     replicationCheckCount = 0;
-    
+    [self setStealthMode:[decoder decodeBoolForKey:@"stealthMode"]];
+
     [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
    return self;

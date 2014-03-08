@@ -45,6 +45,7 @@
     int replicationCheckCount;
     ORAlarm* replicationAlarm;
     NSMutableDictionary* customDataBases;
+    BOOL usingUpdateHandler;
 }
 
 #pragma mark ***Initialization
@@ -71,8 +72,10 @@
 - (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef;
 
 #pragma mark ***Accessors
+- (BOOL) usingUpdateHandler;
+- (void) setUsingUpdateHandler:(BOOL)aState;
 - (BOOL) replicationRunning;
-- (void) setReplicationRunning:(BOOL)aReplicationRunning;
+- (void) setReplicationRunning:(BOOL)aState;
 - (BOOL) couchRunning;
 - (BOOL) keepHistory;
 - (void) setKeepHistory:(BOOL)aKeepHistory;
@@ -113,6 +116,9 @@
 - (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName;
 - (void) createDatabase;
 - (void) createDatabase:(ORCouchDB*)aDBRef;
+- (void) addUpdateHandler;
+- (void) addUpdateHandler:(ORCouchDB*)aDBRef;
+
 - (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;
@@ -143,6 +149,7 @@ extern NSString* ORCouchDBRemoteHostNameChanged;
 extern NSString* ORCouchDBModelStealthModeChanged;
 extern NSString* ORCouchDBModelDBInfoChanged;
 extern NSString* ORCouchDBLocalHostNameChanged;
+extern NSString* ORCouchDBModelUsingUpdateHandleChanged;
 extern NSString* ORCouchDBLock;
 
 
