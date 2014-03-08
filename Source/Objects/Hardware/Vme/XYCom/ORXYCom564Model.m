@@ -527,7 +527,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 #pragma mark ***ORAdcProcessing protocol
 - (void) startProcessCycle
 {
-	[self _stopPolling];
+	//[self _stopPolling];
 }
 - (void) endProcessCycle
 {
@@ -536,12 +536,12 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
 - (void)processIsStarting
 {
-	[self _stopPolling];
+	//[self _stopPolling];
 }
 
 - (void)processIsStopping
 {
-	[self _startPolling];
+	//[self _startPolling];
 }
 
 - (BOOL) processValue:(int)channel
@@ -837,6 +837,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
                 [start release];
                 start = tmp;
                 tryTime = 0;
+                [NSThread sleepForTimeInterval:0.001];
             }
             [pool release];
         }
