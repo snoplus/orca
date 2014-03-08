@@ -1102,22 +1102,26 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     // }
     //
     // (NSDictionary).
+    //
+    // The notification can also pass itself as an object to have its delegate called.
     
     NSDictionary* aDict = [aNote userInfo];
     NSString* postToAddress = [aDict objectForKey:@"Address"];
     NSDictionary* document = [aDict objectForKey:@"Document"];
     if (postToAddress && document) {
-        [self postOrPutCustomRecord:document toAddress:postToAddress];
+        [self postOrPutCustomRecord:document toAddress:postToAddress withDelegate:[aNote object]];
     } else {
         NSLog(@"postOrPutCustomRecord notification not properly constructed\n");
     }
 }
 
-- (void) postOrPutCustomRecord:(NSDictionary*)aRecord toAddress:(NSString*)anAddr
+- (void) postOrPutCustomRecord:(NSDictionary*)aRecord toAddress:(NSString*)anAddr withDelegate:(id)del
 {
     // See documentation for postOrPutCustomRecord:(NSNotification*)aNote
     
-    [self postOrPutCustomRecord:aRecord dataBaseRef:[self statusDBRef:anAddr]];
+    ORCouchDB* ref = [self statusDBRef:anAddr];
+    [ref setDelegate:del];
+    [self postOrPutCustomRecord:aRecord dataBaseRef:ref];
 }
 
 - (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef
