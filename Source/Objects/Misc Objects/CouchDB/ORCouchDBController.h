@@ -55,6 +55,7 @@
 - (void) couchDBLockChanged:(NSNotification*)aNote;
 - (void) setQueCount:(NSNumber*)n;
 - (void) dataBaseInfoChanged:(NSNotification*)aNote;
+- (void) usingUpdateHandlerChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) startReplicationAction:(id)sender;

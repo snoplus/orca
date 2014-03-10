@@ -67,6 +67,7 @@
 - (void) groupChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) stringMapChanged:(NSNotification*)aNote;
+- (void) forceHVUpdate:(int)segIndex;
 
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;

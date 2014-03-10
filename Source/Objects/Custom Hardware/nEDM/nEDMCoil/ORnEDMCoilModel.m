@@ -754,7 +754,8 @@ for (id obj in listOfADCs) [obj x];               \
 - (void) initializeForRunning
 {
     CALL_SELECTOR_ONALL_POWERSUPPLIES(setUserLock:YES withString:@"nEDM Coil Process");
-    for (int i=0; i<NumberOfCoils;i++){
+    int i;
+    for (i=0; i<NumberOfCoils;i++){
         [self _setCurrent:0 forSupply:i];
         [self setVoltage:MaxVoltage atCoil:i];
     }
@@ -768,7 +769,8 @@ for (id obj in listOfADCs) [obj x];               \
     CALL_SELECTOR_ONALL_ADCS(stopPollingActivity);
     CALL_SELECTOR_ONALL_ADCS(setUserLock:NO withString:@"nEDM Coil Process");
     
-    for (int i=0; i<NumberOfCoils;i++){
+    int i;
+    for (i=0; i<NumberOfCoils;i++){
         [self _setCurrent:0 forSupply:i];
         [self setVoltage:1.0 atCoil:i];
     }
