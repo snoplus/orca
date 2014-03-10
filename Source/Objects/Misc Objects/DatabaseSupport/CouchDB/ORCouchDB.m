@@ -645,56 +645,50 @@
 - (void) main
 {
 	if([self isCancelled])return;
-    //@try {
-        if([delegate usingUpdateHandler]){
-            NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/default/_update/replaceDoc/%@", host, port, database, documentId];
-            id theDoc = document;
-            if(documentId && ![[document objectForKey:@"_id"] isEqualToString:documentId]){
-                NSMutableDictionary* mDict = [NSMutableDictionary dictionaryWithDictionary:document];
-                [mDict setObject:documentId forKey:@"_id"];
-                theDoc = mDict;
-            }
-            id result = [self send:httpString type:@"PUT" body:theDoc];
+    if([delegate respondsToSelector:@selector(usingUpdateHandler)] && [delegate usingUpdateHandler]){
+        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/default/_update/replaceDoc/%@", host, port, database, documentId];
+        id theDoc = document;
+        if(documentId && ![[document objectForKey:@"_id"] isEqualToString:documentId]){
+            NSMutableDictionary* mDict = [NSMutableDictionary dictionaryWithDictionary:document];
+            [mDict setObject:documentId forKey:@"_id"];
+            theDoc = mDict;
+        }
+        id result = [self send:httpString type:@"PUT" body:theDoc];
+        if(![result objectForKey:@"error"] && attachmentData){
+            [self addAttachement];
+        }
+    }
+    else {
+        //check for an existing document
+        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+        id result = [self send:httpString];
+        if(!result){
+            result = [NSDictionary dictionaryWithObjectsAndKeys:
+                      [NSString stringWithFormat:@"[%@] timeout",
+                       database],@"Message",nil];
+            informDelegate=YES;
+        }
+        else if([result objectForKey:@"error"]){
+            //document doesn't exist. So just add it.
+            result = [self send:httpString type:@"PUT" body:document];
             if(![result objectForKey:@"error"] && attachmentData){
                 [self addAttachement];
             }
         }
- /*       else {
-            //check for an existing document
-            NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-            id result = [self send:httpString];
-            if(!result){
-                result = [NSDictionary dictionaryWithObjectsAndKeys:
-                          [NSString stringWithFormat:@"[%@] timeout",
-                           database],@"Message",nil];
-                informDelegate=YES;
-            }
-            else if([result objectForKey:@"error"]){
-                //document doesn't exist. So just add it.
-                result = [self send:httpString type:@"PUT" body:document];
+        else {
+            //it already exists. insert the rev number into the document and put it back
+            id rev = [result objectForKey:@"_rev"];
+            if(rev){
+                NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
+                [newDocument setObject:rev forKey:@"_rev"];
+                result = [self send:httpString type:@"PUT" body:newDocument];
                 if(![result objectForKey:@"error"] && attachmentData){
                     [self addAttachement];
                 }
             }
-            else {
-                //it already exists. insert the rev number into the document and put it back
-                id rev = [result objectForKey:@"_rev"];
-                if(rev){
-                    NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
-                    [newDocument setObject:rev forKey:@"_rev"];
-                    result = [self send:httpString type:@"PUT" body:newDocument];
-                    if(![result objectForKey:@"error"] && attachmentData){
-                        [self addAttachement];
-                    }
-                }
-            }
-            if (informDelegate) [self sendToDelegate:result];
         }
+        if (informDelegate) [self sendToDelegate:result];
     }
-    @catch (NSException* e) {
-        //ignore
-    }
-  */
 
 }
 - (void) setInformDelegate:(BOOL)ok
