@@ -784,20 +784,12 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
     UInt8 data[1024];
     CFHTTPMessageRef aResponse;
     int len;
-    NSURL* url;
-    int status;
-    NSHTTPURLResponse* response;
-    NSDictionary* header;
     switch(type){
         case kCFStreamEventHasBytesAvailable:
             if([delegate isWaitingForResponse]){
                 aResponse = (CFHTTPMessageRef)CFReadStreamCopyProperty(stream, kCFStreamPropertyHTTPResponseHeader);
                 if (CFHTTPMessageIsHeaderComplete(aResponse)){
-                    url=[(NSURL*)CFHTTPMessageCopyRequestURL(aResponse) autorelease];
-                    status=CFHTTPMessageGetResponseStatusCode(aResponse);
-                    header=[(NSDictionary*)CFHTTPMessageCopyAllHeaderFields(aResponse) autorelease];
-                    response=[[[NSHTTPURLResponse alloc] initWithURL:url statusCode:status HTTPVersion:@"HTTP/1.1" headerFields:header]autorelease];
-                    [delegate streamReceivedResponse:response];
+                    [delegate streamReceivedResponse:aResponse];
                 }
                 CFRelease(aResponse);
                 break;
@@ -956,11 +948,11 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
     [self cancel];
 }
 
-- (void)streamReceivedResponse:(NSURLResponse *)aResponse {
+- (void)streamReceivedResponse:(CFHTTPMessageRef)aResponse {
     _waitingForResponse=FALSE;
-    _status = (int) ((NSHTTPURLResponse*)aResponse).statusCode;
-    if (_status >= 300) {
-        [self stop];
+    _status = (int) CFHTTPMessageGetResponseStatusCode(aResponse);
+        if (_status >= 300) {
+            [self stop];
     }
     [self sendToDelegate:[NSString stringWithFormat:@"%@: Got response, status %d", self, _status]];
 }

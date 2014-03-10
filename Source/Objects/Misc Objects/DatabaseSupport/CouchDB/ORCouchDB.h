@@ -201,6 +201,7 @@
     id listeningMode;
     NSUInteger heartbeat;
     NSString*   filter;
+    CFHTTPMessageRef _currentRequest;
     
 }
 - (void) main;
@@ -209,7 +210,7 @@
 - (void) setHeartbeat:(NSUInteger)beat;
 - (void) setFilter:(NSString*)aFilter;
 - (void) stop;
-- (void) streamReceivedResponse:(NSURLResponse *)aResponse;
+- (void) streamReceivedResponse:(CFHTTPMessageRef)aResponse;
 - (void) streamReceivedData:(NSData *)data;
 - (void) streamFailedWithError:(NSError *)error;
 - (void) streamFinished;
