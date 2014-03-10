@@ -859,13 +859,13 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
     CFURLRef theURL = CFURLCreateWithString(kCFAllocatorDefault, url, NULL);
     
     CFStringRef requestMethod = CFSTR("GET");
-    CFHTTPMessageRef theRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, requestMethod, theURL, kCFHTTPVersion1_1);
+    _currentRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, requestMethod, theURL, kCFHTTPVersion1_1);
     
-    CFHTTPMessageSetBody(theRequest, bodyData);
-    CFHTTPMessageSetHeaderFieldValue(theRequest, headerFieldName, headerFieldValue);
+    CFHTTPMessageSetBody(_currentRequest, bodyData);
+    CFHTTPMessageSetHeaderFieldValue(_currentRequest, headerFieldName, headerFieldValue);
     CFHTTPMessageRef msg = CFHTTPMessageCreateEmpty(NULL,FALSE);
     if(username && pwd){
-        CFHTTPMessageAddAuthentication(theRequest,msg,
+        CFHTTPMessageAddAuthentication(_currentRequest,msg,
 #if __has_feature(objc_arc)
                                        (__bridge CFStringRef)username,
                                        (__bridge CFStringRef)pwd,
@@ -876,34 +876,37 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
                                        NULL,
                                        FALSE);
 	}
-    
-    CFReadStreamRef _stream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, theRequest);
-    
+
+    while (![self isCancelled]) {
+        CFReadStreamRef _stream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, _currentRequest);
+        
+        CFStreamClientContext theContext={0,self,NULL,NULL,NULL};
+        
+        CFReadStreamSetClient(_stream,
+                              kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered
+                              , (CFReadStreamClientCallBack) &callback, &theContext);
+        
+        CFReadStreamScheduleWithRunLoop(_stream, [rl getCFRunLoop], kCFRunLoopDefaultMode);
+        
+        _waitingForResponse=TRUE;
+        
+        CFReadStreamOpen(_stream);
+        _status = 0;
+        while((![self isCancelled] &&
+               _status != 401 && _status != 407) &&
+              [rl runMode:NSDefaultRunLoopMode
+               beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+        
+        CFReadStreamUnscheduleFromRunLoop(_stream, [rl getCFRunLoop], kCFRunLoopDefaultMode);
+        CFReadStreamClose(_stream);
+        CFRelease(_stream);
+    }
     CFRelease(bodyData);
     CFRelease(theURL);
     CFRelease(msg);
-    CFRelease(theRequest);
-    
-    CFStreamClientContext theContext={0,self,NULL,NULL,NULL};
-    
-    CFReadStreamSetClient(_stream,
-                          kCFStreamEventHasBytesAvailable | kCFStreamEventErrorOccurred | kCFStreamEventEndEncountered
-                          , (CFReadStreamClientCallBack) &callback, &theContext);
-    
-    CFReadStreamScheduleWithRunLoop(_stream, [rl getCFRunLoop], kCFRunLoopDefaultMode);
-    
-    _waitingForResponse=TRUE;
-    
-    CFReadStreamOpen(_stream);
-    
-    while( ![self isCancelled] &&
-          [rl runMode:NSDefaultRunLoopMode
-           beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
-    
+    CFRelease(_currentRequest);
     // When we reach here, we have been cancelled.
     // The close of the stream removes it from the run list.
-    CFReadStreamClose(_stream);
-    CFRelease(_stream);
     
 }
 @end
@@ -951,10 +954,27 @@ static void callback(CFReadStreamRef stream, CFStreamEventType type, ORCouchDBCh
 - (void)streamReceivedResponse:(CFHTTPMessageRef)aResponse {
     _waitingForResponse=FALSE;
     _status = (int) CFHTTPMessageGetResponseStatusCode(aResponse);
+    int tempStatus = _status;
+    if (_status == 401 || _status == 407) {
+        if (!CFHTTPMessageAddAuthentication(_currentRequest, aResponse,
+#if __has_feature(objc_arc)
+                                                    (__bridge CFStringRef)username,
+                                                    (__bridge CFStringRef)pwd,
+#else
+                                                    (CFStringRef)username,
+                                                    (CFStringRef)pwd,
+#endif
+                                                    kCFHTTPAuthenticationSchemeBasic,FALSE)) {
+            [self sendToDelegate:[NSString stringWithFormat:@"%@: Authentication failed", self]];
+            [self stop];
+        }
+
+    } else {
         if (_status >= 300) {
             [self stop];
+        }
     }
-    [self sendToDelegate:[NSString stringWithFormat:@"%@: Got response, status %d", self, _status]];
+    [self sendToDelegate:[NSString stringWithFormat:@"%@: Got response, status %d", self,tempStatus]];
 }
 
 - (void)streamReceivedData:(NSData *)data {
