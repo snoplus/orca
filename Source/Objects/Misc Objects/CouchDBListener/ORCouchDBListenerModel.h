@@ -34,7 +34,7 @@
     
     //CouchDB Configuration
     NSString* hostName;
-    NSUInteger port;
+    NSUInteger portNumber;
     NSString* databaseName;
     NSString* userName;
     NSString* password;
@@ -73,29 +73,30 @@
 - (void) changeIgnored;
 
 //Message Section
-- (NSString*) getStatusLog;
+- (NSString*) statusLog;
 - (void) setStatusLog:(NSString*)log;
 - (void) log:(NSString*)message;
 
 //CouchDb Config
 - (void) setDatabaseName:(NSString*)name;
 - (void) setHostName:(NSString*)name;
-- (void) setPort:(NSUInteger)aPort;
+- (void) setPortNumber:(NSUInteger)aPort;
 - (void) setUserName:(NSString*)name;
 - (void) setPassword:(NSString*)pwd;
-- (NSArray*) getDatabaseList;
-- (NSString*) getDatabase;
-- (NSUInteger) getHeartbeat;
-- (NSString*) getHostName;
-- (NSUInteger) getPort;
-- (NSString*) getUserName;
+- (NSArray*) databaseList;
+- (NSString*) database;
+- (NSUInteger) heartbeat;
+- (NSString*) hostName;
+- (NSUInteger) portNumber;
+- (NSString*) userName;
+- (NSString*) password;
 - (BOOL) isListening;
-- (void) heartbeat:(NSUInteger)beat;
+- (void) setHeartbeat:(NSUInteger)beat;
 
 
 //Command Section
 - (void) setCommonMethods:(BOOL)only;
-- (NSArray*) getObjectList;
+- (NSArray*) objectList;
 - (NSArray*) getMethodListForObjectID:(NSString*)objID;
 - (BOOL) commonMethodsOnly;
 - (NSMutableArray*) cmdTableArray;

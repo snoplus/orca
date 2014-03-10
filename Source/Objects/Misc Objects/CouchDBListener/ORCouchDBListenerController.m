@@ -89,8 +89,8 @@
 - (void) databaseListChanged:(NSNotification *)aNote
 {
     [databaseListView removeAllItems];
-    [databaseListView addItemsWithObjectValues:[model getDatabaseList]];
-    [databaseListView setObjectValue:[model getDatabase]];
+    [databaseListView addItemsWithObjectValues:[model databaseList]];
+    [databaseListView setObjectValue:[model database]];
 }
 
 - (void) listeningChanged:(NSNotification *)aNote
@@ -108,7 +108,7 @@
 - (void) objectListChanged:(NSNotification *)aNote
 {
     [cmdObjectBox removeAllItems];
-    [cmdObjectBox addItemsWithObjectValues:[model getObjectList]];
+    [cmdObjectBox addItemsWithObjectValues:[model objectList]];
 }
 
 - (void) commandsChanged:(NSNotification *)aNote
@@ -118,26 +118,53 @@
 
 - (void) statusLogChanged:(NSNotification *)aNote
 {
-    [statusLog setString:[model getStatusLog]];
+    [statusLog setString:[model statusLog]];
 }
+
+- (void) hostChanged:(NSNotification *)aNote
+{
+    [hostField setStringValue:[model hostName]];
+}
+- (void) portChanged:(NSNotification*)aNote
+{
+    [portField setIntegerValue:[model portNumber]];
+}
+- (void) databaseChanged:(NSNotification*)aNote
+{
+    [databaseListView setObjectValue:[model database]];
+}
+- (void) usernameChanged:(NSNotification*)aNote
+{
+    [userNameField setStringValue:[model userName]];
+}
+- (void) passwordChanged:(NSNotification*)aNote
+{
+    [pwdField setStringValue:[model password]];
+}
+- (void) heartbeatChanged:(NSNotification*)aNote
+{
+    [heartbeatField setIntegerValue:[model heartbeat]];
+}
+
 
 #pragma mark •••Actions
 - (void) updateDisplays
 {
-    [heartbeatField setIntegerValue:[model getHeartbeat]];
-    [hostField setStringValue:[model getHostName]];
     
-    //somehow notifications from this thread do not work???
-    [model updateObjectList];
-    //[model updateObjectList];
     
-    [portField setIntegerValue:[model getPort]];
-    NSString* usr=[model getUserName];
-    if(usr) [userNameField setStringValue:usr];
+    [self heartbeatChanged:nil];
+    [self hostChanged:nil];
+    [self portChanged:nil];
+    [self usernameChanged:nil];
+    [self passwordChanged:nil];
+    [self listeningChanged:nil];
+    
+    [self objectListChanged:nil];
     [self listeningChanged:nil];
     [cmdTable reloadData];
     [cmdCommonMethodsOnly setState:[model commonMethodsOnly]];
-    [statusLog setString:[model getStatusLog]];
+    [self statusLogChanged:nil];
+    [self databaseChanged:nil];
     
 }
 
@@ -187,7 +214,7 @@
 
 - (IBAction) heartbeatSet:(id)sender
 {
-    [model heartbeat:(NSUInteger)[heartbeatField integerValue]];
+    [model setHeartbeat:[heartbeatField integerValue]];
 }
 
 - (IBAction) databaseSelected:(id)sender
@@ -203,8 +230,7 @@
 
 - (IBAction) portSet:(id)sender
 {
-    //MAH. Added cast to clear 10.9 compiler warning about other setPort methods
-    [(ORCouchDBListenerModel*)model setPort:(NSUInteger)[portField integerValue]];
+    [model setPortNumber:[portField integerValue]];
 }
 
 - (IBAction) userNameSet:(id)Sender

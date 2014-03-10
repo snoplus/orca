@@ -53,13 +53,13 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 {
 	self=[super init];
 	[self registerNotificationObservers];
-    heartbeat=5000;
+    [self setHeartbeat:5000];
     [self setHostName:@"localhost"];
-    port=kCouchDBPort;
+    [self setPortNumber:kCouchDBPort];
     commonMethodsOnly=YES;
     [self setDefaults];
     ignoreNextChanges=0;
-    statusLogString=@"";
+    [self setStatusLog:@""];
 	return self;
 }
 
@@ -136,7 +136,7 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
     ignoreNextChanges-=1;
 }
 
-- (NSString*) getStatusLog
+- (NSString*) statusLog
 {
     return statusLogString;
 }
@@ -159,18 +159,18 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 //Couch Config
 - (void) setDatabaseName:(NSString*)name{
     [databaseName release];
-    databaseName=[name retain];
+    databaseName=[name copy];
 }
 
 - (void) setHostName:(NSString*)name{
 
     [hostName release];
-    hostName= [name retain];
+    hostName= [name copy];
 }
 
-- (void) setPort:(NSUInteger)aPort
+- (void) setPortNumber:(NSUInteger)aPort
 {
-    port=aPort;
+    portNumber=aPort;
 }
 
 - (void) setUserName:(NSString*)name
@@ -178,49 +178,56 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
     if ([name length]==0)
     {
         userName=nil;
-        [password release];
-        password=nil;
+        [self setPassword:nil];
     }
     else{
         [userName release];
-        userName=[name retain];
+        userName=[name copy];
     }
 }
 
 - (void) setPassword:(NSString*)pwd
 {
     [password release];
-    password=[pwd retain];
+    password=[pwd copy];
 }
 
-- (NSArray*) getDatabaseList
+- (NSArray*) databaseList
 {
     return databaseList;
 }
 
-- (NSString*) getDatabase
+- (NSString*) database
 {
     return databaseName;
 }
 
-- (NSUInteger) getHeartbeat
+- (NSUInteger) heartbeat
 {
     return heartbeat;
 }
 
-- (NSString*) getHostName
+- (NSString*) hostName
 {
+    if (!hostName) return @"";
     return hostName;
 }
 
-- (NSUInteger) getPort
+- (NSUInteger) portNumber
 {
-    return port;
+    return portNumber;
 }
 
-- (NSString*) getUserName
+- (NSString*) userName
 {
+    if (!userName) return @"";
     return userName;
+}
+
+- (NSString*) password
+{
+    if (!password) return @"";
+    return password;
 }
 
 - (BOOL) isListening
@@ -233,8 +240,9 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
     }
 }
 
-- (void) heartbeat:(NSUInteger)beat
+- (void) setHeartbeat:(NSUInteger)beat
 {
+    
     heartbeat=beat;
 }
 
@@ -245,7 +253,7 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
     commonMethodsOnly=only;
 }
 
-- (NSArray*) getObjectList
+- (NSArray*) objectList
 {
     return objectList;
 }
@@ -371,7 +379,7 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 
 - (ORCouchDB*) statusDBRef
 {
-    return [ORCouchDB couchHost:hostName port:port username:userName pwd:password database:databaseName delegate:self];
+    return [ORCouchDB couchHost:hostName port:portNumber username:userName pwd:password database:dbName delegate:self];
 }
 
 - (void) listDatabases
@@ -695,13 +703,15 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
     [self setHostName: [decoder decodeObjectForKey:@"hostName"]];
-    [self setPort: [decoder decodeIntegerForKey:@"port"]];
+    [self setPortNumber: [decoder decodeIntegerForKey:@"port"]];
     [self setDatabaseName:[decoder decodeObjectForKey:@"dbName"]];
-    [self heartbeat:[decoder decodeIntegerForKey:@"heartbeat"]];
+    [self setHeartbeat:[decoder decodeIntegerForKey:@"heartbeat"]];
 	[self registerNotificationObservers];
     [self setCommands:[decoder decodeObjectForKey:@"cmdTableArray"]];
     [self setCommonMethods:[decoder decodeBoolForKey:@"commonOnly"]];
     [self setStatusLog: [decoder decodeObjectForKey:@"statusLog"]];
+    [self setUserName:[decoder decodeObjectForKey:@"userName"]];
+    [self setPassword:[decoder decodeObjectForKey:@"password"]];
     //[self setCmdDocName: [decoder decodeObjectForKey:@"cmdDocName"]];
     if(!cmdTableArray){
         [self setDefaults];
@@ -713,12 +723,14 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:databaseName forKey:@"dbName"];
-    [encoder encodeInteger:port forKey:@"port"];
+    [encoder encodeInteger:portNumber forKey:@"port"];
     [encoder encodeObject:hostName forKey:@"hostName"];
     [encoder encodeInteger:heartbeat forKey:@"heartbeat"];
     [encoder encodeObject:cmdTableArray forKey:@"cmdTableArray"];
     [encoder encodeBool:commonMethodsOnly forKey:@"commonOnly"];
     [encoder encodeObject:statusLogString forKey:@"statusLog"];
+    [encoder encodeObject:userName forKey:@"userName"];
+    [encoder encodeObject:password forKey:@"password"];
     //[encoder encodeObject:cmdDocName forKey:@"cmdDocName"];
 }
 

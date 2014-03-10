@@ -56,6 +56,13 @@
 - (void) objectListChanged:(NSNotification *)aNote;
 - (void) commandsChanged:(NSNotification *)aNote;
 - (void) statusLogChanged:(NSNotification*)aNote;
+- (void) hostChanged:(NSNotification *)aNote;
+- (void) portChanged:(NSNotification*)aNote;
+- (void) hostChanged:(NSNotification *)aNote;
+- (void) databaseChanged:(NSNotification*)aNote;
+- (void) usernameChanged:(NSNotification*)aNote;
+- (void) passwordChanged:(NSNotification*)aNote;
+- (void) heartbeatChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (void) updateDisplays;
