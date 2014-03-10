@@ -77,7 +77,34 @@
                          name : ORCouchDBListenerModelStatusLogChanged
                        object : nil];
     
-
+    [notifyCenter addObserver : self
+                     selector : @selector(heartbeatChanged:)
+                         name : ORCouchDBListenerModelHeartbeatChanged
+                       object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(hostChanged:)
+                         name : ORCouchDBListenerModelHostChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(portChanged:)
+                         name : ORCouchDBListenerModelPortChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(usernameChanged:)
+                         name : ORCouchDBListenerModelUsernameChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(passwordChanged:)
+                         name : ORCouchDBListenerModelPasswordChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(databaseChanged:)
+                         name : ORCouchDBListenerModelDatabaseChanged
+                       object : nil];
 }
 
 - (void) updateWindow

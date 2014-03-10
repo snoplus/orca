@@ -40,11 +40,18 @@
 
 #define kCouchDBPort 5984
 
-NSString* ORCouchDBListenerModelDatabaseListChanged = @"ORCouchDBListenerModelDatabaseListChanged";
-NSString* ORCouchDBListenerModelListeningChanged = @"ORCouchDBListenerModelListeningChanged";
-NSString* ORCouchDBListenerModelObjectListChanged = @"ORCouchDBListenerModelObjectListChanged";
-NSString* ORCouchDBListenerModelCommandsChanged =@"ORCouchDBListenerModelCommandsChanged";
-NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatusLogChanged";
+NSString* ORCouchDBListenerModelDatabaseListChanged    = @"ORCouchDBListenerModelDatabaseListChanged";
+NSString* ORCouchDBListenerModelListeningChanged       = @"ORCouchDBListenerModelListeningChanged";
+NSString* ORCouchDBListenerModelObjectListChanged      = @"ORCouchDBListenerModelObjectListChanged";
+NSString* ORCouchDBListenerModelCommandsChanged        =@"ORCouchDBListenerModelCommandsChanged";
+NSString* ORCouchDBListenerModelStatusLogChanged       =@"ORCouchDBListenerModelStatusLogChanged";
+NSString* ORCouchDBListenerModelHostChanged            = @"ORCouchDBListenerModelHostChanged";
+NSString* ORCouchDBListenerModelPortChanged            = @"ORCouchDBListenerModelPortChanged"; 
+NSString* ORCouchDBListenerModelDatabaseChanged        = @"ORCouchDBListenerModelDatabaseChanged";
+NSString* ORCouchDBListenerModelUsernameChanged        = @"ORCouchDBListenerModelUsernameChanged";
+NSString* ORCouchDBListenerModelPasswordChanged            = @"ORCouchDBListenerModelPasswordChanged";
+NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerModelListeningStatusChanged";
+NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 
 @implementation ORCouchDBListenerModel
 
@@ -160,17 +167,20 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 - (void) setDatabaseName:(NSString*)name{
     [databaseName release];
     databaseName=[name copy];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelDatabaseChanged object:self];
 }
 
 - (void) setHostName:(NSString*)name{
 
     [hostName release];
     hostName= [name copy];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelHostChanged object:self];
 }
 
 - (void) setPortNumber:(NSUInteger)aPort
 {
     portNumber=aPort;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelPortChanged object:self];
 }
 
 - (void) setUserName:(NSString*)name
@@ -184,12 +194,14 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
         [userName release];
         userName=[name copy];
     }
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelUsernameChanged object:self];
 }
 
 - (void) setPassword:(NSString*)pwd
 {
     [password release];
     password=[pwd copy];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelPasswordChanged object:self];
 }
 
 - (NSArray*) databaseList
@@ -244,6 +256,7 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 {
     
     heartbeat=beat;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelHeartbeatChanged object:self];
 }
 
 
@@ -298,9 +311,9 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
         [self uploadAllSections];
     }
     else{
-        [self log:@"Changesfeed canceled"];
+        [self log:@"Changes feed cancelled"];
         [runningChangesfeed cancel];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBListenerModelListeningChanged object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListeningChanged object:self];
     }
     
 }
@@ -379,6 +392,7 @@ NSString* ORCouchDBListenerModelStatusLogChanged =@"ORCouchDBListenerModelStatus
 
 - (ORCouchDB*) statusDBRef
 {
+    NSString* dbName = [databaseName stringByReplacingOccurrencesOfString:@"/" withString:@"%2F"];
     return [ORCouchDB couchHost:hostName port:portNumber username:userName pwd:password database:dbName delegate:self];
 }
 
