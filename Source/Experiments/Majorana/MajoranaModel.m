@@ -135,6 +135,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         }
         if(!foundIt){
             [anHVCard setChan:aChannel name:@""];
+            [anHVCard setMaxVoltage:aChannel withValue:0 ];
         }
     }
 }

@@ -37,6 +37,9 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 @end
 
 @implementation OREHS8260pModel
+
+#define kMaxVoltage 6000
+
 #pragma mark ***Initialization
 - (id) init {
 	self = [super init];
@@ -491,7 +494,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Min Voltage"];
-    [p setFormat:@"##0" upperLimit:3300 lowerLimit:1 stepSize:1 units:@"V"];
+    [p setFormat:@"##0" upperLimit:[self supplyVoltageLimit] lowerLimit:1 stepSize:1 units:@"V"];
     [p setSetMethod:@selector(setMinVoltage:withValue:) getMethod:@selector(minVoltage)];
     [a addObject:p];
 
@@ -527,6 +530,11 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
     [super setMaxVoltage:i withValue:aValue];
 }
 - (int) maxVoltage:(int)i { return [self ramper:i].maxVoltage; }
+- (int) supplyVoltageLimit
+{
+    //subclassed should override
+    return kMaxVoltage;
+}
 
 //----------------------------------------------------------------------------------------------
 
@@ -552,7 +560,8 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	int i;
 	for(i=0;i<8;i++){
 		ORDetectorRamper* aRamper = [[ORDetectorRamper alloc] initWithDelegate:self channel:i];
-		
+        [rampers addObject:aRamper];
+
 		//defaults
 		aRamper.maxVoltage    = [self maxVoltage:i];
 		aRamper.minVoltage    = 0;
@@ -563,7 +572,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		aRamper.lowVoltageStep        = 75;
 		aRamper.lowVoltageWait        = 30;
 		
-		[rampers addObject:aRamper];
 		
 		[aRamper release];
 	}

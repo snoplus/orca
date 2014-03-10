@@ -587,7 +587,6 @@
         int crateNum  = [[[aSegment params] objectForKey:@"kHVCrate"] intValue];
 		int cardNum   = [[[aSegment params] objectForKey:@"kHVCard"] intValue];
 		int chanNum   = [[[aSegment params] objectForKey:@"kHVChan"] intValue];
-        NSLog(@"%d: %d   %d; %d\n",[aHVCard crateNumber],crateNum,[aHVCard slot],cardNum);
         if([aHVCard crateNumber] != crateNum) continue;
         if([aHVCard slot]        != cardNum) continue;
         [aHVCard setMaxVoltage:chanNum withValue:[[[aSegment params] objectForKey:@"kMaxVoltage"] intValue] ];

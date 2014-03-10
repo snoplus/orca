@@ -211,7 +211,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
                                   [NSNumber numberWithInt:[self slot]],             @"card",
                                   [NSNumber numberWithInt:aChannel],                @"channel",
                                   nil];
-    
+        [self setMaxVoltage:aChannel withValue:[self supplyVoltageLimit]]; //assume no request returned
         [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRequestHVMaxValues object:self userInfo:userInfo];
     }
 }

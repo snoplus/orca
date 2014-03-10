@@ -279,6 +279,7 @@
 		int index = [hvTableView selectedRow];
         if(index<0 || index>[model numberOfChannels])index=0;
 		[model setSelectedChannel:index];
+		[self maxVoltageChanged:nil];
 	}
 }
 

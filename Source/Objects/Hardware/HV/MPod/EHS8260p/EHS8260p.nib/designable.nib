@@ -661,7 +661,7 @@
 															<object class="NSTextField" id="491705889">
 																<reference key="NSNextResponder" ref="64413853"/>
 																<int key="NSvFlags">268</int>
-																<string key="NSFrame">{{107, 149}, {64, 11}}</string>
+																<string key="NSFrame">{{107, 148}, {64, 12}}</string>
 																<reference key="NSSuperview" ref="64413853"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="381045384"/>
@@ -669,7 +669,7 @@
 																<object class="NSTextFieldCell" key="NSCell" id="638745200">
 																	<int key="NSCellFlags">68157504</int>
 																	<int key="NSCellFlags2">4326400</int>
-																	<string key="NSContents">Max: 1000.1</string>
+																	<string key="NSContents"/>
 																	<reference key="NSSupport" ref="22"/>
 																	<reference key="NSControlView" ref="491705889"/>
 																	<reference key="NSBackgroundColor" ref="125656912"/>
@@ -1938,10 +1938,12 @@
 																	<reference key="NSNextKeyView" ref="430694715"/>
 																	<reference key="NSTableView" ref="260760146"/>
 																</object>
-																<object class="_NSCornerView" key="NSCornerView">
-																	<nil key="NSNextResponder"/>
+																<object class="_NSCornerView" key="NSCornerView" id="682996207">
+																	<reference key="NSNextResponder" ref="953458585"/>
 																	<int key="NSvFlags">-2147483392</int>
 																	<string key="NSFrame">{{736, 0}, {16, 17}}</string>
+																	<reference key="NSSuperview" ref="953458585"/>
+																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="430694715"/>
 																</object>
 																<array class="NSMutableArray" key="NSTableColumns">
@@ -2336,6 +2338,20 @@
 														</object>
 														<int key="NScvFlags">4</int>
 													</object>
+													<object class="NSClipView" id="969502596">
+														<reference key="NSNextResponder" ref="953458585"/>
+														<int key="NSvFlags">2338</int>
+														<array class="NSMutableArray" key="NSSubviews">
+															<reference ref="178623341"/>
+														</array>
+														<string key="NSFrame">{{1, 0}, {755, 17}}</string>
+														<reference key="NSSuperview" ref="953458585"/>
+														<reference key="NSWindow"/>
+														<reference key="NSNextKeyView" ref="178623341"/>
+														<reference key="NSDocView" ref="178623341"/>
+														<reference key="NSBGColor" ref="694736172"/>
+														<int key="NScvFlags">4</int>
+													</object>
 													<object class="NSScroller" id="442028624">
 														<reference key="NSNextResponder" ref="953458585"/>
 														<int key="NSvFlags">-2147483392</int>
@@ -2362,20 +2378,7 @@
 														<double key="NSCurValue">0.0013245033112582781</double>
 														<double key="NSPercent">0.99869791666666663</double>
 													</object>
-													<object class="NSClipView" id="969502596">
-														<reference key="NSNextResponder" ref="953458585"/>
-														<int key="NSvFlags">2338</int>
-														<array class="NSMutableArray" key="NSSubviews">
-															<reference ref="178623341"/>
-														</array>
-														<string key="NSFrame">{{1, 0}, {755, 17}}</string>
-														<reference key="NSSuperview" ref="953458585"/>
-														<reference key="NSWindow"/>
-														<reference key="NSNextKeyView" ref="178623341"/>
-														<reference key="NSDocView" ref="178623341"/>
-														<reference key="NSBGColor" ref="694736172"/>
-														<int key="NScvFlags">4</int>
-													</object>
+													<reference ref="682996207"/>
 												</array>
 												<string key="NSFrame">{{6, 308}, {757, 170}}</string>
 												<reference key="NSSuperview" ref="784919653"/>
@@ -2386,6 +2389,7 @@
 												<reference key="NSHScroller" ref="587733114"/>
 												<reference key="NSContentView" ref="430694715"/>
 												<reference key="NSHeaderClipView" ref="969502596"/>
+												<reference key="NSCornerView" ref="682996207"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -3969,8 +3973,8 @@
 							<reference ref="236960428"/>
 							<reference ref="617239936"/>
 							<reference ref="224103151"/>
-							<reference ref="491705889"/>
 							<reference ref="516017360"/>
+							<reference ref="491705889"/>
 						</array>
 						<reference key="parent" ref="784919653"/>
 					</object>
