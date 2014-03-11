@@ -38,7 +38,7 @@
 {
     @private
         NSFileHandle*	filePointer;
-        unsigned long	dataFileSize;
+        unsigned long long	dataFileSize;
         NSString*		fileName;
         NSString*		statusFileName;
 
@@ -105,8 +105,8 @@
 - (NSFileHandle *)filePointer;
 - (void)setFilePointer:(NSFileHandle *)aFilePointer;
 - (void)setTitles;
-- (unsigned long)dataFileSize;
-- (void) setDataFileSize:(unsigned long)aSize;
+- (unsigned long long)dataFileSize;
+- (void) setDataFileSize:(unsigned long long)aSize;
 - (void) getDataFileSize;
 - (void) checkDiskStatus;
 

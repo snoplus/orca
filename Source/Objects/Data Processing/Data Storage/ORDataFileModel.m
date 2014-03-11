@@ -27,17 +27,17 @@
 #import "ORStatusController.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORDataFileModelGenerateMD5Changed = @"ORDataFileModelGenerateMD5Changed";
-NSString* ORDataFileModelProcessLimitHighChanged = @"ORDataFileModelProcessLimitHighChanged";
-NSString* ORDataFileModelUseDatedFileNamesChanged	= @"ORDataFileModelUseDatedFileNamesChanged";
-NSString* ORDataFileModelUseFolderStructureChanged	= @"ORDataFileModelUseFolderStructureChanged";
-NSString* ORDataFileModelFilePrefixChanged			= @"ORDataFileModelFilePrefixChanged";
-NSString* ORDataFileModelFileSegmentChanged			= @"ORDataFileModelFileSegmentChanged";
-NSString* ORDataFileModelMaxFileSizeChanged			= @"ORDataFileModelMaxFileSizeChanged";
-NSString* ORDataFileModelLimitSizeChanged			= @"ORDataFileModelLimitSizeChanged";
-NSString* ORDataFileChangedNotification             = @"The DataFile File Has Changed";
-NSString* ORDataFileStatusChangedNotification 		= @"The DataFile Status Has Changed";
-NSString* ORDataFileSizeChangedNotification 		= @"The DataFile Size Has Changed";
+NSString* ORDataFileModelGenerateMD5Changed             = @"ORDataFileModelGenerateMD5Changed";
+NSString* ORDataFileModelProcessLimitHighChanged        = @"ORDataFileModelProcessLimitHighChanged";
+NSString* ORDataFileModelUseDatedFileNamesChanged       = @"ORDataFileModelUseDatedFileNamesChanged";
+NSString* ORDataFileModelUseFolderStructureChanged      = @"ORDataFileModelUseFolderStructureChanged";
+NSString* ORDataFileModelFilePrefixChanged              = @"ORDataFileModelFilePrefixChanged";
+NSString* ORDataFileModelFileSegmentChanged             = @"ORDataFileModelFileSegmentChanged";
+NSString* ORDataFileModelMaxFileSizeChanged             = @"ORDataFileModelMaxFileSizeChanged";
+NSString* ORDataFileModelLimitSizeChanged               = @"ORDataFileModelLimitSizeChanged";
+NSString* ORDataFileChangedNotification                 = @"The DataFile File Has Changed";
+NSString* ORDataFileStatusChangedNotification           = @"The DataFile Status Has Changed";
+NSString* ORDataFileSizeChangedNotification             = @"The DataFile Size Has Changed";
 NSString* ORDataSaveConfigurationChangedNotification    = @"ORDataSaveConfigurationChangedNotification";
 NSString* ORDataFileModelSizeLimitReachedActionChanged	= @"ORDataFileModelSizeLimitReachedActionChanged";
 
@@ -652,12 +652,12 @@ static const int currentVersion = 1;           // Current version
 {
 }
 
-- (unsigned long)dataFileSize
+- (unsigned long long)dataFileSize
 {
     return dataFileSize;
 }
 
-- (void) setDataFileSize:(unsigned long)aNumber
+- (void) setDataFileSize:(unsigned long long)aNumber
 {
     dataFileSize = aNumber;
     
@@ -672,13 +672,11 @@ static const int currentVersion = 1;           // Current version
 
 - (void) getDataFileSize
 {
-    NSNumber* fsize;
     NSFileManager* fm = [NSFileManager defaultManager];
     NSString* fullFileName = openFilePath;
-    NSDictionary *fattrs = [fm attributesOfItemAtPath:fullFileName error:nil];
-    if ((fsize = [fattrs objectForKey:NSFileSize])){
-        [self setDataFileSize:[fsize intValue]];
-    }
+    unsigned  long long fsize= ([[fm attributesOfItemAtPath:fullFileName error:nil] fileSize]);
+
+    [self setDataFileSize:fsize];
 	checkCount++;
 	if(!(checkCount%20)) {
 		[self checkDiskStatus];

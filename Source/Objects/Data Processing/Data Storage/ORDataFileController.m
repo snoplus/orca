@@ -467,10 +467,10 @@ enum {
 
 - (void) fileSizeChanged:(NSNotification*)note
 {
-	unsigned long theSize = [model dataFileSize];
-	if(theSize<1000)[sizeTextField setStringValue: [NSString stringWithFormat:@"%lu Bytes",[model dataFileSize]]];
-	else if(theSize<100000)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f KB",[model dataFileSize]/1000.]];
-	else if(theSize<1000000000)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f MB",[model dataFileSize]/1000000.]];
+	unsigned long long theSize = [model dataFileSize];
+	if(theSize<1000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%lu Bytes",(unsigned long)[model dataFileSize]]];
+	else if(theSize<100000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f KB",(unsigned long)[model dataFileSize]/1000.]];
+	else if(theSize<1000000000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f MB",[model dataFileSize]/1000000.]];
 	else [sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f GB",[model dataFileSize]/1000000000.]];
 }
 
