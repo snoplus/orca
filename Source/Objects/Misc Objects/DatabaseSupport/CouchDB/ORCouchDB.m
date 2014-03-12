@@ -859,7 +859,7 @@ static void ORCouchDB_Feed_callback(CFReadStreamRef stream,
     httpString = [httpString stringByAppendingString:options];
     
     CFURLRef theURL = CFURLCreateWithString(NULL,
-#if __has_feature(objc_arc)
+#if defined(__has_feature) && __has_feature(objc_arc)
                                             (__bridge CFStringRef)httpString,
 #else
                                             (CFStringRef)httpString,
@@ -981,7 +981,7 @@ static void ORCouchDB_Feed_callback(CFReadStreamRef stream,
     if (_status == 401 || _status == 407) {
         if (!CFHTTPMessageAddAuthentication(_currentRequest,
                                             aResponse,
-#if __has_feature(objc_arc)
+#if defined(__has_feature) && __has_feature(objc_arc)
                                             (__bridge CFStringRef)username,
                                             (__bridge CFStringRef)pwd,
 #else
