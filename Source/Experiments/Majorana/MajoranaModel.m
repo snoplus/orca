@@ -116,22 +116,27 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         int aCard       = [[userInfo objectForKey:@"card"]      intValue];
         int aChannel    = [[userInfo objectForKey:@"channel"]   intValue];
         BOOL foundIt    = NO;
-        int aSet = 0; //for now only the detector can make this request
-        ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
-        int numSegments = [self numberSegmentsInGroup:aSet];
-        int i;
-        for(i = 0; i<numSegments; i++){
-            NSDictionary* params = [[segmentGroup segment:i]params];
-            if(!params)break;
-            if([[params objectForKey:@"kHVCrate"]intValue] != aCrate)continue;
-            if([[params objectForKey:@"kHVCard"]intValue] != aCard)continue;
-            if([[params objectForKey:@"kHVChan"]intValue] != aChannel)continue;
-            //get here and it's a match
-            [anHVCard setMaxVoltage:aChannel withValue:[[params objectForKey:@"kMaxVoltage"] intValue] ];
-            [anHVCard setChan:aChannel name:[params objectForKey:@"kDetectorName"]];
-            foundIt = YES;
-            break;
-            
+        int aSet;
+        for(aSet =0;aSet<2;aSet++){
+            ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+            int numSegments = [self numberSegmentsInGroup:aSet];
+            int i;
+            for(i = 0; i<numSegments; i++){
+                NSDictionary* params = [[segmentGroup segment:i]params];
+                if(!params)break;
+                if([[params objectForKey:@"kHVCrate"]intValue] != aCrate)continue;
+                if([[params objectForKey:@"kHVCard"]intValue] != aCard)continue;
+                if([[params objectForKey:@"kHVChan"]intValue] != aChannel)continue;
+                id maxVoltNum = [params objectForKey:@"kMaxVoltage"];
+                //get here and it's a match
+                if(maxVoltNum){
+                    //only if there is an entry for max voltage do we set it
+                    [anHVCard setMaxVoltage:aChannel withValue:[maxVoltNum intValue] ];
+                    [anHVCard setChan:aChannel name:[params objectForKey:@"kDetectorName"]];
+                }
+                foundIt = YES;
+                break;
+            }
         }
         if(!foundIt){
             [anHVCard setChan:aChannel name:@""];
