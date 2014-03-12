@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------
-//  ORCouchDBModel.h
+//  ORCouchDBListenerModel.h
 //
 //  Created by Thomas Stolz on 05/20/13.
 //  Copyright (c) 2006 CENPA, University of Washington. All rights reserved.
@@ -18,19 +18,13 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-@class ORCouchDB;
 @class ORScriptRunner;
 
 
 @interface ORCouchDBListenerModel : OrcaObject {
     
-    NSUInteger ignoreNextChanges;
-    
     //Message Section
-    BOOL msgSectionReady;
     NSString* statusLogString;
-    NSMutableDictionary* messageDict;
-    NSString* msgDocName;
     
     //CouchDB Configuration
     NSString* hostName;
@@ -56,7 +50,6 @@
     NSMutableArray* cmdTableArray;
     BOOL commonMethodsOnly;
     NSMutableDictionary* cmdDict;
-    NSMutableDictionary* cmdUploadDict;
     NSString* lastRev;
     
 }
@@ -69,8 +62,6 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Accessors
-- (void) ignoreNextChange;
-- (void) changeIgnored;
 
 //Message Section
 - (NSString*) statusLog;
@@ -99,27 +90,15 @@
 - (NSArray*) objectList;
 - (NSArray*) getMethodListForObjectID:(NSString*)objID;
 - (BOOL) commonMethodsOnly;
-- (NSMutableArray*) cmdTableArray;
 - (NSDictionary*) cmdDict;
-//- (void) setCmdDocName:(NSString*) name;
 
 #pragma mark ***DB Access
 - (void) startStopSession;
-- (void) startChangesfeed;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
-- (ORCouchDB*) statusDBRef;
 - (void) listDatabases;
-- (void) fetchCommandDocForCheck;
-- (void) fetchCmdDocForCheck;
-- (void) uploadAllSections;
-- (void) sectionReady;
-
-#pragma mark ***Message Section
-- (void) uploadMsgSection;
 
 #pragma mark ***Command Section
 - (void) updateObjectList;
-- (BOOL) checkSyntax:(NSString*)key;
 - (BOOL) executeCommand:(NSString*)key value:(NSString*)val;
 - (void) setCommands:(NSMutableArray*)anArray;
 - (void) setDefaults;
@@ -128,13 +107,8 @@
 - (void) addCommand;
 - (void) removeCommand:(int)index;
 //DB Interaction
-- (void) uploadCmdSection;
-- (void) createCmdDict;
-- (void) createCmdUploadDict;
-- (void) processCmdDocument:(NSDictionary*) doc;
 
 #pragma mark ***Script Section
-- (void) checkCommandDoc:(NSDictionary*)doc;
 - (BOOL) runScript:(NSString*) aScript;
 - (void) scriptRunnerDidFinish:(BOOL)finished returnValue:(NSNumber*)val;
 

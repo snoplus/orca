@@ -1,5 +1,5 @@
 //
-//  ORCouchDBModel.m
+//  ORCouchDBListenerModel.m
 //  Orca
 //
 //  Created by Thomas Stolz on 05/20/13.
@@ -34,9 +34,8 @@
 #define kListDB             @"kListDB"
 #define kChangesfeed        @"kChangesfeed"
 #define kCommandDocCheck    @"kCommandDocCheck"
-#define kCmdDocCheck        @"kCmdDocCheck"
 #define kCmdUploadDone      @"kCmdUploadDone"
-#define kMsgUploadDone      @"kMsgUploadDone"
+#define kDesignUploadDone   @"kDesignUploadDone"
 
 #define kCouchDBPort 5984
 
@@ -53,6 +52,164 @@ NSString* ORCouchDBListenerModelPasswordChanged            = @"ORCouchDBListener
 NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerModelListeningStatusChanged";
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 
+@interface ORCouchDB (private)
+- (void) _uploadCmdDesignDocument;
+- (void) _fetchDocument:(NSString*)docName;
+- (void) _uploadCmdSection;
+- (void) _createCmdDict;
+- (void) _processCmdDocument:(NSDictionary*) doc;
+- (void) _uploadAllSections;
+- (void) statusDBRef;
+- (BOOL) checkSyntax:(NSString*) key;
+@end
+
+@implementation ORCouchDBListenerModel (private)
+
+- (void) _uploadCmdDesignDocument
+{
+    
+    [self log:@"Uploading _design/orcacommand document..."];
+    NSString* filterString = @"function (doc, req)"
+                              "{"
+                              "   if (doc.type && doc.type == 'command' && !doc.response) { return true; }"
+                              "   return false;"
+                              "}";
+    NSDictionary* filterDict = [NSDictionary dictionaryWithObjectsAndKeys:filterString,@"execute_commands", nil];
+    NSDictionary* dict=[NSDictionary dictionaryWithObjectsAndKeys:filterDict,@"filters",nil];
+    
+    [[self statusDBRef] updateDocument:dict
+                            documentId:@"_design/orcacommand"
+                                   tag:kDesignUploadDone
+                     informingDelegate:YES];
+}
+
+- (void) _fetchDocument:(NSString*)docName
+{
+    [[self statusDBRef] getDocumentId:docName tag:kCommandDocCheck];
+}
+
+//DB Interactions
+
+- (void) _uploadCmdSection
+{
+    [self log:@"Uploading commands section..."];
+    [[self statusDBRef] updateDocument:[NSDictionary dictionaryWithObjectsAndKeys:cmdDict,@"keys",nil]
+                            documentId:cmdDocName
+                                   tag:kCmdUploadDone
+                     informingDelegate:YES];
+}
+
+- (void) _createCmdDict
+{
+    [cmdDict release];
+    cmdDict = [[NSMutableDictionary alloc] initWithCapacity:256];
+    for (id cmd in cmdTableArray) {
+        NSMutableDictionary* tempdict= [NSMutableDictionary dictionaryWithDictionary:cmd];
+        [tempdict removeObjectForKey:@"Label"];
+        [cmdDict setObject:tempdict forKey:[cmd objectForKey:@"Label"]];
+    }
+    
+}
+
+- (void) _processCmdDocument:(NSDictionary*) doc
+{
+    
+    if([[doc valueForKey:@"run"] isEqualToString:@"YES"]){
+        NSString* new_script=[doc objectForKey:@"script"];
+        if(YES){
+            [script release];
+            script=[new_script copy];
+            if([scriptRunner running])
+            {
+                [scriptRunner stop];
+                sleep(0.1);
+            }
+            if([self runScript:script])[self log:@"parsedOK - script started"];
+            else [self log:@"parsing error\n"];
+        }
+    } else if([[doc valueForKey:@"run"] isEqualToString:@"NO"]) {
+        if(scriptRunner){
+            if([scriptRunner running]){
+                [scriptRunner stop];
+            }
+        }
+    } else {
+        
+        NSString* message;
+        NSString* key=[doc valueForKey:@"execute"];
+        NSString* val=[NSString stringWithFormat:@"%@",[doc valueForKey:@"arguments"]];
+        
+        NSDictionary* cmd=[cmdDict objectForKey:key];
+        
+        if(cmd){
+            if ([self checkSyntax:key]){
+                if([self executeCommand:key value:val]){
+                    message=[NSString stringWithFormat:@"executed command with label '%@'",key];
+                }
+                else {
+                    message=@"failure while trying to execute";
+                }
+            }
+            else{
+                message=@"cmd with invalid syntax";
+            }
+        }
+        else {
+            message = @"no cmd found for this key";
+        }
+        [self log:message];
+        NSMutableDictionary* returnDic = [NSMutableDictionary dictionaryWithDictionary:doc];
+        [returnDic setObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                              message,@"content",
+                              [[NSDate date] description],@"timestamp",nil] forKey:@"response"];
+        [[self statusDBRef] updateDocument:returnDic
+                                documentId:[returnDic objectForKey:@"_id"]
+                                       tag:nil];
+    }
+}
+
+- (void) _uploadAllSections
+{
+    cmdSectionReady=NO;
+    //    scriptSectionready=NO;
+    [self _uploadCmdDesignDocument];
+    [self _uploadCmdSection];
+}
+
+- (ORCouchDB*) statusDBRef
+{
+    NSString* dbName = [databaseName stringByReplacingOccurrencesOfString:@"/" withString:@"%2F"];
+    return [ORCouchDB couchHost:hostName port:portNumber username:userName pwd:password database:dbName delegate:self];
+}
+
+- (BOOL) checkSyntax:(NSString*) key
+{
+	BOOL syntaxOK = YES;
+    id aCommand = [cmdDict objectForKey:key];
+	if(aCommand){
+		NSString* objID = [aCommand objectForKey:@"Object"];
+		id obj = [[self document] findObjectWithFullID:objID];
+		if(obj){
+			[aCommand setObject:@"OK" forKey:@"ObjectOK"];
+			NSString* s	= [aCommand objectForKey:@"Selector"];
+			if([obj respondsToSelector:[NSInvocation makeSelectorFromString:s]]){
+				[aCommand setObject:@"OK" forKey:@"SelectorOK"];
+			}
+			else {
+				syntaxOK = NO;
+				[aCommand removeObjectForKey:@"SelectorOK"];
+			}
+		}
+		else {
+			syntaxOK = NO;
+			[aCommand removeObjectForKey:@"ObjectOK"];
+		}
+	}
+	return syntaxOK;
+}
+
+@end
+
 @implementation ORCouchDBListenerModel
 
 #pragma mark ***Initialization
@@ -65,7 +222,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [self setPortNumber:kCouchDBPort];
     commonMethodsOnly=YES;
     [self setDefaults];
-    ignoreNextChanges=0;
     [self setStatusLog:@""];
 	return self;
 }
@@ -82,7 +238,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [databaseList release];
     [cmdTableArray release];
     [cmdDict release];
-    [cmdUploadDict release];
 	[super dealloc];
 }
 
@@ -91,7 +246,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [super wakeUp];
     
     cmdDocName=@"commands";
-    msgDocName=@"messages";
     scriptDocName=@"Orca Scripts";
     commandDoc = @"control";
     runningChangesfeed=nil;
@@ -109,14 +263,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 
 - (void) registerNotificationObservers
 {
-//    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-//    
-//	[notifyCenter removeObserver:self];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(applicationIsTerminating:)
-//                         name : @"ORAppTerminating"
-//                       object : [NSApp delegate]];
 	
 }
 
@@ -126,23 +272,15 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
             [runningChangesfeed release];
             runningChangesfeed=nil;
             [self log:@"Changesfeed operation finished"];
-            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListeningChanged object:self];
+            [[NSNotificationCenter defaultCenter]
+             postNotificationOnMainThreadWithName:ORCouchDBListenerModelListeningChanged
+             object:self];
         }
         
     }
 }
 
 #pragma mark ***Accessors
-- (void) ignoreNextChange
-{
-    ignoreNextChanges+=1;
-}
-
-- (void) changeIgnored
-{
-    ignoreNextChanges-=1;
-}
-
 - (NSString*) statusLog
 {
     return statusLogString;
@@ -163,6 +301,7 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
         [self setStatusLog:[[NSString stringWithFormat:@"%@: %@\n", [NSDate date], message] stringByAppendingString:statusLogString]];
     }
 }
+
 //Couch Config
 - (void) setDatabaseName:(NSString*)name{
     [databaseName release];
@@ -285,30 +424,19 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     return commonMethodsOnly;
 }
 
-- (NSMutableArray*) cmdTableArray
-{
-	return cmdTableArray;
-}
-
 - (NSDictionary*) cmdDict
 {
-    [self createCmdDict];
+    [self _createCmdDict];
     return [NSDictionary dictionaryWithDictionary:cmdDict];
 }
-
-//- (void) setCmdDocName:(NSString*) name
-//{
-//    cmdDocName = [NSString stringWithString:name];
-//}
 
 #pragma mark ***DB Access
 
 -(void) startStopSession
 {
     if (!runningChangesfeed){
-        [self createCmdDict];
-        [self createCmdUploadDict];
-        [self uploadAllSections];
+        [self _createCmdDict];
+        [self _uploadAllSections];
     }
     else{
         [self log:@"Changes feed cancelled"];
@@ -320,7 +448,10 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 
 -(void) startChangesfeed
 {
-    runningChangesfeed=[[[self statusDBRef] changesFeedMode:kContinuousFeed Heartbeat:heartbeat Tag:kChangesfeed] retain];
+    runningChangesfeed=[[[self statusDBRef] changesFeedMode:kContinuousFeed
+                                                  heartbeat:heartbeat
+                                                        tag:kChangesfeed
+                                                     filter:@"orcacommand/execute_commands"] retain];
     [runningChangesfeed addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListeningChanged object:self];
 }
@@ -330,28 +461,10 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 	@synchronized(self){
 		if([aResult isKindOfClass:[NSDictionary class]]){
             if([aTag isEqualToString:kChangesfeed]){
-//                [aResult prettyPrint:@"CouchDB Changes:"];
-                if ([[aResult objectForKey:@"id"] isEqualToString:commandDoc]){
-                    [self fetchCommandDocForCheck];
-                }
-                else if ([[aResult objectForKey:@"id"] isEqualToString:cmdDocName]){
-                    if (ignoreNextChanges){
-                        [self changeIgnored];
-                    }
-                    else{
-                        [self log:@"Command Section has changed - start processing"];
-                        [lastRev release];
-                        lastRev = [[[[aResult objectForKey:@"changes"] objectAtIndex:0] objectForKey:@"rev"] retain];
-                        [self fetchCmdDocForCheck];
-                    }
-                }
-
+                [self _fetchDocument:[aResult objectForKey:@"id"]];
             }
             else if([aTag isEqualToString:kCommandDocCheck]){
-                [self checkCommandDoc:aResult];
-            }
-            else if([aTag isEqualToString:kCmdDocCheck]){
-                [self processCmdDocument:aResult];
+                [self _processCmdDocument:aResult];
             }
             else if([aTag isEqualToString:kCmdUploadDone]){
                 if ([aResult objectForKey:@"error"]){
@@ -362,16 +475,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
                     [self sectionReady];
                 }
                 else [self log:[NSString stringWithFormat:@"Command Section upload failed: %@", aResult]];
-            }
-            else if([aTag isEqualToString:kMsgUploadDone]){
-                if ([aResult objectForKey:@"error"]){
-                    [self log:[NSString stringWithFormat:@"Message Section upload failed: %@", [aResult objectForKey:@"reason"]]];
-                }
-                else if ([aResult objectForKey:@"ok"]){
-                    msgSectionReady=YES;
-                    [self sectionReady];
-                }
-                else [self log:[NSString stringWithFormat:@"Message Section upload failed: %@", aResult]];
             }
 		}
 		else if([aResult isKindOfClass:[NSArray class]]){
@@ -390,53 +493,19 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 
 }
 
-- (ORCouchDB*) statusDBRef
-{
-    NSString* dbName = [databaseName stringByReplacingOccurrencesOfString:@"/" withString:@"%2F"];
-    return [ORCouchDB couchHost:hostName port:portNumber username:userName pwd:password database:dbName delegate:self];
-}
 
 - (void) listDatabases
 {
 	[[self statusDBRef] listDatabases:self tag:kListDB];
 }
 
-- (void) fetchCommandDocForCheck
-{
-    [[self statusDBRef] getDocumentId:commandDoc tag:kCommandDocCheck];
-}
-
-- (void) fetchCmdDocForCheck
-{
-    [[self statusDBRef] getDocumentId:cmdDocName tag:kCmdDocCheck];
-}
-
-- (void) uploadAllSections
-{
-    cmdSectionReady=NO;
-    msgSectionReady=NO;
-//    scriptSectionready=NO;
-    [self uploadCmdSection];
-    [self uploadMsgSection];
-
-    
-}
 
 - (void) sectionReady
 {
-    if (cmdSectionReady && msgSectionReady)    // && scriptSectionReady && prmSectionReady
+    if (cmdSectionReady)    // && scriptSectionReady && prmSectionReady
     {
         [self startChangesfeed];
     }
-}
-
-#pragma mark ***Message Section
-- (void) uploadMsgSection
-{
-    [self log:@"Uploading message section..."];
-    [messageDict release];
-    messageDict=[[NSMutableDictionary alloc] initWithObjectsAndKeys:@"session started", [[NSDate date] description], nil];
-    [[self statusDBRef] updateDocument:messageDict documentId:msgDocName tag:kMsgUploadDone informingDelegate:YES];
 }
 
 #pragma mark ***Command Section
@@ -454,35 +523,9 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     
 }
 
-- (BOOL) checkSyntax:(NSString*) key
-{
-	BOOL syntaxOK = YES;
-    id aCommand = [cmdDict objectForKey:key];
-	if(aCommand){
-		NSString* objID = [aCommand objectForKey:@"Object"];
-		id obj = [[self document] findObjectWithFullID:objID];
-		if(obj){
-			[aCommand setObject:@"OK" forKey:@"ObjectOK"];
-			NSString* s	= [aCommand objectForKey:@"Selector"];
-			if([obj respondsToSelector:[NSInvocation makeSelectorFromString:s]]){
-				[aCommand setObject:@"OK" forKey:@"SelectorOK"];
-			}
-			else {
-				syntaxOK = NO;
-				[aCommand removeObjectForKey:@"SelectorOK"];
-			}
-		}
-		else {
-			syntaxOK = NO;
-			[aCommand removeObjectForKey:@"ObjectOK"];
-		}
-	}
-	return syntaxOK;
-}
-
 - (BOOL) executeCommand:(NSString*) key value:(NSString*)val
 {
-    [self createCmdDict];
+    [self _createCmdDict];
     BOOL goodToGo = NO;
 	id aCommand = [cmdDict objectForKey:key];
     if(aCommand){
@@ -581,96 +624,8 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBListenerModelCommandsChanged object:self];
 }
 
-//DB Interactions
-
-- (void) uploadCmdSection
-{
-    [self log:@"Uploading commands section..."];
-    [[self statusDBRef] updateDocument:cmdUploadDict documentId:cmdDocName tag:kCmdUploadDone informingDelegate:YES];
-//    cmdSectionReady=YES;
-//    [self sectionReady];
-}
-
-- (void) createCmdDict
-{
-    [cmdDict release];
-    cmdDict = [[NSMutableDictionary alloc] initWithCapacity:256];
-    for (id cmd in cmdTableArray) {
-        NSMutableDictionary* tempdict= [NSMutableDictionary dictionaryWithDictionary:cmd];
-        [tempdict removeObjectForKey:@"Label"];
-        [cmdDict setObject:tempdict forKey:[cmd objectForKey:@"Label"]];
-    }
-
-}
-- (void) createCmdUploadDict
-{
-    [cmdUploadDict release];
-    cmdUploadDict = [[NSMutableDictionary alloc] initWithCapacity:256];
-    [cmdUploadDict setObject:cmdDict forKey:@"keys"];
-    [cmdUploadDict setObject:@"" forKey:@"execute"];
-    [cmdUploadDict setObject:@"" forKey:@"value (optional)"];
-}
-
-- (void) processCmdDocument:(NSDictionary*) doc
-{
-    NSString* message;
-    NSString* key=[doc valueForKey:@"execute"];
-    NSString* val=[NSString stringWithFormat:@"%@",[doc valueForKey:@"value (optional)"]];
-
-    NSDictionary* cmd=[cmdDict objectForKey:key];
-
-    if(cmd){
-        if ([self checkSyntax:key]){
-            if([self executeCommand:key value:val]){
-                message=[NSString stringWithFormat:@"%@: executed command with label '%@'", [NSDate date], key];
-            }
-            else {
-                message=@"failure while trying to execute";
-            }
-        }
-        else{
-            message=@"cmd with invalid syntax";
-        }
-    }
-    else {
-        message = @"no cmd found for this key";
-    }
-    [self log:message];
-    [messageDict setObject:message forKey:[[NSDate date] description]];
-    [[self statusDBRef] updateDocument:messageDict documentId:msgDocName tag:nil];
-    if ([[doc objectForKey:@"_rev"] isEqualToString:lastRev]){
-        [self ignoreNextChange];
-        [[self statusDBRef] updateDocument:cmdUploadDict documentId:cmdDocName tag:kCmdUploadDone];
-    }
-}
 
 #pragma mark ***Script Section
-
-- (void) checkCommandDoc:(NSDictionary*)doc
-{
-    if([[doc valueForKey:@"run"] isEqualToString:@"YES"]){
-        NSString* new_script=[doc objectForKey:@"script"];
-        if(YES){
-            [script release];
-            script=[new_script copy];
-            if([scriptRunner running])
-            {
-                [scriptRunner stop];
-                sleep(0.1);
-            }
-            if([self runScript:script])[self log:@"parsedOK - script started"];
-            else [self log:@"parsing error\n"];
-        }
-    }
-    else if([[doc valueForKey:@"run"] isEqualToString:@"NO"]) {
-        if(scriptRunner){
-            if([scriptRunner running]){
-                [scriptRunner stop];
-            }
-        }
-    }
-    else [self log:[NSString stringWithFormat:@"command doc without run statement: %@", doc]];
-}
 
 - (BOOL) runScript:(NSString*) aScript
 {
@@ -684,14 +639,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
         if(parsedOK){
             if([scriptRunner scriptExists]){
                 [scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-                //if([scriptRunner debugging]){
-                //    [scriptRunner setBreakpoints:[self breakpointSet]];
-                //}
-                [scriptRunner setDebugMode:kRunToBreakPoint];
-                //[self shipTaskRecord:self running:YES];
-                //if([startMessage length]>0){
-                //    NSLog(@"%@\n",startMessage);
-                //}
                 [scriptRunner run:nil sender:self];
             }
             else {
@@ -726,7 +673,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [self setStatusLog: [decoder decodeObjectForKey:@"statusLog"]];
     [self setUserName:[decoder decodeObjectForKey:@"userName"]];
     [self setPassword:[decoder decodeObjectForKey:@"password"]];
-    //[self setCmdDocName: [decoder decodeObjectForKey:@"cmdDocName"]];
     if(!cmdTableArray){
         [self setDefaults];
     }
@@ -745,7 +691,6 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [encoder encodeObject:statusLogString forKey:@"statusLog"];
     [encoder encodeObject:userName forKey:@"userName"];
     [encoder encodeObject:password forKey:@"password"];
-    //[encoder encodeObject:cmdDocName forKey:@"cmdDocName"];
 }
 
 @end

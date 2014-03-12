@@ -54,8 +54,9 @@
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
 - (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
-- (NSOperation*) changesFeedMode:(NSString*)mode Tag:(NSString*)aTag;
-- (NSOperation*) changesFeedMode:(NSString*)mode Heartbeat:(NSUInteger)heartbeat Tag:(NSString*)aTag;
+- (NSOperation*) changesFeedMode:(NSString*)mode tag:(NSString*)aTag;
+- (NSOperation*) changesFeedMode:(NSString*)mode heartbeat:(NSUInteger)heartbeat tag:(NSString*)aTag;
+- (NSOperation*) changesFeedMode:(NSString*)mode heartbeat:(NSUInteger)heartbeat tag:(NSString*)aTag filter:(NSString*)filter;
 
 #pragma mark ***CouchDB Checks
 - (BOOL) couchDBRunning;
@@ -198,37 +199,44 @@
     NSMutableData* _inputBuffer;
     int _status;
     BOOL _waitingForResponse;
-    id listeningMode;
-    NSUInteger heartbeat;
-    NSString*   filter;
     CFHTTPMessageRef _currentRequest;
+
+    NSString*  listeningMode;
+    NSUInteger heartbeat;
+    NSString*  filter;
     
 }
 - (void) main;
+
 - (BOOL) isWaitingForResponse;
-- (void) setListeningMode:(NSString*)mode;
-- (void) setHeartbeat:(NSUInteger)beat;
-- (void) setFilter:(NSString*)aFilter;
-- (void) stop;
 - (void) streamReceivedResponse:(CFHTTPMessageRef)aResponse;
 - (void) streamReceivedData:(NSData *)data;
 - (void) streamFailedWithError:(NSError *)error;
 - (void) streamFinished;
-- (void) performContinuousFeed;
-- (void) performPolling;
+
+@property (copy) NSString* listeningMode;
+@property (copy) NSString* filter;
+@property (assign) NSUInteger heartbeat;
+
+
 @end
 
 //a thin wrapper around NSOperationQueue to make a shared queue for couch access
 @interface ORCouchDBQueue : NSObject {
     NSOperationQueue* queue;
+    NSOperationQueue* changesFeedQueue;
 }
 + (ORCouchDBQueue*) sharedCouchDBQueue;
 + (void) addOperation:(NSOperation*)anOp;
++ (void) addChangeFeedOperation:(ORCouchDBChangesfeedOp*)feedOp;
 + (NSOperationQueue*) queue;
++ (NSOperationQueue*) changesFeedQueue;
 + (NSUInteger) operationCount;
 + (void) cancelAllOperations;
 - (void) addOperation:(NSOperation*)anOp;
+- (void) addChangesFeedOperation:(ORCouchDBChangesfeedOp*)feedOp;
 - (NSOperationQueue*) queue;
+- (NSOperationQueue*) changesFeedQueue;
 - (void) cancelAllOperations;
 - (NSInteger) operationCount;
 @end
