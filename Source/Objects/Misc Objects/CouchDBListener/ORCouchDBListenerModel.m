@@ -51,6 +51,7 @@ NSString* ORCouchDBListenerModelUsernameChanged        = @"ORCouchDBListenerMode
 NSString* ORCouchDBListenerModelPasswordChanged            = @"ORCouchDBListenerModelPasswordChanged";
 NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerModelListeningStatusChanged";
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
+NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
 
 @interface ORCouchDB (private)
 - (void) _uploadCmdDesignDocument;
@@ -60,6 +61,7 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 - (void) _processCmdDocument:(NSDictionary*) doc;
 - (void) _uploadAllSections;
 - (void) statusDBRef;
+- (void) statusDBRef:(NSString*)db_name;
 - (BOOL) checkSyntax:(NSString*) key;
 @end
 
@@ -77,7 +79,7 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     NSDictionary* filterDict = [NSDictionary dictionaryWithObjectsAndKeys:filterString,@"execute_commands", nil];
     NSDictionary* dict=[NSDictionary dictionaryWithObjectsAndKeys:filterDict,@"filters",nil];
     
-    [[self statusDBRef] updateDocument:dict
+    [[self statusDBRef]updateDocument:dict
                             documentId:@"_design/orcacommand"
                                    tag:kDesignUploadDone
                      informingDelegate:YES];
@@ -93,10 +95,9 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 - (void) _uploadCmdSection
 {
     [self log:@"Uploading commands section..."];
-    [[self statusDBRef] updateDocument:[NSDictionary dictionaryWithObjectsAndKeys:cmdDict,@"keys",nil]
+    [[self statusDBRef:updatePath] addDocument:[NSDictionary dictionaryWithObjectsAndKeys:cmdDict,@"keys",nil]
                             documentId:cmdDocName
-                                   tag:kCmdUploadDone
-                     informingDelegate:YES];
+                                   tag:kCmdUploadDone];
 }
 
 - (void) _createCmdDict
@@ -178,7 +179,15 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 
 - (ORCouchDB*) statusDBRef
 {
+    return [self statusDBRef:nil];
+}
+
+- (ORCouchDB*) statusDBRef:(NSString*)db_name;
+{
     NSString* dbName = [databaseName stringByReplacingOccurrencesOfString:@"/" withString:@"%2F"];
+    if ([db_name length] != 0) {
+        dbName = [dbName stringByAppendingFormat:@"/%@",db_name];
+    }
     return [ORCouchDB couchHost:hostName port:portNumber username:userName pwd:password database:dbName delegate:self];
 }
 
@@ -343,6 +352,13 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelPasswordChanged object:self];
 }
 
+- (void) setUpdatePath:(NSString *)aPath
+{
+    [updatePath release];
+    updatePath=[aPath copy];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelUpdatePathChanged object:self];
+}
+
 - (NSArray*) databaseList
 {
     return databaseList;
@@ -379,6 +395,12 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 {
     if (!password) return @"";
     return password;
+}
+
+- (NSString*) updatePath
+{
+    if (!updatePath) return @"";
+    return updatePath;
 }
 
 - (BOOL) isListening
@@ -673,6 +695,7 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [self setStatusLog: [decoder decodeObjectForKey:@"statusLog"]];
     [self setUserName:[decoder decodeObjectForKey:@"userName"]];
     [self setPassword:[decoder decodeObjectForKey:@"password"]];
+    [self setUpdatePath:[decoder decodeObjectForKey:@"updatePath"]];
     if(!cmdTableArray){
         [self setDefaults];
     }
@@ -691,6 +714,7 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
     [encoder encodeObject:statusLogString forKey:@"statusLog"];
     [encoder encodeObject:userName forKey:@"userName"];
     [encoder encodeObject:password forKey:@"password"];
+    [encoder encodeObject:updatePath forKey:@"updatePath"];
 }
 
 @end

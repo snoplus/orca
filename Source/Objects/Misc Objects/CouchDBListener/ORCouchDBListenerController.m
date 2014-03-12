@@ -105,6 +105,11 @@
                      selector : @selector(databaseChanged:)
                          name : ORCouchDBListenerModelDatabaseChanged
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updatePathChanged:)
+                         name : ORCouchDBListenerModelUpdatePathChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -172,6 +177,19 @@
 {
     [heartbeatField setIntegerValue:[model heartbeat]];
 }
+- (void) updatePathChanged:(NSNotification*)aNote
+{
+    NSString* updatePath = [model updatePath];
+    if ([updatePath length] == 0) {
+        [updateNameField setStringValue:@""];
+        [updateDesignDocField setStringValue:@""];
+    } else {
+        NSArray* components = [updatePath componentsSeparatedByString:@"/"];
+        if ([components count] != 4) return;
+        [updateNameField setStringValue:[components objectAtIndex:3]];
+        [updateDesignDocField setStringValue:[components objectAtIndex:1]];
+    }
+}
 
 
 #pragma mark •••Actions
@@ -192,6 +210,7 @@
     [cmdCommonMethodsOnly setState:[model commonMethodsOnly]];
     [self statusLogChanged:nil];
     [self databaseChanged:nil];
+    [self updatePathChanged:nil];
     
 }
 
@@ -358,6 +377,18 @@
 {
     [model setStatusLog:@""];
 }
+
+- (IBAction) updatePathAction:(id)sender
+{
+    NSString* designdoc = [updateDesignDocField stringValue];
+    NSString* updatename = [updateNameField stringValue];
+    if ([updatename length] == 0 && [designdoc length] == 0) {
+        [model setUpdatePath:nil];
+    } else if ([updatename length] != 0 && [designdoc length] != 0) {
+        [model setUpdatePath:[NSString stringWithFormat:@"_design/%@/_update/%@",designdoc,updatename]];
+    }
+}
+
 #pragma mark •••DataSource
 
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView

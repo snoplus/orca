@@ -43,6 +43,8 @@
     IBOutlet NSButton* cmdObjectUpdateButton;
     IBOutlet NSButton* cmdTestExecuteButton;
     IBOutlet NSTextField* cmdValueField;
+    IBOutlet NSTextField* updateDesignDocField;
+    IBOutlet NSTextField* updateNameField;
     
     //Status Log
     IBOutlet NSTextView* statusLog;
@@ -63,6 +65,7 @@
 - (void) usernameChanged:(NSNotification*)aNote;
 - (void) passwordChanged:(NSNotification*)aNote;
 - (void) heartbeatChanged:(NSNotification*)aNote;
+- (void) updatePathChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (void) updateDisplays;
@@ -84,6 +87,7 @@
 - (IBAction) updateObjectList:(id)sender;
 - (IBAction) testExecute:(id)sender;
 - (IBAction) clearStatusLog:(id)sender;
+- (IBAction) updatePathAction:(id)sender;
 
 
 

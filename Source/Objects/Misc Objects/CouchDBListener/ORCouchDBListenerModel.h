@@ -52,6 +52,8 @@
     NSMutableDictionary* cmdDict;
     NSString* lastRev;
     
+    NSString* updatePath;
+    
 }
 
 #pragma mark ***Initialization
@@ -74,6 +76,7 @@
 - (void) setPortNumber:(NSUInteger)aPort;
 - (void) setUserName:(NSString*)name;
 - (void) setPassword:(NSString*)pwd;
+- (void) setUpdatePath:(NSString*)aPath;
 - (NSArray*) databaseList;
 - (NSString*) database;
 - (NSUInteger) heartbeat;
@@ -81,6 +84,7 @@
 - (NSUInteger) portNumber;
 - (NSString*) userName;
 - (NSString*) password;
+- (NSString*) updatePath;
 - (BOOL) isListening;
 - (void) setHeartbeat:(NSUInteger)beat;
 
@@ -129,3 +133,4 @@ extern NSString* ORCouchDBListenerModelUsernameChanged;
 extern NSString* ORCouchDBListenerModelPasswordChanged;
 extern NSString* ORCouchDBListenerModelListeningStatusChanged;
 extern NSString* ORCouchDBListenerModelHeartbeatChanged;
+extern NSString* ORCouchDBListenerModelUpdatePathChanged;
