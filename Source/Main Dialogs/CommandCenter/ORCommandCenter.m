@@ -606,13 +606,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
                     }
                 }
                 else {
-                    [aClient sendCmd:@"Error" withString:@"cmd not found"];
+                    [aClient sendCmd:@"Error" withString:@"Cmd Not Found"];
                     NSLog(@"Command not recognized: <%@>.\n",NSStringFromSelector(theSelector));
                 }
             }
             if([allObjs count]==0){
-                [aClient sendCmd:@"Error" withString:@"obj not found"];
-                NSLog(@"unable to parse: %@\n",oneCmd);
+                [aClient sendCmd:@"Error" withString:@"Obj Not Found"];
+                NSLog(@"Comm Center: unable to process (%@)  \n",oneCmd);
             }
         }
     }
