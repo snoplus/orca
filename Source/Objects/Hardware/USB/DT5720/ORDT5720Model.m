@@ -150,12 +150,12 @@ static DT5720Registers Dt5720Regs[kNumberDT5720Registers] = {
 
 - (unsigned long) vendorID
 {
-	return 0x0A2D; //DT5720
+	return 0x21E1UL; //DT5720
 }
 
 - (unsigned long) productID
 {
-	return 0x0019;	//DT5720
+	return 0x0000UL; //DT5720
 }
 
 - (id) getUSBController
