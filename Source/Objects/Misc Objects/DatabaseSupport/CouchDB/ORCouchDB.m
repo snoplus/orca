@@ -859,11 +859,7 @@ static void ORCouchDB_Feed_callback(CFReadStreamRef stream,
     httpString = [httpString stringByAppendingString:options];
     
     CFURLRef theURL = CFURLCreateWithString(NULL,
-#if defined(__has_feature) && __has_feature(objc_arc)
-                                            (__bridge CFStringRef)httpString,
-#else
                                             (CFStringRef)httpString,
-#endif
                                             NULL);
     
     _currentRequest = CFHTTPMessageCreateRequest(NULL,
@@ -981,13 +977,8 @@ static void ORCouchDB_Feed_callback(CFReadStreamRef stream,
     if (_status == 401 || _status == 407) {
         if (!CFHTTPMessageAddAuthentication(_currentRequest,
                                             aResponse,
-#if defined(__has_feature) && __has_feature(objc_arc)
-                                            (__bridge CFStringRef)username,
-                                            (__bridge CFStringRef)pwd,
-#else
                                             (CFStringRef)username,
                                             (CFStringRef)pwd,
-#endif
                                             kCFHTTPAuthenticationSchemeBasic,
                                             FALSE)) {
             [self sendToDelegate:[NSString stringWithFormat:@"%@: Authentication failed", self]];
