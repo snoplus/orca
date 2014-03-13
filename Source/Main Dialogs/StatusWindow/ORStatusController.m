@@ -165,44 +165,51 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 -(oneway void) printString: (NSString*)s1
 {
-	[s1 retain];
-    [statusView replaceCharactersInRange:NSMakeRange([self statusTextlength], 0) withString:s1];
-    [statusView scrollRangeToVisible: NSMakeRange([self statusTextlength], 0)];
-    
-    if([self statusTextlength] > kMaxTextSize){
-        [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,kMaxTextSize/3)];
-        NSRange endOfLineRange = [[self text] rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]];
-        int extra = 0;
-        if(endOfLineRange.location != NSNotFound){
-            [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,endOfLineRange.location)];
-            extra = endOfLineRange.location;
+    @synchronized(self){
+
+        [s1 retain];
+        [statusView replaceCharactersInRange:NSMakeRange([self statusTextlength], 0) withString:s1];
+        [statusView scrollRangeToVisible: NSMakeRange([self statusTextlength], 0)];
+        
+        if([self statusTextlength] > kMaxTextSize){
+            [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,kMaxTextSize/3)];
+            NSString* theText = [[statusView textStorage] string];
+            NSRange endOfLineRange = [theText rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]];
+            int extra = 0;
+            if(endOfLineRange.location != NSNotFound){
+                [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,endOfLineRange.location)];
+                extra = endOfLineRange.location;
+            }
+            [[NSNotificationCenter defaultCenter]
+             postNotificationName:ORStatusFlushedNotification
+             object:self
+             userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
+                        [NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
         }
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORStatusFlushedNotification
-		 object:self
-		 userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-					[NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORStatusLogUpdatedNotification object:self];
+        
+        [s1 release];
     }
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORStatusLogUpdatedNotification object:self];
-	
-    [s1 release];
 }
 
 -(oneway void) printAttributedString:(NSAttributedString*)s1
 {
-	[s1 retain];
+
+    [s1 retain];
     [self printString:[s1 string]];
     int len = [s1 length];
-	
-    NSUInteger i=0;
-    while (i<len) {
-        NSRange range;
-        NSDictionary* dict = [s1 attributesAtIndex:i effectiveRange:&range];
-        range.location += [self statusTextlength] - len;
-        [[statusView textStorage] setAttributes:dict range:range];
-        i += range.length;
+        
+    @synchronized(self){
+       NSUInteger i=0;
+        while (i<len) {
+            NSRange range;
+            NSDictionary* dict = [s1 attributesAtIndex:i effectiveRange:&range];
+            range.location += [self statusTextlength] - len;
+            [[statusView textStorage] setAttributes:dict range:range];
+            i += range.length;
+        }
+        [s1 release];
     }
- 	[s1 release];
 }
 
 - (oneway void) logError: (NSString*)anError usingKeyArray:(NSArray*)keys
@@ -274,35 +281,37 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	if(![[NSFileManager defaultManager] fileExistsAtPath:aPath]){
 		[[NSFileManager defaultManager] createDirectoryAtPath:aPath withIntermediateDirectories:YES attributes:nil error:nil];
 	}
-	
-	//get the current date
-	NSCalendarDate* now = [NSCalendarDate date];
-	NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",[now yearOfCommonEra],[now monthOfYear],[now dayOfMonth]];
-	aPath = [aPath stringByAppendingPathComponent:theFileName];
-	BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];	
-	NSString* contents = nil;
-	if(!lastSnapShot || !fileExists){
-		contents = [[ORStatusController sharedStatusController] contents];
-	}
-	else {
-		NSTimeInterval timeSinceLastSnapShot = [now timeIntervalSinceDate:lastSnapShot];
-		contents = [self contentsTail:(unsigned long)timeSinceLastSnapShot includeDurationHeader:NO];
-	}
-	
-	if([contents length]){
-		
-		[lastSnapShot release];
-		lastSnapShot = [now retain];
-		
-		if(!fileExists){
-			[contents writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-		}
-		else {
-			NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:aPath];
-			[fp seekToEndOfFile];
-			[fp writeData:[contents dataUsingEncoding:NSASCIIStringEncoding]];
-		}
-	}
+    @synchronized(self){
+
+        //get the current date
+        NSCalendarDate* now = [NSCalendarDate date];
+        NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",[now yearOfCommonEra],[now monthOfYear],[now dayOfMonth]];
+        aPath = [aPath stringByAppendingPathComponent:theFileName];
+        BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];	
+        NSString* contents = nil;
+        if(!lastSnapShot || !fileExists){
+            contents = [[ORStatusController sharedStatusController] contents];
+        }
+        else {
+            NSTimeInterval timeSinceLastSnapShot = [now timeIntervalSinceDate:lastSnapShot];
+            contents = [self contentsTail:(unsigned long)timeSinceLastSnapShot includeDurationHeader:NO];
+        }
+        
+        if([contents length]){
+            
+            [lastSnapShot release];
+            lastSnapShot = [now retain];
+            
+            if(!fileExists){
+                [contents writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+            }
+            else {
+                NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:aPath];
+                [fp seekToEndOfFile];
+                [fp writeData:[contents dataUsingEncoding:NSASCIIStringEncoding]];
+            }
+        }
+    }
 }
 
 - (NSString*) contentsTail:(unsigned long)aDuration
@@ -314,42 +323,46 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 {
 	NSString* tailContents	= @"";
 	BOOL	  valid			= NO;
+    NSString*	    contents;
 	@synchronized(self){
-		NSString*	    contents			= [[[statusView string] copy] autorelease];
-		NSArray*	    lines				= [contents componentsSeparatedByString:@"\n"];
-		NSCalendarDate*	theReferenceDate	= [NSCalendarDate date];
-		for(NSString* aLine in [lines reverseObjectEnumerator]){
-			//get first character
-			int datePart = [aLine intValue];
-			if(datePart == 0){
-				if([aLine length]){
-					tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
-				}
-				continue;
-			}
-			else {
-				NSString* theDateAsString = [NSString stringWithFormat:@"20%02d-%02d-%02d %@",
-											 [[aLine substringWithRange:NSMakeRange(4,2)] intValue],   //year part
-											 [[aLine substringWithRange:NSMakeRange(0,2)] intValue],	//month part
-											 [[aLine substringWithRange:NSMakeRange(2,2)] intValue],	//day part
-											 [aLine substringWithRange:NSMakeRange(7,8)]];  //time part
-				
-				NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-				[dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+		contents			= [[[statusView string] copy] autorelease];
+    }
+    
+    NSArray*	    lines				= [contents componentsSeparatedByString:@"\n"];
+    NSCalendarDate*	theReferenceDate	= [NSCalendarDate date];
+    int count=0;
+    for(NSString* aLine in [lines reverseObjectEnumerator]){
+        //get first character
+        int datePart = [aLine intValue];
+        if(datePart == 0){
+            if([aLine length]){
+                tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+            }
+            continue;
+        }
+        else {
+            NSString* theDateAsString = [NSString stringWithFormat:@"20%02d-%02d-%02d %@",
+                                         [[aLine substringWithRange:NSMakeRange(4,2)] intValue],   //year part
+                                         [[aLine substringWithRange:NSMakeRange(0,2)] intValue],	//month part
+                                         [[aLine substringWithRange:NSMakeRange(2,2)] intValue],	//day part
+                                         [aLine substringWithRange:NSMakeRange(7,8)]];  //time part
+            
+            NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
 
-				NSDate* theDate = [dateFormatter dateFromString:theDateAsString];
-				[dateFormatter release];
-				if(theDate){
-					NSTimeInterval deltaTimeForLine = [theReferenceDate timeIntervalSinceDate:theDate];
-					if(deltaTimeForLine <= aDuration){
-						tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
-						valid = YES;
-					}
-					else break;
-				}
-			}
-		}
-	}
+            NSDate* theDate = [dateFormatter dateFromString:theDateAsString];
+            [dateFormatter release];
+            if(theDate){
+                NSTimeInterval deltaTimeForLine = [theReferenceDate timeIntervalSinceDate:theDate];
+                if(deltaTimeForLine <= aDuration || (++count<500)){
+                    tailContents = [aLine stringByAppendingFormat:@"\n%@",tailContents]; 
+                    valid = YES;
+                }
+                else break;
+            }
+        }
+    }
+	
 	if(valid){
 		if(header)return [NSString stringWithFormat:@"Last %lu seconds of ORCA Status log\n\n%@",aDuration,tailContents];
 		else return tailContents;
@@ -368,17 +381,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (int) statusTextlength
 {
-    return [[statusView textStorage] length];
+    int theLength;
+    @synchronized(self){
+        theLength =  [[statusView textStorage] length];
+    }
+    return theLength;
 }
 
 - (int) alarmLogTextlength
 {
-    return [[alarmLogView textStorage] length];
-}
-
-- (NSString*) text
-{
-    return [[statusView textStorage] string];
+    int theLength;
+    @synchronized(self){
+        theLength = [[alarmLogView textStorage] length];
+    }
+    return theLength;
 }
 
 - (IBAction) saveDocument:(id)sender
@@ -501,18 +517,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) mailContent:(id)sender
 {
-	NSString* tabIdentifer = [[tabView selectedTabViewItem]identifier];
-	if([tabIdentifer isEqualToString:@"status"]){
-		ORMailCenter* theMailCenter = [ORMailCenter mailCenter];
-		[theMailCenter showWindow:self];
-		[theMailCenter setTextBodyToRTFData:[statusView RTFFromRange:NSMakeRange(0,[[statusView string] length])]];
-	}
-	else if([tabIdentifer isEqualToString:@"logBook"]){
-		ORMailCenter* theMailCenter = [ORMailCenter mailCenter];
-		[theMailCenter showWindow:self];
-		[self saveLogBook:self];
-		[theMailCenter setFileToAttach:logBookFile];
-	}
+    @synchronized(self){
+        NSString* tabIdentifer = [[tabView selectedTabViewItem]identifier];
+        if([tabIdentifer isEqualToString:@"status"]){
+            ORMailCenter* theMailCenter = [ORMailCenter mailCenter];
+            [theMailCenter showWindow:self];
+            [theMailCenter setTextBodyToRTFData:[statusView RTFFromRange:NSMakeRange(0,[[statusView string] length])]];
+        }
+        else if([tabIdentifer isEqualToString:@"logBook"]){
+            ORMailCenter* theMailCenter = [ORMailCenter mailCenter];
+            [theMailCenter showWindow:self];
+            [self saveLogBook:self];
+            [theMailCenter setFileToAttach:logBookFile];
+        }
+    }
 }
 
 
@@ -721,17 +739,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
                 newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
             }
-			[statusView writeRTFDToFile:newPath atomically:YES];
+            @synchronized(self){
+                [statusView writeRTFDToFile:newPath atomically:YES];
+            }
          }
     }];
 #else
     [savePanel beginSheetForDirectory:startDir
-								 file:nil
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(saveStatusLogDidEnd:returnCode:contextInfo:)
-						  contextInfo:nil];
+                                 file:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(saveStatusLogDidEnd:returnCode:contextInfo:)
+                          contextInfo:nil];
 #endif
+    
 }
 #pragma  mark ¥¥¥Delegate Responsiblities
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
@@ -741,14 +762,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (NSString*) substringWithRange:(NSRange)aRange
 {
-    NSString* text;
+    NSString* result;
     @try {
-        text = [[[[self text] substringWithRange:aRange]retain] autorelease];
+        NSString* theText = [[statusView textStorage] string];
+        result = [[[theText substringWithRange:aRange]retain] autorelease];
 	}
 	@catch(NSException* localException) {
-        text = @"";
+        result = @"";
     }
-    return text;
+    return result;
 }
 
 - (void) handleInvocation:(NSInvocation*) anInvocation
@@ -1054,10 +1076,12 @@ void NSLogError(NSString* aString,...)
 {
     if(returnCode){
         NSString* newPath = [[sheet filenames] objectAtIndex:0];
-		if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
-			newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
-		}
-		[statusView writeRTFDToFile:newPath atomically:YES];
+        if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
+            newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
+        }
+        @synchronized(self){
+           [statusView writeRTFDToFile:newPath atomically:YES];
+        }
     }
 }
 

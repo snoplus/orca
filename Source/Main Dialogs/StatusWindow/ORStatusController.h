@@ -55,7 +55,6 @@
 + (ORStatusController*) sharedStatusController;
 - (int) statusTextlength;
 - (int) alarmLogTextlength;
-- (NSString*) text;
 - (void) setDataSet: (ORDataSet *) aDataSet;
 - (NSString*) substringWithRange:(NSRange)aRange;
 - (void) handleInvocation:(NSInvocation*) anInvocation;
