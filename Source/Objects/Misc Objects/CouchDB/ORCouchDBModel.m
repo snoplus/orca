@@ -1280,7 +1280,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		if(!statusUpdateScheduled){
-			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:10];
+			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:60];
 			statusUpdateScheduled = YES;
 		}
 	}
@@ -1300,7 +1300,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateStatus) object:nil];
 	statusUpdateScheduled = NO;
-	NSString* s = [[ORStatusController sharedStatusController] contentsTail:24*60*60 includeDurationHeader:NO];
+	NSString* s = [[ORStatusController sharedStatusController] contents];
 	NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 							  @"statuslog",		@"_id",
 							  s,				@"statuslog",
