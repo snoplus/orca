@@ -28,15 +28,17 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
 
 @implementation OROpSequence
 
+@synthesize idIndex;
 @synthesize steps;
 @synthesize state;
 @synthesize scriptQueue;
 @synthesize delegate;
 
-- (id) initWithDelegate:(id)aDelegate
+- (id) initWithDelegate:(id)aDelegate idIndex:(int)anIndex
 {
  	self = [super init];
 	if (self) {
+        idIndex = anIndex;
         delegate = aDelegate;
 		scriptQueue = [[OROpSequenceQueue alloc] init];
         state = kOpSeqQueueNeverRun;
@@ -86,8 +88,8 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
     }
     else {
         if([scriptQueue operationCount]==0){
-            if([delegate respondsToSelector:@selector(scriptSteps)]){
-                self.steps = [delegate scriptSteps];
+            if([delegate respondsToSelector:@selector(scriptSteps:)]){
+                self.steps = [delegate scriptSteps:idIndex];
                 for (OROpSeqStep *step in steps){
                     [scriptQueue addOperation:step];
                 }

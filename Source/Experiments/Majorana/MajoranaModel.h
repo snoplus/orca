@@ -35,13 +35,15 @@
 
 @class ORRemoteSocketModel;
 @class OROpSequence;
+@class ORAlarm;
 
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
 	int             viewType;
     int             pollTime;
-    OROpSequence*   scriptModel;
+    OROpSequence*   scriptModel[2];
     NSMutableArray* stringMap;
+    ORAlarm*        rampHVAlarm[2];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -50,11 +52,11 @@
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
 - (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate;
-- (BOOL) anyHvOnCrate:(int)aCrate;
+- (BOOL) anyHvOnVMECrate:(int)aVMECrate;
 - (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
-- (void) rampDownHV:(int)aCrate;
-- (id) scriptModel;
-- (NSArray*) scriptSteps;
+- (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
+- (id) scriptModel:(int)index;
+- (NSArray*) scriptSteps:(int)index;
 - (void) hvInfoRequest:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Segment Group Methods

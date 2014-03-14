@@ -36,12 +36,14 @@ typedef enum
     enumOpSeqQueueState state;
 	OROpSequenceQueue*  scriptQueue;
 	NSArray*            steps;
+    int                 idIndex;
 }
-- (id)   initWithDelegate:(id)aDelegate;
+- (id)   initWithDelegate:(id)aDelegate idIndex:(int)anIndex;
 - (void) start;
 - (void)cancel:(id)parameter;
 - (NSArray*) operations;
 
+@property (nonatomic, assign) int                  idIndex;
 @property (nonatomic, assign) enumOpSeqQueueState  state;
 @property (nonatomic, retain) NSArray*             steps;
 @property (assign)            id                   delegate;
@@ -52,5 +54,5 @@ typedef enum
 extern NSString* OROpSeqStepsChanged;
 
 @interface NSObject (OROpSequence)
--(NSArray*) scriptSteps;
+-(NSArray*) scriptSteps:(int)index;
 @end;

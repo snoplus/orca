@@ -35,6 +35,7 @@
 #import "ORInvocationStep.h"
 #import "ORMPodCrateModel.h"
 #import "ORiSegHVCard.h"
+#import "ORAlarm.h"
 
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 NSString* ORMajoranaModelPollTimeChanged	= @"ORMajoranaModelPollTimeChanged";
@@ -56,9 +57,14 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 #pragma mark ¥¥¥Initialization
 - (void) dealloc
 {
-    [scriptModel setDelegate:nil];
-    [scriptModel cancel:nil];
-    [scriptModel release];
+    int i;
+    for(i=0;i<2;i++){
+        [scriptModel[i] setDelegate:nil];
+        [scriptModel[i] cancel:nil];
+        [scriptModel[i] release];
+        [rampHVAlarm[i] clearAlarm];
+        [rampHVAlarm[i] release];
+    }
     [super dealloc];
 }
 - (void) wakeUp
@@ -313,12 +319,12 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	return [NSString stringWithFormat:@"Gretina4M,Energy,Crate %2d,Card %2d,Channel %2d",[crateName intValue],[cardName intValue],[chanName intValue]];
 }
 
-- (id) scriptModel
+- (id) scriptModel:(int)index
 {
-    if(!scriptModel){
-        scriptModel = [[OROpSequence alloc] init];
+    if(!scriptModel[index]){
+        scriptModel[index] = [[OROpSequence alloc] init];
     }
-    return scriptModel;
+    return scriptModel[index];
 }
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
@@ -336,45 +342,51 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (int) viewType { return viewType; }
 
-- (ORRemoteSocketModel*) remoteSocket:(int)aVMECrate
+- (ORRemoteSocketModel*) remoteSocket:(int)anIndex
 {
     for(id obj in [self orcaObjects]){
-        if([obj tag] == aVMECrate)return obj;
+        if([obj tag] == anIndex+1)return obj;
     }
     return nil;
 }
 
-- (BOOL) anyHvOnCrate:(int)aCrate
+- (BOOL) anyHvOnVMECrate:(int)aVmeCrate
 {
-    //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
+    //tricky .. we have to location the HV crates based on the hv map using the VME crate (detector group 0).
     //But we don't care about the Veto system (group 1).
-    ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
-    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
-    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    ORMPodCrateModel* hvCrateObj[2] = {nil,nil}; //will check for up to two HV crates (should just be one)
+    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodMiniCrateModel,0"];
+    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodMiniCrateModel,1"];
 
-    ORSegmentGroup* group = [self segmentGroup:0];
+    ORSegmentGroup* group = [self segmentGroup:0]; //detector group
     int n = [group numSegments];
     int i;
     for(i=0;i<n;i++){
-        ORDetectorSegment* seg =  [group segment:i];        //get a segment from the group
+        ORDetectorSegment* seg =  [group segment:i];                    //get a segment from the group
 		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
-        if(vmeCrate == aCrate){
+        if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             if(hvCrate<2){
-                if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
+               if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
             }
         }
+    }
+    //if the HV is down, there is none for the alarm
+    if(rampHVAlarm[aVmeCrate]){
+        [rampHVAlarm[aVmeCrate] clearAlarm];
+        [rampHVAlarm[aVmeCrate] release];
+        rampHVAlarm[aVmeCrate] = nil;
     }
     return NO;
 }
 
-- (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState
+- (void) setVmeCrateHVConstraint:(int)aVmeCrate state:(BOOL)aState
 {
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
-    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
-    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodMiniCrateModel,0"];
+    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodMiniCrateModel,1"];
     
     ORSegmentGroup* group = [self segmentGroup:0];
     int n = [group numSegments];
@@ -382,24 +394,33 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     for(i=0;i<n;i++){
         ORDetectorSegment* seg =  [group segment:i];        //get a segment from the group
 		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
-        if(vmeCrate == aCrate){
+        if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
-            int hvCard    = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
+            int hvCard  = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
             if(hvCrate<2){
-                if(aState)[[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:[NSString stringWithFormat:@"HV Card mapped to Cryo %d and Vac Is Bad",aCrate]];
+                if(aState)[[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:[NSString stringWithFormat:@"HV (%d) Card (%d) mapped to VME %d and Vacuum Is Bad or Vacuum system is not communicating",hvCrate,hvCard,aVmeCrate]];
                 else [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
             }
         }
     }
 }
 
-- (void) rampDownHV:(int)aCrate
+- (void) rampDownHV:(int)aCrate vac:(int)aVacSystem
 {
+    if(!rampHVAlarm[aVacSystem]){
+        rampHVAlarm[aVacSystem] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Panic HV (Vac %c)",'A'+aVacSystem] severity:(kEmergencyAlarm)];
+        [rampHVAlarm[aVacSystem] setSticky:YES];
+        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"Vac %c is ramping the HV because of the vacuum is bad!",'A'+aVacSystem]];
+        NSLogColor([NSColor redColor], @"Some HV was ramped down because Module %d was seen as bad\n",aVacSystem);
+    }
+    
+    [rampHVAlarm[aVacSystem] postAlarm];
+    
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
-    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
-    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodMiniCrateModel,0"];
+    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodMiniCrateModel,1"];
     
     ORSegmentGroup* group = [self segmentGroup:0];
     int n = [group numSegments];
@@ -423,10 +444,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     
     [[self undoManager] disableUndoRegistration];
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
-    
-    scriptModel = [[OROpSequence alloc] initWithDelegate:self];
-    [scriptModel setSteps:[self scriptSteps]];
-    
+    int i;
+    for(i=0;i<2;i++){
+        scriptModel[i] = [[OROpSequence alloc] initWithDelegate:self idIndex:i];
+        [scriptModel[i] setSteps:[self scriptSteps:i]];
+    }
     pollTime  = [decoder decodeIntForKey:	@"pollTime"];
     stringMap = [[decoder decodeObjectForKey:@"stringMap"] retain];
 
@@ -636,30 +658,30 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 //
 // returns the array of steps used in the ScriptQueue.
 //
-- (NSArray*) scriptSteps
+- (NSArray*) scriptSteps:(int) index
 {
-    
+    //assume that index is both the index of the Vac system (A,B) and the VME crate (module0,1)
     //steps are executed in order, but may be skipped under certain conditions
 	NSMutableArray *steps = [NSMutableArray array];
     
-    ORRemoteSocketModel* remObj1 = [self remoteSocket:1];
-    NSString* ip1 = [remObj1 remoteHost];
+    ORRemoteSocketModel* remObj = [self remoteSocket:index];
+    NSString*               ip  = [remObj remoteHost];
     
     //---------------------ping machine---------------------
-    [steps addObject: [ORShellStep shellStepWithCommandLine: @"/sbin/ping",@"-c",@"1",@"-t",@"1",@"-q",ip1,nil]];
+    [steps addObject: [ORShellStep shellStepWithCommandLine: @"/sbin/ping",@"-c",@"1",@"-t",@"1",@"-q",ip,nil]];
 	[[steps lastObject] setTrimNewlines:YES];
 	[[steps lastObject] setErrorStringErrorPattern:  @".+"];
     [[steps lastObject] setOutputStringErrorPattern: @".* 100.0%.*"];
 	[[steps lastObject] setOutputStateKey:           @"vacSystemPingOK"];
 	[[steps lastObject] setSuccessTitle:             @"Ping: OK"];
 	[[steps lastObject] setErrorTitle:               @"Ping: Failed"];
-	[[steps lastObject] setTitle:                    @"Ping: CryoVacA"];
+	[[steps lastObject] setTitle:                    [NSString stringWithFormat:@"Ping: CryoVac%c",'A'+index]];
     //----------------------------------------------------------
 
     //---------------------check if HV is on---------------------
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
-                                                                              selector:@selector(anyHvOnCrate:)
-                                                                       retainArguments:NO, (NSUInteger)0]]];
+                                                                              selector:@selector(anyHvOnVMECrate:)
+                                                                       retainArguments:NO, (NSUInteger)index]]];
     [[steps lastObject] setOutputStringErrorPattern: @"0"];
 	[[steps lastObject] setSuccessTitle:@"HV On"];
 	[[steps lastObject] setErrorTitle:  @"HV Off"];
@@ -670,7 +692,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //-------set the bias condition in the Vac system-----------
     //can only execute if the vac system was pinged successfully
     //the command sent is based on the HV state from the kHVOnId step
-    [steps addObject: [ORRemoteSocketStep remoteSocket: remObj1
+    [steps addObject: [ORRemoteSocketStep remoteSocket: remObj
                                       commandSelection: [ScriptValue scriptValueWithKey:@"HVOn"]
                                               commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];",
                                                         @"[ORMJDVacuumModel,1 setDetectorsBiased:1];",
@@ -682,7 +704,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     
     //-----------------check vacuuum conditions-----------------    
     //can only execute if the vac system was pinged successfully
-    [steps addObject: [ORRemoteSocketStep remoteSocket: remObj1
+    [steps addObject: [ORRemoteSocketStep remoteSocket: remObj
                                       commandSelection: nil
                                               commands: @"shouldUnbias = [ORMJDVacuumModel,1 shouldUnbiasDetector];",
                                                         @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
@@ -697,13 +719,15 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 	[[steps lastObject] setSuccessTitle:@"Vac: OK"];
 	[[steps lastObject] setErrorTitle:  @"Vac: BAD"];
-	[[steps lastObject] setTitle:       @"Check CryoVacA"];
+	[[steps lastObject] setTitle:       [NSString stringWithFormat:@"Check CryoVac%c",'A'+index]];
     //----------------------------------------------------------
 
     //---------------------Ramp Down HV---------------------
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
-                                                                              selector:@selector(rampDownHV:)
-                                                                       retainArguments:NO, (NSUInteger)0]]];
+                                                                              selector:@selector(rampDownHV:vac:)
+                                                                       retainArguments:NO,
+                                                                            (NSUInteger)0,
+                                                                            (NSUInteger)index]]];
 
     [[steps lastObject] addOrCondition: @"vacSystemPingOK" value: @"0"];
     [[steps lastObject] addOrCondition: @"OKForHV"         value: @"0"];
@@ -749,7 +773,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void) checkConstraints
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkConstraints) object:nil];
-    [scriptModel start];
+    [scriptModel[0] start];
+    //[scriptModel[1] start];
     if(pollTime)[self performSelector:@selector(checkConstraints) withObject:nil afterDelay:pollTime*60];
 }
 

@@ -353,6 +353,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 - (void) setHvUpdateTime:(int)aHvUpdateTime
 {
     hvUpdateTime = aHvUpdateTime;
+    [self resetHvTimer];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelHvUpdateTimeChanged object:self];
 }
 
@@ -775,6 +776,9 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
     if(hvUpdateTime>0) {
         [self setNextHvUpdateTime:[NSDate dateWithTimeIntervalSinceNow:hvUpdateTime*60]];
         [self performSelector:@selector(setNoHvInfo) withObject:nil afterDelay:1.5*(hvUpdateTime*60)];
+    }
+    else {
+        [self setNextHvUpdateTime:nil];
     }
 }
 

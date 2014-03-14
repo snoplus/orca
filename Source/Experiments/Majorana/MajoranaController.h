@@ -23,6 +23,7 @@
 
 @class ORColorScale;
 @class ORSegmentGroup;
+@class OROpSequenceController;
 
 @interface MajoranaController : ORExperimentController {
  
@@ -48,6 +49,8 @@
     //items in the  subComponet tab view
     IBOutlet ORGroupView*   subComponentsView;
     IBOutlet NSPopUpButton* pollTimePopup;
+    IBOutlet OROpSequenceController* seqController0;
+    IBOutlet OROpSequenceController* seqController1;
 
 	NSView *blankView;
     NSSize detectorSize;

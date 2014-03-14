@@ -21,14 +21,19 @@
 
 - (void)dealloc
 {
-	[[[owner model] scriptModel] cancel:nil];
+	[[[owner model] scriptModel:idIndex] cancel:nil];
     
 	[stepsController removeObserver:self forKeyPath:@"selectionIndex"];
-    [[[[owner model] scriptModel]scriptQueue] removeObserver:self forKeyPath:@"operationCount"];
+    [[[[owner model] scriptModel:idIndex]scriptQueue] removeObserver:self forKeyPath:@"operationCount"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
 	[super dealloc];
 }
+- (void) setIdIndex:(int)aValue;
+{
+    idIndex = aValue;
+}
+- (int) idIndex { return idIndex;}
 
 - (void)awakeFromNib
 {
@@ -43,7 +48,7 @@
     
 	[stepsController addObserver:self forKeyPath:@"selectionIndex" options:0 context:NULL];
 	
-    [[[[owner model] scriptModel]scriptQueue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
+    [[[[owner model] scriptModel:idIndex]scriptQueue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
 
     [self registerNotificationObservers];
     
@@ -76,12 +81,12 @@
 //
 - (IBAction)start:(id)sender
 {
-    [[[owner model] scriptModel] start];
+    [[[owner model] scriptModel:idIndex] start];
 }
 
 - (NSArray*)steps
 {
-    return [[[owner model] scriptModel] steps];
+    return [[[owner model] scriptModel:idIndex] steps];
 }
 
 //
@@ -92,9 +97,9 @@
 //
 - (void)updateProgressDisplay
 {
-    NSArray*  steps      = [[[owner model] scriptModel] steps];
+    NSArray*  steps      = [[[owner model] scriptModel:idIndex] steps];
 	NSInteger total      = [steps count];
-	NSArray*  operations = [[[owner model] scriptModel] operations];
+	NSArray*  operations = [[[owner model] scriptModel:idIndex] operations];
 	NSInteger remaining  = [operations count];
 	
 	//
@@ -110,7 +115,7 @@
 	}
 	
 	if (remaining == 0) {
-		switch ([(OROpSequence*)[[owner model] scriptModel]state]){
+		switch ([(OROpSequence*)[[owner model] scriptModel:idIndex]state]){
 			case kOpSeqQueueRunning:
 			case kOpSeqQueueFinished:
                 {
@@ -171,7 +176,7 @@
 //
 - (IBAction)cancel:(id)parameter
 {
-    [[[owner model] scriptModel] cancel:parameter];
+    [[[owner model] scriptModel:idIndex] cancel:parameter];
     [self updateProgressDisplay];
 }
 

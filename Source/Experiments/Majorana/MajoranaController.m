@@ -31,6 +31,7 @@
 #import "ORPlotView.h"
 #import "ORCompositePlotView.h"
 #import "ORiSegHVCard.h"
+#import "OROpSequenceController.h"
 
 @implementation MajoranaController
 #pragma mark ¥¥¥Initialization
@@ -38,6 +39,12 @@
 {
     self = [super initWithWindowNibName:@"Majorana"];
     return self;
+}
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:seqController0];
+    [[NSNotificationCenter defaultCenter] removeObserver:seqController1];
+    [super dealloc];
 }
 
 - (NSString*) defaultPrimaryMapFilePath
@@ -89,8 +96,9 @@
 	[aPlot1 release];
     [(ORPlot*)[valueHistogramsPlot plotWithTag: 10] setName:@"Detectors"];
     [valueHistogramsPlot setShowLegend:YES];
-
-
+    
+    [seqController0 setIdIndex:0];
+    [seqController1 setIdIndex:1];
 }
 
 

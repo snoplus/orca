@@ -26,11 +26,13 @@
     IBOutlet NSView*            portControlsContent;
 	IBOutlet NSBox*             portControlsView;
 	NSInteger                   lastKnownStepIndex;
+    int                         idIndex;
 }
 
 - (void) stepsChanged:(NSNotification*)aNote;
 - (void)updateProgressDisplay;
-
+- (void) setIdIndex:(int)idIndex;
+- (int) idIndex;
 - (IBAction)start:(id)sender;
 - (IBAction)cancel:(id)sender;
 - (NSArray*)steps;
@@ -40,5 +42,5 @@
 
 @interface NSObject (CocoaScriptController)
 - (id) model;
-- (id) scriptModel;
+- (id) scriptModel:(int)anIndex;
 @end
