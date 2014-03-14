@@ -345,7 +345,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (ORRemoteSocketModel*) remoteSocket:(int)anIndex
 {
     for(id obj in [self orcaObjects]){
-        if([obj tag] == anIndex+1)return obj;
+        if([obj tag] == anIndex)return obj;
     }
     return nil;
 }
@@ -367,6 +367,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             if(hvCrate<2){
+                int removeFollowingLine;
+                return YES;
                if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
             }
         }
@@ -713,8 +715,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
 
     //this step state is error free ONLY if the following values are met.
-	[[steps lastObject] require:        @"shouldUnbias" value:@"0"];
-	[[steps lastObject] require:        @"okToBias"     value:@"1"];
+	[[steps lastObject] require:          @"shouldUnbias" value:@"0"];
+	[[steps lastObject] require:          @"okToBias"     value:@"1"];
     [[steps lastObject] setOutputStateKey:@"OKForHV"];
 
 	[[steps lastObject] setSuccessTitle:@"Vac: OK"];
@@ -733,35 +735,40 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] addOrCondition: @"OKForHV"         value: @"0"];
     
     [[steps lastObject] addAndCondition: @"HVOn"    value: @"1"];
+    [[steps lastObject] setOutputStateKey:@"AddedHVContraint"];
 
 	[[steps lastObject] setSuccessTitle:    @"Ramping Down"];
 	[[steps lastObject] setOutputStateKey:  @"HVRamped"];
-	[[steps lastObject] setTitle:           @"Ramp Down HV"];
+	[[steps lastObject] setTitle:           @"Ramp Down HV Action"];
     //----------------------------------------------------------
     
-    //---------------------Constrain HV---------------------
+    //---------------------add Constrain HV---------------------
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
                                                                               selector:@selector(setVmeCrateHVConstraint:state:)
                                                                        retainArguments:YES,
-                                                                            (NSUInteger)0,
+                                                                            (NSUInteger)index,
                                                                             (NSUInteger)1]]];
             
-    [[steps lastObject] addOrCondition: @"vacSystemPingOK" value: @"1"];
-    [[steps lastObject] addOrCondition: @"OKForHV"         value: @"0"];
+    [[steps lastObject] addOrCondition: @"vacSystemPingOK"  value: @"0"];
+    [[steps lastObject] addOrCondition: @"OKForHV"          value: @"0"];
+    [[steps lastObject] addAndCondition: @"HVOn"            value: @"0"];
+
 	[[steps lastObject] setTitle:       @"Add Constraints"];
+    [[steps lastObject] setOutputStateKey:@"AddedHVContraint"];
     //----------------------------------------------------------
 
     
-    //---------------------Constrain HV---------------------
+    //---------------------remove Constrain HV---------------------
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
                                                                               selector:@selector(setVmeCrateHVConstraint:state:)
                                                                        retainArguments:YES,
-                                                     (NSUInteger)0,
+                                                     (NSUInteger)index,
                                                      (NSUInteger)0]]];
     
-    [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
-    [[steps lastObject] addAndCondition: @"OKForHV"         value: @"1"];
-	[[steps lastObject] setTitle:       @"Remove Constraints"];
+    [[steps lastObject] addOrCondition: @"vacSystemPingOK"  value: @"1"];
+    [[steps lastObject] addOrCondition: @"OKForHV"          value: @"1"];
+    
+	[[steps lastObject] setTitle:   @"Remove Constraints"];
     //----------------------------------------------------------
 
 	return steps;
@@ -773,8 +780,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void) checkConstraints
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkConstraints) object:nil];
-    [scriptModel[0] start];
-    //[scriptModel[1] start];
+    int i;
+    for(i=0;i<2;i++){
+        if([self remoteSocket:i])[scriptModel[i] start];
+    }
     if(pollTime)[self performSelector:@selector(checkConstraints) withObject:nil afterDelay:pollTime*60];
 }
 
