@@ -22,9 +22,9 @@
 
 @interface ORInvocationStep : OROpSeqStep
 {
-    NSInvocation* invocation;
-    NSString* outputStateKey;
-	NSString*               outputStringErrorPattern;
+    NSInvocation*   invocation;
+    NSString*       outputStateKey;
+	NSString*       outputStringErrorPattern;
 }
 
 + (ORInvocationStep*)invocation:(NSInvocation*)anInvocation;
