@@ -30,9 +30,10 @@
 }
 
 - (void) stepsChanged:(NSNotification*)aNote;
-- (void)updateProgressDisplay;
+- (void) updateProgressDisplay:(OROpSequence*)aSeq;
+- (void) updateProgressDisplayChanged:(NSNotification*)aNote;;
 - (void) setIdIndex:(int)idIndex;
-- (int) idIndex;
+- (int)  idIndex;
 - (IBAction)start:(id)sender;
 - (IBAction)cancel:(id)sender;
 - (NSArray*)steps;

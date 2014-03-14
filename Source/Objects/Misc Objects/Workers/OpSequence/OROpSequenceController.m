@@ -23,16 +23,16 @@
 {
 	[[[owner model] scriptModel:idIndex] cancel:nil];
     
-	[stepsController removeObserver:self forKeyPath:@"selectionIndex"];
-    [[[[owner model] scriptModel:idIndex]scriptQueue] removeObserver:self forKeyPath:@"operationCount"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
 	[super dealloc];
 }
+
 - (void) setIdIndex:(int)aValue;
 {
     idIndex = aValue;
 }
+
 - (int) idIndex { return idIndex;}
 
 - (void)awakeFromNib
@@ -44,12 +44,8 @@
 		else NSLog(@"Failed to load SerialPortControls.nib");
 	}
 
- 	[self updateProgressDisplay];
+ 	[self updateProgressDisplayChanged:nil];
     
-	[stepsController addObserver:self forKeyPath:@"selectionIndex" options:0 context:NULL];
-	
-    [[[[owner model] scriptModel:idIndex]scriptQueue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
-
     [self registerNotificationObservers];
     
 	[collectionView setMinItemSize:NSMakeSize(150, 40)];
@@ -64,6 +60,11 @@
 	[notifyCenter addObserver : self
                      selector : @selector(stepsChanged:)
                          name : OROpSeqStepsChanged
+                       object : nil];
+    
+	[notifyCenter addObserver : self
+                     selector : @selector(updateProgressDisplayChanged:)
+                         name : ORSequenceQueueCountChanged
                        object : nil];
 
 }
@@ -95,11 +96,19 @@
 // Update the progress text and progress indicator. Possibly update the
 // cancel/restart button if we've reached the end of the queue
 //
-- (void)updateProgressDisplay
+- (void)updateProgressDisplayChanged:(NSNotification*)aNote
 {
-    NSArray*  steps      = [[[owner model] scriptModel:idIndex] steps];
+    OROpSequence* seq   = [[owner model] scriptModel:idIndex];
+    if([aNote object] != seq) return;
+    else [self updateProgressDisplay:seq];
+}
+
+- (void) updateProgressDisplay:(OROpSequence*)aSeq
+{
+
+    NSArray*  steps      = [aSeq steps];
 	NSInteger total      = [steps count];
-	NSArray*  operations = [[[owner model] scriptModel:idIndex] operations];
+	NSArray*  operations = [aSeq operations];
 	NSInteger remaining  = [operations count];
 	
 	//
@@ -176,36 +185,9 @@
 //
 - (IBAction)cancel:(id)parameter
 {
-    [[[owner model] scriptModel:idIndex] cancel:parameter];
-    [self updateProgressDisplay];
-}
-
-//
-// observeValueForKeyPath:ofObject:change:context:
-//
-// Reponds to changes in the ScriptQueue steps or the selected step
-//
-// Parameters:
-//    keyPath - the property
-//    object - the object
-//    change - the change
-//    context - the context
-//
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
-	change:(NSDictionary *)change context:(void *)context
-{
-	if ([keyPath isEqual:@"operationCount"]) {
-		[self performSelectorOnMainThread:@selector(updateProgressDisplay)
-			withObject:nil waitUntilDone:NO];
-		return;
-	}
-	else if ([keyPath isEqual:@"selectionIndex"])
-	{
-		return;
-	}
-	
-	[super observeValueForKeyPath:keyPath ofObject:object change:change
-		context:context];
+    OROpSequence* seq = [[owner model] scriptModel:idIndex];
+    [seq cancel:parameter];
+    [self updateProgressDisplay:seq];
 }
 
 @end

@@ -52,6 +52,7 @@ typedef enum
 @end
 
 extern NSString* OROpSeqStepsChanged;
+extern NSString* ORSequenceQueueCountChanged;
 
 @interface NSObject (OROpSequence)
 -(NSArray*) scriptSteps:(int)index;

@@ -24,7 +24,8 @@
 #import "OROpSeqStep.h"
 NSArray *ScriptSteps();
 
-NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
+NSString* OROpSeqStepsChanged           = @"OROpSeqStepsChanged";
+NSString* ORSequenceQueueCountChanged   = @"ORSequenceQueueCountChanged";
 
 @implementation OROpSequence
 
@@ -48,6 +49,7 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
                                                    object:scriptQueue];
 
         [scriptQueue addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
+        [scriptQueue addObserver:self forKeyPath:@"selectionIndex" options:0 context:NULL];
 	}
 	return self;
 }
@@ -60,6 +62,7 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
                                                     name:ScriptQueueCancelledNotification
                                                   object:scriptQueue];
     
+    [scriptQueue removeObserver:self forKeyPath:@"selectionIndex"];
     [scriptQueue removeObserver:self forKeyPath:@"operationCount"];
     
 	[scriptQueue cancelAllOperations];
@@ -113,11 +116,11 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
                                                         name:ScriptQueueCancelledNotification
                                                       object:scriptQueue];
 		[scriptQueue cancelAllOperations];
-		while ([[scriptQueue operations] count] > 0) {
-			[[NSRunLoop currentRunLoop]
-             runMode:NSDefaultRunLoopMode
-             beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-		}
+		//while ([[scriptQueue operations] count] > 0) {
+		//	[[NSRunLoop currentRunLoop]
+        //     runMode:NSDefaultRunLoopMode
+        //     beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+		//}
 		[scriptQueue clearState];
 	}
 
@@ -134,12 +137,11 @@ NSString* OROpSeqStepsChanged = @"OROpSeqStepsChanged";
                         change:(NSDictionary *)change context:(void *)context
 {
 	if ([keyPath isEqual:@"operationCount"]) {
-        if([[scriptQueue operations] count]==0){
-           // [self report];
-        }
-		return;
+        [[NSNotificationCenter defaultCenter]
+            postNotificationName:ORSequenceQueueCountChanged
+            object:self];
 	}
-	[super observeValueForKeyPath:keyPath ofObject:object change:change
+	else [super observeValueForKeyPath:keyPath ofObject:object change:change
                           context:context];
 }
 
