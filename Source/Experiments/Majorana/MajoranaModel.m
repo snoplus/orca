@@ -367,8 +367,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             if(hvCrate<2){
-                int removeFollowingLine;
-                return YES;
                if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
             }
         }
