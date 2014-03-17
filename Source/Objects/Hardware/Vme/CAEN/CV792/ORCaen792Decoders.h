@@ -21,11 +21,14 @@
 #import "ORCaenDataDecoder.h"
 
 @interface ORCAEN792DecoderForQdc : ORCaenDataDecoder {
+@private
+    BOOL                 getRatesFromDecodeStage;
+    NSMutableDictionary* actualCards;
 }
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end
 
-@interface ORCAEN792NDecoderForQdc : ORCaenDataDecoder {
+@interface ORCAEN792NDecoderForQdc : ORCAEN792DecoderForQdc {
 }
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end

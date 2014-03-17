@@ -20,15 +20,30 @@
 
 #import "ORCaen792Decoders.h"
 #import "ORDataSet.h"
+#import "ORCaen792Model.h"
 
 @implementation ORCAEN792DecoderForQdc
+- (id) init
+{
+    self = [super init];
+    getRatesFromDecodeStage = YES;
+    return self;
+}
+- (void) dealloc
+{
+	[actualCards release];
+    [super dealloc];
+}
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
 {
     short i;
     long* ptr = (long*) aSomeData;
 	long length = ExtractLength(ptr[0]);
-	NSString* crateKey = [self getCrateKey:ShiftAndExtract(ptr[1],21,0x0000000f)];
-	NSString* cardKey  = [self getCardKey: ShiftAndExtract(ptr[1],16,0x0000001f)];
+    int crate = ShiftAndExtract(ptr[1],21,0x0000000f);
+    int card  = ShiftAndExtract(ptr[1],16,0x0000001f);
+    
+	NSString* crateKey = [self getCrateKey:crate];
+	NSString* cardKey  = [self getCardKey: card];
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
@@ -36,6 +51,27 @@
 			int chan     = [self channel:ptr[i]];
 			NSString* channelKey  = [self getChannelKey: chan];
 			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN792 QDC",crateKey,cardKey,channelKey,nil];
+
+            //get the actual object
+            NSString* aKey = [crateKey stringByAppendingString:cardKey];
+            
+            if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
+            ORCaen792Model* obj = [actualCards objectForKey:aKey];
+            if(!obj){
+                NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen792Model")];
+                NSEnumerator* e = [listOfCards objectEnumerator];
+                ORCaen792Model* aCard;
+                while(aCard = [e nextObject]){
+                    if([aCard slot] == card){
+                        [actualCards setObject:aCard forKey:aKey];
+                        obj = aCard;
+                        break;
+                    }
+                }
+            }
+
+            [obj bumpRateFromDecodeStage:chan];
+
         }
     }
     return length;

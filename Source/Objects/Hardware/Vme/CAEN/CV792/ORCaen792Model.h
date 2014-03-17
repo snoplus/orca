@@ -20,6 +20,8 @@
 #import "ORHWWizard.h"
 #import "ORAdcInfoProviding.h"
 
+@class ORRateGroup;
+
 // Declaration of constants for module.
 enum {
     kOutputBuffer,		// 0000
@@ -72,6 +74,7 @@ enum {
 // Class definition
 @interface ORCaen792Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
+	ORRateGroup*	qdcRateGroup;
     int modelType;
 	unsigned long   onlineMask;
 	unsigned long   dataIdN;
@@ -86,6 +89,8 @@ enum {
     BOOL            cycleZeroSuppression;
     int             percentZeroOff;
     int             totalCycleZTime;
+    BOOL            isRunning;
+    
 }
 
 #pragma mark ***Accessors
@@ -117,6 +122,8 @@ enum {
 - (void)			setOnlineMask:(unsigned long)anOnlineMask;
 - (BOOL)			onlineMaskBit:(int)bit;
 - (void)			setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
+- (ORRateGroup*)    qdcRateGroup;
+- (void)            setQdcRateGroup:(ORRateGroup*)newRateGroup;
 
 #pragma mark ***Register - General routines
 - (int)             numberOfChannels;
@@ -133,6 +140,11 @@ enum {
 - (void)            writeSlideConstReg;
 - (void)            setToDefaults;
 - (unsigned short)  readIPed;
+- (unsigned long)   eventCount:(int)aChannel;
+- (BOOL)            bumpRateFromDecodeStage:(short)channel;
+- (void)            startRates;
+- (void)            clearEventCounts;
+- (unsigned long)   getCounter:(int)counterTag forGroup:(int)groupTag;
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) 		getRegisterName: (short) anIndex;
@@ -162,6 +174,7 @@ extern NSString* ORCaen792ModelSlideConstantChanged;
 extern NSString* ORCaen792ModelSlidingScaleEnableChanged;
 extern NSString* ORCaen792ModelEventCounterIncChanged;
 extern NSString* ORCaen792ModelZeroSuppressThresResChanged;
+extern NSString* ORCaen792RateGroupChangedNotification;
 
 extern NSString* ORCaen792ModelZeroSuppressEnableChanged;
 extern NSString* ORCaen792ModelOverflowSuppressEnableChanged;

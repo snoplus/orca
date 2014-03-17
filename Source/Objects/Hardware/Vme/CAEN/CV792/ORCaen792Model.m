@@ -17,6 +17,7 @@
 #import "ORCaen792Model.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
+#import "ORRateGroup.h"
 
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x9
@@ -75,6 +76,7 @@ NSString* ORCaen792ModelEventCounterIncChanged        = @"ORCaen792ModelEventCou
 NSString* ORCaen792ModelZeroSuppressThresResChanged   = @"ORCaen792ModelZeroSuppressThresResChanged";
 NSString* ORCaen792ModelZeroSuppressEnableChanged     = @"ORCaen792ModelZeroSuppressEnableChanged";
 NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflowSuppressEnableChanged";
+NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChangedNotification";
 
 // Bit Set 2 Register Masks
 #define kTestMem        0x0001
@@ -116,6 +118,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [qdcRateGroup release];
     [super dealloc];
 }
 
@@ -325,6 +328,32 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 	if(aValue)aMask |= (1<<bit);
 	else      aMask &= ~(1<<bit);
 	[self setOnlineMask:aMask];
+}
+
+- (ORRateGroup*) qdcRateGroup
+{
+    return qdcRateGroup;
+}
+- (void) setQdcRateGroup:(ORRateGroup*)newRateGroup
+{
+    [newRateGroup retain];
+    [qdcRateGroup release];
+    qdcRateGroup = newRateGroup;
+    
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORCaen792RateGroupChangedNotification
+	 object:self];
+}
+
+- (id) rateObject:(int)channel
+{
+    return [qdcRateGroup rateObject:channel];
+}
+- (void) setRateIntegrationTime:(double)newIntegrationTime
+{
+	//we this here so we have undo/redo on the rate object.
+    [[[self undoManager] prepareWithInvocationTarget:self] setRateIntegrationTime:[qdcRateGroup integrationTime]];
+    [qdcRateGroup setIntegrationTime:newIntegrationTime];
 }
 
 #pragma mark ***Register - General routines
@@ -545,12 +574,15 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     if(cycleZeroSuppression){
         [self startCyclingZeroSuppression];
     }
+	isRunning = NO;
+    [self startRates];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 {
     
     unsigned short 	theStatus1;
+	isRunning = YES;
     
     @try {
         
@@ -644,8 +676,48 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [self stopCyclingZeroSuppression];
+	[qdcRateGroup stop];
+	isRunning = NO;
 
     [super runTaskStopped:aDataPacket userInfo:userInfo];
+}
+
+#pragma mark ¥¥¥Rates
+- (BOOL) bumpRateFromDecodeStage:(short)channel
+{
+	if(isRunning)return NO;
+    ++eventCounter[channel];
+    return YES;
+}
+
+- (unsigned long) eventCount:(int)aChannel
+{
+    return eventCounter[aChannel];
+}
+
+-(void) startRates
+{
+	[self clearEventCounts];
+    [qdcRateGroup start:self];
+}
+
+- (void) clearEventCounts
+{
+    int i;
+    for(i=0;i<[self numberOfChannels];i++){
+		eventCounter[i]=0;
+    }
+}
+
+- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+{
+	if(groupTag == 0){
+		if(counterTag>=0 && counterTag<[self numberOfChannels]){
+			return eventCounter[counterTag];
+		}
+		else return 0;
+	}
+	else return 0;
 }
 
 - (NSString*) identifier
@@ -716,6 +788,15 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
     [self setModelType:             [aDecoder decodeIntForKey:  @"modelType"]];
    	[self setOnlineMask:            [aDecoder decodeInt32ForKey:@"onlineMask"]];
 
+    [self setQdcRateGroup:[aDecoder decodeObjectForKey:@"qdcRateGroup"]];
+    
+    if(!qdcRateGroup){
+        [self setQdcRateGroup:[[[ORRateGroup alloc] initGroup:[self numberOfChannels] groupTag:0] autorelease]];
+        [qdcRateGroup setIntegrationTime:5];
+    }
+    [qdcRateGroup resetRates];
+    [qdcRateGroup calcRates];
+
     
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -736,6 +817,7 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 	[anEncoder encodeInt:  iPed                   forKey:@"iPed"];
 	[anEncoder encodeInt:  modelType              forKey:@"modelType"];
 	[anEncoder encodeInt32:onlineMask             forKey:@"onlineMask"];
+    [anEncoder encodeObject: qdcRateGroup         forKey:@"qdcRateGroup"];
 }
 
 #pragma mark ¥¥¥AdcProviding Protocol
@@ -744,23 +826,6 @@ NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflow
 {
 	//included to satisfy the protocal... change if needed
 	return NO;
-}
-
-- (unsigned long) eventCount:(int)aChannel
-{
-    if(aChannel>=0 && aChannel<[self numberOfChannels]){
-        return eventCounter[aChannel];
-    }
-    else return 0;
-}
-
-- (void) clearEventCounts
-{
-    int i;
-    int n = [self numberOfChannels];
-    for(i=0;i<n;i++){
-		eventCounter[i]=0;
-    }
 }
 
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan
