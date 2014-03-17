@@ -312,25 +312,31 @@
 
 - (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody
 {
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
-    //[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
-    [request setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
-    
-    if(aType){
-		[request setHTTPMethod:aType];
-		if([aType isEqualToString:@"POST"]){
-			[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
-		}
-	}
-	if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
-    [self _updateAuthentication:request];
-	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
-    
-	if (data) {
-		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-		return [document root];
-	}
-	else return nil;
+    id result = nil;
+    @try {
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+        //[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+        [request setCachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData];
+        
+        if(aType){
+            [request setHTTPMethod:aType];
+            if([aType isEqualToString:@"POST"]){
+                [request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
+            }
+        }
+        if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
+        [self _updateAuthentication:request];
+        NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
+        
+        if (data) {
+            YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
+            result =  [document root];
+        }
+    }
+    @catch(NSException* e){
+        NSLog(@"couch exception\n");
+    }
+	return result;
 }
 
 - (void) sendToDelegate:(id)obj
@@ -665,6 +671,9 @@
         if(![result objectForKey:@"error"] && attachmentData){
             [self addAttachement];
         }
+        
+    
+        
     }
     else {
         //check for an existing document
