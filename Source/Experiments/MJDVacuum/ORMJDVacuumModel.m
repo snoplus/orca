@@ -696,6 +696,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 - (void) addOkToBiasConstraints:(NSString*)aName reason:(NSString*)aReason
 {
 	if(!okToBiasConstraints)okToBiasConstraints = [[NSMutableDictionary dictionary] retain];
+    if(![okToBiasConstraints objectForKey:aName]) NSLog(@"Added bias constraint: %@: %@\n",aName,aReason);
 	[okToBiasConstraints setObject:aReason forKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
 	
@@ -703,6 +704,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 
 - (void) removeOkToBiasConstraints:(NSString*)aName
 {
+    if([okToBiasConstraints objectForKey:aName]) NSLog(@"Removed bias constraint: %@: %@\n",aName);
 	[okToBiasConstraints removeObjectForKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
 }
@@ -710,12 +712,14 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 - (void) addContinuedBiasConstraints:(NSString*)aName reason:(NSString*)aReason
 {
 	if(!continuedBiasConstraints)continuedBiasConstraints = [[NSMutableDictionary dictionary] retain];
+    if(![continuedBiasConstraints objectForKey:aName]) NSLog(@"Added continued bias constraint: %@: %@\n",aName,aReason);
 	[continuedBiasConstraints setObject:aReason forKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
 }
 
 - (void) removeContinuedBiasConstraints:(NSString*)aName
 {
+    if([continuedBiasConstraints objectForKey:aName]) NSLog(@"Removed continued bias constraint: %@: %@\n",aName);
 	[continuedBiasConstraints removeObjectForKey:aName];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelConstraintsChanged object:self];
 }
