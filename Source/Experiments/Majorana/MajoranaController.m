@@ -169,6 +169,15 @@
                          name : ORMJDAuxTablesChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(ignorePanicOnAChanged:)
+                         name : MajoranaModelIgnorePanicOnAChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ignorePanicOnBChanged:)
+                         name : MajoranaModelIgnorePanicOnBChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -187,6 +196,8 @@
     
 	//details
 	[secondaryValuesView reloadData];
+	[self ignorePanicOnAChanged:nil];
+	[self ignorePanicOnBChanged:nil];
 }
 
 
@@ -259,6 +270,16 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) ignorePanicOnBChanged:(NSNotification*)aNote
+{
+	[ignorePanicOnBCB setIntValue: [model ignorePanicOnB]];
+}
+
+- (void) ignorePanicOnAChanged:(NSNotification*)aNote
+{
+	[ignorePanicOnACB setIntValue: [model ignorePanicOnA]];
+}
+
 - (void) specialUpdate:(NSNotification*)aNote
 {
 	[super specialUpdate:aNote];
@@ -319,6 +340,16 @@
 
 }
 #pragma mark ***Actions
+
+- (void) ignorePanicOnBAction:(id)sender
+{
+	[model setIgnorePanicOnB:[sender intValue]];
+}
+
+- (void) ignorePanicOnAAction:(id)sender
+{
+	[model setIgnorePanicOnA:[sender intValue]];
+}
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[sender indexOfSelectedItem]];

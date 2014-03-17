@@ -44,9 +44,15 @@
     OROpSequence*   scriptModel[2];
     NSMutableArray* stringMap;
     ORAlarm*        rampHVAlarm[2];
+    BOOL            ignorePanicOnA;
+    BOOL            ignorePanicOnB;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) ignorePanicOnB;
+- (void) setIgnorePanicOnB:(BOOL)aIgnorePanicOnB;
+- (BOOL) ignorePanicOnA;
+- (void) setIgnorePanicOnA:(BOOL)aIgnorePanicOnA;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (void) setViewType:(int)aViewType;
@@ -83,8 +89,16 @@
 - (void) place:(id)anObj intoSlot:(int)aSlot;
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
+
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
+
 @end
 
+extern NSString* MajoranaModelIgnorePanicOnBChanged;
+extern NSString* MajoranaModelIgnorePanicOnAChanged;
 extern NSString* ORMajoranaModelViewTypeChanged;
 extern NSString* ORMajoranaModelPollTimeChanged;
 extern NSString* ORMJDAuxTablesChanged;

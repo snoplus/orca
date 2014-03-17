@@ -28,6 +28,8 @@
 @interface MajoranaController : ORExperimentController {
  
     IBOutlet NSTextField*	detectorTitle;
+	IBOutlet NSButton*      ignorePanicOnBCB;
+	IBOutlet NSButton*      ignorePanicOnACB;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet ORColorScale*	secondaryColorScale;
     IBOutlet NSButton*		secondaryColorAxisLogCB;
@@ -71,7 +73,14 @@
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) stringMapChanged:(NSNotification*)aNote;
 - (void) forceHVUpdate:(int)segIndex;
+- (void) ignorePanicOnBChanged:(NSNotification*)aNote;
+- (void) ignorePanicOnAChanged:(NSNotification*)aNote;
+- (void) setDetectorTitle;
+- (void) viewTypeChanged:(NSNotification*)aNote;
 
+#pragma mark ***Actions
+- (IBAction) ignorePanicOnBAction:(id)sender;
+- (IBAction) ignorePanicOnAAction:(id)sender;
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) vetoMapLockAction:(id)sender;
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
@@ -80,12 +89,10 @@
 - (IBAction) autoscaleSecondayColorScale:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 
-#pragma mark ¥¥¥Details Interface Management
-- (void) setDetectorTitle;
-- (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 
 @end
+
 @interface ORDetectorView (Majorana)
 - (void) setViewType:(int)aState;
 @end

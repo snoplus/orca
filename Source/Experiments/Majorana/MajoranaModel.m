@@ -37,6 +37,8 @@
 #import "ORiSegHVCard.h"
 #import "ORAlarm.h"
 
+NSString* MajoranaModelIgnorePanicOnBChanged = @"MajoranaModelIgnorePanicOnBChanged";
+NSString* MajoranaModelIgnorePanicOnAChanged = @"MajoranaModelIgnorePanicOnAChanged";
 NSString* ORMajoranaModelViewTypeChanged	= @"ORMajoranaModelViewTypeChanged";
 NSString* ORMajoranaModelPollTimeChanged	= @"ORMajoranaModelPollTimeChanged";
 NSString* ORMJDAuxTablesChanged             = @"ORMJDAuxTablesChanged";
@@ -67,6 +69,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
     [super dealloc];
 }
+
 - (void) wakeUp
 {
     [super wakeUp];
@@ -149,6 +152,52 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [anHVCard setMaxVoltage:aChannel withValue:0 ];
         }
     }
+}
+
+#pragma mark ***Accessors
+- (BOOL) ignorePanicOnB
+{
+    return ignorePanicOnB;
+}
+
+- (void) setIgnorePanicOnB:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIgnorePanicOnB:ignorePanicOnB];
+    
+    if(ignorePanicOnB != aState){
+        ignorePanicOnB = aState;
+        if(ignorePanicOnB){
+            NSLogColor([NSColor redColor],@"WARNING: HV checks will ignore HV Ramp Action on Module 2\n");
+        }
+        else {
+            NSLog(@"HV checks will NOT ignore HV ramp action on Module 2\n");
+        }
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:MajoranaModelIgnorePanicOnBChanged object:self];
+}
+
+- (BOOL) ignorePanicOnA
+{
+    return ignorePanicOnA;
+}
+
+- (void) setIgnorePanicOnA:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIgnorePanicOnA:ignorePanicOnA];
+    
+    if(ignorePanicOnA != aState){
+        ignorePanicOnA = aState;
+        if(ignorePanicOnA){
+            NSLogColor([NSColor redColor],@"WARNING: HV checks will ignore HV Ramp Action on Module 1\n");
+        }
+        else {
+            NSLog(@"HV checks will NOT ignore HV ramp action on Module 1\n");
+        }
+    }
+
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:MajoranaModelIgnorePanicOnAChanged object:self];
 }
 
 - (int) pollTime
@@ -322,7 +371,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (id) scriptModel:(int)index
 {
     if(!scriptModel[index]){
-        scriptModel[index] = [[OROpSequence alloc] init];
+        scriptModel[index] = [[OROpSequence alloc] initWithDelegate:self idIndex:index];
+        [scriptModel[index] setSteps:[self scriptSteps:index]];
     }
     return scriptModel[index];
 }
@@ -371,6 +421,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             }
         }
     }
+        
     //if the HV is down, there is none for the alarm
     if(rampHVAlarm[aVmeCrate]){
         [rampHVAlarm[aVmeCrate] clearAlarm];
@@ -398,8 +449,18 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             int hvCard  = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
             if(hvCrate<2){
-                if(aState)[[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:[NSString stringWithFormat:@"HV (%d) Card (%d) mapped to VME %d and Vacuum Is Bad or Vacuum system is not communicating",hvCrate,hvCard,aVmeCrate]];
-                else [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
+                if(aState) {
+                    [[hvCrateObj[hvCrate] cardInSlot:hvCard] addHvConstraint:@"MJD Vac" reason:[NSString stringWithFormat:@"HV (%d) Card (%d) mapped to VME %d and Vacuum Is Bad or Vacuum system is not communicating",hvCrate,hvCard,aVmeCrate]];
+                }
+                else {
+                    [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
+                    if(rampHVAlarm[aVmeCrate]){
+                        [rampHVAlarm[aVmeCrate] clearAlarm];
+                        [rampHVAlarm[aVmeCrate] release];
+                        rampHVAlarm[aVmeCrate] = nil;
+                    }
+
+                }
             }
         }
     }
@@ -410,11 +471,15 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(!rampHVAlarm[aVacSystem]){
         rampHVAlarm[aVacSystem] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Panic HV (Vac %c)",'A'+aVacSystem] severity:(kEmergencyAlarm)];
         [rampHVAlarm[aVacSystem] setSticky:YES];
-        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"Vac %c is ramping the HV because of the vacuum is bad!",'A'+aVacSystem]];
-        NSLogColor([NSColor redColor], @"Some HV was ramped down because Module %d was seen as bad\n",aVacSystem);
+        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"HV was ramped down on Module %d because Vac %c failed interlocks\n",aCrate+1, 'A'+aVacSystem]];
+        NSLogColor([NSColor redColor], @"HV was ramped down on Module %d because Vac %c failed interlocks\n",aCrate+1,
+                   'A'+aVacSystem);
     }
     
     [rampHVAlarm[aVacSystem] postAlarm];
+    
+    if(aVacSystem==0 && ignorePanicOnA)return;
+    if(aVacSystem==1 && ignorePanicOnB)return;
     
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
@@ -443,6 +508,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setIgnorePanicOnB:[decoder decodeBoolForKey:@"ignorePanicOnB"]];
+    [self setIgnorePanicOnA:[decoder decodeBoolForKey:@"ignorePanicOnA"]];
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
     int i;
     for(i=0;i<2;i++){
@@ -462,6 +529,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:ignorePanicOnB forKey:@"ignorePanicOnB"];
+    [encoder encodeBool:ignorePanicOnA forKey:@"ignorePanicOnA"];
     [encoder encodeInt:viewType     forKey: @"viewType"];
 	[encoder encodeInt:pollTime		forKey: @"pollTime"];
     [encoder encodeObject:stringMap	forKey: @"stringMap"];
@@ -685,6 +754,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] setOutputStringErrorPattern: @"0"];
 	[[steps lastObject] setSuccessTitle:@"HV On"];
 	[[steps lastObject] setErrorTitle:  @"HV Off"];
+    
 	[[steps lastObject] setOutputStateKey:@"HVOn"];
 	[[steps lastObject] setTitle:@"Check HV Bias"];
     //----------------------------------------------------------
@@ -694,11 +764,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //the command sent is based on the HV state from the kHVOnId step
     [steps addObject: [ORRemoteSocketStep remoteSocket: remObj
                                       commandSelection: [ScriptValue scriptValueWithKey:@"HVOn"]
-                                              commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];",
-                                                        @"[ORMJDVacuumModel,1 setDetectorsBiased:1];",
+                                              commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];", //HVOn == NO run this
+                                                        @"[ORMJDVacuumModel,1 setDetectorsBiased:1];", //HVOn == NO run this
                                                         nil]];
     [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
-
 	[[steps lastObject] setTitle:  @"Send HV --> Vac System"];
     //----------------------------------------------------------
     
@@ -718,7 +787,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] setOutputStateKey:@"OKForHV"];
 
 	[[steps lastObject] setSuccessTitle:@"Vac: OK"];
-	[[steps lastObject] setErrorTitle:  @"Vac: BAD"];
+	[[steps lastObject] setErrorTitle:  @"Vac: BAD or No Comm"];
 	[[steps lastObject] setTitle:       [NSString stringWithFormat:@"Check CryoVac%c",'A'+index]];
     //----------------------------------------------------------
 
@@ -729,11 +798,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                                             (NSUInteger)0,
                                                                             (NSUInteger)index]]];
 
-    [[steps lastObject] addOrCondition: @"vacSystemPingOK" value: @"0"];
-    [[steps lastObject] addOrCondition: @"OKForHV"         value: @"0"];
+    //if Vac system ping failed OR not OK for HV AND HV is On then the invocation will run
+    [[steps lastObject] addOrCondition: @"vacSystemPingOK"  value: @"0"];
+    [[steps lastObject] addOrCondition: @"OKForHV"          value: @"0"];
     
-    [[steps lastObject] addAndCondition: @"HVOn"    value: @"1"];
-    [[steps lastObject] setOutputStateKey:@"AddedHVContraint"];
+    [[steps lastObject] addAndCondition: @"HVOn"            value: @"1"];
 
 	[[steps lastObject] setSuccessTitle:    @"Ramping Down"];
 	[[steps lastObject] setOutputStateKey:  @"HVRamped"];
@@ -747,15 +816,15 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                                             (NSUInteger)index,
                                                                             (NSUInteger)1]]];
             
-    [[steps lastObject] addOrCondition: @"vacSystemPingOK"  value: @"0"];
-    [[steps lastObject] addOrCondition: @"OKForHV"          value: @"0"];
-    [[steps lastObject] addAndCondition: @"HVOn"            value: @"0"];
+    //if Vac system ping failed OR not OK for HV AND HV is Off then the invocation will run and add a constraint on the HV system
+    [[steps lastObject] addOrCondition:  @"vacSystemPingOK"  value: @"0"];
+    [[steps lastObject] addOrCondition:  @"OKForHV"          value: @"0"];
+    [[steps lastObject] addAndCondition: @"HVOn"             value: @"0"];
 
-	[[steps lastObject] setTitle:       @"Add Constraints"];
+	[[steps lastObject] setTitle:         @"Add Constraints"];
     [[steps lastObject] setOutputStateKey:@"AddedHVContraint"];
     //----------------------------------------------------------
 
-    
     //---------------------remove Constrain HV---------------------
     [steps addObject: [ORInvocationStep invocation: [NSInvocation invocationWithTarget:self
                                                                               selector:@selector(setVmeCrateHVConstraint:state:)
@@ -763,8 +832,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                      (NSUInteger)index,
                                                      (NSUInteger)0]]];
     
-    [[steps lastObject] addOrCondition: @"vacSystemPingOK"  value: @"1"];
-    [[steps lastObject] addOrCondition: @"OKForHV"          value: @"1"];
+    //if Vac system ping succeeded OR OK for HV then the invocation will run and remove constraint on the HV system
+    [[steps lastObject] addAndCondition: @"vacSystemPingOK"  value: @"1"];
+    [[steps lastObject] addAndCondition: @"OKForHV"          value: @"1"];
     
 	[[steps lastObject] setTitle:   @"Remove Constraints"];
     //----------------------------------------------------------
