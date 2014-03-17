@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.SystemVersion">13C64</string>
+		<string key="IBDocument.InterfaceBuilderVersion">5053</string>
+		<string key="IBDocument.AppKitVersion">1265.19</string>
+		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">5053</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSArrayController</string>
@@ -221,7 +221,7 @@
 						<object class="NSTextFieldCell" key="NSCell" id="476481129">
 							<int key="NSCellFlags">68157504</int>
 							<int key="NSCellFlags2">4326400</int>
-							<string key="NSContents">Running step X of Y:</string>
+							<string key="NSContents">Never Run</string>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">.LucidaGrandeUI</string>
 								<double key="NSSize">11</double>
@@ -246,7 +246,7 @@
 						<object class="NSButtonCell" key="NSCell" id="286783454">
 							<int key="NSCellFlags">67108864</int>
 							<int key="NSCellFlags2">134217728</int>
-							<string key="NSContents">Cancel</string>
+							<string key="NSContents">Run</string>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">.LucidaGrandeUI</string>
 								<double key="NSSize">13</double>
