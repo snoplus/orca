@@ -87,6 +87,7 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) closeGVConstraintPanel:(id)sender;
 - (IBAction) overRideAction:(id)sender;
+- (IBAction) reportConstraints:(id)sender;
 
 #pragma mark •••Data Source For Tables
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;

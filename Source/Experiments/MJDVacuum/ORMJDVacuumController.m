@@ -213,7 +213,7 @@
 {
 	[vacuumView setNeedsDisplay:YES];
     if([model lastHvUpdateTime]){
-        if([model noHvInfo]) [detectorStatusField setStringValue: @"UnKnown! Assume Biased"];
+        if([model noHvInfo]) [detectorStatusField setStringValue: @"NO Bias Info"];
         else				 [detectorStatusField setStringValue: [model detectorsBiased]?@"Biased":@"Unbiased"];
     }
     else {
@@ -447,6 +447,10 @@
     }
 }
 
+- (IBAction) reportConstraints:(id)sender
+{
+    [model reportConstraints];
+}
 
 #pragma mark •••Data Source For Tables
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView

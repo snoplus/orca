@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.SystemVersion">13C64</string>
+		<string key="IBDocument.InterfaceBuilderVersion">5053</string>
+		<string key="IBDocument.AppKitVersion">1265.19</string>
+		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">5053</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -65,6 +65,7 @@
 							<string key="NSFrame">{{-7, -10}, {768, 688}}</string>
 							<reference key="NSSuperview" ref="694819408"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="1065202230"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="902069553">
 									<string key="NSIdentifier">1</string>
@@ -76,12 +77,40 @@
 												<reference key="NSNextResponder" ref="1065202230"/>
 												<int key="NSvFlags">274</int>
 												<array class="NSMutableArray" key="NSSubviews">
+													<object class="NSButton" id="1042917311">
+														<reference key="NSNextResponder" ref="926429161"/>
+														<int key="NSvFlags">268</int>
+														<string key="NSFrame">{{14, 519}, {110, 19}}</string>
+														<reference key="NSSuperview" ref="926429161"/>
+														<reference key="NSWindow"/>
+														<reference key="NSNextKeyView" ref="663491425"/>
+														<bool key="NSEnabled">YES</bool>
+														<object class="NSButtonCell" key="NSCell" id="67473021">
+															<int key="NSCellFlags">-2080374784</int>
+															<int key="NSCellFlags2">134348800</int>
+															<string key="NSContents">Constraint Report</string>
+															<object class="NSFont" key="NSSupport" id="26">
+																<string key="NSName">.LucidaGrandeUI</string>
+																<double key="NSSize">11</double>
+																<int key="NSfFlags">3100</int>
+															</object>
+															<reference key="NSControlView" ref="1042917311"/>
+															<int key="NSButtonFlags">-2033434624</int>
+															<int key="NSButtonFlags2">160</int>
+															<string key="NSAlternateContents"/>
+															<string key="NSKeyEquivalent"/>
+															<int key="NSPeriodicDelay">400</int>
+															<int key="NSPeriodicInterval">75</int>
+														</object>
+														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+													</object>
 													<object class="NSTextField" id="78754600">
 														<reference key="NSNextResponder" ref="926429161"/>
 														<int key="NSvFlags">268</int>
 														<string key="NSFrame">{{553, 581}, {199, 22}}</string>
 														<reference key="NSSuperview" ref="926429161"/>
 														<reference key="NSWindow"/>
+														<reference key="NSNextKeyView" ref="315251024"/>
 														<string key="NSHuggingPriority">{251, 750}</string>
 														<bool key="NSEnabled">YES</bool>
 														<object class="NSTextFieldCell" key="NSCell" id="1050577072">
@@ -117,16 +146,13 @@
 														<string key="NSFrame">{{590, 602}, {154, 28}}</string>
 														<reference key="NSSuperview" ref="926429161"/>
 														<reference key="NSWindow"/>
+														<reference key="NSNextKeyView" ref="1042917311"/>
 														<bool key="NSEnabled">YES</bool>
 														<object class="NSButtonCell" key="NSCell" id="588305877">
 															<int key="NSCellFlags">67108864</int>
 															<int key="NSCellFlags2">134348800</int>
 															<string key="NSContents">Disable Constraints...</string>
-															<object class="NSFont" key="NSSupport" id="26">
-																<string key="NSName">.LucidaGrandeUI</string>
-																<double key="NSSize">11</double>
-																<int key="NSfFlags">3100</int>
-															</object>
+															<reference key="NSSupport" ref="26"/>
 															<reference key="NSControlView" ref="315251024"/>
 															<int key="NSButtonFlags">-2038284288</int>
 															<int key="NSButtonFlags2">129</int>
@@ -148,10 +174,10 @@
 																	<object class="NSTextField" id="890025080">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{88, 43}, {79, 14}}</string>
+																		<string key="NSFrame">{{88, 43}, {120, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="663491425"/>
+																		<reference key="NSNextKeyView" ref="545616025"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="323857274">
 																			<int key="NSCellFlags">68157504</int>
@@ -176,10 +202,10 @@
 																	<object class="NSTextField" id="789034764">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{88, 56}, {97, 14}}</string>
+																		<string key="NSFrame">{{88, 56}, {125, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="404349313"/>
+																		<reference key="NSNextKeyView" ref="890025080"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="869917176">
 																			<int key="NSCellFlags">68157504</int>
@@ -199,7 +225,7 @@
 																		<string key="NSFrame">{{7, 56}, {79, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="789034764"/>
+																		<reference key="NSNextKeyView" ref="404349313"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="365483282">
 																			<int key="NSCellFlags">68157504</int>
@@ -219,7 +245,7 @@
 																		<string key="NSFrame">{{7, 43}, {79, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
-																		<reference key="NSNextKeyView" ref="890025080"/>
+																		<reference key="NSNextKeyView" ref="789034764"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="819517370">
 																			<int key="NSCellFlags">68157504</int>
@@ -236,9 +262,10 @@
 																	<object class="NSTextField" id="20295673">
 																		<reference key="NSNextResponder" ref="820678157"/>
 																		<int key="NSvFlags">268</int>
-																		<string key="NSFrame">{{88, 14}, {120, 14}}</string>
+																		<string key="NSFrame">{{88, 14}, {125, 14}}</string>
 																		<reference key="NSSuperview" ref="820678157"/>
 																		<reference key="NSWindow"/>
+																		<reference key="NSNextKeyView" ref="78754600"/>
 																		<bool key="NSEnabled">YES</bool>
 																		<object class="NSTextFieldCell" key="NSCell" id="663745638">
 																			<int key="NSCellFlags">68157504</int>
@@ -313,13 +340,13 @@
 																		<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																	</object>
 																</array>
-																<string key="NSFrame">{{1, 1}, {206, 80}}</string>
+																<string key="NSFrame">{{1, 1}, {224, 80}}</string>
 																<reference key="NSSuperview" ref="537997527"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="285444675"/>
 															</object>
 														</array>
-														<string key="NSFrame">{{11, 542}, {208, 96}}</string>
+														<string key="NSFrame">{{11, 542}, {226, 96}}</string>
 														<reference key="NSSuperview" ref="926429161"/>
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="820678157"/>
@@ -355,6 +382,7 @@
 														<string key="NSFrame">{{11, 6}, {33, 43}}</string>
 														<reference key="NSSuperview" ref="926429161"/>
 														<reference key="NSWindow"/>
+														<reference key="NSNextKeyView"/>
 														<bool key="NSEnabled">YES</bool>
 														<object class="NSButtonCell" key="NSCell" id="806140492">
 															<int key="NSCellFlags">67108864</int>
@@ -2550,6 +2578,14 @@ wGw</bytes>
 					<string key="id">18z-uB-J1U</string>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">reportConstraints:</string>
+						<reference key="source" ref="53635385"/>
+						<reference key="destination" ref="1042917311"/>
+					</object>
+					<string key="id">pM6-jO-Moq</string>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="111836233"/>
@@ -2984,6 +3020,7 @@ wGw</bytes>
 							<reference ref="537997527"/>
 							<reference ref="78754600"/>
 							<reference ref="315251024"/>
+							<reference ref="1042917311"/>
 						</array>
 						<reference key="parent" ref="1065202230"/>
 					</object>
@@ -3637,6 +3674,19 @@ wGw</bytes>
 						<reference key="object" ref="1050577072"/>
 						<reference key="parent" ref="78754600"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">gLy-0u-xuh</string>
+						<reference key="object" ref="1042917311"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="67473021"/>
+						</array>
+						<reference key="parent" ref="926429161"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">kdD-JS-VXa</string>
+						<reference key="object" ref="67473021"/>
+						<reference key="parent" ref="1042917311"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -3789,6 +3839,8 @@ wGw</bytes>
 				<string key="VXp-gd-75w.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="bLd-1C-e58.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="dhf-bw-83x.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="gLy-0u-xuh.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="kdD-JS-VXa.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="mN0-ry-yfn.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ubk-cQ-wjT.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="xo3-M4-1cG.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3936,6 +3988,7 @@ wGw</bytes>
 						<string key="lockAction:">id</string>
 						<string key="openGVControlPanel:">id</string>
 						<string key="overRideAction:">id</string>
+						<string key="reportConstraints:">id</string>
 						<string key="showGridAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
@@ -3961,6 +4014,10 @@ wGw</bytes>
 						</object>
 						<object class="IBActionInfo" key="overRideAction:">
 							<string key="name">overRideAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="reportConstraints:">
+							<string key="name">reportConstraints:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="showGridAction:">

@@ -752,6 +752,104 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
     return disableConstraints;
 }
 
+- (void) reportConstraints
+{
+    NSLog(@"------------------------------------------------------------\n");
+    NSLog(@"---------------    Constraint Report    --------------------\n");
+    NSLog(@"------------------------------------------------------------\n");
+    unsigned long n = [continuedBiasConstraints count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against continued bias of the detectors\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        for(id aKey in [continuedBiasConstraints allKeys]){
+            NSLog(@"%@: %@\n",aKey,[continuedBiasConstraints objectForKey:aKey]);
+        }
+    }
+    else NSLog(@"There are no constraints against continued bias of the detectors\n");
+
+    n = [okToBiasConstraints count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against biasing the detectors\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        for(id aKey in [okToBiasConstraints allKeys]){
+            NSLog(@"%@: %@\n",aKey,[okToBiasConstraints objectForKey:aKey]);
+        }
+    }
+    else NSLog(@"There are no constraints against biasing the detectors\n");
+
+    //----RGA------
+    NSLog(@"--RGA--\n");
+    ORRGA300Model* rga =  [self findRGA];
+    NSDictionary* aDict = [rga filamentConstraints];
+    n = [aDict count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against RGA filament\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        NSLog(@"%@",[rga filamentConstraintReport]);
+    }
+    else NSLog(@"There are no constraints against the RGA filament\n");
+    
+    aDict = [rga cemConstraints];
+    n = [aDict count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against RGA CEM\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        NSLog(@"%@",[rga filamentConstraintReport]);
+    }
+    else NSLog(@"There are no constraints against the RGA CEM\n");
+    
+    //----Turbo
+    NSLog(@"--Turbo Pump--\n");
+    ORTM700Model* turbo =  [self findTurboPump];
+    aDict = [turbo pumpOffConstraints];
+    n = [aDict count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against Turbo Pump\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        NSLog(@"%@",[turbo pumpOffConstraintReport]);
+    }
+    else NSLog(@"There are no constraints against the Turbo Pump\n");
+
+    //----Cryo
+    NSLog(@"--Cryopump--\n");
+    ORCP8CryopumpModel* cryo =  [self findCryoPump];
+    unsigned long pmpOffCount = [[cryo pumpOffConstraints] count];
+    unsigned long pmpOnCount = [[cryo pumpOnConstraints] count];
+    if(pmpOffCount + pmpOnCount){
+        NSLog(@"%@",[cryo pumpOnOffConstraintReport]);
+    }
+    else NSLog(@"There are no constraints against the Cryo Pump On/Off\n");
+
+    aDict = [cryo purgeOpenConstraints];
+    n = [aDict count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against Cryo Purge Valve\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        NSLog(@"%@",[cryo purgeOpenConstraintReport]);
+    }
+    else NSLog(@"There are no constraints against the Cryo Purge Valve\n");
+
+    
+    aDict = [cryo roughingOpenConstraints];
+    n = [aDict count];
+    if(n){
+        NSLog(@"There %@ %d constraint%@ against Cryo Roughing Valve\n",n>1?@"are":@"is",n,n>1?@"s":@"");
+        NSLog(@"%@",[cryo roughingOpenConstraintReport]);
+    }
+    else NSLog(@"There are no constraints against the Cryo Roughing Valve\n");
+    
+    //Gate Valves
+    NSArray* gateValves = [self gateValves];
+    for(ORVacuumGateValve* aGateValve in gateValves){
+        NSDictionary* constraintDict = [aGateValve constraints];
+        if(constraintDict){
+            unsigned long n = [constraintDict count];
+            if(n){
+                NSLog(@"There %@ %d constraint%@ against changing gatevalve %@\n",n>1?@"are":@"is",n,n>1?@"s":@"",[aGateValve label]);
+                for(id aKey in [constraintDict allKeys]){
+                    NSLog(@"%@: %@\n",aKey,[constraintDict objectForKey:aKey]);
+                }
+            }
+            else NSLog(@"No constraints against gatevalve %@\n",[aGateValve label]);
+        }
+    }
+    NSLog(@"------------------------------------------------------------\n");
+}
+
 @end
 
 
@@ -1689,7 +1787,5 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 	
 	
 }
-
-
 
 @end

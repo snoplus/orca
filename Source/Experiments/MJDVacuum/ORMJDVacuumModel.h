@@ -223,6 +223,7 @@
 - (void) disableConstraintsFor60Seconds;
 - (void) enableConstraints;
 - (BOOL) disableConstraints;
+- (void) reportConstraints;
 @end
 
 extern NSString* ORMJDVacuumModelNoHvInfoChanged;
