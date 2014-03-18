@@ -327,7 +327,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     if(aCoolerMode!=coolerMode){
         [[[self undoManager] prepareWithInvocationTarget:self] setCoolerMode:coolerMode];
         coolerMode = aCoolerMode;
-        [self remakeParts];
+        //[self remakeParts];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelCoolerModeChanged object:self];
     }
 }
@@ -1075,7 +1075,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	int i;
 	for(i=0;i<numItems;i++){
-        if(([self coolerMode] != kThermosyphon) && (pipeList[i].regionTag == kRegionBaratron))continue;
+        //if(([self coolerMode] != kThermosyphon) && (pipeList[i].regionTag == kRegionBaratron))continue;
 		switch(pipeList[i].type){
 			case kVacCorner:
 				[[[ORVacuumCPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag at:NSMakePoint(pipeList[i].x1, pipeList[i].y1)] autorelease];
@@ -1104,7 +1104,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	int i;
 	for(i=0;i<numItems;i++){
-        if(([self coolerMode] != kThermosyphon) && (gvList[i].r1 == kRegionBaratron))continue;
+        //if(([self coolerMode] != kThermosyphon) && (gvList[i].r1 == kRegionBaratron))continue;
 		ORVacuumGateValve* gv= nil;
 		switch(gvList[i].type){
 			case kVacVGateV:
@@ -1135,7 +1135,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	int i;
 	for(i=0;i<numItems;i++){
-        if(([self coolerMode] != kThermosyphon) && (labelItems[i].regionTag == kRegionBaratron))continue;
+        //if(([self coolerMode] != kThermosyphon) && (labelItems[i].regionTag == kRegionBaratron))continue;
 
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
 		if(labelItems[i].type == kVacPressureItem){

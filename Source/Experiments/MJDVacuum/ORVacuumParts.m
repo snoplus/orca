@@ -299,7 +299,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 
 - (void) setState:(int)aState
 {
-	if(aState != state || logState){
+	if(aState != state){
         
         if(logState)NSLog(@"Value %@ state is now %@\n",[self label],[self stateName:aState]);
         
