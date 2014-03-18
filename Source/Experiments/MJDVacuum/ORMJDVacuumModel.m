@@ -171,7 +171,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		[notifyCenter addObserver : self
 						 selector : @selector(lakeShoreChanged:)
 							 name : ORLakeShore336InputTemperatureChanged
-						   object : lakeShore];
+						   object : nil];
         
 		[notifyCenter addObserver : self
 						 selector : @selector(lakeShoreChanged:)
@@ -281,10 +281,12 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 - (void) lakeShoreChanged:(NSNotification*)aNote
 {
     if([self coolerMode] == kPulseTube){
-        ORLakeShore336Model* lakeShore = [aNote object];
-        ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
-        [aRegionlabel setValue:  [lakeShore convertedValue:0]];
-        [aRegionlabel setIsValid:[lakeShore isValid]];
+        ORLakeShore336Model* lakeShore = [self findLakeShore];
+        if([aNote object] == [lakeShore input:0]){ //make sure the value is coming from input A
+            ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
+            [aRegionlabel setValue:  [lakeShore convertedValue:0]];
+            [aRegionlabel setIsValid:[lakeShore isValid]];
+        }
     }
 }
 
