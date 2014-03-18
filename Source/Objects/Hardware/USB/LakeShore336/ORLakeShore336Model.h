@@ -69,6 +69,7 @@
 - (void) checkNoUsbAlarm;
 
 #pragma mark ***Accessors
+- (BOOL) isValid;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (ORUSBInterface*) usbInterface;

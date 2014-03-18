@@ -259,6 +259,12 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 	return cont;
 }
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
+}
+
 #pragma mark ***Accessors
 - (BOOL) anyInputsUsingTimeRate:(id)aTimeRate
 {
