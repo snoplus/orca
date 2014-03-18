@@ -396,8 +396,6 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     [lastHvUpdateTime release];
     lastHvUpdateTime = aLastHvUpdateTime;
 
-    [self resetHvTimer];
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelLastHvUpdateTimeChanged object:self];
 }
 
@@ -418,11 +416,11 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 //the state of the HV so we will use it to clear a deadman timeout
 - (void) setDetectorsBiased:(BOOL)aState
 {
-    [self clearNoHvInfo];
-    [self resetHvTimer];
     NSDate* now = [NSDate date];
     [self setLastHvUpdateTime:now];
-    
+ 
+    [self resetHvTimer];
+
 	if(detectorsBiased!=aState){
 		detectorsBiased = aState;
 		[self checkDetectorConstraints];
@@ -933,9 +931,11 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 - (void) resetHvTimer
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetHvTimer) object:nil];
+    [self clearNoHvInfo];
     if(hvUpdateTime>0) {
         [self setNextHvUpdateTime:[NSDate dateWithTimeIntervalSinceNow:hvUpdateTime*60]];
-        [self performSelector:@selector(setNoHvInfo) withObject:nil afterDelay:1.5*(hvUpdateTime*60)];
+        //set the deadman to 3x the time sent from DAQ
+        [self performSelector:@selector(setNoHvInfo) withObject:nil afterDelay:3*(hvUpdateTime*60)];
     }
     else {
         [self setNextHvUpdateTime:nil];
