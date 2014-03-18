@@ -1239,6 +1239,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     [values setObject: [NSNumber numberWithBool:[self detectorsBiased]]      forKey:@"DetectorsBiased"];
     [values setObject: [NSNumber numberWithBool:[self shouldUnbiasDetector]] forKey:@"ShouldUnbiasDetector"];
     [values setObject: [NSNumber numberWithBool:[self okToBiasDetector]]     forKey:@"OKToBiasDetector"];
+    [values setObject: [NSNumber numberWithInt: [self coolerMode]]           forKey:@"CoolerMode"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:5];
