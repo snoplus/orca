@@ -141,9 +141,9 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 {
 	[PIPECOLOR set];
 	float length = endPt.x - startPt.x;
-	[NSBezierPath fillRect:NSMakeRect(startPt.x,startPt.y-2*kPipeRadius,length,2*kPipeDiameter)];
+	[NSBezierPath fillRect:NSMakeRect(startPt.x,startPt.y-3*kPipeRadius,length,3*kPipeDiameter)];
 	[regionColor set];
-	[NSBezierPath fillRect:NSMakeRect(startPt.x-kPipeThickness,startPt.y-2*kPipeRadius+kPipeThickness,length+2*kPipeThickness,2*kPipeDiameter-2*kPipeThickness)];
+	[NSBezierPath fillRect:NSMakeRect(startPt.x-kPipeThickness,startPt.y-3*kPipeRadius+kPipeThickness,length+2*kPipeThickness,3*kPipeDiameter-2*kPipeThickness)];
 	[[NSColor blackColor] set];
 	[super draw];
 }

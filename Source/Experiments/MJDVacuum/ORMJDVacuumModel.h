@@ -41,8 +41,9 @@
 #define kRegionNegPump		6
 #define kRegionDiaphramPump	7
 #define kRegionBelowTurbo	8
+#define kRegionLakeShore	9
 
-#define kNumberRegions	    9 
+#define kNumberRegions	    10
 //-----------------------------------
 //component tag numbers
 #define kTurboComponent			0
@@ -50,6 +51,7 @@
 #define kCryoPumpComponent		2
 #define kPressureGaugeComponent 3
 #define kBaratronComponent		4
+#define kLakeShoreComponent		5
 
 
 #define kTurboOnPressureConstraint				 @"Turbo ON, Pressure >1.0E-1 Torr."
@@ -109,12 +111,14 @@
 #define kG3NoDataConstraint                     @"G3NoData"
 #define kG3NoDataReason                         @"PKR G3 has no data."
 
-
 #define kNegPumpPressConstraint					@"Press Too high for NEG Pump"
 #define kNegPumpPressReason						@"Opening that valve would expose the NEG to pressures higher than 1E-4."
 
 #define kHVStatusIsUnknownConstraint		    @"HV Bias State is unknown"
 #define kHVStatusIsUnknownReason			    @"No Communication from DAQ. Detector Bias Assumed."
+
+#define kLakeShoreHighConstraint				@"LakeShoreTempHigh"
+#define kLakeShoreHighReason					@"LakeShore Temp A greater than 100K."
 
 //-----------------------------------
 @interface ORMJDVacuumModel : ORGroup <OROrderedObjHolding,ORAdcProcessor,ORBitProcessor,ORCallBackBitProcessor>
@@ -189,6 +193,7 @@
 #pragma mark ***Notificatons
 - (void) registerNotificationObservers;
 - (void) baratronChanged:(NSNotification*)aNote;
+- (void) lakeShoreChanged:(NSNotification*)aNote;
 - (void) turboChanged:(NSNotification*)aNote;
 - (void) pressureGaugeChanged:(NSNotification*)aNote;
 - (void) cryoPumpChanged:(NSNotification*)aNote;

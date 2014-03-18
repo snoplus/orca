@@ -27,6 +27,8 @@
 #import "ORTM700Model.h"
 #import "ORTPG256AModel.h"
 #import "ORCP8CryopumpModel.h"
+#import "ORLakeShore336Model.h"
+#import "ORLakeShore336Input.h"
 #import "ORAlarm.h"
 
 
@@ -60,11 +62,13 @@
 - (void) postCouchRecord;
 - (void) resetHvTimer;
 
+- (ORLakeShore336Model*)findLakeShore;
 - (ORMks660BModel*)     findBaratron;
 - (ORRGA300Model*)      findRGA;
 - (ORTM700Model*)       findTurboPump;
 - (ORTPG256AModel*)     findPressureGauge;
 - (ORCP8CryopumpModel*) findCryoPump;
+- (ORLakeShore336Model*)findLakeShore;
 - (id)                  findObject:(NSString*)aClassName;
 @end
 
@@ -148,7 +152,9 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	//we need to know about a specific set of events in order to handle the constraints
-	ORMks660BModel* baratron = [self findBaratron];
+	ORMks660BModel*       baratron  = [self findBaratron];
+    ORLakeShore336Model*  lakeShore = [self findLakeShore];
+    //should have just one or the other..... baratron or lakeshore not both
 	if(baratron){
 		[notifyCenter addObserver : self
 						 selector : @selector(baratronChanged:)
@@ -160,7 +166,20 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : baratron];
 	}
-	
+
+	if(lakeShore){
+		[notifyCenter addObserver : self
+						 selector : @selector(lakeShoreChanged:)
+							 name : ORLakeShore336InputTemperatureChanged
+						   object : lakeShore];
+        
+		[notifyCenter addObserver : self
+						 selector : @selector(lakeShoreChanged:)
+							 name : ORLakeShore336IsValidChanged
+						   object : lakeShore];
+	}
+
+    
 	ORTM700Model* turbo = [self findTurboPump];
 	if(turbo){
 		[notifyCenter addObserver : self
@@ -251,11 +270,24 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) baratronChanged:(NSNotification*)aNote
 {
-	ORMks660BModel* baratron = [aNote object];
-	ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionBaratron];
-	[aRegionlabel setValue:[baratron pressure]];
-	[aRegionlabel setIsValid:[baratron isValid]];
+    if([self coolerMode] == kThermosyphon){
+        ORMks660BModel* baratron         = [aNote object];
+        ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionBaratron];
+        [aRegionlabel setValue:  [baratron pressure]];
+        [aRegionlabel setIsValid:[baratron isValid]];
+    }
 }
+
+- (void) lakeShoreChanged:(NSNotification*)aNote
+{
+    if([self coolerMode] == kPulseTube){
+        ORLakeShore336Model* lakeShore = [aNote object];
+        ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
+        [aRegionlabel setValue:  [lakeShore convertedValue:0]];
+        [aRegionlabel setIsValid:[lakeShore isValid]];
+    }
+}
+
 
 - (void) turboChanged:(NSNotification*)aNote
 {
@@ -631,7 +663,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 }
 
 #pragma mark •••CardHolding Protocol
-- (int) maxNumberOfObjects	{ return 5; }	//default
+- (int) maxNumberOfObjects	{ return 6; }	//default
 - (int) objWidth			{ return 80; }	//default
 - (int) groupSeparation		{ return 0; }	//default
 - (NSString*) nameForSlot:(int)aSlot	
@@ -646,7 +678,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	else if([anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NSMakeRange(2,1);
 	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])		return NSMakeRange(3,1);
 	else if([anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])		return NSMakeRange(4,1);
-		else return NSMakeRange(0,0);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORLakeShore336Model")])return NSMakeRange(5,1);
+    else return NSMakeRange(0,0);
 }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
@@ -656,6 +689,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORCP8CryopumpModel")]) return NO;
 	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	  return NO;
 	else if(aSlot == 4 && [anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])     return NO;
+	else if(aSlot == 5 && [anObj isKindOfClass:NSClassFromString(@"ORLakeShore336Model")])return NO;
     else return YES;
 }
 
@@ -708,6 +742,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		case kRegionNegPump:		return @"Neg Pump";
 		case kRegionDiaphramPump:	return @"Diaphram Pump";
 		case kRegionBelowTurbo:		return @"Below Turbo";
+		case kRegionLakeShore:		return @"LakeShore";
 		default: return nil;
 	}
 }
@@ -878,6 +913,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 
 @implementation ORMJDVacuumModel (private)
+- (ORLakeShore336Model*)findLakeShore  	    { return [self findObject:@"ORLakeShore336Model"];}
 - (ORMks660BModel*)     findBaratron		{ return [self findObject:@"ORMks660BModel"];     }
 - (ORRGA300Model*)      findRGA				{ return [self findObject:@"ORRGA300Model"];      }
 - (ORTM700Model*)       findTurboPump		{ return [self findObject:@"ORTM700Model"];       }
@@ -927,7 +963,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) makeParts
 {
-#define kNumVacPipes		59
+#define kNumVacPipes		61
 	VacuumPipeStruct vacPipeList[kNumVacPipes] = {
 		//region 0 pipes
 		{ kVacVPipe,  kRegionAboveTurbo, 50,			 260,				50,					450 }, 
@@ -944,9 +980,9 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{ kVacHPipe,  kRegionRGA,		230,			  350,				280-kPipeRadius,	350 },
 		
 		//region 2 pipes (cyrostat)
-		{ kVacBox,	   kRegionCryostat, 475,			  500,				525,				550 },
-		{ kVacBox,	   kRegionCryostat, 600,			  435,				700,				550 },
-		{ kVacBigHPipe, kRegionCryostat,525,			  525,		        600,				525 },
+		{ kVacBox,	   kRegionCryostat, 475,			  500,				525,				555 },
+		{ kVacBox,	   kRegionCryostat, 600,			  435,				700,				555 },
+		{ kVacBigHPipe,kRegionCryostat, 525,			  530,		        600,				530 },
 		{ kVacCorner,  kRegionCryostat, 700,			  400,				kNA,				kNA },
 		{ kVacVPipe,   kRegionCryostat, 700,			   70,				700,				400-kPipeRadius },
 		{ kVacHPipe,   kRegionCryostat, 350,			  400,				700-kPipeRadius,	400 },
@@ -958,6 +994,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{ kVacHPipe,   kRegionCryostat, 350,			  350,				400-kPipeRadius,	350 },
 		{ kVacVPipe,   kRegionCryostat, 400,			  400+kPipeRadius,	400,				450 },
 		{ kVacVPipe,   kRegionCryostat, 500,			  400+kPipeRadius,	500,				500 },
+        
 		//region 3 pipes
 		{ kVacVPipe,  kRegionCryoPump,	600,			  230,				600,				350 },
 		{ kVacHPipe,  kRegionCryoPump,	600+kPipeRadius, 300,				620,				300 },
@@ -966,16 +1003,18 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{ kVacCorner, kRegionCryoPump,	620,			  150,				kNA,				kNA },
 		{ kVacVPipe,  kRegionCryoPump,	620,			  150+kPipeRadius,	620,				200 },
 		{ kVacHPipe,  kRegionCryoPump,	620+kPipeRadius, 150,				640,				150 },
+        
 		//region 4 pipes
 		{ kVacBox,	  kRegionBaratron,  470,			  570,				530,				620 },
 		{ kVacBox,	  kRegionBaratron,  270,			  570,				330,				620 },
-		{ kVacCorner, kRegionBaratron,  500,			  525,				kNA,				kNA },
-		{ kVacCorner, kRegionBaratron,  680,			  525,				kNA,				kNA },
-		{ kVacHPipe,  kRegionBaratron,  500+kPipeRadius,  525,				680-kPipeRadius,	525 },
-		{ kVacVPipe,  kRegionBaratron,  500,			  525+kPipeRadius,	500,				570 },
+		{ kVacCorner, kRegionBaratron,  500,			  535,				kNA,				kNA },
+		{ kVacCorner, kRegionBaratron,  680,			  535,				kNA,				kNA },
+		{ kVacHPipe,  kRegionBaratron,  500+kPipeRadius,  535,				680-kPipeRadius,	535 },
+		{ kVacVPipe,  kRegionBaratron,  500,			  535+kPipeRadius,	500,				570 },
 		{ kVacHPipe,  kRegionBaratron,  330,			  600,				400,				600 },
 		{ kVacHPipe,  kRegionBaratron,  400,			  600,				470,				600 },
-		{ kVacVPipe,  kRegionBaratron,  360,			  550,				360,				600-kPipeRadius },
+		{ kVacVPipe,  kRegionBaratron,  360,			  540,				360,				600-kPipeRadius },
+        
 		//region 5 pipes
 		{ kVacCorner, kRegionDryN2,		150,			  30,				kNA,				kNA },
 		{ kVacCorner, kRegionDryN2,		700,			  30,				kNA,				kNA },
@@ -1001,6 +1040,10 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		//region 8 pipes
 		{ kVacVPipe,  kRegionBelowTurbo, 50,			  200,				50,					260 }, 
 		
+        //region 9 pipes
+		{ kVacCorner, kRegionLakeShore,  680,			  525,				kNA,				kNA },
+		{ kVacHPipe,  kRegionLakeShore,  460+kPipeRadius, 525,				680-kPipeRadius,	525 },
+
 	};
 	
 #define kNumStaticLabelItems	3
@@ -1010,7 +1053,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{kVacStaticLabel, kRegionDiaphramPump,	@"Diaphragm\nPump",	 20,  80,	 80, 110},
 	};	
 	
-#define kNumStatusItems	10
+#define kNumStatusItems	11
 	VacuumDynamicLabelStruct dynamicLabelItems[kNumStatusItems] = {
 		//type,	region, component, channel
 		{kVacStatusItem,   kRegionAboveTurbo,	0, 5,  @"Turbo",	20,	 242,	80,	 268},
@@ -1020,10 +1063,11 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{kVacPressureItem, kRegionRGA,			3, 1,  @"PKR G2",	200, 450,	260, 480},
 		{kVacPressureItem, kRegionCryostat,		3, 2,  @"PKR G3",	370, 450,	430, 480},
 		{kVacPressureItem, kRegionCryoPump,		3, 3,  @"PKR G4",	620, 285,	680, 315},
-		{kVacPressureItem, kRegionBaratron,		4, 0,  @"Baratron",	330, 520,	390, 550},
+		{kVacPressureItem, kRegionBaratron,		4, 0,  @"Baratron",	330, 510,	390, 540},
 		{kVacPressureItem, kRegionDiaphramPump,	3, 3,  @"Assumed",	370, 100,	430, 130},
 		{kVacPressureItem, kRegionDryN2,		99, 99,@"Assumed",	370, 50,	430, 80},
-	};	
+		{kVacPressureItem, kRegionLakeShore,    9, 0,  @"LakeShore",405, 510,	465, 540},
+	};
 	
 #define kNumVacLines 10
 	VacuumLineStruct vacLines[kNumVacLines] = {
@@ -1075,7 +1119,6 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	int i;
 	for(i=0;i<numItems;i++){
-        //if(([self coolerMode] != kThermosyphon) && (pipeList[i].regionTag == kRegionBaratron))continue;
 		switch(pipeList[i].type){
 			case kVacCorner:
 				[[[ORVacuumCPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag at:NSMakePoint(pipeList[i].x1, pipeList[i].y1)] autorelease];
@@ -1104,7 +1147,6 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	int i;
 	for(i=0;i<numItems;i++){
-        //if(([self coolerMode] != kThermosyphon) && (gvList[i].r1 == kRegionBaratron))continue;
 		ORVacuumGateValve* gv= nil;
 		switch(gvList[i].type){
 			case kVacVGateV:
@@ -1135,7 +1177,6 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	int i;
 	for(i=0;i<numItems;i++){
-        //if(([self coolerMode] != kThermosyphon) && (labelItems[i].regionTag == kRegionBaratron))continue;
 
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
 		if(labelItems[i].type == kVacPressureItem){
@@ -1160,8 +1201,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) colorRegions
 {
-	#define kNumberPriorityRegions 9
-	int regionPriority[kNumberPriorityRegions] = {4,6,1,0,3,8,7,2,5}; //lowest to highest
+	#define kNumberPriorityRegions 10
+	int regionPriority[kNumberPriorityRegions] = {9,4,6,1,0,3,8,7,2,5}; //lowest to highest
 					
 	NSColor* regionColor[kNumberPriorityRegions] = {
 		[NSColor colorWithCalibratedRed:1.0 green:1.0 blue:0.7 alpha:1.0], //Region 0 Above Turbo
@@ -1173,6 +1214,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		[NSColor colorWithCalibratedRed:0.8 green:0.8 blue:0.4 alpha:1.0], //Region 6 NEG Pump
 		[NSColor colorWithCalibratedRed:0.4 green:0.6 blue:0.7 alpha:1.0], //Region 7 Diaphragm pump
 		[NSColor colorWithCalibratedRed:0.5 green:0.9 blue:0.3 alpha:1.0], //Region 8 Below Turbo
+		[NSColor colorWithCalibratedRed:0.6 green:0.8 blue:0.8 alpha:1.0], //Region 9 LakeShore
 	};
 	int i;
 	for(i=0;i<kNumberPriorityRegions;i++){
@@ -1804,32 +1846,58 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	
 	//---------------------------------------------------------------------------
 	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing
-	//baratron must be >1000Torr  and <2500Torr 
+	//baratron must be >1000Torr  and <2500Torr if baratron is used
+    //LakeShore A must be >100K is baratron is NOT used
 	//Note: the bias info can only get back to the DAQ via the DAQ system script
 	double			cyrostatPress		= [self valueForRegion:kRegionCryostat];
-	ORMks660BModel* baratron			= [self findBaratron];
-	float			baratronPressure	= [baratron pressure];
 	
-    
 	//baratron operational?
-	if((baratronPressure >= 1000) && (baratronPressure <= 2500) || ([self coolerMode] != kThermosyphon)){
-		[self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
-		[self removeOkToBiasConstraints:kBaratronTooHighConstraint];
-		[self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
-		[self removeOkToBiasConstraints:kBaratronTooLowConstraint];
+    if([self coolerMode] == kThermosyphon){
+        //these don't count in thermosyphon mode
+        [self removeContinuedBiasConstraints:kLakeShoreHighConstraint];
+        [self removeOkToBiasConstraints:     kLakeShoreHighConstraint];
+        
+        ORMks660BModel* baratron			= [self findBaratron];
+        float			baratronPressure	= [baratron pressure];
+        if((baratronPressure >= 1000) && (baratronPressure <= 2500)){
+            [self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
+            [self removeOkToBiasConstraints:     kBaratronTooHighConstraint];
+            [self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
+            [self removeOkToBiasConstraints:     kBaratronTooLowConstraint];
+        }
+        else {
+            //nope, not operational
+            if(baratronPressure < 1000) {
+                [self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
+                [self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
+            }
+            else if(baratronPressure > 2500)	{
+                [self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
+                [self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
+            }
+        }
 	}
-	else {
-		//nope, not operational
-		if(baratronPressure < 1000) {
-			[self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
-			[self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
-		}
-		else if(baratronPressure > 2500)	{
-			[self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
-			[self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
-		}
-	}
-	
+    else {
+        //these don't count in pulse-tube cooler mode
+        [self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
+        [self removeOkToBiasConstraints:     kBaratronTooHighConstraint];
+        [self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
+        [self removeOkToBiasConstraints:     kBaratronTooLowConstraint];
+
+        ORLakeShore336Model* lakeShore			= [self findLakeShore];
+        float lakeShoreTemp	= [lakeShore convertedValue:0];
+        if((lakeShoreTemp >=100)){ //cold enough?
+            [self removeContinuedBiasConstraints:kLakeShoreHighConstraint];
+            [self removeOkToBiasConstraints:kLakeShoreHighConstraint];
+         }
+        else {
+            //nope, not cold enough
+            if(lakeShoreTemp < 100) {
+                [self addContinuedBiasConstraints:kLakeShoreHighConstraint  reason:kLakeShoreHighReason];
+                [self addOkToBiasConstraints:     kLakeShoreHighConstraint  reason:kLakeShoreHighReason];
+            }
+        }
+    }
 	//cryostat region pressure must be <1E-5 to stay biased (also must be non-zero -- zero indicates no data)
     
     if(cyrostatPress==0){
