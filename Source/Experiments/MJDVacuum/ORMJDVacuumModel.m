@@ -29,8 +29,10 @@
 #import "ORCP8CryopumpModel.h"
 #import "ORAlarm.h"
 
+
 @interface ORMJDVacuumModel (private)
 - (void) makeParts;
+- (void) remakeParts;
 - (void) makeLines:(VacuumLineStruct*)lineItems num:(int)numItems;
 - (void) makePipes:(VacuumPipeStruct*)pipeList num:(int)numItems;
 - (void) makeGateValves:(VacuumGVStruct*)pipeList num:(int)numItems;
@@ -78,6 +80,7 @@ NSString* ORMJDVacuumModelNextHvUpdateTimeChanged       = @"ORMJDVacuumModelNext
 NSString* ORMJDVacuumModelLastHvUpdateTimeChanged       = @"ORMJDVacuumModelLastHvUpdateTimeChanged";
 NSString* ORMJDVacuumModelHvUpdateTimeChanged           = @"ORMJDVacuumModelHvUpdateTimeChanged";
 NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelConstraintsDisabledChanged";
+NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCoolerModeChanged";
 
 @implementation ORMJDVacuumModel
 
@@ -314,6 +317,21 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 }
 
 #pragma mark ***Accessors
+- (int) coolerMode
+{
+    return coolerMode;
+}
+
+- (void) setCoolerMode:(int)aCoolerMode
+{
+    if(aCoolerMode!=coolerMode){
+        [[[self undoManager] prepareWithInvocationTarget:self] setCoolerMode:coolerMode];
+        coolerMode = aCoolerMode;
+        [self remakeParts];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDVacuumModelCoolerModeChanged object:self];
+    }
+}
+
 - (BOOL)    noHvInfo         { return noHvInfo;         }
 - (NSDate*) nextHvUpdateTime { return nextHvUpdateTime; }
 - (NSDate*) lastHvUpdateTime { return lastHvUpdateTime; }
@@ -411,6 +429,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setCoolerMode:[decoder decodeIntForKey:@"coolerMode"]];
 	[self setShowGrid:	[decoder decodeBoolForKey:	@"showGrid"]];
 	
 	[self makeParts];
@@ -424,6 +443,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:coolerMode forKey:@"coolerMode"];
     [encoder encodeBool:showGrid					forKey: @"showGrid"];
 }
 
@@ -884,6 +904,27 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
     }
 }
 
+- (void) remakeParts
+{
+    [partDictionary removeAllObjects];
+    [partDictionary release];
+    partDictionary = nil;
+
+    [valueDictionary removeAllObjects];
+    [valueDictionary release];
+    valueDictionary = nil;
+
+    [statusDictionary removeAllObjects];
+    [statusDictionary release];
+    statusDictionary = nil;
+
+    [parts removeAllObjects];
+    [parts release];
+    parts = nil;
+
+    [self makeParts];
+}
+
 - (void) makeParts
 {
 #define kNumVacPipes		59
@@ -1034,6 +1075,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 {
 	int i;
 	for(i=0;i<numItems;i++){
+        if(([self coolerMode] != kThermosyphon) && (pipeList[i].regionTag == kRegionBaratron))continue;
 		switch(pipeList[i].type){
 			case kVacCorner:
 				[[[ORVacuumCPipe alloc] initWithDelegate:self regionTag:pipeList[i].regionTag at:NSMakePoint(pipeList[i].x1, pipeList[i].y1)] autorelease];
@@ -1062,6 +1104,7 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 {
 	int i;
 	for(i=0;i<numItems;i++){
+        if(([self coolerMode] != kThermosyphon) && (gvList[i].r1 == kRegionBaratron))continue;
 		ORVacuumGateValve* gv= nil;
 		switch(gvList[i].type){
 			case kVacVGateV:
@@ -1092,6 +1135,8 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 {
 	int i;
 	for(i=0;i<numItems;i++){
+        if(([self coolerMode] != kThermosyphon) && (labelItems[i].regionTag == kRegionBaratron))continue;
+
 		NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
 		if(labelItems[i].type == kVacPressureItem){
 			[[[ORVacuumValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];			
@@ -1188,10 +1233,12 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
         [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
     }
     
-    [values setObject: valueLabels         forKey:@"DynamicLabels"];
+    [values setObject: valueLabels          forKey:@"DynamicLabels"];
     [values setObject: regionColors         forKey:@"RegionColors"];
     [values setObject: gvStates             forKey:@"GateValves"];
-    [values setObject: [NSNumber numberWithBool:[self detectorsBiased]] forKey:@"DetectorsBiased"];
+    [values setObject: [NSNumber numberWithBool:[self detectorsBiased]]      forKey:@"DetectorsBiased"];
+    [values setObject: [NSNumber numberWithBool:[self shouldUnbiasDetector]] forKey:@"ShouldUnbiasDetector"];
+    [values setObject: [NSNumber numberWithBool:[self okToBiasDetector]]     forKey:@"OKToBiasDetector"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:5];
@@ -1762,8 +1809,9 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 	ORMks660BModel* baratron			= [self findBaratron];
 	float			baratronPressure	= [baratron pressure];
 	
+    
 	//baratron operational?
-	if(baratronPressure >= 1000 && baratronPressure <= 2500){
+	if((baratronPressure >= 1000) && (baratronPressure <= 2500) || ([self coolerMode] != kThermosyphon)){
 		[self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
 		[self removeOkToBiasConstraints:kBaratronTooHighConstraint];
 		[self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
@@ -1773,23 +1821,32 @@ NSString* ORMJDVacuumModelConstraintsDisabledChanged    = @"ORMJDVacuumModelCons
 		//nope, not operational
 		if(baratronPressure < 1000) {
 			[self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
-			[self addOkToBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
+			[self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
 		}
 		else if(baratronPressure > 2500)	{
 			[self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
-			[self addOkToBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
+			[self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
 		}
 	}
 	
-	//cryostat region pressure must be <1E-5 to stay biased
-	if(cyrostatPress>1E-5)		[self addContinuedBiasConstraints:kG3WayHighConstraint  reason:kG3WayHighReason];
-	else						[self removeContinuedBiasConstraints:kG3WayHighConstraint];
-	
-	//cryostat region pressure must be <1E-6 to allow biasing
-	if(cyrostatPress>1E-6)		[self addOkToBiasConstraints:kG3HighConstraint  reason:kG3HighReason];
-	else						[self removeOkToBiasConstraints:kG3HighConstraint];
-	
-	
+	//cryostat region pressure must be <1E-5 to stay biased (also must be non-zero -- zero indicates no data)
+    
+    if(cyrostatPress==0){
+        [self addContinuedBiasConstraints:kG3NoDataConstraint  reason:kG3NoDataReason];
+        [self addOkToBiasConstraints:     kG3NoDataConstraint  reason:kG3NoDataReason];
+    }
+    else {
+        //there is data on G3, so remove these constrainst. The pressure may be bad so continue check.
+        [self removeContinuedBiasConstraints: kG3NoDataConstraint];
+        [self removeOkToBiasConstraints:      kG3NoDataConstraint];
+
+        if(cyrostatPress>1E-5) [self addContinuedBiasConstraints:kG3WayHighConstraint  reason:kG3WayHighReason];
+        else                   [self removeContinuedBiasConstraints:kG3WayHighConstraint];
+        
+        //cryostat region pressure must be <1E-6 to allow biasing
+        if(cyrostatPress>1E-6) [self addOkToBiasConstraints:kG3HighConstraint  reason:kG3HighReason];
+        else                   [self removeOkToBiasConstraints:kG3HighConstraint];
+    }
 }
 
 @end

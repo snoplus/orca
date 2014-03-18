@@ -24,6 +24,7 @@
 @interface ORMJDVacuumController : OrcaObjectController
 {
     IBOutlet ORMJDVacuumView*   vacuumView;
+	IBOutlet NSPopUpButton* coolerModePU;
 	IBOutlet NSTextField*   noHVInfoField;
 	IBOutlet NSTextField*   nextHvUpdateTimeField;
 	IBOutlet NSTextField*   lastHvUpdateTimeField;
@@ -68,6 +69,7 @@
 - (void) toggleGrid;
 
 #pragma mark ***Interface Management
+- (void) coolerModeChanged:(NSNotification*)aNote;
 - (void) nextHvUpdateTimeChanged:(NSNotification*)aNote;
 - (void) lastHvUpdateTimeChanged:(NSNotification*)aNote;
 - (void) hvUpdateTimeChanged:(NSNotification*)aNote;
@@ -80,6 +82,7 @@
 - (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark •••Actions
+- (IBAction) coolerModeAction:(id)sender;
 - (IBAction) showGridAction:(id)sender;
 - (IBAction) openGVControlPanel:(id)sender;
 - (IBAction) closeGVChangePanel:(id)sender;

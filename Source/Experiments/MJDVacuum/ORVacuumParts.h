@@ -229,7 +229,7 @@ typedef struct  {
 	int connectingRegion2;
 	int	controlPreference;
 	ORAlarm* valveAlarm;
-	BOOL firstTime;
+	BOOL logState;
 	NSString* controlObj;
 	int controlChannel;
 	BOOL vetoed;

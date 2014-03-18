@@ -234,7 +234,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 	self.label				= aLabel;
 	self.controlType		= aControlType;
 	self.state				= kGVChanging;
-	firstTime = YES;
+	logState                = NO;
 	return self;
 }
 		
@@ -299,10 +299,9 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 
 - (void) setState:(int)aState
 {
-	if(aState != state || firstTime){
+	if(aState != state || logState){
         
-        if(firstTime)NSLog(@"Value %@ state is now %@\n",[self label],[self stateName:aState]);
-        else NSLog(@"Value %@ changed from %@ to %@\n",[self label],[self stateName:state],[self stateName:aState]);
+        if(logState)NSLog(@"Value %@ state is now %@\n",[self label],[self stateName:aState]);
         
 		state = aState;
 		
@@ -310,7 +309,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
         [self performSelectorOnMainThread:@selector(cancelStuckValveTimer) withObject:nil waitUntilDone:YES];
 		
-		firstTime = NO;
+		logState = YES;
 	}
 }
 

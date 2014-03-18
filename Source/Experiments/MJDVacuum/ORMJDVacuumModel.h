@@ -26,6 +26,10 @@
 @class ORLabJackUE9Model;
 @class ORAlarm;
 
+
+#define kPulseTube    0
+#define kThermosyphon 1
+
 //-----------------------------------
 //region definitions
 #define kRegionAboveTurbo	0
@@ -102,6 +106,10 @@
 #define kG3WayHighConstraint					@"G3High"
 #define kG3WayHighReason						@"PKR G3 greater than 1E-5."
 
+#define kG3NoDataConstraint                     @"G3NoData"
+#define kG3NoDataReason                         @"PKR G3 has no data."
+
+
 #define kNegPumpPressConstraint					@"Press Too high for NEG Pump"
 #define kNegPumpPressReason						@"Opening that valve would expose the NEG to pressures higher than 1E-4."
 
@@ -133,9 +141,12 @@
     NSDate*              nextHvUpdateTime;
     BOOL                 noHvInfo;
     BOOL                 disableConstraints;
+    int coolerMode;
 }
 
 #pragma mark ***Accessors
+- (int) coolerMode;
+- (void) setCoolerMode:(int)aCoolerMode;
 - (BOOL) noHvInfo;
 - (void) setNoHvInfo:(BOOL)aNoHvInfo;
 - (NSDate*) nextHvUpdateTime;
@@ -226,6 +237,7 @@
 - (void) reportConstraints;
 @end
 
+extern NSString* ORMJDVacuumModelCoolerModeChanged;
 extern NSString* ORMJDVacuumModelNoHvInfoChanged;
 extern NSString* ORMJDVacuumModelNextHvUpdateTimeChanged;
 extern NSString* ORMJDVacuumModelLastHvUpdateTimeChanged;

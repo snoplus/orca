@@ -141,6 +141,11 @@
                          name : ORMJDVacuumModelConstraintsDisabledChanged
 						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(coolerModeChanged:)
+                         name : ORMJDVacuumModelCoolerModeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -155,9 +160,15 @@
 	[self hvUpdateTimeChanged:nil];
 	[self lastHvUpdateTimeChanged:nil];
 	[self nextHvUpdateTimeChanged:nil];
+	[self coolerModeChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) coolerModeChanged:(NSNotification*)aNote
+{
+	[coolerModePU selectItemAtIndex: [model coolerMode]];
+}
 - (void) constraintsDisabledChanged:(NSNotification*)aNote
 {
     if([model disableConstraints])[overRideButton setTitle:@"Re-enable Constraints"];
@@ -280,6 +291,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) coolerModeAction:(id)sender
+{
+	[model setCoolerMode:[sender indexOfSelectedItem]];
+}
 - (IBAction) showGridAction:(id)sender
 {
 	[model setShowGrid:[sender intValue]];
