@@ -175,7 +175,7 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
     [[self undoManager] disableUndoRegistration];
     [self setChannel:       [decoder decodeIntForKey:   @"channel"]];
     [self setResistance:    [decoder decodeIntForKey:   @"resistance"]];
-	[self setMaxCurrent:    [decoder decodeIntForKey:   @"maxCurrent"]];
+	//[self setMaxCurrent:    [decoder decodeIntForKey:   @"maxCurrent"]];
     [self setMaxUserCurrent:[decoder decodeIntForKey:   @"maxUserCurrent"]];
     [self setCurrentOrPower:[decoder decodeBoolForKey:  @"currentOrPower"]];
     [self setLowLimit:      [decoder decodeFloatForKey: @"lowLimit"]];
