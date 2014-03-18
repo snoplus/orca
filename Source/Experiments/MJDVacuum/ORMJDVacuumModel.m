@@ -1888,16 +1888,13 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
         ORLakeShore336Model* lakeShore			= [self findLakeShore];
         float lakeShoreTemp	= [lakeShore convertedValue:0];
-        if((lakeShoreTemp >=100)){ //cold enough?
+        if((lakeShoreTemp <=100) && [lakeShore isValid]){ //cold enough?
             [self removeContinuedBiasConstraints:kLakeShoreHighConstraint];
             [self removeOkToBiasConstraints:kLakeShoreHighConstraint];
          }
         else {
-            //nope, not cold enough
-            if(lakeShoreTemp < 100) {
-                [self addContinuedBiasConstraints:kLakeShoreHighConstraint  reason:kLakeShoreHighReason];
-                [self addOkToBiasConstraints:     kLakeShoreHighConstraint  reason:kLakeShoreHighReason];
-            }
+            [self addContinuedBiasConstraints:kLakeShoreHighConstraint  reason:kLakeShoreHighReason];
+            [self addOkToBiasConstraints:     kLakeShoreHighConstraint  reason:kLakeShoreHighReason];
         }
     }
 	//cryostat region pressure must be <1E-5 to stay biased (also must be non-zero -- zero indicates no data)
