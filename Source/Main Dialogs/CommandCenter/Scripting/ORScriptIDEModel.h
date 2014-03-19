@@ -48,6 +48,7 @@
     BOOL					runPeriodically;
     int						periodicRunInterval;
     NSDate*					nextPeriodicRun;
+	NSMutableDictionary*    persistantStore;
 }
 
 #pragma mark ***Initialization
@@ -63,6 +64,9 @@
 - (void) finalQuitNotice:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (id)   storedObjectWithKey:(id)aKey;
+- (void) setStoredObject:(id)anObj forKey:(id)aKey;
+- (void) clearStoredObjects;
 - (BOOL) suppressStartStopMessage;
 - (void) setSuppressStartStopMessage:(BOOL)aState;
 - (NSString*) runStatusString;

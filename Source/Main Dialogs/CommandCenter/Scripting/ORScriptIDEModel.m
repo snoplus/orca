@@ -861,7 +861,24 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	}
 }
 
+- (id)   storedObjectWithKey:(id)aKey
+{
+    return [persistantStore objectForKey:aKey];
+}
 
+- (void) setStoredObject:(id)anObj forKey:(id)aKey
+{
+    if(!persistantStore){
+        persistantStore = [[NSMutableDictionary dictionary] retain];
+    }
+    [persistantStore setObject:anObj forKey:aKey];
+}
+
+- (void) clearStoredObjects
+{
+    [persistantStore release];
+    persistantStore = nil;
+}
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -869,6 +886,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
+    persistantStore = 	[[decoder decodeObjectForKey:@"persistantStore"] retain];
     [self setPeriodicRunInterval:	[decoder decodeIntForKey:@"periodicRunInterval"]];
     [self setRunPeriodically:		[decoder decodeBoolForKey:@"runPeriodically"]];
     [self setAutoRunAtQuit:			[decoder decodeBoolForKey:@"autoRunAtQuit"]];
@@ -894,9 +912,10 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:periodicRunInterval forKey:@"periodicRunInterval"];
-    [encoder encodeBool:runPeriodically forKey:@"runPeriodically"];
-    [encoder encodeBool:autoRunAtQuit forKey:@"autoRunAtQuit"];
+    [encoder encodeObject:persistantStore       forKey:@"persistantStore"];
+    [encoder encodeInt:periodicRunInterval      forKey:@"periodicRunInterval"];
+    [encoder encodeBool:runPeriodically         forKey:@"runPeriodically"];
+    [encoder encodeBool:autoRunAtQuit           forKey:@"autoRunAtQuit"];
     [encoder encodeBool:showCommonOnly			forKey:@"showCommonOnly"];
     [encoder encodeBool:showSuperClass			forKey:@"showSuperClass"];
     [encoder encodeBool:autoStopWithRun			forKey:@"autoStopWithRun"];
