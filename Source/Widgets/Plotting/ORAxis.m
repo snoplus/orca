@@ -1307,6 +1307,7 @@ enum {
 	
 - (id) calibration
 {
+    if(![self isXAxis])return nil;
 	if ([viewToScale respondsToSelector:@selector(dataSource)]){
         id theDataSource = [viewToScale dataSource];
 		if([theDataSource respondsToSelector:@selector(model)]){
