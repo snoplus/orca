@@ -71,10 +71,17 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(TextFinder);
 - (void) loadUI 
 {
     if (!findTextField) {
-        if (![NSBundle loadNibNamed:@"FindPanel" owner:self])  {
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        if (![NSBundle loadNibNamed:@"FindPanel" owner:self]){
+#else
+            if (![[NSBundle mainBundle] loadNibNamed:@"FindPanel" owner:self topLevelObjects:&topLevelObjects]){
+#endif
+        
             NSLog(@"Failed to load FindPanel.nib");
             NSBeep();
         }
+        [topLevelObjects retain];
+
 		if (self == sharedTextFinder) [[findTextField window] setFrameAutosaveName:@"Find"];
     }
     [findTextField setStringValue:[self findString]];
@@ -82,6 +89,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(TextFinder);
 
 - (void) dealloc 
 {
+    //should never get here.. We are a singleton.
     if (self != sharedTextFinder) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [findString release];

@@ -28,7 +28,8 @@
     IBOutlet id copyrightField;
     IBOutlet id creditsField;
     IBOutlet id versionField;
-
+    NSArray* topLevelObjects;
+    
 #pragma mark ¥¥¥Instance Variables
     NSTimer *scrollTimer;
     float currentPosition;

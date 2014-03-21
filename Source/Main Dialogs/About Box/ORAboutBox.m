@@ -40,7 +40,11 @@
         NSDictionary *infoDictionary;
         CFBundleRef localInfoBundle;
         NSDictionary *localInfoDict;
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
         if (![NSBundle loadNibNamed:@"AboutBox" owner:self]){
+#else
+            if (![[NSBundle mainBundle] loadNibNamed:@"AboutBox" owner:self topLevelObjects:&topLevelObjects]){
+#endif
             // int NSRunCriticalAlertPanel(NSString *title,
             //		NSString *msg, NSString *defaultButton,
             //		NSString *alternateButton, NSString *otherButton, ...);
@@ -48,6 +52,7 @@
             NSBeep();
             return;
         }
+        [topLevelObjects retain];
         theWindow = [appNameField window];
                 // Get the info dictionary (Info.plist)
         infoDictionary = [[NSBundle mainBundle] infoDictionary];

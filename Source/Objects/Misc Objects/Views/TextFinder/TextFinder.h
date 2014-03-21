@@ -28,8 +28,9 @@
     IBOutlet NSButton*		findNextButton;
     IBOutlet NSMatrix*		replaceAllScopeMatrix;
     IBOutlet NSTextField*	statusField;
-    BOOL		lastFindWasSuccessful;
-    NSString*	findString;
+    BOOL                    lastFindWasSuccessful;
+    NSString*               findString;
+    NSArray*                topLevelObjects;
 }
 
 /* Common way to get a text finder. One instance of TextFinder per app is good enough. */
