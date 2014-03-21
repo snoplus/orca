@@ -461,8 +461,8 @@
 {
     NSRunAlertPanel([NSString stringWithFormat:@"HW Error Seen in %@ (%@, %@)",[model objectName],
                      [model ipAddress],[model serialNumber]],
-                    astr,
-                    @"OK",nil,nil);
+                    @"%@",
+                    @"OK",nil,nil,astr);
 }
 
 - (void) _updateChannelModes:(unsigned int)bits withTextField:(NSTextField*)tf

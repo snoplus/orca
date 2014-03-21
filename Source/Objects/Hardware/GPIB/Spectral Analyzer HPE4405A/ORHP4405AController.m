@@ -619,10 +619,12 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Freq Settings Load Failed");
         NSRunAlertPanel( @"HP4405A Freq Settings Load Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]
+                        );
 	}
 }
 
@@ -635,10 +637,11 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Trigger Settings Load Failed");
         NSRunAlertPanel( @"HP4405A Trigger Settings Load Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]);
 	}
 }
 
@@ -651,10 +654,11 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A RF Burst Settings Load Failed");
         NSRunAlertPanel( @"HP4405A RF Burst Settings Load Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]);
 	}
 }
 - (IBAction) loadInputPortSettingsAction:(id)sender
@@ -666,10 +670,11 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Input Port Settings Load Failed");
         NSRunAlertPanel( @"HP4405A Input Port Settings Load Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]);
 	}
 }
 
@@ -682,10 +687,11 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Initiate Measurement Failed");
         NSRunAlertPanel( @"HP4405A Initiate Measurement Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]);
 	}
 }
 
@@ -698,10 +704,11 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Pause Measurement Failed");
         NSRunAlertPanel( @"HP4405A Pause Measurement Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]);
 	}
 }
 
@@ -714,10 +721,11 @@
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Check Status Failed");
         NSRunAlertPanel( @"HP4405A Check Status Failed",
-						[localException reason],
+						@"%@",
 						@"OK",
 						nil,
-						nil );
+						nil,
+                        [localException reason]);
 	}
 }
 

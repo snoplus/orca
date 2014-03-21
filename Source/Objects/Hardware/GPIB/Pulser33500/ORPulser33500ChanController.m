@@ -411,11 +411,12 @@
 - (void) showExceptionAlert:(NSException*) localException
 {
 	NSLog( [ localException reason ] );
-	NSRunAlertPanel( [ localException name ], 	// Name of panel
-					[ localException reason ],	// Reason for error
-					@"OK",				// Okay button
-					nil,				// alternate button
-					nil );				// other button
+    NSRunAlertPanel( [ localException name ], 	// Name of panel
+                    @"%@",	// Reason for error
+                    @"OK",	// Okay button
+                    nil,	// alternate button
+                    nil,	// other button
+                    [localException reason ]);
 }
 
 - (IBAction) clearMemory:(id)sender
@@ -492,10 +493,11 @@
 		[progress setDoubleValue:0];
 		NSLog( [ localException reason ] );
 		NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
+						@"%@",	// Reason for error
+						@"OK",	// Okay button
+						nil,	// alternate button
+						nil,    // other button
+                        [localException reason ]);
 	}
 }
 
@@ -538,11 +540,12 @@
 		}
 		@catch(NSException* localException) {
 			NSLog( [ localException reason ] );
-			NSRunAlertPanel( [ localException name ], 	// Name of panel
-							[ localException reason ],	// Reason for error
-							@"OK",				// Okay button
-							nil,				// alternate button
-							nil );				// other button
+            NSRunAlertPanel( [ localException name ], 	// Name of panel
+                            @"%@",	// Reason for error
+                            @"OK",	// Okay button
+                            nil,	// alternate button
+                            nil,	// other button
+                            [localException reason ]);
 		}
     }
 }

@@ -1187,9 +1187,12 @@ SYNC_MODEL_VARS(Set ## var, Get ## var ## Set)
                 
                 // Otherwise we need to ask for confirmation
                 if (NSRunAlertPanel(@"IP Address changed",
+                                    @"%@",
+                                    @"OK",
+                                    @"Cancel",
+                                    nil,
                                     [NSString stringWithFormat:@"The IP (%@) of %@,%@ has changed to %@.  Do you wish to allow this?",
-                                     [self ipAddress],[self objectName],[self serialNumber],[dev ipAddress]],
-                                    @"OK",@"Cancel", nil) == NSAlertDefaultReturn) {
+                                                          [self ipAddress],[self objectName],[self serialNumber],[dev ipAddress]]) == NSAlertDefaultReturn) {
                     [self setIpAddress:[dev ipAddress]];
                 }
                 break;
