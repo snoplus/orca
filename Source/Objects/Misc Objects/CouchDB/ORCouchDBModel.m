@@ -1186,10 +1186,31 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef
 {
     [self checkDataBaseExists:aDataBaseRef];
+    //these are special records that any object can insert into the database via this notification
+    //the userInfo should just be a dictionary that you want to go into the database
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+    
+    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    [dateFormatter setTimeZone:gmt];
+    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+    [dateFormatter release];
     
     NSString* anId = [anObj fullID];
     if([anId length] && aDictionary){
-        [aDataBaseRef addDocument:aDictionary tag:kDocumentAdded];
+        if(![lastTimeStamp length]) lastTimeStamp = @"0";
+        
+        
+        NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        lastTimeStamp,	@"timestamp",
+                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                        nil];
+        
+        [aRecord addEntriesFromDictionary:aDictionary];
+        [aDataBaseRef addDocument:aRecord tag:kDocumentAdded];
     }
 }
 
