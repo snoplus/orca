@@ -18,8 +18,8 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
-#import <Foundation/Foundation.h>
 @class OROpSequenceQueue;
+@class OROpSeqStep;
 
 typedef enum
 {
@@ -37,23 +37,31 @@ typedef enum
 	OROpSequenceQueue*  scriptQueue;
 	NSArray*            steps;
     int                 idIndex;
+    BOOL                allowedToRun;
+    NSMutableDictionary* stepStorage;
 }
 - (id)   initWithDelegate:(id)aDelegate idIndex:(int)anIndex;
 - (void) start;
 - (void)cancel:(id)parameter;
 - (NSArray*) operations;
+- (id) step:(OROpSeqStep*)aStep objectForKey:(NSString*)aKey;
+- (void) step:(OROpSeqStep*)aStep setObject:(id)aValue forKey:(NSString*)aKey;
 
+@property (nonatomic, assign) BOOL                 allowedToRun;
 @property (nonatomic, assign) int                  idIndex;
 @property (nonatomic, assign) enumOpSeqQueueState  state;
 @property (nonatomic, retain) NSArray*             steps;
+@property (nonatomic, retain) NSMutableDictionary* stepStorage;
 @property (assign)            id                   delegate;
 @property (nonatomic, retain, readonly) OROpSequenceQueue* scriptQueue;
 
 @end
 
+extern NSString* OROpSequenceAllowedToRunChanged;
 extern NSString* OROpSeqStepsChanged;
 extern NSString* ORSequenceQueueCountChanged;
 
 @interface NSObject (OROpSequence)
 -(NSArray*) scriptSteps:(int)index;
+-(BOOL)     allowedToRun:(int)index;
 @end;

@@ -198,6 +198,9 @@
 	[secondaryValuesView reloadData];
 	[self ignorePanicOnAChanged:nil];
 	[self ignorePanicOnBChanged:nil];
+    
+    //interlocks
+    [self groupChanged:nil];
 }
 
 
@@ -218,6 +221,7 @@
 {
 	if(note == nil || [note object] == model || [[note object] guardian] == model){
 		[subComponentsView setNeedsDisplay:YES];
+        [model updateAllowedToRunStates];
 	}
 }
 - (void) pollTimeChanged:(NSNotification*)aNotification

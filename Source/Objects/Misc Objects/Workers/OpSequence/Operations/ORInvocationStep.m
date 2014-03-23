@@ -46,6 +46,7 @@
 
 - (void)runStep
 {
+    [super runStep];
 	if (self.concurrentStep) [NSThread sleepForTimeInterval:5.0];
 
     [invocation invokeWithNoUndoOnTarget:[invocation target]];
@@ -88,8 +89,12 @@
 			if ([errorPredicate evaluateWithObject:paragraph])          errors++;
 		}
 	}
-
-	self.errorCount   = errors;
+    if(errors==0) self.errorCount = 0;
+    else {
+        NSInteger theErrors = self.errorCount;
+        theErrors += errors;
+        self.errorCount   = theErrors;
+    }
     
 }
 

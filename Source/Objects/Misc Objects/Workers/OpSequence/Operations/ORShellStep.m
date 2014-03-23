@@ -111,6 +111,7 @@
 
 - (void)runStep
 {
+    [super runStep];
 	if (self.concurrentStep) [NSThread sleepForTimeInterval:5.0];
 
 	taskHandler = [[ORTaskHandler alloc] initWithLaunchPath:launchPath
@@ -254,9 +255,12 @@
 
 		}
 	}
-	
-	self.errorCount   = errors;
-
+    if(errors==0) self.errorCount = 0;
+    else {
+        NSInteger theErrors = self.errorCount;
+        theErrors += errors;
+        self.errorCount   = theErrors;
+    }
 }
 
 - (void)taskComplete:(ORTaskHandler*)aTaskHandler
@@ -273,7 +277,12 @@
 	else [self parseErrors];
 
     if(outputStateKey){
-        [currentQueue setStateValue:self.errorCount==0 ? @"1" : @"0" forKey:outputStateKey];
+        if(self.numAllowedErrors==0){
+            [currentQueue setStateValue:self.errorCount? @"1" : @"0" forKey:outputStateKey];
+        }
+        else {
+            [currentQueue setStateValue:self.errorCount<self.numAllowedErrors ? @"-1" : @"0" forKey:outputStateKey];
+        }
     }
     
 	[taskHandler release];

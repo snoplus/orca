@@ -42,6 +42,7 @@
 
 - (void)runStep
 {
+    [super runStep];
 	if (runOnMainThread) dispatch_sync(dispatch_get_main_queue(), ^{block(self);});
 	else                 block(self);
 }

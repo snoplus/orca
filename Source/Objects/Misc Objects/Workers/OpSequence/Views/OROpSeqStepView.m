@@ -41,6 +41,11 @@
 		[imageView setHidden:NO];
 		[errorLabel setHidden:NO];
 	}
+	else if (newState == kSeqStepWarning){
+		[imageView setImage:[NSImage imageNamed:@"warning"]];
+		[imageView setHidden:NO];
+		[errorLabel setHidden:NO];
+	}
 	else if (newState == kSeqStepFailed){
 		[imageView setImage:[NSImage imageNamed:@"exMark"]];
 		[imageView setHidden:NO];

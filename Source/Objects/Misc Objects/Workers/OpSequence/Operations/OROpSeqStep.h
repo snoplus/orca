@@ -22,6 +22,18 @@
 #import <Cocoa/Cocoa.h>
 
 @class OROpSequenceQueue;
+@class OROpSequence;
+
+typedef enum
+{
+	kSeqStepPending,
+	kSeqStepActive,
+	kSeqStepSuccess,
+	kSeqStepCancelled,
+    kSeqStepWarning,
+	kSeqStepFailed
+} enumScriptStepState;
+
 
 @interface OROpSeqStep : NSOperation
 {
@@ -30,12 +42,17 @@
 	NSTextStorage*      outputStringStorage;
 	NSTextStorage*      errorStringStorage;
 	NSInteger           errorCount;
+	NSInteger           numAllowedErrors;
 	NSString*           title;
 	NSString*           errorTitle;
 	NSString*           successTitle;
-	NSMutableDictionary*   requirements;
+	NSMutableDictionary*  skipConditions;
+	NSMutableDictionary*  requirements;
 	NSMutableDictionary*  andConditions;
 	NSMutableDictionary*  orConditions;
+    OROpSequence*       persistantStorageObj;
+    NSString*           persistantAccessKey;
+
 }
 
 @property (nonatomic, copy) NSString*       title;
@@ -45,18 +62,28 @@
 @property (readonly)        NSTextStorage*  errorStringStorage;
 @property (retain)          OROpSequenceQueue* currentQueue;
 @property (retain)          OROpSeqStep*    concurrentStep;
-@property (readwrite)       NSInteger       errorCount;
-@property (retain) NSMutableDictionary*   requirements;
-@property (retain) NSMutableDictionary*   andConditions;
-@property (retain) NSMutableDictionary*   orConditions;
+@property (nonatomic)       NSInteger       errorCount;
+@property (readwrite)       NSInteger       numAllowedErrors;
+@property (retain) NSMutableDictionary*     requirements;
+@property (retain) NSMutableDictionary*     skipConditions;
+@property (retain) NSMutableDictionary*     andConditions;
+@property (retain) NSMutableDictionary*     orConditions;
+@property (nonatomic,assign)       id       persistantStorageObj;
+@property (nonatomic, copy) NSString*       persistantAccessKey;
 
+- (void)runStep;
+- (enumScriptStepState)state;
+- (NSString*) finalStateString;
 - (NSString *)outputString;
 - (NSString *)errorString;
 - (void) require:(NSString*)aKey value:(NSString*)aValue;
+- (void) addSkipCondition:(NSString*)aKey value:(NSString*)aValue;
 - (void) addAndCondition:(NSString*)aKey value:(NSString*)aValue;
 - (void) addOrCondition:(NSString*)aKey value:(NSString*)aValue;
 - (NSInteger) checkRequirements;
+- (BOOL) checkSkipConditions;
 - (BOOL) checkConditions;
+- (void) setPersistentStorageObj:(id)anObj accessKey:(NSString*)aKey;
 
 - (NSArray *)resolvedScriptArrayForArray:(NSArray *)array;
 - (NSDictionary *)resolvedScriptDictionaryForDictionary:(NSDictionary *)dictionary;

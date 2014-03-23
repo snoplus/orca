@@ -12,21 +12,12 @@
 //  appreciated but not required.
 //
 
-#import <Cocoa/Cocoa.h>
-
-typedef enum
-{
-	kSeqStepPending,
-	kSeqStepActive,
-	kSeqStepSuccess,
-	kSeqStepCancelled,
-	kSeqStepFailed
-} enumScriptStepState;
+#import "OROpSeqStep.h"
 
 @interface OROpSeqStepView : NSView
 {
-	BOOL            selected;
-	enumScriptStepState state;
+	BOOL                            selected;
+	enumScriptStepState             state;
 	IBOutlet NSProgressIndicator*   progressIndicator;
 	IBOutlet NSImageView*           imageView;
 	IBOutlet NSTextField*           errorLabel;

@@ -24,8 +24,9 @@
 #import "OROpSeqStep.h"
 NSArray *ScriptSteps();
 
-NSString* OROpSeqStepsChanged           = @"OROpSeqStepsChanged";
-NSString* ORSequenceQueueCountChanged   = @"ORSequenceQueueCountChanged";
+NSString* OROpSeqStepsChanged               = @"OROpSeqStepsChanged";
+NSString* ORSequenceQueueCountChanged       = @"ORSequenceQueueCountChanged";
+NSString* OROpSequenceAllowedToRunChanged   = @"OROpSequenceAllowedToRunChanged";
 
 @implementation OROpSequence
 
@@ -34,6 +35,8 @@ NSString* ORSequenceQueueCountChanged   = @"ORSequenceQueueCountChanged";
 @synthesize state;
 @synthesize scriptQueue;
 @synthesize delegate;
+@synthesize allowedToRun;
+@synthesize stepStorage;
 
 - (id) initWithDelegate:(id)aDelegate idIndex:(int)anIndex
 {
@@ -71,8 +74,28 @@ NSString* ORSequenceQueueCountChanged   = @"ORSequenceQueueCountChanged";
         
 	[steps release];
 	steps = nil;
+ 
+    [stepStorage release];
+	stepStorage = nil;
     
 	[super dealloc];
+}
+
+- (id) step:(OROpSeqStep*)aStep objectForKey:(NSString*)aKey
+{
+    NSDictionary* variables = [stepStorage objectForKey:[aStep persistantAccessKey]];
+    return [variables objectForKey:aKey];
+}
+
+- (void) step:(OROpSeqStep*)aStep setObject:(id)aValue forKey:(NSString*)aKey
+{
+    if(!stepStorage)self.stepStorage = [NSMutableDictionary dictionary];
+    NSString* stepKey = [aStep persistantAccessKey];
+    if(![stepStorage objectForKey:stepKey]){
+        [stepStorage setObject:[NSMutableDictionary dictionary] forKey:stepKey];
+    }
+    NSMutableDictionary* variables = [stepStorage objectForKey:stepKey];
+    [variables setObject:aValue forKey:aKey];
 }
 
 - (void) setSteps:(NSArray *)anArray
@@ -82,6 +105,12 @@ NSString* ORSequenceQueueCountChanged   = @"ORSequenceQueueCountChanged";
     steps = anArray;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:OROpSeqStepsChanged object:self];
+}
+
+- (void) setAllowedToRun:(BOOL)aState
+{
+    allowedToRun = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROpSequenceAllowedToRunChanged object:self];
 }
 
 - (void) start

@@ -78,7 +78,7 @@
 
 - (void)runStep
 {
-    
+    [super runStep];
 	if (self.concurrentStep) [NSThread sleepForTimeInterval:5.0];
     if(socketObject){
         [socketObject connect];

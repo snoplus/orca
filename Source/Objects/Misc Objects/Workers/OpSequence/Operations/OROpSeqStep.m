@@ -22,6 +22,7 @@
 
 #import "OROpSeqStep.h"
 #import "OROpSequenceQueue.h"
+#import "OROpSequence.h"
 
 @implementation OROpSeqStep
 
@@ -35,7 +36,11 @@
 @synthesize errorCount;
 @synthesize requirements;
 @synthesize andConditions;
+@synthesize skipConditions;
 @synthesize orConditions;
+@synthesize numAllowedErrors;
+@synthesize persistantStorageObj;
+@synthesize persistantAccessKey;
 
 - (id)init
 {
@@ -76,10 +81,23 @@
 	else return title;
 }
 
+- (void) setPersistentStorageObj:(id)anObj accessKey:(NSString*)aKey
+{
+    self.persistantStorageObj   = anObj;
+    self.persistantAccessKey    = aKey;
+}
+
+- (void) setErrorCount:(NSInteger)aValue
+{
+    errorCount = aValue;
+    //also save to persistant storage
+    [persistantStorageObj step:self setObject:[NSNumber numberWithInt:aValue] forKey:@"errorCount"];
+}
 
 - (void) runStep
 {
-    //subclass responibility
+    self.errorCount = [[persistantStorageObj step:self objectForKey:@"errorCount"] intValue];
+    if(self.errorCount >= [self numAllowedErrors])self.errorCount=0;
 }
 
 //
@@ -93,7 +111,7 @@
 {
 	self.currentQueue = [NSOperationQueue currentQueue];
     
-	if([self checkConditions]){
+	if(![self skipConditions] && [self checkConditions]){
         [self runStep];
     }
 	else {
@@ -114,14 +132,61 @@
 	[currentQueue release];
 	[title release];
     [requirements release];
-    requirements = nil;
+    [persistantAccessKey release];
+    [skipConditions release];
     [andConditions release];
-    andConditions = nil;
     [orConditions release];
-    orConditions = nil;
 
+    outputStringStorage     = nil;
+	errorStringStorage      = nil;
+	concurrentStep          = nil;
+	currentQueue            = nil;
+	title                   = nil;
+    requirements            = nil;
+    persistantAccessKey     = nil;
+    skipConditions           = nil;
+    andConditions           = nil;
+    orConditions            = nil;
     
 	[super dealloc];
+}
+
+- (enumScriptStepState)state
+{
+    if ([self isExecuting])return kSeqStepActive;
+    else if ([self isFinished]) {
+        if ([self errorCount] != 0){
+            if([self errorCount]<[self numAllowedErrors]) return kSeqStepWarning;
+            else                                          return kSeqStepFailed;
+        }
+        else if ([self isCancelled])        return kSeqStepCancelled;
+        else                                return kSeqStepSuccess;
+    }
+    else return kSeqStepPending;
+}
+
+- (NSString*) finalStateString
+{
+    if ([self isFinished]) {
+        NSString* s;
+        NSInteger ec = [self errorCount];
+        NSInteger ac = [self numAllowedErrors];
+        
+        if(ec==0){
+            if(self.successTitle)s = self.successTitle;
+            else                 s = @"Success";
+        }
+        else {
+            if(ac>0){
+                s = [NSString stringWithFormat: @"%ld/%ld error%s", (long)ec,(long)ac,ec>1?"s":""];
+            }
+            else s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
+            
+            if(self.errorString && ec>=ac) s = self.errorTitle;
+        }
+        return s;
+    }
+    else return @"Running";
 }
 
 - (void) require:(NSString*)aKey value:(NSString*)aValue
@@ -129,6 +194,13 @@
     if(!requirements)self.requirements = [NSMutableDictionary dictionary];
     [requirements setObject:aValue forKey:aKey];
 }
+
+- (void) addSkipCondition:(NSString*)aKey value:(NSString*)aValue
+{
+    if(!skipConditions)self.skipConditions = [NSMutableDictionary dictionary];
+    [skipConditions setObject:aValue forKey:aKey];
+}
+
 
 - (void) addAndCondition:(NSString*)aKey value:(NSString*)aValue
 {
@@ -142,6 +214,18 @@
     [orConditions setObject:aValue forKey:aKey];
 }
 
+- (BOOL) checkSkipConditions
+{
+    if(!skipConditions)return NO;
+    //if any skip conditions are true return YES
+    
+    for(id aKey in skipConditions){
+        NSString* aValue    = [self resolvedScriptValueForValue:[ScriptValue scriptValueWithKey:aKey]];
+        NSString* skipValue = [skipConditions objectForKey:aKey];
+        if([aValue isEqualToString:skipValue])return YES;
+    }
+    return NO;
+}
 
 - (BOOL) checkConditions
 {
@@ -327,7 +411,8 @@
 	[self replaceAttributedOutputString:[self attributedStringForString:string]];
 	[self applyErrorAttributesToOutputStringStorageRange:
      NSMakeRange(0, [string length])];
-	self.errorCount++;
+    NSInteger theError = self.errorCount;
+	self.errorCount = theError++;
 }
 
 
@@ -480,7 +565,8 @@
 	[self replaceAttributedErrorString:[self attributedStringForString:string]];
 	[self applyErrorAttributesToErrorStringStorageRange:
      NSMakeRange(0, [string length])];
-	self.errorCount++;
+    NSInteger theError = self.errorCount;
+	self.errorCount = theError++;
 }
 
 #pragma mark -- Resolving ScriptValues
@@ -672,6 +758,5 @@
 {
 	return [NSString stringWithFormat:@"<ScriptValue: %@>", stateKey];
 }
-
 
 @end

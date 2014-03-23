@@ -400,6 +400,14 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     return nil;
 }
 
+- (void) updateAllowedToRunStates
+{
+    int i;
+    for(i=0;i<2;i++){
+        [scriptModel[i] setAllowedToRun:[self remoteSocket:i]!=nil];
+    }
+}
+
 - (BOOL) anyHvOnVMECrate:(int)aVmeCrate
 {
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (detector group 0).
@@ -744,6 +752,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	[[steps lastObject] setOutputStateKey:           @"vacSystemPingOK"];
 	[[steps lastObject] setSuccessTitle:             @"Ping: OK"];
 	[[steps lastObject] setErrorTitle:               @"Ping: Failed"];
+	[[steps lastObject] setPersistentStorageObj:scriptModel[index] accessKey:[NSString stringWithFormat:@"Ping%d",index]];
+	[[steps lastObject] setNumAllowedErrors:5];
 	[[steps lastObject] setTitle:                    [NSString stringWithFormat:@"Ping: CryoVac%c",'A'+index]];
     //----------------------------------------------------------
 
@@ -765,9 +775,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [steps addObject: [ORRemoteSocketStep remoteSocket: remObj
                                       commandSelection: [ScriptValue scriptValueWithKey:@"HVOn"]
                                               commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];", //HVOn == NO run this
-                                                        @"[ORMJDVacuumModel,1 setDetectorsBiased:1];", //HVOn == NO run this
+                                                        @"[ORMJDVacuumModel,1 setDetectorsBiased:1];", //HVOn == YES run this
                                                         nil]];
-    [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
+   [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
 	[[steps lastObject] setTitle:  @"Send HV --> Vac System"];
     //----------------------------------------------------------
     
@@ -779,7 +789,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                         @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
                                                         [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",pollTime],
                                                         nil]];
-    [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
+    [[steps lastObject] addSkipCondition: @"vacSystemPingOK" value: @"-1"]; //skip if ping is in warning state
+    [[steps lastObject] addAndCondition:  @"vacSystemPingOK" value: @"1"]; 
 
     //this step state is error free ONLY if the following values are met.
 	[[steps lastObject] require:          @"shouldUnbias" value:@"0"];
@@ -799,9 +810,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                                             (NSUInteger)index]]];
 
     //if Vac system ping failed OR not OK for HV AND HV is On then the invocation will run
-    [[steps lastObject] addOrCondition: @"vacSystemPingOK"  value: @"0"];
-    [[steps lastObject] addOrCondition: @"OKForHV"          value: @"0"];
+    [[steps lastObject] addSkipCondition: @"vacSystemPingOK" value: @"-1"]; //skip if ping is in warning state
     
+    [[steps lastObject] addOrCondition:  @"vacSystemPingOK" value: @"0"];
+    [[steps lastObject] addOrCondition:  @"OKForHV"         value: @"0"];
     [[steps lastObject] addAndCondition: @"HVOn"            value: @"1"];
 
 	[[steps lastObject] setSuccessTitle:    @"Ramping Down"];

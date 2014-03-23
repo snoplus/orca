@@ -67,7 +67,21 @@
                          name : ORSequenceQueueCountChanged
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(allowedToRunChanged:)
+                         name : OROpSequenceAllowedToRunChanged
+                       object : nil];
+    
+
 }
+
+- (void) allowedToRunChanged:(NSNotification*)aNote
+{
+    OROpSequence* seq   = [[owner model] scriptModel:idIndex];
+
+    [cancelButton setEnabled:[seq allowedToRun]];
+}
+
 
 - (void) stepsChanged:(NSNotification*)aNote
 {

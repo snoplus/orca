@@ -34,27 +34,10 @@
 {
 	OROpSeqStep*     step = [self representedObject];
 	OROpSeqStepView* view = (OROpSeqStepView*)[self view];
-	if ([step isExecuting])[view setState:kSeqStepActive];
-	else if ([step isFinished]) {
-        NSString* s;
-        NSInteger ec = [step errorCount];
-        
-        if(ec==0){
-            if(step.successTitle)s = step.successTitle;
-            else s = @"Success";
-        }
-        else {
-            s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
-            if(step.errorString) s = step.errorTitle;
-        }
-        [view setErrorsString:s];
-
-        if ([step errorCount] != 0)         [view setState:kSeqStepFailed];
-        else if ([step isCancelled])        [view setState:kSeqStepCancelled];
-        else                                [view setState:kSeqStepSuccess];
-	}
-	else [view setState:kSeqStepPending];
-}
+    
+    [view setState:[step state]];
+    [view setErrorsString:[step finalStateString]];
+ }
 
 //
 // setRepresentedObject:

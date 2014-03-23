@@ -12,8 +12,6 @@
 //  appreciated but not required.
 //
 
-#import <Cocoa/Cocoa.h>
-
 @interface OROpSeqStepViewItem : NSCollectionViewItem
 {
 }

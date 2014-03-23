@@ -64,6 +64,7 @@
 - (id) scriptModel:(int)index;
 - (NSArray*) scriptSteps:(int)index;
 - (void) hvInfoRequest:(NSNotification*)aNote;
+- (void) updateAllowedToRunStates;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
