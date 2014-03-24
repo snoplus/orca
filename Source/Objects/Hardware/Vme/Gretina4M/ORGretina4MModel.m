@@ -132,7 +132,7 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x40,  @"Control/Status", YES, YES, YES, YES},                
     {0x80,  @"LED Threshold", YES, YES, YES, YES},
     {0x1C0,  @"TRAP Threshold", YES, YES, YES, YES},
-    {0xE8,  @"Central Contact low resolution", YES, YES, YES, YES},
+    {0xA8,  @"LED Central Contact low resolution", YES, YES, YES, YES},
     {0x100, @"Window Timing", YES, YES, YES, YES},
     {0x140, @"Rising Edge Window", YES, YES, YES, YES},        
     {0x400, @"DAC", YES, YES, NO, NO},                             
@@ -404,9 +404,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setCcLowRes:(int)aCcLowRes
 {
+    
     [[[self undoManager] prepareWithInvocationTarget:self] setCcLowRes:ccLowRes];
     
-    ccLowRes = aCcLowRes;
+    ccLowRes = aCcLowRes & 0x3ff;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelCcLowResChanged object:self];
 }
@@ -930,7 +931,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setTriggerMode:(short)chan withValue:(short)aValue	
 { 
 	if(aValue<0) aValue=0;
-    else if(aValue>1)aValue=1;
+    else if(aValue>=1)aValue=1;
     
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerMode:chan withValue:triggerMode[chan]];
 	triggerMode[chan] = aValue;
@@ -1462,7 +1463,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     BOOL startStop;
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
-
+    
     unsigned long theValue = (poleZeroEnabled[chan]         << 22)  | //the baselinerestorer enable is tied to the polezero enable
                              (pzTraceEnabled[chan]          << 14)  |
                              (poleZeroEnabled[chan]         << 13)  |
@@ -2106,7 +2107,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"CC Low Res"];
-    [p setFormat:@"##0" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setCcLowRes:) getMethod:@selector(ccLowRes)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];

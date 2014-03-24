@@ -89,7 +89,7 @@ enum {
     kControlStatus,				//[13] Control Status
     kLEDThreshold,				//[14] LED Threshold
     kTrapThreshold,				//[15] Trapezoidal Threshold
-    kCCLowRes,                  //[15] Central Contract Low Resolution
+    kCCLowRes,                  //[15] LED Central Contact low resolution
     kWindowTiming,              //[16] Window timing
     kRisingEdgeWindow,          //[17] Rising Edge Window
     kDAC,						//[18] DAC
