@@ -18,6 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "NSDictionary+Extensions.h"
+#import "NSFileManager+Extensions.h"
 
 @implementation NSDictionary (OrcaExtensions)
 
@@ -85,13 +86,10 @@
 - (NSData*) asData
 {
     //write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
-	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
-    char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
-	NSString* thePath = [NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding];
+    NSString* thePath =[NSFileManager tempPathInAppSupportFolderUsingTemplate:@"ORCADictionaryXXX"];
     [self writeToFile:thePath atomically:YES];
     NSData* data = [NSData dataWithContentsOfFile:thePath];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] error:nil];
-    free(tmpName);
+	[[NSFileManager defaultManager] removeItemAtPath:thePath error:nil];
 	return data;
 }
 
@@ -133,13 +131,11 @@
 + (id) dictionaryWithPList:(id)plist
 {
 	//write request to temp file because we want the form you get from a disk file...the string to property list isn't right.
-	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
-	char* tmpName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"ORCADictionaryXXX");
-	NSString* thePath = [NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding];
-	[plist writeToFile:thePath atomically:YES];
+    NSString* thePath =[NSFileManager tempPathInAppSupportFolderUsingTemplate:@"ORCADictionaryXXX"];
+
+    [plist writeToFile:thePath atomically:YES];
 	NSDictionary* theResponse = [NSDictionary dictionaryWithContentsOfFile:thePath];
-	[[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] error:nil];
-	free(tmpName);
+	[[NSFileManager defaultManager] removeItemAtPath:thePath error:nil];
 	return theResponse;
 }
 - (void) prettyPrint:(NSString*)aTitle
