@@ -80,6 +80,7 @@
     unsigned short muxResult;
     unsigned short scopeResult;
     unsigned short tubeIndex;
+    NSArray* ncdCableCheckTaskObjects;
 }
 
 - (BOOL) verbose;

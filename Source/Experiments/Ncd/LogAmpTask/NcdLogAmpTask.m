@@ -29,12 +29,22 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"NcdLogAmpTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"NcdLogAmpTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"NcdLogAmpTask" owner:self topLevelObjects:&ncdLogAmpTaskObjects];
+#endif
+        [ncdLogAmpTaskObjects retain];
+
         [self setTitle:@"Log Amp Calib"];
     }
     return self;
 }
-
+- (void) dealloc
+{
+    [ncdLogAmpTaskObjects release];
+    [super dealloc];
+}
 - (void) awakeFromNib
 {
     [super awakeFromNib];
@@ -193,7 +203,12 @@ static NSString* NcdPDSStepTaskTime  = @"NcdPDSStepTaskTime";
 {
     self = [super initWithCoder:decoder];
     
-    [NSBundle loadNibNamed: @"NcdLogAmpTask" owner: self];	
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"NcdLogAmpTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"NcdLogAmpTask" owner:self topLevelObjects:&ncdLogAmpTaskObjects];
+#endif
+    [ncdLogAmpTaskObjects retain];
 	
     [[self undoManager] disableUndoRegistration];
     

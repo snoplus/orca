@@ -66,7 +66,13 @@ enum {
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"NcdCableCheckTask" owner: self];	
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"NcdCableCheckTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"NcdCableCheckTask" owner:self topLevelObjects:&ncdCableCheckTaskObjects];
+#endif
+        [ncdCableCheckTaskObjects retain];
+
         [self setTitle:@"Cable Check"];
         [self setDefaults];
     }
@@ -87,6 +93,8 @@ enum {
     [pulserMemento release];
     [pdsMemento release];
     [tubeArray release];
+    [ncdCableCheckTaskObjects release];
+
     [super dealloc];
 }
 
@@ -504,7 +512,12 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
 {
     self = [super initWithCoder:decoder];
     
-    [NSBundle loadNibNamed: @"NcdCableCheckTask" owner: self];
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"NcdCableCheckTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"NcdCableCheckTask" owner:self topLevelObjects:&ncdCableCheckTaskObjects];
+#endif
+    [ncdCableCheckTaskObjects retain];
 	
     [[self undoManager] disableUndoRegistration];
 	

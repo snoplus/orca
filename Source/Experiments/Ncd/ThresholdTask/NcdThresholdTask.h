@@ -58,6 +58,7 @@
     int currentStep;
     int selectedWaveform;
     BOOL doAllChannels;
+    NSArray* ncdThresholdTaskObjects;
 }
 
 - (int) doAllChannels;

@@ -36,6 +36,7 @@
     NSData* stepTaskMemento;
     NSData* pulserMemento;
     NSData* pdsMemento;
+    NSArray* ncdLogAmpTaskObjects;
 }
 
 - (int)timeOnOneChannel;

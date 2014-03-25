@@ -44,7 +44,14 @@ enum {
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"NcdPulseChannelsTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"NcdPulseChannelsTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"NcdPulseChannelsTask" owner:self topLevelObjects:&ncdPulseChannelsTaskObjects];
+#endif
+        
+        [ncdPulseChannelsTaskObjects retain];
+
         [self setTitle:@"NRE TASK"];
         [self setDefaults];
     }
@@ -422,7 +429,13 @@ enum {
 {
     self = [super initWithCoder:decoder];
     
-    [NSBundle loadNibNamed: @"NcdPulseChannelsTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"NcdPulseChannelsTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"NcdPulseChannelsTask" owner:self topLevelObjects:&ncdPulseChannelsTaskObjects];
+#endif
+        
+    [ncdPulseChannelsTaskObjects retain];
     
     [[self undoManager] disableUndoRegistration];
 	

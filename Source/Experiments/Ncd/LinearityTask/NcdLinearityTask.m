@@ -39,7 +39,13 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"NcdLinearityTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"NcdLinearityTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"NcdLinearityTask" owner:self topLevelObjects:&ncdLinearityTaskObjects];
+#endif
+        [ncdLinearityTaskObjects retain];
+
         [self setTitle:@"Gain & Linearity"];
         [self setDefaults];
     }
@@ -49,6 +55,7 @@
 - (void) dealloc
 {
     [fileLines release];
+    [ncdLinearityTaskObjects release];
     [super dealloc];
 }
 
@@ -656,7 +663,12 @@ static NSString* NcdLinearitySelectedWaveform = @"NcdLinearitySelectedWaveform";
 {
     self = [super initWithCoder:decoder];
     
-    [NSBundle loadNibNamed: @"NcdLinearityTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"NcdLinearityTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"NcdLinearityTask" owner:self topLevelObjects:&ncdLinearityTaskObjects];
+#endif
+    [ncdLinearityTaskObjects retain];
     
     [[self undoManager] disableUndoRegistration];
     [self setDefaults];

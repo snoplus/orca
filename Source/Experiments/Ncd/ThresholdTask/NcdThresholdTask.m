@@ -39,14 +39,25 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"NcdThresholdTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"NcdThresholdTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"NcdThresholdTask" owner:self topLevelObjects:&ncdThresholdTaskObjects];
+#endif
+        
+        [ncdThresholdTaskObjects retain];
+
         [self setTitle:@"Threshold Check"];
         [self setDefaults];
     }
     return self;
 }
 
-
+- (void) dealloc
+{
+    [ncdThresholdTaskObjects release];
+    [super dealloc];
+}
 - (void) awakeFromNib
 {
     [super awakeFromNib];
@@ -421,7 +432,13 @@ static NSString* NcdThresholdDoAll          = @"NcdThresholdDoAll";
 {
     self = [super initWithCoder:decoder];
     
-    [NSBundle loadNibNamed: @"NcdThresholdTask" owner: self];
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"NcdThresholdTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"NcdThresholdTask" owner:self topLevelObjects:&ncdThresholdTaskObjects];
+#endif
+    
+    [ncdThresholdTaskObjects retain];
     
     [[self undoManager] disableUndoRegistration];
     

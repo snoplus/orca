@@ -84,6 +84,7 @@
 	NSString* fileName[2];
     NSArray* fileLines;
     int lastWaveForm;
+    NSArray* ncdLinearityTaskObjects;
 }
 
 - (void)  updateWindow;

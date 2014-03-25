@@ -34,8 +34,8 @@
     IBOutlet NSButton* clrAllButton;
     IBOutlet NSTextField* timeField;
     IBOutlet NSStepper* timeStepper;
-    NSMutableArray*  patternArray;
-
+    NSMutableArray*     patternArray;
+    NSArray*            stepTaskObjects;
     id thePDSModel;
     BOOL reloadPDS;
     BOOL ignorePDS;
@@ -45,6 +45,7 @@
     NSDate* lastTime;
     int     pdsBoard;
     int     pdsChannel;
+    NSArray* pdsStepTaskObjects;
 }
 
 - (id) init;

@@ -32,7 +32,13 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"NcdPDSStepTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"NcdPDSStepTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"NcdPDSStepTask" owner:self topLevelObjects:&stepTaskObjects];
+#endif
+        [stepTaskObjects retain];
+
         
         [self setTitle:@"PDS Step Thru"];
         [self setPatternArray:[NSMutableArray arrayWithObjects:
@@ -52,6 +58,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [lastTime release];
     [patternArray release];
+    [stepTaskObjects release];
+
     [super dealloc];
 }
 
@@ -449,8 +457,15 @@ static NSString* NcdPDSStepTaskTime  = @"NcdPDSStepTaskTime";
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
+  
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"NcdPDSStepTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"NcdPDSStepTask" owner:self topLevelObjects:&pdsStepTaskObjects];
+#endif
     
-    [NSBundle loadNibNamed: @"NcdPDSStepTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+    [pdsStepTaskObjects retain];
+
     
     [self loadMemento:decoder];
     

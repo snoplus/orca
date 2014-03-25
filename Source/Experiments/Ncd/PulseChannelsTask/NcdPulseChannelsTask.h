@@ -62,6 +62,7 @@
 	BOOL pulseOneOnly;
 	int  cardToPulse;
 	int  channelToPulse;
+    NSArray* ncdPulseChannelsTaskObjects;
 }
 
 - (void)  updateWindow;
