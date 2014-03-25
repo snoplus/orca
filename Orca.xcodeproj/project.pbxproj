@@ -2189,6 +2189,8 @@
 		84A95191077B6C8C00CAD99D /* Analyze.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518C077B6C8C00CAD99D /* Analyze.gif */; };
 		84A95192077B6C8C00CAD99D /* Clear.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518D077B6C8C00CAD99D /* Clear.gif */; };
 		84A95193077B6C8C00CAD99D /* LogLin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518E077B6C8C00CAD99D /* LogLin.gif */; };
+		84A9816D18E1D7A400BD3FB3 /* NSFileManager+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A9816B18E1D7A400BD3FB3 /* NSFileManager+Extensions.h */; };
+		84A9816E18E1D7A400BD3FB3 /* NSFileManager+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A9816C18E1D7A400BD3FB3 /* NSFileManager+Extensions.m */; };
 		84AAD80A139A87A600C88F71 /* AlarmIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AAD809139A87A600C88F71 /* AlarmIcon.tif */; };
 		84AB0F3D1056DA4E0069D5E2 /* ModBus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AB0F341056DA4E0069D5E2 /* ModBus.nib */; };
 		84AB0F401056DA4E0069D5E2 /* ORModBusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB0F371056DA4E0069D5E2 /* ORModBusController.h */; };
@@ -5336,6 +5338,8 @@
 		84A9518C077B6C8C00CAD99D /* Analyze.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Analyze.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/Analyze.gif"; sourceTree = SOURCE_ROOT; };
 		84A9518D077B6C8C00CAD99D /* Clear.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Clear.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/Clear.gif"; sourceTree = SOURCE_ROOT; };
 		84A9518E077B6C8C00CAD99D /* LogLin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = LogLin.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/LogLin.gif"; sourceTree = SOURCE_ROOT; };
+		84A9816B18E1D7A400BD3FB3 /* NSFileManager+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Extensions.h"; sourceTree = "<group>"; };
+		84A9816C18E1D7A400BD3FB3 /* NSFileManager+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Extensions.m"; sourceTree = "<group>"; };
 		84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = OfflineRunAlarmHelp; path = "Source/Main Document/OfflineRunAlarmHelp"; sourceTree = SOURCE_ROOT; };
 		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -13162,6 +13166,8 @@
 		F51E695703AE4775015F64B1 /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				84A9816B18E1D7A400BD3FB3 /* NSFileManager+Extensions.h */,
+				84A9816C18E1D7A400BD3FB3 /* NSFileManager+Extensions.m */,
 				84E18C380F0A5D3B0096F0F3 /* NSNotifications+Extensions.h */,
 				84E18C390F0A5D3B0096F0F3 /* NSNotifications+Extensions.m */,
 				8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */,
@@ -14113,6 +14119,7 @@
 				84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */,
 				84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */,
 				84B771400DB3DFBB004798B2 /* ORCaen1720Decoder.h in Headers */,
+				84A9816D18E1D7A400BD3FB3 /* NSFileManager+Extensions.h in Headers */,
 				8499FE8E0DC8E9B700E82DB4 /* ORSNOCrateController.h in Headers */,
 				8499FE900DC8E9B700E82DB4 /* ORSNOCrateModel.h in Headers */,
 				8499FF910DC9090400E82DB4 /* ORSNOCard.h in Headers */,
@@ -15901,6 +15908,7 @@
 				84538DFF0803462F00615B6D /* OR2DHistoDecoders.m in Sources */,
 				84539C520807247B00615B6D /* ORRemoteRunController.m in Sources */,
 				84539C540807247B00615B6D /* ORRemoteRunModel.m in Sources */,
+				84A9816E18E1D7A400BD3FB3 /* NSFileManager+Extensions.m in Sources */,
 				84539EA4080ADAF500615B6D /* ORListenerModel.m in Sources */,
 				84539EA5080ADAF500615B6D /* ORListenerController.m in Sources */,
 				840AF86E0819924D005B750D /* SourceMask.m in Sources */,
