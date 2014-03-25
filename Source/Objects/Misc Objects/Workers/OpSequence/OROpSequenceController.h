@@ -27,6 +27,7 @@
 	IBOutlet NSBox*             portControlsView;
 	NSInteger                   lastKnownStepIndex;
     int                         idIndex;
+    NSArray*                    topLevelObjects;
 }
 
 - (void) stepsChanged:(NSNotification*)aNote;

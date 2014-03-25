@@ -24,7 +24,8 @@
 	[[[owner model] scriptModel:idIndex] cancel:nil];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+    [topLevelObjects release];
+
 	[super dealloc];
 }
 
@@ -38,7 +39,12 @@
 - (void)awakeFromNib
 {
     if(!portControlsContent){
-		if ([NSBundle loadNibNamed:@"OpSequence" owner:self]){
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        if ([NSBundle loadNibNamed:@"OpSequence" owner:self]){
+#else
+        if ([[NSBundle mainBundle] loadNibNamed:@"OpSequence" owner:self topLevelObjects:&topLevelObjects]){
+#endif
+            [topLevelObjects retain];
 			[portControlsView setContentView:portControlsContent];
 		}
 		else NSLog(@"Failed to load SerialPortControls.nib");
