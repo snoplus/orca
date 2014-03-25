@@ -23,6 +23,7 @@
 		IBOutlet NSTextField*	lineNumberField;
 		IBOutlet id				dialogueView;
 		NSLayoutManager*		layoutManager;
+        NSArray*                topLevelObjects;
 }
 
 /* Common way to get a text finder. One instance of GoToLine per app is good enough. */

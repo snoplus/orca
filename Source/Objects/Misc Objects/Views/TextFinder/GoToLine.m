@@ -33,10 +33,16 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 - (void) loadUI 
 {
     if (!lineNumberField) {
-        if (![NSBundle loadNibNamed:@"GoToLine" owner:self])  {
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        if (![NSBundle loadNibNamed:@"GoToLine" owner:self]){
+#else
+        if (![[NSBundle mainBundle] loadNibNamed:@"GoToLine" owner:self topLevelObjects:&topLevelObjects]){
+#endif
+
             NSLog(@"Failed to load GoToLine.nib");
             NSBeep();
         }
+        [topLevelObjects retain];
 		if (self == sharedGoToLine) [[lineNumberField window] setFrameAutosaveName:@"Find"];
     }
 }
@@ -45,6 +51,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 {
     if (self != sharedGoToLine) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [topLevelObjects release];
         [super dealloc];
     }
 }
