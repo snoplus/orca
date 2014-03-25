@@ -144,6 +144,7 @@
 	id						model;
 	ORXYCom200Controller*	owner;
 	int						chipIndex;
+    NSArray*                topLevelObjects;
 }
 
 -(id) initWithOwner:(ORXYCom200Controller*)anOwner chipIndex:(int)anIndex;

@@ -42,6 +42,7 @@
     IBOutlet NSProgressIndicator* progressIndicator;
     IBOutlet NSButton*			visibleButton;
     IBOutlet NSButton*			globalEnableButton;
+    NSArray*                    topLevelObjects;
 }
 
 #pragma mark ***Interface Management

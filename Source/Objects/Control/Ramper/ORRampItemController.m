@@ -35,7 +35,14 @@
 - (id) initWithNib:(NSString*)aNibName
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: aNibName owner: self];	
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:aNibName owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:aNibName owner:self topLevelObjects:&topLevelObjects];
+#endif
+        
+        [topLevelObjects retain];
+
     }
 	return self;
 }
@@ -43,6 +50,8 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [topLevelObjects release];
+
 	[super dealloc];
 }
 

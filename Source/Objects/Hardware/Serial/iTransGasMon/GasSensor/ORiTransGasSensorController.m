@@ -34,7 +34,14 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"iTransGasSensor" owner: self];	
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"iTransGasSensor" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"iTransGasSensor" owner:self topLevelObjects:&topLevelObjects];
+#endif
+        
+        [topLevelObjects retain];
+
     }
     return self;
 }
@@ -45,6 +52,8 @@
     [view removeFromSuperview]; 
 	[okColor release];
 	[badColor release];
+    [topLevelObjects release];
+
     [super dealloc];
 }
 

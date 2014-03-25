@@ -41,6 +41,7 @@
 	BOOL					alarmed;
 	BOOL					failedSensor;
 	BOOL					missingSensor;
+    NSArray*                topLevelObjects;
  }
 
 + (id) sensorPanel;

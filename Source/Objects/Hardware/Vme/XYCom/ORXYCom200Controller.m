@@ -340,7 +340,14 @@
     self=[super init];
     owner = anOwner;
     chipIndex = anIndex;
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
     [NSBundle loadNibNamed:@"PISlashTChip" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"PISlashTChip" owner:self topLevelObjects:&topLevelObjects];
+#endif
+    
+    [topLevelObjects retain];
+
     return self;
 }
 
@@ -348,6 +355,7 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self]; 
     [theView removeFromSuperview];
+    [topLevelObjects release];
 	[super dealloc];
 }
 

@@ -24,8 +24,9 @@
 @interface ORSubPlotController : NSObject 
 {
     @private
-        IBOutlet NSView*		view;
+        IBOutlet NSView*                view;
         IBOutlet ORCompositePlotView*	plotView;
+        NSArray*                        topLevelObjects;
 }
 
 + (ORSubPlotController*) panel;

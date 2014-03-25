@@ -38,6 +38,8 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [topLevelObjects release];
+
 	[super dealloc];
 }
 
@@ -56,9 +58,16 @@
 - (void) awakeFromNib
 {		
 	if(!controlsContent){
-		if ([NSBundle loadNibNamed:@"Pulser33500Chan" owner:self]){
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        if ([NSBundle loadNibNamed:@"Pulser33500Chan" owner:self]){
+#else
+        if ([[NSBundle mainBundle] loadNibNamed:@"Pulser33500Chan" owner:self topLevelObjects:&topLevelObjects]){
+#endif
+            [topLevelObjects retain];
+
 			[controlsView setContentView:controlsContent];
-		}	
+
+		}
 		else NSLog(@"Failed to load Pulser33500Chan.nib");
 	}
 	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];

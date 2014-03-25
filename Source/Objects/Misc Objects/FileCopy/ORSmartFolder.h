@@ -62,6 +62,7 @@
     int         workingOnFile;
     int         startCount;
     int			transferType;
+    NSArray*    topLevelObjects;
 }
 
 #pragma mark ***Initialization

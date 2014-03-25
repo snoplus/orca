@@ -42,6 +42,7 @@
     IBOutlet NSTextField*		voltageDisplay;
     IBOutlet NSTextField*		burstRateDisplay;
     IBOutlet ORCompositePlotView*	plotter;
+    NSArray*                    topLevelObjects;
 }
 
 #pragma mark •••Initialization

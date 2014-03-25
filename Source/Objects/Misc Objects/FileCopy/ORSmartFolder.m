@@ -53,7 +53,13 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 - (id) init
 {
     if(self = [super init]){
-        [NSBundle loadNibNamed: @"SmartFolder" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+        
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"SmartFolder" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"SmartFolder" owner:self topLevelObjects:&topLevelObjects];
+#endif
+        [topLevelObjects retain];
     }
     
     [self setDirectoryName:@"~"];
@@ -76,6 +82,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     [directoryName release];
     [fileQueue cancelAllOperations];
     [fileQueue release];
+    [topLevelObjects release];
     [super dealloc];
 }
 
@@ -789,7 +796,13 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super init];
-    [NSBundle loadNibNamed: @"SmartFolder" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"SmartFolder" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"SmartFolder" owner:self topLevelObjects:&topLevelObjects];
+#endif
+    [topLevelObjects retain];
+
     [[self undoManager] disableUndoRegistration];
     [self setCopyEnabled:[decoder decodeBoolForKey:ORFolderCopyEnabled]];
     [self setDeleteWhenCopied:[decoder decodeBoolForKey:ORFolderDeleteWhenCopied]];

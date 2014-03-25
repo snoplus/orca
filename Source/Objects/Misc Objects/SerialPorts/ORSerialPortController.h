@@ -27,6 +27,7 @@
     IBOutlet NSView*		portControlsContent;
 	IBOutlet NSBox*			portControlsView;
 	IBOutlet id				owner;
+    NSArray*                topLevelObjects;
 }
 
 #pragma mark •••Initialization
