@@ -438,10 +438,11 @@
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
+						@"%@",	// Reason for error
 						@"OK",				// Okay button
 						nil,				// alternate button
-						nil );				// other button
+						nil, 				// other button
+                        [localException reason]);
 	}
 }
 
