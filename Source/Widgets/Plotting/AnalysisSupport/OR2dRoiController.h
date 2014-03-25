@@ -28,7 +28,8 @@
     IBOutlet NSBox*				analysisView;
     IBOutlet NSTextField*       labelField;
 	
-	id model;
+	id          model;
+    NSArray*    topLevelObjects;
 }
 
 + (id) panel;

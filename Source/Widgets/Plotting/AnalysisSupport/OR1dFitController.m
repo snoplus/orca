@@ -39,8 +39,15 @@
 -(id)	init
 {
     self = [super init];
-	[NSBundle loadNibNamed: @"1dFit" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
-	RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"1dFit" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"1dFit" owner:self topLevelObjects:&topLevelObjects];
+#endif
+    
+    [topLevelObjects retain];
+
+	RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h
     
     return self;
 }
@@ -55,6 +62,7 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [topLevelObjects release];
     [super dealloc];
 }
 

@@ -39,8 +39,9 @@
     IBOutlet NSTextField*       standardDeviationField;
     IBOutlet NSTextField*       maxValueField;
     IBOutlet NSTextField*       minValueField;
-    IBOutlet NSBox*			analysisView;
+    IBOutlet NSBox*             analysisView;
 	id model;
+    NSArray*                     topLevelObjects;
 }
 
 + (id) panel;

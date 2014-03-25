@@ -33,6 +33,7 @@
     IBOutlet NSBox*			fitView;
 	
 	id model;
+    NSArray* topLevelObjects;
 }
 
 + (id) panel;

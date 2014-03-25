@@ -32,8 +32,14 @@
 -(id) init
 {
     self = [super init];
-	[NSBundle loadNibNamed: @"2dRoi" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"2dRoi" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"2dRoi" owner:self topLevelObjects:&topLevelObjects];
+#endif
     
+    [topLevelObjects retain];
+
     return self;
 }
 
@@ -46,6 +52,8 @@
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [topLevelObjects release];
+
     [super dealloc];
 }
 

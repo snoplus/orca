@@ -30,7 +30,8 @@
     IBOutlet NSPopUpButton* fftWindowPopup;
     IBOutlet NSBox*			fftView;
 	
-	id model;
+	id       model;
+    NSArray* topLevelObjects;
 }
 
 + (id) panel;

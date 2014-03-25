@@ -43,9 +43,10 @@
     IBOutlet NSTextField*       sigmaField;
     IBOutlet NSTextField*       rateField;
 
-    IBOutlet NSBox*			analysisView;
+    IBOutlet NSBox*             analysisView;
 	
 	id model;
+    NSArray*                    topLevelObjects;
 }
 
 + (id) panel;
