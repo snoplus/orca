@@ -52,7 +52,7 @@ typedef enum
 	NSMutableDictionary*  orConditions;
     OROpSequence*       persistantStorageObj;
     NSString*           persistantAccessKey;
-
+    BOOL                forceError;
 }
 
 @property (nonatomic, copy) NSString*       title;
@@ -68,6 +68,7 @@ typedef enum
 @property (retain) NSMutableDictionary*     skipConditions;
 @property (retain) NSMutableDictionary*     andConditions;
 @property (retain) NSMutableDictionary*     orConditions;
+@property (nonatomic,assign)       BOOL     forceError;
 @property (nonatomic,assign)       id       persistantStorageObj;
 @property (nonatomic, copy) NSString*       persistantAccessKey;
 

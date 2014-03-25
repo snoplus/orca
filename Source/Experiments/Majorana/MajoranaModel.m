@@ -430,12 +430,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         }
     }
         
-    //if the HV is down, there is none for the alarm
-    if(rampHVAlarm[aVmeCrate]){
-        [rampHVAlarm[aVmeCrate] clearAlarm];
-        [rampHVAlarm[aVmeCrate] release];
-        rampHVAlarm[aVmeCrate] = nil;
-    }
     return NO;
 }
 
@@ -462,10 +456,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 }
                 else {
                     [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
-                    if(rampHVAlarm[aVmeCrate]){
+                    if(rampHVAlarm[aVmeCrate].isPosted){
+                        [rampHVAlarm[aVmeCrate] setAcknowledged:NO];
                         [rampHVAlarm[aVmeCrate] clearAlarm];
-                        [rampHVAlarm[aVmeCrate] release];
-                        rampHVAlarm[aVmeCrate] = nil;
                     }
 
                 }
@@ -478,13 +471,15 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 {
     if(!rampHVAlarm[aVacSystem]){
         rampHVAlarm[aVacSystem] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Panic HV (Vac %c)",'A'+aVacSystem] severity:(kEmergencyAlarm)];
-        [rampHVAlarm[aVacSystem] setSticky:YES];
-        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"HV was ramped down on Module %d because Vac %c failed interlocks\n",aCrate+1, 'A'+aVacSystem]];
+        [rampHVAlarm[aVacSystem] setSticky:NO];
+        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"HV was ramped down on Module %d because Vac %c failed interlocks\nThe alarm can be cleared by acknowledging it.",aCrate+1, 'A'+aVacSystem]];
         NSLogColor([NSColor redColor], @"HV was ramped down on Module %d because Vac %c failed interlocks\n",aCrate+1,
                    'A'+aVacSystem);
     }
     
-    [rampHVAlarm[aVacSystem] postAlarm];
+    if(![rampHVAlarm[aVacSystem] acknowledged]){
+       [rampHVAlarm[aVacSystem] postAlarm];
+    }
     
     if(aVacSystem==0 && ignorePanicOnA)return;
     if(aVacSystem==1 && ignorePanicOnB)return;
@@ -777,8 +772,14 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                               commands: @"[ORMJDVacuumModel,1 setDetectorsBiased:0];", //HVOn == NO run this
                                                         @"[ORMJDVacuumModel,1 setDetectorsBiased:1];", //HVOn == YES run this
                                                         nil]];
-   [[steps lastObject] addAndCondition: @"vacSystemPingOK" value: @"1"];
-	[[steps lastObject] setTitle:  @"Send HV --> Vac System"];
+	[[steps lastObject] setPersistentStorageObj:scriptModel[index] accessKey:[NSString stringWithFormat:@"SetVacHVState%d",index]];
+	[[steps lastObject] setNumAllowedErrors:5];
+
+    
+    [[steps lastObject] addSkipCondition:   @"vacSystemPingOK" value: @"-1"]; //skip if ping is in warning state
+    [[steps lastObject] addAndCondition:    @"vacSystemPingOK" value: @"1"];
+	[[steps lastObject] setErrorTitle:      @"No Comm To Vac"];
+	[[steps lastObject] setTitle:           @"Send HV --> Vac System"];
     //----------------------------------------------------------
     
     //-----------------check vacuuum conditions-----------------    
@@ -789,6 +790,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                                         @"okToBias     = [ORMJDVacuumModel,1 okToBiasDetector];",
                                                         [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",pollTime],
                                                         nil]];
+
+    [[steps lastObject] setPersistentStorageObj:scriptModel[index] accessKey:[NSString stringWithFormat:@"CheckVacState%d",index]];
+	[[steps lastObject] setNumAllowedErrors:5];
+
     [[steps lastObject] addSkipCondition: @"vacSystemPingOK" value: @"-1"]; //skip if ping is in warning state
     [[steps lastObject] addAndCondition:  @"vacSystemPingOK" value: @"1"]; 
 

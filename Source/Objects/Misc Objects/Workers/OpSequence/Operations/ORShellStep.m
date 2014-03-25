@@ -277,11 +277,16 @@
 	else [self parseErrors];
 
     if(outputStateKey){
-        if(self.numAllowedErrors==0){
-            [currentQueue setStateValue:self.errorCount? @"1" : @"0" forKey:outputStateKey];
+        if(self.errorCount!=0){
+            if(self.numAllowedErrors==0){
+                [currentQueue setStateValue:@"0" forKey:outputStateKey];
+            }
+            else {
+                [currentQueue setStateValue:self.errorCount<self.numAllowedErrors ? @"-1" : @"0" forKey:outputStateKey];
+            }
         }
         else {
-            [currentQueue setStateValue:self.errorCount<self.numAllowedErrors ? @"-1" : @"0" forKey:outputStateKey];
+            [currentQueue setStateValue:@"1" forKey:outputStateKey];
         }
     }
     

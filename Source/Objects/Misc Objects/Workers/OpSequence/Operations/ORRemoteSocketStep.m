@@ -82,7 +82,8 @@
 	if (self.concurrentStep) [NSThread sleepForTimeInterval:5.0];
     if(socketObject){
         [socketObject connect];
-        if([socketObject isConnected]){
+        BOOL isConnected = [socketObject isConnected];
+        if(isConnected){
             NSNumber* indexNum = (NSNumber*)[self resolvedScriptValueForValue:cmdIndexToExecute];
             if(indexNum){
                 NSInteger index = [indexNum intValue];
@@ -98,15 +99,39 @@
             }
             [socketObject disconnect];
         }
-        else self.errorCount=1;
+        if(isConnected) self.errorCount = 0;
+        else {
+            NSInteger theErrors = self.errorCount;
+            theErrors += 1;
+            self.errorCount   = theErrors;
+        }
     }
-     self.errorCount += [self checkRequirements];
-    if (outputStateKey){
-        NSString* result;
-        if(self.errorCount) result = @"0";
-        else                result = @"1";
-        [currentQueue setStateValue:result forKey:outputStateKey];
-	}
+    if(outputStateKey){
+        if(self.errorCount!=0){
+            if(self.numAllowedErrors==0){
+                NSString* result;
+                if([self checkRequirements]){
+                    result = @"0";          //requirements NOT met
+                    self.forceError = YES;
+                }
+                else                         result = @"1"; //requirements ARE met
+                [currentQueue setStateValue:result forKey:outputStateKey];
+            }
+            else {
+                [currentQueue setStateValue:self.errorCount<self.numAllowedErrors ? @"-1" : @"0" forKey:outputStateKey];
+            }
+        }
+        else {
+            //no connection errors, but may still need to check requirements
+            NSString* result;
+            if([self checkRequirements]){
+                result = @"0";          //requirements NOT met
+                self.forceError = YES;
+            }
+            else         result = @"1"; //requirements ARE met
+            [currentQueue setStateValue:result forKey:outputStateKey];
+        }
+    }
 
 }
 

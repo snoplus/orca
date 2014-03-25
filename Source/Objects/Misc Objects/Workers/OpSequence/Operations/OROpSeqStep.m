@@ -41,6 +41,7 @@
 @synthesize numAllowedErrors;
 @synthesize persistantStorageObj;
 @synthesize persistantAccessKey;
+@synthesize forceError;
 
 - (id)init
 {
@@ -111,7 +112,7 @@
 {
 	self.currentQueue = [NSOperationQueue currentQueue];
     
-	if(![self skipConditions] && [self checkConditions]){
+	if(![self checkSkipConditions] && [self checkConditions]){
         [self runStep];
     }
 	else {
@@ -155,8 +156,8 @@
 {
     if ([self isExecuting])return kSeqStepActive;
     else if ([self isFinished]) {
-        if ([self errorCount] != 0){
-            if([self errorCount]<[self numAllowedErrors]) return kSeqStepWarning;
+        if ([self errorCount] != 0 || forceError){
+            if([self errorCount]<[self numAllowedErrors] && !forceError) return kSeqStepWarning;
             else                                          return kSeqStepFailed;
         }
         else if ([self isCancelled])        return kSeqStepCancelled;
@@ -172,7 +173,7 @@
         NSInteger ec = [self errorCount];
         NSInteger ac = [self numAllowedErrors];
         
-        if(ec==0){
+        if(ec==0 && !self.forceError){
             if(self.successTitle)s = self.successTitle;
             else                 s = @"Success";
         }
@@ -182,7 +183,7 @@
             }
             else s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
             
-            if(self.errorString && ec>=ac) s = self.errorTitle;
+            if(self.errorString && ec>=ac || forceError) s = self.errorTitle;
         }
         return s;
     }

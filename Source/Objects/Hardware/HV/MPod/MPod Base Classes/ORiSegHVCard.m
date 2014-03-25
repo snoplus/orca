@@ -547,7 +547,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 {
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputSetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Paniced MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) clearPanicChannel:(short)channel
