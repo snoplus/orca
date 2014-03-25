@@ -46,10 +46,15 @@ static NSString* valueChangeString[kNumActions] = {
 - (id) init
 {
     if ((self = [super init]) != nil){
-        if (![NSBundle loadNibNamed: @"ActionView" owner: self]){
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        if (![NSBundle loadNibNamed:@"ActionView" owner:self]){
+#else
+        if (![[NSBundle mainBundle] loadNibNamed:@"ActionView" owner:self topLevelObjects:&topLevelObjects]){
+#endif
             [self release];
             self = nil;
         }
+        [topLevelObjects retain];
         [self setParameterValue:[NSNumber numberWithInt:0]];
     }
     
@@ -62,6 +67,7 @@ static NSString* valueChangeString[kNumActions] = {
     [subview release];
     [paramArray release];
     
+    [topLevelObjects release];
     [super dealloc];
 }
 

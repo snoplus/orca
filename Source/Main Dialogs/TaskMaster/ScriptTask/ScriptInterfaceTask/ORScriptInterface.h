@@ -27,6 +27,7 @@
 	IBOutlet NSButton*		breakChainButton;
 	BOOL					didStart;
 	BOOL					waitedOnce;
+    NSArray*                scriptInterfaceTaskObjects;
 }
 
 #pragma mark ¥¥¥Interface

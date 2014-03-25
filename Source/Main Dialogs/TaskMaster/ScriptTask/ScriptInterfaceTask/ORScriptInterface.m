@@ -27,7 +27,15 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"ScriptInterfaceTask" owner: self];	
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"ScriptInterfaceTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"ScriptInterfaceTask" owner:self topLevelObjects:&scriptInterfaceTaskObjects];
+#endif
+        
+        [scriptInterfaceTaskObjects retain];
+
+        
         [self setTitle:@"Orca Script"];
     }
     return self;
@@ -36,6 +44,7 @@
 - (void) delloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [scriptInterfaceTaskObjects release];
     [super dealloc];
 }
 
@@ -166,7 +175,13 @@
     self = [super initWithCoder:decoder];
     
     [self registerNotificationObservers];
-    [NSBundle loadNibNamed: @"ScriptInterfaceTask" owner: self];
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"ScriptInterfaceTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"ScriptInterfaceTask" owner:self topLevelObjects:&scriptInterfaceTaskObjects];
+#endif
+    
+    [scriptInterfaceTaskObjects retain];
 
     [[self undoManager] disableUndoRegistration];
  

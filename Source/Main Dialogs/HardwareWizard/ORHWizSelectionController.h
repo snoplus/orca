@@ -48,6 +48,7 @@ table view controller.
     int selectionTag;
     int selectionValue;
     NSArray* selectionArray;
+    NSArray* topLevelObjects;
 }
 
 // Convenience factory method

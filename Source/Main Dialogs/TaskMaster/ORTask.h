@@ -52,6 +52,7 @@
     BOOL isExpanded;
     float expandedHeight;
     BOOL doingFinishUpWork;
+    NSArray* topLevelObjects;
 }
 
 - (void) sleep;

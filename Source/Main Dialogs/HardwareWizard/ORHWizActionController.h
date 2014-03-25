@@ -47,6 +47,7 @@ table view controller.
 	int parameterTag;
 	NSNumber* parameterValue;
 	NSArray* paramArray;
+    NSArray* topLevelObjects;
 }
 
 // Convenience factory method

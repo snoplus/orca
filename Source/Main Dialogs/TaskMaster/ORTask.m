@@ -51,7 +51,13 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"ORTask" owner: self];	
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        [NSBundle loadNibNamed:@"ORTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"ORTask" owner:self topLevelObjects:&topLevelObjects];
+#endif
+
+        [topLevelObjects retain];
 		[self setTaskState:eTaskStopped];
     }
     return self;
@@ -72,7 +78,8 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     [view removeFromSuperview];
     [title release];
     [[ORTaskMaster sharedTaskMaster] removeTask:self];
-    
+    [topLevelObjects release];
+
     [super dealloc];
 }
 
@@ -484,7 +491,14 @@ static NSString* ORTaskExpanded		= @"ORTaskExpanded";
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super init];
-    [NSBundle loadNibNamed: @"ORTask" owner: self];
+    
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+    [NSBundle loadNibNamed:@"ORTask" owner:self];
+#else
+    [[NSBundle mainBundle] loadNibNamed:@"ORTask" owner:self topLevelObjects:&topLevelObjects];
+#endif
+    [topLevelObjects retain];
+
     [self loadMemento:decoder];
     [[ORTaskMaster sharedTaskMaster] addTask:self];
     

@@ -36,10 +36,16 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
 - (id) init
 {
     if ((self = [super init]) != nil){
-        if (![NSBundle loadNibNamed: @"SelectionView" owner: self]){
+#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+        if (![NSBundle loadNibNamed:@"SelectionView" owner:self]){
+#else
+        if (![[NSBundle mainBundle] loadNibNamed:@"SelectionView" owner:self topLevelObjects:&topLevelObjects]){
+#endif
+
             [self release];
             self = nil;
         }
+        [topLevelObjects retain];
     }
     
     return self;
@@ -50,6 +56,7 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [subview release];
     [selectionArray release];
+    [topLevelObjects release];
     
     [super dealloc];
 }

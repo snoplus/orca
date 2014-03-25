@@ -43,7 +43,7 @@
 #if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
         if (![NSBundle loadNibNamed:@"AboutBox" owner:self]){
 #else
-            if (![[NSBundle mainBundle] loadNibNamed:@"AboutBox" owner:self topLevelObjects:&topLevelObjects]){
+        if (![[NSBundle mainBundle] loadNibNamed:@"AboutBox" owner:self topLevelObjects:&topLevelObjects]){
 #endif
             // int NSRunCriticalAlertPanel(NSString *title,
             //		NSString *msg, NSString *defaultButton,
