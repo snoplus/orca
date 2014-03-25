@@ -22,6 +22,7 @@
 #import "ORDataSet.h"
 #import "ORDataTypeAssigner.h"
 #import "ORBaseDecoder.h"
+#import "NSFileManager+Extensions.h"
 
 #define kAmountToRead 5*1024*1024
 
@@ -356,10 +357,10 @@
 - (NSData*) headerAsData
 {
     //write header to temp file because we want the form you get from a disk file...the string to property list isn't right.
-	NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder];
-    char* name = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding] ,"OrcaHeaderXXX");
-    [self createFileFromHeader:[NSString stringWithCString:name encoding:NSASCIIStringEncoding]];
-    NSData* dataBlock = [NSData dataWithContentsOfFile:[NSString stringWithCString:name encoding:NSASCIIStringEncoding]];
+    NSString* tempName = [NSFileManager tempPathInAppSupportFolderUsingTemplate:@"OrcaHeaderXXX"];
+    [self createFileFromHeader:tempName];
+    
+    NSData* dataBlock = [NSData dataWithContentsOfFile:tempName];
 	unsigned long headerLength        = [dataBlock length];											//in bytes
 	unsigned long lengthWhenPadded    = sizeof(long)*(round(.5 + headerLength/(float)sizeof(long)));					//in bytes
 	unsigned long padSize             = lengthWhenPadded - headerLength;							//in bytes
@@ -377,9 +378,8 @@
 		[data appendBytes:&padByte length:1];
 	}
 	
-    [[NSFileManager defaultManager] removeItemAtPath:[NSString stringWithCString:name encoding:NSASCIIStringEncoding] error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:tempName error:nil];
     
-    free(name);
     return data;
 }
 

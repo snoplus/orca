@@ -29,6 +29,7 @@
 #import "ORSBC_LAMModel.h"
 #import "ORCommandList.h"
 #import "NSNotifications+Extensions.h"
+#import "NSFileManager+Extensions.h"
 
 #import <netdb.h>
 #import <sys/types.h>
@@ -938,9 +939,10 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		
 		//make a staging area
 		NSString* stagingFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Staging"];
-		char* tmpName = tempnam([stagingFolder cStringUsingEncoding:NSASCIIStringEncoding] , [[hwSpecificCodePath lastPathComponent] cStringUsingEncoding:NSASCIIStringEncoding]);
-		mainStagingFolder = [[NSString stringWithCString:tmpName encoding:NSASCIIStringEncoding] retain];
-		free(tmpName);
+        [[NSFileManager defaultManager] removeItemAtPath:stagingFolder error:nil];
+        [mainStagingFolder release];
+        mainStagingFolder = [[NSFileManager tempPathForFolder:stagingFolder usingTemplate:[[hwSpecificCodePath lastPathComponent] stringByAppendingString:@"_XXX"]] retain];
+        
 		NSFileManager* fm = [NSFileManager defaultManager];
 		[fm createDirectoryAtPath:mainStagingFolder withIntermediateDirectories:YES attributes:nil error:nil];
 		

@@ -22,6 +22,7 @@
 #import "ORFileGetterOP.h"
 #import "ORTaskSequence.h"
 #import "NSNotifications+Extensions.h"
+#import "NSFileManager+Extensions.h"
 
 @implementation ORFileGetterOp
 
@@ -88,9 +89,7 @@
     
       //make temp file for the script NOTE: expect must be installed!
     NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
-    char* scriptFileName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding],"OrcaScriptXXX");
-    NSString* scriptPath = [NSString stringWithUTF8String:scriptFileName];
-    free(scriptFileName);
+    NSString* scriptPath = [NSFileManager tempPathForFolder:tempFolder usingTemplate:@"OrcaScriptXXX"];
     if(scriptPath){
         [self setScriptFilePath:scriptPath];            
         NSString* bp = [[NSBundle mainBundle ]resourcePath];

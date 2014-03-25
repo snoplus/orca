@@ -22,6 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORFileMover.h"
 #import "ORTaskSequence.h"
+#import "NSFileManager+Extensions.h"
 
 NSString* ORFileMoverIsDoneNotification = @"ORFileMover Is Done Notification";
 NSString* ORFileMoverCopiedFile         = @"ORFileMoverCopiedFile";
@@ -282,9 +283,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
     else {
         //make temp file for the script NOTE: expect must be installed!
 		NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
-        char* scriptFileName = tempnam([tempFolder cStringUsingEncoding:NSASCIIStringEncoding],"OrcaScriptXXX");
-		NSString* scriptPath = [NSString stringWithUTF8String:scriptFileName];
-		free(scriptFileName);
+        NSString* scriptPath = [NSFileManager tempPathForFolder:tempFolder usingTemplate:@"OrcaScriptXXX"];
 		BOOL isDir = NO;
 		[[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDir];
         if(scriptPath){
