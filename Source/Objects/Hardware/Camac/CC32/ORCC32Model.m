@@ -320,7 +320,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 
 - (void) delay:(float)delayValue
 {
-    [NSThread sleepUntilDate:[[NSDate date] addTimeInterval:delayValue]];
+    [NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:delayValue]];
 }
 
 - (unsigned short) execute
