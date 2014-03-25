@@ -88,10 +88,9 @@ enum {
 	kExtFIFOMonitor,			//[12] External FIFO monitor
     kControlStatus,				//[13] Control Status
     kLEDThreshold,				//[14] LED Threshold
-    kTrapThreshold,				//[15] Trapezoidal Threshold
-    kCCLowRes,                  //[15] LED Central Contact low resolution
-    kWindowTiming,              //[16] Window timing
-    kRisingEdgeWindow,          //[17] Rising Edge Window
+    kWindowTiming,              //[15] Window timing
+    kRisingEdgeWindow,          //[16] Rising Edge Window
+    kTrapThreshold,				//[17] Trapezoidal Threshold
     kDAC,						//[18] DAC
 	kSlaveFrontBusStatus,		//[19] Slave Front bus status
     kChanZeroTimeStampLSB,		//[20] Channel Zero time stamp LSB
@@ -219,7 +218,6 @@ enum Gretina4MFIFOStates {
     short           extTrigLength;
     short           collectionTime;
     short           integrateTime;
-    int             ccLowRes;
 
     int             fifoState;
 	int				fifoEmptyCount;
@@ -283,8 +281,6 @@ enum Gretina4MFIFOStates {
 - (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay;
 - (NSString*) firmwareStatusString;
 - (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
-- (int)  ccLowRes;
-- (void) setCcLowRes:(int)aCcLowRes;
 - (short) integrateTime;
 - (void) setIntegrateTime:(short)aIntegrateTime;
 - (short) collectionTime;
@@ -462,7 +458,6 @@ enum Gretina4MFIFOStates {
 - (void) writeExtTrigLength;
 - (void) writeCollectionTime;
 - (void) writeIntegrateTime;
-- (void) writeCCLowRes;
 
 - (void) tasksCompleted: (NSNotification*)aNote;
 - (BOOL) queueIsRunning;
@@ -525,7 +520,6 @@ enum Gretina4MFIFOStates {
 
 extern NSString* ORGretina4MModelBaselineRestoredDelayChanged;
 extern NSString* ORGretina4MModelFirmwareStatusStringChanged;
-extern NSString* ORGretina4MModelCcLowResChanged;
 extern NSString* ORGretina4MNoiseWindowChanged;
 extern NSString* ORGretina4MClockSourceChanged;
 extern NSString* ORGretina4MIntegrateTimeChanged;

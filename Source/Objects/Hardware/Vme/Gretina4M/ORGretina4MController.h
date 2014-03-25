@@ -32,7 +32,6 @@
     IBOutlet   NSTabView* 	tabView;
 	IBOutlet   NSTextField* baselineRestoredDelayField;
 	IBOutlet   NSTextField* firmwareStatusStringField;
-	IBOutlet   NSTextField* ccLowResField;
 	IBOutlet   NSTextField* noiseWindowField;
     
 	IBOutlet   NSTextField* integrateTimeField;
@@ -143,7 +142,6 @@
 #pragma mark •••Interface Management
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;
-- (void) ccLowResChanged:(NSNotification*)aNote;
 - (void) noiseWindowChanged:(NSNotification*)aNote;
 - (void) chpsdvChanged:(NSNotification*)aNote;
 - (void) mrpsrtChanged:(NSNotification*)aNote;
@@ -199,7 +197,6 @@
 
 #pragma mark •••Actions
 - (IBAction) baselineRestoredDelayAction:(id)sender;
-- (IBAction) ccLowResAction:(id)sender;
 - (IBAction) noiseWindowAction:(id)sender;
 - (IBAction) integrateTimeFieldAction:(id)sender;
 - (IBAction) collectionTimeFieldAction:(id)sender;

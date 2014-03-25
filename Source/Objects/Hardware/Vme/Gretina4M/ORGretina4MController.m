@@ -379,11 +379,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(ccLowResChanged:)
-                         name : ORGretina4MModelCcLowResChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(firmwareStatusStringChanged:)
                          name : ORGretina4MModelFirmwareStatusStringChanged
 						object: model];
@@ -469,7 +464,6 @@
     [self prerecntChanged:nil];
     [self postrecntChanged:nil];
 	[self noiseWindowChanged:nil];
-	[self ccLowResChanged:nil];
 	[self baselineRestoredDelayChanged:nil];
 }
 
@@ -485,10 +479,6 @@
 	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];
 }
 
-- (void) ccLowResChanged:(NSNotification*)aNote
-{
-	[ccLowResField setIntValue: [model ccLowRes]];
-}
 - (void) noiseWindowChanged:(NSNotification*)aNote
 {
 	[noiseWindowField setFloatValue: [model noiseWindowConverted]];
@@ -1092,11 +1082,6 @@
 - (IBAction) baselineRestoredDelayAction:(id)sender
 {
 	[model setBaselineRestoredDelay:[sender intValue]];
-}
-
-- (IBAction) ccLowResAction:(id)sender
-{
-	[model setCcLowRes:[sender intValue]];	
 }
 
 - (IBAction) noiseWindowAction:(id)sender

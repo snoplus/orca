@@ -38,7 +38,6 @@
 
 NSString* ORGretina4MModelBaselineRestoredDelayChanged = @"ORGretina4MModelBaselineRestoredDelayChanged";
 NSString* ORGretina4MModelFirmwareStatusStringChanged = @"ORGretina4MModelFirmwareStatusStringChanged";
-NSString* ORGretina4MModelCcLowResChanged       = @"ORGretina4MModelCcLowResChanged";
 NSString* ORGretina4MNoiseWindowChanged         = @"ORGretina4MNoiseWindowChanged";
 NSString* ORGretina4MIntegrateTimeChanged		= @"ORGretina4MIntegrateTimeChanged";
 NSString* ORGretina4MCollectionTimeChanged      = @"ORGretina4MCollectionTimeChanged";
@@ -131,11 +130,10 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x30,	@"External FIFO monitor", YES, NO, NO, NO}, //new for version 102b
     {0x40,  @"Control/Status", YES, YES, YES, YES},                
     {0x80,  @"LED Threshold", YES, YES, YES, YES},
-    {0x1C0,  @"TRAP Threshold", YES, YES, YES, YES},
-    {0xA8,  @"LED Central Contact low resolution", YES, YES, YES, YES},
     {0x100, @"Window Timing", YES, YES, YES, YES},
     {0x140, @"Rising Edge Window", YES, YES, YES, YES},        
-    {0x400, @"DAC", YES, YES, NO, NO},                             
+    {0x1C0, @"TRAP Threshold", YES, YES, YES, YES},
+    {0x400, @"DAC", YES, YES, NO, NO},
     {0x480, @"Slave Front bus status", YES, YES, NO, NO},          
     {0x484, @"Channel Zero time stamp LSB", YES, YES, NO, NO},     
     {0x488, @"Channel Zero time stamp MSB",  YES, YES, NO, NO}, 
@@ -396,20 +394,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [aConnector retain];
     [linkConnector release];
     linkConnector = aConnector;
-}
-- (int) ccLowRes
-{
-    return ccLowRes;
-}
-
-- (void) setCcLowRes:(int)aCcLowRes
-{
-    
-    [[[self undoManager] prepareWithInvocationTarget:self] setCcLowRes:ccLowRes];
-    
-    ccLowRes = aCcLowRes & 0x3ff;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelCcLowResChanged object:self];
 }
 
 - (short) noiseWindow
@@ -1417,7 +1401,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self writeExtTrigLength];
     [self writeCollectionTime];
     [self writeIntegrateTime];
-    [self writeCCLowRes];
 	[self writeDownSample];
     
     //write the channel level params
@@ -1572,15 +1555,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
-- (void) writeCCLowRes
-{
-    unsigned long theValue = ccLowRes;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kCCLowRes].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
+
 - (void) writeLEDThreshold:(short)channel
 {
     unsigned long theValue = (poleZeroMult[channel] << 20) | (ledThreshold[channel] & 0x1FFFF);
@@ -2108,9 +2083,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"CC Low Res"];
     [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setCcLowRes:) getMethod:@selector(ccLowRes)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Mode"];
@@ -2471,7 +2443,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     [[self undoManager] disableUndoRegistration];
     [self setBaselineRestoredDelay:     [decoder decodeIntForKey:@"baselineRestoredDelay"]];
-    [self setCcLowRes:                  [decoder decodeIntForKey:@"ccLowRes"]];
     [self setNoiseWindow:               [decoder decodeIntForKey:@"noiseWindow"]];
     [self setIntegrateTime:             [decoder decodeIntForKey:@"integrateTime"]];
     [self setCollectionTime:            [decoder decodeIntForKey:@"collectionTime"]];
@@ -2534,7 +2505,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:baselineRestoredDelay forKey:@"baselineRestoredDelay"];
-    [encoder encodeInt:ccLowRes                     forKey:@"ccLowRes"];
     [encoder encodeInt:noiseWindow                  forKey:@"noiseWindow"];
     [encoder encodeInt:integrateTime                forKey:@"integrateTime"];
     [encoder encodeInt:collectionTime               forKey:@"collectionTime"];
@@ -2587,7 +2557,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [objDictionary setObject:[NSNumber numberWithInt:extTrigLength] forKey:@"Ext Trig Length"];
     [objDictionary setObject:[NSNumber numberWithInt:collectionTime] forKey:@"Collection Time"];
     [objDictionary setObject:[NSNumber numberWithInt:integrateTime] forKey:@"Integration Time"];
-    [objDictionary setObject:[NSNumber numberWithInt:ccLowRes] forKey:@"CC Low Res"];
     
 	[self addCurrentState:objDictionary cArray:(short*)enabled forKey:@"Enabled"];
 	[self addCurrentState:objDictionary cArray:(short*)trapEnabled forKey:@"Trap Enabled"];
