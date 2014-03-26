@@ -65,6 +65,7 @@
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
+    IBOutlet NSButton*      initButton1;
     IBOutlet NSButton*      resetButton;
     IBOutlet NSButton*      clearFIFOButton;
     IBOutlet NSButton*      probeButton;
@@ -105,6 +106,9 @@
 	IBOutlet NSButton*		writeSPIButton;
 	IBOutlet NSButton*		dumpAllRegistersButton;
 	
+    IBOutlet NSButton*		diagnosticsEnabledCB;
+    IBOutlet NSButton*		diagnosticsReportButton;
+    
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
     IBOutlet NSTextField*			noiseFloorOffsetField;
@@ -184,6 +188,7 @@
 - (void) trapThresholdChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) easySelectChanged:(NSNotification*)aNote;
+- (void) diagnosticsEnabledChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
@@ -196,6 +201,8 @@
 - (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark •••Actions
+- (IBAction) diagnosticsReportAction:(id)sender;
+- (IBAction) diagnosticsEnableAction:(id)sender;
 - (IBAction) baselineRestoredDelayAction:(id)sender;
 - (IBAction) noiseWindowAction:(id)sender;
 - (IBAction) integrateTimeFieldAction:(id)sender;

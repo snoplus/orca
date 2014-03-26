@@ -29,18 +29,22 @@
 #define	kAccessRemoteDRAM		0x03
 
 
-@interface ORVmeIOCard : ORVmeCard {
-
+@interface ORVmeIOCard : ORVmeCard
+{
 	@protected
-	id	controller; //use to cache the controller for abit more speed. use with care!
-    unsigned long 	baseAddress;
-    unsigned short  addressModifier;
-    unsigned long	exceptionCount;
+	id                   controller; //use to cache the controller for abit more speed. use with care!
+    unsigned long        baseAddress;
+    unsigned short       addressModifier;
+    unsigned long        exceptionCount;
+    BOOL                 diagnosticsEnabled;
+    NSMutableDictionary* diagnosticReport;
 }
 
 #pragma mark ¥¥¥Accessors
 - (void) 			setBaseAddress:(unsigned long) anAddress;
 - (unsigned long) 	baseAddress;
+- (BOOL)            diagnosticsEnabled;
+- (void)            setDiagnosticsEnabled:(BOOL)aState;
 - (void)			setAddressModifier:(unsigned short)anAddressModifier;
 - (unsigned short)  addressModifier;
 - (id)				adapter;
@@ -49,9 +53,17 @@
 - (void)			clearExceptionCount;
 - (NSRange)			memoryFootprint;
 - (BOOL)			memoryConflictsWith:(NSRange)aRange;
-
+- (void)            writeAndCheckLong:(unsigned long)aValue
+                        addressOffset:(short)anOffset
+                                 mask:(unsigned long)aMask
+                            reportKey:(NSString*)aKey;
+- (void) verifyValue:(unsigned long)val1 matches:(unsigned long)val2 reportKey:aKey;
+- (void) clearDiagnosticsReport;
+- (void) briefDiagnosticsReport;
+- (void) printDiagnosticsReport;
 @end
 
 #pragma mark ¥¥¥External String Definitions
 extern NSString* ORVmeIOCardBaseAddressChangedNotification;
 extern NSString* ORVmeIOCardExceptionCountChanged;
+extern NSString* ORVmeDiagnosticsEnabledChanged;

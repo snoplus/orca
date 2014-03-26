@@ -387,6 +387,13 @@
                      selector : @selector(baselineRestoredDelayChanged:)
                          name : ORGretina4MModelBaselineRestoredDelayChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(diagnosticsEnabledChanged:)
+                         name : ORVmeDiagnosticsEnabledChanged
+						object: model];
+    
+    
 
 }
 
@@ -465,9 +472,14 @@
     [self postrecntChanged:nil];
 	[self noiseWindowChanged:nil];
 	[self baselineRestoredDelayChanged:nil];
+    [self diagnosticsEnabledChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) diagnosticsEnabledChanged:(NSNotification*)aNote
+{
+	[diagnosticsEnabledCB setIntValue: [model diagnosticsEnabled]];
+}
 
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote
 {
@@ -883,6 +895,7 @@
     	
     [settingLockButton      setState: locked];
     [initButton             setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [initButton1            setEnabled:!lockedOrRunningMaintenance && !downloading];
     [clearFIFOButton        setEnabled:!locked && !runInProgress && !downloading];
 	[noiseFloorButton       setEnabled:!locked && !runInProgress && !downloading];
 	[statusButton           setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -915,6 +928,8 @@
     [postCountField     setEnabled:!lockedOrRunningMaintenance && !downloading];
     [preCountField      setEnabled:!lockedOrRunningMaintenance && !downloading];
 
+    [diagnosticsReportButton setEnabled:[model diagnosticsEnabled]];
+    
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
         [trapThresholdMatrix setEnabled:NO];
@@ -1078,6 +1093,16 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) diagnosticsReportAction:(id)sender
+{
+    [model printDiagnosticsReport];
+}
+
+- (IBAction) diagnosticsEnableAction:(id)sender
+{
+    [model setDiagnosticsEnabled:[sender intValue]];
+    [self settingsLockChanged:nil]; //update buttons
+}
 
 - (IBAction) baselineRestoredDelayAction:(id)sender
 {

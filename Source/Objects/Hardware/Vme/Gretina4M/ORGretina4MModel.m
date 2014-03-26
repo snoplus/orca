@@ -1456,17 +1456,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 							 (pileUp[chan]                  << 2)   |
                              startStop;
     
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kControlStatus].offset + 4*chan
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-    unsigned long readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0xC17) != (theValue & 0xC17)){
-        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%08x != 0x%08x)\n",chan,readBackValue & 0xC17,theValue & 0xC17);
-    }
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kControlStatus].offset + 4*chan
+                       mask:0x00406C1D
+                  reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]];
 }
+    
+     
 - (short) readClockSource
 {
     unsigned long theValue = 0 ;
@@ -1482,12 +1478,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) writeClockSource: (unsigned long) clocksource
 {
 	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
-	unsigned long theValue = clocksource;
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + fpga_register_information[kVMEGPControl].offset
-                        numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
+    [self writeAndCheckLong:clocksource
+              addressOffset:fpga_register_information[kVMEGPControl].offset
+                       mask:0x3
+                  reportKey:@"ClockSource"];
+
 }
 
 - (void) writeClockSource
@@ -1508,72 +1503,66 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeExternalWindow
 {
-    unsigned long theValue = externalWindow;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kExternalWindow].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:externalWindow
+              addressOffset:register_information[kExternalWindow].offset
+                       mask:0x7ff
+                  reportKey:@"ExternalWindow"];
 }
 
 - (void) writePileUpWindow
 {
     unsigned long theValue = (baselineRestoredDelay<<16) &  pileUpWindow;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kPileupWindow].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+ 
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kPileupWindow].offset
+                       mask:0x07ff07ff
+                  reportKey:@"PileupWindow"];
+
 }
 - (void) writeExtTrigLength
 {
-    unsigned long theValue = extTrigLength;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kExtTrigSlidingLength].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:extTrigLength
+              addressOffset:register_information[kExtTrigSlidingLength].offset
+                       mask:0x7ff
+                  reportKey:@"ExtTrigLength"];
+
 }
 
 - (void) writeCollectionTime
 {
-    unsigned long theValue = collectionTime;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kCollectionTime].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:collectionTime
+              addressOffset:register_information[kCollectionTime].offset
+                       mask:0x1ff
+                  reportKey:@"CollectionTime"];
 }
 
 
 - (void) writeIntegrateTime
 {
-    unsigned long theValue = integrateTime;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kIntegrateTime].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:integrateTime
+              addressOffset:register_information[kIntegrateTime].offset
+                       mask:0x1ff
+                  reportKey:@"IntegrationTime"];
+
 }
 
 - (void) writeLEDThreshold:(short)channel
 {
     unsigned long theValue = (poleZeroMult[channel] << 20) | (ledThreshold[channel] & 0x1FFFF);
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kLEDThreshold].offset + 4*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kLEDThreshold].offset + 4*channel
+                       mask:0xfff1ffff
+                  reportKey:[NSString stringWithFormat:@"LEDThreshold_%d",channel]];
+
 }
 - (void) writeTrapThreshold:(int)channel
 {
     unsigned long theValue = (trapEnabled[channel]<<31) | (trapThreshold[channel] & 0xFFFFFF);
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kTrapThreshold].offset + 4*channel
+                       mask:0x80ffffff
+                  reportKey:[NSString stringWithFormat:@"TrapThreshold_%d",channel]];
     
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kTrapThreshold].offset + 4*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
 }
 
 - (void) writeWindowTiming:(short)channel
@@ -1583,23 +1572,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                              ((mrpsdv[channel]&0xf)<<8) |
                              ((chpsrt[channel]&0xf)<<4) |
                               (chpsdv[channel] & 0xf);
-                             
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kWindowTiming].offset + 4*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-  
+    
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kWindowTiming].offset + 4*channel
+                       mask:0x07ffffff
+                  reportKey:[NSString stringWithFormat:@"WindowTiming_%d",channel]];
 }
 
 - (void) writeRisingEdgeWindow:(short)channel
 {    
-	unsigned long aValue = (((prerecnt[channel]+kPreAdjust)&0x7ff)<<12) | (((postrecnt[channel]+kPostAdjust)&0x7ff));
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + register_information[kRisingEdgeWindow].offset + 4*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+	unsigned long theValue = (((prerecnt[channel]+kPreAdjust)&0x7ff)<<12) | (((postrecnt[channel]+kPostAdjust)&0x7ff));
+    
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kRisingEdgeWindow].offset + 4*channel
+                       mask:0x007ff7ff
+                  reportKey:[NSString stringWithFormat:@"RisingEdgeWindow_%d",channel]];
+
 }
 
 
@@ -2242,8 +2230,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     fifoResetCount = 0;
     [self startRates];
+    
+    [self clearDiagnosticsReport];
+    
     [self initBoard];
-   
+    
+    if([self diagnosticsEnabled])[self briefDiagnosticsReport];
+    
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 

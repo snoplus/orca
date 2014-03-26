@@ -25,14 +25,19 @@
 
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORVmeIOCardBaseAddressChangedNotification = @"Vme IO Card Base Address Changed";
-NSString* ORVmeIOCardExceptionCountChanged 			= @"ORVmeIOCardExceptionCountChanged";
+NSString* ORVmeIOCardBaseAddressChangedNotification  = @"Vme IO Card Base Address Changed";
+NSString* ORVmeIOCardExceptionCountChanged           = @"ORVmeIOCardExceptionCountChanged";
+NSString* ORVmeDiagnosticsEnabledChanged             = @"ORVmeDiagnosticsEnabledChanged";
 
 
 
 @implementation ORVmeIOCard
 
-
+- (void) dealloc
+{
+    [diagnosticReport release];
+    [super dealloc];
+}
 #pragma mark ¥¥¥Accessors
 - (void) setAddressModifier:(unsigned short)anAddressModifier
 {
@@ -136,6 +141,79 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
     return objDictionary;
 }
 
+- (void) writeAndCheckLong:(unsigned long)aValue
+             addressOffset:(short)anOffset
+                      mask:(unsigned long)aMask
+                 reportKey:(NSString*)aKey
+{
+    unsigned long writeValue = aValue & aMask;
+    [[self adapter] writeLongBlock: &writeValue
+                         atAddress: [self baseAddress] + anOffset
+                        numToWrite: 1
+                        withAddMod: [self addressModifier]
+                     usingAddSpace: 0x01];
+    
+    if(diagnosticsEnabled){
+        unsigned long readBackValue = 0;
+        [[self adapter] readLongBlock: &readBackValue
+                            atAddress: [self baseAddress] + anOffset
+                           numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        readBackValue &= aMask;
+        
+        [self verifyValue: writeValue matches:readBackValue reportKey:aKey];
+     }
+}
 
+- (BOOL) diagnosticsEnabled {return diagnosticsEnabled;}
+- (void) setDiagnosticsEnabled:(BOOL)aState
+{
+    if(aState!=diagnosticsEnabled){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDiagnosticsEnabled:diagnosticsEnabled];
+        diagnosticsEnabled = aState;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORVmeDiagnosticsEnabledChanged object: self]; 
+    }
+}
 
+- (void) verifyValue:(unsigned long)val1 matches:(unsigned long)val2 reportKey:aKey
+{
+    if(val1 != val2){
+        if(!diagnosticReport)diagnosticReport = [[NSMutableDictionary dictionary] retain];
+        NSString* errorString = [NSString stringWithFormat:@"0x%08lx != 0x%08lx",val1,val2];
+        //there may be an existing error record for this key, if so we add to it, otherwise we make a new one
+        NSMutableDictionary* aRecord = [diagnosticReport objectForKey:aKey];
+        if(!aRecord)aRecord = [NSMutableDictionary dictionary];
+        unsigned long errorCount = [[aRecord objectForKey:@"ErrorCount"]unsignedLongValue];
+        errorCount++;
+        [aRecord setObject:[NSNumber numberWithUnsignedLong:errorCount] forKey:@"ErrorCount"];
+        [aRecord setObject:errorString forKey:@"LastErrorString"];
+        [aRecord setObject:aKey forKey:@"Name"];
+        [diagnosticReport setObject:aRecord forKey:aKey];
+    }
+}
+- (void) briefDiagnosticsReport
+{
+    if(!diagnosticReport)NSLog(@"%@: No Errors Reported\n",[self fullID]);
+    else {
+        NSLog(@"%@ : %d Registers reported read/write mismatches\n",[self fullID],[[diagnosticReport allKeys] count]);
+    }
+}
+- (void) printDiagnosticsReport
+{
+    if(!diagnosticReport)NSLog(@"%@: No diagnostic report Available\n",[self fullID]);
+    else {
+        NSLog(@"%@: Dagnostic report:\n",[self fullID]);
+        NSLog(@"%d Registers reported read/write mismatches\n",[[diagnosticReport allKeys] count]);
+        for(id anEntry in diagnosticReport){
+            NSLog(@"%@: %@ ErrorCount: %@\n",[anEntry objectForKey:@"Name"],[anEntry objectForKey:@"LastErrorString"],[anEntry objectForKey:@"ErrorCount"]);
+        }
+    }
+}
+- (void) clearDiagnosticsReport
+{
+    [diagnosticReport release];
+    diagnosticReport = nil;
+}
 @end
