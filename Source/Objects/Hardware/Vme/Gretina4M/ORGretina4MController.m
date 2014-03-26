@@ -929,6 +929,7 @@
     [preCountField      setEnabled:!lockedOrRunningMaintenance && !downloading];
 
     [diagnosticsReportButton setEnabled:[model diagnosticsEnabled]];
+    [diagnosticsClearButton  setEnabled:[model diagnosticsEnabled]];
     
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
@@ -1093,6 +1094,12 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) diagnosticsClearAction:(id)sender
+{
+    [model clearDiagnosticsReport];
+    NSLog(@"%@: Cleared Diagnostics Report\n",[model fullID]);
+}
+
 - (IBAction) diagnosticsReportAction:(id)sender
 {
     [model printDiagnosticsReport];

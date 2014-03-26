@@ -108,6 +108,7 @@
 	
     IBOutlet NSButton*		diagnosticsEnabledCB;
     IBOutlet NSButton*		diagnosticsReportButton;
+    IBOutlet NSButton*		diagnosticsClearButton;
     
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
@@ -201,6 +202,7 @@
 - (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark •••Actions
+- (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
 - (IBAction) diagnosticsEnableAction:(id)sender;
 - (IBAction) baselineRestoredDelayAction:(id)sender;
