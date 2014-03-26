@@ -206,7 +206,8 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
     else {
         NSLog(@"%@: Dagnostic report:\n",[self fullID]);
         NSLog(@"%d Registers reported read/write mismatches\n",[[diagnosticReport allKeys] count]);
-        for(id anEntry in diagnosticReport){
+        for(id aKey in [diagnosticReport allKeys]){
+            NSDictionary* anEntry = [diagnosticReport objectForKey:aKey];
             NSLog(@"%@: %@ ErrorCount: %@\n",[anEntry objectForKey:@"Name"],[anEntry objectForKey:@"LastErrorString"],[anEntry objectForKey:@"ErrorCount"]);
         }
     }
