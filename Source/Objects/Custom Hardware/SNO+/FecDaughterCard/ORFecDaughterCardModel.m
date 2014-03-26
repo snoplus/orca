@@ -431,6 +431,97 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 	}
 }
 
+//This information basically follows the loadDefaultValues information above but loads into a mutable dictionary array
+- (NSMutableDictionary*) pullFecDaughterInformationForOrcaDB
+{
+    //Initialise the main array
+    NSMutableDictionary* daughterBoardDBInfo = [NSMutableDictionary dictionaryWithCapacity:20];
+    
+    
+    //Initialise the smaller array
+    NSMutableDictionary* rp1Array = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* rp2Array = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vliArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vsiArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vt_ecalArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vt_zeroArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vt_corrArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vtArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* vbArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* ns100widthArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* ns20widthArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* ns20delayArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* tac0trimArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    NSMutableDictionary* tac1trimArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    //NSMutableDictionary* fecBoardIds = [NSMutableDictionary dictionaryWithCapacity:20];
+    
+	int i;
+	for(i=0;i<2;i++){
+		[rp1Array setObject:[NSNumber numberWithFloat:[self rp1:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [rp2Array setObject:[NSNumber numberWithFloat:[self rp2:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [vliArray setObject:[NSNumber numberWithFloat:[self vli:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [vsiArray setObject:[NSNumber numberWithFloat:[self vsi:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+	}
+    
+    //Add these objects back in later
+    /*[daughterBoardDBInfo setObject:rp1Array forKey:@"rp1"];
+    [daughterBoardDBInfo setObject:rp2Array forKey:@"rp2"];
+    [daughterBoardDBInfo setObject:vliArray forKey:@"vli"];
+    [daughterBoardDBInfo setObject:vsiArray forKey:@"vsi"];*/
+
+    [daughterBoardDBInfo setObject:[NSNumber numberWithFloat:[self vt_safety]] forKey:@"vt_safety"];
+    
+	for(i=0;i<8;i++){
+        [vt_ecalArray setObject:[NSNumber numberWithFloat:[self vt_ecal:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [vt_zeroArray setObject:[NSNumber numberWithFloat:[self vt_zero:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [vt_corrArray setObject:[NSNumber numberWithFloat:[self vt_corr:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [vtArray setObject:[NSNumber numberWithFloat:[self vt:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+	}
+    
+    //get the board ids
+    //for(i=0;i<4;i++){
+        //[fecBoardIds setObject:[self performBoardIDRead:[self slot]] forKey:[NSString stringWithFormat:@"%i",i]];
+    //}
+    
+    //Get the daughter board ID
+    [daughterBoardDBInfo setObject:[self boardID] forKey:@"daughter_board_id"];
+
+    //[self globalCardNumber];
+    
+    //Global Card Number
+    NSNumber * globalCardNumberObj = [NSNumber numberWithInt:[self globalCardNumber]];
+    [daughterBoardDBInfo setObject:globalCardNumberObj forKey:@"daughter_board_global_card_id"];
+    
+    //TODO:Add these objects back in later
+    //[daughterBoardDBInfo setObject:vt_ecalArray forKey:@"vt_ecal"];
+    [daughterBoardDBInfo setObject:vt_zeroArray forKey:@"vt_zero"];
+    //[daughterBoardDBInfo setObject:vt_corrArray forKey:@"vt_corr"];
+    [daughterBoardDBInfo setObject:vtArray forKey:@"vt"];
+    //[daughterBoardDBInfo setObject:fecBoardIds forKey:@"fec_board_ids"];
+    
+	for(i=0;i<16;i++){
+        [vbArray setObject:[NSNumber numberWithFloat:[self vb:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+	}
+	for(i=0;i<8;i++){
+        
+        [ns100widthArray setObject:[NSNumber numberWithFloat:[self ns100width:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [ns20widthArray setObject:[NSNumber numberWithFloat:[self ns20width:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [ns20delayArray setObject:[NSNumber numberWithFloat:[self ns20delay:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [tac0trimArray setObject:[NSNumber numberWithFloat:[self tac0trim:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+        [tac1trimArray setObject:[NSNumber numberWithFloat:[self tac1trim:i]] forKey:[NSString stringWithFormat:@"%i",i]];
+	}
+    
+    //Add these objects back in later
+    /*[daughterBoardDBInfo setObject:ns100widthArray forKey:@"ns100width"];
+    [daughterBoardDBInfo setObject:ns20widthArray forKey:@"ns20width"];
+    [daughterBoardDBInfo setObject:ns20delayArray forKey:@"ns20delay"];
+    [daughterBoardDBInfo setObject:tac0trimArray forKey:@"tac0delay"];
+    [daughterBoardDBInfo setObject:tac1trimArray forKey:@"tac1delay"];*/
+
+    
+    return daughterBoardDBInfo;
+}
+
 - (void) silentUpdateVt:(short)anIndex
 {
     //rethink what really makes sense to set, the following doesn't

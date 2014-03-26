@@ -31,6 +31,7 @@
 #import "ORSNOCrateModel.h"
 #import "ORVmeReadWriteCommand.h"
 #import "ORCommandList.h"
+#import "OROrderedObjManager.h"
 
 //#define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
 
@@ -643,6 +644,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 			}
 		}	
 		// Read the PMTIC for its id
+        //
 		//PerformBoardIDRead(HV_BOARD_ID_INDEX,&dataValue);
 		
 		//read the Mother Card for its id
@@ -894,6 +896,52 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 		NSLog(@"Failure during load of crate address on FEC32 Crate %d Slot %d.", [self crateNumber], [self stationNumber]);	
 		@throw;
 	}
+}
+
+-(NSMutableDictionary*)pullFecForOrcaDB
+{
+    //This information is pulled for every Fec for DQXX
+    //NSLog(@"hello...is is me you're are looking for?");
+    NSMutableDictionary * output = [NSMutableDictionary dictionaryWithCapacity:200];
+    
+    NSMutableDictionary * pmtOnlineArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    
+    //Look to see which PMTs are online
+    for(int k=0;k<32;k++){
+		NSNumber * pmtState = [NSNumber numberWithBool:[self pmtOnline:k]];
+        [pmtOnlineArray setObject:pmtState forKey:[NSString stringWithFormat:@"%i",k]];
+    }
+    
+    [output setObject:pmtOnlineArray forKey:@"pmt_online_array"];
+    
+    //motherBoard Id
+    [output setObject:[self boardID] forKey:@"mother_board_id"];
+    //NSString * motherboardId = [NSString stringWithFormat:[self boardID]];
+    
+    //Crate number
+    NSNumber * crateNumberObj = [NSNumber numberWithInt:[self crateNumber]];
+    [output setObject:crateNumberObj forKey:@"crate_number"];
+    
+    //Global Card Number
+    NSNumber * globalCardNumberObj = [NSNumber numberWithInt:[self globalCardNumber]];
+                                      
+    [output setObject:globalCardNumberObj forKey:@"mother_board_global_card_id"];
+    
+    //sequencer value for DQXX
+    NSNumber * sequencerValue = [NSNumber numberWithFloat:[self seqDisabledMask]];
+    [output setObject:sequencerValue forKey:@"sequencer_mask"];
+    
+    //These functions require NSObject values and cannot deal with anything else
+    NSNumber * trigger20nsMaskValue = [NSNumber numberWithFloat:[self trigger20nsDisabledMask]];
+    [output setObject:trigger20nsMaskValue forKey:@"trigger_20ns_mask"];
+    
+    NSNumber * trigger100nsMaskValue = [NSNumber numberWithFloat:[self trigger20nsDisabledMask]];
+    [output setObject:trigger100nsMaskValue forKey:@"trigger_100ns_mask"];
+    
+    //TODO: PMTIC information
+    //TODO: Cable information
+    //TODO: Not Operational (Need to query Noel's PMT DB??
+    return output;
 }
 
 - (void) resetFifo

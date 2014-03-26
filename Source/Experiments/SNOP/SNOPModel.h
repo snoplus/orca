@@ -84,6 +84,7 @@
     } _rhdrStruct;
     
     NSDictionary* _runDocument;
+    NSDictionary* _configDocument;
     NSMutableDictionary* _runTypeDocumentPhysics;
 }
 
@@ -109,6 +110,7 @@
 @property (nonatomic,assign) unsigned long rhdrDataId;
 
 @property (copy) NSDictionary* runDocument;
+@property (copy) NSDictionary* configDocument;
 
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;

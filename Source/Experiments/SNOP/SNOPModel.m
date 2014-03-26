@@ -29,14 +29,24 @@
 #import "ORDataTaker.h"
 #import "ORDataTypeAssigner.h"
 #import "ORRunModel.h"
+#import "ORMTCModel.h"
+#import "ORMTCController.h"
+#import "ORMTC_Constants.h"
+#import "ORFecDaughterCardModel.h"
+#import "ORFec32Model.h"
+#import "OROrderedObjManager.h"
+#import "ORSNOConstants.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 
+
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
+#define kOrcaConfigDocumentAdded @"kOrcaConfigDocumentAdded"
+#define kOrcaConfigDocumentUpdated @"kOrcaConfigDocumentUpdated"
 
 #define kMorcaCompactDB         @"kMorcaCompactDB"
 
@@ -67,8 +77,8 @@ debugDBIPNumberIndex = _debugDBIPNumberIndex,
 debugDBPingTask = _debugDBPingTask,
 epedDataId = _epedDataId,
 rhdrDataId = _rhdrDataId,
-runDocument = _runDocument;
-
+runDocument = _runDocument,
+configDocument  = _configDocument;
 
 #pragma mark ¥¥¥Initialization
 
@@ -195,7 +205,11 @@ runDocument = _runDocument;
 
 - (void) runStarted:(NSNotification*)aNote
 {
+    //initilise the run document
     self.runDocument = nil;
+    //intialise the configuation document
+    self.configDocument = nil;
+    
     [NSThread detachNewThreadSelector:@selector(_runDocumentWorker) toTarget:self withObject:nil];
 
     [self updateRHDRSruct];
@@ -208,6 +222,7 @@ runDocument = _runDocument;
                              toTarget:self
                            withObject:[[self.runDocument copy] autorelease]];
     self.runDocument = nil;
+    self.configDocument = nil;
 }
 
 // orca script helper (will come from DB)
@@ -493,6 +508,20 @@ runDocument = _runDocument;
             //[aResult prettyPrint:@"CouchDB Ack Doc:"];
         }
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
+            //there was error
+            //[aResult prettyPrint:@"couchdb update doc:"];
+        }
+        //Look for the configuration document tag
+        else if ([aTag isEqualToString:kOrcaConfigDocumentAdded]) {
+            NSMutableDictionary* configDoc = [[[self configDocument] mutableCopy] autorelease];
+            [configDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+            //[runDoc setObject:[aResult objectForKey:@"rev"] forKey:@"_rev"];
+            //[runDoc setObject:[aResult objectForKey:@"ok"] forKey:@"ok"];
+            self.configDocument = configDoc;
+            //[aResult prettyPrint:@"CouchDB Ack Doc:"];
+        }
+        //look for the configuation docuemnt updated tag
+        else if ([aTag isEqualToString:kOrcaConfigDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];
         }
@@ -788,11 +817,12 @@ runDocument = _runDocument;
     unsigned int run_number = 0;
     NSMutableString* runStartString = [NSMutableString string];
     NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* rc;
+    ORRunModel* rc = nil;
 	if([runObjects count]){
         rc = [runObjects objectAtIndex:0];
         run_number = [rc runNumber];
     }
+    
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
@@ -823,15 +853,400 @@ runDocument = _runDocument;
     }
     [runDocDict setObject:@"in progress" forKey:@"run_status"];
 
+    //self.runDocument = runDocDict;
+    [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
+
+    //Collect a series of objects from the ORMTCModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+
+    //Initialise the MTCModal
+    ORMTCModel* aMTCcard = [objs objectAtIndex:0];
     
-    //what else?
-    //mtcd
+    NSMutableDictionary* configDocDict = [NSMutableDictionary dictionaryWithCapacity:1000];
+    
+    //Pulling all the MTC Values
+    NSNumber * mtcFineDelay = [NSNumber numberWithUnsignedLong:[aMTCcard getMTC_FineDelay]];
+    NSNumber * mtcPedWidth = [NSNumber numberWithUnsignedLong:[aMTCcard getMTC_PedWidth]];
+    NSNumber * mtcGTWordMask = [NSNumber numberWithUnsignedLong:[aMTCcard getMTC_GTWordMask]];
+    
+    NSNumber * mtcCoarseDelay = [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kCoarseDelay]];
+    NSNumber * mtcPedestalWidth = [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kPedestalWidth]];
+    NSNumber * mtcNhit100LoPrescale = [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kNhit100LoPrescale]];
+    NSNumber * mtcPulserPeriod = [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kPulserPeriod]];
+    NSNumber * mtcLow10MhzClock = [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kLow10MhzClock]];
+    NSNumber * mtcFineSlope = [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kFineSlope]];
+    NSNumber * mtcMinDelayOffset= [NSNumber numberWithUnsignedLong:[aMTCcard dbFloatByIndex:kMinDelayOffset]];
+    
+    //Important not to help complete this work
+    //dbFloatByIndex - this function will get the value on the screen (at least for the mtc and
+    //read this from what is placed into the GUI (I think)
+    //An example:
+	//[pedestalWidthField		setFloatValue:	[model dbFloatByIndex: kPedestalWidth]];
+
+    //The above example actually set the values in the GUI. But for loading into the database
+    //it is more important to think about the [modeal dbFloatByIndex: kPedestalWidth] information
+    //this is actualy looking up the model information and using it.
+    
+    //Extra values to load into the DB
+    //load the nhit values
+    //NSMatrix * nhitMatrix = nil;
+    NSMutableDictionary *nhitMtcaArray = [NSMutableDictionary dictionaryWithCapacity:100];
+
+	int col,row;
+	float displayValue=0;
+	for(col=0;col<4;col++){
+        
+        NSMutableDictionary * tempArray = [NSMutableDictionary dictionaryWithCapacity:100];
+        
+		for(row=0;row<6;row++){
+            
+			int index = kNHit100HiThreshold + row + (col * 6);
+            
+			if(col == 0){
+	 			int type = [aMTCcard nHitViewType];
+				
+                if(type == kNHitsViewRaw) {
+					displayValue = [aMTCcard dbFloatByIndex: index];
+				}
+				
+                else if(type == kNHitsViewmVolts) {
+					float rawValue = [aMTCcard dbFloatByIndex: index];
+					displayValue = [aMTCcard rawTomVolts:rawValue];
+				}
+				
+                else if(type == kNHitsViewNHits) {
+					int rawValue    = [aMTCcard dbFloatByIndex: index];
+					float mVolts    = [aMTCcard rawTomVolts:rawValue];
+					float dcOffset  = [aMTCcard dbFloatByIndex:index + kNHitDcOffset_Offset];
+					float mVperNHit = [aMTCcard dbFloatByIndex:index + kmVoltPerNHit_Offset];
+					displayValue    = [aMTCcard mVoltsToNHits:mVolts dcOffset:dcOffset mVperNHit:mVperNHit];
+				}
+			}
+			else displayValue = [aMTCcard dbFloatByIndex: index];
+            
+            NSNumber * valueToDisplay = [NSNumber numberWithFloat:displayValue];
+            
+            if(row ==0) {
+                [tempArray setObject:valueToDisplay forKey:@"nhit_100_hi"];
+            }
+            else if(row == 1){
+                [tempArray setObject:valueToDisplay forKey:@"nhit_100_med"];
+            }
+            else if(row == 2){
+                [tempArray setObject:valueToDisplay forKey:@"nhit_100_lo"];
+            }
+            else if(row == 3){
+                [tempArray setObject:valueToDisplay forKey:@"nhit_20"];
+            }
+            else if(row == 4){
+                [tempArray setObject:valueToDisplay forKey:@"nhit_20_lo"];
+            }
+            else if(row == 5){
+                [tempArray setObject:valueToDisplay forKey:@"owln"];
+            }
+            else{
+                NSLog(@"OrcaDB::Cannot write the Mtca Nhit DAC Values to the OrcaDB");
+            }
+    
+		}
+        
+        //Do I need to release the memory for the temporary Array?
+        //This will reveal itself during my analysis for the new Array  
+        if(col == 0){
+            [nhitMtcaArray setObject:tempArray forKey:@"threshold_value"];
+        }
+        else if(col == 1){
+            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_ADC"];
+        }
+        else if(col == 2){
+            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_Nhit"];
+        }
+        else if(col == 3){
+            [nhitMtcaArray setObject:tempArray forKey:@"dc_offset"];
+        }
+        else{
+            NSLog(@"OrcaDB::Cannot write the Mtca Nhit DAC values to the OrcaDB");
+        }
+	}
+    
+     //now the esum values
+    NSMutableDictionary *esumArray = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    for(col=0;col<4;col++){
+         
+        NSMutableDictionary * tempArray = [NSMutableDictionary dictionaryWithCapacity:100];
+         
+         for(row=0;row<4;row++){
+            int index = kESumLowThreshold + row + (col * 4);
+             if(col == 0){
+                 int type = [aMTCcard eSumViewType];
+                 if(type == kESumViewRaw) {
+                     displayValue = [aMTCcard dbFloatByIndex: index];
+                 }
+                 else if(type == kESumViewmVolts) {
+                     float rawValue = [aMTCcard dbFloatByIndex: index];
+                     displayValue = [aMTCcard rawTomVolts:rawValue];
+                 }
+                 else if(type == kESumVieweSumRel) {
+                     float dcOffset = [aMTCcard dbFloatByIndex:index + kESumDcOffset_Offset];
+                     displayValue = dcOffset - [aMTCcard dbFloatByIndex: index];
+                 }
+                 else if(type == kESumViewpC) {
+                     int rawValue   = [aMTCcard dbFloatByIndex: index];
+                     float mVolts   = [aMTCcard rawTomVolts:rawValue];
+                     float dcOffset = [aMTCcard dbFloatByIndex:index + kESumDcOffset_Offset];
+                     float mVperpC  = [aMTCcard dbFloatByIndex:index + kmVoltPerpC_Offset];
+                     displayValue   = [aMTCcard mVoltsTopC:mVolts dcOffset:dcOffset mVperpC:mVperpC];
+                 }
+             }
+             
+             else displayValue = [aMTCcard dbFloatByIndex: index];
+             
+             NSNumber * valueToDisplay = [NSNumber numberWithFloat:displayValue];
+             
+             if(row ==0) {
+                 [tempArray setObject:valueToDisplay forKey:@"ESUM_hi"];
+             }
+             else if(row == 1){
+                 [tempArray setObject:valueToDisplay forKey:@"ESUM_lo"];
+             }
+             else if(row == 2){
+                 [tempArray setObject:valueToDisplay forKey:@"OWLE_hi"];
+             }
+             else if(row == 3){
+                 [tempArray setObject:valueToDisplay forKey:@"OWLE_lo"];
+             }
+             else{
+                 NSLog(@"OrcaDB::Cannot write the Mtca Esum DAC values to the OrcaDB");
+             }
+             
+         }
+        
+        //Do I need to release the memory for the temporary Array?
+        //This will reveal itself during my analysis for the new Array
+        if(col == 0){
+            [esumArray setObject:tempArray forKey:@"threshold_value"];
+        }
+        else if(col == 1){
+            [esumArray setObject:tempArray forKey:@"mv_per_ADC"];
+        }
+        else if(col == 2){
+            [esumArray setObject:tempArray forKey:@"mv_per_Nhit"];
+        }
+        else if(col == 3){
+            [esumArray setObject:tempArray forKey:@"dc_offset"];
+        }
+        
+        
+    }
+        
+    //Get the trigger information and place into the DB
+    NSMutableDictionary * triggerMask = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Respective arrays that will be used to fill the main array 
+    NSMutableArray * gtMask = [NSMutableArray arrayWithCapacity:100];
+    //NSMutableDictionary *gtMask = [NSMutableDictionary dictionaryWithCapacity:100];
+    NSMutableArray * gtCrateMask = [NSMutableArray arrayWithCapacity:100];
+    NSMutableArray * pedCrateMask = [NSMutableArray arrayWithCapacity:100];
+    
+    //Collect a series of objects from the ORMTCController
+    /*NSArray*  controllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCController")];
+    
+    //Initialise the MTCModal
+    ORMTCController* aMTCController = [controllerObjs objectAtIndex:0];
+    
+    NSMutableDictionary * triggerMaskMatricies = [aMTCController getMatriciesFromNib];
+
+    //Unpack all the Matricies from the Nib
+    NSMatrix * globalTriggerMaskMatrix = [triggerMaskMatricies objectForKey:@"globalTriggerMaskMatrix"];*/
+        
+    int i;
+	int maskValue = [aMTCcard dbIntByIndex: kGtMask];
+    NSString * triggerOn = @"On";
+    NSString * triggerOff = @"Off";
+    
+    //add each mask to the main gtMask mutableArray §
+	for(i=0;i<26;i++){
+        NSNumber * maskValueToWrite = [NSNumber numberWithInt:maskValue & (1<<i)];
+        if ([maskValueToWrite intValue] > 0){
+            [gtMask insertObject:triggerOn atIndex:i];
+        }
+        else{
+            [gtMask insertObject:triggerOff atIndex:i];
+        }
+        
+        //Keep this idea for a future date.
+        //This idea is to take the GUI binding titles and read those in as the arguments for the trigger. Perhaps
+        //these would change and it would be better to force the user to use bits???? Keep the database constant?
+
+        //Alternative method
+        
+        /*NSButtonCell * cell = [globalTriggerMaskMatrix cellAtRow:i column:0];
+        NSString *cellTitle = [cell title];
+        
+        if ([maskValueToWrite intValue] > 0){
+            [gtMask setObject:@"triggerOn" forKey:cellTitle];
+        }
+        else{
+            [gtMask setObject:@"triggerOff" forKey:cellTitle];
+        }*/
+        
+	}
+    
+	maskValue = [aMTCcard dbIntByIndex: kGtCrateMask];
+	for(i=0;i<25;i++){
+        NSNumber * maskValueToWrite = [NSNumber numberWithInt:maskValue & (1<<i)];        
+        if ([maskValueToWrite intValue] > 0){
+            [gtCrateMask insertObject:triggerOn atIndex:i];
+        }
+        else{
+            [gtCrateMask insertObject:triggerOff atIndex:i];
+        }
+	}
+    
+	maskValue = [aMTCcard dbIntByIndex: kPEDCrateMask];
+	for(i=0;i<25;i++){
+        NSNumber * maskValueToWrite = [NSNumber numberWithInt:maskValue & (1<<i)];        
+        if ([maskValueToWrite intValue] > 0){
+            [pedCrateMask insertObject:triggerOn atIndex:i];
+        }
+        else{
+            [pedCrateMask insertObject:triggerOff atIndex:i];
+        }
+	}
+    
+    //Combine the mutable arrays containing all the triggers into the Dictionary;
+    [triggerMask setObject:gtMask forKey:@"global_trigger_mask"];
+    [triggerMask setObject:gtCrateMask forKey:@"crate_trigger_mask"];
+    [triggerMask setObject:pedCrateMask forKey:@"pedestal_trigger_mask"];
+    
+    //Fill an array with mtc information 
+    NSMutableDictionary * mtcArray = [NSMutableDictionary dictionaryWithCapacity:20];
+    [mtcArray setObject:mtcCoarseDelay forKey:@"mtc_coarse_delay"];
+    [mtcArray setObject:mtcFineDelay forKey:@"mtc_fine_delay"];
+    [mtcArray setObject:mtcPedWidth forKey:@"mtc_ped_width"];
+    [mtcArray setObject:mtcGTWordMask forKey:@"mtc_gt_word_mask"];
+    [mtcArray setObject:mtcPedestalWidth forKey:@"mtc_pedestal_width"];
+    [mtcArray setObject:mtcNhit100LoPrescale forKey:@"mtc_nhit100_lo_prescale"];
+    [mtcArray setObject:mtcPulserPeriod forKey:@"mtc_pulsar_period"];
+    [mtcArray setObject:mtcLow10MhzClock forKey:@"mtc_low_10Mhz_clock"];
+    [mtcArray setObject:mtcFineSlope forKey:@"mtc_fine_slope"];
+    [mtcArray setObject:mtcMinDelayOffset forKey:@"mtc_min_delay_offset"];
+    [mtcArray setObject:nhitMtcaArray forKey:@"mtca_nhit_matrix"];
+    [mtcArray setObject:esumArray forKey:@"mtca_esum_matrix"];
+    [mtcArray setObject:triggerMask forKey:@"trigger_masks"];
+    
+    
+    //FILL THE DATA FROM EACH FRONT END CARD HERE !!!!!
+    
+    //Initialise a Dictionary to fill the Daughter Card information
+    NSMutableDictionary * fecCardArray = [NSMutableDictionary dictionaryWithCapacity:200];
+    
+    //Loop over all the FEC cards
+    NSArray * fec32ControllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    
+    //Count all Fec32 Cards on the DAQ
+    //int numberFec32Cards = 2; //PLACE THIS IN LATER: [fec32ControllerObjs count];
+    int numberFec32Cards = [fec32ControllerObjs count];
+    
+    //Iterate through all of the Fec32 Cards
+    for(int i=0;i<numberFec32Cards;i++){
+            
+        ORFec32Model * aFec32Card = [fec32ControllerObjs objectAtIndex:i];
+        
+        //Fec 32 Card Iterator
+        NSMutableDictionary * fec32Iterator = [NSMutableDictionary dictionaryWithCapacity:20];
+        
+        //Get the Mother Board Information
+        [fec32Iterator setObject:[aFec32Card pullFecForOrcaDB] forKey:@"mother_board"];
+        
+        //Variable used to loop through all the current settings
+        NSMutableDictionary * daughterCardIterator = [NSMutableDictionary dictionaryWithCapacity:20];
+    
+        //Get the Fec Daughter Cards associated with the actual
+        for(int j=0;j<kNumSNODaughterCards;j++){
+            
+            //Iterate through all the daughter
+			ORFecDaughterCardModel* dc = [[OROrderedObjManager for:aFec32Card] objectInSlot:j];
+    
+            //Fill the daughter card iterator
+            //daughterCardIterator = [dc pullFecDaughterInformationForOrcaDB];
+        
+            //Place the information for each daughter card into the main daughter card array
+            [daughterCardIterator setObject:[dc pullFecDaughterInformationForOrcaDB] forKey:[NSString stringWithFormat:@"%i",j]];
+        
+        }//end of looping through all the front end daughter boards
+        
+        //Fill the daughter card information into the mother board information
+        [fec32Iterator setObject:daughterCardIterator forKey:@"daughter_board"];
+        
+        //[fecCardArray setObject:fec32Iterator forKey:[NSString stringWithFormat:@"%i",i]];
+        [fecCardArray setObject:fec32Iterator forKey:[aFec32Card boardID]];
+        
+        
+    }//end of looping through all the Fec32 Cards
+    
+    //Fill the configuration document with information
+    [configDocDict setObject:@"configuration" forKey:@"doc_type"];
+    [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [configDocDict setObject:@"0" forKey:@"config_id"]; //need to add in an update for this
+    
+     NSNumber * runNumberForConfig = [NSNumber numberWithUnsignedLong:[rc runNumber]];
+    [configDocDict setObject:runNumberForConfig forKey:@"run_number"];
+    
+    [configDocDict setObject:mtcArray forKey:@"mtc_info"];
+    
+    //this works but I'm not sure we need to see everything right now???
+    [configDocDict setObject:fecCardArray forKey:@"fec32_card_info"];
+    
+    //add the configuration document
+    self.configDocument = configDocDict;
+    [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
+    //NSLog(@"Adding configuation file \n");
+    
+    //wait for main thread to receive acknowledgement from couchdb
+    /*NSDate* timeoutConfig = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while ([timeoutConfig timeIntervalSinceNow] > 0 && ![self.runDocument objectForKey:@"_id"]) {
+        [NSThread sleepForTimeInterval:0.1];
+    }*/
+    
+    //Update to the Orca DB
+    //[[self orcaDbRef:self] updateDocument:configDocDict documentId: [configDocDict objectForKey:@"_id"] tag:kOrcaConfigDocumentUpdated];
+    
+
+    //if ([objs count]) {
+    //    aMTCcard = [objs objectAtIndex:0];
+    //}
+    
+    // array object at 0
+    //NSEnumerator* e = [listOfCards objectEnumerator];
+    //ORCaen1720Model* aCard;
+    //while(aCard = [e nextObject]){
+    //    if([aCard crateNumber] == crate && [aCard slot] == card){
+    //        [actualCards setObject:aCard forKey:aKey];
+    //        obj = aCard;
+    //        break;
+    //    }
+   // }
+
+    
+    // access to MTC/D object
+    
+    
+    // mtcdDocDict
+    
+    
+    // upload to DB
+    
+    
+    // get doc id, and update run doc
+    
+    
+    
     //crates
     //cable doc should go here...
     
     //order matters
-    //self.runDocument = runDocDict;
-    [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
 
     
     /*

@@ -28,7 +28,8 @@
 #import "NSDictionary+Extensions.h"
 
 #define kDataVersion 3
-#define kMinSize 4096*2
+#define kMinFrameBufferSize 4096*2
+#define kMaxFrameBufferSize 4096*256
 #define kMinCapacity 4096
 
 @implementation ORDataPacket
@@ -39,7 +40,7 @@
     theDataLock         = [[NSRecursiveLock alloc] init];
     
     version = kDataVersion;
-    lastFrameBufferSize = kMinSize;
+    lastFrameBufferSize = kMinFrameBufferSize;
     return self;
 }
 
@@ -252,11 +253,14 @@
 {
 	[theDataLock lock];   //-----begin critical section
 	if(someData!=0){
+        if (frameBuffer && (frameIndex + length) * sizeof(long) >= kMaxFrameBufferSize) {
+            [self addFrameBuffer:YES];
+        }
 		if(!frameBuffer){
-			[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
+			[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinFrameBufferSize,lastFrameBufferSize)]];
 		}
 		if((frameIndex+length)*sizeof(long)>=[frameBuffer length]){
-			[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinSize];
+			[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinFrameBufferSize];
 			lastFrameBufferSize = [frameBuffer length];
 		}
 		if(frameBuffer){
@@ -272,13 +276,16 @@
 - (unsigned long*) getBlockForAddingLongs:(unsigned long)length
 {
 	[theDataLock lock];   //-----begin critical section
+    if (frameBuffer && (frameIndex + length) * sizeof(long) >= kMaxFrameBufferSize) {
+        [self addFrameBuffer:YES];
+    }
     if(!frameBuffer){
-		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
+		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinFrameBufferSize,lastFrameBufferSize)]];
 	}
 	unsigned long oldFrameIndex = frameIndex;
 	frameIndex += length;
 	if([frameBuffer length]<frameIndex*sizeof(long)){
-		unsigned long deltaLength = (length*sizeof(long))+kMinSize;
+		unsigned long deltaLength = (length*sizeof(long))+kMinFrameBufferSize;
 		[frameBuffer increaseLengthBy:deltaLength];
         lastFrameBufferSize = [frameBuffer length];  
 	}
@@ -291,7 +298,7 @@
 {
 	[theDataLock lock];   //-----begin critical section
     if(!frameBuffer){
-		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinSize,lastFrameBufferSize)]];
+		[self setFrameBuffer:[NSMutableData dataWithLength:MAX(kMinFrameBufferSize,lastFrameBufferSize)]];
 	}
 	
     reservePool[reserveIndex] = frameIndex;
@@ -300,7 +307,7 @@
 	
 	frameIndex += length;
 	if([frameBuffer length]<=frameIndex*sizeof(long)){
-		[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinSize];
+		[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinFrameBufferSize];
         lastFrameBufferSize = [frameBuffer length];        
 	}
 	[theDataLock unlock];   //-----end critical section
@@ -331,11 +338,15 @@
 	if(frameBuffer && (forceAdd || (oldFrameCounter!=frameCounter) || dataAvailable || dataInCache)){
 		oldFrameCounter = frameCounter;
 		[frameBuffer setLength:(frameIndex*sizeof(long))];
+        lastFrameBufferSize = (lastFrameBufferSize + frameIndex*sizeof(long) + kMinFrameBufferSize) / 2;
 		
 		//[self addData:frameBuffer];
 		if(!dataArray)[self setDataArray:[NSMutableArray arrayWithCapacity:kMinCapacity]];
-		[dataArray addObject:frameBuffer];
-		addedData = YES;
+        //do not force add an empty frameBuffer!
+        if (frameIndex != 0 && [frameBuffer length] != 0) {
+            [dataArray addObject:frameBuffer];
+            addedData = YES;
+        }
 		
 		dataAvailable = NO;
 		[frameBuffer release];

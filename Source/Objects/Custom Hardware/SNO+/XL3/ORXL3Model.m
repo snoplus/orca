@@ -1341,8 +1341,8 @@ void SwapLongBlock(void* p, int32_t n)
 	if (xl3OpsRunning == nil) xl3OpsRunning = [[NSMutableDictionary alloc] init];
     [self setXl3InitInProgress:NO];
     //if (isPollingXl3 == YES) [self setIsPollingXl3:NO];
-    [self setIsTriggerON:YES];
-    [self setTriggerStatus:@"ON"];
+    [self setIsTriggerON:NO]; //this was YES before
+    [self setTriggerStatus:@"OFF"]; //this was ON before 
 
     //fill the safe bundle for first crate init, then pull the FEC and DB IDs
     mb_t aConfigBundle;

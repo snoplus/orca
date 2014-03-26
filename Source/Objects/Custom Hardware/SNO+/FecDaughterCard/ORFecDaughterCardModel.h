@@ -130,6 +130,9 @@
 - (float) vbVoltage:(short) n;
 - (unsigned char) vb:(short)ch egain:(short)gain;
 
+//Added by Christopher Jones 
+- (NSMutableDictionary*) pullFecDaughterInformationForOrcaDB;
+
 #pragma mark •••Hardware Access
 - (NSString*) performBoardIDRead:(short) boardIndex;
 - (void) readBoardIds;

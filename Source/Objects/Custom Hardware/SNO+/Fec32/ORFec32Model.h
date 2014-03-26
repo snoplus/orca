@@ -303,6 +303,9 @@ typedef struct Fec32CmosShiftReg{
 - (unsigned long) channelsWithCMOSRateHigherThan:(unsigned long)cmosRateLimit;
 - (unsigned long) channelsWithErrorCMOSRate;
 
+//Added by Christopher Jones
+-(NSMutableDictionary*) pullFecForOrcaDB;
+
 #pragma mark •••Hw Access Helpers
 - (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readFromFec32RegisterCmd:(unsigned long) aRegister;

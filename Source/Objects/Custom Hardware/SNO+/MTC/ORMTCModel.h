@@ -276,6 +276,9 @@
 - (void) stopBasicOps;
 - (void) reportStatus;
 
+//Extra getter functions
+-(NSMutableDictionary*) get_MTCDataBase;
+
 #pragma mark •••Settings
 - (void) saveSet:(NSString*)filePath;
 - (void) loadSet:(NSString*)filePath;

@@ -724,6 +724,12 @@ resetFifoOnStart = _resetFifoOnStart;
 #define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
 #define floatDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] floatValue]
 
+-(NSMutableDictionary*) get_MTCDataBase
+{
+    return mtcDataBase;
+    //return [[mtcDataBase objectForNestedKey:[self getDBDefaultByIndex:DBRef]] unsignedShortValue];
+}
+
 #pragma mark •••Data Taker
 - (NSMutableArray*) children {
     //methods exists to give common interface across all objects for display in lists

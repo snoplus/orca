@@ -106,6 +106,10 @@ bool ORMTCReadout::Start() {
     dlerror();
 
     hv_stop_ok = (int (*)())dlsym(hdl, "hv_stop_ok");
+    
+    LogError("ORMTCReadout::hello...\n");
+    LogError("ORMTCReadout::hv_stop_ok: %i\n",hv_stop_ok);
+    
     if ((dl_err = dlerror()) != NULL) {
         hv_stop_ok = NULL;
         LogError("HV E Stop not accessible\n");
@@ -221,7 +225,7 @@ bool ORMTCReadout::Stop()
 bool ORMTCReadout::UpdateStatus() {
     
     ensureDataCanHold(8);
-    int32_t savedIndex = dataIndex;
+    int32_t   = dataIndex;
     data[dataIndex++] = GetHardwareMask()[1] | 8;
     dataIndex++;
     
@@ -272,9 +276,14 @@ bool ORMTCReadout::UpdateStatus() {
 	}
     data[dataIndex++] = aValue;
 
+    
+    
     int err = -1;
     if (hv_stop_ok) err = hv_stop_ok();
     data[dataIndex++] = (long)err;
+    
+    LogError("hello...\n");
+    LogError("%i\n",err)
 
     return true;
 }
