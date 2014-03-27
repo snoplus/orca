@@ -340,7 +340,7 @@
     self=[super init];
     owner = anOwner;
     chipIndex = anIndex;
-#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
     [NSBundle loadNibNamed:@"PISlashTChip" owner:self];
 #else
     [[NSBundle mainBundle] loadNibNamed:@"PISlashTChip" owner:self topLevelObjects:&topLevelObjects];

@@ -46,7 +46,7 @@ static NSString* valueChangeString[kNumActions] = {
 - (id) init
 {
     if ((self = [super init]) != nil){
-#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
         if (![NSBundle loadNibNamed:@"ActionView" owner:self]){
 #else
         if (![[NSBundle mainBundle] loadNibNamed:@"ActionView" owner:self topLevelObjects:&topLevelObjects]){

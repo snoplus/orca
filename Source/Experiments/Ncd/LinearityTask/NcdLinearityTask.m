@@ -39,7 +39,7 @@
 -(id)	init
 {
     if( self = [super init] ){
-#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
         [NSBundle loadNibNamed:@"NcdLinearityTask" owner:self];
 #else
         [[NSBundle mainBundle] loadNibNamed:@"NcdLinearityTask" owner:self topLevelObjects:&ncdLinearityTaskObjects];
@@ -663,7 +663,7 @@ static NSString* NcdLinearitySelectedWaveform = @"NcdLinearitySelectedWaveform";
 {
     self = [super initWithCoder:decoder];
     
-#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
     [NSBundle loadNibNamed:@"NcdLinearityTask" owner:self];
 #else
     [[NSBundle mainBundle] loadNibNamed:@"NcdLinearityTask" owner:self topLevelObjects:&ncdLinearityTaskObjects];

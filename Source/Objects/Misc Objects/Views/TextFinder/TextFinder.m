@@ -71,7 +71,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(TextFinder);
 - (void) loadUI 
 {
     if (!findTextField) {
-#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
         if (![NSBundle loadNibNamed:@"FindPanel" owner:self]){
 #else
             if (![[NSBundle mainBundle] loadNibNamed:@"FindPanel" owner:self topLevelObjects:&topLevelObjects]){

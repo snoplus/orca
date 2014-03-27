@@ -39,7 +39,7 @@
 - (void)awakeFromNib
 {
     if(!portControlsContent){
-#if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_8
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
         if ([NSBundle loadNibNamed:@"OpSequence" owner:self]){
 #else
         if ([[NSBundle mainBundle] loadNibNamed:@"OpSequence" owner:self topLevelObjects:&topLevelObjects]){
