@@ -590,7 +590,12 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
                 }
                 else [self setIsRunning:NO];
             }
- 
+            else if([aString rangeOfString:@"NEUTRON SURVEY"].location!= NSNotFound){
+                //this means that the scalar run is done. We need to restart it
+                [self sendMode];
+                [self sendStart];
+            }
+
             else if([aString hasPrefix:@"discriminator:"]) [self setDiscriminator:[[aString substringFromIndex:14] intValue]];
             else if([aString hasPrefix:@"deadtime:"])      [self setDeadtime:[[aString substringFromIndex:9] intValue]];
             else if([aString hasPrefix:@"HV:"])            [self setHighVoltage:[[aString substringFromIndex:4] intValue]];
