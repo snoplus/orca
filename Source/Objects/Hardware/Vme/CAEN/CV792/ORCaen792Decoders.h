@@ -25,10 +25,12 @@
     BOOL                 getRatesFromDecodeStage;
     NSMutableDictionary* actualCards;
 }
+- (NSString*) dataKey;
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end
 
 @interface ORCAEN792NDecoderForQdc : ORCAEN792DecoderForQdc {
 }
+- (NSString*) dataKey;
 - (unsigned short) 	channel: (unsigned long) pDataValue;
 @end

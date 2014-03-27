@@ -44,13 +44,15 @@
     
 	NSString* crateKey = [self getCrateKey:crate];
 	NSString* cardKey  = [self getCardKey: card];
+    NSString* dataKey  = [self dataKey];
+    
     for( i = 2; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
 			int chan     = [self channel:ptr[i]];
 			NSString* channelKey  = [self getChannelKey: chan];
-			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:@"CAEN792 QDC",crateKey,cardKey,channelKey,nil];
+			[aDataSet histogram:qdcValue numBins:0xfff sender:self withKeys:dataKey,crateKey,cardKey,channelKey,nil];
 
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
@@ -108,7 +110,10 @@
 {
     return @"CAEN 792 QDC";
 }
-
+- (NSString*) dataKey
+{
+    return @"CAEN792 QDC";
+}
 @end
 
 @implementation ORCAEN792NDecoderForQdc
@@ -120,6 +125,10 @@
 - (NSString*) identifier
 {
     return @"CAEN 792N QDC";
+}
+- (NSString*) dataKey
+{
+    return @"CAEN792N QDC";
 }
 
 @end
