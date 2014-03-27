@@ -40,7 +40,7 @@
 -(id)	init
 {
     self = [super init];
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
     [NSBundle loadNibNamed:@"FFT" owner:self];
 #else
     [[NSBundle mainBundle] loadNibNamed:@"FFT" owner:self topLevelObjects:&topLevelObjects];

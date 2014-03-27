@@ -58,7 +58,7 @@
 - (void) awakeFromNib
 {		
 	if(!controlsContent){
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
         if ([NSBundle loadNibNamed:@"Pulser33500Chan" owner:self]){
 #else
         if ([[NSBundle mainBundle] loadNibNamed:@"Pulser33500Chan" owner:self topLevelObjects:&topLevelObjects]){

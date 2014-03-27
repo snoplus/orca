@@ -51,7 +51,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 -(id)	init
 {
     if( self = [super init] ){
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
         [NSBundle loadNibNamed:@"ORTask" owner:self];
 #else
         [[NSBundle mainBundle] loadNibNamed:@"ORTask" owner:self topLevelObjects:&topLevelObjects];
@@ -492,7 +492,7 @@ static NSString* ORTaskExpanded		= @"ORTaskExpanded";
 {
     self = [super init];
     
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
     [NSBundle loadNibNamed:@"ORTask" owner:self];
 #else
     [[NSBundle mainBundle] loadNibNamed:@"ORTask" owner:self topLevelObjects:&topLevelObjects];

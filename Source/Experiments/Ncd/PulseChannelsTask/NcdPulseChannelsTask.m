@@ -44,7 +44,7 @@ enum {
 -(id)	init
 {
     if( self = [super init] ){
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
         [NSBundle loadNibNamed:@"NcdPulseChannelsTask" owner:self];
 #else
         [[NSBundle mainBundle] loadNibNamed:@"NcdPulseChannelsTask" owner:self topLevelObjects:&ncdPulseChannelsTaskObjects];
@@ -429,7 +429,7 @@ enum {
 {
     self = [super initWithCoder:decoder];
     
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
     [NSBundle loadNibNamed:@"NcdPulseChannelsTask" owner:self];
 #else
     [[NSBundle mainBundle] loadNibNamed:@"NcdPulseChannelsTask" owner:self topLevelObjects:&ncdPulseChannelsTaskObjects];

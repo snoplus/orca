@@ -36,7 +36,7 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
 - (id) init
 {
     if ((self = [super init]) != nil){
-#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9
+#if !defined(MAC_OS_X_VERSION_10_9)
         if (![NSBundle loadNibNamed:@"SelectionView" owner:self]){
 #else
         if (![[NSBundle mainBundle] loadNibNamed:@"SelectionView" owner:self topLevelObjects:&topLevelObjects]){
