@@ -48,7 +48,7 @@
 			if(![aLine hasPrefix:@"--"]){
                 detectorIndex = [aLine intValue];
                 NSArray* parts = [aLine componentsSeparatedByString:@","];
-
+                if([parts count]<12)continue;
                 if(detectorIndex>=0 && detectorIndex < [segments count]){
                     NSString* loGainLine =   [NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@",
                                               [parts objectAtIndex:0],  //segment
@@ -153,7 +153,7 @@
         if(!headerDone){
             NSString* paramHeader = [loGainSeg paramHeader];
             paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kChannel" withString:@"kChanLo,kChanHi"];
-            paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kPreAmpChan" withString:@"kPreAmpLo,kPreAmpHi"];
+//            paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kPreAmpChan" withString:@"kPreAmpLo,kPreAmpHi"];
             
             [theContents appendString:paramHeader];
             headerDone = YES;

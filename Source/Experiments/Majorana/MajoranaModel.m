@@ -410,6 +410,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (BOOL) anyHvOnVMECrate:(int)aVmeCrate
 {
+    int removeMe;
+    return ignorePanicOnA;
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (detector group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil}; //will check for up to two HV crates (should just be one)
@@ -456,11 +458,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                 }
                 else {
                     [[hvCrateObj[hvCrate] cardInSlot:hvCard] removeHvConstraint:@"MJD Vac"];
-                    if(rampHVAlarm[aVmeCrate].isPosted){
-                        [rampHVAlarm[aVmeCrate] setAcknowledged:NO];
-                        [rampHVAlarm[aVmeCrate] clearAlarm];
-                    }
-
+                    [rampHVAlarm[aVmeCrate] setAcknowledged:NO];
                 }
             }
         }
@@ -838,7 +836,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] addOrCondition:  @"OKForHV"          value: @"0"];
     [[steps lastObject] addAndCondition: @"HVOn"             value: @"0"];
 
-	[[steps lastObject] setTitle:         @"Add Constraints"];
+	[[steps lastObject] setTitle:         @"Add HV Constraints"];
     [[steps lastObject] setOutputStateKey:@"AddedHVContraint"];
     //----------------------------------------------------------
 
@@ -853,7 +851,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] addAndCondition: @"vacSystemPingOK"  value: @"1"];
     [[steps lastObject] addAndCondition: @"OKForHV"          value: @"1"];
     
-	[[steps lastObject] setTitle:   @"Remove Constraints"];
+	[[steps lastObject] setTitle:   @"Remove HV Constraints"];
     //----------------------------------------------------------
 
 	return steps;
