@@ -225,7 +225,7 @@ bool ORMTCReadout::Stop()
 bool ORMTCReadout::UpdateStatus() {
     
     ensureDataCanHold(8);
-    int32_t   = dataIndex;
+    int32_t savedIndex = dataIndex;
     data[dataIndex++] = GetHardwareMask()[1] | 8;
     dataIndex++;
     
@@ -283,7 +283,7 @@ bool ORMTCReadout::UpdateStatus() {
     data[dataIndex++] = (long)err;
     
     LogError("hello...\n");
-    LogError("%i\n",err)
+    LogError("%i\n",err);
 
     return true;
 }
