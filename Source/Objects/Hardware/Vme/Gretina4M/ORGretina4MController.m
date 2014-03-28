@@ -393,6 +393,11 @@
                          name : ORVmeDiagnosticsEnabledChanged
 						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(histEMultiplierChanged:)
+                         name : ORGretina4MModelHistEMultiplierChanged
+						object: model];
+
     
 
 }
@@ -473,9 +478,15 @@
 	[self noiseWindowChanged:nil];
 	[self baselineRestoredDelayChanged:nil];
     [self diagnosticsEnabledChanged:nil];
+    
+	[self histEMultiplierChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) histEMultiplierChanged:(NSNotification*)aNote
+{
+	[histEMultiplierField setIntValue: [model histEMultiplier]];
+}
 - (void) diagnosticsEnabledChanged:(NSNotification*)aNote
 {
 	[diagnosticsEnabledCB setIntValue: [model diagnosticsEnabled]];
@@ -927,6 +938,7 @@
     [flatTopField       setEnabled:!lockedOrRunningMaintenance && !downloading];
     [postCountField     setEnabled:!lockedOrRunningMaintenance && !downloading];
     [preCountField      setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[histEMultiplierField setEnabled:!lockedOrRunningMaintenance && !downloading];
 
     [diagnosticsReportButton setEnabled:[model diagnosticsEnabled]];
     [diagnosticsClearButton  setEnabled:[model diagnosticsEnabled]];
@@ -1094,6 +1106,10 @@
 }
 
 #pragma mark •••Actions
+- (void) histEMultiplierAction:(id)sender
+{
+	[model setHistEMultiplier:[sender intValue]];
+}
 - (IBAction) diagnosticsClearAction:(id)sender
 {
     [model clearDiagnosticsReport];

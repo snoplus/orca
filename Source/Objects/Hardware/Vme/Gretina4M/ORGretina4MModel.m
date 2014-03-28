@@ -84,6 +84,7 @@ NSString* ORGretina4MTpolChanged                = @"ORGretina4MTpolChanged";
 NSString* ORGretina4MPresumEnabledChanged       = @"ORGretina4MPresumEnabledChanged";
 NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdChanged";
 NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
+NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultiplierChanged";
 
 @interface ORGretina4MModel (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -355,6 +356,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 #pragma mark ***Accessors
+- (short) histEMultiplier
+{
+    return histEMultiplier;
+}
+
+- (void) setHistEMultiplier:(short)aHistEMultiplier
+{
+    if(aHistEMultiplier<1)aHistEMultiplier=1;
+    else if(aHistEMultiplier>100)aHistEMultiplier = 100;
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistEMultiplier:histEMultiplier];
+    histEMultiplier = aHistEMultiplier;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelHistEMultiplierChanged object:self];
+}
 
 - (unsigned short) baselineRestoredDelay
 {
@@ -2178,7 +2192,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setPresumEnabled:withValue:) getMethod:@selector(presumEnabled:)];
     [a addObject:p];
-        
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Hist E Multiplier"];
+    [p setFormat:@"##0" upperLimit:100 lowerLimit:1 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHistEMultiplier:) getMethod:@selector(histEMultiplier)];
+    [a addObject:p];
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
@@ -2452,7 +2472,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
     [self setNoiseFloorIntegrationTime:	[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
     [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
-    
+    [self setHistEMultiplier:			[decoder decodeIntForKey:@"histEMultiplier"]];
+
     
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
     
@@ -2515,6 +2536,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeFloat:noiseFloorIntegrationTime	forKey:@"NoiseFloorIntegrationTime"];
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
+    [encoder encodeInt:histEMultiplier              forKey:@"histEMultiplier"];
+    
 	int i;
  	for(i=0;i<kNumGretina4MChannels;i++){
 		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
@@ -2568,7 +2591,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self addCurrentState:objDictionary cArray:postrecnt forKey:@"Postrecnt"];
 	[self addCurrentState:objDictionary cArray:tpol forKey:@"TPol"];
 	[self addCurrentState:objDictionary cArray:(short*)presumEnabled forKey:@"PreSum Enabled"];
-    
+
     NSMutableArray* ar = [NSMutableArray array];
     int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
@@ -2576,9 +2599,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
     [objDictionary setObject:ar forKey:@"LED Threshold"];
     [objDictionary setObject:ar forKey:@"TRAP Threshold"];
-    [objDictionary setObject:[NSNumber numberWithInt:downSample] forKey:@"Down Sample"];
-    [objDictionary setObject:[NSNumber numberWithInt:clockSource] forKey:@"Clock Source"];
-	
+    [objDictionary setObject:[NSNumber numberWithInt:downSample]        forKey:@"Down Sample"];
+    [objDictionary setObject:[NSNumber numberWithInt:clockSource]       forKey:@"Clock Source"];
+    [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier]   forKey:@"Hist E Multiplier"];
+
 	
     return objDictionary;
 }

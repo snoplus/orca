@@ -26,6 +26,7 @@
 #import "ORGretina4MModel.h"
 
 #define kIntegrateTimeKey @"Integration Time"
+#define kHistEMultiplierKey @"Hist E Multiplier"
 
 @implementation ORGretina4MWaveformDecoder
 - (id) init
@@ -45,6 +46,7 @@
 	[super registerNotifications];
 	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
 	[nc addObserver:self selector:@selector(integrateTimeChanged:) name:ORGretina4MCardInited object:nil];
+	[nc addObserver:self selector:@selector(histEMultiplierChanged:) name:ORGretina4MModelHistEMultiplierChanged object:nil];
 }
 
 - (void) integrateTimeChanged:(NSNotification*)aNote
@@ -55,11 +57,20 @@
 	[self setObject:[NSNumber numberWithInt:[theCard integrateTime]] forNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil];
 }
 
+- (void) histEMultiplierChanged:(NSNotification*)aNote
+{
+	ORGretina4MModel* theCard	= [aNote object];
+	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+	NSString* cardKey			= [self getCardKey: [theCard slot]];
+	[self setObject:[NSNumber numberWithInt:[theCard histEMultiplier]] forNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil];
+}
+
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
+		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
 	}
 	
     unsigned long* ptr = (unsigned long*)someData;
@@ -92,6 +103,9 @@
             NSString* crateKey	 = [self getCrateKey: crate];
             NSString* cardKey	 = [self getCardKey: card];
             NSString* channelKey = [self getChannelKey: channel];
+
+            int histEMultiplier = [[self objectForNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil] intValue];
+            if(histEMultiplier) energy *= histEMultiplier;
 
             int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
             if(integrateTime) energy /= integrateTime; 

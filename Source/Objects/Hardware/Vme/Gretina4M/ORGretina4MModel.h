@@ -218,6 +218,7 @@ enum Gretina4MFIFOStates {
     short           extTrigLength;
     short           collectionTime;
     short           integrateTime;
+    short			histEMultiplier;
 
     int             fifoState;
 	int				fifoEmptyCount;
@@ -277,6 +278,8 @@ enum Gretina4MFIFOStates {
 - (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (short) histEMultiplier;
+- (void) setHistEMultiplier:(short)aHistEMultiplier;
 - (unsigned short) baselineRestoredDelay;
 - (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay;
 - (NSString*) firmwareStatusString;
@@ -568,4 +571,5 @@ extern NSString* ORGretina4MPostrecntChanged;
 extern NSString* ORGretina4MTpolChanged;
 extern NSString* ORGretina4MPresumEnabledChanged;
 extern NSString* ORGretina4MEasySelectedChanged;
+extern NSString* ORGretina4MModelHistEMultiplierChanged;
 

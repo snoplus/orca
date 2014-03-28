@@ -130,6 +130,7 @@
     IBOutlet NSTextField*			preCountField;
     IBOutlet NSTextField*			postCountField;
     IBOutlet NSTextField*			flatTopField;
+	IBOutlet NSTextField*           histEMultiplierField;
 
     NSView *blankView;
     NSSize settingSize;
@@ -145,6 +146,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) histEMultiplierChanged:(NSNotification*)aNote;
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 - (void) noiseWindowChanged:(NSNotification*)aNote;
@@ -264,6 +266,7 @@
 - (IBAction) closeEasySetPanel:(id)sender;
 - (IBAction) selectAllInEasySet:(id)sender;
 - (IBAction) selectNoneInEasySet:(id)sender;
+- (IBAction) histEMultiplierAction:(id)sender;
 
 
 #pragma mark •••Data Source
