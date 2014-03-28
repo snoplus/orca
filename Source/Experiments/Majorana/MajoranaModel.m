@@ -410,8 +410,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (BOOL) anyHvOnVMECrate:(int)aVmeCrate
 {
-    int removeMe;
-    return ignorePanicOnA;
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (detector group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil}; //will check for up to two HV crates (should just be one)
