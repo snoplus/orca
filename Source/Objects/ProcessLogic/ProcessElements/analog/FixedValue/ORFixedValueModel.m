@@ -42,7 +42,10 @@ NSString* ORFixedValueLock              = @"ORFixedValueLock";
     if([fixedValue length]==0)return @"0";
     else return fixedValue;
 }
-
+- (void) setFloatValue:(float)aValue
+{
+    [self setFixedValue:[NSString stringWithFormat:@"%f",aValue]];
+}
 - (void) setFixedValue:(NSString*)aFixedValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFixedValue:fixedValue];

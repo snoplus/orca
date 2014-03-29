@@ -30,6 +30,7 @@
 #pragma mark ***Accessors
 - (NSString*) fixedValue;
 - (void) setFixedValue:(NSString*)aString;
+- (void) setFloatValue:(float)aValue;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
