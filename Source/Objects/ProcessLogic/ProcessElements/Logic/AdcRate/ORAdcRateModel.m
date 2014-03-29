@@ -189,18 +189,19 @@ NSString* ORAdcRatePassThruConnection           = @"ORAdcRatePassThruConnection"
     float sumXX = 0;
     int n = [buffer count];
     NSTimeInterval t1 = [[[buffer objectAtIndex:0] objectForKey:@"time"] timeIntervalSince1970];
+
     for(id pt in buffer){
         NSTimeInterval t2 = [[pt objectForKey:@"time"] timeIntervalSince1970];
         float x = t2-t1;
-        float y = [[pt objectForKey:@"val"]floatValue];
+        float  y = [[pt objectForKey:@"val"]  floatValue];
         sumX  += x;
         sumY  += y;
         sumXY += x*y;
         sumXX += x*x;
     }
-    
-    rate =  (sumX*sumY - n*sumXY) / (sumX*sumX - n*sumXX);
-    return rate;
+    float div = (n*sumXX - (sumX*sumX));
+    if(div==0)return 0;
+    else return (n*sumXY - sumX*sumY)/div;
 }
 
 #pragma mark ***Archival
