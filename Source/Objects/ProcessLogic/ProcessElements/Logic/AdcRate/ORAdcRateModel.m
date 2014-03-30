@@ -223,6 +223,13 @@ NSString* ORAdcRatePassThruConnection           = @"ORAdcRatePassThruConnection"
     [encoder encodeFloat:integrationTime    forKey:@"integrationTime"];
     [encoder encodeFloat:rateLimit          forKey:@"rateLimit"];
 }
+- (void) processIsStarting
+{
+    valid = NO;
+    [buffer release];
+    buffer = nil;
+    [super processIsStarting];
+}
 
 @end
 

@@ -47,6 +47,7 @@
 - (float) rate;
 - (void) adjustBufferLength;
 - (float) calculateRate;
+- (void) processIsStarting;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
