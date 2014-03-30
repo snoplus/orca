@@ -36,6 +36,9 @@
 
 - (void)setStringValue:(NSString *)aString
 {
+    if(!aString){
+        aString=@"";
+    }
     [super setStringValue:aString];
     [self startTimeOut];
 }
