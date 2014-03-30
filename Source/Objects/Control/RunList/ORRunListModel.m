@@ -359,6 +359,7 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 	NSMutableArray* tempArray = [NSMutableArray array];
 	int i=0;
 	for(id anItem in items){ 
+        #pragma unused(anItem)
 		[tempArray addObject:[NSNumber numberWithInt:i]];
 		i++;
 	}

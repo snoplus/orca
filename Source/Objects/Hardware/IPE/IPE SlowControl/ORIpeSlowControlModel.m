@@ -1965,8 +1965,10 @@ enum {
 	// paths are of the form "/server/database/group/item". Always the fourth level is the leaf node
 	int level = 0;
 	NSMutableArray* aNodeArray = itemTreeRoot;
-	for(id nodeName in pathComponents){
-		aNodeArray = [self insertNode:result 
+    for(id nodeName in pathComponents){
+        #pragma unused(nodeName)
+
+		aNodeArray = [self insertNode:result
 							intoArray:aNodeArray 
 								 path: aPath
 							 nodeName:[pathComponents objectAtIndex:level] 

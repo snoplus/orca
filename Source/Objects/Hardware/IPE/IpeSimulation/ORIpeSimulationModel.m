@@ -1373,7 +1373,8 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	int level = 0;
 	NSMutableArray* aNodeArray = itemTreeRoot;
 	for(id nodeName in pathComponents){
-		aNodeArray = [self insertNode:result 
+        #pragma unused(nodeName)
+		aNodeArray = [self insertNode:result
 							intoArray:aNodeArray 
 								 path: aPath
 							 nodeName:[pathComponents objectAtIndex:level] 

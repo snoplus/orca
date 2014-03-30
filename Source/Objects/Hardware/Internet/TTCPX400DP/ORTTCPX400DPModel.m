@@ -376,11 +376,6 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
 	[self linkToController:@"ORTTCPX400DPController"];
 }
 
-- (void) setSocket:(NetSocket *)socket
-{
-    // Overload to do nothing to protect the variable
-}
-
 - (void) setIpAddress:(NSString *)anIp
 {
     [[[self undoManager] prepareWithInvocationTarget:self] 
