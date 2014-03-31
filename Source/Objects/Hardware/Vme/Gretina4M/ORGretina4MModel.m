@@ -100,6 +100,7 @@ NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultipl
 - (void) copyFirmwareFileToSBC:(NSString*)firmwarePath;
 - (BOOL) controllerIsSBC;
 - (void) setFpgaDownProgress:(short)aFpgaDownProgress;
+- (void) loadFPGAUsingSBC;
 @end
 
 
