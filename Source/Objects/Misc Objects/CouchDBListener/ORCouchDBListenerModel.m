@@ -53,16 +53,16 @@ NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerMode
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
 
-@interface ORCouchDB (private)
+@interface ORCouchDBListenerModel (private)
 - (void) _uploadCmdDesignDocument;
 - (void) _fetchDocument:(NSString*)docName;
 - (void) _uploadCmdSection;
 - (void) _createCmdDict;
 - (void) _processCmdDocument:(NSDictionary*) doc;
 - (void) _uploadAllSections;
-- (void) statusDBRef;
-- (void) statusDBRef:(NSString*)db_name;
 - (BOOL) checkSyntax:(NSString*) key;
+- (ORCouchDB*) statusDBRef:(NSString*)db_name;
+- (ORCouchDB*) statusDBRef;
 @end
 
 @implementation ORCouchDBListenerModel (private)

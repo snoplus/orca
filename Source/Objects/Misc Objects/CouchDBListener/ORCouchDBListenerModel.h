@@ -19,7 +19,7 @@
 
 #pragma mark ***Imported Files
 @class ORScriptRunner;
-
+@class ORCouchDB;
 
 @interface ORCouchDBListenerModel : OrcaObject {
     
@@ -100,6 +100,7 @@
 - (void) startStopSession;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 - (void) listDatabases;
+- (void) sectionReady;
 
 #pragma mark ***Command Section
 - (void) updateObjectList;

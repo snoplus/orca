@@ -30,6 +30,7 @@
     NSArray*                    topLevelObjects;
 }
 
+- (void) allowedToRunChanged:(NSNotification*)aNote;
 - (void) stepsChanged:(NSNotification*)aNote;
 - (void) updateProgressDisplay:(OROpSequence*)aSeq;
 - (void) updateProgressDisplayChanged:(NSNotification*)aNote;;

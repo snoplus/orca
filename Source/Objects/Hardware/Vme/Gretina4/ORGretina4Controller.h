@@ -138,6 +138,7 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface Management
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 - (void) downSampleChanged:(NSNotification*)aNote;
 - (void) histEMultiplierChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
