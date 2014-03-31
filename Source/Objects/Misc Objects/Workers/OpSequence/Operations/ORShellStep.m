@@ -137,6 +137,7 @@
 	while (![self isCancelled] && taskHandler){
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                  beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
+        if ([self isCancelled])break;
 	}
 	
 	if ([self isCancelled])[taskHandler terminate];

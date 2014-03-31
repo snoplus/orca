@@ -138,8 +138,6 @@
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[terminationReceiver performSelector:terminationSelector withObject:self];
-	[terminationReceiver release];
-	terminationReceiver = nil;
 }
 
 - (void)terminatedNotification: (NSNotification *)notification
