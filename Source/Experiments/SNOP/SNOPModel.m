@@ -1150,7 +1150,7 @@ configDocument  = _configDocument;
     int numberFec32Cards = [fec32ControllerObjs count];
     
     //Iterate through all of the Fec32 Cards
-    for(int i=0;i<numberFec32Cards;i++){
+    for(i=0;i<numberFec32Cards;i++){
             
         ORFec32Model * aFec32Card = [fec32ControllerObjs objectAtIndex:i];
         
@@ -1164,7 +1164,8 @@ configDocument  = _configDocument;
         NSMutableDictionary * daughterCardIterator = [NSMutableDictionary dictionaryWithCapacity:20];
     
         //Get the Fec Daughter Cards associated with the actual
-        for(int j=0;j<kNumSNODaughterCards;j++){
+        int j;
+        for(j=0;j<kNumSNODaughterCards;j++){
             
             //Iterate through all the daughter
 			ORFecDaughterCardModel* dc = [[OROrderedObjManager for:aFec32Card] objectInSlot:j];
