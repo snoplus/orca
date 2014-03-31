@@ -907,7 +907,8 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     NSMutableDictionary * pmtOnlineArray = [NSMutableDictionary dictionaryWithCapacity:20];
     
     //Look to see which PMTs are online
-    for(int k=0;k<32;k++){
+    int k;
+    for(k=0;k<32;k++){
 		NSNumber * pmtState = [NSNumber numberWithBool:[self pmtOnline:k]];
         [pmtOnlineArray setObject:pmtState forKey:[NSString stringWithFormat:@"%i",k]];
     }
