@@ -605,7 +605,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 {
  	int i;
 	for(i=0;i<[self numberOfChannels];i++){
-        if([self isOn:i] && [self voltage:i]>10)return YES;
+        if([self isOn:i] || [self voltage:i]>10)return YES;
     }
     return NO;
 }
