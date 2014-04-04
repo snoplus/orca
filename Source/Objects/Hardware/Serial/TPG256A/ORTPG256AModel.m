@@ -624,7 +624,6 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
                              [NSString stringWithFormat:@"%.2E",pressure[3]], @"chan 3",
                              [NSString stringWithFormat:@"%.2E",pressure[4]], @"chan 4",
                              [NSString stringWithFormat:@"%.2E",pressure[5]], @"chan 5",
-                             [NSString stringWithFormat:@"%.2E",pressure[6]], @"chan 6",
                              [NSNumber numberWithInt:    pollTime],           @"pollTime",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
