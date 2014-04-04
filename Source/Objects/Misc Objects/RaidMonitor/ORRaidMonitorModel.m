@@ -19,6 +19,7 @@
 #pragma mark ***Imported Files
 #import "ORRaidMonitorModel.h"
 #import "ORFileGetterOp.h"
+#import "ORFileMoverOp.h"
 
 NSString* ORRaidMonitorModelResultDictionaryChanged = @"ORRaidMonitorModelResultDictionaryChanged";
 NSString* ORRaidMonitorModelLocalPathChanged    = @"ORRaidMonitorModelLocalPathChanged";
@@ -61,6 +62,8 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [dateFormatter release];
     [badDiskAlarm release];
     [dateConvertFormatter release];
+    [fileQueue cancelAllOperations];
+    [fileQueue release];
     [super dealloc];
 }
 
@@ -189,8 +192,52 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [encoder encodeObject:userName   forKey:@"userName"];
 }
 #pragma mark •••scp 
+- (void) shutdown
+{
+    //assumes that a cron job is running on the RAID system that is watching for a file to exist
+    //if it is found, it deletes the file and executes a shutdown -h now
+    if(!fileQueue){
+        fileQueue = [[NSOperationQueue alloc] init];
+        [fileQueue setMaxConcurrentOperationCount:1];
+        [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
+    }
+    
+    fileMover = [[ORFileMoverOp alloc] init];
+    
+    [fileMover setDelegate:self];
+    NSString* contents = @"Please Kill me now!!";
+    NSString* path = [@"~/shutmedown.tempfile" stringByExpandingTildeInPath];
+    [contents writeToFile:path atomically:NO encoding:NSASCIIStringEncoding error:nil];
+    
+    [fileMover setMoveParams:path
+                              to:@"~/shutmedown.tempfile"
+                      remoteHost:[self ipAddress]
+                        userName:[self userName]
+                    passWord:[self password]];
+    
+    [fileMover setVerbose:YES];
+    [fileMover doNotMoveFilesToSentFolder];
+    [fileMover setTransferType:eOpUseSCP];
+    [fileQueue addOperation:fileMover];
+}
+     
+- (void) fileMoverIsDone
+{
+    BOOL transferOK;
+    if ([[fileMover task] terminationStatus] == 0) {
+        NSLog(@"Transferred file: %@ to %@:~/shutmedown.tempfile\n",[fileMover fileName],[fileMover remoteHost]);
+        transferOK = YES;
+    }
+    else {
+        NSLogColor([NSColor redColor], @"Failed to transfer file to %@\n",[fileMover remoteHost]);
+        transferOK = YES;
+    }
+    
+    [fileMover release];
+    fileMover  = nil;
+}
 
--(void) getStatus
+- (void) getStatus
 {
     if(running)return;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
