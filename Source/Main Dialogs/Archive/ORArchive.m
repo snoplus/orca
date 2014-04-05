@@ -23,6 +23,7 @@
 #import "ORArchive.h"
 #import "SynthesizeSingleton.h"
 #import "ORTimedTextField.h"
+#import "NSApplication+Extensions.h"
 
 #define kOldBinaryPath @"~/OldOrcaBinaries"
 #define kFallBackDir @"FallBackConfigs"
@@ -36,22 +37,6 @@ NSString*  ArchiveLock = @"ArchiveLock";
 #pragma mark ¥¥¥Inialization
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
-+ (NSString*) binPath
-{
-    return appPath();
-}
-
-+ (BOOL) deploymentVersion
-{
-    NSString* binPath = appPath();
-    if([binPath rangeOfString:@"Deployment" options:NSCaseInsensitiveSearch].location != NSNotFound){
-        return YES;
-    }
-    else {
-        return NO;
-    }
-}
-
 -(id) init
 {
     self = [super initWithWindowNibName:@"Archive"];
@@ -84,6 +69,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	}
 }
 
+- (NSString*) binPath
+{
+    return appPath();
+}
+
+- (BOOL) deploymentVersion
+{
+    NSString* binPath = appPath();
+    if([binPath rangeOfString:@"Deployment" options:NSCaseInsensitiveSearch].location != NSNotFound){
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
                          change:(NSDictionary *)change context:(void *)context
 {
@@ -212,7 +212,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[aBuildOp release];
 	NSString* aPath;
     
-	if([ORArchive deploymentVersion])aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
+	if([[ORArchive sharedArchive] deploymentVersion])aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
     else aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
 	[self restart:aPath];
 }
@@ -558,21 +558,24 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 			}
 		}
 		
+
+   
 		NSTask* task = [[NSTask alloc] init];
         NSLog(@"Restarting: %@\n",binPath);
 		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
 		[task setLaunchPath: binPath];
+    
 		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"Kill", nil];
 		if(configFile){
 			arguments = [arguments arrayByAddingObjectsFromArray:[NSArray arrayWithObjects: @"-config",newLocation, nil]];
 		}
+        
 		[task setArguments: arguments];
 		
 		[delegate updateStatus:@"Relaunching"];
 		[task launch];
 		[task release];
-		[NSApp terminate:self]; 
-		
+		[NSApp terminate:self];
 	}
 	@catch(NSException* e){
 	}
@@ -653,8 +656,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 			NSTask* task = [[NSTask alloc] init];
 			NSString* thePath = [[srcPath stringByExpandingTildeInPath] stringByAppendingPathComponent:@"Orca"];
 			[task setCurrentDirectoryPath:thePath];
+            NSString* buildType;
+            if([delegate deploymentVersion]){
+                NSLog(@"Cleaning Deployment target\n");
+                buildType = @"Deployment";
+            }
+            else {
+                NSLog(@"Cleaning Development target\n");
+                buildType = @"Development";
+            }
+
 			[task setLaunchPath: @"/usr/bin/xcodebuild"];
-			NSArray* arguments = [NSArray arrayWithObjects: @"-alltargets",@"clean",
+			NSArray* arguments = [NSArray arrayWithObjects: @"-configuration",buildType,@"clean",
 								  nil];
 			
 			[task setArguments: arguments];
@@ -714,25 +727,29 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
 	@try {
 		if(srcPath){
+            NSString* currentAppPath = [appPath() stringByDeletingLastPathComponent];
 			NSTask* task = [[NSTask alloc] init];
 			NSString* thePath = [[srcPath stringByExpandingTildeInPath] stringByAppendingPathComponent:@"Orca"]; 
 			[task setCurrentDirectoryPath:thePath];
 			[task setLaunchPath: @"/usr/bin/xcodebuild"];
-            NSString* buidType;
+            NSString* buildType;
             if([delegate deploymentVersion]){
                 NSLog(@"Building Deployment target\n");
-                buidType = @"Deployment";
+                buildType = @"Deployment";
             }
             else {
                 NSLog(@"Building Development target\n");
-                buidType = @"Development";
+                buildType = @"Development";
             }
+            NSString* theBuildPath = [NSString stringWithFormat:@"%@/build/%@",thePath,buildType];
+            NSString* buildDir = [NSString stringWithFormat:@"CONFIGURATION_BUILD_DIR=%@/",theBuildPath];
 			NSArray* arguments = [NSArray arrayWithObjects: @"-configuration",
-								  buidType,
+								  buildType,
+                                  buildDir,
 								  nil];
 			
 			[task setArguments: arguments];
-			
+ 			
 			NSPipe* pipe = [NSPipe pipe];
 			[task setStandardOutput: pipe];
 			
@@ -747,7 +764,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				if(r.location != NSNotFound){
 					result = [result substringFromIndex:r.location];
 					[delegate updateStatus:@"Build Finished"];
-				}	
+                    if(![currentAppPath isEqualToString:theBuildPath]){
+                        NSError* theError;
+                        [[NSFileManager defaultManager] removeItemAtPath:[currentAppPath stringByDeletingLastPathComponent] error:&theError];
+                        if(theError){
+                            NSLog(@"Unable to remove Old Binary\n");
+                        }
+                     }
+				}
 				else {
 					NSRange r = [result rangeOfString:@"error:"];
 					if(r.location != NSNotFound){
@@ -756,7 +780,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 						[delegate updateStatus:@"Build Failed"];
 						[[delegate queue] cancelAllOperations];
 					}	
-					else [delegate updateStatus:@"Build Finished"];
+					else {
+                        [delegate updateStatus:@"Build Finished"];
+                        if(![currentAppPath isEqualToString:theBuildPath]){
+                            NSError* theError;
+                            [[NSFileManager defaultManager] removeItemAtPath:[currentAppPath stringByDeletingLastPathComponent] error:&theError];
+                            if(theError){
+                                NSLog(@"Unable to remove Old Binary\n");
+                            }
+
+                        }
+                   }
 				}
 
 				if([result length]) NSLog(@"build returned:\n%@", result);
