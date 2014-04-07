@@ -23,7 +23,6 @@
 #import "ORArchive.h"
 #import "SynthesizeSingleton.h"
 #import "ORTimedTextField.h"
-#import "NSApplication+Extensions.h"
 
 #define kOldBinaryPath @"~/OldOrcaBinaries"
 #define kFallBackDir @"FallBackConfigs"
