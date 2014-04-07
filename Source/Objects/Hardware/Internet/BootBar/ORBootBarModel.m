@@ -59,7 +59,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 {
     if([self aWake])return;
     [super wakeUp];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:17];
 }
 
 - (void) sleep
@@ -215,7 +215,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 	if(![self isBusy])[self getStatus];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:30];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:37];
     [self postCouchDBRecord];
 }
 
