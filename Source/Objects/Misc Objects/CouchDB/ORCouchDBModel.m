@@ -203,7 +203,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                      selector : @selector(alarmsChanged:)
                          name : ORAlarmWasPostedNotification
                        object : nil];	
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(alarmsChanged:)
+                         name : ORAlarmWasAcknowledgedNotification
+                       object : nil];
+    
     [notifyCenter addObserver : self
                      selector : @selector(alarmsChanged:)
                          name : ORAlarmWasClearedNotification
