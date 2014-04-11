@@ -477,17 +477,15 @@
 - (void) getxMin:(double*)aXMin xMax:(double*)aXMax;
 {
 	int n  = [dataSource numberPointsInPlot:self];
+    *aXMax = 0;
+    *aXMin = 0;
 	if(n!=0){
-		double minX = 9E9;
-		double maxX = -9E9;
 		int i;
-		BOOL gotOne = NO;
 		for (i=0; i<n; ++i) {
 			double xValue,yValue;
 			[dataSource plotter:self index:i x:&xValue y:&yValue];
 			if(yValue!=0){
-				minX = xValue;
-				gotOne = YES;
+				*aXMin = xValue;
 				break;
 			}
 		}
@@ -496,23 +494,10 @@
 			double xValue,yValue;
 			[dataSource plotter:self index:i x:&xValue y:&yValue];
 			if(yValue!=0){
-				maxX = xValue;
-				gotOne = YES;
+				*aXMax = xValue;
 				break;
 			}
 		}
-		if(gotOne){
-			*aXMin = minX;
-			*aXMax = maxX;
-		}
-		else {
-			*aXMin = 0;
-			*aXMax = 0;
-		}
-	}
-	else {
-		*aXMin = 0;
-		*aXMax = 0;
 	}
 }
 
