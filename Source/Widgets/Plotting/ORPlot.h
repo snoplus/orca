@@ -22,9 +22,13 @@
 
 @class ORPlotView;
 
-@interface NSObject (ORPlotDataSourceMethods)
+@protocol ORPlotDataSourceMethods
 - (int)   numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
+@end
+
+@protocol ORFastPlotDataSourceMethods
+- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
 @end
 
 #define kSymbolSize 10
