@@ -139,6 +139,7 @@ long roundToLong(double x);
 - (void) checkForCalibrationAdjustment;
 
 - (float) getPixAbsFast:(double)val log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
+- (NSData*) getManyPixAbsFast:(double*)val count:(NSUInteger)length log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
 - (float) getPixAbs:(double) val;		// convert absolute value to pixel position
 - (float) getPixRel:(double) val;		// convert relative value to pixel position
 
