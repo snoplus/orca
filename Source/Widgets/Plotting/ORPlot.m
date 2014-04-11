@@ -454,10 +454,26 @@
 - (void) getyMin:(double*)aYMin yMax:(double*)aYMax;
 {
 	int n  = [dataSource numberPointsInPlot:self];
-	if(n!=0){
-		double minY = 9E9;
-		double maxY = -9E9;
-
+    *aYMin = 0;
+    *aYMax = 0;
+	if(n==0) return;
+    double minY = 9E9;
+    double maxY = -9E9;
+    if ([dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
+        NSMutableData* xVals = [NSMutableData data];
+        NSMutableData* yVals = [NSMutableData data];
+        [dataSource plotter:self
+                 indexRange:NSMakeRange(0,n)
+                     stride:1
+                          x:xVals
+                          y:yVals];
+        NSUInteger i, total = [yVals length]/sizeof(*aYMax);
+        double* ptr = (double*)[yVals bytes];
+        for(i=0;i<total;i++) {
+			maxY = MAX(maxY,ptr[i]);
+			minY = MIN(minY,ptr[i]);
+        }
+    } else {
 		int i;
 		for (i=0; i<n; ++i) {
 			double xValue,yValue;
@@ -465,13 +481,9 @@
 			maxY = MAX(maxY,yValue);
 			minY = MIN(minY,yValue);
 		}
-		*aYMin = minY;
-		*aYMax = maxY;
-	}
-	else {
-		*aYMin = 0;
-		*aYMax = 0;
-	}
+    }
+    *aYMin = minY;
+    *aYMax = maxY;
 }
 
 - (void) getxMin:(double*)aXMin xMax:(double*)aXMax;
