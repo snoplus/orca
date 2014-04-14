@@ -836,8 +836,12 @@ configDocument  = _configDocument;
     [runDocDict setObject:@"" forKey:@"run_stop"];
 
     self.runDocument = runDocDict;
-    [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
-
+    
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
+    }
+    
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
     while ([timeout timeIntervalSinceNow] > 0 && ![self.runDocument objectForKey:@"_id"]) {
@@ -852,10 +856,15 @@ configDocument  = _configDocument;
         [runStartString setString:[self stringDateFromDate:runStart]];
     }
     [runDocDict setObject:@"in progress" forKey:@"run_status"];
+        
 
     //self.runDocument = runDocDict;
-    [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
-
+    
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
+    }
+    
     //Collect a series of objects from the ORMTCModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
@@ -1187,6 +1196,16 @@ configDocument  = _configDocument;
         
     }//end of looping through all the Fec32 Cards
     
+    //fetching the svn version used for this DAQ build 
+    NSFileManager* fm = [NSFileManager defaultManager];
+    NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+    NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
+    if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+    if([svnVersion hasSuffix:@"\n"]){
+        [svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+    }
+    
+    
     //Fill the configuration document with information
     [configDocDict setObject:@"configuration" forKey:@"doc_type"];
     [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
@@ -1195,6 +1214,8 @@ configDocument  = _configDocument;
      NSNumber * runNumberForConfig = [NSNumber numberWithUnsignedLong:[rc runNumber]];
     [configDocDict setObject:runNumberForConfig forKey:@"run_number"];
     
+    [configDocDict setObject:svnVersion forKey:@"daq_version_build"];
+    
     [configDocDict setObject:mtcArray forKey:@"mtc_info"];
     
     //this works but I'm not sure we need to see everything right now???
@@ -1202,7 +1223,11 @@ configDocument  = _configDocument;
     
     //add the configuration document
     self.configDocument = configDocDict;
-    [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
+    
+    //check to see if this is an offline run 
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
+    }
     //NSLog(@"Adding configuation file \n");
     
     //wait for main thread to receive acknowledgement from couchdb
@@ -1281,9 +1306,12 @@ configDocument  = _configDocument;
     //end of run xl3 logs
     //ellie
 
-    [[self orcaDbRef:self] updateDocument:runDocDict
-                               documentId:[runDocDict objectForKey:@"_id"]
-                                      tag:kOrcaRunDocumentUpdated];
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self orcaDbRef:self] updateDocument:runDocDict
+                                   documentId:[runDocDict objectForKey:@"_id"]
+                                          tag:kOrcaRunDocumentUpdated];
+    }
     
     [runDocPool release];
 }
