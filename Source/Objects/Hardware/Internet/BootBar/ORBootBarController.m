@@ -32,7 +32,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Boot Bar %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Boot Bar %lu (%@)",[model uniqueIdNumber],[model IPNumber]]];
 }
 
 - (void) registerNotificationObservers
@@ -164,6 +164,7 @@
 - (void) ipNumberChanged:(NSNotification*)aNote
 {
 	[ipNumberComboBox setStringValue:[model IPNumber]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Boot Bar %lu (%@)",[model uniqueIdNumber],[model IPNumber]]];
 }
 
 #pragma mark •••Actions

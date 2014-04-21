@@ -345,7 +345,6 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 				}
 			}
 		}
-		[self disconnect];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	}
 }
@@ -355,6 +354,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
     if(inNetSocket == socket){
 		
 		[self setIsConnected:NO];
+        [socket setDelegate:nil];
 		[socket autorelease];
 		socket = nil;
 		[self setPendingCmd:nil];
@@ -416,17 +416,17 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 - (void) sendCmd
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
-	[socket write:bytes length:[pendingCmd length]];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+    if([pendingCmd length]){
+        const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
+        [socket write:bytes length:[pendingCmd length]];
+    }
+    [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+
 }
-		 
+
 - (void) timeout
 {
-	if([self isConnected]){
-		[self disconnect];
-	}
-	else [self setPendingCmd:nil];
+    [self setPendingCmd:nil];
 }
 		 
 - (void) setPendingCmd:(NSString*)aCmd
