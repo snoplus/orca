@@ -216,34 +216,6 @@
 }
 
 #pragma mark ***CouchDB Checks
-- (BOOL) couchDBRunning
-{
-	BOOL couchDBRunning = NO;
-	@try {
-		NSTask* task = [[[NSTask alloc] init] autorelease];
-		[task setLaunchPath: @"/bin/ps"];
-		[task setArguments: [NSArray arrayWithObjects:@"-ef",nil]];
-		
-		NSPipe* pipe = [NSPipe pipe];
-		[task setStandardOutput: pipe];
-		
-		NSFileHandle* file = [pipe fileHandleForReading];
-		
-		[task launch];
-		NSData* data = [file readDataToEndOfFile];		
-		[task waitUntilExit];
-		
-
-		NSString* result = [[[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding] autorelease];
-		if([result rangeOfString:@"couchdb"].location != NSNotFound &&
-		   [result rangeOfString:@"erlang"].location != NSNotFound) {
-			couchDBRunning = YES;
-		}
-	}
-	@catch (NSException* e) {
-	}
-	return couchDBRunning;
-}
 
 @end
 
