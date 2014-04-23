@@ -84,6 +84,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) periodicCompact;
 - (void) updateDataSets;
 - (void) updateStatus;
+- (void) _cancelAllPeriodicOperations;
+- (void) _startAllPeriodicOperations;
 @end
 
 @implementation ORCouchDBModel
@@ -117,11 +119,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     if(![self aWake]){
         [self createDatabase];
-		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
-		[self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
-		[self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
-		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
-		[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
+        [self _startAllPeriodicOperations];
         [self registerNotificationObservers];
     }
     [super wakeUp];
@@ -130,7 +128,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) sleep
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self _cancelAllPeriodicOperations];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self deleteDatabase];
 	[super sleep];
@@ -291,13 +289,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) setKeepHistory:(BOOL)aKeepHistory
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setKeepHistory:keepHistory];
-	if([self couchRunning]){
-		keepHistory = aKeepHistory;
-		if(keepHistory){
-			[self createHistoryDatabase];
-		}
-	} 
-	else keepHistory=NO;
+    keepHistory = aKeepHistory;
+    if(keepHistory){
+        [self createHistoryDatabase];
+    }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelKeepHistoryChanged object:self];
 }
@@ -310,31 +305,17 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) setStealthMode:(BOOL)aStealthMode
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setStealthMode:stealthMode];
-	BOOL okToRun = [self couchRunning];
-	if(okToRun){
-		stealthMode = aStealthMode;
-		if(stealthMode){
-			if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
-			[self deleteDatabase];
-		}
-		else {
-			[self createDatabase];
-		}
-	}
+    stealthMode = aStealthMode;
+    if(stealthMode){
+        if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
+        [self _cancelAllPeriodicOperations];
+        [self deleteDatabase];
+    }
+    else {
+        [self createDatabase];
+        [self _startAllPeriodicOperations];
+    }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelStealthModeChanged object:self];
-}
-
-- (BOOL) couchRunning
-{
-	BOOL okToRun = YES;
-	ORCouchDB* couch = [[[ORCouchDB alloc] init] autorelease];
-	if(![couch couchDBRunning]){
-		NSBeep();
-		NSLogColor([NSColor redColor],@"It appears CouchDB is not running.\n");
-		okToRun = NO;
-	}
-	
-	return okToRun;
 }
 
 - (id) nextObject
@@ -1403,6 +1384,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 		
 		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
 	}
+}
+
+- (void) _cancelAllPeriodicOperations
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
+
+- (void) _startAllPeriodicOperations
+{
+    [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
+    [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
+    [self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
+    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
 }
 
 #pragma mark ***Archival
