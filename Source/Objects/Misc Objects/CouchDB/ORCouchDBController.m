@@ -296,7 +296,7 @@
                           self,
                           @selector(stealthActionDidEnd:returnCode:contextInfo:),
                           nil,
-                          nil,@"There will be NO values put in the database if you activate this option.");
+                          nil,@"There will be NO values automatically put in to the database if you activate this option.");
     }
     else [model setStealthMode:NO];
 }
