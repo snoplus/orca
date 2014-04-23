@@ -1556,16 +1556,16 @@
 		[self resizeWindowToSize:settingSize];
 		[[self window] setContentView:tabView];
     }
-    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+	else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:registerTabSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:rateSize];
 		[[self window] setContentView:tabView];
     }     
-	else if([tabView indexOfTabViewItem:tabViewItem] == 2){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:registerTabSize];
-		[[self window] setContentView:tabView];
-    }	
 	else if([tabView indexOfTabViewItem:tabViewItem] == 3){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:firmwareTabSize];
