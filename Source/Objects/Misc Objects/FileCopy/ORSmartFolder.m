@@ -72,7 +72,6 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [view removeFromSuperview];
-    [view release];
     [remoteHost release];
     [remotePath release];
     [remoteUserName release];
