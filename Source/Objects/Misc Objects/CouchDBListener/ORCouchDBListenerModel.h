@@ -50,7 +50,6 @@
     NSMutableArray* cmdTableArray;
     BOOL commonMethodsOnly;
     NSMutableDictionary* cmdDict;
-    NSString* lastRev;
     
     NSString* updatePath;
     
