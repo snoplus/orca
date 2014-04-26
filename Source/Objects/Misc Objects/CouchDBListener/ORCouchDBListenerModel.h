@@ -24,7 +24,7 @@
 @interface ORCouchDBListenerModel : OrcaObject {
     
     //Message Section
-    NSString* statusLogString;
+    NSMutableString* statusLogString;
     
     //CouchDB Configuration
     NSString* hostName;
@@ -68,6 +68,7 @@
 //Message Section
 - (NSString*) statusLog;
 - (void) setStatusLog:(NSString*)log;
+- (void) appendStatusLog:(NSString *)log;
 - (void) log:(NSString*)message;
 
 //CouchDb Config
@@ -127,6 +128,7 @@ extern NSString* ORCouchDBListenerModelListeningChanged;
 extern NSString* ORCouchDBListenerModelObjectListChanged;
 extern NSString* ORCouchDBListenerModelCommandsChanged;
 extern NSString* ORCouchDBListenerModelStatusLogChanged;
+extern NSString* ORCouchDBListenerModelStatusLogAppended;
 extern NSString* ORCouchDBListenerModelHostChanged;
 extern NSString* ORCouchDBListenerModelPortChanged;
 extern NSString* ORCouchDBListenerModelDatabaseChanged;

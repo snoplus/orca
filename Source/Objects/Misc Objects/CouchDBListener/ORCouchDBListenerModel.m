@@ -52,6 +52,7 @@ NSString* ORCouchDBListenerModelPasswordChanged            = @"ORCouchDBListener
 NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerModelListeningStatusChanged";
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
+NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerModelStatusLogAppended";
 
 @interface ORCouchDBListenerModel (private)
 - (void) _uploadCmdDesignDocument;
@@ -239,6 +240,7 @@ NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerMode
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [statusLogString release];
     [databaseName release];
     [userName release];
     [password release];
@@ -292,22 +294,32 @@ NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerMode
 #pragma mark ***Accessors
 - (NSString*) statusLog
 {
+    if (!statusLogString) return @"";
     return statusLogString;
 }
 
 - (void) setStatusLog:(NSString *)log
 {
-    @synchronized(self){
+    @synchronized(self) {
         [statusLogString release];
-        statusLogString=[log retain];
+        statusLogString = [[NSMutableString stringWithString:log] retain];
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelStatusLogChanged object:self];
+    }
+}
+
+- (void) appendStatusLog:(NSString *)log
+{
+    @synchronized(self){
+        if (!statusLogString) statusLogString = [[NSMutableString string] retain];
+        [statusLogString appendString:log];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelStatusLogAppended object:log];
     }
 }
 
 - (void) log:(NSString *)message
 {
     if(message){
-        [self setStatusLog:[[NSString stringWithFormat:@"%@: %@\n", [NSDate date], message] stringByAppendingString:statusLogString]];
+        [self appendStatusLog:[NSString stringWithFormat:@"%@: %@\n", [NSDate date], message]];
     }
 }
 

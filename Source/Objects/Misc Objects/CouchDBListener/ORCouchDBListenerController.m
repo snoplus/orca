@@ -78,6 +78,11 @@
                        object : nil];
     
     [notifyCenter addObserver : self
+                     selector : @selector(statusLogChanged:)
+                         name : ORCouchDBListenerModelStatusLogAppended
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(heartbeatChanged:)
                          name : ORCouchDBListenerModelHeartbeatChanged
                        object : nil];
@@ -150,7 +155,13 @@
 
 - (void) statusLogChanged:(NSNotification *)aNote
 {
-    [statusLog setString:[model statusLog]];
+    if ([[aNote name] isEqualToString:ORCouchDBListenerModelStatusLogAppended]) {
+        NSAttributedString* attr = [[NSAttributedString alloc] initWithString:[aNote object]];
+        [[statusLog textStorage] appendAttributedString:attr];
+        [statusLog scrollRangeToVisible:NSMakeRange([[statusLog string] length], 0)];
+    } else {
+        [statusLog setString:[model statusLog]];
+    }
 }
 
 - (void) hostChanged:(NSNotification *)aNote
