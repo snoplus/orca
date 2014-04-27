@@ -296,7 +296,24 @@
                 [request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
             }
         }
-        if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
+        if(aBody){
+            NSData* adat=nil;
+            @try {
+                adat = [[aBody yajl_JSONString]
+                        dataUsingEncoding:NSASCIIStringEncoding];
+            }
+            @catch (NSException *exc) {
+                NSLogColor([NSColor redColor],
+                           @"ORCouchDB JSON parse failure (%@), trying to continue"
+                           " by ignoring unknown types during the parse.\n",exc);
+                adat = [[aBody yajl_JSONStringWithOptions:YAJLGenOptionsIgnoreUnknownTypes
+                                                     indentString:@""]
+                                dataUsingEncoding:NSASCIIStringEncoding];
+            }
+            @finally {
+                if (adat) [request setHTTPBody:adat];
+            }
+        }
         [self _updateAuthentication:request];
         NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
         

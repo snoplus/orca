@@ -23,6 +23,7 @@
 #import "ORCouchDBListenerModel.h"
 #import "ORCouchDB.h"
 #import "NSNotifications+Extensions.h"
+#import <YAJL/NSObject+YAJL.h>
 
 @implementation ORCouchDBListenerController
 
@@ -380,7 +381,15 @@
     id returnVal = [NSNull null];
     if([model executeCommand:key value:nil returnVal:&returnVal]){
         [model log:[NSString stringWithFormat:@"successfully executed command with label '%@'", key]];
-        [model log:[NSString stringWithFormat:@"   received result: '%@'",returnVal]];
+
+        @try {
+            // See if we can parse it.
+            NSString* resultString = [returnVal yajl_JSONString];
+            [model log:[NSString stringWithFormat:@"   received and parsed result: '%@'",resultString]];
+        }
+        @catch (NSException *exception) {
+            [model log:[NSString stringWithFormat:@"   CANNOT parse result to JSON: '%@'",returnVal]];
+        }
     }
     else{
         [model log:[NSString stringWithFormat:@"execution of command '%@' failed", key]];
