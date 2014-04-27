@@ -377,8 +377,10 @@
 - (IBAction) testExecute:(id)sender
 {
     NSString* key=[[model commandAtIndex:[cmdTable selectedRow]] objectForKey:@"Label"];
-    if([model executeCommand:key value:nil]){
+    id returnVal = [NSNull null];
+    if([model executeCommand:key value:nil returnVal:&returnVal]){
         [model log:[NSString stringWithFormat:@"successfully executed command with label '%@'", key]];
+        [model log:[NSString stringWithFormat:@"   received result: '%@'",returnVal]];
     }
     else{
         [model log:[NSString stringWithFormat:@"execution of command '%@' failed", key]];

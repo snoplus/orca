@@ -104,7 +104,7 @@
 
 #pragma mark ***Command Section
 - (void) updateObjectList;
-- (BOOL) executeCommand:(NSString*)key value:(NSString*)val;
+- (BOOL) executeCommand:(NSString*)key value:(NSString*)val returnVal:(id*)retVal;
 - (void) setCommands:(NSMutableArray*)anArray;
 - (void) setDefaults;
 - (NSDictionary*) commandAtIndex:(int)index;

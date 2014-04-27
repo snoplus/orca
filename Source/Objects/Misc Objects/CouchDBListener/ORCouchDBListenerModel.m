@@ -62,6 +62,7 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
 - (void) _processCmdDocument:(NSDictionary*) doc;
 - (void) _uploadAllSections;
 - (BOOL) checkSyntax:(NSString*) key;
+- (id) _convertInvocationReturn:(NSInvocation*)inv;
 - (ORCouchDB*) statusDBRef:(NSString*)db_name;
 - (ORCouchDB*) statusDBRef;
 @end
@@ -138,6 +139,7 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
     } else {
         
         NSString* message;
+        id returnVal = [NSNull null];
         NSString* key=[doc valueForKey:@"execute"];
         NSString* val=[NSString stringWithFormat:@"%@",[doc valueForKey:@"arguments"]];
         
@@ -145,7 +147,7 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         
         if(cmd){
             if ([self checkSyntax:key]){
-                if([self executeCommand:key value:val]){
+                if([self executeCommand:key value:val returnVal:&returnVal]){
                     message=[NSString stringWithFormat:@"executed command with label '%@'",key];
                 }
                 else {
@@ -163,7 +165,9 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         NSMutableDictionary* returnDic = [NSMutableDictionary dictionaryWithDictionary:doc];
         [returnDic setObject:[NSDictionary dictionaryWithObjectsAndKeys:
                               message,@"content",
-                              [[NSDate date] description],@"timestamp",nil] forKey:@"response"];
+                              [[NSDate date] description],@"timestamp",
+                              returnVal,@"return",
+                              nil] forKey:@"response"];
         [[self statusDBRef] updateDocument:returnDic
                                 documentId:[returnDic objectForKey:@"_id"]
                                        tag:nil];
@@ -216,6 +220,41 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
 		}
 	}
 	return syntaxOK;
+}
+
+- (id) _convertInvocationReturn:(NSInvocation*)inv
+{
+    const char* the_type = [[inv methodSignature] methodReturnType];
+    if (strcmp(@encode(void),the_type) == 0) return [NSNull null];
+
+    NSUInteger returnLength = [[inv methodSignature] methodReturnLength];
+    NSMutableData* buffer = [NSMutableData dataWithCapacity:returnLength];
+    void* data = (void*)[buffer bytes];
+    [inv getReturnValue:data];
+
+    // Now deal with the type
+    // If it's just an object, return it.  Maybe it works...
+    if (strcmp(@encode(id),the_type) == 0) return *((id*) data);
+
+    // now handle C scalar types.  We don't bother with anything more complicated.
+#define HANDLE_NUMBER_TYPE(capAType, atype)        \
+if (strcmp(@encode(atype), the_type) == 0)     \
+{ return [NSNumber numberWith ## capAType:*((atype*) data)]; }
+
+    HANDLE_NUMBER_TYPE(Bool, BOOL)
+    HANDLE_NUMBER_TYPE(Double, double)
+    HANDLE_NUMBER_TYPE(Float, float)
+    HANDLE_NUMBER_TYPE(Char, char)
+    HANDLE_NUMBER_TYPE(Int, int)
+    HANDLE_NUMBER_TYPE(Long, long)
+    HANDLE_NUMBER_TYPE(LongLong, long long)
+    HANDLE_NUMBER_TYPE(Short, short)
+    HANDLE_NUMBER_TYPE(UnsignedChar, unsigned char)
+    HANDLE_NUMBER_TYPE(UnsignedInt, unsigned int)
+    HANDLE_NUMBER_TYPE(UnsignedLong, unsigned long)
+    HANDLE_NUMBER_TYPE(UnsignedLongLong, unsigned long long)
+    HANDLE_NUMBER_TYPE(UnsignedShort, unsigned short)
+    return [NSNull null];
 }
 
 @end
@@ -557,10 +596,11 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
     
 }
 
-- (BOOL) executeCommand:(NSString*) key value:(NSString*)val
+- (BOOL) executeCommand:(NSString*) key value:(NSString*)val returnVal:(id*)aReturn
 {
     [self _createCmdDict];
     BOOL goodToGo = NO;
+    *aReturn = [NSNull null];
 	id aCommand = [cmdDict objectForKey:key];
     if(aCommand){
 		NSString* objID = [aCommand objectForKey:@"Object"];
@@ -599,6 +639,7 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
 				[theInvocation performSelectorOnMainThread:@selector(invoke)
                                                 withObject:nil
                                              waitUntilDone:YES];
+                *aReturn = [self _convertInvocationReturn:theInvocation];
                 goodToGo = YES;
 			}
 			@catch(NSException* localException){
