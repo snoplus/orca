@@ -3111,6 +3111,7 @@
 		CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */ = {isa = PBXBuildFile; fileRef = CED29CFB1482B02200BD3AB2 /* SIS3302Generic.nib */; };
 		CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */; };
 		CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */; };
+		DB274E68190F0F55002F67BB /* resistor.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = DB274E67190F0F55002F67BB /* resistor.jpeg */; };
 		DB704A0F18EBA4D100839B42 /* ELLIEController.h in Headers */ = {isa = PBXBuildFile; fileRef = DB704A0D18EBA4D100839B42 /* ELLIEController.h */; };
 		DB704A1018EBA4D100839B42 /* ELLIEController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB704A0E18EBA4D100839B42 /* ELLIEController.m */; };
 		DB704A1318EBA4E100839B42 /* ELLIEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DB704A1118EBA4E100839B42 /* ELLIEModel.h */; };
@@ -6387,6 +6388,7 @@
 		CED29CFB1482B02200BD3AB2 /* SIS3302Generic.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3302Generic.nib; sourceTree = "<group>"; };
 		CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANSIEscapeHelper.h; sourceTree = "<group>"; };
 		CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANSIEscapeHelper.m; sourceTree = "<group>"; };
+		DB274E67190F0F55002F67BB /* resistor.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = resistor.jpeg; sourceTree = "<group>"; };
 		DB704A0D18EBA4D100839B42 /* ELLIEController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELLIEController.h; sourceTree = "<group>"; };
 		DB704A0E18EBA4D100839B42 /* ELLIEController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELLIEController.m; sourceTree = "<group>"; };
 		DB704A1118EBA4E100839B42 /* ELLIEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELLIEModel.h; sourceTree = "<group>"; };
@@ -13107,6 +13109,7 @@
 		DB9CA3CD190ECD7F00063A70 /* ResistorDB */ = {
 			isa = PBXGroup;
 			children = (
+				DB274E67190F0F55002F67BB /* resistor.jpeg */,
 				DB9CA3D4190ECF6000063A70 /* ResistorDBViewController.h */,
 				DB9CA3D5190ECF6000063A70 /* ResistorDBViewController.m */,
 				DB9CA3DA190ED05000063A70 /* ResistorDBWindow.xib */,
@@ -15672,6 +15675,7 @@
 				DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */,
 				DB704A1618EBA61E00839B42 /* ellie.xib in Resources */,
 				DB9CA3DB190ED05000063A70 /* ResistorDBWindow.xib in Resources */,
+				DB274E68190F0F55002F67BB /* resistor.jpeg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
