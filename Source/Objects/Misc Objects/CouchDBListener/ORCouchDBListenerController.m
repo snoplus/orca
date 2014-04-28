@@ -340,24 +340,7 @@
     NSString* val=[NSString stringWithString:[cmdValueField stringValue]];
     NSString* info=[NSString stringWithString:[cmdInfoField stringValue]];
     
-    if ([[model cmdDict] objectForKey:label]){
-        [model log:@"Error: key already in use"];
-    }
-    else{
-        [model addCommand];
-        NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[model commandCount]-1];
-        [cmdTable selectRowIndexes:indexSet byExtendingSelection:NO];
-        
-        id cmd = [model commandAtIndex:[indexSet firstIndex]-1];
-        
-        [cmd setValue:label forKey:@"Label"];
-        [cmd setValue:obj forKey:@"Object"];
-        [cmd setValue:sel forKey:@"Selector"];
-        [cmd setValue:val forKey:@"Value"];
-        [cmd setValue:info forKey:@"Info"];
-        
-        [self commandsChanged:nil];
-    }
+    [model addCommand:obj label:label selector:sel info:info value:val];
 }
 - (IBAction) cmdObjectSelected:(id)sender
 {

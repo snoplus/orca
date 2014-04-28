@@ -687,7 +687,6 @@ if (strcmp(@encode(atype), the_type) == 0)         \
 - (void) setDefaults
 {
     [self setCommands:[NSMutableArray array]];
-	[self addCommand];
 }
 
 - (NSDictionary*) commandAtIndex:(int)index
@@ -703,16 +702,33 @@ if (strcmp(@encode(atype), the_type) == 0)         \
 	return [cmdTableArray count];
 }
 
-- (void) addCommand
+- (void) addCommand:(NSString*)obj label:(NSString*)lab selector:(NSString*)sel info:(NSString*)info value:(NSString*)val
 {
-	[cmdTableArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-						 @"",@"Object",
-						 @"",@"Label",
-						 @"",@"Selector",
-						 @"",@"Info",
-						 nil]];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBListenerModelCommandsChanged object:self];
+    @try {
+        if ([[self cmdDict] objectForKey:lab]){
+            [NSException raise:@"ORCouchDBListerCommand"
+                        format:@"Key (%@) already in use",lab];
+        }
+        
+        NSMutableDictionary* adic = [NSMutableDictionary dictionaryWithObjectsAndKeys:obj,@"Object",
+                                     lab,@"Label",sel,@"Selector",info,@"Info",nil];
+        if(val && [val length] > 0) {
+            NSString* new_str = [val stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if ([new_str characterAtIndex:0] != '[' && [new_str characterAtIndex:[new_str length]-1] != ']') {
+                new_str = [NSString stringWithFormat:@"[%@]",new_str];
+            }
+            if (![[new_str yajl_JSON] isKindOfClass:[NSArray class]]) {
+                [NSException raise:@"ORCouchDBListerCommand"
+                            format:@"Value must be parsable array/list: (e.g. [ 1, 23.4 ] )"];
+            }
+            [adic setObject:new_str forKey:@"Value"];
+        }
+        [cmdTableArray addObject:adic];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBListenerModelCommandsChanged object:self];
+    } @catch (NSException* exc) {
+        [self log:[NSString stringWithFormat:@"Can't add command, exception: %@",[exc reason]]];
+    }
     
 }
 

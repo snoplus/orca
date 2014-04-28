@@ -109,7 +109,7 @@
 - (void) setDefaults;
 - (NSDictionary*) commandAtIndex:(int)index;
 - (NSUInteger) commandCount;
-- (void) addCommand;
+- (void) addCommand:(NSString*)obj label:(NSString*)lab selector:(NSString*)sel info:(NSString*)info value:(NSString*)val;
 - (void) removeCommand:(int)index;
 //DB Interaction
 
