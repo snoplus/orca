@@ -1137,7 +1137,7 @@
 																<string key="NSFrame">{{67, 14}, {283, 66}}</string>
 																<reference key="NSSuperview" ref="673678192"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="94509676"/>
+																<reference key="NSNextKeyView" ref="536526947"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="750645799">
 																	<int key="NSCellFlags">-1805647871</int>
@@ -1182,12 +1182,12 @@
 																<string key="NSFrame">{{371, 97}, {127, 17}}</string>
 																<reference key="NSSuperview" ref="673678192"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="199063491"/>
+																<reference key="NSNextKeyView" ref="94509676"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="318272251">
 																	<int key="NSCellFlags">68157504</int>
 																	<int key="NSCellFlags2">272630784</int>
-																	<string key="NSContents">$1 -&gt; default value</string>
+																	<string key="NSContents">Static arguments:</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="536526947"/>
 																	<reference key="NSBackgroundColor" ref="328053030"/>
@@ -1342,7 +1342,7 @@
 																<string key="NSFrame">{{67, 92}, {286, 26}}</string>
 																<reference key="NSSuperview" ref="673678192"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="536526947"/>
+																<reference key="NSNextKeyView" ref="199063491"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSComboBoxCell" key="NSCell" id="652674851">
 																	<int key="NSCellFlags">342884417</int>
