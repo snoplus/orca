@@ -379,7 +379,7 @@
 {
     NSString* key=[[model commandAtIndex:[cmdTable selectedRow]] objectForKey:@"Label"];
     id returnVal = [NSNull null];
-    if([model executeCommand:key value:nil returnVal:&returnVal]){
+    if([model executeCommand:key arguments:nil returnVal:&returnVal]){
         [model log:[NSString stringWithFormat:@"successfully executed command with label '%@'", key]];
 
         @try {

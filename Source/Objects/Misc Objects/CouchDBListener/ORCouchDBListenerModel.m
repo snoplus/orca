@@ -141,13 +141,13 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         NSString* message;
         id returnVal = [NSNull null];
         NSString* key=[doc valueForKey:@"execute"];
-        NSString* val=[NSString stringWithFormat:@"%@",[doc valueForKey:@"arguments"]];
+        id val=[doc valueForKey:@"arguments"];
         
         NSDictionary* cmd=[cmdDict objectForKey:key];
         
         if(cmd){
             if ([self checkSyntax:key]){
-                if([self executeCommand:key value:val returnVal:&returnVal]){
+                if([self executeCommand:key arguments:val returnVal:&returnVal]){
                     message=[NSString stringWithFormat:@"executed command with label '%@'",key];
                 }
                 else {
@@ -596,7 +596,7 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     
 }
 
-- (BOOL) executeCommand:(NSString*) key value:(NSString*)val returnVal:(id*)aReturn
+- (BOOL) executeCommand:(NSString*) key arguments:(NSArray*)val returnVal:(id*)aReturn
 {
     [self _createCmdDict];
     BOOL goodToGo = NO;
@@ -608,32 +608,57 @@ if (strcmp(@encode(atype), the_type) == 0)     \
 		if(obj){
 			@try {
 				NSMutableString* setterString	= [[[aCommand objectForKey:@"Selector"] mutableCopy] autorelease];
-                NSDecimalNumber* theValue;
-                if (val){
-                    theValue = [NSDecimalNumber decimalNumberWithString:val];
-                }
-				else {
-                    theValue   = [NSDecimalNumber decimalNumberWithString:[aCommand objectForKey:@"Value"]];
+                
+                NSArray* theValue = (val) ? val : [[aCommand objectForKey:@"Value"] yajl_JSON];
+                if (theValue && ![theValue isKindOfClass:[NSArray class]]) {
+                    [NSException raise:@"Invalid arguments"
+                                format:@"Arguments must be an array (e.g. [1, 2.3]) of arguments"];
                 }
 				SEL theSetterSelector			= [NSInvocation makeSelectorFromString:setterString];
 				
 				//do the setter
 				NSMethodSignature*	theSignature	= [obj methodSignatureForSelector:theSetterSelector];
 				NSInvocation*		theInvocation	= [NSInvocation invocationWithMethodSignature:theSignature];
-				NSArray*			selectorItems	= [NSInvocation argumentsListFromSelector:setterString];
 				
 				[theInvocation setSelector:theSetterSelector];
 				int n = [theSignature numberOfArguments];
 				int i;
-				int count=0;
-				for(i=1;i<n;i+=2){
-					if(i<[selectorItems count]){
-						id theArg = [selectorItems objectAtIndex:i];
-						if([theArg isEqualToString:@"$1"]){
-							theArg = theValue;
-						}
-						[theInvocation setArgument:count++ to:theArg];
-					}
+                if ((n-2) != [theValue count]) {
+                    [NSException raise:@"ORCouchDBListenerInvalidArguments"
+                                format:@"Invalid argument number: (%i) seen, (%i) needed",[theValue count],(n-2)];
+                }
+				for(i=2;i<n;i++){
+                    id o = [theValue objectAtIndex:i-2];
+                    const char* the_type = [theSignature getArgumentTypeAtIndex:i];
+                    if (strcmp(@encode(id), the_type)==0) {
+                        // It's expects an object, just try to pass it in.
+                        [theInvocation setArgument:&o atIndex:i];
+                    } else {
+                        // Try to deal with numbers
+                        if (![o isKindOfClass:[NSNumber class]]) {
+                            [NSException raise:@"ORCouchDBListenerInvalidArguments"
+                                        format:@"Can only handle NSNumber type, seen (%@)",[o class]];
+                        }
+#define HANDLE_NUMBER_ARG(capAType, atype)        \
+if (strcmp(@encode(atype), the_type) == 0)         \
+{ atype tmp = [o capAType ## Value]; [theInvocation setArgument:&tmp atIndex:i]; continue; }
+                      
+                        HANDLE_NUMBER_ARG(bool, BOOL)
+                        HANDLE_NUMBER_ARG(double, double)
+                        HANDLE_NUMBER_ARG(float, float)
+                        HANDLE_NUMBER_ARG(int, int)
+                        HANDLE_NUMBER_ARG(double, double)
+                        HANDLE_NUMBER_ARG(long, long)
+                        HANDLE_NUMBER_ARG(longLong, long long)
+                        HANDLE_NUMBER_ARG(short, short)
+                        HANDLE_NUMBER_ARG(unsignedChar, unsigned char)
+                        HANDLE_NUMBER_ARG(unsignedInt, unsigned int)
+                        HANDLE_NUMBER_ARG(unsignedLong, unsigned long)
+                        HANDLE_NUMBER_ARG(unsignedLongLong, unsigned long)
+                        HANDLE_NUMBER_ARG(unsignedShort, unsigned short)
+                        [NSException raise:@"ORCouchDBListenerInvalidArguments"
+                                    format:@"Found invalid requested number type as argument(%s)?!",the_type];
+                    }
 				}
 				[theInvocation setTarget:obj];
 				[theInvocation performSelectorOnMainThread:@selector(invoke)
