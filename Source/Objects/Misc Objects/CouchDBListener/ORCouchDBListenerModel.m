@@ -144,11 +144,12 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         id val=[doc valueForKey:@"arguments"];
         
         NSDictionary* cmd=[cmdDict objectForKey:key];
-        
+        BOOL ok = NO;
         if(cmd){
             if ([self checkSyntax:key]){
                 if([self executeCommand:key arguments:val returnVal:&returnVal]){
                     message=[NSString stringWithFormat:@"executed command with label '%@'",key];
+                    ok = YES;
                 }
                 else {
                     message=@"failure while trying to execute";
@@ -163,11 +164,11 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         }
         [self log:message];
         NSMutableDictionary* returnDic = [NSMutableDictionary dictionaryWithDictionary:doc];
-        [returnDic setObject:[NSDictionary dictionaryWithObjectsAndKeys:
-                              message,@"content",
-                              [[NSDate date] description],@"timestamp",
-                              returnVal,@"return",
-                              nil] forKey:@"response"];
+        NSMutableDictionary* response = [NSMutableDictionary dictionaryWithObjectsAndKeys:message,@"content",
+                                         [[NSDate date] description],@"timestamp",returnVal,@"return",
+                                         nil];
+        if (ok) [response setObject:[NSNumber numberWithBool:ok] forKey:@"ok"];
+        [returnDic setObject:response forKey:@"response"];
         [[self statusDBRef] updateDocument:returnDic
                                 documentId:[returnDic objectForKey:@"_id"]
                                        tag:nil];
