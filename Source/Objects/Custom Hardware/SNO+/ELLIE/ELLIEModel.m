@@ -352,20 +352,21 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     //NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     //ORRunModel* theRunModel = [objs2 objectAtIndex:0];
     
-    [runControl release];
-    runControl = nil;
-    NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if([anArray count])runControl = [[anArray objectAtIndex:0] retain];
+    //[runControl release];
+    //runControl = nil;
+    //NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    //if([anArray count])runControl = [[anArray objectAtIndex:0] retain];
     
     //get the run controller
-    //NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunController")];
-    //ORRunController* theRunController = [objs3 objectAtIndex:0];
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    [runControl startRun];
     
     //[theRunController startRunAction:nil];
     
     //startRunAction:(id)sender
     //[theRunModel performSelector:@selector(startRun) withObject:nil afterDelay:.1];
-    [runControl startRun];
+    //[runControl startRun];
     
     /*if ([theRunModel isRunning]) {
         [theRunModel stopRun];
@@ -467,7 +468,11 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     NSLog(@"Returning SMELLIE into Safe States after finishing a Run\n");
     [self setSmellieSafeStates];
     
-    [runControl haltRun];
+    //[runControl haltRun];
+    
+    [runControl stopRun];
+    
+    //[runControl haltRun];
     
 }
 
@@ -476,8 +481,10 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     //Even though this is stopping in Orca it can still contine on SNODROP!
     //Need a stop run command here
     //TODO: add a try and except statement here
-    
-    
+    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    [theMTCModel stopMTCPedestalsFixedRate];
+    //[runControl haltRun];
     //TODO: Send stop smellie run notification 
     NSLog(@"Stopping SMELLIE Run\n");
 }
