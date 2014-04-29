@@ -567,6 +567,7 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
+    [smellieCheckInterlock setEnabled:NO];
     
     //start different sub runs as the laser runs through
     //communicate with smellie model
@@ -591,6 +592,7 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:YES];
     [smellieStartRunButton setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
+    [smellieCheckInterlock setEnabled:YES];
    
   
     

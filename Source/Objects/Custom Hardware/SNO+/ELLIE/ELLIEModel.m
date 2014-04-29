@@ -315,7 +315,7 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     NSLog(@"Starting SMELLIE Run\n");
     
     NSLog(@"Setting SMELLIE into Safe States before starting a Run\n");
-    [self setSmellieSafeStates];
+    //[self setSmellieSafeStates];
     
     //Extract the number of intensity steps
     NSNumber * numIntStepsObj = [smellieSettings objectForKey:@"num_intensity_steps"];
@@ -349,8 +349,14 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     
     
     //start an actual run here
-    //NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    //ORRunModel* theRunModel = [objs2 objectAtIndex:0];
+    //NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunController")];
+    //theRunController = [objs2 objectAtIndex:0];
+    /*[theRunController release];
+    theRunController = nil;
+    NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunController")];
+    theRunController = [objs2 objectAtIndex:0];
+    [theRunController startRunAction:nil];*/
+    
     
     //[runControl release];
     //runControl = nil;
@@ -362,11 +368,11 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     runControl = [objs3 objectAtIndex:0];
     
     //check to see if the document has been posted to the database otherwise start this
-    if([[runControl document] isDocumentEdited]){
+    /*if([[runControl document] isDocumentEdited]){
 		[[runControl document] afterSaveDo:@selector(startRun) withTarget:self];
         [[runControl document] saveDocument:nil];
     }
-	else [runControl startRun];
+	else [runControl startRun];*/
     
     //[theRunController startRunAction:nil];
     
@@ -476,12 +482,12 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     
     //[runControl haltRun];
     
-    if([runControl isRunning]){
+    /*if([runControl isRunning]){
         [runControl stopRun];
         //[self endEditing];
         //[statusField setStringValue:[self getStoppingString]];
         //[runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-    }
+    }*/
     //[runControl haltRun];
     
 }

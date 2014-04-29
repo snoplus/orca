@@ -11,12 +11,14 @@
 
 @class ORCouchDB;
 @class ORRunModel;
+@class ORRunController;
 
 @interface ELLIEModel :  OrcaObject{
     NSMutableDictionary* smellieRunSettings;
     NSTask* exampleTask;
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
+    ORRunController* theRunController;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
