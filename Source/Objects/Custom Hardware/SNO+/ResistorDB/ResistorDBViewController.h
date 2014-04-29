@@ -12,4 +12,9 @@
     
 }
 
+-(id)init;
+-(void)dealloc;
+-(void) updateWindow;
+-(void) registerNotificationObservers;
+
 @end
