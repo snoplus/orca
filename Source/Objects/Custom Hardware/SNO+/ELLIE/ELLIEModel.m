@@ -360,7 +360,13 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     //get the run controller
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
-    [runControl startRun];
+    
+    //check to see if the document has been posted to the database otherwise start this
+    if([[runControl document] isDocumentEdited]){
+		[[runControl document] afterSaveDo:@selector(startRun) withTarget:self];
+        [[runControl document] saveDocument:nil];
+    }
+	else [runControl startRun];
     
     //[theRunController startRunAction:nil];
     
@@ -472,6 +478,9 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     
     if([runControl isRunning]){
         [runControl stopRun];
+        //[self endEditing];
+        //[statusField setStringValue:[self getStoppingString]];
+        //[runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
     }
     //[runControl haltRun];
     
