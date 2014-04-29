@@ -25,6 +25,8 @@
 #import "SNOPModel.h"
 #import "ORRunModel.h"
 #import "SNOPController.h"
+#import "ORMTCModel.h"
+#import "ORRunController.h"
 
 //tags to define that an ELLIE run file has been updated
 #define kSmellieRunDocumentAdded   @"kSmellieRunDocumentAdded"
@@ -340,6 +342,52 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     [fibreArray addObject:[smellieSettings objectForKey:@"FS055"] ];
     [fibreArray addObject:[smellieSettings objectForKey:@"FS155"] ];
     [fibreArray addObject:[smellieSettings objectForKey:@"FS255"] ];
+    
+    //get the MTC Object
+    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    
+    
+    //start an actual run here
+    //NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    //ORRunModel* theRunModel = [objs2 objectAtIndex:0];
+    
+    [runControl release];
+    runControl = nil;
+    NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if([anArray count])runControl = [[anArray objectAtIndex:0] retain];
+    
+    //get the run controller
+    //NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunController")];
+    //ORRunController* theRunController = [objs3 objectAtIndex:0];
+    
+    //[theRunController startRunAction:nil];
+    
+    //startRunAction:(id)sender
+    //[theRunModel performSelector:@selector(startRun) withObject:nil afterDelay:.1];
+    [runControl startRun];
+    
+    /*if ([theRunModel isRunning]) {
+        [theRunModel stopRun];
+        waituntil (![theRunModel isRunning], 60);
+    }
+    
+    [theRunModel startRun];
+    waituntil(([theRunModel elapsedRunTime] > 1), 10);*/
+    
+    //if ([theRunModel isRunning]) {
+    //    [theRunModel stopRun];
+    //}
+    
+    //[theRunModel startRun];
+    //[NSThread sleepForTimeInterval:10.0f]; //give the run plenty of time to start
+    
+    //NSLog(@"Run State: %@",[theRunModel runningState]);
+    
+    //if running in slave mode fire some pedestals
+    
+    //fire some pedestals
+    [theMTCModel fireMTCPedestalsFixedRate];
  
     ///Loop through each Laser
     for(int laserLoopInt = 0;laserLoopInt < [laserArray count];laserLoopInt++){
@@ -351,16 +399,20 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
         
         //TODO:Read in the configuration Map
         
-        if([[[laserArray objectAtIndex:laserLoopInt] key] isEqualToString:@"375nm_laser_on"]){
-            [self setLaserSwitch:@"1"]; //whichever channel the 375 is connected to 
+        
+        //NSLog(@"%@",[[laserArray objectAtIndex:laserLoopInt] key]);
+        
+        if(laserLoopInt == 0){
+            //Current unconnected for repair
+            //[self setLaserSwitch:@"1"]; //whichever channel the 375 is connected to
         }
-        else if ([[[laserArray objectAtIndex:laserLoopInt] key] isEqualToString:@"405nm_laser_on"]){
+        else if (laserLoopInt == 1){
             [self setLaserSwitch:@"2"]; //whichever channel the 405 is connected to 
         }
-        else if ([[[laserArray objectAtIndex:laserLoopInt] key] isEqualToString:@"440nm_laser_on"]){
+        else if (laserLoopInt == 2){
             [self setLaserSwitch:@"3"]; //whichever channel the 440 is connected to
         }
-        else if ([[[laserArray objectAtIndex:laserLoopInt] key] isEqualToString:@"500nm_laser_on"]){
+        else if (laserLoopInt == 3){
             [self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
         }
         else{
@@ -382,11 +434,22 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
             //Loop through each intensity of a SMELLIE run 
             for(int intensityLoopInt =0;intensityLoopInt < numIntSteps; intensityLoopInt++){
             
-                //TODO: Listen for the stop smellie run notification 
+                //Start a new subrun
+                //[theRunModel startNewSubRun];
+                
+                
+                [self setLaserSoftLockOff];
+                
+                
+                //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
+                //[NSThread sleepForTimeInterval:2.0f];
+                
                 //Call the smellie system here 
                 NSLog(@" Laser:%@ ", [laserArray objectAtIndex:laserLoopInt]);
-                NSLog(@" Fibre:%@ ",[fibreArray objectAtIndex:fibreLoopInt]);
-                NSLog(@" Intensity:%i \n'",intensityLoopInt);
+                //NSLog(@" Fibre:%@ ",[fibreArray objectAtIndex:fibreLoopInt]);
+                NSLog(@" Intensity:%i \n",intensityLoopInt);
+                [self setLaserSoftLockOn];
+                
                 
             }//end of looping through each intensity setting on the smellie laser
             
@@ -394,26 +457,17 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
         
     }//end of looping through each laser
     
-    //actually start a rin with arguments
-    
-    /*NSMutableArray * smellieSubRun = [[NSMutableArray alloc] init];
-    [smellieSubRun addObject:@"2"]; //laser channel
-    [smellieSubRun addObject:@"0"]; //fibre channel
-    [smellieSubRun addObject:@"100"]; //laser intensity
-    [smellieSubRun addObject:@"100"]; //number of pulses
-    [smellieSubRun addObject:@"100"]; //pulse frequency
-    
-    NSLog(@"smellieSubRunParams: %@",smellieSubRun);*/
-    
-    //NSString *arg1 = [NSString stringWithFormat:@"%@%@%@%@%@", @"2", @"0",@"100",@"100",@"100"];
-    
-    //NSArray *args = [NSArray arrayWithObjects:arg1,nil];
-    
-    //NSLog(@"%@",[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/orcaSmellieRun.py" withCmdLineArgs:nil]);
+    //End the run
     
     //[smellieSubRun release];
     [fibreArray release];
     [laserArray release];
+    
+    [theMTCModel stopMTCPedestalsFixedRate];
+    NSLog(@"Returning SMELLIE into Safe States after finishing a Run\n");
+    [self setSmellieSafeStates];
+    
+    [runControl haltRun];
     
 }
 
