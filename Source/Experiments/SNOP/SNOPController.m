@@ -566,6 +566,7 @@ smellieRunFile;
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
+    [smellieStartRunButton setEnabled:NO];
     
     //start different sub runs as the laser runs through
     //communicate with smellie model
@@ -589,6 +590,7 @@ smellieRunFile;
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
     [smellieStartRunButton setEnabled:YES];
+    [smellieStopRunButton setEnabled:NO];
    
   
     
@@ -607,7 +609,7 @@ smellieRunFile;
     
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];
-    [smellieStopRunButton setEnabled:NO];
+    
     
     //[theELLIEModel release];
     

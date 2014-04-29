@@ -470,8 +470,9 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     
     //[runControl haltRun];
     
-    [runControl stopRun];
-    
+    if([runControl isRunning]){
+        [runControl stopRun];
+    }
     //[runControl haltRun];
     
 }
