@@ -366,7 +366,6 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 values = parts;
                 if(headerNames){
                     if(!valueDictionary)self.valueDictionary = [NSMutableDictionary dictionary];
-                    [self setDataValid:YES];
 
                     int i;
                     for(i=0;i<numParts;i++){
@@ -375,7 +374,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                         key = [key stringByReplacingOccurrencesOfString:@"%" withString:@""];
                        [valueDictionary setObject:[values objectAtIndex:i] forKey:key];
                     }
-
+                    [self setDataValid:YES];
                 }
                 break;
             }
