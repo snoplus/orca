@@ -60,6 +60,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [dataInValidAlarm clearAlarm];
     [dataInValidAlarm release];
+    [powerOutAlarm clearAlarm];
+    [powerOutAlarm release];
     
     int i;
     for(i=0;i<8;i++){
@@ -205,6 +207,33 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 [dataInValidAlarm setSticky:YES];
             }
             [dataInValidAlarm postAlarm];
+        }
+    }
+    if(dataValid){
+        float Vin1 = [[self valueForPowerPhase:1  powerTableIndex:0] floatValue];
+        float Vin2 = [[self valueForPowerPhase:2  powerTableIndex:0] floatValue];
+        float Vin3 = [[self valueForPowerPhase:3  powerTableIndex:0] floatValue];
+        float bat  = [[self valueForBattery:0 batteryTableIndex:0] intValue];
+        if((Vin1<110) || (Vin2<110) || (Vin3<110)){
+            if(!powerOutAlarm){
+                powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
+                [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
+                [powerOutAlarm setSticky:YES];
+                [powerOutAlarm postAlarm];
+            }
+            if(lastBatteryValue != bat){
+                NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
+                lastBatteryValue = bat;
+            }
+        }
+        else {
+            if([powerOutAlarm isPosted]){
+                [powerOutAlarm clearAlarm];
+                [powerOutAlarm release];
+                powerOutAlarm = nil;
+                lastBatteryValue = 0;
+                NSLog(@"The Main Davis UPS is restored. Battery capacity is now %.0f%%\n",bat);
+            }
         }
     }
 }

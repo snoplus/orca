@@ -43,9 +43,10 @@
     ORTimeRate*          timeRate[8];
     BOOL                 dataValid;
     ORAlarm*             dataInValidAlarm;
+    ORAlarm*             powerOutAlarm;
     NSOperationQueue*    fileQueue;
     NSMutableSet*        eventLog;
-    
+    float                lastBatteryValue;
     float lowLimit[kNumApcUpsAdcChannels];
     float hiLimit[kNumApcUpsAdcChannels];
 
