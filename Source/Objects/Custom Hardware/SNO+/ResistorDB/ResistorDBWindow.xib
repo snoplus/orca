@@ -43,7 +43,7 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 240}, {569, 590}}</string>
+				<string key="NSWindowRect">{{466, 105}, {569, 590}}</string>
 				<int key="NSWTFlags">544735232</int>
 				<string key="NSWindowTitle">Resistor DB</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -930,6 +930,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<string key="NSFrame">{{159, 15}, {202, 32}}</string>
 											<reference key="NSSuperview" ref="766553133"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="215819589">
