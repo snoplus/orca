@@ -20,12 +20,14 @@
     IBOutlet NSTextField *currentPMTReinstallled;
     IBOutlet NSTextField *currentPulledCable;
     IBOutlet NSTextField *currentBadCable;
-    IBOutlet NSMatrix *updateResistorStatus;
-    IBOutlet NSMatrix *updateSnoLowOcc;
-    IBOutlet NSMatrix *updatePmtRemoved;
-    IBOutlet NSMatrix *updatePmtReinstalled;
-    IBOutlet NSMatrix *updatePulledCable;
-    IBOutlet NSMatrix *updateBadCable;
+    
+    IBOutlet NSComboBox *updateResistorStatus;
+    IBOutlet NSComboBox *updateSnoLowOcc;
+    IBOutlet NSComboBox *updatePmtRemoved;
+    IBOutlet NSComboBox *updatePmtReinstalled;
+    IBOutlet NSComboBox *updateBadCable;
+    IBOutlet NSComboBox *updatePulledCable;
+    
     IBOutlet NSComboBox *updateReasonBox;
     IBOutlet NSTextField *updateReasonOther;
     IBOutlet NSTextField *updateInfoForPull;
