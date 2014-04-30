@@ -16839,7 +16839,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				" CFBundlerHelpBookFolder" = OrcaHelp;
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -16931,7 +16931,7 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DEBUGGING_SYMBOLS = default;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -17054,7 +17054,7 @@
 		84F201BF0B6531990084F4C3 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
 				GCC_VERSION = "";
@@ -17089,7 +17089,7 @@
 		84F201C00B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_VERSION = "";
 				GCC_WARN_PEDANTIC = YES;
@@ -17107,7 +17107,7 @@
 		84F201C10B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_VERSION = "";
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
