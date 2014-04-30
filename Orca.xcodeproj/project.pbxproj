@@ -16839,7 +16839,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				" CFBundlerHelpBookFolder" = OrcaHelp;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(NATIVE_ARCH)";
 				CFBundleHelpBookName = OrcaHelp;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -16900,7 +16900,7 @@
 					"-lnetsnmp",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -16973,7 +16973,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -17042,7 +17042,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
