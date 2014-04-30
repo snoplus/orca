@@ -1416,7 +1416,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //    We wait about 100ms between each write."
 
 	unsigned long theValues[] = {0x1C01, 0x1801, 0x1001, 0x001};
-    for (int i=0; i<4; i++) {
+    int i;
+    for (i=0; i<4; i++) {
         [[self adapter] writeLongBlock:&theValues[i]
                              atAddress:[self baseAddress] + register_information[kSDConfig].offset
                             numToWrite:1
