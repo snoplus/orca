@@ -1178,6 +1178,7 @@
             NodeValue(0);
         }
         @catch (NSException* e) {
+            [self setValue: e forSymbol:[[[p nodeData] objectAtIndex:2] nodeData]];
             NodeValue(1);
         }
     }
