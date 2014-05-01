@@ -1173,7 +1173,7 @@
 }
 - (id) processTry:(id) p
 {
-    if ([[(Node*)p nodeData] count] == 2){
+    if ([[(Node*)p nodeData] count] == 3){
         @try {
             NodeValue(0);
         }
