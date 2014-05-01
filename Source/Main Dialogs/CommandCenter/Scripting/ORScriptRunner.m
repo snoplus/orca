@@ -545,10 +545,11 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	unsigned numNodes = [someNodes count];
 	BOOL failed		= NO;
 	BOOL reported	= NO;
+    id aNode = nil;
 	for(i=0;i<numNodes;i++){
 		NSAutoreleasePool* innerPool = [[NSAutoreleasePool alloc] init];			
 		@try {
-			id aNode = [someNodes objectAtIndex:i];
+			aNode = [someNodes objectAtIndex:i];
 			[eval execute:aNode container:nil];
 		}
 		@catch(NSException* localException) {
@@ -568,8 +569,13 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				break;
 			}
 			else {
-				NSLogColor([NSColor redColor],@"Script will exit because of exception: %@\n",localException);
+                int theLine = [[aNode nodeData] line];
+				NSLogColor([NSColor redColor],
+                           @"Script will exit because of exception (at line %i): \n%@\n",theLine,localException);
 				failed = YES;
+                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerParseError
+                                                                    object:self
+                                                                  userInfo:@{ @"ErrorLocation" : [NSNumber numberWithInt:theLine] }];
 			}
 		}
 		[innerPool release];
