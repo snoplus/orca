@@ -790,14 +790,11 @@
 	argList = [argList stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	argList = [argList stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
 	id result= nil;
-	@try {
-		id target = NodeValue(0);
-		if(target != _zero){
-			result =  [NSInvocation invoke:argList withTarget:target];
-		}
-	}
-	@catch (NSException* localException){
-	}
+    // The following can throw exceptions, but this what we want.
+    id target = NodeValue(0);
+    if(target != _zero){
+        result =  [NSInvocation invoke:argList withTarget:target];
+    }
 	if(result == nil) return _zero;
 	else			  return result;
 }
