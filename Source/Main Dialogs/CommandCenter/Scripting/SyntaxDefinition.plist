@@ -22,6 +22,9 @@
 		<string>default</string>
 		<string>unless</string>
 		<string>array</string>
+		<string>try</string>
+		<string>catch</string>
+		<string>finally</string>
 	</array>
 	<key>Identifiers2</key>
 	<array>

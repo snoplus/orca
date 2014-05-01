@@ -46,6 +46,7 @@
 - (id)		defineArray:(id) p;
 - (id)		defineVariable:(id) p;
 - (id)		processLeftArray:(id) p;
+- (id)		processTry:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
 - (id)		forLoop:(id) p;
@@ -662,7 +663,9 @@
 		case RIGHT_OP:		return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] >> [NodeValue(1) longValue]];
 		case '~':			return [NSDecimalNumber numberWithLong: ~[NodeValue(0) longValue]];
 		case '^':			return [NSDecimalNumber numberWithLong: [NodeValue(0) longValue] ^ [NodeValue(1) longValue]];
-			
+            //exception handling
+		case TRY:			return [self processTry:p];
+
 			//logic
 		case IF:			return [self processIf:p];
 		case UNLESS:		return [self processUnless:p];
@@ -1168,7 +1171,30 @@
 	}
 	return nil;
 }
-
+- (id) processTry:(id) p
+{
+    if ([[(Node*)p nodeData] count] == 2){
+        @try {
+            NodeValue(0);
+        }
+        @catch (NSException* e) {
+            NodeValue(1);
+        }
+    }
+    else {
+        @try {
+            NodeValue(0);
+        }
+        @catch (NSException* e) {
+            [self setValue: e forSymbol:[[[p nodeData] objectAtIndex:2] nodeData]];
+            NodeValue(1);
+        }
+        @finally {
+            NodeValue(3);
+        }
+    }
+	return nil;
+}
 - (id) processIf:(id) p
 {
 	if (![NodeValue(0) isEqual: _zero])		  NodeValue(1);
@@ -1576,6 +1602,9 @@
                 case kLeftArray:		line = [NSMutableString stringWithString:@"[arrayLValue]"];	break;
                 case kRightArray:		line = [NSMutableString stringWithString:@"[arrayRValue]"];	break;
                 case kConditional:		line = [NSMutableString stringWithString:@"[Conditional]"];	break;
+                case TRY:				line = [NSMutableString stringWithString:@"[try]"];			break;
+                case CATCH:				line = [NSMutableString stringWithString:@"[catch]"];		break;
+                case FINALLY:			line = [NSMutableString stringWithString:@"[finally]"];		break;
                 case DO:				line = [NSMutableString stringWithString:@"[do]"];			break;
                 case WHILE:				line = [NSMutableString stringWithString:@"[while]"];		break;
                 case FOR:				line = [NSMutableString stringWithString:@"[for]"];			break;

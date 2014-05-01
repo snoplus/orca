@@ -36,7 +36,7 @@
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN TIME FIXED SCI 
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT MAKESIZE SHELL
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSDATECOMPONENTS NSARRAY MAKERANGE
-%token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE IMPORT HASH CONFIRM REQUEST SHOW SEEDRANDOM RANDOM
+%token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE IMPORT HASH CONFIRM REQUEST SHOW SEEDRANDOM RANDOM TRY CATCH FINALLY
 %nonassoc ELSE
 
 %left '+' '-' 
@@ -44,7 +44,7 @@
 %nonassoc NOT UMINUS INVERT
 
 %type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement 
-%type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement printfile_statement
+%type <nPtr> hex_str expr statement_list objC findObj makeObj selection_statement iteration_statement printfile_statement try_statement
 %type <nPtr> objVar objVar_list print_list log_list print_statement log_statement arg_list argName_list clear_statement
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object sci_statement fixed_statement
 %type <nPtr> case_statement case_list constant_expr point_str rect_str size_str wait_statement alarm_statement
@@ -90,6 +90,7 @@ statement
 : compound_statement		{ $$ = $1;}
 | expression_statement		{ $$ = $1;}
 | selection_statement		{ $$ = $1;}
+| try_statement             { $$ = $1;}
 | iteration_statement		{ $$ = $1;}
 | jump_statement			{ $$ = $1;}
 | special_statement			{ $$ = $1;}
@@ -193,6 +194,11 @@ selection_statement
 | IF '(' expr ')' statement ELSE statement	{ $$ = executionNode(IF, $3, $5, $7,nil); }
 | SWITCH '(' expr ')'  '{' case_list '}'	{ $$ = executionNode(SWITCH, $3, $6,nil); }
 | UNLESS '(' expr ')' statement				{ $$ = executionNode(UNLESS, $3, $5, nil); }
+;
+
+try_statement
+: TRY compound_statement CATCH '(' expr ')' compound_statement                               { $$ = executionNode(TRY, $2, $7, $5, nil); }
+| TRY compound_statement CATCH '(' expr ')' compound_statement FINALLY compound_statement	 { $$ = executionNode(TRY, $2, $7, $5, $9, nil); }
 ;
 
 iteration_statement

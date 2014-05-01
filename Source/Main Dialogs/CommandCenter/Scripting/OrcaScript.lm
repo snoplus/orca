@@ -128,6 +128,9 @@ E			[Ee][+-]?{D}+
 "show"              return SHOW;
 "seedRandom"        return SEEDRANDOM;
 "random"            return RANDOM;
+"try"               return TRY;
+"catch"             return CATCH;
+"finally"           return FINALLY;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);
