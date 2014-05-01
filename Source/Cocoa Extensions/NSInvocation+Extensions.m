@@ -18,6 +18,38 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import <objc/runtime.h>
+
+@interface NSInvocation (OrcaExtensionsPrivate)
+- (void) _privateInvokeWithNoUndoOnTarget:(id)aTarget withAssociatedKey:(void *)akey;
+@end
+
+@implementation NSInvocation (OrcaExtensionsPrivate)
+
+- (void) _privateInvokeWithNoUndoOnTarget:(id)aTarget withAssociatedKey:(void *)akey
+{
+    NSUndoManager* undoer = [[[NSApp delegate]document] undoManager];
+    [undoer disableUndoRegistration];
+    @try {
+        [self invokeWithTarget:aTarget];
+    }
+    @catch (NSException *exception) {
+        if (akey) {
+            // If we have akey, it means we should save the exception
+            objc_setAssociatedObject(self,
+                                     akey,
+                                     exception,
+                                     OBJC_ASSOCIATION_COPY);
+        } else {
+            // Otherwise, reraise the exception (we should be on the main thread).
+            [exception raise];
+        }
+    } @finally {
+        [undoer enableUndoRegistration];
+    }
+}
+@end
+
 @implementation NSInvocation (OrcaExtensions)
 
 //parse a string of the form method:var1 name:var2 ....	to selector			
@@ -343,16 +375,18 @@
 
 - (void) invokeWithNoUndoOnTarget:(id)aTarget
 {
+    static char kExceptionKey;
     if (![[NSThread currentThread] isEqual:[NSThread mainThread]]) {
-        [self performSelectorOnMainThread:_cmd
-                               withObject:aTarget
-                            waitUntilDone:YES];
-        return;
+        // Call the function on the main thread.
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self _privateInvokeWithNoUndoOnTarget:aTarget
+                                 withAssociatedKey:&kExceptionKey];
+        });
+        // The following is a no-op if no exception was seen in main thread
+        [objc_getAssociatedObject(self, &kExceptionKey) raise];
+    } else {
+        [self _privateInvokeWithNoUndoOnTarget:aTarget withAssociatedKey:nil];
     }
-    NSUndoManager* undoer = [[[NSApp delegate]document] undoManager];
-    [undoer disableUndoRegistration];
-    [self invokeWithTarget:aTarget];
-    [undoer enableUndoRegistration];
 }
 
 +(NSInvocation*)invocationWithTarget:(id)target
