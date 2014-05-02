@@ -228,6 +228,7 @@ void yyreset_state()
 char escapedCharacterInString(char c)
 {
     if (!map_dict) {
+        /*
         map_dict = [@{
             @"a" : @"\a",
             @"b" : @"\b",
@@ -242,6 +243,22 @@ char escapedCharacterInString(char c)
             @"\\" : @"\\",
             @"\?" : @"\?"
         } retain];
+*/
+        map_dict = [[NSDictionary dictionaryWithObjectsAndKeys:
+        @"\a", @"a",
+        @"\b", @"b",
+        @"\f" , @"f",
+        @"\n" , @"n",
+        @"\r" , @"r",
+        @"\t" , @"t",
+        @"\v" , @"v",
+        @"\\" , @"\\",
+        @"\"" , @"\"",
+        @"\'" , @"\'",
+        @"\\" , @"\\",
+        @"\?" , @"\?",
+        nil
+        ] retain];
     }
     NSString* temp_str = [map_dict objectForKey:[NSString stringWithFormat:@"%c",c]];
     if (!temp_str) return c;
