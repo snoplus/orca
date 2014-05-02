@@ -52,6 +52,7 @@
     IBOutlet NSTextField* smellieTriggerFrequency;  //trigger frequency of SMELLIE in Hz
     IBOutlet NSTextField* smellieNumTriggersPerLoop;    //number of triggers to be sent per iteration
     
+    IBOutlet NSComboBox *executeCmdBox;
     //Control Button
     IBOutlet NSButton* smellieMakeNewRunButton; //make a new smellie run 
     

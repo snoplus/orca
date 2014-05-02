@@ -469,6 +469,8 @@
 //Custom Command for Smellie
 -(IBAction)executeSmellieCmdDirectAction:(id)sender
 {
+    
+    NSLog(@"CMD %@",[executeCmdBox stringValue]);
     NSString * cmd = [NSString stringWithString:[smellieDirectCmd stringValue]];
     NSString * arg1 = [NSString stringWithString:[smellieDirectArg1 stringValue]];
     NSString * arg2 = [NSString stringWithString:[smellieDirectArg2 stringValue]];

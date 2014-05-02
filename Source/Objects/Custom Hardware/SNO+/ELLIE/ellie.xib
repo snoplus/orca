@@ -2384,6 +2384,99 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																	<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																</object>
+																<object class="NSComboBox" id="664317098">
+																	<reference key="NSNextResponder" ref="91796917"/>
+																	<int key="NSvFlags">268</int>
+																	<string key="NSFrame">{{216, 359}, {99, 26}}</string>
+																	<reference key="NSSuperview" ref="91796917"/>
+																	<reference key="NSWindow"/>
+																	<string key="NSReuseIdentifierKey">_NS:9</string>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSComboBoxCell" key="NSCell" id="61558475">
+																		<int key="NSCellFlags">342884416</int>
+																		<int key="NSCellFlags2">272630784</int>
+																		<string key="NSContents"/>
+																		<reference key="NSSupport" ref="118580902"/>
+																		<string key="NSCellIdentifier">_NS:9</string>
+																		<reference key="NSControlView" ref="664317098"/>
+																		<bool key="NSDrawsBackground">YES</bool>
+																		<reference key="NSBackgroundColor" ref="505863386"/>
+																		<reference key="NSTextColor" ref="625002855"/>
+																		<int key="NSVisibleItemCount">5</int>
+																		<bool key="NSHasVerticalScroller">YES</bool>
+																		<array class="NSMutableArray" key="NSPopUpListData">
+																			<string>Check Connection</string>
+																			<string>Initialise Smellie</string>
+																			<string>Set Safe States</string>
+																			<string>Set Laser Switch</string>
+																			<string>Set Fibre Switch</string>
+																			<string>Set Laset Intensity</string>
+																			<string>Set Soft Lock On</string>
+																			<string>Set Soft Lock Off</string>
+																			<string>Set Master Mode </string>
+																		</array>
+																		<reference key="NSDelegate" ref="664317098"/>
+																		<object class="NSComboTableView" key="NSTableView" id="724932572">
+																			<reference key="NSNextResponder"/>
+																			<int key="NSvFlags">274</int>
+																			<string key="NSFrameSize">{13, 189}</string>
+																			<reference key="NSSuperview"/>
+																			<reference key="NSWindow"/>
+																			<string key="NSReuseIdentifierKey">_NS:24</string>
+																			<bool key="NSEnabled">YES</bool>
+																			<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+																			<bool key="NSControlAllowsExpansionToolTips">YES</bool>
+																			<array class="NSMutableArray" key="NSTableColumns">
+																				<object class="NSTableColumn">
+																					<double key="NSWidth">10</double>
+																					<double key="NSMinWidth">10</double>
+																					<double key="NSMaxWidth">1000</double>
+																					<object class="NSTableHeaderCell" key="NSHeaderCell">
+																						<int key="NSCellFlags">75497472</int>
+																						<int key="NSCellFlags2">0</int>
+																						<string key="NSContents"/>
+																						<reference key="NSSupport" ref="766485152"/>
+																						<object class="NSColor" key="NSBackgroundColor">
+																							<int key="NSColorSpace">3</int>
+																							<bytes key="NSWhite">MC4zMzMzMzI5ODU2AA</bytes>
+																						</object>
+																						<reference key="NSTextColor" ref="290094154"/>
+																					</object>
+																					<object class="NSTextFieldCell" key="NSDataCell">
+																						<int key="NSCellFlags">338690112</int>
+																						<int key="NSCellFlags2">268436480</int>
+																						<reference key="NSSupport" ref="118580902"/>
+																						<reference key="NSControlView" ref="724932572"/>
+																						<bool key="NSDrawsBackground">YES</bool>
+																						<reference key="NSBackgroundColor" ref="735473806"/>
+																						<reference key="NSTextColor" ref="625002855"/>
+																					</object>
+																					<int key="NSResizingMask">3</int>
+																					<bool key="NSIsResizeable">YES</bool>
+																					<reference key="NSTableView" ref="724932572"/>
+																				</object>
+																			</array>
+																			<double key="NSIntercellSpacingWidth">3</double>
+																			<double key="NSIntercellSpacingHeight">2</double>
+																			<reference key="NSBackgroundColor" ref="735473806"/>
+																			<reference key="NSGridColor" ref="662537247"/>
+																			<double key="NSRowHeight">19</double>
+																			<string key="NSAction">tableViewAction:</string>
+																			<int key="NSTvFlags">-765427712</int>
+																			<reference key="NSDelegate" ref="61558475"/>
+																			<reference key="NSDataSource" ref="61558475"/>
+																			<reference key="NSTarget" ref="61558475"/>
+																			<int key="NSColumnAutoresizingStyle">1</int>
+																			<int key="NSDraggingSourceMaskForLocal">15</int>
+																			<int key="NSDraggingSourceMaskForNonLocal">0</int>
+																			<bool key="NSAllowsTypeSelect">YES</bool>
+																			<int key="NSTableViewDraggingDestinationStyle">0</int>
+																			<int key="NSTableViewGroupRowStyle">1</int>
+																		</object>
+																	</object>
+																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+																	<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
+																</object>
 															</array>
 															<string key="NSFrame">{{10, 7}, {517, 536}}</string>
 															<reference key="NSSuperview" ref="957295875"/>
@@ -2921,6 +3014,14 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 						<reference key="destination" ref="558131991"/>
 					</object>
 					<int key="connectionID">521</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">executeCmdBox</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="664317098"/>
+					</object>
+					<int key="connectionID">527</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3555,6 +3656,7 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 							<reference ref="828311378"/>
 							<reference ref="558131991"/>
 							<reference ref="957060519"/>
+							<reference ref="664317098"/>
 						</array>
 						<reference key="parent" ref="683476986"/>
 					</object>
@@ -4114,6 +4216,19 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 						<reference key="object" ref="791334932"/>
 						<reference key="parent" ref="957060519"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">524</int>
+						<reference key="object" ref="664317098"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="61558475"/>
+						</array>
+						<reference key="parent" ref="91796917"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">525</int>
+						<reference key="object" ref="61558475"/>
+						<reference key="parent" ref="664317098"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4295,6 +4410,19 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 				<string key="519.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="522.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="523.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="524.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<array key="525.IBComboBoxObjectValuesKey.objectValues">
+					<string>Check Connection</string>
+					<string>Initialise Smellie</string>
+					<string>Set Safe States</string>
+					<string>Set Laser Switch</string>
+					<string>Set Fibre Switch</string>
+					<string>Set Laset Intensity</string>
+					<string>Set Soft Lock On</string>
+					<string>Set Soft Lock Off</string>
+					<string>Set Master Mode </string>
+				</array>
+				<string key="525.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="72.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="73.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4332,7 +4460,7 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">523</int>
+			<int key="maxID">527</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4399,6 +4527,7 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="executeCmdBox">NSComboBox</string>
 						<string key="smellie375nmLaserButton">NSButton</string>
 						<string key="smellie405nmLaserButton">NSButton</string>
 						<string key="smellie440nmLaserButton">NSButton</string>
@@ -4433,6 +4562,10 @@ c3Rlcl9tb2RlX2ZsYWcgPSA4MCAjdGhpcyBoYXMgdHdvIGFyZ3VtZW50cyA</string>
 						<string key="smellieTriggerFrequency">NSTextField</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="executeCmdBox">
+							<string key="name">executeCmdBox</string>
+							<string key="candidateClassName">NSComboBox</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="smellie375nmLaserButton">
 							<string key="name">smellie375nmLaserButton</string>
 							<string key="candidateClassName">NSButton</string>
