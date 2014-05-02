@@ -575,7 +575,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				failed = YES;
                 [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerParseError
                                                                     object:self
-                                                                  userInfo:@{ @"ErrorLocation" : [NSNumber numberWithInt:theLine] }];
+                                                                  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:theLine] forKey:@"LineNum"]];
 			}
 		}
 		[innerPool release];
