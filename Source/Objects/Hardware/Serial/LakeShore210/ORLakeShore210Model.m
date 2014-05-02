@@ -45,6 +45,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) processOneCommandFromQueue;
 - (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
 - (void) pollTemps;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORLakeShore210Model
@@ -552,6 +553,24 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	[self readTemps];
 	
 	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
+}
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:temp[0]],
+                             [NSNumber numberWithInt:temp[1]],
+                             [NSNumber numberWithInt:temp[2]],
+                             [NSNumber numberWithInt:temp[3]],
+                             [NSNumber numberWithInt:temp[4]],
+                             [NSNumber numberWithInt:temp[5]],
+                             [NSNumber numberWithInt:temp[6]],
+                             [NSNumber numberWithInt:temp[7]],
+                             nil], @"temperatures",
+                            [NSNumber numberWithInt:    unitsType],    @"unitType",
+                            [NSNumber numberWithInt:    pollTime],     @"pollTime",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
 @end
