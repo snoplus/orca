@@ -551,7 +551,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
 	[self readTemps];
-	
+	[self postCouchDBRecord];
 	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
 }
 - (void) postCouchDBRecord
