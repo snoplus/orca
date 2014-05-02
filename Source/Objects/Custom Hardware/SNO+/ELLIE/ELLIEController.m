@@ -469,9 +469,42 @@
 //Custom Command for Smellie
 -(IBAction)executeSmellieCmdDirectAction:(id)sender
 {
-    
+    NSString * cmd = [[NSString alloc] init];
     NSLog(@"CMD %@",[executeCmdBox stringValue]);
-    NSString * cmd = [NSString stringWithString:[smellieDirectCmd stringValue]];
+    NSLog(@"CMD %i",[executeCmdBox indexOfSelectedItem]);
+    
+    int cmdIndex = [executeCmdBox indexOfSelectedItem];
+    
+    if(cmdIndex == 0){
+        cmd = @"10";
+    }
+    else if (cmdIndex == 1){
+        cmd = @"20";
+    }
+    else if (cmdIndex == 2){
+        cmd = @"30";
+    }
+    else if (cmdIndex == 3){
+        cmd = @"2050";
+    }
+    else if (cmdIndex == 4){
+        cmd = @"40";
+    }
+    else if (cmdIndex == 5){
+        cmd = @"50";
+    }
+    else if(cmdIndex == 6){
+        cmd = @"60";
+    }
+    else if(cmdIndex == 7){
+        cmd = @"70";
+    }
+    else if(cmdIndex == 8){
+        cmd = @"80";
+    }
+    
+    
+    //NSString * cmd = [NSString stringWithString:[smellieDirectCmd stringValue]];
     NSString * arg1 = [NSString stringWithString:[smellieDirectArg1 stringValue]];
     NSString * arg2 = [NSString stringWithString:[smellieDirectArg2 stringValue]];
     [model sendCustomSmellieCmd:cmd withArgument1:arg1 withArgument2:arg2];
