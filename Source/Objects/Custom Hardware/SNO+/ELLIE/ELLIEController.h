@@ -40,6 +40,7 @@
     IBOutlet NSButton* smellieFibreButtonFS155;
     IBOutlet NSButton* smellieFibreButtonFS255;
     IBOutlet NSButton* smellieAllFibresButton;
+    IBOutlet NSButton* testButton;
     
     
     //More Run Information
@@ -58,7 +59,7 @@
     
     //Error Fields
     IBOutlet NSTextField* smellieRunErrorTextField; //new run error text field 
-
+    
     //TELLIE interface ------------------------------------------
     
 }

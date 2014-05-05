@@ -86,7 +86,7 @@ smellieRunFile;
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
                          name : ORSNOPModelViewTypeChanged
-			object: model];
+                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(dbOrcaDBIPChanged:)
@@ -106,6 +106,11 @@ smellieRunFile;
     [notifyCenter addObserver : self
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHVNominalVoltageChanged
+                        object: nil];
+    
+    [notifyCenter addObserver :self
+                     selector : @selector(stopSmellieRunAction:)
+                         name : ORELLIERunFinished
                         object: nil];
 }
 
@@ -580,7 +585,12 @@ smellieRunFile;
     
     //Method for completing this without a new thread 
     //[theELLIEModel startSmellieRun:smellieRunFile];
-    [NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
+    
+    smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
+    [smellieThread start];
+    
+    
+    //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
     
     //[theELLIEModel release];
     
@@ -594,9 +604,6 @@ smellieRunFile;
     [smellieStopRunButton setEnabled:NO];
     [smellieCheckInterlock setEnabled:YES];
    
-  
-    
-    
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     
@@ -607,7 +614,11 @@ smellieRunFile;
                              toTarget:theELLIEModel
                            withObject:[smellieRunFile autorelease]];*/
     
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];
+    /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
+    //cancel the smellie thread
+    [smellieThread cancel];
+    [smellieThread release];
+    smellieThread = nil;
     
     //Method for completing this without a new thread
     [theELLIEModel stopSmellieRun];

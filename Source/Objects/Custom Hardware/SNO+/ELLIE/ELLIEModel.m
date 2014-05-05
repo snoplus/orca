@@ -40,6 +40,7 @@
 NSString* ELLIEAllLasersChanged = @"ELLIEAllLasersChanged";
 NSString* ELLIEAllFibresChanged = @"ELLIEAllFibresChanged";
 NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
+NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 
 
 @interface ELLIEModel (private)
@@ -281,6 +282,12 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:softLockOffFlag];
 }
 
+-(void)setLaserFrequency20Mhz
+{
+    NSArray * frequencyTestingModeFlag = @[@"90",@"0",@"0"]; 
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:frequencyTestingModeFlag];
+}
+
 -(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses
 {
     NSString * argumentString = [NSString stringWithFormat:@"%@s%@",triggerFrequency,numOfPulses];
@@ -308,6 +315,16 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     
 }
 
+-(void)testFunction
+{
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
+    
+    
+}
+
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
     //Deconstruct runFile into indiviual subruns ------------------
@@ -318,8 +335,16 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     //[self setSmellieSafeStates];
     
     //Extract the number of intensity steps
-    NSNumber * numIntStepsObj = [smellieSettings objectForKey:@"num_intensity_steps"];
-    int numIntSteps = [numIntStepsObj intValue];
+    //NSNumber * numIntStepsObj = [smellieSettings objectForKey:@"num_intensity_steps"];
+    //int numIntSteps = [numIntStepsObj intValue];
+    
+    //Extract the min intensity
+    NSNumber * minLaserObj = [smellieSettings objectForKey:@"min_laser_intensity"];
+    int minLaserIntensity = [minLaserObj intValue];
+    
+    //Extract the min intensity
+    NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
+    int maxLaserIntensity = [maxLaserObj intValue];
     
     //Extract the lasers to be fired into an array
     NSMutableArray * laserArray = [[NSMutableArray alloc] init];
@@ -344,8 +369,8 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     [fibreArray addObject:[smellieSettings objectForKey:@"FS255"] ];
     
     //get the MTC Object
-    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    //NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    //ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     
     
     //start an actual run here
@@ -377,30 +402,19 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     //[theRunController startRunAction:nil];
     
     //startRunAction:(id)sender
-    //[theRunModel performSelector:@selector(startRun) withObject:nil afterDelay:.1];
-    //[runControl startRun];
-    
-    /*if ([theRunModel isRunning]) {
-        [theRunModel stopRun];
-        waituntil (![theRunModel isRunning], 60);
-    }
-    
-    [theRunModel startRun];
-    waituntil(([theRunModel elapsedRunTime] > 1), 10);*/
-    
-    //if ([theRunModel isRunning]) {
-    //    [theRunModel stopRun];
-    //}
-    
-    //[theRunModel startRun];
-    //[NSThread sleepForTimeInterval:10.0f]; //give the run plenty of time to start
+    //[runControl performSelector:@selector(startRun) withObject:nil afterDelay:.1];
+    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
     //NSLog(@"Run State: %@",[theRunModel runningState]);
     
     //if running in slave mode fire some pedestals
     
+    
+    //REMOVE THIS LATER !!!!!!!!!!!!
+    //[self setLaserFrequency20Mhz];
+    
     //fire some pedestals
-    [theMTCModel fireMTCPedestalsFixedRate];
+    //[theMTCModel fireMTCPedestalsFixedRate];
  
     ///Loop through each Laser
     for(int laserLoopInt = 0;laserLoopInt < [laserArray count];laserLoopInt++){
@@ -445,21 +459,27 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
             [self setFibreSwitch:@"5"];
             
             //Loop through each intensity of a SMELLIE run 
-            for(int intensityLoopInt =0;intensityLoopInt < numIntSteps; intensityLoopInt++){
+            for(int intensityLoopInt =minLaserIntensity;intensityLoopInt < maxLaserIntensity; intensityLoopInt++){
             
                 //Start a new subrun
                 //[theRunModel startNewSubRun];
+                if([[NSThread currentThread] isCancelled]){
+                    break;
+                }
                 
+                //start a new subrun
+                [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+                [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                 
                 [self setLaserSoftLockOff];
                 
-                
+                //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
                 //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
-                //[NSThread sleepForTimeInterval:2.0f];
+                [NSThread sleepForTimeInterval:0.1f];
                 
                 //Call the smellie system here 
                 NSLog(@" Laser:%@ ", [laserArray objectAtIndex:laserLoopInt]);
-                //NSLog(@" Fibre:%@ ",[fibreArray objectAtIndex:fibreLoopInt]);
+                NSLog(@" Fibre:%@ ",[fibreArray objectAtIndex:fibreLoopInt]);
                 NSLog(@" Intensity:%i \n",intensityLoopInt);
                 [self setLaserSoftLockOn];
                 
@@ -476,19 +496,14 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     [fibreArray release];
     [laserArray release];
     
-    [theMTCModel stopMTCPedestalsFixedRate];
+    //[theMTCModel stopMTCPedestalsFixedRate];
     NSLog(@"Returning SMELLIE into Safe States after finishing a Run\n");
     [self setSmellieSafeStates];
     
-    //[runControl haltRun];
+    //don't know if I need this??? called in stop smellie run ???
+    //[runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
     
-    /*if([runControl isRunning]){
-        [runControl stopRun];
-        //[self endEditing];
-        //[statusField setStringValue:[self getStoppingString]];
-        //[runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-    }*/
-    //[runControl haltRun];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
     
 }
 
@@ -500,6 +515,13 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
     NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     [theMTCModel stopMTCPedestalsFixedRate];
+    
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    [runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
+    
+    
     //[runControl haltRun];
     //TODO: Send stop smellie run notification 
     NSLog(@"Stopping SMELLIE Run\n");

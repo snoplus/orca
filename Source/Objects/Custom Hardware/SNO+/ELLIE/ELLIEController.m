@@ -363,6 +363,11 @@
     //[model validationSmellieSettings];
 }
 
+-(IBAction)testButtonAction:(id)sender
+{
+    [model testFunction];
+}
+
 -(IBAction)makeNewSmellieRun:(id)sender
 {
     NSAutoreleasePool* smellieSettingsPool = [[NSAutoreleasePool alloc] init];
@@ -501,6 +506,12 @@
     }
     else if(cmdIndex == 8){
         cmd = @"80";
+    }
+    else if(cmdIndex ==9){
+        cmd = @"90";
+    }
+    else{
+        cmd = @"0"; //not sure what is going on here
     }
     
     

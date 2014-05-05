@@ -62,6 +62,7 @@
     NSImage* _runStopImg;
     NSMutableDictionary *smellieRunFileList;
     NSDictionary *smellieRunFile;
+    NSThread *smellieThread;
     
 }
 

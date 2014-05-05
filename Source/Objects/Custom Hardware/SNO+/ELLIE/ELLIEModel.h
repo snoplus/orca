@@ -56,6 +56,8 @@
 -(void)setLaserSoftLockOff;
 -(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
 -(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2;
+-(void)testFunction;
+-(void)setLaserFrequency20Mhz;
 
 
 @end
@@ -63,3 +65,4 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
+extern NSString* ORELLIERunFinished;
