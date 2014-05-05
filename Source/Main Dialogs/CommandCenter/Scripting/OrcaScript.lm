@@ -114,6 +114,7 @@ E			[Ee][+-]?{D}+
 "nsdictionary"	return NSDICTIONARY;
 "nsdatecomponents"  return NSDATECOMPONENTS;
 "nsarray"		return NSARRAY;
+"nsexception"	return MAKEEXCEPTION;
 "time"			return TIME;
 "sci"			return SCI;
 "fixed"			return FIXED;
@@ -131,6 +132,7 @@ E			[Ee][+-]?{D}+
 "try"               return TRY;
 "catch"             return CATCH;
 "finally"           return FINALLY;
+"throw"             return THROW;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

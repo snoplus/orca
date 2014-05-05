@@ -42,11 +42,15 @@
 - (id)		catString:(id) p;
 - (id)		arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue;
 - (id)		doFunctionCall:(id)p;
+- (id)		valueArray:(id)p;
 - (id)		doValueAppend:(id)p container:(id)aContainer;
 - (id)		defineArray:(id) p;
 - (id)		defineVariable:(id) p;
 - (id)		processLeftArray:(id) p;
 - (id)		processTry:(id) p;
+- (id)		processThrow:(id) p;
+- (id)      makeException:(id) p;
+- (id)      makeDictionary:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
 - (id)		forLoop:(id) p;
@@ -80,7 +84,7 @@
 - (void)    startRequestSheet:(id)aString;
 - (id)      showStatusDialog:(id) p;
 - (id)      genRandom:(id) p;
-
+- (id)      valueArray:(id)p;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -554,6 +558,7 @@
 			
 		case ';':				return [self processStatements:p];
 		case kFuncCall:			return [self doFunctionCall:p];
+		case '#':               return [self valueArray:p];
 		case kMakeArgList:		return [self doValueAppend:p container:aContainer];
 		case ',':				return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@"," stringByAppendingFormat:@"%@",NodeValue(1)]];
 			
@@ -582,7 +587,9 @@
 		case REQUEST:       return [self requestFromUser:p];
 		case kConfirmTimeOut:	return [self confirmWithUserTimeout:p];
 		case SHOW:          return [self showStatusDialog:p];
-		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
+		case NSDICTIONARY:	return [self makeDictionary:p];
+
+		case MAKEEXCEPTION:	return [self makeException:p];
         case NSDATECOMPONENTS:
         {
             NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
@@ -665,6 +672,7 @@
 		case '^':			return [NSDecimalNumber numberWithLong: [NodeValue(0) longValue] ^ [NodeValue(1) longValue]];
             //exception handling
 		case TRY:			return [self processTry:p];
+		case THROW:			return [self processThrow:p];
 
 			//logic
 		case IF:			return [self processIf:p];
@@ -1196,6 +1204,71 @@
     }
 	return nil;
 }
+
+- (id) processThrow:(id) p
+{
+    id e = NodeValue(0);
+    if([e isKindOfClass:NSClassFromString(@"NSException")]){
+        @throw((NSException*)e);
+    }
+    else {
+        NSException* e = [NSException exceptionWithName:@"Bad Argument"
+                                                 reason:[NSString stringWithFormat:@"Argument to throw must be an NSException."]
+                                               userInfo:nil];
+        [e raise];
+
+    }
+    return nil;
+}
+
+- (id) makeException:(id) p
+{
+    id name     = NodeValue(0);
+    id reason   = NodeValue(1);
+    id userInfo = NodeValue(2);
+    if([userInfo isKindOfClass:NSClassFromString(@"NSDictionary")]){
+        return [NSException exceptionWithName:name reason:reason userInfo:userInfo];
+    }
+    else {
+        NSException* e = [NSException exceptionWithName:@"Bad Argument"
+                                                 reason:[NSString stringWithFormat:@"Argument to throw must be an NSDictionary."]
+                                               userInfo:nil];
+        [e raise];
+        
+    }
+    return nil;
+}
+
+- (id) makeDictionary:(id) p
+{
+    if([[p nodeData] count] == 0) return [NSMutableDictionary dictionary];
+    else {
+        NSMutableDictionary* d = [NSMutableDictionary dictionary];
+        NSMutableArray* anArray = [NSMutableArray arrayWithArray:NodeValue(0)];
+        NSLog(@"array: %@\n",NodeValue(0));
+        int n = [anArray count];
+        int i;
+        for(i=0;i<n;i+=2){
+            [d setObject:[anArray objectAtIndex:i+1] forKey:[anArray objectAtIndex:i]];
+        }
+        return d;
+    }
+    return nil;
+}
+
+- (id) valueArray:(id)p
+{
+    if([[p nodeData] count] == 2){
+        return [NSMutableArray arrayWithObjects:NodeValue(0),NodeValue(1),nil];
+    }
+    else {
+        NSMutableArray* anArray = [NSMutableArray arrayWithArray:NodeValue(0)];
+        [anArray addObject:NodeValue(1)];
+        [anArray addObject:NodeValue(2)];
+        return anArray;
+    }
+}
+
 - (id) processIf:(id) p
 {
 	if (![NodeValue(0) isEqual: _zero])		  NodeValue(1);
@@ -1606,6 +1679,8 @@
                 case TRY:				line = [NSMutableString stringWithString:@"[try]"];			break;
                 case CATCH:				line = [NSMutableString stringWithString:@"[catch]"];		break;
                 case FINALLY:			line = [NSMutableString stringWithString:@"[finally]"];		break;
+                case MAKEEXCEPTION:		line = [NSMutableString stringWithString:@"[makeException]"];break;
+                case THROW:             line = [NSMutableString stringWithString:@"[throw]"];		break;
                 case DO:				line = [NSMutableString stringWithString:@"[do]"];			break;
                 case WHILE:				line = [NSMutableString stringWithString:@"[while]"];		break;
                 case FOR:				line = [NSMutableString stringWithString:@"[for]"];			break;
@@ -1686,9 +1761,10 @@
 				case MAKERANGE:			line = [NSMutableString stringWithString:@"[range]"];		break;
 				case REQUEST:			line = [NSMutableString stringWithString:@"[request]"];		break;
 				case CONFIRM:			line = [NSMutableString stringWithString:@"[confirm]"];		break;
-				case SEEDRANDOM:		line = [NSMutableString stringWithString:@"[seedRandom]"];		break;
+				case SEEDRANDOM:		line = [NSMutableString stringWithString:@"[seedRandom]"];	break;
 				case RANDOM:            line = [NSMutableString stringWithString:@"[random]"];		break;
 				case kConfirmTimeOut:	line = [NSMutableString stringWithString:@"[confirmtimeout]"];	break;
+                case '#':				line = [NSMutableString stringWithString:@"[#]"];			break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;
             }
