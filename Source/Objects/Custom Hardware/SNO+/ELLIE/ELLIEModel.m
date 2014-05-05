@@ -258,9 +258,9 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:setLaserSwitchFlagAndArgument];
 }
 
--(void)setFibreSwitch:(NSString*)fibreSwitchChannel
+-(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel
 {
-    NSArray * setFibreSwitchFlagAndArgument = @[@"2050",fibreSwitchChannel,@"0"]; //30 is the flag for setting smellie to its safe states
+    NSArray * setFibreSwitchFlagAndArgument = @[@"40",fibreSwitchInputChannel,fibreSwitchOutputChannel]; //30 is the flag for setting smellie to its safe states
     [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:setFibreSwitchFlagAndArgument];
 }
 
@@ -331,8 +331,13 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     
     NSLog(@"Starting SMELLIE Run\n");
     
+    NSLog(@"Checking Connection to SMELLIE");
+    
+    //NSLog(@"Output from connection check: %@",[self])
+    
     NSLog(@"Setting SMELLIE into Safe States before starting a Run\n");
-    //[self setSmellieSafeStates];
+    //[self performSelector:@selector(setSmellieSafeStates) withObject:nil waitUntilDone:YES];
+    [self setSmellieSafeStates];
     
     //Extract the number of intensity steps
     //NSNumber * numIntStepsObj = [smellieSettings objectForKey:@"num_intensity_steps"];
@@ -346,27 +351,28 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
     int maxLaserIntensity = [maxLaserObj intValue];
     
+    //DO THE MAPPING HERE!!!!
     //Extract the lasers to be fired into an array
-    NSMutableArray * laserArray = [[NSMutableArray alloc] init];
-    [laserArray addObject:[smellieSettings objectForKey:@"375nm_laser_on"] ];
-    [laserArray addObject:[smellieSettings objectForKey:@"405nm_laser_on"] ];
-    [laserArray addObject:[smellieSettings objectForKey:@"440nm_laser_on"] ];
-    [laserArray addObject:[smellieSettings objectForKey:@"500nm_laser_on"] ];
+    NSMutableDictionary * laserArray = [[NSMutableDictionary alloc] init];
+    [laserArray setObject:[smellieSettings objectForKey:@"375nm_laser_on"] forKey:@"375nm" ];
+    [laserArray setObject:[smellieSettings objectForKey:@"405nm_laser_on"] forKey:@"405nm" ];
+    [laserArray setObject:[smellieSettings objectForKey:@"440nm_laser_on"] forKey:@"440nm" ];
+    [laserArray setObject:[smellieSettings objectForKey:@"500nm_laser_on"] forKey:@"500nm" ];
     
     //Extract the fibres to be fired into an array
-    NSMutableArray *fibreArray = [[NSMutableArray alloc] init];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS007"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS107"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS207"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS025"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS125"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS225"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS037"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS137"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS237"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS055"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS155"] ];
-    [fibreArray addObject:[smellieSettings objectForKey:@"FS255"] ];
+    NSMutableDictionary *fibreArray = [[NSMutableDictionary alloc] init];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS007"] forKey:@"FS007" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS107"] forKey:@"FS107" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS207"] forKey:@"FS207" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS025"] forKey:@"FS025" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS125"] forKey:@"FS125" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS225"] forKey:@"FS225" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS037"] forKey:@"FS037" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS137"] forKey:@"FS137" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS237"] forKey:@"FS237" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS055"] forKey:@"FS055" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS155"] forKey:@"FS155" ];
+    [fibreArray setObject:[smellieSettings objectForKey:@"FS255"] forKey:@"FS255" ];
     
     //get the MTC Object
     //NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -402,7 +408,6 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     //[theRunController startRunAction:nil];
     
     //startRunAction:(id)sender
-    //[runControl performSelector:@selector(startRun) withObject:nil afterDelay:.1];
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
     //NSLog(@"Run State: %@",[theRunModel runningState]);
@@ -411,36 +416,50 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     
     
     //REMOVE THIS LATER !!!!!!!!!!!!
-    //[self setLaserFrequency20Mhz];
+    //[self performSelectorOnMainThread:@selector(setLaserFrequency20Mhz) withObject:nil waitUntilDone:YES];
+    //[self performSelector:@selector(setLaserFrequency20Mhz) withObject:nil afterDelay:.1];
+    [self setLaserFrequency20Mhz];
     
     //fire some pedestals
     //[theMTCModel fireMTCPedestalsFixedRate];
  
     ///Loop through each Laser
-    for(int laserLoopInt = 0;laserLoopInt < [laserArray count];laserLoopInt++){
+    int laserLoopInt = 0;
+    for(id laserKey in laserArray){
+    //for(int laserLoopInt = 0;laserLoopInt < [laserArray count];laserLoopInt++){
         
         //Only loop through lasers that are included in the run 
-        if([[laserArray objectAtIndex:laserLoopInt] intValue] != 1){
+        /*if([[laserArray objectAtIndex:laserLoopInt] intValue] != 1){
             continue;
-        }
+        }*/
         
         //TODO:Read in the configuration Map
         
         
         //NSLog(@"%@",[[laserArray objectAtIndex:laserLoopInt] key]);
         
-        if(laserLoopInt == 0){
+        if([laserKey isEqual:@"375nm"]){
+            continue;
             //Current unconnected for repair
+            //[self performSelector:@selector(setLaserSwitch:) withObject:@"1" afterDelay:.1];
             //[self setLaserSwitch:@"1"]; //whichever channel the 375 is connected to
         }
-        else if (laserLoopInt == 1){
-            [self setLaserSwitch:@"2"]; //whichever channel the 405 is connected to 
+        else if ([laserKey isEqual:@"405nm"]){
+            //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"2" waitUntilDone:YES];
+            //[self performSelector:@selector(setLaserSwitch:) withObject:@"2" afterDelay:.1];
+            [self setLaserSwitch:@"2"]; //whichever channel the 405 is connected to
         }
-        else if (laserLoopInt == 2){
+        else if ([laserKey isEqual:@"440nm"]){
+            //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"3" waitUntilDone:YES];
+            //[self performSelector:@selector(setLaserSwitch:) withObject:@"3" afterDelay:.1];
             [self setLaserSwitch:@"3"]; //whichever channel the 440 is connected to
         }
-        else if (laserLoopInt == 3){
-            [self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
+        else if ([laserKey isEqual:@"500nm"]){
+            //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES modes:kCFRunLoopDefaultMode];
+            //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"4" waitUntilDone:YES];
+            //[self performSelector:@selector(setLaserSwitch:) withObject:@"4" afterDelay:.1];
+            [self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES];
+            //[self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
         }
         else{
             NSLog(@"SMELLIE RUN:No laser selected for this iteration");
@@ -448,15 +467,24 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
        
         
         //Loop through each Fibre
-        for(int fibreLoopInt = 0; fibreLoopInt < [fibreArray count];fibreLoopInt++){
+        for(id fibreKey in fibreArray){
+        //for(int fibreLoopInt = 0; fibreLoopInt < [fibreArray count];fibreLoopInt++){
         
             //Only loop through fibres that are included in the run 
-            if([[fibreArray objectAtIndex:fibreLoopInt] intValue] != 1){
+            if([[fibreArray objectForKey:fibreKey] intValue] != 1){
                 continue;
             }
             
-            //For the moment always go through switch 5
-            [self setFibreSwitch:@"5"];
+            //which laser is connected to which input channel
+            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt];
+            
+            //For the moment always go through switch 5 (for the moment)
+            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:@"5"];
+            
+            //NSArray *dataArray = [NSArray arrayWithObjects:inputFibneSwitchChannel,@"5",nil];
+            //[self performSelector:@selector(setFibreSwitch:withOutputChannel:) withObject:dataArray afterDelay:.1];
+            //[self performSelectorOnMainThread:@selector(setFibreSwitch:withOutputChannel:) withObject:dataArray waitUntilDone:YES];
+            
             
             //Loop through each intensity of a SMELLIE run 
             for(int intensityLoopInt =minLaserIntensity;intensityLoopInt < maxLaserIntensity; intensityLoopInt++){
@@ -468,9 +496,10 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
                 }
                 
                 //start a new subrun
-                [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-                [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+                //[runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+                //[runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                 
+                //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:.1];
                 [self setLaserSoftLockOff];
                 
                 //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
@@ -478,9 +507,10 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
                 [NSThread sleepForTimeInterval:0.1f];
                 
                 //Call the smellie system here 
-                NSLog(@" Laser:%@ ", [laserArray objectAtIndex:laserLoopInt]);
-                NSLog(@" Fibre:%@ ",[fibreArray objectAtIndex:fibreLoopInt]);
+                NSLog(@" Laser:%@ ", laserKey);
+                NSLog(@" Fibre:%@ ",fibreKey);
                 NSLog(@" Intensity:%i \n",intensityLoopInt);
+                //[self performSelector:@selector(setLaserSoftLockOn) withObject:nil afterDelay:.1];
                 [self setLaserSoftLockOn];
                 
                 
@@ -488,6 +518,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
             
         }//end of looping through each Fibre
         
+        laserLoopInt = laserLoopInt + 1;
     }//end of looping through each laser
     
     //End the run

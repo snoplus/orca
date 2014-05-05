@@ -50,7 +50,7 @@
 //SMELLIE Control Functions
 -(void)setSmellieSafeStates;
 -(void)setLaserSwitch:(NSString*)laserSwitchChannel;
--(void)setFibreSwitch:(NSString*)fibreSwitchChannel;
+-(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel;
 -(void)setLaserIntensity:(NSString*)laserIntensity;
 -(void)setLaserSoftLockOn;
 -(void)setLaserSoftLockOff;
