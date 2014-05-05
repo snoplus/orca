@@ -761,6 +761,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp
 {
+    if (stealthMode) return;
     if([aSymbol length]>=1) aSymbol = [aSymbol substringWithRange:NSMakeRange(0,1)];
     else aSymbol = @"G";
     
@@ -781,13 +782,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) updateDatabaseStats
 {
-	if(!stealthMode){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-        [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
-        if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
-        [self getRemoteInfo:NO];
-		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
-	}
+    if (stealthMode) return;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+    [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
+    if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
+    [self getRemoteInfo:NO];
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
 }
 
 - (void) setDBInfo:(NSDictionary*)someInfo
@@ -975,6 +975,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) periodicCompact
 {
+    if (stealthMode) return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(periodicCompact) object:nil];
 	[self compactDatabase];
 	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:600];
