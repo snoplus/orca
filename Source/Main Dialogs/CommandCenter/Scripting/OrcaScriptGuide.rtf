@@ -247,7 +247,10 @@ strcat(<var,var,...>)	      //concatenate values into string for printing or an 
 postalarm(<alarmName>, <alarmSeverity> [,<alarmHelp>]);  //the help string is optional\
 clearalarm(<alarmName>);\
 nsdictionary()                     
-\i //makes an NSDictionary
+\i //makes an empty NSDictionary
+\i0 \
+nsdictionary(<key>,<value>, ...)     
+\i //makes a NSDictionary with those keys and values
 \i0 \
 nsarray()                            
 \i //makes an NSArray\
