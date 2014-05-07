@@ -746,6 +746,7 @@
 		case 5: stringToInsert = @"if (<condition>) {\n}\nelse {\n}";	break;
 		case 6: stringToInsert = @"switch (<condition>) {\n\t case <item>:\n\t\t<statement>\n\tbreak;\n\tdefault:\n\t\t<statement>\n\tbreak;\n}";	break;
 		case 7: stringToInsert = @"case <item>:\n\t\t<statement>\n\tbreak;";	break;
+		case 8: stringToInsert = @"try {\n}\ncatch(e){\n}\nfinally{\n}";	break;
 		default:break;
 	}
 	if([stringToInsert length]){
