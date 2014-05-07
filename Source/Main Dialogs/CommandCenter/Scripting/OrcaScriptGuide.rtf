@@ -239,7 +239,8 @@ to start a new empty file with the same name, you must manually delete the old f
 \b0 \
 waituntil (<true>)		       //returns true always\
 waituntil (<true>,<timeout>) //returns false if timed-out, true otherwise.\
-sleep(<# seconds>);\
+sleep(<# seconds>);	       //# seconds can be a float value\
+yield(<# seconds>);	       //# seconds is rounded to int value (1 second granularity)\
 hex(<var>)		                
 \i //convert to hex string
 \i0 \

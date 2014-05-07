@@ -35,6 +35,7 @@
 		<string>waituntil</string>
 		<string>waitUntil</string>
 		<string>sleep</string>
+		<string>yield</string>
 		<string>print</string>
 		<string>printfile</string>
 		<string>display</string>

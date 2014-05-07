@@ -73,6 +73,7 @@
 - (id)		clearAlarm:(id)p;
 - (id)		extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray;
 - (id)		sleepFunc:(id)p;
+- (id)      yieldFunc:(id)p;
 - (id)		timeFunc;
 - (id)		runShellCmd:(id)p;
 - (id)		writeLine:(id) p;
@@ -583,6 +584,7 @@
 			
 			//built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
+		case YIELD:			return [self yieldFunc:p];
 		case TIME:			return [self timeFunc];
 		case CONFIRM:       return [self confirmWithUser:p];
 		case REQUEST:       return [self requestFromUser:p];
@@ -1492,6 +1494,30 @@
 	return exitValue;
 }
 
+- (id) yieldFunc:(id)p
+{
+	int delay = [NodeValue(0) intValue];
+    if(delay<1)delay=1;
+	int total=0;
+	bool exitTime = NO;
+	do {
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		@try {
+			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+			if([self exitNow]){
+				exitTime = YES;
+			}
+			total += 1;
+		}
+		@catch(NSException* localException) {
+		}
+		[pool release];
+		if(exitTime)break;
+	}while(total<delay);
+	return nil;
+}
+
+
 - (id) sleepFunc:(id)p
 {
 	float delay = [NodeValue(0) floatValue];
@@ -1741,6 +1767,7 @@
 				case RETURN:			line = [NSMutableString stringWithString:@"[return]"];		break;
 				case CONTINUE:			line = [NSMutableString stringWithString:@"[continue]"];	break;
 				case SLEEP:				line = [NSMutableString stringWithString:@"[sleep]"];		break;
+				case YIELD:				line = [NSMutableString stringWithString:@"[yield]"];		break;
 				case NSDICTIONARY:		line = [NSMutableString stringWithString:@"[nsdictionary]"]; break;
 				case NSARRAY:			line = [NSMutableString stringWithString:@"[nsarray]"];		 break;
                 case NSDATECOMPONENTS:  line = [NSMutableString stringWithString:@"[nsdatecomponents]"]; break;

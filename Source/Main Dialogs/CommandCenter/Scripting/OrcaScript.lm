@@ -96,6 +96,7 @@ E			[Ee][+-]?{D}+
 "continue"		return CONTINUE;
 "return"		return RETURN;
 "sleep"			return SLEEP;
+"yield"			return YIELD;
 "waituntil"		return WAITUNTIL;
 "waitUntil"		return WAITUNTIL;
 "hex"			return HEX;
