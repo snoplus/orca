@@ -51,6 +51,7 @@
 - (id)		processThrow:(id) p;
 - (id)      makeException:(id) p;
 - (id)      makeDictionary:(id) p;
+- (id)      makeArray:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
 - (id)		forLoop:(id) p;
@@ -588,6 +589,7 @@
 		case kConfirmTimeOut:	return [self confirmWithUserTimeout:p];
 		case SHOW:          return [self showStatusDialog:p];
 		case NSDICTIONARY:	return [self makeDictionary:p];
+		case NSARRAY:       return [self makeArray:p];
 
 		case MAKEEXCEPTION:	return [self makeException:p];
         case NSDATECOMPONENTS:
@@ -603,7 +605,6 @@
                      NSSecondCalendarUnit
                            fromDate:[NSDate date]];
         }
-		case NSARRAY:           return [NSMutableArray array];
         case SEEDRANDOM:        {
             time_t t;
             time(&t);
@@ -1245,13 +1246,21 @@
     else {
         NSMutableDictionary* d = [NSMutableDictionary dictionary];
         NSMutableArray* anArray = [NSMutableArray arrayWithArray:NodeValue(0)];
-        NSLog(@"array: %@\n",NodeValue(0));
         int n = [anArray count];
         int i;
         for(i=0;i<n;i+=2){
             [d setObject:[anArray objectAtIndex:i+1] forKey:[anArray objectAtIndex:i]];
         }
         return d;
+    }
+    return nil;
+}
+- (id) makeArray:(id) p
+{
+    if([[p nodeData] count] == 0) return [NSMutableArray array];
+    else {
+        NSMutableArray* anArray = [NSMutableArray arrayWithArray:NodeValue(0)];
+        return anArray;
     }
     return nil;
 }

@@ -25,6 +25,7 @@
 		<string>try</string>
 		<string>catch</string>
 		<string>finally</string>
+		<string>throw</string>
 	</array>
 	<key>Identifiers2</key>
 	<array>

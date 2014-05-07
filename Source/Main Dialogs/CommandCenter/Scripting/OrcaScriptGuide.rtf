@@ -250,10 +250,19 @@ nsdictionary()
 \i //makes an empty NSDictionary
 \i0 \
 nsdictionary(<key>,<value>, ...)     
+\i //makes a NSDictionary with those keys and values\
+@\{
+\i0 <key>,<value>, ...\}        
 \i //makes a NSDictionary with those keys and values
 \i0 \
 nsarray()                            
 \i //makes an NSArray\
+
+\i0 nsarray(<var>,<var>,...)    
+\i //makes an NSArray and inits it with the <var> list\
+@[
+\i0 <var>,<var>,...]             
+\i //makes an NSArray and inits it with the <var> list\
 
 \i0 nsdatecomponents()
 \i          //returns the date from system\
