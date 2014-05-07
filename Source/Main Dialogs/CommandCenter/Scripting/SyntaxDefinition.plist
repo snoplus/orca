@@ -47,6 +47,7 @@
 		<string>strcat</string>
 		<string>nsdictionary</string>
 		<string>nsarray</string>
+		<string>nsexception</string>
 		<string>point</string>
 		<string>rect</string>
 		<string>pointx</string>

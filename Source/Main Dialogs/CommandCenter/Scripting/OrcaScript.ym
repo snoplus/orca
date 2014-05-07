@@ -139,12 +139,13 @@ ns_object
 | NSFILEMANAGER '('')'                           { $$ = executionNode(NSFILEMANAGER,nil);}
 | NSDATECOMPONENTS '('')'                        { $$ = executionNode(NSDATECOMPONENTS,nil);}
 | MAKEEXCEPTION '(' expr ',' expr ',' expr ')'   { $$ = executionNode(MAKEEXCEPTION,$3,$5,$7,nil);}
+| '@' '[' objList ']'                            { $$ = executionNode(NSARRAY, $3,nil); }
 | '@' '{' keyObjectPairs '}'                     { $$ = executionNode(NSDICTIONARY, $3,nil); }
-| '@' '[' keyObjectPairs ']'                     { $$ = executionNode(NSARRAY, $3,nil); }
 ;
 
+
 random_gen
-: RANDOM '(' expr ',' expr ')'			{ $$ = executionNode(RANDOM,$3,$5,nil);}
+: RANDOM '(' expr ',' expr ')'		{ $$ = executionNode(RANDOM,$3,$5,nil);}
 ;
 
 wait_statement
@@ -386,6 +387,7 @@ assignment_expr
 | confirm_statement                                 { $$ = $1; }
 | request_statement                                 { $$ = $1; }
 | show_statement                                    { $$ = $1; }
+| ns_object                                         { $$ = $1; }
 ;
 
 //create a string from a list of variables...useful only for printing and method calls that take a string
