@@ -1802,7 +1802,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="NSPopUpButton" id="533847688">
 							<reference key="NSNextResponder" ref="963545427"/>
 							<int key="NSvFlags">265</int>
-							<string key="NSFrame">{{393, 395}, {117, 22}}</string>
+							<string key="NSFrame">{{390, 395}, {124, 22}}</string>
 							<reference key="NSSuperview" ref="963545427"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="560108941"/>
@@ -1917,7 +1917,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="890447623"/>
 										</object>
-										<object class="NSMenuItem" id="490348052">
+										<object class="NSMenuItem" id="638974510">
 											<reference key="NSMenu" ref="90816686"/>
 											<string key="NSTitle">try catch finally</string>
 											<string key="NSKeyEquiv"/>
@@ -4385,7 +4385,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 							<reference ref="769069103"/>
 							<reference ref="891511781"/>
 							<reference ref="480606651"/>
-							<reference ref="490348052"/>
+							<reference ref="638974510"/>
 						</array>
 						<reference key="parent" ref="890447623"/>
 					</object>
@@ -4883,7 +4883,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">sZM-xP-2s4</string>
-						<reference key="object" ref="490348052"/>
+						<reference key="object" ref="638974510"/>
 						<reference key="parent" ref="90816686"/>
 					</object>
 				</array>
@@ -5203,27 +5203,6 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">NSTextView</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="orderFrontSharingServicePicker:">id</string>
-						<string key="toggleQuickLookPreviewPanel:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="orderFrontSharingServicePicker:">
-							<string key="name">orderFrontSharingServicePicker:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleQuickLookPreviewPanel:">
-							<string key="name">toggleQuickLookPreviewPanel:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSTextView.h</string>
-					</object>
-				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">OHexFormatter</string>
 					<string key="superclassName">NSFormatter</string>
@@ -5633,20 +5612,6 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<object class="IBActionInfo" key="toggleMaintainIndentation:">
 							<string key="name">toggleMaintainIndentation:</string>
 							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="progress">NSProgressIndicator</string>
-						<string key="status">NSTextField</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="progress">
-							<string key="name">progress</string>
-							<string key="candidateClassName">NSProgressIndicator</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="status">
-							<string key="name">status</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
