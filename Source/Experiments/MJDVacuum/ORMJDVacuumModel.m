@@ -295,24 +295,23 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) lakeShoreChanged:(NSNotification*)aNote
 {
-    if([self coolerMode] == kPulseTube){
-        id lakeShore = [self findLakeShore];
-        if([lakeShore isKindOfClass:NSClassFromString(@"ORLakeShore336Model")]){
-            if([aNote object] == [(ORLakeShore336Model*)lakeShore input:0]){ //make sure the value is coming from input A
-                ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
-                [aRegionlabel setValue:  [(ORLakeShore336Model*)lakeShore convertedValue:0]];
-                [aRegionlabel setIsValid:[(ORLakeShore336Model*)lakeShore isValid]];
-            }
-            else {
-                if([aNote object] == (ORLakeShore210Model*)lakeShore){
-                    ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
-                    [aRegionlabel setValue:  [(ORLakeShore210Model*)lakeShore convertedValue:7]];
-                    [aRegionlabel setIsValid:[(ORLakeShore210Model*)lakeShore isValid]];
-                }
-
-            }
+    id lakeShore = [self findLakeShore];
+    if([lakeShore isKindOfClass:NSClassFromString(@"ORLakeShore336Model")]){
+        if([aNote object] == [(ORLakeShore336Model*)lakeShore input:0]){ //make sure the value is coming from input A
+            ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
+            [aRegionlabel setValue:  [(ORLakeShore336Model*)lakeShore convertedValue:0]];
+            [aRegionlabel setIsValid:[(ORLakeShore336Model*)lakeShore isValid]];
         }
     }
+    else {
+        if([aNote object] == (ORLakeShore210Model*)lakeShore){
+            ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
+            [aRegionlabel setValue:  [(ORLakeShore210Model*)lakeShore convertedValue:7]];
+            [aRegionlabel setIsValid:[(ORLakeShore210Model*)lakeShore isValid]];
+        }
+
+    }
+
 }
 
 
