@@ -154,6 +154,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	//we need to know about a specific set of events in order to handle the constraints
 	ORMks660BModel*       baratron  = [self findBaratron];
     id                    lakeShore = [self findLakeShore];
+    
     //should have just one or the other..... baratron or lakeshore not both
 	if(baratron){
 		[notifyCenter addObserver : self
