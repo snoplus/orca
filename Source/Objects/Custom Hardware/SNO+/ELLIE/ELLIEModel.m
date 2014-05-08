@@ -464,11 +464,13 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
             //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"2" waitUntilDone:YES];
             //[self performSelector:@selector(setLaserSwitch:) withObject:@"2" afterDelay:.1];
             [self setLaserSwitch:@"2"]; //whichever channel the 405 is connected to
+            
         }
         else if ([laserKey isEqual:@"440nm"]){
             //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"3" waitUntilDone:YES];
             //[self performSelector:@selector(setLaserSwitch:) withObject:@"3" afterDelay:.1];
             [self setLaserSwitch:@"3"]; //whichever channel the 440 is connected to
+            [NSThread sleepForTimeInterval:35.0f];
         }
         else if ([laserKey isEqual:@"500nm"]){
             //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES modes:kCFRunLoopDefaultMode];
@@ -477,7 +479,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
             //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES];
             
             [self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
-            ///[NSThread sleepForTimeInterval:35.0f];
+            [NSThread sleepForTimeInterval:35.0f];
             
         }
         else{
@@ -541,7 +543,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
                 
                 //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
                 //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
-                [NSThread sleepForTimeInterval:100.0f];
+                [NSThread sleepForTimeInterval:10.0f];
                 
                 //Call the smellie system here 
                 NSLog(@" Laser:%@ ", laserKey);
