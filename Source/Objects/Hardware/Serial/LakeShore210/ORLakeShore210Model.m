@@ -36,6 +36,7 @@ NSString* ORLakeShore210ModelHighLimitChanged           = @"ORLakeShore210ModelH
 NSString* ORLakeShore210ModelHighAlarmChanged           = @"ORLakeShore210ModelHighAlarmChanged";
 NSString* ORLakeShore210ModelLowLimitChanged            = @"ORLakeShore210ModelLowLimitChanged";
 NSString* ORLakeShore210ModelLowAlarmChanged            = @"ORLakeShore210ModelLowAlarmChanged";
+
 NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 @interface ORLakeShore210Model (private)
@@ -169,6 +170,12 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 
 #pragma mark ***Accessors
+
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
+}
 
 - (ORTimeRate*)timeRate:(int)index
 {
@@ -543,7 +550,8 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	int i;
 	for(i=0;i<[t count];i++){
 		[self setTemp:i value:[[t objectAtIndex:i] floatValue]];
-	}	
+	}
+    [self setIsValid:YES];
 	if(shipTemperatures) [self shipTemps];
 }
 
