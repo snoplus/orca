@@ -272,6 +272,8 @@ primary_expr
 | CONSTANT					{ $$ = constantNode($1); }
 | STRING					{ $$ = stringNode($1); }
 | '@' STRING				{ $$ = stringNode($2); }
+| make_string               { $$ = $1; }
+| cat_string                { $$ = $1; }
 | functionCall				{ $$ = $1; }
 | objC						{ $$ = $1; }
 | findObj					{ $$ = $1; }

@@ -87,6 +87,8 @@
 - (id)      showStatusDialog:(id) p;
 - (id)      genRandom:(id) p;
 - (id)      valueArray:(id)p;
+- (id)      addNodes:(id)p;
+
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -651,7 +653,7 @@
 		case '=':			return [self setValue: NodeValue(1) forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
 		case UMINUS:		return [[NSDecimalNumber decimalNumberWithString:@"-1"] decimalNumberByMultiplyingBy:NodeValue(0)];
 		case '%':			return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] % [NodeValue(1) longValue]];
-		case '+':			return [NodeValue(0) decimalNumberByAdding: NodeValue(1)];
+		case '+':			return [self addNodes:p];
 		case '-':			return [NodeValue(0) decimalNumberBySubtracting: NodeValue(1)];
 		case '*':			return [NodeValue(0) decimalNumberByMultiplyingBy: NodeValue(1)];
 		case '/':			return [self processDiv:p];
@@ -1132,6 +1134,21 @@
 	[argObject release];
 	
 	return returnValue;
+}
+
+- (id) addNodes:(id)p
+{
+    id node0 = NodeValue(0);
+    id node1 = NodeValue(1);
+    if([node0 isKindOfClass:[NSDecimalNumber class]] && [node1 isKindOfClass:[NSDecimalNumber class]]){
+        return [node0 decimalNumberByAdding: node1];
+    }
+    else if([node0 isKindOfClass:[NSString class]] && [node1 isKindOfClass:[NSString class]]){
+        return [NSString stringWithFormat:@"%@%@",node0,node1];
+    }
+    else {
+        return [NSString stringWithFormat:@"%@%@",node0,node1];
+    }
 }
 
 - (id) defineArray:(id) p
