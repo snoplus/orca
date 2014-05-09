@@ -32,6 +32,8 @@
 - (void) setNumber:(int)n height:(float)aHeight spacing:(float)aSpacing;
 - (void) adjustPositionsAndSizes;
 - (void) setXLabel:(NSString*)aLabel;
+- (NSArray*) valueBars;
+
 - (IBAction) setLogX:(id)sender;
 
 @property (retain) ORAxis*			xAxis;
