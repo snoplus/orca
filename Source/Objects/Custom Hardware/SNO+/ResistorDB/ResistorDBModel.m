@@ -8,6 +8,7 @@
 
 #import "ResistorDBModel.h"
 #import "ORCouchDB.h"
+#import "SNOPModel.h"
 
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 
@@ -18,17 +19,38 @@
     [self setImage:[NSImage imageNamed:@"resistor"]];
 }
 
-/*- (void) queryResistorDb
+- (void) queryResistorDb
  {
- //view to query
- NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullResistorInfoByPmt"];
+     //view to query
+     NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullResistorInfoByPmt"];
  
- [[self generalDBRef:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
+     //[[self orcaDbRefWithEntryDB:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
+     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
+     
+     //[self setSmellieDBReadInProgress:YES];
+     //[self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
  
- //[self setSmellieDBReadInProgress:YES];
- //[self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
- 
- }*/
+ }
+
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+{
+    //Loop over all the FEC cards
+    NSArray * snopControllerArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel * snopModel = [snopControllerArray objectAtIndex:0];
+    
+    
+    ORCouchDB* result = [ORCouchDB couchHost:[snopModel orcaDBIPAddress]
+                                        port:[snopModel orcaDBPort]
+                                    username:[snopModel orcaDBUserName]
+                                         pwd:[snopModel orcaDBPassword]
+                                    database:entryDB
+                                    delegate:self];
+    
+    if (aCouchDelegate)
+        [result setDelegate:aCouchDelegate];
+    
+    return [[result retain] autorelease];
+}
 
 -(void)couchDBResult:(id)aResult tag:(NSString *)aTag op:(id)anOp{
     @synchronized(self){

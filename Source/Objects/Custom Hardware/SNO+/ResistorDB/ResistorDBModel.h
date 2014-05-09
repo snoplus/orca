@@ -11,7 +11,12 @@
 
 @class ORCouchDB;
 
-@interface ResistorDBModel :  OrcaObject
+@protocol ResistorDbDelegate <NSObject>
+@required
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+@end
+
+@interface ResistorDBModel :  OrcaObject<ResistorDbDelegate>
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;
