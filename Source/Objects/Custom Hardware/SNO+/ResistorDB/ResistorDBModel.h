@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "ResistorDBViewController.h"
 
+@class ORCouchDB;
+
 @interface ResistorDBModel :  OrcaObject
 -(void) setUpImage;
 -(void) makeMainController;
