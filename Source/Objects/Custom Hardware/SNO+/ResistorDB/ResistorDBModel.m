@@ -12,6 +12,7 @@
 
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 
+NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
 @implementation ResistorDBModel
 
 - (void) setUpImage
@@ -19,9 +20,9 @@
     [self setImage:[NSImage imageNamed:@"resistor"]];
 }
 
-- (void) queryResistorDb
+- (void) queryResistorDb:(id)aCrate withCard:(id)aCard withChannel:(id)aChannel
  {
-     //view to query
+     //view to query (make the request within this string)
      NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullResistorInfoByPmt"];
  
      //[[self orcaDbRefWithEntryDB:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
@@ -64,9 +65,9 @@
             if ([aTag isEqualToString:kResistorDbHeaderRetrieved])
             {
                 NSLog(@"here\n");
-                NSLog(@"Object: %@\n",aResult);
-                NSLog(@"result: %@\n",[aResult objectForKey:@"SnoPmt"]);
-                //[self parseSmellieRunHeaderDoc:aResult];
+                //NSLog(@"Object: %@\n",aResult);
+                //NSLog(@"result: %@\n",[aResult objectForKey:@"SnoPmt"]);
+                [self parseResistorDbResult:aResult];
             }
             //If no tag is found for the query result
             else {
@@ -83,6 +84,34 @@
             //no docs found 
         }
     }
+}
+
+- (void)parseResistorDbResult:(id)aResult
+{
+    //look at the crate, card, channel values in here
+    NSString *snoPmtTest = [NSString stringWithFormat:@"PBHB"]; //test pmt value 
+    
+    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
+    
+    //NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
+    
+    for(i=0;i<cnt;i++){
+        NSLog(@"entry: %@",[[aResult objectForKey:@"rows"] objectAtIndex:i]);
+        //value is the value which is returned by the request string
+        NSString* resistorDbIterator = [NSString stringWithFormat:@"%@",[[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"]];
+        if([resistorDbIterator isEqualToString:snoPmtTest]){
+            NSLog(@"entry: %@",[[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"]);
+        }
+        //NSString *key = [NSString stringWithFormat:@"%u",i];
+        //[tmp setObject:resistorDbIterator forKey:key];
+    }
+    
+    //make notification here
+    [[NSNotificationCenter defaultCenter] postNotificationName:resistorDBQueryLoaded object: self];
+    //[self.viewloadingFromDbWheel startAnimation];
+    
+    //[self setSmellieRunHeaderDocList:tmp];
+    //[tmp release];
 }
 
 

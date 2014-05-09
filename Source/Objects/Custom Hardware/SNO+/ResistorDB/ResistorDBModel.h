@@ -21,8 +21,10 @@
 -(void) makeMainController;
 -(void) wakeUp;
 -(void) sleep;
--(void)dealloc;
+-(void) dealloc;
 
-- (void)queryResistorDb;
+-(void) queryResistorDb:(id)aCrate withCard:(id)aCard withChannel:(id)aChannel;
 
 @end
+
+extern NSString* resistorDBQueryLoaded;

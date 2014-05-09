@@ -32,11 +32,13 @@
     IBOutlet NSTextField *updateReasonOther;
     IBOutlet NSTextField *updateInfoForPull;
     IBOutlet NSButton *updateDbButton;
+    NSProgressIndicator *loadingFromDbWheel;
 }
 
 -(id)init;
 -(void)dealloc;
 -(void) updateWindow;
 -(void) registerNotificationObservers;
+-(void) resistorDbQueryLoaded;
 
 @end
