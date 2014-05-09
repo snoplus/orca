@@ -7,6 +7,7 @@
 //
 
 #import "ResistorDBViewController.h"
+#import "ResistorDBModel.h"
 
 @interface ResistorDBViewController ()
 
@@ -29,6 +30,11 @@
 {
 	[super updateWindow];
     
+}
+
+-(IBAction)queryResistorDB:(id)sender
+{
+    [model queryResistorDb];
 }
 
 - (void) registerNotificationObservers

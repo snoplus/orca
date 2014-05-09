@@ -23,4 +23,6 @@
 -(void) sleep;
 -(void)dealloc;
 
+- (void)queryResistorDb;
+
 @end
