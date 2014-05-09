@@ -497,6 +497,18 @@ configDocument  = _configDocument;
     //[self performSelector:@selector(morcaUpdatePushDocs) withObject:nil afterDelay:0.2];
 }
 
+- (void) queryResistorDb
+ {
+ //view to query
+ NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullResistorInfoByPmt"];
+ 
+ [[self orcaDbRef:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
+ 
+ //[self setSmellieDBReadInProgress:YES];
+ //[self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+ 
+ }
+
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
 	@synchronized(self) {
@@ -534,6 +546,9 @@ configDocument  = _configDocument;
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];
+        }
+        else if ([aTag isEqualToString:@"kResistorDbHeaderRetrieved"]){
+            //do something with the header being recieved 
         }
         //Look for the configuration document tag
         else if ([aTag isEqualToString:kOrcaConfigDocumentAdded]) {

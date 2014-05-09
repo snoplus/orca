@@ -18,6 +18,18 @@
     [self setImage:[NSImage imageNamed:@"resistor"]];
 }
 
+/*- (void) queryResistorDb
+ {
+ //view to query
+ NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullResistorInfoByPmt"];
+ 
+ [[self generalDBRef:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
+ 
+ //[self setSmellieDBReadInProgress:YES];
+ //[self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+ 
+ }*/
+
 -(void)couchDBResult:(id)aResult tag:(NSString *)aTag op:(id)anOp{
     @synchronized(self){
         if([aResult isKindOfClass:[NSDictionary class]]){
@@ -31,7 +43,7 @@
             {
                 NSLog(@"here\n");
                 NSLog(@"Object: %@\n",aResult);
-                NSLog(@"result: %@\n",[aResult objectForKey:@"run_name"]);
+                NSLog(@"result: %@\n",[aResult objectForKey:@"SnoPmt"]);
                 //[self parseSmellieRunHeaderDoc:aResult];
             }
             //If no tag is found for the query result
@@ -50,20 +62,6 @@
         }
     }
 }
-
-/*- (void) queryResistorDb
-{
-    //view to query
-    //NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
-    
-    //[[self generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
-    
-    //[self setSmellieDBReadInProgress:YES];
-    //[self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
-    
-}*/
-
-
 
 - (void) makeMainController
 {
