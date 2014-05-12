@@ -13,17 +13,20 @@
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 
 NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
+
 @implementation ResistorDBModel
+@synthesize
+currentQueryResults = _currentQueryResults;
 
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"resistor"]];
 }
 
-- (void) queryResistorDb:(id)aCrate withCard:(id)aCard withChannel:(id)aChannel
+- (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
  {
      //view to query (make the request within this string)
-     NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullResistorInfoByPmt"];
+     NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullCrate?key=[%i,%i,%i]",aCrate,aCard,aChannel];
  
      //[[self orcaDbRefWithEntryDB:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
      [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
@@ -89,13 +92,14 @@ NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
 - (void)parseResistorDbResult:(id)aResult
 {
     //look at the crate, card, channel values in here
-    NSString *snoPmtTest = [NSString stringWithFormat:@"PBHB"]; //test pmt value 
+    //unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
     
-    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
+    self.currentQueryResults = [[NSMutableDictionary alloc] init];
+    self.currentQueryResults = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"value"];
     
-    //NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
+    //NSLog(@"entry: %@",self.currentQueryResults);
     
-    for(i=0;i<cnt;i++){
+    /*for(i=0;i<cnt;i++){
         NSLog(@"entry: %@",[[aResult objectForKey:@"rows"] objectAtIndex:i]);
         //value is the value which is returned by the request string
         NSString* resistorDbIterator = [NSString stringWithFormat:@"%@",[[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"]];
@@ -104,10 +108,10 @@ NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
         }
         //NSString *key = [NSString stringWithFormat:@"%u",i];
         //[tmp setObject:resistorDbIterator forKey:key];
-    }
+    }*/
     
     //make notification here
-    [[NSNotificationCenter defaultCenter] postNotificationName:resistorDBQueryLoaded object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:resistorDBQueryLoaded object:self];
     //[self.viewloadingFromDbWheel startAnimation];
     
     //[self setSmellieRunHeaderDocList:tmp];

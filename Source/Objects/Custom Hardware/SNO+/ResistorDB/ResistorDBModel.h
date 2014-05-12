@@ -16,14 +16,19 @@
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 @end
 
-@interface ResistorDBModel :  OrcaObject<ResistorDbDelegate>
+
+@interface ResistorDBModel :  OrcaObject<ResistorDbDelegate>{
+    NSMutableDictionary *_currentQueryResults;
+}
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;
 -(void) sleep;
 -(void) dealloc;
 
--(void) queryResistorDb:(id)aCrate withCard:(id)aCard withChannel:(id)aChannel;
+@property (nonatomic,copy) NSMutableDictionary *currentQueryResults;
+
+- (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel;
 
 @end
 

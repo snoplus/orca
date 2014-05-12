@@ -40,5 +40,6 @@
 -(void) updateWindow;
 -(void) registerNotificationObservers;
 -(void) resistorDbQueryLoaded;
+-(NSString*) parseStatusFromResistorDb:(NSString*)aKey withTrueStatement:(NSString*)aTrueStatement withFalseStatement:(NSString*)aFalseStatement;
 
 @end
