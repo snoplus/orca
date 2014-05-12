@@ -488,7 +488,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="728299969">
-												<int key="NSCellFlags">342884416</int>
+												<int key="NSCellFlags">74448961</int>
 												<int key="NSCellFlags2">272630784</int>
 												<string key="NSContents"/>
 												<reference key="NSSupport" ref="94691508"/>
@@ -574,7 +574,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="340576239">
-												<int key="NSCellFlags">342884416</int>
+												<int key="NSCellFlags">74448961</int>
 												<int key="NSCellFlags2">272630784</int>
 												<string key="NSContents"/>
 												<reference key="NSSupport" ref="94691508"/>
@@ -660,7 +660,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="947123549">
-												<int key="NSCellFlags">342884416</int>
+												<int key="NSCellFlags">74448961</int>
 												<int key="NSCellFlags2">272630784</int>
 												<string key="NSContents"/>
 												<reference key="NSSupport" ref="94691508"/>
@@ -746,7 +746,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="581475206">
-												<int key="NSCellFlags">342884416</int>
+												<int key="NSCellFlags">74448961</int>
 												<int key="NSCellFlags2">272630784</int>
 												<string key="NSContents"/>
 												<reference key="NSSupport" ref="94691508"/>
@@ -832,7 +832,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="682780279">
-												<int key="NSCellFlags">342884416</int>
+												<int key="NSCellFlags">74448961</int>
 												<int key="NSCellFlags2">272630784</int>
 												<string key="NSContents"/>
 												<reference key="NSSupport" ref="94691508"/>
@@ -918,7 +918,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSComboBoxCell" key="NSCell" id="682048635">
-												<int key="NSCellFlags">342884416</int>
+												<int key="NSCellFlags">74448961</int>
 												<int key="NSCellFlags2">272630784</int>
 												<string key="NSContents"/>
 												<reference key="NSSupport" ref="94691508"/>
@@ -2062,7 +2062,6 @@
 							<reference ref="436361108"/>
 							<reference ref="1036734269"/>
 							<reference ref="7433224"/>
-							<reference ref="592677976"/>
 							<reference ref="571878693"/>
 							<reference ref="990332815"/>
 							<reference ref="251083966"/>
@@ -2074,6 +2073,7 @@
 							<reference ref="891224991"/>
 							<reference ref="707359919"/>
 							<reference ref="1043845258"/>
+							<reference ref="592677976"/>
 						</array>
 						<reference key="parent" ref="1006"/>
 					</object>
@@ -2889,17 +2889,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ResistorDBViewController</string>
 					<string key="superclassName">OrcaObjectController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">queryResistorDB:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">queryResistorDB:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">queryResistorDB:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="cardSelect">NSComboBox</string>
 						<string key="channelSelect">NSComboBox</string>

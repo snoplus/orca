@@ -55,10 +55,12 @@
 {
     //NSString * falseString = [NSString stringWithFormat:@"0"];
     
-    if([[[[model currentQueryResults] objectForKey:aKey] stringValue] isEqualToString:@"0"]){
+    //NSLog(@"value %@",[[model currentQueryResults] objectForKey:aKey]);
+    
+    if([[[model currentQueryResults] objectForKey:aKey] isEqualToString:@"0"]){
         return aFalseStatement;
     }
-    else if([[[[model currentQueryResults] objectForKey:aKey] stringValue] isEqualToString:@"1"]){
+    else if([[[model currentQueryResults] objectForKey:aKey] isEqualToString:@"1"]){
         return aTrueStatement;
     }
     else{
@@ -71,7 +73,7 @@
     //NSLog(@"in here");
     [loadingFromDbWheel setHidden:YES];
     [loadingFromDbWheel stopAnimation:nil];
-    NSLog(@"model value %@",[model currentQueryResults]);
+    NSLog(@"model value pulled Cable %@",[[model currentQueryResults] objectForKey:@"pulledCable"]);
     
     //Values to load
     NSString *resistorStatus;
@@ -83,19 +85,54 @@
     
     @try{
         resistorStatus = [self parseStatusFromResistorDb:@"rPulled" withTrueStatement:@"Pulled" withFalseStatement:@"Not Pulled"];
-        SNOLowOccString = [self parseStatusFromResistorDb:@"SnoLowOcc" withTrueStatement:@"True" withFalseStatement:@"False"];
-        pmtRemovedString = [self parseStatusFromResistorDb:@"PmtRemoved" withTrueStatement:@"True" withFalseStatement:@"False"];
-        pmtReinstalledString = [self parseStatusFromResistorDb:@"PmtReInstalled" withTrueStatement:@"True" withFalseStatement:@"False"];
-        badCableString = [self parseStatusFromResistorDb:@"BadCable" withTrueStatement:@"True" withFalseStatement:@"False"];
-        pulledCableString = [self parseStatusFromResistorDb:@"pulledCable" withTrueStatement:@"True" withFalseStatement:@"False"];
+        SNOLowOccString = [self parseStatusFromResistorDb:@"SnoLowOcc" withTrueStatement:@"YES" withFalseStatement:@"NO"];
+        pmtRemovedString = [self parseStatusFromResistorDb:@"PmtRemoved" withTrueStatement:@"YES" withFalseStatement:@"NO"];
+        pmtReinstalledString = [self parseStatusFromResistorDb:@"PmtReInstalled" withTrueStatement:@"YES" withFalseStatement:@"NO"];
+        badCableString = [self parseStatusFromResistorDb:@"BadCable" withTrueStatement:@"YES" withFalseStatement:@"NO"];
+        
+        //pulledCable isn't a string but an integer!!!
+        if([[[[model currentQueryResults] objectForKey:@"pulledCable"] stringValue] isEqualToString:@"0"]){
+            pulledCableString = @"YES";
+        }
+        else if([[[[model currentQueryResults] objectForKey:@"pulledCable"] stringValue] isEqualToString:@"1"]){
+            pulledCableString = @"NO";
+        }
+        else{
+            pulledCableString = @"Unknown Cable State";
+        }
+        
         
         //load the values to the screen
-        [currentResistorStatus setValue:resistorStatus];
-        [currentSNOLowOcc setValue:SNOLowOccString];
-        [currentPulledCable setValue:pulledCableString];
-        [currentPMTReinstallled setValue:pmtReinstalledString];
-        [currentPMTRemoved setValue:pmtRemovedString];
-        [currentBadCable setValue:badCableString];
+        [currentResistorStatus setStringValue:resistorStatus];
+        [currentSNOLowOcc setStringValue:SNOLowOccString];
+        [currentPulledCable setStringValue:pulledCableString];
+        [currentPMTReinstallled setStringValue:pmtReinstalledString];
+        [currentPMTRemoved setStringValue:pmtRemovedString];
+        [currentBadCable setStringValue:badCableString];
+        
+        [updateResistorStatus setStringValue:resistorStatus];
+        [updateSnoLowOcc setStringValue:SNOLowOccString];
+        [updatePulledCable setStringValue:pulledCableString];
+        [updatePmtReinstalled setStringValue:pmtReinstalledString];
+        [updatePmtRemoved setStringValue:pmtRemovedString];
+        [updateBadCable setStringValue:badCableString];
+    
+        //reasonbox
+        NSString *reasonString = [[model currentQueryResults] objectForKey:@"reason"];
+        if([reasonString isEqualToString:NULL]){
+            reasonString = @"";
+        }
+        [updateReasonBox setStringValue:reasonString];
+        
+        //infoBox
+        NSString *infoString = [[model currentQueryResults] objectForKey:@"info"];
+        if([infoString isEqualToString:NULL]){
+            infoString = @"";
+        }
+        [updateInfoForPull setStringValue:infoString];
+        [self updateWindow];
+        
+        
     }
     
     @catch(NSException *e){
