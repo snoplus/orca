@@ -26,7 +26,7 @@
 int main(int argc, const char *argv[])
 {
 #if defined(MAC_OS_X_VERSION_10_9) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9)
-    [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityLatencyCritical
+    [[NSProcessInfo processInfo] beginActivityWithOptions:(NSActivityLatencyCritical | NSActivityUserInitiated)
                                                    reason:@"Real-time control/DAQ"];
 #endif
 	//NSZombieEnabled = YES;
