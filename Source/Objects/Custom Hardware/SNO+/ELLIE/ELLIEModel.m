@@ -37,6 +37,9 @@
 #define kAmellieRunDocumentUpdated   @"kAmellieRunDocumentUpdated"
 #define kSmellieRunHeaderRetrieved   @"kSmellieRunHeaderRetrieved"
 
+//sub run information tags
+#define kSmellieSubRunDocumentAdded @"kSmellieSubRunDocumentAdded"
+
 NSString* ELLIEAllLasersChanged = @"ELLIEAllLasersChanged";
 NSString* ELLIEAllFibresChanged = @"ELLIEAllFibresChanged";
 NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
@@ -46,6 +49,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @interface ELLIEModel (private)
 -(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile;
 -(NSString*) stringDateFromDate:(NSDate*)aDate;
+-(void) _pushSmellieRunDocument;
 @end
 
 @implementation ELLIEModel
@@ -53,7 +57,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize smellieRunSettings;
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
-
+@synthesize smellieSubRunInfo;
 
 - (void) setUpImage
 {
@@ -191,6 +195,33 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
             
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
+    
+    [runDocPool release];
+}
+
+-(void) _pushSmellieRunDocument
+{
+    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run_information"];
+    
+    NSLog(@"document_type: %@",docType);
+    
+    [runDocDict setObject:docType forKey:@"doc_type"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run_number"];
+    [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
+    
+    //self.runDocument = runDocDict;
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
     
     [runDocPool release];
 }
@@ -378,52 +409,18 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     [fibreArray setObject:[smellieSettings objectForKey:@"FS155"] forKey:@"FS155" ];
     [fibreArray setObject:[smellieSettings objectForKey:@"FS255"] forKey:@"FS255" ];
     
+    smellieSubRunInfo = [[NSMutableArray alloc] initWithCapacity:100];
+    
     //get the MTC Object
     NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     
-    
-    //start an actual run here
-    //NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunController")];
-    //theRunController = [objs2 objectAtIndex:0];
-    /*[theRunController release];
-    theRunController = nil;
-    NSArray*  objs2 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunController")];
-    theRunController = [objs2 objectAtIndex:0];
-    [theRunController startRunAction:nil];*/
-    
-    
-    //[runControl release];
-    //runControl = nil;
-    //NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    //if([anArray count])runControl = [[anArray objectAtIndex:0] retain];
-    
     //get the run controller
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
-    
-    //check to see if the document has been posted to the database otherwise start this
-    /*if([[runControl document] isDocumentEdited]){
-		[[runControl document] afterSaveDo:@selector(startRun) withTarget:self];
-        [[runControl document] saveDocument:nil];
-    }
-	else [runControl startRun];*/
-    
-    //[theRunController startRunAction:nil];
-    
-    //startRunAction:(id)sender
+
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-    
-    //NSLog(@"Run State: %@",[theRunModel runningState]);
-    
-    //if running in slave mode fire some pedestals
-    
-    
-    //REMOVE THIS LATER !!!!!!!!!!!!
-    //[self performSelectorOnMainThread:@selector(setLaserFrequency20Mhz) withObject:nil waitUntilDone:YES];
-    //[self performSelector:@selector(setLaserFrequency20Mhz) withObject:nil afterDelay:.1];
-    
-    
+
     //fire some pedestals
     [theMTCModel fireMTCPedestalsFixedRate];
  
@@ -544,6 +541,15 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
                 //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
                 [NSThread sleepForTimeInterval:10.0f];
                 
+                NSMutableDictionary *valuesToFillPerSubRun = [[NSMutableDictionary alloc] initWithCapacity:100];
+                [valuesToFillPerSubRun setObject:laserKey forKey:@"laser"];
+                [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
+                [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:intensityLoopInt] forKey:@"intensity"];
+                [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+                
+                [smellieSubRunInfo addObject:valuesToFillPerSubRun];
+                [valuesToFillPerSubRun release];
+                
                 //Call the smellie system here 
                 NSLog(@" Laser:%@ ", laserKey);
                 NSLog(@" Fibre:%@ ",fibreKey);
@@ -589,6 +595,8 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     //removed this to stop splurgingb
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
+    
+    [self _pushSmellieRunDocument];
     
     [runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
     

@@ -530,7 +530,6 @@ configDocument  = _configDocument;
             //NSLog(@"result2: %@\n",[[aResult objectForKey:@"rows"] objectAtIndexedSubscript:0]);
             [self parseSmellieRunHeaderDoc:aResult];
         }
-        
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];

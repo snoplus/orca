@@ -19,11 +19,13 @@
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
     ORRunController* theRunController;
+    NSMutableArray *smellieSubRunInfo;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
+@property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
 
 -(void) setUpImage;
 -(void) makeMainController;
