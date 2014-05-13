@@ -304,11 +304,11 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
         customCmd = @"0";
     }
     
-    if([customArgument1 isEqualToString:nil]){
+    if([customArgument1 isEqualToString:nil] || [customArgument1 isEqualToString:@""]){
         customArgument1 = @"0";
     }
     
-    if([customArgument2 isEqualToString:nil]){
+    if([customArgument2 isEqualToString:nil] || [customArgument2 isEqualToString:@""]){
         customArgument2 = @"0";
     }
         

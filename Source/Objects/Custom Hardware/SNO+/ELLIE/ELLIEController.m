@@ -518,6 +518,14 @@
     //NSString * cmd = [NSString stringWithString:[smellieDirectCmd stringValue]];
     NSString * arg1 = [NSString stringWithString:[smellieDirectArg1 stringValue]];
     NSString * arg2 = [NSString stringWithString:[smellieDirectArg2 stringValue]];
+    if(arg1 == NULL){
+        arg1 = @"0";
+    }
+    
+    if(arg2 == NULL){
+        arg2 = @"0";
+    }
+    
     [model sendCustomSmellieCmd:cmd withArgument1:arg1 withArgument2:arg2];
 }
 
