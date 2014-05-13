@@ -379,8 +379,8 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     [fibreArray setObject:[smellieSettings objectForKey:@"FS255"] forKey:@"FS255" ];
     
     //get the MTC Object
-    //NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    //ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     
     
     //start an actual run here
@@ -425,7 +425,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     
     
     //fire some pedestals
-    //[theMTCModel fireMTCPedestalsFixedRate];
+    [theMTCModel fireMTCPedestalsFixedRate];
  
     BOOL endOfRun = NO;
     
@@ -470,7 +470,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
             //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"3" waitUntilDone:YES];
             //[self performSelector:@selector(setLaserSwitch:) withObject:@"3" afterDelay:.1];
             [self setLaserSwitch:@"3"]; //whichever channel the 440 is connected to
-            [NSThread sleepForTimeInterval:35.0f];
+            //[NSThread sleepForTimeInterval:35.0f];
         }
         else if ([laserKey isEqual:@"500nm"]){
             //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES modes:kCFRunLoopDefaultMode];
@@ -479,18 +479,18 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
             //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES];
             
             [self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
-            [NSThread sleepForTimeInterval:35.0f];
+            //[NSThread sleepForTimeInterval:35.0f];
             
         }
         else{
-            NSLog(@"SMELLIE RUN:No laser selected for this iteration");
+            NSLog(@"SMELLIE RUN:No laser selected for this iteration\n");
         }
         
         
         //REMOVE THIS LATER
-        [NSThread sleepForTimeInterval:1.0f];
-        [self setLaserFrequency20Mhz];
-        [NSThread sleepForTimeInterval:1.0f];
+        //[NSThread sleepForTimeInterval:1.0f];
+        //[self setLaserFrequency20Mhz];
+        //[NSThread sleepForTimeInterval:1.0f];
         
         //Loop through each Fibre
         for(id fibreKey in fibreArray){
@@ -539,7 +539,6 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
                 
                 //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:.1];
                 [self setLaserSoftLockOff];
-                [NSThread sleepForTimeInterval:1.0f];
                 
                 //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
                 //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
@@ -583,9 +582,9 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     //Even though this is stopping in Orca it can still contine on SNODROP!
     //Need a stop run command here
     //TODO: add a try and except statement here
-    //NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    //ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
-    //[theMTCModel stopMTCPedestalsFixedRate];
+    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    [theMTCModel stopMTCPedestalsFixedRate];
     
     //removed this to stop splurgingb
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];

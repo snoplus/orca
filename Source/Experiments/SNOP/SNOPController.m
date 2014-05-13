@@ -531,7 +531,7 @@ smellieRunFile;
                 //Calculate the approximate time of the run
                 float triggerFrequency = [[smellieRunFile objectForKey:@"trigger_frequency"] floatValue];
                 float numberTriggersPerLoop = [[smellieRunFile objectForKey:@"triggers_per_loop"] floatValue];
-                float timePerLaserPerFibrePerIntensity = (1.0/triggerFrequency)*numberTriggersPerLoop;
+                float timePerLaserPerFibrePerIntensity = (1.0/triggerFrequency)*numberTriggersPerLoop + 13.0;
                 float numberOfIntensities = [[smellieRunFile objectForKey:@"num_intensity_steps"] floatValue];
                 float timePerLaserPerFibre = timePerLaserPerFibrePerIntensity*numberOfIntensities;
                 float timePerLaser = timePerLaserPerFibre*(1.0*fibreCounter);
