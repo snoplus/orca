@@ -212,9 +212,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     runControl = [objs3 objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"smellie_run_information"];
-    
-    NSLog(@"document_type: %@",docType);
-    
+
     [runDocDict setObject:docType forKey:@"doc_type"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run_number"];
@@ -224,6 +222,24 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
     
     [runDocPool release];
+}
+
+-(void) _pushSmellieConfigDocument
+{
+    NSAutoreleasePool *configDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary *configDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    NSArray *objs = [[[NSApp delegate] document] collectConnectedObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel *aSnotModel  = [objs objectAtIndex:0];
+    NSString * docType = @"smellie_config_doc";
+    
+    [configDocDict setObject:docType forKey:@"doc_type"];
+    [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    
+    //fill in information from the GUI
+    
+    //[[aSnotModel orcaDBConnectionHistor]]
+    
+    [configDocPool release];
 }
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
