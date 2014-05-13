@@ -10,6 +10,7 @@
 #import "ELLIEModel.h"
 
 @implementation ELLIEController
+    NSMutableDictionary *laserHeadDic;
 
 //@synthesize smellieRunSettingsFromGUI;
 
@@ -48,6 +49,9 @@
     [smellieAllFibresButton setEnabled:YES];
     [smellieAllLasersButton setEnabled:YES];
     [smellieMakeNewRunButton setEnabled:NO];
+    
+    //load most recent smellie config file 
+    laserHeadDic = [[NSMutableDictionary alloc] initWithCapacity:100];
     
     //NSMutableDictionary *smellieRunInfo = [[NSMutableDictionary alloc] init];
     
@@ -88,9 +92,24 @@
 						 name : ELLIEAllFibresChanged
 					   object : model];
     
+    [notifyCenter addObserver:self
+                     selector:@selector(loadCurrentInformationForLaserHead)
+                         name:NSComboBoxSelectionDidChangeNotification
+                       object:smellieConfigLaserHeadField];
+    
 }
 
 //SMELLIE functions -------------------------
+
+
+-(void) loadCurrentInformationForLaserHead
+{
+    //load information from a configArray
+    [smellieConfigAttenuatorField selectItemWithObjectValue:nil];
+    [smellieConfigFsInputCh selectItemWithObjectValue:nil];
+    [smellieConfigFsOutputCh selectItemWithObjectValue:nil];
+    [smellieConfigDetectorFibreRef selectItemWithObjectValue:nil];
+}
 
 //enables all lasers if the "all lasers" box is enabled 
 -(IBAction)setAllLasersAction:(id)sender;

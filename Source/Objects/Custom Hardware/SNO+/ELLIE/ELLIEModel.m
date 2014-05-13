@@ -224,7 +224,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     [runDocPool release];
 }
 
--(void) _pushSmellieConfigDocument
+/*-(void) _pushSmellieConfigDocument
 {
     NSAutoreleasePool *configDocPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary *configDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
@@ -240,7 +240,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     //[[aSnotModel orcaDBConnectionHistor]]
     
     [configDocPool release];
-}
+}*/
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
 {

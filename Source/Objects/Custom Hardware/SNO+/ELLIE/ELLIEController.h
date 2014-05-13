@@ -60,6 +60,20 @@
     //Error Fields
     IBOutlet NSTextField* smellieRunErrorTextField; //new run error text field 
     
+    
+    //SMELLIE Configuration Fields
+    IBOutlet NSComboBox* smellieConfigLaserHeadField;
+    IBOutlet NSComboBox* smellieConfigAttenuatorField;
+    IBOutlet NSComboBox* smellieConfigFsInputCh;
+    IBOutlet NSComboBox* smellieConfigFsOutputCh;
+    IBOutlet NSComboBox* smellieConfigDetectorFibreRef;
+    IBOutlet NSTextField* smellieConfigSelfTestNoOfPulses;
+    IBOutlet NSTextField* smellieConfigSelfTestNoOfPulsesPerLaser;
+    IBOutlet NSTextField* smellieConfigSelfTestNiTriggerOutputPin;
+    IBOutlet NSTextField* smellieConfigSelfTestNiTriggerInputPin;
+    IBOutlet NSTextField* smellieConfigSelfTestLaserTriggerFreq;
+    IBOutlet NSTextField* smellieConfigSelfTestPmtSampleRate;
+    
     //TELLIE interface ------------------------------------------
     
 }
