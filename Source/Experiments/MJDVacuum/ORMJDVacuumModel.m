@@ -1884,7 +1884,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	
 	//---------------------------------------------------------------------------
 	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing
-	//baratron must be >1000Torr  and <2500Torr if baratron is used
+	//baratron must be >.75  and <2.0Bar if baratron is used
     //LakeShore A must be >100K is baratron is NOT used
 	//Note: the bias info can only get back to the DAQ via the DAQ system script
 	double			cyrostatPress		= [self valueForRegion:kRegionCryostat];
@@ -1897,7 +1897,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         
         ORMks660BModel* baratron			= [self findBaratron];
         float			baratronPressure	= [baratron pressure];
-        if((baratronPressure >= 1000) && (baratronPressure <= 2500)){
+        if((baratronPressure >= 0.75) && (baratronPressure <= 2.0)){
             [self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
             [self removeOkToBiasConstraints:     kBaratronTooHighConstraint];
             [self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
@@ -1905,11 +1905,11 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         }
         else {
             //nope, not operational
-            if(baratronPressure < 1000) {
+            if(baratronPressure < 0.75) {
                 [self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
                 [self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
             }
-            else if(baratronPressure > 2500)	{
+            else if(baratronPressure > 2.0)	{
                 [self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
                 [self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
             }
