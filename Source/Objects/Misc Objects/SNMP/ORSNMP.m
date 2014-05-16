@@ -458,7 +458,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 // scripts and having the result go back to the delegate
 //--------------------------------------------------
 @implementation ORSNMPShellOp
-- (id) initWithFilePath:(NSString*)aCmd arguments:(NSArray*)theArgs delegate:(id)aDelegate tag:(int)aTag
+- (id) initWithCmd:(NSString*)aCmd arguments:(NSArray*)theArgs delegate:(id)aDelegate tag:(int)aTag
 {
 	self = [super init];
     tag         = aTag;

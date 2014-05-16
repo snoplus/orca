@@ -111,7 +111,7 @@
     NSString*   command;
     NSArray*    arguments;
 }
-- (id) initWithFilePath:(NSString*)aCmd arguments:(NSArray*)theArgs delegate:(id)aDelegate tag:(int)aTag;
+- (id) initWithCmd:(NSString*)aCmd arguments:(NSArray*)theArgs delegate:(id)aDelegate tag:(int)aTag;
 - (void) main;
 @end
 
