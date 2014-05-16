@@ -99,4 +99,23 @@
 @property (nonatomic,retain)	id			userInfo;
 @end
 
+//--------------------------------------------------
+// ORSNMPShellOp
+// An easier way to use SNMP by just executing shell
+// scripts and having the result go back to the delegate
+//--------------------------------------------------
+@interface ORSNMPShellOp : NSOperation
+{
+	id          delegate;
+    int         tag;
+    NSString*   command;
+    NSArray*    arguments;
+}
+- (id) initWithFilePath:(NSString*)aCmd arguments:(NSArray*)theArgs delegate:(id)aDelegate tag:(int)aTag;
+- (void) main;
+@end
+
+@interface NSObject (ORSNMPShellOp)
+- (void) setSNMP:(int)aTag result:(NSString*)theResult;
+@end;
 
