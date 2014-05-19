@@ -43,8 +43,8 @@
 
 #pragma mark •••Initialization
 - (void) registerNotificationObservers;
-
-#pragma mark •••Interface Management
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) timeWindowChanged:(NSNotification*)aNotification;
 - (void) nHitChanged:(NSNotification*)aNotification;
 - (void) numBurstsNeededChanged:(NSNotification*)aNotification;

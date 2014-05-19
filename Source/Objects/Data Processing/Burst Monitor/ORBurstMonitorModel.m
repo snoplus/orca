@@ -46,6 +46,7 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 @interface ORBurstMonitorModel (private)
 - (void) deleteQueues;
 - (void) monitorQueues;
+- (void) delayedBurstEvent;
 @end
 
 @implementation ORBurstMonitorModel
