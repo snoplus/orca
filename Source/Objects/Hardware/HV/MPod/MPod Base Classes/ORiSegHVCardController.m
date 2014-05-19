@@ -48,9 +48,9 @@
 {	
 	[super awakeFromNib];
 	
-	[[currentPlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
+	[[currentPlotter yAxis] setRngLimitsLow:-5000 withHigh:5000 withMinRng:10];
 	[[voltagePlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
-	[[currentPlotter yAxis] setLabel:@"Current (µA)"];
+	[[currentPlotter yAxis] setLabel:@"Current (pA)"];
 	[[voltagePlotter yAxis] setLabel:@"Voltage (V)"];
 	ORTimeLinePlot* aPlot;
 	
@@ -301,15 +301,6 @@
 
 - (void) channelReadParamsChanged:(NSNotification*)aNote
 {
-	if(!scheduledForUpdate){
-		scheduledForUpdate = YES;
-		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-		[self performSelector:@selector(deferedReadParamsUpdate:) withObject:aNote afterDelay:1];
-	}
-}
-- (void) deferedReadParamsUpdate:(NSNotification*)aNote
-{
-	scheduledForUpdate = NO;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[hvTableView reloadData];
 	[self updateButtons];
@@ -616,6 +607,7 @@
 	[self endEditing];
 	int selectedChannel = [model selectedChannel];
 	[model loadValues:selectedChannel];
+
 }
 
 #pragma mark •••Data Source Methods
@@ -678,11 +670,13 @@
 - (IBAction) powerOnAction:(id)sender
 {
 	[model turnChannelOn:[model selectedChannel]];
+	[[model adapter] pollHardware];
 }
 
 - (IBAction) powerOffAction:(id)sender
 {
 	[model turnChannelOff:[model selectedChannel]];
+	[[model adapter] pollHardware];
 }
 
 - (IBAction) stopRampAction:(id)sender
@@ -746,6 +740,7 @@
 					  nil,
 					  nil,
 					  @"%@",s2);
+
 }
 
 - (IBAction) powerAllOffAction:(id)sender
@@ -776,6 +771,7 @@
 					  nil,
 					  nil,
 					  @"%@",s2);
+
 }
 
 - (IBAction) stopAllRampAction:(id)sender

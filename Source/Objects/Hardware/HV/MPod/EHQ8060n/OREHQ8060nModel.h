@@ -32,8 +32,6 @@
 #pragma mark ***Accessors
 - (NSString*) settingsLock;
 - (NSString*) name;
-- (NSArray*) channelUpdateList;
-- (NSArray*) commonChannelUpdateList;
 
 #pragma mark •••Hardware Wizard
 - (NSArray*) wizardSelections;

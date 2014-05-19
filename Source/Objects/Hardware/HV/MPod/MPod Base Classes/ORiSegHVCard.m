@@ -146,7 +146,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	[[NSNotificationCenter defaultCenter]
      postNotificationName:ORiSegHVCardExceptionCountChanged
      object:self];
-    
 }
 
 - (void)incExceptionCount
@@ -157,7 +156,51 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
      postNotificationName:ORiSegHVCardExceptionCountChanged
      object:self];
 }
-- (NSMutableDictionary*) rdParams:(int)i
+
+- (void) setRdParamsFrom:(NSDictionary*)aDictionary
+{
+	int numChannels = [self numberOfChannels];
+	int i;
+	for(i=0;i<numChannels;i++){
+		id oldOnOffState	= [[[[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
+
+		NSString* aChannelKey = [NSString stringWithFormat:@"u%d",[self slotChannelValue:i]];
+		id params = [aDictionary objectForKey:aChannelKey];
+		[rdParams[i] release];
+		rdParams[i] = [params retain];
+
+		id currentOnOffState	 = [[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
+		int oldState	 = [oldOnOffState intValue];
+		int currentState = [currentOnOffState intValue];
+		
+		if(oldOnOffState && currentOnOffState && (oldState != currentState)){
+			NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], i,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
+		}
+		
+		
+		if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
+		if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
+		[voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
+		[currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]*1000000];
+		
+	}
+	if(shipRecords) [self shipDataRecords];
+	
+	if([[self adapter] respondsToSelector:@selector(power)]){
+		if(![[self adapter] power]){
+			int i;
+			for(i=0;i<[self numberOfChannels];i++){
+				[rdParams[i] release];
+				rdParams[i] = nil;
+			}
+		}
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
+	
+}
+
+- (NSDictionary*) rdParams:(int)i
 {
     if(i>=0 && i<[self numberOfChannels]){
         return rdParams[i];
@@ -248,28 +291,17 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	else return @"";
 }
 
-
-- (NSArray*) channelUpdateList
-{
-	return nil; //subclasses should override
-}
-
-- (NSArray*) commonChannelUpdateList
-{
-	return nil; //subclasses should override
-}
-
 - (void) syncDialog
-{
-	NSArray* syncParams = [NSArray arrayWithObjects:
-						   @"outputMeasurementSenseVoltage",
-						   @"outputCurrent",
-						   nil];
-    
-	syncParams = [self addChannelNumbersToParams:syncParams];
-	syncParams = [syncParams arrayByAddingObjectsFromArray:[self commonChannelUpdateList]];
-	
-	[[self adapter] getValues:syncParams target:self selector:@selector(processSyncResponseArray:)];
+{	
+	int i;
+	for(i=0;i<[self numberOfChannels];i++){
+		
+		float readBackVoltage = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
+		int theTarget = fabs(readBackVoltage)+ 0.5;
+		[self setTarget:i withValue:theTarget];
+
+		//if([name isEqualToString:@"outputCurrent"])	[self setMaxCurrent:theChannel withValue:[[anEntry objectForKey:@"Value"] floatValue]*1000000.];
+	}
 }
 
 - (NSArray*) addChannelNumbersToParams:(NSArray*)someChannelParams
@@ -298,90 +330,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	return convertedArray;
 }
 
-- (void) updateAllValues
-{
-	NSArray* updateRequests = [self channelUpdateList];
-	updateRequests = [updateRequests arrayByAddingObjectsFromArray:[self commonChannelUpdateList]];
-	[[self adapter] getValues: updateRequests  target:self selector:@selector(processReadResponseArray:)];
-	if(shipRecords) [self shipDataRecords];
-}
-
-- (void) processReadResponseArray:(NSArray*)response
-{
-	
-	[super processReadResponseArray:response];
-	
-	for(id anEntry in response){
-		NSString* anError = [anEntry objectForKey:@"Error"];
-		if([anError length]){
-			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
-				//time out so flush the queue
-				[[ORSNMPQueue queue] cancelAllOperations];
-				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
-				break;
-			}
-		}
-		else {
-			//make sure the slot matches: if not then ignore this Entry
-			int theSlot = [[anEntry objectForKey:@"Slot"] intValue];
-			if(theSlot == [self slot]){
-				if([anEntry objectForKey:@"Channel"]){
-					int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-					NSString* name = [anEntry objectForKey:@"Name"];
-					if([self channelInBounds:theChannel]){
-						if(!rdParams[theChannel])rdParams[theChannel] = [[NSMutableDictionary dictionary] retain];
-						id oldOnOffState = nil;
-						id currentOnOffState   = nil;
-						if(name){
-							BOOL checkForStateChange = [name isEqualToString:@"outputSwitch"];
-							
-							//get the orginal state
-							if(checkForStateChange) oldOnOffState	= [[[[rdParams[theChannel] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
-							
-							[rdParams[theChannel] setObject:anEntry forKey:name];
-							
-							if(checkForStateChange){
-								//get the new state
-								currentOnOffState	 = [[rdParams[theChannel] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
-								if(oldOnOffState!=nil && currentOnOffState!=nil){
-									int oldState	 = [oldOnOffState intValue];
-									int currentState = [currentOnOffState intValue];
-									
-									if(oldState != currentState){
-										NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], theChannel,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
-									}
-								}
-							}
-                        }
-					}
-				}
-			}
-		}
-	}
-	
-    
-	if([[self adapter] respondsToSelector:@selector(power)]){
-		if(![[self adapter] power]){
-			int i;
-			for(i=0;i<[self numberOfChannels];i++){
-				[rdParams[i] removeAllObjects];
-			}
-		}
-	}
-	
-	int i;
-	for(i=0;i<[self numberOfChannels];i++){
-		if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
-		if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
-		[voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
-		[currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]];
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
-	
-    
-}
-
 - (void) processWriteResponseArray:(NSArray*)response
 {
 	[super processWriteResponseArray:response];
@@ -395,8 +343,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 				break;
 			}
-		}
-		else {
 		}
 	}
 }
@@ -614,6 +560,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 {
 	int i;
 	for(i=0;i<[self numberOfChannels];i++)[self turnChannelOn:i];
+	[[self adapter] pollHardware];
 }
 
 - (void) turnAllChannelsOff
@@ -622,6 +569,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	for(i=0;i<[self numberOfChannels];i++){
 		[self turnChannelOff:i];
 	}
+	[[self adapter] pollHardware];
+
 }
 
 - (void) panicAllChannels
@@ -704,34 +653,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	}
 }
 
-- (void) processSyncResponseArray:(NSArray*)response
-{
-	[super processSyncResponseArray:response];
-	for(id anEntry in response){
-		NSString* anError = [anEntry objectForKey:@"Error"];
-		if([anError length]){
-			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
-				//time out so flush the queue
-				[[ORSNMPQueue queue] cancelAllOperations];
-				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
-				break;
-			}
-		}
-		else {
-			int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-			if(theChannel>=0 && theChannel<[self numberOfChannels]){
-				NSString* name = [anEntry objectForKey:@"Name"];
-				if([name isEqualToString:@"outputMeasurementSenseVoltage"]){
-					int theTarget = fabs([[anEntry objectForKey:@"Value"] floatValue])+ 0.5;
-					
-					[self setTarget:theChannel withValue:theTarget];
-				}
-				if([name isEqualToString:@"outputCurrent"])	[self setMaxCurrent:theChannel withValue:[[anEntry objectForKey:@"Value"] floatValue]*1000000.];
-			}
-		}
-	}
-}
 
 - (float) riseRate{ return riseRate; }
 - (void) setRiseRate:(float)aValue

@@ -135,51 +135,15 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:OREHS8260pModelCurrentTripBehaviorChanged object:self];
 }
 
-- (NSArray*) channelUpdateList
+- (void) setRdParamsFrom:(NSDictionary*)aDictionary
 {
-	NSMutableArray* channelReadParams = [NSMutableArray arrayWithObjects:
-										 @"outputMeasurementSenseVoltage",	
-										 @"outputMeasurementCurrent",	
-										 @"outputSwitch",
-										 @"outputStatus",
-										 //@"outputVoltage",
-										 //@"outputCurrent",
-										 //@"outputSupervisionMinSenseVoltage",
-										 //@"outputSupervisionMaxSenseVoltage",
-										 //@"outputSupervisionMaxTerminalVoltage",	
-										 //@"outputSupervisionMaxCurrent",
-										 //@"outputSupervisionMaxTemperature",	
-										 //@"outputConfigMaxSenseVoltage",
-										 //@"outputConfigMaxTerminalVoltage",	
-										 //@"outputConfigMaxCurrent",
-										 //@"outputConfigMaxPower",
-										 nil];
-	
-	if(channelUpdateQueryCount==0){
-		[channelReadParams addObject:@"outputSupervisionBehavior"];
-		[channelReadParams addObject:@"outputTripTimeMaxCurrent"];
-	}
-	else if(channelUpdateQueryCount>2){
-		if(channelUpdateQueryCount%2)	[channelReadParams addObject:@"outputSupervisionBehavior"];
-		else							[channelReadParams addObject:@"outputTripTimeMaxCurrent"];
-	}
-	channelUpdateQueryCount++;
-	
-	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
-	return cmds;
-}
-
-- (void) updateAllValues
-{
-	[super updateAllValues];
-	int i;	
-	for(i=0;i<8;i++){
-		if([[self ramper:i] enabled]){
-			[[self adapter] callBackToTarget:self selector:@selector(checkRamperCallBack:) userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"]];
-		}
-	}
-	
-	if(shipRecords) [self shipDataRecords];
+	[super setRdParamsFrom:aDictionary];
+	 int i;	
+	 for(i=0;i<8;i++){
+		 if([[self ramper:i] enabled]){
+			 [[self adapter] callBackToTarget:self selector:@selector(checkRamperCallBack:) userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:i] forKey:@"Channel"]];
+		 }
+	 }
 }
 
 - (void) checkRamperCallBack:(id)userInfo
@@ -188,23 +152,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	if([self channelInBounds:aChannel]){
 		[[self ramper:aChannel] execute];
 	}
-}
-
-
-- (NSArray*) commonChannelUpdateList
-{
-	NSArray* cmds = nil;
-	if(commonParamQueryCount==0){
-		NSArray* channelReadParams = [NSArray arrayWithObjects:
-									  //@"outputVoltageRiseRate",
-									  @"outputMeasurementTemperature",	
-									  nil];
-		cmds = [self addChannel:0 toParams:channelReadParams];
-	}
-	commonParamQueryCount++;
-	if(commonParamQueryCount>60)commonParamQueryCount = 0;
-	
-	return cmds;
 }
 
 - (void) writeTripTimes
@@ -403,10 +350,6 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 		[encoder encodeInt:tripTime[i]					forKey: [@"tripTime" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:outputFailureBehavior[i]		forKey: [@"outputFailureBehavior" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:currentTripBehavior[i]		forKey: [@"currentTripBehavior" stringByAppendingFormat:@"%d",i]];
-		
-		NSMutableDictionary* aValue = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:123.1],@"Value",nil];
-		rdParams[i] = [[NSMutableDictionary alloc] initWithObjectsAndKeys:aValue,@"outputMeasurementSenseVoltage",nil];
-		[aValue release];
 	}
 }
 

@@ -238,8 +238,9 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 
 - (void) postCouchDBRecord
 {
+	
     NSMutableDictionary* theSupplies  = [NSMutableDictionary dictionary];
-    NSMutableDictionary* systemParams = [NSMutableDictionary dictionary];
+    NSMutableDictionary* systemParams = nil;
     
     int numChannelsWithVoltage = 0;
     int numChannelsRamping     = 0;
@@ -264,7 +265,8 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
         }
         else if([anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")]){
             ORMPodCModel* aControllerCard = (ORMPodCModel*)anObj;
-            if([aControllerCard systemParams])systemParams = [aControllerCard systemParams];
+			systemParams = [[aControllerCard parameterDictionary] objectForKey:@"0"];
+			if(!systemParams)systemParams = [NSDictionary dictionary];
         }
     }
     
@@ -278,6 +280,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
     
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+	 
 }
 @end
 

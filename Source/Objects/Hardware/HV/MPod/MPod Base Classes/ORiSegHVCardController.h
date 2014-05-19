@@ -67,8 +67,6 @@
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
 	IBOutlet ORTimedTextField*    timeoutField;
-    
-	BOOL scheduledForUpdate;
 }
 
 #pragma mark •••Interface Management
@@ -89,7 +87,6 @@
 - (void) powerRestored:(NSNotification*)aNote;
 - (void) updateHistoryPlots:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
-- (void) deferedReadParamsUpdate:(NSNotification*)aNote;
 - (void) maxVoltageChanged:(NSNotification*)aNote;
 - (void) chanNameChanged:(NSNotification*)aNote;
 

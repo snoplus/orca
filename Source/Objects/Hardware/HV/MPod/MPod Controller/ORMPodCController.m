@@ -196,7 +196,7 @@
 
 - (IBAction) updateAction:(id)sender
 {
-	[model updateAllValues];
+	[model pollHardware];
 }
 
 - (IBAction) clearHistoryAction:(id)sender

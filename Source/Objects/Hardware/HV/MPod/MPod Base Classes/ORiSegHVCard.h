@@ -65,7 +65,7 @@ enum {
     short			hwGoal[16];		//value to send to hw
     short			target[16];		//input by user
     float			riseRate;
-	NSMutableDictionary* rdParams[16];
+	NSDictionary*	rdParams[16];
     int				selectedChannel;
     float			maxCurrent[16];
     int             maxVoltage[16];
@@ -74,8 +74,6 @@ enum {
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
     NSMutableDictionary* hvConstraints;
-	int				commonParamQueryCount;
-	int				channelUpdateQueryCount;
 }
 
 #pragma mark ***Initialization
@@ -131,7 +129,8 @@ enum {
 - (BOOL) channelInBounds:(short)aChan;
 - (BOOL) isOn:(short)aChannel;
 - (BOOL) hvOnAnyChannel;
-- (NSMutableDictionary*) rdParams:(int)i;
+- (void) setRdParamsFrom:(NSDictionary*)aDictionary;
+- (NSDictionary*) rdParams:(int)i;
 - (BOOL) constraintsInPlace;
 - (void) requestMaxValues:(int)aChannel;
 
@@ -143,13 +142,8 @@ enum {
 - (NSDictionary*) dataRecordDescription;
 
 #pragma mark ***Polling
-- (void) updateAllValues;
-- (NSArray*) channelUpdateList;
-- (NSArray*) commonChannelUpdateList;
 - (NSArray*) addChannelNumbersToParams:(NSArray*)someChannelParams;
 - (NSArray*) addChannel:(int)i toParams:(NSArray*)someChannelParams;
-- (void) processReadResponseArray:(NSArray*)response;
-- (void) processSyncResponseArray:(NSArray*)response;
 - (void) processWriteResponseArray:(NSArray*)response;
 
 #pragma mark ¥¥¥Hardware Access
@@ -212,6 +206,7 @@ enum {
 
 @interface NSObject (ORiSegHVCard)
 - (BOOL) power;
+- (void) pollHardware;
 @end
 
 extern NSString* ORiSegHVCardShipRecordsChanged;

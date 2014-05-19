@@ -23,6 +23,7 @@
 #import "ORMPodCrate.h"
 #import "ORTaskSequence.h"
 #import "ORSNMP.h"
+#import "ORiSegHVCard.h"
 
 NSString* ORMPodCModelVerboseChanged		 = @"ORMPodCModelVerboseChanged";
 NSString* ORMPodCModelCrateStatusChanged	 = @"ORMPodCModelCrateStatusChanged";
@@ -34,16 +35,17 @@ NSString* MPodPowerFailedNotification		 = @"MPodPowerFailedNotification";
 NSString* MPodPowerRestoredNotification		 = @"MPodPowerRestoredNotification";
 NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
+#define kSNMPWalk 1
+
 @implementation ORMPodCModel
 
 - (void) dealloc
 {
 	[[ORSNMPQueue queue] cancelAllOperations];
-	[systemParams release];
 	[connectionHistory release];
     [IPNumber release];
-	[dictionaryFromWebPage release];
-    
+    [parameterDictionary release];
+	
 	@try {
         [[ORSNMPQueue queue] removeObserver:self forKeyPath:@"operationCount"];
     }
@@ -107,12 +109,6 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 }
 
 #pragma mark ***Accessors
-
-- (NSMutableDictionary*) systemParams
-{
-    return systemParams;
-}
-
 - (BOOL) verbose
 {
     return verbose;
@@ -127,11 +123,13 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (BOOL) power
 {
+	NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
     return [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
 }
 
 - (id) systemParam:(NSString*)name
 {
+	NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
 	id result =  [[systemParams objectForKey:name] objectForKey:@"Value"];
 	if(result)return result;
 	else return @"";
@@ -139,6 +137,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (int) systemParamAsInt:(NSString*)name
 {
+	NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
 	return [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
 }
 
@@ -196,69 +195,60 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) pollHardware
 {
-    if([IPNumber length]){
-		//to save time, we will grab the web page and scrape what values we can.
-		ORHvUrlParseOp* aParseOp = [[ORHvUrlParseOp alloc] initWithDelegate:self];
-		[aParseOp setIpAddress:IPNumber];
-		[ORSNMPQueue addOperation:aParseOp];
-		[aParseOp release];
-		
-        for(id aCard in [[self crate] orcaObjects]){
-            [aCard updateAllValues];
-        }
+    if([IPNumber length]){		
+		ORSNMPShellOp* anOp = [[ORSNMPShellOp alloc] 
+							   initWithCmd:@"/usr/bin/snmpwalk" 
+							   arguments:[NSArray arrayWithObjects:@"-v2c", @"-m", @"+WIENER-CRATE-MIB", @"-c", @"public", IPNumber, @"crate",nil] 
+							   delegate:self 
+							   tag:kSNMPWalk];
+		[[ORSNMPQueue queue] addOperation:anOp];
+		[anOp release];
     }
 }
 
 - (void) pollHardwareAfterDelay
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:2];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
 }
 
-- (void) updateAllValues
+- (void) setSNMP:(int)aTag result:(NSString*)theResult
 {
-	[self getValues: [self systemUpdateList]  target:self selector:@selector(processSystemResponseArray:) priority:NSOperationQueuePriorityLow];
-}
-
-- (NSArray*) systemUpdateList
-{
-	NSArray* systemReadParams = [NSArray arrayWithObjects:
-								 @"sysMainSwitch",
-								 @"sysStatus",	
-								 @"psSerialNumber",
-								 @"psOperatingTime",
-								 nil];
-	NSMutableArray* convertedArray = [NSMutableArray array];
-	for(id aParam in systemReadParams){
-		[convertedArray addObject:[aParam stringByAppendingString:@".0"]];
+	switch(aTag){
+		case kSNMPWalk:
+			[self decodeWalk:theResult];
+			break;
 	}
-	return convertedArray;
+}
+- (void) decodeWalk:(NSString*)theWalk
+{
+	ORSNMPWalkDecodeOp* anOp = [[ORSNMPWalkDecodeOp alloc] 
+								initWithWalk:theWalk 
+								delegate:self ];
+	[[ORSNMPQueue queue] addOperation:anOp];
+	[anOp release];
 }
 
-- (void) processSystemResponseArray:(NSArray*)response
+- (NSDictionary*) parameterDictionary
 {
-	for(id anEntry in response){
-		if(!systemParams)systemParams = [[NSMutableDictionary dictionary] retain];
-		NSString* error = [anEntry objectForKey:@"Error"];
-		if([error length]){
-			if([error rangeOfString:@"Timeout"].location != NSNotFound){
-				[systemParams release];
-				systemParams = nil; 
-				//time out so flush the queue
-				[[ORSNMPQueue queue] cancelAllOperations];
-				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],@"HV Controller",nil);
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
-			}
-		}
-		else {
-			NSString* name  = [anEntry objectForKey:@"Name"];
-			if(name)[systemParams setObject:anEntry forKey:name];
+	return parameterDictionary;
+}
+
+- (void) setParameterDictionary:(NSDictionary*)aParameterDictionary
+{
+	[aParameterDictionary retain];
+	[parameterDictionary release];
+	parameterDictionary = aParameterDictionary;
+		
+	//pass the info to each of the cards. They will keep a copy of their values
+	NSArray* cards = [[self crate] orcaObjects];
+	for(id aCard in cards){
+		if(aCard == self)continue;
+        if([aCard isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+			[(ORiSegHVCard*)aCard setRdParamsFrom:parameterDictionary];
 		}
 	}
-	
-	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
-	
 }
 
 - (void) togglePower
@@ -274,130 +264,21 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 }
 
 #pragma mark ¥¥¥Hardware Access
-- (id) controllerCard
-{
-	return [[self crate] controllerCard];
-}
-
 - (void)  checkCratePower
 {
 	NSString* noteName;
 	BOOL currentPower = [self power];
 	if(currentPower != oldPower){
-        
-        NSLog(@"MPod (%d) power changed state from %@ to %@\n",[self uniqueIdNumber],
+        if(doNotSkipPowerCheck){
+			NSLog(@"MPod (%d) power changed state from %@ to %@\n",[self uniqueIdNumber],
               oldPower?@"ON":@"OFF",currentPower?@"ON":@"OFF");
-
+		}
+		doNotSkipPowerCheck = YES;
 		if([self power]) noteName = MPodPowerRestoredNotification;
 		else			 noteName = MPodPowerFailedNotification;
 		[[NSNotificationCenter defaultCenter] postNotificationName:noteName object:self];
 	}
 	oldPower = currentPower;
-}
-
-- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
-{
-	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:aPriority];
-}
-
-- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector
-{
-	[self getValues:[NSArray arrayWithObject:aCmd] target:aTarget selector:aSelector priority:NSOperationQueuePriorityHigh];
-}
-
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector
-{
-    [self getValues:cmds target:aTarget selector:aSelector priority:NSOperationQueuePriorityLow];
-}
-
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority
-{
-	
-	for(id aCmd in cmds){
-		if(aSelector != NSSelectorFromString(@"processSyncResponseArray:")){
-			//before starting a operation on the queue, see if the parameter is in the web page results
-			@synchronized(self){
-				NSRange r = [aCmd rangeOfString:@"."];
-				if(r.location!=NSNotFound){
-					NSString* paramKey = [aCmd substringToIndex:r.location];
-					NSString* chanKey  = [aCmd substringFromIndex:r.location+1];
-					id cardDict = [dictionaryFromWebPage objectForKey:chanKey];
-					id val  = [cardDict objectForKey:paramKey];
-					if([paramKey isEqualToString:@"OutputSwitch"]){
-						if([val isEqualToString:@"ON"])val = @"1";
-						else val = @"0";
-					}
-					if(val){
-						/* must convert to the key/value pairs. for example
-						 Channel = 1;
-						 Name = outputMeasurementCurrent;
-						 Slot = 1;
-						 Units = A;
-						 Value = "-1.549e-09";
-						 */
-						NSMutableDictionary* anEntry = [NSMutableDictionary dictionary];
-						id theChan = [cardDict objectForKey:@"Channel"];
-						id theSlot = [cardDict objectForKey:@"Slot"];
-						if(theChan && theSlot){
-							[anEntry setObject:theChan forKey:@"Channel"];
-							[anEntry setObject:theSlot forKey:@"Slot"];
-							if(paramKey)[anEntry setObject:paramKey							  forKey:@"Name"];
-							
-							NSString* theValueString = [cardDict objectForKey:paramKey];
-							NSArray* parts = [theValueString componentsSeparatedByString:@" "];
-							if([parts count]==2){
-								NSString* units = [parts objectAtIndex:1];
-								float theValue = [[parts objectAtIndex:0]floatValue];
-								if([units isEqualToString:@"mV"]){
-									theValue = theValue/1000.;
-									units    = @"V";
-								}
-								else if([units isEqualToString:@"nA"]){
-									theValue = theValue/1000.;
-									units    = @"uA";
-								}
-								else if([units isEqualToString:@"mA"]){
-									theValue = theValue*1000.;
-									units    = @"uA";
-								}
-												
-								
-								[anEntry setObject:[NSNumber numberWithFloat:theValue] forKey:@"Value"];
-								[anEntry setObject:units forKey:@"Units"];
-							}
-							else {
-								if(theValueString)[anEntry setObject:theValueString forKey:@"Value"];
-							}
-							[aTarget processReadResponseArray:[NSArray arrayWithObject:anEntry]]; 
-							//NSLog(@"%@\n",anEntry);
-							continue;
-						}
-					}
-				}
-			}
-		}
-		
-		ORSNMPReadOperation* aReadOp = [[ORSNMPReadOperation alloc] initWithDelegate:aTarget];
-		aReadOp.mib			= @"WIENER-CRATE-MIB";
-		aReadOp.ipNumber	= IPNumber;
-		aReadOp.selector	= aSelector;
-		aReadOp.cmds		= [NSArray arrayWithObject:aCmd];
-		aReadOp.queuePriority	= aPriority;
-		aReadOp.verbose	= verbose;
-		[ORSNMPQueue addOperation:aReadOp];
-		[aReadOp release];
-		
-	}
-}
-
-- (void) setDictionaryFromWebPage:(NSMutableDictionary*)aDictionary
-{
-	@synchronized(self){
-		[aDictionary retain];
-		[dictionaryFromWebPage release];
-		dictionaryFromWebPage = aDictionary;
-		//NSLog(@"%@\n",dictionaryFromWebPage);
-	}
 }
 
 - (void) writeMaxTerminalVoltage
@@ -536,116 +417,207 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 @end
 
 
-@implementation ORHvUrlParseOp
+@implementation ORSNMPWalkDecodeOp
 
-@synthesize ipAddress,delegate;
-
-- (id) initWithDelegate:(id)aDelegate
+- (id) initWithWalk:(NSString*)aWalk delegate:(id)aDelegate;
 {
     self = [super init];
 	delegate = aDelegate;
+	theWalk = [aWalk copy];
     return self;
 }
 
 - (void) dealloc
 {        	
-    self.ipAddress      = nil;    
-    self.delegate      = nil;    
+    delegate      = nil; 
+	[theWalk release];
+	theWalk = nil;
+	[dictionaryFromWalk release];
+	dictionaryFromWalk = nil;
     [super dealloc];
 }
 
 - (void) main
 {
     if([self isCancelled])return;
-    
-    NSError * error = nil;
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@",ipAddress]];
-    NSStringEncoding usedEncoding;
-    NSString* htmlString = [NSString stringWithContentsOfURL:url
-                                                usedEncoding:&usedEncoding
-                                                       error:&error];
-	
-    NSMutableArray* tables = [NSString extractArrayFromString:htmlString
-                                                     startTag:@"<table"
-                                                       endTag:@"</table>"];
-    
-    //should be three tables
-    //don't care about the first one. just process the last two
-    if([tables count] == 3){
-        [self processSystemTable: [tables objectAtIndex:1]];
-		if([delegate respondsToSelector:@selector(setDictionaryFromWebPage:)]){
-			[delegate setDictionaryFromWebPage: [self processHVTable:     [tables objectAtIndex:2]]];
-		}
-    }
+	NSArray* allLines = [theWalk componentsSeparatedByString:@"\n"];
+	for(id aLine in allLines){
+		NSRange headerRange = [aLine rangeOfString:@"WIENER-CRATE-MIB::"];
+		if(headerRange.location!= NSNotFound){
+			NSString* s = [aLine substringFromIndex:headerRange.length];
+			[self decodeValueArray:[s componentsSeparatedByString:@"="]];
+		}   
+	}
+	[delegate setParameterDictionary:dictionaryFromWalk];
 }
 
-- (void) processSystemTable:(NSString*)aTable
+- (void)decodeValueArray:(NSArray*)parts
 {
-    
+	if([parts count] == 2){
+		[self decode:[parts objectAtIndex:0] value:[parts objectAtIndex:1]];
+	}
 }
 
-- (NSMutableDictionary*) processHVTable:(NSString*)aTable
+- (void) decode:(NSString*)aName value:(NSString*)aValue
 {
-	NSDictionary* translateDict = [NSDictionary dictionaryWithObjectsAndKeys:
-								  @"OutputSwitch",					@"OutputStatus",
-								  @"outputCurrent",					@"Measured Current",
-								  @"outputVoltage",					@"Voltage",
-								  @"outputMeasurementSenseVoltage",	@"Measured Sense Voltage",
-								  nil];
-								  
-	NSMutableDictionary* HVDictionary = [NSMutableDictionary dictionary];
+	if([aName hasPrefix:@"outputNumber"])return; //ignore
+	if([aName hasPrefix:@"outputIndex"])return; //ignore
+	if([aName hasPrefix:@"outputName"])return; //ignore
+	if([aName hasPrefix:@"outputGroup"])return; //ignore
+	if([aName hasPrefix:@"moduleIndex"])return; //ignore
+	if([aName hasPrefix:@"groupsNumber"])return; //ignore
+	if([aName hasPrefix:@"groupsIndex"])return; //ignore
+	if([aName hasPrefix:@"groupsSwitch"])return; //ignore
+	if([aName hasPrefix:@"moduleNumber"])return; //ignore
+	if([aName hasPrefix:@"psAuxiliaryNumber"])return; //ignore
+	if([aName hasPrefix:@"psAuxiliaryIndex"])return; //ignore
 	
-	//pull out the HV param names from the table header
-	NSString* header = [NSString scanString:aTable
-								   startTag:@"<thead"
-									 endTag:@"</thead>"];
-	NSMutableArray* paramNames = [NSString extractArrayFromString:header
-														 startTag:@"<th"
-														   endTag:@"</th>"];
+	if(!dictionaryFromWalk)dictionaryFromWalk = [[NSMutableDictionary dictionary] retain];
 	
-	NSUInteger numParamsNames = [paramNames count];
-	if(numParamsNames){
+	NSArray* nameParts = [aName componentsSeparatedByString:@"."];
+	if([nameParts count]==2){
 		
-		NSArray* paramRows= [NSString extractArrayFromString:aTable
-													startTag:@"<tr"
-													  endTag:@"</tr>"];
-		for(id aRow in paramRows){
+		id channelKey = [[nameParts objectAtIndex:1]trimSpacesFromEnds];
+		id parameterName = [nameParts objectAtIndex:0];
+		
+		id theDecodedValue = [self decodeValue:aValue name:parameterName];
+		if(theDecodedValue){
 			
-			NSArray* itemArray = [NSString extractArrayFromString:aRow
-														 startTag:@"<td"
-														   endTag:@"</td>"];
-			
-			NSUInteger numItems = [itemArray count];
-			if(numItems == numParamsNames){
-				NSMutableDictionary* channelDictionary = [NSMutableDictionary dictionary];
-				
-				NSUInteger i;
-				for(i=0;i<numItems;i++){
-					NSString* key   = [paramNames objectAtIndex:i];
-					NSString* value = [itemArray objectAtIndex:i];
-					if([key isEqualToString:@"Channel"]){
-						value = [[value removeSpaces] lowercaseString];
-						[channelDictionary setObject:value forKey:@"ChannelSlotId"];
-						int num		=  [[value substringFromIndex:1] intValue];
-						int slot	= num/100 + 1;
-						int channel = num%100;
-						[channelDictionary setObject:[NSNumber numberWithInt:slot]    forKey:@"Slot"];
-						[channelDictionary setObject:[NSNumber numberWithInt:channel] forKey:@"Channel"];
-					}
-					else {
-						id translatedKey = [translateDict objectForKey:key];
-						if(translatedKey)key = translatedKey;
-						value = [value removeExtraSpaces];
-
-						[channelDictionary setObject:value forKey:key];
-					}
+			NSMutableDictionary* channelDictionary = [dictionaryFromWalk objectForKey:channelKey];
+			if(!channelDictionary){
+				channelDictionary = [NSMutableDictionary dictionary];
+				[dictionaryFromWalk setObject:channelDictionary forKey:channelKey];
+				if([channelKey hasPrefix:@"u"]){
+					int chanId = [[channelKey substringFromIndex:1] intValue]%100;
+					int slot = [[channelKey substringFromIndex:1] intValue]/100 + 1;
 					
+					[channelDictionary setObject:[NSString stringWithFormat:@"%d",chanId] forKey:@"Channel"];
+					[channelDictionary setObject:[NSString stringWithFormat:@"%d",slot] forKey:@"Slot"];
 				}
-				[HVDictionary setObject:channelDictionary forKey:[channelDictionary objectForKey:@"ChannelSlotId"]];
+				[channelDictionary setObject:channelKey forKey:@"ChannelSlotId"];
 			}
+			
+			[channelDictionary setObject:theDecodedValue forKey:parameterName];
 		}
 	}
-	return HVDictionary;
+}
+
+- (NSMutableDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName
+{
+	if([aValue hasPrefix:@" Opaque: Float:"]){
+		return [self decodeFloat:[aValue substringFromIndex:15]];
+	}
+	else if([aValue hasPrefix:@" INTEGER:"]){
+		return [self decodeInteger:[aValue substringFromIndex:9]];
+	}
+	else if([aValue hasPrefix:@" BITS:"]){
+		return [self decodeBits:[aValue substringFromIndex:6] name:aName];
+	}
+	else if([aValue hasPrefix:@" STRING:"]){
+		return [self decodeString:[aValue substringFromIndex:8] name:aName];
+	}
+	else if([aValue hasPrefix:@" IpAddress:"]){
+		return [self decodeString:[aValue substringFromIndex:11] name:aName];
+	}
+	else if([aValue hasPrefix:@" Hex-STRING:"]){
+		return [self decodeString:[aValue substringFromIndex:12] name:aName];
+	}
+	
+	
+	
+	else return nil;
+}
+
+- (NSMutableDictionary*) decodeFloat:(NSString*)aValue
+{
+	aValue = [aValue trimSpacesFromEnds];
+	NSArray*  parts  = [aValue componentsSeparatedByString:@" "];
+	NSString* number = [parts objectAtIndex:0];
+	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+	if([parts count]==2){
+		NSString* units = [parts objectAtIndex:1];
+		if([units hasSuffix:@"C"])units = [units substringFromIndex:[units length]-1];
+		
+		if([units isEqualToString:@"mV"]){
+			float theValue = [number floatValue];
+			theValue = theValue/1000.;
+			number = [NSString stringWithFormat:@"%f",theValue];
+			units    = @"V";
+		}
+		else if([units isEqualToString:@"nA"]){
+			float theValue = [number floatValue];
+			theValue = theValue/1000.;
+			number = [NSString stringWithFormat:@"%f",theValue];
+			units    = @"uA";
+		}
+		else if([units isEqualToString:@"mA"]){
+			float theValue = [number floatValue];
+			theValue = theValue*1000.;
+			number = [NSString stringWithFormat:@"%f",theValue];
+			units    = @"uA";
+		}
+		
+		
+		
+		[dict setObject:units forKey:@"Units"];
+		
+		
+		
+	}
+	[dict setObject:number forKey:@"Value"];
+	return dict;
+}
+
+- (NSMutableDictionary*) decodeString:(NSString*)aValue  name:(NSString*)aName;
+{
+	aValue = [aValue trimSpacesFromEnds];
+	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+	[dict setObject:aValue forKey:@"Value"];
+	return dict;
+}
+
+- (NSMutableDictionary*) decodeInteger:(NSString*)aValue
+{
+	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+	aValue = [aValue trimSpacesFromEnds];
+	if([aValue hasPrefix:@"on"])		[dict setObject:@"1" forKey:@"Value"];
+	else if([aValue hasPrefix:@"off"])	[dict setObject:@"0" forKey:@"Value"];
+	else {
+		NSArray* parts            = [aValue componentsSeparatedByString:@" "];
+		if([parts count]==2){
+			[dict setObject:[parts objectAtIndex:1] forKey:@"Units"];
+			[dict setObject:[parts objectAtIndex:0] forKey:@"Value"];
+		}
+		else {
+			[dict setObject:aValue forKey:@"Value"];
+		}
+	}
+	return dict;
+}
+
+- (NSMutableDictionary*) decodeBits:(NSString*)aValue name:(NSString*)aName
+{
+	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+	aValue = [aValue trimSpacesFromEnds];
+	unsigned long bitMask = 0;
+	NSArray* parts = [aValue componentsSeparatedByString:@" "];
+	NSMutableArray* descriptionArray = [NSMutableArray array];
+	for(NSString* aPart in parts){
+		NSRange parRange = [aPart rangeOfString:@"("];
+		if(parRange.location != NSNotFound){
+			int setBitLocation = [[aPart substringFromIndex:parRange.location+1]intValue];
+			bitMask |= (0x1L << setBitLocation);
+			[descriptionArray addObject:[aPart substringToIndex:parRange.location]];
+		}
+		
+	}
+	
+	[dict setObject:[NSString stringWithFormat:@"%u",bitMask] forKey:@"Value"];
+	if([descriptionArray count])[dict setObject:descriptionArray forKey:@"Names"];
+	return dict;
 }
 
 @end
+
+
+

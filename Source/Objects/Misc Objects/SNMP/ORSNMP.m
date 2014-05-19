@@ -481,7 +481,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 		if(command && ![self isCancelled]){
 			NSTask* task = [[NSTask alloc] init];
 			[task setLaunchPath: command];
-			[task setArguments: [NSArray arrayWithObjects: arguments,nil]];
+			[task setArguments: arguments];
 			
 			NSPipe* pipe = [NSPipe pipe];
 			[task setStandardOutput: pipe];
@@ -491,7 +491,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
             
 			NSData* data = [file readDataToEndOfFile];
 			if(data){
-				NSString* result = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+				NSString* result = [[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding];
 				if([result length]){
                     if([delegate respondsToSelector:@selector(setSNMP:result:)]){
                         [delegate setSNMP:tag result:result];

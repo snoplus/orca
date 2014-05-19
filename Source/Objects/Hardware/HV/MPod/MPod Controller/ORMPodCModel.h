@@ -28,11 +28,11 @@
 	unsigned		ipNumberIndex;
 	NSString*		IPNumber;
 	NSTask*			pingTask;
-	NSMutableDictionary* systemParams;
 	BOOL			oldPower;
 	double			queueCount;
     BOOL			verbose;
-	NSMutableDictionary* dictionaryFromWebPage;
+	BOOL		    doNotSkipPowerCheck;
+	NSDictionary*   parameterDictionary;
 }
 
 #pragma mark ***Accessors
@@ -46,26 +46,22 @@
 - (unsigned) ipNumberIndex;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
-- (void) updateAllValues;
-- (NSArray*) systemUpdateList;
-- (void) processSystemResponseArray:(NSArray*)response;
 - (int) systemParamAsInt:(NSString*)name;
 - (id) systemParam:(NSString*)name;
 - (void) togglePower;
 - (void) setQueCount:(NSNumber*)n;
 - (void) writeMaxTerminalVoltage;
 - (void) writeMaxTemperature;
-- (NSMutableDictionary*) systemParams;
+- (void) setSNMP:(int)aTag result:(NSString*)theResult;
+- (NSDictionary*) parameterDictionary;
+- (void) setParameterDictionary:(NSDictionary*)aParameterDictionary;
+- (void) decodeWalk:(NSString*)theWalk;
+
 #pragma mark ¥¥¥Hardware Access
-- (id) controllerCard;
 - (void) ping;
 - (BOOL) pingTaskRunning;
-- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
-- (void) getValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) pollHardware;
 - (void) pollHardwareAfterDelay;
@@ -76,7 +72,6 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
-
 
 extern NSString* ORMPodCModelVerboseChanged;
 extern NSString* ORMPodCModelCrateStatusChanged;
@@ -91,24 +86,33 @@ extern NSString* ORMPodCQueueCountChanged;
 @interface NSObject (ORMpodCModel)
 - (void) precessReadResponseArray:(NSArray*)response;
 - (void) processSystemResponseArray:(NSArray*)response;
-- (void) setDictionaryFromWebPage:(NSMutableDictionary*)aDictionary;
 
 @end
 
-@interface ORHvUrlParseOp : NSOperation {
-	id                  delegate;
-	NSString*           ipAddress;
+//--------------------------------------------------
+// ORSNMPWalkDecodeOp
+// The decoding of the full SNMP walk is extensive. 
+// Let a separate thread handle it.
+//--------------------------------------------------
+@interface ORSNMPWalkDecodeOp : NSOperation
+{
+	id					 delegate;
+    NSString*			 theWalk;
+	NSMutableDictionary* dictionaryFromWalk;
 }
-- (id) initWithDelegate:(id)aDelegate;
-- (void) dealloc;
-
-#pragma mark ¥¥¥Move Methods
+- (id) initWithWalk:(NSString*)theWalk delegate:(id)aDelegate;
 - (void) main;
-- (void) processSystemTable:(NSString*)aTable;
-- (NSMutableDictionary*) processHVTable:(NSString*)aTable;
-
-@property (copy)    NSString*   ipAddress;
-@property (assign)  id          delegate;
-
+- (void)decodeValueArray:(NSArray*)parts;
+- (void) decode:(NSString*)aName value:(NSString*)aValue;
+- (NSMutableDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName;
+- (NSMutableDictionary*) decodeFloat:(NSString*)aValue;
+- (NSMutableDictionary*) decodeInteger:(NSString*)aValue;
+- (NSMutableDictionary*) decodeBits:(NSString*)aValue name:(NSString*)aName;
+- (NSMutableDictionary*) decodeString:(NSString*)aValue name:(NSString*)aName;
 @end
+
+@interface NSObject (ORSNMPOps)
+- (void) setSNMP:(int)aTag result:(NSString*)theResult;
+- (void) setParameterDictionary:(NSDictionary*)aParameterDictionary;
+@end;
 
