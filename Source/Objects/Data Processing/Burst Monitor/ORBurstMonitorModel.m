@@ -222,7 +222,7 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
                 
                 if(dataID==0){
                     header                      = [[NSData dataWithBytes:ptr length:recordLen*4] retain]; //save it for the secondary file
-                    NSString* runHeaderString   = [[NSString alloc] initWithBytes:&ptr[2] length:ptr[1] encoding:NSASCIIStringEncoding];
+                    NSString* runHeaderString   = [[[NSString alloc] initWithBytes:&ptr[2] length:ptr[1] encoding:NSASCIIStringEncoding] autorelease];
                     NSDictionary* runHeader     = [runHeaderString propertyList];
                     shaperID                    = [[runHeader nestedObjectForKey:@"dataDescription",@"ORShaperModel",@"Shaper",@"dataId",nil] unsignedLongValue];
                 }

@@ -162,7 +162,7 @@
 - (void) statusLogChanged:(NSNotification *)aNote
 {
     if ([[aNote name] isEqualToString:ORCouchDBListenerModelStatusLogAppended]) {
-        NSAttributedString* attr = [[NSAttributedString alloc] initWithString:[aNote object]];
+        NSAttributedString* attr = [[[NSAttributedString alloc] initWithString:[aNote object]]autorelease];
         [[statusLog textStorage] appendAttributedString:attr];
         [statusLog scrollRangeToVisible:NSMakeRange([[statusLog string] length], 0)];
     } else {
