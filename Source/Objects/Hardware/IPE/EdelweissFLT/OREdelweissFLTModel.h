@@ -210,6 +210,7 @@
 - (void) setFicCardADC01CtrlReg:(uint32_t)aFicCardADC01CtrlReg forFiber:(int)aFiber;
 - (uint32_t) ficCardCtrlReg2ForFiber:(int)aFiber;
 - (void) setFicCardCtrlReg2:(uint32_t)aFicCardCtrlReg2 forFiber:(int)aFiber;
+- (void) setFicCardCtrlReg2AddrOffs:(uint32_t)aOffset  forFiber:(int)aFiber;
 - (uint32_t) ficCardCtrlReg1ForFiber:(int)aFiber;
 - (void) setFicCardCtrlReg1:(uint32_t)aFicCardCtrlReg1 forFiber:(int)aFiber;
 - (int) pollBBStatusIntervall;

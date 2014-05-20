@@ -338,9 +338,22 @@ void chargeBB_template_without_HW_access(SBC_Packet* aPacket)// see void loadXL2
 }
 
 
+/****************************** Denis *************************/
 
-
-
+void send_BBcmd(char bb_id, char subadd, char byte_high, char byte_low) { // bb_id = 255 for broadcast
+//	int b;
+	
+	pbus->write(CmdFIFOReg, 0xf0);
+	pbus->write(CmdFIFOReg, bb_id + 0x0100);//BB id
+	pbus->write(CmdFIFOReg, subadd + 0x0100);// sub-address
+	pbus->write(CmdFIFOReg, byte_high + 0x0100);//data high
+	pbus->write(CmdFIFOReg, byte_low + 0x0100);//data low
+	pbus->write(CmdFIFOReg, 0x200);//end cmd
+	usleep(1800);
+//	_attente_cmd_vide	
+	
+	
+}  /****************************** Denis *************************/	
 
 
 
@@ -354,6 +367,7 @@ void processChargeFICCommand(SBC_Packet* aPacket)
 //see tbtools.c, function "int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo)"
 void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 {
+
 	//
 	//this function is meant to be launched as a job
 	//
@@ -418,7 +432,112 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
     uint32_t n,data_start, data_end;
     data_start=0;
     data_end=1000;
-    for(i=0; i<1000; i++){
+
+    /****************************** Denis *************************/
+	// 1. Prepare FIC card
+//	send_BBcmd(0xff, 0x73, 0x00, 0x00); // switch on ADC clock
+	pbus->write(CmdFIFOReg, 0xf0);
+	pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+	pbus->write(CmdFIFOReg, 0x73 + 0x0100);// sub-address
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data high
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data low
+	pbus->write(CmdFIFOReg, 0x200);//end cmd
+	usleep(1800);
+//	send_BBcmd(0xff, 0x71, 0x00, 0x00); // stop data taking into RAM
+	pbus->write(CmdFIFOReg, 0xf0);
+	pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+	pbus->write(CmdFIFOReg, 0x71 + 0x0100);// sub-address
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data high
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data low
+	pbus->write(CmdFIFOReg, 0x200);//end cmd
+	usleep(1800);
+	usleep(10000);
+	usleep(10000);
+	// 2. Write incoming data to RAM
+//	send_BBcmd(0xff, 0x75, 0x00, 0x01); // config2ram flag
+	pbus->write(CmdFIFOReg, 0xf0);
+	pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+	pbus->write(CmdFIFOReg, 0x75 + 0x0100);// sub-address
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data high
+	pbus->write(CmdFIFOReg, 0x01 + 0x0100);//data low
+	pbus->write(CmdFIFOReg, 0x200);//end cmd
+	usleep(1800);
+	usleep(10000);
+	
+	
+	// 3. send .pof file with 2bytes / 1ms	
+	//// send bytes 156...68555 only!
+	printf("Charging FIC ... \n");
+	uint16_t checksum = 0;
+    for(i=156; i<68555; i+=2){ // 68400 bytes
+		checksum = checksum + charData[i];
+		checksum = checksum + charData[i+1];
+		if (i % 2048 == 0) {
+			//job monitoring
+			strcpy(errorMessage,"chargeFIC: loop running.");	
+			printf("SBC job loop: i=%i; job message: %s\n",i,errorMessage);	
+			strncpy(sbc_job.message,errorMessage,255);
+			pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+			sbc_job.progress = (i*3)/2048; //(double)(i*3)/2048;	//percent done
+			sbc_job.finalStatus = finalStatus;
+			pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+			usleep(20000);
+		}			
+			
+//		send_BBcmd(0xff, 0x76, (charData[i+1] & 0xff), (charData[i] & 0xff));
+		pbus->write(CmdFIFOReg, 0xf0);
+		pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+		pbus->write(CmdFIFOReg, 0x76 + 0x0100);//charge FIC cmd
+		pbus->write(CmdFIFOReg, (charData[i+1] & 0xff) + 0x0100);//data
+		pbus->write(CmdFIFOReg, (charData[i] & 0xff) + 0x0100);//data
+		pbus->write(CmdFIFOReg, 0x200);//end cmd
+		usleep(1800);
+	//	_attente_cmd_vide	
+	}  
+	usleep(10000); //
+	// 4. Copy config data from RAM into EEPROM	
+//	send_BBcmd(0xff, 0x75, 0x00, 0x02); // config2eprom flag
+	pbus->write(CmdFIFOReg, 0xf0);
+	pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+	pbus->write(CmdFIFOReg, 0x75 + 0x0100);// sub-address
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data high
+	pbus->write(CmdFIFOReg, 0x02 + 0x0100);//data low
+	pbus->write(CmdFIFOReg, 0x200);//end cmd
+	usleep(1800);
+	for (i=0; i < 25; i++) {
+		if (i == 0) {
+			strcpy(errorMessage,"Erase EEPROM ....");		
+			strncpy(sbc_job.message,errorMessage,255);
+			printf("Erase EEPROM ... \n");
+		}
+		if (i == 4) {
+			strcpy(errorMessage,"Write to EEPROM ....");		
+			strncpy(sbc_job.message,errorMessage,255);
+			printf("Write to EEPROM ... \n");
+		}
+		pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+		sbc_job.progress = (i*4); //(double)(i*3)/2048;	//percent done
+		sbc_job.finalStatus = finalStatus;
+		pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+		
+		usleep(1000000); // 1 sec.
+		
+	}
+	// 5. send chechsum on channel 0	
+	//	send_BBcmd(0xff, 0x75, 0x00, 0x04); // send_checksum flag
+	pbus->write(CmdFIFOReg, 0xf0);
+	pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+	pbus->write(CmdFIFOReg, 0x75 + 0x0100);// sub-address
+	pbus->write(CmdFIFOReg, 0x00 + 0x0100);//data high
+	pbus->write(CmdFIFOReg, 0x04 + 0x0100);//data low
+	pbus->write(CmdFIFOReg, 0x200);//end cmd
+	usleep(1800);
+	sprintf(errorMessage,"Charging FIC finished ... checksum = 0x4F", checksum);		
+	strncpy(sbc_job.message,errorMessage,255);
+	printf("Charging FIC finished ... checksum = 0x4F\n", checksum);
+	/****************************** Denis *************************/	
+/*	
+	for(i=0; i<1000; i++){
 			
         if(sbc_job.killJobNow){
             //FATAL_ERROR(666,"Job Killed. Early Exit.")
@@ -428,18 +547,33 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
         //do the job
         //usleep(100000);
         //we write bunches of 1000 bytes to the comand FIFO
-        for(n=data_start; n<data_end; n+=1){
+        for(n=data_start; n<data_end; n+=2){
             blo = charData[n];
-            //bhi = charData[n+1];
+            bhi = charData[n+1];
 			//b=(((unsigned short) bhi)<<8) | ((unsigned short) blo); 
-			b= ((unsigned short) blo); 
+			//b= ((unsigned short) blo); 
             pbus->write(CmdFIFOReg, 0xf0);
-            pbus->write(CmdFIFOReg, 0xff);//BB id
-            pbus->write(CmdFIFOReg, 0x76);//charge FIC cmd
-            pbus->write(CmdFIFOReg, b);//data
+            pbus->write(CmdFIFOReg, 0xff + 0x0100);//BB id
+            pbus->write(CmdFIFOReg, 0x76 + 0x0100);//charge FIC cmd
+            pbus->write(CmdFIFOReg, (n & 0xff) + 0x0100);//data
+            pbus->write(CmdFIFOReg, ((n>>8) & 0xff) + 0x0100);//data
+//            pbus->write(CmdFIFOReg, blo + 0x0100);//data
+//            pbus->write(CmdFIFOReg, bhi + 0x0100);//data
             pbus->write(CmdFIFOReg, 0x200);//end cmd
+			usleep(1800);
 			_attente_cmd_vide
         }
+
+        //  //"Original" -tb-
+        //  //do the job
+        //  //usleep(100000);
+        //  //we write bunches of 1000 bytes to the comand FIFO
+        //  for(n=data_start; n<data_end; n++){
+		//  	b=( (unsigned short) charData[n] ) + 0x0100; 
+        //      pbus->write(CmdFIFOReg, b);
+		//  	_attente_cmd_vide
+        //  }
+
         
         //job monitoring
         strcpy(errorMessage,"chargeFIC: loop running.");	
@@ -467,7 +601,7 @@ void chargeFIC(SBC_Packet* aPacket)// see void loadXL2Xilinx_penn(SBC_Packet* aP
 	//-tb- old code: b=0x200;  write_word(driver_fpga,REG_CMD, b);  //fin de commande 
 	usleep(500000);	// laisser le temps pour lire le message d'erreur eventuel
 	printf("on attend 2 pour terminer : ");
-    
+    */
     //job done -> success
     finalStatus=1;//flags success
     strcpy(errorMessage,"chargeFIC: loop finished.");		

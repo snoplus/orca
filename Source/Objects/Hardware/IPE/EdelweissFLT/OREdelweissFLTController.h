@@ -54,6 +54,20 @@
 	IBOutlet   NSTextField* ficCardCtrlReg1BlockLenTextField;
 	IBOutlet   NSMatrix*    ficCardCtrlReg1ChanEnableMatrix;
 	IBOutlet   NSSlider*    ficCardCtrlReg2AddrOffsetSlider;
+	IBOutlet   NSTextField* ficCardCtrlReg2AddrOffsTextField;
+	IBOutlet   NSButton*    ficCardCtrlReg2GapCB;
+	IBOutlet   NSButton*    ficCardCtrlReg2SyncResCB;
+	IBOutlet   NSMatrix*    ficCardCtrlReg2SendChMatrix;
+	IBOutlet   NSMatrix*    ficCardADC0123CtrlRegMatrix;
+    IBOutlet   NSPopUpButton* ficCardADC0CtrlRegPU;
+    IBOutlet   NSPopUpButton* ficCardADC1CtrlRegPU;
+    IBOutlet   NSPopUpButton* ficCardADC2CtrlRegPU;
+    IBOutlet   NSPopUpButton* ficCardADC3CtrlRegPU;
+    
+	//IBOutlet   NSTextField* ficCardCtrlReg1BlockLenTextField;
+	//IBOutlet   NSMatrix*    ficCardCtrlReg1ChanEnableMatrix;
+	IBOutlet   NSTextField* ficCardTriggerCmdDelayTextField;
+	IBOutlet   NSMatrix*    ficCardTriggerCmdChanMaskMatrix;
     
     //Trigger Tab
 	IBOutlet   NSTextField* heatChannelsTextField;
@@ -348,18 +362,35 @@
 - (IBAction) ficCardTriggerCmdTextFieldAction:(id)sender;
 - (IBAction) ficCardADC23CtrlRegTextFieldAction:(id)sender;
 - (IBAction) ficCardADC01CtrlRegTextFieldAction:(id)sender;
-- (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg1TextFieldAction:(id)sender;
-//FIC subelements
-- (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
-- (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
-- (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender;
 //FIC buttons
 - (IBAction) sendFICCtrl1RegButtonAction:(id)sender;
 - (IBAction) sendFICCtrl2RegButtonAction:(id)sender;
 - (IBAction) sendFICADC01CtrlRegButtonAction:(id)sender;
 - (IBAction) sendFICADC23CtrlRegButtonAction:(id)sender;
 - (IBAction) sendFICTriggerCmdButtonAction:(id)sender;
+
+//FIC subelements
+- (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
+
+- (IBAction) ficCardTriggerCmdDelayTextFieldAction:(id)sender;
+- (IBAction) ficCardTriggerCmdChanMaskMatrixAction:(id)sender;
+
+- (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender;
+- (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg2AddrOffsTextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg2GapCBAction:(id)sender;
+- (IBAction) ficCardCtrlReg2SyncResCBAction:(id)sender;
+- (IBAction) ficCardCtrlReg2SendChMatrixAction:(id)sender;
+
+- (IBAction) ficCardADC0CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC1CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC2CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC3CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC0123CtrlRegMatrixAction:(id)sender;
+
+
 
 - (IBAction) pollBBStatusIntervallPUAction:(id)sender;
 - (IBAction) devTabButtonAction:(id) sender;

@@ -72,6 +72,20 @@
 #define kEWFlt_TriggParReg_ShapingL_Shift   0
 #define kEWFlt_TriggParReg_ShapingL_Mask	0xff
 
+//FIC registers
+#define kEWFlt_FICCtrl2_gap_Shift           9
+#define kEWFlt_FICCtrl2_gap_Mask            0x01
+#define kEWFlt_FICCtrl2_SyncRes_Shift       8
+#define kEWFlt_FICCtrl2_SyncRes_Mask        0x01
+#define kEWFlt_FICCtrl2_SendCh_Shift       10
+#define kEWFlt_FICCtrl2_SendCh_Mask        0x3f
+
+#define kEWFlt_FICADC0Ctrl_Mode_Shift      5
+#define kEWFlt_FICADC0Ctrl_Mode_Mask       0x03
+#define kEWFlt_FICADC1Ctrl_Mode_Shift      13
+#define kEWFlt_FICADC1Ctrl_Mode_Mask       0x03
+
+
 
 // Position of the bit fields
 #define kIpeFlt_Cntl_InterruptMask_Shift	8
@@ -118,6 +132,7 @@
 
 #define kIpeFlt_Periph_Integration_Shift	20
 #define kIpeFlt_Periph_Integration_Mask		0xf
+
 
 #if 0 //moved to SLTv4_HW_Definitions.h - names have changed -tb-
 //run modes set by user in popup

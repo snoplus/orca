@@ -432,6 +432,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardCtrlReg2Changed object:self];
 }
 
+- (void) setFicCardCtrlReg2AddrOffs:(uint32_t)aOffset forFiber:(int)aFiber
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setFicCardCtrlReg2:ficCardCtrlReg2[aFiber] forFiber:aFiber];
+    uint32_t aFicCardCtrlReg2 = ficCardCtrlReg2[aFiber];
+    aFicCardCtrlReg2 = (aFicCardCtrlReg2 & 0xff00) |  (aOffset & 0x00ff);
+    [self setFicCardCtrlReg2: aFicCardCtrlReg2 forFiber: aFiber];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardCtrlReg2Changed object:self];
+}
+
 - (uint32_t) ficCardCtrlReg1ForFiber:(int)aFiber
 {
     return ficCardCtrlReg1[aFiber];

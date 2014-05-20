@@ -579,25 +579,83 @@
 - (void) ficCardTriggerCmdChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardTriggerCmdTextField setIntValue: [model ficCardTriggerCmdForFiber:fiber]];
+    uint32_t val = [model ficCardTriggerCmdForFiber:fiber];
+	[ficCardTriggerCmdTextField setIntValue: val];
+    //sub elements
+	[ficCardTriggerCmdDelayTextField setIntValue: val & 0xfff];
+    int i;
+    for(i=0;i<4; i++){
+        [[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:i] setIntValue: (val & (0x1<<(12+i)))];
+    }
 }
 
 - (void) ficCardADC23CtrlRegChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardADC23CtrlRegTextField setIntValue: [model ficCardADC23CtrlRegForFiber:fiber]];
+    uint32_t reg = [model ficCardADC23CtrlRegForFiber:fiber];
+	[ficCardADC23CtrlRegTextField setIntValue: reg];
+    
+    uint32_t val = 0;
+    //PUs
+    val = (reg >> kEWFlt_FICADC0Ctrl_Mode_Shift) & kEWFlt_FICADC0Ctrl_Mode_Mask;
+    [ficCardADC2CtrlRegPU selectItemAtIndex: val];
+    val = (reg >> kEWFlt_FICADC1Ctrl_Mode_Shift) & kEWFlt_FICADC1Ctrl_Mode_Mask;
+    [ficCardADC3CtrlRegPU selectItemAtIndex: val];
+    //CB matrix
+    int i;
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << i)) val=1; else val=0;
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:2 column:i] setIntValue: val];
+    }
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << (8+i))) val=1; else val=0;
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:3 column:i] setIntValue: val];
+    }
+    
 }
 
 - (void) ficCardADC01CtrlRegChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardADC01CtrlRegTextField setIntValue: [model ficCardADC01CtrlRegForFiber:fiber]];
+    uint32_t reg = [model ficCardADC01CtrlRegForFiber:fiber];
+	[ficCardADC01CtrlRegTextField setIntValue: reg];
+    
+    uint32_t val = 0;
+    //PUs
+    val = (reg >> kEWFlt_FICADC0Ctrl_Mode_Shift) & kEWFlt_FICADC0Ctrl_Mode_Mask;
+    [ficCardADC0CtrlRegPU selectItemAtIndex: val];
+    val = (reg >> kEWFlt_FICADC1Ctrl_Mode_Shift) & kEWFlt_FICADC1Ctrl_Mode_Mask;
+    [ficCardADC1CtrlRegPU selectItemAtIndex: val];
+    //CB matrix
+    int i;
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << i)) val=1; else val=0;
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: row: %i   col: %i  val: %i (reg: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), 0, i, val , reg);//TODO : DEBUG testing ...-tb-
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:0 column:i] setIntValue: val];
+    }
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << (8+i))) val=1; else val=0;
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: row: %i   col: %i  val: %i (reg: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), 1, i+8, val , reg);//TODO : DEBUG testing ...-tb-
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:1 column:i] setIntValue: val];
+    }
+    
 }
 
 - (void) ficCardCtrlReg2Changed:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardCtrlReg2TextField setIntValue: [model ficCardCtrlReg2ForFiber:fiber]];
+    int reg2 = [model ficCardCtrlReg2ForFiber:fiber];
+	[ficCardCtrlReg2TextField setIntValue: reg2];
+    char reg2ch = [model ficCardCtrlReg2ForFiber:fiber];
+	[ficCardCtrlReg2AddrOffsTextField setIntValue: reg2ch];
+	[ficCardCtrlReg2AddrOffsetSlider setIntValue: reg2ch];
+    
+	[ficCardCtrlReg2GapCB setIntValue: ((reg2 >> kEWFlt_FICCtrl2_gap_Shift) & kEWFlt_FICCtrl2_gap_Mask)];
+	[ficCardCtrlReg2SyncResCB setIntValue: ((reg2 >> kEWFlt_FICCtrl2_SyncRes_Shift) & kEWFlt_FICCtrl2_SyncRes_Mask)];
+    int i;
+    for(i=0;i<6; i++){
+        [[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:i] setIntValue: (reg2 & (0x1<<(kEWFlt_FICCtrl2_SendCh_Shift+i)))];
+    }
 }
 
 - (void) ficCardCtrlReg1Changed:(NSNotification*)aNote
@@ -1940,11 +1998,157 @@
 	[model setFicCardADC01CtrlReg:[sender intValue] forFiber:fiber];	
 }
 
+- (void) ficCardADC0CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC0Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC0Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC01CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC01CtrlReg:reg forFiber:fiber];	
+}
+
+- (void) ficCardADC1CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC1Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC1Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC01CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC01CtrlReg:reg forFiber:fiber];	
+}
+
+
+
+- (void) ficCardADC2CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC0Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC0Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC23CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC23CtrlReg:reg forFiber:fiber];	
+}
+
+- (void) ficCardADC3CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC1Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC1Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC23CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC23CtrlReg:reg forFiber:fiber];	
+}
+
+
+
+
+- (void) ficCardADC0123CtrlRegMatrixAction:(id)sender
+{
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@:  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: row: %i   col: %i  val: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), [sender selectedRow], [sender selectedColumn], [[sender selectedCell] intValue]);//TODO : DEBUG testing ...-tb-
+
+    // ficCardADC0123CtrlRegMatrix
+
+    int fiber = [model fiberSelectForBBAccess];
+    int row = [sender selectedRow];
+    int col = [sender selectedColumn];
+    int val = [[sender selectedCell] intValue] & 0x1;
+    uint32_t shift = col;
+    uint32_t reg = 0;
+    uint32_t negmask = 0;
+    
+        //DEBUG OUTPUT:    NSLog(@"%@::%@: row: %i   col: %i  val: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), row, col, val);//TODO : DEBUG testing ...-tb-
+    
+    if(row<2){//ADC 0 or 1
+        reg = [model ficCardADC01CtrlRegForFiber:fiber];
+        if(row==1) shift += 8;//ADC 1
+        negmask = ~(0x1 << shift);
+        reg = (reg & negmask) | (val << shift);
+        [model setFicCardADC01CtrlReg: reg forFiber:fiber];
+    }else{//ADC 2 or 3
+        reg = [model ficCardADC23CtrlRegForFiber:fiber];
+        if(row==3) shift += 8;//ADC 3
+        negmask = ~(0x1 << shift);
+        reg = (reg & negmask) | (val << shift);
+        [model setFicCardADC23CtrlReg: reg forFiber:fiber];
+    }
+
+
+}
+
+
+
+
+
 - (void) ficCardCtrlReg2TextFieldAction:(id)sender
 {
     int fiber = [model fiberSelectForBBAccess];
 	[model setFicCardCtrlReg2:[sender intValue] forFiber:fiber];	
 }
+
+- (void) ficCardCtrlReg2AddrOffsTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardCtrlReg2AddrOffs:[sender intValue] forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2GapCBAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t mask = ~(kEWFlt_FICCtrl2_gap_Mask << kEWFlt_FICCtrl2_gap_Shift);
+    uint32_t reg = [model ficCardCtrlReg2ForFiber:fiber];
+    reg = (reg & mask) | (([sender intValue] & kEWFlt_FICCtrl2_gap_Mask) << kEWFlt_FICCtrl2_gap_Shift);
+	[model setFicCardCtrlReg2:reg forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2SyncResCBAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t mask = ~(kEWFlt_FICCtrl2_SyncRes_Mask << kEWFlt_FICCtrl2_SyncRes_Shift);
+    uint32_t reg = [model ficCardCtrlReg2ForFiber:fiber];
+    reg = (reg & mask) | (([sender intValue] & kEWFlt_FICCtrl2_SyncRes_Mask) << kEWFlt_FICCtrl2_SyncRes_Shift);
+	[model setFicCardCtrlReg2:reg forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2SendChMatrixAction:(id)sender
+{
+    uint32_t val   = [[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:0] intValue]  |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:1] intValue] <<1) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:2] intValue] <<2) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:3] intValue] <<3) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:4] intValue] <<4) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:5] intValue] <<5) ;
+
+
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t mask = ~(kEWFlt_FICCtrl2_SendCh_Mask << kEWFlt_FICCtrl2_SendCh_Shift);
+    uint32_t reg = [model ficCardCtrlReg2ForFiber:fiber];
+    reg = (reg & mask) | ((val & kEWFlt_FICCtrl2_SendCh_Mask) << kEWFlt_FICCtrl2_SendCh_Shift);
+	[model setFicCardCtrlReg2:reg forFiber:fiber];	
+}
+
+
 
 - (void) ficCardCtrlReg1TextFieldAction:(id)sender
 {
@@ -1959,6 +2163,8 @@
     reg = reg | ([sender intValue] & 0xfff);
 	[model setFicCardCtrlReg1:reg forFiber:fiber];	
 }
+
+
 
 - (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender
 {
@@ -1975,11 +2181,47 @@
 }
 
 
+
+
+
+- (IBAction) ficCardTriggerCmdDelayTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t reg = [model ficCardTriggerCmdForFiber: fiber] & 0xf000;
+    reg = reg | ([sender intValue] & 0xfff);
+	[model setFicCardTriggerCmd:reg forFiber:fiber];	
+}
+
+- (IBAction) ficCardTriggerCmdChanMaskMatrixAction:(id)sender
+{
+    uint32_t mask = [[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:0] intValue]  |
+                    ([[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:1] intValue] <<1) |
+                    ([[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:2] intValue] <<2) |
+                    ([[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:3] intValue] <<3) ;
+    mask = mask << 12;
+    //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! mask: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),mask);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t reg = ([model ficCardTriggerCmdForFiber: fiber] & 0xfff) | mask;
+	[model setFicCardTriggerCmd:reg forFiber:fiber];	
+}
+
+
+
+
+
+
+
+
 - (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender
 {
     [self endEditing];
 	//debug     
     NSLog(@"Called %@::%@ intValue %i  floatValue %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue],[sender floatValue]);//TODO: DEBUG -tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardCtrlReg2AddrOffs:[sender intValue] forFiber:fiber];	
+
 }
 
 
