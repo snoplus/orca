@@ -26,7 +26,17 @@
 @interface ORGretinaTriggerController : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSTextField*   diagnosticCounterField;
 	IBOutlet NSMatrix*      inputLinkMaskMatrix;
+	IBOutlet NSMatrix*      serDesTPowerMasMatrix;
+	IBOutlet NSMatrix*      serDesRPowerMasMatrix;
+	IBOutlet NSMatrix*      lvdsPreemphasisCtlMatrix;
+	IBOutlet NSMatrix*      miscCtl1Matrix;
+	IBOutlet NSMatrix*      linkLruCrlMatrix;
+	IBOutlet NSMatrix*      linkLockedMatrix;
+	IBOutlet NSTableView*   miscStatTable;
+    IBOutlet NSTextField*   clockUsingLLinkField;
+    IBOutlet NSTextField*   initStateField;
 
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
@@ -34,8 +44,11 @@
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      registerLockButton;
     IBOutlet NSButton*      probeButton;
+    IBOutlet NSButton*      dumpFPGARegsButton;
+    IBOutlet NSButton*      dumpRegsButton;
+    IBOutlet NSButton*      testSandBoxButton;
     IBOutlet NSPopUpButton* masterRouterPU;
- 
+
 	
     //register page
 	IBOutlet NSPopUpButton*	registerIndexPU;
@@ -43,12 +56,19 @@
 	IBOutlet NSButton*		writeRegisterButton;
 	IBOutlet NSButton*		readRegisterButton;
 	IBOutlet NSTextField*	registerStatusField;
-		
+
+    
+    //FPGA download
+	IBOutlet NSTextField*			fpgaFilePathField;
+	IBOutlet NSButton*				loadMainFPGAButton;
+	IBOutlet NSButton*				stopFPGALoadButton;
+    IBOutlet NSProgressIndicator*	loadFPGAProgress;
+	IBOutlet NSTextField*			mainFPGADownLoadStateField;
+	IBOutlet NSTextField*           firmwareStatusStringField;
+
     NSView *blankView;
     NSSize settingSize;
     NSSize registerTabSize;
-
-    
 }
 
 - (id)   init;
@@ -56,7 +76,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) inputLinkMaskChanged:(NSNotification*)aNote;
+- (void) diagnosticCounterChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
@@ -65,6 +85,19 @@
 - (void) isMasterChanged:(NSNotification*)aNote;
 - (void) registerLockChanged:(NSNotification*)aNote;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
+- (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
+- (void) fpgaDownProgressChanged:(NSNotification*)aNote;
+- (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote;
+- (void) fpgaFilePathChanged:(NSNotification*)aNote;
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote;
+- (void) inputLinkMaskChanged:(NSNotification*)aNote;
+- (void) serDesTPowerMaskChanged:(NSNotification*)aNote;
+- (void) serDesRPowerMaskChanged:(NSNotification*)aNote;
+- (void) lvdsPreemphasisCtlChanged:(NSNotification*)aNote;
+- (void) miscCtl1RegChanged:(NSNotification*)aNote;
+- (void) miscStatRegChanged:(NSNotification*)aNote;
+- (void) clockUsingLLinkChanged:(NSNotification*)aNote;
+- (void) initStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) baseAddressAction:(id)sender;
@@ -77,6 +110,11 @@
 - (IBAction) writeRegisterAction:(id)sender;
 - (IBAction) registerLockAction:(id) sender;
 - (IBAction) registerWriteValueAction:(id)sender;
+- (IBAction) dumpFPGARegsAction:(id)sender;
+- (IBAction) dumpRegsAction:(id)sender;
+- (IBAction) testSandBoxAction:(id)sender;
+- (IBAction) downloadMainFPGAAction:(id)sender;
+- (IBAction) stopLoadingMainFPGAAction:(id)sender;
 
 #pragma mark •••Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

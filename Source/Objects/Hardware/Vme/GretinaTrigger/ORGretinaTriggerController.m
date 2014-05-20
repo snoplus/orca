@@ -22,6 +22,14 @@
 #pragma mark ***Imported Files
 #import "ORGretinaTriggerController.h"
 
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@interface ORGretinaTriggerController (private)
+- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
+						 returnCode:(int)returnCode
+						contextInfo:(void*)contextInfo;
+@end
+#endif
+
 @implementation ORGretinaTriggerController
 
 -(id)init
@@ -50,8 +58,34 @@
 	[registerIndexPU setAutoenablesItems:NO];
 	int i;
 	for (i=0;i<kNumberOfGretinaTriggerRegisters;i++) {
-		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
+        NSString* itemName = [NSString stringWithFormat:@"(0x%04lx) %@",[model registerOffsetAt:i],[model registerNameAt:i]];
+		[registerIndexPU insertItemWithTitle:itemName	atIndex:i];
 	}
+    
+    int n = 11;
+	for(i=0;i<n;i++){
+        [[inputLinkMaskMatrix   cellAtRow:0 column:n-i-1]   setTag:i];
+        [[serDesTPowerMasMatrix cellAtRow:0 column:n-i-1] setTag:i];
+        [[serDesRPowerMasMatrix cellAtRow:0 column:n-i-1] setTag:i];
+        [[linkLockedMatrix      cellAtRow:0 column:n-i-1] setTag:i];
+    }
+    
+    n = 9;
+	for(i=0;i<n;i++){
+        [[lvdsPreemphasisCtlMatrix cellAtRow:0 column:n-i-1]   setTag:i];
+    }
+    
+    n = 16;
+	for(i=0;i<n;i++){
+        [[miscCtl1Matrix cellAtRow:0 column:n-i-1]   setTag:i];
+    }
+    
+    n = 12;
+	for(i=0;i<n;i++){
+        [[linkLruCrlMatrix cellAtRow:0 column:n-i-1]   setTag:i];
+    }
+   
+    
     
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -112,10 +146,86 @@
                      selector : @selector(isMasterChanged:)
                          name : ORGretinaTriggerModelIsMasterChanged
 						object: model];
-    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fpgaFilePathChanged:)
+                         name : ORGretinaTriggerFpgaFilePathChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(mainFPGADownLoadStateChanged:)
+                         name : ORGretinaTriggerMainFPGADownLoadStateChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(fpgaDownProgressChanged:)
+                         name : ORGretinaTriggerFpgaDownProgressChanged
+						object: model];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(fpgaDownInProgressChanged:)
+                         name : ORGretinaTriggerMainFPGADownLoadInProgressChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareStatusStringChanged:)
+                         name : ORGretinaTriggerFirmwareStatusStringChanged
+						object: model];
+
     [notifyCenter addObserver : self
                      selector : @selector(inputLinkMaskChanged:)
                          name : ORGretinaTriggerModelInputLinkMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(serDesTPowerMaskChanged:)
+                         name : ORGretinaTriggerSerdesTPowerMaskChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(serDesRPowerMaskChanged:)
+                         name : ORGretinaTriggerSerdesRPowerMaskChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lvdsPreemphasisCtlChanged:)
+                         name : ORGretinaTriggerLvdsPreemphasisCtlMask
+						object: model];
+
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(miscCtl1RegChanged:)
+                         name : ORGretinaTriggerMiscCtl1RegChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(miscStatRegChanged:)
+                         name : ORGretinaTriggerMiscStatRegChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(linkLruCrlRegChanged:)
+                         name : ORGretinaTriggerLinkLruCrlRegChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(linkLockedRegChanged:)
+                         name : ORGretinaTriggerLinkLockedRegChanged
+						object: model];
+
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(clockUsingLLinkChanged:)
+                         name : ORGretinaTriggerClockUsingLLinkChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(initStateChanged:)
+                         name : ORGretinaTriggerModelInitStateChanged
+						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(diagnosticCounterChanged:)
+                         name : ORGretinaTriggerModelDiagnosticCounterChanged
 						object: model];
 
 }
@@ -130,14 +240,133 @@
 	[self registerIndexChanged:nil];
 	[self registerWriteValueChanged:nil];
 	[self isMasterChanged:nil];
+    [self fpgaFilePathChanged:nil];
+    [self mainFPGADownLoadStateChanged:nil];
+    [self fpgaDownProgressChanged:nil];
+    [self fpgaDownInProgressChanged:nil];
+    [self firmwareStatusStringChanged:nil];
 	[self inputLinkMaskChanged:nil];
+	[self serDesTPowerMaskChanged:nil];
+	[self serDesRPowerMaskChanged:nil];
+	[self lvdsPreemphasisCtlChanged:nil];
+	[self miscCtl1RegChanged:nil];
+	[self miscStatRegChanged:nil];
+	[self linkLruCrlRegChanged:nil];
+	[self linkLockedRegChanged:nil];
+	[self clockUsingLLinkChanged:nil];
+	[self initStateChanged:nil];
+	[self diagnosticCounterChanged:nil];
 }
 
 #pragma mark •••Interface Management
 
+- (void) diagnosticCounterChanged:(NSNotification*)aNote
+{
+	[diagnosticCounterField setIntValue: [model diagnosticCounter]];
+}
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote
+{
+	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];
+}
+
+- (void) fpgaDownInProgressChanged:(NSNotification*)aNote
+{
+	if([model downLoadMainFPGAInProgress])[loadFPGAProgress startAnimation:self];
+	else [loadFPGAProgress stopAnimation:self];
+}
+
+- (void) fpgaDownProgressChanged:(NSNotification*)aNote
+{
+	[loadFPGAProgress setDoubleValue:(double)[model fpgaDownProgress]];
+}
+
+- (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote
+{
+	[mainFPGADownLoadStateField setStringValue: [model mainFPGADownLoadState]];
+}
+
+- (void) fpgaFilePathChanged:(NSNotification*)aNote
+{
+	[fpgaFilePathField setStringValue: [[model fpgaFilePath] stringByAbbreviatingWithTildeInPath]];
+}
+
+- (void) initStateChanged:(NSNotification*)aNote
+{
+    [initStateField setStringValue:[model initStateName]];
+}
+
+- (void) clockUsingLLinkChanged:(NSNotification*)aNote
+{
+    if([model isMaster])[clockUsingLLinkField setStringValue:@"N/A (This is Master)"];
+    else [clockUsingLLinkField setStringValue:[model clockUsingLLink]?@"YES":@"NO"];
+}
+
+- (void) linkLockedRegChanged:(NSNotification*)aNote
+{
+    int value = [model linkLockedReg];
+	short i;
+	for(i=0;i<[linkLockedMatrix numberOfColumns];i++){
+		[[linkLockedMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
+}
+
+- (void) linkLruCrlRegChanged:(NSNotification*)aNote
+{
+    int value = [model linkLruCrlReg];
+	short i;
+	for(i=0;i<[linkLruCrlMatrix numberOfColumns];i++){
+		[[linkLruCrlMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
+}
+
+- (void) miscCtl1RegChanged:(NSNotification*)aNote
+{
+    int value = [model miscCtl1Reg];
+	short i;
+	for(i=0;i<[miscCtl1Matrix numberOfColumns];i++){
+		[[miscCtl1Matrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
+}
+
+- (void) miscStatRegChanged:(NSNotification*)aNote
+{
+    [miscStatTable reloadData];    
+}
+
 - (void) inputLinkMaskChanged:(NSNotification*)aNote
 {
-	//[inputLinkMask<custom> setIntValue: [model inputLinkMask]];
+    int value = [model inputLinkMask];
+	short i;
+	for(i=0;i<[inputLinkMaskMatrix numberOfColumns];i++){
+		[[inputLinkMaskMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
+}
+
+- (void) serDesTPowerMaskChanged:(NSNotification*)aNote
+{
+    int value = [model serdesTPowerMask];
+	short i;
+	for(i=0;i<[serDesTPowerMasMatrix numberOfColumns];i++){
+		[[serDesTPowerMasMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
+}
+
+- (void) lvdsPreemphasisCtlChanged:(NSNotification*)aNote
+{
+    int value = [model lvdsPreemphasisCtlMask];
+	short i;
+	for(i=0;i<[lvdsPreemphasisCtlMatrix numberOfColumns];i++){
+		[[lvdsPreemphasisCtlMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
+}
+
+- (void) serDesRPowerMaskChanged:(NSNotification*)aNote
+{
+    int value = [model serdesRPowerMask];
+	short i;
+	for(i=0;i<[serDesRPowerMasMatrix numberOfColumns];i++){
+		[[serDesRPowerMasMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
+	}
 }
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
@@ -308,6 +537,190 @@
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
+- (IBAction) dumpFPGARegsAction:(id)sender
+{
+    [model dumpFpgaRegisters];
+}
+
+- (IBAction) dumpRegsAction:(id)sender
+{
+    [model dumpRegisters];
+}
+
+- (IBAction) testSandBoxAction:(id)sender
+{
+    [model testSandBoxRegisters];
+
+}
+- (IBAction) downloadMainFPGAAction:(id)sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	[openPanel setCanChooseDirectories:NO];
+	[openPanel setCanChooseFiles:YES];
+	[openPanel setAllowsMultipleSelection:NO];
+	[openPanel setPrompt:@"Select FPGA Binary File"];
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model setFpgaFilePath:[[openPanel URL]path]];
+            [model startDownLoadingMainFPGA];
+        }
+    }];
+#else
+	[openPanel beginSheetForDirectory:NSHomeDirectory()
+								 file:nil
+								types:nil //[NSArray arrayWithObjects:@"bin",nil]
+					   modalForWindow:[self window]
+						modalDelegate:self
+					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
+						  contextInfo:NULL];
+#endif
+}
+- (IBAction) stopLoadingMainFPGAAction:(id)sender
+{
+  	[model stopDownLoadingMainFPGA];  
+}
+
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+{
+	if(aTableView == miscStatTable){
+		if([[aTableColumn identifier] isEqualToString:@"name"]){
+            if([model isMaster]){
+                switch(rowIndex){
+                    case 0: return @"Lock Error";
+                    case 1: return @"All Locked";
+                    case 2: return @"Trigger Veto";
+                    case 3: return @"Link Init State";
+                    case 4: return @"Fast Strobe";
+                    case 5: return @"TimeStamp RollOver";
+                    case 6: return @"NIM In 1";
+                    case 7: return @"NIM In 2";
+                    default: return @"";
+                }
+            }
+            else {
+                switch(rowIndex){
+                    case 0: return @"Lock Error";
+                    case 1: return @"All Locked";
+                    case 2: return @"Link Init State";
+                    case 3: return @"CPLD Multiplicity";
+                    case 4: return @"Fast Strobe";
+                    case 5: return @"Router Lock";
+                    case 6: return @"NIM In 1";
+                    case 7: return @"NIM In 2";
+                    default: return @"";
+                }
+            }
+        }
+		else {
+            unsigned short miscStat         = [model miscStatReg];
+            unsigned short linkInitState    = ((miscStat >> 8) & 0xF);
+            unsigned short cpldMultiplicity = ((miscStat >> 4) & 0xF);
+            if([model isMaster]){
+                switch(rowIndex){
+                    case 0:
+                        if(miscStat & (0x1<<15))return @"NO";
+                        else                    return @"YES";
+                        
+                    case 1:
+                        if(miscStat & (0x1<<14))return @"YES";
+                        else                    return @"NO";
+                        
+                    case 2:
+                        if(miscStat & (0x1<<12))return @"Active";
+                        else                    return @"NOT Active";
+                        
+                    case 3:
+                        switch(linkInitState){
+                            case 0:  return @"Machine In reset";
+                            case 3:  return @"Waiting for SerDes Lock";
+                            case 4:  return @"All SerDes Locked";
+                            case 5:  return @"Locked. Sync Removed.";
+                            case 6:  return @"1 or more Locks Lost";
+                            default: return @"?";
+                       }
+                        
+                    case 4:
+                        if(miscStat & (0x1<<3))return @"Set";
+                        else return @"Clr";
+                        
+                    case 5:
+                        if(miscStat & (0x1<<2))return @"Rolled Over";
+                        else return @"Not Rolled Over";
+                        
+                    case 6:
+                        if(miscStat & (0x1<<1))return @"1";
+                        else                   return @"0";
+                        
+                    case 7:
+                        if(miscStat & (0x1<<0)) return @"1";
+                        else                    return @"0";
+                }
+            }
+            else {
+                switch(rowIndex){
+                    case 0:
+                        if(miscStat & (0x1<<15))return @"NO";
+                        else                    return @"YES";
+                        
+                    case 1:
+                        if(miscStat & (0x1<<14))return @"YES";
+                        else                    return @"NO";
+                        
+                    case 2:
+                        switch(linkInitState){
+                            case 0:  return @"Machine In reset";
+                            case 3:  return @"Waiting for SerDes Lock";
+                            case 4:  return @"All SerDes Locked";
+                            case 5:  return @"Locked. Sync Removed.";
+                            case 6:  return @"1 or more Locks Lost";
+                            default: return @"?";
+                        }
+                        
+                    case 3:
+                        return [NSString stringWithFormat:@"%d",cpldMultiplicity];
+                        
+                    case 4:
+                        if(miscStat & (0x1<<3)) return @"Set";
+                        else                    return @"Clr";
+
+                    case 5:
+                        if(miscStat & (0x1<<2)) return @"Locked";
+                        else                    return @"NOT Locked";
+                        
+                    case 6:
+                        if(miscStat & (0x1<<1)) return @"1";
+                        else                    return @"0";
+                        
+                    case 7:
+                        if(miscStat & (0x1<<0)) return @"1";
+                        else                    return @"0";
+                }
+
+            }
+		}
+	}
+	return @"";
+}
+
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+	if(aTableView == miscStatTable)return 8;
+	else return 0;
+}
+
 
 @end
-
+#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
+@implementation ORGretinaTriggerController (private)
+- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
+						 returnCode:(int)returnCode
+						contextInfo:(void*)contextInfo
+{
+    if(returnCode){
+		[model setFpgaFilePath:[sheet filename]];
+		[model startDownLoadingMainFPGA];
+    }
+}
+@end
+#endif
