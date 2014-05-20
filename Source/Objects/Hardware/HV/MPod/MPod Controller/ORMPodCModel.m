@@ -612,7 +612,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		
 	}
 	
-	[dict setObject:[NSString stringWithFormat:@"%u",bitMask] forKey:@"Value"];
+	[dict setObject:[NSString stringWithFormat:@"%lu",bitMask] forKey:@"Value"];
 	if([descriptionArray count])[dict setObject:descriptionArray forKey:@"Names"];
 	return dict;
 }
