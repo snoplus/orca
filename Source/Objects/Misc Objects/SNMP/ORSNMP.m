@@ -491,7 +491,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
             
 			NSData* data = [file readDataToEndOfFile];
 			if(data){
-				NSString* result = [[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding];
+				NSString* result = [[[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding] autorelease];
 				if([result length]){
                     if([delegate respondsToSelector:@selector(setSNMP:result:)]){
                         [delegate setSNMP:tag result:result];

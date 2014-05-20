@@ -240,7 +240,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 {
 	
     NSMutableDictionary* theSupplies  = [NSMutableDictionary dictionary];
-    NSMutableDictionary* systemParams = nil;
+    NSDictionary* systemParams = nil;
     
     int numChannelsWithVoltage = 0;
     int numChannelsRamping     = 0;
