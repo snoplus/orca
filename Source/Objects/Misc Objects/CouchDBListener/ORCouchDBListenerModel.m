@@ -53,6 +53,7 @@ NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerMode
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
 NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerModelStatusLogAppended";
+NSString* ORCouchDBListenerModelListenOnStartChanged   = @"ORCouchDBListenerModelListenOnStartChanged";
 
 @interface ORCouchDBListenerModel (private)
 - (void) _uploadCmdDesignDocument;
@@ -479,6 +480,18 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     commonMethodsOnly=only;
 }
 
+- (BOOL) listenOnStart
+{
+    return listenOnStart;
+}
+- (void) setListenOnStart:(BOOL)alist
+{
+    if (alist == listenOnStart) return;
+    listenOnStart = alist;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListenOnStartChanged
+                                                                        object:self];
+}
+
 - (NSArray*) objectList
 {
     return objectList;
@@ -791,8 +804,12 @@ if (strcmp(@encode(atype), the_type) == 0)         \
     [self setUserName:[decoder decodeObjectForKey:@"userName"]];
     [self setPassword:[decoder decodeObjectForKey:@"password"]];
     [self setUpdatePath:[decoder decodeObjectForKey:@"updatePath"]];
+    [self setListenOnStart:[decoder decodeBoolForKey:@"listenOnStart"]];
     if(!cmdTableArray){
         [self setDefaults];
+    }
+    if (listenOnStart) {
+        [self performSelector:@selector(startStopSession) withObject:self afterDelay:0.5];
     }
    return self;
 }
@@ -810,6 +827,7 @@ if (strcmp(@encode(atype), the_type) == 0)         \
     [encoder encodeObject:userName forKey:@"userName"];
     [encoder encodeObject:password forKey:@"password"];
     [encoder encodeObject:updatePath forKey:@"updatePath"];
+    [encoder encodeBool:listenOnStart forKey:@"listenOnStart"];
 }
 
 @end

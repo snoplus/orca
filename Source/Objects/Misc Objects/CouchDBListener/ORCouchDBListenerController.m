@@ -116,6 +116,11 @@
                      selector : @selector(updatePathChanged:)
                          name : ORCouchDBListenerModelUpdatePathChanged
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(listenOnStartChanged:)
+                         name : ORCouchDBListenerModelListenOnStartChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -203,6 +208,10 @@
     }
 }
 
+- (void) listenOnStartChanged:(NSNotification*)aNote
+{
+    [cmdListenOnStart setState:[model listenOnStart]];
+}
 
 #pragma mark •••Actions
 - (void) updateDisplays
@@ -223,6 +232,7 @@
     [self statusLogChanged:nil];
     [self databaseChanged:nil];
     [self updatePathChanged:nil];
+    [self listenOnStartChanged:nil];
     
 }
 
@@ -310,6 +320,11 @@
 - (IBAction) listDB:(id)sender
 {
     [model listDatabases];
+}
+
+- (IBAction) listenOnStartAction:(id)sender
+{
+    [model setListenOnStart:[sender state]];
 }
 
 - (IBAction) cmdRemoveAction:(id)sender
