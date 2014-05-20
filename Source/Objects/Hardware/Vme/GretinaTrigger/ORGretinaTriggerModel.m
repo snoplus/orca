@@ -609,7 +609,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
 
 - (unsigned long) registerOffsetAt:(unsigned int)index
 {
-	if (index >= kNumberOfGretinaTriggerRegisters) return @"";
+	if (index >= kNumberOfGretinaTriggerRegisters) return 0;
 	return register_information[index].offset;
 }
 
