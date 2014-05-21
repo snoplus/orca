@@ -818,7 +818,7 @@ struct {
 	//----------------------------------------------------------
 	// Fix for controller rev2 + mother board rev2 configuration
 	// Ground and signal connector pins swapped on board
-	// --> Order of channels 0-4 inverted on ribbon cable
+	// --> Order of channels 0-4 inverted on ribbon cable - niko
 	if( chan < 5 ){
 	  swapChan = 4 - chan;
 	  [self setAdc:swapChan value:convertedValue];
@@ -1122,28 +1122,28 @@ struct {
     NSString* alarmName;
     switch(anIndex){
         case 5:
-            if(fabs(aValue - 12) >= 1.0){
+	  if(fabs(aValue - 12)/12 >= 0.1){ //set range to 10% - niko
                 alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 6:
-            if(fabs(aValue + 12) >= 1.0){
+            if(fabs(aValue + 12)/12 >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 13:
-            if(fabs(aValue - 24) >= 1.0){
+            if(fabs(aValue - 24)/24 >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 14:
-            if(fabs(aValue + 24) >= 1.0){
+            if(fabs(aValue + 24)/24 >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
