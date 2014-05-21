@@ -38,6 +38,7 @@
 #define kDesignUploadDone   @"kDesignUploadDone"
 
 #define kCouchDBPort 5984
+#define kCouchDBSubmitHeartbeatsPeriod 10
 
 NSString* ORCouchDBListenerModelDatabaseListChanged    = @"ORCouchDBListenerModelDatabaseListChanged";
 NSString* ORCouchDBListenerModelListeningChanged       = @"ORCouchDBListenerModelListeningChanged";
@@ -54,6 +55,7 @@ NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerMode
 NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
 NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerModelStatusLogAppended";
 NSString* ORCouchDBListenerModelListenOnStartChanged   = @"ORCouchDBListenerModelListenOnStartChanged";
+NSString* ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged = @"ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged";
 
 @interface ORCouchDBListenerModel (private)
 - (void) _uploadCmdDesignDocument;
@@ -64,6 +66,7 @@ NSString* ORCouchDBListenerModelListenOnStartChanged   = @"ORCouchDBListenerMode
 - (void) _uploadAllSections;
 - (BOOL) checkSyntax:(NSString*) key;
 - (id) _convertInvocationReturn:(NSInvocation*)inv;
+- (void) _saveHeartbeat;
 - (ORCouchDB*) statusDBRef:(NSString*)db_name;
 - (ORCouchDB*) statusDBRef;
 @end
@@ -257,6 +260,17 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     HANDLE_NUMBER_TYPE(UnsignedLongLong, unsigned long long)
     HANDLE_NUMBER_TYPE(UnsignedShort, unsigned short)
     return [NSNull null];
+}
+
+- (void) _saveHeartbeat
+{
+    if (![self isListening] || !saveHeartbeatsWhileListening) return;
+    [[self statusDBRef:updatePath] addDocument:[NSDictionary dictionaryWithObjectsAndKeys:@"heartbeat",@"type",nil]
+                                           tag:@""];
+
+    [self performSelector:@selector(_saveHeartbeat)
+               withObject:self
+               afterDelay:kCouchDBSubmitHeartbeatsPeriod];
 }
 
 @end
@@ -473,6 +487,19 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelHeartbeatChanged object:self];
 }
 
+- (void) setSaveHeartbeatsWhileListening:(BOOL)save
+{
+    if (saveHeartbeatsWhileListening == save) return;
+    saveHeartbeatsWhileListening = save;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged
+                                                                        object:self];
+}
+
+- (BOOL) saveHeartbeatsWhileListening
+{
+    return saveHeartbeatsWhileListening;
+}
+
 
 //Command Section
 - (void) setCommonMethods:(BOOL)only
@@ -540,6 +567,9 @@ if (strcmp(@encode(atype), the_type) == 0)     \
                                                         tag:kChangesfeed
                                                      filter:@"orcacommand/execute_commands"] retain];
     [runningChangesfeed addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
+    if (saveHeartbeatsWhileListening) {
+        [self performSelectorOnMainThread:@selector(_saveHeartbeat) withObject:self waitUntilDone:NO];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListeningChanged object:self];
 }
 
@@ -805,6 +835,7 @@ if (strcmp(@encode(atype), the_type) == 0)         \
     [self setPassword:[decoder decodeObjectForKey:@"password"]];
     [self setUpdatePath:[decoder decodeObjectForKey:@"updatePath"]];
     [self setListenOnStart:[decoder decodeBoolForKey:@"listenOnStart"]];
+    [self setSaveHeartbeatsWhileListening:[decoder decodeBoolForKey:@"saveHeartbeatsWhileListening"]];
     if(!cmdTableArray){
         [self setDefaults];
     }
@@ -828,6 +859,7 @@ if (strcmp(@encode(atype), the_type) == 0)         \
     [encoder encodeObject:password forKey:@"password"];
     [encoder encodeObject:updatePath forKey:@"updatePath"];
     [encoder encodeBool:listenOnStart forKey:@"listenOnStart"];
+    [encoder encodeBool:saveHeartbeatsWhileListening forKey:@"saveHeartbeatsWhileListening"];
 }
 
 @end
