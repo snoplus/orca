@@ -25,7 +25,8 @@
 #import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORMJDPreAmpModelUseSBCChanged = @"ORMJDPreAmpModelUseSBCChanged";
+NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
+NSString* ORMJDPreAmpModelUseSBCChanged     = @"ORMJDPreAmpModelUseSBCChanged";
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
@@ -224,6 +225,20 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (int) boardRev
+{
+    return boardRev;
+}
+
+- (void) setBoardRev:(int)aBoardRev
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBoardRev:boardRev];
+    
+    boardRev = aBoardRev;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelBoardRevChanged object:self];
+}
 
 - (BOOL) useSBC
 {
@@ -735,103 +750,108 @@ struct {
     if(!rangesHaveBeenSet)[self writeAdcRanges];
     unsigned long rawAdcValue[16];
     int chan;
-    int swapChan;
     if([self controllerIsSBC] && useSBC ){
-      //if an SBC is available we pass the request to read the adcs
-      //to it.
-      int chip;
-      for(chip=0;chip<2;chip++){
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kMJD;
-	aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
-	aPacket.cmdHeader.numberBytesinPayload	= (8 + 3)*sizeof(long);
-        
-	GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
-	p->baseAddress      = [self baseAddress];
-	p->chip             = chip;
-	p->readEnabledMask  = adcEnabledMask;
-	for(chan=0;chan<8;chan++){
-	  int adcIndex = chan + (chip*8);
-	  if(adcEnabledMask & (0x1<<adcIndex)){
-	    unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
-	      (chan<<10)         |             //set chan
-	      (0x1 << 4)             |             //use internal voltage reference for conversion
-	      (mjdPreAmpTable[adcIndex].conversionType << 5)   |
-	      (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
-	    p->adc[chan] = (mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8));
-	  }
-	  else p->adc[chan] = 0;
-	}
-	@try {
-	  [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
-	  GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
-	  for(chan=0;chan<8;chan++){
-	    int adcIndex = chan + (chip*8);
-	    if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[chan];
-	    else                               rawAdcValue[adcIndex] = 0;
-	  }
-	}
-	@catch(NSException* e){
+        //if an SBC is available we pass the request to read the adcs
+        //to it.
+        int chip;
+        for(chip=0;chip<2;chip++){
+            SBC_Packet aPacket;
+            aPacket.cmdHeader.destination	= kMJD;
+            aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
+            aPacket.cmdHeader.numberBytesinPayload	= (8 + 3)*sizeof(long);
+            
+            GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
+            p->baseAddress      = [self baseAddress];
+            p->chip             = chip;
+            p->readEnabledMask  = adcEnabledMask;
+            for(chan=0;chan<8;chan++){
+                int adcIndex = chan + (chip*8);
+                if(adcEnabledMask & (0x1<<adcIndex)){
+                    unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
+                    (chan<<10)         |             //set chan
+                    (0x1 << 4)             |             //use internal voltage reference for conversion
+                    (mjdPreAmpTable[adcIndex].conversionType << 5)   |
+                    (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
+                    p->adc[chan] = (mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8));
+                }
+                else p->adc[chan] = 0;
+            }
+            @try {
+                [[[[self objectConnectedTo:MJDPreAmpInputConnector] adapter] sbcLink] send:&aPacket receive:&aPacket];
+                GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
+                for(chan=0;chan<8;chan++){
+                    int adcIndex = chan + (chip*8);
+                    if(adcEnabledMask & (0x1<<adcIndex))rawAdcValue[adcIndex] = p->adc[chan];
+                    else                               rawAdcValue[adcIndex] = 0;
+                }
+            }
+            @catch(NSException* e){
                 
-	}
-      }
-
+            }
+        }
+        
     }
     else {
-      for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-	if(adcEnabledMask & (0x1<<chan)){
-	  unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-	    ((chan%8)<<10)         |            //set chan
-	    (mjdPreAmpTable[chan].conversionType << 5)   |
-	    (0x1 << 4)             |            //use internal voltage reference for conversion
-	    (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(adcEnabledMask & (0x1<<chan)){
+                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
+                ((chan%8)<<10)         |            //set chan
+                (mjdPreAmpTable[chan].conversionType << 5)   |
+                (0x1 << 4)             |            //use internal voltage reference for conversion
+                (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
                 
-	  //-------------------------------------------------------
-	  //don't like the following where we have to read four times, but seems we have no choice
-	  rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-	  rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-	  rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-	  rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-	  //-------------------------------------------------------
-	}
-      }
-      
+                //-------------------------------------------------------
+                //don't like the following where we have to read four times, but seems we have no choice
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //-------------------------------------------------------
+            }
+        }
+        
     }
     for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-      if(adcEnabledMask & (0x1<<chan)){
-	//int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
-	//if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
-        
-	long adcValue;
-	if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
-	  if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
-	  else                          adcValue = rawAdcValue[chan] & 0x1FFF;
-	}
-	else {
-	  adcValue = rawAdcValue[chan] & 0x1FFF;
-	}
-        
-	float convertedValue = (-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
-			
-	if(verbose)NSLog(@"%d: %d %d %d %.2f (%.2f)\n",chan,adcValue,mjdPreAmpTable[chan].adcOffset,-adcValue+mjdPreAmpTable[chan].adcOffset,(-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept,convertedValue);
+        if(adcEnabledMask & (0x1<<chan)){
+            //int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
+            //if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
-	//----------------------------------------------------------
-	// Fix for controller rev2 + mother board rev2 configuration
-	// Ground and signal connector pins swapped on board
-	// --> Order of channels 0-4 inverted on ribbon cable - niko
-	if( chan < 5 ){
-	  swapChan = 4 - chan;
-	  [self setAdc:swapChan value:convertedValue];
-	}
-	else [self setAdc:chan value:convertedValue];
-	//----------------------------------------------------------
-
-	[self checkAdcIsWithinLimits:chan];	
-	if(mjdPreAmpTable[chan].calculateLeakageCurrent){
-	  [self calculateLeakageCurrentForAdc:chan];
-	}
-      }
-      else [self setAdc:chan value:0.0];
+            long adcValue;
+            if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
+                if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
+                else                          adcValue = rawAdcValue[chan] & 0x1FFF;
+            }
+            else {
+                adcValue = rawAdcValue[chan] & 0x1FFF;
+            }
+            
+            float convertedValue = (-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
+			
+            if(verbose)NSLog(@"%d: %d %d %d %.2f (%.2f)\n",chan,adcValue,mjdPreAmpTable[chan].adcOffset,-adcValue+mjdPreAmpTable[chan].adcOffset,(-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept,convertedValue);
+            
+            
+            if(boardRev == 0){  //Orginal Board Rev 1
+                [self setAdc:chan value:convertedValue];
+            }
+            else {
+                //this is a Rev 2 board.
+                //----------------------------------------------------------
+                // Fix for controller rev2 + mother board rev2 configuration
+                // Ground and signal connector pins swapped on board
+                // --> Order of channels 0-4 inverted on ribbon cable - niko
+                if( chan < 5 ){
+                    int swapChan = 4 - chan;
+                    [self setAdc:swapChan value:convertedValue];
+                }
+                else [self setAdc:chan value:convertedValue];
+                //----------------------------------------------------------
+            }
+            [self checkAdcIsWithinLimits:chan];	
+            if(mjdPreAmpTable[chan].calculateLeakageCurrent){
+                [self calculateLeakageCurrentForAdc:chan];
+            }
+        }
+        else [self setAdc:chan value:0.0];
     }
     
     [self checkTempIsWithinLimits];
@@ -941,7 +961,8 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setUseSBC:[decoder decodeBoolForKey:@"useSBC"]];
+    [self setBoardRev:      [decoder decodeIntForKey:@"boardRev"]];
+    [self setUseSBC:        [decoder decodeBoolForKey:@"useSBC"]];
     [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
@@ -975,7 +996,8 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeBool:useSBC forKey:@"useSBC"];
+	[encoder encodeInt:boardRev         forKey:@"boardRev"];
+	[encoder encodeBool:useSBC          forKey:@"useSBC"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];
@@ -1005,6 +1027,7 @@ struct {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
     [objDictionary setObject:[NSNumber numberWithInt:[self uniqueIdNumber]] forKey:@"preampID"];
+    [objDictionary setObject:[NSNumber numberWithInt:[self boardRev]] forKey:@"boardRev"];
     
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;

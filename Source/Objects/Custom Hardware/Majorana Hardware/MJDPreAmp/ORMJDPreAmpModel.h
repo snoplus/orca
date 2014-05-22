@@ -58,11 +58,14 @@
     BOOL            rangesHaveBeenSet;
     NSDate*         lastDataBaseUpdate;
     BOOL            useSBC;
+    int             boardRev;
 }
 
 - (void) setUpArrays;
 
 #pragma mark ¥¥¥Accessors
+- (int)  boardRev;
+- (void) setBoardRev:(int)aBoardRev;
 - (BOOL) useSBC;
 - (void) setUseSBC:(BOOL)aUseSBC;
 - (NSString*) detectorName:(int)i;
@@ -149,6 +152,7 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelBoardRevChanged;
 extern NSString* ORMJDPreAmpModelUseSBCChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;

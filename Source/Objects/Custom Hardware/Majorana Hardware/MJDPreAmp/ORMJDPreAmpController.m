@@ -206,7 +206,7 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu",[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu (Rev %d)",[model uniqueIdNumber],[model boardRev]+1]];
     [self settingsLockChanged:nil];
 }
 
@@ -352,6 +352,10 @@
                          name : ORMJDPreAmpModelUseSBCChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(boardRevChanged:)
+                         name : ORMJDPreAmpModelBoardRevChanged
+						object: model];
 }
 
 - (void) updateWindow
@@ -377,9 +381,15 @@
 	[self feedbackResistorArrayChanged:nil];
 	[self detectorNameChanged:nil];
 	[self useSBCChanged:nil];
+	[self boardRevChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) boardRevChanged:(NSNotification*)aNote
+{
+	[boardRevPU selectItemAtIndex: [model boardRev]];
+    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu (Rev %d)",[model uniqueIdNumber],[model boardRev]+1]];
+}
 
 - (void) useSBCChanged:(NSNotification*)aNote
 {
@@ -696,6 +706,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) boardRevAction:(id)sender
+{
+	[model setBoardRev:[sender indexOfSelectedItem]];
+}
 
 - (void) useSBCAction:(id)sender
 {

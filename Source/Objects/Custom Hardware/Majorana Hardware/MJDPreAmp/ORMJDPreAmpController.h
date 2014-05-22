@@ -23,6 +23,7 @@
 {
     @private
 		IBOutlet NSButton*		settingsLockButton;
+        IBOutlet NSPopUpButton* boardRevPU;
         IBOutlet NSButton*      useSBCCB;
 		IBOutlet NSMatrix*		adcEnabledMaskMatrix;
 		IBOutlet NSButton*		shipValuesCB;
@@ -67,6 +68,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) boardRevChanged:(NSNotification*)aNote;
 - (void) useSBCChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
@@ -104,6 +106,7 @@
 - (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) boardRevAction:(id)sender;
 - (IBAction) useSBCAction:(id)sender;
 - (IBAction) detectorNameAction:(id)sender;
 - (IBAction) adcEnabledMaskAction:(id)sender;
