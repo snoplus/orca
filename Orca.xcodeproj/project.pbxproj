@@ -158,7 +158,7 @@
 		2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB011F15EF988C00BC2540 /* EdelweissLogo.tif */; };
 		2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2DAB012015EF988C00BC2540 /* KITLogo.tif */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
-		2DD0C4B4192E46F6009112B2 /* OpSequence.xib in Resources */ = {isa = PBXBuildFile; fileRef = 43A8F954184F69320064BB5A /* OpSequence.xib */; };
+		2DD0C4CE192E4F9E009112B2 /* OpSequence.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C4A0192E45EF009112B2 /* OpSequence.nib */; };
 		2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
@@ -15684,7 +15684,7 @@
 				844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */,
 				DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */,
 				DB704A1618EBA61E00839B42 /* ellie.xib in Resources */,
-				2DD0C4B4192E46F6009112B2 /* OpSequence.xib in Resources */,
+				2DD0C4CE192E4F9E009112B2 /* OpSequence.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
