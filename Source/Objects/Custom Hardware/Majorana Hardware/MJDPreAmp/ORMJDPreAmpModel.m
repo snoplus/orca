@@ -1145,28 +1145,28 @@ struct {
     NSString* alarmName;
     switch(anIndex){
         case 5:
-	  if(fabs(aValue - 12)/12 >= 0.1){ //set range to 10% - niko
+	  if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
                 alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 6:
-            if(fabs(aValue + 12)/12 >= 0.1){ //set range to 10% - niko
+            if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 13:
-            if(fabs(aValue - 24)/24 >= 0.1){ //set range to 10% - niko
+            if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 14:
-            if(fabs(aValue + 24)/24 >= 0.1){ //set range to 10% - niko
+            if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
