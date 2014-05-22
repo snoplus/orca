@@ -265,8 +265,10 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
         }
         else if([anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")]){
             ORMPodCModel* aControllerCard = (ORMPodCModel*)anObj;
-			systemParams = [[aControllerCard parameterDictionary] objectForKey:@"0"];
-			if(!systemParams)systemParams = [NSDictionary dictionary];
+            @synchronized(aControllerCard){
+                systemParams = [[aControllerCard parameterDictionary] objectForKey:@"0"];
+                if(!systemParams)systemParams = [NSDictionary dictionary];
+            }
         }
     }
     

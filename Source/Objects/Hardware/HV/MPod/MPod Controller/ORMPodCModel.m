@@ -236,19 +236,22 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) setParameterDictionary:(NSDictionary*)aParameterDictionary
 {
-	[aParameterDictionary retain];
-	[parameterDictionary release];
-	parameterDictionary = aParameterDictionary;
-		
-	//pass the info to each of the cards. They will keep a copy of their values
-	NSArray* cards = [[self crate] orcaObjects];
-	for(id aCard in cards){
-		if(aCard == self)continue;
-        if([aCard isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
-			[(ORiSegHVCard*)aCard setRdParamsFrom:parameterDictionary];
-		}
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
+    @synchronized(self){
+
+        [aParameterDictionary retain];
+        [parameterDictionary release];
+        parameterDictionary = aParameterDictionary;
+            
+        //pass the info to each of the cards. They will keep a copy of their values
+        NSArray* cards = [[self crate] orcaObjects];
+        for(id aCard in cards){
+            if(aCard == self)continue;
+            if([aCard isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+                [(ORiSegHVCard*)aCard setRdParamsFrom:parameterDictionary];
+            }
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
+    }
 }
 
 - (void) togglePower
