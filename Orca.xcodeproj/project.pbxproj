@@ -3564,7 +3564,6 @@
 		4398E7CC11B81B8B00FC4DDE /* ORCaen775Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Controller.m; sourceTree = SOURCE_ROOT; };
 		4398E7DE11B81BBD00FC4DDE /* ORCaen775Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen775Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Decoders.h; sourceTree = SOURCE_ROOT; };
 		4398E7DF11B81BBD00FC4DDE /* ORCaen775Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen775Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV775/ORCaen775Decoders.m; sourceTree = SOURCE_ROOT; };
-		43A8F954184F69320064BB5A /* OpSequence.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = OpSequence.xib; path = "Source/Objects/Misc Objects/Workers/OpSequence/Views/OpSequence.xib"; sourceTree = SOURCE_ROOT; };
 		43ADFE3B10B6DAF90044617C /* readout_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = readout_code.h; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.h; sourceTree = SOURCE_ROOT; };
 		43ADFE3C10B6DAF90044617C /* ORVCard.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORVCard.hh; path = Source/Objects/Hardware/SBC/SBC_Code/ORVCard.hh; sourceTree = SOURCE_ROOT; };
 		43ADFE3D10B6DAF90044617C /* readout_code.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = readout_code.cc; path = Source/Objects/Hardware/SBC/SBC_Code/readout_code.cc; sourceTree = SOURCE_ROOT; };
@@ -12181,7 +12180,6 @@
 			isa = PBXGroup;
 			children = (
 				2DD0C4A0192E45EF009112B2 /* OpSequence.nib */,
-				43A8F954184F69320064BB5A /* OpSequence.xib */,
 				84D29FDA1843EAC800D320DB /* OROpSeqStepView.h */,
 				84D29FDB1843EAC800D320DB /* OROpSeqStepView.m */,
 				84D29FDC1843EAC800D320DB /* OROpSeqStepViewItem.h */,
