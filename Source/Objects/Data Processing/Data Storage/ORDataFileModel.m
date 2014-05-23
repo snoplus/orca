@@ -87,6 +87,8 @@ static const int currentVersion = 1;           // Current version
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[diskFullAlarm clearAlarm];
     [diskFullAlarm release];
+	[diskFillingAlarm clearAlarm];
+    [diskFillingAlarm release];
     [filePointer release];
     [fileName release];
     [statusFileName release];
@@ -692,7 +694,21 @@ static const int currentVersion = 1;           // Current version
 			long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
 			long long totalSpace = [[diskInfo objectForKey:NSFileSystemSize] longLongValue]; 
 			percentFull = 100 - 100*freeSpace/(double)totalSpace;
-									
+            
+			if(freeSpace < (long long)kScaryDiskSpace * 1024 * 1024 * 1024){
+                if(!diskFillingAlarm){
+					diskFillingAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Data disk getting full"] severity:kHardwareAlarm];
+					[diskFillingAlarm setSticky:YES];
+                    [diskFullAlarm postAlarm];
+					[diskFillingAlarm setHelpString:[NSString stringWithFormat:@"The data disk is filling. You can acknowledge this alarm, but it will not be cleared until more disk space is available."]];
+				}
+            }
+            else {
+                [diskFillingAlarm clearAlarm];
+                [diskFillingAlarm release];
+                diskFillingAlarm = nil;
+            }
+            
 			if(freeSpace < (long long)kMinDiskSpace * 1024 * 1024 * 1024){
 				if(!diskFullAlarm){
 					diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];

@@ -33,6 +33,7 @@
 #define kStopOnLimit	0
 #define kRestartOnLimit 1
 #define kMinDiskSpace   2 //GBytes
+#define kScaryDiskSpace 50 //GBytes
 
 @interface ORDataFileModel :  ORDataChainObject <ORDataProcessing,ORAdcProcessing>
 {
@@ -62,7 +63,8 @@
 		BOOL			useFolderStructure;
 		BOOL			useDatedFileNames;
 		int				sizeLimitReachedAction;
-		ORAlarm*		diskFullAlarm;
+        ORAlarm*		diskFullAlarm;
+        ORAlarm*		diskFillingAlarm;
 		int				checkCount;
 		int				runMode;
 		NSTimeInterval	lastFileCheckTime;
