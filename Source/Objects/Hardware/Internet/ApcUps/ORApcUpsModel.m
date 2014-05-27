@@ -214,7 +214,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         float Vin2 = [[self valueForPowerPhase:2  powerTableIndex:0] floatValue];
         float Vin3 = [[self valueForPowerPhase:3  powerTableIndex:0] floatValue];
         float bat  = [[self valueForBattery:0 batteryTableIndex:0] intValue];
-        if((Vin1<110) || (Vin2<110) || (Vin3<110)){
+        if((Vin1<100) || (Vin2<100) || (Vin3<100)){
             if(!powerOutAlarm){
                 powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
                 [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
