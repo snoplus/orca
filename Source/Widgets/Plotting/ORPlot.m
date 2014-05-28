@@ -246,10 +246,10 @@
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];
     
     // We limit the total number of plotted points by using a stride    
-    NSUInteger totalLength = maxX - minX;
+    NSUInteger totalLength = MIN(maxX - minX,numPoints);
     NSUInteger stride = (NSUInteger)((double)totalLength)/kMaximumPlotPoints;
     if (stride == 0) stride = 1;
-    
+    maxX = MIN(maxX, stride*numPoints + minX);
     if (![dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
         [dataSource plotter:self index:minX x:&xValue y:&yValue];
         x  = [mXScale getPixAbs:minX];
