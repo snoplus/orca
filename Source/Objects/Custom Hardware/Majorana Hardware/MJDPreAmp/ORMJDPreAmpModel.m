@@ -839,8 +839,12 @@ struct {
                 // Fix for controller rev2 + mother board rev2 configuration
                 // Ground and signal connector pins swapped on board
                 // --> Order of channels 0-4 inverted on ribbon cable - niko
-                if( chan < 5 ){
-                    int swapChan = 4 - chan;
+                if( (chan%8) < 5 ){
+                    int swapChan;
+                    if( chan < 5 )
+                        swapChan = 4 - chan;
+                    else swapChan = 20 - chan;
+                    
                     [self setAdc:swapChan value:convertedValue];
                 }
                 else [self setAdc:chan value:convertedValue];
