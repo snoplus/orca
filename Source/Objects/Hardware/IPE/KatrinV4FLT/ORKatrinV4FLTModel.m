@@ -1979,9 +1979,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
     unsigned long sltSubSecReg =  0;		
     unsigned long sltSubSec =  0;		
-    unsigned long sltSec    =  0;		
-
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+    unsigned long sltSec    =  0;
+    int hadException    =  0;
+    
+[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
 
@@ -2079,7 +2080,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	@catch(NSException* localException) {
             //DEBUG
             NSLog(@"%@::%@\n EXCEPTION  sltSec %i",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltSec);//DEBUG -tb-
-            
+        hadException=1;
 	}
 	
     //try to read always between two second strobes -> sec = fullSec+0.4
@@ -2088,7 +2089,11 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     delay += deltadelay;
             //DEBUG            NSLog(@"%@::%@\n delay for call of @selector(readHitRates):delay %f",NSStringFromClass([self class]),NSStringFromSelector(_cmd),delay);//DEBUG -tb-
 
-	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
+	if(!hadException){
+        [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
+    }else{
+        NSLog(@"Exception! Skip 'readHitRates'!\n");
+    }
 }
 
 //------------------
