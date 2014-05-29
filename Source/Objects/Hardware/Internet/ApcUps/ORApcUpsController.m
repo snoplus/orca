@@ -49,7 +49,7 @@
 		[NSColor brownColor]
 	};
     int tag = 0;
-    for(i=0;i<2;i++){
+    for(i=0;i<3;i++){
         ORTimeLinePlot* aPlot= [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
         [aPlot setLineColor:theColors[i]];
         [aPlot setName:[model nameForChannel:tag]];
@@ -164,6 +164,11 @@
                          name : ORApcUpsModelEventLogChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(maintenanceModeChanged:)
+                         name : ORApcUpsModelMaintenanceModeChanged
+						object: model];
+
 }
 
 
@@ -182,6 +187,14 @@
 	[self updateTimePlot:nil];
     [self refreshProcessTable:nil];
 	[self eventLogChanged:nil];
+	[self maintenanceModeChanged:nil];
+}
+
+- (void) maintenanceModeChanged:(NSNotification*)aNote
+{
+    BOOL inMaintenanceMode = [model maintenanceMode];
+    [maintenanceModeButton setStringValue:inMaintenanceMode?@"End Maintenance":@"Start Maintenance"];
+	[maintenanceModeField setStringValue: inMaintenanceMode?@"Maintence":@""];
 }
 
 - (void) eventLogChanged:(NSNotification*)aNote
@@ -242,7 +255,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<8;i++){
+    for(i=0;i<3;i++){
         if(!aNote || [aNote object] == [model timeRate:i]){
             [plotter0 setNeedsDisplay:YES];
             break;
@@ -326,6 +339,29 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) maintenanceModeAction:(id)sender
+{
+    if(![model maintenanceMode]){
+        NSBeginAlertSheet(@"Really Start Maintenance Mode.",
+                          @"Cancel",
+                          @"Yes, Go to Maintenance",
+                          nil,[self window],
+                          self,
+                          @selector(maintenanceModeActionDidEnd:returnCode:contextInfo:),
+                          nil,
+                          nil,@"This will stop polling the UPS and allow unfetered access via the web interface. It will disable all power out alarms. It will automatically revert to normal operations in 30 minutes.");
+    }
+    else {
+        [model setMaintenanceMode:NO];
+    }
+}
+    
+- (void) maintenanceModeActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    [model setMaintenanceMode:YES];
+}
+
 - (IBAction) clearEventLogAction:(id)sender
 {
     NSBeginAlertSheet(@"Clear the Event Log.",
@@ -374,12 +410,14 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
     if(aTableView == powerTableView){
-        if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameAtIndexInPowerTable:rowIndex];
+        if([[aTableColumn identifier] isEqualToString:@"Name"]){
+            return [model nameAtIndexInPowerTable:rowIndex];
+        }
         else {
             if([model dataValid]){
                 if(rowIndex==4){
                     //special case, just one value in the first column
-                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"Freq"];
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"INPUT FREQUENCY"];
                     else return @"";
                 }
                 else return [model valueForPowerPhase:[[aTableColumn identifier] intValue] powerTableIndex:rowIndex];
@@ -392,10 +430,14 @@
         else {
             if([model dataValid]){
                 if(rowIndex==2){
-                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"TupsC"];
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"INTERNAL TEMPERATURE"];
                     else return @"";
-              }
-            else return [model valueForLoadPhase:[[aTableColumn identifier] intValue] loadTableIndex:rowIndex];
+                }
+                else if(rowIndex==3){
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"OUTPUT FREQUENCY"];
+                    else return @"";
+                }
+                else return [model valueForPowerPhase:[[aTableColumn identifier] intValue] powerTableIndex:rowIndex];
             }
             else return @"?";
         }
@@ -435,10 +477,10 @@
         return 5;
     }
     else if(aTableView == loadTableView){
-        return 3;
+        return 4;
     }
     else if(aTableView == batteryTableView){
-        return 3;
+        return 4;
     }
     else if(aTableView == processTableView){
         return kNumApcUpsAdcChannels;

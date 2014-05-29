@@ -24,7 +24,10 @@
 #import "NetSocket.h"
 #import "ORTimeRate.h"
 #import "ORFileGetterOp.h"
+#import "NetSocket.h"
+#import "ORAlarm.h"
 
+NSString* ORApcUpsModelMaintenanceModeChanged = @"ORApcUpsModelMaintenanceModeChanged";
 NSString* ORApcUpsModelEventLogChanged  = @"ORApcUpsModelEventLogChanged";
 NSString* ORApcUpsIsConnectedChanged	= @"ORApcUpsIsConnectedChanged";
 NSString* ORApcUpsIpAddressChanged		= @"ORApcUpsIpAddressChanged";
@@ -40,6 +43,12 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 @interface ORApcUpsModel (private)
 - (void) postCouchDBRecord;
+- (void) clearInputBuffer;
+- (void) parse:(NSString*)aResponse;
+- (void) parseLine:(NSString*)aLine;
+- (void) startTimeout;
+- (void) cancelTimeout;
+- (void) timeout;
 @end
 
 #define kApcEventsPath [@"~/ApcEvents.txt" stringByExpandingTildeInPath]
@@ -62,6 +71,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [dataInValidAlarm release];
     [powerOutAlarm clearAlarm];
     [powerOutAlarm release];
+    [inputBuffer release];
+    [sayIt release];
     
     int i;
     for(i=0;i<8;i++){
@@ -101,6 +112,45 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) maintenanceMode
+{
+    return maintenanceMode;
+}
+
+- (void) setMaintenanceMode:(BOOL)aMaintenanceMode
+{
+    maintenanceMode = aMaintenanceMode;
+    
+    if(aMaintenanceMode){
+        [self performSelector:@selector(cancelMaintenanceMode) withObject:nil afterDelay:30*60];
+        NSLogColor([NSColor redColor],@"Started maintenance on %@\n",[self fullID]);
+    }
+    else {
+        NSLog(@"Ended maintenance on %@\n",[self fullID]);
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cancelMaintenanceMode) object:nil];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelMaintenanceModeChanged object:self];
+}
+
+- (void) cancelMaintenanceMode
+{
+    [self setMaintenanceMode:NO];
+}
+
+- (NetSocket*) socket
+{
+	return socket;
+}
+
+- (void) setSocket:(NetSocket*)aSocket
+{
+	if(aSocket != socket)[socket close];
+	[aSocket retain];
+	[socket release];
+	socket = aSocket;
+    [socket setDelegate:self];
+}
 
 - (unsigned int) pollTime
 {
@@ -182,12 +232,12 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (void) setDataValid:(BOOL)aState
 {
     dataValid = aState;
-    [self checkAlarms];
     if(!dataValid){
         //clear the variables that are being monitored
         [valueDictionary release];
         valueDictionary = nil;
     }
+    [self checkAlarms];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsDataValidChanged object:self];
 }
 
@@ -210,16 +260,19 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         }
     }
     if(dataValid){
-        float Vin1 = [[self valueForPowerPhase:1  powerTableIndex:0] floatValue];
-        float Vin2 = [[self valueForPowerPhase:2  powerTableIndex:0] floatValue];
-        float Vin3 = [[self valueForPowerPhase:3  powerTableIndex:0] floatValue];
-        float bat  = [[self valueForBattery:0 batteryTableIndex:0] intValue];
+        float Vin1 = [self inputVoltageOnPhase:1];
+        float Vin2 = [self inputVoltageOnPhase:2];
+        float Vin3 = [self inputVoltageOnPhase:3];
+        float bat  = [self batteryCapacity];
         if((Vin1<100) || (Vin2<100) || (Vin3<100)){
             if(!powerOutAlarm){
                 powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
                 [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
                 [powerOutAlarm setSticky:YES];
                 [powerOutAlarm postAlarm];
+                [powerOutAlarm acknowledge]; //use the voice instead of beep
+                sayItCount = 0;
+                [self startPowerOutSpeech];
             }
             if(lastBatteryValue != bat){
                 NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
@@ -228,6 +281,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         }
         else {
             if([powerOutAlarm isPosted]){
+                [self stopPowerOutSpeech];
                 [powerOutAlarm clearAlarm];
                 [powerOutAlarm release];
                 powerOutAlarm = nil;
@@ -238,17 +292,65 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     }
 }
 
+- (void)  startPowerOutSpeech
+{
+    sayItCount = 0;
+    [self continuePowerOutSpeech];
+}
+
+- (void)  continuePowerOutSpeech
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startPowerOutSpeech) object:nil];
+    if(!sayIt)sayIt = [[NSSpeechSynthesizer alloc] initWithVoice:[NSSpeechSynthesizer defaultVoice]];
+    if(![sayIt isSpeaking]){
+        if(sayItCount==0)[sayIt startSpeakingString:@"There has been a power outage."];
+        else [sayIt startSpeakingString:[NSString stringWithFormat:@"The UPS is on battery power. %.0f %% remaining.",[self batteryCapacity]]];
+        
+        sayItCount ++;
+    }
+    [self performSelector:@selector(continuePowerOutSpeech) withObject:nil afterDelay:60];
+}
+
+
+- (void)  stopPowerOutSpeech
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(continuePowerOutSpeech) object:nil];
+    [sayIt stopSpeaking];
+    [sayIt startSpeakingString:@"Power is back up!"];
+}
+
+- (BOOL) powerIsOut
+{
+    if([powerOutAlarm isPosted]){
+        NSTimeInterval timePowerHasBeenOut = [powerOutAlarm timeSincePosted];
+        if(timePowerHasBeenOut >= 10*60)return YES;
+        else return NO;
+    }
+    else return NO;
+}
+
+- (float) inputVoltageOnPhase:(int)aPhase
+{
+    if(aPhase>=1 && aPhase<=3) return [[self valueForPowerPhase:aPhase  powerTableIndex:0] floatValue];
+    else return 0;
+}
+
+- (float) batteryCapacity
+{
+    return [[valueDictionary objectForKey:@"BATTERY CAPACITY"]floatValue];
+}
+
 - (void) pollHardware
 {
     if([ipAddress length]!=0 && [password length]!=0 && [username length]!=0){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+        
+        [self connect];
+
         [self performSelector:@selector(pollHardware) withObject:nil afterDelay:[self pollTime]];
         [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:[self pollTime]]];
         [self setLastTimePolled:[NSDate date]];
-        
-        [self getEvents];
-        [self getData];
-
+        [self performSelector:@selector(getEvents) withObject:nil afterDelay:5];
     }
     else [self setDataValid:NO];
 }
@@ -262,8 +364,31 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     }
 }
 
+- (void) connect
+{
+	if(![self isConnected]){
+		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kApcUpsPort]];
+	}
+}
+
+- (void) disconnect
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(disconnect) object:nil];
+    [self setSocket:nil];
+    [self setIsConnected:[socket isConnected]];
+    statusSentOnce = NO;
+}
+
+- (void) setIsConnected:(BOOL)aFlag
+{
+    isConnected = aFlag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsIsConnectedChanged object:self];
+}
+
 - (void) getEvents
 {
+    [self disconnect];
+    
     [self setUpQueue];
    
     ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
@@ -274,22 +399,9 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [fileQueue addOperation:mover];
 }
 
-- (void) getData
-{
-    [self setUpQueue];
-    
-    ORFileGetterOp* mover = [[[ORFileGetterOp alloc] init] autorelease];
-     mover.delegate     = self;
-    [mover setUseFTP:YES];
-    [mover setParams:@"logs/data.txt" localPath:kApcDataPath ipAddress:ipAddress userName:username passWord:password];
-    [mover setDoneSelectorName:@"dataFileArrived"];
-    [fileQueue addOperation:mover];
-    
-}
-
 - (BOOL) isConnected
 {
-    return [fileQueue operationCount]!=0;
+    return isConnected || ([fileQueue operationCount]!=0);
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object
@@ -321,73 +433,48 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
     [self postCouchDBRecord];
-
 }
 
-- (void) dataFileArrived
+#pragma mark ***Delegate Methods
+- (void) netsocketConnected:(NetSocket*)inNetSocket
 {
-    NSStringEncoding* en=nil;
-    NSString* contents = [NSString stringWithContentsOfFile:kApcDataPath usedEncoding:en error:nil];
-    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
-    NSArray* headerNames = nil;
-    NSArray* values      = nil;
-    NSArray* header0Names = nil;
-    NSArray* values0      = nil;
-    if([lines count]==0)[self setDataValid:NO];
-    for(id aLine in lines){
-        aLine = [aLine trimSpacesFromEnds];
-        NSArray* parts = [aLine componentsSeparatedByString:@"\t"];
-        int numParts = [parts count];
-        if(numParts == 6){
-            if(!header0Names){
-                header0Names = parts ;
-            }
-            else {
-                values0 = parts;
-                if(header0Names){
-                    if(!valueDictionary)self.valueDictionary = [NSMutableDictionary dictionary];
-                    
-                    int i;
-                    for(i=0;i<numParts;i++){
-                        NSString* key = [header0Names objectAtIndex:i];
-                        key = [key trimSpacesFromEnds];
-                        if([key isEqualToString:@"Date"])continue;
-                        [valueDictionary setObject:[values0 objectAtIndex:i] forKey:key];
-                    }
-                }
-            }
+    if(inNetSocket == socket){
+        [self setIsConnected:[socket isConnected]];
+    }
+}
 
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIsConnected:NO];
+		[socket autorelease];
+		socket = nil;
+    }
+}
+
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+{
+    if(inNetSocket == socket){
+		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
+        if(!inputBuffer)inputBuffer = [[NSMutableString alloc]initWithString:theString];
+        else [inputBuffer appendString:theString];
+        
+        if([theString rangeOfString:@"USER NAME"].location != NSNotFound){
+            [inNetSocket writeString:[NSString stringWithFormat:@"%@\r",username] encoding:NSASCIIStringEncoding];
+            [self clearInputBuffer];
         }
-        else if(numParts == 31){
-            if(!headerNames){
-                headerNames = parts ;
-            }
-            else {
-                values = parts;
-                if(headerNames){
-                    if(!valueDictionary)self.valueDictionary = [NSMutableDictionary dictionary];
-
-                    int i;
-                    for(i=0;i<numParts;i++){
-                        NSString* key = [headerNames objectAtIndex:i];
-                        key = [key trimSpacesFromEnds];
-                        key = [key stringByReplacingOccurrencesOfString:@"%" withString:@""];
-                       [valueDictionary setObject:[values objectAtIndex:i] forKey:key];
-                    }
-                    [self setDataValid:YES];
-                }
-                break;
-            }
+        else if([theString rangeOfString:@"PASSWORD"].location != NSNotFound){
+            [inNetSocket writeString:[NSString stringWithFormat:@"%@\r",password] encoding:NSASCIIStringEncoding];
+            [self clearInputBuffer];
         }
-        [self postCouchDBRecord];
-
-        int i;
-        for(i=0;i<8;i++){
-            if(timeRate[i] == nil){
-                timeRate[i] = [[ORTimeRate alloc] init];
-                [timeRate[i] setSampleTime: [self pollTime]];
+        else if([theString rangeOfString:@"APC>"].location != NSNotFound){
+            if(!statusSentOnce){
+                statusSentOnce = YES;
+                [inNetSocket writeString:@"detstatus -all\r" encoding:NSASCIIStringEncoding];
+                [self startTimeout];
             }
-            [timeRate[i] addDataToTimeAverage:[self valueForChannel:i]];
+            [self parse:inputBuffer];
+            [self clearInputBuffer];
         }
     }
 }
@@ -409,60 +496,28 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (NSString*) valueForPowerPhase:(int)aPhaseIndex powerTableIndex:(int)aRowIndex
 {
-    switch (aRowIndex){
-        case 0:
-            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Vmin%d",aPhaseIndex]];
-            break;
-        case 1:
-            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Vbp%d",aPhaseIndex]];
-            break;
-        case 2:
-            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Vout%d",aPhaseIndex]];
-            break;
-        case 3:
-            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Iin%d",aPhaseIndex]];
-            break;
-   }
-    return @"?";
-}
-
-- (NSString*) valueForLoadPhase:(int)aLoadIndex loadTableIndex:(int)aRowIndex
-{
-    switch (aRowIndex){
-        case 0:
-            return [valueDictionary objectForKey:[NSString stringWithFormat:@"kVAout%d",aLoadIndex]];
-            break;
-        case 1:
-            return [valueDictionary objectForKey:[NSString stringWithFormat:@"Iout%d",aLoadIndex]];
-            break;
+    if(aRowIndex<=3){
+        id aKey = [NSString stringWithFormat:@"%@ L%d",[self nameAtIndexInPowerTable:aRowIndex],aPhaseIndex];
+        return [valueDictionary objectForKey:aKey];
     }
-    return @"?";
+    else return @"?";
 }
 
 - (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex
 {
-    switch (aRowIndex){
-        case 0:
-            return [valueDictionary objectForKey:@"Cap"];
-            break;
-        case 1:
-            return [valueDictionary objectForKey:@"Vbat"];
-            break;
-        case 2:
-            return [valueDictionary objectForKey:@"Ibat"];
-            break;
-    }
-    return @"?";
+    NSString* s = [valueDictionary objectForKey:[self nameForIndexInBatteryTable:aRowIndex]];
+    if([s length]==0)return @"?";
+    else return s;
 }
 
 - (NSString*) nameAtIndexInPowerTable:(int)i;
 {
     switch(i){
-        case 0: return @"Input Voltage (VAC)";
-        case 1: return @"Bypass Voltage (VAC)";
-        case 2: return @"Output Voltage (VAC)";
-        case 3: return @"Input Current (A)";
-        case 4: return @"Input Frequency (Hz)";
+        case 0: return @"INPUT VOLTAGE";
+        case 1: return @"BYPASS INPUT VOLTAGE";
+        case 2: return @"OUTPUT VOLTAGE";
+        case 3: return @"INPUT CURRENT";
+        case 4: return @"INPUT FREQUENCY";
         default: return @"";
     }
 }
@@ -470,9 +525,10 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (NSString*) nameForIndexInLoadTable:(int)i
 {
     switch(i){
-        case 0: return @"Output Load (KVA)";
-        case 1: return @"Output Current (A)";
-        case 2: return @"Temperature (C)";
+        case 0: return @"OUTPUT KVA";
+        case 1: return @"OUTPUT CURRENT";
+        case 2: return @"INTERNAL TEMPERATURE";
+        case 3: return @"OUTPUT FREQUENCY";
         default: return @"";
     }
 }
@@ -480,9 +536,10 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (NSString*) nameForIndexInBatteryTable:(int)i
 {
     switch(i){
-        case 0: return @"Capacity (%)";
-        case 1: return @"Battery Voltage (VDC)";
-        case 2: return @"Battery Current (A)";
+        case 0: return @"BATTERY CAPACITY";
+        case 1: return @"BATTERY VOLTAGE";
+        case 2: return @"BATTERY CURRENT";
+        case 3: return @"RUNTIME REMAINING";
         default: return @"";
     }
 }
@@ -492,12 +549,13 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     switch(i){
         case 0: return @"Battery Current";
         case 1: return @"Battery Voltage";
-        case 2: return @"Input Voltage L1";
-        case 3: return @"Input Voltage L2";
-        case 4: return @"Input Voltage L3";
-        case 5: return @"Output Current L1";
-        case 6: return @"Output Current L2";
-        case 7: return @"Output Current L3";
+        case 2: return @"Battery Capacity";
+        case 3: return @"Input Voltage L1";
+        case 4: return @"Input Voltage L2";
+        case 5: return @"Input Voltage L3";
+        case 6: return @"Output Current L1";
+        case 7: return @"Output Current L2";
+        case 8: return @"Output Current L3";
         default: return @"";
     }
 }
@@ -505,31 +563,22 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (id) nameForChannel:(int)aChannel
 {
     switch(aChannel){
-        case 0:return @"BATTERY CURRENT"; break;
-        case 1:return @"BATTERY VOLTAGE"; break;
-        case 2:return @"INPUT VOLTAGE L1"; break;
-        case 3:return @"INPUT VOLTAGE L2"; break;
-        case 4:return @"INPUT VOLTAGE L3"; break;
-        case 5:return @"OUTPUT CURRENT L1"; break;
-        case 6:return @"OUTPUT CURRENT L2"; break;
-        case 7:return @"OUTPUT CURRENT L3"; break;
+        case 0:return @"BATTERY CURRENT";   break;
+        case 1:return @"BATTERY VOLTAGE";   break;
+        case 2:return @"BATTERY CAPACITY";  break;
+        case 3:return @"INPUT VOLTAGE L1";  break;
+        case 4:return @"INPUT VOLTAGE L2";  break;
+        case 5:return @"INPUT VOLTAGE L3";  break;
+        case 6:return @"OUTPUT CURRENT L1"; break;
+        case 7:return @"OUTPUT CURRENT L2"; break;
+        case 8:return @"OUTPUT CURRENT L3"; break;
         default: return @"";
     }
 }
 
 - (float) valueForChannel:(int)aChannel
 {
-    NSString* key = nil;
-    switch(aChannel){
-        case 0:key = @"Ibat"; break;
-        case 1:key = @"Vbat"; break;
-        case 2:key = @"Vmin1"; break;
-        case 3:key = @"Vmin2"; break;
-        case 4:key = @"Vmin3"; break;
-        case 5:key = @"Iout1"; break;
-        case 6:key = @"Iout2"; break;
-        case 7:key = @"Iout3"; break;
-    }
+    NSString* key = [self nameForChannel:aChannel];;
     if(key)return [[valueDictionary objectForKey:key]floatValue];
     else return 0;
 }
@@ -722,5 +771,109 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
+
+- (void) parse:(NSString*)aResponse
+{
+    if(!valueDictionary){
+        self.valueDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    aResponse = [aResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    NSArray* lines = [aResponse componentsSeparatedByString:@"\r"];
+    for(NSString* aLine in lines){
+        aLine = [aLine removeNLandCRs];
+        if([aLine rangeOfString:@":"].location != NSNotFound){
+            //special cases
+            if([aLine hasPrefix:@"NAME"]     ||
+               [aLine hasPrefix:@"CONTACT"]  ||
+               [aLine hasPrefix:@"LOCATION"] ||
+               [aLine hasPrefix:@"UP TIME"]){
+                [self parseLine:[aLine substringToIndex:46]];
+                [self parseLine:[aLine substringFromIndex:46]];
+            }
+            else [self parseLine:aLine];
+        }
+    }
+    
+    int i;
+    for(i=0;i<8;i++){
+        if(timeRate[i] == nil){
+            timeRate[i] = [[ORTimeRate alloc] init];
+            [timeRate[i] setSampleTime: [self pollTime]];
+        }
+        [timeRate[i] addDataToTimeAverage:[self valueForChannel:i]];
+    }
+
+    [self cancelTimeout];
+}
+
+- (void) parseLine:(NSString*)aLine
+{
+    NSArray* parts = [aLine componentsSeparatedByString:@":"];
+    if([parts count]==2){
+        
+        NSString* varName = [[parts objectAtIndex:0] removeNLandCRs];
+        varName = [varName trimSpacesFromEnds];
+        
+        NSString* value = [[parts objectAtIndex:1] removeNLandCRs];
+        value = [value trimSpacesFromEnds];
+
+        if([varName hasPrefix:@"BATTERY STATE OF CHARGE"])varName = @"BATTERY CAPACITY";
+        else if([varName hasPrefix:@"INTERNAL TEMPERATURE"]){
+            NSArray* tempParts = [value componentsSeparatedByString:@","];
+            if([tempParts count] > 1){
+                value = [tempParts objectAtIndex:0];
+            }
+        }
+        
+        [valueDictionary setObject:value forKey:varName];
+        if([valueDictionary objectForKey:@"INPUT VOLTAGE L1"] &&
+           [valueDictionary objectForKey:@"INPUT VOLTAGE L2"] &&
+           [valueDictionary objectForKey:@"INPUT VOLTAGE L3"]){
+            [self setDataValid:YES];
+        }
+        
+    }
+    else  if([parts count]==4){
+        //special case TIME
+        NSString* varName = [[parts objectAtIndex:0] trimSpacesFromEnds];
+        varName = [varName removeNLandCRs];
+        if([varName isEqualToString:@"TIME"]){
+            NSString* time = [NSString stringWithFormat:@"%@:%@:%@",
+                              [[parts objectAtIndex:1] trimSpacesFromEnds],
+                              [[parts objectAtIndex:2] trimSpacesFromEnds],
+                              [[parts objectAtIndex:3] trimSpacesFromEnds]
+                              ];
+            time = [time removeNLandCRs];
+            [valueDictionary setObject:time forKey:varName];
+        }
+    }
+}
+
+- (void) clearInputBuffer
+{
+    [inputBuffer release];
+    inputBuffer = nil;
+}
+
+- (void) startTimeout
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+   	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+}
+
+- (void) cancelTimeout
+{
+   	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+}
+
+- (void) timeout
+{
+    [self setDataValid:NO];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	NSLogError(@"command timeout",[self fullID],nil);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsTimedOut object:self];
+}
+
 @end
 

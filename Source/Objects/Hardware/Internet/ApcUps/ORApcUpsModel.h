@@ -24,10 +24,11 @@
 
 #define kApcPollTime            60*3
 #define kApcUpsPort             23
-#define kNumApcUpsAdcChannels    7
+#define kNumApcUpsAdcChannels    9
 
 @class ORAlarm;
 @class ORTimeRate;
+@class NetSocket;
 
 @interface ORApcUpsModel : OrcaObject <ORAdcProcessing>
 {
@@ -47,13 +48,24 @@
     NSOperationQueue*    fileQueue;
     NSMutableSet*        eventLog;
     float                lastBatteryValue;
-    float lowLimit[kNumApcUpsAdcChannels];
-    float hiLimit[kNumApcUpsAdcChannels];
-
+    float                lowLimit[kNumApcUpsAdcChannels];
+    float                hiLimit[kNumApcUpsAdcChannels];
+    NetSocket*           socket;
+    NSMutableString*     inputBuffer;
+    BOOL                 isConnected;
+    NSSpeechSynthesizer* sayIt;
+    int                  sayItCount;
     unsigned int pollTime;
+    BOOL maintenanceMode;
 }
 
 #pragma mark ***Accessors
+- (BOOL) maintenanceMode;
+- (void) setMaintenanceMode:(BOOL)aMaintenanceMode;
+- (void) cancelMaintenanceMode;
+
+- (NetSocket*) socket;
+- (void) setSocket:(NetSocket*)aSocket;
 - (unsigned int) pollTime;
 - (void) setPollTime:(unsigned int)aPollTime;
 - (NSMutableSet*) eventLog;
@@ -76,20 +88,29 @@
 
 - (id) valueForKeyInValueDictionary:(NSString*)aKey;
 - (NSString*) valueForPowerPhase:(int)aPhaseIndex powerTableIndex:(int)aRowIndex;
-- (NSString*) valueForLoadPhase:(int)aLoadIndex loadTableIndex:(int)aRowIndex;
 - (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex;
+- (float) inputVoltageOnPhase:(int)aPhase;
+- (float) batteryCapacity;
+- (BOOL) powerIsOut;
 
 - (void) checkAlarms;
 - (BOOL) isConnected;
 - (void) setUpQueue;
 - (void) getEvents;
-- (void) getData;
+- (void) connect;
+- (void) disconnect;
+- (void) setIsConnected:(BOOL)aFlag;
+- (void)  startPowerOutSpeech;
+- (void)  continuePowerOutSpeech;
+- (void)  stopPowerOutSpeech;
 
 #pragma mark •••Process Limits
 - (float) lowLimit:(int)i;
 - (void)  setLowLimit:(int)i value:(float)aValue;
 - (float) hiLimit:(int)i;
 - (void)  setHiLimit:(int)i value:(float)aValue;
+- (void)  startPowerOutSpeech;
+- (void)  stopPowerOutSpeech;
 
 #pragma mark •••Bit Processing Protocol
 - (void) startProcessCycle;
@@ -117,6 +138,7 @@
 @property (retain,nonatomic) NSDate* nextPollScheduled;
 @end
 
+extern NSString* ORApcUpsModelMaintenanceModeChanged;
 extern NSString* ORApcUpsModelEventLogChanged;
 extern NSString* ORApcUpsIsConnectedChanged;
 extern NSString* ORApcUpsIpAddressChanged;

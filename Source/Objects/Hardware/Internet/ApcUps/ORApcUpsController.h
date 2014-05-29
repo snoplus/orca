@@ -24,6 +24,8 @@
 @interface ORApcUpsController : OrcaObjectController 
 {
     IBOutlet NSTableView*   powerTableView;
+	IBOutlet NSTextField*   maintenanceModeField;
+	IBOutlet NSButton*      maintenanceModeButton;
 	IBOutlet NSTextView*    eventLogTextView;
     IBOutlet NSTableView*   loadTableView;
     IBOutlet NSTableView*   batteryTableView;
@@ -44,6 +46,7 @@
 }
 
 #pragma mark ***Interface Management
+- (void) maintenanceModeChanged:(NSNotification*)aNote;
 - (void) eventLogChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
@@ -60,6 +63,7 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) maintenanceModeAction:(id)sender;
 - (IBAction) clearEventLogAction:(id)sender;
 - (IBAction) ipAddressAction:(id)sender;
 - (IBAction) usernameAction:(id)sender;
@@ -68,6 +72,7 @@
 - (IBAction) dialogLockAction:(id)sender;
 
 - (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) maintenanceModeActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter;
