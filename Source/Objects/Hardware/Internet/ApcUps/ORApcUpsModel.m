@@ -509,6 +509,15 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     else return @"?";
 }
 
+- (NSString*) valueForLoadPhase:(int)aPhaseIndex loadTableIndex:(int)aRowIndex
+{
+    if(aRowIndex<=3){
+        id aKey = [NSString stringWithFormat:@"%@ L%d",[self nameForIndexInLoadTable:aRowIndex],aPhaseIndex];
+        return [valueDictionary objectForKey:aKey];
+    }
+    else return @"?";
+}
+
 - (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex
 {
     NSString* s = [valueDictionary objectForKey:[self nameForIndexInBatteryTable:aRowIndex]];
@@ -533,7 +542,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     switch(i){
         case 0: return @"OUTPUT KVA";
         case 1: return @"OUTPUT CURRENT";
-        case 2: return @"INTERNAL TEMPERATURE";
+        case 2: return @"INTERNAL TEMP";
         case 3: return @"OUTPUT FREQUENCY";
         default: return @"";
     }

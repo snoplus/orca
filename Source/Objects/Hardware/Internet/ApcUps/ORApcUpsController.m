@@ -194,7 +194,7 @@
 {
     BOOL inMaintenanceMode = [model maintenanceMode];
     [maintenanceModeButton setTitle:inMaintenanceMode?@"End Maintenance":@"Start Maintenance"];
-	[maintenanceModeField setStringValue: inMaintenanceMode?@"Maintence":@""];
+	[maintenanceModeField setStringValue: inMaintenanceMode?@"Maintence Mode":@""];
 }
 
 - (void) eventLogChanged:(NSNotification*)aNote
@@ -306,7 +306,7 @@
 
 - (void) refreshTables:(NSNotification*)aNote
 {
-    NSString* name = [[model valueDictionary] objectForKey:@"Name"];
+    NSString* name = [[model valueDictionary] objectForKey:@"NAME"];
     if([name length]!=0)[[self window] setTitle:[NSString stringWithFormat:@"UPS : %@",name]];
     [powerTableView reloadData];
     [loadTableView reloadData];
@@ -444,7 +444,7 @@
                     if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"OUTPUT FREQUENCY"];
                     else return @"";
                 }
-                else return [model valueForPowerPhase:[[aTableColumn identifier] intValue] powerTableIndex:rowIndex];
+                else return [model valueForLoadPhase:[[aTableColumn identifier] intValue] loadTableIndex:rowIndex];
             }
             else return @"?";
         }

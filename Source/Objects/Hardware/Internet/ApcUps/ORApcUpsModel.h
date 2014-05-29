@@ -88,6 +88,7 @@
 
 - (id) valueForKeyInValueDictionary:(NSString*)aKey;
 - (NSString*) valueForPowerPhase:(int)aPhaseIndex powerTableIndex:(int)aRowIndex;
+- (NSString*) valueForLoadPhase:(int)aPhaseIndex loadTableIndex:(int)aRowIndex;
 - (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex;
 - (float) inputVoltageOnPhase:(int)aPhase;
 - (float) batteryCapacity;
