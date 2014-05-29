@@ -193,7 +193,7 @@
 - (void) maintenanceModeChanged:(NSNotification*)aNote
 {
     BOOL inMaintenanceMode = [model maintenanceMode];
-    [maintenanceModeButton setStringValue:inMaintenanceMode?@"End Maintenance":@"Start Maintenance"];
+    [maintenanceModeButton setTitle:inMaintenanceMode?@"End Maintenance":@"Start Maintenance"];
 	[maintenanceModeField setStringValue: inMaintenanceMode?@"Maintence":@""];
 }
 
@@ -325,7 +325,12 @@
 - (void) pollingTimesChanged:(NSNotification*)aNote
 {
     [lastPolledField setObjectValue:[model lastTimePolled]];
-    [nextPollField setObjectValue:[model nextPollScheduled]];
+    if(![model maintenanceMode]){
+        [nextPollField setObjectValue:[model nextPollScheduled]];
+    }
+    else {
+        [nextPollField setStringValue:@"---"];
+    }
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
@@ -359,7 +364,9 @@
     
 - (void) maintenanceModeActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-    [model setMaintenanceMode:YES];
+	if(returnCode == NSAlertAlternateReturn){
+        [model setMaintenanceMode:YES];
+    }
 }
 
 - (IBAction) clearEventLogAction:(id)sender

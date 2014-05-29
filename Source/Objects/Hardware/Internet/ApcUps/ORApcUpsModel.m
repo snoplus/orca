@@ -123,14 +123,20 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     maintenanceMode = aMaintenanceMode;
     
     if(aMaintenanceMode){
+        [self setDataValid:NO];
         [self performSelector:@selector(cancelMaintenanceMode) withObject:nil afterDelay:30*60];
         NSLogColor([NSColor redColor],@"Started maintenance on %@\n",[self fullID]);
+        //also force update of times
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsPollingTimesChanged object:self];
     }
     else {
         NSLog(@"Ended maintenance on %@\n",[self fullID]);
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cancelMaintenanceMode) object:nil];
-    }
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:2];
+     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelMaintenanceModeChanged object:self];
+    
+    
 }
 
 - (void) cancelMaintenanceMode
@@ -342,7 +348,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (void) pollHardware
 {
-    if([ipAddress length]!=0 && [password length]!=0 && [username length]!=0){
+    if([ipAddress length]!=0 && [password length]!=0 && [username length]!=0 && !maintenanceMode){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
         
         [self connect];
