@@ -125,8 +125,20 @@ NSString* ORVXMMotorTypeChanged         = @"ORVXMMotorTypeChanged";
     [[[owner undoManager] prepareWithInvocationTarget:self] setMotorType:motorType];
     motorType = aType;
     
+    sentMotorType = NO;
+    
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:self forKey:@"VMXMotor"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMMotorTypeChanged object:owner userInfo:userInfo];
+}
+
+- (void) setSentMotorType:(BOOL)aState
+{
+    sentMotorType = aState;
+}
+
+- (BOOL) sentMotorType
+{
+    return sentMotorType;
 }
 
 - (int) motorSpeed

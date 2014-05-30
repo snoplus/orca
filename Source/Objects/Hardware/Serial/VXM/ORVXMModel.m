@@ -636,12 +636,16 @@ NSString* ORVXMLock							= @"ORVXMLock";
 
 - (void) sendMotorType:(int)motorIndex
 {
-//    NSString* aCmd = [NSString stringWithFormat:@"setM%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
+    if(![[motors objectAtIndex:motorIndex] sentMotorType]){
+        
+        [[motors objectAtIndex:motorIndex] setSentMotorType:YES];
+        
+        NSString* aCmd = [NSString stringWithFormat:@"setM%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
     
-//    [self addCmdToQueue:aCmd
- //           description:[NSString stringWithFormat:@"Set Motor %d type to %d",motorIndex,[[self motor: motorIndex] motorType]]
-//             waitToSend:YES];
-   
+        [self addCmdToQueue:aCmd
+                description:[NSString stringWithFormat:@"Set Motor %d type to %d",motorIndex,[[self motor: motorIndex] motorType]]
+                 waitToSend:YES];
+    }
 }
 
 - (void) move:(int)motorIndex dx:(float)aPosition speed:(int)aSpeed
@@ -649,7 +653,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	if(motorIndex>=0 && motorIndex<[motors count]){
         
         [self sendMotorType:motorIndex];
-
+        
 		NSString* aCmd = [NSString stringWithFormat:@"K,C,S%dM%d,I%dM%.0f,R",motorIndex+1,aSpeed,motorIndex+1,aPosition];
 		float conversion = [[motors objectAtIndex:motorIndex] conversion];
 		NSString* units = displayRaw?@"stps":@"mm";
