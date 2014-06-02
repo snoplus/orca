@@ -261,7 +261,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 
 - (NSString*) getModuleString
 {
-	return [NSString stringWithFormat:@"ma%i", [self slot]-1];
+	return [NSString stringWithFormat:@"ma%i", ([self slot]-1) ];
 }
 
 - (int) channel:(short)i readParamAsInt:(NSString*)name

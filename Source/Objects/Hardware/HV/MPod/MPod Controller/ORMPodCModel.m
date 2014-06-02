@@ -508,6 +508,10 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 					[channelDictionary setObject:[NSString stringWithFormat:@"%d",chanId] forKey:@"Channel"];
 					[channelDictionary setObject:[NSString stringWithFormat:@"%d",slot] forKey:@"Slot"];
 				}
+                else if([channelKey hasPrefix:@"ma"]){
+                    int moduleId =[[channelKey substringFromIndex: 2] intValue];
+                    [channelDictionary setObject:[NSString stringWithFormat:@"ma%d",moduleId] forKey:@"ModuleSlot"];
+                }
 				[channelDictionary setObject:channelKey forKey:@"ChannelSlotId"];
 			}
 			

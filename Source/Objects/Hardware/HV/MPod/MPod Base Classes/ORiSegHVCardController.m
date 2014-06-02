@@ -709,6 +709,7 @@
 {
 	[model clearPanicChannel:[model selectedChannel]];
 	[model clearEventsChannel:[model selectedChannel]];
+    [model clearModule];
 }
 
 #pragma mark •••Actions for All
