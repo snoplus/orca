@@ -34,6 +34,7 @@
 }
 - (void) awakeFromNib
 {
+	[subComponentsView setGroup:model];
  	[super awakeFromNib];
     int i;
     
@@ -169,6 +170,26 @@
                          name : ORApcUpsModelMaintenanceModeChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupSelectionChanged
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : OROrcaObjectMoved
+                       object : nil];
+
 }
 
 
@@ -188,6 +209,13 @@
     [self refreshProcessTable:nil];
 	[self eventLogChanged:nil];
 	[self maintenanceModeChanged:nil];
+}
+
+-(void) groupChanged:(NSNotification*)note
+{
+	if(note == nil || [note object] == model || [[note object] guardian] == model){
+		[subComponentsView setNeedsDisplay:YES];
+	}
 }
 
 - (void) maintenanceModeChanged:(NSNotification*)aNote

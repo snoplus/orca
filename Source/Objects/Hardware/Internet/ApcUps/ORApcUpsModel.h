@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
+#import "OROrderedObjHolding.h"
 
 #define kApcPollTime            60*3
 #define kApcUpsPort             23
@@ -30,7 +31,7 @@
 @class ORTimeRate;
 @class NetSocket;
 
-@interface ORApcUpsModel : OrcaObject <ORAdcProcessing>
+@interface ORApcUpsModel : ORGroup <OROrderedObjHolding,ORAdcProcessing>
 {
     NSString*   ipAddress;
     NSString*   password;
@@ -101,17 +102,17 @@
 - (void) connect;
 - (void) disconnect;
 - (void) setIsConnected:(BOOL)aFlag;
+- (void)  startShutdownScript;
 - (void)  startPowerOutSpeech;
 - (void)  continuePowerOutSpeech;
 - (void)  stopPowerOutSpeech;
+- (id)   remoteSocket;
 
 #pragma mark •••Process Limits
 - (float) lowLimit:(int)i;
 - (void)  setLowLimit:(int)i value:(float)aValue;
 - (float) hiLimit:(int)i;
 - (void)  setHiLimit:(int)i value:(float)aValue;
-- (void)  startPowerOutSpeech;
-- (void)  stopPowerOutSpeech;
 
 #pragma mark •••Bit Processing Protocol
 - (void) startProcessCycle;
@@ -130,6 +131,18 @@
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark •••OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (NSString*) nameForSlot:(int)aSlot;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 
 @property (retain) NSMutableDictionary* valueDictionary;
 @property (assign,nonatomic) BOOL dataValid;

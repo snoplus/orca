@@ -26,6 +26,7 @@
 #import "ORFileGetterOp.h"
 #import "NetSocket.h"
 #import "ORAlarm.h"
+#import "ORScriptTaskModel.h"
 
 NSString* ORApcUpsModelMaintenanceModeChanged = @"ORApcUpsModelMaintenanceModeChanged";
 NSString* ORApcUpsModelEventLogChanged  = @"ORApcUpsModelEventLogChanged";
@@ -49,10 +50,13 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (void) startTimeout;
 - (void) cancelTimeout;
 - (void) timeout;
+- (ORScriptTaskModel*)       findShutdownScript;
+- (id)                      findObject:(NSString*)aClassName;
 @end
 
 #define kApcEventsPath [@"~/ApcEvents.txt" stringByExpandingTildeInPath]
 #define kApcDataPath   [@"~/ApcData.txt"   stringByExpandingTildeInPath]
+#define KMinVoltage       100
 
 @implementation ORApcUpsModel
 
@@ -270,7 +274,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         float Vin2 = [self inputVoltageOnPhase:2];
         float Vin3 = [self inputVoltageOnPhase:3];
         float bat  = [self batteryCapacity];
-        if((Vin1<100) || (Vin2<100) || (Vin3<100)){
+        if((Vin1<KMinVoltage) || (Vin2<KMinVoltage) || (Vin3<KMinVoltage)){
             if(!powerOutAlarm){
                 powerOutAlarm = [[ORAlarm alloc] initWithName:@"Davis Power Failure" severity:kEmergencyAlarm];
                 [powerOutAlarm setHelpString:@"The Davis UPS is reporting that the input voltage is less then 110V on one or more of the three phases. This Alarm can be silenced by acknowledging it, but it will not be cleared until power is restored."];
@@ -279,6 +283,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 [powerOutAlarm acknowledge]; //use the voice instead of beep
                 sayItCount = 0;
                 [self startPowerOutSpeech];
+                [self startShutdownScript]; //once started, any shutdown runs -- no stopping it.
             }
             if(lastBatteryValue != bat){
                 NSLog(@"The Main Davis UPS is reporting a power failure. Battery capacity is now %.0f%%\n",bat);
@@ -295,6 +300,14 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
                 NSLog(@"The Main Davis UPS is restored. Battery capacity is now %.0f%%\n",bat);
             }
         }
+    }
+}
+
+- (void)  startShutdownScript
+{
+    ORScriptTaskModel* theShutdownScript = [self findShutdownScript];
+    if(![theShutdownScript running]){
+        [theShutdownScript runScriptWithMessage:@"Started From UPS"];
     }
 }
 
@@ -768,10 +781,73 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 		[encoder encodeFloat:hiLimit[i] forKey:[NSString stringWithFormat:@"hiLimit%d",i]];
 	}
 }
+#pragma mark •••CardHolding Protocol
+- (int) maxNumberOfObjects	{ return 2; }	//default
+- (int) objWidth			{ return 100; }	//default
+- (int) groupSeparation		{ return 0; }	//default
+- (NSString*) nameForSlot:(int)aSlot
+{
+    return [NSString stringWithFormat:@"Slot %d",aSlot];
+}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if(     [anObj isKindOfClass:NSClassFromString(@"ORScriptTaskModel")])		return NSMakeRange(0,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORRemoteSocketModel")])	return NSMakeRange(1,1);
+    else return NSMakeRange(0,0);
+}
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj
+{
+	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORScriptTaskModel")])      return NO;
+	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRemoteSocketModel")])	  return NO;
+    else return YES;
+}
+
+- (int) slotAtPoint:(NSPoint)aPoint
+{
+	return floor(((int)aPoint.x)/[self objWidth]);
+}
+
+- (NSPoint) pointForSlot:(int)aSlot
+{
+	return NSMakePoint(aSlot*[self objWidth],0);
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+    [anObj setTag:aSlot];
+	NSPoint slotPoint = [self pointForSlot:aSlot];
+	[anObj moveTo:slotPoint];
+}
+
+- (int) slotForObj:(id)anObj
+{
+    return [anObj tag];
+}
+
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return 1;
+}
+
+- (id)   remoteSocket;
+{
+    return [self findObject:@"ORRemoteSocketModel"];
+}
 
 @end
 
 @implementation ORApcUpsModel (private)
+- (ORScriptTaskModel*) findShutdownScript	{ return [self findObject:@"ORScriptTaskModel"]; }
+- (id) findObject:(NSString*)aClassName
+{
+	for(OrcaObject* anObj in [self orcaObjects]){
+		if([anObj isKindOfClass:NSClassFromString(aClassName)])return anObj;
+	}
+	return nil;
+}
+
 - (void) postCouchDBRecord
 {
     NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:valueDictionary];

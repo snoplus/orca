@@ -43,6 +43,8 @@
 	IBOutlet ORTimedTextField*	timedOutField;
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet ORCompositeTimeLineView*   plotter1;
+    
+	IBOutlet ORGroupView*   subComponentsView;
 }
 
 #pragma mark ***Interface Management

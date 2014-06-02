@@ -55,7 +55,9 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-	return [super acceptsGuardian:aGuardian] || [aGuardian isMemberOfClass:NSClassFromString(@"MajoranaModel")];
+	return [super acceptsGuardian:aGuardian] ||
+            [aGuardian isMemberOfClass:NSClassFromString(@"MajoranaModel")] ||
+            [aGuardian isMemberOfClass:NSClassFromString(@"ORApcUpsModel")];
 }
 
 #pragma mark ***Accessors
