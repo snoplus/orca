@@ -433,6 +433,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (BOOL)    shouldUnbiasDetector	{ return [continuedBiasConstraints count] != 0; }
 - (BOOL)    okToBiasDetector		{ return [okToBiasConstraints count] == 0; }
+//- (BOOL)    shouldUnbiasDetector	{ return NO; }
+//- (BOOL)    okToBiasDetector		{ return YES; }
 - (BOOL)    detectorsBiased         { return detectorsBiased;       }
 
 //-------------------------------------------------------------------

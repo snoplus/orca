@@ -259,6 +259,11 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     }
 }
 
+- (NSString*) getModuleString
+{
+	return [NSString stringWithFormat:@"ma%i", [self slot]-1];
+}
+
 - (int) channel:(short)i readParamAsInt:(NSString*)name
 {
 	if([self channelInBounds:i]){
@@ -475,6 +480,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     
 	[self setHwGoal:channel withValue:0];
 	[self writeVoltage:channel];
+	
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
     NSLog(@"Turned ON MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
@@ -607,6 +613,13 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 {
 	int i;
 	for(i=0;i<[self numberOfChannels];i++)[self panic:i];
+}
+
+- (void) clearModule
+{
+	NSString* clearCmd =[NSString stringWithFormat:@"moduleDoClear.ma%@ i %d",[self getModuleString] ,1];
+	[[self adapter] writeValue:clearCmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+	NSLog(@"Clear Module Events, Card %d ",[self slot]);
 }
 
 - (unsigned long) failureEvents:(short)channel

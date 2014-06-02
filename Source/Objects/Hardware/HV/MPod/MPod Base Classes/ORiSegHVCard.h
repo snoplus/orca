@@ -133,6 +133,7 @@ enum {
 - (NSDictionary*) rdParams:(int)i;
 - (BOOL) constraintsInPlace;
 - (void) requestMaxValues:(int)aChannel;
+- (NSString*) getModuleString;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
@@ -173,6 +174,7 @@ enum {
 - (void) stopAllRamping;
 - (void) rampAllToZero;
 - (void) panicAll;
+- (void) clearModule;
 
 #pragma mark ¥¥¥Trends
 - (ORTimeRate*) voltageHistory:(short)index;
