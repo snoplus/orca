@@ -266,8 +266,9 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                 }
             }
             else if(anObj == adapter){
+                [systemParams release]; //make sure there is only one.
                 systemParams = [[[adapter parameterDictionary] objectForKey:@"0"] copy];
-                if(!systemParams)systemParams = [NSDictionary dictionary];
+                if(!systemParams)systemParams = [[NSDictionary dictionary] retain];
             }
         }
         
