@@ -63,6 +63,10 @@
     IBOutlet NSButton*      rampAllToZeroButton;
     IBOutlet NSButton*      panicAllButton;
     IBOutlet NSButton*      clearAllPanicButton;
+    
+    //module status
+    IBOutlet NSTextField*   moduleStatusField;
+    IBOutlet NSButton*      moduleClearButton;
 	
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
@@ -116,6 +120,7 @@
 - (IBAction) panicAllAction:(id)sender;
 - (IBAction) clearAllPanicAction:(id)sender;
 - (IBAction) loadAllAction:(id)sender;
+- (IBAction) cleadModuleAction:(id)sender;
 
 #pragma mark •••Table Data Source Methods
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView;

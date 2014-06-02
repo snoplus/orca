@@ -799,6 +799,11 @@
 	[model loadAllValues];
 }
 
+- (IBAction) cleadModuleAction:(id)sender
+{
+    [model clearModule];
+}
+
 - (IBAction) panicAllAction:(id)sender
 {
 	[self endEditing];
