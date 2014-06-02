@@ -266,34 +266,50 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 
 - (int) channel:(short)i readParamAsInt:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
-	}
-	else return 0;
+    int theValue;
+    @synchronized([[self crate] adapter]){
+        if([self channelInBounds:i]){
+            theValue= [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
+        }
+        else theValue = 0;
+    }
+    return theValue;
 }
 
 - (float) channel:(short)i readParamAsFloat:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
-	}
-	else return 0;
+    float theValue;
+    @synchronized([[self crate] adapter]){
+        if([self channelInBounds:i]){
+            theValue = [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
+        }
+        else theValue = 0;
+    }
+    return theValue;
 }
 
 - (id) channel:(short)i readParamAsValue:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
-	}
-	else return nil;
+    id theValue;
+    @synchronized([[self crate] adapter]){
+        if([self channelInBounds:i]){
+            theValue =  [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
+        }
+        else theValue =  nil;
+    }
+    return theValue;
 }
 
 - (id) channel:(short)i readParamAsObject:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [rdParams[i] objectForKey:name];
-	}
-	else return @"";
+    id theValue;
+    @synchronized([[self crate] adapter]){
+        if([self channelInBounds:i]){
+            theValue = [rdParams[i] objectForKey:name];
+        }
+        else theValue = @"";
+    }
+    return theValue;
 }
 
 - (void) syncDialog
