@@ -238,52 +238,51 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 
 - (void) postCouchDBRecord
 {
-	
     NSMutableDictionary* theSupplies  = [NSMutableDictionary dictionary];
     NSDictionary* systemParams = nil;
     
     int numChannelsWithVoltage = 0;
     int numChannelsRamping     = 0;
-    for(id anObj in [self orcaObjects]){
-        if([anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
-            ORiSegHVCard* anHVCard = (ORiSegHVCard*)anObj;
-            NSMutableArray* theChannels = [NSMutableArray array];
-            int i;
-            for(i=0;i<[anHVCard numberOfChannels];i++){
-                NSMutableDictionary* params = [[anHVCard rdParams:i]mutableCopy];
-                if(params){
-					[params setObject:[NSNumber numberWithInt:[anHVCard target:i]]     forKey:@"target"];
-					[params setObject:[NSNumber numberWithFloat:[anHVCard maxCurrent:i]] forKey:@"maxCurrent"];
-                    [params setObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
-                    [theChannels addObject:params];
+    @synchronized(adapter){
+        for(id anObj in [self orcaObjects]){
+            if([anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+                ORiSegHVCard* anHVCard = (ORiSegHVCard*)anObj;
+                NSMutableArray* theChannels = [NSMutableArray array];
+                int i;
+                for(i=0;i<[anHVCard numberOfChannels];i++){
+                    NSMutableDictionary* params = [[anHVCard rdParams:i]mutableCopy];
+                    if(params){
+                        [params setObject:[NSNumber numberWithInt:[anHVCard target:i]]     forKey:@"target"];
+                        [params setObject:[NSNumber numberWithFloat:[anHVCard maxCurrent:i]] forKey:@"maxCurrent"];
+                        [params setObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
+                        [theChannels addObject:params];
+                    }
+                    [params release];
                 }
-                [params release];
+                numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
+                numChannelsRamping     += [anHVCard numberChannelsRamping];
+                if(theChannels){
+                    [theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
+                }
             }
-            numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
-            numChannelsRamping     += [anHVCard numberChannelsRamping];
-            if(theChannels)[theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
-        }
-        else if([anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")]){
-            ORMPodCModel* aControllerCard = (ORMPodCModel*)anObj;
-            @synchronized(aControllerCard){
-                systemParams = [[aControllerCard parameterDictionary] objectForKey:@"0"];
+            else if(anObj == adapter){
+                systemParams = [[[adapter parameterDictionary] objectForKey:@"0"] copy];
                 if(!systemParams)systemParams = [NSDictionary dictionary];
             }
         }
-    }
-    
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            systemParams, @"system",
-                            theSupplies,  @"supplies",
-                            [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
-                            [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
-                            nil];
+        
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                                systemParams, @"system",
+                                theSupplies,  @"supplies",
+                                [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
+                                [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
+                                nil];
 
-    
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
-	 
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+    [systemParams release];
 }
+
 @end
 
 @implementation ORMPodCrate (OROrderedObjHolding)

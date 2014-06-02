@@ -123,22 +123,33 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (BOOL) power
 {
-	NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
-    return [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
+    BOOL theValue;
+    @synchronized(self){
+        NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
+        theValue =  [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
+    }
+    return theValue;
 }
 
 - (id) systemParam:(NSString*)name
 {
-	NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
-	id result =  [[systemParams objectForKey:name] objectForKey:@"Value"];
-	if(result)return result;
+    id theValue;
+    @synchronized(self){
+        NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
+        theValue =  [[systemParams objectForKey:name] objectForKey:@"Value"];
+    }
+	if(theValue)return theValue;
 	else return @"";
 }
 
 - (int) systemParamAsInt:(NSString*)name
 {
-	NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
-	return [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
+    int theValue;
+    @synchronized(self){
+        NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
+        theValue = [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
+    }
+    return theValue;
 }
 
 - (void) clearHistory
