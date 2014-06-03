@@ -2787,6 +2787,9 @@
 		84E2064B11AD7841007D757F /* SIS3800.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E2064311AD7841007D757F /* SIS3800.nib */; };
 		84E2064C11AD7841007D757F /* SIS3800Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84E2064411AD7841007D757F /* SIS3800Card.gif */; };
 		84E24F42093E703100E963DF /* ORBitProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E24F41093E703000E963DF /* ORBitProcessing.h */; };
+		84E46973193E247D00020C5C /* UserConfirm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E46970193E247C00020C5C /* UserConfirm.xib */; };
+		84E46974193E247D00020C5C /* UserRequest.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E46971193E247C00020C5C /* UserRequest.xib */; };
+		84E46975193E247D00020C5C /* UserStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E46972193E247D00020C5C /* UserStatus.xib */; };
 		84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */; };
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
@@ -6054,6 +6057,9 @@
 		84E427DC054EFFCA0057208F /* ORReplayDataModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORReplayDataModel.m; sourceTree = "<group>"; };
 		84E427DD054EFFCA0057208F /* ReplayData.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ReplayData.gif; sourceTree = "<group>"; };
 		84E427DE054EFFCA0057208F /* ReplayData.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ReplayData.nib; sourceTree = "<group>"; };
+		84E46970193E247C00020C5C /* UserConfirm.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserConfirm.xib; sourceTree = "<group>"; };
+		84E46971193E247C00020C5C /* UserRequest.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserRequest.xib; sourceTree = "<group>"; };
+		84E46972193E247D00020C5C /* UserStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserStatus.xib; sourceTree = "<group>"; };
 		84E583FB04DB1772005F64B1 /* PCICamac.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PCICamac.nib; sourceTree = "<group>"; };
 		84E583FC04DB1772005F64B1 /* PCICamacCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PCICamacCard.gif; sourceTree = "<group>"; };
 		84E583FE04DB1772005F64B1 /* ORPCICamacCommands.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPCICamacCommands.h; sourceTree = "<group>"; };
@@ -7132,6 +7138,9 @@
 				84759CF40B6036D600123411 /* OrcaScript.ym */,
 				844998630F1282E7004B855B /* SyntaxDefinition.plist */,
 				84759A990B6025E200123411 /* OrcaScriptGuide.rtf */,
+				84E46970193E247C00020C5C /* UserConfirm.xib */,
+				84E46971193E247C00020C5C /* UserRequest.xib */,
+				84E46972193E247D00020C5C /* UserStatus.xib */,
 			);
 			name = Scripting;
 			path = "Source/Main Dialogs/CommandCenter/Scripting";
@@ -15217,6 +15226,7 @@
 				849B472E0D98298B00AD79A0 /* AutoScale.tif in Resources */,
 				849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */,
 				84BC16550DA14F3600D3935C /* Caen1720.nib in Resources */,
+				84E46973193E247D00020C5C /* UserConfirm.xib in Resources */,
 				84BC165C0DA1527300D3935C /* Caen1720Card.gif in Resources */,
 				8499FE8D0DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist in Resources */,
 				8499FE940DC8E9B700E82DB4 /* SNOCrate.nib in Resources */,
@@ -15517,6 +15527,7 @@
 				8459A8DB137C2C6E0029C5B6 /* Comparator.tif in Resources */,
 				8459A8DD137C2C760029C5B6 /* Comparator.nib in Resources */,
 				8459AD2C138D92F90029C5B6 /* CouchHistoryAveMap.txt in Resources */,
+				84E46975193E247D00020C5C /* UserStatus.xib in Resources */,
 				8459AD30138D93240029C5B6 /* CouchHistoryAveReduce.txt in Resources */,
 				84AAD80A139A87A600C88F71 /* AlarmIcon.tif in Resources */,
 				8483D2E2139EAB8B000C8901 /* CV812.gif in Resources */,
@@ -15679,6 +15690,7 @@
 				2D7731A4181188F400070A4A /* LanNetio230Big.tif in Resources */,
 				844CBDCF1866010F0012AA3B /* RaidMonitor.gif in Resources */,
 				844CBDD01866010F0012AA3B /* RaidMonitor.nib in Resources */,
+				84E46974193E247D00020C5C /* UserRequest.xib in Resources */,
 				844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */,
 				DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */,
 				DB704A1618EBA61E00839B42 /* ellie.xib in Resources */,
