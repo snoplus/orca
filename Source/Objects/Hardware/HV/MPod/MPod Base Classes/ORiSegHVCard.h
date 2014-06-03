@@ -55,6 +55,21 @@ enum {
 	outputEmergencyOffMask				= (0x1<<14)
 };
 
+enum{
+    moduleEventPowerFail                = (0x1<<0),
+    
+    moduleEventLiveInsertion            = (0x1<<2),
+
+	moduleEventService                  = (0x1<<4),
+	moduleHardwareLimitVoltageNotGood   = (0x1<<5),
+    moduleEventInputError               = (0x1<<6),
+    
+    moduleEventSafetyLoopNotGood        = (0x1<<10),
+    
+    moduleEventSupplyNotGood            = (0x1<<13),
+    moduleEventTemperatureNotGood       = (0x1<<14)
+};
+
 #define kiSegHVCardProblemMask (outputFailureMaxTerminalVoltageMask | outputFailureMaxCurrentMask | outputFailureMaxTemperatureMask | outputFailureMaxPowerMask | outputFailureTimeoutMask | outputCurrentLimitedMask)
 
 @interface ORiSegHVCard : ORMPodCard <ORHWWizard>
@@ -65,7 +80,7 @@ enum {
     short			hwGoal[16];		//value to send to hw
     short			target[16];		//input by user
     float			riseRate;
-	NSDictionary*	rdParams[16];
+	NSDictionary*	rdParams[17];
     int				selectedChannel;
     float			maxCurrent[16];
     int             maxVoltage[16];
@@ -126,6 +141,7 @@ enum {
 - (BOOL)	channelIsRamping:(short)chan;
 - (unsigned long) failureEvents:(short)channel;
 - (unsigned long) failureEvents;
+- (unsigned long) moduleFailureEvents;
 - (BOOL) channelInBounds:(short)aChan;
 - (BOOL) isOn:(short)aChannel;
 - (BOOL) hvOnAnyChannel;

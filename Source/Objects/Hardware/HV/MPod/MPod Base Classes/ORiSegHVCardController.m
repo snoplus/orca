@@ -311,12 +311,13 @@
 	[channelCountField setIntValue:numberOnChannels];
 	[self outputStatusChanged:aNote];
 	int events = [model failureEvents:selectedChannel];
+    int moduleEvents = [model moduleFailureEvents];
 	int state  = [model channel:selectedChannel readParamAsInt:@"outputSwitch"];
 	[temperatureField setIntValue:[model channel:0 readParamAsInt:@"outputMeasurementTemperature"]];
 
 	NSString* eventString = @"";
 	
-	if(!events && (state != kiSegHVCardOutputSetEmergencyOff))eventString = @"No Events";
+	if(!events && (state != kiSegHVCardOutputSetEmergencyOff) && !moduleEvents)eventString = @"No Events";
 	else {
 		if(state == kiSegHVCardOutputSetEmergencyOff)	eventString = [eventString stringByAppendingString:@"Panicked\n"];
 		if(events & outputFailureMinSenseVoltageMask)	eventString = [eventString stringByAppendingString:@"Min Voltage\n"];
@@ -328,6 +329,15 @@
 		if(events & outputFailureTimeoutMask)			eventString = [eventString stringByAppendingString:@"Timeout\n"];
 		if(events & outputCurrentLimitedMask)			eventString = [eventString stringByAppendingString:@"Current Limit\n"];
 		if(events & outputEmergencyOffMask)				eventString = [eventString stringByAppendingString:@"Emergency Off\n"];
+        if(moduleEvents & moduleEventPowerFail)         eventString = [eventString stringByAppendingString:@"Module Power Failure\n"];
+        if(moduleEvents & moduleEventLiveInsertion)     eventString = [eventString stringByAppendingString:@"Module Live Insertion\n"];
+        if(moduleEvents & moduleEventService)           eventString = [eventString stringByAppendingString:@"Module Requires Service\n"];
+        if(moduleEvents &
+           moduleHardwareLimitVoltageNotGood)           eventString = [eventString stringByAppendingString:@"Module Hard Limit Voltage Not Good\n"];
+        if(moduleEvents & moduleEventInputError)        eventString = [eventString stringByAppendingString:@"Module Input Error\n"];
+        if(moduleEvents & moduleEventSafetyLoopNotGood) eventString = [eventString stringByAppendingString:@"Module Safety Loop Not Good\n"];
+        if(moduleEvents & moduleEventSupplyNotGood)     eventString = [eventString stringByAppendingString:@"Module Power Supply Not Good\n"];
+        if(moduleEvents & moduleEventTemperatureNotGood)eventString = [eventString stringByAppendingString:@"Module Temperature Not Good\n"];
 	}
 	[eventField setStringValue:eventString];
 }
@@ -392,7 +402,7 @@
 			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];
 
 		}
-		else if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff)){
+		else if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff) || [model moduleFailureEvents]){
 			//channel is off
 			[powerOnButton setEnabled:NO];
 			[powerOffButton setEnabled:NO];
@@ -422,10 +432,11 @@
 			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];
 		}
 		
-		if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff)){
+		if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff) || [model moduleFailureEvents]){
 			[clearPanicButton setEnabled:YES];
 		}
 		else {
+            //set up the clear events button
 			[clearPanicButton setEnabled:NO];
 		}
 		

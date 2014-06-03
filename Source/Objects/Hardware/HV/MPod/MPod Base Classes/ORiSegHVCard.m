@@ -157,6 +157,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
      object:self];
 }
 
+
 - (void) setRdParamsFrom:(NSDictionary*)aDictionary
 {
 	int numChannels = [self numberOfChannels];
@@ -184,6 +185,24 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 		[currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]*1000000];
 		
 	}
+
+    
+    id oldModuleEventStatus = [[[rdParams[numChannels+1] objectForKey:@"moduleEventStatus"] copy] autorelease];
+    NSString* moduleID = [self getModuleString];
+    id params = [aDictionary objectForKey:moduleID];
+    id currentEventStatus = [params objectForKey:@"moduleEventStatus"];
+    NSString* newModuleStatus = (NSString*)[currentEventStatus objectForKey:@"Names"];
+    NSString* oldModuleStatus = (NSString*)[oldModuleEventStatus objectForKey:@"Names"];
+    
+    [rdParams[numChannels+1] release];
+    rdParams[numChannels+1] = [params retain];
+    
+    if(newModuleStatus && oldModuleStatus ){
+        if(![newModuleStatus isEqualTo:oldModuleStatus])
+                NSLog(@"MPod (%lu), Card %d State from %@ to %@", [[self guardian]uniqueIdNumber],[self slot], oldModuleStatus, newModuleStatus);
+    }
+    
+    
 	if(shipRecords) [self shipDataRecords];
 	
 	if([[self adapter] respondsToSelector:@selector(power)]){
@@ -633,9 +652,9 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 
 - (void) clearModule
 {
-	NSString* clearCmd =[NSString stringWithFormat:@"moduleDoClear.ma%@ i %d",[self getModuleString] ,1];
+	NSString* clearCmd =[NSString stringWithFormat:@"moduleDoClear.%@ i %d",[self getModuleString] ,1];
 	[[self adapter] writeValue:clearCmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-	NSLog(@"Clear Module Events, Card %d ",[self slot]);
+	NSLog(@"Clear Module Events, Card %d \n",[self slot]);
 }
 
 - (unsigned long) failureEvents:(short)channel
@@ -657,6 +676,17 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 		failEvents |= [self failureEvents:i];
 	}
 	return failEvents;
+}
+- (unsigned long) moduleFailureEvents
+{
+    id oldModuleEventStatus = [[[rdParams[[self numberOfChannels]+1] objectForKey:@"moduleEventStatus"] copy] autorelease];
+    int events = [[oldModuleEventStatus objectForKey:@"Value"] intValue];
+    events &= ( moduleEventPowerFail    |   moduleEventLiveInsertion            |
+                moduleEventService      |   moduleHardwareLimitVoltageNotGood   |
+                moduleEventInputError   |   moduleEventSafetyLoopNotGood        |
+                moduleEventSupplyNotGood|   moduleEventTemperatureNotGood       );
+    NSLog(@"module failure Events %d", events);
+    return events;
 }
 
 - (NSString*) channelState:(short)channel
