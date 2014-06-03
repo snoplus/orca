@@ -199,20 +199,18 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     
 
     int moduleEvents = [self moduleFailureEvents];
-    if(moduleEvents){
-        NSLog(@"MPod Module Status Events: %@\n", newModuleStatus);
-    }
     
     if(moduleEvents & moduleEventSafetyLoopNotGood){
         if(!safetyLoopNotGoodAlarm){
+            
             NSString* s = [NSString stringWithFormat:@"MPod Card %d Safety Loop Not Good", [self slot] ];
             safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: 3];
             [safetyLoopNotGoodAlarm setSticky: YES];
-            [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card"];
+            [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card. Apply current to SL input and clear events to clear alarm."];
         }
         [safetyLoopNotGoodAlarm setAcknowledged:NO];
         [safetyLoopNotGoodAlarm postAlarm];
-
+        NSLog(@"MPod Module Status Events: %@\n", newModuleStatus);
     }
     else if( safetyLoopNotGoodAlarm ){
         if([safetyLoopNotGoodAlarm isPosted])
