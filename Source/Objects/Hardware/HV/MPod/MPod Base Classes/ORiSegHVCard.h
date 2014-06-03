@@ -23,6 +23,7 @@
 #import "ORHWWizard.h"
 
 @class ORTimeRate;
+@class ORAlarm;
 
 #define kPositivePolarity 1
 #define kNegativePolarity 0
@@ -89,6 +90,7 @@ enum{
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
     NSMutableDictionary* hvConstraints;
+    ORAlarm* safetyLoopNotGoodAlarm;
 }
 
 #pragma mark ***Initialization

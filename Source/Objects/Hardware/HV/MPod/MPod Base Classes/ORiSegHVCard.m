@@ -27,6 +27,7 @@
 #import "ORHWWizSelection.h"
 #import "ORSNMP.h"
 #import "ORMPodCrate.h"
+#import "ORAlarm.h"
 
 NSString* ORiSegHVCardShipRecordsChanged		= @"ORiSegHVCardShipRecordsChanged";
 NSString* ORiSegHVCardMaxCurrentChanged         = @"ORiSegHVCardMaxCurrentChanged";
@@ -64,6 +65,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 		[currentHistory[i] release];
 	}
     [hvConstraints release];
+    [safetyLoopNotGoodAlarm clearAlarm];
+    [safetyLoopNotGoodAlarm release];
     
     [super dealloc];
 }
@@ -186,20 +189,38 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 		
 	}
 
-    
-    id oldModuleEventStatus = [[[rdParams[numChannels+1] objectForKey:@"moduleEventStatus"] copy] autorelease];
     NSString* moduleID = [self getModuleString];
     id params = [aDictionary objectForKey:moduleID];
     id currentEventStatus = [params objectForKey:@"moduleEventStatus"];
     NSString* newModuleStatus = (NSString*)[currentEventStatus objectForKey:@"Names"];
-    NSString* oldModuleStatus = (NSString*)[oldModuleEventStatus objectForKey:@"Names"];
     
     [rdParams[numChannels+1] release];
     rdParams[numChannels+1] = [params retain];
     
-    if(newModuleStatus && oldModuleStatus ){
-        if(![newModuleStatus isEqualTo:oldModuleStatus])
-                NSLog(@"MPod (%lu), Card %d State from %@ to %@", [[self guardian]uniqueIdNumber],[self slot], oldModuleStatus, newModuleStatus);
+
+    int moduleEvents = [self moduleFailureEvents];
+    if(moduleEvents){
+        NSLog(@"MPod Module Status Events: %@\n", newModuleStatus);
+    }
+    
+    if(moduleEvents & moduleEventSafetyLoopNotGood){
+        if(!safetyLoopNotGoodAlarm){
+            NSString* s = [NSString stringWithFormat:@"MPod Card %d Safety Loop Not Good", [self slot] ];
+            safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: 3];
+            [safetyLoopNotGoodAlarm setSticky: YES];
+            [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card"];
+        }
+        [safetyLoopNotGoodAlarm setAcknowledged:NO];
+        [safetyLoopNotGoodAlarm postAlarm];
+
+    }
+    else if( safetyLoopNotGoodAlarm ){
+        if([safetyLoopNotGoodAlarm isPosted])
+        {
+            //releasing causes crash, for some reason
+            [safetyLoopNotGoodAlarm clearAlarm];
+            //[safetyLoopNotGoodAlarm release];
+        }
     }
     
     
@@ -685,7 +706,9 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
                 moduleEventService      |   moduleHardwareLimitVoltageNotGood   |
                 moduleEventInputError   |   moduleEventSafetyLoopNotGood        |
                 moduleEventSupplyNotGood|   moduleEventTemperatureNotGood       );
-    NSLog(@"module failure Events %d", events);
+    if(events & moduleEventSafetyLoopNotGood){
+        //create an alarm and attach it to the model
+    }
     return events;
 }
 
