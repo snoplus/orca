@@ -202,8 +202,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     
     if(moduleEvents & moduleEventSafetyLoopNotGood){
         if(!safetyLoopNotGoodAlarm){
-            NSString* s = [NSString stringWithFormat:@"MPod Card %d Safety Loop Not Good", [self slot] ];
-            safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: 3];
+            NSString* s = [NSString stringWithFormat:@"%@ Safety Loop Not Good", [self fullID] ];
+            safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: kHardwareAlarm];
             [safetyLoopNotGoodAlarm setSticky: YES];
             [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card. Apply current to SL input and clear events to clear alarm."];
         
@@ -700,9 +700,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
                 moduleEventService      |   moduleHardwareLimitVoltageNotGood   |
                 moduleEventInputError   |   moduleEventSafetyLoopNotGood        |
                 moduleEventSupplyNotGood|   moduleEventTemperatureNotGood       );
-    if(events & moduleEventSafetyLoopNotGood){
-        //create an alarm and attach it to the model
-    }
     return events;
 }
 
