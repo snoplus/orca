@@ -81,7 +81,8 @@ enum{
     short			hwGoal[16];		//value to send to hw
     short			target[16];		//input by user
     float			riseRate;
-	NSDictionary*	rdParams[17];
+	NSDictionary*	rdParams[16];
+    NSDictionary*   modParams;
     int				selectedChannel;
     float			maxCurrent[16];
     int             maxVoltage[16];
@@ -149,6 +150,7 @@ enum{
 - (BOOL) hvOnAnyChannel;
 - (void) setRdParamsFrom:(NSDictionary*)aDictionary;
 - (NSDictionary*) rdParams:(int)i;
+- (NSDictionary*) modParams;
 - (BOOL) constraintsInPlace;
 - (void) requestMaxValues:(int)aChannel;
 - (NSString*) getModuleString;

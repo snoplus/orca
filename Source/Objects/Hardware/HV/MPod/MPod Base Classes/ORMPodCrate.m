@@ -240,6 +240,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 {
     NSMutableDictionary* theSupplies  = [NSMutableDictionary dictionary];
     NSDictionary* systemParams = nil;
+    NSMutableDictionary* theModules = [NSMutableDictionary dictionary];
     
     int numChannelsWithVoltage = 0;
     int numChannelsRamping     = 0;
@@ -259,11 +260,19 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                     }
                     [params release];
                 }
+                NSMutableDictionary* modParam = [[anHVCard modParams]mutableCopy];
+                if(modParam){
+                    [modParam setObject:[NSNumber numberWithInt:[anHVCard slot]-1] forKey:@"Card"];
+                    //[theSupplies addEntriesFromDictionary:modParam];
+                    [theModules setObject:modParam forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1] ];
+                }
+                
                 numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
                 numChannelsRamping     += [anHVCard numberChannelsRamping];
                 if(theChannels){
                     [theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
                 }
+
             }
             else if(anObj == adapter){
                 [systemParams release]; //make sure there is only one.
@@ -275,6 +284,7 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
         NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                                 systemParams, @"system",
                                 theSupplies,  @"supplies",
+                                theModules, @"modules",
                                 [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
                                 [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
                                 nil];

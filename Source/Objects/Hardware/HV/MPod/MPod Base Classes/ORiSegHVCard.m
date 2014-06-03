@@ -67,6 +67,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     [hvConstraints release];
     [safetyLoopNotGoodAlarm clearAlarm];
     [safetyLoopNotGoodAlarm release];
+    [modParams release];
     
     [super dealloc];
 }
@@ -194,9 +195,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     id currentEventStatus = [params objectForKey:@"moduleEventStatus"];
     NSString* newModuleStatus = (NSString*)[currentEventStatus objectForKey:@"Names"];
     
-    [rdParams[numChannels+1] release];
-    rdParams[numChannels+1] = [params retain];
-    
+    [modParams release];
+    modParams = [[aDictionary objectForKey:moduleID] retain];
 
     int moduleEvents = [self moduleFailureEvents];
     
@@ -232,6 +232,10 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
 	
+}
+- (NSDictionary*) modParams
+{
+    return modParams;
 }
 
 - (NSDictionary*) rdParams:(int)i
@@ -694,7 +698,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 }
 - (unsigned long) moduleFailureEvents
 {
-    id oldModuleEventStatus = [[[rdParams[[self numberOfChannels]+1] objectForKey:@"moduleEventStatus"] copy] autorelease];
+    id oldModuleEventStatus = [[[modParams objectForKey:@"moduleEventStatus"] copy] autorelease];
     int events = [[oldModuleEventStatus objectForKey:@"Value"] intValue];
     events &= ( moduleEventPowerFail    |   moduleEventLiveInsertion            |
                 moduleEventService      |   moduleHardwareLimitVoltageNotGood   |
