@@ -422,6 +422,7 @@ startIndex=traceStart16;
  *  After the basic data record we append a variable length data block containing some ADC related data and the ADC data itself.
  *  The first data block is designed to be as short as possible to allow high data rates.
  *  
+ *  Note (2013-12-11 -tb-): This plan has been canceled, as the collaboration prefers to keep the old format.
  <pre>  
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id

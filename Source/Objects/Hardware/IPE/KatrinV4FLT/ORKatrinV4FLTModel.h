@@ -114,6 +114,8 @@
     //buffer for summed histograms
     katrinV4FullHistogramDataStruct histoBuf[24];
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
+    int useBipolarEnergy;
+    unsigned long bipolarEnergyThreshTest;
 }
 
 #pragma mark •••Initialization
@@ -131,6 +133,10 @@
 - (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
+- (unsigned long) bipolarEnergyThreshTest;
+- (void) setBipolarEnergyThreshTest:(unsigned long)aBipolarEnergyThreshTest;
+- (int) useBipolarEnergy;
+- (void) setUseBipolarEnergy:(int)aUseBipolarEnergy;
 - (int) useSLTtime;
 - (void) updateUseSLTtime;
 //- (void) setUseSLTtime:(int)aUseSLTtime;
@@ -418,6 +424,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged;
+extern NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged;
 extern NSString* ORKatrinV4FLTModelUseSLTtimeChanged;
 extern NSString* ORKatrinV4FLTModelBoxcarLengthChanged;
 extern NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged;

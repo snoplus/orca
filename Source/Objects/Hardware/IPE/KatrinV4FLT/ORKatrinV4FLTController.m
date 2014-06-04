@@ -394,9 +394,29 @@
                          name : ORKatrinV4FLTModelUseSLTtimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useBipolarEnergyChanged:)
+                         name : ORKatrinV4FLTModelUseBipolarEnergyChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(bipolarEnergyThreshTestChanged:)
+                         name : ORKatrinV4FLTModelBipolarEnergyThreshTestChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) bipolarEnergyThreshTestChanged:(NSNotification*)aNote
+{
+	[bipolarEnergyThreshTestTextField setIntValue: [model bipolarEnergyThreshTest]];
+}
+
+- (void) useBipolarEnergyChanged:(NSNotification*)aNote
+{
+	[useBipolarEnergyCB setIntValue: [model useBipolarEnergy]];
+}
 
 - (void) useSLTtimeChanged:(NSNotification*)aNote
 {
@@ -669,6 +689,8 @@
 	[self useDmaBlockReadChanged:nil];
 	[self boxcarLengthChanged:nil];
 	[self useSLTtimeChanged:nil];
+	[self useBipolarEnergyChanged:nil];
+	[self bipolarEnergyThreshTestChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1059,6 +1081,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) bipolarEnergyThreshTestTextFieldAction:(id)sender
+{
+	[model setBipolarEnergyThreshTest:[sender intValue]];	
+}
+
+- (void) useBipolarEnergyCBAction:(id)sender
+{
+	[model setUseBipolarEnergy:[sender intValue]];	
+}
 
 - (void) useSLTtimePUAction:(id)sender
 {

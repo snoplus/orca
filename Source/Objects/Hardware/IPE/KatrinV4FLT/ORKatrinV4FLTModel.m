@@ -31,6 +31,8 @@
 #import "ORCommandList.h"
 
 
+NSString* ORKatrinV4FLTModelBipolarEnergyThreshTestChanged = @"ORKatrinV4FLTModelBipolarEnergyThreshTestChanged";
+NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged = @"ORKatrinV4FLTModelUseBipolarEnergyChanged";
 NSString* ORKatrinV4FLTModelUseSLTtimeChanged = @"ORKatrinV4FLTModelUseSLTtimeChanged";
 NSString* ORKatrinV4FLTModelBoxcarLengthChanged = @"ORKatrinV4FLTModelBoxcarLengthChanged";
 NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
@@ -417,6 +419,34 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 }
 
 #pragma mark •••Accessors
+
+- (unsigned long) bipolarEnergyThreshTest
+{
+    return bipolarEnergyThreshTest;
+}
+
+- (void) setBipolarEnergyThreshTest:(unsigned long)aBipolarEnergyThreshTest
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBipolarEnergyThreshTest:bipolarEnergyThreshTest];
+    
+    bipolarEnergyThreshTest = aBipolarEnergyThreshTest;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelBipolarEnergyThreshTestChanged object:self];
+}
+
+- (int) useBipolarEnergy
+{
+    return useBipolarEnergy;
+}
+
+- (void) setUseBipolarEnergy:(int)aUseBipolarEnergy
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseBipolarEnergy:useBipolarEnergy];
+    if(aUseBipolarEnergy) useBipolarEnergy = 0x1;
+    else  useBipolarEnergy = 0x0;
+    //useBipolarEnergy = aUseBipolarEnergy;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseBipolarEnergyChanged object:self];
+}
 
 - (int) useSLTtime
 {
@@ -1601,7 +1631,13 @@ static double table[32]={
 		unsigned long thres;
 		if( !(triggerEnabledMask & (0x1<<i)) )	thres = 0xfffff;
 		else									thres = [self threshold:i];
-		[aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value:thres & 0xFFFFF]];
+        //DEBUG: FOR TESTING!!! 2013-11-21 added for polar energy
+		unsigned long threshPolar;
+        threshPolar= bipolarEnergyThreshTest & 0xfff;
+        //threshPolar= (thres>>filterShapingLength) & 0xfff;
+        //threshPolar=   0xfff;//switch polar trigger off
+        thres=thres & 0xFFFFF;
+		[aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value: ((threshPolar<<20) | thres)]];
 		[aList addCommand: [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF]];
 	}
 	[aList addCommand: [self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains]];
@@ -1735,10 +1771,16 @@ static double table[32]={
 {
 	
 	//TODO: add fifo length -tb- <---------------------------------------------
-	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
+	unsigned long aValue =	((fltRunMode & 0x3)<<16) | 
+	((useBipolarEnergy & 0x1)<<18) |
 	((fifoLength & 0x1)<<25) |
 	((fifoBehaviour & 0x1)<<24) |
 	((ledOff & 0x1)<<1 );
+    
+    
+    //TODO: force polar energy flag -tb-
+    //aValue = aValue | 0x40000;
+    
 	[self writeReg: kFLTV4ControlReg value:aValue];
 }
 
@@ -1979,10 +2021,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 
     unsigned long sltSubSecReg =  0;		
     unsigned long sltSubSec =  0;		
-    unsigned long sltSec    =  0;
+    unsigned long sltSec    =  0;		
     int hadException    =  0;
-    
-[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	
 	@try {
 
@@ -2025,9 +2067,10 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 				//BOOL overflow = (aValue >> 31) & 0x1;
 				unsigned long overflow = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
 				if(aValue32 & 0xffff0000) overflow =  0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-				unsigned long overflow32 = (aValue32 >>31) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+				unsigned long overflow32 = (aValue32 >>23) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
 				unsigned long aValue16 = aValue32 & 0xffff;
-                aValue32 = aValue32 & 0x7fffffff;
+                aValue32 = aValue32 & 0x7fffff;
+                //... = aValue32 & 0xff000000; this is the new (2013-11) overflow counter: what to do with it? -tb-
 				if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){
 					if (hitRateLengthSec!=0)	hitRate[chan] = aValue32 * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
@@ -2080,7 +2123,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 	@catch(NSException* localException) {
             //DEBUG
             NSLog(@"%@::%@\n EXCEPTION  sltSec %i",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sltSec);//DEBUG -tb-
-        hadException=1;
+            hadException=1;
+            
 	}
 	
     //try to read always between two second strobes -> sec = fullSec+0.4
@@ -2089,6 +2133,7 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     delay += deltadelay;
             //DEBUG            NSLog(@"%@::%@\n delay for call of @selector(readHitRates):delay %f",NSStringFromClass([self class]),NSStringFromSelector(_cmd),delay);//DEBUG -tb-
 
+	//[self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 	if(!hadException){
         [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
     }else{
@@ -2169,6 +2214,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setBipolarEnergyThreshTest:[decoder decodeInt32ForKey:@"bipolarEnergyThreshTest"]];
+    [self setUseBipolarEnergy:[decoder decodeIntForKey:@"useBipolarEnergy"]];
     //[self setUseSLTtime:[decoder decodeIntForKey:@"useSLTtime"]];
     [self setBoxcarLength:[decoder decodeIntForKey:@"boxcarLength"]];
     [self setUseDmaBlockRead:[decoder decodeIntForKey:@"useDmaBlockRead"]];
@@ -2209,6 +2256,8 @@ NSLog(@"debug-output: read value was (0x%x)\n", tmp);
 {
     [super encodeWithCoder:encoder];
 	
+    [encoder encodeInt32:bipolarEnergyThreshTest forKey:@"bipolarEnergyThreshTest"];
+    [encoder encodeInt:useBipolarEnergy forKey:@"useBipolarEnergy"];
     //[encoder encodeInt:useSLTtime forKey:@"useSLTtime"];
     [encoder encodeInt:boxcarLength forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead forKey:@"useDmaBlockRead"];
