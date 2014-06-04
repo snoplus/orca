@@ -22,7 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORIpeCard.h"
 #import "ORIpeV4FLTModel.h"
-#import "ORIpeV4SLTModel.h"
+//#import "ORIpeV4SLTModel.h"
 #import "SLTv4_HW_Definitions.h"
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"

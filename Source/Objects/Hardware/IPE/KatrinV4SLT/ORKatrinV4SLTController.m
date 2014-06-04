@@ -25,6 +25,8 @@
 #import "TimedWorker.h"
 #import "SBC_Link.h"
 
+
+#if 0
 #define kFltNumberTriggerSources 5
 
 NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
@@ -43,6 +45,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	@"External",
 }
 };
+#endif
+
+
+
 
 @interface ORKatrinV4SLTController (private)
 #if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific

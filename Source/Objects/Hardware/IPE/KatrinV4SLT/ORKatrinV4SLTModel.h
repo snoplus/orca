@@ -25,6 +25,12 @@
 #import "SBC_Linking.h"
 #import "SBC_Config.h"
 
+
+
+#import "ORIpeV4SLTModel.h"   //for kSltV4NumRegs declaration - maybe not necessary in the future any more -tb- 2014
+
+
+
 @class ORReadOutList;
 @class ORDataPacket;
 @class TimedWorker;
@@ -134,8 +140,12 @@
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
 
+
+
+
+#if 0
 //IPE V4 register definitions
-enum IpeV4Enum {
+enum KatrinSLTV4Enum {
 	kSltV4ControlReg,
 	kSltV4StatusReg,
 	kSltV4CommandReg,
@@ -193,12 +203,27 @@ enum IpeV4Enum {
 	kSltV4FIFOMaskReg,
 	kSltV4NumRegs //must be last
 };
+#endif
 
-extern IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs];
+
+
+
+
+
+
+extern IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs];
+
+
+
+
+
+
+
+
 
 #if 0
 //this is in .m file
-static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
+static IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
@@ -539,5 +564,5 @@ extern NSString* ORKatrinV4SLTModelNextPageDelayChanged;
 extern NSString* ORKatrinV4SLTModelPollRateChanged;
 extern NSString* ORKatrinV4SLTModelReadAllChanged;
 
-extern NSString* ORSLTV4cpuLock;	
+extern NSString* ORKatrinV4SLTcpuLock;	
 

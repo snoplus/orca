@@ -42,7 +42,7 @@
 #if 0
 //IPE V4 register definitions
 //MOVED TO .h FILE !!!!!!!!!!!!!!!!     <---------------- NOTE!
-enum IpeV4Enum {
+enum KatrinSLTV4Enum {
 	kSltV4ControlReg,
 	kSltV4StatusReg,
 	kSltV4CommandReg,
@@ -86,7 +86,7 @@ enum IpeV4Enum {
 	kSltV4PROMsControlReg,
 	kSltV4PROMsBufferReg,
 	kSltV4DataFIFOReg,
-	kSltV4FIFOModeReg,
+	kSltV4FIFOModeReg,           //    <-------------- //TODO: new for SLT bipolar -tb-
 	kSltV4FIFOStatusReg,
 	kSltV4PAEOffsetReg,
 	kSltV4PAFOffsetReg,
@@ -98,7 +98,7 @@ enum IpeV4Enum {
 #endif
 
 
-IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
+IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
@@ -197,7 +197,7 @@ NSString* ORKatrinV4SLTModelPollRateChanged			= @"ORKatrinV4SLTModelPollRateChan
 NSString* ORKatrinV4SLTModelPageSizeChanged			= @"ORKatrinV4SLTModelPageSizeChanged";
 NSString* ORKatrinV4SLTModelDisplayTriggerChanged		= @"ORKatrinV4SLTModelDisplayTrigerChanged";
 NSString* ORKatrinV4SLTModelDisplayEventLoopChanged	= @"ORKatrinV4SLTModelDisplayEventLoopChanged";
-NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
+NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 
 @interface ORKatrinV4SLTModel (private)
 - (unsigned long) read:(unsigned long) address;
@@ -784,17 +784,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (NSString*) getRegisterName: (short) anIndex
 {
-    return regSLTV4[anIndex].regName;
+    return regKatrinSLTV4[anIndex].regName;
 }
 
 - (unsigned long) getAddress: (short) anIndex
 {
-    return( regSLTV4[anIndex].addressOffset>>2);
+    return( regKatrinSLTV4[anIndex].addressOffset>>2);
 }
 
 - (short) getAccessType: (short) anIndex
 {
-	return regSLTV4[anIndex].accessType;
+	return regKatrinSLTV4[anIndex].accessType;
 }
 
 - (unsigned short) selectedRegIndex
@@ -1279,7 +1279,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[pmcLink readLongBlockPmc:eventStatusBuffer
-					 atAddress:regSLTV4[kSltV4EventStatusReg].addressOffset
+					 atAddress:regKatrinSLTV4[kSltV4EventStatusReg].addressOffset
 					 numToRead: 3];
 	
 */
@@ -1345,6 +1345,15 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
     //DEBUG         
     NSLog(@"%@::%@    \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//DEBUG -tb-
+
+
+//TODO: TEMPORARY WORKAROUND -tb-
+//TODO: TEMPORARY WORKAROUND -tb-
+//TODO: TEMPORARY WORKAROUND -tb-
+//TODO: TEMPORARY WORKAROUND -tb-
+int kSltV4FIFOModeReg = kSltV4FIFOCsrReg -4;
+int kSltV4DataFIFOReg = kSltV4FIFOCsrReg -5;
+
 
     unsigned long mode,f1,f2,f3,f4;
     unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
