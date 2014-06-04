@@ -260,12 +260,13 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                     }
                     [params release];
                 }
-                NSMutableDictionary* modParam = [[anHVCard modParams]mutableCopy];
-                if(modParam){
-                    [modParam setObject:[NSNumber numberWithInt:[anHVCard slot]-1] forKey:@"Card"];
-                    //[theSupplies addEntriesFromDictionary:modParam];
-                    [theModules setObject:modParam forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1] ];
+                
+                NSMutableDictionary* modParams = [[anHVCard modParams]mutableCopy];
+                if(modParams){
+                    [modParams setObject:[NSNumber numberWithInt:[anHVCard slot]-1] forKey:@"Card"];
+                    [theModules setObject:modParams forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1] ];
                 }
+                [modParams release];
                 
                 numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
                 numChannelsRamping     += [anHVCard numberChannelsRamping];
