@@ -199,9 +199,9 @@
 		2DD0C8E2193FBB96009112B2 /* OREdelweissFLTv4Readout.hh in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE81150FE94A00EBD8A2 /* OREdelweissFLTv4Readout.hh */; };
 		2DD0C8E3193FBB96009112B2 /* OREdelweissSLTv4Readout.cc in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE53150FE7B400EBD8A2 /* OREdelweissSLTv4Readout.cc */; };
 		2DD0C8E4193FBB96009112B2 /* OREdelweissSLTv4Readout.hh in KatrinSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EE84150FE96200EBD8A2 /* OREdelweissSLTv4Readout.hh */; };
-		2DD0C962193FC670009112B2 /* UserStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E46972193E247D00020C5C /* UserStatus.xib */; };
-		2DD0C963193FC671009112B2 /* UserRequest.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E46971193E247C00020C5C /* UserRequest.xib */; };
-		2DD0C964193FC672009112B2 /* UserConfirm.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84E46970193E247C00020C5C /* UserConfirm.xib */; };
+		2DD0C97A1940BC78009112B2 /* UserConfirm.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C9771940BC78009112B2 /* UserConfirm.nib */; };
+		2DD0C97B1940BC78009112B2 /* UserRequest.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C9781940BC78009112B2 /* UserRequest.nib */; };
+		2DD0C97C1940BC78009112B2 /* UserStatus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2DD0C9791940BC78009112B2 /* UserStatus.nib */; };
 		2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
@@ -3644,6 +3644,9 @@
 		2DD0C8B4193FBAE4009112B2 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPMCReadWriteCommand.m; sourceTree = "<group>"; };
 		2DD0C8B5193FBAE4009112B2 /* PMC_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMC_Link.h; sourceTree = "<group>"; };
 		2DD0C8B6193FBAE4009112B2 /* PMC_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PMC_Link.m; sourceTree = "<group>"; };
+		2DD0C9771940BC78009112B2 /* UserConfirm.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = UserConfirm.nib; sourceTree = "<group>"; };
+		2DD0C9781940BC78009112B2 /* UserRequest.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = UserRequest.nib; sourceTree = "<group>"; };
+		2DD0C9791940BC78009112B2 /* UserStatus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = UserStatus.nib; sourceTree = "<group>"; };
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
@@ -7272,6 +7275,9 @@
 				84759CF40B6036D600123411 /* OrcaScript.ym */,
 				844998630F1282E7004B855B /* SyntaxDefinition.plist */,
 				84759A990B6025E200123411 /* OrcaScriptGuide.rtf */,
+				2DD0C9771940BC78009112B2 /* UserConfirm.nib */,
+				2DD0C9781940BC78009112B2 /* UserRequest.nib */,
+				2DD0C9791940BC78009112B2 /* UserStatus.nib */,
 				84E46970193E247C00020C5C /* UserConfirm.xib */,
 				84E46971193E247C00020C5C /* UserRequest.xib */,
 				84E46972193E247D00020C5C /* UserStatus.xib */,
@@ -15843,9 +15849,9 @@
 				2DD0C8BC193FBAE4009112B2 /* KatrinV4SLTScript in Resources */,
 				2DD0C8C3193FBAE4009112B2 /* KatrinV4SLT.nib in Resources */,
 				2DD0C8C4193FBAE4009112B2 /* KatrinV4SLTCard.gif in Resources */,
-				2DD0C962193FC670009112B2 /* UserStatus.xib in Resources */,
-				2DD0C963193FC671009112B2 /* UserRequest.xib in Resources */,
-				2DD0C964193FC672009112B2 /* UserConfirm.xib in Resources */,
+				2DD0C97A1940BC78009112B2 /* UserConfirm.nib in Resources */,
+				2DD0C97B1940BC78009112B2 /* UserRequest.nib in Resources */,
+				2DD0C97C1940BC78009112B2 /* UserStatus.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
