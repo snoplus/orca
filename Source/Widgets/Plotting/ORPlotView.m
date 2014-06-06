@@ -613,6 +613,56 @@
 	}
 }
 
+- (IBAction) writeToFile:(id)sender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save Plot CSV Data As"];
+    [savePanel setCanCreateDirectories:YES];
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+    [savePanel setNameFieldLabel:@"File Name:"];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [self savePlotDataAs:[[savePanel URL]path]];
+        }
+    }];
+}
+
+- (void) savePlotDataAs:(NSString*)aPath
+{
+	NSMutableString* string = [NSMutableString string];
+  	int maxPoints = 0;
+	BOOL allPlotsValid = YES;
+	for(id aPlot in plotArray){
+		if([aPlot respondsToSelector:@selector(numberPoints)]){
+			maxPoints = MAX(maxPoints,[aPlot numberPoints]);
+		}
+		if(![aPlot respondsToSelector:@selector(valueAsStringAtPoint:)]){
+			allPlotsValid = NO;
+			break;
+		}
+	}
+	if(allPlotsValid){
+		//make a string with the data
+		int i;
+		for(i=0;i<maxPoints;i++){
+			[string appendFormat:@"%d",i];
+			for(id aPlot in plotArray){
+				NSString* theValueAsString = [aPlot valueAsStringAtPoint:i];
+				[string appendFormat:@",%@",theValueAsString];
+			}
+			[string appendFormat:@"\n"];
+		}
+		
+		if([string length]){
+            [string writeToFile:aPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
+		}
+	}
+	else {
+		NSBeep();
+		NSLog(@"Sorry.. can't write data from that plot\n");
+	}
+}
+
 - (IBAction) refresh:(id)sender		 { [self setNeedsDisplay:YES]; }
 - (IBAction) logLin:(id)sender		 { [[self topPlot] logLin];  }
 - (IBAction) autoScale:(id)sender	 { [self autoscaleAll:sender];}
