@@ -691,11 +691,12 @@
 		}
 		case '!':  
 		{
-			if([NodeValue(0) isKindOfClass:[NSNumber class]]){
-				if(![NodeValue(0) boolValue])return _one;
+            id result = NodeValue(0);
+			if([result isKindOfClass:[NSNumber class]]){
+				if(![result boolValue])return _one;
 				else return _zero;
 			}
-			else if(!NodeValue(0))return _one;
+			else if(result!=0)return _one;
 			else return _zero;
 		}
 			
