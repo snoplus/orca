@@ -63,6 +63,7 @@
 - (void) timedOut:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+-(void) groupChanged:(NSNotification*)note;
 
 #pragma mark •••Actions
 - (IBAction) maintenanceModeAction:(id)sender;
