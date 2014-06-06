@@ -2830,6 +2830,7 @@
 		84E2064B11AD7841007D757F /* SIS3800.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E2064311AD7841007D757F /* SIS3800.nib */; };
 		84E2064C11AD7841007D757F /* SIS3800Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84E2064411AD7841007D757F /* SIS3800Card.gif */; };
 		84E24F42093E703100E963DF /* ORBitProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E24F41093E703000E963DF /* ORBitProcessing.h */; };
+		84E4697719420E4000020C5C /* SaveToFolder.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84E4697619420E4000020C5C /* SaveToFolder.gif */; };
 		84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */; };
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
@@ -6157,6 +6158,7 @@
 		84E46970193E247C00020C5C /* UserConfirm.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserConfirm.xib; sourceTree = "<group>"; };
 		84E46971193E247C00020C5C /* UserRequest.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserRequest.xib; sourceTree = "<group>"; };
 		84E46972193E247D00020C5C /* UserStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserStatus.xib; sourceTree = "<group>"; };
+		84E4697619420E4000020C5C /* SaveToFolder.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SaveToFolder.gif; sourceTree = "<group>"; };
 		84E583FB04DB1772005F64B1 /* PCICamac.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PCICamac.nib; sourceTree = "<group>"; };
 		84E583FC04DB1772005F64B1 /* PCICamacCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = PCICamacCard.gif; sourceTree = "<group>"; };
 		84E583FE04DB1772005F64B1 /* ORPCICamacCommands.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPCICamacCommands.h; sourceTree = "<group>"; };
@@ -9666,6 +9668,7 @@
 				84A9518E077B6C8C00CAD99D /* LogLin.gif */,
 				849DA6FF0BF276AC00044320 /* RawPlot.gif */,
 				849B472F0D982AC000AD79A0 /* Calibrate.gif */,
+				84E4697619420E4000020C5C /* SaveToFolder.gif */,
 			);
 			name = BaseClasses;
 			path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses";
@@ -15050,6 +15053,7 @@
 				847BC83E05E2941D0054841E /* preferences.tif in Resources */,
 				847BC83F05E2941D0054841E /* PasswordLock.tif in Resources */,
 				84073A5205E3F455003E62AA /* ValidatePassword.nib in Resources */,
+				84E4697719420E4000020C5C /* SaveToFolder.gif in Resources */,
 				84CF3B2405E6B60700C5C320 /* Appearance.tif in Resources */,
 				84CF3B2605E6B85800C5C320 /* Startup.tif in Resources */,
 				844E5CD706236ACD0051849B /* CommandCenter.gif in Resources */,
