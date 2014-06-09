@@ -29,8 +29,20 @@
 #import "ORTimeRate.h"
 #import "ORAlarm.h"
 #import "ORSafeQueue.h"
+#import "NetSocket.h"
 
 #pragma mark •••External Strings
+//RS232 Protocol
+NSString* ORPacModelPortNameChanged     = @"ORPacModelPortNameChanged";
+NSString* ORPacModelPortStateChanged    = @"ORPacModelPortStateChanged";
+NSString* ORPacModelSerialPortChanged   = @"ORPacModelSerialPortChanged";
+
+//IP Protocol
+NSString* ORPacModelIpConnectedChanged       = @"ORPacModelIpConnectedChanged";
+NSString* ORPacModelIpAddressChanged          = @"ORPacModelIpAddressChanged";
+NSString* ORPacModelConnectionProtocolChanged = @"ORPacModelConnectionProtocolChanged";
+
+
 NSString* ORPacModelLastGainReadChanged = @"ORPacModelLastGainReadChanged";
 NSString* ORPacModelAdcChannelChanged   = @"ORPacModelAdcChannelChanged";
 NSString* ORPacModelLcmChanged          = @"ORPacModelLcChanged";
@@ -41,10 +53,7 @@ NSString* ORPacModelGainChannelChanged  = @"ORPacModelGainChannelChanged";
 NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
 NSString* ORPacModelPreAmpChanged		= @"ORPacModelPreAmpChanged";
 NSString* ORPacModelModuleChanged		= @"ORPacModelModuleChanged";
-NSString* ORPacModelGainValueChanged		= @"ORPacModelGainValueChanged";
-NSString* ORPacModelSerialPortChanged	= @"ORPacModelSerialPortChanged";
-NSString* ORPacModelPortNameChanged		= @"ORPacModelPortNameChanged";
-NSString* ORPacModelPortStateChanged	= @"ORPacModelPortStateChanged";
+NSString* ORPacModelGainValueChanged	= @"ORPacModelGainValueChanged";
 NSString* ORPacModelAdcChanged			= @"ORPacModelAdcChanged";
 NSString* ORPacLock						= @"ORPacLock";
 NSString* ORPacModelGainsChanged		= @"ORPacModelGainsChanged";
@@ -89,14 +98,24 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     [buffer release];
 	[cmdQueue release];
 	[lastRequest release];
+    
     [portName release];
-    if([serialPort isOpen]){
-        [serialPort close];
+    if([self isConnected]){
+        if(connectionProtocol == kPacUseRS232){
+            [serialPort close];
+            [serialPort setDelegate:nil];
+            [serialPort release];
+        }
+        else {
+            [socket close];
+            [socket setDelegate:nil];
+            [socket release];            
+        }
     }
-	[serialPort setDelegate:nil];
-	[serialPort release];
-	[inComingData release];
 	
+    [ipAddress release];
+
+    [inComingData release];
     [logFile release];
 	[self _stopPolling];
 	
@@ -134,7 +153,31 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) setUpImage
 {
-	[self setImage:[NSImage imageNamed:@"Pac.tif"]];
+    NSImage* aCachedImage = [NSImage imageNamed:@"Pac.tif"];
+	
+    NSSize theIconSize = [aCachedImage size];
+    NSPoint theOffset = NSZeroPoint;
+    NSImage* netConnectIcon = nil;
+    if(connectionProtocol == kPacUseIP){
+        netConnectIcon = [NSImage imageNamed:@"NetConnect"];
+        theIconSize.width += 10;
+    }
+    
+    NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
+    [i lockFocus];
+    if(connectionProtocol == kPacUseIP){
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        theOffset.x += 10;
+    }
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+	
+    [i unlockFocus];
+    
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
+
 }
 
 - (void) makeMainController
@@ -147,12 +190,349 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
+                     selector : @selector(serialDataReceived:)
                          name : ORSerialPortDataReceived
                        object : nil];
 }
 
 #pragma mark •••Accessors
+- (int) connectionProtocol
+{
+    return connectionProtocol;
+}
+
+- (void) setConnectionProtocol:(int)aConnectionProtocol
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setConnectionProtocol:connectionProtocol];
+	
+	connectionProtocol = aConnectionProtocol;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelConnectionProtocolChanged object:self];
+	[self setUpImage];
+}
+
+- (NSString*) title
+{
+	switch (connectionProtocol){
+		case kPacUseRS232:	return [NSString stringWithFormat:@"%@ (RS232)",[self fullID]];
+		case kPacUseIP:	return [NSString stringWithFormat:@"%@ (%@)",[self fullID],[self ipAddress]];
+	}
+	return [self fullID];
+}
+
+- (BOOL) portWasOpen
+{
+    return portWasOpen;
+}
+
+- (void) setPortWasOpen:(BOOL)aPortWasOpen
+{
+    portWasOpen = aPortWasOpen;
+}
+
+//-------------------------------------
+//IP Protocol
+- (BOOL) wasConnected
+{
+    return wasConnected;
+}
+
+- (void) setWasConnected:(BOOL)aState
+{
+    wasConnected = aState;
+}
+
+
+- (NetSocket*) socket
+{
+	return socket;
+}
+- (void) setSocket:(NetSocket*)aSocket
+{
+	if(aSocket != socket)[socket close];
+	[aSocket retain];
+	[socket release];
+	socket = aSocket;
+    [socket setDelegate:self];
+}
+
+- (BOOL) ipConnected
+{
+    return ipConnected;
+}
+
+- (void) setIpConnected:(BOOL)aIpConnected
+{
+    ipConnected  = aIpConnected;
+	wasConnected = ipConnected;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelIpConnectedChanged object:self];
+}
+
+- (NSString*) ipAddress
+{
+    return ipAddress;
+}
+
+- (void) setIpAddress:(NSString*)aIpAddress
+{
+	if(!aIpAddress)aIpAddress = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
+    
+    [ipAddress autorelease];
+    ipAddress = [aIpAddress copy];
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelIpAddressChanged object:self];
+    
+    if(wasConnected){
+        [self connectIP];
+    }
+}
+
+- (void) connectIP
+{
+    //close the serial port. we are going to use TCP/IP
+    if([serialPort isOpen]){
+        [serialPort close];
+        [serialPort setDelegate:nil];
+        [serialPort release];
+    }
+    
+	if(![self isConnected] && [ipAddress length] && (connectionProtocol == kPacUseIP)){
+		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kPacPort]];
+        [self setIpConnected:[socket isConnected]];
+        
+        [self checkVetoCondition];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortStateChanged object:self];
+
+	}
+	else {
+		[self setSocket:nil];
+        [self setIpConnected:[socket isConnected]];
+	}
+}
+
+- (BOOL) isConnected
+{
+    if(connectionProtocol == kPacUseRS232)  return [serialPort isOpen];
+	else                                    return ipConnected;
+}
+
+- (void) netsocketConnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIpConnected:[socket isConnected]];
+    }
+}
+
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+{
+    if(!lastRequest)return;
+    
+    if(inNetSocket == socket){
+        if(!inComingData)inComingData = [[NSMutableData data] retain];
+        NSData* theData = [inNetSocket readData:2048]; //length is unknown, must be larger than max possible
+
+        [inComingData appendData:theData];
+            
+        [self processData];
+    }
+}
+
+
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIpConnected:NO];
+		[socket autorelease];
+		socket = nil;
+    }
+}
+
+
+//-------------------------------------
+//RS232 Protocol
+- (NSString*) portName
+{
+    return portName;
+}
+
+- (void) setPortName:(NSString*)aPortName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
+    
+    if(![aPortName isEqualToString:portName]){
+        [portName autorelease];
+        portName = [aPortName copy];
+        
+        BOOL valid = NO;
+        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+        ORSerialPort *aPort;
+        while (aPort = [enumerator nextObject]) {
+            if([portName isEqualToString:[aPort name]]){
+                [self setSerialPort:aPort];
+                if(portWasOpen){
+                    [self openPort:YES];
+                }
+                valid = YES;
+                break;
+            }
+        }
+        if(!valid){
+            [self setSerialPort:nil];
+        }
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortNameChanged object:self];
+}
+
+- (ORSerialPort*) serialPort
+{
+    return serialPort;
+}
+
+- (void) setSerialPort:(ORSerialPort*)aSerialPort
+{
+    [aSerialPort retain];
+    [serialPort release];
+    serialPort = aSerialPort;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelSerialPortChanged object:self];
+}
+
+- (void) serialDataReceived:(NSNotification*)note
+{
+	if(!lastRequest)return;
+	
+    if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+		if(!inComingData)inComingData = [[NSMutableData data] retain];
+        [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
+		
+		[self processData];
+	}
+}
+//---------------------------------------------
+- (void) processData
+{
+	BOOL done = NO;
+    char* theCmd = (char*)[lastRequest bytes];
+    switch (theCmd[0]){
+        case kPacADCmd:
+            if([inComingData length] >= 3) {
+                unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+                short theChannel = theCmd[1] & 0x7;
+                short msb		 = theData[0];
+                short lsb		 = theData[1];
+                if(theData[2] == kPacOkByte) {
+                    if(theChannel==0){
+                        if([self readingTemperatures])  [self setAdc:theChannel value: msb<<8 | lsb];
+                        else [self setLcm: msb<<8 | lsb];
+                    }
+                    else [self setAdc:theChannel value: msb<<8 | lsb];
+                }
+                else NSLogError(@"ADC !OK",@"PAC",nil);
+                done = YES;
+            }
+			break;
+            
+        case kPacSelCmd:
+            if([inComingData length] >= 1) {
+                unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+                if(theData[0] != kPacOkByte)  NSLogError(@"Port D !OK",@"PAC",nil);
+                done = YES;
+            }
+			break;
+            
+        case kPacGainCmd:
+            if(theCmd[1] == kPacGainReadOneGain){
+                if([inComingData length] >= 3) {
+                    unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+                    short msb		 = (theData[0]&0xf)<<4;
+                    short lsb		 = (theData[1]&0xf0)>>4;
+                    if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb | lsb);
+                    else NSLogError(@"DAC !OK",@"PAC",nil);
+                    done = YES;
+                }
+            }
+            else if(theCmd[1] == kPacGainReadAll){
+                unsigned char* ptr	 = (unsigned char*)[inComingData bytes];
+                int i;
+                unsigned len = [inComingData length];
+                if(len >= 297) {
+                    if(ptr[296] == kPacOkByte){
+                        for(i=0;i<len-1;i+=2){
+                            short msb		 = (ptr[i]&0xf)<<4;
+                            short lsb		 = (ptr[i+1]&0xf0)>>4;
+                            gainReadBack[147-i/2] = msb|lsb;
+                        }
+                        [self setGainReadBack:0 withValue:gainReadBack[0]]; //side effect -- force refresh
+                        NSCalendarDate* theDate = [NSCalendarDate date];
+                        [theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
+                        [self setLastGainRead: theDate];
+                        
+                    }
+                    else if(ptr[296]==kPacErrorByte){
+                        NSLogError(@"DAC !OK",@"PAC",nil);
+                    }
+                    done = YES;
+                }
+            }
+            else if(theCmd[1] == kPacGainWriteOneGain){
+                if([inComingData length] >= 1) {
+                    unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+                    if(theData[0] != kPacOkByte) NSLogError(@"DAC !OK",@"PAC",nil);
+                    done = YES;
+                }
+            }
+            else if(theCmd[1] == kPacGainWriteAll){
+                if([inComingData length] >= 1) {
+                    unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+                    if(theData[0] != kPacOkByte) NSLogError(@"DAC !OK",@"PAC",nil);
+                    done = YES;
+                }
+            }
+			break;
+            
+        case kPacLcmEnaCmd:
+            if([inComingData length] >= 1) {
+                unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+                if(theData[0] != kPacOkByte)  NSLogError(@"LCM ENA !OK",@"PAC",nil);
+                done = YES;
+            }
+			break;
+            
+        default:
+            done = YES;
+            break;
+    }
+    if(done){
+        [inComingData release];
+        inComingData = nil;
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        [self setLastRequest:nil];			 //clear the last request
+        [self processOneCommandFromQueue];	 //do the next command in the queue
+    }
+}
+
+- (void) openPort:(BOOL)state
+{
+    if(state && (connectionProtocol == kPacUseRS232)) {
+        [serialPort open];
+		[serialPort setSpeed:9600];
+		[serialPort setParityNone];
+		[serialPort setStopBits2:NO];
+		[serialPort setDataBits:8];
+		[serialPort commitChanges];
+		[serialPort setDelegate:self];
+    }
+    else [serialPort close];
+    
+    portWasOpen = [serialPort isOpen];
+    
+    [self checkVetoCondition];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortStateChanged object:self];
+}
+
+
 - (NSDate*) lastGainRead
 {
     return lastGainRead;
@@ -464,85 +844,6 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 	lastRequest = aRequest;    
 }
 
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelSerialPortChanged object:self];
-}
-
-- (void) openPort:(BOOL)state
-{
-    if(state) {
-        [serialPort open];
-		[serialPort setSpeed:9600];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-		[serialPort setDelegate:self];
-    }
-    else      [serialPort close];
-    portWasOpen = [serialPort isOpen];
-    [self checkVetoCondition];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortStateChanged object:self];
-}
-
-- (BOOL) isConnected
-{
-    return [serialPort isOpen];
-}
 
 - (NSString*) logFile
 {
@@ -622,11 +923,15 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 	[self setModule:		[decoder decodeIntForKey:	 @"ORPacModelModule"]];
 	[self setGainValue:		[decoder decodeIntForKey:	 @"gainValue"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
+	[self setWasConnected:	[decoder decodeBoolForKey:	 @"wasConnected"]];
 	[self setPollingState:	[decoder decodeIntForKey:	 @"pollingState"]];
 	[self setLogFile:		[decoder decodeObjectForKey: @"logFile"]];
     [self setLogToFile:		[decoder decodeBoolForKey:	 @"logToFile"]];
 	[self setAdcChannel:    [decoder decodeIntForKey:    @"ORPacModelAdcChannel"]];
 	
+    [self setIpAddress:[decoder decodeObjectForKey:@"ORPacModelIpAddress"]];
+    [self setConnectionProtocol:[decoder decodeIntForKey:@"ORPacModelConnectionProtocol"]];
+    
     int i;
 	for(i=0;i<8;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
@@ -654,14 +959,20 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
     [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
     [encoder encodeInt:module			forKey:@"ORPacModelModule"];
-    [encoder encodeInt:gainValue			forKey:@"gainValue"];
-    [encoder encodeBool:portWasOpen		forKey:@"portWasOpen"];
-    [encoder encodeObject:portName		forKey:@"portName"];
+    [encoder encodeInt:gainValue		forKey:@"gainValue"];
     [encoder encodeInt:pollingState		forKey:@"pollingState"];
     [encoder encodeObject:logFile		forKey:@"logFile"];
     [encoder encodeBool:logToFile		forKey:@"logToFile"];
     [encoder encodeInt:adcChannel       forKey:@"ORPacModelAdcChannel"];
-	int i;
+
+    [encoder encodeBool:wasConnected	forKey:@"wasConnected"];
+    [encoder encodeBool:portWasOpen		forKey:@"portWasOpen"];
+    [encoder encodeObject:portName		forKey:@"portName"];
+    
+    [encoder encodeObject:ipAddress     forKey:@"ORPacModelIpAddress"];
+    [encoder encodeInt:connectionProtocol forKey:@"ORPacModelConnectionProtocol"];
+
+    int i;
 	for(i=0;i<148;i++){
 		[encoder encodeInt:gain[i] forKey: [NSString stringWithFormat:@"gain%d",i]];
 	}
@@ -671,7 +982,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 #pragma mark ••• Commands
 - (void) writeLcmEnable
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		char cmdData[2];
 		cmdData[0] = kPacLcmEnaCmd;
 		cmdData[1] = ([self lcmEnabled]?kPacLcmEnaSet:kPacLcmEnaClr);
@@ -680,7 +991,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 }
 - (void) writeModuleSelect
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		char cmdData[2];
 		cmdData[0] = kPacSelCmd; //module select
 		cmdData[1] = (module << 3) | (preAmp & 0x7);
@@ -690,7 +1001,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeReadADC:(int)aChannel
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		char cmdData[2];
 		cmdData[0] = kPacADCmd;		
 		cmdData[1] = aChannel;
@@ -701,7 +1012,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeOneGain:(int)index
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		if(index>=0 && index<148){
 			char cmdData[5];
 			cmdData[0] = kPacGainCmd;
@@ -717,7 +1028,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeReadGain
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		char cmdData[3];
 		cmdData[0] = kPacGainCmd;
 		cmdData[1] = kPacGainReadOneGain;
@@ -728,7 +1039,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeReadAllGains
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		char cmdData[3];
 		cmdData[0] = kPacGainCmd;
 		cmdData[1] = kPacGainReadAll;
@@ -739,7 +1050,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeShipCmd
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		char theCommand = kPacShipAdcs;
 		[self writeCmdData:[NSData dataWithBytes:&theCommand length:1]];
 	}
@@ -774,7 +1085,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeGain
 {
-    if([serialPort isOpen]){ 
+    if([self isConnected]){
 		if([self setAllGains]){
 			char cmdData[5];
 			cmdData[0] = kPacGainCmd;
@@ -862,115 +1173,6 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     return dataDictionary;
 }
 
-- (void) dataReceived:(NSNotification*)note
-{
-	BOOL done = NO;
-	if(!lastRequest)return;
-	
-    if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		if(!inComingData)inComingData = [[NSMutableData data] retain];
-        [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		
-		char* theCmd = (char*)[lastRequest bytes];
-		switch (theCmd[0]){
-			case kPacADCmd:
-				if([inComingData length] >= 3) {
-					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-					short theChannel = theCmd[1] & 0x7;
-					short msb		 = theData[0];
-					short lsb		 = theData[1];
-					if(theData[2] == kPacOkByte) {
-                        if(theChannel==0){
-                            if([self readingTemperatures])  [self setAdc:theChannel value: msb<<8 | lsb];
-                            else [self setLcm: msb<<8 | lsb];
-                        }
-                        else [self setAdc:theChannel value: msb<<8 | lsb];
-                    }
-					else NSLogError(@"ADC !OK",@"PAC",nil);
-					done = YES;
-				}
-			break;
-				
-			case kPacSelCmd:
-				if([inComingData length] >= 1) {
-					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-					if(theData[0] != kPacOkByte)  NSLogError(@"Port D !OK",@"PAC",nil);
-					done = YES;
-				}
-			break;
-				
-			case kPacGainCmd:
-				if(theCmd[1] == kPacGainReadOneGain){
-					if([inComingData length] >= 3) {
-						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						short msb		 = (theData[0]&0xf)<<4;
-						short lsb		 = (theData[1]&0xf0)>>4;
-						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb | lsb);
-						else NSLogError(@"DAC !OK",@"PAC",nil);
-						done = YES;
-					}
-				}
-				else if(theCmd[1] == kPacGainReadAll){
-                    unsigned char* ptr	 = (unsigned char*)[inComingData bytes];
-                    int i;  
-                    unsigned len = [inComingData length];
-                    if(len >= 297) {
-                        if(ptr[296] == kPacOkByte){
-                            for(i=0;i<len-1;i+=2){
-                                short msb		 = (ptr[i]&0xf)<<4;
-                                short lsb		 = (ptr[i+1]&0xf0)>>4;
-                                gainReadBack[147-i/2] = msb|lsb;
-                            }
-                            [self setGainReadBack:0 withValue:gainReadBack[0]]; //side effect -- force refresh
-                            NSCalendarDate* theDate = [NSCalendarDate date];
-                            [theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-                            [self setLastGainRead: theDate];
-
-                        }
-                        else if(ptr[296]==kPacErrorByte){
-                            NSLogError(@"DAC !OK",@"PAC",nil);
-                        }
-                        done = YES;
-                    }
- 				}
-				else if(theCmd[1] == kPacGainWriteOneGain){
-					if([inComingData length] >= 1) {
-						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						if(theData[0] != kPacOkByte) NSLogError(@"DAC !OK",@"PAC",nil);
-						done = YES;
-					}
-				}
-				else if(theCmd[1] == kPacGainWriteAll){
-					if([inComingData length] >= 1) {
-						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						if(theData[0] != kPacOkByte) NSLogError(@"DAC !OK",@"PAC",nil);
-						done = YES;
-					}
-				}
-			break;
-				
-			case kPacLcmEnaCmd:
-				if([inComingData length] >= 1) {
-					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-					if(theData[0] != kPacOkByte)  NSLogError(@"LCM ENA !OK",@"PAC",nil);
-					done = YES;
-				}
-			break;
-                
-            default:
-                done = YES;
-            break;
-		}
-		
-		if(done){
-            [inComingData release];
-            inComingData = nil;
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-			[self setLastRequest:nil];			 //clear the last request
-			[self processOneCommandFromQueue];	 //do the next command in the queue
-		}
-	}
-}
 
 - (unsigned long) timeMeasured:(int)index
 {
@@ -1369,7 +1571,12 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 		}
 		else {
 			[self setLastRequest:cmdData];
-			[serialPort writeDataInBackground:cmdData];
+            if(connectionProtocol == kPacUseRS232){
+                [serialPort writeDataInBackground:cmdData];
+            }
+            else {
+                [socket writeData:cmdData];
+            }
 			[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
 		}
 	}

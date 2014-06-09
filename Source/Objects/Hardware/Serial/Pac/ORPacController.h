@@ -23,6 +23,17 @@
 
 @interface ORPacController : OrcaObjectController
 {
+	IBOutlet NSTabView*		connectionProtocolTabView;
+    
+	IBOutlet NSMatrix*		connectionProtocolMatrix;
+	IBOutlet NSTextField*	ipConnectedTextField;
+	IBOutlet NSTextField*	ipAddressTextField;
+	IBOutlet NSButton*		ipConnectButton;
+
+    IBOutlet NSTextField*   portStateField;
+    IBOutlet NSPopUpButton* portListPopup;
+    IBOutlet NSButton*      openPortButton;
+
 	IBOutlet NSTabView*		tabView;
 	IBOutlet NSTextField*   lastGainReadField;
 	IBOutlet NSTextField*   adcChannelField;
@@ -34,9 +45,6 @@
 	IBOutlet NSTextField*	moduleTextField;
 	IBOutlet NSTextField*	gainValueField;
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readAdcsButton;
     IBOutlet NSMatrix*      channelMatrix;
     IBOutlet NSMatrix*      adcNameMatrix;
@@ -113,14 +121,19 @@
 - (void) moduleChanged:(NSNotification*)aNote;
 - (void) gainValueChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
 - (void) logToFileChanged:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
 - (void) loadLcmTimeValues;
 - (void) logFileChanged:(NSNotification*)aNote;
 - (void) queCountChanged:(NSNotification*)aNote;
+
+- (void) portNameChanged:(NSNotification*)aNote;
+- (void) portStateChanged:(NSNotification*)aNote;
+
+- (void) ipAddressChanged:(NSNotification*)aNote;
+- (void) connectionProtocolChanged:(NSNotification*)aNote;
+- (void) ipConnectedChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) adcChannelAction:(id)sender;
@@ -147,6 +160,11 @@
 - (IBAction) logToFileAction:(id)sender;
 - (IBAction) readGainFileAction:(id)sender;
 - (IBAction) saveGainFileAction:(id)sender;
+
+- (IBAction) ipAddressFieldAction:(id)sender;
+- (IBAction) connectionProtocolAction:(id)sender;
+- (IBAction) connectAction: (id) aSender;
+
 
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;

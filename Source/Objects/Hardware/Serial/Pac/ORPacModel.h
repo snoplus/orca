@@ -26,6 +26,7 @@
 @class ORTimeRate;
 @class ORAlarm;
 @class ORSafeQueue;
+@class NetSocket;
 
 #define kPacShipAdcs	0xff
 
@@ -56,12 +57,28 @@
 #define kPacOkByte				0xf0
 #define kPacErrorByte			0x0f
 
+#define kPacPort 12340
+
+#define kPacUseRS232   0
+#define kPacUseIP      1
+
 @interface ORPacModel : ORSerialDeviceModel <ORAdcProcessing,ORBitProcessing>
 {
     @private
+        int connectionProtocol;
+
+        //ip protocol
+        NSString*   ipAddress;
+        BOOL        ipConnected;
+        NetSocket*  socket;
+        BOOL        wasConnected;
+   
+        //RS232 protocol
         NSString*			portName;
         BOOL				portWasOpen;
         ORSerialPort*		serialPort;
+    
+        BOOL                isConnected;
         unsigned long		dataId;
 		NSData*				lastRequest;
 		ORSafeQueue*		cmdQueue;
@@ -101,9 +118,32 @@
 - (id)   init;
 - (void) dealloc;
 - (void) registerNotificationObservers;
-- (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int) connectionProtocol;
+- (void) setConnectionProtocol:(int)aConnectionProtocol;
+
+//IP Protocol
+- (NetSocket*) socket;
+- (void) setSocket:(NetSocket*)aSocket;
+- (NSString*) ipAddress;
+- (void) setIpAddress:(NSString*)aIpAddress;
+- (BOOL) isConnected;
+- (void) setIpConnected:(BOOL)aFlag;
+- (BOOL) ipConnected;
+- (void) connectIP;
+
+//RS232 Protocol
+- (ORSerialPort*) serialPort;
+- (void) setSerialPort:(ORSerialPort*)aSerialPort;
+- (BOOL) portWasOpen;
+- (void) setPortWasOpen:(BOOL)aPortWasOpen;
+- (NSString*) portName;
+- (void) setPortName:(NSString*)aPortName;
+- (void) serialDataReceived:(NSNotification*)note;
+
+- (NSString*) title;
+
 - (BOOL) vetoInPlace;
 - (NSDate*) lastGainRead;
 - (void) setLastGainRead:(NSDate*)aLastGainRead;
@@ -115,7 +155,6 @@
 - (unsigned short) lcmTimeMeasured;
 - (unsigned short) lcm;
 - (void) setLcm:(unsigned short)aLc;
-- (BOOL) isConnected;
 - (BOOL) readingTemperatures;
 - (NSString*) lastGainFile;
 - (void) setLastGainFile:(NSString*)aLastGainFile;
@@ -140,12 +179,6 @@
 - (void) setModule:(int)aModule;
 - (int) gainValue;
 - (void) setGainValue:(int)aGainValue;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (NSData*) lastRequest;
 - (void) setLastRequest:(NSData*)aRequest;
 - (void) openPort:(BOOL)state;
@@ -162,6 +195,8 @@
 - (void) setLogToFile:(BOOL)aLogToFile;
 - (int) queCount;
 - (void) setProcessLimitDefaults;
+
+- (void) processData;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -225,10 +260,7 @@ extern NSString* ORPacModelLcmEnabledChanged;
 extern NSString* ORPacModelPreAmpChanged;
 extern NSString* ORPacModelModuleChanged;
 extern NSString* ORPacModelGainValueChanged;
-extern NSString* ORPacModelSerialPortChanged;
 extern NSString* ORPacLock;
-extern NSString* ORPacModelPortNameChanged;
-extern NSString* ORPacModelPortStateChanged;
 extern NSString* ORPacModelAdcChanged;
 extern NSString* ORPacModelGainsChanged;
 extern NSString* ORPacModelGainReadBacksChanged;
@@ -239,4 +271,14 @@ extern NSString* ORPacModelLogFileChanged;
 extern NSString* ORPacModelQueCountChanged;
 extern NSString* ORPacModelGainsReadBackChanged;
 extern NSString* ORPacModelVetoChanged;
+
+//RS232 Protocol
+extern NSString* ORPacModelPortNameChanged;
+extern NSString* ORPacModelPortStateChanged;
+extern NSString* ORPacModelSerialPortChanged;
+
+//IP Protocol
+extern NSString* ORPacModelIpConnectedChanged;
+extern NSString* ORPacModelIpAddressChanged;
+extern NSString* ORPacModelConnectionProtocolChanged;
 

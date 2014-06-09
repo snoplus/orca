@@ -124,6 +124,21 @@
     [super registerNotificationObservers];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(connectionProtocolChanged:)
+                         name : ORPacModelConnectionProtocolChanged
+                       object : model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(ipAddressChanged:)
+                         name : ORPacModelIpAddressChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(ipConnectedChanged:)
+                         name : ORPacModelIpConnectedChanged
+						object: model];
+	   
+    [notifyCenter addObserver : self
                      selector : @selector(pollingStateChanged:)
                          name : ORPacModelPollingStateChanged
 						object: model];
@@ -265,8 +280,6 @@
 {
     [super updateWindow];
     [self lockChanged:nil];
-    [self portStateChanged:nil];
-    [self portNameChanged:nil];
 	[self gainValueChanged:nil];
 	[self moduleChanged:nil];
 	[self preAmpChanged:nil];
@@ -288,6 +301,32 @@
 	[self adcChannelChanged:nil];
 	[self lastGainReadChanged:nil];
 	[self vetoConditionChanged:nil];
+
+    [self portStateChanged:nil];
+    [self portNameChanged:nil];
+    
+    [self connectionProtocolChanged:nil];
+	[self ipAddressChanged:nil];
+	[self ipConnectedChanged:nil];
+
+}
+- (void) ipConnectedChanged:(NSNotification*)aNote
+{
+	[ipConnectedTextField setStringValue: [model ipConnected]?@"Connected":@"Not Connected"];
+    [ipConnectButton setTitle:[model ipConnected]?@"Disconnect":@"Connect"];
+}
+
+- (void) connectionProtocolChanged:(NSNotification*)aNote
+{
+	[connectionProtocolMatrix selectCellWithTag:[model connectionProtocol]];
+	[connectionProtocolTabView selectTabViewItemAtIndex:[model connectionProtocol]];
+	[[self window] setTitle:[model title]];
+}
+
+- (void) ipAddressChanged:(NSNotification*)aNote
+{
+	[ipAddressTextField setStringValue: [model ipAddress]];
+	[[self window] setTitle:[model title]];
 }
 
 - (void) vetoConditionChanged:(NSNotification*)aNote
@@ -729,6 +768,21 @@
     if([sender tag] == 4){
         [model readAllGains];
     }
+}
+
+- (void) ipAddressFieldAction:(id)sender
+{
+	[model setIpAddress:[sender stringValue]];
+}
+
+- (IBAction) connectAction: (id) aSender
+{
+    [model connectIP];
+}
+
+- (IBAction) connectionProtocolAction:(id)sender
+{
+	[model setConnectionProtocol:[[connectionProtocolMatrix selectedCell] tag]];
 }
 
 - (IBAction) selectFileAction:(id)sender
