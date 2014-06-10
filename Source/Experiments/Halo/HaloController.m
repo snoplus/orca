@@ -53,6 +53,12 @@
 	return @"~/TestMap";
 }
 
+- (void) dealloc
+{
+    [blankView release];
+    [super dealloc];
+}
+
 -(void) awakeFromNib
 {
 	

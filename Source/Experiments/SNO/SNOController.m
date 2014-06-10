@@ -43,6 +43,7 @@
 
 - (void) dealloc
 {
+    [blankView release];
     [super dealloc];
 }
 

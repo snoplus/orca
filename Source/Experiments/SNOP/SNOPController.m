@@ -41,6 +41,11 @@ runStopImg = _runStopImg;
     return self;
 }
 
+- (void) dealloc
+{
+    [blankView release];
+    [super dealloc];
+}
 
 - (NSString*) defaultPrimaryMapFilePath
 {
