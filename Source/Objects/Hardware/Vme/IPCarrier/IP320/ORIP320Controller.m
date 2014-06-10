@@ -45,6 +45,7 @@
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [blankView release];
     [super dealloc];
 }
 
