@@ -63,6 +63,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	for(i=0;i<[self numberOfChannels];i++){
 		[voltageHistory[i] release];
 		[currentHistory[i] release];
+        [rdParams[i] release];
+        [chanName[i] release];
 	}
     [hvConstraints release];
     [safetyLoopNotGoodAlarm clearAlarm];
