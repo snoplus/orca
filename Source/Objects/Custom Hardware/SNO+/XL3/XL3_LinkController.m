@@ -43,6 +43,7 @@ static NSDictionary* xl3Ops;
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [blankView release];
 	[super dealloc];
 }
 

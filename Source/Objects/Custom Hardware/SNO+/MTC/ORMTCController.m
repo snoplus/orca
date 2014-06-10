@@ -54,7 +54,11 @@
     self = [super initWithWindowNibName:@"MTC"];
     return self;
 }
-
+- (void) dealloc
+{
+    [blankView release];
+    [super dealloc];
+}
 //This pulls any names from the Nib
 - (NSMutableDictionary*) getMatriciesFromNib;
 {
