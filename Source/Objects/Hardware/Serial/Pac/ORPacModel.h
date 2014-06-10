@@ -78,7 +78,6 @@
         BOOL				portWasOpen;
         ORSerialPort*		serialPort;
     
-        BOOL                isConnected;
         unsigned long		dataId;
 		NSData*				lastRequest;
 		ORSafeQueue*		cmdQueue;
