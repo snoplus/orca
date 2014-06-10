@@ -67,6 +67,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [rampHVAlarm[i] clearAlarm];
         [rampHVAlarm[i] release];
     }
+    [stringMap release];
     [super dealloc];
 }
 

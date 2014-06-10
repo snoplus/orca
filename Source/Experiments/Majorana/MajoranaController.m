@@ -44,6 +44,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:seqController0];
     [[NSNotificationCenter defaultCenter] removeObserver:seqController1];
+    [blankView release];
     [super dealloc];
 }
 
