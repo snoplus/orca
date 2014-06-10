@@ -32,6 +32,11 @@
     self = [ super initWithWindowNibName: @"Caen1785" ];
     return self;
 }
+- (void) dealloc
+{
+    [blankView release];
+    [super dealloc];
+}
 - (void) awakeFromNib
 {
 	
