@@ -34,6 +34,7 @@
 	[segmentPathSet release];
 	[errorPathSet release];
     [crateImage release];
+    [labelPathSet release];
 	[super dealloc];
 }
 

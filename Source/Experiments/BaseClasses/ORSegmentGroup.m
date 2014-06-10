@@ -77,8 +77,13 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [colorAxisAttributes release];
 	[segments release];
 	[mapEntries release];
+	[groupName release];
+	[adcClassName release];
+	[mapFile release];
+	[totalRate release];
 	[super dealloc];
 }
 - (void) setCrateIndex:(int)aValue;
