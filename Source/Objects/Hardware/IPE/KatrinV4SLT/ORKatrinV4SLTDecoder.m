@@ -205,8 +205,8 @@ max. number of blocks: 8192 (which is the max. DMA readout block) -tb-
         NSString* info2 = @"";
         #else
         NSString* info1 = [NSString stringWithFormat:@"First event:\n"
-                      "FIFO entry:  flt: %i,chan: %i,energy: %i,sec: %i,subsec: %i   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
-        NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %i,p: %i,toplen: %i,ediff: %i,evID: %i   \n",
+                      "FIFO entry:  flt: %lu,chan: %lu,energy: %lu,sec: %lu,subsec: %lu   \n",flt,chan,energy,sec,subsec ];//DEBUG -tb-
+        NSString* info2 = [NSString stringWithFormat:@"FIFO entry:  multiplicity: %lu,p: %lu,toplen: %lu,ediff: %lu,evID: %lu   \n",
                                                                                    multiplicity,p,toplen,ediff,evID ];//DEBUG -tb-
         #endif
         
