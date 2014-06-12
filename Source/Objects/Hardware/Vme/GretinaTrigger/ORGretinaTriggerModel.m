@@ -730,6 +730,12 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
     [self setMiscStatReg:       [self readRegister:kMiscStatus]];
     [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];
     [self setDiagnosticCounter: [self readRegister:kDiagnosticF]];
+    [self setLinkLruCrlReg:     [self readRegister:kLinkLruCrl]];
+    [self setInputLinkMask:     [self readRegister:kInputLinkMask]];
+    [self setSerdesTPowerMask:  [self readRegister:kSerdesTPower]];
+    [self setSerdesRPowerMask:  [self readRegister:kSerdesRPower]];
+    [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]];
+
     
 }
 - (void) stepMaster
@@ -771,9 +777,9 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             break;
  
         case kStep1c: //1c. Turn on the driver enable bits for the used channels
-            if(connectedRouterMask & 0xf)   preMask |= 0x151; //Links A,B,C,D
-            if(connectedRouterMask & 0x70)  preMask |= 0x152; //Links E,F,G
-             if(connectedRouterMask & 0x780) preMask |= 0x14; //Links H,L,R,U
+            if(connectedRouterMask & 0xf)    preMask |= 0x151; //Links A,B,C,D
+            if(connectedRouterMask & 0x70)   preMask |= 0x152; //Links E,F,G
+             if(connectedRouterMask & 0x780) preMask |= 0x154; //Links H,L,R,U
             [self writeRegister:kLvdsPreEmphasis withValue:preMask];
             [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]]; //read it back for display
             [self setInitState:kStep1d];
@@ -884,8 +890,6 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
     switch(initializationState){
         case kStep2a://2a. Enable the "L" link
             //--------------
-            //2a-0. Not in orginal document
-            //[self writeRegister:kMiscCtl1 withValue:[self readRegister:kMiscCtl1] | kResetLinkInitMachBit]; //<--added
             [self writeRegister:kInputLinkMask withValue:~0x100];           //A set bit disables a channel
             [self setInputLinkMask:  [self readRegister:kInputLinkMask]];   //read it back for display
             //--------------
@@ -900,7 +904,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             break;
             
         case kStep2b: //2b. Turn on the DEN, REN, and SYNC for Link "L"
-            [self writeRegister:kLinkLruCrl withValue:0x007];
+            [self writeRegister:kLinkLruCrl withValue:0x700]; //!!!
             [self setLinkLruCrlReg:[self readRegister:kLinkLruCrl]]; //read back for display
             [self setInitState:kStep2c];
             break;
@@ -1430,16 +1434,12 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
 
 - (void) reloadMainFPGAFromFlash
 {
-    
-    [self writeToAddress:0x900 aValue:kGretinaTriggerResetMainFPGACmd];
-    [self writeToAddress:0x900 aValue:kGretinaTriggerReloadMainFPGACmd];
-	
-    unsigned long statusRegValue=[self readFromAddress:0x904];
-    
-    while(!(statusRegValue & kGretinaTriggerMainFPGAIsLoaded)) {
-        if(stopDownLoadingMainFPGA)return;
-        statusRegValue=[self readFromAddress:0x904];
-    }
+    [self writeToAddress:0x090c aValue:0x0002];
+    [self writeToAddress:0x090c aValue:0x0000];
+    [self writeToAddress:0x090c aValue:0x0001];
+    sleep(3);
+    NSLog(@"After reset: 0x902 = 0x%04x\n",[self readFromAddress:0x902]);
+    [self writeToAddress:0x090c aValue:0x0000];
 }
 
 - (void) downloadingMainFPGADone
