@@ -329,15 +329,20 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     if(!lastRequest)return;
     
     if(inNetSocket == socket){
-        if(!inComingData)inComingData = [[NSMutableData data] retain];
-        NSData* theData = [inNetSocket readData:2048]; //length is unknown, must be larger than max possible
-
-        [inComingData appendData:theData];
-            
-        [self processData];
+		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
+        if(!inputBuffer)inputBuffer = [[NSMutableString alloc]initWithString:theString];
+        else [inputBuffer appendString:theString];
+        
+        [self parseString:inputBuffer];
+        [self clearInputBuffer];
     }
 }
 
+- (void) clearInputBuffer
+{
+    [inputBuffer release];
+    inputBuffer = nil;
+}
 
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
@@ -345,6 +350,43 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
         [self setIpConnected:NO];
 		[socket autorelease];
 		socket = nil;
+    }
+}
+
+- (void) parseString:(NSString*)theString
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+
+    NSArray* parts = [theString componentsSeparatedByString:@":"];
+    if([parts count]==2){
+        NSString* varName = [[parts objectAtIndex:0] removeNLandCRs];
+        varName = [varName trimSpacesFromEnds];
+        
+        NSString* values = [[parts objectAtIndex:1] removeNLandCRs];
+        values = [values trimSpacesFromEnds];
+        
+        if([varName isEqualTo:@"gains"]){
+            NSArray* theParts = [values componentsSeparatedByString:@","];
+            int i=0;
+            for(id aValue in theParts){
+                [self setGain:i withValue:[aValue intValue]];
+            }
+        }
+        if([varName isEqualTo:@"gainchannel"]){
+            NSArray* theParts = [values componentsSeparatedByString:@","];
+            if([theParts count] ==2){
+                int index = [[theParts objectAtIndex:0] intValue];
+                int value = [[theParts objectAtIndex:1] intValue];
+                [self setGain:index withValue:value];
+            }
+        }
+
+        else if([varName isEqualTo:@"temperatures"]){
+            
+        }
+        else if([varName isEqualTo:@"currents"]){
+            
+        }
     }
 }
 
@@ -1002,10 +1044,16 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 - (void) writeReadADC:(int)aChannel
 {
     if([self isConnected]){
-		char cmdData[2];
-		cmdData[0] = kPacADCmd;		
-		cmdData[1] = aChannel;
-		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
+        if(connectionProtocol == kPacUseRS232){
+            char cmdData[2];
+            cmdData[0] = kPacADCmd;
+            cmdData[1] = aChannel;
+            [self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
+        }
+        else {
+            [self writeCmdString:[NSString stringWithFormat:@"get adcchannel:%d",index]];
+            
+        }
 	}
 }
 
@@ -1013,40 +1061,53 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 - (void) writeOneGain:(int)index
 {
     if([self isConnected]){
-		if(index>=0 && index<148){
-			char cmdData[5];
-			cmdData[0] = kPacGainCmd;
-			cmdData[1] = kPacGainWriteOneGain;
-			cmdData[2] = index+1;
-			cmdData[3] = 0x10 | ((gain[index] & 0xf0)>>4);
-			cmdData[4] = (gain[index] & 0x0f)<<4;
-			[self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
-		}
+        if(connectionProtocol == kPacUseRS232){
+            if(index>=0 && index<148){
+                char cmdData[5];
+                cmdData[0] = kPacGainCmd;
+                cmdData[1] = kPacGainWriteOneGain;
+                cmdData[2] = index+1;
+                cmdData[3] = 0x10 | ((gain[index] & 0xf0)>>4);
+                cmdData[4] = (gain[index] & 0x0f)<<4;
+                [self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
+            }
+        }
+        else {
+            [self writeCmdString:[NSString stringWithFormat:@"set gainchannel:%d,%d",index,gain[index]]];
+        }
 	}
 }
-
 
 - (void) writeReadGain
 {
     if([self isConnected]){
-		char cmdData[3];
-		cmdData[0] = kPacGainCmd;
-		cmdData[1] = kPacGainReadOneGain;
-		cmdData[2] = gainChannel+1;
-		[self writeCmdData:[NSData dataWithBytes:cmdData length:3]];
+        if(connectionProtocol == kPacUseRS232){
+            char cmdData[3];
+            cmdData[0] = kPacGainCmd;
+            cmdData[1] = kPacGainReadOneGain;
+            cmdData[2] = gainChannel+1;
+            [self writeCmdData:[NSData dataWithBytes:cmdData length:3]];
+        }
+        else {
+            [self writeCmdString:[NSString stringWithFormat:@"get gainchannel:%d",gainChannel]];
+        }
 	}
 }
 
 - (void) writeReadAllGains
 {
     if([self isConnected]){
-		char cmdData[3];
-		cmdData[0] = kPacGainCmd;
-		cmdData[1] = kPacGainReadAll;
-		[self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
-	}
+        if(connectionProtocol == kPacUseRS232){
+            char cmdData[3];
+            cmdData[0] = kPacGainCmd;
+            cmdData[1] = kPacGainReadAll;
+            [self writeCmdData:[NSData dataWithBytes:cmdData length:2]];
+        }
+        else {
+            [self writeCmdString:@"get gains"];
+        }
+    }
 }
-
 
 - (void) writeShipCmd
 {
@@ -1058,11 +1119,24 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 
 - (void) writeCmdData:(NSData*)someData
 {
+    if(connectionProtocol != kPacUseRS232)return;
+    
 	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
 	[cmdQueue enqueue:someData];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
 	if(!lastRequest)[self processOneCommandFromQueue];
 	
+}
+
+- (void) writeCmdString:(NSString*)aCommand
+{
+    if(connectionProtocol != kPacUseIP)return;
+    
+	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
+    if(![aCommand hasSuffix:@"\n"])aCommand = [NSString stringWithFormat:@"%@\n",aCommand];
+	[cmdQueue enqueue:aCommand];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
+	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
 - (void) selectModule
@@ -1073,44 +1147,56 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 - (void) readAdcs
 {
 	@synchronized (self){
-		int i;
-		[self writeLcmEnable];
-		[self writeModuleSelect];
-		for(i=0;i<8;i++){
-			[self writeReadADC:i];
-		}
+        if(connectionProtocol == kPacUseRS232){
+            int i;
+            [self writeLcmEnable];
+            [self writeModuleSelect];
+            for(i=0;i<8;i++){
+                [self writeReadADC:i];
+            }
+        }
+        else {
+            [self writeCmdString:@"get adcs"];
+        }
 		[self writeShipCmd];
 	}
 }
 
 - (void) writeGain
 {
-    if([self isConnected]){
-		if([self setAllGains]){
-			char cmdData[5];
-			cmdData[0] = kPacGainCmd;
-			cmdData[1] = kPacGainWriteAll;
-			cmdData[2] = 0x10 | ((gainValue & 0xf0)>>4);
-			cmdData[3] = (gainValue & 0x0f)<<4;
-			[self writeCmdData:[NSData dataWithBytes:cmdData length:4]];
-		}
-		else {
-			char cmdData[5];
-			cmdData[0] = kPacGainCmd;
-			cmdData[1] = kPacGainWriteOneGain;
-			cmdData[2] = gainChannel+1;
-			cmdData[3] = 0x10 | ((gainValue & 0xf0)>>4);
-			cmdData[4] = (gainValue & 0x0f)<<4;
-			[self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
-		}
-        
-        [self readAllGains];
-        
-        if(setAllGains){
-            int i;
-            for(i=0;i<148;i++){
-                [self setGain:i withValue:[self gainValue]];
+    if(connectionProtocol == kPacUseRS232){
+        if([self isConnected]){
+            if([self setAllGains]){
+                char cmdData[5];
+                cmdData[0] = kPacGainCmd;
+                cmdData[1] = kPacGainWriteAll;
+                cmdData[2] = 0x10 | ((gainValue & 0xf0)>>4);
+                cmdData[3] = (gainValue & 0x0f)<<4;
+                [self writeCmdData:[NSData dataWithBytes:cmdData length:4]];
             }
+            else {
+                char cmdData[5];
+                cmdData[0] = kPacGainCmd;
+                cmdData[1] = kPacGainWriteOneGain;
+                cmdData[2] = gainChannel+1;
+                cmdData[3] = 0x10 | ((gainValue & 0xf0)>>4);
+                cmdData[4] = (gainValue & 0x0f)<<4;
+                [self writeCmdData:[NSData dataWithBytes:cmdData length:5]];
+            }
+            
+            [self readAllGains];
+            
+            if(setAllGains){
+                int i;
+                for(i=0;i<148;i++){
+                    [self setGain:i withValue:[self gainValue]];
+                }
+            }
+        }
+    }
+    else {
+        if([socket isConnected]){
+            
         }
     }
 }

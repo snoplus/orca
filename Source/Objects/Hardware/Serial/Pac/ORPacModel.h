@@ -68,15 +68,17 @@
         int connectionProtocol;
 
         //ip protocol
-        NSString*   ipAddress;
-        BOOL        ipConnected;
-        NetSocket*  socket;
-        BOOL        wasConnected;
-   
+        NSString*           ipAddress;
+        BOOL                ipConnected;
+        NetSocket*          socket;
+        BOOL                wasConnected;
+        NSMutableString*    inputBuffer;
+  
         //RS232 protocol
         NSString*			portName;
         BOOL				portWasOpen;
         ORSerialPort*		serialPort;
+        NSMutableData*		inComingData;
     
         unsigned long		dataId;
 		NSData*				lastRequest;
@@ -85,7 +87,6 @@
         unsigned short		adc[8];
 		unsigned long		timeMeasured[8];
 		ORTimeRate*			timeRates[8];
-		NSMutableData*		inComingData;
 		int					module;
 		int					preAmp;
 		BOOL				lcmEnabled;
@@ -131,6 +132,9 @@
 - (void) setIpConnected:(BOOL)aFlag;
 - (BOOL) ipConnected;
 - (void) connectIP;
+- (void) writeCmdString:(NSString*)aCommand;
+- (void) parseString:(NSString*)theString;
+- (void) clearInputBuffer;
 
 //RS232 Protocol
 - (ORSerialPort*) serialPort;
@@ -140,6 +144,8 @@
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
 - (void) serialDataReceived:(NSNotification*)note;
+- (void) writeCmdData:(NSData*)someData;
+- (void) processData;
 
 - (NSString*) title;
 
@@ -195,7 +201,6 @@
 - (int) queCount;
 - (void) setProcessLimitDefaults;
 
-- (void) processData;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -211,7 +216,6 @@
 - (void) writeLogBufferToFile;
 
 #pragma mark •••Commands
-- (void) writeCmdData:(NSData*)someData;
 - (void) writeReadADC:(int)aChannel;
 - (void) writeReadGain;
 - (void) writeLcmEnable;
