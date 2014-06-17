@@ -62,6 +62,8 @@
     
     
     //SMELLIE Configuration Fields
+    
+    IBOutlet NSComboBox *sepiaInputChannel;
     IBOutlet NSComboBox* smellieConfigLaserHeadField;
     IBOutlet NSComboBox* smellieConfigAttenuatorField;
     IBOutlet NSComboBox* smellieConfigFsInputCh;
