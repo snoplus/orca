@@ -166,72 +166,76 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 
 - (void) setRdParamsFrom:(NSDictionary*)aDictionary
 {
-	int numChannels = [self numberOfChannels];
-	int i;
-	for(i=0;i<numChannels;i++){
-		id oldOnOffState	= [[[[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
+    @try {
+        int numChannels = [self numberOfChannels];
+        int i;
+        for(i=0;i<numChannels;i++){
+            id oldOnOffState	= [[[[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
 
-		NSString* aChannelKey = [NSString stringWithFormat:@"u%d",[self slotChannelValue:i]];
-		id params = [aDictionary objectForKey:aChannelKey];
-		[rdParams[i] release];
-		rdParams[i] = [params retain];
+            NSString* aChannelKey = [NSString stringWithFormat:@"u%d",[self slotChannelValue:i]];
+            id params = [aDictionary objectForKey:aChannelKey];
+            [rdParams[i] release];
+            rdParams[i] = [params retain];
 
-		id currentOnOffState	 = [[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
-		int oldState	 = [oldOnOffState intValue];
-		int currentState = [currentOnOffState intValue];
-		
-		if(oldOnOffState && currentOnOffState && (oldState != currentState)){
-			NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], i,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
-		}
-		
-		
-		if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
-		if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
-		[voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
-		[currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]*1000000];
-		
-	}
-
-    NSString* moduleID = [self getModuleString];
-    id params = [aDictionary objectForKey:moduleID];
-    id currentEventStatus = [params objectForKey:@"moduleEventStatus"];
-    NSString* newModuleStatus = (NSString*)[currentEventStatus objectForKey:@"Names"];
-    
-    [modParams release];
-    modParams = [[aDictionary objectForKey:moduleID] retain];
-
-    int moduleEvents = [self moduleFailureEvents];
-    
-    if(moduleEvents & moduleEventSafetyLoopNotGood){
-        if(!safetyLoopNotGoodAlarm){
-            NSString* s = [NSString stringWithFormat:@"%@ Safety Loop Not Good", [self fullID] ];
-            safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: kHardwareAlarm];
-            [safetyLoopNotGoodAlarm setSticky: YES];
-            [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card. Apply current to SL input and clear events to clear alarm."];
-        
-            [safetyLoopNotGoodAlarm postAlarm];
-            NSLog(@"MPod Module Status Events: %@\n", newModuleStatus);
+            id currentOnOffState	 = [[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
+            int oldState	 = [oldOnOffState intValue];
+            int currentState = [currentOnOffState intValue];
+            
+            if(oldOnOffState && currentOnOffState && (oldState != currentState)){
+                NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], i,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
+            }
+            
+            
+            if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
+            if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
+            [voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
+            [currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]*1000000];
+            
         }
-    }
-    else if( safetyLoopNotGoodAlarm ){
-        [safetyLoopNotGoodAlarm clearAlarm];
-        [safetyLoopNotGoodAlarm release];
-        safetyLoopNotGoodAlarm = nil;
-    }
-    
-    
-	if(shipRecords) [self shipDataRecords];
-	
-	if([[self adapter] respondsToSelector:@selector(power)]){
-		if(![[self adapter] power]){
-			int i;
-			for(i=0;i<[self numberOfChannels];i++){
-				[rdParams[i] release];
-				rdParams[i] = nil;
-			}
-		}
+
+        NSString* moduleID = [self getModuleString];
+        id params = [aDictionary objectForKey:moduleID];
+        id currentEventStatus = [params objectForKey:@"moduleEventStatus"];
+        NSString* newModuleStatus = (NSString*)[currentEventStatus objectForKey:@"Names"];
+        
+        [modParams release];
+        modParams = [[aDictionary objectForKey:moduleID] retain];
+
+        int moduleEvents = [self moduleFailureEvents];
+        
+        if(moduleEvents & moduleEventSafetyLoopNotGood){
+            if(!safetyLoopNotGoodAlarm){
+                NSString* s = [NSString stringWithFormat:@"%@ Safety Loop Not Good", [self fullID] ];
+                safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: kHardwareAlarm];
+                [safetyLoopNotGoodAlarm setSticky: YES];
+                [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card. Apply current to SL input and clear events to clear alarm."];
+            
+                [safetyLoopNotGoodAlarm postAlarm];
+                NSLog(@"MPod Module Status Events: %@\n", newModuleStatus);
+            }
+        }
+        else if( safetyLoopNotGoodAlarm ){
+            [safetyLoopNotGoodAlarm clearAlarm];
+            [safetyLoopNotGoodAlarm release];
+            safetyLoopNotGoodAlarm = nil;
+        }
+        
+        
+        if(shipRecords) [self shipDataRecords];
+        
+        if([[self adapter] respondsToSelector:@selector(power)]){
+            if(![[self adapter] power]){
+                int i;
+                for(i=0;i<[self numberOfChannels];i++){
+                    [rdParams[i] release];
+                    rdParams[i] = nil;
+                }
+            }
+        }
 	}
-	
+    @catch(NSException* e){
+        
+    }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
 	
 }
@@ -306,50 +310,35 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 
 - (int) channel:(short)i readParamAsInt:(NSString*)name
 {
-    int theValue;
-    @synchronized([[self crate] adapter]){
-        if([self channelInBounds:i]){
-            theValue= [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
-        }
-        else theValue = 0;
+    if([self channelInBounds:i]){
+        return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
     }
-    return theValue;
+    
+    return 0;
 }
 
 - (float) channel:(short)i readParamAsFloat:(NSString*)name
 {
-    float theValue;
-    @synchronized([[self crate] adapter]){
-        if([self channelInBounds:i]){
-            theValue = [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
-        }
-        else theValue = 0;
+    if([self channelInBounds:i]){
+           return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
     }
-    return theValue;
+    return 0;
 }
 
 - (id) channel:(short)i readParamAsValue:(NSString*)name
 {
-    id theValue;
-    @synchronized([[self crate] adapter]){
-        if([self channelInBounds:i]){
-            theValue =  [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
-        }
-        else theValue =  nil;
+    if([self channelInBounds:i]){
+        return  [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
     }
-    return theValue;
+    return 0;
 }
 
 - (id) channel:(short)i readParamAsObject:(NSString*)name
 {
-    id theValue;
-    @synchronized([[self crate] adapter]){
-        if([self channelInBounds:i]){
-            theValue = [rdParams[i] objectForKey:name];
-        }
-        else theValue = @"";
+    if([self channelInBounds:i]){
+            return [rdParams[i] objectForKey:name];
     }
-    return theValue;
+    else return 0;
 }
 
 - (void) syncDialog

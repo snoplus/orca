@@ -123,33 +123,23 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (BOOL) power
 {
-    BOOL theValue;
-    @synchronized(self){
-        NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
-        theValue =  [[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
-    }
-    return theValue;
+    NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
+    return[[[systemParams objectForKey:@"sysMainSwitch"] objectForKey:@"Value"] boolValue];
+
 }
 
 - (id) systemParam:(NSString*)name
 {
-    id theValue;
-    @synchronized(self){
-        NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
-        theValue =  [[systemParams objectForKey:name] objectForKey:@"Value"];
-    }
+    NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
+    id theValue =  [[systemParams objectForKey:name] objectForKey:@"Value"];
 	if(theValue)return theValue;
-	else return @"";
+    else return @"";
 }
 
 - (int) systemParamAsInt:(NSString*)name
 {
-    int theValue;
-    @synchronized(self){
-        NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
-        theValue = [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
-    }
-    return theValue;
+    NSDictionary* systemParams = [parameterDictionary objectForKey:@"0"];
+    return  [[[systemParams objectForKey:name] objectForKey:@"Value"] intValue];
 }
 
 - (void) clearHistory
@@ -247,8 +237,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) setParameterDictionary:(NSDictionary*)aParameterDictionary
 {
-    @synchronized(self){
-
+    @try {
         [aParameterDictionary retain];
         [parameterDictionary release];
         parameterDictionary = aParameterDictionary;
@@ -262,6 +251,9 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
             }
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMPodCModelSystemParamsChanged object:self];
+    }
+    @catch(NSException* e){
+        
     }
 }
 
