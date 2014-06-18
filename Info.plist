@@ -58,14 +58,14 @@
 	<key>CFBundleVersion</key>
 	<string>10.0h</string>
 	<key>CFfile://localhost/Users/markhowe/Dev/Orca/Source/Objects/Misc%20Objects/SQL/BundleGetInfoString</key>
-	<string>Orca 7.9, Copyright ©2009 Mark Howe Physics Dept, University of North Carolina</string>
+	<string>Orca 10, Copyright ©2014 Mark Howe Physics Dept, University of North Carolina</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.6</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>ReportBugsTo</key>
 	<string>mhowe@physics.unc.edu</string>
-	<key>LSMinimumSystemVersion</key>
-    	<string>10.5</string>
 </dict>
 </plist>
