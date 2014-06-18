@@ -523,10 +523,21 @@
     int laserHeadIndex = [sender indexOfSelectedItem];
     
     for (id configValues in configForSmellie){
-        if([configForSmellie key] == [NSString stringWithFormat:@"laserInput%i",laserHeadIndex]){
-            //select the values that correspond to the saved values
-            //fill in all of the boxes for the previous configuration
-        }
+        NSLog(@"config value: %@",configValues);
+        //NSString *keyString = [NSString stringWithFormat:@"laserInput%i",laserHeadIndex];
+        //if([configValues key] == [NSString stringWithFormat:@"laserInput%i",laserHeadIndex]){
+            
+            NSLog(@"in here");
+            //TODO:select the values that correspond to the saved values
+            //[[configForSmellie objectForKey:keyString] objectForKey:@"laserHeadConnected"];
+            //for(id item in [smellieConfigLaserHeadField objectValues]){
+            //    NSLog(@"item value: %@",item);
+           // }
+            //[smellieConfigLaserHeadField]
+            
+            //TODO:fill in all of the boxes for the previous configuration
+            
+        //}
     }
     
     
