@@ -2842,6 +2842,14 @@
 		84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */; };
 		84E966D511848BEF008D9119 /* MajoranaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E966CD11848BEF008D9119 /* MajoranaModel.h */; };
 		84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E966CE11848BEF008D9119 /* MajoranaModel.m */; };
+		84E9C351194F42140028B7E2 /* ORPacFPController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9C349194F42140028B7E2 /* ORPacFPController.h */; };
+		84E9C352194F42140028B7E2 /* ORPacFPController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9C34A194F42140028B7E2 /* ORPacFPController.m */; };
+		84E9C353194F42140028B7E2 /* ORPacFPDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9C34B194F42140028B7E2 /* ORPacFPDecoders.h */; };
+		84E9C354194F42140028B7E2 /* ORPacFPDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9C34C194F42140028B7E2 /* ORPacFPDecoders.m */; };
+		84E9C355194F42140028B7E2 /* ORPacFPModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9C34D194F42140028B7E2 /* ORPacFPModel.h */; };
+		84E9C356194F42140028B7E2 /* ORPacFPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9C34E194F42140028B7E2 /* ORPacFPModel.m */; };
+		84E9C357194F42140028B7E2 /* PacFP.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9C34F194F42140028B7E2 /* PacFP.nib */; };
+		84E9C358194F42140028B7E2 /* PacFP.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E9C350194F42140028B7E2 /* PacFP.tif */; };
 		84E9F69E123FE4D600116607 /* NHQ226L.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9F692123FE4D600116607 /* NHQ226L.nib */; };
 		84E9F69F123FE4D600116607 /* NHQ226L.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E9F693123FE4D600116607 /* NHQ226L.tif */; };
 		84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9F694123FE4D600116607 /* ORNHQ226LController.h */; };
@@ -6175,6 +6183,14 @@
 		84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaDetectorView.m; path = Source/Experiments/Majorana/MajoranaDetectorView.m; sourceTree = SOURCE_ROOT; };
 		84E966CD11848BEF008D9119 /* MajoranaModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MajoranaModel.h; path = Source/Experiments/Majorana/MajoranaModel.h; sourceTree = SOURCE_ROOT; };
 		84E966CE11848BEF008D9119 /* MajoranaModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MajoranaModel.m; path = Source/Experiments/Majorana/MajoranaModel.m; sourceTree = SOURCE_ROOT; };
+		84E9C349194F42140028B7E2 /* ORPacFPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPacFPController.h; sourceTree = "<group>"; };
+		84E9C34A194F42140028B7E2 /* ORPacFPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPacFPController.m; sourceTree = "<group>"; };
+		84E9C34B194F42140028B7E2 /* ORPacFPDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPacFPDecoders.h; sourceTree = "<group>"; };
+		84E9C34C194F42140028B7E2 /* ORPacFPDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPacFPDecoders.m; sourceTree = "<group>"; };
+		84E9C34D194F42140028B7E2 /* ORPacFPModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPacFPModel.h; sourceTree = "<group>"; };
+		84E9C34E194F42140028B7E2 /* ORPacFPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPacFPModel.m; sourceTree = "<group>"; };
+		84E9C34F194F42140028B7E2 /* PacFP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PacFP.nib; sourceTree = "<group>"; };
+		84E9C350194F42140028B7E2 /* PacFP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PacFP.tif; sourceTree = "<group>"; };
 		84E9F692123FE4D600116607 /* NHQ226L.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NHQ226L.nib; path = Source/Objects/Hardware/HV/NHQ226L/NHQ226L.nib; sourceTree = SOURCE_ROOT; };
 		84E9F693123FE4D600116607 /* NHQ226L.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NHQ226L.tif; path = Source/Objects/Hardware/HV/NHQ226L/NHQ226L.tif; sourceTree = SOURCE_ROOT; };
 		84E9F694123FE4D600116607 /* ORNHQ226LController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LController.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LController.h; sourceTree = SOURCE_ROOT; };
@@ -11198,6 +11214,7 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
+				84E9C348194F42140028B7E2 /* PacFP */,
 				846F313517E8819000A5F1DA /* ApcUps */,
 				848E59101472B34400A70AB4 /* TTCPX400DP */,
 				8494C01C1316CEBA00151E7B /* BootBar */,
@@ -12675,6 +12692,21 @@
 			name = Majorana;
 			path = Source/Experiments/Majorana;
 			sourceTree = SOURCE_ROOT;
+		};
+		84E9C348194F42140028B7E2 /* PacFP */ = {
+			isa = PBXGroup;
+			children = (
+				84E9C349194F42140028B7E2 /* ORPacFPController.h */,
+				84E9C34A194F42140028B7E2 /* ORPacFPController.m */,
+				84E9C34B194F42140028B7E2 /* ORPacFPDecoders.h */,
+				84E9C34C194F42140028B7E2 /* ORPacFPDecoders.m */,
+				84E9C34D194F42140028B7E2 /* ORPacFPModel.h */,
+				84E9C34E194F42140028B7E2 /* ORPacFPModel.m */,
+				84E9C34F194F42140028B7E2 /* PacFP.nib */,
+				84E9C350194F42140028B7E2 /* PacFP.tif */,
+			);
+			path = PacFP;
+			sourceTree = "<group>";
 		};
 		84E9F68E123FE4D600116607 /* NHQ226L */ = {
 			isa = PBXGroup;
@@ -14407,6 +14439,7 @@
 				84B28CFA0F4C5DBB00E2B056 /* ORAmi286Controller.h in Headers */,
 				84B28CFC0F4C5DBB00E2B056 /* ORAmi286Decoders.h in Headers */,
 				84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */,
+				84E9C355194F42140028B7E2 /* ORPacFPModel.h in Headers */,
 				84B28D210F4C614000E2B056 /* ORXYScannerController.h in Headers */,
 				84B28D230F4C614000E2B056 /* ORXYScannerDecoders.h in Headers */,
 				84B28D250F4C614000E2B056 /* ORXYScannerModel.h in Headers */,
@@ -14644,6 +14677,7 @@
 				8472AA6D12DB44B400DEEB02 /* OREHQ8060nController.h in Headers */,
 				8472AA7112DB44B400DEEB02 /* OREHQ8060nModel.h in Headers */,
 				8472AA7312DB44B400DEEB02 /* ORMPodCard.h in Headers */,
+				84E9C351194F42140028B7E2 /* ORPacFPController.h in Headers */,
 				8472AA7512DB44B400DEEB02 /* ORMPodCrate.h in Headers */,
 				8472AA7812DB44B400DEEB02 /* ORMPodProtocol.h in Headers */,
 				8472AA7C12DB44B400DEEB02 /* ORMPodCController.h in Headers */,
@@ -14685,6 +14719,7 @@
 				8494D85913393D8A00DD5F9E /* ORRunListController.h in Headers */,
 				8494D85B13393D8A00DD5F9E /* ORRunListModel.h in Headers */,
 				8459A8D4137C1FEC0029C5B6 /* ORComparatorController.h in Headers */,
+				84E9C353194F42140028B7E2 /* ORPacFPDecoders.h in Headers */,
 				8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */,
 				8483D2E4139EAB8B000C8901 /* ORCV812Controller.h in Headers */,
 				8483D2E6139EAB8B000C8901 /* ORCV812Model.h in Headers */,
@@ -15148,6 +15183,7 @@
 				84B7F8D80820551F00721869 /* bigdotshadow.tif in Resources */,
 				844049D408353D47000D03DB /* MemoryWatcher.nib in Resources */,
 				54F5B708087206D9003AC228 /* Katrin.nib in Resources */,
+				84E9C358194F42140028B7E2 /* PacFP.tif in Resources */,
 				546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */,
 				546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */,
 				2A3728F908BCE51A00CA18E5 /* NoDispatcherHelp.plist in Resources */,
@@ -15608,6 +15644,7 @@
 				8457BE3C11B0183500C4082D /* SIS3820Card.gif in Resources */,
 				84B3D12311BFCB8300C17CD6 /* Sql.tif in Resources */,
 				840795DE11DA562300A91442 /* edu.washington.npl.orca.Katrin.plist in Resources */,
+				84E9C357194F42140028B7E2 /* PacFP.nib in Resources */,
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
 				EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */,
@@ -16457,6 +16494,7 @@
 				84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */,
 				84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */,
 				2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */,
+				84E9C354194F42140028B7E2 /* ORPacFPDecoders.m in Sources */,
 				2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */,
 				8493D6BE0F21315300BCD331 /* ORCMC203Controller.m in Sources */,
 				8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */,
@@ -16791,12 +16829,14 @@
 				CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */,
 				CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */,
 				8499A7591518D85800CD7AAC /* ORCP8CryopumpController.m in Sources */,
+				84E9C356194F42140028B7E2 /* ORPacFPModel.m in Sources */,
 				8499A75B1518D85800CD7AAC /* ORCP8CryopumpDecoders.m in Sources */,
 				8499A75D1518D85800CD7AAC /* ORCP8CryopumpModel.m in Sources */,
 				8499AB8F151CA3B000CD7AAC /* ORManualPlot2DController.m in Sources */,
 				8499AB91151CA3B000CD7AAC /* ORManualPlot2DModel.m in Sources */,
 				8499C97615221F9800CD7AAC /* ORMJDVacuumController.m in Sources */,
 				8499C97815221F9800CD7AAC /* ORMJDVacuumModel.m in Sources */,
+				84E9C352194F42140028B7E2 /* ORPacFPController.m in Sources */,
 				8415B6AA152223050092C975 /* ORMJDVacuumView.m in Sources */,
 				8415E587152C7C560092C975 /* ORVacuumParts.m in Sources */,
 				8415EB64152DF0970092C975 /* ORAdcProcessorController.m in Sources */,
