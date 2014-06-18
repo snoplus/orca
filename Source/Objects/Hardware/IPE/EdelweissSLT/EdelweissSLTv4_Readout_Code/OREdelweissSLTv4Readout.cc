@@ -134,7 +134,8 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
                     printf("    Ship ADC data for FLT#%i (idx %i), Channel (%i)\n",flt+1,flt, chan);
                     //-------------SHIP TRACE----------BEGIN
 						        uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
-                        wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
+                        //wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
+                        wfRecordVersion = 0x4 ;//0x4=no data shift for fast channel data  -  added 2014-06-17  -tb-
                                 uint32_t waveformLength = 2048; 
 								uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
 /*								
@@ -153,7 +154,8 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
                                 //rearrange (could do it later, copiing into ring buffer ...)
                                 triggerAddr =  eventFifo4 & 0xfff;
                                 {   int i,ioffset=0;
-                                    ioffset=triggerAddr+1023;
+                                    if(chan>18 || chan<30) ioffset=0;//do not shift 
+                                    else ioffset=triggerAddr+1023;
                                     for(i=0; i<waveformLength; i++,ioffset++){
                                         ioffset = ioffset % 2048;
                                         shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[ioffset] & 0xffff));
