@@ -248,7 +248,11 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             i++;
         }
     }
-    if([lastRequest hasPrefix:@"get temperature"]){
+    else if([lastRequest hasPrefix:@"set gains"]){
+        //nothing to do
+    }
+
+    else if([lastRequest hasPrefix:@"get temperatures"]){
         NSArray* theParts = [theString componentsSeparatedByString:@","];
         int i=0;
         for(id aValue in theParts){
