@@ -545,15 +545,21 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         
         NSString* gainType = [self getValueForPartStartingWith: @" GainType"   parts:parts];
         if([gainType length]==0)return @"Not Mapped";
-        
         if([gainType intValue]==0)gainType = @"Low Gain";
         else gainType = @"Hi Gain";
+ 
+        NSString* detType = [self getValueForPartStartingWith: @" DetectorType"   parts:parts];
+        if([detType length]==0)return @"Not Mapped";
+        if([detType intValue]==0)    detType = @" BeGe";
+        else if([detType intValue]==2)detType = @" Enriched";
+        else detType = @"";
+
         
         finalString = [finalString stringByAppendingFormat: @"%@\n",[parts objectAtIndex:0]];
-        finalString = [finalString stringByAppendingFormat: @"%@ (%@)\n",[self getPartStartingWith: @" Detector"   parts:parts],gainType];
+        finalString = [finalString stringByAppendingFormat: @"%@%@\n",[self getPartStartingWith: @" DetectorName"   parts:parts],detType];
         finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" VME"       parts:parts]];
         finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" CardSlot"  parts:parts]];
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" Channel"   parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@ (%@)\n",[self getPartStartingWith: @" Channel"   parts:parts],gainType];
         
         finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" PreAmpChan"   parts:parts]];
 
@@ -818,9 +824,16 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [[steps lastObject] addOrCondition:  @"OKForHV"         value: @"0"];
     [[steps lastObject] addAndCondition: @"HVOn"            value: @"1"];
 
-	[[steps lastObject] setSuccessTitle:    @"Ramping Down"];
+	[[steps lastObject] setSuccessTitle:    @"Started Ramp Down"];
 	[[steps lastObject] setOutputStateKey:  @"HVRamped"];
-	[[steps lastObject] setTitle:           @"Ramp Down HV Action"];
+    NSString* rampDownTitle = @"Ramp Down HV";
+	if(index ==0){
+        if([self ignorePanicOnA])rampDownTitle = @"HV Action Ignored";
+    }
+    else {
+        if([self ignorePanicOnB])rampDownTitle = @"HV Action Ignored";
+    }
+    [[steps lastObject] setTitle: rampDownTitle];
     //----------------------------------------------------------
     
     //---------------------add Constrain HV---------------------

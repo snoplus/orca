@@ -17,12 +17,16 @@
 
 @class ORColorScale;
 
+#define kUseDetectorView   0 //overlaps with the superclass defines
+
 @interface MajoranaDetectorView : ORDetectorView
 {	
     IBOutlet ORColorScale* detectorColorScale;
     IBOutlet ORColorScale* vetoColorScale;
 	BOOL viewType;
     NSMutableArray* detectorOutlines;
+    NSString* stringLabel[14];
+    NSDictionary* stringLabelAttributes;
 }
 - (void) setViewType:(int)aViewType;
 

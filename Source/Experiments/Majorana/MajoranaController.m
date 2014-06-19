@@ -345,16 +345,60 @@
 
 }
 #pragma mark ***Actions
-
 - (void) ignorePanicOnBAction:(id)sender
 {
-	[model setIgnorePanicOnB:[sender intValue]];
+    [self confirmIgnoreForModule:1];
 }
-
 - (void) ignorePanicOnAAction:(id)sender
 {
-	[model setIgnorePanicOnA:[sender intValue]];
+    [self confirmIgnoreForModule:0];
 }
+
+- (void) confirmIgnoreForModule:(int)module
+{
+	BOOL currentState;
+    if(module == 0) currentState = [model ignorePanicOnA];
+    else            currentState = [model ignorePanicOnB];
+    
+    NSString* s1 = [NSString stringWithFormat:@"Really Turn %@ Constraint Checking for Module %d?",currentState?@"OFF":@"ON",module];
+    if(currentState)s1 = [s1 stringByAppendingFormat:@"\n\n(HV will NOT ramp down if vac is bad)"];
+    else            s1 = [s1 stringByAppendingFormat:@"\n\n(HV will ramp down on next check if vac is bad)"];
+    NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:
+                              [NSNumber numberWithInt:module],@"module",
+                              [NSNumber numberWithInt:currentState],@"currentState",
+                              nil] retain]; //release in confirmDidFinish()
+    
+    NSBeginAlertSheet(s1,
+                      [NSString stringWithFormat:@"YES/Turn %@ HV Checks",currentState?@"OFF":@"ON"],
+					  @"Cancel",
+					  nil,[self window],
+					  self,
+					  @selector(confirmDidFinish:returnCode:contextInfo:),
+					  nil,
+					  context,
+					  @"");
+}
+
+
+- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    int module = [[userInfo objectForKey:@"module"]intValue];
+    BOOL currentState= [[userInfo objectForKey:@"currentState"]intValue];
+    
+	if(returnCode == NSAlertDefaultReturn){
+        if(module == 0) [model setIgnorePanicOnA:!currentState];
+        else            [model setIgnorePanicOnB:!currentState];
+    }
+    else {
+        if(module == 0) [model setIgnorePanicOnA:currentState];
+        else            [model setIgnorePanicOnB:currentState];
+    }
+    [userInfo release];
+}
+
+
+
+
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[sender indexOfSelectedItem]];
@@ -536,8 +580,14 @@
         }
 		else return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
+    
     else if(aTableView == stringMapTableView){
-		return [model stringMap:rowIndex objectForKey:[aTableColumn identifier]];
+        if([[aTableColumn identifier] isEqualToString:@"kStringNum"]){
+            int stringIndex = [[model stringMap:rowIndex objectForKey:[aTableColumn identifier]]intValue];
+            NSString* stringId = [NSString stringWithFormat:@"%d,%d",stringIndex/7+1,stringIndex%7+1];
+            return stringId;
+        }
+		else return [model stringMap:rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else return nil;
 }

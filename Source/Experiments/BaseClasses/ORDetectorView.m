@@ -192,7 +192,8 @@
 			}
 		}
 		
-		[[NSColor colorWithCalibratedWhite:.6 alpha:1] set];
+		[[self outlineColor:setIndex] set];
+        
 		NSBezierPath*   segmentPath = [NSBezierPath bezierPath];
 		[segmentPath setLineWidth:0];
 		for(segmentIndex = 0;segmentIndex<numSegments;segmentIndex++){
@@ -206,7 +207,7 @@
 		NSArray* arrayOfSegmentPaths = [segmentPathSet objectAtIndex:selectedSet];
 		NSBezierPath*   segmentPath  = [arrayOfSegmentPaths objectAtIndex:selectedPath];
 		[segmentPath setLineWidth:highlightLineWidth];
-		[[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
+		[[self selectedColor:setIndex] set];
 		[segmentPath stroke];
 	}
 
@@ -232,6 +233,15 @@
     [super drawRect:rect];
 
 }
+- (NSColor*) outlineColor:(int)aSet
+{
+    return [NSColor grayColor];
+}
+- (NSColor*) selectedColor:(int)aSet
+{
+    return [NSColor redColor];
+}
+
 
 - (void)setFrameSize:(NSSize)newSize
 {
