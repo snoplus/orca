@@ -542,9 +542,9 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
             
 			for(id anAlarm in alarms){
 				if([anAlarm timeSincePosted] > 60 && [self wantsAlarmSeverity:[anAlarm severity]]){
-					content = [content stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++\n%@",[anAlarm helpString]];
+					content = [content stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++\n%@\n",[anAlarm helpString]];
 					if([[anAlarm additionalInfoString] length]){
-						content = [content stringByAppendingFormat:@"\n+++++++++++++++++++++++++++++++++++\n%@",[anAlarm additionalInfoString]];
+						content = [content stringByAppendingFormat:@"\n+++++++++++++++++++++++++++++++++++\n%@\n",[anAlarm additionalInfoString]];
 					}
 					[alarmsSent addObject:anAlarm];
                     NSArray* allDestinations = [[ORAlarmCollection sharedAlarmCollection] eMailList];
