@@ -26,11 +26,11 @@
     
     //Set up the Smellie configuration file
     NSMutableDictionary *genericLaserDriverToDetectorPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericLaserDriverToDetectorPath setObject:@"" forKey:@"laserHeadConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"" forKey:@"attenutatorConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"" forKey:@"fibreSwitchInputConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"" forKey:@"fibreSwitchOutputConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"" forKey:@"detectorFibreReference"];
+    [genericLaserDriverToDetectorPath setObject:@"Empty Channel" forKey:@"laserHeadConnected"];
+    [genericLaserDriverToDetectorPath setObject:@"99/1" forKey:@"attenutatorConnected"];
+    [genericLaserDriverToDetectorPath setObject:@"Channel 1" forKey:@"fibreSwitchInputConnected"];
+    [genericLaserDriverToDetectorPath setObject:@"Channel 14" forKey:@"fibreSwitchOutputConnected"];
+    [genericLaserDriverToDetectorPath setObject:@"FS007" forKey:@"detectorFibreReference"];
     
     configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
     [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput0"];
@@ -522,41 +522,33 @@
     //TODO: Read in current information about that Sepia Input and to the detector
     int laserHeadIndex = [sender indexOfSelectedItem];
     
-    for (id configValues in configForSmellie){
-        NSLog(@"config value: %@",configValues);
+    for (id specificConfigValue in configForSmellie){
+        //NSLog(@"specificConfigValue: %@",specificConfigValue);
+        //NSLog(@"specificConfigValueVersion2: %@",[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]);
         //NSString *keyString = [NSString stringWithFormat:@"laserInput%i",laserHeadIndex];
-        //if([configValues key] == [NSString stringWithFormat:@"laserInput%i",laserHeadIndex]){
+        if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
             
-            NSLog(@"in here");
-            //TODO:select the values that correspond to the saved values
-            //[[configForSmellie objectForKey:keyString] objectForKey:@"laserHeadConnected"];
-            //for(id item in [smellieConfigLaserHeadField objectValues]){
-            //    NSLog(@"item value: %@",item);
-           // }
-            //[smellieConfigLaserHeadField]
+            //Get the values of the configuration
+            NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+            NSString *attentuatorConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"attenutatorConnected"]];
+            NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
+            NSString *fibreSwitchOutputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchOutputConnected"]];
+            NSString *detectorFibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
             
-            //TODO:fill in all of the boxes for the previous configuration
+            //try and select the correct index of the combo boxes to make this work 
+            @try{
+                [smellieConfigLaserHeadField selectItemAtIndex:[smellieConfigLaserHeadField indexOfItemWithObjectValue:laserHeadConnected]];
+                [smellieConfigAttenuatorField selectItemAtIndex:[smellieConfigAttenuatorField indexOfItemWithObjectValue:attentuatorConnected]];
+                [smellieConfigFsInputCh selectItemAtIndex:[smellieConfigFsInputCh indexOfItemWithObjectValue:fibreSwitchInputConnected]];
+                [smellieConfigFsOutputCh selectItemAtIndex:[smellieConfigFsOutputCh indexOfItemWithObjectValue:fibreSwitchOutputConnected]];
+                [smellieConfigDetectorFibreRef selectItemAtIndex:[smellieConfigDetectorFibreRef indexOfItemWithObjectValue:detectorFibreReference]];
+            }
+            @catch (NSException * error) {
+                NSLog(@"Error Parsing Configuration File: %@",error);
+            }
             
-        //}
+        }
     }
-    
-    
-    /*NSMutableDictionary *genericLaserDriverToDetectorPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericLaserDriverToDetectorPath setObject:nil forKey:@"laserHeadConnected"];
-    [genericLaserDriverToDetectorPath setObject:nil forKey:@"attenutatorConnected"];
-    [genericLaserDriverToDetectorPath setObject:nil forKey:@"fibreSwitchInputConnected"];
-    [genericLaserDriverToDetectorPath setObject:nil forKey:@"fibreSwitchOutputConnected"];
-    [genericLaserDriverToDetectorPath setObject:nil forKey:@"detectorFibreReference"];
-    
-    configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput0"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput1"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput2"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput3"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput4"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput5"];*/
-    
-    
 }
 
 
