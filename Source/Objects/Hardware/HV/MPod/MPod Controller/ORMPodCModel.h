@@ -102,6 +102,7 @@ extern NSString* ORMPodCQueueCountChanged;
 }
 - (id) initWithWalk:(NSString*)theWalk delegate:(id)aDelegate;
 - (void) main;
+- (void) sendParametersUsingMainThread;
 - (void)decodeValueArray:(NSArray*)parts;
 - (void) decode:(NSString*)aName value:(NSString*)aValue;
 - (NSMutableDictionary*) decodeValue:(NSString*)aValue name:(NSString*)aName;
