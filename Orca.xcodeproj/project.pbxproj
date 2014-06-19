@@ -2850,6 +2850,7 @@
 		84E9C356194F42140028B7E2 /* ORPacFPModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9C34E194F42140028B7E2 /* ORPacFPModel.m */; };
 		84E9C357194F42140028B7E2 /* PacFP.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9C34F194F42140028B7E2 /* PacFP.nib */; };
 		84E9C358194F42140028B7E2 /* PacFP.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E9C350194F42140028B7E2 /* PacFP.tif */; };
+		84E9C35C19535BA60028B7E2 /* dashMark.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E9C35A19535BA60028B7E2 /* dashMark.tif */; };
 		84E9F69E123FE4D600116607 /* NHQ226L.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E9F692123FE4D600116607 /* NHQ226L.nib */; };
 		84E9F69F123FE4D600116607 /* NHQ226L.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E9F693123FE4D600116607 /* NHQ226L.tif */; };
 		84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9F694123FE4D600116607 /* ORNHQ226LController.h */; };
@@ -6191,6 +6192,7 @@
 		84E9C34E194F42140028B7E2 /* ORPacFPModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPacFPModel.m; sourceTree = "<group>"; };
 		84E9C34F194F42140028B7E2 /* PacFP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PacFP.nib; sourceTree = "<group>"; };
 		84E9C350194F42140028B7E2 /* PacFP.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PacFP.tif; sourceTree = "<group>"; };
+		84E9C35B19535BA60028B7E2 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/dashMark.tif; sourceTree = "<group>"; };
 		84E9F692123FE4D600116607 /* NHQ226L.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NHQ226L.nib; path = Source/Objects/Hardware/HV/NHQ226L/NHQ226L.nib; sourceTree = SOURCE_ROOT; };
 		84E9F693123FE4D600116607 /* NHQ226L.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NHQ226L.tif; path = Source/Objects/Hardware/HV/NHQ226L/NHQ226L.tif; sourceTree = SOURCE_ROOT; };
 		84E9F694123FE4D600116607 /* ORNHQ226LController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LController.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LController.h; sourceTree = SOURCE_ROOT; };
@@ -6750,6 +6752,7 @@
 			isa = PBXGroup;
 			children = (
 				84C533280652BA6B00E4731F /* MainMenu.nib */,
+				84E9C35A19535BA60028B7E2 /* dashMark.tif */,
 				8476004A18DF1EB40097E790 /* warning.tif */,
 				840B721E0948AE3900B1B135 /* smallLock.tif */,
 				847BC82E05E293E80054841E /* Unlocked.tif */,
@@ -15080,6 +15083,7 @@
 				847BC83F05E2941D0054841E /* PasswordLock.tif in Resources */,
 				84073A5205E3F455003E62AA /* ValidatePassword.nib in Resources */,
 				84E4697719420E4000020C5C /* SaveToFolder.gif in Resources */,
+				84E9C35C19535BA60028B7E2 /* dashMark.tif in Resources */,
 				84CF3B2405E6B60700C5C320 /* Appearance.tif in Resources */,
 				84CF3B2605E6B85800C5C320 /* Startup.tif in Resources */,
 				844E5CD706236ACD0051849B /* CommandCenter.gif in Resources */,
@@ -17048,6 +17052,14 @@
 			);
 			name = goBackPressed.tif;
 			sourceTree = SOURCE_ROOT;
+		};
+		84E9C35A19535BA60028B7E2 /* dashMark.tif */ = {
+			isa = PBXVariantGroup;
+			children = (
+				84E9C35B19535BA60028B7E2 /* English */,
+			);
+			name = dashMark.tif;
+			sourceTree = "<group>";
 		};
 		F54577F103AFCD1C015F64B1 /* Orca.icns */ = {
 			isa = PBXVariantGroup;
