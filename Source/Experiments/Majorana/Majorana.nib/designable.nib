@@ -76,7 +76,6 @@
 							<string key="NSFrame">{{-7, -10}, {983, 751}}</string>
 							<reference key="NSSuperview" ref="63912161"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="310617234"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="536685356">
 									<object class="NSView" key="NSView" id="310617234">
@@ -713,7 +712,7 @@ AAABAAAAAQ</bytes>
 																<string key="NSFrameSize">{183, 149}</string>
 																<reference key="NSSuperview" ref="1026806359"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="29286556"/>
+																<reference key="NSNextKeyView" ref="943383408"/>
 																<object class="NSTextContainer" key="NSTextContainer" id="730878918">
 																	<object class="NSLayoutManager" key="NSLayoutManager">
 																		<object class="NSTextStorage" key="NSTextStorage">
@@ -820,7 +819,7 @@ AAABAAAAAQ</bytes>
 												<string key="NSFrame">{{559, 549}, {185, 151}}</string>
 												<reference key="NSSuperview" ref="310617234"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="943383408"/>
+												<reference key="NSNextKeyView" ref="1026806359"/>
 												<int key="NSsFlags">133650</int>
 												<reference key="NSVScroller" ref="796289594"/>
 												<reference key="NSHScroller" ref="943383408"/>
@@ -889,7 +888,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSButton" id="35702856">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{12, 93}, {40, 40}}</string>
+																<string key="NSFrame">{{6, 93}, {42, 36}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="887282854"/>
@@ -916,7 +915,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSButton" id="887282854">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{47, 93}, {39, 40}}</string>
+																<string key="NSFrame">{{43, 93}, {36, 36}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="503433054"/>
@@ -943,7 +942,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSTextField" id="14375663">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{130, 118}, {52, 13}}</string>
+																<string key="NSFrame">{{117, 118}, {68, 13}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="819559175"/>
@@ -963,7 +962,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSTextField" id="503433054">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{92, 118}, {40, 13}}</string>
+																<string key="NSFrame">{{81, 118}, {40, 13}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="14375663"/>
@@ -983,7 +982,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSTextField" id="819559175">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{90, 103}, {40, 14}}</string>
+																<string key="NSFrame">{{79, 103}, {40, 14}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="442216847"/>
@@ -1003,7 +1002,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSTextField" id="442216847">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{130, 104}, {52, 13}}</string>
+																<string key="NSFrame">{{117, 104}, {52, 13}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="151769957"/>
@@ -1023,7 +1022,7 @@ AAABAAAAAQ</bytes>
 															<object class="NSTextField" id="151769957">
 																<reference key="NSNextResponder" ref="1049794218"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{92, 92}, {85, 10}}</string>
+																<string key="NSFrame">{{81, 92}, {85, 10}}</string>
 																<reference key="NSSuperview" ref="1049794218"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="641727586"/>
@@ -2729,7 +2728,6 @@ AAABAAAAAQ</bytes>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{28, 516}, {172, 20}}</string>
 												<reference key="NSSuperview" ref="618824186"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="34830533">
 													<int key="NSCellFlags">-2080374784</int>
@@ -2753,7 +2751,6 @@ AAABAAAAAQ</bytes>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{252, 516}, {218, 20}}</string>
 												<reference key="NSSuperview" ref="618824186"/>
-												<reference key="NSNextKeyView"/>
 												<int key="NSTag">1</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="234614507">
@@ -4414,7 +4411,7 @@ AAABAAAAAQ</bytes>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="975150536"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -8672,27 +8669,6 @@ AAABAAAAAQ</bytes>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">NSCollectionViewItem</string>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="imageView">NSImageView</string>
-						<string key="textField">NSTextField</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="imageView">
-							<string key="name">imageView</string>
-							<string key="candidateClassName">NSImageView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="textField">
-							<string key="name">textField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSCollectionViewItem.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">NSTextView</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="orderFrontSharingServicePicker:">id</string>
@@ -8725,6 +8701,7 @@ AAABAAAAAQ</bytes>
 					<string key="className">ORAxis</string>
 					<string key="superclassName">NSView</string>
 					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="doubleClick:">id</string>
 						<string key="setLogScale:">id</string>
 						<string key="shiftLeft:">id</string>
 						<string key="shiftRight:">id</string>
@@ -8732,6 +8709,10 @@ AAABAAAAAQ</bytes>
 						<string key="zoomOut:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="doubleClick:">
+							<string key="name">doubleClick:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="setLogScale:">
 							<string key="name">setLogScale:</string>
 							<string key="candidateClassName">id</string>
@@ -9319,6 +9300,95 @@ AAABAAAAAQ</bytes>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORGroupView</string>
 					<string key="superclassName">NSView</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="alignBottom:">id</string>
+						<string key="alignHorizontalCenters:">id</string>
+						<string key="alignLeft:">id</string>
+						<string key="alignRight:">id</string>
+						<string key="alignTop:">id</string>
+						<string key="alignVerticalCenters:">id</string>
+						<string key="arrangeInCircle:">id</string>
+						<string key="bringToFront:">id</string>
+						<string key="clearBackgroundImage:">id</string>
+						<string key="copy:">id</string>
+						<string key="cut:">id</string>
+						<string key="delete:">id</string>
+						<string key="getInfo:">id</string>
+						<string key="paste:">id</string>
+						<string key="selectAll:">id</string>
+						<string key="selectBackgroundImage:">id</string>
+						<string key="sendToBack:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="alignBottom:">
+							<string key="name">alignBottom:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignHorizontalCenters:">
+							<string key="name">alignHorizontalCenters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignLeft:">
+							<string key="name">alignLeft:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignRight:">
+							<string key="name">alignRight:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignTop:">
+							<string key="name">alignTop:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignVerticalCenters:">
+							<string key="name">alignVerticalCenters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="arrangeInCircle:">
+							<string key="name">arrangeInCircle:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="bringToFront:">
+							<string key="name">bringToFront:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clearBackgroundImage:">
+							<string key="name">clearBackgroundImage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="cut:">
+							<string key="name">cut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="delete:">
+							<string key="name">delete:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="getInfo:">
+							<string key="name">getInfo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="paste:">
+							<string key="name">paste:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectAll:">
+							<string key="name">selectAll:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectBackgroundImage:">
+							<string key="name">selectBackgroundImage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="sendToBack:">
+							<string key="name">sendToBack:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ORGroupView.h</string>
