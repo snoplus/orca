@@ -88,7 +88,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
     if (object == queue && [keyPath isEqual:@"operations"]) {
         if ([[queue operations] count] == 0) {
-			[self performSelectorOnMainThread:@selector(resetStatusTimer) withObject:nil waitUntilDone:YES];
+			[self performSelectorOnMainThread:@selector(resetStatusTimer) withObject:nil waitUntilDone:NO];
         }
 		[self performSelectorOnMainThread:@selector(lockChanged:) withObject:nil waitUntilDone:NO];
 
@@ -159,6 +159,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) updateWithSvn:(id)sender
 {
+    
+    NSBeginAlertSheet(@"Full Update and Restart",
+                      @"Cancel",
+                      @"Yes/Do it",
+                      nil,[self window],
+                      self,
+                      @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Really do an Archive, SVN Update, Clean Build, and Restart?\n\nThis can take awhile.");
+}
+
+- (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [self doTheSvnUpdate];
+    }
+}
+- (void) doTheSvnUpdate
+{
 	[operationStatusField setTimeOut:1000];
 
 	NSFileManager* fm = [NSFileManager defaultManager];
@@ -209,11 +228,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	ORBuildOrcaOp* aBuildOp = [[ORBuildOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
 	[queue addOperation:aBuildOp];
 	[aBuildOp release];
-	NSString* aPath;
     
-	if([[ORArchive sharedArchive] deploymentVersion])aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
-    else aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
-	[self restart:aPath];
+    [self restart:launchPath()];
 }
 
 - (IBAction) lockAction:(id)sender
@@ -556,29 +572,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				newLocation = nil;
 			}
 		}
-		
-
-   
-		NSTask* task = [[NSTask alloc] init];
-        NSLog(@"Restarting: %@\n",binPath);
-		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
-		[task setLaunchPath: binPath];
-    
-		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"Kill", nil];
-		if(configFile){
-			arguments = [arguments arrayByAddingObjectsFromArray:[NSArray arrayWithObjects: @"-config",newLocation, nil]];
-		}
-        
-		[task setArguments: arguments];
-		
-		[delegate updateStatus:@"Relaunching"];
-		[task launch];
-		[task release];
-		[NSApp terminate:self];
+        //euthanize self and restart. Use main thread
+        [[NSApp delegate] restart:self withConfig:configFile];
 	}
 	@catch(NSException* e){
 	}
 }
+
 @end
 
 @interface NSObject (ORUpdateCenter)

@@ -43,7 +43,7 @@
 #import "ORWindowSaveSet.h"
 #import "ORArchive.h"
 #import "ORVXI11HardwareFinderController.h"
-
+#import "NSApplication+Extensions.h"
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
 
@@ -411,6 +411,17 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 {
 	return configLoadedOK;
 }
+
+- (void) restart:(id)sender withConfig:(NSString*)aConfig
+{
+    if([aConfig length] == 0){
+        aConfig = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
+    }
+    NSMutableArray* arguments = nil;
+    if([aConfig length]!=0)arguments = [NSMutableArray arrayWithObjects:@"--forceLoad",aConfig,nil];
+    [NSApp relaunch:sender arguments:arguments];
+}
+
 #pragma mark ¥¥¥Notification Methods
 -(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
@@ -447,14 +458,17 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
    
     NSError* fileOpenError = nil;
 	configLoadedOK = NO;
+    
 	@try {
 		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
 			
-			NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"config"];
+			NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"forceLoad"]; //this is from relaunch argument
 			if(![lastFile length])lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
+            BOOL relaunched = [lastFile length]!=0;
 			
 			if([lastFile length]){
 				NSLog(@"Trying to open: %@\n",lastFile);
+                if(relaunched)NSLog(@"This is an auto-relaunch using [%@]\n",NSApplicationRelaunchDaemon);
 				NSURL* asURL = [NSURL fileURLWithPath:lastFile];
 				if(![[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:asURL display:YES error:&fileOpenError]){
 					[self closeSplashWindow];

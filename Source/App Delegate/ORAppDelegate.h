@@ -53,6 +53,7 @@
 - (BOOL) configLoadedOK;
 - (void) delayTermination;
 - (void) delayedTermination;
+- (void) restart:(id)sender withConfig:(NSString*)aConfig;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
