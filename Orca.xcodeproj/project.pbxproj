@@ -471,7 +471,6 @@
 		840C7FE01955CA0000E36622 /* NSApplication+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840C7FDE1955CA0000E36622 /* NSApplication+Extensions.h */; };
 		840C7FE11955CA0000E36622 /* NSApplication+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */; };
 		840C7FE81955CA5A00E36622 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840C7FE71955CA5A00E36622 /* Foundation.framework */; };
-		840C7FEF1955CA5A00E36622 /* Relaunch.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 840C7FEE1955CA5A00E36622 /* Relaunch.1 */; };
 		840C7FF81955CA6A00E36622 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 840C7FF61955CA6A00E36622 /* relaunch.m */; };
 		840C80001955E1D300E36622 /* RelaunchOrca in Resources */ = {isa = PBXBuildFile; fileRef = 840C7FE61955CA5A00E36622 /* RelaunchOrca */; };
 		840D0ECC14BBC56A008FAC82 /* SNOMonitoredHardware.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D0EC514BBC56A008FAC82 /* SNOMonitoredHardware.h */; };
@@ -3333,7 +3332,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				840C7FEF1955CA5A00E36622 /* Relaunch.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -3950,9 +3948,6 @@
 		840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSApplication+Extensions.m"; sourceTree = "<group>"; };
 		840C7FE61955CA5A00E36622 /* RelaunchOrca */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RelaunchOrca; sourceTree = BUILT_PRODUCTS_DIR; };
 		840C7FE71955CA5A00E36622 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		840C7FEA1955CA5A00E36622 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		840C7FED1955CA5A00E36622 /* Relaunch-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Relaunch-Prefix.pch"; sourceTree = "<group>"; };
-		840C7FEE1955CA5A00E36622 /* Relaunch.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Relaunch.1; sourceTree = "<group>"; };
 		840C7FF61955CA6A00E36622 /* relaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = relaunch.m; sourceTree = "<group>"; };
 		840D0EC514BBC56A008FAC82 /* SNOMonitoredHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOMonitoredHardware.h; sourceTree = "<group>"; };
 		840D0EC614BBC56A008FAC82 /* SNOMonitoredHardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOMonitoredHardware.m; sourceTree = "<group>"; };
@@ -6791,7 +6786,6 @@
 				F51E693F03AE4775015F64B1 /* Source */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				84F7FB520AE5558900A5AA4C /* Libraries */,
-				840C7FE91955CA5A00E36622 /* Relaunch */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				8434A363055B3288002D3102 /* Info.plist */,
@@ -7567,24 +7561,6 @@
 			name = Label;
 			path = "Source/Objects/Misc Objects/Label";
 			sourceTree = SOURCE_ROOT;
-		};
-		840C7FE91955CA5A00E36622 /* Relaunch */ = {
-			isa = PBXGroup;
-			children = (
-				840C7FEA1955CA5A00E36622 /* main.m */,
-				840C7FEE1955CA5A00E36622 /* Relaunch.1 */,
-				840C7FEC1955CA5A00E36622 /* Supporting Files */,
-			);
-			path = Relaunch;
-			sourceTree = "<group>";
-		};
-		840C7FEC1955CA5A00E36622 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				840C7FED1955CA5A00E36622 /* Relaunch-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
 		};
 		840C7FF41955CA6A00E36622 /* Relaunch */ = {
 			isa = PBXGroup;
@@ -17611,6 +17587,7 @@
 				840C7FF31955CA5A00E36622 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
 		};
 		84F201BA0B6531990084F4C3 /* Build configuration list for PBXNativeTarget "Orca" */ = {
 			isa = XCConfigurationList;
