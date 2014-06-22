@@ -386,8 +386,6 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				  unitSize: sizeof(short)					// unit size in bytes
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFF							// when displayed all values will be masked with this value
-			   specialBits:0x0000	
-				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"UDP-Raw",crateKey,stationKey,fiberKey,channelKey,nil];
 }else if((eventFlags4bit == 0x2)){//FLT event
@@ -407,8 +405,6 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				  unitSize: sizeof(short)					// unit size in bytes
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFF							// when displayed all values will be masked with this value
-			   specialBits:0x0000	
-				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"UDP-ADC-Channels",crateKey,stationKey,totalChannelKey,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
@@ -693,18 +689,20 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     }else{//fast channel
     if(eventFlags4bit==0x2){
         startIndex= (-triggerAddr-1023)%2048;//revert offset from SLTv4Readout -tb-
+    }else{
+        startIndex= 0;
     }
-    //DEBUG 	    
-    NSLog(@"%@::%@ plot FIC channel %i, flags: %i, triggerAddr:%i, startIndex:%i, eventFifo4:0x%08x\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),trigChan, eventFlags4bit,triggerAddr,startIndex,eventFifo4);//TODO: DEBUG testing ...-tb-
-
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
-				startIndex:	1					// first Point Index (past the header offset!!!)
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0  // 0xFFFF // when displayed all values will be masked with this value //only necessary if some bits need to be masked out -tb-
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
     }
+    //DEBUG 	    
+    NSLog(@"%@::%@ plot FIC channel %i, flags: %i, triggerAddr:%i, startIndex:%i, eventFifo4:0x%08x\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),trigChan, eventFlags4bit,triggerAddr,startIndex,eventFifo4);//TODO: DEBUG testing ...-tb-
+
     
     #if 0 //old call  -  the specialBits waveform seems to be buggy (in plots, "Unsigned" check has no effect ...) -tb-
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
