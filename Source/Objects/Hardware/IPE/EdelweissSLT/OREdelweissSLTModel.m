@@ -316,6 +316,9 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	    }
         
 #if 0
+        
+        int counterData1444Packet=counterDataPacket;
+
 	    if(retval == 1444 && counterData1444Packet==0){
 	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data packet from %s!  \n",  inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			int i;
