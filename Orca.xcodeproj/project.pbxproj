@@ -587,6 +587,7 @@
 		841224DC132E6638001AC05B /* ORTPG262Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841224D4132E6638001AC05B /* ORTPG262Model.m */; };
 		841224DD132E6638001AC05B /* TPG262.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841224D5132E6638001AC05B /* TPG262.nib */; };
 		841224DE132E6638001AC05B /* TPG262.tif in Resources */ = {isa = PBXBuildFile; fileRef = 841224D6132E6638001AC05B /* TPG262.tif */; };
+		841491F21958AD03009F5E40 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841491F11958AD03009F5E40 /* Cocoa.framework */; };
 		84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */ = {isa = PBXBuildFile; fileRef = 84150EDB1615FF9C0054FF08 /* Rad7Buttons.png */; };
 		8415B6A9152223050092C975 /* ORMJDVacuumView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8415B6A7152223050092C975 /* ORMJDVacuumView.h */; };
 		8415B6AA152223050092C975 /* ORMJDVacuumView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8415B6A8152223050092C975 /* ORMJDVacuumView.m */; };
@@ -4067,6 +4068,7 @@
 		841224D4132E6638001AC05B /* ORTPG262Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTPG262Model.m; path = Source/Objects/Hardware/Serial/TPG262/ORTPG262Model.m; sourceTree = SOURCE_ROOT; };
 		841224D5132E6638001AC05B /* TPG262.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TPG262.nib; path = Source/Objects/Hardware/Serial/TPG262/TPG262.nib; sourceTree = SOURCE_ROOT; };
 		841224D6132E6638001AC05B /* TPG262.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TPG262.tif; path = Source/Objects/Hardware/Serial/TPG262/TPG262.tif; sourceTree = SOURCE_ROOT; };
+		841491F11958AD03009F5E40 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		84150EDB1615FF9C0054FF08 /* Rad7Buttons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Rad7Buttons.png; path = Source/Objects/Hardware/Serial/Rad7/Rad7Buttons.png; sourceTree = SOURCE_ROOT; };
 		8415B6A7152223050092C975 /* ORMJDVacuumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDVacuumView.h; sourceTree = "<group>"; };
 		8415B6A8152223050092C975 /* ORMJDVacuumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDVacuumView.m; sourceTree = "<group>"; };
@@ -6652,6 +6654,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				841491F21958AD03009F5E40 /* Cocoa.framework in Frameworks */,
 				840C7FE81955CA5A00E36622 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6819,6 +6822,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				841491F11958AD03009F5E40 /* Cocoa.framework */,
 				8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
 				840C7FE71955CA5A00E36622 /* Foundation.framework */,
