@@ -1254,10 +1254,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     //[self resetDCM];  change by Jing: DCM is reset in initSerDes;
     
     /* Finally, initialize the serdes. */
-    [self initSerDes];
+    //[self initSerDes];
 }
 
-/*
+
 - (void) initSerDes
 {
     unsigned long theValue = 0;
@@ -1298,7 +1298,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];    
 }
-*/
+
 
 
 - (void) resetMainFPGA
@@ -1338,7 +1338,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 }
 
-- (void) initSerDes
+/*- (void) initSerDes
 {
 	//first set clock source
 	//I can't find the variable for clock source, so I set it 0 temporarily
@@ -1351,7 +1351,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	//wait for 10 seconds
 	sleep(10);
 	
-	/*
+	
 	unsigned long theValue = 0;
 	NSDate* startDate = [NSDate date];
     while(1) {
@@ -1368,12 +1368,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 			return;
 		}
     }
-	*/
+	
 	 
 	//reset DCM
 	[self resetDCM];
 	
 }
+*/
+
 
 - (BOOL) checkFirmwareVersion
 {
@@ -1491,7 +1493,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeControlReg:i enabled:YES];
         }
     }
-	
+    
+    //[self initSerDes];
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
 
@@ -2404,6 +2408,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){					
 		waveFormCount[i] = 0;
     }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkFifoAlarm) object:nil];
 }
 
 - (void) checkFifoAlarm
