@@ -302,7 +302,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 						object:self];
 
 	}
-	[self performSelector:@selector(collectRates) withObject:nil afterDelay:1.0];
+	[self performSelector:@selector(collectRates) withObject:nil afterDelay:5.0];
 }
 
 #pragma mark •••Specific Dialog Lock Methods
@@ -817,6 +817,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 
 - (void) postCouchDBRecord
 {
+    if([[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
     int aSet;
     int numGroups = [segmentGroups count];
@@ -850,7 +851,6 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
-
 
 - (NSMutableData*) gainDataForSet:(int)aSet
 {
