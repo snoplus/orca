@@ -164,17 +164,15 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (unsigned int) pollTime
 {
-    if(pollTime==0)pollTime = kApcPollTime;
-    else if(pollTime==20)pollTime = 20;
-
     return pollTime;
 }
 
 - (void) setPollTime:(unsigned int)aPollTime
 {
+    
+    if(aPollTime==0 || aPollTime>=kApcPollTime)aPollTime = kApcPollTime;
+    
     pollTime = aPollTime;
-    if(aPollTime==0)aPollTime = kApcPollTime;
-    else if(aPollTime==20)aPollTime = 20;
     [self pollHardware];
 }
 
