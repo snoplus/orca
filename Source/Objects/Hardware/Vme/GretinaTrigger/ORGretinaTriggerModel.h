@@ -298,22 +298,22 @@ enum {
 
 
 // Register access
-- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
-- (unsigned long) readFromAddress:(unsigned long)anAddress;
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue;
+- (unsigned short) readFromAddress:(unsigned long)anAddress;
 - (void) dumpFpgaRegisters;
 - (void) dumpRegisters;
 - (void) testSandBoxRegisters;
 - (void) testSandBoxRegister:(int)anOffset;
 - (NSString*) registerNameAt:(unsigned int)index;
 - (unsigned long) registerOffsetAt:(unsigned int)index;
-- (unsigned long) readRegister:(unsigned int)index;
-- (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
+- (unsigned short) readRegister:(unsigned int)index;
+- (void) writeRegister:(unsigned int)index withValue:(unsigned short)value;
 - (BOOL) canReadRegister:(unsigned int)index;
 - (BOOL) canWriteRegister:(unsigned int)index;
 
 #pragma mark •••Hardware Access
-- (unsigned long) readCodeRevision;
-- (unsigned long) readCodeDate;
+- (unsigned short) readCodeRevision;
+- (unsigned short) readCodeDate;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

@@ -613,12 +613,12 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
 	return register_information[index].offset;
 }
 
-- (unsigned long) readRegister:(unsigned int)index
+- (unsigned short) readRegister:(unsigned int)index
 {
 	if (index >= kNumberOfGretinaTriggerRegisters) return -1;
 	if (![self canReadRegister:index]) return -1;
-	unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
+	unsigned short theValue = 0;
+    [[self adapter] readWordBlock:&theValue
                         atAddress:[self baseAddress] + register_information[index].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
@@ -627,14 +627,13 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
     return theValue & 0xffff;
 }
 
-- (void) writeRegister:(unsigned int)index withValue:(unsigned long)value
+- (void) writeRegister:(unsigned int)index withValue:(unsigned short)value
 {
 	if (index >= kNumberOfGretinaTriggerRegisters) return;
 	if (![self canWriteRegister:index]) return;
-    unsigned long value1 = (value&0xFFFF);
-    NSLog(@"%@ write 0x%04x to 0x%04x (%@)\n",[self isMaster]?@"Master":@"Router",value1,register_information[index].offset,register_information[index].name);
+    NSLog(@"%@ write 0x%04x to 0x%04x (%@)\n",[self isMaster]?@"Master":@"Router",value,register_information[index].offset,register_information[index].name);
     
-    [[self adapter] writeLongBlock:&value1
+    [[self adapter] writeWordBlock:&value
                          atAddress:[self baseAddress] + register_information[index].offset
                          numToWrite:1
 					    withAddMod:[self addressModifier]
@@ -953,13 +952,13 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
     NSLog(@"Gretina Trigger Card FPGA registers (%@)\n",[self isMaster]?@"Master":@"Router");
     int i;
     for(i=0;i<kNumberOfFPGARegisters;i++){
-        unsigned long theValue;
-        [[self adapter] readLongBlock:&theValue
+        unsigned short theValue;
+        [[self adapter] readWordBlock:&theValue
                             atAddress:[self baseAddress] + fpga_register_information[i].offset
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
-        NSLog(@"0x%08x: 0x%04x %@\n",[self baseAddress] +fpga_register_information[i].offset,theValue&0xffff,fpga_register_information[i].name);
+        NSLog(@"0x%08x: 0x%04x %@\n",[self baseAddress] +fpga_register_information[i].offset,theValue,fpga_register_information[i].name);
 
     }
     NSLog(@"--------------------------------------\n");
@@ -971,13 +970,13 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
     NSLog(@"Gretina Trigger Card registers (%@)\n",[self isMaster]?@"Master":@"Router");
     int i;
     for(i=0;i<kNumberOfGretinaTriggerRegisters;i++){
-        unsigned long theValue;
-        [[self adapter] readLongBlock:&theValue
+        unsigned short theValue;
+        [[self adapter] readWordBlock:&theValue
                             atAddress:[self baseAddress] + register_information[i].offset
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
-        NSLog(@"0x%08x: 0x%04x %@\n",[self baseAddress] +register_information[i].offset,theValue & 0xffff,register_information[i].name);
+        NSLog(@"0x%08x: 0x%04x %@\n",[self baseAddress] +register_information[i].offset,theValue,register_information[i].name);
         
     }
     NSLog(@"--------------------------------------\n");
@@ -996,23 +995,23 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
 {
     int errorCount = 0;
     int i;
-    unsigned long writeValue = 0 ;
+    unsigned short writeValue = 0 ;
     for(i=0;i<16;i++){
-        writeValue = (0x1<<i) & 0xffff;
-        [[self adapter] writeLongBlock:&writeValue
+        writeValue = (0x1<<i);
+        [[self adapter] writeWordBlock:&writeValue
                             atAddress:[self baseAddress] + fpga_register_information[anOffset].offset
                             numToWrite:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
 
-        unsigned long readValue = 0 ;
-        [[self adapter] readLongBlock:&readValue
+        unsigned short readValue = 0 ;
+        [[self adapter] readWordBlock:&readValue
                             atAddress:[self baseAddress] + fpga_register_information[anOffset].offset
                             numToRead:1
                            withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
 
-        if((writeValue&0xffff) != (readValue & 0xffff)){
+        if((writeValue&0xffff) != readValue){
             NSLog(@"Sandbox Reg 0x%08x error: wrote: 0x%08x read: 0x%08x\n",[self baseAddress] + fpga_register_information[anOffset].offset,writeValue,readValue);
             errorCount++;
         }
@@ -1028,46 +1027,45 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
 	return (([self slot]+1)&0x1f)<<20;
 }
 
-- (unsigned long) readCodeRevision
+- (unsigned short) readCodeRevision
 {
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
+    unsigned short theValue = 0;
+    [[self adapter] readWordBlock:&theValue
                         atAddress:[self baseAddress] + register_information[kCodeRevision].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-    return theValue & 0xffff;
+    return theValue;
 }
 
-- (unsigned long) readCodeDate
+- (unsigned short) readCodeDate
 {
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
+    unsigned short theValue = 0;
+    [[self adapter] readWordBlock:&theValue
                         atAddress:[self baseAddress] + register_information[kCodeModeDate].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-    return theValue & 0xfff;
+    return theValue;
 }
-- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue
 {
-    aValue &= 0xFFFF;
-    [[self adapter] writeLongBlock:&aValue
+    [[self adapter] writeWordBlock:&aValue
                          atAddress:[self baseAddress] + anAddress
                         numToWrite:1
 					    withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
     
 }
-- (unsigned long) readFromAddress:(unsigned long)anAddress
+- (unsigned short) readFromAddress:(unsigned long)anAddress
 {
-    unsigned long value = 0;
-    [[self adapter] readLongBlock:&value
+    unsigned short value = 0;
+    [[self adapter] readWordBlock:&value
                         atAddress:[self baseAddress] + anAddress
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    return value & 0xffff;
+    return value;
 }
 - (void) startDownLoadingMainFPGA
 {
