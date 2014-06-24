@@ -360,7 +360,7 @@
     if(module == 0) currentState = [model ignorePanicOnA];
     else            currentState = [model ignorePanicOnB];
     
-    NSString* s1 = [NSString stringWithFormat:@"Really Turn %@ Constraint Checking for Module %d?",currentState?@"OFF":@"ON",module];
+    NSString* s1 = [NSString stringWithFormat:@"Really Turn %@ Constraint Checking for Module %d HV?",currentState?@"OFF":@"ON",module];
     if(currentState)s1 = [s1 stringByAppendingFormat:@"\n\n(HV will NOT ramp down if vac is bad)"];
     else            s1 = [s1 stringByAppendingFormat:@"\n\n(HV will ramp down on next check if vac is bad)"];
     NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:
