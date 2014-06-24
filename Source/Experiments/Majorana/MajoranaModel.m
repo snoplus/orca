@@ -36,6 +36,7 @@
 #import "ORMPodCrateModel.h"
 #import "ORiSegHVCard.h"
 #import "ORAlarm.h"
+#import "ORTimeRate.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged = @"MajoranaModelIgnorePanicOnAChanged";
@@ -273,6 +274,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) postCouchDBRecord
 {
+    if([[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
+    
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
     int aSet;
     int numGroups = [segmentGroups count];
@@ -297,6 +300,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
         if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
         if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
+        
+        NSArray* totalRateArray = [[[self segmentGroup:aSet] totalRate] ratesAsArray];
+        if(totalRateArray)[aDictionary setObject:totalRateArray forKey:@"totalRate"];
 
         [values setObject:aDictionary forKey:[segmentGroup groupName]];
     }
@@ -305,6 +311,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [aDictionary setObject:stringMapEntries       forKey: @"geometry"];
     [values setObject:aDictionary forKey:@"Strings"];
     
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
