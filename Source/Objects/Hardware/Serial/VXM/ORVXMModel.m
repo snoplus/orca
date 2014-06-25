@@ -640,11 +640,22 @@ NSString* ORVXMLock							= @"ORVXMLock";
         
         [[motors objectAtIndex:motorIndex] setSentMotorType:YES];
         
+		abortAllRepeats = YES;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+        [self sendCommand:@"K"]; //NO <CR>
+        [self queryPositions];
+
         NSString* aCmd = [NSString stringWithFormat:@"setMA%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
     
         [self addCmdToQueue:aCmd
                 description:[NSString stringWithFormat:@"Set Motor %d type to %d",motorIndex,[[self motor: motorIndex] motorType]]
                  waitToSend:NO];
+        
+        abortAllRepeats = YES;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+        [self sendCommand:@"K"]; //NO <CR>
+        [self queryPositions];
+
     }
 }
 
@@ -887,6 +898,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			[self setCmdIndex:0];
 			[self setRepeatCount:0];
             [self sendCommand:aCmdString];
+            if([aCmdString hasPrefix:@"setMA"])sleep(1);
 		}
 	}
 }
