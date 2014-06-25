@@ -640,11 +640,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
         
         [[motors objectAtIndex:motorIndex] setSentMotorType:YES];
         
-        NSString* aCmd = [NSString stringWithFormat:@"setM%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
+        NSString* aCmd = [NSString stringWithFormat:@"setMA%dM%x",motorIndex+1,[[self motor: motorIndex] motorType]];
     
         [self addCmdToQueue:aCmd
                 description:[NSString stringWithFormat:@"Set Motor %d type to %d",motorIndex,[[self motor: motorIndex] motorType]]
-                 waitToSend:YES];
+                 waitToSend:NO];
     }
 }
 
