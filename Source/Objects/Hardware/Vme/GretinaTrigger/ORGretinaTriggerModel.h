@@ -185,15 +185,45 @@ enum {
     kStep3b,
     kRunSteps4a4c,
     kWaitOnSteps4a4c,
+    kStep3c,
+    kStep3d,
+    kStep3e,
     kStep4a,
+    kStepStartCheckingCounter,
+    kStepCheckCounter,
     kStep4b,
+    kStep5a,
+    kStep5b,
+    kStep5c,
+    kStep5d,
+    kWaitTillFinal,
+    kStep6a,
+    kStep6b,
+    kStep7a,
+    kStep7b,
+    kStep7c,
+    kStep7d,
+    kStep7e,
+    kStep7f,
+    kStep7g,
+    kStepFinal,
     kStepError,
 };
 
 
 #define kResetLinkInitMachBit (0x1<<2)
 #define kClockSourceSelectBit (0x1<<15)
-#define kLinkInitStateMask    (0x0f00)
+#define kLinkInitStateMask    (0x0F00)
+#define kSerdesPowerOnAll     (0x7FF)
+#define kLinkLruCrlMask       (0x700)
+#define kLvdsPreEmphasisPowerOnL (0x1<<2)
+#define kLinkLockedAll        (0x7FF)
+#define kAllLockBit           (0x1<<14)
+#define kStringentLockBit     (0x1<<4)
+#define kMaxTimeAllowed       (5)
+#define linkInitAckBit        (0x1<<1)
+#define waitAcknowledgeState  (0x4<8)
+#define acknowledgedState     (0x5)
 
 @interface ORGretinaTriggerModel : ORVmeIOCard
 {
@@ -201,16 +231,20 @@ enum {
 	NSThread*		fpgaProgrammingThread;
 	ORConnector*    linkConnector[11]; //we won't draw these connectors so we have to keep references to them
 	BOOL            isMaster;
-    unsigned long   registerWriteValue;
+    unsigned short  registerWriteValue;
     int             registerIndex;
-    unsigned long   inputLinkMask;
-    unsigned long   serdesTPowerMask;
-    unsigned long   serdesRPowerMask;
-    unsigned long   lvdsPreemphasisCtlMask;
-    unsigned long   miscCtl1Reg;
-    unsigned long   miscStatReg;
-    unsigned long   linkLruCrlReg;
-    unsigned long   linkLockedReg;
+    unsigned short  inputLinkMask;
+    unsigned short  serdesTPowerMask;
+    unsigned short  serdesRPowerMask;
+    unsigned short  lvdsPreemphasisCtlMask;
+    unsigned short  miscCtl1Reg;
+    unsigned short  miscStatReg;
+    unsigned short  linkLruCrlReg;
+    unsigned short  linkLockedReg;
+    unsigned short  lastCounter;
+    unsigned short  currentCounter;
+    int             stepAfterCounterCheck;
+    unsigned short  totalTimeCheckingCounter;
     BOOL            clockUsingLLink;
     NSString*       mainFPGADownLoadState;
     NSString*       fpgaFilePath;
@@ -219,7 +253,7 @@ enum {
     int             fpgaDownProgress;
 	NSLock*         progressLock;
     NSString*       firmwareStatusString;
-    unsigned long   diagnosticCounter;
+    unsigned short  diagnosticCounter;
    
     //------------------internal use only
     ORFileMoverOp*  fpgaFileMover;
@@ -228,6 +262,7 @@ enum {
     BOOL            slaveRoutersToMasterRunning;
     short           initializationState;
     unsigned short  connectedRouterMask;
+    unsigned short  connectedDigitizerMask;
 }
 
 - (id) init;
@@ -239,28 +274,28 @@ enum {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
-- (unsigned long) diagnosticCounter;
-- (void) setDiagnosticCounter:(unsigned long)aDiagnosticCounter;
+- (unsigned short) diagnosticCounter;
+- (void) setDiagnosticCounter:(unsigned short)aDiagnosticCounter;
 - (short) initState;
 - (void) setInitState:(short)aState;
 - (NSString*) initStateName;
 
-- (unsigned long) inputLinkMask;
-- (void) setInputLinkMask:(unsigned long)aMask;
-- (unsigned long) serdesTPowerMask;
-- (void) setSerdesTPowerMask:(unsigned long)aMask;
-- (unsigned long) serdesRPowerMask;
-- (void) setSerdesRPowerMask:(unsigned long)aMask;
-- (unsigned long) lvdsPreemphasisCtlMask;
-- (void) setLvdsPreemphasisCtlMask:(unsigned long)aMask;
-- (unsigned long)miscCtl1Reg;
-- (void) setMiscCtl1Reg:(unsigned long)aValue;
-- (unsigned long)miscStatReg;
-- (void) setMiscStatReg:(unsigned long)aValue;
-- (unsigned long)linkLruCrlReg;
-- (void) setLinkLruCrlReg:(unsigned long)aValue;
-- (unsigned long)linkLockedReg;
-- (void) setLinkLockedReg:(unsigned long)aValue;
+- (unsigned short) inputLinkMask;
+- (void) setInputLinkMask:(unsigned short)aMask;
+- (unsigned short) serdesTPowerMask;
+- (void) setSerdesTPowerMask:(unsigned short)aMask;
+- (unsigned short) serdesRPowerMask;
+- (void) setSerdesRPowerMask:(unsigned short)aMask;
+- (unsigned short) lvdsPreemphasisCtlMask;
+- (void) setLvdsPreemphasisCtlMask:(unsigned short)aMask;
+- (unsigned short)miscCtl1Reg;
+- (void) setMiscCtl1Reg:(unsigned short)aValue;
+- (unsigned short)miscStatReg;
+- (void) setMiscStatReg:(unsigned short)aValue;
+- (unsigned short)linkLruCrlReg;
+- (void) setLinkLruCrlReg:(unsigned short)aValue;
+- (unsigned short)linkLockedReg;
+- (void) setLinkLockedReg:(unsigned short)aValue;
 - (BOOL)clockUsingLLink;
 - (void) setClockUsingLLink:(BOOL)aValue;
 
@@ -283,12 +318,13 @@ enum {
 - (void) setIsMaster:(BOOL)aIsMaster;
 - (int) registerIndex;
 - (void) setRegisterIndex:(int)aRegisterIndex;
-- (unsigned long) registerWriteValue;
-- (void) setRegisterWriteValue:(unsigned long)aWriteValue;
+- (unsigned short) registerWriteValue;
+- (void) setRegisterWriteValue:(unsigned short)aWriteValue;
 
 #pragma mark •••set up routines
 - (void) initAsOneMasterOneRouter;
-- (unsigned long)findRouterMask;
+- (unsigned short)findRouterMask;
+- (unsigned short)findDigitizerMask;
 - (void) readDisplayRegs;
 
 - (void) stepMaster;
