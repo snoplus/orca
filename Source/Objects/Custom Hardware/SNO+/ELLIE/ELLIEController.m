@@ -12,6 +12,7 @@
 @implementation ELLIEController
     NSMutableDictionary *laserHeadDic;
     NSMutableDictionary *configForSmellie;
+    BOOL *laserHeadSelected;
 
 //@synthesize smellieRunSettingsFromGUI;
 
@@ -21,7 +22,8 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"ellie"];
- 
+
+     laserHeadSelected = NO;
     //SMELLIE Configuration file
     
     //Set up the Smellie configuration file
@@ -535,13 +537,17 @@
             NSString *fibreSwitchOutputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchOutputConnected"]];
             NSString *detectorFibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
             
-            //try and select the correct index of the combo boxes to make this work 
+            
             @try{
+                //try and select the correct index of the combo boxes to make this work 
                 [smellieConfigLaserHeadField selectItemAtIndex:[smellieConfigLaserHeadField indexOfItemWithObjectValue:laserHeadConnected]];
                 [smellieConfigAttenuatorField selectItemAtIndex:[smellieConfigAttenuatorField indexOfItemWithObjectValue:attentuatorConnected]];
                 [smellieConfigFsInputCh selectItemAtIndex:[smellieConfigFsInputCh indexOfItemWithObjectValue:fibreSwitchInputConnected]];
                 [smellieConfigFsOutputCh selectItemAtIndex:[smellieConfigFsOutputCh indexOfItemWithObjectValue:fibreSwitchOutputConnected]];
                 [smellieConfigDetectorFibreRef selectItemAtIndex:[smellieConfigDetectorFibreRef indexOfItemWithObjectValue:detectorFibreReference]];
+                
+                laserHeadSelected = YES;
+                
             }
             @catch (NSException * error) {
                 NSLog(@"Error Parsing Configuration File: %@",error);
@@ -551,6 +557,71 @@
     }
 }
 
+-(IBAction)onClickLaserHead:(id)sender
+{
+    if(laserHeadSelected){
+        //update the correct value which is selected
+        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+        
+        //copy the current object into an array
+        //NSMutableDictionary *currentSmellieConfigForSepiaInput = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[configForSmellie objectForKey:currentSepiaInputChannel], nil];
+        //[configForSmellie objectForKey:currentSepiaInputChannel];
+        
+        //update with new value
+        //[currentSmellieConfigForSepiaInput setObject:[smellieConfigLaserHeadField objectValueOfSelectedItem] forKey:@"laserHeadConnected"];
+        //[configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
+        
+
+    }
+}
+
+
+- (IBAction)onClickAttenuator:(id)sender
+{
+    if(laserHeadSelected){
+        //update the correct value which is selected
+        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+        [[configForSmellie objectForKey:currentSepiaInputChannel] setObject:[smellieConfigAttenuatorField objectValueOfSelectedItem] forKey:@"attenutatorConnected"];
+    }
+}
+
+- (IBAction)onClickFibreSwithInput:(id)sender
+{
+    if(laserHeadSelected){
+        //update the correct value which is selected
+        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+        [[configForSmellie objectForKey:currentSepiaInputChannel] setObject:[smellieConfigFsInputCh objectValueOfSelectedItem] forKey:@"fibreSwitchInputConnected"];
+    }
+}
+- (IBAction)onClickFibeSwitchOutput:(id)sender
+{
+    if(laserHeadSelected){
+        //update the correct value which is selected
+        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+        [[configForSmellie objectForKey:currentSepiaInputChannel] setObject:[smellieConfigFsOutputCh objectValueOfSelectedItem] forKey:@"fibreSwitchOutputConnected"];
+    }
+}
+
+- (IBAction)onClickDetectorFibreReference:(id)sender
+{
+    if(laserHeadSelected){
+        //update the correct value which is selected
+        NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+        [[configForSmellie objectForKey:currentSepiaInputChannel] setObject:[smellieConfigDetectorFibreRef objectValueOfSelectedItem] forKey:@"detectorFibreReference"];
+    }
+}
+
+- (IBAction)onClickNumOfPulses:(id)sender
+{
+    
+}
+
+
+
+-(IBAction)onClickValidateSmellieConfig:(id)sender
+{
+    
+}
 
 //Custom Command for Smellie
 -(IBAction)executeSmellieCmdDirectAction:(id)sender
