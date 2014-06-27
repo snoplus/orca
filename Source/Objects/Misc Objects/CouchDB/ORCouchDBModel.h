@@ -117,12 +117,10 @@
 - (void) createDatabase:(ORCouchDB*)aDBRef;
 - (void) addUpdateHandler;
 - (void) addUpdateHandler:(ORCouchDB*)aDBRef;
-
+- (void) startReplication;
 - (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;
-- (void) startReplication;
-- (void) replicate:(BOOL)continuously;
 - (void) deleteDatabase;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 //test functions
@@ -133,6 +131,8 @@
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
 - (void) updateRunInfo;
+- (void) replicate:(BOOL)continuously;
+- (void) replicate:(BOOL)continuously restart:(BOOL)aRestart;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

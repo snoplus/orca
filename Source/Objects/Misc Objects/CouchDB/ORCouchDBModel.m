@@ -48,22 +48,23 @@ NSString* ORCouchDBLock							= @"ORCouchDBLock";
 NSString* ORCouchDBLocalHostNameChanged         = @"ORCouchDBLocalHostNameChanged";
 NSString* ORCouchDBModelUsingUpdateHandleChanged = @"ORCouchDBModelUsingUpdateHandleChanged";
 
-#define kCreateDB		 @"kCreateDB"
-#define kReplicateDB	 @"kReplicateDB"
-#define kCreateRemoteDB  @"kCreateRemoteDB"
-#define kDeleteDB		 @"kDeleteDB"
-#define kListDB			 @"kListDB"
-#define kRemoteInfo		 @"kRemoteInfo"
-#define kRemoteInfoVerbose @"kRemoteInfoVerbose"
-#define kDocument		 @"kDocument"
-#define kInfoDB			 @"kInfoDB"
-#define kDocumentAdded	 @"kDocumentAdded"
-#define kDocumentUpdated @"kDocumentUpdated"
-#define kDocumentDeleted @"kDocumentDeleted"
-#define kCompactDB		 @"kCompactDB"
-#define kInfoInternalDB  @"kInfoInternalDB"
-#define kAttachmentAdded @"kAttachmentAdded"
-#define kInfoHistoryDB   @"kInfoHistoryDB"
+#define kCreateDB           @"kCreateDB"
+#define kReplicateDB        @"kReplicateDB"
+#define kRestartReplicateDB @"kRestartReplicateDB"
+#define kCreateRemoteDB     @"kCreateRemoteDB"
+#define kDeleteDB           @"kDeleteDB"
+#define kListDB             @"kListDB"
+#define kRemoteInfo         @"kRemoteInfo"
+#define kRemoteInfoVerbose  @"kRemoteInfoVerbose"
+#define kDocument           @"kDocument"
+#define kInfoDB             @"kInfoDB"
+#define kDocumentAdded      @"kDocumentAdded"
+#define kDocumentUpdated    @"kDocumentUpdated"
+#define kDocumentDeleted    @"kDocumentDeleted"
+#define kCompactDB          @"kCompactDB"
+#define kInfoInternalDB     @"kInfoInternalDB"
+#define kAttachmentAdded    @"kAttachmentAdded"
+#define kInfoHistoryDB      @"kInfoHistoryDB"
 #define kAddUpdateHandler @"kAddUpdateHandler"
 
 #define kCouchDBPort 5984
@@ -554,14 +555,37 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[[self remoteDBRef]         createDatabase:kCreateRemoteDB views:nil];
     for(id aKey in [customDataBases allKeys]){
         [[self remoteHistoryDBRef:aKey]  createDatabase:kCreateRemoteDB views:nil];
-    }}
+    }
+}
+
+- (void) startReplication
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startReplication) object:nil];
+   
+    [self replicate:YES restart:replicationRunning];
+    
+	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
+    [self performSelector:@selector(startReplication) withObject:nil afterDelay:3600];
+}
 
 - (void) replicate:(BOOL)continuously
-{			
-	[[self remoteHistoryDBRef]  replicateLocalDatabase:kReplicateDB continous:continuously];
-	[[self remoteDBRef]         replicateLocalDatabase:kReplicateDB continous:continuously];
+{
+    [self replicate:continuously restart:NO];
+}
+
+- (void)replicate:(BOOL)continuously restart:(BOOL)aRestart
+{
+    int tag;
+    
+    if(!aRestart) tag = kReplicateDB;
+    else         tag = kRestartReplicateDB;
+    
+	[[self remoteHistoryDBRef]  replicateLocalDatabase:tag continous:continuously];
+	[[self remoteDBRef]         replicateLocalDatabase:tag continous:continuously];
     for(id aKey in [customDataBases allKeys]){
-        [[self remoteHistoryDBRef:aKey]  replicateLocalDatabase:kReplicateDB continous:YES];
+        [[self remoteHistoryDBRef:aKey]  replicateLocalDatabase:tag continous:YES];
     }
 }
 
@@ -847,6 +871,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 				else if([aTag isEqualToString:kDocumentAdded]){
 					//ignore
 				}
+				else if([aTag isEqualToString:kRestartReplicateDB]){
+					//ignore
+				}
 				else if([aTag isEqualToString:kCreateDB]){
 					[aResult prettyPrint:@"CouchDB Message:"];
 				}
@@ -962,15 +989,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         replicationAlarm = nil;
     }
 
-}
-
-- (void) startReplication
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-    
-	[self replicate:YES];
-    
-	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
 }
 
 - (void) periodicCompact
