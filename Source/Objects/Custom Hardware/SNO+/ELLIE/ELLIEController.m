@@ -750,8 +750,17 @@
 
 -(IBAction)onClickValidateSmellieConfig:(id)sender
 {
-    
+    //TODO: Check the file is correct and send a message to the user
+    //if the file is correct then able the submit 
+    [smellieConfigSubmitButton setEnabled:YES];
 }
+
+- (IBAction)onClickSubmitButton:(id)sender
+{
+    //post to the database
+    [model smellieConfigurationDBpush:configForSmellie];
+}
+
 
 //Custom Command for Smellie
 -(IBAction)executeSmellieCmdDirectAction:(id)sender

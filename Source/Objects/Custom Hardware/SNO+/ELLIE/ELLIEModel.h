@@ -47,6 +47,7 @@
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic;
+-(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic;
 -(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 
 //SMELLIE Control Functions

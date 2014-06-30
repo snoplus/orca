@@ -48,8 +48,10 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 
 @interface ELLIEModel (private)
 -(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile;
+-(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile;
 -(NSString*) stringDateFromDate:(NSDate*)aDate;
 -(void) _pushSmellieRunDocument;
+//-(void) _pushSmellieConfigDocument;
 @end
 
 @implementation ELLIEModel
@@ -224,27 +226,39 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
     [runDocPool release];
 }
 
-/*-(void) _pushSmellieConfigDocument
+-(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile
 {
-    NSAutoreleasePool *configDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary *configDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-    NSArray *objs = [[[NSApp delegate] document] collectConnectedObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel *aSnotModel  = [objs objectAtIndex:0];
-    NSString * docType = @"smellie_config_doc";
+    NSAutoreleasePool* configDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
     
-    [configDocDict setObject:docType forKey:@"doc_type"];
-    [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     
-    //fill in information from the GUI
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    //[[aSnotModel orcaDBConnectionHistor]]
+    NSString* docType = [NSMutableString stringWithFormat:@"%@%@",aCouchDBName,@"_configuration"];
+    
+    NSLog(@"document_type: %@",docType);
+    
+    [configDocDic setObject:docType forKey:@"doc_type"];
+    [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [configDocDic setObject:customRunFile forKey:@"configuration_info"];
+    
+    //self.runDocument = runDocDict;
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
     
     [configDocPool release];
-}*/
+}
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
 {
     [self _pushEllieCustomRunToDB:@"smellie" runFiletoPush:dbDic];
+}
+
+-(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic
+{
+    [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic];
 }
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp

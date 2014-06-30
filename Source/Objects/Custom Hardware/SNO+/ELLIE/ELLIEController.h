@@ -77,6 +77,7 @@
     IBOutlet NSTextField* smellieConfigSelfTestPmtSampleRate;
     IBOutlet NSTextField *smellieConfigAttenutationFactor;
     
+    IBOutlet NSButton *smellieConfigSubmitButton;
     //TELLIE interface ------------------------------------------
     
 }
