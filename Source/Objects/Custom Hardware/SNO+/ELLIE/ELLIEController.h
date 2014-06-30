@@ -75,6 +75,7 @@
     IBOutlet NSTextField* smellieConfigSelfTestNiTriggerInputPin;
     IBOutlet NSTextField* smellieConfigSelfTestLaserTriggerFreq;
     IBOutlet NSTextField* smellieConfigSelfTestPmtSampleRate;
+    IBOutlet NSTextField *smellieConfigAttenutationFactor;
     
     //TELLIE interface ------------------------------------------
     
