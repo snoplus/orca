@@ -47,6 +47,7 @@
 	[super awakeFromNib];
 	[statusField setTimeOut:1.5];
 	[self loadHelpFile];
+    scriptView.automaticQuoteSubstitutionEnabled = NO;
 	//some scripts can't be chained together -- get rid of the button that are not used
 	[breakChainButton setTransparent:[model nextScriptConnector]==nil];
 }
