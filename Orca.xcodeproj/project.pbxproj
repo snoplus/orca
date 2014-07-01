@@ -197,6 +197,8 @@
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
+		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
+		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
 		4325BA38109F6378009E15B9 /* GermaniumHighE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA37109F6378009E15B9 /* GermaniumHighE */; };
 		4325BA3A109F6381009E15B9 /* GermaniumLowE in Resources */ = {isa = PBXBuildFile; fileRef = 4325BA39109F6381009E15B9 /* GermaniumLowE */; };
@@ -314,8 +316,6 @@
 		840463C1183515AC00F69B23 /* GretinaTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840463B9183515AC00F69B23 /* GretinaTrigger.nib */; };
 		840463C3183515AC00F69B23 /* ORGretinaTriggerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */; };
 		840463C4183515AC00F69B23 /* ORGretinaTriggerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */; };
-		840463C7183515AC00F69B23 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840463BF183515AC00F69B23 /* ORGretinaTriggerModel.h */; };
-		840463C8183515AC00F69B23 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840463C0183515AC00F69B23 /* ORGretinaTriggerModel.m */; };
 		840463CA183515FF00F69B23 /* GretinaTrigger.gif in Resources */ = {isa = PBXBuildFile; fileRef = 840463C9183515FF00F69B23 /* GretinaTrigger.gif */; };
 		84052A2C13106B65007607A4 /* CouchDB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2613106B65007607A4 /* CouchDB.nib */; };
 		84052A2D13106B65007607A4 /* CouchDB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84052A2713106B65007607A4 /* CouchDB.tif */; };
@@ -3676,6 +3676,9 @@
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
+		431357FF195C5D5D007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGretinaTriggerModel.m; path = ../../Downloads/ORGretinaTriggerModel.m; sourceTree = "<group>"; };
+		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
+		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		4325BA37109F6378009E15B9 /* GermaniumHighE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumHighE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumHighE; sourceTree = SOURCE_ROOT; };
 		4325BA39109F6381009E15B9 /* GermaniumLowE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = GermaniumLowE; path = Source/Objects/Hardware/GPIB/HPPulser/GermaniumLowE; sourceTree = SOURCE_ROOT; };
@@ -3777,8 +3780,6 @@
 		840463B9183515AC00F69B23 /* GretinaTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = GretinaTrigger.nib; sourceTree = "<group>"; };
 		840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerController.h; sourceTree = "<group>"; };
 		840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerController.m; sourceTree = "<group>"; };
-		840463BF183515AC00F69B23 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
-		840463C0183515AC00F69B23 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		840463C9183515FF00F69B23 /* GretinaTrigger.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = GretinaTrigger.gif; sourceTree = "<group>"; };
 		84052A2613106B65007607A4 /* CouchDB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CouchDB.nib; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.nib"; sourceTree = SOURCE_ROOT; };
 		84052A2713106B65007607A4 /* CouchDB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CouchDB.tif; path = "Source/Objects/Misc Objects/CouchDB/CouchDB.tif"; sourceTree = SOURCE_ROOT; };
@@ -6777,6 +6778,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
+				431357FF195C5D5D007B1F15 /* ORGretinaTriggerModel.m */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -7153,8 +7155,8 @@
 				840463C9183515FF00F69B23 /* GretinaTrigger.gif */,
 				840463BB183515AC00F69B23 /* ORGretinaTriggerController.h */,
 				840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */,
-				840463BF183515AC00F69B23 /* ORGretinaTriggerModel.h */,
-				840463C0183515AC00F69B23 /* ORGretinaTriggerModel.m */,
+				43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */,
+				43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */,
 			);
 			path = GretinaTrigger;
 			sourceTree = "<group>";
@@ -13963,7 +13965,6 @@
 				8434A223055B3287002D3102 /* TubeMapData.h in Headers */,
 				8434A224055B3287002D3102 /* ORGenericView.h in Headers */,
 				8434A227055B3287002D3102 /* ORTimeRate.h in Headers */,
-				840463C7183515AC00F69B23 /* ORGretinaTriggerModel.h in Headers */,
 				8434A228055B3287002D3102 /* MuxScopeMap.h in Headers */,
 				8434A229055B3287002D3102 /* ORCaenCardModel.h in Headers */,
 				8434A22A055B3287002D3102 /* ORCaenDataDecoder.h in Headers */,
@@ -14862,6 +14863,7 @@
 				8499C97715221F9800CD7AAC /* ORMJDVacuumModel.h in Headers */,
 				8415B6A9152223050092C975 /* ORMJDVacuumView.h in Headers */,
 				8415E586152C7C560092C975 /* ORVacuumParts.h in Headers */,
+				43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */,
 				8415EB63152DF0970092C975 /* ORAdcProcessorController.h in Headers */,
 				8415EB65152DF0970092C975 /* ORAdcProcessorModel.h in Headers */,
 				8491303315334EAA00597004 /* ORBitProcessorController.h in Headers */,
@@ -16032,6 +16034,7 @@
 				8434A2C8055B3287002D3102 /* ORRunController.m in Sources */,
 				8434A2CA055B3287002D3102 /* ORPreferencesController.m in Sources */,
 				8434A2CB055B3287002D3102 /* ORDefaults.m in Sources */,
+				43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */,
 				8434A2CE055B3287002D3102 /* ORHistoModel.m in Sources */,
 				8434A2CF055B3287002D3102 /* ORHistoController.m in Sources */,
 				8434A2D0055B3287002D3102 /* ORFanInController.m in Sources */,
@@ -16218,7 +16221,6 @@
 				841DAAC507846CC20099BBF6 /* ORCamacControllerCard.m in Sources */,
 				84D9809A0795C5AC0074A035 /* ORAD811Model.m in Sources */,
 				84D9809C0795C5AC0074A035 /* ORAD811Controller.m in Sources */,
-				840463C8183515AC00F69B23 /* ORGretinaTriggerModel.m in Sources */,
 				84D980F60795DCC80074A035 /* ORAD811Decoders.m in Sources */,
 				84D98264079605CD0074A035 /* ORL2551Model.m in Sources */,
 				84D98266079605CD0074A035 /* ORL2551Decoders.m in Sources */,

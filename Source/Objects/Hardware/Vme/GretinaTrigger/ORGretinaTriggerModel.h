@@ -183,8 +183,8 @@ enum {
     kStep2c,
     kStep3a,
     kStep3b,
-    kRunSteps4a4c,
-    kWaitOnSteps4a4c,
+    kRunSteps4a4b,
+    kWaitOnSteps4a4b,
     kStep3c,
     kStep3d,
     kStep3e,
@@ -196,6 +196,7 @@ enum {
     kStep5b,
     kStep5c,
     kStep5d,
+    kRunLastSteps,
     kWaitTillFinal,
     kStep6a,
     kStep6b,
@@ -217,13 +218,11 @@ enum {
 #define kSerdesPowerOnAll     (0x7FF)
 #define kLinkLruCrlMask       (0x700)
 #define kLvdsPreEmphasisPowerOnL (0x1<<2)
-#define kLinkLockedAll        (0x7FF)
 #define kAllLockBit           (0x1<<14)
 #define kStringentLockBit     (0x1<<4)
-#define kMaxTimeAllowed       (5)
 #define linkInitAckBit        (0x1<<1)
-#define waitAcknowledgeState  (0x4<8)
-#define acknowledgedState     (0x5)
+#define kWaitAcknowledgeStateMask  (0x0F00)
+#define kAcknowledgedStateMask     (0x0F00)
 
 @interface ORGretinaTriggerModel : ORVmeIOCard
 {

@@ -692,14 +692,15 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
         case kStep3c:       return @"Altering Misc Ctl1";
         case kStep3d:       return @"Altering Misc Ctl1";
         case kStep3e:       return @"Altering Misc Ctl1";
-        case kRunSteps4a4c: return @"Setting Router Clock Src";
-        case kWaitOnSteps4a4c: return @"Waiting on Routers";
+        case kRunSteps4a4b: return @"Setting Router Clock Src";
+        case kWaitOnSteps4a4b: return @"Waiting on Routers";
         case kStep4a:       return @"Set Clock Source";
         case kStep4b:       return @"Check Router Lock";
         case kStep5a:       return @"Check WAIT_ACK State";
         case kStep5b:       return @"Set and Clear ACK Bit";
         case kStep5c:       return @"Verify ACKED Mode";
         case kStep5d:       return @"Send Normal Data";
+        case kRunLastSteps:  return @"Running non-Master Setup";
         case kWaitTillFinal:return @"Waiting on Routers and Digitizers";
         case kStep6a:       return @"Router Stringent Data Checking";
         case kStep6b:       return @"Verify Router Still Locked";
@@ -840,7 +841,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             break;
             
         case kStep3a://3a. Read Link Locked to verify the SERDES of Master is locked the syn pattern of the Router
-            if([self readRegister:linkLockedReg]!=kLinkLockedAll) {
+            if(linkLockedReg!= 0x7FE) {
                 NSLog(@"HW issue: the SERDES of the Master has not locked on to the synchronization pattern from the Router");
                 [self setInitState:kStepError];
             }
@@ -852,47 +853,44 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             break;
             
         case kStep3b: //3b. Verify that the state of the link
-            if ((([self readRegister:miscStatReg] & kLinkInitStateMask)>>8) != 0x4) {
+            if (((miscStatReg & kLinkInitStateMask)>>8) != 0x4) {
                 NSLog(@"HW issue: Master Trigger %@ has not locked on to the synchronization pattern from the Router.\n",[self fullID]);
                 [self setInitState:kStepError];
             }
-            else if((([self readRegister:miscStatReg] & kAllLockBit)>>14) != 0x1) {
+            else if(((miscStatReg & kAllLockBit)>>14) != 0x1) {
                 NSLog(@"HW issue: Master Trigger %@ does not have all links locked.\n",[self fullID]);
                 [self setInitState:kStepError];
             }
             else {
                 NSLog(@"Master Trigger %@ indicates it has locked on to the Router data stream.\n",[self fullID]);
-                [self setInitState:kWaitOnSteps4a4c];
+                [self setInitState:kRunSteps4a4b];
             }
             break;
-            
-            /*        case kStep3c:
-             [self writeRegister:miscCtl1Reg withValue:0xFFC2];
-             [self setMiscCtl1Reg:[self readRegister:miscCtl1Reg]]; // read it back for display
-             [self setInitState:kStep3d];
-             break;
-             
-             case kStep3d:
-             [self writeRegister:miscCtl1Reg withValue:0xFF02];
-             [self setMiscCtl1Reg:[self readRegister:miscCtl1Reg]];
-             [self setInitState:kStep3e];
-             break;
-             
-             case kStep3e:
-             [self writeRegister:miscCtl1Reg withValue:0xFF00];
-             [self setMiscCtl1Reg:[self readRegister:miscCtl1Reg]];
-             [self setInitState:kRunSteps4a4c];
-             break;
-             */
+       
+        case kRunSteps4a4b:
+        {
+            int i;
+            for(i=0;i<8;i++){
+                ORConnector* otherConnector = [linkConnector[i] connector];
+                if([otherConnector identifer] == 'L'){
+                    ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                    [routerObj setInitState:kStep4a];
+                    [routerObj stepRouter];
+                }
+            }
+        }
+            [self setInitState:kWaitOnSteps4a4b];
+            break;
 
-        case kWaitOnSteps4a4c:
+        case kWaitOnSteps4a4b:
             if([self allRoutersIdle]){
                 [self setInitState:kStep5a];
             }
             break;
             
         case kStep5a:
-            if(([self readRegister:miscStatReg] & waitAcknowledgeState >> 8) != 0x4) {
+            if(((miscStatReg & kWaitAcknowledgeStateMask)
+                >> 8) != 0x4) {
                 NSLog(@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in WAIT_ACK mode.\n", [self fullID]);
                 [self setInitState:kStepError];
             }
@@ -903,14 +901,14 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             break;
         
         case kStep5b:
-            [self writeRegister:miscCtl1Reg withValue:0xFFC2];
-            [self writeRegister:miscCtl1Reg withValue:0xFFC0];
-            [self setMiscCtl1Reg:[self readRegister:miscCtl1Reg]];
+            [self writeRegister:kMiscCtl1 withValue:0xFFC2];
+            [self writeRegister:kMiscCtl1 withValue:0xFFC0];
+            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
             [self setInitState:kStep5c];
             break;
             
         case kStep5c:
-            if ((([self readRegister:miscStatReg] & acknowledgedState) >> 8 != 0x5)) {
+            if (((miscStatReg & kAcknowledgedStateMask) >> 8 != 0x5)) {
                 NSLog(@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in ACKED mode.\n", [self fullID]);
                 [self setInitState:kStepError];
             }
@@ -921,26 +919,41 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             break;
             
         case kStep5d:
-            [self writeRegister:miscCtl1Reg withValue:0xFF40];
-            [self setMiscCtl1Reg:[self readRegister:miscCtl1Reg]];
+            [self writeRegister:kMiscCtl1 withValue:0xFF40];
+            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
+            [self setInitState:kRunLastSteps];
+            break;
+            
+        case kRunLastSteps:
+        {
+            int i;
+            for(i=0;i<8;i++){
+                ORConnector* otherConnector = [linkConnector[i] connector];
+                if([otherConnector identifer] == 'L'){
+                    ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                    [routerObj setInitState:kStep6a];
+                    [routerObj stepRouter];
+                }
+            }
+        }
             [self setInitState:kWaitTillFinal];
             break;
             
         case kWaitTillFinal:
             if([self allRoutersIdle]){
-                [self setInitState:kStepFinal];
+                [self setInitState:kStepError];
             }
             break;
-            
-            
-        if(initializationState != kRunSteps2a2c && initializationState!= kWaitOnSteps2a2c){
-            // NSLog(@"After Step\n");
-            [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
-        }
-        if(initializationState != kStepError && initializationState != kStepIdle){
-            [self performSelector:@selector(stepMaster) withObject:nil afterDelay:kTriggerInitDelay];
-        }
     }
+    
+    if(initializationState != kRunSteps2a2c && initializationState!= kWaitOnSteps2a2c && initializationState != kWaitOnSteps4a4b && initializationState != kWaitTillFinal){
+        // NSLog(@"After Step\n");
+        [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
+    }
+    if(initializationState != kStepError && initializationState != kStepIdle){
+        [self performSelector:@selector(stepMaster) withObject:nil afterDelay:kTriggerInitDelay];
+    }
+
 }
 
 
@@ -988,7 +1001,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             
         case kStep2b: //2b. Turn on the DEN, REN, and SYNC for Link "L"
             //[self writeRegister:kLinkLruCrl withValue: ( [self readRegister:kLinkLruCrl] | kLinkLruCrlMask)]; //!!!
-            [self writeRegister:linkLruCrlReg withValue:0x88F];
+            [self writeRegister:kLinkLruCrl withValue:0x88F];
             [self setLinkLruCrlReg:[self readRegister:kLinkLruCrl]]; //read back for display
             [self setInitState:kStep2c];
             break;
@@ -1004,7 +1017,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             //[self writeRegister:kMiscClkCrl withValue:[self readRegister:kMiscClkCrl] | kClockSourceSelectBit];
             [self writeRegister:kMiscClkCrl withValue:0x8007];
             [self setClockUsingLLink:([self readRegister:kMiscClkCrl] & kClockSourceSelectBit)!=0]; //read back for display
-            [self setInitState:kStep4b];
+            [self setInitState:kStepIdle];
             break;
             
             /*        case kStepStartCheckingCounter:
@@ -1031,17 +1044,17 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
              }
              break;
              */
-        case kStep4b: // Completed in kStepStartCheckingCounter and kStepCheckCounter. Kept to match exact steps outlined in instructions
+/*        case kStep4b: // Completed in kStepStartCheckingCounter and kStepCheckCounter. Kept to match exact steps outlined in instructions
             stepAfterCounterCheck = kStep4b;
             [self setInitState:kStepStartCheckingCounter];
             [self setInitState:kStepIdle];
             break;
-            
+*/
         case kStep6a:
-            //[self writeRegister:miscCtl1Reg withValue:[self readRegister:miscCtl1Reg] | kStringentLockBit];
-            [self writeRegister:miscCtl1Reg withValue:0x14];
-            [self setMiscCtl1Reg:[self readRegister:miscCtl1Reg]]; //read back for display
-            [self setInitState:kStep6b];
+            //[self writeRegister:kMiscClt1 withValue:[self readRegister:kMiscCtl1] | kStringentLockBit];
+            [self writeRegister:kMiscCtl1 withValue:0x14];
+            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]]; //read back for display
+            [self setInitState:kStepIdle];
             break;
             
 /*        case kStep6b:
@@ -1056,12 +1069,12 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
                 [self setInitState:kStepError];
             }
             else {
-                [self writeRegister:inputLinkMask withValue:(~connectedDigitizerMask)]; // !!!
-                [self setInputLinkMask:[self readRegister:inputLinkMask]]; // read back for display
+                [self writeRegister:kInputLinkMask withValue:(~connectedDigitizerMask)]; // !!!
+                [self setInputLinkMask:[self readRegister:kInputLinkMask]]; // read back for display
                 [self setInitState:kStep7b];
             }
-            [self writeRegister:inputLinkMask withValue:(~connectedDigitizerMask)]; // !!!
-            [self setInputLinkMask:[self readRegister:inputLinkMask]]; // read back for display
+            [self writeRegister:kInputLinkMask withValue:(~connectedDigitizerMask)]; // !!!
+            [self setInputLinkMask:[self readRegister:kInputLinkMask]]; // read back for display
             [self setInitState:kStep7b];
             break;
             
