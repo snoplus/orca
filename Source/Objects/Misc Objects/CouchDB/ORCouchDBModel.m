@@ -577,7 +577,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void)replicate:(BOOL)continuously restart:(BOOL)aRestart
 {
-    int tag;
+    NSString* tag;
     
     if(!aRestart) tag = kReplicateDB;
     else         tag = kRestartReplicateDB;
