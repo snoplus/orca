@@ -47,7 +47,11 @@
 	[super awakeFromNib];
 	[statusField setTimeOut:1.5];
 	[self loadHelpFile];
+    
+#if defined(MAC_OS_X_VERSION_10_9) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9)
     scriptView.automaticQuoteSubstitutionEnabled = NO;
+#endif
+    
 	//some scripts can't be chained together -- get rid of the button that are not used
 	[breakChainButton setTransparent:[model nextScriptConnector]==nil];
 }
