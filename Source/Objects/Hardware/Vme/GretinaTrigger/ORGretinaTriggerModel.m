@@ -941,6 +941,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kNumberOfFPGA
             
         case kWaitTillFinal:
             if([self allRoutersIdle]){
+                NSLog(@"Script Completed");
                 [self setInitState:kStepError];
             }
             break;

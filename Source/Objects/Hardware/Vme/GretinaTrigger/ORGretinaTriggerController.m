@@ -660,8 +660,8 @@
             else {
                 switch(rowIndex){
                     case 0:
-                        if(miscStat & (0x1<<15))return @"NO";
-                        else                    return @"YES";
+                        if(miscStat & (0x1<<15))return @"YES";
+                        else                    return @"NO";
                         
                     case 1:
                         if(miscStat & (0x1<<14))return @"YES";

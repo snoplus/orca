@@ -1551,6 +1551,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //new code version 1 (Jing Qian)
 - (void) writeClockSource: (unsigned long) clocksource
 {
+    return; ////temp.....
 	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
     [self writeAndCheckLong:clocksource
               addressOffset:fpga_register_information[kVMEGPControl].offset
@@ -2323,7 +2324,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) runAboutToStart:(NSNotification*)aNote
 {
     //temporary until the trigger card is ready
-    [self resetClock];
+    //[self resetClock];
 }
 
 //**************************************************************************************
