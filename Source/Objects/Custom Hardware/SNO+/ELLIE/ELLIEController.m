@@ -673,28 +673,49 @@
         [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
     }
 }
+
+
+BOOL isNumeric(NSString *s)
+{
+    NSScanner *sc = [NSScanner scannerWithString: s];
+    if ( [sc scanFloat:NULL] )
+    {
+        return [sc isAtEnd];
+    }
+    return NO;
+}
+
+
 - (IBAction)onChangeAttenuationFactor:(id)sender
 {
     if(laserHeadSelected){
         
         float attenutationFactor = [smellieConfigAttenutationFactor floatValue];
         
-        //check the attenuation factor makes sense
-        if((attenutationFactor < 0.0) || (attenutationFactor > 100.0)){
-            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter an attentuation factor between 0.0 and 100.0");
-            [smellieConfigAttenutationFactor setFloatValue:0.0];
+        BOOL isAttenutationFactorNumeric = isNumeric([smellieConfigAttenutationFactor stringValue]);
+        
+        if(isAttenutationFactorNumeric == YES){
+            
+            //check the attenuation factor makes sense
+            if((attenutationFactor < 0.0) || (attenutationFactor > 100.0)){
+                NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter an attentuation factor between 0.0 and 100.0\n");
+                [smellieConfigAttenutationFactor setFloatValue:0.0];
+            }
+            else{
+                NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+                //copy the current object into an array
+                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+                [currentSmellieConfigForSepiaInput
+                    setObject:[NSString stringWithString:[smellieConfigAttenutationFactor stringValue]]
+                    forKey:@"attenuationFactor"];
+        
+        
+                [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
+            }
         }
         else{
-        
-            NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
-            //copy the current object into an array
-            NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
-            [currentSmellieConfigForSepiaInput
-                setObject:[NSString stringWithString:[smellieConfigAttenutationFactor stringValue]]
-                forKey:@"attenuationFactor"];
-        
-        
-            [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
+            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the attenutation Factor\n");
+            [smellieConfigAttenutationFactor setFloatValue:0.0];
         }
     }
 }
@@ -704,10 +725,17 @@
     //copy the current object into an array
     NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
     
-    [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNoOfPulses stringValue]]
-                             forKey:@"selfTestNumOfPulses"];
+    BOOL isNumOfPulsesNumeric = isNumeric([smellieConfigSelfTestNoOfPulses stringValue]);
     
-    configForSmellie = [currentSmellieConfig mutableCopy];
+    if(isNumOfPulsesNumeric == YES){
+        [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNoOfPulses stringValue]]
+                                 forKey:@"selfTestNumOfPulses"];
+        configForSmellie = [currentSmellieConfig mutableCopy];
+    }
+    else{
+        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the number of pulses\n");
+        [smellieConfigSelfTestNoOfPulses setFloatValue:10.0];
+    }
 }
 
 - (IBAction)onClickSelfTestLasertTrigFreq:(id)sender
@@ -715,10 +743,29 @@
     //copy the current object into an array
     NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
     
-    [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestLaserTriggerFreq stringValue]]
-                             forKey:@"selfTestLaserTrigFrequency"];
+    BOOL isLaserFreqNumeric = isNumeric([smellieConfigSelfTestLaserTriggerFreq stringValue]);
     
-    configForSmellie = [currentSmellieConfig mutableCopy];
+    if(isLaserFreqNumeric == YES){
+    
+        float selfTestlaserFreq = [smellieConfigSelfTestLaserTriggerFreq floatValue];
+        
+        //PMT monitoring system cannot deal with a frequency that is greater than 17Khz.
+        //Also it is dangerous to try and trigger the laser at high rates
+        if((selfTestlaserFreq < 0.0) || (selfTestlaserFreq > 17000.0)){
+            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Laser self test frequency has to be between 0.0 and 17000 Hz\n");
+            [smellieConfigSelfTestNoOfPulses setFloatValue:10.0];
+        }
+        
+        else{
+            [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestLaserTriggerFreq stringValue]]
+                                     forKey:@"selfTestLaserTrigFrequency"];
+    
+            configForSmellie = [currentSmellieConfig mutableCopy];
+        }
+    }
+    else{
+        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test laser frequency\n");
+    }
 }
 
 - (IBAction)onClickSelfTestPmtSampleRate:(id)sender
@@ -726,20 +773,38 @@
     //copy the current object into an array
     NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
     
-    [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestPmtSampleRate stringValue]]
-                             forKey:@"selfTestPmtSamplerRate"];
+    BOOL isSelfTestPmtSampleRateNumeric = isNumeric([smellieConfigSelfTestPmtSampleRate stringValue]);
     
-    configForSmellie = [currentSmellieConfig mutableCopy];
+    if(isSelfTestPmtSampleRateNumeric == YES){
+    
+        [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestPmtSampleRate stringValue]]
+                                 forKey:@"selfTestPmtSamplerRate"];
+    
+        configForSmellie = [currentSmellieConfig mutableCopy];
+    }
+    else{
+        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test Pmt sample rate\n");
+    }
 }
 
+//PMT samples to take per Laser
 - (IBAction)onClickNumOfPulsesPerLaser:(id)sender
 {
     NSMutableDictionary *currentSmellieConfig = [configForSmellie mutableCopy];
     
-    [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNoOfPulsesPerLaser stringValue]]
-                             forKey:@"selfTestNumOfPulsesPerLaser"];
+    BOOL isNumberOfPulsesPerLaserNumeric = isNumeric([smellieConfigSelfTestNoOfPulsesPerLaser stringValue]);
     
-    configForSmellie = [currentSmellieConfig mutableCopy];
+    if(isNumberOfPulsesPerLaserNumeric == YES){
+    
+        [currentSmellieConfig setObject:[NSString stringWithString:[smellieConfigSelfTestNoOfPulsesPerLaser stringValue]]
+                                 forKey:@"selfTestNumOfPulsesPerLaser"];
+    
+        configForSmellie = [currentSmellieConfig mutableCopy];
+        
+    }
+    else{
+        NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the Self test Pmt samples per laser\n");
+    }
 }
 
 - (IBAction)onClickNiTriggerOutputPin:(id)sender

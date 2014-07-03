@@ -3298,7 +3298,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
-																										<string key="NSPlaceholderString"/>
+																										<string key="NSPlaceholderString">50</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="1071808413"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -3515,6 +3515,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
+																										<string key="NSPlaceholderString">10</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="405205029"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -3538,6 +3539,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
+																										<string key="NSPlaceholderString">10000</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="783288275"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -3561,6 +3563,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
+																										<string key="NSPlaceholderString">100000</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="552780107"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -3584,6 +3587,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
+																										<string key="NSPlaceholderString">/ctr0</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="264064493"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -3607,6 +3611,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
+																										<string key="NSPlaceholderString">/ai0:1</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="212821276"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -3630,6 +3635,7 @@
 																										<int key="NSCellFlags2">272630784</int>
 																										<string key="NSContents"/>
 																										<reference key="NSSupport" ref="118580902"/>
+																										<string key="NSPlaceholderString">100</string>
 																										<string key="NSCellIdentifier">_NS:9</string>
 																										<reference key="NSControlView" ref="587257040"/>
 																										<bool key="NSDrawsBackground">YES</bool>
@@ -5959,12 +5965,12 @@
 							<reference ref="101161488"/>
 							<reference ref="405205029"/>
 							<reference ref="587257040"/>
-							<reference ref="783288275"/>
 							<reference ref="552780107"/>
 							<reference ref="264064493"/>
 							<reference ref="212821276"/>
 							<reference ref="120347801"/>
 							<reference ref="493374232"/>
+							<reference ref="783288275"/>
 						</array>
 						<reference key="parent" ref="653420068"/>
 					</object>
