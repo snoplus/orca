@@ -917,6 +917,42 @@ configDocument  = _configDocument;
     return [[result retain] autorelease];
 }
 
+//iso formatted string from date
+- (NSString*) stringUnixFromDate:(NSDate*)aDate
+{
+    //NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
+    //[snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
+    //snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    NSDate* strDate;
+    if (!aDate)
+        strDate = [NSDate date];
+    else
+        strDate = aDate;
+    //strDate.date.timeIntervalSince1970
+    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
+    //[snotDateFormatter release];
+    strDate = nil;
+    return [[result retain] autorelease];
+}
+
+
+//rfc2822 formatted string from date
+- (NSString*) rfc2822StringDateFromDate:(NSDate*)aDate
+{
+    NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
+    [snotDateFormatter setDateFormat:@"EEE, dd MMM yyyy HH:mm:ss Z"];
+    snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    NSDate* strDate;
+    if (!aDate)
+        strDate = [NSDate date];
+    else
+        strDate = aDate;
+    NSString* result = [snotDateFormatter stringFromDate:strDate];
+    [snotDateFormatter release];
+    strDate = nil;
+    return [[result retain] autorelease];
+}
+
 - (void) _runDocumentWorker
 {
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
@@ -934,14 +970,15 @@ configDocument  = _configDocument;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
-    [runDocDict setObject:runNumber forKey:@"run_number"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
+    [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
+    [runDocDict setObject:runNumber forKey:@"run"];
     [runDocDict setObject:@"starting" forKey:@"run_status"];
     
     //[runDocDict setObject:runStartString forKey:@"run_start"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_start"];
-
-    [runDocDict setObject:@"" forKey:@"run_stop"];
+    [runDocDict setObject:@"" forKey:@"time_stamp_end"];
+    [runDocDict setObject:@"" forKey:@"sudbury_time_start"];
+    //[runDocDict setObject:@"" forKey:@"run_stop"];
 
     self.runDocument = runDocDict;
     [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
@@ -1170,8 +1207,12 @@ configDocument  = _configDocument;
         
     int i;
 	int maskValue = [aMTCcard dbIntByIndex: kGtMask];
-    NSString * triggerOn = @"On";
-    NSString * triggerOff = @"Off";
+    //NSString * triggerOn = @"On";
+    //NSString * triggerOff = @"Off";
+    
+    NSNumber *triggerOn = [NSNumber numberWithInt:1];
+    NSNumber *triggerOff = [NSNumber numberWithInt:0];
+    
     
     //add each mask to the main gtMask mutableArray §
 	for(i=0;i<26;i++){
@@ -1382,7 +1423,9 @@ configDocument  = _configDocument;
     NSMutableDictionary* runDocDict = [[runDoc mutableCopy] autorelease];
 
     [runDocDict setObject:@"done" forKey:@"run_status"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_stop"];
+    //[runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_stop"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_end"];
+    [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_end"];
 
     //after run stats
     //alarm logs
