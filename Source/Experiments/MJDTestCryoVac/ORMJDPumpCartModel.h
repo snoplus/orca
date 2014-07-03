@@ -56,6 +56,7 @@
 	int					 leftSideConnection;
 	int					 rightSideConnection;
 	NSMutableArray*		 testCryostats;
+	BOOL				 couchPostScheduled;
 }
 
 #pragma mark ***Accessors

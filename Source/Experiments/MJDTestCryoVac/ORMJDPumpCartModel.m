@@ -53,6 +53,7 @@
 - (ORTPG256AModel*)    findPressureGauge:(int)aSlot;
 - (id) findObject:(NSString*)aClassName;
 - (id) findObject:(NSString*)aClassName inSlot:(int)aSlot;
+- (void)postCouchRecord;
 
 @end
 
@@ -363,7 +364,10 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
     leftSideConnection = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelLeftSideConnectionChanged object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelConnectionChanged object:self];
-	
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+    }
 }
 
 - (int) rightSideConnection
@@ -379,6 +383,11 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 	rightSideConnection = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelRightSideConnectionChanged object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelConnectionChanged object:self];
+    
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+    }
 }
 
 
@@ -726,7 +735,57 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 			}
 		}
 	}
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+    }
 }
+
+- (void)postCouchRecord
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postCouchRecord) object:nil];
+    
+    couchPostScheduled = NO;
+
+    if([[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]>0){
+
+        NSMutableDictionary* values = [NSMutableDictionary dictionary];
+        NSMutableArray* regionColors = [NSMutableArray array];
+        int i;
+        for(i=0;i<kNumberPriorityRegions;i++){
+            NSArray* pipes = [self pipesForRegion:i];
+            for(id aPipe in pipes){
+                [regionColors addObject:[aPipe rgbString]];
+            }
+        }
+        
+        NSMutableArray* gvStates = [NSMutableArray array];
+        for(ORVacuumGateValve* aGateValve in [self gateValves]){
+            [gvStates addObject:[NSArray arrayWithObjects:
+                                 [NSNumber numberWithInt:[aGateValve state]],
+                                 [NSNumber numberWithInt:[aGateValve constraintCount]],
+                                 nil]];
+        }
+        
+        NSMutableArray* valueLabels = [NSMutableArray array];
+        for(ORVacuumStatusLabel* aLabel in [self statusLabels]){
+            [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
+        }
+        for(ORVacuumDynamicLabel* aLabel in [self valueLabels]){
+            [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
+        }
+        
+        [values setObject: valueLabels          forKey:@"DynamicLabels"];
+        [values setObject: regionColors         forKey:@"RegionColors"];
+        [values setObject: gvStates             forKey:@"GateValves"];
+        [values setObject: [NSNumber numberWithInt:leftSideConnection]                   forKey:@"LeftSideConnection"];
+        [values setObject: [NSNumber numberWithInt:rightSideConnection]                    forKey:@"RightSideConnection"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+    [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+}
+
 
 - (void) resetVisitationFlag
 {
