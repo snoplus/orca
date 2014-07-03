@@ -970,6 +970,8 @@ configDocument  = _configDocument;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
+    [runDocDict setObject:@"physics" forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
     [runDocDict setObject:runNumber forKey:@"run"];
@@ -977,7 +979,7 @@ configDocument  = _configDocument;
     
     //[runDocDict setObject:runStartString forKey:@"run_start"];
     [runDocDict setObject:@"" forKey:@"time_stamp_end"];
-    [runDocDict setObject:@"" forKey:@"sudbury_time_start"];
+    [runDocDict setObject:@"" forKey:@"sudbury_time_end"];
     //[runDocDict setObject:@"" forKey:@"run_stop"];
 
     self.runDocument = runDocDict;
