@@ -47,6 +47,7 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
 #define kOrcaConfigDocumentAdded @"kOrcaConfigDocumentAdded"
 #define kOrcaConfigDocumentUpdated @"kOrcaConfigDocumentUpdated"
+#define kMtcRunDocumentAdded @"kMtcRunDocumentAdded"
 
 #define kMorcaCompactDB         @"kMorcaCompactDB"
 
@@ -81,7 +82,9 @@ rhdrDataId = _rhdrDataId,
 runDocument = _runDocument,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
-configDocument  = _configDocument;
+configDocument  = _configDocument,
+mtcConfigDoc = _mtcConfigDoc;
+
 
 @synthesize smellieRunHeaderDocList;
 
@@ -224,6 +227,8 @@ configDocument  = _configDocument;
     self.runDocument = nil;
     //intialise the configuation document
     self.configDocument = nil;
+    //initilise the run document
+    self.mtcConfigDoc = nil;
     
     [NSThread detachNewThreadSelector:@selector(_runDocumentWorker) toTarget:self withObject:nil];
 
@@ -535,6 +540,11 @@ configDocument  = _configDocument;
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];
+        }
+        else if([aTag isEqualToString:kMtcRunDocumentAdded]){
+            NSMutableDictionary* mtcConfigDoc = [[[self mtcConfigDoc] mutableCopy] autorelease];
+            [mtcConfigDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+            self.mtcConfigDoc = mtcConfigDoc;
         }
         //Look for the configuration document tag
         else if ([aTag isEqualToString:kOrcaConfigDocumentAdded]) {
@@ -992,7 +1002,6 @@ configDocument  = _configDocument;
     }
     
     //if failed emit alarm and give up
-    
     runDocDict = [[[self runDocument] mutableCopy] autorelease];
     if (rc) {
         NSDate* runStart = [[[rc startTime] copy] autorelease];
@@ -1287,6 +1296,20 @@ configDocument  = _configDocument;
     [mtcArray setObject:esumArray forKey:@"mtca_esum_matrix"];
     [mtcArray setObject:triggerMask forKey:@"trigger_masks"];
     
+    
+    //make an MTC document
+    NSMutableDictionary* mtcDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    
+    [mtcDocDict setObject:@"mtc" forKey:@"doc_type"];
+    [mtcDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
+    [mtcDocDict setObject:runNumber forKey:@"run"];
+    
+    self.mtcConfigDoc = mtcDocDict;
+    
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self orcaDbRef:self] addDocument:mtcDocDict tag:kMtcRunDocumentAdded];
+    }
     
     //FILL THE DATA FROM EACH FRONT END CARD HERE !!!!!
     

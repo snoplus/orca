@@ -87,6 +87,7 @@
     
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
+    NSDictionary* _mtcConfigDoc;
     NSMutableDictionary* _runTypeDocumentPhysics;
     NSMutableDictionary* smellieRunHeaderDocList;
     
@@ -123,6 +124,7 @@
 
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
+@property (copy) NSDictionary* mtcConfigDoc;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
