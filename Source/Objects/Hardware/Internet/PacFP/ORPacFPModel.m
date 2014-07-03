@@ -204,7 +204,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) netsocketConnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-        [self setIpConnected:[socket isConnected]];
+        [self setIpConnected:YES];
     }
 }
 

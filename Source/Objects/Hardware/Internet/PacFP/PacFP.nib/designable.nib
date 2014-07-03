@@ -45,7 +45,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1013037794">
 			<object class="NSCustomObject" id="863748961">
-				<string key="NSClassName">ORPacController</string>
+				<string key="NSClassName">ORPacFPController</string>
 			</object>
 			<object class="NSCustomObject" id="1004998797">
 				<string key="NSClassName">FirstResponder</string>
@@ -322,7 +322,7 @@
 												<string key="NSFrame">{{332, 94}, {5, 228}}</string>
 												<reference key="NSSuperview" ref="1048534997"/>
 												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="759145833"/>
+												<reference key="NSNextKeyView" ref="385734923"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
@@ -1409,7 +1409,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 																<string key="NSFrame">{{38, 7}, {121, 28}}</string>
 																<reference key="NSSuperview" ref="932585157"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="385734923"/>
+																<reference key="NSNextKeyView" ref="33097192"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="429411452">
 																	<int key="NSCellFlags">67108864</int>
@@ -1548,7 +1548,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 																<string key="NSFrame">{{11, 14}, {152, 31}}</string>
 																<reference key="NSSuperview" ref="693657871"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="33097192"/>
+																<reference key="NSNextKeyView" ref="681623596"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="641396332">
 																	<int key="NSCellFlags">67108928</int>
@@ -1625,7 +1625,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 												<object class="NSTextFieldCell" key="NSCell" id="119591856">
 													<int key="NSCellFlags">-1804599231</int>
 													<int key="NSCellFlags2">71435264</int>
-													<string key="NSContents">128.95.100.177</string>
+													<string key="NSContents"/>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="655378674"/>
 													<bool key="NSDrawsBackground">YES</bool>
@@ -1941,7 +1941,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">256</int>
 																<string key="NSFrameSize">{304, 228}</string>
 																<reference key="NSSuperview" ref="729464963"/>
-																<reference key="NSNextKeyView" ref="640355965"/>
+																<reference key="NSNextKeyView" ref="783764576"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2190,13 +2190,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												</array>
 												<string key="NSFrame">{{13, 130}, {321, 246}}</string>
 												<reference key="NSSuperview" ref="787338410"/>
-												<reference key="NSNextKeyView" ref="783764576"/>
+												<reference key="NSNextKeyView" ref="729464963"/>
 												<int key="NSsFlags">133138</int>
 												<reference key="NSVScroller" ref="640355965"/>
 												<reference key="NSHScroller" ref="783764576"/>
 												<reference key="NSContentView" ref="729464963"/>
 												<reference key="NSHeaderClipView" ref="26016062"/>
-												<reference key="NSCornerView" ref="407294296"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -2215,7 +2214,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">256</int>
 																<string key="NSFrameSize">{321, 228}</string>
 																<reference key="NSSuperview" ref="644702020"/>
-																<reference key="NSNextKeyView" ref="808920842"/>
+																<reference key="NSNextKeyView" ref="465433194"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2439,13 +2438,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												</array>
 												<string key="NSFrame">{{351, 130}, {323, 246}}</string>
 												<reference key="NSSuperview" ref="787338410"/>
-												<reference key="NSNextKeyView" ref="465433194"/>
+												<reference key="NSNextKeyView" ref="644702020"/>
 												<int key="NSsFlags">133682</int>
 												<reference key="NSVScroller" ref="808920842"/>
 												<reference key="NSHScroller" ref="804670762"/>
 												<reference key="NSContentView" ref="644702020"/>
 												<reference key="NSHeaderClipView" ref="197984936"/>
-												<reference key="NSCornerView" ref="465433194"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -2698,7 +2696,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">274</int>
 																<string key="NSFrameSize">{438, 155}</string>
 																<reference key="NSSuperview" ref="689880730"/>
-																<reference key="NSNextKeyView" ref="464565078"/>
+																<reference key="NSNextKeyView" ref="903074812"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2950,13 +2948,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												</array>
 												<string key="NSFrame">{{17, 224}, {440, 173}}</string>
 												<reference key="NSSuperview" ref="793091824"/>
-												<reference key="NSNextKeyView" ref="903074812"/>
+												<reference key="NSNextKeyView" ref="689880730"/>
 												<int key="NSsFlags">133122</int>
 												<reference key="NSVScroller" ref="903074812"/>
 												<reference key="NSHScroller" ref="755454522"/>
 												<reference key="NSContentView" ref="689880730"/>
 												<reference key="NSHeaderClipView" ref="1051676104"/>
-												<reference key="NSCornerView" ref="167699676"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -5225,56 +5222,32 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ORPacController</string>
+					<string key="className">ORPacFPController</string>
 					<string key="superclassName">OrcaObjectController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="adcChannelAction:">id</string>
-						<string key="gainChannelAction:">id</string>
-						<string key="gainDisplayTypeAction:">id</string>
-						<string key="gainValueAction:">id</string>
-						<string key="lcmEnabledAction:">id</string>
-						<string key="loadGainAction:">id</string>
+						<string key="connectAction:">id</string>
+						<string key="getGainsAction:">id</string>
+						<string key="ipAddressFieldAction:">id</string>
 						<string key="lockAction:">id</string>
 						<string key="logToFileAction:">id</string>
-						<string key="moduleAction:">id</string>
-						<string key="openPortAction:">id</string>
-						<string key="portListAction:">id</string>
-						<string key="preAmpAction:">id</string>
 						<string key="readAdcsAction:">id</string>
-						<string key="readBackAllGains:">id</string>
-						<string key="readGainAction:">id</string>
 						<string key="readGainFileAction:">id</string>
 						<string key="saveGainFileAction:">id</string>
 						<string key="selectFileAction:">id</string>
-						<string key="selectModuleAction:">id</string>
-						<string key="setAllGainsAction:">id</string>
+						<string key="setGainsAction:">id</string>
 						<string key="setPollingAction:">id</string>
-						<string key="writeGainAction:">id</string>
-						<string key="writeLcmEnabledAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="adcChannelAction:">
-							<string key="name">adcChannelAction:</string>
+						<object class="IBActionInfo" key="connectAction:">
+							<string key="name">connectAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="gainChannelAction:">
-							<string key="name">gainChannelAction:</string>
+						<object class="IBActionInfo" key="getGainsAction:">
+							<string key="name">getGainsAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="gainDisplayTypeAction:">
-							<string key="name">gainDisplayTypeAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="gainValueAction:">
-							<string key="name">gainValueAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="lcmEnabledAction:">
-							<string key="name">lcmEnabledAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="loadGainAction:">
-							<string key="name">loadGainAction:</string>
+						<object class="IBActionInfo" key="ipAddressFieldAction:">
+							<string key="name">ipAddressFieldAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="lockAction:">
@@ -5285,32 +5258,8 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<string key="name">logToFileAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="moduleAction:">
-							<string key="name">moduleAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="openPortAction:">
-							<string key="name">openPortAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="portListAction:">
-							<string key="name">portListAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="preAmpAction:">
-							<string key="name">preAmpAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
 						<object class="IBActionInfo" key="readAdcsAction:">
 							<string key="name">readAdcsAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="readBackAllGains:">
-							<string key="name">readBackAllGains:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="readGainAction:">
-							<string key="name">readGainAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="readGainFileAction:">
@@ -5325,24 +5274,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<string key="name">selectFileAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="selectModuleAction:">
-							<string key="name">selectModuleAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="setAllGainsAction:">
-							<string key="name">setAllGainsAction:</string>
+						<object class="IBActionInfo" key="setGainsAction:">
+							<string key="name">setGainsAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="setPollingAction:">
 							<string key="name">setPollingAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="writeGainAction:">
-							<string key="name">writeGainAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="writeLcmEnabledAction:">
-							<string key="name">writeLcmEnabledAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>
@@ -5360,24 +5297,18 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<string key="gainReadBackTableView">NSTableView</string>
 						<string key="gainTableView">NSTableView</string>
 						<string key="gainValueField">NSTextField</string>
+						<string key="ipAddressTextField">NSTextField</string>
+						<string key="ipConnectButton">NSButton</string>
+						<string key="ipConnectedTextField">NSTextField</string>
 						<string key="lastGainReadField">NSTextField</string>
-						<string key="lcmEnabledMatrix">NSMatrix</string>
-						<string key="lcmRunVetoWarning">NSTextField</string>
-						<string key="loadButton0">NSButton</string>
-						<string key="loadButton1">NSButton</string>
-						<string key="loadButton2">NSButton</string>
-						<string key="loadButton3">NSButton</string>
 						<string key="loadButtonAll">NSButton</string>
 						<string key="lockButton">NSButton</string>
 						<string key="logFileTextField">NSTextField</string>
 						<string key="logToFileButton">NSButton</string>
 						<string key="moduleTextField">NSTextField</string>
-						<string key="openPortButton">NSButton</string>
 						<string key="plotter0">ORCompositeTimeLineView</string>
 						<string key="plotter1">ORCompositeTimeLineView</string>
 						<string key="pollingButton">NSPopUpButton</string>
-						<string key="portListPopup">NSPopUpButton</string>
-						<string key="portStateField">NSTextField</string>
 						<string key="preAmpTextField">NSTextField</string>
 						<string key="processLimitsTableView">NSTableView</string>
 						<string key="queueValueBar">ORValueBarGroupView</string>
@@ -5446,33 +5377,21 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<string key="name">gainValueField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="ipAddressTextField">
+							<string key="name">ipAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ipConnectButton">
+							<string key="name">ipConnectButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ipConnectedTextField">
+							<string key="name">ipConnectedTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="lastGainReadField">
 							<string key="name">lastGainReadField</string>
 							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="lcmEnabledMatrix">
-							<string key="name">lcmEnabledMatrix</string>
-							<string key="candidateClassName">NSMatrix</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="lcmRunVetoWarning">
-							<string key="name">lcmRunVetoWarning</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="loadButton0">
-							<string key="name">loadButton0</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="loadButton1">
-							<string key="name">loadButton1</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="loadButton2">
-							<string key="name">loadButton2</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="loadButton3">
-							<string key="name">loadButton3</string>
-							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="loadButtonAll">
 							<string key="name">loadButtonAll</string>
@@ -5494,10 +5413,6 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 							<string key="name">moduleTextField</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="openPortButton">
-							<string key="name">openPortButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="plotter0">
 							<string key="name">plotter0</string>
 							<string key="candidateClassName">ORCompositeTimeLineView</string>
@@ -5509,14 +5424,6 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<object class="IBToOneOutletInfo" key="pollingButton">
 							<string key="name">pollingButton</string>
 							<string key="candidateClassName">NSPopUpButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="portListPopup">
-							<string key="name">portListPopup</string>
-							<string key="candidateClassName">NSPopUpButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="portStateField">
-							<string key="name">portStateField</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="preAmpTextField">
 							<string key="name">preAmpTextField</string>
@@ -5577,7 +5484,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORPacController.h</string>
+						<string key="minorKey">./Classes/ORPacFPController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
