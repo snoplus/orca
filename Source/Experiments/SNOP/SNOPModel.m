@@ -1182,16 +1182,16 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //Fill an array with mtc information 
     NSMutableDictionary * mtcArray = [NSMutableDictionary dictionaryWithCapacity:20];
-    [mtcArray setObject:mtcCoarseDelay forKey:@"mtc_coarse_delay"];
-    [mtcArray setObject:mtcFineDelay forKey:@"mtc_fine_delay"];
-    [mtcArray setObject:mtcPedWidth forKey:@"mtc_ped_width"];
-    [mtcArray setObject:mtcGTWordMask forKey:@"mtc_gt_word_mask"];
-    [mtcArray setObject:mtcPedestalWidth forKey:@"mtc_pedestal_width"];
-    [mtcArray setObject:mtcNhit100LoPrescale forKey:@"mtc_nhit100_lo_prescale"];
-    [mtcArray setObject:mtcPulserPeriod forKey:@"mtc_pulsar_period"];
-    [mtcArray setObject:mtcLow10MhzClock forKey:@"mtc_low_10Mhz_clock"];
-    [mtcArray setObject:mtcFineSlope forKey:@"mtc_fine_slope"];
-    [mtcArray setObject:mtcMinDelayOffset forKey:@"mtc_min_delay_offset"];
+    [mtcArray setObject:mtcCoarseDelay forKey:@"coarse_delay"];
+    [mtcArray setObject:mtcFineDelay forKey:@"fine_delay"];
+    [mtcArray setObject:mtcPedWidth forKey:@"ped_width"];
+    [mtcArray setObject:mtcGTWordMask forKey:@"gt_word_mask"];
+    [mtcArray setObject:mtcPedestalWidth forKey:@"pedestal_width"];
+    [mtcArray setObject:mtcNhit100LoPrescale forKey:@"nhit100_lo_prescale"];
+    [mtcArray setObject:mtcPulserPeriod forKey:@"pulsar_period"];
+    [mtcArray setObject:mtcLow10MhzClock forKey:@"low_10Mhz_clock"];
+    [mtcArray setObject:mtcFineSlope forKey:@"fine_slope"];
+    [mtcArray setObject:mtcMinDelayOffset forKey:@"min_delay_offset"];
     [mtcArray setObject:nhitMtcaArray forKey:@"mtca_nhit_matrix"];
     [mtcArray setObject:esumArray forKey:@"mtca_esum_matrix"];
     [mtcArray setObject:triggerMask forKey:@"trigger_masks"];
@@ -1203,6 +1203,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [mtcDocDict setObject:@"mtc" forKey:@"doc_type"];
     [mtcDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [mtcDocDict setObject:runNumber forKey:@"run"];
+    [mtcDocDict setObject:mtcArray forKey:@"mtc_info"];
     
     self.mtcConfigDoc = mtcDocDict;
     
