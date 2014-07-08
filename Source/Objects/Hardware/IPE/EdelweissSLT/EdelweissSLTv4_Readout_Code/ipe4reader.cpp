@@ -3386,6 +3386,13 @@ void FIFOREADER::scanFIFObuffer(void)
 {
 	int32_t		temp_status_bbv2_1[_nb_mots_status_bbv2 + 10];	//_nb_mots_status_bbv2 = 57 -tb-
 	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
+	
+	//following lines by Bernhard to get the localtime in the ipe4reader output
+	struct tm *Zeit;
+	long Jetzt;
+	time(&Jetzt);
+	Zeit = localtime(&Jetzt);
+	//end modification by Bernhard*/
 
 
 
@@ -3616,6 +3623,7 @@ void FIFOREADER::scanFIFObuffer(void)
                     }
                 }
                 printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
+                printf("PC-Time: %d:%d:%d\n",Zeit->tm_hour, Zeit->tm_min, Zeit->tm_sec); //by Bernhard to see the time in the ipe4reader output
             }
             #endif
             
