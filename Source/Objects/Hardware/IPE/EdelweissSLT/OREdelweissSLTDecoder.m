@@ -677,8 +677,8 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     // waveforms
     //----------------------------------------
     if(trigChan<18 || trigChan>29){//slow channel or filter output
-    startIndex=0;
-	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+        startIndex=0;
+	    [aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
@@ -687,12 +687,13 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
     }else{//fast channel
-    if(eventFlags4bit==0x2){
-        startIndex= (-triggerAddr-1023)%2048;//revert offset from SLTv4Readout -tb-
-    }else{
-        startIndex= 0;
-    }
-	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+        if(eventFlags4bit==0x2){
+            startIndex= (-triggerAddr-1023)%2048;//revert offset from SLTv4Readout -tb-
+        }else{
+            startIndex= 0;//for e.g. version 0x4
+        }
+
+		[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
