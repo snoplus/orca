@@ -701,8 +701,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
     }
-    //DEBUG 	    
-    NSLog(@"%@::%@ plot FIC channel %i, flags: %i, triggerAddr:%i, startIndex:%i, eventFifo4:0x%08x\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),trigChan, eventFlags4bit,triggerAddr,startIndex,eventFifo4);//TODO: DEBUG testing ...-tb-
+    //DEBUG 	   NSLog(@"%@::%@ plot FIC channel %i, flags: %i, triggerAddr:%i, startIndex:%i, eventFifo4:0x%08x\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),trigChan, eventFlags4bit,triggerAddr,startIndex,eventFifo4);//TODO: DEBUG testing ...-tb-
 
     
     #if 0 //old call  -  the specialBits waveform seems to be buggy (in plots, "Unsigned" check has no effect ...) -tb-
