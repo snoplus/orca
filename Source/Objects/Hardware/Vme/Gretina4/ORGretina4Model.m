@@ -243,6 +243,7 @@ static struct {
 	[fifoFullAlarm clearAlarm];
 	[fifoFullAlarm release];
 	[progressLock release];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
 }
 
