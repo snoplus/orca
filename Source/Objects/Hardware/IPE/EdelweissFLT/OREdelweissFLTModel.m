@@ -2113,7 +2113,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
     //postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:2047];//min 6 was found 'experimental' for KATRIN -tb-
-    postTriggerTime = postTriggerTime & 0xffff;
+    postTriggerTime = aPostTriggerTime & 0xffff;
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelPostTriggerTimeChanged object:self];
 }
 
