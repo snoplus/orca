@@ -742,6 +742,8 @@ typedef struct {
 
 //size: id + header + 21*16 + UDPFIFOmap + IPmap = (1 + 8 + 336 + 5 + 20) 32-bit words = 1480 bytes
 #define MAX_NUM_FLT_CARDS 20
+#define MAX_NUM_FLT_PAGES 16
+
 #define IPE_BLOCK_SIZE    16
   //TODO: is also defined in EdelweissSLTv4_HW_Definitions.h, remove one of them -tb-
 

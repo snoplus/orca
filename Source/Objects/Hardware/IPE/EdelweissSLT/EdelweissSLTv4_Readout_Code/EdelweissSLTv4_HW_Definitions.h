@@ -30,6 +30,9 @@
 #define kSLTRev20131212_5WordsPerEvent	0x41950242
 //FLT events in SLT Event FIFO consists now of 5 instead of 4 words
 //+ new driver necessary (kit_ipe_slt)
+#define kSLTRev20140710_TimerWithSubsec	0x41970018
+//the 48 bit SLT time register now counts in 100 kHz sub units (was rounded to seconds up to now)
+
 
 #define kReadWaveForms	0x1 << 0
 

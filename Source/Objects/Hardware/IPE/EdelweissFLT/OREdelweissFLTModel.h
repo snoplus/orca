@@ -26,6 +26,9 @@
 #import "OREdelweissFLTDefs.h"
 #import "ORAdcInfoProviding.h"
 
+#import "ipe4structure.h"
+
+
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Forward Definitions
 @class ORDataPacket;

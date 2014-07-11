@@ -148,8 +148,8 @@ static IpeRegisterNamesStruct regV4[kEWSltV4NumRegs] = {
 {@"OperaStatusReg1",	0xB00010,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"OperaStatusReg2",	0xB00014,		1,			kIpeRegReadable | kIpeRegWriteable },
 
-{@"TimeLow",			0xB00018,		1,			kIpeRegReadable },
-{@"TimeHigh",			0xB0001C,		1,			kIpeRegReadable },
+{@"TimeLow",			0xB00018,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"TimeHigh",			0xB0001C,		1,			kIpeRegReadable | kIpeRegWriteable },
 
 {@"EventFIFO",			0xB80000,  		1, 			kIpeRegReadable },
 {@"EventFIFOStatus",	0xB80004,  		1, 			kIpeRegReadable },

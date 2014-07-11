@@ -412,6 +412,10 @@ uint32_t FLTTriggerMask_2Reg(int numFLT){
     return FLTTriggerMask_2RegBase | ((numFLT & 0x3f) <<17);  
 }
 
+uint32_t FLTPostTriggI2HDelayReg(int numFLT){
+    return FLTPostTriggI2HDelayRegBase | ((numFLT & 0x3f) <<17);  
+}
+
 uint32_t FLTAccessTestReg(int numFLT){
     return FLTAccessTestRegBase | ((numFLT & 0x3f) <<17); 
 }

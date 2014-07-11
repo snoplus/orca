@@ -128,8 +128,10 @@ uint32_t BBcsrReg(int numFIFO);
 	static const uint32_t FLTFiberSet_2RegBase  = 0x000028 >> 2;
 	static const uint32_t FLTStreamMask_1RegBase  = 0x00002c >> 2;
 	static const uint32_t FLTStreamMask_2RegBase  = 0x000030 >> 2;
+    
 	static const uint32_t FLTTriggerMask_1RegBase  = 0x000034 >> 2;
 	static const uint32_t FLTTriggerMask_2RegBase  = 0x000038 >> 2;
+	static const uint32_t FLTPostTriggI2HDelayRegBase  = 0x00003c >> 2;
 
 	static const uint32_t FLTAccessTestRegBase     = 0x000040 >> 2;
 	
@@ -141,7 +143,7 @@ uint32_t BBcsrReg(int numFIFO);
 
 
 	static const uint32_t FLTHeatTriggParRegBase     = 0x00000050 >> 2;
-	static const uint32_t FLTIonTriggParRegBase     = 0x00000050 >> 2;
+	static const uint32_t FLTIonTriggParRegBase     = 0x00000054 >> 2;
 	
 	static const uint32_t FLTReadPageNumRegBase     = 0x00007c >> 2;
 
@@ -162,6 +164,7 @@ uint32_t FLTStreamMask_1Reg(int numFLT);
 uint32_t FLTStreamMask_2Reg(int numFLT);
 uint32_t FLTTriggerMask_1Reg(int numFLT);
 uint32_t FLTTriggerMask_2Reg(int numFLT);
+uint32_t FLTPostTriggI2HDelayReg(int numFLT);
 uint32_t FLTAccessTestReg(int numFLT);
 uint32_t FLTBBStatusReg(int numFLT, int numChan);
 uint32_t FLTTotalTriggerNReg(int numFLT);

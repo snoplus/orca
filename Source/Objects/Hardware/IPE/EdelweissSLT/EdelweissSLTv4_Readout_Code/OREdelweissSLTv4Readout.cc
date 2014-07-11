@@ -1,5 +1,7 @@
 #include "OREdelweissSLTv4Readout.hh"
+#include "OREdelweissFLTv4Readout.hh" //for constatnts like kNumV4FLTs (maybe better take from ipe4structure.h?) -tb- 
 #include "EdelweissSLTv4_HW_Definitions.h"
+#include "ipe4structure.h"
 
 #include "readout_code.h"
 
@@ -30,6 +32,34 @@ extern uint32_t presentFLTMap; // store a map of the present FLT cards
 
 bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 {
+
+	//static data: buffer for data coming in from the hardware
+    //MAX_NUM_FLT_CARDS is defined in ipe4structure.h
+    const int kMaxNumFLTs  = MAX_NUM_FLT_CARDS;
+    const int kMaxNumPages = MAX_NUM_FLT_PAGES;
+    
+    
+	//static uint32_t adctrace32[kNumV4FLTs][kNumV4FLTChannels][kNumV4FLTADCPageSize32];//shall I use a 4th index for the page number? -tb-
+	//if sizeof(long unsigned int) != sizeof(uint32_t) we will come into troubles (64-bit-machines?) ... -tb-
+	static uint32_t FIFO1[kMaxNumFLTs][kMaxNumPages];
+	static uint32_t FIFO2[kMaxNumFLTs][kMaxNumPages];
+	static uint32_t FIFO3[kMaxNumFLTs][kMaxNumPages];
+	static uint32_t FIFO4[kMaxNumFLTs][kMaxNumPages];
+	static uint32_t FIFO5[kMaxNumFLTs][kMaxNumPages];
+	static int64_t timestampBuf[kMaxNumFLTs][kMaxNumPages];
+    //flags
+	static uint8_t flagHasEvent[kMaxNumFLTs][kMaxNumPages];
+	static uint8_t fltEnabled[kMaxNumFLTs];
+	static uint32_t flagsBuf[kMaxNumFLTs][kMaxNumPages];
+    #define kFlagBufPending 0x1
+    //more buffers
+	static uint32_t fltTriggerMaskBuf[kMaxNumFLTs];
+	static uint32_t fltPostTrigTimeBuf[kMaxNumFLTs];
+    
+	//static uint32_t FltStatusReg[kNumV4FLTs];
+	//static uint32_t debugbuffer[kNumV4FLTs][kNumV4FLTChannels];//used for debugging -tb-
+
+
 
     uint32_t readbuffer32[2048];
     uint32_t shipbuffer32[2048];
@@ -62,10 +92,13 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     
     uint32_t location   = 0;
     
-    if(runFlags & kFirstTimeFlag){// firstTime   
+    if(runFlags & kFirstTimeFlag){// firstTime   -    clear software event buffer, read parameters from hardware
     	location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
-fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, GetNextTriggerIndex()[0] %i\n",location,GetNextTriggerIndex()[0]);fflush(stderr);
+
+
+        //DEBUG:
+        fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, GetNextTriggerIndex()[0] %i\n",location,GetNextTriggerIndex()[0]);fflush(stderr);
 		//make some plausability checks
 		//...
 
@@ -76,6 +109,38 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
         //debug: 
 		fprintf(stdout,"SLT #%i: first cycle\n",col+1);fflush(stdout);
         //debug: //sleep(1);
+        
+        //read post trigger times from HW
+        int xyz=presentFLTMap;
+        int fltIdx,trigChanIdx;
+        for(fltIdx=0; fltIdx<ORFLTv4Readout::kNumFLTs /*MAX_NUM_FLT_CARDS*/; fltIdx++){//MAX_NUM_FLT_CARDS (in ipe4structure.h, #define) or kNumV4FLTs (in OREdelweissFLTv4Readout.h, class member, use as ORFLTv4Readout::kNumFLTs) ... is the same ... -tb-
+            fltPostTrigTimeBuf[fltIdx]=0;
+            fltTriggerMaskBuf[fltIdx]=0;
+            if((0x1<<fltIdx) & presentFLTMap){
+                //read post trigger time
+                xyz = pbus->read(FLTPostTriggI2HDelayReg(fltIdx+1));
+                fprintf(stdout,"firsttime: FLT %i,#%i: is present, PostTriggReg is 0x%08x\n",fltIdx,fltIdx+1,xyz);fflush(stdout);
+                fltPostTrigTimeBuf[fltIdx]=(xyz>>16) & 0xffff;
+                
+                //read trigger enable mask
+                for(trigChanIdx=0; trigChanIdx<18; trigChanIdx++){
+                    xyz = pbus->read(FLTTriggParReg(fltIdx+1, trigChanIdx));
+                    //fprintf(stdout,"   firsttime: FLT %i,#%i: is present, fltTrigParReg idx %i is 0x%08x\n",fltIdx,fltIdx+1,trigChanIdx,xyz);fflush(stdout);
+                    if(xyz & 0x8000) 
+                       fltTriggerMaskBuf[fltIdx] = fltTriggerMaskBuf[fltIdx] | (0x1<<trigChanIdx);
+                }
+                fprintf(stdout,"firsttime: FLT %i,#%i: is present, fltTriggerMaskBuf is 0x%08x\n",fltIdx,fltIdx+1,fltTriggerMaskBuf[fltIdx]);fflush(stdout);
+            }
+        }
+        //clear buffer (just clear flags)
+        int f,p;
+        for(f=0; f<kMaxNumFLTs;f++){
+            for(p=0; p<kMaxNumPages; p++){
+                flagHasEvent[f][p]=0;
+                if((0x1<<fltIdx) & presentFLTMap) fltEnabled[f]=1; else fltEnabled[f]=0;
+            }
+        }
+        
 		return true;
 	}
 
@@ -127,7 +192,10 @@ fprintf(stderr,"OREWSLTv4Readout::Readout(SBC_LAM_Data* lamData): location %i, G
             usleep(21000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
             
             uint32_t chan,chanBit,chanMap; 
-            chanMap=eventFifo2 & 0x3ffff;
+            //chanMap is used to flag, which channels to read out (it is NOT written to the file - use FIFO2 instead) -tb-
+            //chanMap=eventFifo2 & 0x3ffff;// this reads only triggered events (with flag set in FIFO2)
+            chanMap=fltTriggerMaskBuf[flt];  //this reads all channels, which have the triggerEnable flag set (see HeatTrigggPar/IonTriggPar)
+            printf("--> Found trigger for FLT#%i (idx %i), chanmap is 0x%08x, using software mask 0x%08x\n",flt+1,flt, eventFifo2 & 0x3ffff, chanMap);
             for(chan=0; chan<30; chan++){
                 if(chan<18) chanBit=0x1 << chan; else chanBit=0x1 << (chan-18+6);
                 if(chanBit & chanMap){//read out according data buffer and ship event
@@ -156,7 +224,7 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
                                 {   int i,ioffset=0;
                                     if(chan>17 && chan<30) ioffset=triggerAddr;//do not shift 
                                     else 
-										ioffset=triggerAddr+1023;//TODO: take postriggerTime-1 instead of 1023 -tb-
+										ioffset=triggerAddr+(fltPostTrigTimeBuf[flt]-1);//TODO: take postriggerTime-1 instead of 1023 -tb- DONE -tb-
                                     for(i=0; i<waveformLength; i++,ioffset++){
                                         ioffset = ioffset % 2048;
                                         shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[ioffset] & 0xffff));

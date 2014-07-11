@@ -25,6 +25,9 @@
 #import "OREdelweissFLTDefs.h"
 #import "SLTv4_HW_Definitions.h"
 
+#import "ipe4structure.h"
+
+
 @implementation OREdelweissFLTDecoderForEnergy
 
 //-------------------------------------------------------------
