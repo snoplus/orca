@@ -151,21 +151,21 @@ enum {
 };
 
 enum {
-	kMainFPGAControl,			//[0] Main Digitizer FPGA configuration register
-	kMainFPGAStatus,			//[1] Main Digitizer FPGA status register
-	kVoltageAndTemperature,		//[2] Voltage and Temperature Status
-	kVMEGPControl,				//[3] General Purpose VME Control Settings
-	kVMETimeoutValue,			//[4] VME Timeout Value Register
-	kVMEFPGAVersionStatus,		//[5] VME Version/Status
-	kVMEFPGASandbox1,			//[6] VME FPGA Sandbox Register Block
-	kVMEFPGASandbox2,			//[7] VME FPGA Sandbox Register Block
-	kVMEFPGASandbox3,			//[8] VME FPGA Sandbox Register Block
-	kVMEFPGASandbox4,			//[9] VME FPGA Sandbox Register Block
-	kFlashAddress,				//[10] Flash Address
-	kFlashDataWithAddrIncr,		//[11] Flash Data with Auto-increment address
-	kFlashData,					//[12] Flash Data
-	kFlashCommandRegister,		//[13] Flash Command Register
-	kNumberOfFPGARegisters
+	kTriggerMainFPGAControl,			//[0] Main Digitizer FPGA configuration register
+	kTriggerMainFPGAStatus,             //[1] Main Digitizer FPGA status register
+	kTriggerVoltageAndTemperature,		//[2] Voltage and Temperature Status
+	kTriggerVMEGPControl,				//[3] General Purpose VME Control Settings
+	kTriggerVMETimeoutValue,			//[4] VME Timeout Value Register
+	kTriggerVMEFPGAVersionStatus,		//[5] VME Version/Status
+	kTriggerVMEFPGASandbox1,			//[6] VME FPGA Sandbox Register Block
+	kTriggerVMEFPGASandbox2,			//[7] VME FPGA Sandbox Register Block
+	kTriggerVMEFPGASandbox3,			//[8] VME FPGA Sandbox Register Block
+	kTriggerVMEFPGASandbox4,			//[9] VME FPGA Sandbox Register Block
+	kTriggerFlashAddress,				//[10] Flash Address
+	kTriggerFlashDataWithAddrIncr,		//[11] Flash Data with Auto-increment address
+	kTriggerFlashData,					//[12] Flash Data
+	kTriggerFlashCommandRegister,		//[13] Flash Command Register
+	kTriggerNumberOfFPGARegisters
 };
 
 enum {
@@ -197,7 +197,7 @@ enum {
     kStep5c,
     kStep5d,
     kRunLastSteps,
-    kWaitTillFinal,
+    kWaitOnSteps6To9,
     kStep6a,
     kStep6b,
     kStep7a,
@@ -207,7 +207,9 @@ enum {
     kStep7e,
     kStep7f,
     kStep7g,
-    kStepFinal,
+    kStep8,
+    kStep9,
+    kStep10,
     kStepError,
 };
 
@@ -328,6 +330,7 @@ enum {
 
 - (void) stepMaster;
 - (void) stepRouter;
+- (void) stepDigitizer;
 - (void) setRoutersToIdle;
 - (BOOL) allRoutersIdle;
 
