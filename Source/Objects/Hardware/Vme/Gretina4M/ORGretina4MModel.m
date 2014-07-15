@@ -544,7 +544,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return registerIndex;
 }
 
-- (void) setRegisterIndex:(short)aRegisterIndex
+- (void) setRegisterIndex:(int)aRegisterIndex
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRegisterIndex:registerIndex];
     registerIndex = aRegisterIndex;
@@ -582,10 +582,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	return register_information[index].name;
 }
 
+- (unsigned short) registerOffsetAt:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4MRegisters) return @"";
+	return register_information[index].offset;
+}
+
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index
 {
 	if (index >= kNumberOfFPGARegisters) return @"";
 	return fpga_register_information[index].name;
+}
+
+- (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return @"";
+	return fpga_register_information[index].offset;
 }
 
 - (unsigned long) readRegister:(unsigned int)index
@@ -1395,10 +1407,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
 	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
-
-	if (mainVersion > kCurrentFirmwareVersion){
-		NSLog(@"Main FPGA version is higher than expected: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
-	}
     
 	if (mainVersion < kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);

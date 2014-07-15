@@ -449,11 +449,22 @@ static struct {
 	if (index >= kNumberOfGretina4Registers) return @"";
 	return register_information[index].name;
 }
+- (unsigned short) registerOffsetAt:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return @"";
+	return register_information[index].offset;
+}
 
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index
 {
 	if (index >= kNumberOfFPGARegisters) return @"";
 	return fpga_register_information[index].name;
+}
+
+- (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return @"";
+	return fpga_register_information[index].offset;
 }
 
 - (unsigned long) readRegister:(unsigned int)index
