@@ -94,12 +94,16 @@
         [[postrecntMatrix cellAtRow:i column:0] setTag:i];
     }
 	for (i=0;i<kNumberOfGretina4MRegisters;i++) {
-		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i], [model registerNameAt:i]];
+        
+		[registerIndexPU insertItemWithTitle:s	atIndex:i];
 		[[registerIndexPU itemAtIndex:i] setEnabled:![model displayRegisterOnMainPage:i] && ![model displayFPGARegisterOnMainPage:i]];
 	}
 	// And now the FPGA registers
 	for (i=0;i<kNumberOfFPGARegisters;i++) {
-		[registerIndexPU insertItemWithTitle:[model fpgaRegisterNameAt:i]	atIndex:(i+kNumberOfGretina4MRegisters)];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model fpgaRegisterOffsetAt:i], [model fpgaRegisterNameAt:i]];
+
+		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4MRegisters)];
 	}
 
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4M%d.selectedtab",[model slot]];

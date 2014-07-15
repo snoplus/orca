@@ -171,7 +171,11 @@
     
     NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
-	ptr+=2;
+
+    NSString* crateKey			= [self getCrateKey: crate];
+	NSString* cardKey			= [self getCardKey: card];
+
+    ptr+=2;
     NSString* chan  = [NSString stringWithFormat:@"Chan  = %lu\n",*ptr&0xf];
 	ptr+=2;
 	unsigned long energy = *ptr >> 16;
@@ -180,13 +184,23 @@
 	
 	// energy is in 2's complement, taking abs value if necessary
 	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
-	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %lu\n",energy/50]; //mah 10/21 added the /50 to be consistent with histogramed value
+    
+    NSString* rawEnergyStr = [NSString stringWithFormat:@"Raw Energy  = 0x%08lx\n",energy];
+
+    int histEMultiplier = [[self objectForNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil] intValue];
+    if(histEMultiplier) energy *= histEMultiplier;
+    
+    int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
+    if(integrateTime) energy /= integrateTime;
+    
+	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %lu\n",energy];
+    
     NSString* header = @"Header (Raw)\n";
     int i;
     for(i=0;i<15;i++){
         header = [header stringByAppendingFormat:@"%d: 0x%08lx\n",i,headerStartPtr[i]];
     }
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,chan,energyStr,header];
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,chan,rawEnergyStr,energyStr,header];
 }
 
 @end

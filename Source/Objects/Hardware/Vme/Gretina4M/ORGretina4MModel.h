@@ -303,7 +303,7 @@ enum Gretina4MFIFOStates {
 - (short) downSample;
 - (void) setDownSample:(short)aDownSample;
 - (short) registerIndex;
-- (void) setRegisterIndex:(short)aRegisterIndex;
+- (void) setRegisterIndex:(int)aRegisterIndex;
 - (unsigned long) registerWriteValue;
 - (void) setRegisterWriteValue:(unsigned long)aWriteValue;
 - (unsigned long) spiWriteValue;
@@ -326,7 +326,9 @@ enum Gretina4MFIFOStates {
 
 // Register access
 - (NSString*) registerNameAt:(unsigned int)index;
+- (unsigned short) registerOffsetAt:(unsigned int)index;
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index;
+- (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index;
 - (unsigned long) readRegister:(unsigned int)index;
 - (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
 - (BOOL) canReadRegister:(unsigned int)index;
