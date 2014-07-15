@@ -371,7 +371,7 @@
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
 {
-	[registerWriteValueField setIntValue: [model registerWriteValue]];
+	[registerWriteValueField setIntValue: [model regWriteValue]];
 }
 
 - (void) registerIndexChanged:(NSNotification*)aNote
@@ -474,7 +474,7 @@
 - (IBAction) writeRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = [model registerWriteValue];
+	unsigned short aValue = [model regWriteValue];
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretinaTriggerRegisters) {
 		[model writeRegister:index withValue:aValue];
@@ -483,7 +483,7 @@
 
 - (IBAction) registerWriteValueAction:(id)sender
 {
-	[model setRegisterWriteValue:[sender intValue]];
+	[model setRegWriteValue:[sender intValue]];
 }
 
 - (IBAction) settingLockAction:(id) sender
