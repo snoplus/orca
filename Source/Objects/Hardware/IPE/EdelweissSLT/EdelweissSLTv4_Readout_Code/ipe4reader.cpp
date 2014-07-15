@@ -3387,13 +3387,6 @@ void FIFOREADER::scanFIFObuffer(void)
 	int32_t		temp_status_bbv2_1[_nb_mots_status_bbv2 + 10];	//_nb_mots_status_bbv2 = 57 -tb-
 	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
 	
-	//following lines by Bernhard to get the localtime in the ipe4reader output
-	struct tm *Zeit;
-	long Jetzt;
-	time(&Jetzt);
-	Zeit = localtime(&Jetzt);
-	//end modification by Bernhard*/
-
 
 
 
@@ -3622,12 +3615,31 @@ void FIFOREADER::scanFIFObuffer(void)
                         setUdpDataPacketSize(max_udp_size_config);
                     }
                 }
+                
                 printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
-                printf("PC-Time: %d:%d:%d\n",Zeit->tm_hour, Zeit->tm_min, Zeit->tm_sec); //by Bernhard to see the time in the ipe4reader output
+
             }
             #endif
             
-            
+            {
+                //show PC time
+                struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
+                gettimeofday(&currenttime,NULL);
+                uint32_t currentSec = currenttime.tv_sec;  
+                uint32_t currentSubSec = currenttime.tv_usec;  
+
+	            //following lines by Bernhard to get the localtime in the ipe4reader output
+	            struct tm *Zeit;
+	            long Jetzt;
+	            time(&Jetzt);
+	            Zeit = localtime(&Jetzt);
+	            //end modification by Bernhard*/
+
+                printf("PC-Time (CEST?): %d:%02d:%02d  (UTC:%i, gtodUTC:%i,%i)\n",Zeit->tm_hour, Zeit->tm_min, Zeit->tm_sec,Jetzt,currentSec,currentSubSec); //by Bernhard to see the time in the ipe4reader output
+            }
+
+
+
 		    //TODO: move "send code" to this location???? -tb-
 		
 
@@ -3642,9 +3654,12 @@ void FIFOREADER::scanFIFObuffer(void)
             uint32_t pd_fort=0, pd_faible=0;
             pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
             pd_faible = FIFObuf32[2] & 0x3fffffff;  // 30 bit
-            udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;
+    uint64_t sltTime = 0;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) /100000 ;
+            udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;//THIS FORMULA IS WRONG -tb- 2014-07
+            udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
-            if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i\n", globalHeaderWordCounter,udpdataSec);
+            if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
 //TODO: remove it, for DEBUGGING -tb-
 //udpdataSec= globalHeaderWordCounter;
             //now 'remove' header from FIFObuff32
@@ -4186,6 +4201,46 @@ void RunSomeHardwareTests()
     printf("----------------------------\n");
     pbus->write(SLTCommandReg,0x2);//this is the SltRes flag
     usleep(1);
+    
+    //4.
+    //set SLT time register to UTC -tb- 2014-07
+    struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
+    uint32_t currentSec = 0;  
+    gettimeofday(&currenttime,NULL);
+    currentSec = currenttime.tv_sec;  
+
+    uint32_t sltTimeLo = 0;  
+    uint32_t sltTimeHi = 0;  
+    uint64_t sltTime = 0;  
+    int64_t timeDiff = 0;  
+    sltTimeLo = pbus->read(SLTTimeLowReg);
+    sltTimeHi = pbus->read(SLTTimeHighReg);
+    sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+    printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+    timeDiff=currentSec-sltTime;
+    if((timeDiff < -1) || (timeDiff >1)){
+        printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
+        sltTime = ((uint64_t)currentSec) * 100000LL;
+        sltTimeLo =  sltTime        & 0xffffffff;
+        sltTimeHi = (sltTime >> 32) & 0xffffffff;
+        pbus->write(SLTTimeLowReg, sltTimeLo);
+        pbus->write(SLTTimeHighReg, sltTimeHi);
+        sleep(1);
+        sltTimeLo = pbus->read(SLTTimeLowReg);
+        sltTimeHi = pbus->read(SLTTimeHighReg);
+        sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+        printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+
+        #if 0
+        pbus->write(SLTTimeLowReg, 0);
+        pbus->write(SLTTimeHighReg, 0);
+        sleep(1);
+        #endif
+
+
+    }else{
+        printf("   timeDiff:  %lli - OK!\n", timeDiff);
+    }
     
 }
 
