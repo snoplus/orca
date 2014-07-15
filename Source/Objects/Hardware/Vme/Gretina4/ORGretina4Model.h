@@ -295,7 +295,9 @@ enum Gretina4FIFOStates {
 
 // Register access
 - (NSString*) registerNameAt:(unsigned int)index;
+- (unsigned short) registerOffsetAt:(unsigned int)index;
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index;
+- (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index;
 - (unsigned long) readRegister:(unsigned int)index;
 - (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
 - (BOOL) canReadRegister:(unsigned int)index;
