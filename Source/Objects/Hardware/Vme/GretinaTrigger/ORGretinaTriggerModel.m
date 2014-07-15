@@ -779,17 +779,17 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             break;
             
         case kStep1a: //1a. Mask out all unused channels
-            // [self writeRegister:kInputLinkMask withValue:~connectedRouterMask]; //A set bit disables a channel
-            [self writeRegister:kInputLinkMask withValue:0xFE];
+            [self writeRegister:kInputLinkMask withValue:~connectedRouterMask]; //A set bit disables a channel
+            //[self writeRegister:kInputLinkMask withValue:0xFE];
             [self setInputLinkMask:  [self readRegister:kInputLinkMask]];       //read it back for display
             [self setInitState:kStep1b];
             break;
             
         case kStep1b: //1b. Set the matching bit in the serdes tpower and rpower registers
-            // [self writeRegister:kSerdesTPower withValue:connectedRouterMask]; // !!!
-            // [self writeRegister:kSerdesRPower withValue:connectedRouterMask]; // !!!
-            [self writeRegister:kSerdesTPower withValue:0x1];
-            [self writeRegister:kSerdesRPower withValue:0x1];
+            [self writeRegister:kSerdesTPower withValue:connectedRouterMask];
+            [self writeRegister:kSerdesRPower withValue:connectedRouterMask];
+            //[self writeRegister:kSerdesTPower withValue:0x1];
+            //[self writeRegister:kSerdesRPower withValue:0x1];
             [self setSerdesTPowerMask:[self readRegister:kSerdesTPower]]; //read it back for display
             [self setSerdesRPowerMask:[self readRegister:kSerdesRPower]]; //read it back for display
             [self setInitState:kStep1c];
@@ -799,8 +799,8 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             if(connectedRouterMask & 0xf)    masterPreMask |= 0x151; //Links A,B,C,D
             if(connectedRouterMask & 0x70)   masterPreMask |= 0x152; //Links E,F,G
             if(connectedRouterMask & 0x780)  masterPreMask |= 0x154; //Links H,L,R,U
-            //[self writeRegister:kLvdsPreEmphasis withValue:masterPreMask];
-            [self writeRegister:kLvdsPreEmphasis withValue:0x7];
+            [self writeRegister:kLvdsPreEmphasis withValue:masterPreMask];
+            //[self writeRegister:kLvdsPreEmphasis withValue:0x7];
             [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]]; //read it back for display
             [self setInitState:kStep1d];
             break;
@@ -979,19 +979,6 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
     return YES;
 }
 
-/*- (BOOL) allDigitizersIdle
-{
-    int i;
-    for(i=0;i<8;i++){
-        ORConnector* otherConnector = [linkConnector[i] connector];
-        if([otherConnector identifer] == 'G'){
-            ORGretina4MModel* digitizerObj = [otherConnector objectLink];
-            if([digitizerObj initState] != kStepIdle)return NO;
-        }
-    }
-    return YES;
-}
-*/
 - (void) stepRouter
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stepRouter) object:nil];
@@ -1092,15 +1079,15 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             }
             else {
                // [self writeRegister:kInputLinkMask withValue:(~connectedDigitizerMask)]; // !!!
-                [self writeRegister:kInputLinkMask withValue:0xBF];
+                [self writeRegister:kInputLinkMask withValue:0xFC];
                 [self setInputLinkMask:[self readRegister:kInputLinkMask]]; // read back for display
                 [self setInitState:kStep7b];
             }
             break;
             
         case kStep7b:
-            [self writeRegister:kSerdesTPower withValue:0x140];
-            [self writeRegister:kSerdesRPower withValue:0x140];
+            [self writeRegister:kSerdesTPower withValue:0x103];
+            [self writeRegister:kSerdesRPower withValue:0x103];
             [self setSerdesRPowerMask:[self readRegister:kSerdesRPower]]; // read back for display
             [self setSerdesTPowerMask:[self readRegister:kSerdesTPower]]; // read back for display
             [self setInitState:kStep7d];
@@ -1175,35 +1162,6 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
     }
 }
 
-/*- (void) stepDigitizer
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stepDigitizer) object:nil];
-    
-    NSLog(@"\n");
-    NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
-    //    NSLog(@"Before Step\n");
-    //read a few registers that we will use repeatedly and display
-    [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
-    
-    switch (initializationState) {
-        case kStep8a:
-            [self writeRegister:kTriggerVMEGPControl withValue:0x2];
-            [self setInitState:kStep8b];
-            break;
-            
-        case kStep8b:
-            [self writeRegister:kMasterLogicStatus withValue:0x20051];
-            [self setInitState:kStep8c];
-            break;
-            
-        case kStep8c:
-            [self writeRegister:kSDConfig withValue:0x20];
-            [self setInitState:kStepIdle];
-            break;
-    }
-
-}
-*/
 - (unsigned short)findRouterMask
 {
     unsigned short aMask = 0x0;
