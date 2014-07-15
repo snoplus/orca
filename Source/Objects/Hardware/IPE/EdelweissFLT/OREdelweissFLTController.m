@@ -3298,7 +3298,8 @@
 //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
     //TODO: use try...catch -tb-
-    [model writeTriggerParameters];
+    [model writeTriggerParametersVerbose];
+    //[model writeTriggerParameters];
 }
 
 - (IBAction) dumpTriggerParametersButtonAction:(id)sender

@@ -146,6 +146,8 @@
     int swTriggerIsRepeating;
     int32_t fiberOutMask;
     int fiberSelectForBBStatusBits;
+    int testVariable;
+    unsigned long CFPGAVersion;
     
     
     uint32_t statusBitsBB[kNumEWFLTFibers][kNumBBStatusBufferLength32];//default: [6][30]
@@ -199,6 +201,13 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (short) getNumberRegisters;
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers;
+//- (void) runIsAboutToStop:(NSNotification*)aNote;
+- (void) runIsAboutToStart:(NSNotification*)aNote;
+- (void) runIsAboutToChangeState:(NSNotification*)aNote;
+- (BOOL) preRunChecks;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 - (NSString*) chargeFICFile;
@@ -436,6 +445,7 @@
 - (void) setGains:(NSMutableArray*)aGains;
 
 - (void) readTriggerParameters;
+- (void) writeTriggerParametersVerbose;
 - (void) writeTriggerParameters;
 - (void) dumpTriggerParameters;
 - (void) setTriggerPar:(unsigned short)chan  withValue:(uint32_t) val;

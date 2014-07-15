@@ -35,8 +35,10 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
 	//static data: buffer for data coming in from the hardware
     //MAX_NUM_FLT_CARDS is defined in ipe4structure.h
-    const int kMaxNumFLTs  = MAX_NUM_FLT_CARDS;
-    const int kMaxNumPages = MAX_NUM_FLT_PAGES;
+    const int kMaxNumFLTs  = MAX_NUM_FLT_CARDS;//currently 4096
+    const int kMaxNumPages = MAX_NUM_FLT_PAGES;//currently 4096
+    const int kMaxPageLength32 = MAX_FLT_PAGE_LENGTH;//currently 4096
+    static int currentPageLength32 = 2048;
     
     
 	//static uint32_t adctrace32[kNumV4FLTs][kNumV4FLTChannels][kNumV4FLTADCPageSize32];//shall I use a 4th index for the page number? -tb-
@@ -56,15 +58,18 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 	static uint32_t fltTriggerMaskBuf[kMaxNumFLTs];
 	static uint32_t fltPostTrigTimeBuf[kMaxNumFLTs];
     
+	static uint32_t hwCFPGAversion[kMaxNumFLTs];//individual CFPGA versions read back from HW
+	static uint32_t globalCFPGAversion = 0;//CFPGA version read back from HW
+    
 	//static uint32_t FltStatusReg[kNumV4FLTs];
 	//static uint32_t debugbuffer[kNumV4FLTs][kNumV4FLTChannels];//used for debugging -tb-
 
 
 
-    uint32_t readbuffer32[2048];
-    uint32_t shipbuffer32[2048];
+    uint32_t readbuffer32[kMaxPageLength32];
+    uint32_t shipbuffer32[kMaxPageLength32];
     uint16_t *shipbuffer16=(uint16_t *)shipbuffer32;
-    uint32_t shipdebugbuffer32[2048];
+    uint32_t shipdebugbuffer32[kMaxPageLength32];
     uint16_t *shipdebugbuffer16=(uint16_t *)shipdebugbuffer32;
     
     int32_t leaf_index;
@@ -95,6 +100,8 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     if(runFlags & kFirstTimeFlag){// firstTime   -    clear software event buffer, read parameters from hardware
     	location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;
 
+        //init/clear buffered values
+        globalCFPGAversion = 0;
 
 
         //DEBUG:
@@ -114,9 +121,13 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
         int xyz=presentFLTMap;
         int fltIdx,trigChanIdx;
         for(fltIdx=0; fltIdx<ORFLTv4Readout::kNumFLTs /*MAX_NUM_FLT_CARDS*/; fltIdx++){//MAX_NUM_FLT_CARDS (in ipe4structure.h, #define) or kNumV4FLTs (in OREdelweissFLTv4Readout.h, class member, use as ORFLTv4Readout::kNumFLTs) ... is the same ... -tb-
-            fltPostTrigTimeBuf[fltIdx]=0;
-            fltTriggerMaskBuf[fltIdx]=0;
-            if((0x1<<fltIdx) & presentFLTMap){
+            //init/clear buffers
+            fltPostTrigTimeBuf[fltIdx] = 0;
+            fltTriggerMaskBuf[fltIdx]  = 0;
+            hwCFPGAversion[fltIdx]     = 0;
+            
+            //read from FLTs
+            if((0x1<<fltIdx) & presentFLTMap){//read only from present FLTs
                 //read post trigger time
                 xyz = pbus->read(FLTPostTriggI2HDelayReg(fltIdx+1));
                 fprintf(stdout,"firsttime: FLT %i,#%i: is present, PostTriggReg is 0x%08x\n",fltIdx,fltIdx+1,xyz);fflush(stdout);
@@ -130,8 +141,32 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
                        fltTriggerMaskBuf[fltIdx] = fltTriggerMaskBuf[fltIdx] | (0x1<<trigChanIdx);
                 }
                 fprintf(stdout,"firsttime: FLT %i,#%i: is present, fltTriggerMaskBuf is 0x%08x\n",fltIdx,fltIdx+1,fltTriggerMaskBuf[fltIdx]);fflush(stdout);
+                
+                //read CFPGA version
+                hwCFPGAversion[fltIdx]  = pbus->read(FLTVersionReg(fltIdx+1));
+                globalCFPGAversion = hwCFPGAversion[fltIdx];
+                fprintf(stdout,"firsttime: FLT %i,#%i: is present, hwCFPGAversion is 0x%08x\n",fltIdx,fltIdx+1,hwCFPGAversion[fltIdx]);fflush(stdout);
             }
         }
+        //CFPGA version dependent settings
+        //if(globalCFPGAversion==0)  fprintf(stdout,"firsttime:  globalCFPGAversion is 0x%08x - no FLTs in the crate!\n",globalCFPGAversion);
+        //version with large pages: > 0x4001020e (1073807886), more precisely for version >3.x (>0x400103XX)
+        if(globalCFPGAversion >= 0x40010300){//large (4096) pages
+            //TODO:  replace by 0x40010300!!! DONE -tb-
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            //TODO:  replace by 0x40010300!!!
+            currentPageLength32 = 4096;
+        }else{//short (2048) pages
+            currentPageLength32 = 2048;
+        }
+        fprintf(stdout,"firsttime:  globalCFPGAversion is 0x%08x - using FLT page length %i!\n",globalCFPGAversion,currentPageLength32);
+        
         //clear buffer (just clear flags)
         int f,p;
         for(f=0; f<kMaxNumFLTs;f++){
@@ -204,8 +239,8 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 						        uint32_t wfRecordVersion=0;//length: 4 bit (0..15) 0x1=raw trace, full length
                         //wfRecordVersion = 0x2 ;//0x2=always take adcoffset+post trigger time - recommended as default -tb-
                         wfRecordVersion = 0x4 ;//0x4= data shift for fast channel data without postTriggerTime -  added 2014-06-17  -tb-
-                                uint32_t waveformLength = 2048; 
-								uint32_t waveformLength32=waveformLength/2; //the waveform length is variable    
+                                uint32_t waveformLength = currentPageLength32; //now variable 2014-07 -tb- - was 2048; is now 4096
+								uint32_t waveformLength32=waveformLength/2; //this is  the length for the Orca data record; the waveform length is variable    
 /*								
 int itmp;
 for(itmp=0; itmp<16; itmp++){
@@ -218,7 +253,8 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
 
                                 uint32_t address=  FLTRAMDataReg(flt+1, chan)  ;
                                 //ensure to wait until FLT has written the trace ...
-                                pbus->readBlock(address, (unsigned long *) readbuffer32, waveformLength);//read 2048 word32s
+                                pbus->readBlock(address, (unsigned long *) readbuffer32, waveformLength);//read 2048 (was 2048; is now 4096) word32s
+                    printf("    Ship ADC data for FLT#%i (idx %i), Channel (%i) , read page length %i (%i)\n",flt+1,flt, chan,waveformLength,currentPageLength32);
                                 //rearrange (could do it later, copiing into ring buffer ...)
                                 triggerAddr =  eventFifo4 & 0xfff;
                                 {   int i,ioffset=0;
@@ -226,7 +262,7 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
                                     else 
 										ioffset=triggerAddr+(fltPostTrigTimeBuf[flt]-1);//TODO: take postriggerTime-1 instead of 1023 -tb- DONE -tb-
                                     for(i=0; i<waveformLength; i++,ioffset++){
-                                        ioffset = ioffset % 2048;
+                                        ioffset = ioffset % waveformLength; //was 2048; is now 4096
                                         shipbuffer16[i]=(uint16_t)((uint32_t)(readbuffer32[ioffset] & 0xffff));
                                         shipdebugbuffer16[i]=(uint16_t)((uint32_t)((readbuffer32[ioffset]>>16) & 0xffff));
                                     }
@@ -241,7 +277,7 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
                                     shapingLength= pbus->read(FLTTriggParReg(flt+1,chan)) & 0xff;
 
                                 //ship data record
-                                ensureDataCanHold(9 + waveformLength/2); 
+                                ensureDataCanHold(9 + waveformLength32); 
                                 data[dataIndex++] = fltEventId | (9 + waveformLength32);    
                                 //printf("FLT%i: fltEventId is %i  loc+ev.chan %i\n",col+1,fltEventId,  location | eventchan<<8);
                                 data[dataIndex++] = location;
@@ -258,7 +294,7 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
                                 //data[dataIndex++] = 0;    //spare to remain byte compatible with the v3 record
                                 data[dataIndex++] = 0;//tmpNumPage; //shapingLength;//0;//postTriggerTime /*for debugging -tb-*/   ;    //spare to remain byte compatible with the v3 record
                                 
-                                //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-
+                                //TODO: SHIP TRIGGER POS and POSTTRIGG time !!! -tb-  for now (2014-07): TRIGGER POS is in eventFifo4, POSTTRIGGTIME is in XML header
                                 
                                 //ship waveform
                                 for(uint32_t i=0;i<waveformLength32;i++){
@@ -324,6 +360,7 @@ pbus->write(FLTReadPageNumReg(flt+1),numPage);
     
     readoutWith4WordsPerEvent: ;
     //old version of readout loop (used in eg. Tuebingen 2013), before 2013-12-12 -tb-
+    //has hardcoded waveform length of 2048 shorts
 	//===================================================================================================================
     //data readout loop
     if(takeEventData){

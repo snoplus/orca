@@ -282,6 +282,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self setStatusBitsBBData: [NSMutableData dataWithLength: 4 * kNumEWFLTFibers * kNumBBStatusBufferLength32]];
 	}
 
+    int i;
+	if(!thresholds){
+		[self setThresholds: [NSMutableArray array]];
+		for(i=0;i<kNumEWFLTHeatIonChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
+	}
+	if(!triggerParameter){
+		[self setTriggerParameter: [NSMutableArray array]];
+		for(i=0;i<kNumEWFLTHeatIonChannels;i++) [triggerParameter addObject:[NSNumber numberWithInt:0]];
+	}
+    
+    [self registerNotificationObservers];
+
     return self;
 }
 
@@ -289,7 +301,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {	
     [chargeFICFile release];
     [chargeBBFileForFiber[0] release];//sorry, this is awfuel, but it was a quick hack -tb-
-    [chargeBBFileForFiber[1] release];
+    [chargeBBFileForFiber[1] release]; 
     [chargeBBFileForFiber[2] release];
     [chargeBBFileForFiber[3] release];
     [chargeBBFileForFiber[4] release];
@@ -304,6 +316,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[triggerParameter release];
 	[gains release];
 	[totalRate release];
+   	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
 	[super dealloc];
 }
 
@@ -345,6 +359,155 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
+
+
+
+
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers
+{
+
+    return; //currently unused -tb-
+    
+    
+    
+    
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+ 	[notifyCenter removeObserver:self]; //guard against a double register
+   
+    //[super registerNotificationObservers]; ORIpeV4FLTModel does not implement it ... -tb-
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+					   
+	#if 0
+    [notifyCenter addObserver : self
+                     selector : @selector(XXXXsettingsLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToStop:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToChangeState:)
+                         name : ORRunAboutToChangeState
+                       object : nil];
+	#endif
+					   
+}
+
+#if 0
+//#define SHOW_RUN_NOTIFICATIONS_AND_CALLS 1
+- (void) runIsAboutToStop:(NSNotification*)aNote
+{
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    //reset the 'sync with subruns' facility (should not be necessary without 'sending  eRunStarting twice' bug)
+	runControlState = eRunStopping;
+	syncWithRunControlCounterFlag = 0;
+}
+#endif
+
+
+
+- (void) runIsAboutToStart:(NSNotification*)aNote
+{
+         //DEBUG
+                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    
+        //a test:
+        testVariable = 25;
+    
+    if(![self isPartOfRun]) return;
+        //read FPGA firmware version and status register for ... addParametersToDictionary:(NSMutableDictionary*) ...
+        //this is called ater runTaskStarted:..., so these values will go into the Orca run file -tb-
+        unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	    [self setStatusRegister:status];
+    
+        CFPGAVersion = [self readVersion];
+
+}
+
+
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote
+{
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+
+         //DEBUG
+                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- FLT #%i [self isPartOfRun] %i<----------------state:%i---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],[self isPartOfRun],state);//DEBUG -tb-
+                
+    
+    //is FLT  in data taker list of data task manager?
+    if(![self isPartOfRun]) return;
+    
+
+    if(1 || state==eRunStarting){
+        //DEBUG
+        NSLog(@"%@::%@ FLT#%i: run is starting, read back statusReg and FPGA version\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],hitRateEnabledMask);//DEBUG -tb-
+	    //TODO: [self addRunWaitWithReason:@"FLTv4: wait for next hitrate event."];
+        //a test:
+        testVariable = 24;
+    
+        //read FPGA firmware version and status register for ... addParametersToDictionary:(NSMutableDictionary*) ...
+        //this is called ater runTaskStarted:..., so these values will go into the Orca run file -tb-
+        unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	    [self setStatusRegister:status];
+    
+        CFPGAVersion = [self readVersion];       }
+
+	//we need to care about the following cases:
+	// 1. no run active, system going to start run:
+    //    (old state: eRunStopping/0  , new state: eRunStarting)
+	// 2. run active, system going to change state:
+	//    possible cases:
+    //    old state: eRunStarting        , new state: eRunStopping ->stop run
+    //    old state: eRunBetweenSubRuns  , new state: eRunStopping ->stop run (from 'between subruns')
+    //    old state: eRunStarting        , new state: eRunBetweenSubRuns ->stop subrun, stay 'between subruns'
+    //    old state: eRunBetweenSubRuns  , new state: eRunStarting ->start new subrun (from 'between subruns')
+
+
+
+	/*
+	id rc =  [aNote object];
+    NSLog(@"Calling object %@\n",NSStringFromClass([rc class]));//DEBUG -tb-
+	switch (state) {
+		case eRunStarting://=2
+            NSLog(@"   Notification: go to  %@\n",@"eRunStarting");//DEBUG -tb-
+			break;
+		case eRunBetweenSubRuns://=4
+            NSLog(@"   Notification: go to  %@\n",@"eRunBetweenSubRuns");//DEBUG -tb-
+			break;
+		case eRunStopping://=3
+            NSLog(@"   Notification: go to  %@\n",@"eRunStopping");//DEBUG -tb-
+			break;
+		default:
+			break;
+	}
+	*/
+
+}
+
+- (BOOL) preRunChecks;
+{
+         //DEBUG                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+                 return true;
+}
+
+
+
+
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
@@ -2247,13 +2410,25 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self readThresholds];
 }
 
-- (void) writeTriggerParameters
+- (void) writeTriggerParametersVerbose
 {
         NSLog(@"WRITE TriggerParameters\n");
         NSLog(@"----------------------------\n");
     int i;
     for(i=0;i<kNumEWFLTHeatIonChannels;i++){
         NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
+        [self writeTriggerPar:i value:triggerPar[i]];
+    }    
+
+    //TODO: make own action -tb-
+    [self writeThresholds];
+}
+
+- (void) writeTriggerParameters
+{
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        //NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
         [self writeTriggerPar:i value:triggerPar[i]];
     }    
 
@@ -2926,9 +3101,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writePostTriggerTimeAndIonToHeatDelay
 {
 	unsigned long aValue =	((postTriggerTime & 0xffff)<<16) | (ionToHeatDelay & 0xffff);
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@:   kFLTV4Ion2HeatDelayReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
-    //DEBUG OUTPUT: 	NSLog(@"%@::%@:   selectFiberTrig: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),selectFiberTrig);//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT: 	NSLog(@"%@::%@:   kFLTV4Ion2HeatDelayReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
 	
 	[self writeReg: kFLTV4Ion2HeatDelayReg value:aValue];
 }
@@ -3788,8 +3961,6 @@ for(chan=0; chan<6;chan++)
     [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]-2];//to be backward compatible with old Orca config files -tb-
     [self setGapLength:			[decoder decodeIntForKey:@"gapLength"]];
     [self setPostTriggerTime:	[decoder decodeInt32ForKey:@"postTriggerTime"]];
-    [self setFifoBehaviour:		[decoder decodeIntForKey:@"fifoBehaviour"]];
-    [self setAnalogOffset:		[decoder decodeIntForKey:@"analogOffset"]];
     [self setInterruptMask:		[decoder decodeInt32ForKey:@"interruptMask"]];
     [self setHitRateLength:		[decoder decodeIntForKey:@"OREdelweissFLTModelHitRateLength"]];
     [self setHitRateEnabledMask:[decoder decodeIntForKey:@"hitRateEnabledMask"]];
@@ -3802,6 +3973,11 @@ for(chan=0; chan<6;chan++)
     [self setWriteValue:		[decoder decodeIntForKey:@"writeValue"]];
     [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
+    /* unused
+    //TODO: remove from call definition -tb-
+    [self setFifoBehaviour:		[decoder decodeIntForKey:@"fifoBehaviour"]];
+    [self setAnalogOffset:		[decoder decodeIntForKey:@"analogOffset"]];
+    */
 	
 	//int i;
 	if(!thresholds){
@@ -3842,7 +4018,8 @@ for(chan=0; chan<6;chan++)
 	}
 	
     [[self undoManager] enableUndoRegistration];
-	
+    [self registerNotificationObservers];
+
     return self;
 }
 
@@ -3922,8 +4099,6 @@ for(chan=0; chan<6;chan++)
     [encoder encodeInt:(filterLength+2)			forKey:@"filterLength"];//to be backward compatible with old Orca config files (this is the register value)-tb-
     [encoder encodeInt:gapLength			forKey:@"gapLength"];
     [encoder encodeInt32:postTriggerTime	forKey:@"postTriggerTime"];
-    [encoder encodeInt:fifoBehaviour		forKey:@"fifoBehaviour"];
-    [encoder encodeInt:analogOffset			forKey:@"analogOffset"];
     [encoder encodeInt32:interruptMask		forKey:@"interruptMask"];
     [encoder encodeInt:hitRateLength		forKey:@"OREdelweissFLTModelHitRateLength"];
     [encoder encodeInt:hitRateEnabledMask	forKey:@"hitRateEnabledMask"];
@@ -3938,6 +4113,11 @@ for(chan=0; chan<6;chan++)
     [encoder encodeInt:writeValue           forKey:@"writeValue"];	
     [encoder encodeInt:selectedRegIndex  	forKey:@"selectedRegIndex"];	
     [encoder encodeInt:selectedChannelValue	forKey:@"selectedChannelValue"];	
+    
+    /*
+    [encoder encodeInt:fifoBehaviour		forKey:@"fifoBehaviour"];
+    [encoder encodeInt:analogOffset			forKey:@"analogOffset"];
+    */
 }
 
 #pragma mark *** Data Taking
@@ -4025,36 +4205,59 @@ for(chan=0; chan<6;chan++)
 }
 
 
-
+//this goes into the Orca run file XML header
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+
+
+    [objDictionary setObject:[NSNumber numberWithLong:controlRegister]		forKey:@"controlRegister"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:fiberDelays]		forKey:@"fiberDelays"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:streamMask]		forKey:@"streamMask"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:fiberOutMask]		forKey:@"fiberOutMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:testVariable]		forKey:@"testVariable"];
+
     [objDictionary setObject:thresholds										forKey:@"thresholds"];
+    
     int i;
 	for(i=0;i<kNumEWFLTHeatIonChannels;i++)    [triggerParameter replaceObjectAtIndex:i withObject:[NSNumber numberWithUnsignedInt:triggerPar[i]]];
     [objDictionary setObject:triggerParameter								forKey:@"triggerParameter"];
-    [objDictionary setObject:gains											forKey:@"gains"];
-    [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
     [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
+    if(sizeof(uint64_t) < sizeof(long long)) NSLog(@"%@::%@: ERROR - WARNING - sizeof(uint64_t) < sizeof(long long) - cannot store: ionTriggerMask, heatTriggerMask without information loss! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+    //else NSLog(@"%@::%@:  sizeof(uint64_t)(%i) >= sizeof(long long) (%i) -  store: ionTriggerMask, heatTriggerMask - OK! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sizeof(uint64_t),sizeof(long long));//TODO : DEBUG testing ...-tb-
+    //usually both are 8 ... -tb-
+
+    [objDictionary setObject:[NSNumber numberWithLongLong:ionTriggerMask]		forKey:@"ionTriggerMask"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:heatTriggerMask]		forKey:@"heatTriggerMask"];
     [objDictionary setObject:[NSNumber numberWithLong:ionToHeatDelay]		forKey:@"ionToHeatDelay"];
-    [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
-    [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask]	forKey:@"hitRateEnabledMask"];
+    
+    //if([self isPartOfRun]){ // ... is not yet set at this point ... -tb-
+        unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	    [self setStatusRegister:status];
+    
+        CFPGAVersion = [self readVersion];
+        
+        [objDictionary setObject:[NSNumber numberWithLong:statusRegister]		forKey:@"statusRegister"];
+        [objDictionary setObject:[NSNumber numberWithLong:CFPGAVersion]		forKey:@"CFPGAVersion"];
+    //}
+    
+    //obsolete values -tb- 2014
+    /*
+    [objDictionary setObject:gains											forKey:@"gains"];
+    [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
+    
+    
+    [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
+    [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     //TODO: obsolete for EW -tb- [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
     //TODO: obsolete for EW -tb- [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]			forKey:@"filterLength"];//this is the fpga register value -tb-
+    */
 	return objDictionary;
 }
 
@@ -4105,7 +4308,23 @@ for(chan=0; chan<6;chan++)
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
+        //DEBUG
+                 NSLog(@"%@::%@ Called runTaskStarted -  UNDER CONSTRUCTION --- FLT #%i<-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
 
+
+#if 0
+    //moved to runIsAboutToChangeState
+    //a test:
+    testVariable = 23;
+    
+    //read FPGA firmware version and status register for ... addParametersToDictionary:(NSMutableDictionary*) ...
+    //this is called ater runTaskStarted:..., so these values will go into the Orca run file -tb-
+    unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	[self setStatusRegister:status];
+    
+    CFPGAVersion = [self readVersion];   
+#endif
+    
     [self setIsPartOfRun: YES];
 
 	firstTime = YES;
@@ -4483,6 +4702,16 @@ for(chan=0; chan<6;chan++)
 
 - (void) printStatusReg
 {
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    
+    
 	unsigned long status = [self readStatus];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"FLT %d status Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTV4StatusReg],status);
