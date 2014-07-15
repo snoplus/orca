@@ -22,6 +22,7 @@
 #pragma mark ***Imported Files
 #import "ORVmeIOCard.h"
 #import "SBC_Link.h"
+
 @class ORFileMoverOp;
 
 #pragma mark •••Register Definitions
@@ -232,7 +233,7 @@ enum {
 	NSThread*		fpgaProgrammingThread;
 	ORConnector*    linkConnector[11]; //we won't draw these connectors so we have to keep references to them
 	BOOL            isMaster;
-    unsigned short  registerWriteValue;
+    unsigned short  regWriteValue;
     int             registerIndex;
     unsigned short  inputLinkMask;
     unsigned short  serdesTPowerMask;
@@ -273,6 +274,8 @@ enum {
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (unsigned short) diagnosticCounter;
@@ -319,18 +322,17 @@ enum {
 - (void) setIsMaster:(BOOL)aIsMaster;
 - (int) registerIndex;
 - (void) setRegisterIndex:(int)aRegisterIndex;
-- (unsigned short) registerWriteValue;
-- (void) setRegisterWriteValue:(unsigned short)aWriteValue;
+- (unsigned short) regWriteValue;
+- (void) setRegWriteValue:(unsigned short)aWriteValue;
 
 #pragma mark •••set up routines
-- (void) initAsOneMasterOneRouter;
+- (void) initClockDistribution;
 - (unsigned short)findRouterMask;
 - (unsigned short)findDigitizerMask;
 - (void) readDisplayRegs;
 
 - (void) stepMaster;
 - (void) stepRouter;
-- (void) stepDigitizer;
 - (void) setRoutersToIdle;
 - (BOOL) allRoutersIdle;
 
@@ -357,13 +359,6 @@ enum {
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-@end
-
-@interface NSObject (Gretina4M)
-- (NSString*) IPNumber;
-- (NSString*) userName;
-- (NSString*) passWord;
-- (SBC_Link*) sbcLink;
 @end
 
 extern NSString* ORGretinaTriggerModelDiagnosticCounterChanged;

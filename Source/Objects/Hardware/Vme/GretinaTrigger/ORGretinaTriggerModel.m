@@ -25,6 +25,7 @@
 #import "ORFileMoverOp.h"
 #import "MJDCmds.h"
 #import "ORGretina4MModel.h"
+#import "ORRunModel.h"
 
 NSString* ORGretinaTriggerModelDiagnosticCounterChanged = @"ORGretinaTriggerModelDiagnosticCounterChanged";
 NSString* ORGretinaTriggerModelIsMasterChanged       = @"ORGretinaTriggerModelIsMasterChanged";
@@ -271,7 +272,8 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     int i;
     for(i=0;i<9;i++){
         [linkConnector[i] release];
@@ -281,7 +283,6 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
 	[progressLock release];
     [fileQueue cancelAllOperations];
     [fileQueue release];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -401,6 +402,22 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
     for(i=0;i<9;i++){
         [aGuardian assumeDisplayOf:linkConnector[i]];
     }
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self];
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+    
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    [self initClockDistribution];
 }
 
 #pragma mark ***Accessors
@@ -590,15 +607,15 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerRegisterIndexChanged object:self];
 }
 
-- (unsigned short) registerWriteValue
+- (unsigned short) regWriteValue
 {
-    return registerWriteValue;
+    return regWriteValue;
 }
 
-- (void) setRegisterWriteValue:(unsigned short)aWriteValue
+- (void) setRegWriteValue:(unsigned short)aWriteValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:registerWriteValue];
-    registerWriteValue = aWriteValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRegWriteValue:regWriteValue];
+    regWriteValue = aWriteValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerRegisterWriteValueChanged object:self];
 }
 
@@ -716,10 +733,13 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
         default:            return @"?";
     }
 }
-- (void) initAsOneMasterOneRouter
+
+- (void) initClockDistribution
 {
     if(!initializationRunning && isMaster){
         
+        [self addRunWaitWithReason:@"Wait for Trigger Card Clock Distribution Init"];
+
         [self setInitState:kStepSetup];
         connectedRouterMask = 0;
         
@@ -955,14 +975,32 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             [self setInitState:kStepError];
     }
     
-    if(initializationState != kRunSteps2a2c && initializationState!= kWaitOnSteps2a2c && initializationState != kWaitOnSteps4a4b && initializationState != kWaitOnSteps6To9){
+    if(initializationState != kRunSteps2a2c     &&
+       initializationState!= kWaitOnSteps2a2c   &&
+       initializationState != kWaitOnSteps4a4b  &&
+       initializationState != kWaitOnSteps6To9) {
         // NSLog(@"After Step\n");
         [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
     }
-    if(initializationState != kStepError && initializationState != kStepIdle){
+    
+    if(initializationState != kStepError &&
+       initializationState != kStepIdle) {
         [self performSelector:@selector(stepMaster) withObject:nil afterDelay:kTriggerInitDelay];
     }
 
+    if(initializationState == kStepError){
+        //there was an error, we must make sure the run doesn't continue to start
+        NSString* reason = @"Trigger Card Failed to achieve lock";
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                                                            object:self
+                                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+        [self releaseRunWait];
+
+    }
+    else if(initializationState == kStepIdle){
+        //OK, the lock was achieved. The run can continue to start
+        [self releaseRunWait];
+    }
 }
 
 
@@ -1401,7 +1439,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
         [self setLink:i connector:[decoder decodeObjectForKey:[NSString stringWithFormat:@"linkConnector%d",i]]];
     }
     [[self undoManager] enableUndoRegistration];
-    
+    [self registerNotificationObservers];
     return self;
 }
 
