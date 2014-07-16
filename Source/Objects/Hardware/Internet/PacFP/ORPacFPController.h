@@ -106,7 +106,7 @@
 - (void) loadLcmTimeValues;
 
 - (void) ipAddressChanged:(NSNotification*)aNote;
-- (void) ipConnectedChanged:(NSNotification*)aNote;
+- (void) isConnectedChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender;

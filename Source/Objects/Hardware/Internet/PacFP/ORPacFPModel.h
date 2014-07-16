@@ -29,7 +29,7 @@
     @private
         //ip protocol
         NSString*           ipAddress;
-        BOOL                ipConnected;
+        BOOL                isConnected;
         NetSocket*          socket;
         BOOL                wasConnected;
         NSMutableString*    inputBuffer;
@@ -71,9 +71,7 @@
 - (NSString*) ipAddress;
 - (void) setIpAddress:(NSString*)aIpAddress;
 - (BOOL) isConnected;
-- (void) setIpConnected:(BOOL)aFlag;
-- (BOOL) ipConnected;
-- (void) connectIP;
+- (void) setIsConnected:(BOOL)aFlag;
 - (void) writeCmdString:(NSString*)aCommand;
 - (void) parseString:(NSString*)theString;
 - (void) clearInputBuffer;
@@ -168,6 +166,6 @@ extern NSString* ORPacFPModelLogToFileChanged;
 extern NSString* ORPacFPModelLogFileChanged;
 extern NSString* ORPacFPModelQueCountChanged;
 extern NSString* ORPacFPModelGainsReadBackChanged;
-extern NSString* ORPacFPModelIpConnectedChanged;
+extern NSString* ORPacFPModelIsConnectedChanged;
 extern NSString* ORPacFPModelIpAddressChanged;
 

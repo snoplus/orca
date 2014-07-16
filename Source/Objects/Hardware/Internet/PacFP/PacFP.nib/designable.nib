@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13D65</string>
+		<string key="IBDocument.SystemVersion">13E28</string>
 		<string key="IBDocument.InterfaceBuilderVersion">5056</string>
-		<string key="IBDocument.AppKitVersion">1265.20</string>
+		<string key="IBDocument.AppKitVersion">1265.21</string>
 		<string key="IBDocument.HIToolboxVersion">698.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -109,7 +109,6 @@
 							<string key="NSFrame">{{-7, 54}, {545, 458}}</string>
 							<reference key="NSSuperview" ref="707971934"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="1048534997"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="965532901">
 									<string key="NSIdentifier">1</string>
@@ -3383,6 +3382,30 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<reference key="destination" ref="330031078"/>
 					</object>
 					<string key="id">abE-dd-qQ9</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ipConnectButton</string>
+						<reference key="source" ref="863748961"/>
+						<reference key="destination" ref="330031078"/>
+					</object>
+					<string key="id">3fD-Qf-sNe</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ipConnectedTextField</string>
+						<reference key="source" ref="863748961"/>
+						<reference key="destination" ref="467588991"/>
+					</object>
+					<string key="id">GS6-ae-zRc</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ipAddressTextField</string>
+						<reference key="source" ref="863748961"/>
+						<reference key="destination" ref="655378674"/>
+					</object>
+					<string key="id">8KH-nf-tbu</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">

@@ -123,8 +123,8 @@
 						object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(ipConnectedChanged:)
-                         name : ORPacFPModelIpConnectedChanged
+                     selector : @selector(isConnectedChanged:)
+                         name : ORPacFPModelIsConnectedChanged
 						object: model];
 	   
     [notifyCenter addObserver : self
@@ -228,13 +228,13 @@
 	[self adcChanged:nil];
     
 	[self ipAddressChanged:nil];
-	[self ipConnectedChanged:nil];
+	[self isConnectedChanged:nil];
 
 }
-- (void) ipConnectedChanged:(NSNotification*)aNote
+- (void) isConnectedChanged:(NSNotification*)aNote
 {
-	[ipConnectedTextField setStringValue: [model ipConnected]?@"Connected":@"Not Connected"];
-    [ipConnectButton setTitle:[model ipConnected]?@"Disconnect":@"Connect"];
+	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
+    [ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
 }
 
 - (void) ipAddressChanged:(NSNotification*)aNote
@@ -477,7 +477,8 @@
 
 - (IBAction) connectAction: (id) aSender
 {
-    [model connectIP];
+    [self endEditing];
+    [model connect];
 }
 
 - (IBAction) selectFileAction:(id)sender

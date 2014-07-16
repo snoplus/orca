@@ -28,7 +28,7 @@
 
 #pragma mark •••External Strings
 
-NSString* ORPacFPModelIpConnectedChanged       = @"ORPacFPModelIpConnectedChanged";
+NSString* ORPacFPModelIsConnectedChanged       = @"ORPacFPModelIsConnectedChanged";
 NSString* ORPacFPModelIpAddressChanged         = @"ORPacFPModelIpAddressChanged";
 
 NSString* ORPacFPModelLastGainReadChanged   = @"ORPacFPModelLastGainReadChanged";
@@ -153,17 +153,31 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     [socket setDelegate:self];
 }
 
-- (BOOL) ipConnected
+- (void) setIsConnected:(BOOL)aFlag
 {
-    return ipConnected;
+    isConnected = aFlag;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIsConnectedChanged object:self];
 }
 
-- (void) setIpConnected:(BOOL)aIpConnected
+
+- (void) connect
 {
-    ipConnected  = aIpConnected;
-	wasConnected = ipConnected;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIpConnectedChanged object:self];
+	if(!isConnected && [ipAddress length]){
+		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kPacFPPort]];
+        [self setIsConnected:[socket isConnected]];
+	}
+	else {
+		[self setSocket:nil];
+        [self setIsConnected:[socket isConnected]];
+	}
 }
+
+- (BOOL) isConnected
+{
+    return isConnected;
+}
+
 
 - (NSString*) ipAddress
 {
@@ -181,30 +195,15 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIpAddressChanged object:self];
     
     if(wasConnected){
-        [self connectIP];
+        [self connect];
     }
 }
 
-- (void) connectIP
-{
-	if(![self isConnected] && [ipAddress length]){
-		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kPacFPPort]];
-        [self setIpConnected:[socket isConnected]];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIpConnectedChanged object:self];
-
-	}
-}
-
-- (BOOL) isConnected
-{
-    return ipConnected;
-}
 
 - (void) netsocketConnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-        [self setIpConnected:YES];
+        [self setIsConnected:YES];
     }
 }
 
@@ -231,7 +230,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-        [self setIpConnected:NO];
+        [self setIsConnected:NO];
 		[socket autorelease];
 		socket = nil;
     }
