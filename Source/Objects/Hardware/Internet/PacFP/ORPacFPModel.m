@@ -156,7 +156,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) setIsConnected:(BOOL)aFlag
 {
     isConnected = aFlag;
-	
+    [self setWasConnected:isConnected];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIsConnectedChanged object:self];
 }
 
@@ -204,6 +204,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
     if(inNetSocket == socket){
         [self setIsConnected:YES];
+        
     }
 }
 
@@ -537,6 +538,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	for(i=0;i<148;i++){
 		[self setGain:i withValue: [decoder decodeIntForKey:[NSString stringWithFormat:@"gain%d",i]]];
 	}
+    
+    if(wasConnected)[self connect];
     
 	[[self undoManager] enableUndoRegistration];
 
