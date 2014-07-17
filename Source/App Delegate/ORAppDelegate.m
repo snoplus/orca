@@ -429,7 +429,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
     NSLog(@"-------------------------------------------------\n");
     NSLog(@"   Orca (v%@) Has Started                    \n",fullVersion());
-    NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag]; 
+    NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag];
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
 		NSLog(@"   (After crash or hard debugger stop)           \n");
     }
@@ -444,6 +444,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
     NSLog(@"Running MacOS %@ %@\n", version,updateNotice);
     NSLog(@"Mac Address: %@\n",[self ethernetHardwareAddress]);
+    NSLog(@"Machine Name: %@\n",computerName());
 	NSString* theAppPath = appPath();
 	if(theAppPath)	NSLog(@"Launch Path: %@\n",theAppPath);
 
@@ -615,7 +616,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 						[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
 						ORMailer* mailer = [ORMailer mailer];
 						[mailer setTo:finalAddressList];
-						[mailer setSubject:@"ORCA Crash Log"];
+						[mailer setSubject:[NSString stringWithFormat:@"ORCA Crash Log for: %@",computerName()]];
 						[mailer setBody:crashLog];
 						[mailer send:self];
 						[crashLog release];
