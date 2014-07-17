@@ -224,7 +224,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
             //set the page number on FLT
             pbus->write(FLTReadPageNumReg(flt+1),numPage);
             //usleep(10000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
-            usleep(21000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
+            usleep(41000);//TODO: this is ugly, but we need to give the FLT time to write the trace!!! change it in the future! -tb-
             
             uint32_t chan,chanBit,chanMap; 
             //chanMap is used to flag, which channels to read out (it is NOT written to the file - use FIFO2 instead) -tb-
