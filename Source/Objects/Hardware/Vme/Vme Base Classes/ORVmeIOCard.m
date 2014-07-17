@@ -154,6 +154,8 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
                      usingAddSpace: 0x01];
     
     if(diagnosticsEnabled){
+        NSLog(@"%@ addressOffset: (0x%08x) write: 0x%08x\n",[self fullID],anOffset,aValue);
+
         unsigned long readBackValue = 0;
         [[self adapter] readLongBlock: &readBackValue
                             atAddress: [self baseAddress] + anOffset
