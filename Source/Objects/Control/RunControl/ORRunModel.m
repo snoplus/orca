@@ -60,6 +60,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 @interface ORRunModel (private)
 - (void) startRun:(BOOL)doInit;
+- (void) waitOnObjects:(NSNumber*)doInitBool;
+- (void) continueWithRunStart:(NSNumber*)doInitBool;
 - (void) startRunStage0:(NSNumber*)doInitBool;
 - (void) startRunStage1:(NSNumber*)doInitBool;
 - (void) startRunStage2:(NSNumber*)doInitBool;
@@ -1100,14 +1102,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[self setStartScriptState:@"Done"];
 	}
 	
-	BOOL doInit = [doInitBool boolValue];
+	//BOOL doInit = [doInitBool boolValue];
     @try {
         [runFailedAlarm clearAlarm];
         client =  [self objectConnectedTo: ORRunModelRunControlConnection];
                 
-        [self runStarted:doInit];
+        [self runStarted:doInitBool];
         
-        //start the thread
+        //start the threaddo
         if(dataTakingThreadRunning){
             NSLogColor([NSColor redColor],@"*****runthread still exists\n");
         }
@@ -1504,7 +1506,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     heartBeatTimer = nil;
     
     ignoreRepeat = NO;
-    id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
     
     [self setDataPacket:[[[ORDataPacket alloc] init]autorelease]];
     [[self dataPacket] setRunNumber:[self runNumber]];
@@ -1538,8 +1539,28 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStartNotification
                                                         object: self
                                                       userInfo: runInfo];
+    //------
+    //at this stage, some object may need extra time. If so they will post a wait request
+    [self waitOnObjects:[NSNumber numberWithBool:doInit]];
+}
+
+- (void) waitOnObjects:(NSNumber*)doInitBool
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
+    if([objectsRequestingStateChangeWait count]==0){
+        [self continueWithRunStart:doInitBool];
+    }
+    else {
+        [self performSelector:@selector(waitOnObjects:) withObject:doInitBool afterDelay:0];
+    }
+}
+
+- (void) continueWithRunStart:(NSNumber*)doInitBool
+{
+    BOOL doInit = [doInitBool boolValue];
     
     //tell them to start up
+    id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
     [nextObject runTaskStarted:runInfo];
     [nextObject setInvolvedInCurrentRun:YES];
 	
