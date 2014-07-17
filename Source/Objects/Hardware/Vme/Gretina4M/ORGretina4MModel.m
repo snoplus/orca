@@ -1806,6 +1806,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 
+    if(![self fifoIsEmpty]){
+        NSLogColor([NSColor redColor], @"%@ Fifo NOT reset properly\n",[self fullID]);
+    }
+    
 }
 
 - (BOOL) fifoIsEmpty
@@ -2083,7 +2087,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     return dataDictionary;
 }
-
 
 #pragma mark •••HW Wizard
 -(BOOL) hasParmetersToRamp
