@@ -29,26 +29,17 @@
 
 	IBOutlet NSTabView*		tabView;
 	IBOutlet NSTextField*   lastGainReadField;
-	IBOutlet NSTextField*   adcChannelField;
 	IBOutlet NSMatrix*		gainDisplayTypeMatrix;
-	IBOutlet NSButton*		setAllGainsButton;
 	IBOutlet NSTextField*	cmdQueCountField;
-	IBOutlet NSTextField*	gainChannelTextField;
-	IBOutlet NSTextField*	preAmpTextField;
-	IBOutlet NSTextField*	moduleTextField;
-	IBOutlet NSTextField*	gainValueField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      readAdcsButton;
     IBOutlet NSMatrix*      channelMatrix;
     IBOutlet NSMatrix*      adcNameMatrix;
     IBOutlet NSMatrix*      adcMatrix;
     IBOutlet NSMatrix*      timeMatrix;
-    IBOutlet NSButton*      writeGainButton;
-    IBOutlet NSButton*      readGainButton;
-    IBOutlet NSButton*      selectModuleButton;
 
-    IBOutlet NSButton*      readButtonAll;
-    IBOutlet NSButton*      loadButtonAll;
+    IBOutlet NSButton*      readAllGainsButton;
+    IBOutlet NSButton*      writeAllGainsButton;
 
 	IBOutlet NSPopUpButton* pollingButton;
 	IBOutlet NSTextField*	logFileTextField;
@@ -65,9 +56,6 @@
     IBOutlet NSTableView*   processLimitsTableView;
 
     IBOutlet ORValueBarGroupView*  queueValueBar;
-    IBOutlet NSBox*         adc0Line0;	
-    IBOutlet NSBox*         adc0Line1;	
-    IBOutlet NSBox*         adc0Line2;	
 
     NSSize					normalSize;
     NSSize					setUpSize;
@@ -110,7 +98,6 @@
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id) sender;
-- (IBAction) readAdcsAction:(id)sender;
 - (IBAction) getGainsAction:(id)sender;
 - (IBAction) setGainsAction:(id)sender;
 

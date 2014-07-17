@@ -432,17 +432,15 @@
 {
 
     //BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORPacFPLock];
+    //BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORPacFPLock];
     BOOL locked = [gSecurity isLocked:ORPacFPLock];
 
     [lockButton setState: locked];
 
-    [readGainButton setEnabled:!locked];
-    [writeGainButton setEnabled:!locked];
-    [readGainButton setEnabled:!locked];
+    [readAllGainsButton setEnabled:!locked];
+    [writeAllGainsButton setEnabled:!locked];
     [readAdcsButton setEnabled:!locked];
     [gainTableView setEnabled:!locked];
-    [writeGainButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 #pragma mark •••Actions

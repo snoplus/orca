@@ -75,6 +75,7 @@
 - (void) writeCmdString:(NSString*)aCommand;
 - (void) parseString:(NSString*)theString;
 - (void) clearInputBuffer;
+- (void) connect;
 
 - (NSString*) title;
 
