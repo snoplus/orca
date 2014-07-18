@@ -34,7 +34,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------^-^^^^--------------------- Card number
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------------------------------^^- Acq Mode. 0=disabled,1=Random, 2=periodic
------------------------------------^----- Header Enabled
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Enabled Mask
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  header
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 0
@@ -52,6 +51,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	unsigned long length	= ExtractLength(ptr[0]);
 	int crate				= ShiftAndExtract(ptr[1],21,0xf);
 	int card				= ShiftAndExtract(ptr[1],16,0x1f);
+	int dataIs24Bit			= ShiftAndExtract(ptr[2],2,0x1);
 	unsigned long enabledMask	= ptr[3];
 
 	NSString* crateKey   = [self getCrateKey: crate];
@@ -62,6 +62,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
+            unsigned long theValue = *ptr;
+            if(dataIs24Bit)theValue &= 0x03ffffff;
 			NSString* valueString = [NSString stringWithFormat:@"%lu",*ptr];
 			NSString* channelKey = [self getChannelKey:i];
 
@@ -130,7 +132,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<kNumCV830Channels;i++){
 		if(enabledMask & (0x1L<<i)){
-			NSString* valueString = [NSString stringWithFormat:@"%lu",ptr[4+i]];
+			NSString* valueString = [NSString stringWithFormat:@"%lu",ptr[5+i]];
 			[aDataSet loadGenericData:valueString sender:self withKeys:@"Scalers",@"V830",  crateKey,cardKey,[self getChannelKey:i],nil];
 		}
 	}
@@ -152,7 +154,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,date];
 	for(i=0;i<kNumCV830Channels;i++){
 		if(enabledMask & (0x1L<<i)){
-			s = [s stringByAppendingFormat:@"%d:%lu\n",i,ptr[4+i]];
+			s = [s stringByAppendingFormat:@"%d:%lu\n",i,ptr[5+i]];
 		}
 	}
 	

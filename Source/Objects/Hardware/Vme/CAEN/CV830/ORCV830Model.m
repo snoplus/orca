@@ -460,10 +460,19 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 - (void) initBoard
 {
 	@try {
+        //disable all channels
+        unsigned long aValue = 0;
+        [[self adapter] writeLongBlock:&aValue
+                             atAddress:[self baseAddress]+[self getAddressOffset:kChannelEnable]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+
 		[self softwareReset];
-		[self writeEnabledMask];
+        [self softwareClear];
+		[self writeDwellTime];
 		[self writeControlReg];
-		if(testMode)[self writeDwellTime];
+		[self writeEnabledMask];
 	}
 	@catch(NSException* localException){
 		NSLogColor([NSColor redColor],@"unable to init HW for CV830,%d,%d\n",[self crateNumber],[self slot]);
@@ -507,7 +516,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 					NSLog(@"First Event Only will follow:\n");
 					int numEntriesPerEvent = [self numEnabledChannels]; //note that we already read the header if needed.
 					int i;
-					for(i=0;i<numEvents;i++){
+					for(i=0;i<1;i++){
 						int j;
 						for(j=0;j<numEntriesPerEvent;j++){
 							unsigned long aValue;
@@ -524,6 +533,8 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 						}
 					}
 				}
+                [self softwareClear];
+
 			}
 			else NSLog(@"Nothing in Buffer\n");
 		}
@@ -753,8 +764,9 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
-		
-		if(statusRegValue & (0x1L << 0)){
+		BOOL dataReady = statusRegValue & (0x1L << 0);
+        BOOL cardBusy  = statusRegValue & (0x1L << 4);
+		if(dataReady && !cardBusy){
 			//there was an event
 			unsigned short numEvents = 0;
 			[[self adapter] readWordBlock:&numEvents
@@ -779,7 +791,8 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 									   withAddMod:[self addressModifier]
 									usingAddSpace:0x01];
 					dataRecord[4] = theHeader;
-					
+                    NSLog(@"header: 0x%08x\n",theHeader);
+
 					
 					int aWord;
 					for(aWord=0 ; aWord<numEnabledChannels ; aWord++){
@@ -790,6 +803,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 										   withAddMod:[self addressModifier]
 										usingAddSpace:0x01];
 						//put into record
+                        NSLog(@"channel: %d value: 0x%08x\n",aWord,aValue);
 						dataRecord[aWord + 5] = aValue;
 					}
 					[aDataPacket addLongsToFrameBuffer:dataRecord length:totalWordsInRecord];

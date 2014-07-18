@@ -252,27 +252,27 @@
 
 #pragma mark •••Actions
 
-- (void) autoResetAction:(id)sender
+- (IBAction) autoResetAction:(id)sender
 {
 	[model setAutoReset:[sender intValue]];	
 }
 
-- (void) clearMebAction:(id)sender
+- (IBAction) clearMebAction:(id)sender
 {
 	[model setClearMeb:[sender intValue]];	
 }
 
-- (void) testModeAction:(id)sender
+- (IBAction) testModeAction:(id)sender
 {
 	[model setTestMode:[sender intValue]];	
 }
 
-- (void) acqModeAction:(id)sender
+- (IBAction) acqModeAction:(id)sender
 {
 	[model setAcqMode:[sender indexOfSelectedItem]];	
 }
 
-- (void) dwellTimeAction:(id)sender
+- (IBAction) dwellTimeAction:(id)sender
 {
 	[model setDwellTime:[sender intValue]];	
 }
@@ -282,7 +282,7 @@
 	[model initBoard];
 }
 
-- (void) enabledMaskAction:(id)sender
+- (IBAction) enabledMaskAction:(id)sender
 {
 	int i;
 	unsigned long aMask = 0;
