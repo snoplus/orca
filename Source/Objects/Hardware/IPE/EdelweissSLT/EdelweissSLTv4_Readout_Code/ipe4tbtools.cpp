@@ -1000,10 +1000,12 @@ uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOf
     if(timeDiff != 0){
         if(beVerbose) printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
         currentSec = currentSec + 1;//maybe this is not necessary
-        sltTime = ((uint64_t)currentSec) * 100000LL;
+        sltTime = (((uint64_t)currentSec) * 100000LL) + 1;//TODO: +1: this is a fix for the timestamp error (SLT timer register sends ...-1 to BB)
         sltTimeLo =  sltTime        & 0xffffffff;
         sltTimeHi = (sltTime >> 32) & 0xffffffff;
+        if(beVerbose) printf("    Writing SLT timer reg: timeLo:  %li (0x%08x) - timeHi: %li  (0x%08x) \n", sltTimeLo, sltTimeLo, sltTimeHi, sltTimeHi);
         pbus->write(SLTTimeLowReg, sltTimeLo);
+        //need to correct pd_fort/pd_faible in the status packet!!!!! -tb- 2014-07-18
         pbus->write(SLTTimeHighReg, sltTimeHi);
         if(readBack){
             sleep(1);

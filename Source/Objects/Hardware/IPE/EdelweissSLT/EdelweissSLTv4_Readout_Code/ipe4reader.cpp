@@ -3661,6 +3661,8 @@ void FIFOREADER::scanFIFObuffer(void)
             uint32_t pd_fort=0, pd_faible=0;
             pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
             pd_faible = FIFObuf32[2] & 0x3fffffff;  // 30 bit
+#if 0
+//TODO: original code without correction, see correction in ipe4tbtool, setSLTtimerWithUTC TEMPORARY FIX -tb- 2014-07-18
             uint64_t sltTime = 0;  
             uint64_t sltTimeSubSec = 0;  
             sltTime = (((uint64_t)pd_fort << 30) | pd_faible) ;
@@ -3671,6 +3673,32 @@ void FIFOREADER::scanFIFObuffer(void)
             udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
             if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+#endif
+
+//code with TEMPORARY CORRECTION -tb- 2014-07-18
+//we assume, subsecs are not 0 but 1 -> correction by software -tb-
+            uint64_t sltTime = 0;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) /100000 ;
+            {
+                //make correction for timestamp pattern in data stream:
+                //    the SLT timer registers have a exactly 1 second larger timestamp (subseconds are OK)
+                //    the reason is unknown, maybe it is in the Opera "black box" 
+                //    we (Denis, Bernhard, Till) decided to make this correction in software 
+                //    in order to be consistent, we recompute pd_fort, pd_faible
+                // -tb- 2014-07-17
+                //sltTime = sltTime + 1;
+                uint64_t sltTimeCorr = sltTime * 100000;
+                pd_fort   = (sltTimeCorr >> 32) &  0x3ffff;     // 18 bits
+                pd_faible =  sltTimeCorr        &  0x3fffffff;  // 30 bit
+            }
+            //udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;//THIS FORMULA IS WRONG -tb- 2014-07
+            udpdataSec = sltTime;
+            globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
+            if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+
+
+
+
 //TODO: remove it, for DEBUGGING -tb-
 //udpdataSec= globalHeaderWordCounter;
             //now 'remove' header from FIFObuff32
