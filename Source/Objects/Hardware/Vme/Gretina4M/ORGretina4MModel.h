@@ -432,6 +432,7 @@ enum Gretina4MFIFOStates {
 - (void) resetDCM;
 - (void) resetMainFPGA;
 - (void) resetFIFO;
+- (void) resetSingleFIFO;
 - (void) initBoard;
 - (void) initSerDes;
 - (unsigned long) readControlReg:(short)channel;

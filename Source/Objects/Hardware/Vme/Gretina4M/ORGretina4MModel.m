@@ -1262,12 +1262,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];
     }
-	
-    /* Then reset the DCM clock. (This will also reset the serdes.) */
-    //[self resetDCM];  change by Jing: DCM is reset in initSerDes;
     
-    /* Finally, initialize the serdes. */
-    //[self initSerDes];
+    [self resetFIFO];
+    [self resetMainFPGA];
+    [ORTimer delay:6];  // 6 second delay during board reset    
+
 }
 
 
@@ -1783,6 +1782,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) resetFIFO
 {
+
+    [self resetSingleFIFO];
+    [self resetSingleFIFO];
+
+    if(![self fifoIsEmpty]){
+        NSLogColor([NSColor redColor], @"%@ Fifo NOT reset properly\n",[self fullID]);
+    }
+    
+}
+
+- (void) resetSingleFIFO
+{
     unsigned long val = 0;
     [[self adapter] readLongBlock:&val
                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
@@ -1793,11 +1804,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     val |= (0x1<<27);
     
     [[self adapter] writeLongBlock:&val
-                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
                         numToWrite:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-  
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
     val &= ~(0x1<<27);
     
     [[self adapter] writeLongBlock:&val
@@ -1805,10 +1816,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-
-    if(![self fifoIsEmpty]){
-        NSLogColor([NSColor redColor], @"%@ Fifo NOT reset properly\n",[self fullID]);
-    }
     
 }
 
