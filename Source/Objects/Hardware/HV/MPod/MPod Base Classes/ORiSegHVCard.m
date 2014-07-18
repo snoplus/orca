@@ -1085,7 +1085,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Ramp Rate"];
-    [p setFormat:@"##0" upperLimit:500 lowerLimit:2 stepSize:1 units:[NSString stringWithFormat:@"%cV",[self polarity]?'+':'-']];
+    [p setFormat:@"##0" upperLimit:500 lowerLimit:2 stepSize:1 units:[NSString stringWithFormat:@"%cV/s",[self polarity]?'+':'-']];
     [p setSetMethod:@selector(setRiseRate:) getMethod:@selector(riseRate)];
 	[p setInitMethodSelector:@selector(loadAllValues)];
     [a addObject:p];
