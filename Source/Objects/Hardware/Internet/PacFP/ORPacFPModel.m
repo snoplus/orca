@@ -204,7 +204,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
     if(inNetSocket == socket){
         [self setIsConnected:YES];
-        
     }
 }
 
@@ -214,18 +213,9 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-        if(!inputBuffer)inputBuffer = [[NSMutableString alloc]initWithString:theString];
-        else [inputBuffer appendString:theString];
         
-        [self parseString:inputBuffer];
-        [self clearInputBuffer];
+        [self parseString:theString];
     }
-}
-
-- (void) clearInputBuffer
-{
-    [inputBuffer release];
-    inputBuffer = nil;
 }
 
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
@@ -240,29 +230,42 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+    NSLog(@"Received: %@",theString);
+    if([theString hasPrefix:@"+"])return;
+    
     if([lastRequest hasPrefix:@"get gains"]){
+        theString = [theString substringFromIndex:9];
         NSArray* theParts = [theString componentsSeparatedByString:@","];
         int i=0;
         for(id aValue in theParts){
             [self setGainReadBack:i withValue:[aValue intValue]];
             i++;
         }
+        [self setLastRequest:nil];
     }
     else if([lastRequest hasPrefix:@"set gains"]){
+        [self setLastRequest:nil];
         //nothing to do
     }
 
     else if([lastRequest hasPrefix:@"get temperatures"]){
+        theString = [theString substringFromIndex:16];
         NSArray* theParts = [theString componentsSeparatedByString:@","];
         int i=0;
         for(id aValue in theParts){
             [self setAdc:i value:[aValue floatValue]];
             i++;
         }
+        [self setLastRequest:nil];
     }
     else if([lastRequest hasPrefix:@"get current"]){
+        theString = [theString substringFromIndex:11];
         [self setLcm:[theString intValue]];
+        [self setLastRequest:nil];
     }
+    
+    if(!lastRequest)[self processOneCommandFromQueue];
+
 }
 
 - (NSDate*) lastGainRead
@@ -618,6 +621,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
 	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
     if(![aCommand hasSuffix:@"\n"])aCommand = [NSString stringWithFormat:@"%@\n",aCommand];
+    NSLog(@"adding to queue: %@",aCommand);
 	[cmdQueue enqueue:aCommand];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelQueCountChanged object: self];
 	if(!lastRequest)[self processOneCommandFromQueue];
@@ -976,6 +980,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 															object:[NSData dataWithBytes:data length:sizeof(long)*18]];
 	}
 }
+
 - (void) loadLogBuffer
 {
 	NSString*   outputString = nil;
@@ -994,6 +999,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	}
 	readCount++;	
 }
+
 - (void) timeout
 {
 	@synchronized (self){
@@ -1002,7 +1008,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 		[self setLastRequest:nil];
 		[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelQueCountChanged object: self];
-		//[self processOneCommandFromQueue];	 //do the next command in the queue
 		gainIndex = 0;
 	}
 }
@@ -1019,6 +1024,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 			[self processOneCommandFromQueue];
 		}
 		else {
+            NSLog(@"sending: %@\n",cmd);
 			[self setLastRequest:cmd];
             [socket writeString:cmd encoding:NSASCIIStringEncoding];
 			[self performSelector:@selector(timeout) withObject:nil afterDelay:1];

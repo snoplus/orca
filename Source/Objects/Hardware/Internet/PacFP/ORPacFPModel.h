@@ -32,7 +32,6 @@
         BOOL                isConnected;
         NetSocket*          socket;
         BOOL                wasConnected;
-        NSMutableString*    inputBuffer;
   
         unsigned long		dataId;
 		NSString*			lastRequest;
@@ -74,7 +73,6 @@
 - (void) setIsConnected:(BOOL)aFlag;
 - (void) writeCmdString:(NSString*)aCommand;
 - (void) parseString:(NSString*)theString;
-- (void) clearInputBuffer;
 - (void) connect;
 
 - (NSString*) title;

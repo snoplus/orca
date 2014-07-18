@@ -109,7 +109,6 @@
 							<string key="NSFrame">{{-7, 54}, {545, 458}}</string>
 							<reference key="NSSuperview" ref="707971934"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="1048534997"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="965532901">
 									<string key="NSIdentifier">1</string>
@@ -1395,7 +1394,6 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 																			</object>
 																		</array>
 																	</object>
-																	<int key="NSSelectedIndex">-1</int>
 																	<int key="NSPreferredEdge">3</int>
 																	<bool key="NSUsesItemFromMenu">YES</bool>
 																	<bool key="NSAltersState">YES</bool>
@@ -1941,7 +1939,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">256</int>
 																<string key="NSFrameSize">{304, 228}</string>
 																<reference key="NSSuperview" ref="729464963"/>
-																<reference key="NSNextKeyView" ref="640355965"/>
+																<reference key="NSNextKeyView" ref="783764576"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2190,13 +2188,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												</array>
 												<string key="NSFrame">{{13, 130}, {321, 246}}</string>
 												<reference key="NSSuperview" ref="787338410"/>
-												<reference key="NSNextKeyView" ref="783764576"/>
+												<reference key="NSNextKeyView" ref="729464963"/>
 												<int key="NSsFlags">133138</int>
 												<reference key="NSVScroller" ref="640355965"/>
 												<reference key="NSHScroller" ref="783764576"/>
 												<reference key="NSContentView" ref="729464963"/>
 												<reference key="NSHeaderClipView" ref="26016062"/>
-												<reference key="NSCornerView" ref="407294296"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -2215,7 +2212,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 																<int key="NSvFlags">256</int>
 																<string key="NSFrameSize">{321, 228}</string>
 																<reference key="NSSuperview" ref="644702020"/>
-																<reference key="NSNextKeyView" ref="808920842"/>
+																<reference key="NSNextKeyView" ref="465433194"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2439,13 +2436,12 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 												</array>
 												<string key="NSFrame">{{351, 130}, {323, 246}}</string>
 												<reference key="NSSuperview" ref="787338410"/>
-												<reference key="NSNextKeyView" ref="465433194"/>
+												<reference key="NSNextKeyView" ref="644702020"/>
 												<int key="NSsFlags">133682</int>
 												<reference key="NSVScroller" ref="808920842"/>
 												<reference key="NSHScroller" ref="804670762"/>
 												<reference key="NSContentView" ref="644702020"/>
 												<reference key="NSHeaderClipView" ref="197984936"/>
-												<reference key="NSCornerView" ref="465433194"/>
 												<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 												<double key="NSMinMagnification">0.25</double>
 												<double key="NSMaxMagnification">4</double>
@@ -4385,21 +4381,6 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<reference key="parent" ref="43930253"/>
 					</object>
 					<object class="IBObjectRecord">
-						<string key="id">2632</string>
-						<reference key="object" ref="778092269"/>
-						<reference key="parent" ref="923193875"/>
-					</object>
-					<object class="IBObjectRecord">
-						<string key="id">2631</string>
-						<reference key="object" ref="562486999"/>
-						<reference key="parent" ref="923193875"/>
-					</object>
-					<object class="IBObjectRecord">
-						<string key="id">2630</string>
-						<reference key="object" ref="50943916"/>
-						<reference key="parent" ref="923193875"/>
-					</object>
-					<object class="IBObjectRecord">
 						<string key="id">2629</string>
 						<reference key="object" ref="990325836"/>
 						<reference key="parent" ref="923193875"/>
@@ -4904,6 +4885,21 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 						<string key="id">MBf-iM-P8W</string>
 						<reference key="object" ref="456545181"/>
 						<reference key="parent" ref="872520427"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">2631</string>
+						<reference key="object" ref="562486999"/>
+						<reference key="parent" ref="923193875"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">2632</string>
+						<reference key="object" ref="778092269"/>
+						<reference key="parent" ref="923193875"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">2630</string>
+						<reference key="object" ref="50943916"/>
+						<reference key="parent" ref="923193875"/>
 					</object>
 				</array>
 			</object>
