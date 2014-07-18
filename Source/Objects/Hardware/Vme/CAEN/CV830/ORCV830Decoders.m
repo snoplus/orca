@@ -34,10 +34,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------^-^^^^--------------------- Card number
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------------------------------^^- Acq Mode. 0=disabled,1=Random, 2=periodic
-------------------------------------^---- Data Format 0=32Bit,1=24Bit
 -----------------------------------^----- Header Enabled
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Enabled Mask
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 0 or header
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Enabled Mask
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  header
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 0
 ..
 ..
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled channels are included so list may be shorter
@@ -77,7 +77,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
     NSString* title= @"CV830 Scaler Record\n\n";
 	int crateNum			= ShiftAndExtract(ptr[1],21,0xf);
 	int cardNum				= ShiftAndExtract(ptr[1],16,0x1f);
-	int dataIs24Bit			= ShiftAndExtract(ptr[2],2,0x1);
 	int enabledMask			= ptr[3];
 
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",crateNum];
@@ -90,8 +89,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-			if(dataIs24Bit) s = [s stringByAppendingFormat:@"Channel:%d Counter: %lu\n",i,*ptr*0xFFFFFF];
-			else			s = [s stringByAppendingFormat:@"Channel:%d Counter: %lu\n",i,*ptr];
+			s = [s stringByAppendingFormat:@"Channel:%d Counter: %lu\n",i,*ptr];
 			ptr++;
 		}
 	}

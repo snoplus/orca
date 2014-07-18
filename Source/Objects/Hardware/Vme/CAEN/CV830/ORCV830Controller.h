@@ -25,7 +25,6 @@
 	IBOutlet NSButton*		enableAllButton;
 	IBOutlet NSButton*		autoResetCB;
 	IBOutlet NSButton*		clearMebCB;
-	IBOutlet NSButton*		dataFormatCB;
 	IBOutlet NSButton*		testModeCB;
 	IBOutlet NSPopUpButton* acqModePU;
 	IBOutlet NSTextField*	dwellTimeField;
@@ -48,7 +47,6 @@
 #pragma mark •••Interface Management
 - (void) autoResetChanged:(NSNotification*)aNote;
 - (void) clearMebChanged:(NSNotification*)aNote;
-- (void) dataFormatChanged:(NSNotification*)aNote;
 - (void) testModeChanged:(NSNotification*)aNote;
 - (void) acqModeChanged:(NSNotification*)aNote;
 - (void) dwellTimeChanged:(NSNotification*)aNote;
@@ -62,7 +60,6 @@
 #pragma mark •••Actions
 - (IBAction) autoResetAction:(id)sender;
 - (IBAction) clearMebAction:(id)sender;
-- (IBAction) dataFormatAction:(id)sender;
 - (IBAction) testModeAction:(id)sender;
 - (IBAction) acqModeAction:(id)sender;
 - (IBAction) dwellTimeAction:(id)sender;

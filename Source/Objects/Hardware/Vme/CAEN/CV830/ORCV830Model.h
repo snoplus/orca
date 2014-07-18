@@ -114,7 +114,6 @@ enum {
 		unsigned long	dwellTime;
 		short			acqMode;
 		BOOL			testMode;
-		BOOL			dataFormat;
 		BOOL			clearMeb;
 		BOOL			autoReset;
 		unsigned long	polledDataId;
@@ -136,8 +135,6 @@ enum {
 - (void) setAutoReset:(BOOL)aAutoReset;
 - (BOOL) clearMeb;
 - (void) setClearMeb:(BOOL)aClearMeb;
-- (BOOL) dataFormat;
-- (void) setDataFormat:(BOOL)aDataFormat;
 - (BOOL) testMode;
 - (void) setTestMode:(BOOL)aTestMode;
 - (short) acqMode;
@@ -200,7 +197,6 @@ enum {
 #pragma mark •••External String Definitions
 extern NSString* ORCV830ModelAutoResetChanged;
 extern NSString* ORCV830ModelClearMebChanged;
-extern NSString* ORCV830ModelDataFormatChanged;
 extern NSString* ORCV830ModelTestModeChanged;
 extern NSString* ORCV830ModelAcqModeChanged;
 extern NSString* ORCV830ModelDwellTimeChanged;

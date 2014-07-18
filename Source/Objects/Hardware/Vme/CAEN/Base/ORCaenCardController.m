@@ -531,8 +531,8 @@
     
 	// Populate the register popup
     for (i = 0; i < [model getNumberRegisters]; i++) {
-        [registerAddressPopUp insertItemWithTitle:[model 
-												   getRegisterName:i] 
+        [registerAddressPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d %@",i,[model
+												   getRegisterName:i]]
 										  atIndex:i];
     }
     

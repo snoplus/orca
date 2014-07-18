@@ -97,11 +97,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(dataFormatChanged:)
-                         name : ORCV830ModelDataFormatChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(clearMebChanged:)
                          name : ORCV830ModelClearMebChanged
 						object: model];
@@ -123,11 +118,6 @@
 - (void) clearMebChanged:(NSNotification*)aNote
 {
 	[clearMebCB setIntValue: [model clearMeb]];
-}
-
-- (void) dataFormatChanged:(NSNotification*)aNote
-{
-	[dataFormatCB setIntValue: [model dataFormat]];
 }
 
 - (void) testModeChanged:(NSNotification*)aNote
@@ -164,7 +154,6 @@
 	[self dwellTimeChanged:nil];
 	[self acqModeChanged:nil];
 	[self testModeChanged:nil];
-	[self dataFormatChanged:nil];
 	[self clearMebChanged:nil];
 	[self autoResetChanged:nil];
 }
@@ -212,7 +201,6 @@
     [shipRecordsButton setEnabled:!lockedOrRunningMaintenance];
 	[autoResetCB setEnabled:!lockedOrRunningMaintenance];
 	[clearMebCB setEnabled:!lockedOrRunningMaintenance];
-	[dataFormatCB setEnabled:!lockedOrRunningMaintenance];
 	[testModeCB setEnabled:!lockedOrRunningMaintenance];
 	[acqModePU setEnabled:!lockedOrRunningMaintenance];
 	[dwellTimeField setEnabled:!lockedOrRunningMaintenance && [model acqMode]==2];
@@ -272,11 +260,6 @@
 - (void) clearMebAction:(id)sender
 {
 	[model setClearMeb:[sender intValue]];	
-}
-
-- (void) dataFormatAction:(id)sender
-{
-	[model setDataFormat:[sender intValue]];	
 }
 
 - (void) testModeAction:(id)sender
@@ -407,7 +390,7 @@
     
     short	i;
     for (i = 0; i < [model getNumberRegisters]; i++) {
-        [registerAddressPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
+        [registerAddressPopUp insertItemWithTitle:[NSString stringWithFormat:@"%2d %@",i,[model getRegisterName:i]] atIndex:i];
     }
     
 }

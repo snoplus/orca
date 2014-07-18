@@ -98,7 +98,6 @@ static RegisterNamesStruct reg[kNumberOfV830Registers] = {
 #pragma mark •••Notification Strings
 NSString* ORCV830ModelAutoResetChanged			= @"ORCV830ModelAutoResetChanged";
 NSString* ORCV830ModelClearMebChanged			= @"ORCV830ModelClearMebChanged";
-NSString* ORCV830ModelDataFormatChanged			= @"ORCV830ModelDataFormatChanged";
 NSString* ORCV830ModelTestModeChanged			= @"ORCV830ModelTestModeChanged";
 NSString* ORCV830ModelAcqModeChanged			= @"ORCV830ModelAcqModeChanged";
 NSString* ORCV830ModelDwellTimeChanged			= @"ORCV830ModelDwellTimeChanged";
@@ -205,17 +204,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 }
 
 
-- (BOOL) dataFormat
-{
-    return dataFormat;
-}
-
-- (void) setDataFormat:(BOOL)aDataFormat
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDataFormat:dataFormat];
-    dataFormat = aDataFormat;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV830ModelDataFormatChanged object:self];
-}
 
 - (BOOL) testMode
 {
@@ -516,10 +504,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 					else			NSLog(@"Trigger: VME\n");
 					NSLog(@"Total Words in event: %d\n",(aValue>>18)&0x3F);
 					
-					BOOL format24Bit = [self dataFormat];
-					if(format24Bit) NSLog(@"24 Bit format\n");
-					else 			NSLog(@"32 Bit format\n");	
-					NSLog(@"First Event Only will follow:\n");	
+					NSLog(@"First Event Only will follow:\n");
 					int numEntriesPerEvent = [self numEnabledChannels]; //note that we already read the header if needed.
 					int i;
 					for(i=0;i<numEvents;i++){
@@ -533,8 +518,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 											usingAddSpace:0x01];
 							if(i==0){
 								//print out just the first event
-								if(format24Bit) NSLog(@"Channel: %d Counter: %d\n",(aValue>>27)&0x1F,aValue&0xFFFFFF);
-								else NSLog(@"%d\n",aValue);
+								NSLog(@"%d\n",aValue);
 							}
 							
 						}
@@ -580,7 +564,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 {
 	unsigned short aValue = 
 		(acqMode & 0x3)		|
-		(dataFormat << 2)	|
 		(testMode << 3)		|
 		(1 << 5)			| //header MUST be enabled
 		(clearMeb << 6)		|
@@ -729,7 +712,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	
     [objDictionary setObject: [NSNumber numberWithLong:enabledMask]		forKey:@"enabledMask"];	
-	[objDictionary setObject: [NSNumber numberWithInt:dataFormat]		forKey:@"dataFormat"];
 	[objDictionary setObject: [NSNumber numberWithLong:dwellTime]		forKey:@"dwellTime"];
 	
     return objDictionary;
@@ -786,7 +768,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 					int totalWordsInRecord = 4+numEnabledChannels + 1;
 					dataRecord[0] = dataId | totalWordsInRecord;
 					dataRecord[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
-					dataRecord[2] = ((dataFormat&0x1) << 1) | (acqMode & 0x3);
+					dataRecord[2] = (acqMode & 0x3);
 					dataRecord[3] = enabledMask;
 					
 					//read the header
@@ -857,7 +839,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	configStruct->card_info[index].deviceSpecificData[2] = [self getAddressOffset:kMEBEventNum];
 	configStruct->card_info[index].deviceSpecificData[3] = [self getAddressOffset:kEventBuffer];
 	configStruct->card_info[index].deviceSpecificData[4] = [self numEnabledChannels];
-	configStruct->card_info[index].deviceSpecificData[5] =((dataFormat&0x1) << 1) | (acqMode & 0x3);
+	configStruct->card_info[index].deviceSpecificData[5] = (acqMode & 0x3);
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	    
 	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by this card
@@ -906,7 +888,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
     [[self undoManager] disableUndoRegistration];
     [self setAutoReset:		[decoder decodeBoolForKey:@"autoReset"]];
     [self setClearMeb:		[decoder decodeBoolForKey:@"clearMeb"]];
-    [self setDataFormat:	[decoder decodeBoolForKey:@"dataFormat"]];
     [self setTestMode:		[decoder decodeBoolForKey:@"testMode"]];
     [self setAcqMode:		[decoder decodeIntForKey:@"acqMode"]];
     [self setDwellTime:		[decoder decodeInt32ForKey:@"dwellTime"]];
@@ -935,7 +916,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
     [super encodeWithCoder:encoder];
     [encoder encodeBool:autoReset		forKey:@"autoReset"];
     [encoder encodeBool:clearMeb		forKey:@"clearMeb"];
-    [encoder encodeBool:dataFormat		forKey:@"dataFormat"];
     [encoder encodeBool:testMode		forKey:@"testMode"];
     [encoder encodeInt:acqMode			forKey:@"acqMode"];
     [encoder encodeInt32:dwellTime		forKey:@"dwellTime"];
