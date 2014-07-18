@@ -271,11 +271,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [configDocDic setObject:docType forKey:@"doc_type"];
     [configDocDic setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
     [configDocDic setObject:customRunFile forKey:@"configuration_info"];
-    
-    //Fetch the configuration number and increment
-    
-    [configDocDic setObject:[NSNumber numberWithInt:1] forKey:@"configuration_version"];
-    
+
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
     

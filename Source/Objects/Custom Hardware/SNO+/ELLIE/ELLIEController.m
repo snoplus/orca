@@ -8,6 +8,7 @@
 
 #import "ELLIEController.h"
 #import "ELLIEModel.h"
+#import "SNOPModel.h"
 
 @implementation ELLIEController
     NSMutableDictionary *laserHeadDic;
@@ -28,21 +29,34 @@
     laserHeadSelected = NO;
     fibreSwitchOutputSelected = NO;
     
+    //this function operates under the assumption that there is an initial file already in place
+    NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
+    
+    //fetch the current version of the smellie configuration
+    currentConfigurationVersion = [self fetchRecentVersion];
+    
+    //fetch the data associated with the current configuration
+    configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
+    configForSmellie = [self fetchCurrentConfigurationForVersion:currentConfigurationVersion];
+    
+    //increment the current version of the incrementation
+    currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
+    
     //SMELLIE Configuration file
 
     //Set up the Smellie configuration file
-    NSMutableDictionary *genericLaserDriverToDetectorPath = [[NSMutableDictionary alloc] initWithCapacity:10];
+    /*NSMutableDictionary *genericLaserDriverToDetectorPath = [[NSMutableDictionary alloc] initWithCapacity:10];
     [genericLaserDriverToDetectorPath setObject:@"Empty Channel" forKey:@"laserHeadConnected"];
     [genericLaserDriverToDetectorPath setObject:@"99/1" forKey:@"splitterTypeConnected"];
     [genericLaserDriverToDetectorPath setObject:@"Channel1" forKey:@"fibreSwitchInputConnected"];
     [genericLaserDriverToDetectorPath setObject:@"50" forKey:@"attenuationFactor"];
     
     NSMutableDictionary *genericFibreSwitchOutputPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericFibreSwitchOutputPath setObject:@"FS007" forKey:@"detectorFibreReference"];
+    [genericFibreSwitchOutputPath setObject:@"FS007" forKey:@"detectorFibreReference"];*/
     
     
-    configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput0"];
+    
+    /*[configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput0"];
     [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput1"];
     [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput2"];
     [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput3"];
@@ -63,6 +77,8 @@
     [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel12"];
     [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel13"];
     [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel14"];
+    
+    [configForSmellie setObject:currentConfigurationVersion forKey:@"configuration_version"];
 
     
     [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNoOfPulses stringValue]]
@@ -81,7 +97,7 @@
                          forKey:@"selfTestNiTriggerInputPin"];
     
     [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestPmtSampleRate stringValue]]
-                         forKey:@"selfTestPmtSamplerRate"];
+                         forKey:@"selfTestPmtSamplerRate"];*/
     
     
     //load the most recent configuration settings from the database
@@ -557,12 +573,73 @@
     
 }
 
--(void) fetchRecentVersion
+-(NSNumber*) fetchRecentVersion
 {
-    NSURL *url = [NSURL URLWithString:@"http://localhost:8080/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?descending=true"];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSNumber *currentVersionNumber;
     NSData *data = [NSData dataWithContentsOfURL:url];
     NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSLog(@"ret=%@", ret);
+    NSError *error =  nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        @try{
+            //format the json response
+            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
+            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
+            //NSLog(@"parsedNumber%@",currentVersionNumber);
+            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
+            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
+        }
+        @catch (NSException *e) {
+            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
+        }
+    }
+    else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+
+    return currentVersionNumber;
+}
+
+-(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    //NSDictionary* currentConfig;
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        NSLog(@"sucessful query");
+        /*@try{
+            //format the json response
+            //NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
+            //NSLog(@"parsedNumber%@",currentVersionNumber);
+            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
+            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
+        }
+        @catch (NSException *e) {
+            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
+        }*/
+    }
+    else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+    
+    return [[currentConfig objectForKey:@"rows"] objectAtIndex:0];
 }
 
 //Submit Smellie configuration file to the Database
@@ -570,7 +647,7 @@
 -(IBAction)onSelectOfSepiaInput:(id)sender
 {
     //TODO: Read in current information about that Sepia Input and to the detector
-    [self fetchSmellieConfigurationInformationV2];
+    //[self fetchRecentVersion];
     //Download the most recent smellie configuration - this is implemented by run number
     //NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     //ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
