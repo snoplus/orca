@@ -18,6 +18,10 @@
 /* History:
 
 -----SOFTWARE VERSION:
+version 11:2014 July
+           read out full FLT when a single channel triggered
+           better timing (SLT timer now readable)
+ 
 version 10:2014 January
            added variable UDP packet size
            until 2013 December:
@@ -2789,6 +2793,9 @@ int parseConfigFileLine(char *line, int flags)
 			  wasFound = searchHex32InString(mystring,"PixbusEnable:",&slt.PixbusEnable);
 			  if(wasFound) printf("PixbusEnable: 0x%x\n",slt.PixbusEnable);
 			  
+			  wasFound = searchIntInString(mystring,"UTCTimeOffset:",&slt.utcTimeOffset);
+			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.utcTimeOffset);
+			  
 			  
 			  
     #if 0// now per FIFO (see below)
@@ -3654,9 +3661,13 @@ void FIFOREADER::scanFIFObuffer(void)
             uint32_t pd_fort=0, pd_faible=0;
             pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
             pd_faible = FIFObuf32[2] & 0x3fffffff;  // 30 bit
-    uint64_t sltTime = 0;  
-            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) /100000 ;
-            udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;//THIS FORMULA IS WRONG -tb- 2014-07
+            uint64_t sltTime = 0;  
+            uint64_t sltTimeSubSec = 0;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) ;
+            sltTimeSubSec = (((uint64_t)pd_fort << 30) | pd_faible) % 100000 ;
+            /* error check */
+            if(sltTimeSubSec != 0) printf("    scanFIFObuffer: *** WARNING *** *** WARNING *** - time from TimeStamp pattern not multiple of 100000: %lli (subSecs are %lli) \n",   sltTime, sltTimeSubSec);
+            sltTime = sltTime / 100000;
             udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
             if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
@@ -4204,6 +4215,12 @@ void RunSomeHardwareTests()
     
     //4.
     //set SLT time register to UTC -tb- 2014-07
+    #if 1
+    uint64_t retval , utcTime=0 , utcTimeOffset=SLTSETTINGS::SLT->utcTimeOffset;
+    uint32_t flags=kSetSLTtimerWithUTCFlag_Verbose | kSetSLTtimerWithUTCFlag_ReadBack;
+    retval = setSLTtimerWithUTC( flags,  utcTime, utcTimeOffset);
+    #else
+    //moved to function "setSLTtimerWithUTC":
     struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
     uint32_t currentSec = 0;  
     gettimeofday(&currenttime,NULL);
@@ -4241,6 +4258,7 @@ void RunSomeHardwareTests()
     }else{
         printf("   timeDiff:  %lli - OK!\n", timeDiff);
     }
+    #endif
     
 }
 

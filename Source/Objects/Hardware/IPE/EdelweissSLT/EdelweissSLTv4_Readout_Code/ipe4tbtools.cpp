@@ -956,6 +956,80 @@ return;
 
 
 /*--------------------------------------------------------------------
+ *    function:     setSLTtimerWithUTC
+ *    purpose:      set the SLT timer register to UTC
+ *                     
+ *
+ *    author:       Till Bergmann, 2013
+ *
+ *--------------------------------------------------------------------*/ //-tb-
+ 
+#define kSetSLTtimerWithUTCFlag_Value     0x1     //init with "utcTime", else use system time in UTC
+#define kSetSLTtimerWithUTCFlag_Verbose   0x2     //print output to console
+#define kSetSLTtimerWithUTCFlag_ReadBack  0x4     //read back after setting (with a sleep(1))
+
+uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOffset)
+{
+    int useInputValueUTC = flags & kSetSLTtimerWithUTCFlag_Value;
+    int beVerbose        = flags & kSetSLTtimerWithUTCFlag_Verbose;
+    int readBack         = flags & kSetSLTtimerWithUTCFlag_ReadBack;
+
+    struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
+    uint32_t currentSec = 0;  //I use currentSec to compute the the setpoint time - sorry, bad name (change to setpointTime in the future) -tb-
+    gettimeofday(&currenttime,NULL);
+    currentSec = currenttime.tv_sec;  
+    
+    if(useInputValueUTC){
+        currentSec = utcTime;
+    }else{//read from system
+    }
+
+    //take into account the offset:
+    currentSec = currentSec - utcTimeOffset;
+    
+    uint32_t sltTimeLo = 0;  
+    uint32_t sltTimeHi = 0;  
+    uint64_t sltTime = 0;  
+    int64_t timeDiff = 0;  
+    sltTimeLo = pbus->read(SLTTimeLowReg);
+    sltTimeHi = pbus->read(SLTTimeHighReg);
+    sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+    if(beVerbose) printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+    timeDiff=currentSec-sltTime;
+    //if((timeDiff < -1) || (timeDiff >1)){
+    if(timeDiff != 0){
+        if(beVerbose) printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
+        currentSec = currentSec + 1;//maybe this is not necessary
+        sltTime = ((uint64_t)currentSec) * 100000LL;
+        sltTimeLo =  sltTime        & 0xffffffff;
+        sltTimeHi = (sltTime >> 32) & 0xffffffff;
+        pbus->write(SLTTimeLowReg, sltTimeLo);
+        pbus->write(SLTTimeHighReg, sltTimeHi);
+        if(readBack){
+            sleep(1);
+            sltTimeLo = pbus->read(SLTTimeLowReg);
+            sltTimeHi = pbus->read(SLTTimeHighReg);
+            sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+            if(beVerbose) printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+        }
+        #if 0
+        pbus->write(SLTTimeLowReg, 0);
+        pbus->write(SLTTimeHighReg, 0);
+        sleep(1);
+        #endif
+
+
+    }else{
+        if(beVerbose) printf("   timeDiff:  %lli - OK!\n", timeDiff);
+    }
+    
+    return sltTime;
+
+}
+
+
+
+/*--------------------------------------------------------------------
   globals
   --------------------------------------------------------------------*/
 

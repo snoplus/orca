@@ -196,6 +196,7 @@ int chargeBBWithFILEPtr(FILE * fichier,int * numserie, int numFifo);
 void chargeBBWithFile(char * filename, int fromFifo);
 
 
+uint32_t setSLTtimerWithUTC(uint32_t flags, uint32_t utcTime, uint64_t utcTimeOffset);
 
 
 

@@ -730,11 +730,13 @@ public:
 	    initVars();
 	}
     uint32_t PixbusEnable;
+    int      utcTimeOffset;
     uint32_t numHWFifos;
 	void initVars(){
 		//
 		PixbusEnable=0x0;
         numHWFifos=0;
+        utcTimeOffset=0;
     }
     
     static void initSLTSETTINGS(){
