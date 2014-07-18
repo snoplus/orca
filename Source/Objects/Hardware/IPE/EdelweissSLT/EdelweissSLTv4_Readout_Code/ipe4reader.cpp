@@ -3678,7 +3678,7 @@ void FIFOREADER::scanFIFObuffer(void)
 //code with TEMPORARY CORRECTION -tb- 2014-07-18
 //we assume, subsecs are not 0 but 1 -> correction by software -tb-
             uint64_t sltTime = 0;  
-            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) /100000 ;
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) /100000 ;//   .../100000 removes the .........1 -tb-
             {
                 //make correction for timestamp pattern in data stream:
                 //    the SLT timer registers have a exactly 1 second larger timestamp (subseconds are OK)
@@ -3688,13 +3688,15 @@ void FIFOREADER::scanFIFObuffer(void)
                 // -tb- 2014-07-17
                 //sltTime = sltTime + 1;
                 uint64_t sltTimeCorr = sltTime * 100000;
-                pd_fort   = (sltTimeCorr >> 32) &  0x3ffff;     // 18 bits
+                pd_fort   = (sltTimeCorr >> 30) &  0x3ffff;     // 18 bits
                 pd_faible =  sltTimeCorr        &  0x3fffffff;  // 30 bit
             }
             //udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;//THIS FORMULA IS WRONG -tb- 2014-07
             udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
             if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+            //crosscheck of correction - 
+            if(show_debug_info) printf("   pd_faible is:  %i 0x%08x   pd_fort is:  %i 0x%08x   \n", pd_faible,pd_faible, pd_fort,pd_fort);
 
 
 
