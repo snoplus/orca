@@ -29,10 +29,11 @@
 	
 	BOOL selfRetained;
 	NSString* fileToAttach;
+    id delegate;
 }
 
-+ (id) mailCenter;
-- (id)init;
++ (id) mailCenterWithDelegate:(id)aDelegate;
+- (id)initWithDelegate:(id)aDelegate;
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window;
 - (void) windowWillClose:(NSNotification*)aNote;
 - (void) sendit;

@@ -67,6 +67,7 @@
 - (void) populateFilterPopup;
 - (void) loadAlarmHistory;
 - (void) doPeriodicSnapShotToPath:(NSString*) aPath;
+- (void) mailSent:(NSString*)address;
 
 #pragma mark ¥¥¥Updating
 - (void) updateErrorDisplay;

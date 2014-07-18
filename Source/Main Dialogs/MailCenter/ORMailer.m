@@ -44,6 +44,7 @@
 
 - (void)dealloc 
 {
+    self.delegate = nil;
 	self.to		 = nil;
 	self.cc		 = nil;
 	self.from	 = nil;

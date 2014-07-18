@@ -520,12 +520,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     @synchronized(self){
         NSString* tabIdentifer = [[tabView selectedTabViewItem]identifier];
         if([tabIdentifer isEqualToString:@"status"]){
-            ORMailCenter* theMailCenter = [ORMailCenter mailCenter];
+            ORMailCenter* theMailCenter = [ORMailCenter mailCenterWithDelegate:self];
             [theMailCenter showWindow:self];
             [theMailCenter setTextBodyToRTFData:[statusView RTFFromRange:NSMakeRange(0,[[statusView string] length])]];
         }
         else if([tabIdentifer isEqualToString:@"logBook"]){
-            ORMailCenter* theMailCenter = [ORMailCenter mailCenter];
+            ORMailCenter* theMailCenter = [ORMailCenter mailCenterWithDelegate:self];
             [theMailCenter showWindow:self];
             [self saveLogBook:self];
             [theMailCenter setFileToAttach:logBookFile];
@@ -533,6 +533,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     }
 }
 
+- (void) mailSent:(NSString*)address
+{
+	NSLog(@"StatusLog Content was sent to:\n%@\n",address);
+}
 
 - (IBAction) removeItemAction:(id)sender
 { 

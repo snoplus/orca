@@ -25,9 +25,9 @@
 
 #pragma mark ¥¥¥Initialization
 
-+ (id) mailCenter
++ (id) mailCenterWithDelegate:(id)aDelegate
 {
-	ORMailCenter* mailCenter = [[[ORMailCenter alloc] init] autorelease];
+	ORMailCenter* mailCenter = [[[ORMailCenter alloc] initWithDelegate:aDelegate] autorelease];
 
 	[[NSNotificationCenter defaultCenter] addObserver:mailCenter selector:@selector(windowWillClose:) name:NSWindowWillCloseNotification object:nil];
 	return mailCenter;
@@ -35,11 +35,12 @@
 
 #pragma mark ***Accessors
 
-- (id)init
+- (id)initWithDelegate:aDelegate
 {
     self = [super initWithWindowNibName:@"MailCenter"];
 	[self retain];
 	selfRetained = YES;
+    delegate = aDelegate;
     return self;
 }
 
@@ -136,7 +137,7 @@
 	[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
 	[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
 	[mailer setBody:theContent];
-	[mailer send:self];
+	[mailer send:delegate];
 	[theContent release];
 }
 
