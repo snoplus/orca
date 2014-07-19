@@ -1318,6 +1318,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 		int index = 2;
 		int i;
 		for(i=0;i<8;i++){
+			data[index++] = timeMeasured[i];
 			data[index++] = adc[i];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
