@@ -160,14 +160,15 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIsConnectedChanged object:self];
 }
 
-
 - (void) connect
 {
 	if(!isConnected && [ipAddress length]){
+        NSLog(@"trying to connect\n");
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kPacFPPort]];
         [self setIsConnected:[socket isConnected]];
 	}
 	else {
+        NSLog(@"trying to disconnect\n");
 		[self setSocket:nil];
         [self setIsConnected:[socket isConnected]];
 	}
@@ -177,7 +178,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
     return isConnected;
 }
-
 
 - (NSString*) ipAddress
 {
@@ -204,6 +204,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
     if(inNetSocket == socket){
         [self setIsConnected:YES];
+        NSLog(@"connected\n");
     }
 }
 
@@ -221,6 +222,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
+        NSLog(@"disconnected\n");
         [self setIsConnected:NO];
 		[socket autorelease];
 		socket = nil;
@@ -234,7 +236,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     if([theString hasPrefix:@"+"])return;
     
     if([lastRequest hasPrefix:@"get gains"]){
-        theString = [theString substringFromIndex:9];
         NSArray* theParts = [theString componentsSeparatedByString:@","];
         int i=0;
         for(id aValue in theParts){
@@ -249,7 +250,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     }
 
     else if([lastRequest hasPrefix:@"get temperatures"]){
-        theString = [theString substringFromIndex:16];
         NSArray* theParts = [theString componentsSeparatedByString:@","];
         int i=0;
         for(id aValue in theParts){
@@ -259,7 +259,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
         [self setLastRequest:nil];
     }
     else if([lastRequest hasPrefix:@"get current"]){
-        theString = [theString substringFromIndex:11];
         [self setLcm:[theString intValue]];
         [self setLastRequest:nil];
     }
