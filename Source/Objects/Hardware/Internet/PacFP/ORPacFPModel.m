@@ -232,8 +232,10 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+    NSLog(@"Processing Last Request: %@\n",lastRequest);
     NSLog(@"Received: %@",theString);
     if([theString hasPrefix:@"+"])return;
+    
     
     if([lastRequest hasPrefix:@"get gains"]){
         NSArray* theParts = [theString componentsSeparatedByString:@","];
