@@ -15,9 +15,6 @@
     NSMutableDictionary *configForSmellie;
     BOOL *laserHeadSelected;
     BOOL *fibreSwitchOutputSelected;
-
-//@synthesize smellieRunSettingsFromGUI;
-
 //smellie maxiumum trigger frequency
 
 //Set up functions
@@ -25,6 +22,7 @@
 {
     self = [super initWithWindowNibName:@"ellie"];
     //[smellieConfigAttenutationFactor setKeyboardType:UIKeyboardTypeNumberPad];
+
 
     laserHeadSelected = NO;
     fibreSwitchOutputSelected = NO;
@@ -37,73 +35,14 @@
     
     //fetch the data associated with the current configuration
     configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    configForSmellie = [self fetchCurrentConfigurationForVersion:currentConfigurationVersion];
+    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     //increment the current version of the incrementation
     currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
+    [configForSmellie setObject:currentConfigurationVersion forKey:@"configuration_version"];
     
     //SMELLIE Configuration file
 
-    //Set up the Smellie configuration file
-    /*NSMutableDictionary *genericLaserDriverToDetectorPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericLaserDriverToDetectorPath setObject:@"Empty Channel" forKey:@"laserHeadConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"99/1" forKey:@"splitterTypeConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"Channel1" forKey:@"fibreSwitchInputConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"50" forKey:@"attenuationFactor"];
-    
-    NSMutableDictionary *genericFibreSwitchOutputPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericFibreSwitchOutputPath setObject:@"FS007" forKey:@"detectorFibreReference"];*/
-    
-    
-    
-    /*[configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput0"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput1"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput2"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput3"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput4"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput5"];
-    
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel1"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel2"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel3"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel4"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel5"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel6"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel7"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel8"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel9"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel10"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel11"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel12"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel13"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel14"];
-    
-    [configForSmellie setObject:currentConfigurationVersion forKey:@"configuration_version"];
-
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNoOfPulses stringValue]]
-                         forKey:@"selfTestNumOfPulses"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNoOfPulsesPerLaser stringValue]]
-                         forKey:@"selfTestNumOfPulsesPerLaser"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestLaserTriggerFreq stringValue]]
-                         forKey:@"selfTestLaserTrigFrequency"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNiTriggerOutputPin stringValue]]
-                         forKey:@"selfTestNiTriggerOutputPin"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNiTriggerInputPin stringValue]]
-                         forKey:@"selfTestNiTriggerInputPin"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestPmtSampleRate stringValue]]
-                         forKey:@"selfTestPmtSamplerRate"];*/
-    
-    
-    //load the most recent configuration settings from the database
-    
-    //If there is no database configuration file
-    
     //Make sure these buttons are working on start up for Smellie
     [smellieNumIntensitySteps setEnabled:YES];
     [smellieMaxIntensity setEnabled:YES];
@@ -624,28 +563,20 @@
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(!error){
         NSLog(@"sucessful query");
-        /*@try{
-            //format the json response
-            //NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
-            //NSLog(@"parsedNumber%@",currentVersionNumber);
-            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
-            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
-        }
-        @catch (NSException *e) {
-            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
-        }*/
     }
     else{
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
     }
     
-    return [[currentConfig objectForKey:@"rows"] objectAtIndex:0];
+    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 }
 
 //Submit Smellie configuration file to the Database
 
 -(IBAction)onSelectOfSepiaInput:(id)sender
 {
+    [model testArrayOrganisation];
+    
     //TODO: Read in current information about that Sepia Input and to the detector
     //[self fetchRecentVersion];
     //Download the most recent smellie configuration - this is implemented by run number
@@ -654,12 +585,12 @@
     //[anELLIEModel fetchSmellieConfigurationInformation];
     
     //print down the current self-test pmt values
-    [smellieConfigSelfTestNoOfPulses setStringValue:@"10"];
-    [smellieConfigSelfTestLaserTriggerFreq setStringValue:@"10000"];
-    [smellieConfigSelfTestPmtSampleRate setStringValue:@"100000"];
-    [smellieConfigSelfTestNoOfPulsesPerLaser setStringValue:@"100"];
-    [smellieConfigSelfTestNiTriggerOutputPin setStringValue:@"/ctr0"];
-    [smellieConfigSelfTestNiTriggerInputPin setStringValue:@"/ai0:1"];
+    [smellieConfigSelfTestNoOfPulses setStringValue:[configForSmellie objectForKey:@"selfTestNumOfPulses"]];
+    [smellieConfigSelfTestLaserTriggerFreq setStringValue:[configForSmellie objectForKey:@"selfTestLaserTrigFrequency"]];
+    [smellieConfigSelfTestPmtSampleRate setStringValue:[configForSmellie objectForKey:@"selfTestPmtSamplerRate"]];
+    [smellieConfigSelfTestNoOfPulsesPerLaser setStringValue:[configForSmellie objectForKey:@"selfTestNumOfPulsesPerLaser"]];
+    [smellieConfigSelfTestNiTriggerOutputPin setStringValue:[configForSmellie objectForKey:@"selfTestNiTriggerOutputPin"]];
+    [smellieConfigSelfTestNiTriggerInputPin setStringValue:[configForSmellie objectForKey:@"selfTestNiTriggerInputPin"]];
     
     
     int laserHeadIndex = [sender indexOfSelectedItem];
@@ -930,62 +861,6 @@ BOOL isNumeric(NSString *s)
 -(IBAction)onClickValidateSmellieConfig:(id)sender
 {
     //TODO: Check the file is correct and send a message to the user
-    //if the file is correct then able the submit
-    
-    /*NSMutableDictionary *genericLaserDriverToDetectorPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericLaserDriverToDetectorPath setObject:@"Empty Channel" forKey:@"laserHeadConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"99/1" forKey:@"splitterTypeConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"Channel1" forKey:@"fibreSwitchInputConnected"];
-    [genericLaserDriverToDetectorPath setObject:@"50" forKey:@"attenuationFactor"];
-    
-    NSMutableDictionary *genericFibreSwitchOutputPath = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [genericFibreSwitchOutputPath setObject:@"FS007" forKey:@"detectorFibreReference"];
-    
-    
-    configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput0"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput1"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput2"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput3"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput4"];
-    [configForSmellie setObject:genericLaserDriverToDetectorPath forKey:@"laserInput5"];
-    
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel1"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel2"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel3"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel4"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel5"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel6"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel7"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel8"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel9"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel10"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel11"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel12"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel13"];
-    [configForSmellie setObject:genericFibreSwitchOutputPath forKey:@"Channel14"];
-    
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNoOfPulses stringValue]]
-                         forKey:@"selfTestNumOfPulses"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNoOfPulsesPerLaser stringValue]]
-                         forKey:@"selfTestNumOfPulsesPerLaser"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestLaserTriggerFreq stringValue]]
-                         forKey:@"selfTestLaserTrigFrequency"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNiTriggerOutputPin stringValue]]
-                         forKey:@"selfTestNiTriggerOutputPin"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestNiTriggerInputPin stringValue]]
-                         forKey:@"selfTestNiTriggerInputPin"];
-    
-    [configForSmellie setObject:[NSString stringWithFormat:@"%@",[smellieConfigSelfTestPmtSampleRate stringValue]]
-                         forKey:@"selfTestPmtSamplerRate"];*/
-    
-    
-    
     
     [smellieConfigSubmitButton setEnabled:YES];
 }
@@ -997,6 +872,7 @@ BOOL isNumeric(NSString *s)
     
     //post to the database
     [model smellieConfigurationDBpush:configForSmellie];
+    [self close];
 }
 
 

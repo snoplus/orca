@@ -421,11 +421,134 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
 }
 
+-(NSNumber*) fetchRecentVersion
+{
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //Initialise the SNOPModel
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSNumber *currentVersionNumber;
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        @try{
+            //format the json response
+            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
+            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
+            //NSLog(@"parsedNumber%@",currentVersionNumber);
+            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
+            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
+        }
+        @catch (NSException *e) {
+            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
+        }
+    }
+    else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+    
+    return currentVersionNumber;
+}
+
+-(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    //NSDictionary* currentConfig;
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        NSLog(@"sucessful query");
+    }
+    else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+    
+    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
+}
+
+
+-(void)testArrayOrganisation
+{
+    NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
+    //fetch the current version of the smellie configuration
+    currentConfigurationVersion = [self fetchRecentVersion];
+    
+    //fetch the data associated with the current configuration
+    NSMutableDictionary *configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
+    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    
+    NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
+    
+    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
+    
+    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
+        
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
+                
+                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+                
+                [laserHeadToSepiaMapping setObject:[NSString stringWithFormat:@"%i",laserHeadIndex] forKey:laserHeadConnected];
+            }
+        }
+    } //end of looping through each laserHeadIndex
+    
+    for(int outputChannelIndex =1; outputChannelIndex < 13; outputChannelIndex++){
+        
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
+                
+                NSString *fibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
+                
+                [fibreSwitchOutputToFibre setObject:[NSString stringWithFormat:@"%i",outputChannelIndex] forKey:fibreReference];
+            }
+        }
+    } //end of looping through each laserHeadIndex
+    
+    
+    //TODO: Add the laserHeadToSepiaMapping variable into the startSmellieRun function
+}
+
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
     //Deconstruct runFile into indiviual subruns ------------------
     
     NSLog(@"Starting SMELLIE Run\n");
+    
+    
+    //Look to the test
+    /*NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
+    //fetch the current version of the smellie configuration
+    currentConfigurationVersion = [self fetchRecentVersion];
+    
+    //fetch the data associated with the current configuration
+    NSMutableDictionary *configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
+    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    
+    NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
+    
+    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
+    
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
+            
+                [laserHeadToSepiaMapping setObject:[specificConfigValue objectForKey:@"laserHeadConnected"] forKey:[NSString stringWithFormat:@"%i",laserHeadIndex]];
+            }
+        }
+        
+    }*/
     
     NSLog(@"Checking Connection to SMELLIE\n");
     
@@ -491,6 +614,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     ///Loop through each Laser
     int laserLoopInt = 0;
+    
     for(id laserKey in laserArray){
     //for(int laserLoopInt = 0;laserLoopInt < [laserArray count];laserLoopInt++){
         
@@ -511,14 +635,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             continue;
         }
         
+        //TODO:[self setLaserSwitch:[laserHeadToSepiaMapping objectForKey:@"375nm"]];
         
         //NSLog(@"%@",[[laserArray objectAtIndex:laserLoopInt] key]);
         
         if([laserKey isEqual:@"375nm"]){
-            continue;
+            //continue;
             //Current unconnected for repair
             //[self performSelector:@selector(setLaserSwitch:) withObject:@"1" afterDelay:.1];
-            //[self setLaserSwitch:@"1"]; //whichever channel the 375 is connected to
+            [self setLaserSwitch:@"1"]; //whichever channel the 375 is connected to
         }
         else if ([laserKey isEqual:@"405nm"]){
             //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"2" waitUntilDone:YES];
@@ -537,7 +662,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"4" waitUntilDone:YES];
             //[self performSelector:@selector(setLaserSwitch:) withObject:@"4" afterDelay:.1];
             //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES];
-            
             [self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
             //[NSThread sleepForTimeInterval:35.0f];
             
@@ -545,12 +669,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         else{
             NSLog(@"SMELLIE RUN:No laser selected for this iteration\n");
         }
-        
-        
-        //REMOVE THIS LATER
-        //[NSThread sleepForTimeInterval:1.0f];
-        //[self setLaserFrequency20Mhz];
-        //[NSThread sleepForTimeInterval:1.0f];
         
         //Loop through each Fibre
         for(id fibreKey in fibreArray){
@@ -567,10 +685,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             
             //which laser is connected to which input channel
             //labelling on fibre switch is one above normal
+            
+            //TODO:Fetch the OutputChannel for a given fibre setting
+            
             NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt+1];
             //NSLog(@"inputFibreSwitch :%@",inputFibneSwitchChannel);
             
-            //For the moment always go through switch 5 (for the moment)
+            //Find the FibreSwitchInput channel that corresponds to a particular laser            
+            
+            //Need to give the input channel 
+            
+            //TODO; After inserting the test code, need to also add in the extra code
+            //[self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[fibreSwitchOutputToFibre objectForKey:fibreKey];
             [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:@"5"];
             [NSThread sleepForTimeInterval:1.0f];
             
