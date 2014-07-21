@@ -23,6 +23,11 @@ currentQueryResults = _currentQueryResults;
     [self setImage:[NSImage imageNamed:@"resistor"]];
 }
 
+//-(void) postToQueryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
+//{
+    //[[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
+//}
+
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
  {
      //view to query (make the request within this string)
@@ -68,8 +73,6 @@ currentQueryResults = _currentQueryResults;
             if ([aTag isEqualToString:kResistorDbHeaderRetrieved])
             {
                 NSLog(@"here\n");
-                //NSLog(@"Object: %@\n",aResult);
-                //NSLog(@"result: %@\n",[aResult objectForKey:@"SnoPmt"]);
                 [self parseResistorDbResult:aResult];
             }
             //If no tag is found for the query result

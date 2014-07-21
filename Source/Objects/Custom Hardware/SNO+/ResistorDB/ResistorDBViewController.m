@@ -74,6 +74,7 @@
     [loadingFromDbWheel setHidden:YES];
     [loadingFromDbWheel stopAnimation:nil];
     NSLog(@"model value pulled Cable %@",[[model currentQueryResults] objectForKey:@"pulledCable"]);
+    NSLog(@"model results %@",[model currentQueryResults]);
     
     //Values to load
     NSString *resistorStatus;
@@ -139,6 +140,12 @@
         NSLog(@"CouchDb Parse Error %@",e);
     }
     
+}
+
+-(IBAction)updatePmtDatabase:(id)sender
+{
+    
+    //Perform an update of the current Pmt Database 
 }
 
 - (void) registerNotificationObservers
