@@ -693,10 +693,11 @@
 		{
             id result = NodeValue(0);
 			if([result isKindOfClass:[NSNumber class]]){
-				if(![result boolValue])return _one;
+                
+				if([result intValue]==0)return _one;
 				else return _zero;
 			}
-			else if(result!=0)return _one;
+			else if(result==0)return _one;
 			else return _zero;
 		}
 			
@@ -1300,14 +1301,14 @@
 
 - (id) processIf:(id) p
 {
-	if (![NodeValue(0) isEqual: _zero])		  NodeValue(1);
-	else if ([[(Node*)p nodeData] count] > 2) NodeValue(2);
+	if (![NodeValue(0) isEqual: _zero])		  return NodeValue(1);
+	else if ([[(Node*)p nodeData] count] > 2) return NodeValue(2);
 	return nil;
 }
 
 - (id) processUnless:(id) p
 {
-	if ([NodeValue(0) isEqual: _zero])		  NodeValue(1);
+	if ([NodeValue(0) isEqual: _zero])		  return NodeValue(1);
 	return nil;
 }
 
