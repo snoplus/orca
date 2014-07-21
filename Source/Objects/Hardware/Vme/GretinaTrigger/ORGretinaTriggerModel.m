@@ -417,7 +417,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-    [self initClockDistribution];
+    //[self initClockDistribution];
 }
 
 #pragma mark ***Accessors
@@ -820,14 +820,13 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             if(connectedRouterMask & 0x70)   masterPreMask |= 0x152; //Links E,F,G
             if(connectedRouterMask & 0x780)  masterPreMask |= 0x154; //Links H,L,R,U
             [self writeRegister:kLvdsPreEmphasis withValue:masterPreMask];
-            //[self writeRegister:kLvdsPreEmphasis withValue:0x7];
             [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]]; //read it back for display
             [self setInitState:kStep1d];
             break;
             
         case kStep1d: //1d. Release the link-init machine by clearing the reset bit in the misc-ctl register
-            //[self writeRegister:kMiscCtl1 withValue:[self readRegister:kMiscCtl1] & ~kResetLinkInitMachBit];
-            [self writeRegister:kMiscCtl1 withValue:0xFFC0];
+            [self writeRegister:kMiscCtl1 withValue:[self readRegister:kMiscCtl1] & ~kResetLinkInitMachBit];
+            //[self writeRegister:kMiscCtl1 withValue:0xFFC0];
             [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]]; //read it back for display
             [self setInitState:kCheckStep1d];
             break;
@@ -865,7 +864,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             break;
             
         case kStep3a://3a. Read Link Locked to verify the SERDES of Master is locked the syn pattern of the Router
-            if(linkLockedReg!= 0x7FE) {
+            if(linkLockedReg!= (~connectedRouterMask & 0x7FF)) {
                 NSLog(@"HW issue: the SERDES of the Master has not locked on to the synchronization pattern from the Router");
                 [self setInitState:kStepError];
             }
@@ -972,7 +971,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
         case kStep10:
             [self writeRegister:kMiscCtl1 withValue:0xFF00];
             [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
-            [self setInitState:kStepError];
+            [self setInitState:kStepIdle];
     }
     
     if(initializationState != kRunSteps2a2c     &&
@@ -1035,10 +1034,10 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             //[self setInputLinkMask:  [self readRegister:kInputLinkMask]];   //read it back for display
             //--------------
             
-            //[self writeRegister:kSerdesTPower withValue:kSerdesPowerOnAll];
-            //[self writeRegister:kSerdesRPower withValue:kSerdesPowerOnAll];
-            [self writeRegister:kSerdesTPower withValue:0x100];
-            [self writeRegister:kSerdesRPower withValue:0x100];
+            [self writeRegister:kSerdesTPower withValue:kPowerOnLSerDes];
+            [self writeRegister:kSerdesRPower withValue:kPowerOnLSerDes];
+            //[self writeRegister:kSerdesTPower withValue:0x100];
+            //[self writeRegister:kSerdesRPower withValue:0x100];
             
             [self setSerdesTPowerMask:[self readRegister:kSerdesTPower]]; //read back for display
             [self setSerdesRPowerMask:[self readRegister:kSerdesRPower]]; //read back for display
@@ -1047,7 +1046,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             break;
             
         case kStep2b: //2b. Turn on the DEN, REN, and SYNC for Link "L"
-            //[self writeRegister:kLinkLruCrl withValue: ( [self readRegister:kLinkLruCrl] | kLinkLruCrlMask)]; //!!!
+            //[self writeRegister:kLinkLruCrl withValue: ( [self readRegister:kLinkLruCrl] | kLinkLruCrlMask)];
             [self writeRegister:kLinkLruCrl withValue:0x88F];
             [self setLinkLruCrlReg:[self readRegister:kLinkLruCrl]]; //read back for display
             [self setInitState:kStep2c];
@@ -1116,16 +1115,18 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
                 [self setInitState:kStepError];
             }
             else {
-               // [self writeRegister:kInputLinkMask withValue:(~connectedDigitizerMask)]; // !!!
-                [self writeRegister:kInputLinkMask withValue:0xFC];
+                [self writeRegister:kInputLinkMask withValue:(~connectedDigitizerMask)];
+                //[self writeRegister:kInputLinkMask withValue:0xFC];
                 [self setInputLinkMask:[self readRegister:kInputLinkMask]]; // read back for display
                 [self setInitState:kStep7b];
             }
             break;
             
         case kStep7b:
-            [self writeRegister:kSerdesTPower withValue:0x103];
-            [self writeRegister:kSerdesRPower withValue:0x103];
+            [self writeRegister:kSerdesTPower withValue:connectedDigitizerMask];
+            [self writeRegister:kSerdesRPower withValue:connectedDigitizerMask];
+            //[self writeRegister:kSerdesTPower withValue:0x103];
+            //[self writeRegister:kSerdesRPower withValue:0x103];
             [self setSerdesRPowerMask:[self readRegister:kSerdesRPower]]; // read back for display
             [self setSerdesTPowerMask:[self readRegister:kSerdesTPower]]; // read back for display
             [self setInitState:kStep7d];
@@ -1215,9 +1216,9 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
 {
     unsigned short aMask = 0x0;
     int i;
-    for(i=0;i<8;i++){
+    for(i=0;i<9;i++){
         ORConnector* otherConnector = [linkConnector[i] connector];
-        if([otherConnector identifer] != 'L')aMask |= (0x1<<i);
+        if([otherConnector objectLink] != nil) aMask |= (0x1<<i);
     }
     return aMask;
 }

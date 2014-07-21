@@ -216,6 +216,7 @@ enum {
 
 
 #define kResetLinkInitMachBit (0x1<<2)
+#define kPowerOnLSerDes        (0x1<<8)
 #define kClockSourceSelectBit (0x1<<15)
 #define kLinkInitStateMask    (0x0F00)
 #define kSerdesPowerOnAll     (0x7FF)
