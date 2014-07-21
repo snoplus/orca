@@ -24,6 +24,7 @@
 {
     
 	IBOutlet NSTextField*	ipConnectedTextField;
+	IBOutlet   NSTextField* workingOnGainTextField;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
 
@@ -56,7 +57,9 @@
     IBOutlet NSTableView*   processLimitsTableView;
 
     IBOutlet ORValueBarGroupView*  queueValueBar;
-
+    IBOutlet NSProgressIndicator*  progress;
+    IBOutlet NSTextField*          progressField;
+    
     NSSize					normalSize;
     NSSize					setUpSize;
     NSSize					gainSize;
@@ -76,6 +79,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) workingOnGainChanged:(NSNotification*)aNote;
 - (void) processLimitsChanged:(NSNotification*)aNote;
 - (void) gainDisplayTypeChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNotification;
@@ -109,6 +113,7 @@
 
 - (IBAction) ipAddressFieldAction:(id)sender;
 - (IBAction) connectAction: (id) aSender;
+- (IBAction) flushQueueAction: (id) aSender;
 
 
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

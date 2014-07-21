@@ -28,6 +28,7 @@
 
 #pragma mark •••External Strings
 
+NSString* ORPacFPModelWorkingOnGainChanged = @"ORPacFPModelWorkingOnGainChanged";
 NSString* ORPacFPModelIsConnectedChanged       = @"ORPacFPModelIsConnectedChanged";
 NSString* ORPacFPModelIpAddressChanged         = @"ORPacFPModelIpAddressChanged";
 
@@ -123,6 +124,18 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) workingOnGain
+{
+    return workingOnGain;
+}
+
+- (void) setWorkingOnGain:(int)aWorkingOnGain
+{
+    workingOnGain = aWorkingOnGain;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelWorkingOnGainChanged object:self];
+}
 
 - (NSString*) title
 {
@@ -233,22 +246,34 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     }
 }
 
+- (void) flushQueue
+{
+    [cmdQueue removeAllObjects];
+    [self setLastRequest:nil];
+}
+
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
     NSLog(@"Processing Last Request: %@\n",lastRequest);
     NSLog(@"Received: %@",theString);
     theString = [theString trimSpacesFromEnds];
-    
+    theString = [theString lowercaseString];
     NSArray* lines = [theString componentsSeparatedByString:@"\n"];
     for(NSString* aLine in lines){
         
         if([aLine length]==0)       continue;
         
-        if([aLine hasPrefix:@"+"])  continue;
+        if([aLine hasPrefix:@"+"]){
+            if([aLine hasPrefix:@"+channel"]){
+                int theChannel = [[aLine substringFromIndex:8] intValue];
+                [self setWorkingOnGain:theChannel];
+            }
+            return;
+        }
         
-        
-        if([lastRequest hasPrefix:@"get gains"]){
+        else if([lastRequest hasPrefix:@"get gains"]){
+            aLine = [aLine substringFromIndex:9];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(id aValue in theParts){
@@ -258,11 +283,18 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             [self setLastRequest:nil];
         }
         else if([lastRequest hasPrefix:@"set gains"]){
+            aLine = [aLine substringFromIndex:9];
+            NSArray* theParts = [aLine componentsSeparatedByString:@","];
+            int i=0;
+            for(id aValue in theParts){
+                [self setGain:i withValue:[aValue intValue]];
+                i++;
+            }
             [self setLastRequest:nil];
-            //nothing to do
         }
 
         else if([lastRequest hasPrefix:@"get temperatures"]){
+            aLine = [aLine substringFromIndex:16];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(id aValue in theParts){
@@ -272,14 +304,12 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             [self setLastRequest:nil];
         }
         else if([lastRequest hasPrefix:@"get current"]){
+            aLine = [aLine substringFromIndex:11];
             [self setLcm:[aLine intValue]];
             [self setLastRequest:nil];
         }
-        
     }
     [self processNextCommandFromQueue];
-
-
 }
 
 - (NSDate*) lastGainRead

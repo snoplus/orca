@@ -59,12 +59,15 @@
         unsigned short      lcmTimeMeasured;
         int                 adcChannel;
         NSDate*             lastGainRead;
+    int workingOnGain;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (int) workingOnGain;
+- (void) setWorkingOnGain:(int)aWorkingOnGain;
 - (NetSocket*) socket;
 - (void) setSocket:(NetSocket*)aSocket;
 - (NSString*) ipAddress;
@@ -108,7 +111,7 @@
 - (void) setLogToFile:(BOOL)aLogToFile;
 - (int) queCount;
 - (void) setProcessLimitDefaults;
-
+- (void) flushQueue;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -152,6 +155,7 @@
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
+extern NSString* ORPacFPModelWorkingOnGainChanged;
 extern NSString* ORPacFPModelLastGainReadChanged;
 extern NSString* ORPacFPModelLcmChanged;
 extern NSString* ORPacFPModelProcessLimitsChanged;

@@ -107,6 +107,9 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
     
+    [progress setIndeterminate:NO];
+
+    
 	[super awakeFromNib];
 }
 
@@ -203,6 +206,12 @@
                      selector : @selector(lcmChanged:)
                          name : ORPacFPModelLcmChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(workingOnGainChanged:)
+                         name : ORPacFPModelWorkingOnGainChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -229,8 +238,23 @@
     
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
-
 }
+
+- (void) workingOnGainChanged:(NSNotification*)aNote
+{
+	[workingOnGainTextField setIntValue: [model workingOnGain]];
+    if([model workingOnGain] == 1){
+        [progress setMaxValue:148];
+        [progress startAnimation:self];
+    }
+    [progressField setStringValue:[NSString stringWithFormat:@"%d/148",[model workingOnGain]]];
+    [progress setValue:[model workingOnGain]];
+    if([model workingOnGain] == 148){
+        [progress stopAnimation:self];
+        [progressField setStringValue:@"--"];
+    }
+}
+
 - (void) isConnectedChanged:(NSNotification*)aNote
 {
 	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
@@ -663,6 +687,11 @@
                        didEndSelector:@selector(readGainFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 #endif
+}
+
+- (IBAction) flushQueueAction: (id) aSender
+{
+    [model flushQueue];
 }
 
 - (IBAction) saveGainFileAction:(id)sender
