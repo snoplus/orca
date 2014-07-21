@@ -205,6 +205,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     if(inNetSocket == socket){
         [self setIsConnected:YES];
         NSLog(@"connected\n");
+        [cmdQueue removeAllObjects];
+        [self setLastRequest:nil];
     }
 }
 
@@ -226,6 +228,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
         [self setIsConnected:NO];
 		[socket autorelease];
 		socket = nil;
+        [cmdQueue removeAllObjects];
+        [self setLastRequest:nil];
     }
 }
 
