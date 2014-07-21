@@ -47,7 +47,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 
 @interface ORPacFPModel (private)
 - (void) timeout;
-- (void) processOneCommandFromQueue;
+- (void) processNextCommandFromQueue;
 - (void) _setUpPolling:(BOOL)verbose;
 - (void) _stopPolling;
 - (void) _startPolling;
@@ -238,38 +238,47 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
     NSLog(@"Processing Last Request: %@\n",lastRequest);
     NSLog(@"Received: %@",theString);
-    if([theString hasPrefix:@"+"])return;
+    theString = [theString trimSpacesFromEnds];
     
-    
-    if([lastRequest hasPrefix:@"get gains"]){
-        NSArray* theParts = [theString componentsSeparatedByString:@","];
-        int i=0;
-        for(id aValue in theParts){
-            [self setGainReadBack:i withValue:[aValue intValue]];
-            i++;
+    NSArray* lines = [theString componentsSeparatedByString:@"\n"];
+    for(NSString* aLine in lines){
+        
+        if([aLine length]==0)       continue;
+        
+        if([aLine hasPrefix:@"+"])  continue;
+        
+        
+        if([lastRequest hasPrefix:@"get gains"]){
+            NSArray* theParts = [aLine componentsSeparatedByString:@","];
+            int i=0;
+            for(id aValue in theParts){
+                [self setGainReadBack:i withValue:[aValue intValue]];
+                i++;
+            }
+            [self setLastRequest:nil];
         }
-        [self setLastRequest:nil];
-    }
-    else if([lastRequest hasPrefix:@"set gains"]){
-        [self setLastRequest:nil];
-        //nothing to do
-    }
+        else if([lastRequest hasPrefix:@"set gains"]){
+            [self setLastRequest:nil];
+            //nothing to do
+        }
 
-    else if([lastRequest hasPrefix:@"get temperatures"]){
-        NSArray* theParts = [theString componentsSeparatedByString:@","];
-        int i=0;
-        for(id aValue in theParts){
-            [self setAdc:i value:[aValue floatValue]];
-            i++;
+        else if([lastRequest hasPrefix:@"get temperatures"]){
+            NSArray* theParts = [aLine componentsSeparatedByString:@","];
+            int i=0;
+            for(id aValue in theParts){
+                [self setAdc:i value:[aValue floatValue]];
+                i++;
+            }
+            [self setLastRequest:nil];
         }
-        [self setLastRequest:nil];
+        else if([lastRequest hasPrefix:@"get current"]){
+            [self setLcm:[aLine intValue]];
+            [self setLastRequest:nil];
+        }
+        
     }
-    else if([lastRequest hasPrefix:@"get current"]){
-        [self setLcm:[theString intValue]];
-        [self setLastRequest:nil];
-    }
-    
-    if(!lastRequest)[self processOneCommandFromQueue];
+    [self processNextCommandFromQueue];
+
 
 }
 
@@ -629,7 +638,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     NSLog(@"adding to queue: %@",aCommand);
 	[cmdQueue enqueue:aCommand];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelQueCountChanged object: self];
-	if(!lastRequest)[self processOneCommandFromQueue];
+	[self processNextCommandFromQueue];
 }
 
 
@@ -1018,16 +1027,16 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	}
 }
 
-- (void) processOneCommandFromQueue
+- (void) processNextCommandFromQueue
 {
+    if(lastRequest)return;
 	if([cmdQueue count] > 0){
 		NSString* cmd = [cmdQueue dequeue];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelQueCountChanged object: self];
-		if([cmd isEqualToString:@"++ShipData"]){
-			[self setLastRequest:nil];
+		if([cmd hasPrefix:@"++ShipData"]){
 			[self shipAdcValues];
 			[self loadLogBuffer];
-			[self processOneCommandFromQueue];
+            [self processNextCommandFromQueue];
 		}
 		else {
             NSLog(@"sending: %@\n",cmd);
