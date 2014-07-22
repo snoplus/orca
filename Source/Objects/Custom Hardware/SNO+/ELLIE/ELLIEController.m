@@ -575,7 +575,7 @@
 
 -(IBAction)onSelectOfSepiaInput:(id)sender
 {
-    [model testArrayOrganisation];
+    //[model testArrayOrganisation];
     
     //TODO: Read in current information about that Sepia Input and to the detector
     //[self fetchRecentVersion];
