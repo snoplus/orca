@@ -968,7 +968,7 @@ return;
 #define kSetSLTtimerWithUTCFlag_Verbose   0x2     //print output to console
 #define kSetSLTtimerWithUTCFlag_ReadBack  0x4     //read back after setting (with a sleep(1))
 
-uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOffset)
+uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOffset, uint64_t utcTimeCorrection100kHz)
 {
     int useInputValueUTC = flags & kSetSLTtimerWithUTCFlag_Value;
     int beVerbose        = flags & kSetSLTtimerWithUTCFlag_Verbose;
@@ -1000,7 +1000,7 @@ uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOf
     if(timeDiff != 0){
         if(beVerbose) printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
         currentSec = currentSec + 1;//maybe this is not necessary
-        sltTime = (((uint64_t)currentSec) * 100000LL) + 1;//TODO: +1: this is a fix for the timestamp error (SLT timer register sends ...-1 to BB)
+        sltTime = (((uint64_t)currentSec) * 100000LL) + utcTimeCorrection100kHz;//TODO: +1: this is a fix for the timestamp error (SLT timer register sends ...-1 to BB)
         sltTimeLo =  sltTime        & 0xffffffff;
         sltTimeHi = (sltTime >> 32) & 0xffffffff;
         if(beVerbose) printf("    Writing SLT timer reg: timeLo:  %li (0x%08x) - timeHi: %li  (0x%08x) \n", sltTimeLo, sltTimeLo, sltTimeHi, sltTimeHi);

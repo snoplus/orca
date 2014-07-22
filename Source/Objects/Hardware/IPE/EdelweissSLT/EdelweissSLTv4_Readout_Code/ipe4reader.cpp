@@ -12,7 +12,7 @@
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW           10
+#define VERSION_IPE4_SW           11
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
 
 /* History:
@@ -2793,8 +2793,14 @@ int parseConfigFileLine(char *line, int flags)
 			  wasFound = searchHex32InString(mystring,"PixbusEnable:",&slt.PixbusEnable);
 			  if(wasFound) printf("PixbusEnable: 0x%x\n",slt.PixbusEnable);
 			  
-			  wasFound = searchIntInString(mystring,"UTCTimeOffset:",&slt.utcTimeOffset);
+			  wasFound = searchIntInString(mystring,"sltTimerSetting:",&slt.sltTimerSetting);
+			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.sltTimerSetting);
+			  
+			  wasFound = searchIntInString(mystring,"utcTimeOffset:",&slt.utcTimeOffset);
 			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.utcTimeOffset);
+			  
+			  wasFound = searchIntInString(mystring,"utcTimeCorrection100kHz:",&slt.utcTimeCorrection100kHz);
+			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.utcTimeCorrection100kHz);
 			  
 			  
 			  
@@ -3459,21 +3465,26 @@ void FIFOREADER::scanFIFObuffer(void)
                 waitingForSynchroWord = 0;
                 synchroWordPosHint=0;
                 //if(show_debug_info>2) 
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                 printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
             }else{
                 if(synchroWordBufferPosHint>=-64 && synchroWordBufferPosHint<=64){//is near the expected position
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                     printf("scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position  \n",synchroWordBufferPosHint);//TODO: DEBUG output -tb-
                 }
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                     printf("  !!!scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position (i=%i, to numWord32=%i) \n",synchroWordBufferPosHint,i,numWord32);//TODO: DEBUG output -tb-
                 //in all other cases the pattern 0x00003117 is assumed to be ADC data
                 if(   (0x00080c00 == (FIFObuf32[popIndexFIFObuf32+1] & 0x000f0f00))   ||   synchroWordBufferPosHint==8192){
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                     printf("WARNING: is 0x00080cXX or 8192 shift: MOST PROBABLY A synch word - scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position (i=%i, to numWord32=%i) \n",synchroWordBufferPosHint,i,numWord32);//TODO: DEBUG output -tb-
                   headerWordFoundFlag=1 ;  
                   waitingForSynchroWord = 0;
                   synchroWordPosHint=0;
                 //if(show_debug_info>2) 
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                 printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
@@ -3563,16 +3574,35 @@ void FIFOREADER::scanFIFObuffer(void)
         pushIndexFIFObuf32 = FIFObuf32avail;
         
         //DEBUGKRAM
-        if(show_debug_info>=1){
+        if(show_debug_info>=1 || show_debug_info == -1){
             if(FIFObuf32avail >= 4){
                 printf("   SynchroWord: ");
                 int i;
                 for(i=0; i<4; i++){
                     printf("0x%08x, ",FIFObuf32[i]);
                 }
+                
+                
+        #if 1 //TODO: this was for the TS debugging - REMOVE IT -tb-
+        if(show_debug_info == -1){
+            uint32_t pd_fort=0, pd_faible=0;
+            pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
+            pd_faible = FIFObuf32[2] & 0x3fffffff;  // 30 bit
+            uint64_t sltTime = 0,sltTimeSubSec;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) ;
+                printf("     - time  %lli ",sltTime);
+            sltTimeSubSec = (((uint64_t)pd_fort << 30) | pd_faible) % 100000 - SLTSETTINGS::SLT->utcTimeCorrection100kHz;
+            /* error check */
+            if(sltTimeSubSec != 0) printf("    scanFIFObuffer: *** WARNING *** *** WARNING *** - time from TimeStamp pattern not OK: %lli (subSecs are %lli) \n",   sltTime, sltTimeSubSec);
+        }
+        #endif
+                
+                
+                
                 printf("\n");
             }
         }
+
         
         //DEBUG: show spike finder results
         if(use_spike_finder ){
@@ -3623,7 +3653,8 @@ void FIFOREADER::scanFIFObuffer(void)
                     }
                 }
                 
-                printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
+                if(show_debug_info>=1 )
+                    printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
 
             }
             #endif
@@ -3651,7 +3682,7 @@ void FIFOREADER::scanFIFObuffer(void)
 		
 
             //print num of sent bytes
-			//if(show_debug_info) 
+			//if(show_debug_info >= 1) 
 			printf("scanFIFObuffer: numfifo %i: read bytes: %i\n", numfifo, udpdataByteCounter);
 
             //prepare next UDP packet header
@@ -3672,7 +3703,7 @@ void FIFOREADER::scanFIFObuffer(void)
             sltTime = sltTime / 100000;
             udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
-            if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+            if(show_debug_info >= 1) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
 #endif
 
 //code with TEMPORARY CORRECTION -tb- 2014-07-18
@@ -3694,9 +3725,9 @@ void FIFOREADER::scanFIFObuffer(void)
             //udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;//THIS FORMULA IS WRONG -tb- 2014-07
             udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
-            if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+            if(show_debug_info >= 1) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
             //crosscheck of correction - 
-            if(show_debug_info) printf("   pd_faible is:  %i 0x%08x   pd_fort is:  %i 0x%08x   \n", pd_faible,pd_faible, pd_fort,pd_fort);
+            if(show_debug_info >= 1) printf("   pd_faible is:  %i 0x%08x   pd_fort is:  %i 0x%08x   \n", pd_faible,pd_faible, pd_fort,pd_fort);
 
 
 
@@ -4245,50 +4276,65 @@ void RunSomeHardwareTests()
     
     //4.
     //set SLT time register to UTC -tb- 2014-07
-    #if 1
-    uint64_t retval , utcTime=0 , utcTimeOffset=SLTSETTINGS::SLT->utcTimeOffset;
-    uint32_t flags=kSetSLTtimerWithUTCFlag_Verbose | kSetSLTtimerWithUTCFlag_ReadBack;
-    retval = setSLTtimerWithUTC( flags,  utcTime, utcTimeOffset);
-    #else
-    //moved to function "setSLTtimerWithUTC":
-    struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
-    uint32_t currentSec = 0;  
-    gettimeofday(&currenttime,NULL);
-    currentSec = currenttime.tv_sec;  
+    if(version > 0x41970000){
+        printf("   This SLT FPGA version supports writable timer registers! (ver: 0x%08x)\n", version);
+        #if 1
+        uint64_t retval , utcTime=0 , utcTimeOffset=SLTSETTINGS::SLT->utcTimeOffset;
+        uint64_t utcTimeCorrection100kHz = SLTSETTINGS::SLT->utcTimeCorrection100kHz;
+        uint32_t flags=0;
+        if(SLTSETTINGS::SLT->sltTimerSetting != -2){
+            flags=kSetSLTtimerWithUTCFlag_Verbose | kSetSLTtimerWithUTCFlag_ReadBack;
+            if(SLTSETTINGS::SLT->sltTimerSetting >= 0){
+                flags |= kSetSLTtimerWithUTCFlag_Value;
+                utcTime = SLTSETTINGS::SLT->sltTimerSetting;
+            }
+            //if SLTSETTINGS::SLT->sltTimerSetting == -1, use UTC from crate PC (the default)
+            retval = setSLTtimerWithUTC( flags,  utcTime, utcTimeOffset, utcTimeCorrection100kHz);
+        }
+        #else
+        //moved to function "setSLTtimerWithUTC":
+        struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
+        uint32_t currentSec = 0;  
+        gettimeofday(&currenttime,NULL);
+        currentSec = currenttime.tv_sec;  
 
-    uint32_t sltTimeLo = 0;  
-    uint32_t sltTimeHi = 0;  
-    uint64_t sltTime = 0;  
-    int64_t timeDiff = 0;  
-    sltTimeLo = pbus->read(SLTTimeLowReg);
-    sltTimeHi = pbus->read(SLTTimeHighReg);
-    sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
-    printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
-    timeDiff=currentSec-sltTime;
-    if((timeDiff < -1) || (timeDiff >1)){
-        printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
-        sltTime = ((uint64_t)currentSec) * 100000LL;
-        sltTimeLo =  sltTime        & 0xffffffff;
-        sltTimeHi = (sltTime >> 32) & 0xffffffff;
-        pbus->write(SLTTimeLowReg, sltTimeLo);
-        pbus->write(SLTTimeHighReg, sltTimeHi);
-        sleep(1);
+        uint32_t sltTimeLo = 0;  
+        uint32_t sltTimeHi = 0;  
+        uint64_t sltTime = 0;  
+        int64_t timeDiff = 0;  
         sltTimeLo = pbus->read(SLTTimeLowReg);
         sltTimeHi = pbus->read(SLTTimeHighReg);
         sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
-        printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+        printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+        timeDiff=currentSec-sltTime;
+        if((timeDiff < -1) || (timeDiff >1)){
+            printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
+            sltTime = ((uint64_t)currentSec) * 100000LL;
+            sltTimeLo =  sltTime        & 0xffffffff;
+            sltTimeHi = (sltTime >> 32) & 0xffffffff;
+            pbus->write(SLTTimeLowReg, sltTimeLo);
+            pbus->write(SLTTimeHighReg, sltTimeHi);
+            sleep(1);
+            sltTimeLo = pbus->read(SLTTimeLowReg);
+            sltTimeHi = pbus->read(SLTTimeHighReg);
+            sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+            printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
 
-        #if 0
-        pbus->write(SLTTimeLowReg, 0);
-        pbus->write(SLTTimeHighReg, 0);
-        sleep(1);
+            #if 0
+            pbus->write(SLTTimeLowReg, 0);
+            pbus->write(SLTTimeHighReg, 0);
+            sleep(1);
+            #endif
+
+
+        }else{
+            printf("   timeDiff:  %lli - OK!\n", timeDiff);
+        }
         #endif
-
-
+        
     }else{
-        printf("   timeDiff:  %lli - OK!\n", timeDiff);
+            printf("   This SLT FPGA version does not support writable timer registers! (ver: 0x%08x)\n", version);
     }
-    #endif
     
 }
 
@@ -5168,10 +5214,12 @@ int32_t main(int32_t argc, char *argv[])
 			    //check FIFObuf
 			   if(show_debug_info>1) printf("main: FIFObuf32avail(%i): %i\n",iFifo, FifoReader[iFifo].FIFObuf32avail);//DEBUG output -tb-
 			   
-			   if(currDiffTime!=0.0)printf("Average datarate FIFO %i: %9.3g KB/sec; ",FifoReader[iFifo].numfifo, (FifoReader[iFifo].FIFObuf32counter*0.004)/currDiffTime);
-			   printf("current rate: %9.3g KB/sec; ", ((FifoReader[iFifo].FIFObuf32counter-FifoReader[iFifo].FIFObuf32counterlast)*0.004)/elapsedTime);//elapsedTime is larger 0.0
-			   printf(" (%lli word32s in %g seconds) ",FifoReader[iFifo].FIFObuf32counter,currDiffTime);
-			   printf("\n");
+               if(show_debug_info >= 1){
+			       if(currDiffTime!=0.0)printf("Average datarate FIFO %i: %9.3g KB/sec; ",FifoReader[iFifo].numfifo, (FifoReader[iFifo].FIFObuf32counter*0.004)/currDiffTime);
+			       printf("current rate: %9.3g KB/sec; ", ((FifoReader[iFifo].FIFObuf32counter-FifoReader[iFifo].FIFObuf32counterlast)*0.004)/elapsedTime);//elapsedTime is larger 0.0
+			       printf(" (%lli word32s in %g seconds) ",FifoReader[iFifo].FIFObuf32counter,currDiffTime);
+			       printf("\n");
+               }
                FifoReader[iFifo].FIFObuf32counterlast = FifoReader[iFifo].FIFObuf32counter;
 			}
 			
