@@ -248,7 +248,7 @@
         [progress startAnimation:self];
     }
     [progressField setStringValue:[NSString stringWithFormat:@"%d/148",[model workingOnGain]]];
-    [progress setValue:[model workingOnGain]];
+    [progress setDoubleValue:[model workingOnGain]];
     if([model workingOnGain] == 148){
         [progress stopAnimation:self];
         [progressField setStringValue:@"--"];
