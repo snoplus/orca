@@ -58,6 +58,7 @@
 - (void) setOrcaControllers:(NSMutableArray*)newOrcaControllers;
 - (BOOL) documentCanBeChanged;
 
+- (NSArray*) collectObjectsWithClassName:(NSString*)aClassName;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;

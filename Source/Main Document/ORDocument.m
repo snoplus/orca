@@ -251,6 +251,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	[[self group] resetAlreadyVisitedInChainSearch];
 }
 
+- (NSArray*) collectObjectsWithClassName:(NSString*)aClassName
+{
+    return [self collectObjectsOfClass:NSClassFromString(aClassName)];
+}
+
 
 - (NSArray*) collectObjectsOfClass:(Class)aClass
 {
