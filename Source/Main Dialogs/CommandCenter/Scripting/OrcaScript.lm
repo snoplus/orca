@@ -80,6 +80,7 @@ E			[Ee][+-]?{D}+
 "do"			return DO;
 "while"         return WHILE;
 "for"			return FOR;
+"in"			return IN;
 "if"            return IF;
 "unless"        return UNLESS;
 "switch"        return SWITCH;

@@ -1418,40 +1418,85 @@
 }
 
 - (id) forLoop:(id) p
-{   
-	//eval for loop ,i.e. for(i=0;i<10;i++){ loop guts }
-	NodeValue(0); //loop init, i.e. i=0
-	do {
-		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		if([self exitNow]){
-			[pool release];
-			break;
-		}
-		else {
-			@try {
-				if([NodeValue(1) isEqual: _zero]){ //the end of loop check, i.e. i<10
-					[pool release];
-					break;
-				}
-				NodeValue(3); //this is the loop guts
-				NodeValue(2); //this is the end of loop action, i.e. i++
-			}
-			@catch(NSException* localException) {
-				if([[localException name] isEqualToString:@"continue"]){
-					[pool release];
-					NodeValue(2); //this is the end of loop action, i.e. i++
-					continue;
-				}
-				else if([[localException name] isEqualToString:@"break"]){
-					[pool release];
-					break;
-				}
-				else [localException raise];
-			}
-		}
-		[pool release];
-	} while(1);
+{
+    
+    if ([[(Node*)p nodeData] count] ==3){
+        //eval for loop ,i.e. for(a in b){ loop guts }
+        id  collectionObj = NodeValue(1);
+
+        if([collectionObj isKindOfClass:NSClassFromString(@"NSArray")]){
+            //OK, we'll continue without doing anything here.
+        }
+        else if([collectionObj isKindOfClass:NSClassFromString(@"NSDictionary")]){
+            //convert to an array of the keys
+            collectionObj = [collectionObj allKeys];
+        }
+        else {
+            [NSException raise:@"Run Time Exception" format:@"%@ is not an array or dictionary",VARIABLENAME(1)];
+        }
         
+        int i;
+        int n = [collectionObj count];
+        for(i=0;i<n;i++){
+            NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+            if([self exitNow]){
+                [pool release];
+                break;
+            }
+            @try {
+                id aValue = [collectionObj objectAtIndex:i];
+                [self setValue: aValue forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
+                NodeValue(2); //this is the loop guts
+            }
+            @catch(NSException* localException) {
+                if([[localException name] isEqualToString:@"continue"]){
+                    [pool release];
+                    i++;
+                    continue;
+                }
+                else if([[localException name] isEqualToString:@"break"]){
+                    [pool release];
+                    break;
+                }
+                else [localException raise];
+            }
+            [pool release];
+        }
+    }
+    else {
+        //eval for loop ,i.e. for(i=0;i<10;i++){ loop guts }
+        NodeValue(0); //loop init, i.e. i=0
+        do {
+            NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+            if([self exitNow]){
+                [pool release];
+                break;
+            }
+            else {
+                @try {
+                    if([NodeValue(1) isEqual: _zero]){ //the end of loop check, i.e. i<10
+                        [pool release];
+                        break;
+                    }
+                    NodeValue(3); //this is the loop guts
+                    NodeValue(2); //this is the end of loop action, i.e. i++
+                }
+                @catch(NSException* localException) {
+                    if([[localException name] isEqualToString:@"continue"]){
+                        [pool release];
+                        NodeValue(2); //this is the end of loop action, i.e. i++
+                        continue;
+                    }
+                    else if([[localException name] isEqualToString:@"break"]){
+                        [pool release];
+                        break;
+                    }
+                    else [localException raise];
+                }
+            }
+            [pool release];
+        } while(1);
+    }
 	return nil;
 }
 
