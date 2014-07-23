@@ -269,7 +269,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
                 int theChannel = [[aLine substringFromIndex:8] intValue];
                 [self setWorkingOnGain:theChannel];
             }
-            return;
         }
         
         else if([lastRequest hasPrefix:@"get gains"]){
