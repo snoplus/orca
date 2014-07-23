@@ -910,9 +910,10 @@ BOOL isNumeric(NSString *s)
         cmd = @"70";
     }
     else if(cmdIndex == 8){
-        cmd = @"80";
+        [model setSmellieMasterMode:[NSString stringWithString:[smellieDirectArg1 stringValue]] withNumOfPulses:[NSString stringWithString:[smellieDirectArg2 stringValue]]];
+        //cmd = @"80";
     }
-    else if(cmdIndex ==9){
+    else if(cmdIndex == 9){
         cmd = @"90";
     }
     else{

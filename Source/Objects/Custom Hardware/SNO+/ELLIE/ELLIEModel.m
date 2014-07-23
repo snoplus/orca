@@ -666,7 +666,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             continue;
         }
         
-        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]]];
+        //TODO: Put this back in after testing!
+        //[self setLaserSwitch:[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]]];
+        
+        [self setLaserSwitch:@"3"]; 
         
         //TODO:[self setLaserSwitch:[laserHeadToSepiaMapping objectForKey:@"375nm"]];
         
@@ -760,18 +763,23 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 //[self setLaserIntensity:laserIntensityAsString];
                 [NSThread sleepForTimeInterval:10.0f];
                 
-                //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:4.0];
-                [self setLaserSoftLockOff];
-                
-                //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
-                //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
-                [NSThread sleepForTimeInterval:1.0f]; //this used to be 10.0,  Slave mode in Orca requires time (unknown reason)
+                 //this used to be 10.0,  Slave mode in Orca requires time (unknown reason)
                 
                 NSMutableDictionary *valuesToFillPerSubRun = [[NSMutableDictionary alloc] initWithCapacity:100];
                 [valuesToFillPerSubRun setObject:laserKey forKey:@"laser"];
                 [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:intensityLoopInt] forKey:@"intensity"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+                //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:4.0];
+                
+                //TODO:only have this in slave mode 
+                //[self setLaserSoftLockOff];
+                
+                //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
+                //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
+                [NSThread sleepForTimeInterval:1.0f];
+                
+                
                 [self setSmellieMasterMode:@"100" withNumOfPulses:@"1000"];
                 [NSThread sleepForTimeInterval:10.0f];
                 
@@ -783,7 +791,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 NSLog(@" Fibre:%@ ",fibreKey);
                 NSLog(@" Intensity:%i \n",intensityLoopInt);
                 //[self performSelector:@selector(setLaserSoftLockOn) withObject:nil afterDelay:.1];
-                [self setLaserSoftLockOn];
+                
+                //TODO:only have this in slave mode 
+                //[self setLaserSoftLockOn];
                 [NSThread sleepForTimeInterval:1.0f];
                 
                 
