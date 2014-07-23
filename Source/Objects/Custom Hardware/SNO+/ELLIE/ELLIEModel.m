@@ -638,7 +638,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
 
     //fire some pedestals
-    [theMTCModel fireMTCPedestalsFixedRate];
+    //TODO:only use in slave mode
+    //[theMTCModel fireMTCPedestalsFixedRate];
  
     BOOL endOfRun = NO;
     
@@ -721,8 +722,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             
             //TODO:Fetch the OutputChannel for a given fibre setting
             
-            //NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt+1];
-            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%@",[laserToInputFibreMapping objectForKey:laserKey]];
+            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt+1];
+            //NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%@",[laserToInputFibreMapping objectForKey:laserKey]];
             //laserToInputFibreMapping
             //NSLog(@"inputFibreSwitch :%@",inputFibneSwitchChannel);
             
@@ -731,8 +732,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             //Need to give the input channel 
             
             //TODO; After inserting the test code, need to also add in the extra code
-            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
-            //[self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:@"5"];
+            //[self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
+            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:@"5"];
             [NSThread sleepForTimeInterval:1.0f];
             
             //NSArray *dataArray = [NSArray arrayWithObjects:inputFibneSwitchChannel,@"5",nil];
@@ -755,10 +756,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                 
                 NSString * laserIntensityAsString = [NSString stringWithFormat:@"%i",intensityLoopInt];
-                [self setLaserIntensity:laserIntensityAsString];
-                [NSThread sleepForTimeInterval:1.0f];
+                [self sendCustomSmellieCmd:@"50" withArgument1:@"100" withArgument2:@"0"];
+                //[self setLaserIntensity:laserIntensityAsString];
+                [NSThread sleepForTimeInterval:10.0f];
                 
-                //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:.1];
+                //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:4.0];
                 [self setLaserSoftLockOff];
                 
                 //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
@@ -770,6 +772,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:intensityLoopInt] forKey:@"intensity"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+                [self setSmellieMasterMode:@"100" withNumOfPulses:@"1000"];
+                [NSThread sleepForTimeInterval:10.0f];
                 
                 [smellieSubRunInfo addObject:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
