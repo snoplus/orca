@@ -362,7 +362,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     [self logSystemResponse];
     [self writeToGPIBDevice:@"BURS:MODE TRIG"];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Burst Period set to %f\n",period);
+    if([self verbose])NSLog(@"HP Pulser Burst Period set to %f\n",period);
 }
 
 - (void) writeBurstState:(BOOL)value
@@ -375,7 +375,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"BURS:NCYC %d",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Burst Cycles set to %d\n",value);
+    if([self verbose])NSLog(@"HP Pulser Burst Cycles set to %d\n",value);
 }
 
 - (void) writeBurstPhase:(int)value
@@ -384,7 +384,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     [self writeToGPIBDevice:@"UNIT:ANGL DEG"];
     [self writeToGPIBDevice:[NSString stringWithFormat:@"BURS:PHAS %d",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Burst Phase set to %d\n",value);
+    if([self verbose])NSLog(@"HP Pulser Burst Phase set to %d\n",value);
 }
 
 - (void) setUsbInterface:(ORUSBInterface*)anInterface

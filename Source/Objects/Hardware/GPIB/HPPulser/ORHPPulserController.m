@@ -213,6 +213,11 @@
                          name : ORHPPulserModelNegativePulseChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseChanged:)
+                         name : ORHPPulserModelVerboseChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -235,6 +240,12 @@
     [self randomCountChanged:nil];
     [self triggerModeChanged:nil];
     [self negativePulseChanged:nil];
+	[self verboseChanged:nil];
+}
+
+- (void) verboseChanged:(NSNotification*)aNote
+{
+	[verboseCB setIntValue:[model verbose]];
 }
 
 - (void) negativePulseChanged:(NSNotification*)aNote
@@ -244,6 +255,12 @@
 
 
 #pragma mark •••Actions
+
+- (IBAction) verboseAction:(id)sender;
+{
+	[model setVerbose:[sender intValue]];
+}
+
 - (IBAction) negativePulseAction:(id)sender
 {
 	if([[sender selectedCell] tag] != [model negativePulse]){

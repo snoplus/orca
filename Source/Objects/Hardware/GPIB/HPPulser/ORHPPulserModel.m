@@ -40,6 +40,7 @@
 #define PI  3.141592
 
 #pragma mark •••Notification Strings
+NSString* ORHPPulserModelVerboseChanged = @"ORHPPulserModelVerboseChanged";
 NSString* ORHPPulserModelNegativePulseChanged = @"ORHPPulserModelNegativePulseChanged";
 NSString* ORHPPulserModelLockGUIChanged = @"ORHPPulserModelLockGUIChanged";
 NSString* ORHPPulserVoltageChangedNotification		= @"HP Pulser Voltage Changed";
@@ -207,6 +208,20 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 
 #pragma mark •••Accessors
+
+- (BOOL) verbose
+{
+    return verbose;
+}
+
+- (void) setVerbose:(BOOL)aVerbose
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVerbose:verbose];
+    
+    verbose = aVerbose;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHPPulserModelVerboseChanged object:self];
+}
 
 - (BOOL) negativePulse
 {
@@ -640,7 +655,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([self isConnected]){
 		[self writeToGPIBDevice:@"*TST?"];
-        NSLog(@"HP Pulser Test.\n");
+        if(verbose)NSLog(@"HP Pulser Test.\n");
     }
 }
 
@@ -650,7 +665,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [self logSystemResponse];
     [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT:LOW %dE-3",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Voltage LOW PP set to %d\n",value);
+    if(verbose)NSLog(@"HP Pulser Voltage LOW PP set to %d\n",value);
 }
 
 - (void) writeVoltageHigh:(unsigned short)value
@@ -659,21 +674,21 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [self logSystemResponse];
     [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT:HIGH %dE-3",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Voltage LOW PP set to %d\n",value);
+    if(verbose)NSLog(@"HP Pulser Voltage LOW PP set to %d\n",value);
 }
 
 - (void) writeOutput:(BOOL)aState
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"OUTPUT %@",aState?@"ON":@"OFF"]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Output %@\n",aState?@"ON":@"OFF");
+    if(verbose)NSLog(@"HP Pulser Output %@\n",aState?@"ON":@"OFF");
 }
 
 - (void) writeSync:(BOOL)aState
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"OUTPUT:SYNC %@",aState?@"ON":@"OFF"]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Sync %@\n",aState?@"ON":@"OFF");
+    if(verbose)NSLog(@"HP Pulser Sync %@\n",aState?@"ON":@"OFF");
 }
 
 - (void) writePulsePeriod:(float)aValue
@@ -682,7 +697,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     else if(aValue>2000)aValue = 2000;
     [self writeToGPIBDevice:[NSString stringWithFormat:@"PULSE:PERIOD %E",aValue]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Pulse Period %E\n",aValue);
+    if(verbose)NSLog(@"HP Pulser Pulse Period %E\n",aValue);
 }
 
 - (void) writePulseWidth:(float)aValue
@@ -691,7 +706,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     else if(aValue>2000)aValue = 2000;
     [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:PULSE:WIDT %E",aValue]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Pulse Width %E\n",aValue);
+    if(verbose)NSLog(@"HP Pulser Pulse Width %E\n",aValue);
 }
 
 - (void) writePulseDutyCycle:(unsigned short)aValue
@@ -699,7 +714,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     if(aValue>100)aValue = 100;
     [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:PULSE:DCYC %d",aValue]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Pulse Duty Cycle %d\n",aValue);
+    if(verbose)NSLog(@"HP Pulser Pulse Duty Cycle %d\n",aValue);
 }
 
 - (void) writePulseEdgeTime:(float)aValue
@@ -708,7 +723,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     else if(aValue>100E-9)aValue = 100E-9;
     [self writeToGPIBDevice:[NSString stringWithFormat:@"FUNC:PULSE:TRAN %E",aValue]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Pulse Edge Time %E\n",aValue);
+    if(verbose)NSLog(@"HP Pulser Pulse Edge Time %E\n",aValue);
 }
 
 - (void) writeVoltage:(unsigned short)value
@@ -717,21 +732,21 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [self logSystemResponse];
     [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT %dE-3",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Voltage PP set to %dE-3\n",value);
+    if(verbose)NSLog(@"HP Pulser Voltage PP set to %dE-3\n",value);
 }
 
 - (void) writeVoltageOffset:(short)value
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT:OFFS %dE-3",value]];
 	[self logSystemResponse];
-	NSLog(@"HP Pulser Voltage Offset set to %dE-3\n",value);
+	if(verbose)NSLog(@"HP Pulser Voltage Offset set to %dE-3\n",value);
 }
 
 - (void) writeFrequency:(float)value
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"FREQ %E",value]];
 	[self logSystemResponse];
-	NSLog(@"HP Pulser Frequency set to %E\n",value);
+	if(verbose)NSLog(@"HP Pulser Frequency set to %E\n",value);
 }
 
 - (void) writeBurstRate:(float)value
@@ -740,7 +755,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [self logSystemResponse];
     [self writeToGPIBDevice:@"BM:SOUR INT"];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Burst Rate set to %f\n",value);
+    if(verbose)NSLog(@"HP Pulser Burst Rate set to %f\n",value);
 }
 
 - (void) writeBurstState:(BOOL)value
@@ -754,14 +769,14 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:NCYC %d",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Burst Cycles set to %d\n",value);
+    if(verbose)NSLog(@"HP Pulser Burst Cycles set to %d\n",value);
 }
 
 - (void) writeBurstPhase:(int)value
 {
     [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:PHAS %d",value]];
     [self logSystemResponse];
-    NSLog(@"HP Pulser Burst Phase set to %d\n",value);
+    if(verbose)NSLog(@"HP Pulser Burst Phase set to %d\n",value);
 }
 
 - (void) writeTriggerSource:(int)value
@@ -1237,6 +1252,7 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 - (id)initWithCoder:(NSCoder*)aDecoder
 {
     self = [super initWithCoder:aDecoder];
+    [self setVerbose:[aDecoder decodeBoolForKey:@"verbose"]];
     [self setNegativePulse:[aDecoder decodeBoolForKey:@"ORHPPulserModelNegativePulse"]];
     [self loadMemento:aDecoder];
 	
@@ -1272,6 +1288,7 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 
 - (void)saveMemento:(NSCoder*)anEncoder
 {
+    [anEncoder encodeBool:verbose forKey:@"verbose"];
     [anEncoder encodeBool:negativePulse forKey:@"ORHPPulserModelNegativePulse"];
     [anEncoder encodeInt: [self triggerSource] forKey: HPTriggerMode];
     [anEncoder encodeFloat: [self voltage] forKey: HPVoltage];

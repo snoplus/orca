@@ -44,7 +44,7 @@
     IBOutlet NSStepper* 	burstPhaseStepper;
     IBOutlet NSTextField* 	burstCyclesField;
     IBOutlet NSStepper* 	burstCyclesStepper;
-    IBOutlet NSMatrix*          triggerModeMatrix;
+    IBOutlet NSMatrix*      triggerModeMatrix;
     IBOutlet NSButton* 		triggerButton;	
 
     IBOutlet NSButton*		enableRandomButton;
@@ -69,10 +69,12 @@
 
     IBOutlet NSTextField*   commandField;
     IBOutlet NSButton*		sendCommandButton;
+    IBOutlet NSButton*		verboseCB;
 
 }
 
 #pragma mark •••Actions
+- (IBAction) verboseAction:(id)sender;
 - (IBAction) negativePulseAction:(id)sender;
 - (IBAction) triggerAction:(id)sender;
 - (IBAction) triggerModeAction:(id)sender;
@@ -89,7 +91,6 @@
 - (IBAction) setBurstRateAction:(id)sender;
 - (IBAction) setBurstCyclesAction:(id)sender;
 - (IBAction) setBurstPhaseAction:(id)sender;
-//- (IBAction) setTotalWidthAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) enableRandomAction:(id)sender;
 - (IBAction) minTimeAction:(id)sender;
@@ -103,7 +104,8 @@
 
 - (void) setButtonStates;
 
-#pragma mark •••Notifications
+#pragma mark ***Interface Management
+- (void) verboseChanged:(NSNotification*)aNote;
 - (void) volatileChanged:(NSNotification*)aNotification;
 - (void) nonVolatileChanged:(NSNotification*)aNotification;
 - (void) enableRandomChanged:(NSNotification*)note;
@@ -119,7 +121,6 @@
 - (void) burstRateChanged:(NSNotification*)aNotification;
 - (void) burstCyclesChanged:(NSNotification*)aNotification;
 - (void) burstPhaseChanged:(NSNotification*)aNotification;
-//- (void) totalWidthChanged:(NSNotification*)aNotification;
 - (void) loadConstantsChanged:(NSNotification*)aNotification;
 - (void) waveformLoadStarted:(NSNotification*)aNotification;
 - (void) waveformLoadProgressing:(NSNotification*)aNotification;
@@ -130,4 +131,5 @@
 
 
 @end
+
 
