@@ -272,7 +272,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
         }
         
         else if([lastRequest hasPrefix:@"get gains"]){
-            aLine = [aLine substringFromIndex:9];
+            aLine = [aLine substringFromIndex:10];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(id aValue in theParts){
@@ -282,7 +282,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             [self setLastRequest:nil];
         }
         else if([lastRequest hasPrefix:@"set gains"]){
-            aLine = [aLine substringFromIndex:9];
+            aLine = [aLine substringFromIndex:10];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(id aValue in theParts){
@@ -293,7 +293,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
         }
 
         else if([lastRequest hasPrefix:@"get temperatures"]){
-            aLine = [aLine substringFromIndex:16];
+            aLine = [aLine substringFromIndex:17];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(id aValue in theParts){
@@ -303,7 +303,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             [self setLastRequest:nil];
         }
         else if([lastRequest hasPrefix:@"get current"]){
-            aLine = [aLine substringFromIndex:11];
+            aLine = [aLine substringFromIndex:12];
             [self setLcm:[aLine intValue]];
             [self setLastRequest:nil];
         }

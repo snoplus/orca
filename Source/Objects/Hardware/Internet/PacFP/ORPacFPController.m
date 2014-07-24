@@ -610,7 +610,6 @@
         else board = 3;
         [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
         [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
-        [model getGains];
 
     }
     else if(processLimitsTableView == aTableView){
@@ -618,7 +617,6 @@
 		[[[self undoManager] prepareWithInvocationTarget:self] tableView:aTableView setObjectValue:[obj objectForKey:[aTableColumn identifier]] forTableColumn:aTableColumn row:rowIndex];
 		[obj setObject:anObject forKey:[aTableColumn identifier]];
 		[aTableView reloadData];
-
     }
 }
 
