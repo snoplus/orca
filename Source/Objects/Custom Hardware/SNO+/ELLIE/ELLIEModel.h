@@ -64,7 +64,6 @@
 -(void)testFunction;
 -(void)setLaserFrequency20Mhz;
 -(void)fetchSmellieConfigurationInformation;
--(void)testArrayOrganisation;
 
 
 @end

@@ -562,7 +562,7 @@
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(!error){
-        NSLog(@"sucessful query");
+        NSLog(@"sucessful query\n");
     }
     else{
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
@@ -575,7 +575,6 @@
 
 -(IBAction)onSelectOfSepiaInput:(id)sender
 {
-    //[model testArrayOrganisation];
     
     //TODO: Read in current information about that Sepia Input and to the detector
     //[self fetchRecentVersion];

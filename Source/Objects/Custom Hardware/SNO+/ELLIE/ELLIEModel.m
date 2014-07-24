@@ -469,7 +469,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(!error){
-        NSLog(@"sucessful query");
+        //NSLog(@"sucessful query");
     }
     else{
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
@@ -478,54 +478,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 }
 
-
--(void)testArrayOrganisation
-{
-    NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
-    //fetch the current version of the smellie configuration
-    currentConfigurationVersion = [self fetchRecentVersion];
-    
-    //fetch the data associated with the current configuration
-    NSMutableDictionary *configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
-    
-    NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    
-    NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
-    
-    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
-        
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
-                
-                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
-                
-                [laserHeadToSepiaMapping setObject:[NSString stringWithFormat:@"%i",laserHeadIndex] forKey:laserHeadConnected];
-            }
-        }
-    } //end of looping through each laserHeadIndex
-    
-    for(int outputChannelIndex =1; outputChannelIndex < 13; outputChannelIndex++){
-        
-        for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
-                
-                NSString *fibreReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"detectorFibreReference"]];
-                
-                [fibreSwitchOutputToFibre setObject:[NSString stringWithFormat:@"%i",outputChannelIndex] forKey:fibreReference];
-            }
-        }
-    } 
-    
-    
-    //TODO: Add the laserHeadToSepiaMapping variable into the startSmellieRun function
-}
-
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
-    //Deconstruct runFile into indiviual subruns ------------------
-    
-    NSLog(@"Starting SMELLIE Run\n");
+    NSLog(@"SMELLIE_RUN:Starting SMELLIE Run\n");
     
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
     currentConfigurationVersion = [self fetchRecentVersion];
@@ -535,7 +490,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    //NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
     
     for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
         
@@ -557,11 +511,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         for (id specificConfigValue in configForSmellie){
             if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
                 
-                NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
+                //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
                 
-                NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+                //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+                
+                NSString* laserHeadReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
 
-                [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:updatedFibreReference];
+                [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:laserHeadReference];
             }
         }
 
@@ -581,16 +537,24 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         }
     }
     
-    
-    NSLog(@"Checking Connection to SMELLIE\n");
-        
-    NSLog(@"Setting SMELLIE into Safe States before starting a Run\n");
-    //[self performSelector:@selector(setSmellieSafeStates) withObject:nil waitUntilDone:YES];
+    BOOL slaveMode,masterMode;
+    NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
+    if([operationMode isEqualToString:@"Slave Mode"]){
+        slaveMode = YES;
+        masterMode = NO;
+    }
+    else if([operationMode isEqualToString:@"Master Mode"]){
+        slaveMode = NO;
+        masterMode = YES;
+    }
+    else{
+        slaveMode = NO;
+        masterMode = NO;
+    }
+    NSLog(@"SMELLIE_RUN:Running in %@\n",operationMode);
+    NSLog(@"SMELLIE_RUN:Checking Connection to SMELLIE\n");
+    NSLog(@"SMELLIE_RUN:Setting SMELLIE into Safe States before starting a Run\n");
     [self setSmellieSafeStates];
-    
-    //Extract the number of intensity steps
-    //NSNumber * numIntStepsObj = [smellieSettings objectForKey:@"num_intensity_steps"];
-    //int numIntSteps = [numIntStepsObj intValue];
     
     //Extract the min intensity
     NSNumber * minLaserObj = [smellieSettings objectForKey:@"min_laser_intensity"];
@@ -599,10 +563,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Extract the min intensity
     NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
     int maxLaserIntensity = [maxLaserObj intValue];
-    //NSLog(@"min laser intensity %i",minLaserIntensity);
-    //NSLog(@"max laser intensity %i",maxLaserIntensity);
     
-    //DO THE MAPPING HERE!!!!
     //Extract the lasers to be fired into an array
     NSMutableDictionary * laserArray = [[NSMutableDictionary alloc] init];
     [laserArray setObject:[smellieSettings objectForKey:@"375nm_laser_on"] forKey:@"375nm" ];
@@ -627,89 +588,43 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     smellieSubRunInfo = [[NSMutableArray alloc] initWithCapacity:100];
     
-    //get the MTC Object
+    //get the MTC Object (but only use in Slave Mode)
     NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
+    [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
     
     //get the run controller
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
 
+    //start the run controller
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
 
-    //fire some pedestals
-    //TODO:only use in slave mode
-    //[theMTCModel fireMTCPedestalsFixedRate];
- 
+    //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers
+    if(slaveMode){
+        NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
+        [theMTCModel fireMTCPedestalsFixedRate];
+    }
+    
     BOOL endOfRun = NO;
-    
-    ///Loop through each Laser
     int laserLoopInt = 0;
-    
     for(id laserKey in laserArray){
-    //for(int laserLoopInt = 0;laserLoopInt < [laserArray count];laserLoopInt++){
         
         if(endOfRun == YES){
-            break;
+            break; //if the end of the run is reached then break the run loop
         }
-        
-        //NSLog(@"laser key: %@",laserKey);
-        //Only loop through lasers that are included in the run 
-        /*if([[laserArray objectAtIndex:laserLoopInt] intValue] != 1){
-            continue;
-        }*/
-        
-        //TODO:Read in the configuration Map
         
         //Only loop through fibres that are included in the run
         if([[laserArray objectForKey:laserKey] intValue] != 1){
             continue;
         }
         
-        //TODO: Put this back in after testing!
-        //[self setLaserSwitch:[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]]];
-        
-        [self setLaserSwitch:@"3"]; 
-        
-        //TODO:[self setLaserSwitch:[laserHeadToSepiaMapping objectForKey:@"375nm"]];
-        
-        //NSLog(@"%@",[[laserArray objectAtIndex:laserLoopInt] key]);
-        
-        /*if([laserKey isEqual:@"375nm"]){
-            //continue;
-            //Current unconnected for repair
-            //[self performSelector:@selector(setLaserSwitch:) withObject:@"1" afterDelay:.1];
-            [self setLaserSwitch:@"1"]; //whichever channel the 375 is connected to
-            //[self setLaserSwitch:@"%@",[laserHeadToSepiaMapping objectForKey:@"375nm"]];
-        }
-        else if ([laserKey isEqual:@"405nm"]){
-            //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"2" waitUntilDone:YES];
-            //[self performSelector:@selector(setLaserSwitch:) withObject:@"2" afterDelay:.1];
-            [self setLaserSwitch:@"2"]; //whichever channel the 405 is connected to
-            
-        }
-        else if ([laserKey isEqual:@"440nm"]){
-            //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"3" waitUntilDone:YES];
-            //[self performSelector:@selector(setLaserSwitch:) withObject:@"3" afterDelay:.1];
-            [self setLaserSwitch:@"3"]; //whichever channel the 440 is connected to
-            //[NSThread sleepForTimeInterval:35.0f];
-        }
-        else if ([laserKey isEqual:@"500nm"]){
-            //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES modes:kCFRunLoopDefaultMode];
-            //[self performSelectorOnMainThread:@selector(setLaserSwitch:) withObject:@"4" waitUntilDone:YES];
-            //[self performSelector:@selector(setLaserSwitch:) withObject:@"4" afterDelay:.1];
-            //[self performSelector:@selector(setLaserSwitch:) onThread:[NSThread currentThread] withObject:@"4" waitUntilDone:YES];
-            [self setLaserSwitch:@"4"]; //whichever channel the 500 is connected to
-            //[NSThread sleepForTimeInterval:35.0f];
-            
-        }
-        else{
-            NSLog(@"SMELLIE RUN:No laser selected for this iteration\n");
-        }*/
+        //set the laser switch which corresponds to the laserHead mapping to Sepia
+        NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]],laserKey);
+        [self setLaserSwitch:[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]]];
         
         //Loop through each Fibre
         for(id fibreKey in fibreArray){
-        //for(int fibreLoopInt = 0; fibreLoopInt < [fibreArray count];fibreLoopInt++){
         
             if(endOfRun == YES){
                 break;
@@ -720,35 +635,16 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 continue;
             }
             
-            //which laser is connected to which input channel
-            //labelling on fibre switch is one above normal
+            //NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt+1];
+            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%@",[laserToInputFibreMapping objectForKey:laserKey]];
             
-            //TODO:Fetch the OutputChannel for a given fibre setting
-            
-            NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%i",laserLoopInt+1];
-            //NSString *inputFibneSwitchChannel = [NSString stringWithFormat:@"%@",[laserToInputFibreMapping objectForKey:laserKey]];
-            //laserToInputFibreMapping
-            //NSLog(@"inputFibreSwitch :%@",inputFibneSwitchChannel);
-            
-            //Find the FibreSwitchInput channel that corresponds to a particular laser            
-            
-            //Need to give the input channel 
-            
-            //TODO; After inserting the test code, need to also add in the extra code
-            //[self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
-            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:@"5"];
+            NSLog(@"SMELLIE_RUN:Setting the Fibre Switch to Input Channel:%@ from the %@ Laser and Output Channel %@\n",inputFibneSwitchChannel,laserKey,[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]);
+            [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
             [NSThread sleepForTimeInterval:1.0f];
-            
-            //NSArray *dataArray = [NSArray arrayWithObjects:inputFibneSwitchChannel,@"5",nil];
-            //[self performSelector:@selector(setFibreSwitch:withOutputChannel:) withObject:dataArray afterDelay:.1];
-            //[self performSelectorOnMainThread:@selector(setFibreSwitch:withOutputChannel:) withObject:dataArray waitUntilDone:YES];
             
             //Loop through each intensity of a SMELLIE run 
             for(int intensityLoopInt = minLaserIntensity;intensityLoopInt < maxLaserIntensity; intensityLoopInt++){
             
-                //NSLog(@"intensity value %i",intensityLoopInt);
-                //Start a new subrun
-                //[theRunModel startNewSubRun];
                 if([[NSThread currentThread] isCancelled]){
                     endOfRun = YES;
                     break;
@@ -759,27 +655,24 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                 
                 NSString * laserIntensityAsString = [NSString stringWithFormat:@"%i",intensityLoopInt];
-                [self sendCustomSmellieCmd:@"50" withArgument1:@"100" withArgument2:@"0"];
-                //[self setLaserIntensity:laserIntensityAsString];
-                [NSThread sleepForTimeInterval:10.0f];
+                 NSLog(@"SMELLIE_RUN:Setting the Laser Intensity to %@ \n",laserIntensityAsString);
+                [self setLaserIntensity:laserIntensityAsString];
+                //[NSThread sleepForTimeInterval:10.0f];
                 
-                 //this used to be 10.0,  Slave mode in Orca requires time (unknown reason)
+                //this used to be 10.0,  Slave mode in Orca requires time (unknown reason)
                 
                 NSMutableDictionary *valuesToFillPerSubRun = [[NSMutableDictionary alloc] initWithCapacity:100];
                 [valuesToFillPerSubRun setObject:laserKey forKey:@"laser"];
                 [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:intensityLoopInt] forKey:@"intensity"];
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-                //[self performSelector:@selector(setLaserSoftLockOff) withObject:nil afterDelay:4.0];
                 
-                //TODO:only have this in slave mode 
-                //[self setLaserSoftLockOff];
+                if(slaveMode){
+                    [self setLaserSoftLockOff];
+                }
                 
-                //[runControl performSelector:@selector(stopRun)withObject:nil afterDelay:.1];
                 //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
                 [NSThread sleepForTimeInterval:1.0f];
-                
-                
                 [self setSmellieMasterMode:@"100" withNumOfPulses:@"1000"];
                 [NSThread sleepForTimeInterval:10.0f];
                 
@@ -787,15 +680,16 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [valuesToFillPerSubRun release];
                 
                 //Call the smellie system here 
-                NSLog(@" Laser:%@ ", laserKey);
-                NSLog(@" Fibre:%@ ",fibreKey);
-                NSLog(@" Intensity:%i \n",intensityLoopInt);
-                //[self performSelector:@selector(setLaserSoftLockOn) withObject:nil afterDelay:.1];
+                NSLog(@"Laser:%@ ", laserKey);
+                NSLog(@"Fibre:%@ ",fibreKey);
+                NSLog(@"Intensity:%i \n",intensityLoopInt);
                 
-                //TODO:only have this in slave mode 
-                //[self setLaserSoftLockOn];
+                //TODO:only have this in slave mode
+                if(slaveMode){
+                    [self setLaserSoftLockOn];
+                }
+                
                 [NSThread sleepForTimeInterval:1.0f];
-                
                 
             }//end of looping through each intensity setting on the smellie laser
             
@@ -810,8 +704,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [fibreArray release];
     [laserArray release];
     
-    //[theMTCModel stopMTCPedestalsFixedRate];
-    NSLog(@"Returning SMELLIE into Safe States after finishing a Run\n");
+    //stop the pedestals if required 
+    if(masterMode){
+        [theMTCModel stopMTCPedestalsFixedRate];
+    }
+    NSLog(@"SMELLIE_RUN:Returning SMELLIE into Safe States after finishing a Run\n");
     [self setSmellieSafeStates];
     
     //don't know if I need this??? called in stop smellie run ???
@@ -843,7 +740,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //[runControl haltRun];
     //TODO: Send stop smellie run notification 
-    NSLog(@"Stopping SMELLIE Run\n");
+    NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");
 }
 
 
