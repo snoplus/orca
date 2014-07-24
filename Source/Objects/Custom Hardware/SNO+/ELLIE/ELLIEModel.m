@@ -244,6 +244,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
     [runDocDict setObject:docType forKey:@"doc_type"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    NSNumber *smellieConfigurationVersion = [self fetchRecentVersion];
+    [runDocDict setObject:smellieConfigurationVersion forKey:@"configuration_version"];
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run_number"];
     [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
     
@@ -564,6 +566,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSNumber * maxLaserObj = [smellieSettings objectForKey:@"max_laser_intensity"];
     int maxLaserIntensity = [maxLaserObj intValue];
     
+    NSNumber * numOfIntensitySteps = [smellieSettings objectForKey:@"num_intensity_steps"];
+
     //Extract the lasers to be fired into an array
     NSMutableDictionary * laserArray = [[NSMutableDictionary alloc] init];
     [laserArray setObject:[smellieSettings objectForKey:@"375nm_laser_on"] forKey:@"375nm" ];
@@ -642,8 +646,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
             [NSThread sleepForTimeInterval:1.0f];
             
+            int increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
+            //NSNumber *incrementInteger = [NSNUmber numberWithFloat:increment];
+            
             //Loop through each intensity of a SMELLIE run 
-            for(int intensityLoopInt = minLaserIntensity;intensityLoopInt < maxLaserIntensity; intensityLoopInt++){
+            for(int intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
             
                 if([[NSThread currentThread] isCancelled]){
                     endOfRun = YES;
@@ -655,9 +662,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
                 
                 NSString * laserIntensityAsString = [NSString stringWithFormat:@"%i",intensityLoopInt];
-                 NSLog(@"SMELLIE_RUN:Setting the Laser Intensity to %@ \n",laserIntensityAsString);
+                NSLog(@"SMELLIE_RUN:Setting the Laser Intensity to %@ \n",laserIntensityAsString);
                 [self setLaserIntensity:laserIntensityAsString];
-                //[NSThread sleepForTimeInterval:10.0f];
+                [NSThread sleepForTimeInterval:1.0f];
                 
                 //this used to be 10.0,  Slave mode in Orca requires time (unknown reason)
                 
@@ -673,16 +680,25 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 
                 //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
                 [NSThread sleepForTimeInterval:1.0f];
-                [self setSmellieMasterMode:@"100" withNumOfPulses:@"1000"];
-                [NSThread sleepForTimeInterval:10.0f];
+                if(masterMode){
+                    NSString* numOfPulses = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
+                    NSString* triggerFrequency = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
+                    NSLog(@"SMELLIE_RUN:%@ Pulses at %@ Hz \n",numOfPulses,triggerFrequency);
+                    [self setSmellieMasterMode:triggerFrequency withNumOfPulses:numOfPulses];
+                }
+                if(slaveMode){
+                    //Wait a certain amount of time for slave Mode
+                    [NSThread sleepForTimeInterval:5.0f];
+                }
                 
                 [smellieSubRunInfo addObject:valuesToFillPerSubRun];
                 [valuesToFillPerSubRun release];
                 
-                //Call the smellie system here 
-                NSLog(@"Laser:%@ ", laserKey);
-                NSLog(@"Fibre:%@ ",fibreKey);
-                NSLog(@"Intensity:%i \n",intensityLoopInt);
+                if(!endOfRun){
+                    NSLog(@"Laser:%@ ", laserKey);
+                    NSLog(@"Fibre:%@ ",fibreKey);
+                    NSLog(@"Intensity:%i \n",intensityLoopInt);
+                }
                 
                 //TODO:only have this in slave mode
                 if(slaveMode){

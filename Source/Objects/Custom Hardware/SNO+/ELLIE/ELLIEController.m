@@ -246,15 +246,15 @@
         [smellieNumIntensitySteps setIntValue:numberOfIntensitySteps];
     }
     
-    if( (numberOfIntensitySteps > maxNumberOfSteps)|| (numberOfIntensitySteps < 1)){
-        numberOfIntensitySteps = maxNumberOfSteps;
-        [smellieNumIntensitySteps setIntValue:maxNumberOfSteps];
+    if( (numberOfIntensitySteps > maxNumberOfSteps)|| (numberOfIntensitySteps < 1) || (remainderf((1.0*maxNumberOfSteps),(1.0*numberOfIntensitySteps)) != 0)){
+        numberOfIntensitySteps = 1;
+        [smellieNumIntensitySteps setIntValue:numberOfIntensitySteps];
         NSLog(@"SMELLIE_RUN_BUILDER: Number of Intensity steps is invalid. Setting the the maximum correct value\n");
     }
     
 }
 
-//checks to make sure the trigger frequency isn't too high 
+//checks to make sure the trigger frequency isn't too high
 -(IBAction)validateSmellieTriggerFrequency:(id)sender;
 {
     int triggerFrequency;
