@@ -268,7 +268,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    NSLog(@"Processing Last Request: %@\n",lastRequest);
     NSLog(@"Received: %@",theString);
     theString = [theString trimSpacesFromEnds];
     theString = [theString lowercaseString];
@@ -286,43 +285,47 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
                 int result = [[aLine substringFromIndex:10] intValue];
                 [self setSetGainsResult:result];
             }
-       }
+        }
         
-        else if([lastRequest hasPrefix:@"get gains"]){
-            aLine = [aLine substringFromIndex:10];
-            NSArray* theParts = [aLine componentsSeparatedByString:@","];
-            int i=0;
-            for(id aValue in theParts){
-                [self setGainReadBack:i withValue:[aValue intValue]];
-                i++;
-            }
-            [self setLastRequest:nil];
-        }
-        else if([lastRequest hasPrefix:@"set gains"]){
-            aLine = [aLine substringFromIndex:10];
-            NSArray* theParts = [aLine componentsSeparatedByString:@","];
-            int i=0;
-            for(id aValue in theParts){
-                [self setGain:i withValue:[aValue intValue]];
-                i++;
-            }
-            [self setLastRequest:nil];
-        }
+        else {
+            NSLog(@"Processing Last Request: %@\n",lastRequest);
 
-        else if([lastRequest hasPrefix:@"get temperatures"]){
-            aLine = [aLine substringFromIndex:17];
-            NSArray* theParts = [aLine componentsSeparatedByString:@","];
-            int i=0;
-            for(id aValue in theParts){
-                [self setAdc:i value:[aValue floatValue]];
-                i++;
+            if([lastRequest hasPrefix:@"get gains"]){
+                aLine = [aLine substringFromIndex:10];
+                NSArray* theParts = [aLine componentsSeparatedByString:@","];
+                int i=0;
+                for(id aValue in theParts){
+                    [self setGainReadBack:i withValue:[aValue intValue]];
+                    i++;
+                }
+                [self setLastRequest:nil];
             }
-            [self setLastRequest:nil];
-        }
-        else if([lastRequest hasPrefix:@"get current"]){
-            aLine = [aLine substringFromIndex:12];
-            [self setLcm:[aLine intValue]];
-            [self setLastRequest:nil];
+            else if([lastRequest hasPrefix:@"set gains"]){
+                aLine = [aLine substringFromIndex:10];
+                NSArray* theParts = [aLine componentsSeparatedByString:@","];
+                int i=0;
+                for(id aValue in theParts){
+                    [self setGain:i withValue:[aValue intValue]];
+                    i++;
+                }
+                [self setLastRequest:nil];
+            }
+
+            else if([lastRequest hasPrefix:@"get temperatures"]){
+                aLine = [aLine substringFromIndex:17];
+                NSArray* theParts = [aLine componentsSeparatedByString:@","];
+                int i=0;
+                for(id aValue in theParts){
+                    [self setAdc:i value:[aValue floatValue]];
+                    i++;
+                }
+                [self setLastRequest:nil];
+            }
+            else if([lastRequest hasPrefix:@"get current"]){
+                aLine = [aLine substringFromIndex:12];
+                [self setLcm:[aLine intValue]];
+                [self setLastRequest:nil];
+            }
         }
     }
     [self processNextCommandFromQueue];
