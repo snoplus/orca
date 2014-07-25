@@ -228,6 +228,24 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocPool release];
 }
 
+//unix version of the date
+- (NSString*) stringUnixFromDate:(NSDate*)aDate
+{
+    //NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
+    //[snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
+    //snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    NSDate* strDate;
+    if (!aDate)
+        strDate = [NSDate date];
+    else
+        strDate = aDate;
+    //strDate.date.timeIntervalSince1970
+    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
+    //[snotDateFormatter release];
+    strDate = nil;
+    return [[result retain] autorelease];
+}
+
 -(void) _pushSmellieRunDocument
 {
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
@@ -240,13 +258,21 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
-    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run_information"];
-
+    NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
+    
+    NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
+    
+    //Fetch the run index that is being used
+    //NSString* runDescription = [NSString stringWithFormat:@"%@",[aSnotModel]]
+    
     [runDocDict setObject:docType forKey:@"doc_type"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:smellieRunNameLabel forKey:@"index"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     NSNumber *smellieConfigurationVersion = [self fetchRecentVersion];
     [runDocDict setObject:smellieConfigurationVersion forKey:@"configuration_version"];
-    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run_number"];
+    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
     [runDocDict setObject:smellieSubRunInfo forKey:@"sub_run_info"];
     
     //self.runDocument = runDocDict;

@@ -476,6 +476,7 @@ smellieRunFile;
                 self.smellieRunFile = loopValue;
                 
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
+                [model setSmellieRunNameLabel];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
                 [loadedSmellieOperationModeLabel setStringValue:[smellieRunFile objectForKey:@"operation_mode"]];
                 [loadedSmellieMaxIntensityLaser setStringValue:[smellieRunFile objectForKey:@"max_laser_intensity"]];

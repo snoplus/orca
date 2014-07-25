@@ -62,6 +62,7 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 
 @synthesize
 orcaDBUserName = _orcaDBUserName,
+smellieRunNameLabel = _smellieRunNameLabel,
 orcaDBPassword = _orcaDBPassword,
 orcaDBName = _orcaDBName,
 orcaDBPort = _orcaDBPort,
@@ -877,6 +878,12 @@ configDocument  = _configDocument;
     
     [self setSmellieDocUploaded:YES];
 }
+
+/*-(void)setSmellieRunNameLabel:(NSString*)aRunNameLabel
+{
+    [self setSmellieRunNameLabel:aRunNameLabel];
+}*/
+
 
 - (NSMutableDictionary*)smellieTestFct
 {

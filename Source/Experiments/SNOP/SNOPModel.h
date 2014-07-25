@@ -55,6 +55,7 @@
     NSString* _debugDBUserName;
     NSString* _debugDBPassword;
     NSString* _debugDBName;
+    NSString* _smellieRunNameLabel;
     unsigned int _debugDBPort;
     NSString* _debugDBIPAddress;
     NSMutableArray* _debugDBConnectionHistory;
@@ -107,6 +108,7 @@
 @property (nonatomic,copy) NSString* debugDBUserName;
 @property (nonatomic,copy) NSString* debugDBPassword;
 @property (nonatomic,copy) NSString* debugDBName;
+@property (nonatomic,copy) NSString* smellieRunNameLabel;
 @property (nonatomic,assign) unsigned int debugDBPort;
 @property (nonatomic,copy) NSString* debugDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
