@@ -122,6 +122,7 @@ configDocument  = _configDocument;
     //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
 }
 
+
 - (void) initSmellieRunDocsDic
 {
     [self setSmellieDBReadInProgress:NO];

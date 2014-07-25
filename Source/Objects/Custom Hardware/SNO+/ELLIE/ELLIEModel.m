@@ -48,8 +48,8 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 
 
 @interface ELLIEModel (private)
--(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile;
--(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile;
+-(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType;
+-(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType;
 -(NSString*) stringDateFromDate:(NSDate*)aDate;
 -(void) _pushSmellieRunDocument;
 //-(void) _pushSmellieConfigDocument;
@@ -203,7 +203,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 }
 
 //Push the information from the GUI into a couchDB database
--(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile
+-(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
 {
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
@@ -214,7 +214,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    NSString* docType = [NSMutableString stringWithFormat:@"%@%@",aCouchDBName,@"_run"];
+    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
     
     NSLog(@"document_type: %@",docType);
     
@@ -267,7 +267,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [runDocDict setObject:docType forKey:@"doc_type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:smellieRunNameLabel forKey:@"index"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:smellieRunNameLabel forKey:@"run_description_used"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     NSNumber *smellieConfigurationVersion = [self fetchRecentVersion];
@@ -281,7 +282,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocPool release];
 }
 
--(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile
+-(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
 {
     NSAutoreleasePool* configDocPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
@@ -292,7 +293,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    NSString* docType = [NSMutableString stringWithFormat:@"%@%@",aCouchDBName,@"_configuration"];
+    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
     
     NSLog(@"document_type: %@",docType);
     
@@ -308,12 +309,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
 {
-    [self _pushEllieCustomRunToDB:@"smellie" runFiletoPush:dbDic];
+    [self _pushEllieCustomRunToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_description"];
 }
 
 -(void) smellieConfigurationDBpush:(NSMutableDictionary*)dbDic
 {
-    [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic];
+    [self _pushEllieConfigDocToDB:@"smellie" runFiletoPush:dbDic withDocType:@"smellie_run_configuration"];
 }
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
