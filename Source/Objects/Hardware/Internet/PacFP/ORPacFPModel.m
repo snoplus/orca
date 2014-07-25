@@ -28,9 +28,10 @@
 
 #pragma mark •••External Strings
 
-NSString* ORPacFPModelWorkingOnGainChanged = @"ORPacFPModelWorkingOnGainChanged";
-NSString* ORPacFPModelIsConnectedChanged       = @"ORPacFPModelIsConnectedChanged";
-NSString* ORPacFPModelIpAddressChanged         = @"ORPacFPModelIpAddressChanged";
+NSString* ORPacFPModelSetGainsResultChanged = @"ORPacFPModelSetGainsResultChanged";
+NSString* ORPacFPModelWorkingOnGainChanged  = @"ORPacFPModelWorkingOnGainChanged";
+NSString* ORPacFPModelIsConnectedChanged    = @"ORPacFPModelIsConnectedChanged";
+NSString* ORPacFPModelIpAddressChanged      = @"ORPacFPModelIpAddressChanged";
 
 NSString* ORPacFPModelLastGainReadChanged   = @"ORPacFPModelLastGainReadChanged";
 NSString* ORPacFPModelAdcChannelChanged     = @"ORPacFPModelAdcChannelChanged";
@@ -124,6 +125,18 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) setGainsResult
+{
+    return setGainsResult;
+}
+
+- (void) setSetGainsResult:(BOOL)aSetGainsResult
+{
+    setGainsResult = aSetGainsResult;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelSetGainsResultChanged object:self];
+}
 
 - (int) workingOnGain
 {
@@ -269,7 +282,11 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
                 int theChannel = [[aLine substringFromIndex:8] intValue];
                 [self setWorkingOnGain:theChannel];
             }
-        }
+            else if([aLine hasPrefix:@"+set gains"]){
+                int result = [[aLine substringFromIndex:10] intValue];
+                [self setSetGainsResult:result];
+            }
+       }
         
         else if([lastRequest hasPrefix:@"get gains"]){
             aLine = [aLine substringFromIndex:10];
@@ -595,7 +612,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:processLimits     forKey:@"processLimits"];
+    [encoder encodeObject:processLimits forKey:@"processLimits"];
     [encoder encodeObject:lastGainFile  forKey:@"lastGainFile"];
     [encoder encodeInt:gainDisplayType  forKey:@"gainDisplayType"];
     [encoder encodeInt:pollingState		forKey:@"pollingState"];

@@ -24,13 +24,14 @@
 {
     
 	IBOutlet NSTextField*	ipConnectedTextField;
-	IBOutlet   NSTextField* workingOnGainTextField;
+	IBOutlet NSTextField*   setGainsResultTextField;
+	IBOutlet NSTextField*   workingOnGainTextField;
+    IBOutlet NSMatrix*		gainDisplayTypeMatrix;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
 
 	IBOutlet NSTabView*		tabView;
 	IBOutlet NSTextField*   lastGainReadField;
-	IBOutlet NSMatrix*		gainDisplayTypeMatrix;
 	IBOutlet NSTextField*	cmdQueCountField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      readAdcsButton;
@@ -79,6 +80,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) setGainsResultChanged:(NSNotification*)aNote;
 - (void) workingOnGainChanged:(NSNotification*)aNote;
 - (void) processLimitsChanged:(NSNotification*)aNote;
 - (void) gainDisplayTypeChanged:(NSNotification*)aNote;

@@ -212,6 +212,11 @@
                          name : ORPacFPModelWorkingOnGainChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(setGainsResultChanged:)
+                         name : ORPacFPModelSetGainsResultChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -238,6 +243,12 @@
     
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
+	[self setGainsResultChanged:nil];
+}
+
+- (void) setGainsResultChanged:(NSNotification*)aNote
+{
+	[setGainsResultTextField setStringValue: [model setGainsResult]?@"Success":@"Failed"];
 }
 
 - (void) workingOnGainChanged:(NSNotification*)aNote
@@ -246,6 +257,7 @@
     if([model workingOnGain] == 1){
         [progress setMaxValue:148];
         [progress startAnimation:self];
+        [setGainsResultTextField setStringValue:@"Working..."];
     }
     [progressField setStringValue:[NSString stringWithFormat:@"%d/148",[model workingOnGain]]];
     [progress setDoubleValue:[model workingOnGain]];

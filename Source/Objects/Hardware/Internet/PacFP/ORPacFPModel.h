@@ -59,13 +59,16 @@
         unsigned short      lcmTimeMeasured;
         int                 adcChannel;
         NSDate*             lastGainRead;
-    int workingOnGain;
+        int                 workingOnGain;
+        BOOL                setGainsResult;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (BOOL) setGainsResult;
+- (void) setSetGainsResult:(BOOL)aSetGainsResult;
 - (int) workingOnGain;
 - (void) setWorkingOnGain:(int)aWorkingOnGain;
 - (NetSocket*) socket;
@@ -155,6 +158,7 @@
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
+extern NSString* ORPacFPModelSetGainsResultChanged;
 extern NSString* ORPacFPModelWorkingOnGainChanged;
 extern NSString* ORPacFPModelLastGainReadChanged;
 extern NSString* ORPacFPModelLcmChanged;
