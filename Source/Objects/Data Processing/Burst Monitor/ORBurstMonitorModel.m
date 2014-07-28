@@ -126,7 +126,7 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 
 - (void) setTimeWindow:(unsigned short)aValue
 {
-    if(aValue<5)aValue = 5;
+    if(aValue<1)aValue = 1;  //CB changed min to 1 
 	[[[self undoManager] prepareWithInvocationTarget:self] setTimeWindow:timeWindow];
     timeWindow = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorTimeWindowChanged object:self];
@@ -233,9 +233,9 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
                         unsigned short crateNum = ShiftAndExtract(ptr[1],21,0xf);
                         unsigned short cardNum  = ShiftAndExtract(ptr[1],16,0x1f);
                         unsigned short chanNum  = ShiftAndExtract(ptr[1],12,0xf);
-                        unsigned short energy   = ShiftAndExtract(ptr[1], 0,0xfff);
+                        unsigned short energy   = ShiftAndExtract(ptr[1], 0,0xfff); //CB //mod if time can be extracted here then buffer can be built
                         
-                        if(energy >= minimumEnergyAllowed){
+                        if(energy >= minimumEnergyAllowed && cardNum <= 15){  //CB extending adc value filter to general filter
                             //make a key for looking up the correct queue for this record
                             NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
                             
@@ -465,14 +465,15 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     
     NSDate* now = [NSDate date];
     int numBurstingChannels = 0;
+	int numTotalCounts = 0; //CB
 
     NSArray* allKeys = [queueMap allKeys];
     for(id aKey in allKeys){
-        int i     = [[queueMap  objectForKey:aKey]intValue];
+        int i     = [[queueMap  objectForKey:aKey]intValue]; //CB //mod how to get the aQueue to get the time?
         id aQueue = [queueArray objectAtIndex:i];
             
         while ([aQueue count]) {
-            ORBurstData* aRecord = [aQueue objectAtIndex:0];
+			ORBurstData* aRecord = [aQueue objectAtIndex:0]; //CB use this to extract times and adcs?
             NSDate* datePosted = aRecord.datePosted;
             
             NSTimeInterval timeDiff = [now timeIntervalSinceDate:datePosted];
@@ -481,9 +482,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
             }
             else break; //done -- no records in queue are older than the time window
         }
-         
+		numTotalCounts = numTotalCounts + [aQueue count]; //CB, n count and filter
         //check if the number still in the queue would signify a burst then count it.
-         if([aQueue count] > nHit){
+         if([aQueue count] >= 1){  //CB was nHit 
             numBurstingChannels++;
          }
     }
@@ -493,7 +494,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [queueLock unlock];//--end critial section
 
     //only tag this as a true burst if the number of detectors seeing the burst is more than the number specified.
-    if(numBurstingChannels>=numBurstsNeeded){
+    if(numBurstingChannels>=numBurstsNeeded && numTotalCounts>=nHit){  //CB nHit was neutron in one chan, now all
         NSLog(@"Burst Detected\n");
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
         [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:1];
@@ -525,7 +526,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         int i     = [[queueMap  objectForKey:aKey]intValue];
         id aQueue = [queueArray objectAtIndex:i];
         int count = [aQueue count];
-        theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=nHit?@" <---":@""];
+        theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=1?@" <---":@""]; //CB was nHit, no email at lu yet //testme
     }
     
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];

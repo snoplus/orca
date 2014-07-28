@@ -39,6 +39,13 @@
     unsigned short       minimumEnergyAllowed;
     unsigned long        shaperID;
     
+    //buffer
+    NSMutableArray* chans;
+    NSMutableArray* cards;
+    NSMutableArray* adcs;
+    NSMutableArray* secs;
+    NSMutableArray* mics;
+    
     NSMutableArray*      queueArray;
     NSMutableDictionary* queueMap;
     NSRecursiveLock*     queueLock;
