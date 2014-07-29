@@ -15,6 +15,7 @@
 
 @interface ELLIEModel :  OrcaObject{
     NSMutableDictionary* smellieRunSettings;
+    NSMutableDictionary* currentOrcaSettingsForSmellie;
     NSTask* exampleTask;
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
@@ -24,6 +25,7 @@
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
+@property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;

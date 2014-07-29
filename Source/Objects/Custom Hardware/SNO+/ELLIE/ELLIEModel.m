@@ -27,6 +27,7 @@
 #import "SNOPController.h"
 #import "ORMTCModel.h"
 #import "ORRunController.h"
+#import "ORMTC_Constants.h"
 
 //tags to define that an ELLIE run file has been updated
 #define kSmellieRunDocumentAdded   @"kSmellieRunDocumentAdded"
@@ -61,6 +62,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
 @synthesize smellieSubRunInfo,
+currentOrcaSettingsForSmellie,
 smellieDBReadInProgress = _smellieDBReadInProgress;
 
 - (void) setUpImage
@@ -372,13 +374,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)setSmellieSafeStates
 {
     NSArray * setSafeStates = @[@"30",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:setSafeStates];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setSafeStates];
 }
 
 -(void)setLaserSwitch:(NSString*)laserSwitchChannel
 {
     NSArray * setLaserSwitchFlagAndArgument = @[@"2050",laserSwitchChannel,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:setLaserSwitchFlagAndArgument];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setLaserSwitchFlagAndArgument];
 }
 
 -(void)setFibreSwitch:(NSString*)fibreSwitchInputChannel withOutputChannel:(NSString*)fibreSwitchOutputChannel
@@ -386,38 +388,38 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSString * argumentStringFS = [NSString stringWithFormat:@"%@s%@",fibreSwitchInputChannel,fibreSwitchOutputChannel];
     //NSLog(@"fibre switch argument %@",argumentStringFS);
     NSArray * setFibreSwitchFlagAndArgument = @[@"40",argumentStringFS,@"0"];
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:setFibreSwitchFlagAndArgument];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setFibreSwitchFlagAndArgument];
 }
 
 -(void)setLaserIntensity:(NSString*)laserIntensity
 {
     NSArray * setLaserIntensityFlagAndArgument = @[@"50",laserIntensity,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:setLaserIntensityFlagAndArgument];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:setLaserIntensityFlagAndArgument];
 }
 
 -(void)setLaserSoftLockOn
 {
     NSArray * softLockOnFlag = @[@"60",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:softLockOnFlag];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOnFlag];
 }
 
 -(void)setLaserSoftLockOff
 {
     NSArray * softLockOffFlag = @[@"70",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:softLockOffFlag];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOffFlag];
 }
 
 -(void)setLaserFrequency20Mhz
 {
     NSArray * frequencyTestingModeFlag = @[@"90",@"0",@"0"]; 
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:frequencyTestingModeFlag];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:frequencyTestingModeFlag];
 }
 
 -(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses
 {
     NSString * argumentString = [NSString stringWithFormat:@"%@s%@",triggerFrequency,numOfPulses];
     NSArray * smellieMasterModeFlag = @[@"80",argumentString,@"0"]; //30 is the flag for setting smellie to its safe states
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:smellieMasterModeFlag];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieMasterModeFlag];
 }
 
 -(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2
@@ -436,7 +438,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
         
     NSArray * smellieCustomCmd = @[customCmd,customArgument1,customArgument2];
-    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection.py" withCmdLineArgs:smellieCustomCmd];
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieCustomCmd];
     
 }
 
@@ -580,6 +582,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         slaveMode = NO;
         masterMode = NO;
     }
+    
+   
+    
     NSLog(@"SMELLIE_RUN:Running in %@\n",operationMode);
     NSLog(@"SMELLIE_RUN:Checking Connection to SMELLIE\n");
     NSLog(@"SMELLIE_RUN:Setting SMELLIE into Safe States before starting a Run\n");
@@ -618,6 +623,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [fibreArray setObject:[smellieSettings objectForKey:@"FS255"] forKey:@"FS255" ];
     
     smellieSubRunInfo = [[NSMutableArray alloc] initWithCapacity:100];
+    NSString* numOfPulsesInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
+    NSString* triggerFrequencyInSlaveMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"trigger_frequency"]];
+    
+    NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+    [f setNumberStyle:NSNumberFormatterDecimalStyle];
+    float timeToPulse = [[f numberFromString:numOfPulsesInSlaveMode] floatValue]/[[f numberFromString:triggerFrequencyInSlaveMode] floatValue];
+    [f release];
+    
     
     //get the MTC Object (but only use in Slave Mode)
     NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -627,14 +640,40 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //get the run controller
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
-
+    
+    //Save the current settings of the detector
+    currentOrcaSettingsForSmellie  = [[NSMutableDictionary alloc] init];
+    NSLog(@"SMELLIE_RUN:Mtcd coarse delay set to %f ns\n",[theMTCModel dbFloatByIndex:kCoarseDelay]);
+    NSNumber * mtcCoarseDelay = [NSNumber numberWithUnsignedLong:[theMTCModel dbFloatByIndex:kCoarseDelay]];
+    [currentOrcaSettingsForSmellie setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
+    
+    NSLog(@"SMELLIE_RUN:Mtcd pulser rate set to %f Hz\n",[theMTCModel dbFloatByIndex:kPulserPeriod]);
+    NSNumber * mtcPulserPeriod = [NSNumber numberWithFloat:[theMTCModel dbFloatByIndex:kPulserPeriod]];
+    [currentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
+    
+    //Set the Mtcd for smellie settings
+    NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay to 900ns \n",[[NSNumber numberWithUnsignedShort:900] unsignedShortValue]);
+    [theMTCModel setupGTCorseDelay:[[NSNumber numberWithInt:900] intValue]];
+    
+    
     //start the run controller
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
 
     //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers
     if(slaveMode){
+
+        NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
+        NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+        [f setNumberStyle:NSNumberFormatterDecimalStyle];
+        NSNumber * numericTriggerFrequencyInSlaveMode = [f numberFromString:triggerFrequencyInSlaveMode];
+        [f release];
+        
         NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
         [theMTCModel fireMTCPedestalsFixedRate];
+        
+        //We need to set the pulser rate after firing pedestals 
+        float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
+        [theMTCModel setThePulserRate:pulserRate];
     }
     
     BOOL endOfRun = NO;
@@ -678,6 +717,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             
             //Loop through each intensity of a SMELLIE run 
             for(int intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
+                
+                
+                //if run control cancels the run
+                /*if(![runControl isRunning]){
+                    endOfRun = YES;
+                    break;
+                }*/
             
                 if([[NSThread currentThread] isCancelled]){
                     endOfRun = YES;
@@ -705,7 +751,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     [self setLaserSoftLockOff];
                 }
                 
-                //TODO: Delay the thread for a certain amount of time depending on the mode (slave/master)
                 [NSThread sleepForTimeInterval:1.0f];
                 if(masterMode){
                     NSString* numOfPulses = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"triggers_per_loop"]];
@@ -713,7 +758,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     NSLog(@"SMELLIE_RUN:%@ Pulses at %@ Hz \n",numOfPulses,triggerFrequency);
                     [self setSmellieMasterMode:triggerFrequency withNumOfPulses:numOfPulses];
                 }
+                
                 if(slaveMode){
+                    NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //Wait a certain amount of time for slave Mode
                     [NSThread sleepForTimeInterval:5.0f];
                 }
@@ -748,9 +795,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [laserArray release];
     
     //stop the pedestals if required 
-    if(masterMode){
+    if(slaveMode){
+        NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
         [theMTCModel stopMTCPedestalsFixedRate];
     }
+    
+    //Resetting the mtcd to settings before the smellie run
+    
     NSLog(@"SMELLIE_RUN:Returning SMELLIE into Safe States after finishing a Run\n");
     [self setSmellieSafeStates];
     
@@ -773,6 +824,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //removed this to stop splurgingb
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
+    
+    //Set the Mtcd for back to original settings
+    [theMTCModel setupPulserRateAndEnable:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
+    NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
+    //set the Mtcd - coarse delay back 
+    /*NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+    [f setNumberStyle:NSNumberFormatterDecimalStyle];
+    float coarseDelayFloat = [[f numberFromString:[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"]] floatValue];
+    [f release];
+    NSNumber *oldCoarseDelay = [NSNumber numberWithFloat:coarseDelayFloat];*/
+    [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
+    NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
     
     [self _pushSmellieRunDocument];
     
