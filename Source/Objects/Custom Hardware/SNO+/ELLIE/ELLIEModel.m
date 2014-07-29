@@ -582,7 +582,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         slaveMode = NO;
         masterMode = NO;
     }
-    
    
     
     NSLog(@"SMELLIE_RUN:Running in %@\n",operationMode);
@@ -828,12 +827,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Set the Mtcd for back to original settings
     [theMTCModel setupPulserRateAndEnable:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
-    //set the Mtcd - coarse delay back 
-    /*NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
-    [f setNumberStyle:NSNumberFormatterDecimalStyle];
-    float coarseDelayFloat = [[f numberFromString:[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"]] floatValue];
-    [f release];
-    NSNumber *oldCoarseDelay = [NSNumber numberWithFloat:coarseDelayFloat];*/
+    
     [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
     
