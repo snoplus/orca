@@ -45,6 +45,14 @@
     NSMutableArray* adcs;
     NSMutableArray* secs;
     NSMutableArray* mics;
+    long int removedSec;
+
+    
+    //burst tags
+    unsigned short burstTell; //1 if a bust still needs printing
+    unsigned short burstState; //1 if in burst, 0 if not
+    unsigned short novaState; //1 if nova possible, 0 if not
+    double novaP; //probability of data appearing from supernova
     
     NSMutableArray*      queueArray;
     NSMutableDictionary* queueMap;
@@ -56,6 +64,7 @@
     NSMutableDictionary* runUserInfo;
     unsigned short       burstCount;
 }
+
 
 - (id)   init;
 - (void) dealloc;
@@ -107,14 +116,19 @@ extern NSString* ORBurstMonitorMinimumEnergyAllowedChanged;
 extern NSString* ORBurstMonitorQueueChanged;
 extern NSString* ORBurstMonitorEmailListChanged;
 extern NSString* ORBurstMonitorLock;
-
+//extern NSString* burstString; //CB string to email
+//extern NSDate* burstStart;
 
 @interface ORBurstData : NSObject
 {
+    NSNumber* epSec; //Time from shaper card
+    NSNumber* epMic;
     NSDate* datePosted;
     NSData* dataRecord;
 }
 @property (retain) NSDate* datePosted;
 @property (retain) NSData* dataRecord;
+@property (retain) NSNumber* epSec;
+@property (retain) NSNumber* epMic;
 
 @end

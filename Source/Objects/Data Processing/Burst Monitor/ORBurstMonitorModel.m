@@ -42,6 +42,9 @@ NSString* ORBurstMonitorMinimumEnergyAllowedChanged = @"ORBurstMonitorMinimumEne
 NSString* ORBurstMonitorQueueChanged                = @"ORBurstMonitorQueueChangedNotification";
 NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged";
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
+NSString* burstString = @"";
+NSDate* burstStart = NULL;
+
 
 @interface ORBurstMonitorModel (private)
 - (void) deleteQueues;
@@ -126,7 +129,7 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 
 - (void) setTimeWindow:(unsigned short)aValue
 {
-    if(aValue<1)aValue = 1;  //CB changed min to 1 
+    if(aValue<1)aValue = 1;
 	[[[self undoManager] prepareWithInvocationTarget:self] setTimeWindow:timeWindow];
     timeWindow = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorTimeWindowChanged object:self];
@@ -136,8 +139,16 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setNHit:nHit];
     nHit = value;
+    //buffer
+    [chans removeAllObjects];
+    [cards removeAllObjects];
+    [adcs removeAllObjects];
+    [secs removeAllObjects];
+    [mics removeAllObjects];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorNHitChanged object:self];
 }
+
+
 
 - (void) setMinimumEnergyAllowed:(unsigned short)value
 {
@@ -233,9 +244,13 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
                         unsigned short crateNum = ShiftAndExtract(ptr[1],21,0xf);
                         unsigned short cardNum  = ShiftAndExtract(ptr[1],16,0x1f);
                         unsigned short chanNum  = ShiftAndExtract(ptr[1],12,0xf);
-                        unsigned short energy   = ShiftAndExtract(ptr[1], 0,0xfff); //CB //mod if time can be extracted here then buffer can be built
+                        unsigned short energy   = ShiftAndExtract(ptr[1], 0,0xfff);
                         
-                        if(energy >= minimumEnergyAllowed && cardNum <= 15){  //CB extending adc value filter to general filter
+                        unsigned long secondsSinceEpoch = ShiftAndExtract(ptr[2], 0, 0xffffffff);
+                        unsigned long microseconds = ShiftAndExtract(ptr[3], 0, 0xffffffff);
+                        
+                        if(energy >= minimumEnergyAllowed && cardNum <= 15){  //Filter
+                            [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
                             //make a key for looking up the correct queue for this record
                             NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
                             
@@ -253,13 +268,87 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
                             NSData* theShaperRecord = [NSData dataWithBytes:ptr length:recordLen*sizeof(long)];
                             
                             ORBurstData* burstData = [[ORBurstData alloc] init];
-                            burstData.datePosted = now;
+                            burstData.datePosted = now; //DAQ at LU has a different time zone than the data records do.  It might be best not to mix DAQ time and SBC time in the monitor.
                             burstData.dataRecord = theShaperRecord;
+                            NSNumber* epochSec = [NSNumber numberWithLong:secondsSinceEpoch];
+                            NSNumber* epochMic = [NSNumber numberWithLong:microseconds];
+                            burstData.epSec = [epochSec copy];
+                            burstData.epMic = [epochMic copy];
                             
-                            [[queueArray objectAtIndex:queueIndex ] addObject:burstData];
-                            [burstData release];
+                            //[[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
+                            //[burstData release];
+                            int addThisToQueue = 1;
                             
                             [queueLock unlock]; //--end critial section
+                            
+                            //make array of data to be buffered
+                            [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
+                            [cards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
+                            [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
+                            [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
+                            [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
+                            if([chans count] >= nHit){ //There is enough data in the buffer now, start looking for bursts
+                                int countofchan = [chans count];
+                                double lastTime = ([[secs objectAtIndex:0] longValue] + 0.000001*[[mics objectAtIndex:0] longValue]);
+                                double firstTime = ([[secs objectAtIndex:(nHit-1)] longValue] + 0.000001*[[mics objectAtIndex:(nHit-1)] longValue]);
+                                double diffTime = (lastTime - firstTime);
+                                if(diffTime < timeWindow){ //burst found, start saveing everything untill it stops
+                                    burstState = 1;
+                                    novaState = 1;
+                                    novaP = 1;
+                                }
+                                else{ //no burst found, stop saveing thing and send alarm if there was a burst directly before.
+                                    if(burstState == 1){
+                                        int iter;
+                                        NSString* bString = @"";
+                                        for(iter=1; iter<countofchan; iter++){ //Skip most recent event, print all others
+                                            double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
+                                            //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
+                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]]];
+                                        }
+                                        burstTell = 1;
+                                        burstString = [bString mutableCopy];
+                                        
+                                        //fixme //Try to start DelayedBurstEvent directly, but does not work
+                                        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
+                                        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //copied from monitorqueues, maybe?
+                                        //[self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1]; //does not work in this function
+                                        //NSInvocation *newvoke = [NSInvocation invocationWithMethodSignature:[self, [instanceMethodSignitureForSelector monitorQueues]];
+                                        //newvoke.target = self;
+                                        //newvoke.selector = monitorQueues;
+                                        //[newvoke setArgument:nil atIndex:2];
+                                        //[newvoke invoke]; 
+                                        
+                                        //Clean up
+                                        [chans removeAllObjects];
+                                        [cards removeAllObjects];
+                                        [adcs removeAllObjects];
+                                        [secs removeAllObjects];
+                                        [mics removeAllObjects];
+                                        addThisToQueue = 0;
+                                    }
+                                    burstState = 0;
+                                    novaState = 0;
+                                    novaP = 0;
+                                    removedSec = [[secs objectAtIndex:(nHit-2)] longValue];
+                                    [chans removeObjectAtIndex:nHit-1]; //remove old things from the buffer
+                                    [cards removeObjectAtIndex:nHit-1];
+                                    [adcs removeObjectAtIndex:nHit-1];
+                                    [secs removeObjectAtIndex:nHit-1];
+                                    [mics removeObjectAtIndex:nHit-1];
+                                    NSLog(@"removedSec is now %li \n", removedSec);
+                                    NSTimeInterval removedSeconds = removedSec;
+                                    burstStart = [NSDate dateWithTimeIntervalSince1970:removedSeconds]; //Fixme hard to get consistency, so used removedSec instead
+                                }
+                                //Testing
+                            }
+                            else{
+                                NSLog(@"not full has %i \n", [chans count]);
+                            }
+                            if(addThisToQueue == 1){
+                                [[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
+                                [burstData release];
+                            }
                         }
                     }
                 }
@@ -303,6 +392,18 @@ NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
     
     if(!queueLock)queueLock = [[NSRecursiveLock alloc] init];
     queueMap = [[NSMutableDictionary dictionary] retain];
+    
+    //buffer  clear throut
+    if(!chans) chans = [[NSMutableArray alloc] init];
+    if(!cards) cards = [[NSMutableArray alloc] init];
+    if(!adcs) adcs = [[NSMutableArray alloc] init];
+    if(!secs) secs = [[NSMutableArray alloc] init];
+    if(!mics) mics = [[NSMutableArray alloc] init];
+    if(!burstString) burstString = [[NSString alloc] init];
+    burstTell = 0;
+    burstState = 0;
+    novaState = 0;
+    novaP = 0;
     
     //start the monitoring
     [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
@@ -463,28 +564,27 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
     [queueLock lock]; //--begin critial section
     
-    NSDate* now = [NSDate date];
+    //NSDate* now = [NSDate date];
     int numBurstingChannels = 0;
-	int numTotalCounts = 0; //CB
+	int numTotalCounts = 0;
 
     NSArray* allKeys = [queueMap allKeys];
     for(id aKey in allKeys){
-        int i     = [[queueMap  objectForKey:aKey]intValue]; //CB //mod how to get the aQueue to get the time?
+        int i     = [[queueMap  objectForKey:aKey]intValue];
         id aQueue = [queueArray objectAtIndex:i];
             
         while ([aQueue count]) {
-			ORBurstData* aRecord = [aQueue objectAtIndex:0]; //CB use this to extract times and adcs?
-            NSDate* datePosted = aRecord.datePosted;
-            
-            NSTimeInterval timeDiff = [now timeIntervalSinceDate:datePosted];
-            if(timeDiff > timeWindow){
+			ORBurstData* aRecord = [aQueue objectAtIndex:0]; 
+            //NSDate* datePosted = aRecord.datePosted;
+            double timePosted = ([aRecord.epSec longValue] + 0.000001*[aRecord.epMic longValue]);
+            if(timePosted < removedSec){
                 [aQueue removeObjectAtIndex:0];
             }
             else break; //done -- no records in queue are older than the time window
         }
-		numTotalCounts = numTotalCounts + [aQueue count]; //CB, n count and filter
+		numTotalCounts = numTotalCounts + [aQueue count];
         //check if the number still in the queue would signify a burst then count it.
-         if([aQueue count] >= 1){  //CB was nHit 
+         if([aQueue count] >= 1){
             numBurstingChannels++;
          }
     }
@@ -494,10 +594,12 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [queueLock unlock];//--end critial section
 
     //only tag this as a true burst if the number of detectors seeing the burst is more than the number specified.
-    if(numBurstingChannels>=numBurstsNeeded && numTotalCounts>=nHit){  //CB nHit was neutron in one chan, now all
+    //if(numBurstingChannels>=numBurstsNeeded && numTotalCounts>=nHit){
+    if(burstTell == 1){  //just call delayedburst when told by data proc //fixme need to remove last event from buffer, or not add it to queue
+        burstTell = 0;
         NSLog(@"Burst Detected\n");
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
-        [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:1];
+        [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:1];  
     }
     [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
     
@@ -520,13 +622,15 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Minimum Bursts Needed: %d\n",numBurstsNeeded];
     theContent = [theContent stringByAppendingFormat:@"Num Bursts this run: %d\n",burstCount];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+    theContent = [theContent stringByAppendingString:burstString];
+    theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     
     NSArray* allKeys = [[queueMap allKeys]sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
     for(id aKey in allKeys){
         int i     = [[queueMap  objectForKey:aKey]intValue];
         id aQueue = [queueArray objectAtIndex:i];
         int count = [aQueue count];
-        theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=1?@" <---":@""]; //CB was nHit, no email at lu yet //testme
+        theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=1?@" <---":@""];
     }
     
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
@@ -534,6 +638,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     
+    NSLog(@"theContent in delayedBurstEvent is: \n %@", theContent);
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
     [self sendMail:userInfo];
     
@@ -543,7 +648,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	[theBurstMonitoredObject runTaskStarted:runUserInfo];
 	[theBurstMonitoredObject setInvolvedInCurrentRun:YES];
 
-    [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
+    [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //What does this do
     for(NSMutableArray* aQueue in queueArray){
         NSMutableArray* anArrayOfData = [NSMutableArray array];
         //have to extract the raw data record.
@@ -565,10 +670,16 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 
 @synthesize datePosted;
 @synthesize dataRecord;
+@synthesize epSec;
+@synthesize epMic;
 
 - (void) dealloc {
     [datePosted release];
     [dataRecord release];
+    [epSec release];
+    [epMic release];
+    self.epSec=nil;
+    self.epMic=nil;
     [super dealloc];
 }
 @end
