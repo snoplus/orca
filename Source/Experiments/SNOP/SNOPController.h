@@ -40,6 +40,14 @@
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
+    //Run information
+    IBOutlet NSTextField* currentRunNumber;
+    IBOutlet NSTextField* currentRunType;
+    IBOutlet NSTextField* currentStatus;
+    IBOutlet NSTextField* lastRunNumber;
+    IBOutlet NSTextField* lastRunType;
+
+    
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;
     IBOutlet NSTextField *loadedSmellieRunNameLabel;

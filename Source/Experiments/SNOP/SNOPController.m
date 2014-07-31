@@ -28,6 +28,8 @@
 #import "ORXL3Model.h"
 #import "ELLIEModel.h"
 #import "ORCouchDB.h"
+#import "ORRunModel.h"
+#import "ORRunController.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -112,6 +114,13 @@ smellieRunFile;
                      selector : @selector(stopSmellieRunAction:)
                          name : ORELLIERunFinished
                         object: nil];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(runNumberChanged:)
+                         name: ORRunNumberChangedNotification
+                       object: nil];
+    
+    
 }
 
 - (void) updateWindow
@@ -121,6 +130,7 @@ smellieRunFile;
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
+    [self runNumberChanged:nil]; //update the run number everytime this is called 
 }
 
 -(IBAction)setTellie:(id)sender
@@ -134,6 +144,40 @@ smellieRunFile;
 
 -(IBAction)fireTellie:(id)sender
 {
+    
+}
+
+- (void) runNumberChanged:(NSNotification*)aNotification
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    [currentRunNumber setIntValue:[theRunControl runNumber]];
+    [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
+}
+
+- (IBAction) startRunAction:(id)sender
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+	if([[theRunControl document] isDocumentEdited]){
+		[[theRunControl document] afterSaveDo:@selector(startRun) withTarget:self];
+        [[theRunControl document] saveDocument:nil];
+    }
+	else [self startRun];
+}
+
+- (void) startRun
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
+}
+
+- (void) runTypeChanged:(NSNotification*)aNotification
+{
+    //TODO: Call the database and fetch the run_type for this run 
+    //TODO: Set the run type for the current run
+    //TODO: Set the run type for the next run 
     
 }
 
