@@ -123,6 +123,20 @@ smellieRunFile;
     [self dbDebugDBIPChanged:nil];
 }
 
+-(IBAction)setTellie:(id)sender
+{
+    //Collect a series of objects from the ELLIEModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    //NSArray * setSafeStates = @[@"0",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
+    [theELLIEModel callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_orca_script.py" withCmdLineArgs:nil];
+}
+
+-(IBAction)fireTellie:(id)sender
+{
+    
+}
+
 - (void) viewTypeChanged:(NSNotification*)aNote
 {
 	[viewTypePU selectItemAtIndex:[model viewType]];
