@@ -718,7 +718,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
         case kStep5b:       return @"Set and Clear ACK Bit";
         case kStep5c:       return @"Verify ACKED Mode";
         case kStep5d:       return @"Send Normal Data";
-        case kRunLastSteps:  return @"Running non-Master Setup";
+        case kRunSteps6To9:  return @"Running non-Master Setup";
         case kWaitOnSteps6To9:return @"Waiting on Routers and Digitizers";
         case kStep6a:       return @"Router Stringent Data Checking";
         case kStep6b:       return @"Verify Router Still Locked";
@@ -760,6 +760,34 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
         }
     }
 }
+
+//  In progress
+- (BOOL) systemAllLocked
+{
+    int i;
+    int j;
+    
+    if ( (miscStatReg & 0x4000) != kAllLockBit  )
+        return NO;
+    else {
+        for(i=0;i<8;i++){
+            ORConnector* routerConnector = [linkConnector[i] connector];
+            if([routerConnector identifer] == 'L'){
+                if ( [routerConnector miscStatReg] & 0x4000 != kAllLockBit)
+                    return NO;
+                else {
+                    for(i=0;i<8;i++){
+                     //   if([[routerConnector linkConnector[j]] connector] != 'L'){
+                      //      ORConnector* triggerConnector = [linkConnector[i] connector];
+                       //     ORGretina4MModel* digitizerObj = [triggerConnector objectLink];
+                     //   }
+                    }
+                }
+            }
+        }
+    }
+}
+
 - (void) readDisplayRegs
 {
     [self setLinkLockedReg:     [self readRegister:kLinkLocked]];
@@ -863,6 +891,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             }
             break;
             
+        // Also rarely gets stuck here. Trigger cards stop responding. Current solution is power off / on.
         case kStep3a://3a. Read Link Locked to verify the SERDES of Master is locked the syn pattern of the Router
             if(linkLockedReg!= (~connectedRouterMask & 0x7FF)) {
                 NSLog(@"HW issue: the SERDES of the Master has not locked on to the synchronization pattern from the Router");
@@ -911,7 +940,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             }
             break;
             
-        case kStep5a:
+        case kStep5a:  // This is where it sometimes fails
             if(((miscStatReg & kWaitAcknowledgeStateMask)
                 >> 8) != 0x4) {
                 NSLog(@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in WAIT_ACK mode.\n", [self fullID]);
@@ -944,10 +973,10 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
         case kStep5d:
             [self writeRegister:kMiscCtl1 withValue:0xFF40];
             [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
-            [self setInitState:kRunLastSteps];
+            [self setInitState:kRunSteps6To9];
             break;
             
-        case kRunLastSteps:
+        case kRunSteps6To9:
         {
             int i;
             for(i=0;i<8;i++){
@@ -1132,6 +1161,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             [self setInitState:kStep7d];
             break;
             
+            //not used because all preemps are turned on
 /*        case kStep7c:
             if(connectedDigitizerMask & 0xf) routerPreMask |= 0x151; //Links A,B,C,D
             if(connectedRouterMask & 0x70)   routerPreMask |= 0x152; //Links E,F,G

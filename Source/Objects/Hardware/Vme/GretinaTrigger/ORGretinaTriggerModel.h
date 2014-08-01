@@ -197,7 +197,7 @@ enum {
     kStep5b,
     kStep5c,
     kStep5d,
-    kRunLastSteps,
+    kRunSteps6To9,
     kWaitOnSteps6To9,
     kStep6a,
     kStep6b,
@@ -328,6 +328,7 @@ enum {
 
 #pragma mark •••set up routines
 - (void) initClockDistribution;
+- (BOOL) systemAllLocked;
 - (unsigned short)findRouterMask;
 - (unsigned short)findDigitizerMask;
 - (void) readDisplayRegs;
