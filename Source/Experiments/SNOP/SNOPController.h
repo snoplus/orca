@@ -47,6 +47,12 @@
     IBOutlet NSTextField* lastRunNumber;
     IBOutlet NSTextField* lastRunType;
 
+    IBOutlet NSTextField *n100Hi;
+    IBOutlet NSTextField *n100med;
+    IBOutlet NSTextField *n20hi;
+    IBOutlet NSTextField *esumhi;
+    IBOutlet NSTextField *owln;
+    IBOutlet NSTextField *n100Lo;
     
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;

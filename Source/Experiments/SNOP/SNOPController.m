@@ -30,6 +30,8 @@
 #import "ORCouchDB.h"
 #import "ORRunModel.h"
 #import "ORRunController.h"
+#import "ORMTC_Constants.h"
+#import "ORMTCModel.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -53,7 +55,6 @@ smellieRunFile;
 	return @"~/SNOP";
 }
 
-
 -(void) awakeFromNib
 {
 	detectorSize		= NSMakeSize(620,595);
@@ -72,9 +73,8 @@ smellieRunFile;
     
     //pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
-    
-    
 	[super awakeFromNib];
+    [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
 
 
@@ -82,6 +82,8 @@ smellieRunFile;
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
     
     [super registerNotificationObservers];
 
@@ -115,22 +117,30 @@ smellieRunFile;
                          name : ORELLIERunFinished
                         object: nil];
     
+    
     [notifyCenter addObserver: self
                      selector: @selector(runNumberChanged:)
                          name: ORRunNumberChangedNotification
-                       object: nil];
+                       object: theRunControl];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(runStatusChanged:)
+                         name: ORRunStatusChangedNotification
+                       object: theRunControl];
     
     
 }
 
 - (void) updateWindow
 {
-	[super updateWindow];
+    [super updateWindow];
 	[self viewTypeChanged:nil];
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
-    [self runNumberChanged:nil]; //update the run number everytime this is called 
+    [self fetchNhitSettings];
+    [self runNumberChanged:nil]; //update the run number
+    [self runStatusChanged:nil]; //update the run status
 }
 
 -(IBAction)setTellie:(id)sender
@@ -145,6 +155,38 @@ smellieRunFile;
 -(IBAction)fireTellie:(id)sender
 {
     
+}
+
+-(void)fetchNhitSettings
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* theMtcModel = [objs objectAtIndex:0];
+    int col,row;
+    for(col=0;col<4;col++){
+		for(row=0;row<6;row++){
+			int index = kNHit100HiThreshold + row + (col * 6);
+            int mtcaIndex = kESumLowThreshold + row + (col * 4);
+            if((col == 0) && (row==0)){
+                [n100Hi setIntValue:[theMtcModel dbFloatByIndex: index]];
+                [esumhi setIntValue:[theMtcModel dbFloatByIndex:mtcaIndex]];
+            }
+            else if((col == 0) && (row==1)){
+                [n100med setIntValue:[theMtcModel dbFloatByIndex: index]];
+            }
+            else if((col == 0) && (row==3)){
+                [n20hi setIntValue:[theMtcModel dbFloatByIndex: index]];
+            }
+            else if((col == 0) && (row==5)){
+                [owln setIntValue:[theMtcModel dbFloatByIndex: index]];
+            }
+            else if((col == 0) && (row==2)){
+                [n100Lo setIntValue:[theMtcModel dbFloatByIndex: index]]; 
+            }
+            else{
+                //do nothing
+            }
+        }
+    }
 }
 
 - (void) runNumberChanged:(NSNotification*)aNotification
@@ -164,6 +206,21 @@ smellieRunFile;
         [[theRunControl document] saveDocument:nil];
     }
 	else [self startRun];
+    [currentStatus setStringValue:[self getStartingString]];
+}
+- (IBAction)newRunAction:(id)sender {
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    [theRunControl setForceRestart:YES];
+    [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
+    [currentStatus setStringValue:[self getRestartingString]];
+    
+}
+- (IBAction)stopRunAction:(id)sender {
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
+    [currentStatus setStringValue:[self getStoppingString]];
 }
 
 - (void) startRun
@@ -172,6 +229,66 @@ smellieRunFile;
     ORRunModel* theRunControl = [objs objectAtIndex:0];
 	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
+
+- (void) runStatusChanged:(NSNotification*)aNotification{
+    
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    if([theRunControl runningState] == eRunInProgress){
+		if(![theRunControl runPaused])[currentStatus setStringValue:[[ORGlobal sharedGlobal] runModeString]];
+		else [currentStatus setStringValue:@"Paused"];
+	}
+	else if([theRunControl runningState] == eRunStopped){
+		[currentStatus setStringValue:@"Stopped"];
+	}
+	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
+		if([theRunControl runningState] == eRunStarting)[currentStatus setStringValue:[self getStartingString]];
+		else {
+			if([theRunControl runningState] == eRunBetweenSubRuns)	[currentStatus setStringValue:[self getBetweenSubrunsString]];
+			else                                                    [currentStatus setStringValue:[self getStoppingString]];
+		}
+	}
+}
+
+- (NSString*) getStartingString
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    NSString* s;
+    if([theRunControl waitRequestersCount]==0)s = @"Starting...";
+    else s = @"Starting (Waiting)";
+    return s;
+}
+
+- (NSString*) getRestartingString
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    NSString* s;
+    if([theRunControl waitRequestersCount]==0)s = @"Restart...";
+    else s = @"Restarting (Waiting)";
+    return s;
+}
+- (NSString*) getStoppingString
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    NSString* s;
+    if([theRunControl waitRequestersCount]==0)s = @"Stopping...";
+    else s = @"Stopping (Waiting)";
+    return s;
+}
+- (NSString*) getBetweenSubrunsString
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* theRunControl = [objs objectAtIndex:0];
+    NSString* s;
+    if([theRunControl waitRequestersCount]==0)s = @"Between Sub Runs..";
+    else s = @"'TweenSubRuns (Waiting)";
+    return s;
+}
+
+
 
 - (void) runTypeChanged:(NSNotification*)aNotification
 {
