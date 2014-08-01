@@ -42,8 +42,7 @@ NSString* ORBurstMonitorMinimumEnergyAllowedChanged = @"ORBurstMonitorMinimumEne
 NSString* ORBurstMonitorQueueChanged                = @"ORBurstMonitorQueueChangedNotification";
 NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged";
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
-NSString* burstString = @"";
-NSDate* burstStart = NULL;
+NSDate*   burstStart = NULL;
 
 
 @interface ORBurstMonitorModel (private)
@@ -73,6 +72,7 @@ NSDate* burstStart = NULL;
     [runUserInfo release];
     [queueLock release];
     [emailList release];
+    [burstString release];
     [super dealloc];
 }
 
@@ -270,10 +270,9 @@ NSDate* burstStart = NULL;
                             ORBurstData* burstData = [[ORBurstData alloc] init];
                             burstData.datePosted = now; //DAQ at LU has a different time zone than the data records do.  It might be best not to mix DAQ time and SBC time in the monitor.
                             burstData.dataRecord = theShaperRecord;
-                            NSNumber* epochSec = [NSNumber numberWithLong:secondsSinceEpoch];
-                            NSNumber* epochMic = [NSNumber numberWithLong:microseconds];
-                            burstData.epSec = [epochSec copy];
-                            burstData.epMic = [epochMic copy];
+                            //cleaned up some bad memory leaks here... MAH 8/1/14
+                            burstData.epSec = [NSNumber numberWithLong:secondsSinceEpoch];
+                            burstData.epMic = [NSNumber numberWithLong:secondsSinceEpoch];
                             
                             //[[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
                             //[burstData release];
@@ -307,7 +306,10 @@ NSDate* burstStart = NULL;
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]]];
                                         }
                                         burstTell = 1;
-                                        burstString = [bString mutableCopy];
+                                        
+                                        //fixed memory leak here.. MAH 8/1/14
+                                        [burstString release];
+                                        burstString = [bString copy];
                                         
                                         //fixme //Try to start DelayedBurstEvent directly, but does not work
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
@@ -347,8 +349,9 @@ NSDate* burstStart = NULL;
                             }
                             if(addThisToQueue == 1){
                                 [[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
-                                [burstData release];
                             }
+                            [burstData release];
+
                         }
                     }
                 }
@@ -399,7 +402,6 @@ NSDate* burstStart = NULL;
     if(!adcs) adcs = [[NSMutableArray alloc] init];
     if(!secs) secs = [[NSMutableArray alloc] init];
     if(!mics) mics = [[NSMutableArray alloc] init];
-    if(!burstString) burstString = [[NSString alloc] init];
     burstTell = 0;
     burstState = 0;
     novaState = 0;

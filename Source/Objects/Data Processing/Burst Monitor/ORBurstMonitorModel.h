@@ -63,6 +63,7 @@
     ORDecoder*           theDecoder;
     NSMutableDictionary* runUserInfo;
     unsigned short       burstCount;
+    NSString*            burstString;
 }
 
 
