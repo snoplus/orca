@@ -37,6 +37,7 @@
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
 #import "ELLIEModel.h"
+#import "SNOP_Run_Constants.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
@@ -87,12 +88,23 @@ mtcConfigDoc = _mtcConfigDoc;
 
 
 @synthesize smellieRunHeaderDocList;
+int runType = kRunUndefined;
 
 #pragma mark ¥¥¥Initialization
 
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"SNOP"]];
+}
+
+- (int) getRunType
+{
+    return runType;
+}
+
+- (void) setRunType:(int)aRunType
+{
+    runType = aRunType;
 }
 
 - (void) makeMainController
@@ -675,6 +687,7 @@ mtcConfigDoc = _mtcConfigDoc;
 	return viewType;
 }
 
+//undefined run type
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -682,6 +695,8 @@ mtcConfigDoc = _mtcConfigDoc;
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
+    //zero is the undefined run type otherwise specified
+    [self setRunType:kRunUndefined];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -980,7 +995,7 @@ mtcConfigDoc = _mtcConfigDoc;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
-    [runDocDict setObject:@"physics" forKey:@"run_type"];
+    [runDocDict setObject:[self getRunType] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];

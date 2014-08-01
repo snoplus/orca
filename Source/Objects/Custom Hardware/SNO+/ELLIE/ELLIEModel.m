@@ -28,6 +28,7 @@
 #import "ORMTCModel.h"
 #import "ORRunController.h"
 #import "ORMTC_Constants.h"
+#import "SNOP_Run_Constants.h"
 
 //tags to define that an ELLIE run file has been updated
 #define kSmellieRunDocumentAdded   @"kSmellieRunDocumentAdded"
@@ -512,7 +513,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
     NSLog(@"SMELLIE_RUN:Starting SMELLIE Run\n");
-    
+
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
     currentConfigurationVersion = [self fetchRecentVersion];
     
@@ -635,6 +636,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
+    
+    //get the MTC Object (but only use in Slave Mode)
+    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
+    [theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
     
     //get the run controller
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
