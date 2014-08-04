@@ -91,6 +91,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 {
     //FZK-internal: [self setAdeiServiceUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
     [self setIPNumber: @"fuzzy.fzk.de/adei"];
+    currentQueueErrorIndex=0;
 	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 	return self;
@@ -1262,7 +1263,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 }
 
 //Just send the request string, don't wait for response.
-- (void) sendRequestString:(NSString*)requestString
+//extended to store a queueErrorIndex -tb- 2014-04-04
+- (void) sendRequestString:(NSString*)requestString withQueueErrorIndex:(int) aIndex;
 {
 	//NSLog(@"%@::%@: requestString:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),requestString);//TODO: debug output -tb-
 
@@ -1274,12 +1276,18 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
         }
     ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiType:kRequestStringType delegate:self didFinishSelector:@selector(handleSilentItemResult:path:)];
     [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
+    [aLoader setQueueErrorIndex:aIndex];
     [aLoader sendRequestString:requestString];
 	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
 
 }
 
+//extended to store a queueErrorIndex -tb- 2014-08-04 - see above
+- (void) sendRequestString:(NSString*)requestString
+{
+    [self sendRequestString:requestString withQueueErrorIndex:-1];
+}
 
 /*
 NSStringEncoding
@@ -1788,13 +1796,16 @@ enum {
 
 
 
-- (void) sendSetpointRequestQueue
+- (int) sendSetpointRequestQueue
 {
 	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	NSLog(@"The queue: %@\n",setpointRequestsQueue);
 	#endif
 	
+    int newCurrentQueueErrorIndex = ([self currentQueueErrorIndex] + 1) % kMaxQueueErrorEntries;
+    [self setCurrentQueueErrorIndex: newCurrentQueueErrorIndex];
+    
 	//sort the list/queue according to url and path -> build a tree
 	NSMutableDictionary *requestTree = [NSMutableDictionary dictionary];
 	id objx;
@@ -1836,11 +1847,14 @@ enum {
 	for(i=0; i<count; i++){
 		NSMutableString *requestString = [requestStringList objectAtIndex:i];
 		//NSLog(@"Request %i is: %@\n",i,requestString);
-		[self sendRequestString:requestString];
+		//[self sendRequestString:requestString]; //added error handlich for queues 2014-04 -tb-
+		[self sendRequestString:requestString withQueueErrorIndex:newCurrentQueueErrorIndex];
 	}
 	
 	
 	[self clearSetpointRequestQueue];	
+    
+    return newCurrentQueueErrorIndex;
 }
 
 
@@ -1859,6 +1873,54 @@ enum {
 	//NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
 
 }
+
+
+- (int) currentQueueErrorIndex
+{
+    return currentQueueErrorIndex;
+}
+
+- (void) setCurrentQueueErrorIndex:(int)anIndex
+{
+    if(anIndex<0) anIndex=0;
+    if(anIndex>=kMaxQueueErrorEntries) anIndex=kMaxQueueErrorEntries;
+    currentQueueErrorIndex=anIndex;
+}
+
+- (int) queueErrorForIndex:(int)anIndex
+{
+    if(anIndex<0) return 0;
+    if(anIndex>=kMaxQueueErrorEntries) return 0;
+    return queueError[anIndex];
+}
+
+- (void) setQueueError:(int)aError forIndex:(int)anIndex
+{
+    if(anIndex<0) return ;
+    if(anIndex>=kMaxQueueErrorEntries) return ;
+    queueError[anIndex] = aError;
+}
+
+- (void) setCurrentQueueError:(int)aError
+{
+    int anIndex = [self currentQueueErrorIndex];
+    [self setQueueError:aError forIndex: anIndex];
+}
+
+- (int) currentQueueError
+{
+    int anIndex = [self currentQueueErrorIndex];
+    return [self queueErrorForIndex: anIndex];
+}
+
+- (void) incCurrentQueueError
+{
+    int aError = [self currentQueueError];
+    aError++;
+    [self setCurrentQueueError:aError ];
+}
+
+
 
 
 
@@ -2110,6 +2172,10 @@ enum {
 		NSMutableDictionary* dictionary = [result objectAtIndex:0];
 		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"] path:[dictionary objectForKey:@"Path"]];
 		//NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);//DEBUG OUTPUT -tb-
+        int queueErrorIndex = -23;
+        NSNumber * num= [dictionary objectForKey:@"queueErrorIndex"] ;
+        if(num) queueErrorIndex=[num intValue];
+		NSLog(@"handleSilentItemResult: ... queueErrorIndex is %i \n",queueErrorIndex);//DEBUG OUTPUT -tb-
         //if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         
         //housekeeping
