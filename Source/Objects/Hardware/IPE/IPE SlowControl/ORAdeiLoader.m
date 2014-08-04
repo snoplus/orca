@@ -250,6 +250,18 @@
 - (BOOL) showDebugOutput
 {   return showDebugOutput; }
 
+- (int) queueErrorIndex
+{
+    return queueErrorIndex;
+}
+
+- (void) setQueueErrorIndex:(int)anIndex
+{
+    queueErrorIndex=anIndex;
+}
+
+
+
 
 #pragma mark ***Delegate Methods
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -346,6 +358,7 @@
 	else if(dataFormat == kmsgFormat){
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];//resultArray will be shipped to delegate
 		NSMutableDictionary* dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys: host, @"URL", path, @"Path", nil];
+    	[dictionary setObject:[NSNumber numberWithInt:queueErrorIndex]		forKey:@"queueErrorIndex"];
 		[resultArray addObject: dictionary];
         
         [self parseXMLData:receivedData];

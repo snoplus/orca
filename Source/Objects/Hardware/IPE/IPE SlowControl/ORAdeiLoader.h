@@ -49,6 +49,7 @@
 	NSArray*			setupOptions;
     NSMutableString*    resultInProgress;
 	BOOL				showDebugOutput;
+    int                 queueErrorIndex;
 }
 
 + (id)	 loaderWithAdeiHost:(NSString*)aHost adeiType:(int)aType delegate:(id)aDelegate didFinishSelector:(SEL)aSelector setupOptions:(NSArray*)setupOptions;
@@ -68,6 +69,9 @@
 - (void) sendRequestString:(NSString*)requestString;
 - (void) setShowDebugOutput:(BOOL) aOption;
 - (BOOL) showDebugOutput;
+- (int) queueErrorIndex;
+- (void) setQueueErrorIndex:(int)anIndex;
+
 
 #pragma mark •••Helpers
 + (NSString*) controlItemRequestStringUrl:(NSString*)aUrl itemPath:(NSString*)aPath;
