@@ -764,8 +764,10 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
 //  In progress
 - (BOOL) systemAllLocked
 {
+    return YES; //temp
+    /*
     int i;
-    int j;
+    //int j;
     
     if ( (miscStatReg & 0x4000) != kAllLockBit  )
         return NO;
@@ -786,6 +788,7 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
             }
         }
     }
+     */
 }
 
 - (void) readDisplayRegs
@@ -1048,7 +1051,6 @@ static GretinaTriggerRegisterInformation fpga_register_information[kTriggerNumbe
 - (void) stepRouter
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stepRouter) object:nil];
-    unsigned short routerPreMask = 0;
     
     NSLog(@"\n");
     NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
