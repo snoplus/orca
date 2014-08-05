@@ -208,15 +208,14 @@
     [resistorDocDic setObject:pmtReinstalledString forKey:@"PmtReInstalled"];
     [resistorDocDic setObject:[NSNumber numberWithInt:channelNumber] forKey:@"channel"];
     
-    [model setResistorDocument:[[model currentQueryResults] copy]];
     [model updateResistorDb:resistorDocDic];
+    [resistorDocDic release];
     
     //update the current query value
     NSLog(@"value: %i %i %i",crateNumber,cardNumber,channelNumber);
     [loadingFromDbWheel setHidden:NO];
     [loadingFromDbWheel startAnimation:nil];
     [model queryResistorDb:crateNumber withCard:cardNumber withChannel:channelNumber];
-    
 
 }
 
