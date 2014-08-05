@@ -11,34 +11,32 @@
 #import "SNOPModel.h"
 
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
+#define kResistorDbDocumentPosted @"kResistorDbDocumentPosted"
 
 NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
+NSString* resistorDBUpdated = @"resistorDBUpdated";
 
 @implementation ResistorDBModel
 @synthesize
-currentQueryResults = _currentQueryResults;
+currentQueryResults = _currentQueryResults,
+resistorDocument = _resistorDocument;
 
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"resistor"]];
 }
 
-//-(void) postToQueryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
-//{
-    //[[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
-//}
+
+-(void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic
+{
+    [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] updateDocument:aResistorDocDic documentId:[[self currentQueryResults] objectForKey:@"_id"] tag:kResistorDbDocumentPosted];
+}
 
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
  {
      //view to query (make the request within this string)
      NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/pullCrate?key=[%i,%i,%i]",aCrate,aCard,aChannel];
- 
-     //[[self orcaDbRefWithEntryDB:@"resistor"] getDocumentId:requestString tag:@"kResistorDbHeaderRetrieved"];
-     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
-     
-     //[self setSmellieDBReadInProgress:YES];
-     //[self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
- 
+    [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
  }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
@@ -68,12 +66,18 @@ currentQueryResults = _currentQueryResults;
             if(message){
                 [aResult prettyPrint:@"CouchDB Message:"];
             }
-            //Look through all of the possible tags for ellie couchDB results
-            //This is called when smellie run header is queried from CouchDB
             if ([aTag isEqualToString:kResistorDbHeaderRetrieved])
             {
-                NSLog(@"here\n");
                 [self parseResistorDbResult:aResult];
+            }
+            else if ([aTag isEqualToString:kResistorDbDocumentPosted])
+            {
+                //NSMutableDictionary* resistorDoc = [[[self resistorDocument] mutableCopy] autorelease];
+                //[resistorDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+                //[resistorDoc setObject:[aResult objectForKey:@"rev"] forKey:@"_rev"];
+                //NSLog(@"Posted to ResistorDB %@",resistorDoc);
+                //self.resistorDocument = resistorDoc;
+                
             }
             //If no tag is found for the query result
             else {
@@ -94,31 +98,11 @@ currentQueryResults = _currentQueryResults;
 
 - (void)parseResistorDbResult:(id)aResult
 {
-    //look at the crate, card, channel values in here
-    //unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
-    
     self.currentQueryResults = [[NSMutableDictionary alloc] init];
     self.currentQueryResults = [[[aResult objectForKey:@"rows"] objectAtIndex:0] objectForKey:@"value"];
-    
-    //NSLog(@"entry: %@",self.currentQueryResults);
-    
-    /*for(i=0;i<cnt;i++){
-        NSLog(@"entry: %@",[[aResult objectForKey:@"rows"] objectAtIndex:i]);
-        //value is the value which is returned by the request string
-        NSString* resistorDbIterator = [NSString stringWithFormat:@"%@",[[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"]];
-        if([resistorDbIterator isEqualToString:snoPmtTest]){
-            NSLog(@"entry: %@",[[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"]);
-        }
-        //NSString *key = [NSString stringWithFormat:@"%u",i];
-        //[tmp setObject:resistorDbIterator forKey:key];
-    }*/
-    
-    //make notification here
+
+    //make notification here to tell controller that this has changed 
     [[NSNotificationCenter defaultCenter] postNotificationName:resistorDBQueryLoaded object:self];
-    //[self.viewloadingFromDbWheel startAnimation];
-    
-    //[self setSmellieRunHeaderDocList:tmp];
-    //[tmp release];
 }
 
 
@@ -132,6 +116,7 @@ currentQueryResults = _currentQueryResults;
 {
     if([self aWake])return;
     [super wakeUp];
+    self.resistorDocument = nil;
 }
 
 - (void) sleep

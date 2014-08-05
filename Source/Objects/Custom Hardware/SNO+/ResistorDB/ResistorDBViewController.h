@@ -20,6 +20,9 @@
     IBOutlet NSTextField *currentPMTReinstallled;
     IBOutlet NSTextField *currentPulledCable;
     IBOutlet NSTextField *currentBadCable;
+    IBOutlet NSTextField *currentReason;
+    IBOutlet NSTextField *currentInfo;
+    
     
     IBOutlet NSComboBox *updateResistorStatus;
     IBOutlet NSComboBox *updateSnoLowOcc;

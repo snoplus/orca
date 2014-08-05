@@ -19,6 +19,7 @@
 
 @interface ResistorDBModel :  OrcaObject<ResistorDbDelegate>{
     NSMutableDictionary *_currentQueryResults;
+    NSDictionary* _resistorDocument;
 }
 -(void) setUpImage;
 -(void) makeMainController;
@@ -27,8 +28,10 @@
 -(void) dealloc;
 
 @property (nonatomic,copy) NSMutableDictionary *currentQueryResults;
+@property (copy) NSDictionary *resistorDocument;
 
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel;
+- (void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic;
 
 @end
 
