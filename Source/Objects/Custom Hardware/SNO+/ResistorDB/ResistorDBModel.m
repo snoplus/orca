@@ -30,7 +30,6 @@ resistorDocument = _resistorDocument;
 -(void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic
 {
     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] updateDocument:aResistorDocDic documentId:[[self currentQueryResults] objectForKey:@"_id"] tag:kResistorDbDocumentPosted];
-    [aResistorDocDic release];
 }
 
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
