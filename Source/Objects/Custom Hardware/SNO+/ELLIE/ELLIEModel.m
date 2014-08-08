@@ -638,9 +638,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
     
     //get the MTC Object (but only use in Slave Mode)
-    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    [theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
+    //NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
+    //[theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
     
     //get the run controller
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
