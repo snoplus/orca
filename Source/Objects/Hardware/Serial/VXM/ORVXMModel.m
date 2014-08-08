@@ -652,9 +652,9 @@ NSString* ORVXMLock							= @"ORVXMLock";
                  waitToSend:NO];
         
         abortAllRepeats = YES;
-		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [self sendCommand:@"K"]; //NO <CR>
-        [self queryPositions];
+		//[NSObject cancelPreviousPerformRequestsWithTarget:self];
+        //[self sendCommand:@"K"]; //NO <CR>
+        //[self queryPositions];
 
     }
 }
@@ -898,7 +898,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 			[self setCmdIndex:0];
 			[self setRepeatCount:0];
             [self sendCommand:aCmdString];
-            if([aCmdString hasPrefix:@"setMA"])sleep(1);
+           // if([aCmdString hasPrefix:@"setMA"])sleep(2);
 		}
 	}
 }
