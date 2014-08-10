@@ -485,12 +485,6 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
     
     //Get the daughter board ID
     [daughterBoardDBInfo setObject:[self boardID] forKey:@"daughter_board_id"];
-
-    //[self globalCardNumber];
-    
-    //Global Card Number
-    NSNumber * globalCardNumberObj = [NSNumber numberWithInt:[self globalCardNumber]];
-    [daughterBoardDBInfo setObject:globalCardNumberObj forKey:@"daughter_board_global_card_id"];
     
     //TODO:Add these objects back in later
     //[daughterBoardDBInfo setObject:vt_ecalArray forKey:@"vt_ecal"];

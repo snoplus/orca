@@ -38,6 +38,7 @@
 #define kUseCrateView	1
 #define kUsePSUPView	2
 #define kNumTubes	20 //XL3s
+#define kNumOfCrates 19 //number of Crates in SNO+
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {

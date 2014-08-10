@@ -24,6 +24,7 @@
 #define kChannelsPerCrate  512
 #define kMaxNumberPMTs	  9685
 
+#define kMaxSNOMotherBoards     304 //total number of mother boards in SNO+
 #define kMaxSNOCrates			20
 #define kNumSNOCards			16
 #define kNumSNOCrateSlots		18

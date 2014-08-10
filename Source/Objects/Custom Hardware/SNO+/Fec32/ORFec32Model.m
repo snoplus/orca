@@ -923,10 +923,9 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     NSNumber * crateNumberObj = [NSNumber numberWithInt:[self crateNumber]];
     [output setObject:crateNumberObj forKey:@"crate_number"];
     
-    //Global Card Number
-    NSNumber * globalCardNumberObj = [NSNumber numberWithInt:[self globalCardNumber]];
-                                      
-    [output setObject:globalCardNumberObj forKey:@"mother_board_global_card_id"];
+    //Slot Number 
+    NSNumber *slotNumber = [NSNumber numberWithInt:[self slot]];
+    [output setObject:slotNumber forKey:@"slot"];
     
     //sequencer value for DQXX
     NSNumber * sequencerValue = [NSNumber numberWithFloat:[self seqDisabledMask]];
