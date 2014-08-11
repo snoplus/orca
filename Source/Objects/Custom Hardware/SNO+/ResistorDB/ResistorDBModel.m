@@ -9,6 +9,7 @@
 #import "ResistorDBModel.h"
 #import "ORCouchDB.h"
 #import "SNOPModel.h"
+#import "ORFec32Model.h"
 
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 #define kResistorDbDocumentPosted @"kResistorDbDocumentPosted"
@@ -30,6 +31,108 @@ resistorDocument = _resistorDocument;
 -(void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic
 {
     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] updateDocument:aResistorDocDic documentId:[[self currentQueryResults] objectForKey:@"_id"] tag:kResistorDbDocumentPosted];
+    
+    [self loadPmtOnlineMaskToFe32FromCouchDb];
+}
+
+-(void) loadPmtOnlineMaskToFe32FromCouchDb
+{
+    
+    //Fetch a view from the PMT resistor Database
+    
+    /////http:localhost:5984/resistor/_design/resistorQuery/_view/getPmtOnlineMask
+    //NSURL *url = [NSURL URLWithString:@"http:localhost:5984/resistor/_design/resistorQuery/_view/getPmtOnlineMask"];
+    //NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+    //NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    //NSLog(@"%@",connection);
+    //Fetch a view from the PMT Database (different to the PMT Resistor Database)
+    
+    NSHTTPURLResponse *response = nil;
+	NSError *connectionError;
+	
+	NSString *urlName=[[NSString alloc] initWithFormat:
+                       @"http:localhost:5984/resistor/_design/resistorQuery/_view/getPmtOnlineMask"];
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:
+                                    [NSURL URLWithString:urlName] cachePolicy: NSURLRequestReloadIgnoringCacheData timeoutInterval:1];
+	NSData *responseData = [[NSData alloc] initWithData:
+                            [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&connectionError]];
+    
+    //this jsonObject contains all the responses from a view 
+    NSDictionary *couchDbQueryResponse=[NSJSONSerialization
+                              JSONObjectWithData:responseData
+                              options:NSJSONReadingMutableLeaves
+                              error:nil];
+    
+    
+    //Loop over all the FEC cards
+    NSArray * fec32ControllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    
+    //Count all Fec32 Cards on the DAQ
+    int numberFec32Cards = [fec32ControllerObjs count];
+            
+    //extract the channel status from the json file for a given crate,card,channel
+    //loop through the couchDb response to see pick out the crate and slot for this channel
+    //BAD CODE: this assumes these arrive in groups of 32 ordered sets 
+    int counter = 0;
+    unsigned long aPmtMask = 0;
+    for(id key in [couchDbQueryResponse objectForKey:@"rows"]){
+        
+        //NSMutableDictionary *printString = [key mutableCopy];
+        NSArray* keyString = [key objectForKey:@"key"]; //this key contains [crate,card,channel]
+        NSArray* valueString = [key objectForKey:@"value"]; //this value contains [resistor pulled, cable pulled, pmt removed]
+        NSNumber * crateFromDb = [NSNumber numberWithInt:[[keyString objectAtIndex:0] intValue]];
+        NSNumber * cardFromDb = [NSNumber numberWithInt:[[keyString objectAtIndex:1] intValue]];
+        NSNumber * channelFromDb = [NSNumber numberWithInt:[[keyString objectAtIndex:2] intValue]];
+        
+        NSNumber * resistorPulled = [NSNumber numberWithInt:[[valueString objectAtIndex:0] intValue]];
+        
+        if([resistorPulled intValue] == 0){
+            //add a bitwise value to the channel
+            aPmtMask |= (1 << [channelFromDb intValue]);
+        }
+        
+        counter++;
+        if(counter == 32){
+            //post the pmtMask for a specific card
+            NSLog(@"%lu\n",aPmtMask);
+            
+            //loop through all the Fec32 and pick the card for this crate/card
+            int iFec32card;
+            for(iFec32card=0;iFec32card<numberFec32Cards;iFec32card++){
+                
+                ORFec32Model *aFec32Model = [fec32ControllerObjs objectAtIndex:iFec32card];
+                
+                //check to see if the Fec32 is in the current crate and card combination
+                if(([crateFromDb intValue] == [aFec32Model crateNumber]) && ([cardFromDb intValue] && [aFec32Model slot])){
+                    //now assign the mask for the crate and card/slot of interest
+                    [aFec32Model setOnlineMask:aPmtMask];
+                    
+                }
+                
+            }
+            
+            //reset the mask
+            aPmtMask = 0;
+            counter = 0;
+        }
+        
+        //if this is the correct crate,card and channel for this current pmt
+        /*if(([crateFromDb intValue] == crateNumber) && ([cardFromDb intValue] == slotNumber) && ([channelFromDb intValue] == iChannel)){
+            
+            if([resistorPulled intValue] == 1){
+                //add a bitwise
+                aPmtMask |= 1UL<<iChannel;
+            }
+            
+            //fill in the particular pmt mask
+            
+        }*/
+        
+    }
+    
+    
+        //set the pmtOnlineMask for eachFec32Card
+    
 }
 
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel
