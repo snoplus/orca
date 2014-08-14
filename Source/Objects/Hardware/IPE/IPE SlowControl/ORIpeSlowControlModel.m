@@ -91,7 +91,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 {
     //FZK-internal: [self setAdeiServiceUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
     [self setIPNumber: @"fuzzy.fzk.de/adei"];
-    currentQueueErrorIndex=0;
+    currentQueueErrorIndex=1;
 	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 	return self;
@@ -1804,7 +1804,9 @@ enum {
 	#endif
 	
     int newCurrentQueueErrorIndex = ([self currentQueueErrorIndex] + 1) % kMaxQueueErrorEntries;
+    if(newCurrentQueueErrorIndex==0) newCurrentQueueErrorIndex = 1;
     [self setCurrentQueueErrorIndex: newCurrentQueueErrorIndex];
+    [self setCurrentQueueError: -1];
     
 	//sort the list/queue according to url and path -> build a tree
 	NSMutableDictionary *requestTree = [NSMutableDictionary dictionary];
@@ -1874,7 +1876,7 @@ enum {
 
 }
 
-
+//count from 1 to kMaxQueueErrorEntries-1 (index 0 is reserved)
 - (int) currentQueueErrorIndex
 {
     return currentQueueErrorIndex;
@@ -1894,6 +1896,8 @@ enum {
     return queueError[anIndex];
 }
 
+
+//aError: -1: still pending; 0 got a reply without error; 1 = reply with error
 - (void) setQueueError:(int)aError forIndex:(int)anIndex
 {
     if(anIndex<0) return ;
@@ -2173,9 +2177,30 @@ enum {
 		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"] path:[dictionary objectForKey:@"Path"]];
 		//NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);//DEBUG OUTPUT -tb-
         int queueErrorIndex = -23;
+        
+        //ERROR handling for queues
         NSNumber * num= [dictionary objectForKey:@"queueErrorIndex"] ;
-        if(num) queueErrorIndex=[num intValue];
-		NSLog(@"handleSilentItemResult: ... queueErrorIndex is %i \n",queueErrorIndex);//DEBUG OUTPUT -tb-
+        if(num){
+            queueErrorIndex=[num intValue];
+		    //DEBUG NSLog(@"handleSilentItemResult: ... queueErrorIndex is %i \n",queueErrorIndex);//DEBUG OUTPUT -tb-
+            if([self showDebugOutput])
+		        //DEBUG 
+                NSLog(@"handleSilentItemResult: ... result is %@ \n",result);//DEBUG OUTPUT -tb-
+            NSString* errorObj  = [dictionary objectForKey:@"Error"];
+            NSString* resultObj  = [dictionary objectForKey:@"Result"];
+            int isError = 0;
+            int tmp=[resultObj caseInsensitiveCompare:@"Error"];//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+            //DEBUG  NSLog(@"%@::%@   result is >>>%@<<< comparison is:(%i) ((NSOrderedAscending is %i))\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),result,tmp,NSOrderedAscending);//DEBUG OUTPUT -tb-
+            if(tmp!=NSOrderedDescending){//== @"Error"  found 
+                isError=1;
+                if([self showDebugOutput])
+		            NSLog(@"handleSilentItemResult: ... ERROR with string: %@ \n",errorObj);//DEBUG OUTPUT -tb-
+                [self setQueueError:1 forIndex: queueErrorIndex];
+            }
+            if([self queueErrorForIndex:queueErrorIndex] == -1) [self setQueueError:0 forIndex: queueErrorIndex];
+        }
+
+
         //if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         
         //housekeeping
