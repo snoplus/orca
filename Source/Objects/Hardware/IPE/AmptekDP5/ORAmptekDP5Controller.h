@@ -22,9 +22,12 @@
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Imported Files
 #import "ORAmptekDP5Model.h"
-#import "SBC_LinkController.h"
+//#import "SBC_LinkController.h"
 
-@interface ORAmptekDP5Controller : SBC_LinkController {
+@interface ORAmptekDP5Controller : OrcaObjectController {
+
+	IBOutlet NSTabView*				tabView;
+    
 	@private
 	
     //BB commands
@@ -218,6 +221,7 @@
 - (void) displayTriggerChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
+- (void) setWindowTitle;
 - (void) checkGlobalSecurity;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 

@@ -227,7 +227,7 @@
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
-- (void) setGuardian:(id)aGuardian;
+// - (void) setGuardian:(id)aGuardian;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Notifications
 - (void) registerNotificationObservers;

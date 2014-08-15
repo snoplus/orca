@@ -23,7 +23,7 @@
 #import "ORAmptekDP5Controller.h"
 #import "ORAmptekDP5Model.h"
 #import "TimedWorker.h"
-#import "SBC_Link.h"
+//#import "SBC_Link.h"
 
 #define kFltNumberTriggerSources 5
 
@@ -81,7 +81,7 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
     streamingSize		= NSMakeSize(650,670);
     udpDReadSize		= NSMakeSize(650,670);
 	
-	[[self window] setTitle:@"IPE-DAQ-V4 EDELWEISS SLT"];	
+	[[self window] setTitle:@"Amptek DP5"];	//TODO: use enumbering
 	
     [super awakeFromNib];
     [self updateWindow];
@@ -622,7 +622,7 @@ return;
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	[super tabView:aTabView didSelectTabViewItem:tabViewItem];
+	//[super tabView:aTabView didSelectTabViewItem:tabViewItem];   //TODO: SBC_LinkController ist als Klasse dazwischengeschoben und bekommt hierdurch message-Kopie -tb-
 	
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:controlSize];			break;
@@ -685,6 +685,7 @@ return;
 - (void) updateWindow
 {
     [super updateWindow];
+    [self setWindowTitle];
 	[self hwVersionChanged:nil];
 	[self controlRegChanged:nil];
     [self writeValueChanged:nil];
@@ -737,6 +738,10 @@ return;
 	[self resetEventCounterAtRunStartChanged:nil];
 }
 
+- (void) setWindowTitle
+{
+	[[self window] setTitle: [NSString stringWithFormat:@"Amptek DP5 - %lu",[model uniqueIdNumber]]];
+}
 
 - (void) checkGlobalSecurity
 {
@@ -748,7 +753,7 @@ return;
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    [super settingsLockChanged:aNotification];
+    //[super settingsLockChanged:aNotification];        //TODO: SBC_LinkController ist als Klasse dazwischengeschoben und bekommt hierdurch message-Kopie -tb-
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAmptekDP5SettingsLock];
     BOOL locked = [gSecurity isLocked:ORAmptekDP5SettingsLock];
 	BOOL isRunning = [gOrcaGlobals runInProgress];

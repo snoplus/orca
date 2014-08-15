@@ -623,10 +623,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 - (id) init
 {
     self = [super init];
-	ORReadOutList* readList = [[ORReadOutList alloc] initWithIdentifier:@"ReadOut List"];	
-	[self setReadOutGroup:readList];
-    [self makePoller:0];
-	[readList release];
+	//ORReadOutList* readList = [[ORReadOutList alloc] initWithIdentifier:@"ReadOut List"];	
+	//[self setReadOutGroup:readList];
+    //[self makePoller:0];
+	//[readList release];
 
 
 	[self setSecondsSetInitWithHost: YES];
@@ -694,6 +694,14 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 - (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"AmptekDP5Card"]]; }
 - (void) makeMainController	{ [self linkToController:@"ORAmptekDP5Controller"];		}
+
+
+
+
+
+
+#if 0
+
 - (Class) guardianClass		{ return NSClassFromString(@"ORIpeV4CrateModel");		}
 
 - (void) setGuardian:(id)aGuardian //-tb-
@@ -708,6 +716,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	}
 	[super setGuardian:aGuardian];
 }
+#endif  
+
+
+
+
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
 - (void) registerNotificationObservers
@@ -1941,7 +1954,7 @@ commands:
       sendline[7]=0x0f;
       sendlen=8;
 
-      #if 1
+      #if 0
       sendline[0]=0xf5;
       sendline[1]=0xfa;
       sendline[2]=3;
@@ -1953,7 +1966,7 @@ commands:
       sendlen=8;
       #endif
       
-      #if 1
+      #if 0
       sendline[0]=0xf5;
       sendline[1]=0xfa;
       sendline[2]=3;
@@ -3561,7 +3574,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	
     if(accessAllowedToHardwareAndSBC){
 	    //load all the data needed for the eCPU to do the HW read-out.
-	    [self load_HW_Config];
+	    //    [self load_HW_Config];
 	    ////TODO: remove SLT stuff -tb-   2014 [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
