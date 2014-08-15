@@ -102,7 +102,7 @@
 #define kTrgTimingTrgWindow		(0x00000007 <<  16) //R/W
 #define kTrgEndPageDelay		(0x000007FF <<   0) //R/W
 
-@interface ORAmptekDP5Model : ORIpeCard <ORDataTaker,SBC_Linking>
+@interface ORAmptekDP5Model : OrcaObject <ORDataTaker>
 {
 	@private
 		unsigned long	hwVersion;
@@ -135,7 +135,7 @@
 		unsigned long   lastSimSec;
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
-		PMC_Link*		pmcLink;
+		// PMC_Link*		pmcLink;  //TODO: remove SLT stuff -tb-   2014 
         
 		unsigned long controlReg;
 		unsigned long statusReg;//deprecated 2013-06 -tb-
@@ -315,9 +315,6 @@
 - (unsigned long) controlReg;
 - (void) setControlReg:(unsigned long)aControlReg;
 
-- (SBC_Link*)sbcLink;
-- (bool)sbcIsConnected;
-- (bool)crateCPUIsConnected;
 - (unsigned long) projectVersion;
 - (unsigned long) documentVersion;
 - (unsigned long) implementation;
@@ -353,11 +350,7 @@
 - (void) setDisplayEventLoop:(BOOL) aState;
 - (unsigned long) pageSize; //< Length of the ADC data (0..100us)
 - (void) setPageSize: (unsigned long) pageSize;   
-- (void) sendSimulationConfigScriptON;
-- (void) sendSimulationConfigScriptOFF;
-- (void) installIPE4reader;
-- (void) installAndCompileIPE4reader;
-- (void) sendPMCCommandScript: (NSString*)aString;
+
 
 #pragma mark ***Polling
 - (TimedWorker *) poller;
@@ -417,7 +410,6 @@
 - (void)          chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus;
 - (int)           chargeFICusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
 - (void)          chargeFICStatus:(ORSBCLinkJobStatus*) jobStatus;
-- (void)          killSBCJob;
 - (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
 - (void)		  readAllControlSettingsFromHW;
 
@@ -440,7 +432,6 @@
 - (void)		writeFltReset;
 - (void)		writeEvRes;
 - (unsigned long long) readBoardID;
-- (void) readEventStatus:(unsigned long*)eventStatusBuffer;
 - (void) readEventFifoStatusReg;
 
 #if 0 //deprecated 2013-06 -tb-
@@ -475,7 +466,6 @@
 //- (void)		loadPulserValues;
 //- (void)		swTrigger;
 - (void)		initBoard;
-- (void)		autoCalibrate;
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;
 - (long)		getSltPciDriverVersion;
@@ -515,14 +505,10 @@
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢SBC_Linking Protocol
 - (NSString*) driverScriptName;
-- (NSString*) cpuName;
 - (NSString*) sbcLockName;
 - (NSString*) sbcLocalCodePath;
 - (NSString*) codeResourcePath;
 						 
-#pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢SBC Data Structure Setup
-- (void) load_HW_Config;
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
 @end
 

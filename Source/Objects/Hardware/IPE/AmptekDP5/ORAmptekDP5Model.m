@@ -627,7 +627,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	[self setReadOutGroup:readList];
     [self makePoller:0];
 	[readList release];
-	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
+
+
 	[self setSecondsSetInitWithHost: YES];
 	[self registerNotificationObservers];
 	//some defaults
@@ -654,15 +655,12 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	[readOutGroup release];
     [poller stop];
     [poller release];
-	[pmcLink setDelegate:nil];
-	[pmcLink release];
     [super dealloc];
 }
 
 - (void) wakeUp
 {
     if([self aWake])return;
-	[pmcLink wakeUp];
     [super wakeUp];
     if(![gOrcaGlobals runInProgress]){
         [poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -672,12 +670,13 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 - (void) sleep
 {
     [super sleep];
-	[pmcLink sleep];
     [poller stop];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
+#if 0 //TODO: remove SLT stuff -tb-   2014 
+
 	@try {
 		if(!pmcLink){
 			pmcLink = [[PMC_Link alloc] initWithDelegate:self];
@@ -686,6 +685,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	}
 	@catch(NSException* localException) {
 	}
+#endif
+
+
+
+
 }
 
 - (void) setUpImage			{ [self setImage:[NSImage imageNamed:@"AmptekDP5Card"]]; }
@@ -1224,9 +1228,6 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 - (void) writeFltReset			{ [self writeReg:kEWSltV4CommandReg value:kEWCmdFltReset];   }
 
 - (id) controllerCard		{ return self;	  }
-- (SBC_Link*)sbcLink		{ return pmcLink; } 
-- (bool)sbcIsConnected      { return [pmcLink isConnected]; }
-- (bool)crateCPUIsConnected { return [self sbcIsConnected]; }
 
 - (TimedWorker *) poller	{ return poller;  }
 
@@ -1512,135 +1513,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	
 }  
 
-/*! Send a script to the PrPMC which will configure the PrPMC.
- *
- */
-- (void) sendSimulationConfigScriptON
-{
-	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
-	
-	//[self sendPMCCommandScript: @"SimulationConfigScriptON"];
-	[self sendPMCCommandScript: [NSString stringWithFormat:@"%@ %i",@"SimulationConfigScriptON",[pmcLink portNumber]]];//send the port number, too
 
-	#if 0
-	NSString *scriptName = @"AmptekDP5Script";
-		ORTaskSequence* aSequence;	
-		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
-		
-		NSString* driverCodePath; //[pmcLink ]
-		if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
-		else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
-		//driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
-		driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
-		ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
-		[driverScriptFileMover setDelegate:aSequence];
-NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);		
-		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
-										to:@"" 
-								remoteHost:[pmcLink IPNumber] 
-								  userName:[pmcLink userName] 
-								  passWord:[pmcLink passWord]];
-		[driverScriptFileMover setVerbose:YES];
-		[driverScriptFileMover doNotMoveFilesToSentFolder];
-		[driverScriptFileMover setTransferType:eUseSCP];
-		[aSequence addTaskObj:driverScriptFileMover];
-		
-		//NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
-		NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
-NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);		
-		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,
-				 //@"arg1",@"arg2",nil]];
-				 //@"shellcommand",@"ls",@"&&",@"date",@"&&",@"ps",nil]];
-				 //@"shellcommand",@"ls",@"-laF",nil]];
-				 @"shellcommand",@"ls",@"-l",@"-a",@"-F",nil]];  //limited to 6 arguments (see loginScript)
-				 //TODO: use sltScriptArguments -tb-
-		
-		[aSequence launch];
-		#endif
-
-}
-
-/*! Send a script to the PrPMC which will configure the PrPMC.
- */
-- (void) sendSimulationConfigScriptOFF
-{
-	//NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
-	
-	[self sendPMCCommandScript: @"SimulationConfigScriptOFF"];
-}
-
-- (void) installIPE4reader
-{
-	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	
-	[self sendPMCCommandScript: @"InstallIpe4reader"];
-}
-
-- (void) installAndCompileIPE4reader
-{
-	NSLog(@"%@::%@: under construction.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	
-	[self sendPMCCommandScript: @"InstallAndCompileIpe4reader"];
-}
-
-/*! Send a script to the PrPMC which will configure the PrPMC.
- *
- */
-- (void) sendPMCCommandScript: (NSString*)aString;
-{
-	NSLog(@"%@::%@: invoked.\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));
-	//example code to send a script:  SBC_Link.m: - (void) installDriver:(NSString*)rootPwd 
-
-
-	NSArray *scriptcommands = nil;//limited to 6 arguments (see loginScript)
-	if(aString) scriptcommands = [aString componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	if([scriptcommands count] >6) NSLog(@"WARNING: too much arguments in sendPMCConfigScript:\n");
-	
-	NSString *scriptName = @"IpeEdelweissV4SLTScript";
-		ORTaskSequence* aSequence;	
-		aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
-		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
-		
-		NSString* driverCodePath; //[pmcLink ]
-		if([pmcLink loadMode])driverCodePath = [[pmcLink filePath] stringByAppendingPathComponent:[self sbcLocalCodePath]];
-		else driverCodePath = [resourcePath stringByAppendingPathComponent:[self codeResourcePath]];
-		//driverCodePath = [driverCodePath stringByAppendingPathComponent:[delegate driverScriptName]];
-		driverCodePath = [driverCodePath stringByAppendingPathComponent: scriptName];
-		ORFileMover* driverScriptFileMover = [[ORFileMover alloc] init];//TODO: keep it as object in the class variables -tb-
-		[driverScriptFileMover setDelegate:aSequence];
-NSLog(@"loadMode: %i driverCodePath: %@ \n",[pmcLink loadMode], driverCodePath);		
-		[driverScriptFileMover setMoveParams:[driverCodePath stringByExpandingTildeInPath]
-										to:@"" 
-								remoteHost:[pmcLink IPNumber] 
-								  userName:[pmcLink userName] 
-								  passWord:[pmcLink passWord]];
-		[driverScriptFileMover setVerbose:YES];
-		[driverScriptFileMover doNotMoveFilesToSentFolder];
-		[driverScriptFileMover setTransferType:eUseSCP];
-		[aSequence addTaskObj:driverScriptFileMover];
-		
-		//NSString* scriptRunPath = [NSString stringWithFormat:@"/home/%@/%@",[pmcLink userName],scriptName];
-		NSString* scriptRunPath = [NSString stringWithFormat:@"~/%@",scriptName];
-NSLog(@"  scriptRunPath: %@ \n" , scriptRunPath);	
-
-	    //prepare script commands/arguments
-		NSMutableArray *arguments = nil;
-		arguments = [NSMutableArray arrayWithObjects:[pmcLink userName],[pmcLink passWord],[pmcLink IPNumber],scriptRunPath,nil];
-		[arguments addObjectsFromArray:	scriptcommands];
-NSLog(@"  arguments: %@ \n" , arguments);	
-	
-		//add task
-		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments: arguments];  //limited to 6 arguments (see loginScript)
-
-		
-		[aSequence launch];
-
-}
 
 
 
@@ -2733,30 +2606,6 @@ for(l=0;l<2500;l++){
 
 
 
-- (void) killSBCJob
-{
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kSBC_Process;//kSBC_Command;//kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kSBC_KillJob;
-	aPacket.cmdHeader.numberBytesinPayload	= 0;//sizeof(AmptekDP5chargeBBStruct) + numLongs*sizeof(long);
-
-	@try {
-		//launch the load job. The response will be a job status record
-        NSLog(@"Sending kSBC_KillJob.\n");
-		[pmcLink send:&aPacket receive:&aPacket];
-        NSLog(@"Sent kSBC_KillJob.\n");
-//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
-//		}
-//		else NSLog(@"Looks like success.\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"kSBC_KillJob command failed. %@\n",localException);
-		[NSException raise:@"kSBC_KillJob command failed" format:@"%@",localException];
-	}
-
-}
-
 
 
 //this uses a general write command
@@ -2807,6 +2656,9 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) checkPresence
 {
+
+#if 0//TODO: remove SLT stuff -tb-   2014 
+
 	@try {
 		[self readStatusReg];
 		[self setPresent:YES];
@@ -2814,6 +2666,12 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	@catch(NSException* localException) {
 		[self setPresent:NO];
 	}
+#endif
+
+
+
+
+
 }
 /*
 - (void) loadPatternFile
@@ -2964,11 +2822,6 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	return [ORPMCReadWriteCommand readLongBlockAtAddress:regAddress
 									  numToRead:1];
-}
-
-- (void) executeCommandList:(ORCommandList*)aList
-{
-	[pmcLink executeCommandList:aList];
 }
 
 - (void) readAllStatus
@@ -3186,17 +3039,6 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	return theMap;
 }
 
-//TODO: remove this, never usd -tb-
-- (void) readEventStatus:(unsigned long*)eventStatusBuffer
-{
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	[pmcLink readLongBlockPmc:eventStatusBuffer
-					 atAddress:regV4[kSltV4EventFIFOStatusReg].addressOffset
-					 numToRead: 1];
-	
-}
 
 - (void) readEventFifoStatusReg
 {
@@ -3444,9 +3286,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	[self setCrateUDPCommandIP:[decoder decodeObjectForKey:@"crateUDPCommandIP"]];
 	[self setCrateUDPCommandPort:[decoder decodeIntForKey:@"crateUDPCommandPort"]];
 	[self setSltScriptArguments:[decoder decodeObjectForKey:@"sltScriptArguments"]];
-	pmcLink = [[decoder decodeObjectForKey:@"PMC_Link"] retain];
-	if(!pmcLink)pmcLink = [[PMC_Link alloc] initWithDelegate:self];
-	else [pmcLink setDelegate:self];
+
+
 
 	[self setControlReg:		[decoder decodeInt32ForKey:@"controlReg"]];
 	if([decoder containsValueForKey:@"secondsSetInitWithHost"])
@@ -3518,7 +3359,6 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	[encoder encodeInt:crateUDPCommandPort forKey:@"crateUDPCommandPort"];
 	[encoder encodeBool:secondsSetInitWithHost forKey:@"secondsSetInitWithHost"];
 	[encoder encodeObject:sltScriptArguments forKey:@"sltScriptArguments"];
-	[encoder encodeObject:pmcLink		forKey:@"PMC_Link"];
 	[encoder encodeInt32:controlReg	forKey:@"controlReg"];
 	
 	//status reg
@@ -3628,14 +3468,6 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
        accessAllowedToHardwareAndSBC = NO;
     }
 
-    [self clearExceptionCount];
-	
-	//check that we can actually run
-    if(takeEventData){
-	    if(![pmcLink isConnected]){
-		    [NSException raise:@"Not Connected" format:@"Check the SLT connection"];
-	    }
-    }
 	
     if(takeUDPstreamData){
         savedUDPSocketState = [self isOpenDataCommandSocket] | ([self isListeningOnDataServerSocket]<<1);
@@ -3730,7 +3562,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
     if(accessAllowedToHardwareAndSBC){
 	    //load all the data needed for the eCPU to do the HW read-out.
 	    [self load_HW_Config];
-	    [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
+	    ////TODO: remove SLT stuff -tb-   2014 [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
     }
 	
 }
@@ -3748,9 +3580,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
 		//the resulting data from a generic circular buffer in the pmc code.
-        if(accessAllowedToHardwareAndSBC)
-    		[pmcLink takeData:aDataPacket userInfo:userInfo];
-        
+//...        
         
         //additionally we generate events here
         //start timer -------TIMER------------
@@ -4131,8 +3961,8 @@ if((len % 4) != 0){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
     
-    if(accessAllowedToHardwareAndSBC)
-    	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
+    //if(accessAllowedToHardwareAndSBC)//TODO: remove SLT stuff -tb-   2014 
+    //	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -4157,8 +3987,8 @@ if((len % 4) != 0){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	
 
-    if(accessAllowedToHardwareAndSBC)	
-    	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
+//    if(accessAllowedToHardwareAndSBC)	//TODO: remove SLT stuff -tb-   2014 
+//    	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -4211,7 +4041,11 @@ if((len % 4) != 0){
 
 - (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l
 {
-	unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+	//unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+
+
+
+	unsigned long location = 0; //TODO: removed subclassing from IpeCard -tb- (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
 	unsigned long data[5];
 			data[0] = eventDataId | 5; 
 			data[1] = location | ((aCounterType & 0xf)<<4) | (aType & 0xf);
@@ -4225,7 +4059,8 @@ if((len % 4) != 0){
 
 - (BOOL) doneTakingData
 {
-	return [pmcLink doneTakingData];
+	//TODO: remove SLT stuff -tb-   2014 return [pmcLink doneTakingData];
+return 0;
 }
 
 - (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj
@@ -4363,17 +4198,6 @@ if((len % 4) != 0){
 	
 }
 */
-- (void) autoCalibrate
-{
-	NSArray* allFLTs = [[self crate] orcaObjects];
-	NSEnumerator* e = [allFLTs objectEnumerator];
-	id aCard;
-	while(aCard = [e nextObject]){
-		if(![aCard isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")]){  //remained from V3 ??? -tb-
-			[aCard autoCalibrate];
-		}
-	}
-}
 
 - (void) tasksCompleted: (NSNotification*)aNote
 {
@@ -4384,10 +4208,6 @@ if((len % 4) != 0){
 - (NSString*) driverScriptName {return nil;} //no driver
 - (NSString*) driverScriptInfo {return @"";}
 
-- (NSString*) cpuName
-{
-	return [NSString stringWithFormat:@"IPE-DAQ-V4 EDELWEISS SLT Card (Crate %d)",[self crateNumber]];
-}
 
 - (NSString*) sbcLockName
 {
@@ -4405,80 +4225,12 @@ if((len % 4) != 0){
 }
 
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢SBC Data Structure Setup
-- (void) load_HW_Config
-{
-	int index = 0;
-	SBC_crate_config configStruct;
-	configStruct.total_cards = 0;
-	[self load_HW_Config_Structure:&configStruct index:index];
-	[pmcLink load_HW_Config:&configStruct];
-}
-
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= 0;//TODO: kSLTv4EW;	//should be unique
-	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
-	configStruct->card_info[index].hw_mask[1] 	= waveFormId;
-	configStruct->card_info[index].hw_mask[2] 	= fltEventId;
-	configStruct->card_info[index].slot			= [self stationNumber];
-	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= 0;		//not needed for this HW
-	
-	configStruct->card_info[index].deviceSpecificData[0] = partOfRunFLTMask;	
-    
-	unsigned long runFlagsMask = 0;
-	//TODO: runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
-    //TODO: if(takeEventData)  runFlagsMask |= kTakeEventDataFlag;
-	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
-    
-    //for handling of different firmware versions
-    if(hwVersion==0) [self readHwVersion];
-    NSLog(@"IPE-DAQ EW SLT FPGA version 0x%08x (build %s %s)\n", hwVersion, __DATE__, __TIME__);
-    
-    
-    
-    
-    
-    #if 0
-    if(hwVersion <= kSLTRev20131212_5WordsPerEvent /*is 0x41950242*/){
-        NSLog(@"WARNING: You use a old SLT firmware - consider a update!\n");
-        NSLog(@"WARNING: This version is supported, but you will miss some features!\n");
-        NSLog(@"WARNING: KIT-IPE\n");
-    }						  
-    #endif
-    
-    
-    
-    
-    
-	configStruct->card_info[index].deviceSpecificData[7] = hwVersion;	
-
-	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by SLT
-    int nextIndex = index+1;
-    
-	configStruct->card_info[index].next_Trigger_Index[0] = -1;
-	for(id obj in dataTakers){
-		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
-			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
-				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;
-			}
-			int savedIndex = nextIndex;
-			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
-			if(obj == [dataTakers lastObject]){
-				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
-			}
-		}
-	}
-	configStruct->card_info[index].next_Card_Index 	= nextIndex;	
-	return index+1;
-}
 @end
 
 @implementation ORAmptekDP5Model (private)
 - (unsigned long) read:(unsigned long) address
 {
+#if 0//TODO: remove SLT stuff -tb-   2014 
 	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
@@ -4487,16 +4239,25 @@ if((len % 4) != 0){
 					  atAddress:address
 					  numToRead: 1];
 	return theData;
+#endif
+
+
+return 0;
 }
 
 - (void) write:(unsigned long) address value:(unsigned long) aValue
 {
+#if 0//TODO: remove SLT stuff -tb-   2014 
 	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[pmcLink writeLongBlockPmc:&aValue
 					  atAddress:address
 					 numToWrite:1];
+#endif
+
+
+
 }
 
 
@@ -4506,12 +4267,17 @@ if((len % 4) != 0){
 		 increment:(unsigned long)  incr
 {
     //DEBUG   NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+#if 0//TODO: remove SLT stuff -tb-   2014 
 	if(![pmcLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[pmcLink readLongBlockPmc:   aDataBuffer
 					  atAddress: address
 					  numToRead: length];
+#endif
+
+
+
 }
 
 

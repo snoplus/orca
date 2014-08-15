@@ -1520,7 +1520,7 @@ return;
 {
  	//
     NSLog(@"%@::%@: still under construction\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-   	[model installIPE4reader];  
+   	//TODO: remove SLT stuff -tb-   2014 [model installIPE4reader];  
 
 }
 
@@ -1528,7 +1528,7 @@ return;
 {
  	//
     NSLog(@"%@::%@: still under construction\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-    [model installAndCompileIPE4reader];  
+    //TODO: remove SLT stuff -tb-   2014 [model installAndCompileIPE4reader];  
 
 }
 
@@ -1538,7 +1538,7 @@ return;
 {
 	[self endEditing];
 	NSString *fullCommand = [NSString stringWithFormat: @"shellcommand %@",[model sltScriptArguments]];
-	[model sendPMCCommandScript: fullCommand];  
+	//TODO: remove SLT stuff -tb-   2014 [model sendPMCCommandScript: fullCommand];  
 }
 
 - (IBAction) sendSimulationConfigScriptON:(id)sender
@@ -1557,7 +1557,9 @@ return;
 
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-//NSLog(@"This is my _killCrateDidEnd: -tb-\n");
+NSLog(@"This is my _killCrateDidEnd: -tb-\n");
+#if 0
+//TODO: remove SLT stuff -tb-   2014 
 	//called
 	if(returnCode == NSAlertAlternateReturn){		
 		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
@@ -1571,12 +1573,13 @@ return;
 		[[model sbcLink] startCrate];
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
+#endif
 }
 
 
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender
 {
-	[model sendSimulationConfigScriptOFF];  
+	//TODO: remove SLT stuff -tb-   2014 [model sendSimulationConfigScriptOFF];  
 	NSLog(@"Sending simulation-mode-off script is still under development. If it fails just stop and force-reload-start the crate.\n");
 }
 
@@ -1669,6 +1672,7 @@ return;
 
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
+#if 0 //TODO: remove SLT stuff -tb-   2014 
     if(returnCode == NSAlertAlternateReturn){
 		@try {
 			[model autoCalibrate];
@@ -1676,6 +1680,11 @@ return;
 		@catch(NSException* localException) {
 		}
     }    
+#endif
+
+
+
+
 }
 
 - (void) do:(SEL)aSelector name:(NSString*)aName
