@@ -124,6 +124,14 @@
 		2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CE126F516D00BA2E2E /* SimStart.tif */; };
 		2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8CF126F516D00BA2E2E /* SimStop.tif */; };
 		2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D24A8DE126F543400BA2E2E /* Fieldline.gif */; };
+		2D29452E199E6A9400F68093 /* AmptekDP5.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D294525199E6A9400F68093 /* AmptekDP5.nib */; };
+		2D29452F199E6A9400F68093 /* AmptekDP5Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D294526199E6A9400F68093 /* AmptekDP5Card.gif */; };
+		2D294530199E6A9400F68093 /* ORAmptekDP5Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D294527199E6A9400F68093 /* ORAmptekDP5Controller.h */; };
+		2D294531199E6A9400F68093 /* ORAmptekDP5Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D294528199E6A9400F68093 /* ORAmptekDP5Controller.m */; };
+		2D294532199E6A9400F68093 /* ORAmptekDP5Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D294529199E6A9400F68093 /* ORAmptekDP5Decoder.h */; };
+		2D294533199E6A9400F68093 /* ORAmptekDP5Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D29452A199E6A9400F68093 /* ORAmptekDP5Decoder.m */; };
+		2D294535199E6A9400F68093 /* ORAmptekDP5Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D29452C199E6A9400F68093 /* ORAmptekDP5Model.h */; };
+		2D294536199E6A9400F68093 /* ORAmptekDP5Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D29452D199E6A9400F68093 /* ORAmptekDP5Model.m */; };
 		2D2AEA001672892C0057E424 /* ipe4reader.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */; };
 		2D2AED601696281E0057E424 /* Makefile.ipe4reader in Resources */ = {isa = PBXBuildFile; fileRef = 2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */; };
 		2D2AED63169628310057E424 /* ipe4reader.config in Resources */ = {isa = PBXBuildFile; fileRef = 2D2AED62169628310057E424 /* ipe4reader.config */; };
@@ -3625,6 +3633,14 @@
 		2D24A8CE126F516D00BA2E2E /* SimStart.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStart.tif; sourceTree = "<group>"; };
 		2D24A8CF126F516D00BA2E2E /* SimStop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SimStop.tif; sourceTree = "<group>"; };
 		2D24A8DE126F543400BA2E2E /* Fieldline.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Fieldline.gif; sourceTree = "<group>"; };
+		2D294525199E6A9400F68093 /* AmptekDP5.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = AmptekDP5.nib; sourceTree = "<group>"; };
+		2D294526199E6A9400F68093 /* AmptekDP5Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = AmptekDP5Card.gif; sourceTree = "<group>"; };
+		2D294527199E6A9400F68093 /* ORAmptekDP5Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAmptekDP5Controller.h; sourceTree = "<group>"; };
+		2D294528199E6A9400F68093 /* ORAmptekDP5Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAmptekDP5Controller.m; sourceTree = "<group>"; };
+		2D294529199E6A9400F68093 /* ORAmptekDP5Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAmptekDP5Decoder.h; sourceTree = "<group>"; };
+		2D29452A199E6A9400F68093 /* ORAmptekDP5Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAmptekDP5Decoder.m; sourceTree = "<group>"; };
+		2D29452C199E6A9400F68093 /* ORAmptekDP5Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORAmptekDP5Model.h; sourceTree = "<group>"; };
+		2D29452D199E6A9400F68093 /* ORAmptekDP5Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORAmptekDP5Model.m; sourceTree = "<group>"; };
 		2D2AE9FF1672892C0057E424 /* ipe4reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4reader.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4reader.cpp; sourceTree = "<group>"; };
 		2D2AED5F1696281E0057E424 /* Makefile.ipe4reader */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.ipe4reader; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/Makefile.ipe4reader; sourceTree = "<group>"; };
 		2D2AED62169628310057E424 /* ipe4reader.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ipe4reader.config; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4reader.config; sourceTree = "<group>"; };
@@ -7011,6 +7027,21 @@
 				2D24A8CF126F516D00BA2E2E /* SimStop.tif */,
 			);
 			path = IpeSimulation;
+			sourceTree = "<group>";
+		};
+		2D294524199E6A9400F68093 /* AmptekDP5 */ = {
+			isa = PBXGroup;
+			children = (
+				2D294525199E6A9400F68093 /* AmptekDP5.nib */,
+				2D294526199E6A9400F68093 /* AmptekDP5Card.gif */,
+				2D294527199E6A9400F68093 /* ORAmptekDP5Controller.h */,
+				2D294528199E6A9400F68093 /* ORAmptekDP5Controller.m */,
+				2D294529199E6A9400F68093 /* ORAmptekDP5Decoder.h */,
+				2D29452A199E6A9400F68093 /* ORAmptekDP5Decoder.m */,
+				2D29452C199E6A9400F68093 /* ORAmptekDP5Model.h */,
+				2D29452D199E6A9400F68093 /* ORAmptekDP5Model.m */,
+			);
+			path = AmptekDP5;
 			sourceTree = "<group>";
 		};
 		2D51C5F915B59CFE000F0ACD /* EdelweissFLT */ = {
@@ -12912,6 +12943,7 @@
 				2DD0C89C193FBAE3009112B2 /* KatrinV4SLT */,
 				2D158EAB11359F5800EA1552 /* KatrinV4FLT */,
 				2D24A8C5126F516D00BA2E2E /* IpeSimulation */,
+				2D294524199E6A9400F68093 /* AmptekDP5 */,
 			);
 			name = IPE;
 			path = Source/Objects/Hardware/IPE;
@@ -15024,6 +15056,9 @@
 				2DD0C8C7193FBAE4009112B2 /* ORKatrinV4SLTDecoder.h in Headers */,
 				2DD0C8C9193FBAE4009112B2 /* ORKatrinV4SLTDefs.h in Headers */,
 				2DD0C8CA193FBAE4009112B2 /* ORKatrinV4SLTModel.h in Headers */,
+				2D294530199E6A9400F68093 /* ORAmptekDP5Controller.h in Headers */,
+				2D294532199E6A9400F68093 /* ORAmptekDP5Decoder.h in Headers */,
+				2D294535199E6A9400F68093 /* ORAmptekDP5Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15993,6 +16028,8 @@
 				2DD0C97A1940BC78009112B2 /* UserConfirm.nib in Resources */,
 				2DD0C97B1940BC78009112B2 /* UserRequest.nib in Resources */,
 				2DD0C97C1940BC78009112B2 /* UserStatus.nib in Resources */,
+				2D29452E199E6A9400F68093 /* AmptekDP5.nib in Resources */,
+				2D29452F199E6A9400F68093 /* AmptekDP5Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -17066,6 +17103,9 @@
 				2DD0C8C6193FBAE4009112B2 /* ORKatrinV4SLTController.m in Sources */,
 				2DD0C8C8193FBAE4009112B2 /* ORKatrinV4SLTDecoder.m in Sources */,
 				2DD0C8CB193FBAE4009112B2 /* ORKatrinV4SLTModel.m in Sources */,
+				2D294531199E6A9400F68093 /* ORAmptekDP5Controller.m in Sources */,
+				2D294533199E6A9400F68093 /* ORAmptekDP5Decoder.m in Sources */,
+				2D294536199E6A9400F68093 /* ORAmptekDP5Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
