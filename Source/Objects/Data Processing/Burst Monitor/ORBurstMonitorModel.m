@@ -42,7 +42,8 @@ NSString* ORBurstMonitorMinimumEnergyAllowedChanged = @"ORBurstMonitorMinimumEne
 NSString* ORBurstMonitorQueueChanged                = @"ORBurstMonitorQueueChangedNotification";
 NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged";
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
-NSDate*   burstStart = NULL;
+NSString* burstString = @"";
+NSDate* burstStart = NULL;
 
 
 @interface ORBurstMonitorModel (private)
@@ -72,7 +73,6 @@ NSDate*   burstStart = NULL;
     [runUserInfo release];
     [queueLock release];
     [emailList release];
-    [burstString release];
     [super dealloc];
 }
 
@@ -202,6 +202,27 @@ NSDate*   burstStart = NULL;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorEmailListChanged object:self];
 }
 
+- (int) channelsCheck:(NSMutableArray*) aChans
+{
+    int searchChan = 0;
+    int numChan = 0;
+    while([aChans count]>0)
+    {
+        searchChan = [[aChans objectAtIndex:(0)] intValue]; //This is first channel, look to see if there are more of it
+        for(int k = 1; k<[aChans count]; k++)
+        {
+            if([[aChans objectAtIndex:(k)] intValue] == searchChan)
+            {
+                [aChans removeObjectAtIndex:(k)];
+                k=k-1;
+            }
+        }
+        [aChans removeObjectAtIndex:(0)];
+        numChan++;
+    }
+    return numChan;
+}
+
 #pragma mark •••Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
@@ -270,9 +291,10 @@ NSDate*   burstStart = NULL;
                             ORBurstData* burstData = [[ORBurstData alloc] init];
                             burstData.datePosted = now; //DAQ at LU has a different time zone than the data records do.  It might be best not to mix DAQ time and SBC time in the monitor.
                             burstData.dataRecord = theShaperRecord;
-                            //cleaned up some bad memory leaks here... MAH 8/1/14
-                            burstData.epSec = [NSNumber numberWithLong:secondsSinceEpoch];
-                            burstData.epMic = [NSNumber numberWithLong:secondsSinceEpoch];
+                            NSNumber* epochSec = [NSNumber numberWithLong:secondsSinceEpoch];
+                            NSNumber* epochMic = [NSNumber numberWithLong:microseconds];
+                            burstData.epSec = [epochSec copy];
+                            burstData.epMic = [epochMic copy];
                             
                             //[[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
                             //[burstData release];
@@ -305,11 +327,19 @@ NSDate*   burstStart = NULL;
                                             //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]]];
                                         }
-                                        burstTell = 1;
+                                        //Find metadata
+                                        NSMutableArray* reChans = [chans mutableCopy];
+                                        [reChans removeObjectAtIndex:(0)];
+                                        int numChan = [self channelsCheck:(reChans)];
+                                        numBurstChan = numChan;
+                                        double startTime = ([[secs objectAtIndex:(countofchan-1)] longValue] + 0.000001*[[mics objectAtIndex:(countofchan-1)] longValue]);
+                                        double endTime = ([[secs objectAtIndex:1] longValue] + 0.000001*[[mics objectAtIndex:1] longValue]);
+                                        durSec = (endTime - startTime);
+                                        NSLog(@"duration is %d \n", durSec);
+                                        countsInBurst = countofchan - 1;
                                         
-                                        //fixed memory leak here.. MAH 8/1/14
-                                        [burstString release];
-                                        burstString = [bString copy];
+                                        addThisToQueue = 0;
+                                        burstString = [bString mutableCopy];
                                         
                                         //fixme //Try to start DelayedBurstEvent directly, but does not work
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
@@ -319,15 +349,24 @@ NSDate*   burstStart = NULL;
                                         //newvoke.target = self;
                                         //newvoke.selector = monitorQueues;
                                         //[newvoke setArgument:nil atIndex:2];
-                                        //[newvoke invoke]; 
+                                        //[newvoke invoke];
                                         
+                                        if(numBurstChan>=numBurstsNeeded)
+                                        {
+                                            burstTell = 1;
+                                        }
+                                        else
+                                        {
+                                            NSLog(@"Burst had only %i channels, needed %i \n", numBurstChan, numBurstsNeeded);
+                                            removedSec = [[secs objectAtIndex:(0)] longValue];
+                                            NSLog(@"removedSec is now %li \n", removedSec);
+                                        }
                                         //Clean up
                                         [chans removeAllObjects];
                                         [cards removeAllObjects];
                                         [adcs removeAllObjects];
                                         [secs removeAllObjects];
                                         [mics removeAllObjects];
-                                        addThisToQueue = 0;
                                     }
                                     burstState = 0;
                                     novaState = 0;
@@ -338,7 +377,6 @@ NSDate*   burstStart = NULL;
                                     [adcs removeObjectAtIndex:nHit-1];
                                     [secs removeObjectAtIndex:nHit-1];
                                     [mics removeObjectAtIndex:nHit-1];
-                                    NSLog(@"removedSec is now %li \n", removedSec);
                                     NSTimeInterval removedSeconds = removedSec;
                                     burstStart = [NSDate dateWithTimeIntervalSince1970:removedSeconds]; //Fixme hard to get consistency, so used removedSec instead
                                 }
@@ -349,9 +387,8 @@ NSDate*   burstStart = NULL;
                             }
                             if(addThisToQueue == 1){
                                 [[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
+                                [burstData release];
                             }
-                            [burstData release];
-
                         }
                     }
                 }
@@ -402,6 +439,7 @@ NSDate*   burstStart = NULL;
     if(!adcs) adcs = [[NSMutableArray alloc] init];
     if(!secs) secs = [[NSMutableArray alloc] init];
     if(!mics) mics = [[NSMutableArray alloc] init];
+    if(!burstString) burstString = [[NSString alloc] init];
     burstTell = 0;
     burstState = 0;
     novaState = 0;
@@ -599,9 +637,10 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //if(numBurstingChannels>=numBurstsNeeded && numTotalCounts>=nHit){
     if(burstTell == 1){  //just call delayedburst when told by data proc //fixme need to remove last event from buffer, or not add it to queue
         burstTell = 0;
+        NSLog(@"numBurstingChannels is %i \n", numBurstingChannels);
         NSLog(@"Burst Detected\n");
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
-        [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:1];  
+        [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:0];
     }
     [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
     
@@ -621,7 +660,11 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Time Window: %d sec\n",timeWindow];
     theContent = [theContent stringByAppendingFormat:@"Events/Window Needed: %d\n",nHit];
     theContent = [theContent stringByAppendingFormat:@"Minimum ADC Energy: %d\n",minimumEnergyAllowed];
-    theContent = [theContent stringByAppendingFormat:@"Minimum Bursts Needed: %d\n",numBurstsNeeded];
+    theContent = [theContent stringByAppendingFormat:@"Number of channels required: %d\n",numBurstsNeeded];
+    theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+    theContent = [theContent stringByAppendingFormat:@"Number of counts in the burst: %d\n",countsInBurst];
+    theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
+    theContent = [theContent stringByAppendingFormat:@"Duration of burst: %f seconds \n",durSec];
     theContent = [theContent stringByAppendingFormat:@"Num Bursts this run: %d\n",burstCount];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:burstString];

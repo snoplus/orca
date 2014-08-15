@@ -46,7 +46,9 @@
     NSMutableArray* secs;
     NSMutableArray* mics;
     long int removedSec;
-
+    int numBurstChan;
+    double durSec; //The number of seconds the burst takes to finish
+    int countsInBurst;
     
     //burst tags
     unsigned short burstTell; //1 if a bust still needs printing
@@ -63,7 +65,6 @@
     ORDecoder*           theDecoder;
     NSMutableDictionary* runUserInfo;
     unsigned short       burstCount;
-    NSString*            burstString;
 }
 
 
@@ -89,6 +90,7 @@
 - (void) setEmailList:(NSMutableArray*)aEmailList;
 - (void) addAddress:(id)anAddress atIndex:(int)anIndex;
 - (void) removeAddressAtIndex:(int) anIndex;
+- (int) channelsCheck:(NSMutableArray*) aChans;
 - (void) lockArray;
 - (void) unlockArray;
 #pragma mark •••Run Methods
