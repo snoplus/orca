@@ -310,9 +310,17 @@
 	double SUMxy= 0;
 	double SUMxx= 0;
 	calibrationValid = NO;
-	int n = [calibrationArray count];
+    
+    NSMutableArray* dataArray = [NSMutableArray arrayWithArray:calibrationArray];
+
+	int n = [dataArray count];
+    
 	if(n!=0){
-		for(id pt in calibrationArray){
+        if(n==1){
+            [dataArray insertObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:0],@"Channel",[NSNumber numberWithDouble:0],@"Energy", nil] atIndex:0];
+            n = [dataArray count];
+        }
+		for(id pt in dataArray){
 			double x = [[pt objectForKey:@"Channel"] doubleValue];
 			double y = [[pt objectForKey:@"Energy"] doubleValue];
 			SUMx = SUMx + x;
@@ -325,7 +333,13 @@
 			intercept = ( SUMy - slope*SUMx ) / n;
 			calibrationValid = YES;
 		}
+        else {
+            NSLog(@"Invalid Calibration: sum of the x values is zero\n");   
+        }
 	}
+    else {
+        NSLog(@"Invalid Calibration: you must enter at least one set of values\n");
+    }
 }
 
 
