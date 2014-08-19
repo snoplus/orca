@@ -71,6 +71,16 @@
 #define kSPIChipSelect	0x8
 #define kSPIRead        0x10
 
+enum {
+    kSerDesIdle,
+    kSerDesStep1,
+    kSerDesStep2,
+    kSerDesStep3,
+    kSerDesStep4,
+    kSerDesStep5,
+    kSerDesError,
+};
+
 #pragma mark •••Register Definitions
 enum {
 	kBoardID,					//[0] board ID
@@ -265,6 +275,7 @@ enum Gretina4MFIFOStates {
     
     //------------------internal use only
     NSOperationQueue*	fileQueue;
+    int                 initializationState;
 }
 
 - (id) init;
@@ -278,6 +289,8 @@ enum Gretina4MFIFOStates {
 - (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (short) initState;
+- (void) setInitState:(short)aState;
 - (short) histEMultiplier;
 - (void) setHistEMultiplier:(short)aHistEMultiplier;
 - (unsigned short) baselineRestoredDelay;
@@ -434,7 +447,6 @@ enum Gretina4MFIFOStates {
 - (void) resetFIFO;
 - (void) resetSingleFIFO;
 - (void) initBoard;
-- (void) initSerDes;
 - (unsigned long) readControlReg:(short)channel;
 - (void) writeControlReg:(short)channel enabled:(BOOL)enabled;
 - (void) writeClockSource: (unsigned long) clocksource;
@@ -515,6 +527,9 @@ enum Gretina4MFIFOStates {
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan;
 - (unsigned short) gainForDisplay:(unsigned short) aChan;
 
+#pragma mark •••Internal Use only
+- (void) stepSerDesInit;
+
 @end
 
 @interface NSObject (Gretina4M)
@@ -575,4 +590,5 @@ extern NSString* ORGretina4MTpolChanged;
 extern NSString* ORGretina4MPresumEnabledChanged;
 extern NSString* ORGretina4MEasySelectedChanged;
 extern NSString* ORGretina4MModelHistEMultiplierChanged;
+extern NSString* ORGretina4MModelInitStateChanged;
 

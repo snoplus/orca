@@ -211,6 +211,7 @@ enum {
     kStep7b,
     kStep7d,
     kStep8,
+    kGretinaInitWait,
     kStep9,
     kRouterError,
     kNumRouterTriggerStates //must be last
@@ -346,6 +347,7 @@ enum {
 - (void) stepRouter;
 - (void) setRoutersToIdle;
 - (BOOL) allRoutersIdle;
+- (BOOL) allGretinaCardsIdle;
 
 
 // Register access

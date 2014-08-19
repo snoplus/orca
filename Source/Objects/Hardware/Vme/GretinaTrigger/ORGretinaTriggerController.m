@@ -89,7 +89,7 @@
    
     
     
-    NSString* key = [NSString stringWithFormat: @"orca.Gretina4%d.selectedtab",[model slot]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORGretinaTrigger%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
@@ -317,7 +317,7 @@
 
 - (void) linkLockedRegChanged:(NSNotification*)aNote
 {
-    int value = [model linkLockedReg];
+    int value = ~[model linkLockedReg];
 	short i;
 	for(i=0;i<[linkLockedMatrix numberOfColumns];i++){
 		[[linkLockedMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
@@ -349,7 +349,7 @@
 
 - (void) inputLinkMaskChanged:(NSNotification*)aNote
 {
-    int value = [model inputLinkMask];
+    int value = ~[model inputLinkMask];
 	short i;
 	for(i=0;i<[inputLinkMaskMatrix numberOfColumns];i++){
 		[[inputLinkMaskMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];

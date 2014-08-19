@@ -85,6 +85,8 @@ NSString* ORGretina4MPresumEnabledChanged       = @"ORGretina4MPresumEnabledChan
 NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdChanged";
 NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
 NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultiplierChanged";
+NSString* ORGretina4MModelInitStateChanged      = @"ORGretina4MModelInitStateChanged";
+
 
 @interface ORGretina4MModel (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -1269,49 +1271,48 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 }
 
-
-- (void) initSerDes
+- (short) initState {return initializationState;}
+- (void) setInitState:(short)aState
 {
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-    if ((theValue & 0x7) == 0x7) return;
-    theValue = 0x22;
-    // First we set to loop back mode so the SD can lock. 
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-    NSDate* startDate = [NSDate date];
-    while(1) {
-        // Wait for the SD and DCM to lock 
-        [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                            numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		
-        if ((theValue & 0x7) == 0x7) break;
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 2) {
-			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
-			return;
-		}
-    }
-    theValue = 0x02;
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];    
+    initializationState = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelInitStateChanged object:self];
 }
 
-
+- (void) stepSerDesInit
+{
+    switch(initializationState){
+        case kSerDesStep1:
+            [self writeFPGARegister:kVMEGPControl withValue:0x2];
+            [self setInitState:kSerDesStep2];
+            break;
+            
+        case kSerDesStep2:
+            [self writeRegister:kSDConfig withValue:0x10];
+            [self setInitState:kSerDesStep3];
+            break;
+            
+        case kSerDesStep3:
+            [self writeRegister:kSDConfig withValue:0x0];
+            [self setInitState:kSerDesStep4];
+            break;
+            
+        case kSerDesStep4:
+           [self writeRegister:kMasterLogicStatus withValue:0x20051];
+            [self setInitState:kSerDesStep5];
+           break;
+            
+        case kSerDesStep5:
+            [self writeRegister:kSDConfig withValue:0x20];
+            [self setInitState:kSerDesIdle];
+            break;
+            
+        case kSerDesError:
+            break;
+    }
+    if(initializationState!= kSerDesError){
+       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:0];
+    }
+}
 
 - (void) resetMainFPGA
 {
@@ -1350,43 +1351,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 }
 
-/*- (void) initSerDes
-{
-	//first set clock source
-	//I can't find the variable for clock source, so I set it 0 temporarily
-	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
-	[self setClockSource:0x01];
-	
-	//main FPGA reset cycle
-	[self resetMainFPGA];
-	
-	//wait for 10 seconds
-	sleep(10);
-	
-	
-	unsigned long theValue = 0;
-	NSDate* startDate = [NSDate date];
-    while(1) {
-        // Wait for the SD and DCM to lock 
-        [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                            numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		
-        if ((theValue & 0x7) == 0x7) break;
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 10) {
-			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
-			return;
-		}
-    }
-	
-	 
-	//reset DCM
-	[self resetDCM];
-	
-}
-*/
 
 
 - (BOOL) checkFirmwareVersion
@@ -1502,7 +1466,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         }
     }
     
-    //[self initSerDes];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }

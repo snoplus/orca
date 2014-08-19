@@ -307,6 +307,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     { kStep7b,          kRouterState,   @"Set TPower and RPower Bits"},
     { kStep7d,          kRouterState,   @"Release LINK_INIT Reset"},
     { kStep8,           kRouterState,   @"Running Digitizer Setup"},
+    { kGretinaInitWait, kRouterState,   @"Waiting For Gretina SerDes Init"},
     { kStep9,           kRouterState,   @"Set and Clear ACK Bit"},
     { kRouterError,     kRouterState,   @""}
 };
@@ -716,7 +717,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 {
 	if (index >= kNumberOfGretinaTriggerRegisters) return;
 	if (![self canWriteRegister:index]) return;
-    NSLog(@"%@ write 0x%04x to 0x%04x (%@)\n",[self isMaster]?@"Master":@"Router",value,register_information[index].offset,register_information[index].name);
+    if(verbose)NSLog(@"%@ write 0x%04x to 0x%04x (%@)\n",[self isMaster]?@"Master":@"Router",value,register_information[index].offset,register_information[index].name);
     
     [[self adapter] writeWordBlock:&value
                          atAddress:[self baseAddress] + register_information[index].offset
@@ -768,7 +769,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         if(([self isMaster] && (aState == kMasterError)) || (![self isMaster] && (aState == kRouterError))){
             [anEntry setObject:@"See Status Log" forKey:@"status"];
         }
-        else [anEntry setObject:@"Up Next" forKey:@"status"];
+        else [anEntry setObject:@"Executing" forKey:@"status"];
         [stateStatus replaceObjectAtIndex:aState withObject:anEntry];
     }
     initializationState = aState;
@@ -1134,6 +1135,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
     else if(initializationState == kMasterIdle){
         //OK, the lock was achieved. The run can continue to start
+        NSLog(@"%@: Appears Lock Successful\n",[self fullID]);
         [self releaseRunWait];
     }
 }
@@ -1301,7 +1303,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             break;
  */
         case kStep8:
-        {
+            {
+                int i;
+                for(i=0;i<8;i++){
+                    if([linkConnector[i]  identifer] != 'L'){
+                        ORConnector* otherConnector = [linkConnector[i] connector];
+                        ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+                        if(digitizerObj){
+                            if(verbose)NSLog(@"Set up Gretina SerDes %@\n",[digitizerObj fullID]);
+                            [digitizerObj setInitState:kSerDesStep1];
+                            [digitizerObj stepSerDesInit];
+                        }
+                    }
+                }
+            }
+            [self setInitState:kGretinaInitWait];
+ 
+ /*       {
             int i;
             for(i=0;i<8;i++){
                 if([linkConnector[i]  identifer] != 'L'){
@@ -1318,9 +1336,15 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 }
             }
         }
-            [self setInitState:kStep9];
+  */
+           // [self setInitState:kStep9];
             break;
-            
+        
+        case kGretinaInitWait:
+            if([self allGretinaCardsIdle]){
+                [self setInitState:kStep9];
+            }
+            break;
             
         case kStep9:
             [self writeRegister:kMiscCtl1 withValue:0x12];
@@ -1335,6 +1359,21 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     if(initializationState != kRouterIdle){
         [self performSelector:@selector(stepRouter) withObject:nil afterDelay:kTriggerInitDelay];
     }
+}
+
+- (BOOL) allGretinaCardsIdle
+{
+    int i;
+    for(i=0;i<8;i++){
+        if([linkConnector[i]  identifer] != 'L'){
+            ORConnector* otherConnector = [linkConnector[i] connector];
+            ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+            if(digitizerObj){
+                if([digitizerObj initState] != kSerDesIdle)return NO;
+            }
+        }
+    }
+    return YES;
 }
 
 - (unsigned short)findRouterMask
@@ -1850,7 +1889,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [self writeToAddress:0x090c aValue:0x0000];
     [self writeToAddress:0x090c aValue:0x0001];
     sleep(3);
-    NSLog(@"After reset: 0x902 = 0x%04x\n",[self readFromAddress:0x902]);
+    NSLog(@"%@ After reset: 0x902 = 0x%04x\n",[self fullID],[self readFromAddress:0x902]);
     [self writeToAddress:0x090c aValue:0x0000];
 }
 
