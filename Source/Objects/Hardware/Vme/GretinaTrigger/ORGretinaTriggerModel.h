@@ -169,8 +169,10 @@ enum {
 	kTriggerNumberOfFPGARegisters
 };
 
+//do NOT change this list without changing the GretinaTriggerStateInfo array in the .m file
+//Master States
 enum {
-    kStepIdle,
+    kMasterIdle,
     kStepSetup,
     kStep1a,
     kStep1b,
@@ -179,54 +181,54 @@ enum {
     kCheckStep1d,
     kRunSteps2a2c,
     kWaitOnSteps2a2c,
-    kStep2a,
-    kStep2b,
-    kStep2c,
     kStep3a,
     kStep3b,
     kRunSteps4a4b,
     kWaitOnSteps4a4b,
-    kStep3c,
-    kStep3d,
-    kStep3e,
-    kStep4a,
-    kStepStartCheckingCounter,
-    kStepCheckCounter,
-    kStep4b,
+    //kStepStartCheckingCounter,
+    //kStepCheckCounter,
     kStep5a,
     kStep5b,
     kStep5c,
     kStep5d,
     kRunSteps6To9,
     kWaitOnSteps6To9,
+    kStep10,
+    kMasterError,
+    kNumMasterTriggerStates //must be last
+};
+
+//do NOT change this list without changing the GretinaTriggerStateInfo array in the .m file
+//Router States
+enum {
+    kRouterIdle,
+    kStep2a,
+    kStep2b,
+    kStep2c,
+    kStep4a,
     kStep6a,
-    kStep6b,
     kStep7a,
     kStep7b,
-    kStep7c,
     kStep7d,
-    kStep7e,
-    kStep7f,
-    kStep7g,
     kStep8,
     kStep9,
-    kStep10,
-    kStepError,
+    kRouterError,
+    kNumRouterTriggerStates //must be last
 };
 
 
-#define kResetLinkInitMachBit (0x1<<2)
-#define kPowerOnLSerDes        (0x1<<8)
-#define kClockSourceSelectBit (0x1<<15)
-#define kLinkInitStateMask    (0x0F00)
-#define kSerdesPowerOnAll     (0x7FF)
-#define kLinkLruCrlMask       (0x700)
-#define kLvdsPreEmphasisPowerOnL (0x1<<2)
-#define kAllLockBit           (0x1<<14)
-#define kStringentLockBit     (0x1<<4)
-#define linkInitAckBit        (0x1<<1)
-#define kWaitAcknowledgeStateMask  (0x0F00)
-#define kAcknowledgedStateMask     (0x0F00)
+#define kResetLinkInitMachBit       (0x1<<2)
+#define kPowerOnLSerDes             (0x1<<8)
+#define kClockSourceSelectBit       (0x1<<15)
+#define kLinkInitStateMask          (0x0F00)
+#define kSerdesPowerOnAll           (0x7FF)
+#define kLinkLruCrlMask             (0x700)
+#define kLvdsPreEmphasisPowerOnL    (0x1<<2)
+#define kAllLockBit                 (0x1<<14)
+#define kStringentLockBit           (0x1<<4)
+#define linkInitAckBit              (0x1<<1)
+#define kWaitAcknowledgeStateMask   (0x0F00)
+#define kAcknowledgedStateMask      (0x0F00)
 
 @interface ORGretinaTriggerModel : ORVmeIOCard
 {
@@ -266,6 +268,7 @@ enum {
     short           initializationState;
     unsigned short  connectedRouterMask;
     unsigned short  connectedDigitizerMask;
+    NSMutableArray* stateStatus;
 }
 
 - (id) init;
@@ -284,7 +287,8 @@ enum {
 - (short) initState;
 - (void) setInitState:(short)aState;
 - (NSString*) initStateName;
-
+- (void) setupStateArray;
+- (NSString*) stateName:(int)anIndex;
 - (unsigned short) inputLinkMask;
 - (void) setInputLinkMask:(unsigned short)aMask;
 - (unsigned short) serdesTPowerMask;
@@ -325,6 +329,8 @@ enum {
 - (void) setRegisterIndex:(int)aRegisterIndex;
 - (unsigned short) regWriteValue;
 - (void) setRegWriteValue:(unsigned short)aWriteValue;
+- (void) setupStateArray;
+- (NSString*) stateStatus:(int)aStateIndex;
 
 #pragma mark •••set up routines
 - (void) initClockDistribution;

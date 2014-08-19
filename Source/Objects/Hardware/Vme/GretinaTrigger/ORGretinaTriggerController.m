@@ -47,8 +47,10 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(830,510);
-    registerTabSize	= NSMakeSize(400,287);
+    settingTabSize  = NSMakeSize(830,510);
+    stateTabSize	= NSMakeSize(520,480);
+    registerTabSize	= NSMakeSize(400,180);
+    firmwareTabSize	= NSMakeSize(400,180);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -293,6 +295,7 @@
 - (void) initStateChanged:(NSNotification*)aNote
 {
     [initStateField setStringValue:[model initStateName]];
+    [stateStatusTable reloadData];
 }
 
 - (void) clockUsingLLinkChanged:(NSNotification*)aNote
@@ -523,14 +526,24 @@
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:settingSize];
+		[self resizeWindowToSize:settingTabSize];
 		[[self window] setContentView:tabView];
     }
  	else if([tabView indexOfTabViewItem:tabViewItem] == 1){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:registerTabSize];
+		[self resizeWindowToSize:stateTabSize];
 		[[self window] setContentView:tabView];
     }	
+ 	else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:registerTabSize];
+		[[self window] setContentView:tabView];
+    }
+ 	else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:firmwareTabSize];
+		[[self window] setContentView:tabView];
+    }
 
     NSString* key = [NSString stringWithFormat: @"orca.ORGretinaTrigger%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
@@ -612,6 +625,7 @@
                 }
             }
         }
+
 		else {
             unsigned short miscStat         = [model miscStatReg];
             unsigned short linkInitState    = ((miscStat >> 8) & 0xF);
@@ -700,12 +714,24 @@
             }
 		}
 	}
+    else if(aTableView == stateStatusTable){
+        if([[aTableColumn identifier] isEqualToString:@"name"]){
+            return [model stateName:rowIndex];
+        }
+        else {
+            return [model stateStatus:rowIndex];
+        }
+    }
 	return @"";
 }
 
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == miscStatTable)return 8;
+    else if(aTableView == stateStatusTable){
+        if([model isMaster])return kNumMasterTriggerStates;
+        else                return kNumRouterTriggerStates;
+    }
 	else return 0;
 }
 

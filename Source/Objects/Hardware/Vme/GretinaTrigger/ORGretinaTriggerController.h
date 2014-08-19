@@ -57,7 +57,9 @@
 	IBOutlet NSButton*		readRegisterButton;
 	IBOutlet NSTextField*	registerStatusField;
 
-    
+    //state view page
+    IBOutlet NSTableView*   stateStatusTable;
+
     //FPGA download
 	IBOutlet NSTextField*			fpgaFilePathField;
 	IBOutlet NSButton*				loadMainFPGAButton;
@@ -67,8 +69,10 @@
 	IBOutlet NSTextField*           firmwareStatusStringField;
 
     NSView *blankView;
-    NSSize settingSize;
+    NSSize settingTabSize;
+    NSSize stateTabSize;
     NSSize registerTabSize;
+    NSSize firmwareTabSize;
 }
 
 - (id)   init;
