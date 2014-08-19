@@ -26,6 +26,7 @@
 @interface ORGretinaTriggerController : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+	IBOutlet NSButton*       verboseCB;
 	IBOutlet NSTextField*   diagnosticCounterField;
 	IBOutlet NSMatrix*      inputLinkMaskMatrix;
 	IBOutlet NSMatrix*      serDesTPowerMasMatrix;
@@ -80,6 +81,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) verboseChanged:(NSNotification*)aNote;
 - (void) diagnosticCounterChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
@@ -104,6 +106,7 @@
 - (void) initStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) verboseAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;

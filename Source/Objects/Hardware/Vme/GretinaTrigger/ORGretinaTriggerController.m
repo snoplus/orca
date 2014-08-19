@@ -230,6 +230,11 @@
                          name : ORGretinaTriggerModelDiagnosticCounterChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseChanged:)
+                         name : ORGretinaTriggerModelVerboseChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -258,9 +263,15 @@
 	[self clockUsingLLinkChanged:nil];
 	[self initStateChanged:nil];
 	[self diagnosticCounterChanged:nil];
+	[self verboseChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) verboseChanged:(NSNotification*)aNote
+{
+	[verboseCB setIntValue: [model verbose]];
+}
 
 - (void) diagnosticCounterChanged:(NSNotification*)aNote
 {
@@ -451,6 +462,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) verboseAction:(id)sender
+{
+	[model setVerbose:[sender intValue]];
+}
+
 - (IBAction) isMasterAction:(id)sender
 {
     [model setIsMaster:[sender indexOfSelectedItem]];

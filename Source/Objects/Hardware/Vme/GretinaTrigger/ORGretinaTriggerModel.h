@@ -259,6 +259,7 @@ enum {
 	NSLock*         progressLock;
     NSString*       firmwareStatusString;
     unsigned short  diagnosticCounter;
+    BOOL            verbose;
    
     //------------------internal use only
     ORFileMoverOp*  fpgaFileMover;
@@ -282,6 +283,8 @@ enum {
 - (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerbose;
 - (unsigned short) diagnosticCounter;
 - (void) setDiagnosticCounter:(unsigned short)aDiagnosticCounter;
 - (short) initState;
@@ -369,6 +372,7 @@ enum {
 
 @end
 
+extern NSString* ORGretinaTriggerModelVerboseChanged;
 extern NSString* ORGretinaTriggerModelDiagnosticCounterChanged;
 extern NSString* ORGretinaTriggerModelInputLinkMaskChanged;
 extern NSString* ORGretinaTriggerSerdesTPowerMaskChanged;
