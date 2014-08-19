@@ -329,6 +329,11 @@ NSDate* burstStart = NULL;
                                         }
                                         //Find metadata
                                         NSMutableArray* reChans = [chans mutableCopy];
+                                        for(int j=0; j<[reChans count]; j++)
+                                        {
+                                            int chanID = [[reChans objectAtIndex:j] intValue] + 10*[[cards objectAtIndex:j] intValue];
+                                            [reChans replaceObjectAtIndex:j withObject:[NSNumber numberWithInt:chanID]];
+                                        }
                                         [reChans removeObjectAtIndex:(0)];
                                         int numChan = [self channelsCheck:(reChans)];
                                         numBurstChan = numChan;
@@ -384,6 +389,18 @@ NSDate* burstStart = NULL;
                             }
                             else{
                                 NSLog(@"not full has %i \n", [chans count]);
+                                if(burstTell ==1) //Event showed up before burst was prossessed, say it for now but don't record it.
+                                {
+                                    double lateTime = [[secs objectAtIndex:0] longValue] + 0.000001*[[mics objectAtIndex:0] longValue];
+                                    NSLog(@"extra trip: t=%lf, adc=%i, chan=%i-%i \n", lateTime, [[adcs objectAtIndex:0] intValue], [[cards objectAtIndex:0] intValue], [[chans objectAtIndex:0] intValue]);
+                                    addThisToQueue = 0;
+                                    //Clean up
+                                    [chans removeAllObjects];
+                                    [cards removeAllObjects];
+                                    [adcs removeAllObjects];
+                                    [secs removeAllObjects];
+                                    [mics removeAllObjects];
+                                }
                             }
                             if(addThisToQueue == 1){
                                 [[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
