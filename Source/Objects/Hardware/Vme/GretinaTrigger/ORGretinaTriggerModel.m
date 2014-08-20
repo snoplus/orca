@@ -471,7 +471,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-    //[self initClockDistribution];
+    [self initClockDistribution];
 }
 
 #pragma mark ***Accessors
@@ -869,34 +869,25 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     else return @"?";
 }
 
-//  In progress
 - (BOOL) systemAllLocked
 {
-    return YES; //temp
-    /*
+    if(![self isLocked])return NO;
     int i;
-    //int j;
-    
-    if ( (miscStatReg & 0x4000) != kAllLockBit  )
-        return NO;
-    else {
-        for(i=0;i<8;i++){
-            ORConnector* routerConnector = [linkConnector[i] connector];
-            if([routerConnector identifer] == 'L'){
-                if ( [routerConnector miscStatReg] & 0x4000 != kAllLockBit)
-                    return NO;
-                else {
-                    for(i=0;i<8;i++){
-                     //   if([[routerConnector linkConnector[j]] connector] != 'L'){
-                      //      ORConnector* triggerConnector = [linkConnector[i] connector];
-                       //     ORGretina4MModel* digitizerObj = [triggerConnector objectLink];
-                     //   }
-                    }
-                }
-            }
+    for(i=0;i<8;i++){
+        ORConnector* otherConnector = [linkConnector[i] connector];
+        if([otherConnector identifer] == 'L'){
+            ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+            if(![routerObj isLocked])return NO;
         }
     }
-     */
+    return YES;
+}
+
+- (BOOL) isLocked
+{
+    [self setMiscStatReg:       [self readRegister:kMiscStatus]];
+    if((miscStatReg & 0x4000) != kAllLockBit) return NO;
+    else return YES;
 }
 
 - (void) readDisplayRegs

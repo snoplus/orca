@@ -285,17 +285,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[linkConnector setOffColor:[NSColor colorWithCalibratedRed:1 green:1 blue:.3 alpha:1.]];
 }
 
-- (void) registerNotificationObservers
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    [notifyCenter removeObserver:self];
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
-                       object : nil];
-
-}
-
 - (void) setSlot:(int)aSlot
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
@@ -2302,12 +2291,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
-{
-    //temporary until the trigger card is ready
-    //[self resetClock];
-}
-
 //**************************************************************************************
 // Function:	TakeData
 // Description: Read data from a card
@@ -2551,8 +2534,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         [self setEasySelected:i		withValue:[decoder decodeIntForKey:[@"easySelected"	    stringByAppendingFormat:@"%d",i]]];
 	}
     
-    [self registerNotificationObservers];
-
     [[self undoManager] enableUndoRegistration];
     
     return self;

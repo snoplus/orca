@@ -339,6 +339,7 @@ enum {
 #pragma mark •••set up routines
 - (void) initClockDistribution;
 - (BOOL) systemAllLocked;
+- (BOOL) isLocked;
 - (unsigned short)findRouterMask;
 - (unsigned short)findDigitizerMask;
 - (void) readDisplayRegs;
