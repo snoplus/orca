@@ -95,6 +95,7 @@
 		NSThread* readoutThread;
     
         NSMutableArray* objectsRequestingStateChangeWait;
+        NSMutableArray* objectsRequestingRunStartAbort;
         int selectedRunTypeScript;
         int savedSelectedRunTypeScript;
 }
@@ -208,6 +209,7 @@
 - (void) incrementTime:(NSTimer*)aTimer;
 - (void) sendHeartBeat:(NSTimer*)aTimer;
 
+- (void) addRunStartupAbort:(NSNotification*)aNote;
 - (void) addRunStateChangeWait:(NSNotification*)aNote;
 - (void) releaseRunStateChangeWait:(NSNotification*)aNote;
 - (void) needMoreTimeToStopRun:(NSNotification*)aNotification;

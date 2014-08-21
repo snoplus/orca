@@ -123,6 +123,8 @@ extern ORGlobal* gOrcaGlobals;
 extern NSString* ORRunTypeMask;
 extern NSString* ORQueueRecordForShippingNotification;
 
+extern NSString* ORAddRunStartupAbort;
+extern NSString* ORRunInitializationNotification;
 extern NSString* ORRunAboutToChangeState;
 extern NSString* ORRunAboutToStopNotification;
 extern NSString* ORRunFinalCallNotification;

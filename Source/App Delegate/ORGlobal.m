@@ -46,6 +46,7 @@ NSString* ORQueueRecordForShippingNotification  = @"ORQueueRecordForShippingNoti
 
 
 NSString* ORNeedMoreTimeToStopRun			= @"Extend Time to stop run";
+NSString* ORRunInitializationNotification   = @"Time to do inits";
 NSString* ORRunAboutToStartNotification     = @"Run is about to start";
 NSString* ORRunStartedNotification          = @"Run started";
 NSString* ORRunBetweenSubRunsNotification   = @"Between sub runs";
@@ -62,6 +63,7 @@ NSString* ORRequestRunHalt					= @"ORRequestRunHalt";
 NSString* ORAddRunStateChangeWait           = @"ORAddRunStateChangeWait";
 NSString* ORReleaseRunStateChangeWait       = @"ORReleaseRunStateChangeWait";
 NSString* ORRunAboutToChangeState           = @"ORRunAboutToChangeState";
+NSString* ORAddRunStartupAbort              = @"ORAddRunStartupAbort";
 
 NSString* ORRunTypeMask			    = @"ORRunTypeMask";
 NSString* ORRunStatusValue		    = @"Run Status Value";

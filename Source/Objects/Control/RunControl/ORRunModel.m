@@ -99,6 +99,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) dealloc
 {
     [objectsRequestingStateChangeWait release];
+    [objectsRequestingRunStartAbort release];
     [shutDownScriptState release];
     [startScriptState release];
     [shutDownScript release];
@@ -1032,6 +1033,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) startRun:(BOOL)doInit
 {
+    //make sure to clear out any left overs
+    [objectsRequestingRunStartAbort release];
+    objectsRequestingRunStartAbort = nil;
+
 	skipShutDownScript = NO;
     _forceRestart      = NO;
     if([self isRunning]){
@@ -1039,7 +1044,43 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         NSLogColor([NSColor redColor],@"Start a run while one is already in progress.\n");
         return;
     }
+    //first call to see if any object needs to stop the run or do something to cause the run start process to wait
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunInitializationNotification
+                                                        object: self
+                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
 
+    //------
+    //at this stage, some object may need extra time. If so they will post a wait request
+    [self waitOnObjects:[NSNumber numberWithBool:doInit]];
+}
+
+- (void) waitOnObjects:(NSNumber*)doInitBool
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
+    if([objectsRequestingStateChangeWait count]==0){
+        [self continueWithRunStart:doInitBool];
+    }
+    else {
+        [self performSelector:@selector(waitOnObjects:) withObject:doInitBool afterDelay:.01];
+    }
+}
+
+- (void) continueWithRunStart:(NSNumber*)doInitBool
+{
+    if([objectsRequestingRunStartAbort count]){
+        NSLog(@"Run was not started because one or more objects requested a run start abort\n");
+        NSLog(@"%@\n",objectsRequestingRunStartAbort);
+        
+        [objectsRequestingRunStartAbort release];
+        objectsRequestingRunStartAbort = nil;
+
+        [self setRunningState:eRunStopped];
+        return;
+    }
+    
+    BOOL doInit = [doInitBool boolValue];
+
+    
 	//movedfrom startRunStage1 06/29/05 MAH to test remote run stuff
 	[self getCurrentRunNumber];
 	
@@ -1539,26 +1580,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStartNotification
                                                         object: self
                                                       userInfo: runInfo];
-    //------
-    //at this stage, some object may need extra time. If so they will post a wait request
-    [self waitOnObjects:[NSNumber numberWithBool:doInit]];
-}
 
-- (void) waitOnObjects:(NSNumber*)doInitBool
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
-    if([objectsRequestingStateChangeWait count]==0){
-        [self continueWithRunStart:doInitBool];
-    }
-    else {
-        [self performSelector:@selector(waitOnObjects:) withObject:doInitBool afterDelay:0];
-    }
-}
-
-- (void) continueWithRunStart:(NSNumber*)doInitBool
-{
-    BOOL doInit = [doInitBool boolValue];
-    
     //tell them to start up
     id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
     [nextObject runTaskStarted:runInfo];
@@ -1729,11 +1751,35 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 						 name:ORAddRunStateChangeWait 
 					   object:nil];
 
+    [notifyCenter addObserver:self
+					 selector:@selector(addRunStartupAbort:)
+						 name:ORAddRunStartupAbort
+					   object:nil];
+
+    
     [notifyCenter addObserver:self 
 					 selector:@selector(releaseRunStateChangeWait:) 
 						 name:ORReleaseRunStateChangeWait 
 					   object:nil];
 
+}
+
+- (void) addRunStartupAbort:(NSNotification*)aNote
+{
+    @synchronized (self){
+        if(!objectsRequestingRunStartAbort)objectsRequestingRunStartAbort = [[NSMutableArray array]retain];
+        id obj = [aNote object];
+        NSString* requester;
+        if([obj respondsToSelector:@selector(fullID)]) requester = [obj fullID];
+        else requester = [obj className];
+        if(requester){
+            NSString* reason = [[aNote userInfo] objectForKey:@"Reason"];
+            if([reason length]==0)reason = @"No Reason Given";
+            NSString* details = [[aNote userInfo] objectForKey:@"Details"];
+            if([details length]==0)details = @"No Details Given";
+            [objectsRequestingRunStartAbort addObject:[NSDictionary dictionaryWithObjectsAndKeys:requester,@"Requester",reason,@"Reason",details,@"Details", nil]];
+        }
+    }
 }
 
 - (void) addRunStateChangeWait:(NSNotification*)aNote
