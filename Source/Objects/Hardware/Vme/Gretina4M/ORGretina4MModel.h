@@ -73,6 +73,7 @@
 
 enum {
     kSerDesIdle,
+    kSerDesSetup,
     kSerDesStep1,
     kSerDesStep2,
     kSerDesStep3,
@@ -527,7 +528,7 @@ enum Gretina4MFIFOStates {
 
 #pragma mark •••Internal Use only
 - (void) stepSerDesInit;
-
+- (NSString*) initSerDesStateName;
 @end
 
 @interface NSObject (Gretina4M)

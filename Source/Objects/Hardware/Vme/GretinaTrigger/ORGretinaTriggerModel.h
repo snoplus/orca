@@ -173,7 +173,8 @@ enum {
 //Master States
 enum {
     kMasterIdle,
-    kStepSetup,
+    kMasterSetup,
+    kWaitOnRouterSetup,
     kStep1a,
     kStep1b,
     kStep1c,
@@ -202,6 +203,7 @@ enum {
 //Router States
 enum {
     kRouterIdle,
+    kRouterSetup,
     kStep2a,
     kStep2b,
     kStep2c,
@@ -261,7 +263,8 @@ enum {
     NSString*       firmwareStatusString;
     unsigned short  diagnosticCounter;
     BOOL            verbose;
-   
+    BOOL            locked;
+    
     //------------------internal use only
     ORFileMoverOp*  fpgaFileMover;
     NSOperationQueue*	fileQueue;
@@ -271,6 +274,7 @@ enum {
     unsigned short  connectedRouterMask;
     unsigned short  connectedDigitizerMask;
     NSMutableArray* stateStatus;
+    NSString*       errorString;
 }
 
 - (id) init;
@@ -281,9 +285,15 @@ enum {
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 - (void) registerNotificationObservers;
-- (void) runAboutToStart:(NSNotification*)aNote;
+- (void) runInitialization:(NSNotification*)aNote;
+- (void) startPollingLock:(NSNotification*)aNote;
+- (void) endPollingLock:(NSNotification*)aNote;
+- (void) pollLock;
 
 #pragma mark ***Accessors
+- (BOOL) locked;
+- (void) setErrorString:(NSString*)aString;
+- (NSString*) errorString;
 - (BOOL) verbose;
 - (void) setVerbose:(BOOL)aVerbose;
 - (unsigned short) diagnosticCounter;
@@ -338,6 +348,7 @@ enum {
 
 #pragma mark •••set up routines
 - (void) initClockDistribution;
+- (void) initClockDistribution:(BOOL)force;
 - (BOOL) systemAllLocked;
 - (BOOL) isLocked;
 - (unsigned short)findRouterMask;
@@ -399,4 +410,5 @@ extern NSString* ORGretinaTriggerLinkLruCrlRegChanged;
 extern NSString* ORGretinaTriggerLinkLockedRegChanged;
 extern NSString* ORGretinaTriggerClockUsingLLinkChanged;
 extern NSString* ORGretinaTriggerModelInitStateChanged;
+extern NSString* ORGretinaTriggerLockChanged;
 

@@ -110,6 +110,8 @@
     IBOutlet NSButton*		diagnosticsReportButton;
     IBOutlet NSButton*		diagnosticsClearButton;
     
+    IBOutlet NSTextField*	initSerDesStateField;
+
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
     IBOutlet NSTextField*			noiseFloorOffsetField;
@@ -202,6 +204,7 @@
 - (void) spiWriteValueChanged:(NSNotification*)aNote;
 
 - (void) setRegisterDisplay:(unsigned int)index;
+- (void) initSerDesStateChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
 - (IBAction) diagnosticsClearAction:(id)sender;

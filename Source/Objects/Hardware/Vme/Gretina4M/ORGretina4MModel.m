@@ -1269,8 +1269,42 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) stepSerDesInit
 {
+    //---------------
+    //[self writeRegister:kSDConfig           withValue: 0x00000031]; //power up value
+    //[self writeRegister:kVMEGPControl       withValue: 0x00000400]; //power up value
+    //[self writeRegister:kMasterLogicStatus  withValue:0x05420000]; //power up value
+   
+    //[self writeRegister:kSDConfig withValue:(0x3<<9)];
+   // [self writeFPGARegister:kVMEGPControl withValue:0x2];
+    //[self writeRegister:kSDConfig withValue:0x11];
+    //[self writeRegister:kSDConfig withValue:0x0];
+    //[self writeRegister:kMasterLogicStatus withValue:0x20051];
+   // [self writeRegister:kSDConfig withValue:0x20];
+   
+    
+    //[self setInitState:kSerDesIdle];
+    //return;
+    //---------------
+
+    
     switch(initializationState){
+            
+        case kSerDesSetup:
+            //NSLog(@"SD Config: 0x%08x\n",[self readRegister:kSDConfig]);
+            //NSLog(@"Master Logic Status: 0x%08x\n",[self readRegister:kMasterLogicStatus]);
+            //NSLog(@"VmeGPControl: 0x%08x\n",[self readRegister:kVMEGPControl]);
+            //[self writeRegister:kSDConfig           withValue: 0x00000031]; //power up value
+            //[self writeRegister:kVMEGPControl       withValue: 0x00000400]; //power up value
+            //[self writeRegister:kMasterLogicStatus  withValue:0x05420000]; //power up value
+            //[self writeRegister:kSDConfig           withValue: 0x3<<9]; //reset the ten channel module and clock
+
+            [self setInitState:kSerDesStep1];
+            break;
+            
         case kSerDesStep1:
+            [[self undoManager] disableUndoRegistration];
+            [self setClockSource:0]; //set to external clock
+            [[self undoManager] enableUndoRegistration];
             [self writeFPGARegister:kVMEGPControl withValue:0x2];
             [self setInitState:kSerDesStep2];
             break;
@@ -1299,7 +1333,38 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             break;
     }
     if(initializationState!= kSerDesError){
-       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:0];
+       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.1];
+    }
+}
+- (NSString*) initSerDesStateName
+{
+    switch(initializationState){
+        case kSerDesIdle:
+            return @"Idle";
+            
+        case kSerDesSetup:
+            return @"Set up";
+            
+        case kSerDesStep1:
+            return @"Write VME GP = 0x2";
+            
+        case kSerDesStep2:
+            return @"Write SD Config = 0x10";
+            
+        case kSerDesStep3:
+            return @"Write SD Config = 0x00";
+            
+        case kSerDesStep4:
+            return @"Write Master Logic = 0x20051";
+            
+        case kSerDesStep5:
+            return @"Write SD Config = 0x20";
+            
+        case kSerDesError:
+            return @"Idle";
+            
+        default:
+            return @"?";
     }
 }
 

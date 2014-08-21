@@ -60,7 +60,7 @@
 {
     settingSize     = NSMakeSize(940,460);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,287);
+    registerTabSize	= NSMakeSize(400,490);
 	firmwareTabSize = NSMakeSize(340,187);
 	definitionsTabSize = NSMakeSize(1200,350);
     blankView = [[NSView alloc] init];
@@ -402,8 +402,12 @@
                          name : ORGretina4MModelHistEMultiplierChanged
 						object: model];
 
-    
+    [notifyCenter addObserver : self
+                     selector : @selector(initSerDesStateChanged:)
+                         name : ORGretina4MModelInitStateChanged
 
+						object: model];
+   
 }
 
 - (void) registerRates
@@ -484,9 +488,16 @@
     [self diagnosticsEnabledChanged:nil];
     
 	[self histEMultiplierChanged:nil];
+    [self initSerDesStateChanged:nil];
+    
 }
 
 #pragma mark •••Interface Management
+- (void) initSerDesStateChanged:(NSNotification*) aNote
+{
+    [initSerDesStateField setStringValue:[model initSerDesStateName]];
+}
+
 - (void) histEMultiplierChanged:(NSNotification*)aNote
 {
 	[histEMultiplierField setIntValue: [model histEMultiplier]];

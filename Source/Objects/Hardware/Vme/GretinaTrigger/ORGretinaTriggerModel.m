@@ -27,28 +27,29 @@
 #import "ORGretina4MModel.h"
 #import "ORRunModel.h"
 
-NSString* ORGretinaTriggerModelVerboseChanged = @"ORGretinaTriggerModelVerboseChanged";
+NSString* ORGretinaTriggerModelVerboseChanged           = @"ORGretinaTriggerModelVerboseChanged";
 NSString* ORGretinaTriggerModelDiagnosticCounterChanged = @"ORGretinaTriggerModelDiagnosticCounterChanged";
-NSString* ORGretinaTriggerModelIsMasterChanged       = @"ORGretinaTriggerModelIsMasterChanged";
-NSString* ORGretinaTriggerSettingsLock				 = @"ORGretinaTriggerSettingsLock";
-NSString* ORGretinaTriggerRegisterLock				 = @"ORGretinaTriggerRegisterLock";
-NSString* ORGretinaTriggerRegisterIndexChanged       = @"ORGretinaTriggerRegisterIndexChanged";
-NSString* ORGretinaTriggerRegisterWriteValueChanged  = @"ORGretinaTriggerRegisterWriteValueChanged";
-NSString* ORGretinaTriggerFpgaDownProgressChanged	 = @"ORGretinaTriggerFpgaDownProgressChanged";
-NSString* ORGretinaTriggerMainFPGADownLoadStateChanged		= @"ORGretinaTriggerMainFPGADownLoadStateChanged";
-NSString* ORGretinaTriggerFpgaFilePathChanged				= @"ORGretinaTriggerFpgaFilePathChanged";
+NSString* ORGretinaTriggerModelIsMasterChanged          = @"ORGretinaTriggerModelIsMasterChanged";
+NSString* ORGretinaTriggerSettingsLock                  = @"ORGretinaTriggerSettingsLock";
+NSString* ORGretinaTriggerRegisterLock                  = @"ORGretinaTriggerRegisterLock";
+NSString* ORGretinaTriggerRegisterIndexChanged          = @"ORGretinaTriggerRegisterIndexChanged";
+NSString* ORGretinaTriggerRegisterWriteValueChanged     = @"ORGretinaTriggerRegisterWriteValueChanged";
+NSString* ORGretinaTriggerFpgaDownProgressChanged       = @"ORGretinaTriggerFpgaDownProgressChanged";
+NSString* ORGretinaTriggerMainFPGADownLoadStateChanged	= @"ORGretinaTriggerMainFPGADownLoadStateChanged";
+NSString* ORGretinaTriggerFpgaFilePathChanged			= @"ORGretinaTriggerFpgaFilePathChanged";
 NSString* ORGretinaTriggerMainFPGADownLoadInProgressChanged = @"ORGretinaTriggerMainFPGADownLoadInProgressChanged";
-NSString* ORGretinaTriggerFirmwareStatusStringChanged		= @"ORGretinaTriggerFirmwareStatusStringChanged";
-NSString* ORGretinaTriggerModelInputLinkMaskChanged = @"ORGretinaTriggerModelInputLinkMaskChanged";
-NSString* ORGretinaTriggerSerdesTPowerMaskChanged   = @"ORGretinaTriggerSerdesTPowerMaskChanged";
-NSString* ORGretinaTriggerSerdesRPowerMaskChanged   = @"ORGretinaTriggerSerdesRPowerMaskChanged";
-NSString* ORGretinaTriggerLvdsPreemphasisCtlMask    = @"ORGretinaTriggerLvdsPreemphasisCtlMask";
-NSString* ORGretinaTriggerMiscCtl1RegChanged        = @"ORGretinaTriggerMiscCtl1RegChanged";
-NSString* ORGretinaTriggerMiscStatRegChanged        = @"ORGretinaTriggerMiscStatRegChanged";
-NSString* ORGretinaTriggerLinkLruCrlRegChanged      = @"ORGretinaTriggerLinkLruCrlRegChanged";
-NSString* ORGretinaTriggerLinkLockedRegChanged      = @"ORGretinaTriggerLinkLockedRegChanged";
-NSString* ORGretinaTriggerClockUsingLLinkChanged    = @"ORGretinaTriggerClockUsingLLinkChanged";
-NSString* ORGretinaTriggerModelInitStateChanged     = @"ORGretinaTriggerModelInitStateChanged";
+NSString* ORGretinaTriggerFirmwareStatusStringChanged	= @"ORGretinaTriggerFirmwareStatusStringChanged";
+NSString* ORGretinaTriggerModelInputLinkMaskChanged     = @"ORGretinaTriggerModelInputLinkMaskChanged";
+NSString* ORGretinaTriggerSerdesTPowerMaskChanged       = @"ORGretinaTriggerSerdesTPowerMaskChanged";
+NSString* ORGretinaTriggerSerdesRPowerMaskChanged       = @"ORGretinaTriggerSerdesRPowerMaskChanged";
+NSString* ORGretinaTriggerLvdsPreemphasisCtlMask        = @"ORGretinaTriggerLvdsPreemphasisCtlMask";
+NSString* ORGretinaTriggerMiscCtl1RegChanged            = @"ORGretinaTriggerMiscCtl1RegChanged";
+NSString* ORGretinaTriggerMiscStatRegChanged            = @"ORGretinaTriggerMiscStatRegChanged";
+NSString* ORGretinaTriggerLinkLruCrlRegChanged          = @"ORGretinaTriggerLinkLruCrlRegChanged";
+NSString* ORGretinaTriggerLinkLockedRegChanged          = @"ORGretinaTriggerLinkLockedRegChanged";
+NSString* ORGretinaTriggerClockUsingLLinkChanged        = @"ORGretinaTriggerClockUsingLLinkChanged";
+NSString* ORGretinaTriggerModelInitStateChanged         = @"ORGretinaTriggerModelInitStateChanged";
+NSString*  ORGretinaTriggerLockChanged                  = @"ORGretinaTriggerLockChanged";
 
 #define kFPGARemotePath @"GretinaFPGA.bin"
 #define kCurrentFirmwareVersion 0x107
@@ -272,32 +273,34 @@ typedef struct {
 
 //do NOT change this list without changing the enum states in the .h file
 static GretinaTriggerStateInfo master_state_info[kNumMasterTriggerStates] = {
-    { kMasterIdle,      kMasterState,   @"Idle"},
-    { kStepSetup,       kMasterState,   @"Setup"},
-    { kStep1a,          kMasterState,   @"Set Input Link Mask"},
-    { kStep1b,          kMasterState,   @"Set SerDes T/R Power"},
-    { kStep1c,          kMasterState,   @"Pre-Emphassis Control"},
-    { kStep1d,          kMasterState,   @"Release Link-Init"},
-    { kCheckStep1d,     kMasterState,   @"Check Misc Status"},
-    { kRunSteps2a2c,    kMasterState,   @"Running Router Setup"},
-    { kWaitOnSteps2a2c, kMasterState,   @"Waiting on Routers"},
-    { kStep3a,          kMasterState,   @"Read Link Lock"},
-    { kStep3b,          kMasterState,   @"Verify Link State"},
-    { kRunSteps4a4b,    kMasterState,   @"Setting Router Clock Src"},
-    { kWaitOnSteps4a4b, kMasterState,   @"Waiting on Routers"},
-    { kStep5a,          kMasterState,   @"Check WAIT_ACK State"},
-    { kStep5b,          kMasterState,   @"Set and Clear ACK Bit"},
-    { kStep5c,          kMasterState,   @"Verify ACKED Mode"},
-    { kStep5d,          kMasterState,   @"Send Normal Data"},
-    { kRunSteps6To9,    kMasterState,   @"Running non-Master Setup"},
-    { kWaitOnSteps6To9, kMasterState,   @"Waiting on Routers and Digitizers"},
-    { kStep10,          kMasterState,   @"Turn Off IMPERATIVE_SYNC Bit"},
-    { kMasterError,     kMasterState,   @""}
+    { kMasterIdle,          kMasterState,   @"Idle"},
+    { kMasterSetup,         kMasterState,   @"Setup"},
+    { kWaitOnRouterSetup,   kMasterState,   @"Wait On Router Setup"},
+    { kStep1a,              kMasterState,   @"Set Input Link Mask"},
+    { kStep1b,              kMasterState,   @"Set SerDes T/R Power"},
+    { kStep1c,              kMasterState,   @"Pre-Emphassis Control"},
+    { kStep1d,              kMasterState,   @"Release Link-Init"},
+    { kCheckStep1d,         kMasterState,   @"Check Misc Status"},
+    { kRunSteps2a2c,        kMasterState,   @"Running Router Setup"},
+    { kWaitOnSteps2a2c,     kMasterState,   @"Waiting on Routers"},
+    { kStep3a,              kMasterState,   @"Read Link Lock"},
+    { kStep3b,              kMasterState,   @"Verify Link State"},
+    { kRunSteps4a4b,        kMasterState,   @"Setting Router Clock Src"},
+    { kWaitOnSteps4a4b,     kMasterState,   @"Waiting on Routers"},
+    { kStep5a,              kMasterState,   @"Check WAIT_ACK State"},
+    { kStep5b,              kMasterState,   @"Set and Clear ACK Bit"},
+    { kStep5c,              kMasterState,   @"Verify ACKED Mode"},
+    { kStep5d,              kMasterState,   @"Send Normal Data"},
+    { kRunSteps6To9,        kMasterState,   @"Running Router/Gretina Setup"},
+    { kWaitOnSteps6To9,     kMasterState,   @"Waiting on Routers and Digitizers"},
+    { kStep10,              kMasterState,   @"Turn Off IMPERATIVE_SYNC Bit"},
+    { kMasterError,         kMasterState,   @""}
 };
 
 //do NOT change this list without changing the enum states in the .h file
 static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     { kRouterIdle,      kRouterState,   @"Idle"},
+    { kRouterSetup,     kRouterState,   @"Setup"},
     { kStep2a,          kRouterState,   @"Set SerDes T/R Power"},
     { kStep2b,          kRouterState,   @"L Link DEN,REN,SYNC"},
     { kStep2c,          kRouterState,   @"Enable Driver L Link"},
@@ -337,6 +340,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [fileQueue cancelAllOperations];
     [fileQueue release];
     [stateStatus release];
+    [errorString release];
     [super dealloc];
 }
 
@@ -463,18 +467,56 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [notifyCenter removeObserver:self];
     [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
+                     selector : @selector(runInitialization:)
+                         name : ORRunInitializationNotification
                        object : nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(startPollingLock:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(endPollingLock:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
+- (void) startPollingLock:(NSNotification*)aNote
+{
+    [self pollLock];
+}
+
+- (void) endPollingLock:(NSNotification*)aNote
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+}
+
+- (void) pollLock
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+    [self isLocked];
+    [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
+}
+
+- (void) runInitialization:(NSNotification*)aNote
 {
     [self initClockDistribution];
 }
 
 #pragma mark ***Accessors
+- (void) setErrorString:(NSString*)aString
+{
+    [errorString autorelease];
+    errorString = [aString copy];
+    NSLog(@"%@\n",errorString);
+}
+
+- (NSString*) errorString
+{
+    return errorString;
+}
 
 - (BOOL) verbose
 {
@@ -794,7 +836,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 return @"Program Error";
             }
         }
-        else return @"?";
+        else {
+            return @"";
+        }
     }
     else {
         if(anIndex<kNumRouterTriggerStates){
@@ -807,17 +851,30 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                 return @"Program Error";
             }
         }
-        else return @"?";
+        else return @"";
     }
 }
 
 - (void) initClockDistribution
 {
+    [self initClockDistribution:NO];
+}
+
+- (void) initClockDistribution:(BOOL)force
+{
+    if(![self isMaster])return;
+    
+    if(!force){
+        if([self isLocked]){
+            NSLog(@"Trigger System is locked.\n");
+            return;
+        }
+    }
     if(!initializationRunning && isMaster){
 
         [self addRunWaitWithReason:@"Wait for Trigger Card Clock Distribution Init"];
         [self setupStateArray];
-        [self setInitState:kStepSetup];
+        [self setInitState:kMasterSetup];
         connectedRouterMask = 0;
 
         [self setRoutersToIdle];
@@ -834,7 +891,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         if([otherConnector identifer] == 'L'){
             ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
             [routerObj setupStateArray];
-
             [routerObj setInitState:kRouterIdle];
         }
     }
@@ -866,7 +922,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     if(aStateIndex < [stateStatus count]){
         return [[stateStatus objectAtIndex:aStateIndex] objectForKey:@"status"];
     }
-    else return @"?";
+    else return @"";
 }
 
 - (BOOL) systemAllLocked
@@ -886,8 +942,17 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 - (BOOL) isLocked
 {
     [self setMiscStatReg:       [self readRegister:kMiscStatus]];
-    if((miscStatReg & 0x4000) != kAllLockBit) return NO;
-    else return YES;
+    BOOL lockState = (miscStatReg & 0x4000) == kAllLockBit;
+    if(lockState != locked){
+        locked = lockState;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerLockChanged object: self];
+    }
+    return lockState;
+}
+
+- (BOOL) locked
+{
+    return locked;
 }
 
 - (void) readDisplayRegs
@@ -911,40 +976,58 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     unsigned short masterPreMask = 0;
     if(verbose) NSLog(@"\n");
     if(verbose) NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
-    if(initializationState != kRunSteps2a2c && initializationState!= kWaitOnSteps2a2c){
-        [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
-    }
+
+    [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
+
+    int i;
     switch(initializationState){
             
-        case kStepSetup:
+        case kMasterSetup:
             connectedRouterMask = [self findRouterMask];
             if(connectedRouterMask==0){
-                NSLog(@"HW Error. Tried to initialize %@ for clock distribution but it is not connected to any routers\n",[self fullID]);
+                [self setErrorString:[NSString stringWithFormat:@"HW Error. Tried to initialize %@ for clock distribution but it is not connected to any routers",[self fullID]]];
                 [self setInitState:kMasterError];
             }
             else {
+                [self writeRegister:kInputLinkMask withValue:~connectedRouterMask]; //A set bit disables a channel
+
+               // [self writeToAddress:0x0840 aValue: 0xFFC4];
+               // [self writeToAddress:0x083C aValue: 0x0888];
+                
+                for(i=0;i<8;i++){
+                    ORConnector* otherConnector = [linkConnector[i] connector];
+                    if([otherConnector identifer] == 'L'){
+                        ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                        [routerObj setInitState:kRouterSetup];
+                        [routerObj stepRouter];
+                    }
+                }
+            
+                [self setInitState:kWaitOnRouterSetup];
+            }
+            break;
+            
+        case kWaitOnRouterSetup:
+            if([self allRoutersIdle]){
                 [self setInitState:kStep1a];
             }
             break;
             
-        case kStep1a: //1a. Mask out all unused channels
+        case kStep1a: //Mask out all unused channels
             [self writeRegister:kInputLinkMask withValue:~connectedRouterMask]; //A set bit disables a channel
-            //[self writeRegister:kInputLinkMask withValue:0xFE];
             [self setInputLinkMask:  [self readRegister:kInputLinkMask]];       //read it back for display
             [self setInitState:kStep1b];
             break;
             
-        case kStep1b: //1b. Set the matching bit in the serdes tpower and rpower registers
+        case kStep1b: //Set the matching bit in the serdes tpower and rpower registers
             [self writeRegister:kSerdesTPower withValue:connectedRouterMask];
             [self writeRegister:kSerdesRPower withValue:connectedRouterMask];
-            //[self writeRegister:kSerdesTPower withValue:0x1];
-            //[self writeRegister:kSerdesRPower withValue:0x1];
             [self setSerdesTPowerMask:[self readRegister:kSerdesTPower]]; //read it back for display
             [self setSerdesRPowerMask:[self readRegister:kSerdesRPower]]; //read it back for display
             [self setInitState:kStep1c];
             break;
             
-        case kStep1c: //1c. Turn on the driver enable bits for the used channels
+        case kStep1c: //Turn on the driver enable bits for the used channels
             if(connectedRouterMask & 0xf)    masterPreMask |= 0x151; //Links A,B,C,D
             if(connectedRouterMask & 0x70)   masterPreMask |= 0x152; //Links E,F,G
             if(connectedRouterMask & 0x780)  masterPreMask |= 0x154; //Links H,L,R,U
@@ -953,7 +1036,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self setInitState:kStep1d];
             break;
             
-        case kStep1d: //1d. Release the link-init machine by clearing the reset bit in the misc-ctl register
+        case kStep1d: //Release the link-init machine by clearing the reset bit in the misc-ctl register
             [self writeRegister:kMiscCtl1 withValue:[self readRegister:kMiscCtl1] & ~kResetLinkInitMachBit];
             //[self writeRegister:kMiscCtl1 withValue:0xFFC0];
             [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]]; //read it back for display
@@ -962,7 +1045,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kCheckStep1d: //verify that we are waiting to lock onto the data stream of the router
             if(((miscStatReg & kLinkInitStateMask)>>8) != 0x3){
-                NSLog(@"HW issue: Master Trigger %@ not waiting for data stream from Router.\n",[self fullID]);
+                [self setErrorString:[NSString stringWithFormat:@"HW issue: Master Trigger %@ not waiting for data stream from Router",[self fullID]]];
+                if(verbose)NSLog(@"Misc Status Reg: 0x%04x\n",miscStatReg);
                 [self setInitState:kMasterError];
             }
             else {
@@ -971,9 +1055,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             }
             break;
             
-        case kRunSteps2a2c:
-        {
-            int i;
+        case kRunSteps2a2c: // pass control to the routers
             for(i=0;i<8;i++){
                 ORConnector* otherConnector = [linkConnector[i] connector];
                 if([otherConnector identifer] == 'L'){
@@ -982,36 +1064,38 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     [routerObj stepRouter];
                 }
             }
-        }
+        
             [self setInitState:kWaitOnSteps2a2c];
             break;
             
-        case kWaitOnSteps2a2c:
+        case kWaitOnSteps2a2c: //waiting on routers
             if([self allRoutersIdle]){
                 [self setInitState:kStep3a];
             }
             break;
             
         // Also rarely gets stuck here. Trigger cards stop responding. Current solution is power off / on.
-        case kStep3a://3a. Read Link Locked to verify the SERDES of Master is locked the syn pattern of the Router
+        case kStep3a://Read Link Locked to verify the SERDES of Master is locked the syn pattern of the Router
             if(linkLockedReg!= (~connectedRouterMask & 0x7FF)) {
-                NSLog(@"HW issue: the SERDES of the Master has not locked on to the synchronization pattern from the Router");
+                [self setErrorString:@"HW issue: the SERDES of the Master has not locked on to the synchronization pattern from the Router"];
                 [self setInitState:kMasterError];
             }
             else {
-                if(verbose)NSLog(@"The Link Locked Register of the Master indicates it has locked onto the synchronization pattern of the router");
+                if(verbose)NSLog(@"The Link Locked Register of the Master indicates it has locked onto the synchronization pattern of the router\n");
                 [self setInitState:kStep3b];
             }
             
             break;
             
-        case kStep3b: //3b. Verify that the state of the link
+        case kStep3b: //Verify that the state of the link
             if (((miscStatReg & kLinkInitStateMask)>>8) != 0x4) {
-                NSLog(@"HW issue: Master Trigger %@ has not locked on to the synchronization pattern from the Router.\n",[self fullID]);
+                [self setErrorString:[NSString stringWithFormat:@"HW issue: Master Trigger %@ has not locked on to the synchronization pattern from the Router",[self fullID]]];
+                if(verbose)NSLog(@"Misc Status Reg: 0x%04x\n",miscStatReg);
                 [self setInitState:kMasterError];
             }
             else if(((miscStatReg & kAllLockBit)>>14) != 0x1) {
-                NSLog(@"HW issue: Master Trigger %@ does not have all links locked.\n",[self fullID]);
+                [self setErrorString:[NSString stringWithFormat:@"HW issue: Master Trigger %@ does not have all links locked",[self fullID]]];
+                if(verbose)NSLog(@"Misc Status Reg: 0x%04x\n",miscStatReg);
                 [self setInitState:kMasterError];
             }
             else {
@@ -1020,9 +1104,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             }
             break;
        
-        case kRunSteps4a4b:
-        {
-            int i;
+        case kRunSteps4a4b: //pass control to the routers
+        
             for(i=0;i<8;i++){
                 ORConnector* otherConnector = [linkConnector[i] connector];
                 if([otherConnector identifer] == 'L'){
@@ -1031,19 +1114,20 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     [routerObj stepRouter];
                 }
             }
-        }
+        
             [self setInitState:kWaitOnSteps4a4b];
             break;
 
-        case kWaitOnSteps4a4b:
+        case kWaitOnSteps4a4b: //wait for routers to finish
             if([self allRoutersIdle]){
                 [self setInitState:kStep5a];
             }
             break;
             
-        case kStep5a:  // This is where it sometimes fails
+        case kStep5a:  //Check wait ack flag
             if(((miscStatReg & kWaitAcknowledgeStateMask) >> 8) != 0x4) {
-                NSLog(@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in WAIT_ACK mode.\n", [self fullID]);
+                [self setErrorString:[NSString stringWithFormat:@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in WAIT_ACK mode", [self fullID]]];
+                if(verbose)NSLog(@"Misc Status Reg: 0x%04x\n",miscStatReg);
                 [self setInitState:kMasterError];
             }
             else {
@@ -1061,7 +1145,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kStep5c:
             if (((miscStatReg & kAcknowledgedStateMask) >> 8 != 0x5)) {
-                NSLog(@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in ACKED mode.\n", [self fullID]);
+                [self setErrorString:[NSString stringWithFormat:@"HW Error: Master Trigger MISC_STAT register %@ indicates that it is not in ACKED mode", [self fullID]]];
+                if(verbose)NSLog(@"Misc Status Reg: 0x%04x\n",miscStatReg);
                 [self setInitState:kMasterError];
             }
             else {
@@ -1076,9 +1161,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self setInitState:kRunSteps6To9];
             break;
             
-        case kRunSteps6To9:
-        {
-            int i;
+        case kRunSteps6To9: //pass control to routers to init serdes on the gretina cards
             for(i=0;i<8;i++){
                 ORConnector* otherConnector = [linkConnector[i] connector];
                 if([otherConnector identifer] == 'L'){
@@ -1087,11 +1170,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     [routerObj stepRouter];
                 }
             }
-        }
+        
             [self setInitState:kWaitOnSteps6To9];
             break;
             
-        case kWaitOnSteps6To9:
+        case kWaitOnSteps6To9:  //wait on routers
             if([self allRoutersIdle]){
                 [self setInitState:kStep10];
             }
@@ -1103,12 +1186,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self setInitState:kMasterIdle];
     }
     
-    if(initializationState != kRunSteps2a2c     &&
-       initializationState!= kWaitOnSteps2a2c   &&
-       initializationState != kWaitOnSteps4a4b  &&
-       initializationState != kWaitOnSteps6To9) {
-        [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
-    }
+    [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
     
     if(initializationState != kMasterError &&
        initializationState != kMasterIdle) {
@@ -1117,10 +1195,10 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
     if(initializationState == kMasterError){
         //there was an error, we must make sure the run doesn't continue to start
-        NSString* reason = @"Trigger Card Failed to achieve lock";
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+        NSString* reason = [NSString stringWithFormat:@"%@ Failed to achieve lock.",[self fullID]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort
                                                             object:self
-                                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+                                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",errorString,@"Details",nil]];
         [self releaseRunWait];
 
     }
@@ -1151,22 +1229,24 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     
     if(verbose) NSLog(@"\n");
     if(verbose)NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
-    //    NSLog(@"Before Step\n");
     //read a few registers that we will use repeatedly and display
     [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
-    
+    int i;
     switch(initializationState){
-        case kStep2a://2a. Enable the "L" link
-            //--------------
-            //[self writeRegister:kInputLinkMask withValue:([self readRegister:kInputLinkMask] & ~0x100)]; //A set bit disables a channel !!!
-            //[self setInputLinkMask:  [self readRegister:kInputLinkMask]];   //read it back for display
-            //--------------
+        case kRouterSetup: //force some regs to power up state
+            //[self writeToAddress:0x0840 aValue: 0x0004];
+           // [self writeToAddress:0x083C aValue: 0x0888];
+            //[self writeRegister:kLinkLruCrl withValue:0x0888];
+            //[self writeRegister:kMiscCtl1 withValue:0x0004];
+            [self setInitState:kRouterIdle];
+        break;
+
+            
+        case kStep2a://2a. Power up the SerDes TPower and RPower
             
             [self writeRegister:kSerdesTPower withValue:kPowerOnLSerDes];
             [self writeRegister:kSerdesRPower withValue:kPowerOnLSerDes];
-            //[self writeRegister:kSerdesTPower withValue:0x100];
-            //[self writeRegister:kSerdesRPower withValue:0x100];
-            
+             
             [self setSerdesTPowerMask:[self readRegister:kSerdesTPower]]; //read back for display
             [self setSerdesRPowerMask:[self readRegister:kSerdesRPower]]; //read back for display
             
@@ -1174,21 +1254,18 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             break;
             
         case kStep2b: //2b. Turn on the DEN, REN, and SYNC for Link "L"
-            //[self writeRegister:kLinkLruCrl withValue: ( [self readRegister:kLinkLruCrl] | kLinkLruCrlMask)];
             [self writeRegister:kLinkLruCrl withValue:0x88F];
             [self setLinkLruCrlReg:[self readRegister:kLinkLruCrl]]; //read back for display
             [self setInitState:kStep2c];
             break;
             
-        case kStep2c: //2c. Enable the Link "L" driver
-            //[self writeRegister:kLvdsPreEmphasis withValue:([self readRegister:kLvdsPreEmphasis] | kLvdsPreEmphasisPowerOnL)]; // !!!
+        case kStep2c: //2c. PreEmphasis
             [self writeRegister:kLvdsPreEmphasis withValue:0x157];
             [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]]; //read back for display
             [self setInitState:kRouterIdle];
             break;
             
         case kStep4a:
-            //[self writeRegister:kMiscClkCrl withValue:[self readRegister:kMiscClkCrl] | kClockSourceSelectBit];
             [self writeRegister:kMiscClkCrl withValue:0x8007];
             [self setClockUsingLLink:([self readRegister:kMiscClkCrl] & kClockSourceSelectBit)!=0]; //read back for display
             [self setInitState:kRouterIdle];
@@ -1217,8 +1294,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
              
              }
              break;
-             */
-/*        case kStep4b: // Completed in kStepStartCheckingCounter and kStepCheckCounter. Kept to match exact steps outlined in instructions
+             
+          case kStep4b: // Completed in kStepStartCheckingCounter and kStepCheckCounter. Kept to match exact steps outlined in instructions
             stepAfterCounterCheck = kStep4b;
             [self setInitState:kStepStartCheckingCounter];
             [self setInitState:kStepIdle];
@@ -1239,7 +1316,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
        case kStep7a:
             connectedDigitizerMask = [self findDigitizerMask];
             if(connectedDigitizerMask == 0) {
-                NSLog(@"The Router is not connected to any digitizers.");
+                [self setErrorString:@"Rounter is not connected to any digitizers"];
                 [self setInitState:kRouterError];
             }
             else {
@@ -1260,16 +1337,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self setInitState:kStep7d];
             break;
             
-            //not used because all preemps are turned on
-/*        case kStep7c:
-            if(connectedDigitizerMask & 0xf) routerPreMask |= 0x151; //Links A,B,C,D
-            if(connectedRouterMask & 0x70)   routerPreMask |= 0x152; //Links E,F,G
-            if(connectedRouterMask & 0x780)  routerPreMask |= 0x154; //Links H,L,R,U
-            [self writeRegister:kLvdsPreEmphasis withValue:routerPreMask];
-            [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]]; //read it back for display
-            [self setInitState:kStep7d];
-            break;
-*/           
         case kStep7d:
           //  [self writeRegister:kMiscCtl1 withValue:([self readRegister:kMiscCtl1] & ~kResetLinkInitMachBit)];
             [self writeRegister:kMiscCtl1 withValue:0x10];
@@ -1277,58 +1344,21 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self setInitState:kStep8];
             break;
             
-/*        case kStep7e:
-            // Finish ???
-            [self setInitState:kStep7f];
-            break;
-            
-        case kStep7f:
-            if (([self readRegister:kMiscCtl1] & linkInitAckBit)>>1 != 0x1) {
-                if(verbose)NSLog(@"HW Issue: All router links are not reporting that they are locked.");
-                [self setInitState:kStepError];
-            }
-            else {
-                // ???
-                
-            }
-            break;
- */
         case kStep8:
-            {
-                int i;
-                for(i=0;i<8;i++){
-                    if([linkConnector[i]  identifer] != 'L'){
-                        ORConnector* otherConnector = [linkConnector[i] connector];
-                        ORGretina4MModel* digitizerObj = [otherConnector objectLink];
-                        if(digitizerObj){
-                            if(verbose)NSLog(@"Set up Gretina SerDes %@\n",[digitizerObj fullID]);
-                            [digitizerObj setInitState:kSerDesStep1];
-                            [digitizerObj stepSerDesInit];
-                        }
-                    }
-                }
-            }
-            [self setInitState:kGretinaInitWait];
- 
- /*       {
-            int i;
             for(i=0;i<8;i++){
                 if([linkConnector[i]  identifer] != 'L'){
                     ORConnector* otherConnector = [linkConnector[i] connector];
                     ORGretina4MModel* digitizerObj = [otherConnector objectLink];
                     if(digitizerObj){
                         if(verbose)NSLog(@"Set up Gretina SerDes %@\n",[digitizerObj fullID]);
-                        [digitizerObj writeFPGARegister:kVMEGPControl withValue:0x2];
-                        [digitizerObj writeRegister:kSDConfig withValue:0x10];
-                        [digitizerObj writeRegister:kSDConfig withValue:0x0];
-                        [digitizerObj writeRegister:kMasterLogicStatus withValue:0x20051];
-                        [digitizerObj writeRegister:kSDConfig withValue:0x20];
+                        [digitizerObj setInitState:kSerDesSetup];
+                        [digitizerObj stepSerDesInit];
                     }
                 }
             }
-        }
-  */
-           // [self setInitState:kStep9];
+            
+            [self setInitState:kGretinaInitWait];
+ 
             break;
         
         case kGretinaInitWait:
@@ -1343,7 +1373,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self writeRegister:kMiscCtl1 withValue:0x10];
             [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
             [self setInitState:kRouterIdle];
-         
+            break;
     }
     [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
     

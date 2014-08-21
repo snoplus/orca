@@ -235,6 +235,12 @@
                          name : ORGretinaTriggerModelVerboseChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORGretinaTriggerLockChanged
+						object: model];
+    
+    
 }
 
 - (void) updateWindow
@@ -264,9 +270,14 @@
 	[self initStateChanged:nil];
 	[self diagnosticCounterChanged:nil];
 	[self verboseChanged:nil];
+	[self lockChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) lockChanged:(NSNotification*)aNote
+{
+    [lockedField setStringValue:[model locked]?@"Yes":@"No"];
+}
 
 - (void) verboseChanged:(NSNotification*)aNote
 {

@@ -38,6 +38,7 @@
 	IBOutlet NSTableView*   miscStatTable;
     IBOutlet NSTextField*   clockUsingLLinkField;
     IBOutlet NSTextField*   initStateField;
+    IBOutlet NSTextField*   lockedField;
 
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
@@ -104,6 +105,7 @@
 - (void) miscStatRegChanged:(NSNotification*)aNote;
 - (void) clockUsingLLinkChanged:(NSNotification*)aNote;
 - (void) initStateChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) verboseAction:(id)sender;
