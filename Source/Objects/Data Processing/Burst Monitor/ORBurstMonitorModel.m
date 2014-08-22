@@ -209,7 +209,8 @@ NSDate* burstStart = NULL;
     while([aChans count]>0)
     {
         searchChan = [[aChans objectAtIndex:(0)] intValue]; //This is first channel, look to see if there are more of it
-        for(int k = 1; k<[aChans count]; k++)
+        int k; //MAH -- declaration has to be outside the loop for XCode < 5.x
+        for(k = 1; k<[aChans count]; k++)
         {
             if([[aChans objectAtIndex:(k)] intValue] == searchChan)
             {
@@ -329,7 +330,8 @@ NSDate* burstStart = NULL;
                                         }
                                         //Find metadata
                                         NSMutableArray* reChans = [chans mutableCopy];
-                                        for(int j=0; j<[reChans count]; j++)
+                                        int j; //MAH -- declaration has to be outside the loop for XCode < 5.x
+                                        for(j=0; j<[reChans count]; j++)
                                         {
                                             int chanID = [[reChans objectAtIndex:j] intValue] + 10*[[cards objectAtIndex:j] intValue];
                                             [reChans replaceObjectAtIndex:j withObject:[NSNumber numberWithInt:chanID]];
