@@ -113,7 +113,8 @@
     IBOutlet NSButton*		diagnosticsClearButton;
     
     IBOutlet NSTextField*	initSerDesStateField;
-
+    IBOutlet NSTextField*   lockStateField;
+    
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
     IBOutlet NSTextField*			noiseFloorOffsetField;

@@ -277,6 +277,8 @@
 - (void) lockChanged:(NSNotification*)aNote
 {
     [lockedField setStringValue:[model locked]?@"Yes":@"No"];
+    
+    [digitizersLockedField setStringValue:[NSString stringWithFormat:@"%d/%d",[model digitizerLockCount],[model digitizerCount]]];    
 }
 
 - (void) verboseChanged:(NSNotification*)aNote

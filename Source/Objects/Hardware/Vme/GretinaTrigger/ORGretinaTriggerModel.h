@@ -175,26 +175,24 @@ enum {
     kMasterIdle,
     kMasterSetup,
     kWaitOnRouterSetup,
-    kStep1a,
-    kStep1b,
-    kStep1c,
-    kStep1d,
-    kCheckStep1d,
-    kRunSteps2a2c,
-    kWaitOnSteps2a2c,
-    kStep3a,
+    kSetInputLinkMask,
+    kSetMasterTRPower,
+    kSetMasterPreEmphCtrl,
+    kReleaseLinkInit,
+    kCheckMiscStatus,
+    kStartRouterTRPowerUp,
+    kWaitOnRouterTRPowerUp,
+    kReadLinkLock,
     kStep3b,
     kRunSteps4a4b,
     kWaitOnSteps4a4b,
-    //kStepStartCheckingCounter,
-    //kStepCheckCounter,
-    kStep5a,
-    kStep5b,
-    kStep5c,
-    kStep5d,
-    kRunSteps6To9,
-    kWaitOnSteps6To9,
-    kStep10,
+    kCheckWaitAckState,
+    kMasterSetClearAckBit,
+    kVerifyAckMode,
+    kSendNormalData,
+    kRunRouterDataCheck,
+    kWaitOnRouterDataCheck,
+    kReleaseClocks,
     kMasterError,
     kNumMasterTriggerStates //must be last
 };
@@ -204,19 +202,19 @@ enum {
 enum {
     kRouterIdle,
     kRouterSetup,
-    kGretinaSetup,
-    kGretinaSetupWait,
-    kStep2a,
-    kStep2b,
-    kStep2c,
-    kStep4a,
-    kStep6a,
-    kStep7a,
-    kStep7b,
-    kStep7d,
-    kStep8,
-    kGretinaInitWait,
-    kStep9,
+    kDigitizerSetup,
+    kDigitizerSetupWait,
+    kSetRouterTRPower,
+    SetLLinkDenRenSync,
+    kSetRouterPreEmphCtrl,
+    kSetClockSource,
+    kRouterDataChecking,
+    kMaskUnusedRouterChans,
+    kSetTRPowerBits,
+    kReleaseLintInitReset,
+    kRunDigitizerInit,
+    kWaitOnDigitizerInit,
+    kRouterSetClearAckBit,
     kRouterError,
     kNumRouterTriggerStates //must be last
 };
@@ -277,6 +275,8 @@ enum {
     unsigned short  connectedDigitizerMask;
     NSMutableArray* stateStatus;
     NSString*       errorString;
+    int             digitizerCount;
+    int             digitizerLockCount;
 }
 
 - (id) init;
@@ -294,6 +294,9 @@ enum {
 
 #pragma mark ***Accessors
 - (BOOL) locked;
+- (void) setLocked:(BOOL)aState;
+- (int) digitizerCount;
+- (int) digitizerLockCount;
 - (void) setErrorString:(NSString*)aString;
 - (NSString*) errorString;
 - (BOOL) verbose;
@@ -351,7 +354,7 @@ enum {
 #pragma mark •••set up routines
 - (void) initClockDistribution;
 - (void) initClockDistribution:(BOOL)force;
-- (BOOL) systemAllLocked;
+- (BOOL) checkSystemLock;
 - (BOOL) isLocked;
 - (unsigned short)findRouterMask;
 - (unsigned short)findDigitizerMask;

@@ -176,7 +176,7 @@
 
     //recast pointer to short and point to the actual data header
     unsigned short* headerPtr = (unsigned short*)(ptr+2);
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",headerPtr[0]&0xf];
+    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",headerPtr[2]&0xf];
     
 	unsigned long energy = headerPtr[7] + (headerPtr[8] << 16);
 	

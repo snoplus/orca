@@ -86,6 +86,7 @@ NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdCh
 NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
 NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultiplierChanged";
 NSString* ORGretina4MModelInitStateChanged      = @"ORGretina4MModelInitStateChanged";
+NSString* ORGretina4MLockChanged                = @"ORGretina4MLockChanged";
 
 
 @interface ORGretina4MModel (private)
@@ -1269,110 +1270,76 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) stepSerDesInit
 {
-    //---------------
-    //[self writeRegister:kSDConfig           withValue: 0x00000031]; //power up value
-    //[self writeRegister:kVMEGPControl       withValue: 0x00000400]; //power up value
-    //[self writeRegister:kMasterLogicStatus  withValue:0x05420000]; //power up value
-   
-    //[self writeRegister:kSDConfig withValue:(0x3<<9)];
-   // [self writeFPGARegister:kVMEGPControl withValue:0x2];
-    //[self writeRegister:kSDConfig withValue:0x11];
-    //[self writeRegister:kSDConfig withValue:0x0];
-    //[self writeRegister:kMasterLogicStatus withValue:0x20051];
-   // [self writeRegister:kSDConfig withValue:0x20];
-   
-    
-    //[self setInitState:kSerDesIdle];
-    //return;
-    //---------------
-
-   // NSLog(@"1)%@ --> %@: SD_Config: 0x%08x\n",[self fullID],[self initSerDesStateName],[self readRegister:kSDConfig]);
-    NSLog(@"1)%@ --> %@: VMEGP: 0x%08x \n",[self fullID],[self initSerDesStateName],[self readFPGARegister:kVMEGPControl]);
     switch(initializationState){
-            
         case kSerDesSetup:
-            NSLog(@"SD Config: 0x%08x\n",[self readRegister:kSDConfig]);
-            NSLog(@"Master Logic Status: 0x%08x\n",[self readRegister:kMasterLogicStatus]);
-            NSLog(@"VmeGPControl: 0x%08x\n",[self readRegister:kVMEGPControl]);
-            [self writeRegister:kSDConfig           withValue: 0x00000031]; //turn off the SERDES and reset the
-            [self writeRegister:kMasterLogicStatus  withValue:0x04420000]; //power up value
-            
-            //[self clockManagerReset];
+            [self writeRegister:kSDConfig           withValue: 0x00000631]; //SERDES disabled
+            [self writeRegister:kMasterLogicStatus  withValue: 0x04420000]; //power up value
             [self setInitState:kSerDesIdle];
 
             break;
             
-        case kSerDesStep1:
+        case kSetDigitizerClkSrc:
+            [self writeRegister:kSDConfig           withValue: 0x00000031]; //SERDES disabled
             [[self undoManager] disableUndoRegistration];
             [self setClockSource:0]; //set to external clock gui only
             [[self undoManager] enableUndoRegistration];
             
-            //[self writeFPGARegister:kVMEGPControl withValue:0x2];
             [self writeFPGARegister:kVMEGPControl withValue:0x0]; //thorsten suggestion
-            [self setInitState:kSerDesStep2];
+            [self setInitState:kPowerUpRTPower];
             break;
             
-        case kSerDesStep2:
-            [self writeRegister:kSDConfig withValue:0x10];
-            [self setInitState:kSerDesStep3];
+        case kPowerUpRTPower:
+            [self writeRegister:kSDConfig withValue:0x00];
+            [self setInitState:kSetMasterLogic];
             break;
             
-        case kSerDesStep3:
-            [self writeRegister:kSDConfig withValue:0x0];
-            [self setInitState:kSerDesStep4];
+        case kSetMasterLogic:
+            [self writeRegister:kMasterLogicStatus withValue:0x20051];
+            [self setInitState:kSetSDSyncBit];
             break;
             
-        case kSerDesStep4:
-           [self writeRegister:kMasterLogicStatus withValue:0x20051];
-            [self setInitState:kSerDesStep5];
-           break;
-            
-        case kSerDesStep5:
-
+        case kSetSDSyncBit:
             [self writeRegister:kSDConfig withValue:0x20];
             [self setInitState:kSerDesIdle];
-            
-
             break;
             
         case kSerDesError:
             break;
 
     }
-    NSLog(@"2)%@ --> %@: VMEGP: 0x%08x \n\n",[self fullID],[self initSerDesStateName],[self readFPGARegister:kVMEGPControl]);
     if(initializationState!= kSerDesError && initializationState!= kSerDesIdle){
        [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.1];
     }
 }
+
+- (BOOL) isLocked
+{
+    [self setLocked:([self readRegister:kMasterLogicStatus] & kSDLockBit)==kSDLockBit];
+     return [self locked];
+}
+
+- (BOOL) locked
+{
+    return locked;
+}
+
+- (void) setLocked:(BOOL)aState
+{
+    locked = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MLockChanged object: self];
+}
+
 - (NSString*) initSerDesStateName
 {
-    switch(initializationState){
-        case kSerDesIdle:
-            return @"Idle";
-            
-        case kSerDesSetup:
-            return @"Set up";
-            
-        case kSerDesStep1:
-            return @"Write VME GP = 0x2";
-            
-        case kSerDesStep2:
-            return @"Write SD Config = 0x10";
-            
-        case kSerDesStep3:
-            return @"Write SD Config = 0x00";
-            
-        case kSerDesStep4:
-            return @"Write Master Logic = 0x20051";
-            
-        case kSerDesStep5:
-            return @"Write SD Config = 0x20";
-            
-        case kSerDesError:
-            return @"Error";
-            
-        default:
-            return @"?";
+    switch(initializationState){    
+        case kSerDesIdle:           return @"Idle";
+        case kSerDesSetup:          return @"Reset to power up state";
+        case kSetDigitizerClkSrc:   return @"Set the Clk Source";
+        case kPowerUpRTPower:       return @"Power up T/R Power";
+        case kSetMasterLogic:       return @"Write Master Logic = 0x20051";
+        case kSetSDSyncBit:         return @"Write SD Sync Bit";
+        case kSerDesError:          return @"Error";
+        default:                    return @"?";
     }
 }
 
@@ -1527,7 +1494,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeControlReg:i enabled:YES];
         }
     }
-    
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }

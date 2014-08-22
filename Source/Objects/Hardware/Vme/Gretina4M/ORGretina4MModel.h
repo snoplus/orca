@@ -70,15 +70,16 @@
 #define kSPIClock	    0x4
 #define kSPIChipSelect	0x8
 #define kSPIRead        0x10
+#define kSDLockBit      (0x1<<17)
+#define kSDLostLockBit  (0x1<<24)
 
 enum {
     kSerDesIdle,
     kSerDesSetup,
-    kSerDesStep1,
-    kSerDesStep2,
-    kSerDesStep3,
-    kSerDesStep4,
-    kSerDesStep5,
+    kSetDigitizerClkSrc,
+    kPowerUpRTPower,
+    kSetMasterLogic,
+    kSetSDSyncBit,
     kSerDesError,
 };
 
@@ -273,6 +274,7 @@ enum Gretina4MFIFOStates {
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
+    BOOL            locked;
     
     //------------------internal use only
     NSOperationQueue*	fileQueue;
@@ -530,9 +532,14 @@ enum Gretina4MFIFOStates {
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan;
 - (unsigned short) gainForDisplay:(unsigned short) aChan;
 
+- (BOOL) isLocked;
+- (BOOL) locked;
+- (void) setLocked:(BOOL)aState;
+
 #pragma mark •••Internal Use only
 - (void) stepSerDesInit;
 - (NSString*) initSerDesStateName;
+
 @end
 
 @interface NSObject (Gretina4M)
@@ -594,4 +601,5 @@ extern NSString* ORGretina4MPresumEnabledChanged;
 extern NSString* ORGretina4MEasySelectedChanged;
 extern NSString* ORGretina4MModelHistEMultiplierChanged;
 extern NSString* ORGretina4MModelInitStateChanged;
+extern NSString* ORGretina4MLockChanged;
 

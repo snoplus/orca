@@ -405,8 +405,13 @@
     [notifyCenter addObserver : self
                      selector : @selector(initSerDesStateChanged:)
                          name : ORGretina4MModelInitStateChanged
-
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORGretina4MLockChanged
+						object: model];
+    
    
 }
 
@@ -489,10 +494,15 @@
     
 	[self histEMultiplierChanged:nil];
     [self initSerDesStateChanged:nil];
-    
+    [self lockChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) lockChanged:(NSNotification*) aNote
+{
+    [lockStateField setStringValue:[model locked]?@"Yes":@"No"];
+}
+
 - (void) initSerDesStateChanged:(NSNotification*) aNote
 {
     [initSerDesStateField setStringValue:[model initSerDesStateName]];
