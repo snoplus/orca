@@ -277,6 +277,8 @@ enum Gretina4MFIFOStates {
     //------------------internal use only
     NSOperationQueue*	fileQueue;
     int                 initializationState;
+    unsigned long       snapShot[kNumberOfGretina4MRegisters];
+    unsigned long       fpgaSnapShot[kNumberOfFPGARegisters];
 }
 
 - (id) init;
@@ -434,6 +436,8 @@ enum Gretina4MFIFOStates {
 - (float) integrateTimeConverted;
 
 - (void) dumpAllRegisters;
+- (void) snapShotRegisters;
+- (void) compareToSnapShot;
 
 #pragma mark •••Hardware Access
 - (short) readBoardID;

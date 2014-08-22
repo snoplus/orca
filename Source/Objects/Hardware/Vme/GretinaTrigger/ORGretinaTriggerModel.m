@@ -301,6 +301,8 @@ static GretinaTriggerStateInfo master_state_info[kNumMasterTriggerStates] = {
 static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     { kRouterIdle,      kRouterState,   @"Idle"},
     { kRouterSetup,     kRouterState,   @"Setup"},
+    { kGretinaSetup,     kRouterState,  @"Running Digitizer Setup"},
+    { kGretinaSetupWait, kRouterState,  @"Waiting For Digitizer SerDes Setup"},
     { kStep2a,          kRouterState,   @"Set SerDes T/R Power"},
     { kStep2b,          kRouterState,   @"L Link DEN,REN,SYNC"},
     { kStep2c,          kRouterState,   @"Enable Driver L Link"},
@@ -309,8 +311,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     { kStep7a,          kRouterState,   @"Mask Unused Router Channels"},
     { kStep7b,          kRouterState,   @"Set TPower and RPower Bits"},
     { kStep7d,          kRouterState,   @"Release LINK_INIT Reset"},
-    { kStep8,           kRouterState,   @"Running Digitizer Setup"},
-    { kGretinaInitWait, kRouterState,   @"Waiting For Gretina SerDes Init"},
+    { kStep8,           kRouterState,   @"Running Digitizer Init"},
+    { kGretinaInitWait, kRouterState,   @"Waiting For Digitizer init"},
     { kStep9,           kRouterState,   @"Set and Clear ACK Bit"},
     { kRouterError,     kRouterState,   @""}
 };
@@ -991,8 +993,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             else {
                 [self writeRegister:kInputLinkMask withValue:~connectedRouterMask]; //A set bit disables a channel
 
-               // [self writeToAddress:0x0840 aValue: 0xFFC4];
-               // [self writeToAddress:0x083C aValue: 0x0888];
+                [self writeToAddress:0x0840 aValue: 0xFFC4];
+                [self writeToAddress:0x083C aValue: 0x0888];
                 
                 for(i=0;i<8;i++){
                     ORConnector* otherConnector = [linkConnector[i] connector];
@@ -1236,10 +1238,33 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         case kRouterSetup: //force some regs to power up state
             //[self writeToAddress:0x0840 aValue: 0x0004];
            // [self writeToAddress:0x083C aValue: 0x0888];
-            //[self writeRegister:kLinkLruCrl withValue:0x0888];
-            //[self writeRegister:kMiscCtl1 withValue:0x0004];
-            [self setInitState:kRouterIdle];
+            [self writeRegister:kLinkLruCrl withValue:0x0888];
+            [self writeRegister:kMiscCtl1 withValue:0x0004];
+            [self setInitState:kGretinaSetup];
         break;
+            
+        case kGretinaSetup:
+            for(i=0;i<8;i++){
+                if([linkConnector[i]  identifer] != 'L'){
+                    ORConnector* otherConnector = [linkConnector[i] connector];
+                    ORGretina4MModel* digitizerObj = [otherConnector objectLink];
+                    if(digitizerObj){
+                        if(verbose)NSLog(@"Init Gretina SerDes VMEGP Reg %@\n",[digitizerObj fullID]);
+                        [digitizerObj setInitState:kSerDesSetup];
+                        [digitizerObj stepSerDesInit];
+                    }
+                }
+            }
+            
+            [self setInitState:kGretinaSetupWait];
+            
+            break;
+            
+        case kGretinaSetupWait:
+            if([self allGretinaCardsIdle]){
+                [self setInitState:kRouterIdle];
+            }
+            break;
 
             
         case kStep2a://2a. Power up the SerDes TPower and RPower
@@ -1344,6 +1369,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             [self setInitState:kStep8];
             break;
             
+            
         case kStep8:
             for(i=0;i<8;i++){
                 if([linkConnector[i]  identifer] != 'L'){
@@ -1351,21 +1377,22 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
                     ORGretina4MModel* digitizerObj = [otherConnector objectLink];
                     if(digitizerObj){
                         if(verbose)NSLog(@"Set up Gretina SerDes %@\n",[digitizerObj fullID]);
-                        [digitizerObj setInitState:kSerDesSetup];
+                        [digitizerObj setInitState:kSerDesStep1];
                         [digitizerObj stepSerDesInit];
                     }
                 }
             }
             
             [self setInitState:kGretinaInitWait];
- 
+            
             break;
-        
+            
         case kGretinaInitWait:
             if([self allGretinaCardsIdle]){
                 [self setInitState:kStep9];
             }
             break;
+            
             
         case kStep9:
             [self writeRegister:kMiscCtl1 withValue:0x12];

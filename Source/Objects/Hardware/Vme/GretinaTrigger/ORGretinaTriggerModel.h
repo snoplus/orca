@@ -204,6 +204,8 @@ enum {
 enum {
     kRouterIdle,
     kRouterSetup,
+    kGretinaSetup,
+    kGretinaSetupWait,
     kStep2a,
     kStep2b,
     kStep2c,

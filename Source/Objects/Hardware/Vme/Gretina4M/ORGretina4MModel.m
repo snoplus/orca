@@ -1286,26 +1286,29 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     //return;
     //---------------
 
-    
+   // NSLog(@"1)%@ --> %@: SD_Config: 0x%08x\n",[self fullID],[self initSerDesStateName],[self readRegister:kSDConfig]);
+    NSLog(@"1)%@ --> %@: VMEGP: 0x%08x \n",[self fullID],[self initSerDesStateName],[self readFPGARegister:kVMEGPControl]);
     switch(initializationState){
             
         case kSerDesSetup:
-            //NSLog(@"SD Config: 0x%08x\n",[self readRegister:kSDConfig]);
-            //NSLog(@"Master Logic Status: 0x%08x\n",[self readRegister:kMasterLogicStatus]);
-            //NSLog(@"VmeGPControl: 0x%08x\n",[self readRegister:kVMEGPControl]);
-            //[self writeRegister:kSDConfig           withValue: 0x00000031]; //power up value
-            //[self writeRegister:kVMEGPControl       withValue: 0x00000400]; //power up value
-            //[self writeRegister:kMasterLogicStatus  withValue:0x05420000]; //power up value
-            //[self writeRegister:kSDConfig           withValue: 0x3<<9]; //reset the ten channel module and clock
+            NSLog(@"SD Config: 0x%08x\n",[self readRegister:kSDConfig]);
+            NSLog(@"Master Logic Status: 0x%08x\n",[self readRegister:kMasterLogicStatus]);
+            NSLog(@"VmeGPControl: 0x%08x\n",[self readRegister:kVMEGPControl]);
+            [self writeRegister:kSDConfig           withValue: 0x00000031]; //turn off the SERDES and reset the
+            [self writeRegister:kMasterLogicStatus  withValue:0x04420000]; //power up value
+            
+            //[self clockManagerReset];
+            [self setInitState:kSerDesIdle];
 
-            [self setInitState:kSerDesStep1];
             break;
             
         case kSerDesStep1:
             [[self undoManager] disableUndoRegistration];
-            [self setClockSource:0]; //set to external clock
+            [self setClockSource:0]; //set to external clock gui only
             [[self undoManager] enableUndoRegistration];
-            [self writeFPGARegister:kVMEGPControl withValue:0x2];
+            
+            //[self writeFPGARegister:kVMEGPControl withValue:0x2];
+            [self writeFPGARegister:kVMEGPControl withValue:0x0]; //thorsten suggestion
             [self setInitState:kSerDesStep2];
             break;
             
@@ -1325,14 +1328,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
            break;
             
         case kSerDesStep5:
+
             [self writeRegister:kSDConfig withValue:0x20];
             [self setInitState:kSerDesIdle];
+            
+
             break;
             
         case kSerDesError:
             break;
+
     }
-    if(initializationState!= kSerDesError){
+    NSLog(@"2)%@ --> %@: VMEGP: 0x%08x \n\n",[self fullID],[self initSerDesStateName],[self readFPGARegister:kVMEGPControl]);
+    if(initializationState!= kSerDesError && initializationState!= kSerDesIdle){
        [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.1];
     }
 }
@@ -1361,7 +1369,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             return @"Write SD Config = 0x20";
             
         case kSerDesError:
-            return @"Idle";
+            return @"Error";
             
         default:
             return @"?";
@@ -2746,22 +2754,64 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return readBack;
 }
 
+- (void) snapShotRegisters
+{
+    int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        snapShot[i] = [self readRegister:i];
+    }
+    
+    for(i=0;i<kNumberOfFPGARegisters;i++){        
+        fpgaSnapShot[i] = [self readFPGARegister:i];
+    }
+}
+
+- (void) compareToSnapShot
+{
+    NSLog(@"------------------------------------------------\n");
+    NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"offset   snapshot        newest\n");
+
+    int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        unsigned long theValue = [self readRegister:i];
+        if(snapShot[i] != theValue){
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",register_information[i].offset,snapShot[i],theValue,register_information[i].name);
+ 
+        }
+    }
+    
+    for(i=0;i<kNumberOfFPGARegisters;i++){
+        unsigned long theValue = [self readFPGARegister:i];
+        if(fpgaSnapShot[i] != theValue){
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",register_information[i].offset,fpgaSnapShot[i],theValue,register_information[i].name);
+            
+        }
+    }
+    NSLog(@"------------------------------------------------\n");
+
+}
+
+
 - (void) dumpAllRegisters
 {
     NSLog(@"------------------------------------------------\n");
     NSLog(@"Register Values for Channel #1\n");
     int i;
     for(i=0;i<kNumberOfGretina4MRegisters;i++){
-        unsigned long theValue = 0;
-        [[self adapter] readLongBlock:&theValue
-							atAddress:[self baseAddress] + register_information[i].offset
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-       NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",register_information[i].offset,theValue,register_information[i].name);
+        unsigned long theValue = [self readRegister:i];
+        NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",register_information[i].offset,theValue,register_information[i].name);
+        snapShot[i] = theValue;
 
     }
     NSLog(@"------------------------------------------------\n");
+
+    for(i=0;i<kNumberOfFPGARegisters;i++){
+        unsigned long theValue = [self readFPGARegister:i];
+          NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",fpga_register_information[i].offset,theValue,fpga_register_information[i].name);
+        
+        fpgaSnapShot[i] = theValue;
+    }
+
 }
 
 #pragma mark •••AdcProviding Protocol

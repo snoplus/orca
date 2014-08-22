@@ -105,6 +105,8 @@
 	IBOutlet NSTextField*	spiWriteValueField;
 	IBOutlet NSButton*		writeSPIButton;
 	IBOutlet NSButton*		dumpAllRegistersButton;
+	IBOutlet NSButton*		snapShotRegistersButton;
+	IBOutlet NSButton*		compareRegistersButton;
 	
     IBOutlet NSButton*		diagnosticsEnabledCB;
     IBOutlet NSButton*		diagnosticsReportButton;
@@ -270,6 +272,8 @@
 - (IBAction) selectAllInEasySet:(id)sender;
 - (IBAction) selectNoneInEasySet:(id)sender;
 - (IBAction) histEMultiplierAction:(id)sender;
+- (IBAction) snapShotRegistersAction:(id)sender;
+- (IBAction) compareToSnapShotAction:(id)sender;
 
 
 #pragma mark •••Data Source

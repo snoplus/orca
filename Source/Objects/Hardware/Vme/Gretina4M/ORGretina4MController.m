@@ -939,6 +939,11 @@
 	[downSamplePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+
+    
+    
     [tpolMatrix             setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
     
@@ -1630,6 +1635,17 @@
 - (IBAction) dumpAllRegisters:(id)sender
 {
     [model dumpAllRegisters];
+}
+
+- (IBAction) snapShotRegistersAction:(id)sender
+{
+    [model snapShotRegisters];
+
+}
+
+- (IBAction) compareToSnapShotAction:(id)sender
+{
+    [model compareToSnapShot];
 }
 
 #pragma mark •••Data Source
