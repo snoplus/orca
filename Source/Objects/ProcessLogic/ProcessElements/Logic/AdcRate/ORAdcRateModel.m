@@ -164,15 +164,17 @@ NSString* ORAdcRatePassThruConnection           = @"ORAdcRatePassThruConnection"
 }
 
 - (void) adjustBufferLength
-{    
+{
     int n = [buffer count];
-    int i;
-    for(i=0;i<n;i++){
-        NSTimeInterval t1 = -[[[buffer objectAtIndex:0] objectForKey:@"time"] timeIntervalSinceNow];
-        if(t1>integrationTime) {
-            [buffer removeObjectAtIndex:0];
+    NSTimeInterval tf = [[[buffer objectAtIndex:n-1] objectForKey:@"time"] timeIntervalSince1970];
+    while(1) {
+        NSTimeInterval dt =  tf - [[[buffer objectAtIndex:0] objectForKey:@"time"] timeIntervalSince1970];
+        if(lroundf(dt/integrationTime - floor(dt/integrationTime) == 0)) break;
+        else [buffer removeObjectAtIndex:0];
+        if([buffer count] == 0) {
+            // should not happen; ignore
+            break;
         }
-        else break;
     }
 }
 
