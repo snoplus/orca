@@ -264,7 +264,8 @@ enum {
     unsigned short  diagnosticCounter;
     BOOL            verbose;
     BOOL            locked;
-    
+    unsigned long   dataId;
+
     //------------------internal use only
     ORFileMoverOp*  fpgaFileMover;
     NSOperationQueue*	fileQueue;
@@ -384,6 +385,15 @@ enum {
 #pragma mark •••Hardware Access
 - (unsigned short) readCodeRevision;
 - (unsigned short) readCodeDate;
+
+#pragma mark •••Data Records
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+- (void) shipDataRecord;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
