@@ -551,6 +551,10 @@
                         localException);
     }
 }
+- (IBAction) shipRecordAction:(id)sender
+{
+    [model shipDataRecord];
+}
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {

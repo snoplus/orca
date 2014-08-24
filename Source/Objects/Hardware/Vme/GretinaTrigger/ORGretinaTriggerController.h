@@ -113,6 +113,7 @@
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;
+- (IBAction) shipRecordAction:(id)sender;
 
 - (IBAction) isMasterAction:(id)sender;
 - (IBAction) registerIndexPUAction:(id)sender;

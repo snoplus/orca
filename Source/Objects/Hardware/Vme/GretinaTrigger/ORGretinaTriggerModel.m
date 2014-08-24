@@ -488,7 +488,16 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 - (void) startPollingLock:(NSNotification*)aNote
 {
     if([self isMaster]){
-        [self pollLock];
+        @try {
+            //double check that we can reach the card by reading the boardID. If an exception
+            //is thrown, then we won't actually start polling
+            [self readRegister:kBoardID];
+            [self pollLock];
+        }
+        @catch(NSException* e){
+            NSLog(@"%@:%@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+            NSLog(@"%@ not polling system lock because of exception\n",[self fullID]);
+        }
     }
 }
 
@@ -510,7 +519,16 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) runInitialization:(NSNotification*)aNote
 {
-    [self initClockDistribution];
+    if([self isMaster]){
+        @try {
+            [self readRegister:kBoardID];
+            [self initClockDistribution];
+        }
+        @catch(NSException* e){
+            NSLog(@"%@:%@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+            NSLog(@"%@ Did not init the clock because of exception\n",[self fullID]);
+        }
+    }
 }
 
 #pragma mark ***Accessors
@@ -874,24 +892,23 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) initClockDistribution:(BOOL)force
 {
-    if(![self isMaster])return;
-    
-    if(!force){
-        if([self checkSystemLock]){
-            NSLog(@"Trigger System appears locked. No need to relock the system.\n");
-            return;
+    if([self isMaster]){
+        if(!force){
+            if([self checkSystemLock]){
+                NSLog(@"Trigger System appears locked. No need to relock the system.\n");
+                return;
+            }
         }
-    }
-    if(!initializationRunning && isMaster){
+        if(!initializationRunning && isMaster){
+            //a check to make sure we can reach the card
+            [self readRegister:kBoardID];
+            [self addRunWaitWithReason:@"Wait for Trigger Card Clock Distribution Init"];
+            [self setupStateArray];
+            [self setInitState:kMasterSetup];
+            connectedRouterMask = 0;
 
-        [self addRunWaitWithReason:@"Wait for Trigger Card Clock Distribution Init"];
-        [self setupStateArray];
-        [self setInitState:kMasterSetup];
-        connectedRouterMask = 0;
-
-        [self setRoutersToIdle];
-
-        [self performSelector:@selector(stepMaster) withObject:nil afterDelay:kTriggerInitDelay];
+            [self stepMaster];
+        }
     }
 }
 
@@ -1675,6 +1692,78 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         }
     }
+}
+#pragma mark •••Data Records
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    if([self isMaster]){
+        [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"GretinaTriggerModel"];
+    }
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    if([self isMaster]){
+        NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     @"ORGretinaTriggerDecoder",		@"decoder",
+                                     [NSNumber numberWithLong:dataId],  @"dataId",
+                                     [NSNumber numberWithBool:NO],      @"variable",
+                                     [NSNumber numberWithLong:5],       @"length",
+                                     nil];
+        [dataDictionary setObject:aDictionary forKey:@"Master"];
+    }
+
+    
+    return dataDictionary;
+}
+
+- (void) shipDataRecord
+{
+    if([[ORGlobal sharedGlobal] runInProgress]){
+        if([self isMaster]){
+            time_t	ut_Time;
+            time(&ut_Time);
+
+            //TBD get Timestamp from card, timeStampA,B,C
+            //unsigned short timeStampA = [self readRegister:kTimeStampA];
+            //unsigned short timeStampB = [self readRegister:kTimeStampB];
+            //unsigned short timeStampC = [self readRegister:kTimeStampC];
+
+            unsigned short timeStampA = 1;
+            unsigned short timeStampB = 2;
+            unsigned short timeStampC = 3;
+
+            
+            unsigned long data[5];
+            data[0] = dataId | 5;                      //Data Id
+            data[1] = ([self uniqueIdNumber]&0xf);    //Location and spare bits
+            data[2] = ut_Time;                          //Mac Unix time
+            data[3] = timeStampA;                       //timeStampA (high bits) + 16 bits spare
+            data[4] = (timeStampB<<16) | timeStampC;
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                                object:[NSData dataWithBytes:data
+                                                                length:sizeof(long)*5]];
+        }
+	}
 }
 
 #pragma mark •••Archival

@@ -1,0 +1,70 @@
+//
+//  ORGretinaTriggerDecoder.m
+//  Orca
+//
+// Created by Mark  A. Howe on Sat Aug 23, 2014
+//  Copyright 2014 University of North Carolina. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//North Carolina sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+#import "ORGretinaTriggerDecoder.h"
+#import "ORDataPacket.h"
+#import "ORDataSet.h"
+
+//------------------------------------------------------------------------------------------------
+// Data Format
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+// ^^^^ ^^^^ ^^^^ ^^------------------------data id
+//                  ^^ ^^^^ ^^^^ ^^^^ ^^^^--length in longs
+//
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+// ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-------spare bits
+//                                    ^^^^--device id
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx--Mac Unix time in seconds since Jan 1,1970 (UT)
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+// ^^^^ ^^^^ ^^^^ ^^^^ ---------------------spare bits
+//                     ^^^^ ^^^^ ^^^^ ^^^^--timeStampA
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+// ^^^^ ^^^^ ^^^^ ^^^^ ---------------------timeStampB
+//                     ^^^^ ^^^^ ^^^^ ^^^^--timeStampC
+//-----------------------------------------------------------------------------------------------
+
+@implementation ORGretinaTriggerDecoder
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+	unsigned long* p = (unsigned long*)someData;
+    unsigned long length = ExtractLength(p[0]);
+    //just record it in the data monitor
+    [aDataSet loadGenericData:@" " sender:self withKeys:@"Master Trigger",nil];
+	return length;
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+{
+    
+    NSString* title= @"Master Trigger\n\n";
+    NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
+	int ident = dataPtr[1] & 0xfff;
+	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
+    NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+    [date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+    
+    theString = [theString stringByAppendingFormat:@"Date: %@\n",date];
+    theString = [theString stringByAppendingFormat:@"TimeStamp: 0x%012llx\n",(unsigned long long)dataPtr[3]<<32 | dataPtr[4]];
+	return theString;
+}
+@end
+
+
