@@ -40,6 +40,7 @@
     IBOutlet NSTextField*   initStateField;
     IBOutlet NSTextField*   lockedField;
     IBOutlet NSTextField*   digitizersLockedField;
+    IBOutlet NSButton*      shipRecordButton;
 
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;

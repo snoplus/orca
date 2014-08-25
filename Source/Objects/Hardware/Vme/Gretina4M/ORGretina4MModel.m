@@ -1272,16 +1272,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     switch(initializationState){
         case kSerDesSetup:
-            [self writeRegister:kSDConfig           withValue: 0x00000631]; //SERDES disabled
+            [self writeRegister:kSDConfig           withValue: 0x00000631]; //power up value
             [self writeRegister:kMasterLogicStatus  withValue: 0x04420000]; //power up value
             [self setInitState:kSerDesIdle];
-
             break;
             
         case kSetDigitizerClkSrc:
             [self writeRegister:kSDConfig           withValue: 0x00000031]; //SERDES disabled
+            
             [[self undoManager] disableUndoRegistration];
-            [self setClockSource:0]; //set to external clock gui only
+            [self setClockSource:0]; //set to external clock (gui only!!!)
             [[self undoManager] enableUndoRegistration];
             
             [self writeFPGARegister:kVMEGPControl withValue:0x0]; //thorsten suggestion
@@ -1294,13 +1294,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             break;
             
         case kSetMasterLogic:
-            [self writeRegister:kMasterLogicStatus withValue:0x20051];
+            [self writeRegister:kMasterLogicStatus withValue:0x2151];
             [self setInitState:kSetSDSyncBit];
             break;
             
         case kSetSDSyncBit:
             [self writeRegister:kSDConfig withValue:0x20];
+            [self writeRegister:kMasterLogicStatus withValue:0x2051]; //release the 'reset lost lock' bit
+
             [self setInitState:kSerDesIdle];
+            [self resetFIFO];
             break;
             
         case kSerDesError:
@@ -1308,14 +1311,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     }
     if(initializationState!= kSerDesError && initializationState!= kSerDesIdle){
-       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.1];
+       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:0];
     }
 }
 
 - (BOOL) isLocked
 {
-    [self setLocked:([self readRegister:kMasterLogicStatus] & kSDLockBit)==kSDLockBit];
-     return [self locked];
+    BOOL lockedBitSet   = ([self readRegister:kMasterLogicStatus] & kSDLockBit)==kSDLockBit;
+    //BOOL lostLockBitSet = ([self readRegister:kSDLostLockBit] & kSDLostLockBit)==kSDLostLockBit;
+    [self setLocked: lockedBitSet]; //& !lostLockBitSet];
+    return [self locked];
 }
 
 - (BOOL) locked

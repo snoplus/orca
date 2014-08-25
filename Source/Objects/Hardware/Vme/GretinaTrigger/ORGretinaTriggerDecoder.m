@@ -29,7 +29,9 @@
 //                  ^^ ^^^^ ^^^^ ^^^^ ^^^^--length in longs
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-// ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-------spare bits
+// ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^  -------spare bits
+//                                  ^-------locked
+//                                 ^ -------link was lost
 //                                    ^^^^--device id
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx--Mac Unix time in seconds since Jan 1,1970 (UT)
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
@@ -53,18 +55,25 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    
     NSString* title= @"Master Trigger\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
 	int ident = dataPtr[1] & 0xfff;
+    BOOL locked   = ShiftAndExtract(dataPtr[1], 4, 0x1);
+    BOOL lockLost = ShiftAndExtract(dataPtr[1], 5, 0x1);
+    
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
     NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
     [date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
     
     theString = [theString stringByAppendingFormat:@"Date: %@\n",date];
     theString = [theString stringByAppendingFormat:@"TimeStamp: 0x%012llx\n",(unsigned long long)dataPtr[3]<<32 | dataPtr[4]];
+    
+    theString = [theString stringByAppendingFormat:@"Locked:   %@\n",locked   ? @"YES":@"NO"];
+    theString = [theString stringByAppendingFormat:@"LockLost: %@\n",lockLost ? @"YES":@"NO"];
+
 	return theString;
 }
+
 @end
 
 

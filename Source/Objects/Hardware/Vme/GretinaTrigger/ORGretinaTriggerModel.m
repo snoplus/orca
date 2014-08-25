@@ -204,7 +204,7 @@ static GretinaTriggerRegisterInformation register_information[kNumberOfGretinaTr
     {0x0124,    @"Rc State",            kReadOnly, kRouterOnly},
     //End of Split
     //----------
-    {0x0128,    @"Misc State",          kReadOnly, kMasterAndRouter},
+    {0x0128,    @"Misc Status",         kReadOnly, kMasterAndRouter},
     {0x012C,    @"Diagnostic A",        kReadOnly, kMasterAndRouter},
     {0x0130,    @"Diagnostic B",        kReadOnly, kMasterAndRouter},
     {0x0134,    @"Diagnostic C",        kReadOnly, kMasterAndRouter},
@@ -512,6 +512,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 {
     if([self isMaster]){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+        [self readDisplayRegs];
         [self checkSystemLock];
         [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
     }
@@ -900,12 +901,14 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             }
         }
         if(!initializationRunning && isMaster){
+            [self setupStateArray];
             //a check to make sure we can reach the card
             [self readRegister:kBoardID];
             [self addRunWaitWithReason:@"Wait for Trigger Card Clock Distribution Init"];
-            [self setupStateArray];
             [self setInitState:kMasterSetup];
             connectedRouterMask = 0;
+            
+            [self setRoutersToIdle]; //init the router state machine
 
             [self stepMaster];
         }
@@ -1024,10 +1027,24 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     return locked;
 }
 
-- (void) setLocked:(BOOL)aState
+- (void) setLocked:(BOOL)aCurrentState
 {
-    locked = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerLockChanged object: self];
+    if(locked!=aCurrentState){
+        if(locked && !aCurrentState){
+            linkWasLost = YES;
+        }
+        
+        locked = aCurrentState;
+        
+        if([self isMaster] && linkWasLost){
+            NSLogColor([NSColor redColor],@"%@: Trigger card was locked but lock was lost.\n",[self fullID]);
+        }
+        [self shipDataRecord]; //ship a record to show the new state
+
+        if(locked)linkWasLost = NO;
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerLockChanged object: self];
+    }
 }
 
 - (void) readDisplayRegs
@@ -1043,6 +1060,10 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [self setLvdsPreemphasisCtlMask:[self readRegister:kLvdsPreEmphasis]];
 }
 
+- (int) initializationState
+{
+    return initializationState;
+}
 
 - (void) stepMaster
 {
@@ -1113,14 +1134,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kReleaseLinkInit: //Release the link-init machine by clearing the reset bit in the misc-ctl register
             [self writeRegister:kMiscCtl1 withValue:[self readRegister:kMiscCtl1] & ~kResetLinkInitMachBit];
-            //[self writeRegister:kMiscCtl1 withValue:0xFFC0];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]]; //read it back for display
             [self setInitState:kCheckMiscStatus];
             break;
             
         case kCheckMiscStatus: //verify that we are waiting to lock onto the data stream of the router
-            [self setMiscStatReg:       [self readRegister:kMiscStatus]];
-            if(((miscStatReg & kLinkInitStateMask)>>8) != 0x3){
+            if((([self readRegister:kMiscStatus] & kLinkInitStateMask)>>8) != 0x3){
                 [self setErrorString:[NSString stringWithFormat:@"HW issue: Master Trigger %@ not waiting for data stream from Router",[self fullID]]];
                 if(verbose)NSLog(@"Misc Status Reg: 0x%04x\n",miscStatReg);
                 [self setInitState:kMasterError];
@@ -1150,7 +1168,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             }
             break;
             
-        // Also rarely gets stuck here. Trigger cards stop responding. Current solution is power off / on.
         case kReadLinkLock://Read Link Locked to verify the SERDES of Master is locked the syn pattern of the Router
             if(linkLockedReg!= (~connectedRouterMask & 0x7FF)) {
                 [self setErrorString:@"HW issue: the SERDES of the Master has not locked on to the synchronization pattern from the Router"];
@@ -1235,7 +1252,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kSendNormalData:
             [self writeRegister:kMiscCtl1 withValue:0xFF40];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
             [self setInitState:kRunRouterDataCheck];
             break;
             
@@ -1260,7 +1276,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kReleaseClocks:
             [self writeRegister:kMiscCtl1 withValue:0xFF00];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
             [self setInitState:kMasterIdle];
     }
     
@@ -1378,7 +1393,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
          case kRouterDataChecking:
             [self writeRegister:kMiscCtl1 withValue:0x14];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]]; //read back for display
             [self setInitState:kMaskUnusedRouterChans];
             break;
                     
@@ -1409,7 +1423,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         case kReleaseLintInitReset:
           //  [self writeRegister:kMiscCtl1 withValue:([self readRegister:kMiscCtl1] & ~kResetLinkInitMachBit)];
             [self writeRegister:kMiscCtl1 withValue:0x10];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]]; // read back for display
             [self setInitState:kRunDigitizerInit];
             break;
             
@@ -1440,9 +1453,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kRouterSetClearAckBit:
             [self writeRegister:kMiscCtl1 withValue:0x12];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
             [self writeRegister:kMiscCtl1 withValue:0x10];
-            [self setMiscCtl1Reg:[self readRegister:kMiscCtl1]];
             [self setInitState:kRouterIdle];
             break;
     }
@@ -1747,8 +1758,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             unsigned short timeStampC = [self readRegister:kTimeStampC];
             
             unsigned long data[5];
-            data[0] = dataId | 5;                      //Data Id
-            data[1] = ([self uniqueIdNumber]&0xf);    //Location and spare bits
+            data[0] = dataId | 5;                       //Data Id
+            data[1] =
+                      locked     << 4   |               //locked
+                      linkWasLost<< 5   |               //link was lost bit
+                      ([self uniqueIdNumber]&0xf);      //Location and spare bits
             data[2] = ut_Time;                          //Mac Unix time
             data[3] = timeStampA;                       //timeStampA (high bits) + 16 bits spare
             data[4] = (timeStampB<<16) | timeStampC;

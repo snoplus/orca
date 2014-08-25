@@ -424,9 +424,17 @@
     //BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORGretinaTriggerSettingsLock];
     BOOL locked = [gSecurity isLocked:ORGretinaTriggerSettingsLock];
 		
-    [settingLockButton setState: locked];
-    [addressText setEnabled:!locked && !runInProgress];
-	[probeButton setEnabled:!locked && !runInProgress];
+    [settingLockButton  setState: locked];
+    [addressText        setEnabled:!locked && !runInProgress];
+	[probeButton        setEnabled:!locked && !runInProgress];
+    if(![model isMaster]){
+        [shipRecordButton setHidden:YES];
+    }
+    else {
+        [shipRecordButton setHidden:NO];
+        [shipRecordButton   setEnabled:!locked && [model isMaster]];
+    }
+    
 }
 
 - (void) registerLockChanged:(NSNotification*)aNotification
@@ -472,6 +480,7 @@
 - (void) isMasterChanged:(NSNotification*)aNote
 {
     [masterRouterPU selectItemAtIndex:[model isMaster]];
+    [self settingsLockChanged:nil];
 }
 
 #pragma mark •••Actions

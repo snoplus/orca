@@ -278,6 +278,7 @@ enum {
     NSString*       errorString;
     int             digitizerCount;
     int             digitizerLockCount;
+    BOOL            linkWasLost;
 }
 
 - (id) init;
@@ -351,6 +352,7 @@ enum {
 - (void) setRegWriteValue:(unsigned short)aWriteValue;
 - (void) setupStateArray;
 - (NSString*) stateStatus:(int)aStateIndex;
+- (int) initializationState;
 
 #pragma mark •••set up routines
 - (void) initClockDistribution;
