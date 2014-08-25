@@ -1742,15 +1742,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             time_t	ut_Time;
             time(&ut_Time);
 
-            //TBD get Timestamp from card, timeStampA,B,C
-            //unsigned short timeStampA = [self readRegister:kTimeStampA];
-            //unsigned short timeStampB = [self readRegister:kTimeStampB];
-            //unsigned short timeStampC = [self readRegister:kTimeStampC];
-
-            unsigned short timeStampA = 1;
-            unsigned short timeStampB = 2;
-            unsigned short timeStampC = 3;
-
+            unsigned short timeStampA = [self readRegister:kTimeStampA];
+            unsigned short timeStampB = [self readRegister:kTimeStampB];
+            unsigned short timeStampC = [self readRegister:kTimeStampC];
             
             unsigned long data[5];
             data[0] = dataId | 5;                      //Data Id
