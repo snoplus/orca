@@ -214,6 +214,8 @@
 		432D17EE17820CDB00557918 /* AngularComponent.obj in Resources */ = {isa = PBXBuildFile; fileRef = 432D17ED17820CDB00557918 /* AngularComponent.obj */; };
 		432D17F117820D0700557918 /* ZComponent.mtl in Resources */ = {isa = PBXBuildFile; fileRef = 432D17EF17820D0700557918 /* ZComponent.mtl */; };
 		432D17F217820D0700557918 /* ZComponent.obj in Resources */ = {isa = PBXBuildFile; fileRef = 432D17F017820D0700557918 /* ZComponent.obj */; };
+		4338654519AB6D340052796C /* ORGretinatriggerDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4338654319AB6D330052796C /* ORGretinatriggerDecoder.h */; };
+		4338654619AB6D340052796C /* ORGretinaTriggerDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 4338654419AB6D330052796C /* ORGretinaTriggerDecoder.m */; };
 		4342D59411ECB8AD007EFFB1 /* ORCAEN775Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */; };
 		4342D59511ECB8AD007EFFB1 /* ORCAEN775Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */; };
 		4342D5F311ECC4D0007EFFB1 /* ORCAEN775Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */; };
@@ -3709,6 +3711,8 @@
 		432D17ED17820CDB00557918 /* AngularComponent.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AngularComponent.obj; sourceTree = "<group>"; };
 		432D17EF17820D0700557918 /* ZComponent.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ZComponent.mtl; sourceTree = "<group>"; };
 		432D17F017820D0700557918 /* ZComponent.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ZComponent.obj; sourceTree = "<group>"; };
+		4338654319AB6D330052796C /* ORGretinatriggerDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinatriggerDecoder.h; sourceTree = "<group>"; };
+		4338654419AB6D330052796C /* ORGretinaTriggerDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerDecoder.m; sourceTree = "<group>"; };
 		4342D59211ECB8AD007EFFB1 /* ORCAEN775Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN775Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.cc; sourceTree = SOURCE_ROOT; };
 		4342D59311ECB8AD007EFFB1 /* ORCAEN775Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN775Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN775Readout.hh; sourceTree = SOURCE_ROOT; };
 		4398E6B711B7E36400FC4DDE /* ORCAEN785Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN785Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN785Readout.cc; sourceTree = SOURCE_ROOT; };
@@ -7202,6 +7206,8 @@
 				840463BC183515AC00F69B23 /* ORGretinaTriggerController.m */,
 				43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */,
 				43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */,
+				4338654319AB6D330052796C /* ORGretinatriggerDecoder.h */,
+				4338654419AB6D330052796C /* ORGretinaTriggerDecoder.m */,
 			);
 			path = GretinaTrigger;
 			sourceTree = "<group>";
@@ -15059,6 +15065,7 @@
 				2D294530199E6A9400F68093 /* ORAmptekDP5Controller.h in Headers */,
 				2D294532199E6A9400F68093 /* ORAmptekDP5Decoder.h in Headers */,
 				2D294535199E6A9400F68093 /* ORAmptekDP5Model.h in Headers */,
+				4338654519AB6D340052796C /* ORGretinatriggerDecoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -17106,6 +17113,7 @@
 				2D294531199E6A9400F68093 /* ORAmptekDP5Controller.m in Sources */,
 				2D294533199E6A9400F68093 /* ORAmptekDP5Decoder.m in Sources */,
 				2D294536199E6A9400F68093 /* ORAmptekDP5Model.m in Sources */,
+				4338654619AB6D340052796C /* ORGretinaTriggerDecoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
