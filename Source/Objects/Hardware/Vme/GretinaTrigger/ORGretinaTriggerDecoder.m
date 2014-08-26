@@ -58,8 +58,9 @@
     NSString* title= @"Master Trigger\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
 	int ident = dataPtr[1] & 0xfff;
-    BOOL locked   = ShiftAndExtract(dataPtr[1], 4, 0x1);
-    BOOL lockLost = ShiftAndExtract(dataPtr[1], 5, 0x1);
+    BOOL locked    = ShiftAndExtract(dataPtr[1], 4, 0x1);
+    BOOL lockLost  = ShiftAndExtract(dataPtr[1], 5, 0x1);
+    BOOL doNotLock = ShiftAndExtract(dataPtr[1], 6, 0x1);
     
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
     NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
@@ -70,6 +71,7 @@
     
     theString = [theString stringByAppendingFormat:@"Locked:   %@\n",locked   ? @"YES":@"NO"];
     theString = [theString stringByAppendingFormat:@"LockLost: %@\n",lockLost ? @"YES":@"NO"];
+    if(doNotLock)theString = [theString stringByAppendingString:@"User Opted NOT to Lock"];
 
 	return theString;
 }

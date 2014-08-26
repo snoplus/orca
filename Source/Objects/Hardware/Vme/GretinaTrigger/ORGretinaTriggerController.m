@@ -251,6 +251,12 @@
                          name : ORGretinaTriggerModelNumTimesToRetryChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(alwaysRelockChanged:)
+                         name : ORGretinaTriggerModelAlwaysRelockChanged
+						object: model];
+    
+    
 }
 
 - (void) updateWindow
@@ -283,9 +289,15 @@
 	[self lockChanged:nil];
 	[self doNotLockChanged:nil];
 	[self numTimesToRetryChanged:nil];
+	[self alwaysRelockChanged:nil];
+    
 }
 
 #pragma mark •••Interface Management
+- (void) alwaysRelockChanged:(NSNotification*)aNote
+{
+	[alwaysRelockCB setIntValue: [model alwaysRelock]];
+}
 
 - (void) numTimesToRetryChanged:(NSNotification*)aNote
 {
@@ -509,6 +521,10 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) alwaysRelockAction:(id)sender
+{
+	[model setAlwaysRelock:[sender intValue]];
+}
 
 - (IBAction) numTimesToRetryAction:(id)sender
 {

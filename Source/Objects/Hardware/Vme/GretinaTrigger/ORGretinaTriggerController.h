@@ -28,6 +28,7 @@
     IBOutlet NSTabView* 	tabView;
 	IBOutlet NSTextField*   numTimesToRetryField;
 	IBOutlet NSButton*      doNotLockCB;
+    IBOutlet NSButton*      alwaysRelockCB;
 	IBOutlet NSButton*      verboseCB;
 	IBOutlet NSTextField*   diagnosticCounterField;
 	IBOutlet NSMatrix*      inputLinkMaskMatrix;
@@ -87,6 +88,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) alwaysRelockChanged:(NSNotification*)aNote;
 - (void) numTimesToRetryChanged:(NSNotification*)aNote;
 - (void) doNotLockChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
@@ -115,6 +117,7 @@
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) alwaysRelockAction:(id)sender;
 - (IBAction) numTimesToRetryAction:(id)sender;
 - (IBAction) doNotLockAction:(id)sender;
 - (IBAction) verboseAction:(id)sender;

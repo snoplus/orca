@@ -26,9 +26,11 @@
 #import "MJDCmds.h"
 #import "ORGretina4MModel.h"
 #import "ORRunModel.h"
+#import "ORAlarm.h"
 
-NSString* ORGretinaTriggerModelNumTimesToRetryChanged = @"ORGretinaTriggerModelNumTimesToRetryChanged";
-NSString* ORGretinaTriggerModelDoNotLockChanged = @"ORGretinaTriggerModelDoNotLockChanged";
+NSString* ORGretinaTriggerModelAlwaysRelockChanged      = @"ORGretinaTriggerModelAlwaysRelockChanged";
+NSString* ORGretinaTriggerModelNumTimesToRetryChanged   = @"ORGretinaTriggerModelNumTimesToRetryChanged";
+NSString* ORGretinaTriggerModelDoNotLockChanged         = @"ORGretinaTriggerModelDoNotLockChanged";
 NSString* ORGretinaTriggerModelVerboseChanged           = @"ORGretinaTriggerModelVerboseChanged";
 NSString* ORGretinaTriggerModelDiagnosticCounterChanged = @"ORGretinaTriggerModelDiagnosticCounterChanged";
 NSString* ORGretinaTriggerModelIsMasterChanged          = @"ORGretinaTriggerModelIsMasterChanged";
@@ -296,6 +298,7 @@ static GretinaTriggerStateInfo master_state_info[kNumMasterTriggerStates] = {
     { kRunRouterDataCheck,      kMasterState,   @"Running Router/Gretina Setup"},
     { kWaitOnRouterDataCheck,   kMasterState,   @"Waiting on Routers and Digitizers"},
     { kReleaseClocks,           kMasterState,   @"Turn Off IMPERATIVE_SYNC Bit"},
+    { kFinalCheck,              kMasterState,   @"Final Check"},
     { kMasterError,             kMasterState,   @""}
 };
 
@@ -345,7 +348,19 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [fileQueue release];
     [stateStatus release];
     [errorString release];
+    [noClockAlarm clearAlarm];
+    [noClockAlarm release];
+    noClockAlarm = nil;
+
     [super dealloc];
+}
+
+- (void)sleep
+{
+    [super sleep];
+    [noClockAlarm clearAlarm];
+    [noClockAlarm release];
+    noClockAlarm = nil;
 }
 
 - (void) setUpImage
@@ -489,7 +504,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) startPollingLock:(NSNotification*)aNote
 {
-    if([self isMaster]){
+    //only poll the state if we are master and the user wants to lock
+    if([self isMaster] && !doNotLock){
         @try {
             //double check that we can reach the card by reading the boardID. If an exception
             //is thrown, then we won't actually start polling
@@ -516,26 +532,53 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
         [self readDisplayRegs];
         [self checkSystemLock];
+        
+        if(![self locked] && [gOrcaGlobals runInProgress]){
+            [self shipDataRecord];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
+                                                                object:self
+                                                              userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil]];
+
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+        }
         [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
     }
 }
 
+- (int) tryNumber
+{
+    return tryNumber;
+}
+
 - (void) runInitialization:(NSNotification*)aNote
 {
-    if([self isMaster]){
-        @try {
-            [self readRegister:kBoardID];
-            [self initClockDistribution];
+    tryNumber = 1;
+    if(!doNotLock){
+        if([self isMaster]){
+            @try {
+                [self readRegister:kBoardID];
+                [self initClockDistribution];
+            }
+            @catch(NSException* e){
+                NSLog(@"%@:%@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+                NSLog(@"%@ Did not init the clock because of exception\n",[self fullID]);
+            }
         }
-        @catch(NSException* e){
-            NSLog(@"%@:%@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
-            NSLog(@"%@ Did not init the clock because of exception\n",[self fullID]);
+    }
+    else {
+        NSLogColor([NSColor redColor],@"%@: Will NOT distribute clock pulses (User Option)\n",[self fullID]);
+        if(!noClockAlarm){
+            noClockAlarm = [[ORAlarm alloc] initWithName:@"No Clock Distribution (User Option)" severity:0];
+            [noClockAlarm setSticky:NO];
+            [noClockAlarm setHelpString:@"User has opted to NOT distribute clock pulses from the Gretina trigger master. This alarm will go away if you acknowledge it."];
         }
+        [noClockAlarm setAcknowledged:NO];
+        [noClockAlarm postAlarm];
+        [self setToInternalClock];
     }
 }
 
 #pragma mark ***Accessors
-
 - (unsigned short) numTimesToRetry
 {
     return numTimesToRetry;
@@ -543,6 +586,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) setNumTimesToRetry:(unsigned short)aNumTimesToRetry
 {
+    if(aNumTimesToRetry<1)      aNumTimesToRetry=1;
+    else if(aNumTimesToRetry>10)aNumTimesToRetry=10;
     [[[self undoManager] prepareWithInvocationTarget:self] setNumTimesToRetry:numTimesToRetry];
     
     numTimesToRetry = aNumTimesToRetry;
@@ -562,6 +607,20 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     doNotLock = aDoNotLock;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelDoNotLockChanged object:self];
+}
+
+- (BOOL) alwaysRelock
+{
+    return alwaysRelock;
+}
+
+- (void) setAlwaysRelock:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAlwaysRelock:alwaysRelock];
+    
+    alwaysRelock = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelAlwaysRelockChanged object:self];
 }
 
 - (int) digitizerCount      {return digitizerCount;}
@@ -918,7 +977,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) initClockDistribution
 {
-    [self initClockDistribution:NO];
+    [self initClockDistribution:alwaysRelock];
 }
 
 - (void) initClockDistribution:(BOOL)force
@@ -987,6 +1046,33 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     else return @"";
 }
 
+- (void) setToInternalClock
+{
+    int i;
+    if([self isMaster]){
+        for(i=0;i<8;i++){
+            ORConnector* otherConnector = [linkConnector[i] connector];
+            if([otherConnector identifer] == 'L'){
+                ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                [routerObj setToInternalClock];
+            }
+        }
+    }
+    else {
+        for(i=0;i<8;i++){
+            if([linkConnector[i]  identifer] != 'L'){
+                ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
+                if(digitizerObj){
+                    [[self undoManager] disableUndoRegistration];
+                    [digitizerObj setClockSource:1];
+                    [[self undoManager] enableUndoRegistration];
+
+                }
+            }
+        }
+    }
+}
+
 - (BOOL) checkSystemLock
 {
     BOOL lockState = [self isLocked];
@@ -1011,6 +1097,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         return NO;
     }
     [self setLocked:lockState];
+    
+
+    
     return lockState;
 }
 
@@ -1109,6 +1198,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     switch(initializationState){
             
         case kMasterSetup:
+            tryNumber++;
+
             connectedRouterMask = [self findRouterMask];
             if(connectedRouterMask==0){
                 [self setErrorString:[NSString stringWithFormat:@"HW Error. Tried to initialize %@ for clock distribution but it is not connected to any routers",[self fullID]]];
@@ -1300,10 +1391,19 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kWaitOnRouterDataCheck:
             if([self allRoutersIdle]){
-                [self setInitState:kReleaseClocks];
+                [self setInitState:kFinalCheck];
             }
             break;
             
+        case kFinalCheck:
+            if([self checkSystemLock]){
+                [self setInitState:kReleaseClocks];
+            }
+            else {
+                [self setInitState:kMasterError];
+            }
+            break;
+          
         case kReleaseClocks:
             [self writeRegister:kMiscCtl1 withValue:0xFF00];
             [self setInitState:kMasterIdle];
@@ -1317,14 +1417,20 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
 
     if(initializationState == kMasterError){
-        NSLogColor([NSColor redColor],@"%@: It appears Lock was Unsuccessful\n",[self fullID]);
-        //there was an error, we must make sure the run doesn't continue to start
-        NSString* reason = [NSString stringWithFormat:@"%@ Failed to achieve lock.",[self fullID]];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort
+        if(tryNumber<numTimesToRetry){
+            [self setInitState:kMasterSetup];
+            [self performSelector:@selector(stepMaster) withObject:nil afterDelay:kTriggerInitDelay];
+        }
+        else {
+            NSLogColor([NSColor redColor],@"%@: It appears Lock was Unsuccessful after %d %@\n",[self fullID],tryNumber,tryNumber>1?@"tries":@"try");
+            //there was an error, we must make sure the run doesn't continue to start
+            NSString* reason = [NSString stringWithFormat:@"%@ Failed to achieve lock.",[self fullID]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort
                                                             object:self
                                                           userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",errorString,@"Details",nil]];
-        [self releaseRunWait]; //we have to clear this. The above line will have aborted the run start up process.
-
+        
+            [self releaseRunWait]; //we have to clear this. The above line will have aborted the run start up process.
+        }
     }
     else if(initializationState == kMasterIdle){
         //OK, the lock was achieved. The run can continue to start
@@ -1789,10 +1895,10 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
             unsigned long data[5];
             data[0] = dataId | 5;                       //Data Id
-            data[1] =
-                      locked     << 4   |               //locked
-                      linkWasLost<< 5   |               //link was lost bit
-                      ([self uniqueIdNumber]&0xf);      //Location and spare bits
+            data[1] =   locked      << 4   |            //locked
+                        linkWasLost << 5   |            //link was lost bit
+                        doNotLock   << 6   |            //do Not Lock option bit
+                        ([self uniqueIdNumber]&0xf);    //Location and spare bits
             data[2] = ut_Time;                          //Mac Unix time
             data[3] = timeStampA;                       //timeStampA (high bits) + 16 bits spare
             data[4] = (timeStampB<<16) | timeStampC;
@@ -1810,10 +1916,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setNumTimesToRetry:[decoder decodeIntForKey:@"numTimesToRetry"]];
-    [self setDoNotLock:[decoder decodeBoolForKey:@"doNotLock"]];
-    [self setInputLinkMask:[decoder decodeIntForKey:@"inputLinkMask"]];
-    [self setIsMaster: [decoder decodeBoolForKey:@"isMaster"]];
+    [self setNumTimesToRetry:   [decoder decodeIntForKey:@"numTimesToRetry"]];
+    [self setAlwaysRelock:      [decoder decodeBoolForKey:@"alwaysRelock"]];
+    [self setDoNotLock:         [decoder decodeBoolForKey:@"doNotLock"]];
+    [self setInputLinkMask:     [decoder decodeIntForKey:@"inputLinkMask"]];
+    [self setIsMaster:          [decoder decodeBoolForKey:@"isMaster"]];
     int i;
     for(i=0;i<9;i++){
         [self setLink:i connector:[decoder decodeObjectForKey:[NSString stringWithFormat:@"linkConnector%d",i]]];
@@ -1826,10 +1933,11 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:numTimesToRetry forKey:@"numTimesToRetry"];
-    [encoder encodeBool:doNotLock forKey:@"doNotLock"];
-    [encoder encodeInt:inputLinkMask forKey:@"inputLinkMask"];
-    [encoder encodeBool:isMaster	forKey:@"isMaster"];
+    [encoder encodeInt:numTimesToRetry  forKey:@"numTimesToRetry"];
+    [encoder encodeBool:alwaysRelock    forKey:@"alwaysRelock"];
+    [encoder encodeBool:doNotLock       forKey:@"doNotLock"];
+    [encoder encodeInt:inputLinkMask    forKey:@"inputLinkMask"];
+    [encoder encodeBool:isMaster        forKey:@"isMaster"];
     int i;
     for(i=0;i<9;i++){
         [encoder encodeObject:linkConnector[i] forKey:[NSString stringWithFormat:@"linkConnector%d",i]];

@@ -24,6 +24,7 @@
 #import "SBC_Link.h"
 
 @class ORFileMoverOp;
+@class ORAlarm;
 
 #pragma mark •••Register Definitions
 enum {
@@ -193,6 +194,7 @@ enum {
     kRunRouterDataCheck,
     kWaitOnRouterDataCheck,
     kReleaseClocks,
+    kFinalCheck,
     kMasterError,
     kNumMasterTriggerStates //must be last
 };
@@ -267,8 +269,11 @@ enum {
     unsigned long   dataId;
     BOOL            doNotLock;
     unsigned short  numTimesToRetry;
-
+    ORAlarm*        noClockAlarm;
+    BOOL            alwaysRelock;
+    
     //------------------internal use only
+    int             tryNumber;
     ORFileMoverOp*  fpgaFileMover;
     NSOperationQueue*	fileQueue;
     BOOL            initializationRunning;
@@ -297,6 +302,9 @@ enum {
 - (void) pollLock;
 
 #pragma mark ***Accessors
+- (int) tryNumber;
+- (BOOL) alwaysRelock;
+- (void) setAlwaysRelock:(BOOL)aFlag;
 - (unsigned short) numTimesToRetry;
 - (void) setNumTimesToRetry:(unsigned short)aNumTimesToRetry;
 - (BOOL) doNotLock;
@@ -368,6 +376,7 @@ enum {
 - (unsigned short)findRouterMask;
 - (unsigned short)findDigitizerMask;
 - (void) readDisplayRegs;
+- (BOOL) isRouterLocked;
 
 - (void) stepMaster;
 - (void) stepRouter;
@@ -375,6 +384,7 @@ enum {
 - (BOOL) allRoutersIdle;
 - (BOOL) allGretinaCardsIdle;
 
+- (void) setToInternalClock;
 
 // Register access
 - (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue;
@@ -436,4 +446,5 @@ extern NSString* ORGretinaTriggerLinkLockedRegChanged;
 extern NSString* ORGretinaTriggerClockUsingLLinkChanged;
 extern NSString* ORGretinaTriggerModelInitStateChanged;
 extern NSString* ORGretinaTriggerLockChanged;
+extern NSString* ORGretinaTriggerModelAlwaysRelockChanged;
 
