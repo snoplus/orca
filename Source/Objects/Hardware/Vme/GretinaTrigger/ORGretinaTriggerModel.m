@@ -27,6 +27,8 @@
 #import "ORGretina4MModel.h"
 #import "ORRunModel.h"
 
+NSString* ORGretinaTriggerModelNumTimesToRetryChanged = @"ORGretinaTriggerModelNumTimesToRetryChanged";
+NSString* ORGretinaTriggerModelDoNotLockChanged = @"ORGretinaTriggerModelDoNotLockChanged";
 NSString* ORGretinaTriggerModelVerboseChanged           = @"ORGretinaTriggerModelVerboseChanged";
 NSString* ORGretinaTriggerModelDiagnosticCounterChanged = @"ORGretinaTriggerModelDiagnosticCounterChanged";
 NSString* ORGretinaTriggerModelIsMasterChanged          = @"ORGretinaTriggerModelIsMasterChanged";
@@ -533,6 +535,34 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 }
 
 #pragma mark ***Accessors
+
+- (unsigned short) numTimesToRetry
+{
+    return numTimesToRetry;
+}
+
+- (void) setNumTimesToRetry:(unsigned short)aNumTimesToRetry
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNumTimesToRetry:numTimesToRetry];
+    
+    numTimesToRetry = aNumTimesToRetry;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelNumTimesToRetryChanged object:self];
+}
+
+- (BOOL) doNotLock
+{
+    return doNotLock;
+}
+
+- (void) setDoNotLock:(BOOL)aDoNotLock
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDoNotLock:doNotLock];
+    
+    doNotLock = aDoNotLock;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelDoNotLockChanged object:self];
+}
 
 - (int) digitizerCount      {return digitizerCount;}
 - (int) digitizerLockCount  {return digitizerLockCount;}
@@ -1780,6 +1810,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setNumTimesToRetry:[decoder decodeIntForKey:@"numTimesToRetry"]];
+    [self setDoNotLock:[decoder decodeBoolForKey:@"doNotLock"]];
     [self setInputLinkMask:[decoder decodeIntForKey:@"inputLinkMask"]];
     [self setIsMaster: [decoder decodeBoolForKey:@"isMaster"]];
     int i;
@@ -1794,6 +1826,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:numTimesToRetry forKey:@"numTimesToRetry"];
+    [encoder encodeBool:doNotLock forKey:@"doNotLock"];
     [encoder encodeInt:inputLinkMask forKey:@"inputLinkMask"];
     [encoder encodeBool:isMaster	forKey:@"isMaster"];
     int i;

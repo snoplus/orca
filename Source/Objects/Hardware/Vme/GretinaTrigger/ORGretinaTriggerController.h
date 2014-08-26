@@ -26,7 +26,9 @@
 @interface ORGretinaTriggerController : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
-	IBOutlet NSButton*       verboseCB;
+	IBOutlet NSTextField*   numTimesToRetryField;
+	IBOutlet NSButton*      doNotLockCB;
+	IBOutlet NSButton*      verboseCB;
 	IBOutlet NSTextField*   diagnosticCounterField;
 	IBOutlet NSMatrix*      inputLinkMaskMatrix;
 	IBOutlet NSMatrix*      serDesTPowerMasMatrix;
@@ -41,7 +43,8 @@
     IBOutlet NSTextField*   lockedField;
     IBOutlet NSTextField*   digitizersLockedField;
     IBOutlet NSButton*      shipRecordButton;
-
+    IBOutlet NSBox*         optionsBox;
+    
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
 
@@ -84,6 +87,8 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) numTimesToRetryChanged:(NSNotification*)aNote;
+- (void) doNotLockChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
 - (void) diagnosticCounterChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
@@ -110,6 +115,8 @@
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) numTimesToRetryAction:(id)sender;
+- (IBAction) doNotLockAction:(id)sender;
 - (IBAction) verboseAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;

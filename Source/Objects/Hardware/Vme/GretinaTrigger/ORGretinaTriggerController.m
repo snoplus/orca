@@ -241,6 +241,16 @@
 						object: model];
     
     
+    [notifyCenter addObserver : self
+                     selector : @selector(doNotLockChanged:)
+                         name : ORGretinaTriggerModelDoNotLockChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(numTimesToRetryChanged:)
+                         name : ORGretinaTriggerModelNumTimesToRetryChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -271,9 +281,22 @@
 	[self diagnosticCounterChanged:nil];
 	[self verboseChanged:nil];
 	[self lockChanged:nil];
+	[self doNotLockChanged:nil];
+	[self numTimesToRetryChanged:nil];
 }
 
 #pragma mark •••Interface Management
+
+- (void) numTimesToRetryChanged:(NSNotification*)aNote
+{
+	[numTimesToRetryField setIntValue: [model numTimesToRetry]];
+}
+
+- (void) doNotLockChanged:(NSNotification*)aNote
+{
+	[doNotLockCB setIntValue: [model doNotLock]];
+}
+
 - (void) lockChanged:(NSNotification*)aNote
 {
     [lockedField setStringValue:[model locked]?@"Yes":@"No"];
@@ -429,10 +452,12 @@
 	[probeButton        setEnabled:!locked && !runInProgress];
     if(![model isMaster]){
         [shipRecordButton setHidden:YES];
+        [optionsBox setHidden:YES];
     }
     else {
         [shipRecordButton setHidden:NO];
         [shipRecordButton   setEnabled:!locked && [model isMaster]];
+        [optionsBox setHidden:NO];
     }
     
 }
@@ -485,7 +510,17 @@
 
 #pragma mark •••Actions
 
-- (void) verboseAction:(id)sender
+- (IBAction) numTimesToRetryAction:(id)sender
+{
+	[model setNumTimesToRetry:[sender intValue]];
+}
+
+- (IBAction) doNotLockAction:(id)sender
+{
+	[model setDoNotLock:[sender intValue]];
+}
+
+- (IBAction) verboseAction:(id)sender
 {
 	[model setVerbose:[sender intValue]];
 }

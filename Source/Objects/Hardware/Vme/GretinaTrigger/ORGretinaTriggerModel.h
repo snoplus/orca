@@ -265,6 +265,8 @@ enum {
     BOOL            verbose;
     BOOL            locked;
     unsigned long   dataId;
+    BOOL            doNotLock;
+    unsigned short  numTimesToRetry;
 
     //------------------internal use only
     ORFileMoverOp*  fpgaFileMover;
@@ -295,6 +297,10 @@ enum {
 - (void) pollLock;
 
 #pragma mark ***Accessors
+- (unsigned short) numTimesToRetry;
+- (void) setNumTimesToRetry:(unsigned short)aNumTimesToRetry;
+- (BOOL) doNotLock;
+- (void) setDoNotLock:(BOOL)aDoNotLock;
 - (BOOL) locked;
 - (void) setLocked:(BOOL)aState;
 - (int) digitizerCount;
@@ -403,6 +409,8 @@ enum {
 
 @end
 
+extern NSString* ORGretinaTriggerModelNumTimesToRetryChanged;
+extern NSString* ORGretinaTriggerModelDoNotLockChanged;
 extern NSString* ORGretinaTriggerModelVerboseChanged;
 extern NSString* ORGretinaTriggerModelDiagnosticCounterChanged;
 extern NSString* ORGretinaTriggerModelInputLinkMaskChanged;
