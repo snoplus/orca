@@ -194,7 +194,7 @@
 	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %lu\n",energy];
     
     unsigned long long timeStamp = ((unsigned long long)headerPtr[6] << 32) + ((unsigned long long)headerPtr[5] << 16) + (unsigned long long)headerPtr[4];
-    NSString* timeStampString = [NSString stringWithFormat:@"Time: 0x%012llx\n",timeStamp];
+    NSString* timeStampString = [NSString stringWithFormat:@"Time: %lld\n",timeStamp];
     
     NSString* header = @"Header (Raw)\n";
     int i;
