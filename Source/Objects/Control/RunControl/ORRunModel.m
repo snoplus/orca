@@ -1143,12 +1143,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[self setStartScriptState:@"Done"];
 	}
 	
-	//BOOL doInit = [doInitBool boolValue];
+	BOOL doInit = [doInitBool boolValue];
     @try {
         [runFailedAlarm clearAlarm];
         client =  [self objectConnectedTo: ORRunModelRunControlConnection];
                 
-        [self runStarted:doInitBool];
+        [self runStarted:doInit];//was doInitBool, needs BOOL, not NSNumber -tb-
         
         //start the threaddo
         if(dataTakingThreadRunning){
