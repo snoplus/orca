@@ -1185,37 +1185,27 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSLog(@"Gretina: 0x%0x   HV1: 0x%0x   HV2: 0x%0x\n",theValue1,theValue2,theValue3);
 }
 
+
 - (void) resetClock
 {
-    //this routine is temporary to see if we can reset the clock via software
-    [self writeRegister:kAuxIOConfig withValue:0x1001];
-    [self writeRegister:kAuxIOConfig withValue:0x1000];
-
-}
-
-- (void) resetDCM
-{
-    //Start Slave clock
-	//turn off SerDes driver
-	unsigned long theValue = 0x11;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	//reset DCM clock while keeping SerDes driver off
+    
 	// To reset the DCM, assert bit 9 of this register. 
-	theValue = 0x211;
+	unsigned long theValue;
+    [[self adapter] readLongBlock:&theValue
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+    theValue ^= (0x1<<9);
+
 	[[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
                         withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
-	//sleep(1); //wait for 1 second:
-	
-	theValue = 0x11;
+	sleep(1);
+    theValue ^= (0x1<<9);
 	[[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
@@ -1223,29 +1213,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 }
 
-- (void) resetAndHoldClock
-{
-	//reset DCM clock while keeping SerDes driver off
-	// To reset the DCM, assert bit 9 of this register.
-	unsigned long theValue = 0x211;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-}
-- (void) releaseClock
-{
-	//reset DCM clock while keeping SerDes driver off
-	// To reset the DCM, assert bit 9 of this register.
-	unsigned long theValue = 0x11;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-}
 - (void) resetBoard
 {
     /* First disable all channels. This does not affect the model state,
@@ -1258,7 +1225,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self resetFIFO];
     [self resetMainFPGA];
     [ORTimer delay:6];  // 6 second delay during board reset    
-
 }
 
 - (short) initState {return initializationState;}
@@ -1272,46 +1238,47 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     switch(initializationState){
         case kSerDesSetup:
-            [self writeRegister:kSDConfig           withValue: 0x00000631]; //power up value
-            [self writeRegister:kMasterLogicStatus  withValue: 0x04420000]; //power up value
+            [self writeRegister:kSDConfig           withValue: 0x00001c31]; //T/R SerDes off, reset clock manager, reset clocks
+            [self writeRegister:kMasterLogicStatus  withValue: 0x04420001]; //power up value
             [self setInitState:kSerDesIdle];
             break;
-            
+        
         case kSetDigitizerClkSrc:
-            [self writeRegister:kSDConfig           withValue: 0x00000031]; //SERDES disabled
-            
             [[self undoManager] disableUndoRegistration];
-            [self setClockSource:0]; //set to external clock (gui only!!!)
+            [self setClockSource:0];                                //set to external clock (gui only!!!)
             [[self undoManager] enableUndoRegistration];
+            [self writeFPGARegister:kVMEGPControl   withValue:0x00 ]; //set to external clock (in HW)
+            [self setInitState:kReleaseClkManager];
+            break;
             
-            [self writeFPGARegister:kVMEGPControl withValue:0x0]; //thorsten suggestion
+        case kReleaseClkManager:
+            //SERDES still disabled, release clk manager, clocks still held at reset
+            [self writeRegister:kSDConfig           withValue: 0x00000c11];
             [self setInitState:kPowerUpRTPower];
             break;
             
         case kPowerUpRTPower:
-            [self writeRegister:kSDConfig withValue:0x00];
+            //SERDES enabled, clocks still held at reset
+            [self writeRegister:kSDConfig           withValue: 0x00000200];
             [self setInitState:kSetMasterLogic];
             break;
             
         case kSetMasterLogic:
-            [self writeRegister:kMasterLogicStatus withValue:0x2151];
+            [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
             [self setInitState:kSetSDSyncBit];
             break;
             
         case kSetSDSyncBit:
-            [self writeRegister:kSDConfig withValue:0x20];
-            [self writeRegister:kMasterLogicStatus withValue:0x2051]; //release the 'reset lost lock' bit
+            [self writeRegister:kSDConfig           withValue: 0x00000020]; //release the clocks
 
             [self setInitState:kSerDesIdle];
-            [self resetFIFO];
             break;
             
         case kSerDesError:
             break;
-
     }
     if(initializationState!= kSerDesError && initializationState!= kSerDesIdle){
-       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:0];
+       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.01];
     }
 }
 
@@ -1423,10 +1390,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //    0x0001
 //    We wait about 100ms between each write."
 
-	unsigned long theValues[] = {0x1C01, 0x1801, 0x1001, 0x001};
+	unsigned long theValues[] = {0x0000, 0x1000, 0x1800, 0x1C00};
+    unsigned long aValue;
+    [[self adapter] readLongBlock:&aValue
+                         atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
     int i;
     for (i=0; i<4; i++) {
-        [[self adapter] writeLongBlock:&theValues[i]
+        aValue &= 0xFF; 
+        aValue |= theValues[i];
+        [[self adapter] writeLongBlock:&aValue
                              atAddress:[self baseAddress] + register_information[kSDConfig].offset
                             numToWrite:1
                             withAddMod:[self addressModifier]

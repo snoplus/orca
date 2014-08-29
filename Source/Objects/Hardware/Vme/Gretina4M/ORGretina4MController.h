@@ -39,6 +39,7 @@
 	IBOutlet   NSTextField* extTrigLengthField;
 	IBOutlet   NSTextField* pileUpWindowField;
 	IBOutlet   NSTextField* externalWindowField;
+	IBOutlet   NSTextField* clockLockedField;
 
     //basic ops page
 	IBOutlet NSMatrix*		enabledMatrix;
@@ -151,6 +152,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) updateClockLocked;
 - (void) histEMultiplierChanged:(NSNotification*)aNote;
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;

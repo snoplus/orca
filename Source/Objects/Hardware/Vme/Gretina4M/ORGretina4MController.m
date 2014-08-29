@@ -501,6 +501,13 @@
 - (void) lockChanged:(NSNotification*) aNote
 {
     [lockStateField setStringValue:[model locked]?@"Yes":@"No"];
+    [self updateClockLocked];
+}
+
+- (void) updateClockLocked
+{
+    if([model clockSource] == 1) [clockLockedField setStringValue:@""];
+    else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
 }
 
 - (void) initSerDesStateChanged:(NSNotification*) aNote
@@ -666,6 +673,8 @@
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
+    [self updateClockLocked];
+
 }
 
 - (void) downSampleChanged:(NSNotification*)aNote

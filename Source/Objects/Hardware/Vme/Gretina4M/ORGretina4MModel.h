@@ -77,6 +77,7 @@ enum {
     kSerDesIdle,
     kSerDesSetup,
     kSetDigitizerClkSrc,
+    kReleaseClkManager,
     kPowerUpRTPower,
     kSetMasterLogic,
     kSetSDSyncBit,
@@ -447,7 +448,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) checkFirmwareVersion:(BOOL)verbose;
 - (void) readFPGAVersions;
 - (void) resetBoard;
-- (void) resetDCM;
+- (void) resetClock;
 - (void) resetMainFPGA;
 - (void) resetFIFO;
 - (void) resetSingleFIFO;
