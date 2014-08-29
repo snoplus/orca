@@ -996,7 +996,8 @@ int runType = kRunUndefined;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
-    [runDocDict setObject:[self getRunType] forKey:@"run_type"];
+    //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
+    [runDocDict setObject:@"physics" forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
@@ -1501,9 +1502,7 @@ int runType = kRunUndefined;
     
     //NSLog(@"%@",organisedFec32Information);
     
-    //this works but I'm not sure we need to see everything right now???
     [configDocDict setObject:fecCardArray forKey:@"fec32_card_info"];
-    
     [configDocDict setObject:caenArray forKey:@"caen_info"];
     
     //collect the objects that correspond to the CAEN
