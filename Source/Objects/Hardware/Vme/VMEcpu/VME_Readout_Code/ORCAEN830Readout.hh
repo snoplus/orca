@@ -6,8 +6,14 @@ class ORCAEN830Readout : public ORVVmeCard
 {
   public:
     ORCAEN830Readout(SBC_card_info* ci) : ORVVmeCard(ci) {} 
-    virtual ~ORCAEN830Readout() {} 
+	virtual bool Start();
+    virtual ~ORCAEN830Readout() {}
     virtual bool Readout(SBC_LAM_Data*);
+private:
+    bool     chan0Enabled;
+    uint32_t lastChan0Count;
+	uint32_t rollOverCount;
+
 };
 
 #endif /* _ORCAEN830Readout_hh_*/
