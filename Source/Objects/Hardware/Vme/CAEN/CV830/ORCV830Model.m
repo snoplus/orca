@@ -359,7 +359,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 		data[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
 		data[2] = enabledMask;
 		data[3] = lastReadTime;	//seconds since 1970
-		
 		int index = 4;
 		int i;
 		for(i=0;i<kNumCV830Channels;i++){
@@ -450,7 +449,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 								numToRead:1
 							   withAddMod:[self addressModifier]
 							usingAddSpace:0x01];
-			[self setScalerValue:aValue & 0x00ffffff index:i];
+			[self setScalerValue:aValue index:i];
 		}
 		else [self setScalerValue:0 index:i];
 		
@@ -468,8 +467,8 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
-		[self softwareReset];
-        [self softwareClear];
+		//[self softwareReset];
+        //[self softwareClear];
 		[self writeDwellTime];
 		[self writeControlReg];
 		[self writeEnabledMask];
@@ -741,11 +740,13 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 {  
 	
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
-	scheduledForUpdate = NO;
-	isRunning = NO;
-	numEnabledChannels = [self numEnabledChannels];
-	[self initBoard];
-	
+	scheduledForUpdate  = NO;
+	isRunning           = NO;
+	numEnabledChannels  = [self numEnabledChannels];
+	chan0RollOverCount  = 0;
+    lastChan0Count      = 0;
+    [self initBoard];
+
 	//cache the data takers for alittle more speed
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	for(id obj in dataTakers){
@@ -777,11 +778,11 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 			if(numEvents){
 				int event;
 				for(event=0;event<numEvents;event++){
-					int totalWordsInRecord = 4+numEnabledChannels + 1;
+					int totalWordsInRecord = 6+numEnabledChannels + 1;
 					dataRecord[0] = dataId | totalWordsInRecord;
 					dataRecord[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
-					dataRecord[2] = (acqMode & 0x3);
-					dataRecord[3] = enabledMask;
+					dataRecord[2] = enabledMask;
+					dataRecord[3] = 0; //chan 0 roll over. fill in later
 					
 					//read the header
 					unsigned long theHeader;
@@ -791,20 +792,26 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 									   withAddMod:[self addressModifier]
 									usingAddSpace:0x01];
 					dataRecord[4] = theHeader;
-                    NSLog(@"header: 0x%08x\n",theHeader);
 
 					
-					int aWord;
-					for(aWord=0 ; aWord<numEnabledChannels ; aWord++){
+					int i;
+					for(i=0 ; i<numEnabledChannels ; i++){
 						unsigned long aValue;
 						[[self adapter] readLongBlock:&aValue
 											atAddress:[self baseAddress]+[self getAddressOffset:kEventBuffer]
 											numToRead:1
 										   withAddMod:[self addressModifier]
 										usingAddSpace:0x01];
-						//put into record
-                        NSLog(@"channel: %d value: 0x%08x\n",aWord,aValue);
-						dataRecord[aWord + 5] = aValue;
+                        //for chan zero keep a rollover count
+                        if((enabledMask & 0x1) && (i==0)){
+                            if(aValue<lastChan0Count){
+                                chan0RollOverCount++;
+                            }
+                            lastChan0Count = aValue;
+                            dataRecord[3] = chan0RollOverCount;
+
+                        }
+						dataRecord[i + 5] = aValue;
 					}
 					[aDataPacket addLongsToFrameBuffer:dataRecord length:totalWordsInRecord];
 
@@ -853,7 +860,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	configStruct->card_info[index].deviceSpecificData[2] = [self getAddressOffset:kMEBEventNum];
 	configStruct->card_info[index].deviceSpecificData[3] = [self getAddressOffset:kEventBuffer];
 	configStruct->card_info[index].deviceSpecificData[4] = [self numEnabledChannels];
-	configStruct->card_info[index].deviceSpecificData[5] = (acqMode & 0x3);
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	    
 	configStruct->card_info[index].num_Trigger_Indexes = 1;	//Just 1 group of objects controlled by this card

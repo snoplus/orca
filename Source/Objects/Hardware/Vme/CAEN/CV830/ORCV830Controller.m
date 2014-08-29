@@ -34,7 +34,9 @@
 	int i;
 	for(i=0;i<kNumCV830Channels;i++){
 		[[enabledMaskMatrix cellAtRow:i column:0] setTag:i];
+		[[scalerValueMatrix cellAtRow:i column:0] setTag:i];
 		[[channelLabelMatrix cellAtRow:i column:0] setIntValue:i];
+		[[scalerValueMatrix cellAtRow:i column:0] setIntValue:0];
 	}
 	
 	[super awakeFromNib];	
@@ -239,13 +241,13 @@
 	if(aNotification==nil){
 		int i;
 		for(i=0;i<kNumCV830Channels;i++){
-			[[scalerValueMatrix cellAtRow:i column:0] setIntValue:[model scalerValue:i]];
+			[[scalerValueMatrix cellAtRow:i column:0] setDoubleValue:[model scalerValue:i]];
 		}
 	}
 	else {
 		int index = [[[aNotification userInfo]objectForKey:@"Channel"] intValue];
 		if(index>=0 && index < kNumCV830Channels){
-			[[scalerValueMatrix cellAtRow:index column:0] setIntValue:[model scalerValue:index]];
+			[[scalerValueMatrix cellAtRow:index column:0] setDoubleValue:[model scalerValue:index]];
 		}
 	}
 }

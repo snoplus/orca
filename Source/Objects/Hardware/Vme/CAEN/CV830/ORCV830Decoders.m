@@ -51,23 +51,26 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	unsigned long length	= ExtractLength(ptr[0]);
 	int crate				= ShiftAndExtract(ptr[1],21,0xf);
 	int card				= ShiftAndExtract(ptr[1],16,0x1f);
-	int dataIs24Bit			= ShiftAndExtract(ptr[2],2,0x1);
-	unsigned long enabledMask	= ptr[3];
-
+	unsigned long enabledMask	= ptr[2];
+    unsigned long long chan0RollOver = (unsigned long long)ptr[3];
 	NSString* crateKey   = [self getCrateKey: crate];
 	NSString* cardKey    = [self getCardKey: card];
 	
-	ptr+=5;					//point to first word of data (past header)
 	
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-            unsigned long theValue = *ptr;
-            if(dataIs24Bit)theValue &= 0x03ffffff;
-			NSString* valueString = [NSString stringWithFormat:@"%lu",*ptr];
+            unsigned long theValue = ptr[5+i];
+			NSString* valueString;
+            if((i==0) && (enabledMask&0x1)){
+                valueString = [NSString stringWithFormat:@"%llu",(chan0RollOver<<32)|ptr[5+i]];
+            }
+            else {
+                valueString = [NSString stringWithFormat:@"%lu",theValue];
+            }
 			NSString* channelKey = [self getChannelKey:i];
 
-			[aDataSet loadGenericData:valueString sender:self withKeys:@"Scaler Event",@"V830",  crateKey,cardKey,channelKey,nil];
+			[aDataSet loadGenericData:valueString sender:self withKeys:@"V830",  crateKey,cardKey,channelKey,nil];
 			ptr++;
 		}
 	}
@@ -79,20 +82,24 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
     NSString* title= @"CV830 Scaler Record\n\n";
 	int crateNum			= ShiftAndExtract(ptr[1],21,0xf);
 	int cardNum				= ShiftAndExtract(ptr[1],16,0x1f);
-	int enabledMask			= ptr[3];
+	int enabledMask			= ptr[2];
 
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",crateNum];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",cardNum];
 	NSString* s = [NSString stringWithFormat:@"%@%@%@\n",title,crate,card];
 	s = [s stringByAppendingFormat:@"Enabled Mask:0X%08X\n",enabledMask];
-	
-	ptr+=5;					//point to first word of data (past header)
-	
+    unsigned long long chan0RollOver = (unsigned long long)ptr[3];
+		
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-			s = [s stringByAppendingFormat:@"Channel:%d Counter: %lu\n",i,*ptr];
-			ptr++;
+            if((i==0) && (enabledMask&0x1)){
+                unsigned long long timeStamp = ((unsigned long long)chan0RollOver << 32) + (unsigned long long)ptr[5+i];
+                s = [s stringByAppendingFormat:@"Time: %lld\n",timeStamp];
+            }
+            else {
+                s = [s stringByAppendingFormat:@"%d: 0x%08lx",i,ptr[5+i]];
+            }
 		}
 	}
 
@@ -133,7 +140,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	for(i=0;i<kNumCV830Channels;i++){
 		if(enabledMask & (0x1L<<i)){
 			NSString* valueString = [NSString stringWithFormat:@"%lu",ptr[5+i]];
-			[aDataSet loadGenericData:valueString sender:self withKeys:@"Scalers",@"V830",  crateKey,cardKey,[self getChannelKey:i],nil];
+			[aDataSet loadGenericData:valueString sender:self withKeys:@"V830Poll",  crateKey,cardKey,[self getChannelKey:i],nil];
 		}
 	}
     return length; //must return number of longs processed.
