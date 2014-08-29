@@ -48,7 +48,7 @@
 - (void) awakeFromNib
 {
     settingTabSize  = NSMakeSize(830,510);
-    stateTabSize	= NSMakeSize(520,480);
+    stateTabSize	= NSMakeSize(520,500);
     registerTabSize	= NSMakeSize(400,180);
     firmwareTabSize	= NSMakeSize(400,180);
     
@@ -108,12 +108,7 @@
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(baseAddressChanged:)
-                         name : ORVmeIOCardBaseAddressChangedNotification
-                       object : model];
-    
+	   
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
                          name : ORRunStatusChangedNotification
@@ -250,11 +245,12 @@
                      selector : @selector(numTimesToRetryChanged:)
                          name : ORGretinaTriggerModelNumTimesToRetryChanged
 						object: model];
-
+    
     [notifyCenter addObserver : self
-                     selector : @selector(alwaysRelockChanged:)
-                         name : ORGretinaTriggerModelAlwaysRelockChanged
+                     selector : @selector(timeStampChanged:)
+                         name : ORGretinaTriggerTimeStampChanged
 						object: model];
+
     
     
 }
@@ -262,7 +258,6 @@
 - (void) updateWindow
 {
     [super updateWindow];
-    [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
     [self registerLockChanged:nil];
@@ -289,14 +284,13 @@
 	[self lockChanged:nil];
 	[self doNotLockChanged:nil];
 	[self numTimesToRetryChanged:nil];
-	[self alwaysRelockChanged:nil];
-    
+    [self timeStampChanged:nil];
 }
 
 #pragma mark •••Interface Management
-- (void) alwaysRelockChanged:(NSNotification*)aNote
+- (void) timeStampChanged:(NSNotification*)aNote
 {
-	[alwaysRelockCB setIntValue: [model alwaysRelock]];
+    [timeStampField setDoubleValue:(double)[model timeStamp]];
 }
 
 - (void) numTimesToRetryChanged:(NSNotification*)aNote
@@ -307,6 +301,7 @@
 - (void) doNotLockChanged:(NSNotification*)aNote
 {
 	[doNotLockCB setIntValue: [model doNotLock]];
+    [self settingsLockChanged:nil];
 }
 
 - (void) lockChanged:(NSNotification*)aNote
@@ -460,8 +455,8 @@
     BOOL locked = [gSecurity isLocked:ORGretinaTriggerSettingsLock];
 		
     [settingLockButton  setState: locked];
-    [addressText        setEnabled:!locked && !runInProgress];
 	[probeButton        setEnabled:!locked && !runInProgress];
+ 
     if(![model isMaster]){
         [shipRecordButton setHidden:YES];
         [optionsBox setHidden:YES];
@@ -470,8 +465,8 @@
         [shipRecordButton setHidden:NO];
         [shipRecordButton   setEnabled:!locked && [model isMaster]];
         [optionsBox setHidden:NO];
+        [numTimesToRetryField setEnabled:![model doNotLock]];
     }
-    
 }
 
 - (void) registerLockChanged:(NSNotification*)aNotification
@@ -499,11 +494,6 @@
     [[self window] setTitle:[NSString stringWithFormat:@"GretinaTrigger Card (Slot %d)",[model slot]]];
 }
 
-- (void) baseAddressChanged:(NSNotification*)aNote
-{
-    [addressText setIntValue: [model baseAddress]];
-}
-
 - (void) setRegisterDisplay:(unsigned int)index
 {
 	if (index < kNumberOfGretinaTriggerRegisters) {
@@ -521,11 +511,6 @@
 }
 
 #pragma mark •••Actions
-- (IBAction) alwaysRelockAction:(id)sender
-{
-	[model setAlwaysRelock:[sender intValue]];
-}
-
 - (IBAction) numTimesToRetryAction:(id)sender
 {
 	[model setNumTimesToRetry:[sender intValue]];
@@ -544,13 +529,6 @@
 - (IBAction) isMasterAction:(id)sender
 {
     [model setIsMaster:[sender indexOfSelectedItem]];
-}
-
-- (IBAction) baseAddressAction:(id)sender
-{
-    if([sender intValue] != [model baseAddress]){
-        [model setBaseAddress:[sender intValue]];
-    }
 }
 
 - (IBAction) readRegisterAction:(id)sender
@@ -604,6 +582,7 @@
         NSLog(@"Gretina Trigger Code Revision (slot %d): 0x%x\n",[model slot],rev);
         unsigned long date = [model readCodeDate];
         NSLog(@"Gretina Trigger Code Date (slot %d): 0x%x\n",[model slot],date);
+        [model readDisplayRegs];
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe GretinaTrigger Board FAILED Probe.\n");

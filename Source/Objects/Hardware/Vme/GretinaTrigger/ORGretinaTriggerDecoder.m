@@ -67,7 +67,7 @@
     [date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
     
     theString = [theString stringByAppendingFormat:@"Date: %@\n",date];
-    theString = [theString stringByAppendingFormat:@"TimeStamp: 0x%012llx\n",(unsigned long long)dataPtr[3]<<32 | dataPtr[4]];
+    theString = [theString stringByAppendingFormat:@"TimeStamp: %lld\n",(unsigned long long)dataPtr[3]<<32 | dataPtr[4]];
     
     theString = [theString stringByAppendingFormat:@"Locked:   %@\n",locked   ? @"YES":@"NO"];
     theString = [theString stringByAppendingFormat:@"LockLost: %@\n",lockLost ? @"YES":@"NO"];

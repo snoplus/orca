@@ -28,7 +28,6 @@
     IBOutlet NSTabView* 	tabView;
 	IBOutlet NSTextField*   numTimesToRetryField;
 	IBOutlet NSButton*      doNotLockCB;
-    IBOutlet NSButton*      alwaysRelockCB;
 	IBOutlet NSButton*      verboseCB;
 	IBOutlet NSTextField*   diagnosticCounterField;
 	IBOutlet NSMatrix*      inputLinkMaskMatrix;
@@ -45,7 +44,7 @@
     IBOutlet NSTextField*   digitizersLockedField;
     IBOutlet NSButton*      shipRecordButton;
     IBOutlet NSBox*         optionsBox;
-    
+    IBOutlet NSTextField*   timeStampField;
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
 
@@ -88,14 +87,12 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) alwaysRelockChanged:(NSNotification*)aNote;
 - (void) numTimesToRetryChanged:(NSNotification*)aNote;
 - (void) doNotLockChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
 - (void) diagnosticCounterChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
-- (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) setRegisterDisplay:(unsigned int)index;
 - (void) isMasterChanged:(NSNotification*)aNote;
@@ -115,13 +112,12 @@
 - (void) clockUsingLLinkChanged:(NSNotification*)aNote;
 - (void) initStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
+- (void) timeStampChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) alwaysRelockAction:(id)sender;
 - (IBAction) numTimesToRetryAction:(id)sender;
 - (IBAction) doNotLockAction:(id)sender;
 - (IBAction) verboseAction:(id)sender;
-- (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) shipRecordAction:(id)sender;

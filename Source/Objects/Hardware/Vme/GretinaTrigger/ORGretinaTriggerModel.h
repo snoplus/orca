@@ -184,17 +184,18 @@ enum {
     kStartRouterTRPowerUp,
     kWaitOnRouterTRPowerUp,
     kReadLinkLock,
-    kStep3b,
-    kRunSteps4a4b,
-    kWaitOnSteps4a4b,
+    kVerifyLinkState,
+    kSetClockSource,
+    kWaitOnSetClockSource,
     kCheckWaitAckState,
     kMasterSetClearAckBit,
     kVerifyAckMode,
     kSendNormalData,
     kRunRouterDataCheck,
     kWaitOnRouterDataCheck,
-    kReleaseClocks,
     kFinalCheck,
+    kResetScaler,
+    kReleaseClocks,
     kMasterError,
     kNumMasterTriggerStates //must be last
 };
@@ -209,7 +210,7 @@ enum {
     kSetRouterTRPower,
     SetLLinkDenRenSync,
     kSetRouterPreEmphCtrl,
-    kSetClockSource,
+    KSetRouterClockSource,
     kRouterDataChecking,
     kMaskUnusedRouterChans,
     kSetTRPowerBits,
@@ -270,7 +271,9 @@ enum {
     BOOL            doNotLock;
     unsigned short  numTimesToRetry;
     ORAlarm*        noClockAlarm;
-    BOOL            alwaysRelock;
+    unsigned short  timeStampA;
+    unsigned short  timeStampB;
+    unsigned short  timeStampC;
     
     //------------------internal use only
     int             tryNumber;
@@ -302,9 +305,8 @@ enum {
 - (void) pollLock;
 
 #pragma mark ***Accessors
+- (unsigned long long) timeStamp;
 - (int) tryNumber;
-- (BOOL) alwaysRelock;
-- (void) setAlwaysRelock:(BOOL)aFlag;
 - (unsigned short) numTimesToRetry;
 - (void) setNumTimesToRetry:(unsigned short)aNumTimesToRetry;
 - (BOOL) doNotLock;
@@ -377,6 +379,7 @@ enum {
 - (unsigned short)findDigitizerMask;
 - (void) readDisplayRegs;
 - (BOOL) isRouterLocked;
+- (void) resetScaler;
 
 - (void) stepMaster;
 - (void) stepRouter;
@@ -387,8 +390,6 @@ enum {
 - (void) setToInternalClock;
 
 // Register access
-- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue;
-- (unsigned short) readFromAddress:(unsigned long)anAddress;
 - (void) dumpFpgaRegisters;
 - (void) dumpRegisters;
 - (void) testSandBoxRegisters;
@@ -403,6 +404,9 @@ enum {
 #pragma mark •••Hardware Access
 - (unsigned short) readCodeRevision;
 - (unsigned short) readCodeDate;
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue;
+- (unsigned short) readFromAddress:(unsigned long)anAddress;
+- (void) readTimeStamps;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -419,6 +423,7 @@ enum {
 
 @end
 
+extern NSString* ORGretinaTriggerTimeStampChanged;
 extern NSString* ORGretinaTriggerModelNumTimesToRetryChanged;
 extern NSString* ORGretinaTriggerModelDoNotLockChanged;
 extern NSString* ORGretinaTriggerModelVerboseChanged;
@@ -446,5 +451,4 @@ extern NSString* ORGretinaTriggerLinkLockedRegChanged;
 extern NSString* ORGretinaTriggerClockUsingLLinkChanged;
 extern NSString* ORGretinaTriggerModelInitStateChanged;
 extern NSString* ORGretinaTriggerLockChanged;
-extern NSString* ORGretinaTriggerModelAlwaysRelockChanged;
 
