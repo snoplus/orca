@@ -2550,7 +2550,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setPrerecnt:i     withValue:[decoder decodeIntForKey:[@"prerecnt"     stringByAppendingFormat:@"%d",i]]];
 		[self setPostrecnt:i    withValue:[decoder decodeIntForKey:[@"postrecnt"    stringByAppendingFormat:@"%d",i]]];
 		[self setTpol:i         withValue:[decoder decodeIntForKey:[@"tpol"         stringByAppendingFormat:@"%d",i]]];
-		[self setPresumEnabled:i withValue:[decoder decodeIntForKey:[@"PresumEnabled"         stringByAppendingFormat:@"%d",i]]];
+		[self setPresumEnabled:i withValue:[decoder decodeIntForKey:[@"presumEnabled"         stringByAppendingFormat:@"%d",i]]];
         [self setEasySelected:i		withValue:[decoder decodeIntForKey:[@"easySelected"	    stringByAppendingFormat:@"%d",i]]];
 	}
     
