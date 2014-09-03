@@ -51,11 +51,19 @@
 
 - (void) main 
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	if(currentDecoder){
-		NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
-		fileAsData = [[fh readDataToEndOfFile] retain];
-		[delegate setDataRecords:[self decodeDataIntoArray]]; 
-		[delegate setHeader:[ORHeaderItem headerFromObject:[currentDecoder fileHeader] named:@"Root"]];
+        @try {
+            NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
+            fileAsData = [[fh readDataToEndOfFile] retain];
+            [delegate setDataRecords:[self decodeDataIntoArray]];
+            [delegate setHeader:[ORHeaderItem headerFromObject:[currentDecoder fileHeader] named:@"Root"]];
+        }
+        @catch(NSException* e){
+            NSLogColor([NSColor redColor],@"Data Explorer: File too big -- out of memory\n");
+            [delegate setDataRecords:nil];
+            [delegate setHeader:nil];
+        }
 	}
 	
 	if([delegate respondsToSelector:@selector(updateProgress:)]){
@@ -69,6 +77,7 @@
 								   withObject:nil
 								waitUntilDone:YES];
 	}
+    [thePool release];
 }
 
 - (NSArray*) decodeDataIntoArray
