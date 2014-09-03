@@ -54,6 +54,7 @@
     NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	if(currentDecoder){
         @try {
+            NSLog(@"Data Explorer: Opening %@\n",filePath);
             NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
             fileAsData = [[fh readDataToEndOfFile] retain];
             [delegate setDataRecords:[self decodeDataIntoArray]];
