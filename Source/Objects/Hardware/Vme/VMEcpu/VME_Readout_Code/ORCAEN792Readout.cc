@@ -15,18 +15,17 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
     /* 3: fifo buffer address                         */
     uint16_t statusOne, statusTwo;
     int32_t result;
-	uint32_t dataId            = GetHardwareMask()[0];
-	uint32_t locationMask      = ((GetCrate() & 0x01e)<<21) | ((GetSlot() & 0x0000001f)<<16);
-    uint32_t statusOneAddress  = GetBaseAddress() + GetDeviceSpecificData()[0];
-	uint32_t fifoAddress       = GetDeviceSpecificData()[1];
-	uint32_t statusTwoAddress  = GetBaseAddress() + GetDeviceSpecificData()[2];
-	//uint32_t bufferSizeInLongs = GetDeviceSpecificData()[3];
+	uint32_t dataId             = GetHardwareMask()[0];
+	uint32_t locationMask       = ((GetCrate() & 0x01e)<<21) | ((GetSlot() & 0x0000001f)<<16);
+    uint32_t modelType          = GetDeviceSpecificData()[0];
+    uint32_t status1Address     = GetDeviceSpecificData()[1];
+    uint32_t status2Address     = GetDeviceSpecificData()[2];
+	uint32_t fifoAddress        = GetDeviceSpecificData()[3];
+	uint32_t bufferSizeInLongs  = GetDeviceSpecificData()[4];
 	
+    uint32_t addressModifier = 0x39;
 	
-	result = VMERead(statusTwoAddress,
-                     0x39,
-                     sizeof(statusTwo),
-                     statusTwo);
+/*	result = VMERead(statusTwoAddress, addressModifier, sizeof(statusTwo),statusTwo);
     if (result != sizeof(statusTwo)) {
         LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
         return false; 
@@ -37,8 +36,8 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 		//wow, the buffer is full. We will use dma to read out the whole buffer and decoder it locally into events
 		uint32_t buffer[v792BufferSizeInLongs];
 		
-		result = DMARead(GetBaseAddress()+fifoAddress,
-						 0x39,
+		result = DMARead(fifoAddress,
+						 addressModifier,
 						 (uint32_t) 4,
 						 (uint8_t*) buffer,
 						 v792BufferSizeInBytes);
@@ -121,21 +120,20 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 	}
 	
 	else {
-		result = VMERead(statusOneAddress,
-						 0x39,
-						 sizeof(statusOne),
-						 statusOne);
+ */
+		result = VMERead(statusOneAddress,addressModifier,sizeof(statusOne),statusOne);
 		
 		if (result != sizeof(statusOne)) {
 			LogBusError("CAEN 0x%0x status 1 read",GetBaseAddress());
 			return false; 
 		}
+        
 		uint8_t dataIsReady     =  statusOne & 0x0001;
 		if (dataIsReady) {
 			
 			//OK, at least one data value is ready, first value read should be a header
 			uint32_t dataWord;
-			result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataWord), dataWord);
+			result = VMERead(fifoAddress, addressModifier, sizeof(dataWord), dataWord);
 			if((result == sizeof(dataWord)) && (ShiftAndExtract(dataWord,24,0x7) == 0x2)){
 				int32_t numMemorizedChannels = ShiftAndExtract(dataWord,8,0x3f);
 				int32_t i;
@@ -143,13 +141,16 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 					//make sure the data buffer can hold our data. Note that we do NOT ship the end of block. 
 					ensureDataCanHold(numMemorizedChannels + 3);
 					
-					int32_t savedDataIndex = dataIndex;
+					//save the location in case we have to dump the data because of an error
+                    int32_t savedDataIndex = dataIndex;
 					data[dataIndex++] = dataId | (numMemorizedChannels + 3);
 					data[dataIndex++] = locationMask;
 					uint8_t dataOK = true;
 					for(i=0;i<numMemorizedChannels;i++){
-						result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataWord), dataWord);
-						if((result == sizeof(dataWord)) && (ShiftAndExtract(dataWord,24,0x7) == 0x0))data[dataIndex++] = dataWord;
+						result = VMERead(fifoAddress, addressModifier, sizeof(dataWord), dataWord);
+						if((result == sizeof(dataWord)) && (ShiftAndExtract(dataWord,24,0x7) == 0x0)){
+                            data[dataIndex++] = dataWord;
+                        }
 						else {
 							dataOK = false;
 							dataIndex = savedDataIndex;
@@ -160,7 +161,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 					}
 					if(dataOK){
 						//OK we read the data, get the end of block
-						result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataWord), dataWord);
+						result = VMERead(fifoAddress, addressModifier, sizeof(dataWord), dataWord);
 						if((result != sizeof(dataWord)) || (ShiftAndExtract(dataWord,24,0x7) != 0x4)){
 							//some kind of bad error, report and flush the buffer
 							LogBusError("Rd Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno)); 
@@ -172,7 +173,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 				}
 			}
 		}
-	}
+	//}
 	
     return true; 
 }
@@ -184,7 +185,7 @@ void ORCAEN792Readout::FlushDataBuffer()
 	int32_t i;
 	for(i=0;i<0x07FC;i++) {
 		uint32_t dataValue;
-		int32_t result = VMERead(GetBaseAddress()+fifoAddress, 0x39, sizeof(dataValue), dataValue);
+		int32_t result = VMERead(fifoAddress, addressModifier, sizeof(dataValue), dataValue);
 		if(result<0){
 			LogBusError("Flush Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno)); 
 			break;
