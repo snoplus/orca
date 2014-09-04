@@ -320,7 +320,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (BOOL)onlineMaskBit:(int)bit
 {
-	return onlineMask&(1<<bit);
+	return (onlineMask&(1<<bit))!=0;
 }
 
 - (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
