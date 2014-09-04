@@ -229,7 +229,19 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     [[NSNotificationCenter defaultCenter] postNotificationName:KatrinModelSlowControlIsConnectedChanged object:self];
 	
 }
-
+- (void) collectRates
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(collectRates) object:nil];
+	if([self guardian]){
+		[self collectRatesFromAllGroups];
+        
+		[[NSNotificationCenter defaultCenter]
+         postNotificationName:ExperimentCollectedRates
+         object:self];
+        
+	}
+	[self performSelector:@selector(collectRates) withObject:nil afterDelay:1.0];
+}
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
