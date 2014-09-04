@@ -732,7 +732,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //Make the data record from the burst array
     int BurstSize = Bchans.count;
     NSLog(@"Size of burst file: %i \n", (BurstSize - 1) );
-    for(int l=1;l<BurstSize; l++)
+    int l;
+    for(l=1;l<BurstSize; l++)
     {
         ORBurstData* someData = [[ORBurstData alloc] init]; //was separate, test
         //someData.epSec=[[Bsecs objectAtIndex:l] longValue]; //crashes from bad access, but seems unneccesary //fixme?
