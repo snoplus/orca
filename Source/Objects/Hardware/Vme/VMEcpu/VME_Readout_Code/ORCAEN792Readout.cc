@@ -9,30 +9,32 @@
 bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 {
     /* The deviceSpecificData is as follows:          */ 
-    /* 0: statusOne register                          */
-    /* 1: statusTwo register                          */
-    /* 2: fifo buffer size (in longs)                 */
+    /* 0: model type                          */
+    /* 1: statusOne register                          */
+    /* 2: statusTwo register                          */
     /* 3: fifo buffer address                         */
-    uint16_t statusOne, statusTwo;
+    /* 4: fifo buffer size (in longs)                 */
+    uint16_t status1;
+    //uint16_t status2;
     int32_t result;
 	uint32_t dataId             = GetHardwareMask()[0];
 	uint32_t locationMask       = ((GetCrate() & 0x01e)<<21) | ((GetSlot() & 0x0000001f)<<16);
-    uint32_t modelType          = GetDeviceSpecificData()[0];
+    //uint32_t modelType          = GetDeviceSpecificData()[0];
     uint32_t status1Address     = GetDeviceSpecificData()[1];
-    uint32_t status2Address     = GetDeviceSpecificData()[2];
+    //uint32_t status2Address     = GetDeviceSpecificData()[2];
 	uint32_t fifoAddress        = GetDeviceSpecificData()[3];
-	uint32_t bufferSizeInLongs  = GetDeviceSpecificData()[4];
+	//uint32_t bufferSizeInLongs  = GetDeviceSpecificData()[4];
 	
-    uint32_t addressModifier = 0x39;
+    uint32_t addressModifier = 0x09;
 	
-/*	result = VMERead(statusTwoAddress, addressModifier, sizeof(statusTwo),statusTwo);
-    if (result != sizeof(statusTwo)) {
-        LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
-        return false; 
-	}
-    uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
+//	result = VMERead(statusTwoAddress, addressModifier, sizeof(statusTwo),statusTwo);
+//    if (result != sizeof(statusTwo)) {
+//        LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
+//        return false;
+//	}
+//    uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
 	
-	if(bufferIsFull){
+/*	if(bufferIsFull){
 		//wow, the buffer is full. We will use dma to read out the whole buffer and decoder it locally into events
 		uint32_t buffer[v792BufferSizeInLongs];
 		
@@ -121,14 +123,14 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 	
 	else {
  */
-		result = VMERead(statusOneAddress,addressModifier,sizeof(statusOne),statusOne);
+		result = VMERead(status1Address,addressModifier,sizeof(status1),status1);
 		
-		if (result != sizeof(statusOne)) {
+		if (result != sizeof(status1)) {
 			LogBusError("CAEN 0x%0x status 1 read",GetBaseAddress());
 			return false; 
 		}
         
-		uint8_t dataIsReady     =  statusOne & 0x0001;
+		uint8_t dataIsReady     =  status1 & 0x0001;
 		if (dataIsReady) {
 			
 			//OK, at least one data value is ready, first value read should be a header
@@ -185,7 +187,7 @@ void ORCAEN792Readout::FlushDataBuffer()
 	int32_t i;
 	for(i=0;i<0x07FC;i++) {
 		uint32_t dataValue;
-		int32_t result = VMERead(fifoAddress, addressModifier, sizeof(dataValue), dataValue);
+		int32_t result = VMERead(fifoAddress, 0x9, sizeof(dataValue), dataValue);
 		if(result<0){
 			LogBusError("Flush Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno)); 
 			break;
