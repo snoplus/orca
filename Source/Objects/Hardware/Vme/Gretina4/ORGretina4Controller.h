@@ -44,6 +44,8 @@
 	IBOutlet NSMatrix*		cfdThresholdMatrix;
 	IBOutlet NSMatrix*		dataDelayMatrix;
 	IBOutlet NSMatrix*		dataLengthMatrix;
+	IBOutlet NSTextField*   clockLockedField;
+    IBOutlet NSPopUpButton* clockSourcePU;
 
 	//arrggg! why can't you put a popup into a NSMatrix????
 	IBOutlet NSPopUpButton*	polarityPU0;
@@ -138,6 +140,9 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface Management
+- (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) updateClockLocked;
+- (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 - (void) downSampleChanged:(NSNotification*)aNote;
 - (void) histEMultiplierChanged:(NSNotification*)aNote;

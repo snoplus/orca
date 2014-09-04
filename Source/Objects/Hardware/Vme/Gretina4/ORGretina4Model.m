@@ -72,6 +72,9 @@ NSString* ORGretina4SettingsLock				= @"ORGretina4SettingsLock";
 NSString* ORGretina4RegisterLock				= @"ORGretina4RegisterLock";
 NSString* ORGretina4odelSetEnableStatusChanged		= @"ORGretina4odelSetEnableStatusChanged";
 NSString* ORGretina4ModelFirmwareStatusStringChanged= @"ORGretina4ModelFirmwareStatusStringChanged";
+NSString* ORGretina4ClockSourceChanged         = @"ORGretina4ClockSourceChanged";
+NSString* ORGretina4ModelInitStateChanged      = @"ORGretina4ModelInitStateChanged";
+NSString* ORGretina4LockChanged                 = @"ORGretina4LockChanged";
 
 @interface ORGretina4Model (private)
 - (void) blockEraseFlash;
@@ -357,6 +360,24 @@ static struct {
 }
 
 #pragma mark ***Accessors
+- (short) initState {return initializationState;}
+- (void) setInitState:(short)aState
+{
+    initializationState = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelInitStateChanged object:self];
+}
+- (short) clockSource
+{
+    return clockSource;
+}
+
+- (void) setClockSource:(short)aClockSource
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
+    clockSource = aClockSource;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ClockSourceChanged object:self];
+}
+
 - (ORConnector*) spiConnector
 {
     return spiConnector;
@@ -1012,35 +1033,6 @@ static struct {
     return theValue & 0xfff;
 }
 
-- (void) resetDCM
-{
-    //Start Slave clock
-	//turn off SerDes driver
-	unsigned long theValue = 0x11;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	//reset DCM clock while keeping SerDes driver off
-	// To reset the DCM, assert bit 9 of this register. 
-	theValue = 0x211;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	sleep(1); //wait for 1 second:
-	
-	theValue = 0x11;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-}
 
 - (void) resetBoard
 {
@@ -1050,68 +1042,156 @@ static struct {
     for(i=0;i<kNumGretina4Channels;i++){
         [self writeControlReg:i enabled:NO];
     }
-	
-    /* Then reset the DCM clock. (This will also reset the serdes.) */
-    //[self resetDCM];  change by Jing: DCM is reset in initSerDes;
     
-    /* Finally, initialize the serdes. */
-    [self initSerDes];
+    [self resetMainFPGA];
+    [ORTimer delay:6];  // 6 second delay during board reset
 }
 
-/*
-- (void) initSerDes
+- (void) resetFIFO
 {
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
+    
+    [self resetSingleFIFO];
+    [self resetSingleFIFO];
+    
+    if(![self fifoIsEmpty]){
+        NSLogColor([NSColor redColor], @"%@ Fifo NOT reset properly\n",[self fullID]);
+    }
+    
+}
+
+- (void) resetSingleFIFO
+{
+    unsigned long val = 0;
+    [[self adapter] readLongBlock:&val
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
                         numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-    if ((theValue & 0x7) == 0x7) return;
-    theValue = 0x22;
-    // First we set to loop back mode so the SD can lock. 
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    val |= (0x1<<27);
+    
+    [[self adapter] writeLongBlock:&val
+                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
                         numToWrite:1
                         withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-    NSDate* startDate = [NSDate date];
-    while(1) {
-        // Wait for the SD and DCM to lock 
-        [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                            numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		
-        if ((theValue & 0x7) == 0x7) break;
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 2) {
-			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
-			return;
-		}
-    }
-    theValue = 0x02;
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];    
+                     usingAddSpace:0x01];
+    
+    val &= ~(0x1<<27);
+    
+    [[self adapter] writeLongBlock:&val
+                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
 }
-*/
+- (BOOL) fifoIsEmpty
+{
+    unsigned long val = 0;
+    [[self adapter] readLongBlock:&val
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    return ((val>>20) & 0x1); //bit is high if FIFO is empty
+}
+
 
 //new code version 1 (Jing Qian)
-- (void) setClockSource: (unsigned long) clocksource
+- (void) writeClockSource
 {
+    if(clockSource == 0)return; ////temp..... Clock source might be set by the Trigger Card init code.
 	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
-	unsigned long theValue = clocksource;
+	unsigned long theValue = clockSource;
     [[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + fpga_register_information[kVMEGPControl].offset
                         numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 }
+
+- (void) stepSerDesInit
+{
+    switch(initializationState){
+        case kSerDesSetup:
+        [self writeRegister:kSDConfig           withValue: 0x00001c31]; //T/R SerDes off, reset clock manager, reset clocks
+        [self writeRegister:kMasterLogicStatus  withValue: 0x04420001]; //power up value
+        [self setInitState:kSerDesIdle];
+        break;
+        
+        case kSetDigitizerClkSrc:
+        [[self undoManager] disableUndoRegistration];
+        [self setClockSource:0];                                //set to external clock (gui only!!!)
+        [[self undoManager] enableUndoRegistration];
+        [self writeFPGARegister:kVMEGPControl   withValue:0x00 ]; //set to external clock (in HW)
+        [self setInitState:kReleaseClkManager];
+        break;
+        
+        case kReleaseClkManager:
+        //SERDES still disabled, release clk manager, clocks still held at reset
+        [self writeRegister:kSDConfig           withValue: 0x00000c11];
+        [self setInitState:kPowerUpRTPower];
+        break;
+        
+        case kPowerUpRTPower:
+        //SERDES enabled, clocks still held at reset
+        [self writeRegister:kSDConfig           withValue: 0x00000200];
+        [self setInitState:kSetMasterLogic];
+        break;
+        
+        case kSetMasterLogic:
+        [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
+        [self setInitState:kSetSDSyncBit];
+        break;
+        
+        case kSetSDSyncBit:
+        [self writeRegister:kSDConfig           withValue: 0x00000020]; //release the clocks
+        
+        [self setInitState:kSerDesIdle];
+        break;
+        
+        case kSerDesError:
+        break;
+    }
+    if(initializationState!= kSerDesError && initializationState!= kSerDesIdle){
+        [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.01];
+    }
+}
+
+- (BOOL) isLocked
+{
+    BOOL lockedBitSet   = ([self readRegister:kMasterLogicStatus] & kSDLockBit)==kSDLockBit;
+    //BOOL lostLockBitSet = ([self readRegister:kSDLostLockBit] & kSDLostLockBit)==kSDLostLockBit;
+    [self setLocked: lockedBitSet]; //& !lostLockBitSet];
+    return [self locked];
+}
+
+- (BOOL) locked
+{
+    return locked;
+}
+
+- (void) setLocked:(BOOL)aState
+{
+    locked = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4LockChanged object: self];
+}
+
+- (NSString*) initSerDesStateName
+{
+    switch(initializationState){
+        case kSerDesIdle:           return @"Idle";
+        case kSerDesSetup:          return @"Reset to power up state";
+        case kSetDigitizerClkSrc:   return @"Set the Clk Source";
+        case kPowerUpRTPower:       return @"Power up T/R Power";
+        case kSetMasterLogic:       return @"Write Master Logic = 0x20051";
+        case kSetSDSyncBit:         return @"Write SD Sync Bit";
+        case kSerDesError:          return @"Error";
+        default:                    return @"?";
+    }
+}
+
 
 - (void) resetMainFPGA
 {
@@ -1148,43 +1228,6 @@ static struct {
                         numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-}
-
-- (void) initSerDes
-{
-	//first set clock source
-	//I can't find the variable for clock source, so I set it 0 temporarily
-	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
-	[self setClockSource:0x01];
-	
-	//main FPGA reset cycle
-	[self resetMainFPGA];
-	
-	//wait for 10 seconds
-	sleep(10);
-	
-	/*
-	unsigned long theValue = 0;
-	NSDate* startDate = [NSDate date];
-    while(1) {
-        // Wait for the SD and DCM to lock 
-        [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                            numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		
-        if ((theValue & 0x7) == 0x7) break;
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 10) {
-			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
-			return;
-		}
-    }
-	*/
-	 
-	//reset DCM
-	[self resetDCM];
-	
 }
 
 - (void) initBoard:(BOOL)doEnableChannels
@@ -1229,10 +1272,7 @@ static struct {
 	NSLog(@"VHDL Version number: 0x%x \n", ((vmeVersion & 0xFF000000) >> 24));
 	
 	
-    //[self initSerDes];
     //write the card level params
-	
-	
 	int i;
 	for(i=0;i<kNumGretina4CardParams;i++){
 		unsigned long theValue = [[cardInfo objectAtIndex:i] longValue];
@@ -1242,7 +1282,8 @@ static struct {
 							withAddMod:[self addressModifier]
 							usingAddSpace:0x01];
 	}
-	
+    [self writeClockSource];
+
 	//write the channel level params
 	if (doEnableChannels) {
 		for(i=0;i<kNumGretina4Channels;i++) {
@@ -2003,6 +2044,13 @@ static struct {
     [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Clock Source"];
+    [p setFormat:@"##0" upperLimit:0x2 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Data Delay"];
     [p setFormat:@"##0.00" upperLimit:4.5 lowerLimit:0 stepSize:.01 units:@"us"];
     [p setSetMethod:@selector(setDataDelayConverted:withValue:) getMethod:@selector(dataDelayConverted:)];
@@ -2307,6 +2355,7 @@ static struct {
     }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
+    [self setClockSource:               [decoder decodeIntForKey:@"clockSource"]];
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
@@ -2347,6 +2396,7 @@ static struct {
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];
     [encoder encodeObject:cardInfo					forKey:@"cardInfo"];
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
+    [encoder encodeInt:clockSource                  forKey:@"clockSource"];
 	int i;
  	for(i=0;i<kNumGretina4Channels;i++){
 		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
@@ -2396,6 +2446,7 @@ static struct {
 	}
     [objDictionary setObject:ar forKey:@"LED Threshold"];
     [objDictionary setObject:[NSNumber numberWithInt:downSample] forKey:@"Down Sample"];
+    [objDictionary setObject:[NSNumber numberWithInt:clockSource]       forKey:@"Clock Source"];
     [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier] forKey:@"Hist E Multiplier"];
 	
 	

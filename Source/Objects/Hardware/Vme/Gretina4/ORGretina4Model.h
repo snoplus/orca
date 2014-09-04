@@ -71,6 +71,20 @@
 #define kSPIChipSelect	0x8
 #define kSPIRead        0x10
 
+#define kSDLockBit      (0x1<<17)
+#define kSDLostLockBit  (0x1<<24)
+
+enum {
+    kSerDesIdle,
+    kSerDesSetup,
+    kSetDigitizerClkSrc,
+    kReleaseClkManager,
+    kPowerUpRTPower,
+    kSetMasterLogic,
+    kSetSDSyncBit,
+    kSerDesError,
+};
+
 #pragma mark ¥¥¥Register Definitions
 enum {
 	kBoardID,					//[0] board ID
@@ -201,7 +215,8 @@ enum Gretina4FIFOStates {
     short			pzTraceEnabled[kNumGretina4Channels];
     int				downSample;
     int				histEMultiplier;
-	
+    short           clockSource;
+
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4Channels];
 	BOOL			isRunning;
@@ -246,9 +261,11 @@ enum Gretina4FIFOStates {
 
     NSString*       firmwareStatusString;
     ORFileMoverOp*  fpgaFileMover;
+    BOOL            locked;
     
     //------------------internal use only
     NSOperationQueue*	fileQueue;
+    int                 initializationState;
 }
 
 - (id) init;
@@ -260,6 +277,8 @@ enum Gretina4FIFOStates {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (short) initState;
+- (void) setInitState:(short)aState;
 - (ORConnector*) linkConnector;
 - (void) setLinkConnector:(ORConnector*)aConnector;
 - (ORConnector*) spiConnector;
@@ -364,6 +383,9 @@ enum Gretina4FIFOStates {
 // Data Length refers to total length of the record (w/ header), trace length refers to length of trace
 - (int) dataLength:(short)chan;
 - (int) traceLength:(short)chan;
+- (BOOL) isLocked;
+- (BOOL) locked;
+- (void) setLocked:(BOOL)aState;
 
 //conversion methods
 - (float) poleZeroTauConverted:(short)chan;
@@ -381,12 +403,14 @@ enum Gretina4FIFOStates {
 
 #pragma mark ¥¥¥Hardware Access
 - (short) readBoardID;
+- (void) resetFIFO;
+- (void) resetSingleFIFO;
 - (void) resetBoard;
-- (void) resetDCM;
-- (void) setClockSource:(unsigned long) clocksource;
+- (BOOL) fifoIsEmpty;
+- (short) clockSource;
+- (void) setClockSource:(short)aClockMux;
 - (void) resetMainFPGA;
 - (void) initBoard:(BOOL)doEnableChannels;
-- (void) initSerDes;
 - (unsigned long) readControlReg:(int)channel;
 - (void) writeControlReg:(int)channel enabled:(BOOL)enabled;
 - (void) writeLEDThreshold:(int)channel;
@@ -411,6 +435,7 @@ enum Gretina4FIFOStates {
 - (int) readDownSample;
 - (BOOL) controllerIsSBC;
 - (void) copyFirmwareFileToSBC:(NSString*)firmwarePath;
+- (void) writeClockSource;
 
 
 #pragma mark ¥¥¥FPGA download
@@ -506,3 +531,6 @@ extern NSString* ORGretina4ModelFIFOCheckChanged;
 extern NSString* ORGretina4CardInited;
 extern NSString* ORGretina4ModelSetEnableStatusChanged;
 extern NSString* ORGretina4ModelFirmwareStatusStringChanged;
+extern NSString* ORGretina4ClockSourceChanged;
+extern NSString* ORGretina4ModelInitStateChanged;
+extern NSString* ORGretina4LockChanged;

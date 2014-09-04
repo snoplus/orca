@@ -346,7 +346,11 @@
                          name : ORGretina4ModelFirmwareStatusStringChanged
 						object: model];
 
-    
+    [notifyCenter addObserver : self
+                     selector : @selector(clockSourceChanged:)
+                         name : ORGretina4ClockSourceChanged
+						object: model];
+
 	[self registerRates];
 }
 
@@ -417,9 +421,23 @@
 	[self histEMultiplierChanged:nil];
     
 	[self firmwareStatusStringChanged:nil];
+	[self clockSourceChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) updateClockLocked
+{
+    if([model clockSource] == 1) [clockLockedField setStringValue:@""];
+    else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
+}
+
+- (void) clockSourceChanged:(NSNotification*)aNote
+{
+	[clockSourcePU selectItemAtIndex: [model clockSource]];
+    [self updateClockLocked];
+    
+}
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote
 {
 	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];
