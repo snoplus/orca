@@ -287,7 +287,7 @@ NSDate* burstStart = NULL;
                             
                             //get the right queue for this record and insert the record
                             int     queueIndex      = [[queueMap objectForKey:aShaperKey] intValue];
-                            NSData* theShaperRecord = [NSData dataWithBytes:ptr length:recordLen*sizeof(long)];
+                            NSData* theShaperRecord = [NSData dataWithBytes:ptr length:recordLen*sizeof(long)]; //couldnt put humpdy together again //CBDO re the count
                             
                             ORBurstData* burstData = [[ORBurstData alloc] init];
                             burstData.datePosted = now; //DAQ at LU has a different time zone than the data records do.  It might be best not to mix DAQ time and SBC time in the monitor.
@@ -321,14 +321,23 @@ NSDate* burstStart = NULL;
                                 }
                                 else{ //no burst found, stop saveing thing and send alarm if there was a burst directly before.
                                     if(burstState == 1){
+                                        
+                                        Bchans = [chans mutableCopy];
+                                        Bcards = [cards mutableCopy];
+                                        Badcs = [adcs mutableCopy];
+                                        Bsecs = [secs mutableCopy];
+                                        Bmics = [mics mutableCopy];
+                                        
                                         int iter;
                                         NSString* bString = @"";
-                                        for(iter=1; iter<countofchan; iter++){ //Skip most recent event, print all others
+                                        for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
+                                        { 
                                             double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
                                             //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]]];
                                         }
-                                        //Find metadata
+                                        
+                                        //Find characturistics of burst
                                         NSMutableArray* reChans = [chans mutableCopy];
                                         int j; //MAH -- declaration has to be outside the loop for XCode < 5.x
                                         for(j=0; j<[reChans count]; j++)
@@ -458,6 +467,11 @@ NSDate* burstStart = NULL;
     if(!adcs) adcs = [[NSMutableArray alloc] init];
     if(!secs) secs = [[NSMutableArray alloc] init];
     if(!mics) mics = [[NSMutableArray alloc] init];
+    if(!Bchans) Bchans = [[NSMutableArray alloc] init];
+    if(!Bcards) Bcards = [[NSMutableArray alloc] init];
+    if(!Badcs) Badcs = [[NSMutableArray alloc] init];
+    if(!Bsecs) Bsecs = [[NSMutableArray alloc] init];
+    if(!Bmics) Bmics = [[NSMutableArray alloc] init];
     if(!burstString) burstString = [[NSString alloc] init];
     burstTell = 0;
     burstState = 0;
@@ -712,13 +726,32 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	[theBurstMonitoredObject runTaskStarted:runUserInfo];
 	[theBurstMonitoredObject setInvolvedInCurrentRun:YES];
 
-    [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //What does this do
+    //Creating the data file
+    [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //this is the header of the data file
+    NSMutableArray* anArrayOfData = [NSMutableArray array];
+    //Make the data record from the burst array
+    int BurstSize = Bchans.count;
+    NSLog(@"Size of burst file: %i \n", (BurstSize - 1) );
+    for(int l=1;l<BurstSize; l++)
+    {
+        ORBurstData* someData = [[ORBurstData alloc] init]; //was separate, test
+        //someData.epSec=[[Bsecs objectAtIndex:l] longValue]; //crashes from bad access, but seems unneccesary //fixme?
+        //someData.epMic=[[Bmics objectAtIndex:l] longValue];
+        unsigned long* testsec[4];
+        testsec[0]=2621444; //idk why, its just this every time and it seems not to work with null
+        testsec[1]=[[Badcs objectAtIndex:l] longValue]+(4096*[[Bchans objectAtIndex:l] longValue])+(65536*[[Bcards objectAtIndex:l] longValue]); // adc 3 digets, channel, card
+        testsec[2]=[[Bsecs objectAtIndex:l] longValue];
+        testsec[3]=[[Bmics objectAtIndex:l] longValue]; //CB works, make data file from array now
+        someData.dataRecord = [NSData dataWithBytes:&testsec length: sizeof(testsec)];
+        [anArrayOfData addObject:someData.dataRecord];
+    }
+    [theBurstMonitoredObject processData:anArrayOfData decoder:theDecoder];
+    //end of adding things to the data file
+    
     for(NSMutableArray* aQueue in queueArray){
-        NSMutableArray* anArrayOfData = [NSMutableArray array];
-        //have to extract the raw data record.
-        for(ORBurstData* someData in aQueue)[anArrayOfData addObject:someData.dataRecord];
-        
-        [theBurstMonitoredObject processData:anArrayOfData decoder:theDecoder];
+        //Data file writing was here before
+        //for(ORBurstData* someData in aQueue)
+        //[anArrayOfData addObject:someData.dataRecord];
         [aQueue removeAllObjects];
     }
     [queueLock unlock];//--end critial section

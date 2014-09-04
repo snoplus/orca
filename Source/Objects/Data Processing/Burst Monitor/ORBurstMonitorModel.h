@@ -45,6 +45,14 @@
     NSMutableArray* adcs;
     NSMutableArray* secs;
     NSMutableArray* mics;
+    
+    //burst channels
+    NSMutableArray* Bchans;
+    NSMutableArray* Bcards;
+    NSMutableArray* Badcs;
+    NSMutableArray* Bsecs;
+    NSMutableArray* Bmics;
+
     long int removedSec;
     int numBurstChan;
     double durSec; //The number of seconds the burst takes to finish
