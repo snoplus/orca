@@ -1466,10 +1466,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     //enable channels
     [self resetFIFO];
-    [ORTimer delay:.1];
-    [self resetFIFO];
-    [ORTimer delay:.1];
-
+ 
     for(i=0;i<kNumGretina4MChannels;i++){
         if([self enabled:i]){
             [self writeControlReg:i enabled:YES];

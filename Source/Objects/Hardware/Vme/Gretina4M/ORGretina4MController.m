@@ -306,7 +306,6 @@
                          name : ORGretina4MDownSampleChanged
 						object: model];
 
-	[self registerRates];
     [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORGretina4MClockSourceChanged
@@ -412,7 +411,8 @@
                          name : ORGretina4MLockChanged
 						object: model];
     
-   
+   	[self registerRates];
+
 }
 
 - (void) registerRates
