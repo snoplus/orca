@@ -132,7 +132,6 @@
     NSSize rateSize;
     NSSize registerTabSize;
 	NSSize firmwareTabSize;
-
 }
 
 - (id)   init;
@@ -232,6 +231,7 @@
 - (IBAction) registerWriteValueAction:(id)sender;
 - (IBAction) spiWriteValueAction:(id)sender;
 - (IBAction) writeSPIAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

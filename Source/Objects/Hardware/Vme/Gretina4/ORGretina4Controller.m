@@ -891,18 +891,22 @@
 }
 
 #pragma mark ¥¥¥Actions
-- (void) downSampleAction:(id)sender
+- (IBAction) downSampleAction:(id)sender
 {
 	if([sender indexOfSelectedItem] != [model downSample]){
 		[model setDownSample:[sender indexOfSelectedItem]];
 	}
 }
 
-- (void) histEMultiplierAction:(id)sender
+- (IBAction) histEMultiplierAction:(id)sender
 {
 	[model setHistEMultiplier:[sender intValue]];
 }
 
+- (IBAction) clockSourceAction:(id)sender
+{
+	[model setClockSource:[sender indexOfSelectedItem]];
+}
 - (IBAction) registerIndexPUAction:(id)sender
 {
 	unsigned int index = [sender indexOfSelectedItem];
