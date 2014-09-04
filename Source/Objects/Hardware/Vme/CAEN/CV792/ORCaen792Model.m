@@ -186,7 +186,10 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [[[self undoManager] prepareWithInvocationTarget:self] setCycleZeroSuppression:cycleZeroSuppression];
     
     cycleZeroSuppression = aCycleZeroSuppression;
-
+    
+    if(!cycleZeroSuppression)[self stopCyclingZeroSuppression];
+    else if([gOrcaGlobals runInProgress])[self startCyclingZeroSuppression];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelCycleZeroSuppressionChanged object:self];
 }
 
@@ -931,7 +934,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (void) stopCyclingZeroSuppression
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startCyclingZeroSuppression) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycle) object:nil];
     
 }
 @end
