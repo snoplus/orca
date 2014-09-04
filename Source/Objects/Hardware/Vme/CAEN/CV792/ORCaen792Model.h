@@ -69,7 +69,7 @@ enum {
 #define kADCOutputBufferSize 0x07FF + 0x0004
 #define kModel792  0
 #define kModel792N 1
-
+ 
 
 // Class definition
 @interface ORCaen792Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
@@ -161,6 +161,7 @@ enum {
 - (void) clearEventCounts;
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan;
 - (unsigned short) gainForDisplay:(unsigned short) aChan;
+- (void) postAdcInfoProvidingValueChanged;
 
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

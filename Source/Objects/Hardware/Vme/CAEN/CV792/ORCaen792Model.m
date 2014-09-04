@@ -315,6 +315,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
     onlineMask = anOnlineMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelOnlineMaskChanged object:self];
+    [self postAdcInfoProvidingValueChanged];
 }
 
 - (BOOL)onlineMaskBit:(int)bit
@@ -357,6 +358,11 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 }
 
 #pragma mark ***Register - General routines
+- (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
+{
+    [super setThreshold:aChnl threshold:aValue];
+    [self postAdcInfoProvidingValueChanged];
+}
 - (short) getNumberRegisters
 {
     return kNumRegisters;
