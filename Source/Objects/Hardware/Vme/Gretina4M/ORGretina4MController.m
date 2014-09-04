@@ -674,7 +674,6 @@
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
     [self updateClockLocked];
-
 }
 
 - (void) downSampleChanged:(NSNotification*)aNote

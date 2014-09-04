@@ -212,6 +212,7 @@
 - (void) initSerDesStateChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) clockSourceAction:(id)sender
 - (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
 - (IBAction) diagnosticsEnableAction:(id)sender;
