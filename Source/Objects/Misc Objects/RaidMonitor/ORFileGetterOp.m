@@ -78,69 +78,73 @@
 #pragma mark •••Move Methods
 - (void) main
 {
-    if([self isCancelled])return;
-    
-    NSDictionary* defaultEnvironment = [[NSProcessInfo processInfo] environment];
-    NSMutableDictionary* environment = [[[NSMutableDictionary alloc] initWithDictionary:defaultEnvironment] autorelease];
-    [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
-    
-    self.task = [[[NSTask alloc] init] autorelease];
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 
-    [task setEnvironment: environment];
-    
-      //make temp file for the script NOTE: expect must be installed!
-    NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
-    NSString* scriptPath = [NSFileManager tempPathForFolder:tempFolder usingTemplate:@"OrcaScriptXXX"];
-    if(scriptPath){
-        [self setScriptFilePath:scriptPath];            
-        NSString* bp = [[NSBundle mainBundle ]resourcePath];
-        if(useFTP){
-            NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
-            [theScript replace:@"<remotePath>" with:remotePath];
-            [theScript replace:@"<userName>"   with:userName];
-            [theScript replace:@"<host>"       with:ipAddress];
-            [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
-            [theScript replace:@"<password>"   with:passWord];
-            [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+    if(![self isCancelled]){
+        
+        NSDictionary* defaultEnvironment = [[NSProcessInfo processInfo] environment];
+        NSMutableDictionary* environment = [[[NSMutableDictionary alloc] initWithDictionary:defaultEnvironment] autorelease];
+        [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
+        
+        self.task = [[[NSTask alloc] init] autorelease];
+
+        [task setEnvironment: environment];
+        
+          //make temp file for the script NOTE: expect must be installed!
+        NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
+        NSString* scriptPath = [NSFileManager tempPathForFolder:tempFolder usingTemplate:@"OrcaScriptXXX"];
+        if(scriptPath){
+            [self setScriptFilePath:scriptPath];            
+            NSString* bp = [[NSBundle mainBundle ]resourcePath];
+            if(useFTP){
+                NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
+                [theScript replace:@"<remotePath>" with:remotePath];
+                [theScript replace:@"<userName>"   with:userName];
+                [theScript replace:@"<host>"       with:ipAddress];
+                [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
+                [theScript replace:@"<password>"   with:passWord];
+                [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+            }
+            else {
+                NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
+                [theScript replace:@"<remotePath>" with:remotePath];
+                [theScript replace:@"<userName>"   with:userName];
+                [theScript replace:@"<host>"       with:ipAddress];
+                [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
+                [theScript replace:@"<password>"   with:passWord];
+                [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+           }
+            
         }
-        else {
-            NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectGetScript"] encoding:NSASCIIStringEncoding error:nil];
-            [theScript replace:@"<remotePath>" with:remotePath];
-            [theScript replace:@"<userName>"   with:userName];
-            [theScript replace:@"<host>"       with:ipAddress];
-            [theScript replace:@"<localPath>"  with:[localPath stringByExpandingTildeInPath]];
-            [theScript replace:@"<password>"   with:passWord];
-            [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-       }
-        
-    }
-        
-    //make the script executable
-    NSFileManager* fileManager = [NSFileManager defaultManager];
-    NSError* err = nil;
-    [fileManager removeItemAtPath:[localPath stringByExpandingTildeInPath] error:&err];
-    BOOL fileOK = [fileManager fileExistsAtPath: scriptPath];
-    if ( fileOK ) {
-        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
-        [fileManager setAttributes:dict ofItemAtPath:scriptPath error:nil];
-        [task setLaunchPath:scriptPath];
-    }
-    @try {
-        NSPipe* newPipe = [NSPipe pipe];
-        [task setStandardOutput:newPipe];
-        [task setStandardError:newPipe];
-        NSFileHandle *readHandle = [newPipe fileHandleForReading];
-        [task launch];
-        
-        [self readOutput:readHandle];
-        SEL theDoneSelector = NSSelectorFromString(doneSelectorName);
-        if ([delegate respondsToSelector:theDoneSelector]){
-            [delegate performSelectorOnMainThread:theDoneSelector withObject:nil waitUntilDone:NO];
+            
+        //make the script executable
+        NSFileManager* fileManager = [NSFileManager defaultManager];
+        NSError* err = nil;
+        [fileManager removeItemAtPath:[localPath stringByExpandingTildeInPath] error:&err];
+        BOOL fileOK = [fileManager fileExistsAtPath: scriptPath];
+        if ( fileOK ) {
+            NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
+            [fileManager setAttributes:dict ofItemAtPath:scriptPath error:nil];
+            [task setLaunchPath:scriptPath];
+        }
+        @try {
+            NSPipe* newPipe = [NSPipe pipe];
+            [task setStandardOutput:newPipe];
+            [task setStandardError:newPipe];
+            NSFileHandle *readHandle = [newPipe fileHandleForReading];
+            [task launch];
+            
+            [self readOutput:readHandle];
+            SEL theDoneSelector = NSSelectorFromString(doneSelectorName);
+            if ([delegate respondsToSelector:theDoneSelector]){
+                [delegate performSelectorOnMainThread:theDoneSelector withObject:nil waitUntilDone:NO];
+            }
+        }
+        @catch (NSException* e){
+            NSLog(@"File Getter exception.. stopped during launch\n");
         }
     }
-    @catch (NSException* e){
-        NSLog(@"File Getter exception.. stopped during launch\n");
-    }
+    [thePool release];
 }
 
 - (void) readOutput:(NSFileHandle*)fileHandle
