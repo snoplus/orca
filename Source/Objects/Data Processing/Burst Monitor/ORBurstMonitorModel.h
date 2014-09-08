@@ -52,8 +52,16 @@
     NSMutableArray* Badcs;
     NSMutableArray* Bsecs;
     NSMutableArray* Bmics;
+    
+    //neutron only buffer
+    NSMutableArray* Nchans; 
+    NSMutableArray* Ncards;
+    NSMutableArray* Nadcs;
+    NSMutableArray* Nsecs;
+    NSMutableArray* Nmics;
 
     long int removedSec;
+    long int removedMic;
     int numBurstChan;
     double durSec; //The number of seconds the burst takes to finish
     int countsInBurst;
