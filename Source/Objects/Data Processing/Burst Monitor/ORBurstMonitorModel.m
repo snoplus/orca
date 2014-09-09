@@ -234,7 +234,6 @@ NSDate* burstStart = NULL;
         theDecoder = [aDecoder retain];
     }
     NSDate* now = [NSDate date];
-    
 	[dataArray retain];
 	//each block of data is an array of NSData objects, each potentially containing many records
 	for(id data in dataArray){
@@ -259,9 +258,9 @@ NSDate* burstStart = NULL;
                     NSDictionary* runHeader     = [runHeaderString propertyList];
                     shaperID                    = [[runHeader nestedObjectForKey:@"dataDescription",@"ORShaperModel",@"Shaper",@"dataId",nil] unsignedLongValue];
                 }
-                
-                if (dataID == shaperID) {                    
-                    if (recordLen>1) {
+                // header gets here
+                if (dataID == shaperID || burstForce==1) {
+                    if (recordLen>1 || burstForce==1) {
                         //extract the card's info
                         unsigned short crateNum = ShiftAndExtract(ptr[1],21,0xf);
                         unsigned short cardNum  = ShiftAndExtract(ptr[1],16,0x1f);
@@ -270,6 +269,7 @@ NSDate* burstStart = NULL;
                         
                         unsigned long secondsSinceEpoch = ShiftAndExtract(ptr[2], 0, 0xffffffff);
                         unsigned long microseconds = ShiftAndExtract(ptr[3], 0, 0xffffffff);
+                        quietSec=0;
                         
                         //make array of data to be buffered
                         [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
@@ -277,7 +277,7 @@ NSDate* burstStart = NULL;
                         [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
                         [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
                         [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
-                        if(energy >= minimumEnergyAllowed && cardNum <= 15){  //Filter
+                        if((energy >= minimumEnergyAllowed && cardNum <= 15) || burstForce ==1){  //Filter
                             [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
                             //make a key for looking up the correct queue for this record
                             NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
@@ -324,14 +324,13 @@ NSDate* burstStart = NULL;
                                 double lastTime = ([[Nsecs objectAtIndex:0] longValue] + 0.000001*[[Nmics objectAtIndex:0] longValue]);
                                 double firstTime = ([[Nsecs objectAtIndex:(nHit-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(nHit-1)] longValue]);
                                 double diffTime = (lastTime - firstTime);
-                                if(diffTime < timeWindow){ //burst found, start saveing everything untill it stops
+                                if(diffTime < timeWindow && burstForce==0){ //burst found, start saveing everything untill it stops
                                     burstState = 1;
                                     novaState = 1;
                                     novaP = 1;
                                 }
                                 else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
                                     if(burstState == 1){
-                                        
                                         Bchans = [chans mutableCopy];
                                         Bcards = [cards mutableCopy];
                                         Badcs = [adcs mutableCopy];
@@ -385,8 +384,8 @@ NSDate* burstStart = NULL;
                                         else
                                         {
                                             NSLog(@"Burst had only %i channels, needed %i \n", numBurstChan, numBurstsNeeded);
-                                            removedSec = [[secs objectAtIndex:(0)] longValue];
-                                            //NSLog(@"removedSec is now %li \n", removedSec);
+                                            removedSec = [[secs objectAtIndex:1] longValue];
+                                            removedMic = [[mics objectAtIndex:1] longValue];
                                         }
                                         //Clean up
                                         [chans removeAllObjects];
@@ -397,14 +396,20 @@ NSDate* burstStart = NULL;
                                         [Nchans removeAllObjects];
                                         [Ncards removeAllObjects];
                                         [Nadcs removeAllObjects];
-                                        [Nsecs removeAllObjects]; 
+                                        [Nsecs removeAllObjects];
                                         [Nmics removeAllObjects];
                                     }//end of burststate = 1 stuff
-                                    burstState = 0;
+                                    loudSec=0;
+                                    burstForce=0;
                                     novaState = 0;
                                     novaP = 0;
+                                    burstState = 0;
+                                    if(Nchans.count<nHit){ // happens if a burst had too few channels and just got whiped
+                                        return;
+                                    }
                                     removedSec = [[Nsecs objectAtIndex:(nHit-2)] longValue];
                                     removedMic = [[Nmics objectAtIndex:(nHit-2)] longValue];
+
                                     //NSLog(@"removed time is now %f \n", removedSec+0.000001*removedMic);
                                     [Nchans removeObjectAtIndex:nHit-1]; //remove old things from the buffer
                                     [Ncards removeObjectAtIndex:nHit-1];
@@ -430,6 +435,8 @@ NSDate* burstStart = NULL;
                                 }//End of no burst found
                             }//End of Nchans>nHit
                             else{
+                                loudSec=0;
+                                burstForce=0;
                                 NSLog(@"not full, has %i neutrons\n", [Nchans count]);
                                 if(burstTell ==1) //Event showed up before burst was prossessed, say it for now but don't record it.
                                 {
@@ -513,6 +520,8 @@ NSDate* burstStart = NULL;
     burstState = 0;
     novaState = 0;
     novaP = 0;
+    quietSec=0;
+    loudSec=0;
     
     //start the monitoring
     [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
@@ -697,7 +706,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 			ORBurstData* aRecord = [aQueue objectAtIndex:0]; 
             //NSDate* datePosted = aRecord.datePosted;
             double timePosted = ([aRecord.epSec longValue] + 0.000001*[aRecord.epMic longValue]);
-            if(timePosted < removedSec){
+            double timeRemoved = (removedSec + 0.000001*removedMic);
+            if(timePosted < timeRemoved){
                 [aQueue removeObjectAtIndex:0];
             }
             else break; //done -- no records in queue are older than the time window
@@ -722,8 +732,21 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
         [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:0];
     }
+    //Check stall in buffer
+    if(burstState == 1){
+        quietSec++;
+        loudSec=[[secs objectAtIndex:1] longValue] - [[secs objectAtIndex:(secs.count-1)] longValue];
+        if(quietSec > 30){
+            burstForce=1;
+            [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
+        }
+        if(loudSec > 30){
+            burstForce=1;
+            //[theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
+        }
+    }
+
     [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
-    
 }
 
 - (void) delayedBurstEvent

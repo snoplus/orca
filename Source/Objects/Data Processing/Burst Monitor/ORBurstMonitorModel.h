@@ -65,6 +65,9 @@
     int numBurstChan;
     double durSec; //The number of seconds the burst takes to finish
     int countsInBurst;
+    int quietSec;
+    int loudSec;
+    int burstForce;
     
     //burst tags
     unsigned short burstTell; //1 if a bust still needs printing
