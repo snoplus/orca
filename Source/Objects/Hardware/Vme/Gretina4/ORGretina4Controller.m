@@ -59,7 +59,7 @@
 {
     settingSize     = NSMakeSize(830,510);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,287);
+    registerTabSize	= NSMakeSize(400,330);
 	firmwareTabSize = NSMakeSize(340,187);
     
     blankView = [[NSView alloc] init];
@@ -350,6 +350,17 @@
                      selector : @selector(clockSourceChanged:)
                          name : ORGretina4ClockSourceChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(initSerDesStateChanged:)
+                         name : ORGretina4ModelInitStateChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORGretina4LockChanged
+						object: model];
+
 
 	[self registerRates];
 }
@@ -422,14 +433,27 @@
     
 	[self firmwareStatusStringChanged:nil];
 	[self clockSourceChanged:nil];
+	[self initSerDesStateChanged:nil];
+    [self lockChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) lockChanged:(NSNotification*) aNote
+{
+    [lockStateField setStringValue:[model locked]?@"Yes":@"No"];
+    [self updateClockLocked];
+}
 
 - (void) updateClockLocked
 {
     if([model clockSource] == 1) [clockLockedField setStringValue:@""];
     else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
+}
+
+- (void) initSerDesStateChanged:(NSNotification*) aNote
+{
+    [initSerDesStateField setStringValue:[model initSerDesStateName]];
 }
 
 - (void) clockSourceChanged:(NSNotification*)aNote

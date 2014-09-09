@@ -87,6 +87,8 @@
 
 	IBOutlet NSPopUpButton* downSamplePU;
 	IBOutlet NSTextField*	histEMultiplierField;
+    IBOutlet NSTextField*	initSerDesStateField;
+    IBOutlet NSTextField*   lockStateField;
 	
 	//FPGA download
 	IBOutlet NSTextField*			fpgaFilePathField;
@@ -140,6 +142,8 @@
 
 #pragma mark ¥¥¥Interface Management
 - (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) initSerDesStateChanged:(NSNotification*) aNote;
+- (void) lockChanged:(NSNotification*) aNote;
 - (void) updateClockLocked;
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;

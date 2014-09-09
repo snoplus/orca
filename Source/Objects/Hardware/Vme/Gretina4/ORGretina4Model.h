@@ -78,6 +78,7 @@ enum {
     kSerDesIdle,
     kSerDesSetup,
     kSetDigitizerClkSrc,
+    kFlushFifo,
     kReleaseClkManager,
     kPowerUpRTPower,
     kSetMasterLogic,
@@ -386,6 +387,7 @@ enum Gretina4FIFOStates {
 - (BOOL) isLocked;
 - (BOOL) locked;
 - (void) setLocked:(BOOL)aState;
+- (NSString*) initSerDesStateName;
 
 //conversion methods
 - (float) poleZeroTauConverted:(short)chan;

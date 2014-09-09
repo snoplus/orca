@@ -1113,6 +1113,7 @@ static struct {
 
 - (void) stepSerDesInit
 {
+    int i;
     switch(initializationState){
         case kSerDesSetup:
         [self writeRegister:kSDConfig           withValue: 0x00001c31]; //T/R SerDes off, reset clock manager, reset clocks
@@ -1125,8 +1126,17 @@ static struct {
         [self setClockSource:0];                                //set to external clock (gui only!!!)
         [[self undoManager] enableUndoRegistration];
         [self writeFPGARegister:kVMEGPControl   withValue:0x00 ]; //set to external clock (in HW)
-        [self setInitState:kReleaseClkManager];
+        [self setInitState:kFlushFifo];
         break;
+            
+        case kFlushFifo:
+            for(i=0;i<kNumGretina4Channels;i++){
+                [self writeControlReg:i enabled:NO];
+            }
+            
+            [self resetFIFO];
+            [self setInitState:kReleaseClkManager];
+            break;
         
         case kReleaseClkManager:
         //SERDES still disabled, release clk manager, clocks still held at reset
@@ -1183,6 +1193,7 @@ static struct {
     switch(initializationState){
         case kSerDesIdle:           return @"Idle";
         case kSerDesSetup:          return @"Reset to power up state";
+        case kFlushFifo:            return @"Flush FIFO";
         case kSetDigitizerClkSrc:   return @"Set the Clk Source";
         case kPowerUpRTPower:       return @"Power up T/R Power";
         case kSetMasterLogic:       return @"Write Master Logic = 0x20051";
