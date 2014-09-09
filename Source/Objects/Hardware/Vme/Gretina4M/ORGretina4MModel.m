@@ -1236,10 +1236,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) stepSerDesInit
 {
+    int i;
     switch(initializationState){
         case kSerDesSetup:
-            [self writeRegister:kSDConfig           withValue: 0x00001c31]; //T/R SerDes off, reset clock manager, reset clocks
-            [self writeRegister:kMasterLogicStatus  withValue: 0x04420001]; //power up value
+            [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
+            [self writeRegister:kSDConfig           withValue: 0x00001231]; //T/R SerDes off, reset clock manager, reset clocks
             [self setInitState:kSerDesIdle];
             break;
         
@@ -1248,12 +1249,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self setClockSource:0];                                //set to external clock (gui only!!!)
             [[self undoManager] enableUndoRegistration];
             [self writeFPGARegister:kVMEGPControl   withValue:0x00 ]; //set to external clock (in HW)
+            [self setInitState:kFlushFifo];
+            
+            break;
+            
+        case kFlushFifo:
+            for(i=0;i<kNumGretina4MChannels;i++){
+                [self writeControlReg:i enabled:NO];
+            }
+            
+            [self resetFIFO];
             [self setInitState:kReleaseClkManager];
             break;
             
         case kReleaseClkManager:
             //SERDES still disabled, release clk manager, clocks still held at reset
-            [self writeRegister:kSDConfig           withValue: 0x00000c11];
+            [self writeRegister:kSDConfig           withValue: 0x00000211];
             [self setInitState:kPowerUpRTPower];
             break;
             
@@ -1269,7 +1280,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             break;
             
         case kSetSDSyncBit:
-            [self writeRegister:kSDConfig           withValue: 0x00000020]; //release the clocks
+            [self writeRegister:kSDConfig           withValue: 0x00000000]; //release the clocks
+            [self writeRegister:kSDConfig           withValue: 0x00000020]; //set sd syn
 
             [self setInitState:kSerDesIdle];
             break;
@@ -1307,6 +1319,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         case kSerDesIdle:           return @"Idle";
         case kSerDesSetup:          return @"Reset to power up state";
         case kSetDigitizerClkSrc:   return @"Set the Clk Source";
+        case kFlushFifo:            return @"Flush FIFO";
+ 
         case kPowerUpRTPower:       return @"Power up T/R Power";
         case kSetMasterLogic:       return @"Write Master Logic = 0x20051";
         case kSetSDSyncBit:         return @"Write SD Sync Bit";
@@ -1466,7 +1480,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     //enable channels
     [self resetFIFO];
- 
+
     for(i=0;i<kNumGretina4MChannels;i++){
         if([self enabled:i]){
             [self writeControlReg:i enabled:YES];

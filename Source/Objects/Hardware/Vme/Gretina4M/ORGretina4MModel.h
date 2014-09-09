@@ -77,6 +77,7 @@ enum {
     kSerDesIdle,
     kSerDesSetup,
     kSetDigitizerClkSrc,
+    kFlushFifo,
     kReleaseClkManager,
     kPowerUpRTPower,
     kSetMasterLogic,
