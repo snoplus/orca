@@ -31,7 +31,6 @@
 NSString* ORGretinaTriggerModelNumTimesToRetryChanged   = @"ORGretinaTriggerModelNumTimesToRetryChanged";
 NSString* ORGretinaTriggerModelDoNotLockChanged         = @"ORGretinaTriggerModelDoNotLockChanged";
 NSString* ORGretinaTriggerModelVerboseChanged           = @"ORGretinaTriggerModelVerboseChanged";
-NSString* ORGretinaTriggerModelDiagnosticCounterChanged = @"ORGretinaTriggerModelDiagnosticCounterChanged";
 NSString* ORGretinaTriggerModelIsMasterChanged          = @"ORGretinaTriggerModelIsMasterChanged";
 NSString* ORGretinaTriggerSettingsLock                  = @"ORGretinaTriggerSettingsLock";
 NSString* ORGretinaTriggerRegisterLock                  = @"ORGretinaTriggerRegisterLock";
@@ -57,7 +56,7 @@ NSString*  ORGretinaTriggerTimeStampChanged             = @"ORGretinaTriggerTime
 
 #define kFPGARemotePath @"GretinaFPGA.bin"
 #define kCurrentFirmwareVersion 0x107
-#define kTriggerInitDelay  0.11
+#define kTriggerInitDelay  0.02
 
 @interface ORGretinaTriggerModel (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -524,6 +523,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 {
     if([self isMaster]){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+        unsigned long aValue = [self readRegister:kMiscCtl1];
+        [self writeRegister:kMiscCtl1 withValue:aValue |= (0x1<<6)]; //set the Imp Syn
+        [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];  //display it
     }
 }
 
@@ -652,18 +654,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     verbose = aVerbose;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelVerboseChanged object:self];
-}
-
-- (unsigned short) diagnosticCounter
-{
-    return diagnosticCounter;
-}
-
-- (void) setDiagnosticCounter:(unsigned short)aDiagnosticCounter
-{
-    diagnosticCounter = aDiagnosticCounter;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelDiagnosticCounterChanged object:self];
 }
 
 - (NSString*) firmwareStatusString
@@ -1173,7 +1163,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [self setLinkLockedReg:     [self readRegister:kLinkLocked]];
     [self setMiscStatReg:       [self readRegister:kMiscStatus]];
     [self setMiscCtl1Reg:       [self readRegister:kMiscCtl1]];
-    [self setDiagnosticCounter: [self readRegister:kDiagnosticF]];
     [self setLinkLruCrlReg:     [self readRegister:kLinkLruCrl]];
     [self setInputLinkMask:     [self readRegister:kInputLinkMask]];
     [self setSerdesTPowerMask:  [self readRegister:kSerdesTPower]];
@@ -1211,8 +1200,8 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             else {
                 [self writeRegister:kInputLinkMask withValue:~connectedRouterMask]; //A set bit disables a channel
 
-                [self writeToAddress:0x0840 aValue: 0xFFC4];
-                [self writeToAddress:0x083C aValue: 0x0888];
+                [self writeRegister:kMiscCtl1 withValue:0xFFC4];
+                [self writeRegister:kLinkLruCrl withValue:0x0888];
                 
                 for(i=0;i<8;i++){
                     ORConnector* otherConnector = [linkConnector[i] connector];
@@ -1356,8 +1345,9 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             break;
         
         case kMasterSetClearAckBit:
-            [self writeRegister:kMiscCtl1 withValue:0xFFC2];
-            [self writeRegister:kMiscCtl1 withValue:0xFFC0];
+            aValue = [self readRegister:kMiscCtl1];
+            [self writeRegister:kMiscCtl1 withValue:aValue | 0x2];
+            [self writeRegister:kMiscCtl1 withValue:aValue & ~0x2];
             [self setInitState:kVerifyAckMode];
             break;
             
@@ -1457,7 +1447,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         //reset the scaler
         NSArray* scalers = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORCV830Model")];
         for(id aScaler in scalers){
-            [aScaler performSelector:NSSelectorFromString(@"softwareClear")];
+            [aScaler performSelector:NSSelectorFromString(@"remoteInitBoard")];
         }
     }
 }
@@ -1480,14 +1470,14 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stepRouter) object:nil];
     
     if(verbose) NSLog(@"\n");
-    if(verbose)NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
+    if(verbose) NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
     //read a few registers that we will use repeatedly and display
     [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
     int i;
     switch(initializationState){
         case kRouterSetup: //force some regs to power up state
             [self writeRegister:kLinkLruCrl withValue:0x0888];
-            [self writeRegister:kMiscCtl1 withValue:0x0004];
+            [self writeRegister:kMiscCtl1   withValue:0xFFC4];
             [self setInitState:kDigitizerSetup];
         break;
             
@@ -1527,7 +1517,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             break;
             
         case SetLLinkDenRenSync: //Turn on the DEN, REN, and SYNC for Link "L"
-            [self writeRegister:kLinkLruCrl withValue:0x88F];
+            [self writeRegister:kLinkLruCrl withValue:0x887];
             [self setLinkLruCrlReg:[self readRegister:kLinkLruCrl]]; //read back for display
             [self setInitState:kSetRouterPreEmphCtrl];
             break;
@@ -1925,7 +1915,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             unsigned long data[5];
             data[0] = dataId | 5;                       //Data Id
             data[1] =   locked      << 4   |            //locked
-                        linkWasLost << 5   |            //link was lost bit
+                        linkWasLost << 5   |            //link was lost
                         doNotLock   << 6   |            //do Not Lock option bit
                         ([self uniqueIdNumber]&0xf);    //Location and spare bits
             data[2] = ut_Time;                          //Mac Unix time

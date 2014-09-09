@@ -220,10 +220,6 @@
                      selector : @selector(initStateChanged:)
                          name : ORGretinaTriggerModelInitStateChanged
 						object: model];
-    [notifyCenter addObserver : self
-                     selector : @selector(diagnosticCounterChanged:)
-                         name : ORGretinaTriggerModelDiagnosticCounterChanged
-						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(verboseChanged:)
@@ -250,9 +246,6 @@
                      selector : @selector(timeStampChanged:)
                          name : ORGretinaTriggerTimeStampChanged
 						object: model];
-
-    
-    
 }
 
 - (void) updateWindow
@@ -279,7 +272,6 @@
 	[self linkLockedRegChanged:nil];
 	[self clockUsingLLinkChanged:nil];
 	[self initStateChanged:nil];
-	[self diagnosticCounterChanged:nil];
 	[self verboseChanged:nil];
 	[self lockChanged:nil];
 	[self doNotLockChanged:nil];
@@ -316,10 +308,6 @@
 	[verboseCB setIntValue: [model verbose]];
 }
 
-- (void) diagnosticCounterChanged:(NSNotification*)aNote
-{
-	[diagnosticCounterField setIntValue: [model diagnosticCounter]];
-}
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote
 {
 	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];

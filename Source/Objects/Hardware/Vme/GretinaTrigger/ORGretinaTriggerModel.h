@@ -264,7 +264,6 @@ enum {
     int             fpgaDownProgress;
 	NSLock*         progressLock;
     NSString*       firmwareStatusString;
-    unsigned short  diagnosticCounter;
     BOOL            verbose;
     BOOL            locked;
     unsigned long   dataId;
@@ -319,8 +318,6 @@ enum {
 - (NSString*) errorString;
 - (BOOL) verbose;
 - (void) setVerbose:(BOOL)aVerbose;
-- (unsigned short) diagnosticCounter;
-- (void) setDiagnosticCounter:(unsigned short)aDiagnosticCounter;
 - (short) initState;
 - (void) setInitState:(short)aState;
 - (NSString*) initStateName;
@@ -427,7 +424,6 @@ extern NSString* ORGretinaTriggerTimeStampChanged;
 extern NSString* ORGretinaTriggerModelNumTimesToRetryChanged;
 extern NSString* ORGretinaTriggerModelDoNotLockChanged;
 extern NSString* ORGretinaTriggerModelVerboseChanged;
-extern NSString* ORGretinaTriggerModelDiagnosticCounterChanged;
 extern NSString* ORGretinaTriggerModelInputLinkMaskChanged;
 extern NSString* ORGretinaTriggerSerdesTPowerMaskChanged;
 extern NSString* ORGretinaTriggerSerdesRPowerMaskChanged;

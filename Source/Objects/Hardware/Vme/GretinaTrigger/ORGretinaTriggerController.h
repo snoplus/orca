@@ -29,7 +29,6 @@
 	IBOutlet NSTextField*   numTimesToRetryField;
 	IBOutlet NSButton*      doNotLockCB;
 	IBOutlet NSButton*      verboseCB;
-	IBOutlet NSTextField*   diagnosticCounterField;
 	IBOutlet NSMatrix*      inputLinkMaskMatrix;
 	IBOutlet NSMatrix*      serDesTPowerMasMatrix;
 	IBOutlet NSMatrix*      serDesRPowerMasMatrix;
@@ -90,7 +89,6 @@
 - (void) numTimesToRetryChanged:(NSNotification*)aNote;
 - (void) doNotLockChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
-- (void) diagnosticCounterChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
