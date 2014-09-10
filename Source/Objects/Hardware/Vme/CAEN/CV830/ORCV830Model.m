@@ -456,6 +456,12 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	}
 }
 
+- (void) remoteInitBoard
+{
+    remoteInit= YES;
+    [self initBoard];
+}
+
 - (void) initBoard
 {
 	@try {
@@ -467,8 +473,8 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
                             withAddMod:[self addressModifier]
                          usingAddSpace:0x01];
 
-		//[self softwareReset];
-        //[self softwareClear];
+		[self softwareReset];
+        [self softwareClear];
 		[self writeDwellTime];
 		[self writeControlReg];
 		[self writeEnabledMask];
@@ -745,8 +751,8 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	numEnabledChannels  = [self numEnabledChannels];
 	chan0RollOverCount  = 0;
     lastChan0Count      = 0;
-    [self initBoard];
-
+    if(!remoteInit)[self initBoard];
+    
 	//cache the data takers for alittle more speed
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	for(id obj in dataTakers){
@@ -837,6 +843,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+    remoteInit = NO;
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	

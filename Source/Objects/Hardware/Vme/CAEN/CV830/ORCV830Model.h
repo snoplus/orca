@@ -119,11 +119,14 @@ enum {
 		unsigned long	polledDataId;
 		unsigned long	dataRecord[38];
 		ORReadOutList*	readOutGroup;
+        BOOL            remoteInit;
+    
 		//some cached variabled
 		NSArray* dataTakers;	//cache of data takers.
 		unsigned long numEnabledChannels;
         unsigned long    lastChan0Count;
         unsigned long    chan0RollOverCount;
+    
 }
 
 #pragma mark •••Initialization
@@ -155,6 +158,7 @@ enum {
 - (void) runAboutToStop:(NSNotification*)aNote;
 
 #pragma mark •••Hardware Access
+- (void) remoteInitBoard;
 - (void) initBoard;
 - (void) readStatus;
 - (void) readScalers;

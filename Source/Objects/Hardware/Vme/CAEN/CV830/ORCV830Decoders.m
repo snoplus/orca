@@ -34,6 +34,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------^-^^^^--------------------- Card number
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------------------------------^^- Acq Mode. 0=disabled,1=Random, 2=periodic
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Chan0 Roll over
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Enabled Mask
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  header
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 0
