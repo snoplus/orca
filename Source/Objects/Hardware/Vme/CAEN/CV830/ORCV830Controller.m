@@ -108,9 +108,19 @@
                          name : ORCV830ModelAutoResetChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(count0OffsetChanged:)
+                         name : ORCV830ModelCount0OffsetChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) count0OffsetChanged:(NSNotification*)aNote
+{
+	[count0OffsetField setIntValue: [model count0Offset]];
+}
 
 - (void) autoResetChanged:(NSNotification*)aNote
 {
@@ -158,6 +168,7 @@
 	[self testModeChanged:nil];
 	[self clearMebChanged:nil];
 	[self autoResetChanged:nil];
+	[self count0OffsetChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -253,6 +264,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) count0OffsetAction:(id)sender
+{
+	[model setCount0Offset:[sender intValue]];	
+}
 
 - (IBAction) autoResetAction:(id)sender
 {

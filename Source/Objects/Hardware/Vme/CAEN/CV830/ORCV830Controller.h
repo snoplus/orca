@@ -23,6 +23,7 @@
 @interface ORCV830Controller : ORCaenCardController {
 
 	IBOutlet NSButton*		enableAllButton;
+	IBOutlet NSTextField*   count0OffsetField;
 	IBOutlet NSButton*		autoResetCB;
 	IBOutlet NSButton*		clearMebCB;
 	IBOutlet NSButton*		testModeCB;
@@ -45,6 +46,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) count0OffsetChanged:(NSNotification*)aNote;
 - (void) autoResetChanged:(NSNotification*)aNote;
 - (void) clearMebChanged:(NSNotification*)aNote;
 - (void) testModeChanged:(NSNotification*)aNote;
@@ -58,6 +60,7 @@
 - (void) pollingStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) count0OffsetAction:(id)sender;
 - (IBAction) autoResetAction:(id)sender;
 - (IBAction) clearMebAction:(id)sender;
 - (IBAction) testModeAction:(id)sender;

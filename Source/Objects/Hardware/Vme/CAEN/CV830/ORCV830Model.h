@@ -120,7 +120,8 @@ enum {
 		unsigned long	dataRecord[38];
 		ORReadOutList*	readOutGroup;
         BOOL            remoteInit;
-    
+        long            count0Offset;
+   
 		//some cached variabled
 		NSArray* dataTakers;	//cache of data takers.
 		unsigned long numEnabledChannels;
@@ -136,6 +137,8 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (long) count0Offset;
+- (void) setCount0Offset:(long)aCount0Offset;
 - (BOOL) autoReset;
 - (void) setAutoReset:(BOOL)aAutoReset;
 - (BOOL) clearMeb;
@@ -201,6 +204,7 @@ enum {
 @end
 
 #pragma mark •••External String Definitions
+extern NSString* ORCV830ModelCount0OffsetChanged;
 extern NSString* ORCV830ModelAutoResetChanged;
 extern NSString* ORCV830ModelClearMebChanged;
 extern NSString* ORCV830ModelTestModeChanged;
