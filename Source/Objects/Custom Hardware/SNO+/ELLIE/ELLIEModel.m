@@ -404,6 +404,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:softLockOnFlag];
 }
 
+//this function kills any external software that will block the functions of a smellie run 
+-(void)killBlockingSoftware
+{
+    NSArray * killBS = @[@"110",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:killBS];
+}
+
 -(void)setLaserSoftLockOff
 {
     NSArray * softLockOffFlag = @[@"70",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
@@ -513,6 +520,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
     NSLog(@"SMELLIE_RUN:Starting SMELLIE Run\n");
+    
+    NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)");
+    [self killBlockingSoftware];
 
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
     currentConfigurationVersion = [self fetchRecentVersion];
