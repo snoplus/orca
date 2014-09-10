@@ -519,9 +519,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)startSmellieRun:(NSDictionary*)smellieSettings
 {
+    //stop any current runs and go into a maintainence run 
+    //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    //[runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    
     NSLog(@"SMELLIE_RUN:Starting SMELLIE Run\n");
     
-    NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)");
+    NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
 
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
@@ -823,7 +827,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //don't know if I need this??? called in stop smellie run ???
     //[runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
+    if(!endOfRun){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIERunFinished object:self];
+    }
     
 }
 
@@ -849,7 +855,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [self _pushSmellieRunDocument];
     
-    [runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
+    //[runControl performSelectorOnMainThread:@selector(setForceRestart:) withObject:YES waitUntilDone:YES];
+    //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    //used to be halt run but this now moves straight into a maintainence run 
     
     //end the run correctly if it is still running
     

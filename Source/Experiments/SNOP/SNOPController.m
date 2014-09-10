@@ -136,7 +136,7 @@ smellieRunFile;
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
     [self fetchNhitSettings];
-    [self runNumberChanged:nil]; //update the run number
+    //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
 }
 
