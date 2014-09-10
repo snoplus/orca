@@ -48,7 +48,7 @@
 - (void) awakeFromNib
 {
     settingTabSize  = NSMakeSize(830,510);
-    stateTabSize	= NSMakeSize(520,500);
+    stateTabSize	= NSMakeSize(520,540);
     registerTabSize	= NSMakeSize(400,180);
     firmwareTabSize	= NSMakeSize(400,180);
     

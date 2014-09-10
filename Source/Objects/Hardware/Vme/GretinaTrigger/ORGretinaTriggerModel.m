@@ -297,8 +297,10 @@ static GretinaTriggerStateInfo master_state_info[kNumMasterTriggerStates] = {
     { kRunRouterDataCheck,      kMasterState,   @"Running Router/Gretina Setup"},
     { kWaitOnRouterDataCheck,   kMasterState,   @"Waiting on Routers and Digitizers"},
     { kFinalCheck,              kMasterState,   @"Final Check"},
+    { kHaltClock,               kMasterState,   @"Halt Clock"},
     { kResetScaler,             kMasterState,   @"Reset Scaler"},
-    { kReleaseClocks,           kMasterState,   @"Turn Off IMPERATIVE_SYNC Bit"},
+    { kReleaseImpSync,          kMasterState,  @"Turn Off IMPERATIVE_SYNC Bit"},
+    { kReleaseClock,            kMasterState,   @"Release Clock"},
     { kMasterError,             kMasterState,   @""}
 };
 
@@ -1390,22 +1392,33 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kFinalCheck:
             if([self checkSystemLock]){
-                [self setInitState:kResetScaler];
+                [self setInitState:kHaltClock];
             }
             else {
                 [self setInitState:kMasterError];
             }
             break;
-            
+        
+        case kHaltClock:
+            [self writeRegister:kAuxIOCrl withValue:0x2E9B]; //this stops the clock
+            [self setInitState:kResetScaler];
+            break;
+        
         case kResetScaler:
             [self resetScaler];
-            [self setInitState:kReleaseClocks];
+            [self setInitState:kReleaseImpSync];
             break;
             
-        case kReleaseClocks:
-            //release the Imp. Sync. bit to start the clocks
+        
+        case kReleaseImpSync:
+            //release the Imp. Sync. bit
             aValue = [self readRegister:kMiscCtl1];
             [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];
+            [self setInitState:kReleaseClock];
+            break;
+
+        case kReleaseClock:
+            [self writeRegister:kAuxIOCrl withValue:0x2E9B]; //this stops the clock
             [self setInitState:kMasterIdle];
             break;
     }

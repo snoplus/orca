@@ -194,8 +194,10 @@ enum {
     kRunRouterDataCheck,
     kWaitOnRouterDataCheck,
     kFinalCheck,
+    kHaltClock,
     kResetScaler,
-    kReleaseClocks,
+    kReleaseImpSync,
+    kReleaseClock,
     kMasterError,
     kNumMasterTriggerStates //must be last
 };
