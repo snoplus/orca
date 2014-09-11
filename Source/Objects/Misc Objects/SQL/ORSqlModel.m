@@ -1330,8 +1330,9 @@ Table: Histogram2Ds
 @implementation ORPostMachineNameOp
 - (void) main
 {
+    if([self isCancelled])return;
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			NSString* name			 = computerName();
@@ -1370,6 +1371,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 
 @end
@@ -1377,8 +1381,9 @@ Table: Histogram2Ds
 @implementation ORDeleteMachineNameOp
 - (void) main
 {
-	@try {	
-        if([self isCancelled])return;
+    if([self isCancelled])return;
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			[sqlConnection queryString:[NSString stringWithFormat:@"DELETE from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
@@ -1388,14 +1393,18 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
 @implementation ORUpdateUptime
 - (void) main
 {
-	@try {	
-        if([self isCancelled])return;
+    if([self isCancelled])return;
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
@@ -1414,6 +1423,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
@@ -1440,8 +1452,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1489,6 +1502,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 
 }
 @end
@@ -1507,8 +1523,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1539,7 +1556,10 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
-	
+    @finally {
+        [thePool release];
+    }
+
 }
 @end
 
@@ -1557,8 +1577,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1589,6 +1610,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
@@ -1607,8 +1631,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine id using our MAC Address
@@ -1640,6 +1665,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
@@ -1659,8 +1687,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
@@ -1842,6 +1871,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
@@ -1861,8 +1893,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
+    if([self isCancelled])return;
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	@try {
-        if([self isCancelled])return;
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			if([experiment isKindOfClass:NSClassFromString(@"ORExperimentModel")]) {
@@ -1916,6 +1949,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
@@ -1944,8 +1980,9 @@ Table: Histogram2Ds
 
 - (void) main
 {
-	@try {			
-        if([self isCancelled])return;
+    if([self isCancelled])return;
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
 			//get our machine_id using our MAC Address
@@ -1979,6 +2016,9 @@ Table: Histogram2Ds
 	@catch(NSException* e){
 		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
@@ -1996,48 +2036,51 @@ Table: Histogram2Ds
 - (void) main
 {
     if([self isCancelled])return;
-	ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
-	@try {			
-		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if([sqlConnection isConnected]){
-			//get our machine_id using our MAC Address
-			ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-			id row				    = [theResult fetchRowAsDictionary];
-			id machine_id			= [row objectForKey:@"machine_id"];
-			
-			if(machine_id){
-				//since we only update this map on demand (i.e. if it changes) we'll just delete and start over
-				[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM segmentMap where machine_id=%@",
-											[sqlConnection quoteObject:machine_id]]];
-				
-				ORSegmentGroup* theGroup = [experiment segmentGroup:0];
-				NSArray* segments = [theGroup segments];
-				int segmentNumber = 0;
-				for(id aSegment in segments){
-					NSString* crateName		= [aSegment objectForKey:@"kCrate"];
-					NSString* cardName		= [aSegment objectForKey:@"kCardSlot"];
-					NSString* chanName		= [aSegment objectForKey:@"kChannel"];
-					NSString* dataSetName   = [experiment dataSetNameGroup:0 segment:segmentNumber];
-					[sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO segmentMap (machine_id,monitor_id,segment,histogram1DName,crate,card,channel) VALUES (%@,%d,%d,%@,%@,%@,%@)",
-												[sqlConnection quoteObject:machine_id],
-												monitor_id,
-												segmentNumber,
-												[sqlConnection quoteObject:dataSetName],
-												[sqlConnection quoteObject:crateName],
-												[sqlConnection quoteObject:cardName],
-												[sqlConnection quoteObject:chanName]]];
-					segmentNumber++;
-				}
-			}	
-			[sqlConnection release];
-		}
-	}
-	@catch(NSException* e){
-		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
-	}
-	@finally {
-		[experiment release];
-	}
+   NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+    ORExperimentModel* experiment = (ORExperimentModel*)[[delegate nextObject] retain];
+    @try {			
+        ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
+        if([sqlConnection isConnected]){
+            //get our machine_id using our MAC Address
+            ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+            id row				    = [theResult fetchRowAsDictionary];
+            id machine_id			= [row objectForKey:@"machine_id"];
+            
+            if(machine_id){
+                //since we only update this map on demand (i.e. if it changes) we'll just delete and start over
+                [sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM segmentMap where machine_id=%@",
+                                            [sqlConnection quoteObject:machine_id]]];
+                
+                ORSegmentGroup* theGroup = [experiment segmentGroup:0];
+                NSArray* segments = [theGroup segments];
+                int segmentNumber = 0;
+                for(id aSegment in segments){
+                    NSString* crateName		= [aSegment objectForKey:@"kCrate"];
+                    NSString* cardName		= [aSegment objectForKey:@"kCardSlot"];
+                    NSString* chanName		= [aSegment objectForKey:@"kChannel"];
+                    NSString* dataSetName   = [experiment dataSetNameGroup:0 segment:segmentNumber];
+                    [sqlConnection queryString:[NSString stringWithFormat:@"INSERT INTO segmentMap (machine_id,monitor_id,segment,histogram1DName,crate,card,channel) VALUES (%@,%d,%d,%@,%@,%@,%@)",
+                                                [sqlConnection quoteObject:machine_id],
+                                                monitor_id,
+                                                segmentNumber,
+                                                [sqlConnection quoteObject:dataSetName],
+                                                [sqlConnection quoteObject:crateName],
+                                                [sqlConnection quoteObject:cardName],
+                                                [sqlConnection quoteObject:chanName]]];
+                    segmentNumber++;
+                }
+            }	
+            [sqlConnection release];
+        }
+    }
+    @catch(NSException* e){
+        [delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+    }
+    @finally {
+        [experiment release];
+        [thePool release];
+    }
+    
 }
 @end
 
@@ -2057,76 +2100,81 @@ Table: Histogram2Ds
 
 - (void) main
 {
-	@try {
-        if([self isCancelled])return;
-		//get our machine_id using our MAC Address
-		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
-		if([sqlConnection isConnected]){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
-			id row			= [theResult fetchRowAsDictionary];
-			id machine_id	= [row objectForKey:@"machine_id"];
-			if(machine_id) {
-				//collect the existing DB entries for a sweep of deleted objects
-				theResult				= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT name from Processes where machine_id=%@",machine_id]];	
-				NSMutableArray* allEntries = [NSMutableArray array];
-				id anEntry;
-				while((anEntry = [theResult fetchRowAsDictionary]))[allEntries addObject:anEntry];
+    if([self isCancelled])return;
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+    @try {
+        //get our machine_id using our MAC Address
+        ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
+        if([sqlConnection isConnected]){		ORSqlResult* theResult  = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT machine_id from machines where hw_address = %@",[sqlConnection quoteObject:macAddress()]]];
+            id row			= [theResult fetchRowAsDictionary];
+            id machine_id	= [row objectForKey:@"machine_id"];
+            if(machine_id) {
+                //collect the existing DB entries for a sweep of deleted objects
+                theResult				= [sqlConnection queryString:[NSString stringWithFormat:@"SELECT name from Processes where machine_id=%@",machine_id]];	
+                NSMutableArray* allEntries = [NSMutableArray array];
+                id anEntry;
+                while((anEntry = [theResult fetchRowAsDictionary]))[allEntries addObject:anEntry];
 
-				//do 1D Histograms first
-				for(id aProcess in processes){
-					@synchronized(aProcess){
+                //do 1D Histograms first
+                for(id aProcess in processes){
+                    @synchronized(aProcess){
 
-						ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
-																			   machine_id,
-																			   [sqlConnection quoteObject:[aProcess fullID]]
-																			   ]];
-						id anEntry			= [theResult fetchRowAsDictionary];
-						id process_id		= [anEntry objectForKey:@"process_id"];
-						if(process_id) {
-							//already exists... just update
-							NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
-												  [sqlConnection quoteObject:[aProcess fullID]],
-												  [sqlConnection quoteObject:[aProcess shortName]],
-												  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-												  [sqlConnection quoteObject:[aProcess report]],
-												  [aProcess processRunning],
-												  [sqlConnection quoteObject:process_id]];
-							[sqlConnection queryString:theQuery];
-						}
-						else {
-							//have to add a new entry
-							NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
-												  [sqlConnection quoteObject:machine_id],
-												  [sqlConnection quoteObject:[aProcess fullID]],
-												  [sqlConnection quoteObject:[aProcess shortName]],
-												  [sqlConnection quoteObject:[aProcess lastSampleTime]],
-												  [sqlConnection quoteObject:[aProcess report]],
-												  [aProcess processRunning]];
-							[sqlConnection queryString:theQuery];
-						}
-						for(id anEntry in allEntries){
-							NSString* aName = [anEntry objectForKey:@"name"];
-							if([aName isEqualToString:[aProcess fullID]]){
-								[allEntries removeObject:anEntry];
-								break;
-							}
-						}
-					}
-				}
-				//clean out any deleted items
-				for(id anEntry in allEntries){
-					NSString* aName = [anEntry objectForKey:@"name"];
-					[sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Processes where (machine_id=%@ AND name=%@)",
-												[sqlConnection quoteObject:machine_id],
-												[sqlConnection quoteObject:aName]]];
-				}
-			}
-			[sqlConnection release];
-		}
-		
-	}
-	@catch(NSException* e){
-		[delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
-	}
+                        ORSqlResult* theResult	 = [sqlConnection queryString:[NSString stringWithFormat:@"SELECT process_id from Processes where (machine_id=%@ and name=%@)",
+                                                                               machine_id,
+                                                                               [sqlConnection quoteObject:[aProcess fullID]]
+                                                                               ]];
+                        id anEntry			= [theResult fetchRowAsDictionary];
+                        id process_id		= [anEntry objectForKey:@"process_id"];
+                        if(process_id) {
+                            //already exists... just update
+                            NSString* theQuery = [NSString stringWithFormat:@"UPDATE Processes SET name=%@,title=%@,timeStamp=%@,data=%@,state=%d WHERE process_id=%@",
+                                                  [sqlConnection quoteObject:[aProcess fullID]],
+                                                  [sqlConnection quoteObject:[aProcess shortName]],
+                                                  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+                                                  [sqlConnection quoteObject:[aProcess report]],
+                                                  [aProcess processRunning],
+                                                  [sqlConnection quoteObject:process_id]];
+                            [sqlConnection queryString:theQuery];
+                        }
+                        else {
+                            //have to add a new entry
+                            NSString* theQuery = [NSString stringWithFormat:@"INSERT INTO Processes (machine_id,name,title,timeStamp,data,state) VALUES (%@,%@,%@,%@,%@,%d)",
+                                                  [sqlConnection quoteObject:machine_id],
+                                                  [sqlConnection quoteObject:[aProcess fullID]],
+                                                  [sqlConnection quoteObject:[aProcess shortName]],
+                                                  [sqlConnection quoteObject:[aProcess lastSampleTime]],
+                                                  [sqlConnection quoteObject:[aProcess report]],
+                                                  [aProcess processRunning]];
+                            [sqlConnection queryString:theQuery];
+                        }
+                        for(id anEntry in allEntries){
+                            NSString* aName = [anEntry objectForKey:@"name"];
+                            if([aName isEqualToString:[aProcess fullID]]){
+                                [allEntries removeObject:anEntry];
+                                break;
+                            }
+                        }
+                    }
+                }
+                //clean out any deleted items
+                for(id anEntry in allEntries){
+                    NSString* aName = [anEntry objectForKey:@"name"];
+                    [sqlConnection queryString:[NSString stringWithFormat:@"DELETE FROM Processes where (machine_id=%@ AND name=%@)",
+                                                [sqlConnection quoteObject:machine_id],
+                                                [sqlConnection quoteObject:aName]]];
+                }
+            }
+            [sqlConnection release];
+        }
+        
+    }
+    @catch(NSException* e){
+        [delegate performSelectorOnMainThread:@selector(logQueryException:) withObject:e waitUntilDone:YES];
+    }
+    @finally {
+        [thePool release];
+    }
+
 }
 @end
 
