@@ -1299,10 +1299,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		////NSLog(@"Stop Run message received and ignored because no run in progress.\n");
 		//return;
 		//}
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
+		@try {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
 															object: self
 														  userInfo: nil];
+        }
+        @catch(NSException* e){
+            NSLog(@"Exception thrown and caught broadcasting the RunAboutToStop Notification. Apparently a HW error. %@\n",e);
+        }
 		
 		[self setRunningState:eRunStopping];
 		
@@ -1370,9 +1374,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
         NSDictionary* statusInfo = [NSDictionary
 									dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStopped],ORRunStatusValue,
-                                    [NSNumber numberWithLong:runNumber],kRunNumber,
-                                    [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+                                    [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
+                                    [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
                                     [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                                    [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
 									@"Not Running",ORRunStatusString,
 									dataPacket,@"DataPacket",nil];
         
