@@ -349,30 +349,36 @@
 @implementation ORCouchDBCompactDBOp
 -(void) main
 {	
-	if([self isCancelled])return;
-	NSString* httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_compact", host, port,database];
-	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
-	[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
-	[request setHTTPMethod:@"POST"];
-    [self _updateAuthentication:request];
-	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];	
-	YAJLDocument *document = nil;
-	if (data) {
-		document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-		[self sendToDelegate:[document root]];
-	}	
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        NSString* httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_compact", host, port,database];
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+        [request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
+        [request setHTTPMethod:@"POST"];
+        [self _updateAuthentication:request];
+        NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];	
+        YAJLDocument *document = nil;
+        if (data) {
+            document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
+            [self sendToDelegate:[document root]];
+        }
+    }
+    [thePool release];
 }
 @end
 
 @implementation ORCouchDBListDBOp
 -(void) main
 {
-	if([self isCancelled])return;
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
-	for(id name in result){
-        NSLog([NSString stringWithFormat:@"%@\n",name]);
-	}
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+        for(id name in result){
+            NSLog([NSString stringWithFormat:@"%@\n",name]);
+        }
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 @end
 
@@ -380,26 +386,35 @@
 @implementation ORCouchDBListDocsOp
 -(void) main
 {
-	if([self isCancelled])return;
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/_all_docs", host, port,database]];
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/_all_docs", host, port,database]];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 @end
 
 @implementation ORCouchDBListTasksOp
 -(void) main
 {
-	if([self isCancelled])return;
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_active_tasks", host, port]];
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_active_tasks", host, port]];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 @end
 @implementation ORCouchDBVersionOp
 - (void) main
 {
-	if([self isCancelled])return;
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u", host, port]];
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u", host, port]];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 
 @end
@@ -407,9 +422,12 @@
 @implementation ORCouchDBInfoDBOp
 -(void) main
 {
-	if([self isCancelled])return;
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/", host, port,database]];
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@/", host, port,database]];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 @end
 
@@ -423,53 +441,56 @@
 
 -(void) main
 {
-	if([self isCancelled])return;
-	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
-	if(![result containsObject:database]){
-		result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"PUT"];
-		if([response statusCode] != 201)  result = [NSDictionary dictionaryWithObjectsAndKeys:
-												   [NSString stringWithFormat:@"[%@] creation FAILED",database],
-												   @"Message",
-												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
-												   @"Reason",
-												   nil];
-		else {
-            if(views){
-                NSMutableDictionary* allMaps = [NSMutableDictionary dictionary];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+        if(![result containsObject:database]){
+            result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"PUT"];
+            if([response statusCode] != 201)  result = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [NSString stringWithFormat:@"[%@] creation FAILED",database],
+                                                       @"Message",
+                                                       [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
+                                                       @"Reason",
+                                                       nil];
+            else {
+                if(views){
+                    NSMutableDictionary* allMaps = [NSMutableDictionary dictionary];
 
-                NSDictionary* viewDictionary = [views objectForKey:@"views"];
-                for(id aViewKey in viewDictionary){
-                    
-                    NSMutableDictionary* aNewView = [[[viewDictionary objectForKey:aViewKey] mutableCopy] autorelease];
-                                    
-                    id mapName = [[[aNewView objectForKey:@"mapName"] retain] autorelease];
-                    if(![mapName length])mapName = database;
-                    else [aNewView removeObjectForKey:@"mapName"];
-                    
-                    if(![allMaps objectForKey:mapName]){
-                        [allMaps setObject:[NSMutableDictionary dictionary] forKey:mapName];
-                        [[allMaps objectForKey:mapName] setObject:@"javascript" forKey:@"language"];
-                        [[allMaps objectForKey:mapName] setObject:[NSMutableDictionary dictionary] forKey:@"views"];
-                    }
-                    
-                    [[[allMaps objectForKey:mapName] objectForKey:@"views"] setObject:aNewView forKey:aViewKey];
-                 }
-                 for(id aMapName in allMaps){
-                    NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, aMapName];
-                    /*id result = */[self send:httpString type:@"PUT" body:[allMaps objectForKey:aMapName]];
-                 }
+                    NSDictionary* viewDictionary = [views objectForKey:@"views"];
+                    for(id aViewKey in viewDictionary){
+                        
+                        NSMutableDictionary* aNewView = [[[viewDictionary objectForKey:aViewKey] mutableCopy] autorelease];
+                                        
+                        id mapName = [[[aNewView objectForKey:@"mapName"] retain] autorelease];
+                        if(![mapName length])mapName = database;
+                        else [aNewView removeObjectForKey:@"mapName"];
+                        
+                        if(![allMaps objectForKey:mapName]){
+                            [allMaps setObject:[NSMutableDictionary dictionary] forKey:mapName];
+                            [[allMaps objectForKey:mapName] setObject:@"javascript" forKey:@"language"];
+                            [[allMaps objectForKey:mapName] setObject:[NSMutableDictionary dictionary] forKey:@"views"];
+                        }
+                        
+                        [[[allMaps objectForKey:mapName] objectForKey:@"views"] setObject:aNewView forKey:aViewKey];
+                     }
+                     for(id aMapName in allMaps){
+                        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/%@", host, port, database, aMapName];
+                        /*id result = */[self send:httpString type:@"PUT" body:[allMaps objectForKey:aMapName]];
+                     }
+                }
+                
             }
-            
         }
-	}
-	else {
-		result = [NSDictionary dictionaryWithObjectsAndKeys:
-				  @"Did not create new database", @"Message",
-				  [NSString stringWithFormat:@"[%@] already exists",database],
-				  @"Reason",nil];
-	}
-	[self sendToDelegate:result];
+        else {
+            result = [NSDictionary dictionaryWithObjectsAndKeys:
+                      @"Did not create new database", @"Message",
+                      [NSString stringWithFormat:@"[%@] already exists",database],
+                      @"Reason",nil];
+        }
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 @end
 
@@ -485,11 +506,15 @@
 
 -(void) main
 {
-    NSString* httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/default", host, port, database];
-    NSDictionary* doc = [NSDictionary dictionaryWithObject:updateHandler forKey:@"replaceDoc"];
-    NSDictionary* aDict = [NSDictionary dictionaryWithObject:doc forKey:@"updates"];
-    id result = [self send:httpString type:@"PUT" body:aDict];
-    [self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        NSString* httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/default", host, port, database];
+        NSDictionary* doc = [NSDictionary dictionaryWithObject:updateHandler forKey:@"replaceDoc"];
+        NSDictionary* aDict = [NSDictionary dictionaryWithObject:doc forKey:@"updates"];
+        id result = [self send:httpString type:@"PUT" body:aDict];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 
 }
 @end
@@ -497,21 +522,25 @@
 @implementation ORCouchDBDeleteDBOp
 -(void) main
 {
-	if([self isCancelled])return;
-	
-	NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
-	if([result containsObject:database]){
-		result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"DELETE"];
-		if([response statusCode] != 200) result = [NSDictionary dictionaryWithObjectsAndKeys:
-												   [NSString stringWithFormat:@"[%@] deletion FAILED",database],
-												   @"Message",
-												   [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
-												   @"Reason",
-												   nil];
-	}
-	else result = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"[%@] didn't exist",database],@"Message",nil];
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        
+        NSString *escaped = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        id result = [self send:[NSString stringWithFormat:@"http://%@:%u/_all_dbs", host, port]];
+        if([result containsObject:database]){
+            result = [self send:[NSString stringWithFormat:@"http://%@:%u/%@", host, port, escaped] type:@"DELETE"];
+            if([response statusCode] != 200) result = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [NSString stringWithFormat:@"[%@] deletion FAILED",database],
+                                                       @"Message",
+                                                       [NSString stringWithFormat:@"Error Code: %d",[response statusCode]],
+                                                       @"Reason",
+                                                       nil];
+        }
+        else result = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"[%@] didn't exist",database],@"Message",nil];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
+    
 }
 @end
 
@@ -519,30 +548,33 @@
 @synthesize continuous;
 - (void) main
 {
-	if([self isCancelled])return;
-	NSString* escaped   = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	NSString* httpString = [NSString stringWithFormat:@"http://127.0.0.1:%u/_replicate", port];
-	
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
-    [self _updateAuthentication:request];
-	[request setHTTPMethod:@"POST"];
-	[request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
-	NSString* target = [NSString stringWithFormat:@"http://%@:%d/%@",host,port,escaped];
-	NSDictionary* aBody;
-	if(continuous) aBody= [NSDictionary dictionaryWithObjectsAndKeys:escaped,@"source",target,@"target",[NSNumber numberWithBool:1],@"continuous",nil];
-	else           aBody = [NSDictionary dictionaryWithObjectsAndKeys:escaped,@"source",target,@"target",nil];
-	NSString* s = [aBody yajl_JSONString];
-	NSData* asData = [s dataUsingEncoding:NSASCIIStringEncoding];
-	[request setHTTPBody:asData];
-	NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
-	
-	id result = nil;
-	if (data) {
-		YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
-		result= [document root];
-	}
-	
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        NSString* escaped   = [database stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString* httpString = [NSString stringWithFormat:@"http://127.0.0.1:%u/_replicate", port];
+        
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:httpString]];
+        [self _updateAuthentication:request];
+        [request setHTTPMethod:@"POST"];
+        [request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
+        NSString* target = [NSString stringWithFormat:@"http://%@:%d/%@",host,port,escaped];
+        NSDictionary* aBody;
+        if(continuous) aBody= [NSDictionary dictionaryWithObjectsAndKeys:escaped,@"source",target,@"target",[NSNumber numberWithBool:1],@"continuous",nil];
+        else           aBody = [NSDictionary dictionaryWithObjectsAndKeys:escaped,@"source",target,@"target",nil];
+        NSString* s = [aBody yajl_JSONString];
+        NSData* asData = [s dataUsingEncoding:NSASCIIStringEncoding];
+        [request setHTTPBody:asData];
+        NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
+        
+        id result = nil;
+        if (data) {
+            YAJLDocument *document = [[[YAJLDocument alloc] initWithData:data parserOptions:YAJLParserOptionsNone error:nil] autorelease];
+            result= [document root];
+        }
+        
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 
 @end
@@ -584,31 +616,34 @@
 
 - (void) main
 {
-	if([self isCancelled])return;
-	NSString* httpString;
-	NSString* action;
-	if(documentId){
-		action = @"PUT";
-		httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-	}
-	else {
-		action = @"POST";
-		httpString = [NSString stringWithFormat:@"http://%@:%u/%@", host, port, database];
-	}
-	id result = [self send:httpString type:action body:document];
-	if(!result){
-		result = [NSDictionary dictionaryWithObjectsAndKeys:
-				  [NSString stringWithFormat:@"[%@] timeout",
-				   database],@"Message",nil];
-		[self sendToDelegate:result];
-	}	
-	else {
-		if(attachmentData){
-			[self addAttachement];
-		}
-	}
-	
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        NSString* httpString;
+        NSString* action;
+        if(documentId){
+            action = @"PUT";
+            httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+        }
+        else {
+            action = @"POST";
+            httpString = [NSString stringWithFormat:@"http://%@:%u/%@", host, port, database];
+        }
+        id result = [self send:httpString type:action body:document];
+        if(!result){
+            result = [NSDictionary dictionaryWithObjectsAndKeys:
+                      [NSString stringWithFormat:@"[%@] timeout",
+                       database],@"Message",nil];
+            [self sendToDelegate:result];
+        }	
+        else {
+            if(attachmentData){
+                [self addAttachement];
+            }
+        }
+        
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 	
 }
 
@@ -647,55 +682,57 @@
 @implementation ORCouchDBUpdateDocumentOp
 - (void) main
 {
-	if([self isCancelled])return;
-    if([delegate respondsToSelector:@selector(usingUpdateHandler)] && [delegate usingUpdateHandler]){
-        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/default/_update/replaceDoc/%@", host, port, database, documentId];
-        id theDoc = document;
-        if(documentId && ![[document objectForKey:@"_id"] isEqualToString:documentId]){
-            NSMutableDictionary* mDict = [NSMutableDictionary dictionaryWithDictionary:document];
-            [mDict setObject:documentId forKey:@"_id"];
-            theDoc = mDict;
-        }
-        id result = [self send:httpString type:@"PUT" body:theDoc];
-        if(![result objectForKey:@"error"] && attachmentData){
-            [self addAttachement];
-        }
-        
-    
-        
-    }
-    else {
-        //check for an existing document
-        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-        id result = [self send:httpString];
-        if(!result){
-            result = [NSDictionary dictionaryWithObjectsAndKeys:
-                      [NSString stringWithFormat:@"[%@] timeout",
-                       database],@"Message",nil];
-            informDelegate=YES;
-        }
-        else if([result objectForKey:@"error"]){
-            //document doesn't exist. So just add it.
-            result = [self send:httpString type:@"PUT" body:document];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        if([delegate respondsToSelector:@selector(usingUpdateHandler)] && [delegate usingUpdateHandler]){
+            NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/_design/default/_update/replaceDoc/%@", host, port, database, documentId];
+            id theDoc = document;
+            if(documentId && ![[document objectForKey:@"_id"] isEqualToString:documentId]){
+                NSMutableDictionary* mDict = [NSMutableDictionary dictionaryWithDictionary:document];
+                [mDict setObject:documentId forKey:@"_id"];
+                theDoc = mDict;
+            }
+            id result = [self send:httpString type:@"PUT" body:theDoc];
             if(![result objectForKey:@"error"] && attachmentData){
                 [self addAttachement];
             }
+            
+        
+            
         }
         else {
-            //it already exists. insert the rev number into the document and put it back
-            id rev = [result objectForKey:@"_rev"];
-            if(rev){
-                NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
-                [newDocument setObject:rev forKey:@"_rev"];
-                result = [self send:httpString type:@"PUT" body:newDocument];
+            //check for an existing document
+            NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+            id result = [self send:httpString];
+            if(!result){
+                result = [NSDictionary dictionaryWithObjectsAndKeys:
+                          [NSString stringWithFormat:@"[%@] timeout",
+                           database],@"Message",nil];
+                informDelegate=YES;
+            }
+            else if([result objectForKey:@"error"]){
+                //document doesn't exist. So just add it.
+                result = [self send:httpString type:@"PUT" body:document];
                 if(![result objectForKey:@"error"] && attachmentData){
                     [self addAttachement];
                 }
             }
+            else {
+                //it already exists. insert the rev number into the document and put it back
+                id rev = [result objectForKey:@"_rev"];
+                if(rev){
+                    NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:document];
+                    [newDocument setObject:rev forKey:@"_rev"];
+                    result = [self send:httpString type:@"PUT" body:newDocument];
+                    if(![result objectForKey:@"error"] && attachmentData){
+                        [self addAttachement];
+                    }
+                }
+            }
+            if (informDelegate) [self sendToDelegate:result];
         }
-        if (informDelegate) [self sendToDelegate:result];
     }
-
+    [thePool release];
 }
 - (void) setInformDelegate:(BOOL)ok
 {
@@ -706,58 +743,66 @@
 @implementation ORCouchDBUpdateEventCatalogOp
 - (void) main
 {
-	if([self isCancelled])return;
-	//check for an existing document
-	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-	id result = [self send:httpString];
-	if(!result){
-		result = [NSDictionary dictionaryWithObjectsAndKeys:
-				  [NSString stringWithFormat:@"[%@] timeout",
-				   database],@"Message",nil];
-		[self sendToDelegate:result];
-	}
-	else if([result objectForKey:@"error"]){
-		//document doesn't exist. So just add it.
-        NSArray* anEvent = [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:[document objectForKey:@"name"]]];
-        NSDictionary* newDocument = [NSDictionary dictionaryWithObjectsAndKeys:@"EventCatalog",@"name", @"Event Catalog",@"title",anEvent,@"events",nil];
-		result = [self send:httpString type:@"PUT" body:newDocument];
-		if(![result objectForKey:@"error"] && attachmentData){
-			[self addAttachement];
-		}
-	}
-	else {
-		//it already exists. insert the rev number into the document and put it back
-		id rev = [result objectForKey:@"_rev"];
-		if(rev){
-            NSString* eventNameForCatalog = [document objectForKey:@"name"];
-			NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:result];
-            NSArray* eventsAlreadyInCatalog = [result objectForKey:@"events"];
-            for(id anEntry in eventsAlreadyInCatalog){
-                if([anEntry objectForKey:eventNameForCatalog])return; //alreay there
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	if(![self isCancelled]){
+        //check for an existing document
+        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+        id result = [self send:httpString];
+        if(!result){
+            result = [NSDictionary dictionaryWithObjectsAndKeys:
+                      [NSString stringWithFormat:@"[%@] timeout",
+                       database],@"Message",nil];
+            [self sendToDelegate:result];
+        }
+        else if([result objectForKey:@"error"]){
+            //document doesn't exist. So just add it.
+            NSArray* anEvent = [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:[document objectForKey:@"name"]]];
+            NSDictionary* newDocument = [NSDictionary dictionaryWithObjectsAndKeys:@"EventCatalog",@"name", @"Event Catalog",@"title",anEvent,@"events",nil];
+            result = [self send:httpString type:@"PUT" body:newDocument];
+            if(![result objectForKey:@"error"] && attachmentData){
+                [self addAttachement];
             }
-            //if we get here, it's not in the list of events already
-            NSArray* newArray = [[result objectForKey:@"events"] arrayByAddingObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:eventNameForCatalog]];
-            [newDocument setObject:newArray forKey:@"events"];
-            [newDocument setObject:rev forKey:@"_rev"];
-            [self send:httpString type:@"PUT" body:newDocument];
-		}
-	}
-    
+        }
+        else {
+            //it already exists. insert the rev number into the document and put it back
+            id rev = [result objectForKey:@"_rev"];
+            if(rev){
+                NSString* eventNameForCatalog = [document objectForKey:@"name"];
+                NSMutableDictionary* newDocument = [NSMutableDictionary dictionaryWithDictionary:result];
+                NSArray* eventsAlreadyInCatalog = [result objectForKey:@"events"];
+                for(id anEntry in eventsAlreadyInCatalog){
+                    if([anEntry objectForKey:eventNameForCatalog]){
+                        [thePool release];
+                        return; //alreay there
+                    }
+                }
+                //if we get here, it's not in the list of events already
+                NSArray* newArray = [[result objectForKey:@"events"] arrayByAddingObject:[NSDictionary dictionaryWithObject:[document objectForKey:@"time"] forKey:eventNameForCatalog]];
+                [newDocument setObject:newArray forKey:@"events"];
+                [newDocument setObject:rev forKey:@"_rev"];
+                [self send:httpString type:@"PUT" body:newDocument];
+            }
+        }
+    }
+    [thePool release];
 }
 @end
 
 @implementation ORCouchDBDeleteDocumentOp
 - (void) main
 {
-	if([self isCancelled])return;
-	//check for an existing document
-	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
-	id result = [self send:httpString];
-	id rev = [result objectForKey:@"_rev"];
-	if(rev){
-		httpString = [httpString stringByAppendingFormat:@"?rev=%@",rev];
-		[self send:httpString type:@"DELETE"];
-	}
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    if(![self isCancelled]){
+        //check for an existing document
+        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, documentId];
+        id result = [self send:httpString];
+        id rev = [result objectForKey:@"_rev"];
+        if(rev){
+            httpString = [httpString stringByAppendingFormat:@"?rev=%@",rev];
+            [self send:httpString type:@"DELETE"];
+        }
+    }
+    [thePool release];
 }
 @end
 
@@ -776,11 +821,14 @@
 
 - (void) main
 {
-	if([self isCancelled])return;
-    NSString* escaped = [documentId stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, escaped];
-	id result = [self send:httpString];
-	[self sendToDelegate:result];
+    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    if(![self isCancelled]){
+        NSString* escaped = [documentId stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *httpString = [NSString stringWithFormat:@"http://%@:%u/%@/%@", host, port, database, escaped];
+        id result = [self send:httpString];
+        [self sendToDelegate:result];
+    }
+    [thePool release];
 }
 @end
 

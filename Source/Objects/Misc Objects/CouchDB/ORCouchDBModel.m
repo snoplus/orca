@@ -256,7 +256,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[self alarmsChanged:nil];
 	[self statusLogChanged:nil];
 	[self updateExperiment];
-    [self recordEvent:@"Restart" symbol:@"O" comment:@"ORCA restarted"];
+    NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                         @"ORCA restarted",                                     @"comment",
+                         @"O",                                                  @"Symbol",
+                         nil];
+
+    [self recordEvent:@"Restart" document:doc];
 }
 
 #pragma mark ***Accessors
@@ -766,8 +771,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	}
 }
 
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment
+- (void) recordEvent:(NSString*)eventName document:aDocument
 {
+    if (stealthMode) return;
+    
     NSDate* localDate = [NSDate date];
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -780,24 +787,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
     [dateFormatter release];
     
-    [self recordEvent:eventName symbol:aSymbol comment:aComment timeString:lastTimeStamp timeStamp:secondsSince1970];
-}
-
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp
-{
-    if (stealthMode) return;
-    if([aSymbol length]>=1) aSymbol = [aSymbol substringWithRange:NSMakeRange(0,1)];
-    else aSymbol = @"G";
-    
-    NSMutableDictionary* eventInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        eventName,          @"name",
-                                        @"Events",			@"title",
-                                        aSymbol,            @"symbol",
-                                        aComment,           @"comment",
-                                        aDateString,		@"timestamp",
-                                        [NSNumber numberWithUnsignedLong: aTimeStamp],		@"time",
-                                        nil];
-
+    NSMutableDictionary* eventInfo = [NSMutableDictionary dictionaryWithDictionary:aDocument];
+    [eventInfo setObject:eventName forKey:@"name"];
+    [eventInfo setObject:@"Events" forKey:@"title"];
+    [eventInfo setObject:lastTimeStamp forKey:@"timestamp"];
+    [eventInfo setObject:[NSNumber numberWithUnsignedLong: secondsSince1970] forKey:@"time"];
+ 
     [[self historyDBRef] addDocument:eventInfo tag:kDocumentAdded];
 	
 	[[self historyDBRef] updateEventCatalog:eventInfo documentId:@"eventCatalog" tag:kDocumentAdded];
@@ -996,7 +991,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if (stealthMode) return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(periodicCompact) object:nil];
 	[self compactDatabase];
-	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:600];
+	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 }
 
 - (void) compactDatabase
@@ -1039,7 +1034,17 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         NSString* comment;
         if(subRunNumberLocal==0) comment = [NSString stringWithFormat:@"Run %lu Started",runNumberLocal];
         else                     comment = [NSString stringWithFormat:@"Run %lu.%lu Started",runNumberLocal,subRunNumberLocal];
-        [self recordEvent:@"RunStarted" symbol:@"S" comment:comment];
+        
+        NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithUnsignedLong:runNumberLocal]   , @"RunNumber",
+                             [NSNumber numberWithUnsignedLong:subRunNumberLocal], @"SubRunNumber",
+                             comment,@"comment",
+                             @"S",@"Symbol",
+                             nil];
+        
+        
+        
+        [self recordEvent:@"RunStarted" document:doc];
     }
 }
 
@@ -1049,10 +1054,22 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if([[info objectForKey:@"kRunMode"] intValue]==0){
         unsigned long runNumberLocal     = [[info objectForKey:@"kRunNumber"] unsignedLongValue];
         unsigned long subRunNumberLocal  = [[info objectForKey:@"kSubRunNumber"]unsignedLongValue];
+        float elapsedTimeLocal   = [[info objectForKey:@"kElapsedTime"]floatValue];
         NSString* comment;
         if(subRunNumberLocal==0) comment = [NSString stringWithFormat:@"Run %lu Stopped",runNumberLocal];
         else                     comment = [NSString stringWithFormat:@"Run %lu.%lu Stopped",runNumberLocal,subRunNumberLocal];
-        [self recordEvent:@"RunStopped" symbol:@"E" comment:comment];
+        
+        
+        NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithUnsignedLong:runNumberLocal]   , @"RunNumber",
+                             [NSNumber numberWithUnsignedLong:subRunNumberLocal], @"SubRunNumber",
+                             [NSNumber numberWithFloat:elapsedTimeLocal],         @"ElapsedTime",
+                             
+                             comment,@"comment",
+                             @"E",@"Symbol",
+                             nil];
+
+        [self recordEvent:@"RunStopped" document:doc];
     }
 }
 
@@ -1284,7 +1301,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		if(!statusUpdateScheduled){
-			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:60];
+			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:120];
 			statusUpdateScheduled = YES;
 		}
 	}
@@ -1401,7 +1418,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
             }
         }
 		
-		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
+		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:30];
 	}
 }
 
@@ -1414,9 +1431,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
     [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
-    [self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
-    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
-    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
+    [self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:4];
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:5];
+    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 }
 
 #pragma mark ***Archival

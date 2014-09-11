@@ -99,8 +99,7 @@
 - (NSDictionary*) dBHistoryInfo;
 - (NSDictionary*) dBInfo;
 - (void) checkReplication;
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment;
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp;
+- (void) recordEvent:(NSString*)eventName document:aDocument;
 - (void) checkDataBaseExists:(ORCouchDB*)aDataBase;
 
 #pragma mark ***DB Access
