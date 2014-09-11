@@ -640,6 +640,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
 				NSArray* parts =  [aLine componentsSeparatedByString:@","];
 				if([parts count]>=3){
+                    
+                    if([[parts objectAtIndex:0] rangeOfString:@"S"].location != NSNotFound)continue;
+                    
 					int index = [[parts objectAtIndex:0] intValue];
 					if(index<14){
 						NSMutableDictionary* dict = [stringMap objectAtIndex:index];

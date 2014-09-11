@@ -242,9 +242,11 @@
     int stringNum;
     for(stringNum=0;stringNum<14;stringNum++){
         int detectorNum;
-        float y = height-60;
+        
+        float           y = height-60;
         if(stringNum>=7)y = height-182;
-        float x = 67 + stringNum%7 * 40;
+        float           x = 67 + stringNum%7 * 40;
+        
         BOOL atLeastOne = NO;
         for(detectorNum=0;detectorNum<5;detectorNum++){
             
@@ -260,10 +262,10 @@
             if(detIndex > numSegments) continue;
             
             ORDetectorSegment* aSegment = [aGroup segment:detIndex];
-
             int type = [[aSegment objectForKey:@"kDetectorType"] intValue];
             if(type>0) detHeight = dh * 1.3;
             if(!skip){
+
                 atLeastOne = YES;
                 NSRect r = NSMakeRect(x,y-detHeight/2,detWidth,detHeight/2.);
                 [segmentPaths addObject:[NSBezierPath bezierPathWithRect:r]];
@@ -276,7 +278,7 @@
                 r = NSMakeRect(x-2,y-detHeight-2,detWidth+4,detHeight+4);
                 [detectorOutlines   addObject:[NSBezierPath bezierPathWithRect:r]];
             }
-            y -= (detHeight + detSpacing);            
+             y -= (detHeight + detSpacing);            
 
         }
         if(atLeastOne){
