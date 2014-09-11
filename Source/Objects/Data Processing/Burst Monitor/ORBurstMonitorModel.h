@@ -34,7 +34,7 @@
 
     id					 thePassThruObject;         //cache the object on the other side of the pass thru connection
 	id					 theBurstMonitoredObject;	//cache the object on the other side of the BurstMonitor connection
-    unsigned short       timeWindow;
+    double       timeWindow;
     unsigned short       nHit;
     unsigned short       minimumEnergyAllowed;
     unsigned long        shaperID;
@@ -94,8 +94,8 @@
 - (unsigned short) numBurstsNeeded;
 - (void) setNumBurstsNeeded:(unsigned short)aNumBurstsNeeded;
 
-- (unsigned short) timeWindow;
-- (void) setTimeWindow:(unsigned short)value;
+- (double) timeWindow;
+- (void) setTimeWindow:(double)value;
 
 - (void) setNHit:(unsigned short)value;
 - (unsigned short) nHit;

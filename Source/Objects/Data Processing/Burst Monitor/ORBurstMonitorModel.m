@@ -114,7 +114,7 @@ NSDate* burstStart = NULL;
 }
 
 - (unsigned short) numBurstsNeeded      { return numBurstsNeeded; }
-- (unsigned short) timeWindow           { return timeWindow; }
+- (double) timeWindow           { return timeWindow; }
 - (unsigned short) nHit                 { return nHit; }
 - (unsigned short) minimumEnergyAllowed { return minimumEnergyAllowed; }
 
@@ -127,9 +127,9 @@ NSDate* burstStart = NULL;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorModelNumBurstsNeededChanged object:self];
 }
 
-- (void) setTimeWindow:(unsigned short)aValue
+- (void) setTimeWindow:(double)aValue //was unsigned short for integers
 {
-    if(aValue<1)aValue = 1;
+    if(aValue<0.000001)aValue = 0.000001;
 	[[[self undoManager] prepareWithInvocationTarget:self] setTimeWindow:timeWindow];
     timeWindow = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorTimeWindowChanged object:self];
@@ -740,7 +740,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
             burstForce=1;
             [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
         }
-        if(loudSec > 30){
+        if(loudSec > 120){
             burstForce=1;
             //[theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
         }
@@ -760,7 +760,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
-    theContent = [theContent stringByAppendingFormat:@"Time Window: %d sec\n",timeWindow];
+    theContent = [theContent stringByAppendingFormat:@"Time Window: %f sec\n",timeWindow];
     theContent = [theContent stringByAppendingFormat:@"Events/Window Needed: %d\n",nHit];
     theContent = [theContent stringByAppendingFormat:@"Minimum ADC Energy: %d\n",minimumEnergyAllowed];
     theContent = [theContent stringByAppendingFormat:@"Number of channels required: %d\n",numBurstsNeeded];

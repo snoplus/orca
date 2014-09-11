@@ -167,7 +167,7 @@
 
 - (void) timeWindowChanged:(NSNotification*)aNotification
 {
-	[timeWindowField setIntValue: [model timeWindow]];
+	[timeWindowField setDoubleValue: [model timeWindow]]; //CB was setIntValue
 }
 
 - (void) numBurstsNeededChanged:(NSNotification*)aNotification
@@ -238,9 +238,9 @@
 #pragma mark •••Actions
 - (IBAction) timeWindowAction:(id)sender
 {
-	if([sender intValue] != [model timeWindow]){
+	if([sender doubleValue] != [model timeWindow]){
 		[[self undoManager] setActionName: @"Set Time Window"];
-		[model setTimeWindow:[sender intValue]];
+		[model setTimeWindow:[sender doubleValue]];
 	}
 }
 
