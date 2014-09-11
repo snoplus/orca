@@ -207,6 +207,7 @@ enum Gretina4MFIFOStates {
     BOOL			debug[kNumGretina4MChannels];
     BOOL			pileUp[kNumGretina4MChannels];
     BOOL            poleZeroEnabled[kNumGretina4MChannels];
+    BOOL            baselineRestoreEnabled[kNumGretina4MChannels];
     BOOL			pzTraceEnabled[kNumGretina4MChannels];
     BOOL			presumEnabled[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
@@ -382,7 +383,8 @@ enum Gretina4MFIFOStates {
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setTrapEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setPoleZeroEnabled:(short)chan withValue:(BOOL)aValue;
-- (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
+- (void) setBaselineRestoreEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;
 - (void) setPZTraceEnabled:(short)chan withValue:(BOOL)aValue;		
 - (void) setDebug:(short)chan withValue:(BOOL)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
@@ -402,6 +404,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) enabled:(short)chan;
 - (BOOL) trapEnabled:(short)chan;
 - (BOOL) poleZeroEnabled:(short)chan;
+- (BOOL) baselineRestoreEnabled:(short)chan;
 - (short) poleZeroMult:(short)chan;
 - (BOOL) pzTraceEnabled:(short)chan;
 - (BOOL) debug:(short)chan;		
@@ -577,6 +580,7 @@ extern NSString* ORGretina4MTrapEnabledChanged;
 extern NSString* ORGretina4MDebugChanged;
 extern NSString* ORGretina4MPileUpChanged;
 extern NSString* ORGretina4MPoleZeroEnabledChanged;
+extern NSString* ORGretina4MBaselineRestoreEnabledChanged;
 extern NSString* ORGretina4MPoleZeroMultChanged;
 extern NSString* ORGretina4MPZTraceEnabledChanged;
 extern NSString* ORGretina4MTriggerModeChanged;

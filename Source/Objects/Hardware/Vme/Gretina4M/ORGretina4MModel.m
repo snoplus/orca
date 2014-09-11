@@ -64,6 +64,7 @@ NSString* ORGretina4MEnabledChanged             = @"ORGretina4MEnabledChanged";
 NSString* ORGretina4MPoleZeroEnabledChanged     = @"ORGretina4MPoleZeroEnabledChanged";
 NSString* ORGretina4MPoleZeroMultChanged        = @"ORGretina4MPoleZeroMultChanged";
 NSString* ORGretina4MPZTraceEnabledChanged      = @"ORGretina4MPZTraceEnabledChanged";
+NSString* ORGretina4MBaselineRestoreEnabledChanged = @"ORGretina4MBaselineRestoreEnabledChanged";
 NSString* ORGretina4MDebugChanged               = @"ORGretina4MDebugChanged";
 NSString* ORGretina4MPileUpChanged              = @"ORGretina4MPileUpChanged";
 NSString* ORGretina4MTriggerModeChanged         = @"ORGretina4MTriggerModeChanged";
@@ -823,6 +824,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		pileUp[i]			= NO;
 		poleZeroEnabled[i]	= NO;
 		poleZeroMult[i]	    = 0x600;
+        baselineRestoreEnabled[i]= NO;
 		pzTraceEnabled[i]	= NO;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x1FFFF;//spec default: maximum (0x1FFFF)
@@ -916,7 +918,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MPZTraceEnabledChanged object:self userInfo:userInfo];
 }
 
-- (void) setDebug:(short)chan withValue:(BOOL)aValue	
+- (void) setBaselineRestoreEnabled:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBaselineRestoreEnabled:chan withValue:baselineRestoreEnabled[chan]];
+	baselineRestoreEnabled[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MBaselineRestoreEnabledChanged object:self userInfo:userInfo];
+}
+
+- (void) setDebug:(short)chan withValue:(BOOL)aValue
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setDebug:chan withValue:debug[chan]];
 	debug[chan] = aValue;
@@ -1062,6 +1072,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (BOOL) trapEnabled:(short)chan        { return trapEnabled[chan]; }
 - (BOOL) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
 - (short) poleZeroMult:(short)chan      { return poleZeroMult[chan]; }
+- (BOOL) baselineRestoreEnabled:(short)chan	{ return baselineRestoreEnabled[chan]; }
 - (BOOL) pzTraceEnabled:(short)chan     { return pzTraceEnabled[chan]; }
 - (BOOL) debug:(short)chan              { return debug[chan]; }
 - (BOOL) pileUp:(short)chan             { return pileUp[chan];}
@@ -2549,6 +2560,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroMultiplier:i withValue:[decoder decodeIntForKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]]];
+		[self setBaselineRestoreEnabled:i withValue:[decoder decodeIntForKey:[@"baselineRestoreEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPZTraceEnabled:i withValue:[decoder decodeIntForKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
@@ -2601,6 +2613,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroMult[i]  forKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:baselineRestoreEnabled[i] forKey:[@"baselineRestoreEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pzTraceEnabled[i] forKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:ledThreshold[i]	forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
@@ -2635,6 +2648,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self addCurrentState:objDictionary cArray:(short*)pileUp forKey:@"Pile Up"];
 	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
 	[self addCurrentState:objDictionary cArray:(short*)poleZeroEnabled forKey:@"Pole Zero Enabled"];
+	[self addCurrentState:objDictionary cArray:(short*)baselineRestoreEnabled forKey:@"Baseline Restore Enabled"];
 	[self addCurrentState:objDictionary cArray:poleZeroMult forKey:@"Pole Zero Multiplier"];
 	[self addCurrentState:objDictionary cArray:(short*)pzTraceEnabled forKey:@"PZ Trace Enabled"];
 	[self addCurrentState:objDictionary cArray:mrpsrt forKey:@"Mrpsrt"];

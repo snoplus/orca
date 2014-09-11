@@ -78,6 +78,7 @@
         [[easySelectMatrix cellAtRow:i column:0] setTag:i];
         [[trapEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroEnabledMatrix cellAtRow:i column:0] setTag:i];
+        [[baselineRestoreEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroTauMatrix cellAtRow:i column:0] setTag:i];
         [[pzTraceEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[pileUpMatrix cellAtRow:i column:0] setTag:i];
@@ -219,7 +220,12 @@
                      selector : @selector(poleZeroEnabledChanged:)
                          name : ORGretina4MPoleZeroEnabledChanged
                        object : model];
-	
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(baselineRestoreEnabledChanged:)
+                         name: ORGretina4MBaselineRestoreEnabledChanged
+                       object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(poleZeroTauChanged:)
                          name : ORGretina4MPoleZeroMultChanged
@@ -444,6 +450,7 @@
 	[self easySelectChanged:nil];
 	[self trapEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
+	[self baselineRestoreEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
 	[self pzTraceEnabledChanged:nil];
 	[self presumEnabledChanged:nil];
@@ -772,7 +779,22 @@
         [[poleZeroEnabledMatrix cellWithTag:chan] setState:[model poleZeroEnabled:chan]];
     }
 }
+
+- (void) baselineRestoreEnabledChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[baselineRestoreEnabledMatrix cellWithTag:i] setState:[model baselineRestoreEnabled:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[baselineRestoreEnabledMatrix cellWithTag:chan] setState:[model baselineRestoreEnabled:chan]];
+    }
     
+    [self settingsLockChanged:nil];
+}
 
 - (void) poleZeroTauChanged:(NSNotification*)aNote
 {
@@ -945,6 +967,7 @@
 	[statusButton           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[probeButton            setEnabled:!locked && !runInProgress && !downloading];
 	[poleZeroEnabledMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [baselineRestoreEnabledMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroTauMatrix      setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pzTraceEnabledMatrix   setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -992,10 +1015,20 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             BOOL usingTrap      = [model trapEnabled:i];
             BOOL presumEnabled  = [model presumEnabled:i];
-            [[ledThresholdMatrix cellAtRow:i column:0] setEnabled:!usingTrap];
-            [[trapThresholdMatrix cellAtRow:i column:0] setEnabled:usingTrap];
+            BOOL baselineRestoreEnabled = [model baselineRestoreEnabled:i];
+            
+            [[ledThresholdMatrix cellWithTag:i] setEnabled:!usingTrap];
+            [[trapThresholdMatrix cellWithTag:i] setEnabled:usingTrap];
+            //            [[chpsrtMatrix cellWithTag:i] setEnabled:presumEnabled];
+            //            [[chpsdvMatrix cellWithTag:i] setEnabled:presumEnabled];
             [[chpsrtMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
             [[chpsdvMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
+            
+            // The following lines force BLR to be enabled for PZ to be enabled.
+//            [[poleZeroEnabledMatrix  cellWithTag:i] setEnabled:baselineRestoreEnabled];
+//            if (!baselineRestoreEnabled) {
+//                [model setPoleZeroEnabled:i withValue:NO];
+//            }
         }
     }
 }
@@ -1300,6 +1333,12 @@
 {
 	if([sender intValue] != [model poleZeroEnabled:[[sender selectedCell] tag]]){
 		[model setPoleZeroEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+- (IBAction) baselineRestoreEnabledAction:(id)sender
+{
+	if([sender intValue] != [model baselineRestoreEnabled:[[sender selectedCell] tag]]){
+		[model setBaselineRestoreEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 - (IBAction) poleZeroTauAction:(id)sender

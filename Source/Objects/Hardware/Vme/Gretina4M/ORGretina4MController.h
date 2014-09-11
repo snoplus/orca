@@ -47,6 +47,7 @@
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroTauMatrix;
 	IBOutlet NSMatrix*		pzTraceEnabledMatrix;
+    IBOutlet NSMatrix*      baselineRestoreEnabledMatrix;
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		presumEnabledMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
@@ -189,6 +190,7 @@
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) trapEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;
+- (void) baselineRestoreEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroTauChanged:(NSNotification*)aNote;
 - (void) pzTraceEnabledChanged:(NSNotification*)aNote;
 - (void) presumEnabledChanged:(NSNotification*)aNote;
@@ -250,6 +252,7 @@
 
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) trapEnabledAction:(id)sender;
+- (IBAction) baselineRestoreEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
 - (IBAction) poleZeroTauAction:(id)sender;
 - (IBAction) pzTraceEnabledAction:(id)sender;
