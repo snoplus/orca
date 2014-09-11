@@ -1389,12 +1389,17 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 - (void) main
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
 	@try {
 		[delegate readAdcValues];
 		[delegate sendIoControl];
 	}
 	@catch(NSException* e){
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
 
