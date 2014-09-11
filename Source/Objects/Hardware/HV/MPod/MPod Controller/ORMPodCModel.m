@@ -445,16 +445,19 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) main
 {
-    if([self isCancelled])return;
-	NSArray* allLines = [theWalk componentsSeparatedByString:@"\n"];
-	for(id aLine in allLines){
-		NSRange headerRange = [aLine rangeOfString:@"WIENER-CRATE-MIB::"];
-		if(headerRange.location!= NSNotFound){
-			NSString* s = [aLine substringFromIndex:headerRange.length];
-			[self decodeValueArray:[s componentsSeparatedByString:@"="]];
-		}   
-	}
-    [self performSelectorOnMainThread:@selector(sendParametersUsingMainThread) withObject:nil waitUntilDone:YES];
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+    if(![self isCancelled]){
+        NSArray* allLines = [theWalk componentsSeparatedByString:@"\n"];
+        for(id aLine in allLines){
+            NSRange headerRange = [aLine rangeOfString:@"WIENER-CRATE-MIB::"];
+            if(headerRange.location!= NSNotFound){
+                NSString* s = [aLine substringFromIndex:headerRange.length];
+                [self decodeValueArray:[s componentsSeparatedByString:@"="]];
+            }   
+        }
+        [self performSelectorOnMainThread:@selector(sendParametersUsingMainThread) withObject:nil waitUntilDone:YES];
+    }
+    [thePool release];
 }
 
 - (void) sendParametersUsingMainThread
