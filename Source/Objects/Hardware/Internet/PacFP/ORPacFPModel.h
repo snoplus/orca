@@ -54,10 +54,8 @@
         BOOL                readOnce;
         NSMutableArray*     processLimits;    
         int                 gainIndex;
-        NSMutableData*      gainBuffer;
         unsigned short      lcm;
         unsigned short      lcmTimeMeasured;
-        int                 adcChannel;
         NSDate*             lastGainRead;
         int                 workingOnGain;
         BOOL                setGainsResult;
