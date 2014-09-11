@@ -105,108 +105,111 @@
 #pragma mark •••Move Methods
 - (void) main
 {
-    if([self isCancelled])return;
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+    if(![self isCancelled]){
     
-    [self setPercentDone:0];
+        [self setPercentDone:0];
 
-    NSDictionary* defaultEnvironment = [[NSProcessInfo processInfo] environment];
-    NSMutableDictionary* environment = [[[NSMutableDictionary alloc] initWithDictionary:defaultEnvironment] autorelease];
-    [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
-    
-    self.task = [[[NSTask alloc] init] autorelease];
-
-    [task setEnvironment: environment];
-    NSString* tmpRemotePath;
-	if(useTempFile && [remotePath length]) tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
-	else			tmpRemotePath = remotePath;
-    if([self transferType] == eOpUseCURL){
-		
-        [task setLaunchPath:@"/usr/bin/curl"];
-		
-        NSMutableArray* params = [NSMutableArray array];
-        [params addObject:@"-T"];
-        [params addObject:[NSString stringWithFormat:@"%@",[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]]];
-        [params addObject:@"-u"];
-        [params addObject:[NSString stringWithFormat:@"%@:%@",remoteUserName,remotePassWord]];
-        [params addObject:[NSString stringWithFormat:@"sftp://%@/%@",remoteHost,tmpRemotePath]];
-        //[params addObject:@"--create-dirs"];
-		
-        if(verbose)[params addObject:@"-v"];
+        NSDictionary* defaultEnvironment = [[NSProcessInfo processInfo] environment];
+        NSMutableDictionary* environment = [[[NSMutableDictionary alloc] initWithDictionary:defaultEnvironment] autorelease];
+        [environment setObject:@"YES" forKey:@"NSUnbufferedIO"];
         
-        [task setArguments:params];
-		
-    }
-    else {
-        //make temp file for the script NOTE: expect must be installed!
-		NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
-        NSString* scriptPath = [NSFileManager tempPathForFolder:tempFolder usingTemplate:@"OrcaScriptXXX"];
-		BOOL isDir = NO;
-		[[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDir];
-        if(scriptPath){
-            [self setScriptFilePath:scriptPath];            
-            switch ([self transferType]) {
-                case eOpUseSCP:
-				{
-					NSString* bp = [[NSBundle mainBundle ]resourcePath];
-					NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
-					[theScript replace:@"<isDir>" with:isDir?@"-r":@""];
-					[theScript replace:@"<verbose>" with:@""]; // High verbosity messes up the expect.
-					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
-					[theScript replace:@"<userName>" with:remoteUserName];
-					[theScript replace:@"<host>" with:remoteHost];
-					[theScript replace:@"<destinationPath>" with:tmpRemotePath];
-					[theScript replace:@"<password>" with:remotePassWord];
-					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-				}
-                    break;
-                    
-                case eOpUseSFTP:
-                case eOpUseFTP:
-				{
-					NSString* bp = [[NSBundle mainBundle ]resourcePath];
-					NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
-					
-					[theScript replace:@"<ftp>" with:[self transferType] == eOpUseSFTP?@"sftp":@"ftp"];
-					[theScript replace:@"<user>" with:remoteUserName];
-					[theScript replace:@"<host>" with:remoteHost];
-					[theScript replace:@"<password>" with:remotePassWord];
-					[theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
-					[theScript replace:@"<destinationPath>" with:tmpRemotePath];
-					[theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-				}
-                    break;
-                    
-                case eOpUseCURL:
-                    break;
-            }
-			
-            //make the script executable
-            NSFileManager     *fileManager = [NSFileManager defaultManager];
-            BOOL fileOK = [fileManager fileExistsAtPath: fullPath];
-            if ( fileOK ) {
-                NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
-                [fileManager setAttributes:dict ofItemAtPath:scriptPath error:nil];
-                [task setLaunchPath:scriptPath];
-				NSLog(@"Trying to send <%@> to %@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");
+        self.task = [[[NSTask alloc] init] autorelease];
+
+        [task setEnvironment: environment];
+        NSString* tmpRemotePath;
+        if(useTempFile && [remotePath length]) tmpRemotePath = [remotePath stringByAppendingPathExtension:@"tmp"];
+        else			tmpRemotePath = remotePath;
+        if([self transferType] == eOpUseCURL){
+            
+            [task setLaunchPath:@"/usr/bin/curl"];
+            
+            NSMutableArray* params = [NSMutableArray array];
+            [params addObject:@"-T"];
+            [params addObject:[NSString stringWithFormat:@"%@",[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]]];
+            [params addObject:@"-u"];
+            [params addObject:[NSString stringWithFormat:@"%@:%@",remoteUserName,remotePassWord]];
+            [params addObject:[NSString stringWithFormat:@"sftp://%@/%@",remoteHost,tmpRemotePath]];
+            //[params addObject:@"--create-dirs"];
+            
+            if(verbose)[params addObject:@"-v"];
+            
+            [task setArguments:params];
+            
+        }
+        else {
+            //make temp file for the script NOTE: expect must be installed!
+            NSString* tempFolder = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"Scripts"];
+            NSString* scriptPath = [NSFileManager tempPathForFolder:tempFolder usingTemplate:@"OrcaScriptXXX"];
+            BOOL isDir = NO;
+            [[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDir];
+            if(scriptPath){
+                [self setScriptFilePath:scriptPath];            
+                switch ([self transferType]) {
+                    case eOpUseSCP:
+                    {
+                        NSString* bp = [[NSBundle mainBundle ]resourcePath];
+                        NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"scpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
+                        [theScript replace:@"<isDir>" with:isDir?@"-r":@""];
+                        [theScript replace:@"<verbose>" with:@""]; // High verbosity messes up the expect.
+                        [theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
+                        [theScript replace:@"<userName>" with:remoteUserName];
+                        [theScript replace:@"<host>" with:remoteHost];
+                        [theScript replace:@"<destinationPath>" with:tmpRemotePath];
+                        [theScript replace:@"<password>" with:remotePassWord];
+                        [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+                    }
+                        break;
+                        
+                    case eOpUseSFTP:
+                    case eOpUseFTP:
+                    {
+                        NSString* bp = [[NSBundle mainBundle ]resourcePath];
+                        NSMutableString* theScript = [NSMutableString stringWithContentsOfFile:[bp stringByAppendingPathComponent:@"ftpExpectScript"] encoding:NSASCIIStringEncoding error:nil];
+                        
+                        [theScript replace:@"<ftp>" with:[self transferType] == eOpUseSFTP?@"sftp":@"ftp"];
+                        [theScript replace:@"<user>" with:remoteUserName];
+                        [theScript replace:@"<host>" with:remoteHost];
+                        [theScript replace:@"<password>" with:remotePassWord];
+                        [theScript replace:@"<sourcePath>" with:[fullPath stringByReplacingOccurrencesOfString:@" " withString:@"\\ "]];
+                        [theScript replace:@"<destinationPath>" with:tmpRemotePath];
+                        [theScript writeToFile:scriptPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+                    }
+                        break;
+                        
+                    case eOpUseCURL:
+                        break;
+                }
+                
+                //make the script executable
+                NSFileManager     *fileManager = [NSFileManager defaultManager];
+                BOOL fileOK = [fileManager fileExistsAtPath: fullPath];
+                if ( fileOK ) {
+                    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
+                    [fileManager setAttributes:dict ofItemAtPath:scriptPath error:nil];
+                    [task setLaunchPath:scriptPath];
+                    NSLog(@"Trying to send <%@> to %@%@%@\n",[fullPath stringByAbbreviatingWithTildeInPath],remoteHost,remotePath?@":":@"",remotePath?remotePath:@"");
+                }
             }
         }
-    }
-    @try {
-        NSPipe *newPipe = [NSPipe pipe];
-        [task setStandardOutput:newPipe];
-        [task setStandardError:newPipe];
-        NSFileHandle *readHandle = [newPipe fileHandleForReading];
-        [task launch];
-        
-        [self readOutput:readHandle];
-        [self checkOutput];
-        if ([delegate respondsToSelector:@selector(fileMoverIsDone)]){
-            [delegate performSelectorOnMainThread:@selector(fileMoverIsDone) withObject:nil waitUntilDone:NO];
+        @try {
+            NSPipe *newPipe = [NSPipe pipe];
+            [task setStandardOutput:newPipe];
+            [task setStandardError:newPipe];
+            NSFileHandle *readHandle = [newPipe fileHandleForReading];
+            [task launch];
+            
+            [self readOutput:readHandle];
+            [self checkOutput];
+            if ([delegate respondsToSelector:@selector(fileMoverIsDone)]){
+                [delegate performSelectorOnMainThread:@selector(fileMoverIsDone) withObject:nil waitUntilDone:NO];
+            }
+        }
+        @catch (NSException* e){
+            NSLog(@"File Mover exception.. stopped during launch\n");
         }
     }
-    @catch (NSException* e){
-        NSLog(@"File Mover exception.. stopped during launch\n");
-    }
+    [thePool release];
 }
 
 - (void) checkOutput
