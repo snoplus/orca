@@ -66,91 +66,98 @@
 
 - (void) main
 {
-    if([self isCancelled])return;
-	/* create a new outgoing message object */
-	/* create a Scripting Bridge object for talking to the Mail application */
-	MailApplication *mail = [SBApplication applicationWithBundleIdentifier:@"com.apple.Mail"];
-	MailOutgoingMessage *emailMessage = [[[mail classForScriptingClass:@"outgoing message"] alloc] initWithProperties:
-										 [NSDictionary dictionaryWithObjectsAndKeys:
-										  subject, @"subject",
-										  [body string], @"content",
-										  nil]];
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 
-	@try {
-		/* add the object to the mail app  */
-		[[mail outgoingMessages] addObject: emailMessage];
-		
-		int delayCount = 0;
-		while (![mail isRunning]) {
-			[ORTimer delay:1];
-			delayCount++;
-			if(delayCount>5)break;
-		}
-		
-		if([mail isRunning]){
-			/* set the sender, don't show the message */
-			emailMessage.sender = @"ORCA";
-			emailMessage.visible = YES;
-			
-			if ( [mail lastError] != nil ){
-				@throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
-			}
-			NSArray* people = [to componentsSeparatedByString:@","];
-			int count = 0;
-			for(id aPerson in people){
-				if([aPerson rangeOfString:@"@"].location != NSNotFound){
-					NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
-					MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"to recipient"] alloc] initWithProperties:properties];
-					[emailMessage.toRecipients addObject: theRecipient];
-					[theRecipient release];
-					count++;
-				}
-			}
-			
-			people = [cc componentsSeparatedByString:@","];
-			for(id aPerson in people){
-				if([aPerson rangeOfString:@"@"].location != NSNotFound && [aPerson length]>0){
-					NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
-					MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"cc recipient"] alloc] initWithProperties:properties];
-					[emailMessage.ccRecipients addObject: theRecipient];
-					[theRecipient release];
-				}
-			}
-			
-			if ( [mail lastError] == nil && count>0){
-				[emailMessage send];
-				if([mail lastError] != nil)	{
-					@throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
-				}
-				else {
-					if([delegate respondsToSelector:@selector(mailSent:)]){
-						[delegate mailSent:to];
-					}
-					else NSLog(@"email sent to: %@\n",to);
-				}
-			}
-		}
-		else NSLogColor([NSColor redColor],@"Mail app did not start. ORCA unable to send email.\n");
+    if(![self isCancelled]){
+        /* create a new outgoing message object */
+        /* create a Scripting Bridge object for talking to the Mail application */
+        MailApplication *mail = [SBApplication applicationWithBundleIdentifier:@"com.apple.Mail"];
+        MailOutgoingMessage *emailMessage = [[[mail classForScriptingClass:@"outgoing message"] alloc] initWithProperties:
+                                             [NSDictionary dictionaryWithObjectsAndKeys:
+                                              subject, @"subject",
+                                              [body string], @"content",
+                                              nil]];
+
+        @try {
+            /* add the object to the mail app  */
+            [[mail outgoingMessages] addObject: emailMessage];
+            
+            int delayCount = 0;
+            while (![mail isRunning]) {
+                [ORTimer delay:1];
+                delayCount++;
+                if(delayCount>5)break;
+            }
+            
+            if([mail isRunning]){
+                /* set the sender, don't show the message */
+                emailMessage.sender = @"ORCA";
+                emailMessage.visible = YES;
+                
+                if ( [mail lastError] != nil ){
+                    @throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
+                }
+                NSArray* people = [to componentsSeparatedByString:@","];
+                int count = 0;
+                for(id aPerson in people){
+                    if([aPerson rangeOfString:@"@"].location != NSNotFound){
+                        NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
+                        MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"to recipient"] alloc] initWithProperties:properties];
+                        [emailMessage.toRecipients addObject: theRecipient];
+                        [theRecipient release];
+                        count++;
+                    }
+                }
+                
+                people = [cc componentsSeparatedByString:@","];
+                for(id aPerson in people){
+                    if([aPerson rangeOfString:@"@"].location != NSNotFound && [aPerson length]>0){
+                        NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys: aPerson, @"address",nil];
+                        MailToRecipient *theRecipient = [[[mail classForScriptingClass:@"cc recipient"] alloc] initWithProperties:properties];
+                        [emailMessage.ccRecipients addObject: theRecipient];
+                        [theRecipient release];
+                    }
+                }
+                
+                if ( [mail lastError] == nil && count>0){
+                    [emailMessage send];
+                    if([mail lastError] != nil)	{
+                        @throw([NSException exceptionWithName:@"ORMailer had problems sending message" reason:@"" userInfo:nil]);
+                    }
+                    else {
+                        if([delegate respondsToSelector:@selector(mailSent:)]){
+                            [delegate mailSent:to];
+                        }
+                        else NSLog(@"email sent to: %@\n",to);
+                    }
+                }
+            }
+            else NSLogColor([NSColor redColor],@"Mail app did not start. ORCA unable to send email.\n");
+        }
+        @catch(NSException* e){
+            NSLog( @"Possible problems with sending e-mail to %@\n",to);
+        }
+        @finally {
+            [emailMessage release];
+        }
 	}
-	@catch(NSException* e){
-		NSLog( @"Possible problems with sending e-mail to %@\n",to);
-	}
-	@finally {
-		[emailMessage release];
-	}
-	
+    [thePool release];
 }
 
 @end
 @implementation ORMailerDelay
 - (void) main
 {
-    if([self isCancelled])return;
-    int i;
-    for(i=0;i<50;i++){
-        if([self isCancelled])return;
-        usleep(100000);
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
+    if(![self isCancelled]){
+        int i;
+        for(i=0;i<50;i++){
+            if([self isCancelled])return;
+            usleep(100000);
+        }
     }
+    [thePool release];
 }
 @end
 											 
