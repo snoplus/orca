@@ -110,6 +110,8 @@
 //
 - (void) main
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
 	self.currentQueue = [NSOperationQueue currentQueue];
     
 	if(![self checkSkipConditions] && [self checkConditions]){
@@ -123,6 +125,7 @@
 	//	[[NSOperationQueue currentQueue] cancelAllOperations];
 	//}
 	self.currentQueue = nil;
+    [thePool release];
 }
 
 - (void)dealloc
