@@ -533,29 +533,34 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
 - (void) pollLock
 {
-    if([self isMaster]){
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
-        [self readDisplayRegs];
-        [self checkSystemLock];
-        [self readTimeStamps];
-        int i;
-        for(i=0;i<8;i++){
-            ORConnector* otherConnector = [linkConnector[i] connector];
-            if([otherConnector identifer] == 'L'){
-                ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
-                [routerObj readTimeStamps];
-            }
-        }
-        
-        if(![self locked] && [gOrcaGlobals runInProgress]){
-            [self shipDataRecord];
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
-                                                                object:self
-                                                              userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil]];
-
+    @try {
+        if([self isMaster]){
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+            [self readDisplayRegs];
+            [self checkSystemLock];
+            [self readTimeStamps];
+            int i;
+            for(i=0;i<8;i++){
+                ORConnector* otherConnector = [linkConnector[i] connector];
+                if([otherConnector identifer] == 'L'){
+                    ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                    [routerObj readTimeStamps];
+                }
+            }
+            
+            if(![self locked] && [gOrcaGlobals runInProgress]){
+                [self shipDataRecord];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
+                                                                    object:self
+                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"Clock Lock Lost",@"Reason",@"Master Trigger card reported lost lock",@"Details",nil]];
+
+                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollLock) object:nil];
+            }
+            [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
         }
-        [self performSelector:@selector(pollLock) withObject:nil afterDelay:10];
+    }
+    @catch (NSException* e){
+        
     }
 }
 
