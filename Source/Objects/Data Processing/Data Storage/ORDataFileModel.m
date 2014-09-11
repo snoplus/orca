@@ -965,6 +965,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 - (void) main
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
 	@try {
 		if(filePath && ![self isCancelled]){
 			NSTask* task = [[NSTask alloc] init];
@@ -999,5 +1001,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	}
 	@catch(NSException* e){
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end
