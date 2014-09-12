@@ -27,6 +27,7 @@
 - (void) makeDetectors;
 - (void) makeVeto;
 - (void) drawLabels;
+- (int) getStringNumForDetector:(int)aDetectorIndex position:(int*)aPosition;
 @end
 
 @implementation MajoranaDetectorView
@@ -129,21 +130,24 @@
 
 - (void) downArrow
 {
+/*
     int n = [detectorOutlines count]*2;
     if(n==0)return;
 	selectedPath++;
 	if(selectedSet == 0) selectedPath %= n;
+ */
 }
 
 - (void) upArrow
 {
+    /*
     int n = [detectorOutlines count]*2;
     if(n<1)return;
 	selectedPath--;
 	if(selectedSet == 0){
 		if(selectedPath < 0) selectedPath = n-1;
 	}
-
+*/
 }
 
 @end
@@ -207,21 +211,37 @@
                                   nil] retain];
     }
     int i;
-    float x = 65;
-    float y = 373;
+    float x = 70;
+    float y = 368;
     for(i=0;i<7;i++){
         [stringLabel[i] drawAtPoint:NSMakePoint(x,y) withAttributes:stringLabelAttributes];
         x += 40;
     }
-    x = 65;
+    x = 70;
     y = 251;
     for(i=7;i<14;i++){
         [stringLabel[i] drawAtPoint:NSMakePoint(x,y) withAttributes:stringLabelAttributes];
         x += 40;
-        
     }
 }
 
+- (int) getStringNumForDetector:(int)aDetectorIndex position:(int*)aPosition
+{
+    int stringNum;
+    for(stringNum=0;stringNum<14;stringNum++){
+        int position;
+        for(position=0;position<5;position++){
+            NSString* sn = [delegate stringMap:stringNum objectForKey:[NSString stringWithFormat:@"kDet%d",position+1]];
+            if([sn rangeOfString:@"-"].location == NSNotFound && [sn length] != 0){
+                if([sn intValue]==aDetectorIndex){
+                    *aPosition = position+1;
+                    return stringNum;
+                }
+            }
+        }
+    }
+    return -1;
+}
 
 - (void) makeDetectors
 {
@@ -232,69 +252,75 @@
     
     float height = [self bounds].size.height;
     float detWidth = 30;
-    float dh = detWidth/2.+2;
+    float dh = detWidth/2.;
+    float detHeight = dh;
     float detSpacing = 5;
     
     ORSegmentGroup* aGroup = [delegate segmentGroup:0];
-    int numSegments = [aGroup numSegments];
-
-    //we have to make all segments. If a segment doesn't belong to a string, we will just put it offscreen.
-    int stringNum;
-    for(stringNum=0;stringNum<14;stringNum++){
-        int detectorNum;
-        
-        float           y = height-60;
-        if(stringNum>=7)y = height-182;
-        float           x = 67 + stringNum%7 * 40;
-        
-        BOOL atLeastOne = NO;
-        for(detectorNum=0;detectorNum<5;detectorNum++){
-            
-            float detHeight = dh;
-            BOOL skip  = NO;
-            
-            NSString* sn = [delegate stringMap:stringNum objectForKey:[NSString stringWithFormat:@"kDet%d",detectorNum+1]];
-            if([sn rangeOfString:@"-"].location != NSNotFound || [sn length] == 0){
-                skip = YES;
-            }
-            
-            int detIndex = [sn intValue]*2;
-            if(detIndex > numSegments) continue;
-            
-            ORDetectorSegment* aSegment = [aGroup segment:detIndex];
-            int type = [[aSegment objectForKey:@"kDetectorType"] intValue];
-            if(type>0) detHeight = dh * 1.3;
-            if(!skip){
-
-                atLeastOne = YES;
-                NSRect r = NSMakeRect(x,y-detHeight/2,detWidth,detHeight/2.);
-                [segmentPaths addObject:[NSBezierPath bezierPathWithRect:r]];
-                [errorPaths   addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
-                
-                r = NSMakeRect(x,y-detHeight,detWidth,detHeight/2.);
-                [segmentPaths   addObject:[NSBezierPath bezierPathWithRect:r]];
-                [errorPaths     addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
-                
-                r = NSMakeRect(x-2,y-detHeight-2,detWidth+4,detHeight+4);
-                [detectorOutlines   addObject:[NSBezierPath bezierPathWithRect:r]];
-            }
-             y -= (detHeight + detSpacing);            
-
-        }
-        if(atLeastOne){
-            [stringLabel[stringNum] autorelease];
-            stringLabel[stringNum] = [[NSString stringWithFormat:@"Str%d,%d",stringNum/7+1,stringNum%7 + 1] retain];
-        }
-        else {
-            [stringLabel[stringNum] release];
-            stringLabel[stringNum] = nil;
-        }
+    int numDetectors = [aGroup numSegments];
+    float x;
+    float y;
+    float yOffset[14];
+    BOOL  stringDefined[14];
+    int i;
+    for(i=0;i<14;i++){
+        if(i>=7)yOffset[i] = height-182;
+        else    yOffset[i] = height-65;
+        stringDefined[i] = NO;
+        [stringLabel[i] autorelease];
+        stringLabel[i] = [@"" copy];
     }
     
-    
+    for(i=0;i<numDetectors/2;i++){
+        int detectorIndex = i*2;
+        int position = 0;
+        int stringNum = [self getStringNumForDetector:i position:&position];
+        if(stringNum<0){
+            //this detector is not part of a string so draw offscreen
+            x = -100;
+            y = -100;
+        }
+        else {
+            if([delegate validateDetector:detectorIndex]){
+                ORDetectorSegment* aSegment = [aGroup segment:detectorIndex];
+                int type = [[aSegment objectForKey:@"kDetectorType"] intValue];
+                if(type>0)  detHeight = dh * 1.3;
+                else        detHeight = dh;
+                
+                x = 67 + stringNum%7 * 40;
+                y = yOffset[stringNum];
+
+                [stringLabel[stringNum] autorelease];
+                stringLabel[stringNum] = [[NSString stringWithFormat:@"Str%d,%d",stringNum/7+1,stringNum%7 + 1] retain];
+            }
+            else {
+                x = -100;
+                y = -100;
+
+            }
+        }
+        
+        //low gain part
+        NSRect r = NSMakeRect(x,y-detHeight/2,detWidth,detHeight/2.);
+        [segmentPaths addObject:[NSBezierPath bezierPathWithRect:r]];
+        [errorPaths   addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
+        
+        //high gain part
+        r = NSMakeRect(x,y-detHeight,detWidth,detHeight/2.);
+        [segmentPaths   addObject:[NSBezierPath bezierPathWithRect:r]];
+        [errorPaths     addObject:[NSBezierPath bezierPathWithRect:NSInsetRect(r, -5, -5)]];
+        
+        //draw an outline also
+        r = NSMakeRect(x-2,y-detHeight-2,detWidth+4,detHeight+4);
+        [detectorOutlines   addObject:[NSBezierPath bezierPathWithRect:r]];
+        
+        if(stringNum>=0)yOffset[stringNum] -= (detHeight+detSpacing);
+        
+    }
     //store into the whole set
     [segmentPathSet addObject:segmentPaths];
     [errorPathSet addObject:errorPaths];
+    [self setNeedsDisplay:YES];
 }
 
 - (void) makeVeto

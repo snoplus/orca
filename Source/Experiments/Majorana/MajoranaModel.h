@@ -72,6 +72,7 @@
 - (id)   stringMap:(int)i objectForKey:(id)aKey;
 - (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey;
 - (NSString*) mapFileAsString;
+- (BOOL) validateDetector:(int)aDetectorIndex;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;

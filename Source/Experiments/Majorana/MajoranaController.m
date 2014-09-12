@@ -208,6 +208,7 @@
 - (void) stringMapChanged:(NSNotification*)aNote
 {
 	[stringMapTableView reloadData];
+	[detectorView makeAllSegments];
 }
 
 - (void) checkGlobalSecurity
@@ -290,7 +291,12 @@
 	[super specialUpdate:aNote];
 	[secondaryTableView reloadData];
 	[secondaryValuesView reloadData];
-	[detectorView makeAllSegments];
+}
+
+- (void) segmentGroupChanged:(NSNotification*)aNote
+{
+	[super segmentGroupChanged:aNote];
+    [detectorView makeAllSegments];
 }
 
 - (void) setDetectorTitle

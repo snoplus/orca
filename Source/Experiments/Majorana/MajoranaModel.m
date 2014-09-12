@@ -693,6 +693,31 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	else return @"";
 }
 
+- (BOOL) validateDetector:(int)aDetectorIndex
+{
+    int numSegments = [self numberSegmentsInGroup:0];
+    if(aDetectorIndex>=0 && aDetectorIndex<numSegments){
+        ORSegmentGroup* segmentGroup = [self segmentGroup:0];
+        NSDictionary* params = [[segmentGroup segment:aDetectorIndex]params];
+        if(!params)return NO;
+        NSString* aCrate = [params objectForKey:@"kVME"];
+        if([aCrate length]==0 || [aCrate rangeOfString:@"-"].location!=NSNotFound)return NO;
+
+        NSString* aCard = [params objectForKey:@"kCardSlot"];
+        if([aCard length]==0 || [aCard rangeOfString:@"-"].location!=NSNotFound)return NO;
+                                 
+         NSString* aChannel = [params objectForKey:@"kChannel"];
+         if([aChannel length]==0 || [aChannel rangeOfString:@"-"].location!=NSNotFound)return NO;
+
+        NSString* aName = [params objectForKey:@"kDetectorName"];
+        if([aName length]==0 || [aName rangeOfString:@"-"].location!=NSNotFound)return NO;
+
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey
 {
 	if(i>=0 && i<kMaxNumStrings){
