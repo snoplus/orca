@@ -259,6 +259,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kMaxVoltage",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorName",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kStringNum",     @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPosition",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
     }
     else if(groupIndex == 1){
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber", @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
@@ -534,7 +536,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     stringMap = [[decoder decodeObjectForKey:@"stringMap"] retain];
 
 	[self validateStringMap];
-
+    [self setDetectorStringPositions];
 	[[self undoManager] enableUndoRegistration];
 
     return self;
@@ -910,6 +912,29 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 	return steps;
 }
+- (void) setDetectorStringPositions
+{
+    //first must reset all positions
+    ORSegmentGroup* segmentGroup = [self segmentGroup:0];
+    int numSegments = [self numberSegmentsInGroup:0];
+    int i;
+    for(i = 0; i<numSegments; i++){
+        [segmentGroup setSegment:i object:[NSNumber numberWithInt:999] forKey:@"kStringNum"];
+        [segmentGroup setSegment:i object:[NSNumber numberWithInt:999] forKey:@"kPosition"];
+    }
+    
+    for(i=0;i<14;i++){
+        int j;
+        for(j=0;j<5;j++){
+            NSString* detectorNum = [self stringMap:i objectForKey:[NSString stringWithFormat:@"kDet%d",j+1]];
+            if([detectorNum rangeOfString:@"-"].location == NSNotFound && [detectorNum length]!=0){
+                int detIndex = [detectorNum intValue];
+                [segmentGroup setSegment:detIndex*2 object:[NSNumber numberWithInt:i] forKey:@"kStringNum"];
+                [segmentGroup setSegment:detIndex*2 object:[NSNumber numberWithInt:j] forKey:@"kPosition"];
+            }
+        }
+    }
+}
 
 @end
 
@@ -941,6 +966,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 		}
 	}
 }
+
+
 - (NSArray*) linesInFile:(NSString*)aPath
 {
 	NSString* contents = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath] encoding:NSASCIIStringEncoding error:nil];

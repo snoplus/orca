@@ -65,6 +65,7 @@
 - (NSArray*) scriptSteps:(int)index;
 - (void) hvInfoRequest:(NSNotification*)aNote;
 - (void) updateAllowedToRunStates;
+- (void) setDetectorStringPositions;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

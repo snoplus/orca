@@ -245,6 +245,9 @@
 
 - (void) makeDetectors
 {
+    
+    [delegate setDetectorStringPositions];
+    
     NSMutableArray* segmentPaths     = [NSMutableArray arrayWithCapacity:kNumDetectors];
     NSMutableArray* errorPaths       = [NSMutableArray arrayWithCapacity:kNumDetectors];
     [detectorOutlines release];
@@ -258,6 +261,9 @@
     
     ORSegmentGroup* aGroup = [delegate segmentGroup:0];
     int numDetectors = [aGroup numSegments];
+    
+    
+    
     float x;
     float y;
     float yOffset[14];
@@ -273,9 +279,12 @@
     
     for(i=0;i<numDetectors/2;i++){
         int detectorIndex = i*2;
-        int position = 0;
-        int stringNum = [self getStringNumForDetector:i position:&position];
-        if(stringNum<0){
+        ORDetectorSegment* aSegment = [aGroup segment:detectorIndex];
+        
+        int position  = [[aSegment objectForKey:@"kPosition"]intValue];
+        int stringNum = [[aSegment objectForKey:@"kStringNum"]intValue];
+        
+        if(position> numDetectors/2|| stringNum>numDetectors/2){
             //this detector is not part of a string so draw offscreen
             x = -100;
             y = -100;
@@ -296,7 +305,6 @@
             else {
                 x = -100;
                 y = -100;
-
             }
         }
         
@@ -320,6 +328,7 @@
     //store into the whole set
     [segmentPathSet addObject:segmentPaths];
     [errorPathSet addObject:errorPaths];
+         
     [self setNeedsDisplay:YES];
 }
 

@@ -184,6 +184,11 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	return [[segments objectAtIndex:index] objectForKey:aKey];
 }
 
+- (void) setSegment:(int)index object:(id)anObject forKey:(id)aKey
+{
+    [[segments objectAtIndex:index] setObject:anObject forKey:aKey];
+}
+
 - (ORDetectorSegment*) segment:(int)index
 {
 	return [segments objectAtIndex:index];
