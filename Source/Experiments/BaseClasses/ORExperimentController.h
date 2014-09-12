@@ -127,6 +127,7 @@
 - (IBAction) clearAction:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) segmentGroupChanged:(NSNotification*)aNote;
 - (void) customColor1Changed:(NSNotification*)aNote;
 - (void) customColor2Changed:(NSNotification*)aNote;
 - (void) refreshSegmentTables:(NSNotification*)aNote;

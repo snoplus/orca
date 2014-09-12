@@ -231,9 +231,9 @@
                      selector : @selector(specialUpdate:)
                          name : ORAdcInfoProvidingValueChanged
 						object: nil];
-
+    
     [notifyCenter addObserver : self
-                     selector : @selector(specialUpdate:)
+                     selector : @selector(segmentGroupChanged:)
                          name : ORSegmentGroupConfiguationChanged
 						object: nil];
 
@@ -313,6 +313,11 @@
                          name : KSegmentChangedNotification
 						object: nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(specialUpdate:)
+                         name : KSegmentChangedNotification
+						object: nil];
+   
     [notifyCenter addObserver : self
                      selector : @selector(colorScaleTypeChanged:)
                          name : ExperimentModelColorScaleTypeChanged
@@ -844,6 +849,10 @@
 	[primaryValuesView reloadData];
 	[primaryTableView reloadData];
 	[valueHistogramsPlot setNeedsDisplay:YES];
+}
+
+- (void) segmentGroupChanged:(NSNotification*)aNote
+{
 }
 
 - (void) selectionChanged:(NSNotification*)aNote
