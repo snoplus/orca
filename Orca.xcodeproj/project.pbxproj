@@ -1835,6 +1835,7 @@
 		848A149D10BAE43A002A80D0 /* ORDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 848A149B10BAE43A002A80D0 /* ORDecoder.h */; };
 		848A149E10BAE43A002A80D0 /* ORDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 848A149C10BAE43A002A80D0 /* ORDecoder.m */; };
 		848A160A10BB00F3002A80D0 /* makeScript in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 847D76FD10B7963D00893F3A /* makeScript */; };
+		848ACC3519C323900055005C /* ORDataProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 848ACC3419C323900055005C /* ORDataProcessing.h */; };
 		848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */; };
 		848BF50F107255F8005779A2 /* PMC_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 848BF50D107255F8005779A2 /* PMC_Link.m */; };
 		848BF510107255F8005779A2 /* PMC_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = 848BF50E107255F8005779A2 /* PMC_Link.h */; };
@@ -5099,6 +5100,7 @@
 		848A148610BAE40E002A80D0 /* ORDecoderOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDecoderOperation.m; path = "Source/Objects/Data Processing/BaseClasses/ORDecoderOperation.m"; sourceTree = SOURCE_ROOT; };
 		848A149B10BAE43A002A80D0 /* ORDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDecoder.h; path = "Source/Objects/Data Processing/Data Objects/ORDecoder.h"; sourceTree = SOURCE_ROOT; };
 		848A149C10BAE43A002A80D0 /* ORDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDecoder.m; path = "Source/Objects/Data Processing/Data Objects/ORDecoder.m"; sourceTree = SOURCE_ROOT; };
+		848ACC3419C323900055005C /* ORDataProcessing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDataProcessing.h; path = ../../../../../junk/Orca/Source/Objects/OrcaObject/ORDataProcessing.h; sourceTree = "<group>"; };
 		848B03070D6505C6007FDEBD /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaFilterScript.icns; sourceTree = "<group>"; };
 		848BF50D107255F8005779A2 /* PMC_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PMC_Link.m; sourceTree = "<group>"; };
 		848BF50E107255F8005779A2 /* PMC_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMC_Link.h; sourceTree = "<group>"; };
@@ -13809,6 +13811,7 @@
 				8423768F0ED46B7A00BECB64 /* OROrderedObjManager.h */,
 				842376900ED46B7A00BECB64 /* OROrderedObjManager.m */,
 				842377090ED4710700BECB64 /* OROrderedObjHolding.h */,
+				848ACC3419C323900055005C /* ORDataProcessing.h */,
 				84E09A200CCD1AA400EFBC8F /* dec.tif */,
 				84E09A210CCD1AA400EFBC8F /* inc.tif */,
 			);
@@ -14077,6 +14080,7 @@
 				84CF3B4005E6BF2300C5C320 /* ORPlacardScrollView.h in Headers */,
 				2ACEE0E20612266000CAD497 /* ThresholdCalibrationChannel.h in Headers */,
 				2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */,
+				848ACC3519C323900055005C /* ORDataProcessing.h in Headers */,
 				840C7FE01955CA0000E36622 /* NSApplication+Extensions.h in Headers */,
 				848463AD0625D65F00128299 /* ORSmartFolder.h in Headers */,
 				84FFCAA80636D5B10069432F /* ORCaen792Controller.h in Headers */,
