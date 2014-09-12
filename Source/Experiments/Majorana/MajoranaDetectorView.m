@@ -27,7 +27,6 @@
 - (void) makeDetectors;
 - (void) makeVeto;
 - (void) drawLabels;
-- (int) getStringNumForDetector:(int)aDetectorIndex position:(int*)aPosition;
 @end
 
 @implementation MajoranaDetectorView
@@ -225,24 +224,6 @@
     }
 }
 
-- (int) getStringNumForDetector:(int)aDetectorIndex position:(int*)aPosition
-{
-    int stringNum;
-    for(stringNum=0;stringNum<14;stringNum++){
-        int position;
-        for(position=0;position<5;position++){
-            NSString* sn = [delegate stringMap:stringNum objectForKey:[NSString stringWithFormat:@"kDet%d",position+1]];
-            if([sn rangeOfString:@"-"].location == NSNotFound && [sn length] != 0){
-                if([sn intValue]==aDetectorIndex){
-                    *aPosition = position+1;
-                    return stringNum;
-                }
-            }
-        }
-    }
-    return -1;
-}
-
 - (void) makeDetectors
 {
     
@@ -262,17 +243,17 @@
     ORSegmentGroup* aGroup = [delegate segmentGroup:0];
     int numDetectors = [aGroup numSegments];
     
-    
-    
     float x;
     float y;
-    float yOffset[14];
-    BOOL  stringDefined[14];
+    float yOffset[14][5];
     int i;
     for(i=0;i<14;i++){
-        if(i>=7)yOffset[i] = height-182;
-        else    yOffset[i] = height-65;
-        stringDefined[i] = NO;
+        int j;
+        for(j=0;j<5;j++){
+            if(i>=7)yOffset[i][j] = height-182-(j*(dh+detSpacing));
+            else    yOffset[i][j] = height-65-(j*(dh+detSpacing));
+        }
+        
         [stringLabel[i] autorelease];
         stringLabel[i] = [@"" copy];
     }
@@ -296,8 +277,15 @@
                 if(type>0)  detHeight = dh * 1.3;
                 else        detHeight = dh;
                 
+                if(type>0){
+                    int j;
+                    for(j=position+1;j<5;j++){
+                        yOffset[stringNum][j]-=((dh*1.3 - dh));
+                    }
+                }
+                
                 x = 67 + stringNum%7 * 40;
-                y = yOffset[stringNum];
+                y = yOffset[stringNum][position];
 
                 [stringLabel[stringNum] autorelease];
                 stringLabel[stringNum] = [[NSString stringWithFormat:@"Str%d,%d",stringNum/7+1,stringNum%7 + 1] retain];
@@ -322,7 +310,7 @@
         r = NSMakeRect(x-2,y-detHeight-2,detWidth+4,detHeight+4);
         [detectorOutlines   addObject:[NSBezierPath bezierPathWithRect:r]];
         
-        if(stringNum>=0)yOffset[stringNum] -= (detHeight+detSpacing);
+        //if(stringNum>=0)yOffset[stringNum] -= (detHeight+detSpacing);
         
     }
     //store into the whole set
