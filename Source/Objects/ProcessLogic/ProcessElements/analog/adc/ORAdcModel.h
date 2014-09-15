@@ -88,6 +88,8 @@ extern NSString* ORAdcModelHighTextChanged;
 extern NSString* ORAdcModelInRangeTextChanged;
 extern NSString* ORAdcModelLowTextChanged;
 extern NSString* ORAdcModelMinChangeChanged;
+extern NSString* ORAdcModelOutOfRangeLow;
+extern NSString* ORAdcModelOutOfRangeHi;
 
 @interface ORAdcLowLimitNub : ORProcessNub
 - (id) eval;

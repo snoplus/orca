@@ -48,6 +48,10 @@
 	BOOL		sendStartNoticeNextRead;
     BOOL        masterProcess;
     BOOL        updateImageForMasterChange;
+    int         outOfRangeLowCount;
+    int         outOfRangeHiCount;
+    int         lastOutOfRangeLowCount;
+    int         lastOutOfRangeHiCount;
 }
 
 - (NSString*) report;
@@ -121,6 +125,8 @@
 - (void) incrementProcessRunNumber;
 - (int) processRunNumber;
 - (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses;
+- (void) outOfRangeLowChanged:(NSNotification*)aNote;
+- (void) outOfRangeHiChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

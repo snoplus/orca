@@ -33,6 +33,8 @@ NSString* ORAdcModelMinChangeChanged	= @"ORAdcModelMinChangeChanged";
 NSString* ORAdcModelOKConnection		= @"ORAdcModelOKConnection";
 NSString* ORAdcModelLowConnection		= @"ORAdcModelLowConnection";
 NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
+NSString* ORAdcModelOutOfRangeLow       = @"ORAdcModelOutOfRangeLow";
+NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 
 @interface ORAdcModel (private)
 - (NSImage*) composeIcon;
@@ -281,7 +283,13 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 			if(trackMaxMin)[self checkMaxMinValues];
 		}
 		BOOL newState = !(valueTooLow || valueTooHigh);
-		
+		if(valueTooLow){
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAdcModelOutOfRangeLow object:self userInfo:nil waitUntilDone:YES];
+        }
+		if(valueTooHigh){
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAdcModelOutOfRangeHi object:self userInfo:nil waitUntilDone:YES];
+        }
+        
 		if((newState == [self state]) && updateNeeded){
 			//if the state will not post an update, then do it here.
 			[self postStateChange];

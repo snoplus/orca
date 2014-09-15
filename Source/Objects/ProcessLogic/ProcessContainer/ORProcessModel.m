@@ -25,6 +25,7 @@
 #import "ORProcessCenter.h"
 #import "ORMailer.h"
 #import "ORCouchDBModel.h"
+#import "ORAdcModel.h"
 
 NSString* ORProcessModelMasterProcessChanged = @"ORProcessModelMasterProcessChanged";
 NSString* ORProcessModelSendOnStopChanged			= @"ORProcessModelSendOnStopChanged";
@@ -109,6 +110,30 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                      selector: @selector(runNow:)
                          name: ORForceProcessPollNotification
                        object: nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(outOfRangeLowChanged:)
+                         name: ORAdcModelOutOfRangeLow
+                       object: nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(outOfRangeHiChanged:)
+                         name: ORAdcModelOutOfRangeHi
+                       object: nil];
+}
+
+- (void) outOfRangeLowChanged:(NSNotification*)aNote
+{
+    if([[aNote object] guardian]==self){
+        outOfRangeLowCount++;
+    }
+}
+
+- (void) outOfRangeHiChanged:(NSNotification*)aNote
+{
+    if([[aNote object] guardian]==self){
+        outOfRangeHiCount++;
+    }
 }
 
 #pragma mark ***Accessors
@@ -488,7 +513,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
            
             NSSize theIconSize = [[self image] size];
             NSSize textSize = [n size];
-            float x = theIconSize.width/2 - textSize.width/2;
+            float x = theIconSize.width/2 - textSize.width/2 + 30;
             [n drawInRect:NSMakeRect(x,[i size].height-18,textSize.width,textSize.height)];
 
 
@@ -500,6 +525,22 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 									 attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
 			
 			[n drawInRect:NSMakeRect([i size].width-[n size].width-10,[i size].height-18,[i size].width-20,16)];
+			[n release];
+		}
+		if(outOfRangeLowCount && processRunning){
+			NSAttributedString* n = [[NSAttributedString alloc]
+									 initWithString:[NSString stringWithFormat:@"%d Lo",outOfRangeLowCount]
+									 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName,[NSColor redColor],NSForegroundColorAttributeName,nil] ];
+			
+            [n drawInRect:NSMakeRect(80,[i size].height-18,[i size].width-20,16)];
+			[n release];
+		}
+		if(outOfRangeHiCount && processRunning){
+			NSAttributedString* n = [[NSAttributedString alloc]
+									 initWithString:[NSString stringWithFormat:@"%d Hi",outOfRangeHiCount]
+									 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName,[NSColor redColor],NSForegroundColorAttributeName,nil] ];
+			
+            [n drawInRect:NSMakeRect(120,[i size].height-18,[i size].width-20,16)];
 			[n release];
 		}
 
@@ -709,6 +750,9 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 - (void) startProcessCycle
 {
+    outOfRangeHiCount=0;
+    outOfRangeLowCount=0;
+    
 	if(processRunning){
 		if(!sampleGateOpen){
 			NSDate* now = [NSDate date];
@@ -734,7 +778,16 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 			}
 		}
 		sampleGateOpen = NO;
-		
+        
+		if(lastOutOfRangeLowCount!=outOfRangeLowCount || lastOutOfRangeHiCount!=outOfRangeHiCount){
+            if(lastOutOfRangeLowCount!=outOfRangeLowCount){
+                lastOutOfRangeLowCount=outOfRangeLowCount;
+            }
+            if(lastOutOfRangeHiCount!=outOfRangeHiCount){
+                lastOutOfRangeHiCount=outOfRangeHiCount;
+            }
+            [self setUpImage];
+        }
         @synchronized(self){
             if(keepHistory && [historyFile length]){
                 NSString* header = @"# SampleTime";
@@ -785,8 +838,13 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                 }
             }
         }
-
 	}
+    else {
+        lastOutOfRangeLowCount=0;
+        lastOutOfRangeHiCount=0;
+        outOfRangeLowCount=0;
+        outOfRangeHiCount=0;
+    }
 }
 
 - (void) checkForAchival
