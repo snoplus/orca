@@ -186,7 +186,7 @@
             }
             else s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
             
-            if(self.errorString && ec>=ac || forceError) s = self.errorTitle;
+            if((self.errorString && ec>=ac) || forceError) s = self.errorTitle;
         }
         return s;
     }
