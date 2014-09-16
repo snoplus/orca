@@ -805,15 +805,25 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     int l;
     for(l=1;l<BurstSize; l++)
     {
+        
+        //------------------------
+        //MAH 09/16/14 Some notes:
+        //this was some really bad code below... modified slightly by MAH to get rid of compiler warnings.
+        //you should review this and make additional changes. Please review the use of pointers and objects...
+        //if you are trying to make a data record, we need to talk. you need to use the proper data id and data
+        //record size in the first word in order to have it work....
+        //-------------------------
         ORBurstData* someData = [[ORBurstData alloc] init]; //was separate, test
         //someData.epSec=[[Bsecs objectAtIndex:l] longValue]; //crashes from bad access, but seems unneccesary //fixme?
         //someData.epMic=[[Bmics objectAtIndex:l] longValue];
-        unsigned long* testsec[4];
+       // unsigned long* testsec[4]; <<--this is not being used as a pointer. removed MAH 09/16/14
+        unsigned long testsec[4];
         testsec[0]=2621444; //idk why, its just this every time and it seems not to work with null
         testsec[1]=[[Badcs objectAtIndex:l] longValue]+(4096*[[Bchans objectAtIndex:l] longValue])+(65536*[[Bcards objectAtIndex:l] longValue]); // adc 3 digets, channel, card
         testsec[2]=[[Bsecs objectAtIndex:l] longValue];
         testsec[3]=[[Bmics objectAtIndex:l] longValue]; //CB works, make data file from array now
-        someData.dataRecord = [NSData dataWithBytes:&testsec length: sizeof(testsec)];
+        //someData.dataRecord = [NSData dataWithBytes:&testsec length: sizeof(testsec)]; <<--removed MAH 09/16/14
+        someData.dataRecord = [NSData dataWithBytes:testsec length: sizeof(testsec)];
         [anArrayOfData addObject:someData.dataRecord];
     }
     [theBurstMonitoredObject processData:anArrayOfData decoder:theDecoder];
