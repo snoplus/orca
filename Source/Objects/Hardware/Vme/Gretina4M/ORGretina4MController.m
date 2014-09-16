@@ -1015,7 +1015,7 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             BOOL usingTrap      = [model trapEnabled:i];
             BOOL presumEnabled  = [model presumEnabled:i];
-            BOOL baselineRestoreEnabled = [model baselineRestoreEnabled:i];
+            //BOOL baselineRestoreEnabled = [model baselineRestoreEnabled:i];
             
             [[ledThresholdMatrix cellWithTag:i] setEnabled:!usingTrap];
             [[trapThresholdMatrix cellWithTag:i] setEnabled:usingTrap];
