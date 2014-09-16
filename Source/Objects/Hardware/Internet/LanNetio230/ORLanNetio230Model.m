@@ -453,7 +453,7 @@ int curlGetLanNetIOStatus(const char * request)
         fgets (buf , 1000 , p);//get full line
 	    //fscanf(p,"%s",buf); //gets single characters
 		     //NSLog(@"pattern  : %s\n",buf);
-		if( cptr=strstr(buf, HTMLPATTERN) ){  // 
+		if( (cptr=strstr(buf, HTMLPATTERN)) ){  // 
 	         version = version & 0x7fff;
 		     //NSLog(@"pattern found in line: %s\n",cptr);
 		     //printf("pattern found in line: %s\n",cptr);
