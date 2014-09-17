@@ -145,6 +145,7 @@ enum {
 - (void)            startRates;
 - (void)            clearEventCounts;
 - (unsigned long)   getCounter:(int)counterTag forGroup:(int)groupTag;
+- (void)            clearData;
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) 		getRegisterName: (short) anIndex;

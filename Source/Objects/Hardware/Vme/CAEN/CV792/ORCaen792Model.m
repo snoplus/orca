@@ -543,7 +543,16 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [self writeIPed];
     [self writeBit2Register];
     [self writeSlideConstReg];
+    [self clearData];
 }
+
+- (void) clearData
+{
+    // Clear unit
+    [self write:kBitSet2 sendValue:kClearData];		// Clear data,
+    [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
+}
+
 #pragma mark ***DataTaker
 - (void) setDataIds:(id)assigner
 {
@@ -563,23 +572,15 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     dataIdN = DataId;
 }
 
-
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
-    // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];		// Clear data,
-    [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
-
     // Set options
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 
-    // Set thresholds in unit
     [self initBoard];
     
-    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
-   
     if(cycleZeroSuppression){
         [self startCyclingZeroSuppression];
     }
@@ -687,6 +688,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [self stopCyclingZeroSuppression];
 	[qdcRateGroup stop];
 	isRunning = NO;
+    [self clearData];
 
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
