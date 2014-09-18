@@ -66,8 +66,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 @end
 
 #define kBadPacFPValue -999
-//#define kPacFPPort 12340
-#define kPacFPPort 4667
+#define kPacFPPort 12340
 
 @implementation ORPacFPModel
 
