@@ -416,7 +416,8 @@ NSDate* burstStart = NULL;
                                     [Nadcs removeObjectAtIndex:nHit-1];
                                     [Nsecs removeObjectAtIndex:nHit-1];
                                     [Nmics removeObjectAtIndex:nHit-1];
-                                    for(int k = nHit-1; k<chans.count; k++) //remove old things from the buffer (was k<countofchan, this terminates the function);
+                                    int k=0;
+                                    for(k = nHit-1; k<chans.count; k++) //remove old things from the buffer (was k<countofchan, this terminates the function);
                                     {
                                         if(([[secs objectAtIndex:k] longValue] + 0.000001*[[mics objectAtIndex:k] longValue])<(removedSec+0.000001*removedMic))
                                         {
