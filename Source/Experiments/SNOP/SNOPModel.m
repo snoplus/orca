@@ -995,17 +995,17 @@ int runType = kRunUndefined;
     
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
-    [runDocDict setObject:@"run" forKey:@"doc_type"];
+    [runDocDict setObject:@"run" forKey:@"type"];
     //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
-    [runDocDict setObject:@"physics" forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedInt:1] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
+    [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
     [runDocDict setObject:runNumber forKey:@"run"];
     [runDocDict setObject:@"starting" forKey:@"run_status"];
     
     //[runDocDict setObject:runStartString forKey:@"run_start"];
-    [runDocDict setObject:@"" forKey:@"time_stamp_end"];
+    [runDocDict setObject:@"" forKey:@"timestamp_end"];
     [runDocDict setObject:@"" forKey:@"sudbury_time_end"];
     //[runDocDict setObject:@"" forKey:@"run_stop"];
 
@@ -1455,12 +1455,12 @@ int runType = kRunUndefined;
     
     
     //Fill the configuration document with information
-    [configDocDict setObject:@"configuration" forKey:@"doc_type"];
-    [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [configDocDict setObject:@"configuration" forKey:@"type"];
+    [configDocDict setObject:[NSNumber numberWithDouble:[[self stringDateFromDate:nil] doubleValue]] forKey:@"timestamp"];
     [configDocDict setObject:@"0" forKey:@"config_id"]; //need to add in an update for this
     
      NSNumber * runNumberForConfig = [NSNumber numberWithUnsignedLong:[rc runNumber]];
-    [configDocDict setObject:runNumberForConfig forKey:@"run_number"];
+    [configDocDict setObject:runNumberForConfig forKey:@"run"];
     
     [configDocDict setObject:svnVersion forKey:@"daq_version_build"];
     
@@ -1586,7 +1586,7 @@ int runType = kRunUndefined;
 
     [runDocDict setObject:@"done" forKey:@"run_status"];
     //[runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_stop"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_end"];
+    [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_end"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_end"];
 
     //after run stats
