@@ -28,6 +28,8 @@
 
 #pragma mark •••External Strings
 
+NSString* ORPacFPModelChannelSelectionChanged = @"ORPacFPModelChannelSelectionChanged";
+NSString* ORPacFPModelPreAmpSelectionChanged = @"ORPacFPModelPreAmpSelectionChanged";
 NSString* ORPacFPModelSetGainsResultChanged = @"ORPacFPModelSetGainsResultChanged";
 NSString* ORPacFPModelWorkingOnGainChanged  = @"ORPacFPModelWorkingOnGainChanged";
 NSString* ORPacFPModelIsConnectedChanged    = @"ORPacFPModelIsConnectedChanged";
@@ -45,6 +47,10 @@ NSString* ORPacFPModelLogToFileChanged      = @"ORPacFPModelLogToFileChanged";
 NSString* ORPacFPModelLogFileChanged		= @"ORPacFPModelLogFileChanged";
 NSString* ORPacFPModelQueCountChanged		= @"ORPacFPModelQueCountChanged";
 NSString* ORPacFPModelGainsReadBackChanged  = @"ORPacFPModelGainsReadBackChanged";
+
+NSString* ORPacFPModelLcmEnabledChanged     = @"ORPacFPModelLcmEnabledChanged";
+NSString* ORPacFPModelVetoChanged           = @"ORPacFPModelVetoChanged";
+
 NSString* ORPacFPLock						= @"ORPacFPLock";
 
 @interface ORPacFPModel (private)
@@ -56,10 +62,12 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) _pollAllChannels;
 - (void) shipAdcValues;
 - (void) loadLogBuffer;
+- (void) checkVetoCondition;
 @end
 
 #define kBadPacFPValue -999
-#define kPacFPPort 12340
+//#define kPacFPPort 12340
+#define kPacFPPort 4667
 
 @implementation ORPacFPModel
 
@@ -80,6 +88,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     }
 	
     [ipAddress release];
+    [lcmEnabledAlarm clearAlarm];
+	[lcmEnabledAlarm release];
 
     [logFile release];
 	[self _stopPolling];
@@ -103,6 +113,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
 		}
     }
+	[self checkVetoCondition];
     [super wakeUp];
 }
 
@@ -125,6 +136,46 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 }
 
 #pragma mark •••Accessors
+- (BOOL) lcmEnabled
+{
+    return lcmEnabled;
+}
+
+- (void) setLcmEnabled:(BOOL)aLcmEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLcmEnabled:lcmEnabled];
+    lcmEnabled = aLcmEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelLcmEnabledChanged object:self];
+	[self checkVetoCondition];
+}
+
+- (unsigned short) channelSelection
+{
+    return channelSelection;
+}
+
+- (void) setChannelSelection:(unsigned short)aChannelSelection
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setChannelSelection:channelSelection];
+    
+    channelSelection = aChannelSelection;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelChannelSelectionChanged object:self];
+}
+
+- (unsigned short) preAmpSelection
+{
+    return preAmpSelection;
+}
+
+- (void) setPreAmpSelection:(unsigned short)aPreAmpSelection
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreAmpSelection:preAmpSelection];
+    
+    preAmpSelection = aPreAmpSelection;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelPreAmpSelectionChanged object:self];
+}
 
 - (BOOL) setGainsResult
 {
@@ -189,12 +240,12 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) connect
 {
 	if(!isConnected && [ipAddress length]){
-        NSLog(@"trying to connect\n");
+        NSLog(@"%@: trying to connect\n",[self fullID]);
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kPacFPPort]];
         [self setIsConnected:[socket isConnected]];
 	}
 	else {
-        NSLog(@"trying to disconnect\n");
+        NSLog(@"%@: trying to disconnect\n",[self fullID]);
 		[self setSocket:nil];
         [self setIsConnected:[socket isConnected]];
 	}
@@ -220,9 +271,6 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelIpAddressChanged object:self];
     
-    if(wasConnected){
-        [self connect];
-    }
 }
 
 
@@ -230,9 +278,11 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
     if(inNetSocket == socket){
         [self setIsConnected:YES];
-        NSLog(@"connected\n");
+        NSLog(@"%@: Connected\n",[self fullID]);
+        
         [cmdQueue removeAllObjects];
         [self setLastRequest:nil];
+        [self checkVetoCondition];
     }
 }
 
@@ -250,12 +300,13 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket
 {
     if(inNetSocket == socket){
-        NSLog(@"disconnected\n");
         [self setIsConnected:NO];
+        NSLog(@"%@: Disconnected\n",[self fullID]);
 		[socket autorelease];
 		socket = nil;
         [cmdQueue removeAllObjects];
         [self setLastRequest:nil];
+        [self checkVetoCondition];
     }
 }
 
@@ -268,7 +319,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    NSLog(@"Received: %@",theString);
+    //NSLog(@"Received: %@",theString);
     theString = [theString trimSpacesFromEnds];
     theString = [theString lowercaseString];
     NSArray* lines = [theString componentsSeparatedByString:@"\n"];
@@ -288,7 +339,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
         }
         
         else {
-            NSLog(@"Processing Last Request: %@\n",lastRequest);
+            //NSLog(@"Processing Last Request: %@\n",lastRequest);
 
             if([lastRequest hasPrefix:@"get gains"]){
                 aLine = [aLine substringFromIndex:10];
@@ -350,6 +401,11 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     return lcmTimeMeasured;
 }
 
+- (BOOL) readingTemperatures
+{
+    return [self lcmEnabled]; //the logic got inverted somewhere.
+}
+
 - (unsigned short) lcm
 {
     return lcm;
@@ -365,6 +421,11 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     lcmTimeMeasured = ut_Time;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelLcmChanged object:self];
+}
+
+- (BOOL) vetoInPlace
+{
+	return lcmEnabledAlarm!=nil;
 }
 
 - (NSMutableArray*) processLimits
@@ -588,15 +649,17 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     processLimits = [[decoder decodeObjectForKey:@"processLimits"]retain];
     if(!processLimits)[self setProcessLimitDefaults];
     //--------------------------------------------------------------
-	[self setLastGainFile:	[decoder decodeObjectForKey: @"lastGainFile"]];
-	[self setGainDisplayType:[decoder decodeIntForKey:   @"gainDisplayType"]];
-	[self setWasConnected:	[decoder decodeBoolForKey:	 @"wasConnected"]];
-	[self setPollingState:	[decoder decodeIntForKey:	 @"pollingState"]];
-	[self setLogFile:		[decoder decodeObjectForKey: @"logFile"]];
-    [self setLogToFile:		[decoder decodeBoolForKey:	 @"logToFile"]];
-	
-    [self setIpAddress:[decoder decodeObjectForKey:@"ORPacFPModelIpAddress"]];
-    
+	[self setLastGainFile:      [decoder decodeObjectForKey: @"lastGainFile"]];
+	[self setGainDisplayType:   [decoder decodeIntForKey:    @"gainDisplayType"]];
+	[self setWasConnected:      [decoder decodeBoolForKey:	 @"wasConnected"]];
+	[self setPollingState:      [decoder decodeIntForKey:	 @"pollingState"]];
+	[self setLogFile:           [decoder decodeObjectForKey: @"logFile"]];
+    [self setLogToFile:         [decoder decodeBoolForKey:	 @"logToFile"]];
+	[self setChannelSelection:  [decoder decodeIntForKey:    @"channelSelection"]];
+	[self setPreAmpSelection:   [decoder decodeIntForKey:    @"preAmpSelection"]];
+    [self setIpAddress:         [decoder decodeObjectForKey: @"ORPacFPModelIpAddress"]];
+    [self setLcmEnabled:	    [decoder decodeBoolForKey:	 @"lcmEnabled"]];
+
     int i;
 	for(i=0;i<8;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
@@ -615,15 +678,16 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:lcmEnabled       forKey:@"lcmEnabled"];
+    [encoder encodeInt:channelSelection forKey:@"channelSelection"];
+    [encoder encodeInt:preAmpSelection  forKey:@"preAmpSelection"];
     [encoder encodeObject:processLimits forKey:@"processLimits"];
     [encoder encodeObject:lastGainFile  forKey:@"lastGainFile"];
     [encoder encodeInt:gainDisplayType  forKey:@"gainDisplayType"];
     [encoder encodeInt:pollingState		forKey:@"pollingState"];
     [encoder encodeObject:logFile		forKey:@"logFile"];
     [encoder encodeBool:logToFile		forKey:@"logToFile"];
-
     [encoder encodeBool:wasConnected	forKey:@"wasConnected"];
-    
     [encoder encodeObject:ipAddress     forKey:@"ORPacFPModelIpAddress"];
 
     int i;
@@ -674,17 +738,33 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	}
 }
 
+- (void) readAllAdcs
+{
+    if(pollingState==0){
+        [self getCurrent];
+        [self getTemperatures];
+    }
+}
+
+
 - (void) readAdcs
 {
-    [self getTemperatures];
-    [self getCurrent];
+    if([self lcmEnabled])[self getCurrent];
+    else                 [self getTemperatures];
+}
+
+- (void) writeModuleSelect
+{
+    if([self isConnected]){
+        [self writeCmdString:[NSString stringWithFormat:@"select %d,%d",preAmpSelection,channelSelection]];
+    }
 }
 
 - (void) writeCmdString:(NSString*)aCommand
 {
 	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
     if(![aCommand hasSuffix:@"\n"])aCommand = [NSString stringWithFormat:@"%@\n",aCommand];
-    NSLog(@"adding to queue: %@",aCommand);
+    //NSLog(@"adding to queue: %@",aCommand);
 	[cmdQueue enqueue:aCommand];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelQueCountChanged object: self];
 	[self processNextCommandFromQueue];
@@ -1025,6 +1105,30 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 @end
 
 @implementation ORPacFPModel (private)
+- (void) checkVetoCondition
+{
+    if(![self readingTemperatures] && [self isConnected]){
+        [[ORGlobal sharedGlobal] addRunVeto:@"LCM Enabled" comment:@"Leakage Current Measurement Enabled in PAC Board"];
+        NSLog(@"%@ put run veto in place for leakage current measurement.\n",[self fullID]);
+        if(!lcmEnabledAlarm){
+            lcmEnabledAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Leakage Current Measurement"] severity:kInformationAlarm];
+            [lcmEnabledAlarm setSticky:YES];
+            [lcmEnabledAlarm setHelpString:@"The PAC board posted this informational alarm because it is set to measure leakage current."];
+        }
+        [lcmEnabledAlarm setAcknowledged:NO];
+        [lcmEnabledAlarm postAlarm];
+    }
+    else {
+        if([self vetoInPlace]){
+            [[ORGlobal sharedGlobal] removeRunVeto:@"LCM Enabled"];
+            NSLog(@"%@ removed leakage current measurement veto.\n",[self fullID]);
+            [lcmEnabledAlarm clearAlarm];
+            [lcmEnabledAlarm release];
+            lcmEnabledAlarm = nil;
+        }
+    }
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelVetoChanged object:self];
+}
 
 - (void) shipAdcValues
 {
@@ -1088,7 +1192,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             [self processNextCommandFromQueue];
 		}
 		else {
-            NSLog(@"sending: %@\n",cmd);
+            //NSLog(@"sending: %@\n",cmd);
 			[self setLastRequest:cmd];
             [socket writeString:cmd encoding:NSASCIIStringEncoding];
 			[self performSelector:@selector(timeout) withObject:nil afterDelay:1];

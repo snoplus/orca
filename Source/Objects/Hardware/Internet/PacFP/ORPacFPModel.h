@@ -59,12 +59,23 @@
         NSDate*             lastGainRead;
         int                 workingOnGain;
         BOOL                setGainsResult;
+        unsigned short      preAmpSelection;
+        unsigned short      channelSelection;
+        ORAlarm*            lcmEnabledAlarm;
+        BOOL                lcmEnabled;
 }
 
 #pragma mark •••Initialization
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (BOOL) lcmEnabled;
+- (void) setLcmEnabled:(BOOL)aLcmEnabled;
+- (BOOL) readingTemperatures;
+- (unsigned short) channelSelection;
+- (void) setChannelSelection:(unsigned short)aChannelSelection;
+- (unsigned short) preAmpSelection;
+- (void) setPreAmpSelection:(unsigned short)aPreAmpSelection;
 - (BOOL) setGainsResult;
 - (void) setSetGainsResult:(BOOL)aSetGainsResult;
 - (int) workingOnGain;
@@ -113,6 +124,7 @@
 - (int) queCount;
 - (void) setProcessLimitDefaults;
 - (void) flushQueue;
+- (BOOL) vetoInPlace;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -130,6 +142,8 @@
 - (void) getCurrent;
 - (void) writeShipCmd;
 - (void) readAdcs;
+- (void) readAllAdcs;
+- (void) writeModuleSelect;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -156,6 +170,8 @@
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
+extern NSString* ORPacFPModelChannelSelectionChanged;
+extern NSString* ORPacFPModelPreAmpSelectionChanged;
 extern NSString* ORPacFPModelSetGainsResultChanged;
 extern NSString* ORPacFPModelWorkingOnGainChanged;
 extern NSString* ORPacFPModelLastGainReadChanged;
@@ -173,4 +189,6 @@ extern NSString* ORPacFPModelQueCountChanged;
 extern NSString* ORPacFPModelGainsReadBackChanged;
 extern NSString* ORPacFPModelIsConnectedChanged;
 extern NSString* ORPacFPModelIpAddressChanged;
+extern NSString* ORPacFPModelLcmEnabledChanged;
+extern NSString* ORPacFPModelVetoChanged;
 

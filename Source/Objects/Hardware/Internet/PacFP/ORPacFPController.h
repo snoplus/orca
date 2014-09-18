@@ -24,6 +24,8 @@
 {
     
 	IBOutlet NSTextField*	ipConnectedTextField;
+	IBOutlet NSTextField*   channelSelectionField;
+	IBOutlet NSTextField*   preAmpSelectionField;
 	IBOutlet NSTextField*   setGainsResultTextField;
 	IBOutlet NSTextField*   workingOnGainTextField;
     IBOutlet NSMatrix*		gainDisplayTypeMatrix;
@@ -35,10 +37,16 @@
 	IBOutlet NSTextField*	cmdQueCountField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      readAdcsButton;
+    IBOutlet NSButton*      readAllAdcsButton;
     IBOutlet NSMatrix*      channelMatrix;
     IBOutlet NSMatrix*      adcNameMatrix;
     IBOutlet NSMatrix*      adcMatrix;
     IBOutlet NSMatrix*      timeMatrix;
+    IBOutlet NSMatrix*      lcmEnabledMatrix;
+    IBOutlet NSBox*         adc0Line0;
+    IBOutlet NSBox*         adc0Line1;
+    IBOutlet NSBox*         adc0Line2;
+    IBOutlet NSTextField*	lcmRunVetoWarning;
 
     IBOutlet NSButton*      readAllGainsButton;
     IBOutlet NSButton*      writeAllGainsButton;
@@ -80,6 +88,8 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) channelSelectionChanged:(NSNotification*)aNote;
+- (void) preAmpSelectionChanged:(NSNotification*)aNote;
 - (void) setGainsResultChanged:(NSNotification*)aNote;
 - (void) workingOnGainChanged:(NSNotification*)aNote;
 - (void) processLimitsChanged:(NSNotification*)aNote;
@@ -98,11 +108,19 @@
 - (void) queCountChanged:(NSNotification*)aNote;
 - (void) lcmChanged:(NSNotification*)aNote;
 - (void) loadLcmTimeValues;
+- (void) lcmEnabledChanged:(NSNotification*)aNote;
 
 - (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) readAdcsAction:(id)sender;
+- (IBAction) readAllAdcsAction:(id)sender;
+- (IBAction) lcmEnabledAction:(id)sender;
+- (IBAction) gainDisplayTypeAction:(id)sender;
+- (IBAction) sendPreAmpAndChannelAction:(id)sender;
+- (IBAction) channelSelectionAction:(id)sender;
+- (IBAction) preAmpSelectionAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) getGainsAction:(id)sender;
 - (IBAction) setGainsAction:(id)sender;
@@ -117,10 +135,8 @@
 - (IBAction) connectAction: (id) aSender;
 - (IBAction) flushQueueAction: (id) aSender;
 
-
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
-
 @end
 
 

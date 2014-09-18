@@ -96,7 +96,7 @@
     [[queueValueBar xAxis] setRngDefaultsLow:0 withHigh:300];
     
     blankView = [[NSView alloc] init];
-    setUpSize			= NSMakeSize(540,515);
+    setUpSize			= NSMakeSize(540,575);
     normalSize			= NSMakeSize(400,515);
     gainSize			= NSMakeSize(695,515);
     processLimitsSize	= NSMakeSize(470,515);
@@ -217,6 +217,26 @@
                          name : ORPacFPModelSetGainsResultChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(preAmpSelectionChanged:)
+                         name : ORPacFPModelPreAmpSelectionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(channelSelectionChanged:)
+                         name : ORPacFPModelChannelSelectionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lcmEnabledChanged:)
+                         name : ORPacFPModelLcmEnabledChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(vetoConditionChanged:)
+                         name : ORPacFPModelVetoChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -234,16 +254,58 @@
     [self pollingStateChanged:nil];
 	[self logToFileChanged:nil];
 	[self logFileChanged:nil];
-    [self pollingStateChanged:nil];
     [self miscAttributesChanged:nil];
 	[self queCountChanged:nil];
 	[self gainDisplayTypeChanged:nil];
 	[self processLimitsChanged:nil];
 	[self adcChanged:nil];
+	[self lcmEnabledChanged:nil];
     
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
 	[self setGainsResultChanged:nil];
+	[self preAmpSelectionChanged:nil];
+	[self channelSelectionChanged:nil];
+	[self vetoConditionChanged:nil];
+}
+
+- (void) vetoConditionChanged:(NSNotification*)aNote
+{
+    if([model vetoInPlace])[ lcmRunVetoWarning setStringValue:@"Run is Vetoed because of the LCM setting!"];
+	else					[lcmRunVetoWarning setStringValue:@""];
+}
+
+- (void) lcmEnabledChanged:(NSNotification*)aNote
+{
+    BOOL state = [model lcmEnabled];
+	[lcmEnabledMatrix selectCellWithTag: state];
+    [adc0Line0 setHidden:state];
+    [adc0Line1 setHidden:state];
+    [adc0Line2 setHidden:!state];
+    
+    NSColor* enabledColor = [NSColor blackColor];
+    NSColor* disabledColor = [NSColor grayColor];
+    
+    [[channelMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    [[adcNameMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    [[adcMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    [[timeMatrix cellAtRow:0 column:0] setTextColor:!state?enabledColor:disabledColor];
+    
+    
+    [[channelMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    [[adcNameMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    [[adcMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+    [[timeMatrix cellAtRow:1 column:0] setTextColor:state?enabledColor:disabledColor];
+}
+
+- (void) channelSelectionChanged:(NSNotification*)aNote
+{
+	[channelSelectionField setObjectValue: [model channelSelection]];
+}
+
+- (void) preAmpSelectionChanged:(NSNotification*)aNote
+{
+	[preAmpSelectionField setObjectValue: [model preAmpSelection]];
 }
 
 - (void) setGainsResultChanged:(NSNotification*)aNote
@@ -384,6 +446,7 @@
 - (void) pollingStateChanged:(NSNotification*)aNotification
 {
 	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
+    [self lockChanged:nil];
 }
 
 - (void) queCountChanged:(NSNotification*)aNotification
@@ -467,7 +530,7 @@
 - (void) lockChanged:(NSNotification*)aNotification
 {
 
-    //BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
     //BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORPacFPLock];
     BOOL locked = [gSecurity isLocked:ORPacFPLock];
 
@@ -476,10 +539,33 @@
     [readAllGainsButton setEnabled:!locked];
     [writeAllGainsButton setEnabled:!locked];
     [readAdcsButton setEnabled:!locked];
+    [readAllAdcsButton setEnabled:!locked && [model pollingState]==0];
     [gainTableView setEnabled:!locked];
+    [lcmEnabledMatrix setEnabled:!locked && !runInProgress];
 }
 
 #pragma mark •••Actions
+- (IBAction) lcmEnabledAction:(id)sender
+{
+	[model setLcmEnabled:[[sender selectedCell]tag]];
+}
+
+- (IBAction) channelSelectionAction:(id)sender
+{
+	[model setChannelSelection:[sender objectValue]];	
+}
+
+- (IBAction) preAmpSelectionAction:(id)sender
+{
+	[model setPreAmpSelection:[sender objectValue]];	
+}
+
+- (IBAction) sendPreAmpAndChannelAction:(id)sender
+{
+    [model writeModuleSelect];
+}
+
+
 - (IBAction) setGainsAction:(id)sender
 {
 	[model setGains];
@@ -503,6 +589,11 @@
 	[model readAdcs];
 }
 
+- (IBAction) readAllAdcsAction:(id)sender
+{
+ 	[self endEditing];
+	[model readAllAdcs];
+}
 
 - (void) ipAddressFieldAction:(id)sender
 {
@@ -663,6 +754,11 @@
 	int index = count-i-1;
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
+}
+
+- (IBAction) gainDisplayTypeAction:(id)sender
+{
+	[model setGainDisplayType:[[sender selectedCell] tag]];
 }
 
 - (IBAction) readGainFileAction:(id)sender
