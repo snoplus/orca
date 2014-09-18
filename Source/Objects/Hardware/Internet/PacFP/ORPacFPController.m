@@ -562,6 +562,7 @@
 
 - (IBAction) sendPreAmpAndChannelAction:(id)sender
 {
+ 	[self endEditing];
     [model writeModuleSelect];
 }
 
