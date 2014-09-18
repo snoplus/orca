@@ -108,6 +108,8 @@
 - (void) queCountChanged:(NSNotification*)aNote;
 - (void) lcmChanged:(NSNotification*)aNote;
 - (void) loadLcmTimeValues;
+- (void) vetoConditionChanged:(NSNotification*)aNote;
+
 - (void) lcmEnabledChanged:(NSNotification*)aNote;
 
 - (void) ipAddressChanged:(NSNotification*)aNote;

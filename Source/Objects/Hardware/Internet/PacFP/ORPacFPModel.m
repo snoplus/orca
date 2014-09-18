@@ -748,8 +748,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 
 - (void) readAdcs
 {
-    if([self lcmEnabled])[self getCurrent];
-    else                 [self getTemperatures];
+    if(![self lcmEnabled])[self getCurrent];//inverted logic!
+    else                  [self getTemperatures];
 }
 
 - (void) writeModuleSelect
