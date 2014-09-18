@@ -300,12 +300,12 @@
 
 - (void) channelSelectionChanged:(NSNotification*)aNote
 {
-	[channelSelectionField setObjectValue: [model channelSelection]];
+	[channelSelectionField setIntValue: [model channelSelection]];
 }
 
 - (void) preAmpSelectionChanged:(NSNotification*)aNote
 {
-	[preAmpSelectionField setObjectValue: [model preAmpSelection]];
+	[preAmpSelectionField setIntValue: [model preAmpSelection]];
 }
 
 - (void) setGainsResultChanged:(NSNotification*)aNote
@@ -552,12 +552,12 @@
 
 - (IBAction) channelSelectionAction:(id)sender
 {
-	[model setChannelSelection:[sender objectValue]];	
+	[model setChannelSelection:[sender intValue]];
 }
 
 - (IBAction) preAmpSelectionAction:(id)sender
 {
-	[model setPreAmpSelection:[sender objectValue]];	
+	[model setPreAmpSelection:[sender intValue]];
 }
 
 - (IBAction) sendPreAmpAndChannelAction:(id)sender

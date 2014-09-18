@@ -677,7 +677,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:lcmEnabled       forKey:@"lcmEnabled"];
+    [encoder encodeBool:lcmEnabled      forKey:@"lcmEnabled"];
     [encoder encodeInt:channelSelection forKey:@"channelSelection"];
     [encoder encodeInt:preAmpSelection  forKey:@"preAmpSelection"];
     [encoder encodeObject:processLimits forKey:@"processLimits"];
