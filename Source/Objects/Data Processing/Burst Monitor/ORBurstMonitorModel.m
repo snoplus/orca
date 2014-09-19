@@ -852,13 +852,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 @synthesize epSec;
 @synthesize epMic;
 
-- (void) dealloc {
-    [datePosted release];
-    [dataRecord release];
-    [epSec release];
-    [epMic release];
-    self.epSec=nil;
-    self.epMic=nil;
+- (void) dealloc
+{
+    //release the properties
+    self.dataRecord =   nil;
+    self.datePosted =   nil;
+    self.epSec      =   nil;
+    self.epMic      =   nil;
+    
     [super dealloc];
 }
 @end
