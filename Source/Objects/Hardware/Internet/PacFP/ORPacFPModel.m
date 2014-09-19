@@ -374,8 +374,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
                 NSArray* theParts = [aLine componentsSeparatedByString:@","];
                 int i=0;
                 for(id aValue in theParts){
-                //DEBUG
-            NSLog(@" .... set ADC/Temperatures %i to: %f \n",i,[aValue doubleValue]);
+                //DEBUG            NSLog(@" .... set ADC/Temperatures %i to: %f \n",i,[aValue doubleValue]);
                     [self setAdc:i value:[aValue doubleValue]];
                     i++;
                 }
@@ -540,7 +539,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 {
 	float theValue = kBadPacFPValue; //a 'bad' value as default
 	@synchronized (self){
-		if(index<0 && index>8)return 0.0;
+		if(index<0 && index>=8) return 0.0;
                 
 		float temperatureConstants[8][2] = {
 			{1.0	,	0.0}, //for PAC object this was 	 	{100.0	,	-50.0}, now we get already converted values from FP -tb-
