@@ -44,11 +44,11 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[xAxis release];
-	[yAxis release];
-	[legend release];
-	[plotView release];
-	[titleField release];
+	self.xAxis      = nil;
+	self.yAxis      = nil;
+	self.legend     = nil;
+	self.plotView   = nil;
+	self.titleField = nil;
 	[super dealloc];
 }
 

@@ -59,6 +59,7 @@
 	self.pwd		= nil;
 	self.host		= nil;
 	self.database	= nil;
+	self.queue      = nil;
 	[super dealloc];
 }
 
@@ -1142,7 +1143,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
 {
     self = [super init];
 	queue = [[NSOperationQueue alloc] init];
-	[queue setMaxConcurrentOperationCount:1];
+	[queue setMaxConcurrentOperationCount:10];
     changesFeedQueue = [[NSOperationQueue alloc] init];
     return self;
 }

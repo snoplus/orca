@@ -56,8 +56,8 @@
     BOOL                 isConnected;
     NSSpeechSynthesizer* sayIt;
     int                  sayItCount;
-    unsigned int pollTime;
-    BOOL maintenanceMode;
+    unsigned int         pollTime;
+    BOOL                 maintenanceMode;
 }
 
 #pragma mark ***Accessors

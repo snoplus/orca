@@ -69,23 +69,30 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 - (void) dealloc
 {
+ 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    
     [eventLog release];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [dataInValidAlarm clearAlarm];
-    [dataInValidAlarm release];
-    [powerOutAlarm clearAlarm];
-    [powerOutAlarm release];
-    [inputBuffer release];
-    [sayIt release];
+    [dataInValidAlarm   clearAlarm];
+    [powerOutAlarm      clearAlarm];
+    
+    [dataInValidAlarm   release];
+    [powerOutAlarm      release];
+    [inputBuffer        release];
+    [sayIt              release];
+    [socket             release];
+    [channelFromNameTable release];
     
     int i;
     for(i=0;i<8;i++){
         [timeRate[i] release];
     }
     
-    [channelFromNameTable release];
-    
+    //release the properties (newer code)
     self.valueDictionary        = nil;
+    self.username               = nil;
+    self.password               = nil;
+    self.lastTimePolled         = nil;
+    self.nextPollScheduled      = nil;
     
     [fileQueue cancelAllOperations];
     [fileQueue release];
