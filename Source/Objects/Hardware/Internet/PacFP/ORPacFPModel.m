@@ -527,13 +527,13 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 		if(index<0 && index>8)return 0.0;
                 
 		float temperatureConstants[8][2] = {
-			{100.0	,	-50.0},
+			{1.0	,	0.0}, //for PAC object this was 	 	{100.0	,	-50.0}, now we get already converted values from FP -tb-
 			{1.0	,	0.0},
 			{1.0	,	0.0},
 			{1.0	,	0.0},
 			{1.0	,	0.0},
 			{1.0	,	0.0},
-			{86.141	,	-100},
+			{1.0	,	0.0},//for PAC object this was 	 	{86.141	,	-100}, now we get already converted values from FP -tb-
 			{1.0	,	0.0},
 		};
         
