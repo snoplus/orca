@@ -315,6 +315,10 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     NSLog(@"%@::%@: \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
     [cmdQueue removeAllObjects];
     [self setLastRequest:nil];
+    
+    //TODO: I think we need this ... -tb-
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacFPModelQueCountChanged object: self];
+
 }
 
 - (void) parseString:(NSString*)theString
@@ -370,6 +374,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
                 NSArray* theParts = [aLine componentsSeparatedByString:@","];
                 int i=0;
                 for(id aValue in theParts){
+                //DEBUG
+            NSLog(@" .... set ADC/Temperatures %i to: %f \n",i,[aValue doubleValue]);
                     [self setAdc:i value:[aValue doubleValue]];
                     i++;
                 }
