@@ -55,7 +55,8 @@
         BOOL                readOnce;
         NSMutableArray*     processLimits;    
         int                 gainIndex;
-        unsigned short      lcm;
+        //unsigned short      lcm;
+        double              lcm;//changed to double -tb-
         unsigned short      lcmTimeMeasured;
         NSDate*             lastGainRead;
         int                 workingOnGain;
@@ -96,8 +97,8 @@
 - (NSDate*) lastGainRead;
 - (void) setLastGainRead:(NSDate*)aLastGainRead;
 - (unsigned short) lcmTimeMeasured;
-- (unsigned short) lcm;
-- (void) setLcm:(unsigned short)aLc;
+- (double) lcm;
+- (void) setLcm:(double)aLc;
 - (NSString*) lastGainFile;
 - (void) setLastGainFile:(NSString*)aLastGainFile;
 - (int) gainDisplayType;

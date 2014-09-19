@@ -368,15 +368,15 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
                 NSArray* theParts = [aLine componentsSeparatedByString:@","];
                 int i=0;
                 for(id aValue in theParts){
-                    [self setAdc:i value:[aValue floatValue]];
+                    [self setAdc:i value:[aValue doubleValue]];
                     i++;
                 }
                 [self setLastRequest:nil];
             }
             else if([lastRequest hasPrefix:@"get current"]){
                 aLine = [aLine substringFromIndex:12];
-            NSLog(@" .... set Leakage Current to: %i (extracted from %@)\n",[aLine intValue],aLine);
-                [self setLcm:[aLine intValue]];
+            NSLog(@" .... set Leakage Current to: %i (extracted from %@)\n",[aLine doubleValue],aLine);
+                [self setLcm:[aLine doubleValue]];
                 [self setLastRequest:nil];
             }
         }
@@ -408,12 +408,12 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     return [self lcmEnabled]; //the logic got inverted somewhere.
 }
 
-- (unsigned short) lcm
+- (double) lcm
 {
     return lcm;
 }
 
-- (void) setLcm:(unsigned short)aLcm
+- (void) setLcm:(double)aLcm
 {
     lcm = aLcm;
     //get the time(UT!)
@@ -498,9 +498,10 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	}
 }
 
-- (float) lcmVoltage
+- (float) lcmVoltage //lcm is now lcmVoltage (we get it from FP) -tb-
 {
-	return 5.0 * lcm/65535.0;
+	return  lcm;
+	//return 5.0 * lcm/65535.0;
 }
 
 - (double) adcVoltage:(int)index
