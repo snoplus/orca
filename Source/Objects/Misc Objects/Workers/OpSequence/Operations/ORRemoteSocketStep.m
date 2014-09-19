@@ -61,13 +61,17 @@
 
 - (void)dealloc
 {
-    [socketObject release];
-    socketObject = nil;
-	[commands release];
-    commands = nil;
-    [cmdIndexToExecute release];
-    cmdIndexToExecute = nil;
-	[super dealloc];
+    [socketObject       release];
+	[commands           release];
+    [cmdIndexToExecute  release];
+    [outputStateKey     release];
+
+    outputStateKey      = nil;
+    cmdIndexToExecute   = nil;
+    commands            = nil;
+    socketObject        = nil;
+
+    [super dealloc];
 }
 
 - (NSString *)title

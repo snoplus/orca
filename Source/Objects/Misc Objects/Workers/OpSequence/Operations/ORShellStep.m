@@ -82,16 +82,18 @@
 
 - (void)dealloc
 {
-	[taskStartedCondition release];
-	[taskHandler release];
-	[launchPath release];
-	[argumentsArray release];
-	[environment release];
-	[currentDirectory release];
-	[outputStateKey release];
-	[errorStateKey release];
+	[taskStartedCondition     release];
+	[taskHandler              release];
+	[launchPath               release];
+	[argumentsArray           release];
+	[environment              release];
+	[currentDirectory         release];
+	[outputStateKey           release];
+	[errorStateKey            release];
 	[outputStringErrorPattern release];
-	[errorStringErrorPattern release];
+	[errorStringErrorPattern  release];
+	[outputPipe               release];
+	[errorPipe                release];
     
 	[super dealloc];
 }
