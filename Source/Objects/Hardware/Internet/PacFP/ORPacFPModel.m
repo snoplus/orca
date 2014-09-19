@@ -375,7 +375,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             }
             else if([lastRequest hasPrefix:@"get current"]){
                 aLine = [aLine substringFromIndex:12];
-            NSLog(@" .... set Leakage Current to: %@ (extracted from %@)\n",[aLine intValue],aLine);
+            NSLog(@" .... set Leakage Current to: %i (extracted from %@)\n",[aLine intValue],aLine);
                 [self setLcm:[aLine intValue]];
                 [self setLastRequest:nil];
             }
