@@ -503,10 +503,11 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	return 5.0 * lcm/65535.0;
 }
 
-- (float) adcVoltage:(int)index
+- (double) adcVoltage:(int)index
 {
 	if(index<0 && index>=8)return 0.0;
-	else return 5.0 * adc[index]/65535.0;
+	else  return adc[index];
+	//else return 5.0 * adc[index]/65535.0;
 }
 
 - (float) convertedLcm
@@ -520,7 +521,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     return theValue;
 }
 
-- (float) convertedAdc:(int)index
+- (double) convertedAdc:(int)index
 {
 	float theValue = kBadPacFPValue; //a 'bad' value as default
 	@synchronized (self){
@@ -537,7 +538,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 			{1.0	,	0.0},
 		};
         
-		float voltage = [self adcVoltage:index];
+		double voltage = [self adcVoltage:index];
 		if(index>=0 && index<8) {
             theValue = voltage * temperatureConstants[index][0] + temperatureConstants[index][1];
         }
@@ -545,13 +546,13 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 	return theValue;
 }
 
-- (unsigned short) adc:(int)index
+- (double) adc:(int)index
 {
 	if(index>=0 && index<8)return adc[index];
 	else return 0.0;
 }
 
-- (void) setAdc:(int)index value:(unsigned short)aValue
+- (void) setAdc:(int)index value:(double)aValue
 {
 	if(index>=0 && index<8){
 		adc[index] = aValue;

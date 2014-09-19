@@ -38,7 +38,8 @@
 		ORSafeQueue*		cmdQueue;
 		NSMutableString*    buffer;
     
-        unsigned short		adc[8];
+        //unsigned short		adc[8];
+        double      		adc[8];//changed to double -tb-
 		unsigned long		timeMeasured[8];
 		ORTimeRate*			timeRates[8];
         int					gain[148];
@@ -110,13 +111,13 @@
 - (void) setGainReadBack:(int)index withValue:(int)aValue;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
-- (unsigned short) adc:(int)index;
+- (double) adc:(int)index;
 - (unsigned long) timeMeasured:(int)index;
-- (void) setAdc:(int)index value:(unsigned short)aValue;
+- (void) setAdc:(int)index value:(double)aValue;
 - (float) lcmVoltage;
-- (float) adcVoltage:(int)index;
+- (double) adcVoltage:(int)index;
 - (float) convertedLcm;
-- (float) convertedAdc:(int)index;
+- (double) convertedAdc:(int)index;
 - (NSString*) logFile;
 - (void) setLogFile:(NSString*)aLogFile;
 - (BOOL) logToFile;
