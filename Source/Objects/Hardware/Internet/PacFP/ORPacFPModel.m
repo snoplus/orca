@@ -311,6 +311,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 
 - (void) flushQueue
 {
+ 	//DEBUG    
+    NSLog(@"%@::%@: \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
     [cmdQueue removeAllObjects];
     [self setLastRequest:nil];
 }
