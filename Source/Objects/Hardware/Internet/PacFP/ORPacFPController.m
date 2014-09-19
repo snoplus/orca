@@ -509,6 +509,7 @@
 
 - (void) loadAdcTimeValuesForIndex:(int)index
 {
+ 	    //DEBUG                NSLog(@"%@::%@:  index: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),index);//TODO: DEBUG testing ...-tb-
 	[[adcMatrix cellWithTag:index+1] setFloatValue:[model convertedAdc:index]];
 	unsigned long t = [model timeMeasured:index];
 	NSCalendarDate* theDate;
