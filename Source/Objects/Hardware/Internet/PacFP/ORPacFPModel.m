@@ -375,8 +375,14 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             }
             else if([lastRequest hasPrefix:@"get current"]){
                 aLine = [aLine substringFromIndex:12];
-            NSLog(@" .... set Leakage Current to: %i (extracted from %@)\n",[aLine doubleValue],aLine);
+            NSLog(@" .... set Leakage Current to: %f (extracted from %@)\n",[aLine doubleValue],aLine);
                 [self setLcm:[aLine doubleValue]];
+                [self setLastRequest:nil];
+            }
+            else if([lastRequest hasPrefix:@"select"]){//we await the command echo, but we don't await a response, so clear lastRequest after echo -tb-
+                aLine = [aLine substringFromIndex:0];
+            NSLog(@"   echo is:  %@ \n",aLine);
+                //[self setLcm:[aLine doubleValue]];
                 [self setLastRequest:nil];
             }
         }
