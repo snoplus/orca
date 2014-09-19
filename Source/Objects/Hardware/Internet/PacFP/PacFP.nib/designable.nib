@@ -446,7 +446,7 @@
 														<string key="NSContents">--</string>
 														<reference key="NSSupport" ref="26"/>
 														<reference key="NSControlView" ref="872520427"/>
-														<int key="NSTag">-1</int>
+														<int key="NSTag">8</int>
 														<reference key="NSBackgroundColor" ref="878927451"/>
 														<reference key="NSTextColor" ref="180378430"/>
 													</object>
@@ -965,7 +965,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 														<string key="NSContents">0</string>
 														<reference key="NSSupport" ref="26"/>
 														<reference key="NSControlView" ref="818037528"/>
-														<int key="NSTag">9</int>
+														<int key="NSTag">8</int>
 														<reference key="NSBackgroundColor" ref="878927451"/>
 														<reference key="NSTextColor" ref="180378430"/>
 													</object>
@@ -1431,7 +1431,7 @@ AQABAAEAAQAB//+dkAEA//+PgAAE//+dkAEI//+dkAEMUERUAFBTVABQV1QAUFBUAAAAAAEAAAABA</b
 																<string key="NSFrame">{{8, 8}, {157, 28}}</string>
 																<reference key="NSSuperview" ref="932585157"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
+																<reference key="NSNextKeyView" ref="681623596"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="553416201">
 																	<int key="NSCellFlags">67108864</int>
