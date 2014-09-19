@@ -15,8 +15,8 @@ bool ORCAEN830Readout::Start()
 
 bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 {
-    uint32_t statusRegOffset		= GetDeviceSpecificData()[1];
-    uint32_t chan0Offset		    = GetDeviceSpecificData()[5];
+    uint32_t statusRegOffset	= GetDeviceSpecificData()[1];
+    int32_t chan0Offset		    = (int32_t)GetDeviceSpecificData()[5];
     uint16_t statusWord;
 
     int32_t result = VMERead(GetBaseAddress() + statusRegOffset,0x39, sizeof(statusWord),statusWord);
