@@ -318,7 +318,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
 - (void) parseString:(NSString*)theString
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    //NSLog(@"Received: %@",theString);
+    //
+    NSLog(@"Received: %@",theString);
     theString = [theString trimSpacesFromEnds];
     theString = [theString lowercaseString];
     NSArray* lines = [theString componentsSeparatedByString:@"\n"];
@@ -338,7 +339,8 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
         }
         
         else {
-            //NSLog(@"Processing Last Request: %@\n",lastRequest);
+            //
+            NSLog(@"Processing Last Request: %@\n",lastRequest);
 
             if([lastRequest hasPrefix:@"get gains"]){
                 aLine = [aLine substringFromIndex:10];
@@ -373,6 +375,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
             }
             else if([lastRequest hasPrefix:@"get current"]){
                 aLine = [aLine substringFromIndex:12];
+            NSLog(@" .... set Leakage Current to: %@ (extracted from %@)\n",[aLine intValue],aLine);
                 [self setLcm:[aLine intValue]];
                 [self setLastRequest:nil];
             }
