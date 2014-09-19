@@ -297,10 +297,8 @@ static GretinaTriggerStateInfo master_state_info[kNumMasterTriggerStates] = {
     { kRunRouterDataCheck,      kMasterState,   @"Running Router/Gretina Setup"},
     { kWaitOnRouterDataCheck,   kMasterState,   @"Waiting on Routers and Digitizers"},
     { kFinalCheck,              kMasterState,   @"Final Check"},
-    { kHaltClock,               kMasterState,   @"Halt Clock"},
-    { kResetScaler,             kMasterState,   @"Reset Scaler"},
-    { kReleaseImpSync,          kMasterState,  @"Turn Off IMPERATIVE_SYNC Bit"},
-    { kReleaseClock,            kMasterState,   @"Release Clock"},
+    { kReleaseImpSync,          kMasterState,   @"Turn Off IMPERATIVE_SYNC Bit"},
+    { kFinalReset,            kMasterState,     @"Final Reset of Clocks"},
     { kMasterError,             kMasterState,   @""}
 };
 
@@ -1397,33 +1395,24 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
             
         case kFinalCheck:
             if([self checkSystemLock]){
-                [self setInitState:kHaltClock];
+                [self setInitState:kReleaseImpSync];
             }
             else {
                 [self setInitState:kMasterError];
             }
             break;
-        
-        case kHaltClock:
-            [self writeRegister:kAuxIOCrl withValue:0x2E9B]; //this stops the clock
-            [self setInitState:kResetScaler];
-            break;
-        
-        case kResetScaler:
-            [self resetScaler];
-            [self setInitState:kReleaseImpSync];
-            break;
-            
+                    
         
         case kReleaseImpSync:
             //release the Imp. Sync. bit
             aValue = [self readRegister:kMiscCtl1];
             [self writeRegister:kMiscCtl1 withValue:aValue &= ~(0x1<<6)];
-            [self setInitState:kReleaseClock];
+            [self setInitState:kFinalReset];
             break;
 
-        case kReleaseClock:
-            [self writeRegister:kAuxIOCrl withValue:0x2E9B]; //this stops the clock
+        case kFinalReset:
+            [self resetScaler];
+            [self writeRegister:kPulsedCtl2 withValue:0x1000]; //send one imp syn
             [self setInitState:kMasterIdle];
             break;
     }
