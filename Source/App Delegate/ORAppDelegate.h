@@ -40,6 +40,7 @@
 	BOOL delayTermination;
 }
 
+- (BOOL)   inDebugger;
 - (MemoryWatcher*) memoryWatcher;
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher;
 - (ORAlarmCollection*) alarmCollection;

@@ -48,9 +48,11 @@
 #import "ORHelpCenter.h"
 
 #import <sys/sysctl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-NSString* kCrashLogDir  = @"~/Library/Logs/CrashReporter";
-NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
+NSString* kCrashLogDir               = @"~/Library/Logs/CrashReporter";
+NSString* kLastCrashLog              = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 NSString* OROrcaAboutToQuitNotice    = @"OROrcaAboutToQuitNotice";
 NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
@@ -148,6 +150,25 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
     [self registerNotificationObservers];
     [self setAlarmCollection:[[[ORAlarmCollection alloc] init] autorelease]];
     [self setMemoryWatcher:[[[MemoryWatcher alloc] init] autorelease]];
+}
+
+- (BOOL) inDebugger
+{
+    int                 mib[4];
+    struct kinfo_proc   info;
+    
+    info.kp_proc.p_flag = 0;
+    
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PID;
+    mib[3] = getpid();
+    
+    size_t size = sizeof(info);
+    int err = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
+    //In debugger if the P_TRACED flag is set.
+    if(err == 0) return ((info.kp_proc.p_flag & P_TRACED) != 0);
+    else         return NO; //just return NO on error
 }
 
 - (ORHelpCenter*) helpCenter
@@ -426,9 +447,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 -(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
 	[self showStatusLog:self];
-
+    
+    bool debugging = [self inDebugger];
     NSLog(@"-------------------------------------------------\n");
-    NSLog(@"   Orca (v%@) Has Started                    \n",fullVersion());
+    NSLog(@"   Orca (v%@) started %@                   \n",fullVersion(),debugging?@"in debugger":@"");
     NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag];
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
 		NSLog(@"   (After crash or hard debugger stop)           \n");
