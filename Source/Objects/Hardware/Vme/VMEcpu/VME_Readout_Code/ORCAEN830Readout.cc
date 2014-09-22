@@ -67,14 +67,14 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 						}
                         //keep a rollover count for channel zero
                         if(chan0Enabled && i==0){
-                            aValue += chan0Offset;
                             if(aValue<lastChan0Count){
                                 rollOverCount++;
                             }
                             lastChan0Count = aValue;
                             data[indexForRollOver] = rollOverCount;
+                            data[dataIndex++]      = aValue+chan0Offset;
                         }
-                        data[dataIndex++]      = aValue;
+                        else    data[dataIndex++]      = aValue;
 					}
 					
 					int32_t leaf_index;
