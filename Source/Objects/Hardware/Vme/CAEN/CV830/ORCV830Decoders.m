@@ -32,8 +32,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 --------^-^^^--------------------------- Crate number
 -------------^-^^^^--------------------- Card number
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
--------------------------------------^^- Acq Mode. 0=disabled,1=Random, 2=periodic
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Chan0 Roll over
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx- Enabled Mask
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  header
@@ -52,7 +50,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	unsigned long length	= ExtractLength(ptr[0]);
 	int crate				= ShiftAndExtract(ptr[1],21,0xf);
 	int card				= ShiftAndExtract(ptr[1],16,0x1f);
-	unsigned long enabledMask	= ptr[2];
+	unsigned long enabledMask	= ptr[3];
 	NSString* crateKey   = [self getCrateKey: crate];
 	NSString* cardKey    = [self getCardKey: card];
 	
@@ -60,10 +58,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-            unsigned long theValue = ptr[5+i];
+            unsigned long theValue = ptr[6+i];
 			NSString* valueString;
             if((i==0) && (enabledMask&0x1)){
-                valueString = [NSString stringWithFormat:@"%lu - %lu",ptr[3],ptr[5+i]];
+                valueString = [NSString stringWithFormat:@"%lu - %lu",ptr[2],ptr[5+i]];
             }
             else {
                 valueString = [NSString stringWithFormat:@"%lu",theValue];
@@ -93,7 +91,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
             if((i==0) && (enabledMask&0x1)){
-                s = [s stringByAppendingFormat:@"Time: 0x%08lx 0x%08lx\n",ptr[3],ptr[5+i]];
+                s = [s stringByAppendingFormat:@"Time: 0x%08lx 0x%08lx\n",ptr[3],ptr[6+i]];
             }
             else {
                 s = [s stringByAppendingFormat:@"%d: 0x%08lx",i,ptr[5+i]];

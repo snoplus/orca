@@ -48,10 +48,11 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 					ensureDataCanHold(5+numEnabledChannels); //event size
 					data[dataIndex++] = dataId | (5+numEnabledChannels);
 					data[dataIndex++] = locationMask;
+                    uint32_t indexForRollOver = dataIndex;  //save a place for the roll over
+                    data[dataIndex++] = 0;                  //channel 0 rollover
 					data[dataIndex++] = enabledMask;
                     
-                    uint32_t indexForRollOver = dataIndex;  //save a place for the roll over
-					data[dataIndex++] = 0;                  //channel 0 rollover
+ 
 					
 					//get the header -- always the first word
 					uint32_t dataHeader = 0;
