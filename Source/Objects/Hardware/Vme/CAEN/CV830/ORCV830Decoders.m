@@ -58,13 +58,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
-            unsigned long theValue = ptr[6+i];
 			NSString* valueString;
             if((i==0) && (enabledMask&0x1)){
                 valueString = [NSString stringWithFormat:@"%lu - %lu",ptr[2],ptr[5+i]];
             }
             else {
-                valueString = [NSString stringWithFormat:@"%lu",theValue];
+                valueString = [NSString stringWithFormat:@"%lu",ptr[5+i]];
             }
 			NSString* channelKey = [self getChannelKey:i];
 

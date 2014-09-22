@@ -70,6 +70,8 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                         if(chan0Enabled && i==0){
                             if(aValue<lastChan0Count){
                                 rollOverCount++;
+                                LogBusError("Rollove: 0x%04x",rolloverCount);
+
                             }
                             lastChan0Count = aValue;
                             data[indexForRollOver] = rollOverCount;
