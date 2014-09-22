@@ -53,7 +53,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 	int crate				= ShiftAndExtract(ptr[1],21,0xf);
 	int card				= ShiftAndExtract(ptr[1],16,0x1f);
 	unsigned long enabledMask	= ptr[2];
-    unsigned long long chan0RollOver = (unsigned long long)ptr[3];
 	NSString* crateKey   = [self getCrateKey: crate];
 	NSString* cardKey    = [self getCardKey: card];
 	
@@ -64,7 +63,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
             unsigned long theValue = ptr[5+i];
 			NSString* valueString;
             if((i==0) && (enabledMask&0x1)){
-                valueString = [NSString stringWithFormat:@"%llu",(chan0RollOver<<32)|ptr[5+i]];
+                valueString = [NSString stringWithFormat:@"%lu - %lu",ptr[3],ptr[5+i]];
             }
             else {
                 valueString = [NSString stringWithFormat:@"%lu",theValue];
@@ -89,14 +88,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",cardNum];
 	NSString* s = [NSString stringWithFormat:@"%@%@%@\n",title,crate,card];
 	s = [s stringByAppendingFormat:@"Enabled Mask:0X%08X\n",enabledMask];
-    unsigned long long chan0RollOver = (unsigned long long)ptr[3];
 		
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
             if((i==0) && (enabledMask&0x1)){
-                unsigned long long timeStamp = ((unsigned long long)chan0RollOver << 32) + (unsigned long long)ptr[5+i];
-                s = [s stringByAppendingFormat:@"Time: %lld\n",timeStamp];
+                s = [s stringByAppendingFormat:@"Time: 0x%08lx 0x%08lx\n",ptr[3],ptr[5+i]];
             }
             else {
                 s = [s stringByAppendingFormat:@"%d: 0x%08lx",i,ptr[5+i]];
