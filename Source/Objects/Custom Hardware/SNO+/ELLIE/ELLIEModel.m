@@ -679,7 +679,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
 
     //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers
-    if(slaveMode){
+    /*if(slaveMode){
 
         NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
         NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
@@ -693,7 +693,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //We need to set the pulser rate after firing pedestals 
         float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
         [theMTCModel setThePulserRate:pulserRate];
-    }
+    }*/
     
     BOOL endOfRun = NO;
     int laserLoopInt = 0;
@@ -767,6 +767,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
                 
                 if(slaveMode){
+                    NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
+                    NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
+                    [f setNumberStyle:NSNumberFormatterDecimalStyle];
+                    NSNumber * numericTriggerFrequencyInSlaveMode = [f numberFromString:triggerFrequencyInSlaveMode];
+                    [f release];
+                    
+                    NSLog(@"SMELLIE_RUN:Intensity:Firing Pedestals\n");
+                    [theMTCModel fireMTCPedestalsFixedRate];
+                    
+                    //We need to set the pulser rate after firing pedestals
+                    float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
+                    [theMTCModel setThePulserRate:pulserRate];
                     [self setLaserSoftLockOff];
                 }
                 
@@ -795,6 +807,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 
                 //TODO:only have this in slave mode
                 if(slaveMode){
+                    NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
+                    [theMTCModel stopMTCPedestalsFixedRate];
                     [self setLaserSoftLockOn];
                 }
                 
@@ -815,7 +829,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //stop the pedestals if required 
     if(slaveMode){
-        NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
+        //NSLog(@"SMELLIE_RUN:Stopping MTCPedestals\n");
         [theMTCModel stopMTCPedestalsFixedRate];
     }
     
