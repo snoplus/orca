@@ -254,6 +254,8 @@
 	port	 = aPort;
 	pwd      = [aPwd copy];
 	username = [aUN copy];
+    [self  setQueuePriority:NSOperationQueuePriorityHigh];
+
 	return self;
 }
 
@@ -1143,7 +1145,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
 {
     self = [super init];
 	queue = [[NSOperationQueue alloc] init];
-	[queue setMaxConcurrentOperationCount:10];
+	[queue setMaxConcurrentOperationCount:4];
     changesFeedQueue = [[NSOperationQueue alloc] init];
     return self;
 }
