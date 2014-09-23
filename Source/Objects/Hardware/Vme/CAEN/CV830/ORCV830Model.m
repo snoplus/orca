@@ -800,12 +800,12 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 			if(numEvents){
 				int event;
 				for(event=0;event<numEvents;event++){
-					int totalWordsInRecord = 6+numEnabledChannels + 1;
+					int totalWordsInRecord = 4+numEnabledChannels + 1;
 					dataRecord[0] = dataId | totalWordsInRecord;
 					dataRecord[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
-					dataRecord[2] = enabledMask;
-					dataRecord[3] = 0; //chan 0 roll over. fill in later
-					
+					dataRecord[2] = 0; //chan 0 roll over. fill in later
+                    dataRecord[3] = enabledMask;
+
 					//read the header
 					unsigned long theHeader;
 					[[self adapter] readLongBlock:&theHeader
@@ -826,15 +826,15 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 										usingAddSpace:0x01];
                         //for chan zero keep a rollover count
                         if((enabledMask & 0x1) && (i==0)){
-                            aValue += count0Offset;
                             if(aValue<lastChan0Count){
                                 chan0RollOverCount++;
                             }
                             lastChan0Count = aValue;
-                            dataRecord[3] = chan0RollOverCount;
+                            dataRecord[2] = chan0RollOverCount;
+                            dataRecord[i + 5] = aValue + count0Offset;
 
                         }
-						dataRecord[i + 5] = aValue;
+						else dataRecord[i + 5] = aValue;
 					}
 					[aDataPacket addLongsToFrameBuffer:dataRecord length:totalWordsInRecord];
 

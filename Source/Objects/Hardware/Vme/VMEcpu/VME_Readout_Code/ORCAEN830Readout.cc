@@ -18,8 +18,8 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t statusRegOffset	= GetDeviceSpecificData()[1];
     int32_t chan0Offset		    = (int32_t)GetDeviceSpecificData()[5];
     uint16_t statusWord;
-    uint32_t addressModifier = 0x09;
-
+    uint32_t addressModifier    = GetAddressModifier();
+    uint32_t baseAdd            = GetBaseAddress();
     int32_t result = VMERead(GetBaseAddress() + statusRegOffset,addressModifier, sizeof(statusWord),statusWord);
     
     if(result != sizeof(statusWord)){
@@ -68,10 +68,9 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 						}
                         //keep a rollover count for channel zero
                         if(chan0Enabled && i==0){
+
                             if(aValue!=lastChan0Count && aValue<lastChan0Count){
                                 rollOverCount++;
-                               // LogBusError("Rollover: 0x%x 0x%x 0x%x",aValue,lastChan0Count,rollOverCount);
-
                             }
                             lastChan0Count = aValue;
                             data[indexForRollOver] = rollOverCount;
