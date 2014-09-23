@@ -855,7 +855,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //TODO: add a try and except statement here
     NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
-    [theMTCModel stopMTCPedestalsFixedRate];
+    
     
     //removed this to stop splurgingb
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -864,6 +864,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Set the Mtcd for back to original settings
     [theMTCModel setupPulserRateAndEnable:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd pulser back to %f Hz\n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_pulser_period"] floatValue]);
+    [theMTCModel stopMTCPedestalsFixedRate];
     
     [theMTCModel setupGTCorseDelay:[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]];
     NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay back to %i \n",[[currentOrcaSettingsForSmellie objectForKey:@"mtcd_coarse_delay"] intValue]);
