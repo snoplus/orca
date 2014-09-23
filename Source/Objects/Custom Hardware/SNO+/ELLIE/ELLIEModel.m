@@ -675,9 +675,17 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [theMTCModel setupGTCorseDelay:[[NSNumber numberWithInt:900] intValue]];
     
     
-    //start the run controller
-    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-
+    
+    if(![runControl isRunning]){
+        //start the run controller
+        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    }
+    else{
+        //Stop the current run and start a new run 
+        [runControl setForceRestart:YES];
+        [runControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
+    }
+    
     //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers
     /*if(slaveMode){
 
