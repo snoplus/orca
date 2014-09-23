@@ -1943,8 +1943,9 @@ resetFifoOnStart = _resetFifoOnStart;
 	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
     
     //get the run controller
-    NSArray* objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* runControl;
+    runControl = [objs objectAtIndex:0];
     //access the run control and only allow this to happen if a run is going
     if([runControl isRunning]){
             @try {
@@ -1955,6 +1956,9 @@ resetFifoOnStart = _resetFifoOnStart;
                 NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
                 NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
             }
+    }
+    else{
+        NSLog(@"MTC failed to fire pedestals because there is no run going!\n");
     }
 }
 
