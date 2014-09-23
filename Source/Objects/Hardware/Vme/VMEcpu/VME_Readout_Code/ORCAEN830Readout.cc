@@ -20,7 +20,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
     uint16_t statusWord;
     uint32_t addressModifier    = GetAddressModifier();
     uint32_t baseAdd            = GetBaseAddress();
-    int32_t result = VMERead(GetBaseAddress() + statusRegOffset,addressModifier, sizeof(statusWord),statusWord);
+    int32_t result = VMERead(baseAdd + statusRegOffset,addressModifier, sizeof(statusWord),statusWord);
     
     if(result != sizeof(statusWord)){
         LogBusError("Status Rd: V830 0x%04x %s",GetBaseAddress(),strerror(errno));
@@ -34,9 +34,9 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 			
 			uint16_t numEvents = 0;
 			uint32_t mebEventNumRegOffset	= GetDeviceSpecificData()[2];
-            result = VMERead(GetBaseAddress() + mebEventNumRegOffset,addressModifier, sizeof(numEvents), numEvents);
+            result = VMERead(baseAdd + mebEventNumRegOffset,addressModifier, sizeof(numEvents), numEvents);
 			if(result != sizeof(numEvents)){
-				LogBusError("Num Events Rd: V830 0x%04x %s",GetBaseAddress()+mebEventNumRegOffset,strerror(errno)); 
+				LogBusError("Num Events Rd: V830 0x%04x %s",baseAdd+mebEventNumRegOffset,strerror(errno));
 			}
 			else if(numEvents){
 				
@@ -56,15 +56,15 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 					
 					//get the header -- always the first word
 					uint32_t dataHeader = 0;
-					if(VMERead(GetBaseAddress() + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
-						LogBusError("Header Rd: V830 0x%04x %s",GetBaseAddress()+eventBufferOffset,strerror(errno)); 
+					if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
+						LogBusError("Header Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
 					}
 					data[dataIndex++] = dataHeader;
 					
 					for(uint16_t i=0 ; i<numEnabledChannels ; i++){
 						uint32_t aValue;
-						if(VMERead(GetBaseAddress() + eventBufferOffset,addressModifier, sizeof(aValue), aValue) != sizeof(aValue)){
-							LogBusError("Data Rd: V830 0x%04x %s",GetBaseAddress()+eventBufferOffset,strerror(errno)); 
+						if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(aValue), aValue) != sizeof(aValue)){
+							LogBusError("Data Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
 						}
                         //keep a rollover count for channel zero
                         if(chan0Enabled && i==0){
