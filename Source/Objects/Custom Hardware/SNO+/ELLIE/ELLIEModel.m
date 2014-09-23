@@ -523,7 +523,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     //[runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
-    NSLog(@"SMELLIE_RUN:Starting SMELLIE Run\n");
+    NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
     
     NSLog(@"SMELLIE_RUN:Stopping any Blocking Software on SMELLIE computer(SNODROP)\n");
     [self killBlockingSoftware];
@@ -683,7 +683,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     else{
         //Stop the current run and start a new run 
         [runControl setForceRestart:YES];
-        [runControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
+        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+        //[runControl:@selector(stopRun) withObject:nil afterDelay:0];
     }
     
     //fire some pedestals but only in slave mode. The pedestals are used to trigger the SMELLIE lasers

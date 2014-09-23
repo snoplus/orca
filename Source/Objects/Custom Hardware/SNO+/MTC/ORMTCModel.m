@@ -1940,6 +1940,10 @@ resetFifoOnStart = _resetFifoOnStart;
 	//Fire Pedestal pulses at a pecified period in ms, with a specifed 
 	//GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
+    
+    //access the run control and only allow this to happen if a run is going
+    
+    
 	@try {
 		[self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
 		[self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
