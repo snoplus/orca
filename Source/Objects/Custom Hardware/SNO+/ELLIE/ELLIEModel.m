@@ -767,6 +767,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
                 
                 if(slaveMode){
+                    [self setLaserSoftLockOff];
                     NSLog(@"SMELLIE_RUN:Setting the Pedestal to :%@ Hz \n",triggerFrequencyInSlaveMode);
                     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
                     [f setNumberStyle:NSNumberFormatterDecimalStyle];
@@ -779,7 +780,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                     //We need to set the pulser rate after firing pedestals
                     float pulserRate = [numericTriggerFrequencyInSlaveMode floatValue];
                     [theMTCModel setThePulserRate:pulserRate];
-                    [self setLaserSoftLockOff];
+                    
                 }
                 
                 [NSThread sleepForTimeInterval:1.0f];
