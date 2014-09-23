@@ -29,6 +29,7 @@
 
 @class ORMTC_DB;
 @class ORReadOutList;
+@class ORRunModel;
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
 
@@ -73,6 +74,7 @@
     unsigned long _mtcaOWLNMask;
 
 		//data taking variables
+        ORRunModel* runControl;
 		ORReadOutList*  triggerGroup;
 		NSString*		triggerName;
 		//NSArray*		dataTakers;       //cache of data takers.

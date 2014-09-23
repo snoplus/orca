@@ -34,6 +34,7 @@
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
 #import "ORCaen1720Model.h"
+#import "ORRunController.h"
 
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
@@ -1941,17 +1942,20 @@ resetFifoOnStart = _resetFifoOnStart;
 	//GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
     
+    //get the run controller
+    NSArray* objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
     //access the run control and only allow this to happen if a run is going
-    
-    
-	@try {
-		[self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
-		[self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
-	}
-	@catch(NSException* e) {
-		NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
+    if([runControl isRunning]){
+            @try {
+                [self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
+                [self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
+            }
+            @catch(NSException* e) {
+                NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+                NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+            }
+    }
 }
 
 - (void) basicMTCPedestalGTrigSetup

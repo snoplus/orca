@@ -682,8 +682,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
     else{
         //Stop the current run and start a new run 
-        [runControl setForceRestart:YES];
+        //[runControl setForceRestart:YES];
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
         //[runControl:@selector(stopRun) withObject:nil afterDelay:0];
     }
     
