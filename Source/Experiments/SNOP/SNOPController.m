@@ -32,6 +32,7 @@
 #import "ORRunController.h"
 #import "ORMTC_Constants.h"
 #import "ORMTCModel.h"
+#import "SNOP_Run_Constants.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
@@ -204,6 +205,28 @@ smellieRunFile;
     }
 	else [self startRun];
     [currentStatus setStringValue:[self getStartingString]];
+    
+    
+    //decide whether to issue a standard Physics run or a maintainence run
+    if([[sender title] isEqualToString:@"Start Physics Run"]){
+
+        //Check to see if TELLIE is enabled
+        if([tellieEnabled isEnabled]){
+            [model setRunType:kRunStandardPhysicsRunWithoutTellie];
+        }
+        else{
+            [model setRunType:kRunStandardPhysicsRun];
+        }
+    }
+    else if ([[sender title] isEqualToString:@"Start Maint. Run"]){
+        [model setRunType:kRunMaintainence];
+    }
+    else{
+        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
+        [model setRunType:kRunUndefined];
+    }
+    
+    
 }
 - (IBAction)newRunAction:(id)sender {
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -212,12 +235,33 @@ smellieRunFile;
     [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
     [currentStatus setStringValue:[self getRestartingString]];
     
+    if([[sender title] isEqualToString:@"New Physics Run"]){
+        
+        //Check to see if TELLIE is enabled
+        if([tellieEnabled isEnabled]){
+            [model setRunType:kRunStandardPhysicsRunWithoutTellie];
+        }
+        else{
+            [model setRunType:kRunStandardPhysicsRun];
+        }
+    }
+    else if ([[sender title] isEqualToString:@"New Maint. Run"]){
+        [model setRunType:kRunMaintainence];
+    }
+    else{
+        NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
+        [model setRunType:kRunUndefined];
+    }
+    
 }
 - (IBAction)stopRunAction:(id)sender {
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
     [currentStatus setStringValue:[self getStoppingString]];
+    
+    //reset the run Type to be undefined
+    [model setRunType:kRunUndefined];
 }
 
 - (void) startRun
@@ -741,8 +785,10 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-    //[smellieCheckInterlock setEnabled:NO];
     
+    //assign the run type as a SMELLIE run
+    [model setRunType:kRunSmellie];
+
     //start different sub runs as the laser runs through
     //communicate with smellie model
     
@@ -772,6 +818,10 @@ smellieRunFile;
     [smellieStartRunButton setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
     //[smellieCheckInterlock setEnabled:YES];
+    
+    
+    //unassign the run type as a SMELLIE run
+    [model setRunType:kRunUndefined];
    
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
@@ -807,6 +857,9 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
     [smellieStopRunButton setEnabled:NO];
+    
+    //unassign the run type as a SMELLIE run
+    [model setRunType:kRunUndefined];
     //[smellieCheckInterlock setEnabled:NO];
     //turn the interlock off
     //(if a smellie run is currently operating) start a maintainence run

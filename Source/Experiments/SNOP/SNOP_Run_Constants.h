@@ -9,7 +9,7 @@
 //These constants define the numerical values of different run types in SNO+ 
 #define kRunUndefined                               0
 #define kRunMaintainence                            1
-#define kRunStandardPhysicsRunWithTellie            2
+#define kRunStandardPhysicsRun                      2
 #define kRunStandardPhysicsRunWithoutTellie         3
 #define kRunTellie                                  4
 #define kRunSmellie                                 5

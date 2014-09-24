@@ -186,6 +186,10 @@
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
+//run type definition functions
+- (void) setRunType:(int)aRunType;
+- (int) getRunType;
+
 //smellie functions -------
 - (void) getSmellieRunListInfo;
 - (NSMutableDictionary*)smellieTestFct;
