@@ -268,7 +268,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Fetch the run index that is being used
     //NSString* runDescription = [NSString stringWithFormat:@"%@",[aSnotModel]]
     
-    [runDocDict setObject:docType forKey:@"doc_type"];
+    [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
     [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
     [runDocDict setObject:smellieRunNameLabel forKey:@"run_description_used"];
