@@ -681,7 +681,7 @@ smellieRunFile;
 
 -(IBAction)loadSmellieRunAction:(id)sender
 {
-    if( ([smellieRunFileNameField objectValueOfSelectedItem]!= nil) && (self.smellieRunFile != nil))
+    if([smellieRunFileNameField objectValueOfSelectedItem]!= nil)
     {
         [smellieStartRunButton setEnabled:YES];
         [smellieStopRunButton setEnabled:YES];
