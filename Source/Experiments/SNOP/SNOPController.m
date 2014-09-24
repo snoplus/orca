@@ -206,6 +206,7 @@ smellieRunFile;
 	else [self startRun];
     [currentStatus setStringValue:[self getStartingString]];
     
+    NSLog(@"Sender: %@",[sender title]);
     
     //decide whether to issue a standard Physics run or a maintainence run
     if([[sender title] isEqualToString:@"Start Physics Run"]){
@@ -234,6 +235,8 @@ smellieRunFile;
     [theRunControl setForceRestart:YES];
     [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
     [currentStatus setStringValue:[self getRestartingString]];
+    
+    NSLog(@"Sender: %@",[sender title]);
     
     if([[sender title] isEqualToString:@"New Physics Run"]){
         

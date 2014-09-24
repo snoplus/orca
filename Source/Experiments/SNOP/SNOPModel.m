@@ -997,7 +997,7 @@ int runType = kRunUndefined;
 
     [runDocDict setObject:@"run" forKey:@"type"];
     //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
-    [runDocDict setObject:[NSNumber numberWithUnsignedInt:1] forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedInt:[self getRunType]] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
