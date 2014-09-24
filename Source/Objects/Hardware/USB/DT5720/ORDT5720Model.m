@@ -2,21 +2,18 @@
 //  ORDT5720Model.m
 //  Orca
 //
-//  USB Relay I/O Interface
-//
-//  Created by Mark Howe on Thurs Jan 26 2007.
-//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Wed Mar 12,2014.
+//  Copyright (c) 2014 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
+//This program was prepared for the Regents of the University of
+//North Carolina at the Center sponsored in part by the United States
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//The University has certain rights in the program pursuant to
+//the contract and the program should not be copied or distributed
+//outside your organization.  The DOE and the University of
+//North Carolina reserve all rights in the program. Neither the authors,
+//University of North Carolina, or U.S. Government make any warranty,
+//express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
 
@@ -103,11 +100,32 @@ static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
     {@"BLT Event Num",		false,	true, 	true,	0xEF1C,		kReadWrite},
     {@"Scratch",			false,	true, 	true,	0xEF20,		kReadWrite},
     {@"SW Reset",			false,	false, 	false,	0xEF24,		kWriteOnly},
-    {@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly}
+    {@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly},
     //	{@"Flash Enable",		false,	false, 	true,	0xEF2C,		kReadWrite},
     //	{@"Flash Data",			false,	false, 	true,	0xEF30,		kReadWrite},
     //	{@"Config Reload",		false,	false, 	false,	0xEF34,		kWriteOnly},
-    //	{@"Config ROM",			false,	false, 	false,	0xF000,		kReadOnly}
+    {@"ConfROM CheckSum",	false,	false, 	false,	0xF000,		kReadOnly},
+    {@"ConfROM CheckSumLen2",false,	false, 	false,	0xF004,		kReadOnly},
+    {@"ConfROM CheckSumLen1",false,	false, 	false,	0xF008,		kReadOnly},
+    {@"ConfROM CheckSumLen0",false,	false, 	false,	0xF00C,		kReadOnly},
+    {@"ConfROM Version",	false,	false, 	false,	0xF030,		kReadOnly},
+    {@"ConfROM Board2",     false,	false, 	false,	0xF034,		kReadOnly},
+    {@"ConfROM Board1",     false,	false, 	false,	0xF038,		kReadOnly},
+    {@"ConfROM Board0",     false,	false, 	false,	0xF03C,		kReadOnly},
+    {@"ConfROM SerNum1",    false,	false, 	false,	0xF080,		kReadOnly},
+    {@"ConfROM SerNum0",    false,	false, 	false,	0xF084,		kReadOnly},
+    {@"ConfROM VCXOType",   false,	false, 	false,	0xF088,		kReadOnly}
+};
+
+static DT5720ControllerRegisterNamesStruct ctrlReg[kNumberDT5720ControllerRegisters] = {
+    {@"Status register", 0x00, kReadOnly, 16},
+    {@"Control register", 0x01, kReadWrite, 16},
+    {@"Firmware revision", 0x02, kReadOnly, 16},
+    {@"Firmware download", 0x03, kReadWrite, 8},
+    {@"Flash Enable", 0x04, kReadWrite, 1},
+    {@"IRQ Status", 0x05, kReadOnly, 7},
+    {@"Front Panel Input", 0x08, kReadWrite, 7},
+    {@"Front Panel Output", 0x08, kReadWrite, 11}
 };
 
 static NSString* DT5720RunModeString[4] = {
@@ -117,13 +135,34 @@ static NSString* DT5720RunModeString[4] = {
     @"Multi-Board Sync",
 };
 
+@interface ORDT5720Model (private)
+{
+}
+
+- (void) dataWorker:(NSDictionary*)arg;
+
+@end
+
+
 @implementation ORDT5720Model
+
+@synthesize
+vmeRegValue = _vmeRegValue,
+vmeRegIndex = _vmeRegIndex,
+vmeRegArray = _vmeRegArray,
+isNeedToSwap = _isNeedToSwap,
+isVMEFIFOMode = _isVMEFIFOMode,
+isDataWorkerRunning = _isDataWorkerRunning,
+isTimeToStopDataWorker = _isTimeToStopDataWorker;
+
 - (id) init //designated initializer
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	[self setEnabledMask:0xF];
     [self setEventSize:0xa];
+    [self setEndianness];
+    [self fillVmeRegArray];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -470,18 +509,18 @@ static NSString* DT5720RunModeString[4] = {
 	 object:self];
 }
 
-- (unsigned long) writeValue
+- (unsigned long) selectedRegValue
 {
-    return writeValue;
+    return selectedRegValue;
 }
 
-- (void) setWriteValue:(unsigned long) aValue
+- (void) setSelectedRegValue:(unsigned long) aValue
 {
     // Set the undo manager action.  The label has already been set by the controller calling this method.
-    [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegValue:[self selectedRegValue]];
     
     // Set the new value in the model.
-    writeValue = aValue;
+    selectedRegValue = aValue;
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
@@ -891,7 +930,7 @@ static NSString* DT5720RunModeString[4] = {
     short	end;
     short	i;
 	
-    long theValue			=  [self writeValue];
+    long theValue			= [self selectedRegValue];
     short theChannelIndex	= [self selectedChannel];
     short theRegIndex 		= [self selectedRegIndex];
     
@@ -1130,6 +1169,8 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) initBoard
 {
+    [self initEmbeddedVMEController];
+    [self readConfigurationROM];
     [self writeAcquistionControl:NO]; // Make sure it's off.
 	[self clearAllMemory];
 	[self softwareReset];
@@ -1144,6 +1185,108 @@ static NSString* DT5720RunModeString[4] = {
 	[self writeOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
+}
+
+- (void) initEmbeddedVMEController
+{
+
+    //get FIFO mode; address increment bit == 1 -> disabled -> fifo mode
+    unsigned short value;
+    int err;
+
+    err = [self readVmeCtrlRegister:ctrlReg[kCtrlCtrl].addressOffset toValue:&value];
+    if (err) {
+		NSLog(@"DT5720 error reading VME control register.\n");
+        NSLog(@"DT5720 Embedded VME controller was NOT initialized.\n");
+        return;
+    }
+
+    //NSLog(@"DT5720 VME control register: 0x%04x\n", value);
+    self.isVMEFIFOMode = (BOOL)(value & 0x2000);
+    
+}
+
+
+- (void) readConfigurationROM
+{
+    unsigned long value;
+    int err;
+    
+    //test we can write and read
+    value = 0xCC00FFEE;
+    err = [self writeLongBlock:&value atAddress:reg[kScratch].addressOffset];
+    if (err) {
+        NSLog(@"DT5720 write scratch register at address: 0x%04x failed\n", reg[kScratch].addressOffset);
+        return;
+    }
+    
+    value = 0;
+    err = [self readLongBlock:&value atAddress:reg[kScratch].addressOffset];
+    if (err) {
+        NSLog(@"DT5720 read scratch register at address: 0x%04x failed\n", reg[kScratch].addressOffset);
+        return;
+    }
+    if (value != 0xCC00FFEE) {
+        NSLog(@"DT5720 read scratch register returned bad value: 0x%08x, expected: 0xCC00FFEE\n");
+        return;
+    }
+
+    //get digitizer version
+    value = 0;
+    err = [self readLongBlock:&value atAddress:reg[kConfigROMVersion].addressOffset];
+    if (err) {
+        NSLog(@"DT5720 read configuration ROM version at address: 0x%04x failed\n", reg[kConfigROMVersion].addressOffset);
+        return;
+    }
+    switch (value & 0xFF) {
+        case 0x30: //DT5720 tested. 4 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C4, SE
+            break;
+
+        case 0x32:
+            NSLog(@"Warning: DT5720B/C is not tested\n");
+            //DT5720B is 4 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C20, SE, i.e., different FPGA
+            //DT5720C is 2 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C20, SE
+            //unlikely to work without testing
+            break;
+
+        case 0x34:
+            NSLog(@"Warning: DT5720A is not tested\n");
+            //DT5720A is 2 Ch. 12 bit 250 MS/s Digitizer: 1.25MS/ch, C4, SE
+            //should work fine
+            //todo: reduce number of channels in UI
+            break;
+
+        case 0x38:
+            NSLog(@"Warning: DT5720D is not tested\n");
+            //DT5720D is 4 Ch. 12 bit 250 MS/s Digitizer: 10MS/ch, C20, SE, i.e., different FPGA and RAM
+            //unlikely to work
+            break;
+
+        case 0x39:
+            NSLog(@"Warning: DT5720E is not tested\n");
+            //DT5720E is 2 Ch. 12 bit 250 MS/s Digitizer: 10MS/ch, C20, SE; two channel version of D
+            break;
+
+        default:
+            NSLog(@"Warning: unknown digitizer version read from its configuration ROM.\n");
+            break;
+    }
+    
+    //check board ID
+    value = 0;
+    err = [self readLongBlock:&value atAddress:reg[kConfigROMBoard2].addressOffset];
+    if (err) {
+        NSLog(@"DT5720 read configuration ROM Board2 at address: 0x%04x failed\n", reg[kConfigROMBoard2].addressOffset);
+        return;
+    }
+    switch (value & 0xFF) {
+        case 0x02: //DT5720x
+            break;
+            
+        default:
+            NSLog(@"Warning: unknown digitizer Board2 ID read from its configuration ROM.\n");
+            break;
+    }
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue
@@ -1423,6 +1566,7 @@ static NSString* DT5720RunModeString[4] = {
     
     return dataDictionary;
 }
+
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     //----------------------------------------------------------------------------------------
@@ -1430,14 +1574,36 @@ static NSString* DT5720RunModeString[4] = {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORDT5720Model"];    
 	//----------------------------------------------------------------------------------------
     [self initBoard];
+
+    
+    //launch data pulling thread
+    if (!self.dataArray) self.dataArray = [NSMutableArray arrayWithCapacity:10000];
+    [self.dataArray removeAllObjects];
+    
+    self.isTimeToStopDataWorker = NO;
+    self.isDataWorkerRunning = NO;
+    [NSThread detachNewThreadSelector:@selector(dataWorker:) toTarget:self withObject:nil];
+    
+    
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
+    //stop data pulling thread
+    
+    self.isTimeToStopDataWorker = YES;
+    while (self.isDataWorkerRunning) {
+        usleep(1000);
+    }
+    
+    //copy all the remaining data from dataArray
+    
 }
 
 #pragma mark ***Archival
@@ -1459,20 +1625,394 @@ static NSString* DT5720RunModeString[4] = {
     return 0; //no meaning ?
 }
 
+-(void) setEndianness
+{
+    if (0x0000ABCD == htonl(0x0000ABCD)) {
+        self.isNeedToSwap = true;
+    }
+}
+
+- (void) fillVmeRegArray
+{
+    
+    NSMutableArray* vmeReg = [NSMutableArray arrayWithCapacity:kNumberDT5720ControllerRegisters];
+    for (int i=0; i<kNumberDT5720ControllerRegisters; i++) {
+        //[vmeReg addObject:[NSValue valueWithBytes:&ctrlReg[i] objCType:@encode(DT5720ControllerRegisterNamesStruct)]];
+        [vmeReg addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                           ctrlReg[i].regName, @"name",
+                           [NSNumber numberWithLong:ctrlReg[i].addressOffset], @"addressOffset",
+                           [NSNumber numberWithBool:(ctrlReg[i].accessType == kReadOnly || ctrlReg[i].accessType == kReadWrite)], @"readEnable",
+                           [NSNumber numberWithBool:(ctrlReg[i].accessType == kWriteOnly || ctrlReg[i].accessType == kReadWrite)], @"writeEnable",
+                           nil]];
+    }
+    self.vmeRegArray = vmeReg;
+    
+    /*
+    self.vmeRegArray = @[
+                          @{@"name": @"Status register", @"offset": @0x00, @"access": @0, @"bits": @16},
+                          @{@"name": @"Control register", @"offset": @0x01, @"access": @1, @"bits": @16},
+                          @{@"name": @"Firmware revision", @"offset": @0x02, @"access": @0, @"bits": @16}
+                        ];
+     */
+}
+
+#define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
+#define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
+
+- (void) readVmeCtrlRegister
+{
+    unsigned short value;
+    int error;
+    
+    error = [self readVmeCtrlRegister:ctrlReg[self.vmeRegIndex].addressOffset toValue:&value];
+    if (!error) {
+        self.vmeRegValue = value;
+    }
+}
+
+- (int) readVmeCtrlRegister:(unsigned short) address toValue:(unsigned short*) value
+{
+    struct {
+        unsigned short address;
+    } req;
+    
+    struct {
+        unsigned short value;
+        unsigned short status;
+    } resp;
+    
+    req.address = 0x4080U | address;
+    
+    if (self.isNeedToSwap) {
+        req.address = swapShort(req.address);
+    }
+    
+    @try {
+		[[self usbInterface] writeBytes:(void*) &req length:sizeof(req)];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 read controller at address: 0x%04x failed\n", address);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+    
+    memset(&resp, 0, sizeof(resp));
+    
+    @try {
+        [[self usbInterface] readBytes:(void*) &resp length:sizeof(resp)];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 controller failed to respond at address: 0x%04x\n", address);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+    
+    if (self.isNeedToSwap) {
+        resp.value = swapShort(resp.value);
+    }
+    
+    *value = resp.value;
+    
+    return 0;
+}
+
+- (void) writeVmeCtrlRegister
+{
+    [self writeVmeCtrlRegister:ctrlReg[self.vmeRegIndex].addressOffset value:self.vmeRegValue];
+}
+
+- (int) writeVmeCtrlRegister:(unsigned short) address value:(unsigned short) value
+{
+    struct {
+        unsigned short address;
+        unsigned short value;
+    } req;
+    
+    req.address = 0x0080U | address;
+    req.value = value;
+    
+    if (self.isNeedToSwap) {
+        req.address = swapShort(req.address);
+        req.value = swapShort(req.value);
+    }
+    
+    @try {
+		[[self usbInterface] writeBytes:(void*) &req length:sizeof(req)];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 write controller register at address: 0x%04x failed\n", address);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+    
+    return 0;
+}
+
+//compatibility with VME interface
 -(void) writeLongBlock:(unsigned long *) writeAddress
 			 atAddress:(unsigned int) vmeAddress
 			numToWrite:(unsigned int) numberLongs
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
+    [self writeLongBlock:writeAddress atAddress:vmeAddress];
 }
+
+//returns 0 if success; -1 if request fails, and number of bytes returned by digitizer in otherwise
+-(int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) vmeAddress
+{
+    struct {
+        unsigned short commandID;
+        unsigned long address;
+        unsigned long value;
+    } req;
+    
+    struct {
+        unsigned short status;
+    } resp;
+
+    int num_read = 0;
+    
+    req.commandID = 0x89A1;
+    req.address = vmeAddress;
+    req.value = *writeValue;
+    
+    if (self.isNeedToSwap) {
+        req.commandID = swapShort(req.commandID);
+        req.address = swapLong(req.address);
+        req.value = swapLong(req.value);
+    }
+    
+    //req c struct is aligned in a different way than CAEN wants
+    char req_aligned[10];
+    *(unsigned short*) req_aligned = req.commandID;
+    *(unsigned long*) (req_aligned + 2) = req.address;
+    *(unsigned long*) (req_aligned + 6) = req.value;
+    
+    @try {
+		[[self usbInterface] writeBytes:(void*) req_aligned length:10];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 failed write request at address: 0x%08x failed\n", vmeAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+
+    memset(&resp, 0, sizeof(resp));
+    
+    @try {
+        num_read = [[self usbInterface] readBytes:(void*) &resp length:sizeof(resp)];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 failed write respond at address: 0x%08x\n", vmeAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+	}
+    
+    if (self.isNeedToSwap) {
+        resp.status = swapShort(resp.status);
+    }
+    
+    if (num_read != 2 || resp.status & 0x20) {
+		NSLog(@"DT5720 failed write at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 returned with bus error\n");
+        return num_read;
+    }
+    
+    return 0;
+}
+
+//compatibility with VME interface
 -(void) readLongBlock:(unsigned long *) readAddress
 			atAddress:(unsigned int) vmeAddress
 			numToRead:(unsigned int) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
 		usingAddSpace:(unsigned short) anAddressSpace
 {
+    [self readLongBlock:readAddress atAddress:vmeAddress];
 }
+
+//returns 0 if success, -1 if request fails, and number of bytes returned by digitizer otherwise
+-(int) readLongBlock:(unsigned long*) readValue atAddress:(unsigned int) vmeAddress
+{
+    struct {
+        unsigned short commandID;
+        unsigned int address;
+    } req;
+    
+    struct {
+        unsigned int value;
+        unsigned short status;
+    } resp;
+
+    int num_read = 0;
+    
+    req.commandID = 0xC9A1;
+    req.address = vmeAddress;
+
+    if (self.isNeedToSwap) {
+        req.commandID = swapShort(req.commandID);
+        req.address = swapLong(req.address);
+    }
+
+    //req c struct is aligned in a different way than CAEN wants
+    char req_aligned[6];
+    *(unsigned short*) req_aligned = req.commandID;
+    *(unsigned long*) (req_aligned + 2) = req.address;
+    
+    @try {
+		[[self usbInterface] writeBytes:(void*) req_aligned length:6];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 failed read request at address: 0x%08x failed\n", vmeAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+    
+    memset(&resp, 0, sizeof(resp));
+
+    @try {
+        num_read = [[self usbInterface] readBytes:(void*) &resp length:sizeof(resp)];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 failed read respond at address: 0x%08x\n", vmeAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+    
+    if (self.isNeedToSwap) {
+        resp.value = swapLong(resp.value);
+        resp.status = swapShort(resp.status);
+    }
+    
+    if (num_read != 6 || (resp.status & 0x20)) {
+		NSLog(@"DT5720 failed read at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 returned with bus error\n");
+        return num_read;
+    }
+    
+    *readValue = resp.value;
+    return 0;
+}
+
+//returns 0 if success; -1 if request fails, and number of bytes returned by digitizer otherwise
+//this isn't a user friendly function for performance reasons
+//numBytes must be multiple of 8
+//readValue must be atleast (numBytes + 2) long
+- (int) readMBLT:(unsigned long*) readValue
+       atAddress:(unsigned int) vmeAddress
+  numBytesToRead:(unsigned long) numBytes
+{
+    if (numBytes == 0) return 0;
+    
+    //64 bit cycles -> numBytes must be 8 aligned
+    const unsigned long aligned_num_bytes = (numBytes + 7) & ~7UL;
+    
+    //limited to 16 MB on linux why?
+    //chunk size in bytes, must be multiples of 8, max is 0xffff * 8
+    const unsigned long chunk_size = 0x8000 * 8; //bytes
+
+    int num_read = 0;
+    int i;
+    
+    unsigned long num_transfers = (aligned_num_bytes - 1) / chunk_size + 1;
+
+    //MBLT request is an array of readLongBlock like requests
+    char req[num_transfers * 8];
+    struct {
+        unsigned short commandID;
+        unsigned short num_cycles;
+        unsigned long address;
+    } mblt_req;
+    
+    mblt_req.commandID = 0xC8BF;
+    mblt_req.num_cycles = chunk_size >> 4;
+    mblt_req.address = vmeAddress; //this works in fifo mode, regardless what the vme controller says
+    
+    if (self.isNeedToSwap) {
+        mblt_req.commandID = swapShort(mblt_req.commandID);
+        mblt_req.num_cycles = swapShort(mblt_req.num_cycles);
+        mblt_req.address = swapLong(mblt_req.address);
+    }
+    
+    //req c struct is aligned in a different way than CAEN wants
+    char mblt_req_aligned[8];
+    *(unsigned short*) mblt_req_aligned = mblt_req.commandID;
+    *(unsigned short*) (mblt_req_aligned + 2) = mblt_req.num_cycles;
+    *(unsigned long*) (mblt_req_aligned + 4) = mblt_req.address;
+
+    for (i = 0; i < num_transfers - 1; ++i) {
+        memcpy(req + i*8, mblt_req_aligned, 8);
+    }
+    
+    //now the final readLongBlock request
+    mblt_req.commandID = 0xC8BC;
+    mblt_req.num_cycles = (aligned_num_bytes - (num_transfers - 1) * chunk_size) >> 4;
+    mblt_req.address = vmeAddress;
+
+    if (self.isNeedToSwap) {
+        mblt_req.commandID = swapShort(mblt_req.commandID);
+        mblt_req.num_cycles = swapShort(mblt_req.num_cycles);
+        mblt_req.address = swapLong(mblt_req.address);
+    }
+
+    size_t req_offset = (num_transfers - 1) * 8;
+    
+    *(unsigned short*) (req + req_offset) = mblt_req.commandID;
+    *(unsigned short*) (req + req_offset + 2) = mblt_req.num_cycles;
+    *(unsigned long*) (req + req_offset + 4) = mblt_req.address;
+
+    @try {
+		[[self usbInterface] writeBytes:(void*) req length:sizeof(req)];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 readMBLT request at address: 0x%08x failed\n", vmeAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+    
+    //char read_buffer[aligned_num_bytes + 2];
+    //memset(read_buffer, 0, sizeof(read_buffer));
+    memset(readValue, 0, aligned_num_bytes + 2);
+    
+    @try {
+        num_read = [[self usbInterface] readBytes:(void*) readValue length:aligned_num_bytes + 2];
+	}
+    @catch (NSException* e) {
+		NSLog(@"DT5720 failed readMBLT respond at address: 0x%08x\n", vmeAddress);
+		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+        return -1;
+	}
+
+    unsigned short* resp_status = (unsigned short*) readValue + aligned_num_bytes;
+    if (self.isNeedToSwap) {
+        *resp_status = swapShort(*resp_status);
+    }
+
+    if (num_read != aligned_num_bytes + 2 || (*resp_status & 0x20)) {
+		NSLog(@"DT5720 failed readMBLT at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 returned with bus error\n");
+        return num_read;
+    }
+    *resp_status = 0x0;
+    
+/*
+    dw = 64 -> dsize = 3
+    DW = 0x08 it's in bytes
+    am = VME_MBLT_AM = 0x08
+    MAX_BLT_SIZE = 60 * 1024 //chunk used for everything
+    
+    opcode = 0xC000 | (AM << 8) | (2 << 6) | (dsize << 4);
+    opcode = 0xC000 | (0x08 << 8) | (0x02 << 6) | (0x03 << 4);
+             0xC000    0x0800        0x0080        0x0030
+             0xC8B0
+    
+    //    all transfers but the last one | FPBLT = 0xF
+    //    last transfer | FBLT = 0xC
+*/
+    
+    return 0;
+}
+
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)aDecoder
@@ -1510,7 +2050,9 @@ static NSString* DT5720RunModeString[4] = {
         [self setThreshold:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENThresChnl%d", i]]];
         [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENOverUnderChnl%d", i]]];
     }
-    
+
+    [self setEndianness];
+    [self fillVmeRegArray];
     
     [[self undoManager] enableUndoRegistration];
 	
@@ -1551,6 +2093,59 @@ static NSString* DT5720RunModeString[4] = {
 	
     return objDictionary;
 }
+
+@end
+
+@implementation ORDT5720Model (private)
+
+
+//data is NSArray of NSData ever growing
+//we need a lock token for @synchronized to copy data from the NSArray
+
+
+- (void) dataWorker:(NSDictionary*)arg
+{
+    NSAutoreleasePool* workerPool = [[NSAutoreleasePool alloc] init];
+    self.isDataWorkerRunning = YES;
+
+    char data_buffer[11*1024*1024]; //digitizer RAM
+    BOOL isDataAvailable;
+    
+    while (!self.isTimeToStopDataWorker) {
+
+        //is data available?
+        
+        //if no data available sleep 10 msec and then continue;
+        
+        //now we have data in digitizer...
+        
+        //fill from actually read event size
+        unsigned long event_size = 1024; //in bytes
+        
+        
+        //the data taker object thing goes here
+        
+        //pull all the events at once into a static buffer 11 MB large
+        
+        //break them into multiple events? here? decoder? think about max ORCA data packet size which is 0x3ffff words
+        
+        //get the bytes
+        
+        
+        //turn them into nsdata with two empty words prepended
+        memset(data_buffer, 0, 8); //make sure orca packet header placeholders are empty
+        NSData* event_data = [NSData dataWithBytes:data_buffer length:event_size + 8];
+        
+        //add them into dataArray
+        @synchronized(_dataArray) {
+            [self.dataArray addObject:[[event_data autorelease] retain]]; //passing ownership to the main thread
+        }
+    }
+    
+    self.isDataWorkerRunning = NO;
+    [workerPool release];
+}
+
 
 @end
 

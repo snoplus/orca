@@ -74,7 +74,17 @@ enum {
 	//kFlashEnable,			//0xEF2C
 	//kFlashData,			//0xEF30
 	//kConfigReload,		//0xEF34
-	//kConfigROM,			//0xF000
+	kConfigROMCheckSum,		//0xF000
+	kConfigROMCheckSumLen2,	//0xF004
+	kConfigROMCheckSumLen1,	//0xF008
+	kConfigROMCheckSumLen0,	//0xF00C
+	kConfigROMVersion,		//0xF030
+	kConfigROMBoard2,		//0xF034
+	kConfigROMBoard1,		//0xF038
+	kConfigROMBoard0,		//0xF03C
+	kConfigROMSerNum1,		//0xF080
+	kConfigROMSerNum0,		//0xF084
+	kConfigROMVCXOType,		//0xF088
 	kNumberDT5720Registers
 };
 
@@ -87,13 +97,36 @@ typedef struct  {
 	short			accessType;
 } DT5720RegisterNamesStruct;
 
+// DT5720 includes SW implemenation of V1718
+// V1718 registers follow
+enum {
+    kCtrlStatus,    //0x00
+    kCtrlCtrl,      //0x01
+    kCtrlFwRev,     //0x02
+    kCtrlFwDwnld,   //0x03
+    kCtrlFlEna,     //0x04
+    kCtrlIrqStat,   //0x05
+    kCtrlInReg,     //0x08
+    kCtrlOutRegS,   //0x0A
+    //the rest is probably not relevant
+	kNumberDT5720ControllerRegisters
+};
+
+typedef struct  {
+	NSString*       regName;
+	unsigned long 	addressOffset;
+	short			accessType;
+    unsigned short  numBits;
+} DT5720ControllerRegisterNamesStruct;
+
+
 // Size of output buffer
 #define kEventBufferSize 0x0FFC
-enum {
-	kReadOnly,
-	kWriteOnly,
-	kReadWrite
-};
+
+#define kReadOnly 0
+#define kWriteOnly 1
+#define kReadWrite 2
+
 #define kNumDT5720Channels 4
 
 @interface ORDT5720Model : ORUsbDeviceModel <USBDevice,ORDataTaker> {
@@ -103,7 +136,7 @@ enum {
 	unsigned long   dataId;
 	unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
-    unsigned long   writeValue;
+    unsigned long   selectedRegValue;
 	unsigned short  thresholds[kNumDT5720Channels];
 	unsigned short	dac[kNumDT5720Channels];
 	unsigned short	overUnderThreshold[kNumDT5720Channels];
@@ -128,13 +161,32 @@ enum {
     int				eventSize;
     unsigned long   numberBLTEventsToReadout;
     BOOL            continuousMode;
-	
+    
+    unsigned long   _vmeRegValue;
+    unsigned int   _vmeRegIndex;
+    NSArray*        _vmeRegArray;
+    BOOL            _isNeedToSwap; //DT5720 talks little endian
+    BOOL            _isVMEFIFOMode;
+    
 	//cached variables, valid only during running
 	unsigned int    statusReg;
 	unsigned long   location;
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
+
+    BOOL _isDataWorkerRunning;
+    BOOL _isTimeToStopDataWorker;
+    NSMutableArray* _dataArray;
 }
+
+@property (nonatomic, assign) unsigned long vmeRegValue;
+@property (nonatomic, assign) unsigned int vmeRegIndex;
+@property (nonatomic, assign) BOOL isNeedToSwap;
+@property (nonatomic, copy) NSArray* vmeRegArray;
+@property (nonatomic, assign) BOOL isVMEFIFOMode;
+@property (assign) BOOL isDataWorkerRunning;
+@property (assign) BOOL isTimeToStopDataWorker;
+@property (nonatomic, assign) NSMutableArray* dataArray;
 
 #pragma mark ***Accessors
 - (id) getUSBController;
@@ -165,8 +217,8 @@ enum {
 - (void)			setSelectedRegIndex: (unsigned short) anIndex;
 - (unsigned short) 	selectedChannel;
 - (void)			setSelectedChannel: (unsigned short) anIndex;
-- (unsigned long) 	writeValue;
-- (void)			setWriteValue: (unsigned long) anIndex;
+- (unsigned long) 	selectedRegValue;
+- (void)			setSelectedRegValue: (unsigned long) anIndex;
 - (unsigned short)	enabledMask;
 - (void)			setEnabledMask:(unsigned short)aEnabledMask;
 - (unsigned long)	postTriggerSetting;
@@ -199,6 +251,10 @@ enum {
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
 #pragma mark ***Register - General routines
+- (int)     readVmeCtrlRegister:(unsigned short) address toValue:(unsigned short*) value;
+- (void)    readVmeCtrlRegister;
+- (int)     writeVmeCtrlRegister:(unsigned short) address value:(unsigned short) value;
+- (void)    writeVmeCtrlRegister;
 - (void)			read;
 - (void)			write;
 - (void)			report;
@@ -210,8 +266,11 @@ enum {
 - (void)			clearAllMemory;
 - (void)			checkBufferAlarm;
 
+
 #pragma mark ***HW Init
 - (void)			initBoard;
+- (void)			initEmbeddedVMEController;
+- (void)            readConfigurationROM;
 - (void)			writeChannelConfiguration;
 - (void)			writeCustomSize;
 - (void)			writeAcquistionControl:(BOOL)start;
@@ -262,10 +321,18 @@ enum {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ***HW Read/Write API
+- (void) setEndianness;
+- (void) fillVmeRegArray;
 - (id) adapter;
 - (unsigned long) baseAddress;
 - (unsigned short) addressModifier;
 - (int) slot;
+- (int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) vmeAddress;
+- (int) readLongBlock:(unsigned long*) readValue atAddress:(unsigned int) vmeAddress;
+
+- (int) readMBLT:(unsigned long*) readValue
+       atAddress:(unsigned int) vmeAddress
+  numBytesToRead:(unsigned long) numBytes;
 
 - (void) writeLongBlock:(unsigned long *) writeAddress
 			 atAddress:(unsigned int) vmeAddress
@@ -279,7 +346,6 @@ enum {
 			numToRead:(unsigned int) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
          usingAddSpace:(unsigned short) anAddressSpace;
-
 
 @end
 

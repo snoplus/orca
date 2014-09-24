@@ -1,5 +1,5 @@
 //
-//  ORHPDT5720Controller.m
+//  ORDT5720Controller.m
 //  Orca
 //
 //  Created by Mark Howe on Wed Mar 12,2014.
@@ -238,7 +238,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) awakeFromNib
 {
-    basicSize      = NSMakeSize(280,400);
+    basicSize      = NSMakeSize(780,450); //NSMakeSize(280,400);
     settingsSize   = NSMakeSize(780,450);
     monitoringSize = NSMakeSize(783,320);
     
@@ -415,8 +415,8 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) writeValueChanged:(NSNotification*) aNotification
 {
 	//  Set value of both text and stepper
-	[self updateStepper:writeValueStepper setting:[model writeValue]];
-	[writeValueTextField setIntValue:[model writeValue]];
+	[self updateStepper:writeValueStepper setting:[model selectedRegValue]];
+	[writeValueTextField setIntValue:[model selectedRegValue]];
 }
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
@@ -710,9 +710,9 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (IBAction) writeValueAction:(id) aSender
 {
     // Make sure that value has changed.
-    if ([aSender intValue] != [model writeValue]){
+    if ([aSender intValue] != [model selectedRegValue]){
 		[[[model document] undoManager] setActionName:@"Set Write Value"]; // Set undo name.
-		[model setWriteValue:[aSender intValue]]; // Set new value
+		[model setSelectedRegValue:[aSender intValue]]; // Set new value
     }
 }
 
