@@ -117,7 +117,6 @@
 //smellie functions -------------------
 - (IBAction) loadSmellieRunAction:(id)sender;
 - (IBAction) callSmellieSettings:(id)sender;
-- (IBAction) checkSmellieInterlockAction:(id)sender;
 - (IBAction) startSmellieRunAction:(id)sender;
 - (IBAction) stopSmellieRunAction:(id)sender;
 - (IBAction) emergencySmellieStopAction:(id)sender;

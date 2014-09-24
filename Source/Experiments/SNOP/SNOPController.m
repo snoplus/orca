@@ -58,9 +58,9 @@ smellieRunFile;
 -(void) awakeFromNib
 {
 	detectorSize		= NSMakeSize(620,595);
-	detailsSize		= NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(450,480);
+	detailsSize		= NSMakeSize(620,595);//NSMakeSize(450,589);
+	focalPlaneSize		= NSMakeSize(620,595);//NSMakeSize(450,589);
+	couchDBSize		= NSMakeSize(620,595);//NSMakeSize(450,480);
 	hvMasterSize		= NSMakeSize(620,595);
 	runsSize		= NSMakeSize(620,595);
 	
@@ -610,7 +610,7 @@ smellieRunFile;
 
 //this fetches the smellie run file information 
 - (IBAction) callSmellieSettings:(id)sender
-{
+{	
     //remove any old smellie file values 
     self.smellieRunFileList = nil;
     NSMutableDictionary *tmp = [[NSMutableDictionary alloc] initWithDictionary:[model smellieTestFct]];
@@ -634,8 +634,12 @@ smellieRunFile;
 
 -(IBAction)loadSmellieRunAction:(id)sender
 {
-    if([smellieRunFileNameField objectValueOfSelectedItem]!= nil)
+    if( ([smellieRunFileNameField objectValueOfSelectedItem]!= nil) && (self.smellieRunFile != nil))
     {
+        [smellieStartRunButton setEnabled:YES];
+        [smellieStopRunButton setEnabled:YES];
+        [smellieEmergencyStop setEnabled:YES];
+        
         //Loop through all the smellie files in the run list 
         for(id key in self.smellieRunFileList){
             
@@ -719,24 +723,16 @@ smellieRunFile;
                 [loadedSmellieLasersLabel setStringValue:smellieLaserString];
                 
                 //unlock the control buttons
-                [smellieCheckInterlock setEnabled:YES];
+                //[smellieCheckInterlock setEnabled:YES];
                 [smellieLaserString release];
                 
             }
         }
     }
     else{
-        [smellieCheckInterlock setEnabled:NO];
+        //[smellieCheckInterlock setEnabled:NO];
         NSLog(@"Main SNO+ Control:Please choose a Smellie Run File from selection\n");
     }
-}
-
-- (IBAction) checkSmellieInterlockAction:(id)sender
-{
-    //Check interlock with them model here
-    [smellieStartRunButton setEnabled:YES];
-    [smellieStopRunButton setEnabled:YES];
-    [smellieEmergencyStop setEnabled:YES];
 }
 
 - (IBAction) startSmellieRunAction:(id)sender
@@ -745,7 +741,7 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
-    [smellieCheckInterlock setEnabled:NO];
+    //[smellieCheckInterlock setEnabled:NO];
     
     //start different sub runs as the laser runs through
     //communicate with smellie model
@@ -775,7 +771,7 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:YES];
     [smellieStartRunButton setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
-    [smellieCheckInterlock setEnabled:YES];
+    //[smellieCheckInterlock setEnabled:YES];
    
     //Collect a series of objects from the ELLIEModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
@@ -811,7 +807,7 @@ smellieRunFile;
     [smellieRunFileNameField setEnabled:YES];
     [smellieStartRunButton setEnabled:NO];
     [smellieStopRunButton setEnabled:NO];
-    [smellieCheckInterlock setEnabled:NO];
+    //[smellieCheckInterlock setEnabled:NO];
     //turn the interlock off
     //(if a smellie run is currently operating) start a maintainence run
     //reset the smellie laser system
