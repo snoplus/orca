@@ -527,8 +527,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
     [theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
-    [objsSNOP release];
-    [theSNOPModel release];
     
     NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
     
@@ -894,8 +892,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
     [theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
-    [objsSNOP release];
-    [theSNOPModel release];
     
     //used to be halt run but this now moves straight into a maintainence run 
     
