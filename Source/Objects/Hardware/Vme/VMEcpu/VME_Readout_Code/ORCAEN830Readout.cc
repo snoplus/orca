@@ -27,8 +27,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
     }
     else  {
         bool dataReady = statusWord & (0x1L << 0);
-        bool cardBusy  = statusWord & (0x1L << 4);
-		if(dataReady & !cardBusy){
+		if(dataReady){
 			uint32_t dataId			= GetHardwareMask()[0];
 			uint32_t locationMask	= ((GetCrate() & 0x0f)<<21) | ((GetSlot() & 0x1f)<<16);
 			
@@ -51,9 +50,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                     uint32_t indexForRollOver = dataIndex;  //save a place for the roll over
                     data[dataIndex++] = 0;                  //channel 0 rollover
 					data[dataIndex++] = enabledMask;
-                    
- 
-					
+                
 					//get the header -- always the first word
 					uint32_t dataHeader = 0;
 					if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
@@ -68,13 +65,18 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 						}
                         //keep a rollover count for channel zero
                         if(chan0Enabled && i==0){
-
-                            if(aValue!=lastChan0Count && aValue<lastChan0Count){
-                                rollOverCount++;
+                            if(aValue!=0){
+                                if(aValue<lastChan0Count){
+                                    rollOverCount++;
+                                }
+                                lastChan0Count = aValue;
+                                data[indexForRollOver] = rollOverCount;
+                                data[dataIndex++]      = aValue+chan0Offset;
                             }
-                            lastChan0Count = aValue;
-                            data[indexForRollOver] = rollOverCount;
-                            data[dataIndex++]      = aValue+chan0Offset;
+                            else {
+                                data[indexForRollOver] = 0xffffffff;
+                                data[dataIndex++]      = 0xffffffff;
+                            }
                         }
                         else    data[dataIndex++]      = aValue;
 					}

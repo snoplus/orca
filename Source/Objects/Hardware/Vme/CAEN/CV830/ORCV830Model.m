@@ -590,14 +590,24 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 }
-
+- (unsigned short) readControlReg
+{
+  	unsigned short aValue;
+	[[self adapter] readWordBlock:&aValue
+						atAddress:[self baseAddress]+[self getAddressOffset:kControlReg]
+						numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+    return aValue;
+  
+}
 - (void) writeControlReg
 {
 	unsigned short aValue = 
 		(acqMode & 0x3)		|
 		(testMode << 3)		|
 		(1 << 5)			| //header MUST be enabled
-		(clearMeb << 6)		|
+        (clearMeb << 6)		|
 		(autoReset << 7);
 	
     [[self adapter] writeWordBlock:&aValue
@@ -763,7 +773,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
 	scheduledForUpdate  = NO;
-	isRunning           = NO;
 	numEnabledChannels  = [self numEnabledChannels];
 	chan0RollOverCount  = 0;
     lastChan0Count      = 0;
@@ -780,7 +789,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	@try {
-		isRunning = YES;
 		unsigned short statusRegValue;
 		[[self adapter] readWordBlock:&statusRegValue
 							atAddress:[self baseAddress]+[self getAddressOffset:kStatusReg]
@@ -788,61 +796,45 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
 		BOOL dataReady = statusRegValue & (0x1L << 0);
-        BOOL cardBusy  = statusRegValue & (0x1L << 4);
-		if(dataReady && !cardBusy){
-			//there was an event
-			unsigned short numEvents = 0;
-			[[self adapter] readWordBlock:&numEvents
-								atAddress:[self baseAddress]+[self getAddressOffset:kMEBEventNum]
-								numToRead:1
-							   withAddMod:[self addressModifier]
-							usingAddSpace:0x01];
-			if(numEvents){
-				int event;
-				for(event=0;event<numEvents;event++){
-					int totalWordsInRecord = 4+numEnabledChannels + 1;
-					dataRecord[0] = dataId | totalWordsInRecord;
-					dataRecord[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
-					dataRecord[2] = 0; //chan 0 roll over. fill in later
-                    dataRecord[3] = enabledMask;
+        
+		if(dataReady){
+            //there is at least one event
+            int totalWordsInRecord = 4+numEnabledChannels + 1;
+            dataRecord[0] = dataId | totalWordsInRecord;
+            dataRecord[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
+            dataRecord[2] = 0; //chan 0 roll over. fill in later
+            dataRecord[3] = enabledMask;
+            int i;
+            for(i=0;i<numEnabledChannels+1;i++){
+                //read the header + the counts for the enabled channels
+                [[self adapter] readLongBlock:&dataRecord[4+i]
+                                    atAddress:[self baseAddress]+[self getAddressOffset:kEventBuffer]
+                                    numToRead:1
+                                   withAddMod:[self addressModifier]
+                                usingAddSpace:0x01];
+            }
+            //for chan zero keep a rollover count
+            if((enabledMask & 0x1)){
+                if(dataRecord[5]!=0){
+                    if(dataRecord[5]<lastChan0Count){
+                        chan0RollOverCount++;
+                    }
+                    lastChan0Count = dataRecord[5];
+                    dataRecord[2] = chan0RollOverCount;
+                    dataRecord[5] += count0Offset;
+                }
+                else {
+                    //temp work around for erroronous counter transfers
+                    dataRecord[2] = 0xffffffff;
+                    dataRecord[5] = 0xffffffff;
+                }
+            }
 
-					//read the header
-					unsigned long theHeader;
-					[[self adapter] readLongBlock:&theHeader
-										atAddress:[self baseAddress]+[self getAddressOffset:kEventBuffer]
-										numToRead:1
-									   withAddMod:[self addressModifier]
-									usingAddSpace:0x01];
-					dataRecord[4] = theHeader;
+            [aDataPacket addLongsToFrameBuffer:dataRecord length:totalWordsInRecord];
 
-					
-					int i;
-					for(i=0 ; i<numEnabledChannels ; i++){
-						unsigned long aValue;
-						[[self adapter] readLongBlock:&aValue
-											atAddress:[self baseAddress]+[self getAddressOffset:kEventBuffer]
-											numToRead:1
-										   withAddMod:[self addressModifier]
-										usingAddSpace:0x01];
-                        //for chan zero keep a rollover count
-                        if((enabledMask & 0x1) && (i==0)){
-                            if(aValue<lastChan0Count){
-                                chan0RollOverCount++;
-                            }
-                            lastChan0Count = aValue;
-                            dataRecord[2] = chan0RollOverCount;
-                            dataRecord[i + 5] = aValue + count0Offset;
-
-                        }
-						else dataRecord[i + 5] = aValue;
-					}
-					[aDataPacket addLongsToFrameBuffer:dataRecord length:totalWordsInRecord];
-
-					for(id obj in dataTakers){
-						[obj takeData:aDataPacket userInfo:userInfo];
-					}
-				}	
-			}
+            for(id obj in dataTakers){
+                [obj takeData:aDataPacket userInfo:userInfo];
+            }
 		}
 	}
 	@catch(NSException* localException) {
@@ -867,7 +859,6 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	[dataTakers release];
 	dataTakers = nil;
     controller = nil;
-	isRunning = NO;
 }
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index

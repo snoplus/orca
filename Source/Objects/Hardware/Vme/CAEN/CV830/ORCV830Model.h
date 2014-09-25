@@ -173,6 +173,7 @@ enum {
 - (void) writeDwellTime;
 - (unsigned short) getNumEvents;
 - (unsigned short) numEnabledChannels;
+- (unsigned short) readControlReg;
 
 #pragma mark •••Data Header
 - (unsigned long) polledDataId;
