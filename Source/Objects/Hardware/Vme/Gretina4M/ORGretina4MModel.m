@@ -1523,7 +1523,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
     
-    unsigned long theValue = (poleZeroEnabled[chan]         << 22)  | //the baselinerestorer enable is tied to the polezero enable
+    unsigned long theValue = (baselineRestoreEnabled[chan]  << 22)  | //the baselinerestorer enable was tied to the polezero enable
                              (pzTraceEnabled[chan]          << 14)  |
                              (poleZeroEnabled[chan]         << 13)  |
                              ((tpol[chan] & 0x3)            << 10)  |
@@ -1608,7 +1608,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self writeAndCheckLong:collectionTime
               addressOffset:register_information[kCollectionTime].offset
-                       mask:0x1ff
+                       mask:0x3ff
                   reportKey:@"CollectionTime"];
 }
 
@@ -1617,7 +1617,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self writeAndCheckLong:integrateTime
               addressOffset:register_information[kIntegrateTime].offset
-                       mask:0x1ff
+                       mask:0x3ff
                   reportKey:@"IntegrationTime"];
 
 }
