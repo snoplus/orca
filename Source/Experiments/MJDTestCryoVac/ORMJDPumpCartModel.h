@@ -36,14 +36,19 @@
 #define kRegionRightSide	6
 #define kRegionNegPump		7
 #define kRegionCryostat		8
+#define kRegionTempA        9
+#define kRegionTempB        10
+#define kRegionTempC        11
+#define kRegionTempD        12
 
-#define kNumberRegions	    9
+#define kNumberRegions	    13
 //-----------------------------------
 //component tag numbers
 #define kTurboComponent			 0
 #define kRGAComponent			 1
 #define kPressureGaugeComponent1 2
 #define kPressureGaugeComponent2 3
+#define kTemperatureComponent1   4
 
 //-----------------------------------
 @interface ORMJDPumpCartModel : ORGroup <OROrderedObjHolding>
@@ -93,6 +98,7 @@
 - (void) turboChanged:(NSNotification*)aNote;
 - (void) pressureGaugeChanged:(NSNotification*)aNote;
 - (void) rgaChanged:(NSNotification*)aNote;
+- (void) temperatureGaugeChanged:(NSNotification*)aNote;
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder;

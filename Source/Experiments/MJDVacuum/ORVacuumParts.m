@@ -601,7 +601,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumDynamicLabel
-@synthesize channel,component,isValid;
+@synthesize channel,component,isValid,value;
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag component:(int)aComponent channel:(int)aChannel label:(NSString*)aLabel bounds:(NSRect)aRect
 {
 	self = [super initWithDelegate:aDelegate regionTag:aRegionTag label:aLabel bounds:aRect];
@@ -613,6 +613,11 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 - (NSString*) displayString
 {
 	return @"?";
+}
+- (BOOL) valueHigherThan:(double)aValue
+{
+    if(!self.isValid) return YES; //assume worst case
+    else return self.value > aValue;
 }
 
 - (void) draw 
@@ -667,7 +672,6 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumValueLabel
-@synthesize value;
 
 - (void) setValue:(double)aValue
 {
@@ -675,11 +679,6 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		value = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 	}
-}
-- (BOOL) valueHigherThan:(double)aValue
-{
-	if(!self.isValid) return YES; //assume worst case
-	else return self.value > aValue;
 }
 
 - (NSString*) displayString
@@ -689,6 +688,28 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 }
 
 @end
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@implementation ORTemperatureValueLabel
+
+- (void) setValue:(double)aValue
+{
+    if(fabs(aValue-value) > .1){
+        value = aValue;
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
+    }
+}
+
+
+- (NSString*) displayString
+{
+    if(self.isValid) return [NSString stringWithFormat:@"%.1f",[self value]];
+    else return @"?";
+}
+
+@end
+
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------

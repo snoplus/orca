@@ -291,7 +291,7 @@
 - (void) tempChanged:(NSNotification*)aNote
 {
 	if(aNote){
-		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+		int index = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
 		[self loadTempTimeValuesForIndex:index];
 	}
 	else {

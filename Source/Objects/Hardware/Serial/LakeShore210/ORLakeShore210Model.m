@@ -174,7 +174,8 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
 	return [super acceptsGuardian:aGuardian] ||
-    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")];
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDPumpCartModel")];
 }
 
 - (ORTimeRate*)timeRate:(int)index
@@ -225,6 +226,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	}
 }
 
+- (BOOL) isValid {return YES;}  //<<<----remove
 
 - (float) temp:(int)index
 {
@@ -250,7 +252,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210TempChanged 
 															object:self 
-														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
+														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
 
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
 		[timeRates[index] addDataToTimeAverage:aValue];

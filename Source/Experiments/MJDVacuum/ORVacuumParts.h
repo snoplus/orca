@@ -73,6 +73,7 @@ typedef struct  {
 #define kVacLine		9
 #define kGVControl		10
 #define kVacStatusItem	11
+#define kVacTempItem    12
 
 #define kGVImpossible				0
 #define kGVOpen					    1
@@ -173,24 +174,29 @@ typedef struct  {
 	BOOL isValid;
 	int component;
 	int channel;
+    double value;
 }
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag component:(int)aComponent channel:(int)aChannel label:(NSString*)label bounds:(NSRect)aRect;
 - (NSString*) displayString;
+- (BOOL) valueHigherThan:(double)aValue;
 @property (nonatomic,assign) int channel;
 @property (nonatomic,assign) int component;
 @property (nonatomic,assign) BOOL isValid;
+@property (nonatomic,assign) double value;
 @end
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @interface ORVacuumValueLabel : ORVacuumDynamicLabel
 {
-	double value;
 }
+@end
 
-- (BOOL) valueHigherThan:(double)aValue;
-
-@property (nonatomic,assign) double value;
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@interface ORTemperatureValueLabel : ORVacuumDynamicLabel
+{
+}
 @end
 
 //----------------------------------------------------------------------------------------------------

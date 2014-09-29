@@ -89,7 +89,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(stateChanged:)
                          name : ORVacuumPartChanged
-						object: model];
+						object: nil];
 
 	[notifyCenter addObserver : self
                      selector : @selector(lockChanged:)

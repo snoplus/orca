@@ -41,12 +41,23 @@
 	NSPoint aPoint = NSMakePoint(85,105);
 	[stringsImage drawAtPoint:aPoint fromRect:[stringsImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 
-	NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Cryo #%d",tag+1]
-												 attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-															 [NSFont fontWithName:@"Geneva" size:12],NSFontAttributeName,
-															 nil]]; 			
-	[s drawAtPoint:NSMakePoint( 3, 167)];
-	[s release];
-}
+    [self drawString:[NSString stringWithFormat:@"Cryo #%d",tag+1] atPoint:NSMakePoint( 3, 167)];
+    [self drawString:@"A" atPoint:NSMakePoint( 75, 160)];
+    [self drawString:@"B" atPoint:NSMakePoint(115, 160)];
+    [self drawString:@"C" atPoint:NSMakePoint( 75, 150)];
+    [self drawString:@"D" atPoint:NSMakePoint( 75, 108)];
 
+    
+   
+}
+- (void) drawString:(NSString*)aString atPoint:(NSPoint)aPoint
+{
+    NSAttributedString* s = [[NSAttributedString alloc] initWithString:aString
+                                        attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                    [NSFont fontWithName:@"Geneva" size:12],NSFontAttributeName,
+                                                    nil]];
+    [s drawAtPoint:aPoint];
+    [s release];
+
+}
 @end
