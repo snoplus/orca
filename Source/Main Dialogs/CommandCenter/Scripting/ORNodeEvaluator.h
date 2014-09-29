@@ -22,7 +22,6 @@
 
 @interface ORNodeEvaluator : NSObject {
 	NSMutableDictionary* symbolTable;
-	NSMutableDictionary* argValueDicionary;
 	NSArray*			 parsedNodes;
 	NSDecimalNumber*	 _one;
 	NSDecimalNumber*	 _zero;
