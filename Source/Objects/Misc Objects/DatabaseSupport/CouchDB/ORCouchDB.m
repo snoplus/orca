@@ -1090,6 +1090,13 @@ static void ORCouchDB_Feed_callback(CFReadStreamRef stream,
                                length: 0];
 }
 
+- (void) dealloc
+{
+    self.listeningMode = nil;
+    self.filter = nil;
+    [super dealloc];
+}
+
 - (void)streamFailedWithError:(NSError *)error
 {
     NSLog(@"%@: Got error %@\n", self, error);
