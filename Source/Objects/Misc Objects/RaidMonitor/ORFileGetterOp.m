@@ -41,18 +41,21 @@
 
 - (void) dealloc
 {        	
-    self.ipAddress      = nil;
-    self.remotePath     = nil;
-    self.userName       = nil;
-    self.fullPath       = nil;
-    self.passWord       = nil;
+    self.ipAddress          = nil;
+    self.remotePath         = nil;
+    self.localPath          = nil;
+    self.userName           = nil;
+    self.fullPath           = nil;
+    self.passWord           = nil;
+    self.doneSelectorName   = nil;
+    
     @try {
         [task terminate];
     }
     @catch (NSException* e){
-        
     }
     self.task           = nil;
+    
     [allOutput release];
     [[NSFileManager defaultManager] removeItemAtPath:scriptFilePath error:nil];
     self.scriptFilePath = nil;
