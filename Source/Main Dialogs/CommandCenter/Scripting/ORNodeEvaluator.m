@@ -1080,7 +1080,7 @@
 {
 	id returnValue = nil;
 	NSString* aFunctionName = VARIABLENAME(0);
-	NSMutableArray* argObject = [[NSMutableArray alloc] initWithCapacity:10];
+	NSMutableArray* argObject = [[[NSMutableArray alloc] initWithCapacity:10]autorelease];
 	id result = NodeValueWithContainer(1,argObject);
 	if([argObject count] == 0 && result!=nil)[argObject addObject:result];
 	
@@ -1108,7 +1108,6 @@
 				}
 			}
 			else {
-				[argObject release];
 				[functionEvaluator release];
 				functionEvaluator = nil;
 				[localException raise];
@@ -1133,7 +1132,6 @@
 			[NSException raise:@"Run time" format:@"Function not found"];
 		}
 	}
-	[argObject release];
 	
 	return returnValue;
 }
