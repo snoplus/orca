@@ -269,7 +269,11 @@ NSDate* burstStart = NULL;
                         
                         unsigned long secondsSinceEpoch = ShiftAndExtract(ptr[2], 0, 0xffffffff);
                         unsigned long microseconds = ShiftAndExtract(ptr[3], 0, 0xffffffff);
+                        if(cardNum>=16){
+                            break;
+                        }
                         quietSec=0;
+                        
                         
                         //make array of data to be buffered
                         [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
