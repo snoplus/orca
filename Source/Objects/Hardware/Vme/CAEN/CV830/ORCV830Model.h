@@ -109,7 +109,6 @@ enum {
 		NSTimeInterval	pollingState;
 		BOOL			shipRecords;
 		time_t			lastReadTime;
-		BOOL			isRunning;
 		BOOL			scheduledForUpdate;
 		unsigned long	dwellTime;
 		short			acqMode;
