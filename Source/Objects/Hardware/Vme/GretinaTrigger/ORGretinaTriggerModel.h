@@ -252,10 +252,6 @@ enum {
     unsigned short  miscStatReg;
     unsigned short  linkLruCrlReg;
     unsigned short  linkLockedReg;
-    unsigned short  lastCounter;
-    unsigned short  currentCounter;
-    int             stepAfterCounterCheck;
-    unsigned short  totalTimeCheckingCounter;
     BOOL            clockUsingLLink;
     NSString*       mainFPGADownLoadState;
     NSString*       fpgaFilePath;
@@ -279,7 +275,6 @@ enum {
     ORFileMoverOp*  fpgaFileMover;
     NSOperationQueue*	fileQueue;
     BOOL            initializationRunning;
-    BOOL            slaveRoutersToMasterRunning;
     short           initializationState;
     unsigned short  connectedRouterMask;
     unsigned short  connectedDigitizerMask;
