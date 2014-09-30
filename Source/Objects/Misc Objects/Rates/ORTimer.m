@@ -49,8 +49,9 @@
 
 + (void) delay:(NSTimeInterval)seconds
 {
-	NSTimeInterval t0 = [NSDate timeIntervalSinceReferenceDate];
-	while([NSDate timeIntervalSinceReferenceDate]-t0 < seconds);
+    [NSThread sleepForTimeInterval:seconds];
+	//NSTimeInterval t0 = [NSDate timeIntervalSinceReferenceDate];
+	//while([NSDate timeIntervalSinceReferenceDate]-t0 < seconds);
 }
 
 // reset
