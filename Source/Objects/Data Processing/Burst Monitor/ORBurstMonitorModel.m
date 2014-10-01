@@ -304,8 +304,10 @@ NSDate* burstStart = NULL;
                             burstData.dataRecord = theShaperRecord;
                             NSNumber* epochSec = [NSNumber numberWithLong:secondsSinceEpoch];
                             NSNumber* epochMic = [NSNumber numberWithLong:microseconds];
-                            burstData.epSec = [epochSec copy];
-                            burstData.epMic = [epochMic copy];
+                            //burstData.epSec = [epochSec copy]; <--- leaks....
+                            //burstData.epMic = [epochMic copy]; <--- leaks....
+                            burstData.epSec = epochSec; //MAH 9/30/14--no need to copy or retain. the property is doing that.
+                            burstData.epMic = epochMic;
                             
                             //[[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
                             //[burstData release];
@@ -351,7 +353,7 @@ NSDate* burstStart = NULL;
                                         }
                                         
                                         //Find characturistics of burst
-                                        NSMutableArray* reChans = [Nchans mutableCopy]; 
+                                        NSMutableArray* reChans = [[Nchans mutableCopy] autorelease]; //MAH added autorelease to prevent memory leak
                                         int j; //MAH -- declaration has to be outside the loop for XCode < 5.x
                                         for(j=0; j<[reChans count]; j++)
                                         {
@@ -409,6 +411,7 @@ NSDate* burstStart = NULL;
                                     novaP = 0;
                                     burstState = 0;
                                     if(Nchans.count<nHit){ // happens if a burst had too few channels and just got whiped
+                                        [burstData release]; //MAH... added to prevent memory leak on early return.
                                         return;
                                     }
                                     removedSec = [[Nsecs objectAtIndex:(nHit-2)] longValue];
@@ -818,7 +821,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         //if you are trying to make a data record, we need to talk. you need to use the proper data id and data
         //record size in the first word in order to have it work....
         //-------------------------
-        ORBurstData* someData = [[ORBurstData alloc] init]; //was separate, test
+        ORBurstData* someData = [[[ORBurstData alloc] init] autorelease]; //<<<<MAH. added the autorelease to prevent memory leak below. //was separate, test
         //someData.epSec=[[Bsecs objectAtIndex:l] longValue]; //crashes from bad access, but seems unneccesary //fixme?
         //someData.epMic=[[Bmics objectAtIndex:l] longValue];
        // unsigned long* testsec[4]; <<--this is not being used as a pointer. removed MAH 09/16/14
