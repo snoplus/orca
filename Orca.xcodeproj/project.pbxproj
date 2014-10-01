@@ -204,6 +204,7 @@
 		2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
+		2DE91C6719DC8C2B005C1A11 /* amptek-logo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
 		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
@@ -3702,6 +3703,7 @@
 		2DD0C9791940BC78009112B2 /* UserStatus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = UserStatus.nib; sourceTree = "<group>"; };
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
+		2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "amptek-logo.gif"; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
@@ -7040,6 +7042,7 @@
 			children = (
 				2D294525199E6A9400F68093 /* AmptekDP5.nib */,
 				2D294526199E6A9400F68093 /* AmptekDP5Card.gif */,
+				2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */,
 				2D294527199E6A9400F68093 /* ORAmptekDP5Controller.h */,
 				2D294528199E6A9400F68093 /* ORAmptekDP5Controller.m */,
 				2D294529199E6A9400F68093 /* ORAmptekDP5Decoder.h */,
@@ -16041,6 +16044,7 @@
 				2DD0C97C1940BC78009112B2 /* UserStatus.nib in Resources */,
 				2D29452E199E6A9400F68093 /* AmptekDP5.nib in Resources */,
 				2D29452F199E6A9400F68093 /* AmptekDP5Card.gif in Resources */,
+				2DE91C6719DC8C2B005C1A11 /* amptek-logo.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

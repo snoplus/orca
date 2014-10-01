@@ -1215,7 +1215,8 @@ return;
 //reply socket (server)
 - (IBAction) startListeningForReplyButtonAction:(id)sender
 {
-    //debug	NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    //debug	
+    NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model startListeningServerSocket];	
 }
 

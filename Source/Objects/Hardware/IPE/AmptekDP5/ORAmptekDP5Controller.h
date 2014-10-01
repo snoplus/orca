@@ -302,7 +302,7 @@
 - (IBAction) stopListeningForReplyButtonAction:(id)sender;
 - (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;
 
-- (IBAction) crateUDPCommandSendButtonAction:(id)sender;
+- (IBAction) crateUDPCommandSendButtonAction:(id)sender; //TODO: rename -tb-
 - (IBAction) crateUDPCommandSendBinaryButtonAction:(id)sender;
 - (IBAction) crateUDPCommandTextFieldAction:(id)sender;
 - (IBAction) crateUDPCommandIPTextFieldAction:(id)sender;

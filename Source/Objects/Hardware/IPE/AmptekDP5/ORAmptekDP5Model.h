@@ -125,7 +125,8 @@
 		NSArray*		dataTakers;			//cache of data takers.
 		BOOL			first;
         BOOL            accessAllowedToHardwareAndSBC;
-		// ak, 9.12.07
+
+
 		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
 		BOOL            displayEventLoop;  //< Display the event loop parameter
 		unsigned long   lastDisplaySec;
@@ -166,7 +167,12 @@
         socklen_t sockaddr_fromLength;
 		int isListeningOnServerSocket;
 		
-		
+        #define MAXDP5PACKETLENGTH 32775
+		unsigned char dp5Packet[MAXDP5PACKETLENGTH +1000];// according to DP5 manual (+some spares) -tb-
+        int currentDP5PacketLen; //current length
+        int countReceivedPackets; //current length
+        int expectedDP5PacketLen; //for adding up UDP packets ...
+        int waitForResponse; //a flag ...
 		
     int selectedFifoIndex;
     unsigned long pixelBusEnableReg;
@@ -366,6 +372,7 @@
 - (int) openServerSocket;
 - (void) closeServerSocket;
 - (int) receiveFromReplyServer;
+- (int) parseReceivedDP5Packet;
 
 //command socket (client)
 - (int) openCommandSocket;
@@ -373,10 +380,15 @@
 - (void) closeCommandSocket;
 - (int) sendUDPCommand;
 - (int) sendUDPCommandString:(NSString*)aString;
+- (int) sendBinaryString:(NSString*)aString;
 
 - (int) sendUDPCommandBinary;
 
 
+
+
+//UNUSED:
+//UNUSED:
 //  UDP data packet connection
 //reply socket (server)
 - (int) startListeningDataServerSocket;
