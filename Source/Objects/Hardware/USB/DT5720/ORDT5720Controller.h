@@ -172,14 +172,14 @@
 - (IBAction) selectRegisterAction: (id) aSender;
 - (IBAction) selectChannelAction: (id) aSender;
 
-- (IBAction) basicRead: (id) sender;
-- (IBAction) basicWrite: (id) sender;
+- (IBAction) basicReadAction: (id) sender;
+- (IBAction) basicWriteAction: (id) sender;
 - (IBAction) basicLockAction:(id)sender;
 - (IBAction) settingsLockAction:(id)sender;
 
-- (IBAction) report: (id) sender;
-- (IBAction) initBoard: (id) sender;
-- (IBAction) loadThresholds: (id) sender;
+- (IBAction) reportAction: (id) sender;
+- (IBAction) initBoardAction: (id) sender;
+- (IBAction) loadThresholdsAction: (id) sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) postTriggerSettingTextFieldAction:(id)sender;
 - (IBAction) triggerSourceMaskAction:(id)sender;

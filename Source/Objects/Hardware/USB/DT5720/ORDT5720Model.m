@@ -59,6 +59,7 @@ NSString* ORDT5720ModelContinuousModeChanged              = @"ORDT5720ModelConti
 NSString* ORDT5720ModelEventSizeChanged                   = @"ORDT5720ModelEventSizeChanged";
 
 static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
+//  {regName       dataReset, softwareReset, hwReset, addressOffset, accessType},
     {@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly}, //not implemented in HW yet
     {@"ZS_Thres",			false,	true, 	true,	0x1024,		kReadWrite}, //not implemented in HW yet
     {@"ZS_NsAmp",			false,	true, 	true,	0x1028,		kReadWrite},
@@ -73,7 +74,7 @@ static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
     {@"Chan Config Bit Set",false,	true, 	true,	0x8004,		kWriteOnly},
     {@"Chan Config Bit Clr",false,	true, 	true,	0x8008,		kWriteOnly},
     {@"Buffer Organization",false,	true, 	true,	0x800C,		kReadWrite},
-    {@"Buffer Free",		false,	false, 	false,	0x8010,		kReadWrite},
+    {@"Buffer Free",		false,	false, 	false,	0x8010,		kReadWrite},    // Not in docs
     {@"Custom Size",		false,	true, 	true,	0x8020,		kReadWrite},
     {@"Acq Control",		false,	true, 	true,	0x8100,		kReadWrite},
     {@"Acq Status",			false,	false, 	false,	0x8104,		kReadOnly},
@@ -81,20 +82,20 @@ static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
     {@"Trig Src Enbl Mask",	false,	true, 	true,	0x810C,		kReadWrite},
     {@"FP Trig Out Enbl Mask",false,true, 	true,	0x8110,		kReadWrite},
     {@"Post Trig Setting",	false,	true, 	true,	0x8114,		kReadWrite},
-    {@"FP I/O Data",		false,	true, 	true,	0x8118,		kReadWrite},
+    {@"FP I/O Data",		false,	true, 	true,	0x8118,		kReadWrite},    // Not in docs
     {@"FP I/O Control",		false,	true, 	true,	0x811C,		kReadWrite},
     {@"Chan Enable Mask",	false,	true, 	true,	0x8120,		kReadWrite},
     {@"ROC FPGA Version",	false,	false, 	false,	0x8124,		kReadOnly},
     {@"Event Stored",		true,	true, 	true,	0x812C,		kReadOnly},
-    {@"Set Monitor DAC",	false,	true, 	true,	0x8138,		kReadWrite},
+    {@"Set Monitor DAC",	false,	true, 	true,	0x8138,		kReadWrite},    // Not in docs
     {@"Board Info",			false,	false, 	false,	0x8140,		kReadOnly},
-    {@"Monitor Mode",		false,	true, 	true,	0x8144,		kReadWrite},
+    {@"Monitor Mode",		false,	true, 	true,	0x8144,		kReadWrite},    // Not in docs
     {@"Event Size",			true,	true, 	true,	0x814C,		kReadOnly},
     {@"VME Control",		false,	false, 	true,	0xEF00,		kReadWrite},
     {@"VME Status",			false,	false, 	false,	0xEF04,		kReadOnly},
-    {@"Board ID",			false,	true, 	true,	0xEF08,		kReadWrite},
-    {@"MultCast Base Add",	false,	false, 	true,	0xEF0C,		kReadWrite},
-    {@"Relocation Add",		false,	false, 	true,	0xEF10,		kReadWrite},
+    {@"Board ID",			false,	true, 	true,	0xEF08,		kReadWrite},    // Not in docs
+    {@"MultCast Base Add",	false,	false, 	true,	0xEF0C,		kReadWrite},    // Not in docs
+    {@"Relocation Add",		false,	false, 	true,	0xEF10,		kReadWrite},    // Not in docs
     {@"Interrupt Status ID",false,	false, 	true,	0xEF14,		kReadWrite},
     {@"Interrupt Event Num",false,	true, 	true,	0xEF18,		kReadWrite},
     {@"BLT Event Num",		false,	true, 	true,	0xEF1C,		kReadWrite},
@@ -118,6 +119,7 @@ static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
 };
 
 static DT5720ControllerRegisterNamesStruct ctrlReg[kNumberDT5720ControllerRegisters] = {
+//  {regName, addressOffset, accessType, numBits},
     {@"Status register", 0x00, kReadOnly, 16},
     {@"Control register", 0x01, kReadWrite, 16},
     {@"Firmware revision", 0x02, kReadOnly, 16},
@@ -821,10 +823,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     
     // Perform the read operation.
     [self  readLongBlock:pValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
+                        atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100];
     
 }
 
@@ -845,10 +844,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     // Do actual write
     @try {
 		[[self adapter] writeLongBlock:&theValue
-							 atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+							 atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100];
 		
 	}
 	@catch(NSException* localException) {
@@ -985,10 +981,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     
     // Perform the read operation.
     [[self adapter] readLongBlock:pValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
+                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]];
     
 }
 
@@ -1008,10 +1001,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     // Do actual write
     @try {
 		[[self adapter] writeLongBlock:&pValue
-                   atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-                  numToWrite:1
-                  withAddMod:[self addressModifier]
-               usingAddSpace:0x01];
+                   atAddress:[self baseAddress] + [self getAddressOffset:pReg]];
 		
 	}
 	@catch(NSException* localException) {
@@ -1024,10 +1014,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     unsigned long 	threshold = [self threshold:pChan];
     
     [[self adapter] writeLongBlock:&threshold
-                         atAddress:[self baseAddress] + reg[kThresholds].addressOffset + (pChan * 0x100)
-                        numToWrite:1
-                       withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kThresholds].addressOffset + (pChan * 0x100)];
 }
 
 - (void) writeOverUnderThresholds
@@ -1036,10 +1023,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 	for(i=0;i<kNumDT5720Channels;i++){
 		unsigned long aValue = overUnderThreshold[i];
 		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+							 atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)];
 	}
 }
 
@@ -1049,10 +1033,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 	for(i=0;i<kNumDT5720Channels;i++){
 		unsigned long value;
 		[[self adapter] readLongBlock:&value
-							atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
+							atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)];
 
  }
 }
@@ -1070,40 +1051,28 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     unsigned long 	aValue = [self dac:pChan];
     
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kDacs].addressOffset + (pChan * 0x100)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kDacs].addressOffset + (pChan * 0x100)];
 }
 
 - (void) generateSoftwareTrigger
 {
 	unsigned long dummy = 0;
     [[self adapter] writeLongBlock:&dummy
-                         atAddress:[self baseAddress] + reg[kSWTrigger].addressOffset
-                       numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kSWTrigger].addressOffset];
 }
 
 - (void) writeChannelConfiguration
 {
 	unsigned long mask = [self channelConfigMask];
 	[[self adapter] writeLongBlock:&mask
-                         atAddress:[self baseAddress] + reg[kChanConfig].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kChanConfig].addressOffset];
 }
 
 - (void) writeCustomSize
 {
 	unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kCustomSize].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kCustomSize].addressOffset];
 }
 
 - (void) report
@@ -1115,7 +1084,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Chan Enabled Thres  NumOver Status Buffers  Offset trigSrc\n");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
-	for(chan=0;chan<8;chan++){
+	for(chan=0;chan<kNumDT5720Channels;chan++){
 		[self readChan:chan reg:kThresholds returnValue:&threshold];
 		[self readChan:chan reg:kNumOUThreshold returnValue:&numOU];
 		[self readChan:chan reg:kStatus returnValue:&status];
@@ -1185,6 +1154,8 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 	[self writeOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
+    
+    NSLog(@"Caen 5720 (slot %d) initialized\n",[self slot]);
 }
 
 - (void) initEmbeddedVMEController
@@ -1307,16 +1278,16 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     for (i = 0; i < kNumDT5720Channels; i++){
         [self writeThreshold:i];
     }
+    NSLog(@"Caen 5720 %d thresholds loaded\n",[self slot]);
+    
+    return;
 }
 
 - (void) softwareReset
 {
 	unsigned long aValue = 0;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kSWReset].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kSWReset].addressOffset];
 	
 }
 
@@ -1324,10 +1295,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 {
 	unsigned long aValue = 0;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kSWClear].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kSWClear].addressOffset];
 	
 }
 
@@ -1335,10 +1303,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 {
 	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset];
 }
 
 
@@ -1346,10 +1311,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 {
 	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset];
 	
 }
 
@@ -1357,30 +1319,21 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 {
 	unsigned long aValue = triggerOutMask;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kFPTrigOutEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kFPTrigOutEnblMask].addressOffset];
 }
 
 - (void) writeFrontPanelControl
 {
 	unsigned long aValue = frontPanelControlMask;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset];
 }
 
 - (void) readFrontPanelControl
 {
 	unsigned long aValue = 0;
 	[[self adapter] readLongBlock:&aValue
-                        atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
+                        atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset];
 	
 	[self setFrontPanelControlMask:aValue];
 }
@@ -1390,20 +1343,14 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 {
 	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset];
 }
 
 - (void) writeChannelEnabledMask
 {
 	unsigned long aValue = enabledMask;
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kChanEnableMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kChanEnableMask].addressOffset];
 	
 }
 
@@ -1411,21 +1358,15 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 {
     
 	[[self adapter] writeLongBlock:&postTriggerSetting
-                         atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset];
 	
 }
 
 - (void) writeAcquistionControl:(BOOL)start
 {
-	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x3);
+	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x4);      // Should think about this... SJM
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kAcqControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kAcqControl].addressOffset];
 	
 }
 
@@ -1436,20 +1377,14 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     unsigned long aValue = (enable) ? 1 : 0;
     
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kBLTEventNum].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kBLTEventNum].addressOffset];
 }
 
 - (void) writeEnableBerr:(BOOL)enable
 {
     unsigned long aValue;
 	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
+						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset];
     
 	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
 	if ( enable ) aValue |= 0x30;
@@ -1458,10 +1393,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 	//else aValue &= 0xFFEF;
     
 	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset];
 }
 
 - (void) checkBufferAlarm
@@ -1533,9 +1465,9 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 	return [NSString stringWithFormat:@"DT5720 %lu",[self uniqueIdNumber]];
 }
 
-- (void) initBoard:(int)i
-{
-}
+//- (void) initBoard:(int)i
+//{
+//}
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
@@ -1589,7 +1521,9 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+    NSLog(@"Fill in the takeData method!!!\n");
+    
+    return;
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1749,17 +1683,17 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 }
 
 //compatibility with VME interface
--(void) writeLongBlock:(unsigned long *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberLongs
-			withAddMod:(unsigned short) anAddressModifier
-		 usingAddSpace:(unsigned short) anAddressSpace
-{
-    [self writeLongBlock:writeAddress atAddress:vmeAddress];
-}
+//-(void) writeLongBlock:(unsigned long *) writeAddress
+//			 atAddress:(unsigned int) vmeAddress
+//			numToWrite:(unsigned int) numberLongs
+//			withAddMod:(unsigned short) anAddressModifier
+//		 usingAddSpace:(unsigned short) anAddressSpace
+//{
+//    [self writeLongBlock:writeAddress atAddress:vmeAddress];
+//}
 
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer in otherwise
--(int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) vmeAddress
+-(int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) anAddress
 {
     struct {
         unsigned short commandID;
@@ -1774,7 +1708,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     int num_read = 0;
     
     req.commandID = 0x89A1;
-    req.address = vmeAddress;
+    req.address = anAddress;
     req.value = *writeValue;
     
     if (self.isNeedToSwap) {
@@ -1793,7 +1727,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 		[[self usbInterface] writeBytes:(void*) req_aligned length:10];
 	}
     @catch (NSException* e) {
-		NSLog(@"DT5720 failed write request at address: 0x%08x failed\n", vmeAddress);
+		NSLog(@"DT5720 failed write request at address: 0x%08x failed\n", req.address);
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
         return -1;
 	}
@@ -1804,7 +1738,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
         num_read = [[self usbInterface] readBytes:(void*) &resp length:sizeof(resp)];
 	}
     @catch (NSException* e) {
-		NSLog(@"DT5720 failed write respond at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 failed write respond at address: 0x%08x\n", req.address);
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
 	}
     
@@ -1813,7 +1747,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     }
     
     if (num_read != 2 || resp.status & 0x20) {
-		NSLog(@"DT5720 failed write at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 failed write at address: 0x%08x\n", req.address);
 		NSLog(@"DT5720 returned with bus error\n");
         return num_read;
     }
@@ -1832,7 +1766,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 }
 
 //returns 0 if success, -1 if request fails, and number of bytes returned by digitizer otherwise
--(int) readLongBlock:(unsigned long*) readValue atAddress:(unsigned int) vmeAddress
+-(int) readLongBlock:(unsigned long*) readValue atAddress:(unsigned int) anAddress
 {
     struct {
         unsigned short commandID;
@@ -1847,7 +1781,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     int num_read = 0;
     
     req.commandID = 0xC9A1;
-    req.address = vmeAddress;
+    req.address = anAddress;
 
     if (self.isNeedToSwap) {
         req.commandID = swapShort(req.commandID);
@@ -1863,7 +1797,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
 		[[self usbInterface] writeBytes:(void*) req_aligned length:6];
 	}
     @catch (NSException* e) {
-		NSLog(@"DT5720 failed read request at address: 0x%08x failed\n", vmeAddress);
+		NSLog(@"DT5720 failed read request at address: 0x%08x failed\n", req.address);
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
         return -1;
 	}
@@ -1874,7 +1808,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
         num_read = [[self usbInterface] readBytes:(void*) &resp length:sizeof(resp)];
 	}
     @catch (NSException* e) {
-		NSLog(@"DT5720 failed read respond at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 failed read respond at address: 0x%08x\n", req.address);
 		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
         return -1;
 	}
@@ -1885,7 +1819,7 @@ isTimeToStopDataWorker = _isTimeToStopDataWorker;
     }
     
     if (num_read != 6 || (resp.status & 0x20)) {
-		NSLog(@"DT5720 failed read at address: 0x%08x\n", vmeAddress);
+		NSLog(@"DT5720 failed read at address: 0x%08x\n", req.address);
 		NSLog(@"DT5720 returned with bus error\n");
         return num_read;
     }

@@ -467,7 +467,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	int i;
 	unsigned long mask = [model triggerSourceMask];
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumDT5720Channels;i++){
 		[[chanTriggerMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
 	}
 	[[otherTriggerMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
@@ -478,7 +478,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	int i;
 	unsigned long mask = [model triggerOutMask];
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumDT5720Channels;i++){
 		[[chanTriggerOutMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
 	}
 	[[otherTriggerOutMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
@@ -683,7 +683,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     }
 }
 
-- (IBAction) basicRead:(id) pSender
+- (IBAction) basicReadAction:(id) pSender
 {
 	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
@@ -695,7 +695,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     }
 }
 
-- (IBAction) basicWrite:(id) pSender
+- (IBAction) basicWriteAction:(id) pSender
 {
 	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
@@ -743,7 +743,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [gSecurity tryToSetLock:ORDT5720SettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) report: (id) sender
+- (IBAction) reportAction: (id) sender
 {
 	@try {
 		[model report];
@@ -754,11 +754,10 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	}
 }
 
-- (IBAction) loadThresholds: (id) sender
+- (IBAction) loadThresholdsAction: (id) sender
 {
 	@try {
 		[model writeThresholds];
-		NSLog(@"Caen 1720 Card %d thresholds loaded\n",[model slot]);
 	}
 	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nThreshold loading failed", @"OK", nil, nil,
@@ -766,11 +765,10 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	}
 }
 
-- (IBAction) initBoard: (id) sender
+- (IBAction) initBoardAction: (id) sender
 {
 	@try {
 		[model initBoard];
-		NSLog(@"Caen 1720 Card %d inited\n",[model slot]);
 	}
 	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
@@ -800,7 +798,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	int i;
 	unsigned long mask = 0;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumDT5720Channels;i++){
 		if([[chanTriggerMatrix cellWithTag:i] intValue]) mask |= (1L << i);
 	}
 	if([[otherTriggerMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
@@ -812,7 +810,7 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	int i;
 	unsigned long mask = 0;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumDT5720Channels;i++){
 		if([[chanTriggerOutMatrix cellWithTag:i] intValue]) mask |= (1L << i);
 	}
 	if([[otherTriggerOutMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
@@ -968,11 +966,11 @@ int dt5720ChanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 										  atIndex:i];
     }
 	
-	for (i = 0; i < 8 ; i++) {
+	for (i = 0; i < kNumDT5720Channels ; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i]
 								  atIndex:i];
     }
-    [channelPopUp insertItemWithTitle:@"All" atIndex:8];
+    [channelPopUp insertItemWithTitle:@"All" atIndex:kNumDT5720Channels];
     
     [self selectedRegIndexChanged:nil];
     [self selectedRegChannelChanged:nil];
