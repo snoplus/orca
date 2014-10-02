@@ -93,6 +93,12 @@ enum {
 	kNumberDT5720ControllerRegisters
 };
 
+enum {
+    kNoZeroSuppression,
+    kZeroLengthEncoding,
+    kFullSuppressionBasedOnAmplitude
+};
+
 typedef struct  {
 	NSString*       regName;
 	unsigned long 	addressOffset;
@@ -119,7 +125,7 @@ typedef struct  {
     unsigned short  thresholds[kNumDT5720Channels];
     unsigned short  nLbk[kNumDT5720Channels];
     unsigned short  nLfwd[kNumDT5720Channels];
-    BOOL            logicType;
+    BOOL            logicType[kNumDT5720Channels];
     int             zsAlgorithm;
     BOOL            trigOverlapEnabled;
     BOOL            testPatternEnabled;
@@ -185,7 +191,7 @@ typedef struct  {
 @property (assign) BOOL isTimeToStopDataWorker;
 @property (nonatomic, assign) NSMutableArray* dataArray;
 
-#pragma mark ***Accessors
+#pragma mark ***USB
 - (id)              getUSBController;
 - (ORUSBInterface*) usbInterface;
 - (void)            setUsbInterface:(ORUSBInterface*)anInterface;
@@ -198,22 +204,27 @@ typedef struct  {
 - (void)            interfaceRemoved:(NSNotification*)aNote;
 - (void)            checkUSBAlarm;
 
-#pragma mark HW Related Accessors
-- (BOOL)            logicType;
-- (void)            setLogicType:(BOOL)aLogicType;
-- (unsigned short)	zsThreshold:(unsigned short) aChnl;
-- (void)			setZsThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
-- (unsigned short)	nLbk:(unsigned short) aChnl;
-- (void)			setNlbk:(unsigned short) aChnl withValue:(unsigned short) aValue;
-- (unsigned short)	nLfwd:(unsigned short) aChnl;
-- (void)			setNlfwd:(unsigned short) aChnl withValue:(unsigned short) aValue;
-- (unsigned short)	threshold:(unsigned short) aChnl;
-- (void)			setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
-- (unsigned short)	overUnderThreshold:(unsigned short) aChnl;
-- (void)			setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue;
-- (unsigned short)	dac:(unsigned short) aChnl;
-- (void)			setDac:(unsigned short) aChnl withValue:(unsigned short) aValue;
-//channel config
+#pragma mark Accessors
+//------------------------------
+- (BOOL)            logicType:(unsigned short) i;
+- (void)            setLogicType:(unsigned short) i withValue:(BOOL)aLogicType;
+- (unsigned short)	zsThreshold:(unsigned short) i;
+- (void)			setZsThreshold:(unsigned short) i withValue:(unsigned long) aValue;
+//------------------------------
+- (unsigned short)	nLbk:(unsigned short) i;
+- (void)			setNlbk:(unsigned short) i withValue:(unsigned short) aValue;
+- (unsigned short)	nLfwd:(unsigned short) i;
+- (void)			setNlfwd:(unsigned short) i withValue:(unsigned short) aValue;
+//------------------------------
+- (unsigned short)	threshold:(unsigned short) i;
+- (void)			setThreshold:(unsigned short) i withValue:(unsigned long) aValue;
+//------------------------------
+- (unsigned short)	overUnderThreshold:(unsigned short) i;
+- (void)			setOverUnderThreshold:(unsigned short) i withValue:(unsigned short) aValue;
+//------------------------------
+- (unsigned short)	dac:(unsigned short) i;
+- (void)			setDac:(unsigned short) i withValue:(unsigned short) aValue;
+//------------------------------
 - (int)             zsAlgorithm;
 - (void)            setZsAlgorithm:(int)aZsAlgorithm;
 - (BOOL)            trigOnUnderThreshold;
@@ -222,21 +233,21 @@ typedef struct  {
 - (void)            setTestPatternEnabled:(BOOL)aTestPatternEnabled;
 - (BOOL)            trigOverlapEnabled;
 - (void)            setTrigOverlapEnabled:(BOOL)aTrigOverlapEnabled;
-//event buffer
+//------------------------------
 - (int)				eventSize;
 - (void)			setEventSize:(int)aEventSize;
 - (BOOL)            isCustomSize;
 - (void)            setIsCustomSize:(BOOL)aIsCustomSize;
 - (unsigned long)   customSize;
 - (void)            setCustomSize:(unsigned long)aCustomSize;
-//acq control
+//------------------------------
 - (BOOL)            clockSource;
 - (void)            setClockSource:(BOOL)aClockSource;
 - (BOOL)			countAllTriggers;
 - (void)			setCountAllTriggers:(BOOL)aCountAllTriggers;
 - (BOOL)            gpiRunMode;
 - (void)            setGpiRunMode:(BOOL)aGpiRunMode;
-//trigger source
+//------------------------------
 - (BOOL)            softwareTrigEnabled;
 - (void)            setSoftwareTrigEnabled:(BOOL)aSoftwareTrigEnabled;
 - (BOOL)            externalTrigEnabled;
@@ -245,30 +256,31 @@ typedef struct  {
 - (void)			setCoincidenceLevel:(unsigned short)aCoincidenceLevel;
 - (unsigned long)	triggerSourceMask;
 - (void)			setTriggerSourceMask:(unsigned long)aTriggerSourceMask;
-//front panel trigger out
+//------------------------------
 - (BOOL)            fpSoftwareTrigEnabled;
 - (void)            setFpSoftwareTrigEnabled:(BOOL)aFpSoftwareTrigEnabled;
 - (BOOL)            fpExternalTrigEnabled;
 - (void)            setFpExternalTrigEnabled:(BOOL)aFpExternalTrigEnabled;
 - (unsigned long)	triggerOutMask;
 - (void)			setTriggerOutMask:(unsigned long)aTriggerOutMask;
-//----------------
-//front panel I/O
+//------------------------------
 - (BOOL)            gpoEnabled;
 - (void)            setGpoEnabled:(BOOL)aGpoEnabled;
 - (int)             ttlEnabled;
 - (void)            setTtlEnabled:(int)aTtlEnabled;
-//----------------
+//------------------------------
 - (unsigned long)	postTriggerSetting;
 - (void)			setPostTriggerSetting:(unsigned long)aPostTriggerSetting;
-//----------------
+//------------------------------
 - (unsigned short)	enabledMask;
 - (void)			setEnabledMask:(unsigned short)aEnabledMask;
+//------------------------------
 
 - (int)				bufferState;
 - (unsigned long)	numberBLTEventsToReadout;
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
+//------------------------------
 //rate related
 - (void)			clearWaveFormCounts;
 - (void)			setRateIntegrationTime:(double)newIntegrationTime;
@@ -287,33 +299,37 @@ typedef struct  {
 - (void)			read:(unsigned short) pReg returnValue:(unsigned long*) pValue;
 - (void)			write:(unsigned short) pReg sendValue:(unsigned long) pValue;
 - (short)			getNumberRegisters;
-- (void)			generateSoftwareTrigger;
-- (void)			softwareReset;
-- (void)			clearAllMemory;
-- (void)			checkBufferAlarm;
 
 
 #pragma mark ***HW Init
 - (void)			initBoard;
-- (void)			initEmbeddedVMEController;
-- (void)            readConfigurationROM;
-- (void)			writeChannelConfiguration;
-- (void)			writeCustomSize;
-- (void)			writeAcquistionControl:(BOOL)start;
-- (void)            writeTriggerSourceEnableMask;
-- (void)			writeTriggerOut;
-- (void)			writeFrontPanelControl;
-- (void)			writePostTriggerSetting;
-- (void)			writeChannelEnabledMask;
-- (void)            writeNumberBLTEvents:(BOOL)enable;
-- (void)            writeEnableBerr:(BOOL)enable;
-- (void)			writeOverUnderThresholds;
+- (void)			initEmbeddedVMEController; //??? do we need this ???
+
+- (void)            writeZSThresholds;
+- (void)            writeZSThreshold:(unsigned short) i;
+- (void)            writeZSAmplReg;
+- (void)            writeZSAmplReg:(unsigned short) i;
 - (void)			writeThresholds;
 - (void)			writeThreshold:(unsigned short) pChan;
+- (void)            writeNumOverUnderThresholds;
+- (void)            writeNumOverUnderThreshold:(unsigned short) i;
 - (void)			writeDacs;
 - (void)			writeDac:(unsigned short) pChan;
-- (void)			readOverUnderThresholds;
+- (void)			writeChannelConfiguration;
 - (void)			writeBufferOrganization;
+- (void)			writeCustomSize;
+- (void)			writeAcquistionControl:(BOOL)start;
+- (void)            trigger;
+- (void)            writeTriggerSourceEnableMask;
+- (void)            writeFrontPanelTriggerOutEnableMask;
+- (void)			writePostTriggerSetting;
+- (void)            writeFrontPanelIOControl;
+- (void)			writeChannelEnabledMask;
+- (void)			softwareReset;
+- (void)			clearAllMemory;
+- (void)			checkBufferAlarm;
+
+- (void)            readConfigurationROM;
 
 #pragma mark ***Register - Register specific routines
 - (unsigned short) 	selectedChannel;
@@ -362,7 +378,8 @@ typedef struct  {
 
 @end
 
-extern NSString* ORDT5720ModelLock;
+extern NSString* ORDT5720BasicLock;
+extern NSString* ORDT5720LowLevelLock;
 extern NSString* ORDT5720ModelUSBInterfaceChanged;
 extern NSString* ORDT5720ModelSerialNumberChanged;
 
@@ -408,8 +425,6 @@ extern NSString* ORDT5720SelectedRegIndexChanged;
 extern NSString* ORDT5720SelectedChannelChanged;
 extern NSString* ORDT5720WriteValueChanged;
 
-extern NSString* ORDT5720BasicLock;
-extern NSString* ORDT5720SettingsLock;
 extern NSString* ORDT5720RateGroupChanged;
 extern NSString* ORDT5720ModelBufferCheckChanged;
 

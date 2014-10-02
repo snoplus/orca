@@ -25,6 +25,35 @@
 @interface ORDT5720Controller : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* serialNumberPopup;
+    IBOutlet NSMatrix*		enabledMaskMatrix;
+    
+    IBOutlet NSMatrix*      logicTypeMatrix;
+    IBOutlet NSMatrix*		zsThresholdMatrix;
+    IBOutlet NSMatrix*		numOverUnderMatrix;
+    IBOutlet NSMatrix*		nLbkMatrix;
+    IBOutlet NSMatrix*		nLfwdMatrix;
+    IBOutlet NSMatrix*		thresholdMatrix;
+    IBOutlet NSMatrix*		overUnderthresholdMatrix;
+    IBOutlet NSMatrix*		dacMatrix;
+    IBOutlet NSPopUpButton* zsAlgorithmPU;
+    IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
+    IBOutlet NSButton*      testPatternEnabledButton;
+    IBOutlet NSButton*      trigOverlapEnabledButton;
+    IBOutlet NSPopUpButton* eventSizePopUp;
+    IBOutlet NSButton*      fixedSizeButton;
+    IBOutlet NSTextField*	eventSizeTextField;
+    IBOutlet NSTextField*	customSizeTextField;
+    IBOutlet NSButton*      customSizeButton;
+
+    IBOutlet NSTextField*	postTriggerSettingTextField;
+    IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix;
+    IBOutlet NSMatrix*		triggerOutMatrix;
+    IBOutlet NSTextField*	coincidenceLevelTextField;
+
+    
+    IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSMatrix*		countAllTriggersMatrix;
+
 	IBOutlet NSMatrix*      ttlEnabledMatrix;
 	IBOutlet NSButton*      gpoEnabledButton;
 	IBOutlet NSButton*      fpSoftwareTrigEnabledButton;
@@ -32,22 +61,8 @@
 	IBOutlet NSButton*      externalTrigEnabledButton;
 	IBOutlet NSButton*      softwareTrigEnabledButton;
 	IBOutlet NSMatrix*      gpiRunModeMatrix;
-	IBOutlet NSPopUpButton* clockSourcePU;
-	IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
-	IBOutlet NSButton*      testPatternEnabledButton;
-	IBOutlet NSButton*      trigOverlapEnabledButton;
-	IBOutlet NSPopUpButton* zsAlgorithmPU;
-    IBOutlet NSMatrix*		thresholdMatrix;
-    IBOutlet NSMatrix*		zsThresholdMatrix;
-    IBOutlet NSMatrix*		nLbkMatrix;
-    IBOutlet NSMatrix*		nLfwdMatrix;
-    IBOutlet NSMatrix*		dacMatrix;
-
-	IBOutlet NSMatrix*      logicTypeMatrix;
-	IBOutlet NSButton*		lockButton;
+ 
     IBOutlet NSTabView* 	tabView;
-    IBOutlet NSStepper* 	addressStepper;
-    IBOutlet NSTextField* 	addressTextField;
     IBOutlet NSStepper* 	writeValueStepper;
     IBOutlet NSTextField* 	writeValueTextField;
     IBOutlet NSPopUpButton*	registerAddressPopUp;
@@ -65,25 +80,9 @@
     
     
     IBOutlet NSButton*		softwareTriggerButton;
-	IBOutlet NSMatrix*		enabledMaskMatrix;
 	IBOutlet NSMatrix*		chanTriggerMatrix;
-	IBOutlet NSMatrix*		otherTriggerMatrix;
-	IBOutlet NSMatrix*		chanTriggerOutMatrix;
-	IBOutlet NSMatrix*		otherTriggerOutMatrix;
 	IBOutlet NSButton*		fpIOGetButton;
 	IBOutlet NSButton*		fpIOSetButton;
-	IBOutlet NSTextField*	postTriggerSettingTextField;
-	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
-	IBOutlet NSTextField*	coincidenceLevelTextField;
-	IBOutlet NSMatrix*		countAllTriggersMatrix;
-	IBOutlet NSTextField*	customSizeTextField;
-	IBOutlet NSButton*      customSizeButton;
-	IBOutlet NSButton*      fixedSizeButton;
-    IBOutlet NSMatrix*		overUnderMatrix;
-	IBOutlet NSPopUpButton* eventSizePopUp;
-	IBOutlet NSTextField*	eventSizeTextField;
-    IBOutlet NSTextField*	slotField;
-    IBOutlet NSTextField*	slot1Field;
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
@@ -103,16 +102,15 @@
     IBOutlet ORCompositeTimeLineView*    timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
     IBOutlet NSTextField*   bufferStateField;
-    
 	
     IBOutlet NSButton*		basicLockButton;
-    IBOutlet NSButton*		settingsLockButton;
+    IBOutlet NSButton*		lowLevelLockButton;
 	IBOutlet NSTextField*   settingsLockDocField;
     
     
     NSView *blankView;
+    NSSize lowLevelSize;
     NSSize basicSize;
-    NSSize settingsSize;
     NSSize monitoringSize;
 }
 
@@ -138,7 +136,6 @@
 - (void) logicTypeChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
-- (void) lockChanged:(NSNotification*)aNote;
 
 - (void) validateInterfacePopup;
 
@@ -159,21 +156,19 @@
 - (void) dacChanged: (NSNotification*) aNote;
 
 
-- (void) integrationChanged:(NSNotification*)aNote;
 - (void) writeValueChanged: (NSNotification*) aNote;
 - (void) selectedRegIndexChanged: (NSNotification*) aNote;
 - (void) selectedRegChannelChanged:(NSNotification*) aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) postTriggerSettingChanged:(NSNotification*)aNote;
-- (void) triggerSourceMaskChanged:(NSNotification*)aNote;
+- (void) triggerSourceEnableMaskChanged:(NSNotification*)aNote;
 - (void) triggerOutMaskChanged:(NSNotification*)aNote;
 - (void) coincidenceLevelChanged:(NSNotification*)aNote;
-- (void) basicLockChanged:(NSNotification*)aNote;
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
 - (void) customSizeChanged:(NSNotification*)aNote;
 - (void) isCustomSizeChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
-- (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) lowLevelLockChanged:(NSNotification*)aNote;
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 
@@ -187,7 +182,7 @@
 - (IBAction) externalTrigEnabledAction:(id)sender;
 - (IBAction) softwareTrigEnabledAction:(id)sender;
 - (IBAction) gpiRunModeAction:(id)sender;
-- (IBAction) clockSourcePUAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;
 - (IBAction) trigOnUnderThresholdAction:(id)sender;
 - (IBAction) testPatternEnabledAction:(id)sender;
 - (IBAction) trigOverlapEnabledAction:(id)sender;
@@ -200,7 +195,6 @@
 - (IBAction) overUnderAction: (id) sender;
 - (IBAction) dacAction: (id) sender;
 
-- (IBAction) settingLockAction:(id) sender;
 - (IBAction) serialNumberAction:(id)sender;
 - (IBAction) eventSizeAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;
@@ -210,24 +204,24 @@
 
 - (IBAction) basicReadAction: (id) sender;
 - (IBAction) basicWriteAction: (id) sender;
+
+- (IBAction) lowLevelLockAction:(id) sender;
 - (IBAction) basicLockAction:(id)sender;
-- (IBAction) settingsLockAction:(id)sender;
 
 - (IBAction) reportAction: (id) sender;
 - (IBAction) initBoardAction: (id) sender;
 - (IBAction) loadThresholdsAction: (id) sender;
 - (IBAction) enabledMaskAction:(id)sender;
-- (IBAction) postTriggerSettingTextFieldAction:(id)sender;
-- (IBAction) triggerSourceMaskAction:(id)sender;
+- (IBAction) postTriggerSettingAction:(id)sender;
+- (IBAction) triggerSourceEnableMaskAction:(id)sender;
 - (IBAction) triggerOutMaskAction:(id)sender;
 - (IBAction) fpIOGetAction:(id)sender;
 - (IBAction) fpIOSetAction:(id)sender;
-- (IBAction) coincidenceLevelTextFieldAction:(id)sender;
+- (IBAction) coincidenceLevelAction:(id)sender;
 - (IBAction) generateTriggerAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
 - (IBAction) customSizeAction:(id)sender;
 - (IBAction) isCustomSizeAction:(id)sender;
-- (IBAction) countinuousRunsAction:(id)sender;
 
 #pragma mark •••Misc Helpers
 - (void)    populatePullDown;

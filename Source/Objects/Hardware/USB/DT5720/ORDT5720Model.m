@@ -71,7 +71,7 @@ NSString* ORDT5720SelectedChannelChanged                  = @"ORDT5720SelectedCh
 NSString* ORDT5720WriteValueChanged                       = @"ORDT5720WriteValueChanged";
 
 NSString* ORDT5720BasicLock                               = @"ORDT5720BasicLock";
-NSString* ORDT5720SettingsLock                            = @"ORDT5720SettingsLock";
+NSString* ORDT5720LowLevelLock                            = @"ORDT5720LowLevelLock";
 NSString* ORDT5720RateGroupChanged                        = @"ORDT5720RateGroupChanged";
 NSString* ORDT5720ModelBufferCheckChanged                 = @"ORDT5720ModelBufferCheckChanged";
 
@@ -390,108 +390,154 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 #pragma mark Accessors
-- (int) ttlEnabled
+//------------------------------
+//Reg Channel n ZS_Thres (0x1n24)
+- (BOOL) logicType:(unsigned short) i;
 {
-    return ttlEnabled;
+    return logicType[i];
 }
 
-- (void) setTtlEnabled:(int)aTtlEnabled
+- (void) setLogicType:(unsigned short) i withValue:(BOOL)aLogicType
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setTtlEnabled:ttlEnabled];
+    [[[self undoManager] prepareWithInvocationTarget:self] setLogicType:i withValue:logicType];
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    logicType[i] = aLogicType;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelLogicTypeChanged object:self];
+}
+
+- (unsigned short) zsThreshold:(unsigned short) i
+{
+    return zsThresholds[i];
+}
+
+- (void) setZsThreshold:(unsigned short) i withValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:i withValue:[self threshold:i]];
     
-    ttlEnabled = aTtlEnabled;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTtlEnabledChanged object:self];
-}
-
-- (BOOL) gpoEnabled
-{
-    return gpoEnabled;
-}
-
-- (void) setGpoEnabled:(BOOL)aGpoEnabled
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setGpoEnabled:gpoEnabled];
+    zsThresholds[i] = aValue;
     
-    gpoEnabled = aGpoEnabled;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelGpoEnabledChanged object:self];
-}
-
-- (BOOL) fpSoftwareTrigEnabled
-{
-    return fpSoftwareTrigEnabled;
-}
-
-- (void) setFpSoftwareTrigEnabled:(BOOL)aFpSoftwareTrigEnabled
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFpSoftwareTrigEnabled:fpSoftwareTrigEnabled];
-    fpSoftwareTrigEnabled = aFpSoftwareTrigEnabled;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelFpSoftwareTrigEnabledChanged object:self];
-}
-
-- (BOOL) fpExternalTrigEnabled
-{
-    return fpExternalTrigEnabled;
-}
-
-- (void) setFpExternalTrigEnabled:(BOOL)aFpExternalTrigEnabled
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFpExternalTrigEnabled:fpExternalTrigEnabled];
-    fpExternalTrigEnabled = aFpExternalTrigEnabled;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelFpExternalTrigEnabledChanged object:self];
-}
-
-- (BOOL) externalTrigEnabled
-{
-    return externalTrigEnabled;
-}
-
-- (void) setExternalTrigEnabled:(BOOL)aExternalTrigEnabled
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setExternalTrigEnabled:externalTrigEnabled];
-    externalTrigEnabled = aExternalTrigEnabled;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelExternalTrigEnabledChanged object:self];
-}
-
-- (BOOL) softwareTrigEnabled
-{
-    return softwareTrigEnabled;
-}
-
-- (void) setSoftwareTrigEnabled:(BOOL)aSoftwareTrigEnabled
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSoftwareTrigEnabled:softwareTrigEnabled];
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
     
-    softwareTrigEnabled = aSoftwareTrigEnabled;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelSoftwareTrigEnabledChanged object:self];
+    // Send out notification that the value has changed.
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ZsThresholdChanged
+                                                        object:self
+                                                      userInfo:userInfo];
 }
 
-- (BOOL) gpiRunMode
+//------------------------------
+//Reg Channel n ZS_NSAmp (0x1n28)
+- (unsigned short)	nLbk:(unsigned short) i
 {
-    return gpiRunMode;
+    return nLbk[i];
 }
 
-- (void) setGpiRunMode:(BOOL)aGpiRunMode
+- (void) setNlbk:(unsigned short) i withValue:(unsigned short) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setGpiRunMode:gpiRunMode];
-    gpiRunMode = aGpiRunMode;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelGpiRunModeChanged object:self];
-}
-
-- (BOOL) clockSource
-{
-    return clockSource;
-}
-
-- (void) setClockSource:(BOOL)aClockSource
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
+    [[[self undoManager] prepareWithInvocationTarget:self] setNlbk:i withValue:nLbk[i]];
     
-    clockSource = aClockSource;
+    nLbk[i] = aValue;
+    
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlbkChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelClockSourceChanged object:self];
+- (unsigned short)	nLfwd:(unsigned short) i
+{
+    return nLfwd[i];
+    
+}
+
+- (void) setNlfwd:(unsigned short) i withValue:(unsigned short) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNlfwd:i withValue:nLfwd[i]];
+    nLfwd[i] = aValue;
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlfwdChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+//------------------------------
+//Reg Channel n Threshold (0x1n80)
+- (unsigned short) threshold:(unsigned short) i
+{
+    return thresholds[i];
+}
+
+- (void) setThreshold:(unsigned short) i withValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:i withValue:[self threshold:i]];
+    
+    thresholds[i] = aValue;
+    
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
+    // Send out notification that the value has changed.
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ThresholdChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+//------------------------------
+//Reg Channel n Over/Under Threshold (0x1n80)
+- (unsigned short) overUnderThreshold:(unsigned short) i
+{
+    return overUnderThreshold[i];
+}
+
+- (void) setOverUnderThreshold:(unsigned short) i withValue:(unsigned short) aValue
+{
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setOverUnderThreshold:i withValue:overUnderThreshold[i]];
+    overUnderThreshold[i] = aValue;
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720OverUnderThresholdChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+//------------------------------
+//Reg Channel n DAC (0x1n98)
+- (unsigned short) dac:(unsigned short) i
+{
+    return dac[i];
+}
+
+- (void) setDac:(unsigned short) i withValue:(unsigned short) aValue
+{
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setDac:i withValue:dac[i]];
+    
+    dac[i] = aValue;
+    
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ChnlDacChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+
+//------------------------------
+//Reg Channel Configuration (0x8000)
+- (int) zsAlgorithm
+{
+    return zsAlgorithm;
+}
+
+- (void) setZsAlgorithm:(int)aZsAlgorithm
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setZsAlgorithm:zsAlgorithm];
+    zsAlgorithm = aZsAlgorithm;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelZsAlgorithmChanged object:self];
 }
 
 - (BOOL) trigOnUnderThreshold
@@ -530,131 +576,8 @@ static NSString* DT5720RunModeString[4] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTrigOverlapEnabledChanged object:self];
 }
 
-- (int) zsAlgorithm
-{
-    return zsAlgorithm;
-}
-
-- (void) setZsAlgorithm:(int)aZsAlgorithm
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setZsAlgorithm:zsAlgorithm];
-    zsAlgorithm = aZsAlgorithm;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelZsAlgorithmChanged object:self];
-}
-
-- (BOOL) logicType
-{
-    return logicType;
-}
-
-- (void) setLogicType:(BOOL)aLogicType
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setLogicType:logicType];
-    logicType = aLogicType;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelLogicTypeChanged object:self];
-}
-
-- (unsigned short) threshold:(unsigned short) aChnl
-{
-    return thresholds[aChnl];
-}
-
-- (void) setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
-    
-    thresholds[aChnl] = aValue;
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORDT5720Chnl];
-    
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ThresholdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
-}
-
-- (unsigned short) zsThreshold:(unsigned short) aChnl
-{
-    return zsThresholds[aChnl];
-}
-
-- (void) setZsThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
-    
-    zsThresholds[aChnl] = aValue;
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORDT5720Chnl];
-    
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ZsThresholdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
-}
-
-- (unsigned short) overUnderThreshold:(unsigned short) aChnl
-{
-    return overUnderThreshold[aChnl];
-}
-
-- (void) setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue
-{
-    
-    [[[self undoManager] prepareWithInvocationTarget:self] setOverUnderThreshold:aChnl withValue:overUnderThreshold[aChnl]];
-    
-    overUnderThreshold[aChnl] = aValue;
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORDT5720Chnl];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720OverUnderThresholdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
-}
-
-- (unsigned short)	nLbk:(unsigned short) aChnl
-{
-    return nLbk[aChnl];
-}
-
-- (void) setNlbk:(unsigned short) aChnl withValue:(unsigned short) aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNlbk:aChnl withValue:nLbk[aChnl]];
-    
-    nLbk[aChnl] = aValue;
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORDT5720Chnl];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlbkChanged
-                                                        object:self
-                                                      userInfo:userInfo];
-}
-
-- (unsigned short)	nLfwd:(unsigned short) aChnl
-{
-    return nLfwd[aChnl];
- 
-}
-
-- (void) setNlfwd:(unsigned short) aChnl withValue:(unsigned short) aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNlfwd:aChnl withValue:nLfwd[aChnl]];
-    
-    nLfwd[aChnl] = aValue;
-    
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORDT5720Chnl];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlfwdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
-  
-}
-
-
+//------------------------------
+//Reg Buffer Organization (0x800C)
 - (int) eventSize
 {
     return eventSize;
@@ -662,15 +585,214 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) setEventSize:(int)aEventSize
 {
-	//if(aEventSize == 0)aEventSize = 0xa; //default
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setEventSize:eventSize];
+    //if(aEventSize == 0)aEventSize = 0xa; //default
     
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventSize:eventSize];
     eventSize = aEventSize;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelEventSizeChanged object:self];
 }
+//------------------------------
+//Reg Custom Size (0x8020)
+- (BOOL) isCustomSize
+{
+    return isCustomSize;
+}
 
+- (void) setIsCustomSize:(BOOL)aIsCustomSize
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIsCustomSize:isCustomSize];
+    isCustomSize = aIsCustomSize;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelIsCustomSizeChanged object:self];
+}
+
+- (unsigned long) customSize
+{
+    return customSize;
+}
+
+- (void) setCustomSize:(unsigned long)aCustomSize
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCustomSize:customSize];
+    customSize = aCustomSize;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCustomSizeChanged object:self];
+}
+//------------------------------
+//Reg Acquistion Control (0x8100)
+- (BOOL) clockSource
+{
+    return clockSource;
+}
+
+- (void) setClockSource:(BOOL)aClockSource
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
+    clockSource = aClockSource;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelClockSourceChanged object:self];
+}
+- (BOOL) countAllTriggers
+{
+    return countAllTriggers;
+}
+
+- (void) setCountAllTriggers:(BOOL)aCountAllTriggers
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCountAllTriggers:countAllTriggers];
+    countAllTriggers = aCountAllTriggers;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCountAllTriggersChanged object:self];
+}
+
+- (BOOL) gpiRunMode
+{
+    return gpiRunMode;
+}
+
+- (void) setGpiRunMode:(BOOL)aGpiRunMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setGpiRunMode:gpiRunMode];
+    gpiRunMode = aGpiRunMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelGpiRunModeChanged object:self];
+}
+//------------------------------
+//Reg Trigger Source Enable Mask (0x810C)
+- (BOOL) softwareTrigEnabled
+{
+    return softwareTrigEnabled;
+}
+
+- (void) setSoftwareTrigEnabled:(BOOL)aSoftwareTrigEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSoftwareTrigEnabled:softwareTrigEnabled];
+    softwareTrigEnabled = aSoftwareTrigEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelSoftwareTrigEnabledChanged object:self];
+}
+
+- (BOOL) externalTrigEnabled
+{
+    return externalTrigEnabled;
+}
+
+- (void) setExternalTrigEnabled:(BOOL)aExternalTrigEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setExternalTrigEnabled:externalTrigEnabled];
+    externalTrigEnabled = aExternalTrigEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelExternalTrigEnabledChanged object:self];
+}
+
+- (unsigned short) coincidenceLevel
+{
+    return coincidenceLevel;
+}
+
+- (void) setCoincidenceLevel:(unsigned short)aCoincidenceLevel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCoincidenceLevel:coincidenceLevel];
+    coincidenceLevel = aCoincidenceLevel;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCoincidenceLevelChanged object:self];
+}
+- (unsigned long) triggerSourceMask
+{
+    return triggerSourceMask;
+}
+
+- (void) setTriggerSourceMask:(unsigned long)aTriggerSourceMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerSourceMask:triggerSourceMask];
+    triggerSourceMask = aTriggerSourceMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTriggerSourceMaskChanged object:self];
+}
+
+//------------------------------
+//Reg Front Panel Trigger Out Enable Mask (0x8110)
+- (BOOL) fpSoftwareTrigEnabled
+{
+    return fpSoftwareTrigEnabled;
+}
+
+- (void) setFpSoftwareTrigEnabled:(BOOL)aFpSoftwareTrigEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFpSoftwareTrigEnabled:fpSoftwareTrigEnabled];
+    fpSoftwareTrigEnabled = aFpSoftwareTrigEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelFpSoftwareTrigEnabledChanged object:self];
+}
+
+- (BOOL) fpExternalTrigEnabled
+{
+    return fpExternalTrigEnabled;
+}
+
+- (void) setFpExternalTrigEnabled:(BOOL)aFpExternalTrigEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFpExternalTrigEnabled:fpExternalTrigEnabled];
+    fpExternalTrigEnabled = aFpExternalTrigEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelFpExternalTrigEnabledChanged object:self];
+}
+
+- (unsigned long) triggerOutMask
+{
+    return triggerOutMask;
+}
+
+- (void) setTriggerOutMask:(unsigned long)aTriggerOutMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutMask:triggerOutMask];
+    //do not step into the reserved area
+    triggerOutMask = aTriggerOutMask & 0xc00000ff;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTriggerOutMaskChanged object:self];
+}
+
+//------------------------------
+//Reg Post Trigger Setting (0x8114)
+- (unsigned long) postTriggerSetting
+{
+    return postTriggerSetting;
+}
+
+- (void) setPostTriggerSetting:(unsigned long)aPostTriggerSetting
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerSetting:postTriggerSetting];
+    postTriggerSetting = aPostTriggerSetting;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelPostTriggerSettingChanged object:self];
+}
+//------------------------------
+//Reg Front Panel I/O Setting (0x811C)
+- (BOOL) gpoEnabled
+{
+    return gpoEnabled;
+}
+
+- (void) setGpoEnabled:(BOOL)aGpoEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setGpoEnabled:gpoEnabled];
+    gpoEnabled = aGpoEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelGpoEnabledChanged object:self];
+}
+
+- (int) ttlEnabled
+{
+    return ttlEnabled;
+}
+
+- (void) setTtlEnabled:(int)aTtlEnabled
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTtlEnabled:ttlEnabled];
+    ttlEnabled = aTtlEnabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTtlEnabledChanged object:self];
+}
+//------------------------------
+//Reg Channel Enable Mask (0x8120)
+- (unsigned short) enabledMask
+{
+    return enabledMask;
+}
+
+- (void) setEnabledMask:(unsigned short)aEnabledMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
+    enabledMask = aEnabledMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelEnabledMaskChanged object:self];
+}
+
+//------------------------------
 - (int)	bufferState
 {
 	return bufferState;
@@ -774,118 +896,6 @@ static NSString* DT5720RunModeString[4] = {
 	 object:self];
 }
 
-- (unsigned short) enabledMask
-{
-    return enabledMask;
-}
-
-- (void) setEnabledMask:(unsigned short)aEnabledMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
-    
-    enabledMask = aEnabledMask;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelEnabledMaskChanged object:self];
-}
-
-- (unsigned long) postTriggerSetting
-{
-    return postTriggerSetting;
-}
-
-- (void) setPostTriggerSetting:(unsigned long)aPostTriggerSetting
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerSetting:postTriggerSetting];
-    
-    postTriggerSetting = aPostTriggerSetting;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelPostTriggerSettingChanged object:self];
-}
-
-- (unsigned long) triggerSourceMask
-{
-    return triggerSourceMask;
-}
-
-- (void) setTriggerSourceMask:(unsigned long)aTriggerSourceMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerSourceMask:triggerSourceMask];
-    triggerSourceMask = aTriggerSourceMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTriggerSourceMaskChanged object:self];
-}
-
-- (unsigned long) triggerOutMask
-{
-	return triggerOutMask;
-}
-
-- (void) setTriggerOutMask:(unsigned long)aTriggerOutMask
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutMask:triggerOutMask];
-	//do not step into the reserved area
-	triggerOutMask = aTriggerOutMask & 0xc00000ff;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelTriggerOutMaskChanged object:self];
-}
-
-- (unsigned short) coincidenceLevel
-{
-    return coincidenceLevel;
-}
-
-- (void) setCoincidenceLevel:(unsigned short)aCoincidenceLevel
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCoincidenceLevel:coincidenceLevel];
-    
-    coincidenceLevel = aCoincidenceLevel;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCoincidenceLevelChanged object:self];
-}
-
-
-
-- (BOOL) countAllTriggers
-{
-    return countAllTriggers;
-}
-
-- (void) setCountAllTriggers:(BOOL)aCountAllTriggers
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCountAllTriggers:countAllTriggers];
-    
-    countAllTriggers = aCountAllTriggers;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCountAllTriggersChanged object:self];
-}
-
-- (unsigned long) customSize
-{
-    return customSize;
-}
-
-- (void) setCustomSize:(unsigned long)aCustomSize
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCustomSize:customSize];
-    
-    customSize = aCustomSize;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCustomSizeChanged object:self];
-}
-
-- (BOOL) isCustomSize
-{
-	return isCustomSize;
-}
-
-- (void) setIsCustomSize:(BOOL)aIsCustomSize
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setIsCustomSize:isCustomSize];
-	
-	isCustomSize = aIsCustomSize;
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelIsCustomSizeChanged object:self];
-}
-
-
 - (unsigned long) numberBLTEventsToReadout
 {
     return numberBLTEventsToReadout;
@@ -907,7 +917,6 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 #pragma mark ***Register - Register specific routines
-
 - (NSString*) getRegisterName:(short) anIndex
 {
     return reg[anIndex].regName;
@@ -937,33 +946,6 @@ static NSString* DT5720RunModeString[4] = {
 {
     return reg[anIndex].hwReset;
 }
-
-
-- (unsigned short) dac:(unsigned short) aChnl
-{
-    return dac[aChnl];
-}
-
-- (void) setDac:(unsigned short) aChnl withValue:(unsigned short) aValue
-{
-	
-    // Set the undo manager action.  The label has already been set by the controller calling this method.
-    [[[self undoManager] prepareWithInvocationTarget:self] setDac:aChnl withValue:dac[aChnl]];
-    
-    // Set the new value in the model.
-    dac[aChnl] = aValue;
-    
-    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORDT5720Chnl];
-    
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORDT5720ChnlDacChanged
-	 object:self
-	 userInfo:userInfo];
-}
-
 
 - (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
 {
@@ -1046,12 +1028,6 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 
-//--------------------------------------------------------------------------------
-/*!\method  write
- * \brief	Writes data out to a CAEN VME device register.
- * \note
- */
-//--------------------------------------------------------------------------------
 - (void) write
 {
     short	start;
@@ -1140,77 +1116,6 @@ static NSString* DT5720RunModeString[4] = {
 	}
 }
 
-
-- (void) writeThreshold:(unsigned short) pChan
-{
-    unsigned long 	threshold = [self threshold:pChan];
-    [self writeLongBlock:&threshold
-               atAddress:reg[kThresholds].addressOffset + (pChan * 0x100)];
-}
-
-- (void) writeOverUnderThresholds
-{
-	int i;
-	for(i=0;i<kNumDT5720Channels;i++){
-		unsigned long aValue = overUnderThreshold[i];
-		[self writeLongBlock:&aValue
-							 atAddress:reg[kNumOUThreshold].addressOffset + (i * 0x100)];
-	}
-}
-
-- (void) readOverUnderThresholds
-{
-	int i;
-	for(i=0;i<kNumDT5720Channels;i++){
-		unsigned long value;
-		[self readLongBlock:&value
-							atAddress:reg[kNumOUThreshold].addressOffset + (i * 0x100)];
-
- }
-}
-
-- (void) writeDacs
-{
-    short	i;
-    for (i = 0; i < kNumDT5720Channels; i++){
-        [self writeDac:i];
-    }
-}
-
-- (void) writeDac:(unsigned short) pChan
-{
-    unsigned long 	aValue = [self dac:pChan];
-    
-    [self writeLongBlock:&aValue
-                         atAddress:reg[kDacs].addressOffset + (pChan * 0x100)];
-}
-
-- (void) generateSoftwareTrigger
-{
-	unsigned long dummy = 0;
-    [self writeLongBlock:&dummy
-                         atAddress:reg[kSWTrigger].addressOffset];
-}
-
-- (void) writeChannelConfiguration
-{
-	unsigned long mask = 0;
-    mask |= (zsAlgorithm&0x3)           <<16;
-    mask |= (trigOnUnderThreshold&0x1)  <<6;
-    mask |= (testPatternEnabled&0x1)    <<3;
-    mask |= (trigOverlapEnabled&0x1)    <<1;
-    //note that pack2.5 is permently disabled.
-	[self writeLongBlock:&mask
-                         atAddress:reg[kChanConfig].addressOffset];
-}
-
-- (void) writeCustomSize
-{
-	unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kCustomSize].addressOffset];
-}
-
 - (void) report
 {
 	unsigned long enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
@@ -1282,21 +1187,18 @@ static NSString* DT5720RunModeString[4] = {
 	[self writeThresholds];
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
-	[self writeTriggerSource];
-	[self writeTriggerOut];
-	[self writeFrontPanelControl];
+	[self writeFrontPanelIOControl];
 	[self writeChannelEnabledMask];
 	[self writeBufferOrganization];
-	[self writeOverUnderThresholds];
+	[self writeNumOverUnderThresholds];
 	[self writeDacs];
 	[self writePostTriggerSetting];
     
-    NSLog(@"Caen 5720 (slot %d) initialized\n",[self slot]);
+    NSLog(@"%@ initialized\n",[self fullID]);
 }
 
 - (void) initEmbeddedVMEController
 {
-
     //get FIFO mode; address increment bit == 1 -> disabled -> fifo mode
     unsigned short value;
     int err;
@@ -1396,6 +1298,240 @@ static NSString* DT5720RunModeString[4] = {
     }
 }
 
+#pragma mark ***HW Reg Access
+- (void) writeZSThresholds
+{
+    short	i;
+    for (i=0;i<kNumDT5720Channels;i++){
+        [self writeZSThreshold:i];
+    }
+}
+
+- (void) writeZSThreshold:(unsigned short) i
+{
+    unsigned long aValue = 0;
+    aValue |= logicType[i]<<31;
+    aValue |= [self zsThreshold:i] & 0xFFF;
+    
+    [self writeLongBlock:&aValue
+               atAddress:reg[kZS_Thres].addressOffset + (i * 0x100)];
+}
+
+- (void) writeZSAmplReg
+{
+    short	i;
+    for (i=0;i<kNumDT5720Channels;i++){
+        [self writeZSAmplReg:i];
+    }
+}
+
+- (void) writeZSAmplReg:(unsigned short) i
+{
+    
+    if(zsAlgorithm == kFullSuppressionBasedOnAmplitude){
+        unsigned long 	aValue = [self overUnderThreshold:i] & 0xFFFFF;
+    
+        [self writeLongBlock:&aValue
+                   atAddress:reg[kZS_NsAmp].addressOffset + (i * 0x100)];
+    }
+    else if(zsAlgorithm == kZeroLengthEncoding){
+        unsigned long aValue = ([self nLbk:i] & 0xFFFF)<<16 |
+                               ([self nLfwd:i]& 0xFFFF);
+        [self writeLongBlock:&aValue
+                   atAddress:reg[kZS_NsAmp].addressOffset + (i * 0x100)];
+    }
+
+}
+
+- (void) writeThresholds
+{
+    short	i;
+    for (i = 0; i < kNumDT5720Channels; i++){
+        [self writeThreshold:i];
+    }
+}
+
+- (void) writeThreshold:(unsigned short) i
+{
+    unsigned long 	threshold = [self threshold:i];
+    [self writeLongBlock:&threshold
+               atAddress:reg[kThresholds].addressOffset + (i * 0x100)];
+}
+
+- (void) writeNumOverUnderThresholds
+{
+    short	i;
+    for (i = 0; i < kNumDT5720Channels; i++){
+        [self writeNumOverUnderThreshold:i];
+    }
+}
+- (void) writeNumOverUnderThreshold:(unsigned short) i
+{
+    unsigned long 	aValue = [self overUnderThreshold:i];
+    [self writeLongBlock:&aValue
+               atAddress:reg[kNumOUThreshold].addressOffset + (i * 0x100)];
+}
+
+- (void) writeDacs
+{
+    short	i;
+    for (i = 0; i < kNumDT5720Channels; i++){
+        [self writeDac:i];
+    }
+}
+
+- (void) writeDac:(unsigned short) i
+{
+    unsigned long 	aValue = [self dac:i];
+    [self writeLongBlock:&aValue
+               atAddress:reg[kDacs].addressOffset + (i * 0x100)];
+}
+
+- (void) writeChannelConfiguration
+{
+    unsigned long mask = 0;
+    mask |= (zsAlgorithm & 0x3)           << 16;
+    mask |= (trigOnUnderThreshold & 0x1)  <<  6;
+    mask |= (testPatternEnabled & 0x1)    <<  3;
+    mask |= (trigOverlapEnabled & 0x1)    <<  1;
+    //note that pack2.5 is permently disabled.
+    [self writeLongBlock:&mask
+               atAddress:reg[kChanConfig].addressOffset];
+}
+
+- (void) writeBufferOrganization
+{
+    unsigned long aValue = eventSize; //(unsigned long)pow(2.,(float)eventSize);
+    [self writeLongBlock:&aValue
+               atAddress:reg[kBufferOrganization].addressOffset];
+}
+
+- (void) writeCustomSize
+{
+    unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kCustomSize].addressOffset];
+}
+
+- (void) writeAcquistionControl:(BOOL)start
+{
+    unsigned long aValue = 0;
+    aValue |= (clockSource & 0x1)       << 6;
+    aValue |= (countAllTriggers & 0x1)  << 3;
+    aValue |= (start & 0x1)             << 2;
+    aValue |= (gpiRunMode & 0x1)        << 0;
+    
+    [self writeLongBlock:&aValue
+               atAddress:reg[kAcqControl].addressOffset];
+    
+}
+
+- (void) trigger
+{
+    unsigned long aValue = 0;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kSWTrigger].addressOffset];
+   
+}
+
+- (void) writeTriggerSourceEnableMask
+{
+    unsigned long aValue = 0;
+    aValue |= (softwareTrigEnabled & 0x1) << 31;
+    aValue |= (externalTrigEnabled & 0x1) << 30;
+    aValue |= (coincidenceLevel    & 0x7) << 24;
+    aValue |= (triggerSourceMask   & 0xf) <<  0;
+    
+    [self writeLongBlock:&aValue
+               atAddress:reg[kTrigSrcEnblMask].addressOffset];
+}
+
+- (void) writeFrontPanelTriggerOutEnableMask
+{
+    unsigned long aValue = 0;
+    aValue = (fpSoftwareTrigEnabled & 0x1) << 31;
+    aValue = (fpExternalTrigEnabled & 0x1) << 30;
+    aValue = (triggerOutMask        & 0xf) <<  0;
+    
+    [self writeLongBlock:&aValue
+               atAddress:reg[kFPTrigOutEnblMask].addressOffset];
+}
+
+- (void) writePostTriggerSetting
+{
+    [self writeLongBlock:&postTriggerSetting
+               atAddress:reg[kPostTrigSetting].addressOffset];
+    
+}
+
+- (void) writeFrontPanelIOControl
+{
+    unsigned long aValue = 0;
+    aValue = (gpoEnabled & 0x1) << 1;
+    aValue = (ttlEnabled & 0x1) << 0;
+    
+    [self writeLongBlock:&aValue
+               atAddress:reg[kFPIOControl].addressOffset];
+}
+
+- (void) writeChannelEnabledMask
+{
+    unsigned long aValue = enabledMask;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kChanEnableMask].addressOffset];
+    
+}
+
+- (void) softwareReset
+{
+    unsigned long aValue = 0;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kSWReset].addressOffset];
+    
+}
+
+- (void) clearAllMemory
+{
+    unsigned long aValue = 0;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kSWClear].addressOffset];
+    
+}
+
+- (void) checkBufferAlarm
+{
+    if((bufferState == 1) && isRunning){
+        bufferEmptyCount = 0;
+        if(!bufferFullAlarm){
+            NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1720 (%@)",[self fullID]];
+            bufferFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+            [bufferFullAlarm setSticky:YES];
+            [bufferFullAlarm setHelpString:@"The rate is too high. Adjust the Threshold accordingly."];
+            [bufferFullAlarm postAlarm];
+        }
+    }
+    else {
+        bufferEmptyCount++;
+        if(bufferEmptyCount>=5){
+            [bufferFullAlarm clearAlarm];
+            [bufferFullAlarm release];
+            bufferFullAlarm = nil;
+            bufferEmptyCount = 0;
+        }
+    }
+    if(isRunning){
+        [self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1.5];
+    }
+    else {
+        [bufferFullAlarm clearAlarm];
+        [bufferFullAlarm release];
+        bufferFullAlarm = nil;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelBufferCheckChanged object:self];
+}
+
+
+#pragma mark ***Helpers
 - (float) convertDacToVolts:(unsigned short)aDacValue
 {
 	return 2*aDacValue/65535. - 0.9999;
@@ -1408,155 +1544,6 @@ static NSString* DT5720RunModeString[4] = {
     //return (unsigned short)((short) (65535. * (aVoltage)/2.));
 }
 
-- (void) writeThresholds
-{
-    short	i;
-    for (i = 0; i < kNumDT5720Channels; i++){
-        [self writeThreshold:i];
-    }
-    NSLog(@"%@ thresholds loaded\n",[self fullID]);
-    
-    return;
-}
-
-- (void) softwareReset
-{
-	unsigned long aValue = 0;
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kSWReset].addressOffset];
-	
-}
-
-- (void) clearAllMemory
-{
-	unsigned long aValue = 0;
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kSWClear].addressOffset];
-	
-}
-
-- (void) writeTriggerSourceEnableMask
-{
-    unsigned long aValue = 0;
-    aValue |= softwareTrigEnabled<<31;
-    aValue |= externalTrigEnabled<<30;
-    aValue |= ((coincidenceLevel&0x7)<<24);
-    aValue |= (triggerSourceMask & 0xf);
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kTrigSrcEnblMask].addressOffset];
-}
-
-
-- (void) writeTriggerSource
-{
-	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kTrigSrcEnblMask].addressOffset];
-	
-}
-
-- (void) writeTriggerOut
-{
-	unsigned long aValue = triggerOutMask;
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kFPTrigOutEnblMask].addressOffset];
-}
-
-- (void) writeFrontPanelControl
-{
-//	unsigned long aValue = frontPanelControlMask;
-//	[self writeLongBlock:&aValue
-//                         atAddress:reg[kFPIOControl].addressOffset];
-}
-
-- (void) writeBufferOrganization
-{
-	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kBufferOrganization].addressOffset];
-}
-
-- (void) writeChannelEnabledMask
-{
-	unsigned long aValue = enabledMask;
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kChanEnableMask].addressOffset];
-	
-}
-
-- (void) writePostTriggerSetting
-{
-    
-	[self writeLongBlock:&postTriggerSetting
-                         atAddress:reg[kPostTrigSetting].addressOffset];
-	
-}
-
-- (void) writeAcquistionControl:(BOOL)start
-{
-//	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x4);      // Should think about this... SJM
-//	[self writeLongBlock:&aValue
-//                         atAddress:reg[kAcqControl].addressOffset];
-	
-}
-
-- (void) writeNumberBLTEvents:(BOOL)enable
-{
-    //we must start in a safe mode with 1 event, the numberBLTEvents is passed to SBC
-    //unsigned long aValue = (enable) ? numberBLTEventsToReadout : 0;
-    unsigned long aValue = (enable) ? 1 : 0;
-    
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kBLTEventNum].addressOffset];
-}
-
-- (void) writeEnableBerr:(BOOL)enable
-{
-    unsigned long aValue;
-	[self readLongBlock:&aValue
-						atAddress:reg[kVMEControl].addressOffset];
-    
-	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
-	if ( enable ) aValue |= 0x30;
-	else aValue &= 0xFFCF;
-	//if ( enable ) aValue |= 0x10;
-	//else aValue &= 0xFFEF;
-    
-	[self writeLongBlock:&aValue
-                         atAddress:reg[kVMEControl].addressOffset];
-}
-
-- (void) checkBufferAlarm
-{
-	if((bufferState == 1) && isRunning){
-		bufferEmptyCount = 0;
-		if(!bufferFullAlarm){
-			NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1720 (slot %d)",[self slot]];
-			bufferFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
-			[bufferFullAlarm setSticky:YES];
-			[bufferFullAlarm setHelpString:@"The rate is too high. Adjust the Threshold accordingly."];
-			[bufferFullAlarm postAlarm];
-		}
-	}
-	else {
-		bufferEmptyCount++;
-		if(bufferEmptyCount>=5){
-			[bufferFullAlarm clearAlarm];
-			[bufferFullAlarm release];
-			bufferFullAlarm = nil;
-			bufferEmptyCount = 0;
-		}
-	}
-	if(isRunning){
-		[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1.5];
-	}
-	else {
-		[bufferFullAlarm clearAlarm];
-		[bufferFullAlarm release];
-		bufferFullAlarm = nil;
-	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelBufferCheckChanged object:self];
-}
 
 #pragma mark ***DataTaker
 
@@ -1671,20 +1658,6 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 #pragma mark ***Archival
-
-
-- (unsigned long) baseAddress
-{
-    return 0;//no meaning ?
-}
-- (unsigned short) addressModifier
-{
-    return 0;//no meaning ?
-}
-- (int) slot
-{
-    return 0; //no meaning ?
-}
 
 -(void) setEndianness
 {
@@ -1809,15 +1782,6 @@ static NSString* DT5720RunModeString[4] = {
     return 0;
 }
 
-//compatibility with VME interface
-//-(void) writeLongBlock:(unsigned long *) writeAddress
-//			 atAddress:(unsigned int) vmeAddress
-//			numToWrite:(unsigned int) numberLongs
-//			withAddMod:(unsigned short) anAddressModifier
-//		 usingAddSpace:(unsigned short) anAddressSpace
-//{
-//    [self writeLongBlock:writeAddress atAddress:vmeAddress];
-//}
 
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer in otherwise
 - (int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) anAddress
@@ -1882,15 +1846,6 @@ static NSString* DT5720RunModeString[4] = {
     return 0;
 }
 
-//compatibility with VME interface
--(void) readLongBlock:(unsigned long *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberLongs
-		   withAddMod:(unsigned short) anAddressModifier
-		usingAddSpace:(unsigned short) anAddressSpace
-{
-    [self readLongBlock:readAddress atAddress:vmeAddress];
-}
 
 //returns 0 if success, -1 if request fails, and number of bytes returned by digitizer otherwise
 -(int) readLongBlock:(unsigned long*) readValue atAddress:(unsigned int) anAddress
@@ -2093,7 +2048,6 @@ static NSString* DT5720RunModeString[4] = {
     [self setTestPatternEnabled:    [aDecoder decodeBoolForKey:     @"testPatternEnabled"]];
     [self setTrigOverlapEnabled:    [aDecoder decodeBoolForKey:     @"trigOverlapEnabled"]];
     [self setZsAlgorithm:           [aDecoder decodeIntForKey:      @"zsAlgorithm"]];
-    [self setLogicType:             [aDecoder decodeBoolForKey:     @"logicType"]];
     [self setEventSize:             [aDecoder decodeIntForKey:      @"eventSize"]];
     [self setEnabledMask:           [aDecoder decodeIntForKey:      @"enabledMask"]];
     [self setPostTriggerSetting:    [aDecoder decodeInt32ForKey:    @"postTriggerSetting"]];
@@ -2115,11 +2069,14 @@ static NSString* DT5720RunModeString[4] = {
 	
 	int i;
     for (i = 0; i < kNumDT5720Channels; i++){
-        [self setThreshold:i   withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"threshold%d", i]]];
-        [self setZsThreshold:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"zsThreshold%d", i]]];
+        [self setLogicType:i withValue:         [aDecoder decodeBoolForKey: [NSString stringWithFormat:@"logicType%d", i]]];
+        [self setThreshold:i   withValue:       [aDecoder decodeInt32ForKey:[NSString stringWithFormat:@"threshold%d", i]]];
+        [self setZsThreshold:i withValue:       [aDecoder decodeInt32ForKey:[NSString stringWithFormat:@"zsThreshold%d", i]]];
         
-        [self setDac:i withValue:      [aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENDacChnl%d", i]]];
-        [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENOverUnderChnl%d", i]]];
+        [self setDac:i withValue:               [aDecoder decodeInt32ForKey:[NSString stringWithFormat:@"dac%d", i]]];
+        [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"overUnderThreshold%d", i]]];
+        [self setNlbk:i withValue:              [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"nLbk%d", i]]];
+        [self setNlfwd:i withValue:             [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"nLfwd%d", i]]];
     }
 
     [self setEndianness];
@@ -2160,19 +2117,21 @@ static NSString* DT5720RunModeString[4] = {
     
 	int i;
 	for (i = 0; i < kNumDT5720Channels; i++){
+        [anEncoder encodeInt32:logicType[i]         forKey:[NSString stringWithFormat:@"logicType%d", i]];
         [anEncoder encodeInt32:thresholds[i]        forKey:[NSString stringWithFormat:@"threshold%d", i]];
-        [anEncoder encodeInt32:zsThresholds[i]        forKey:[NSString stringWithFormat:@"zsThreshold%d", i]];
+        [anEncoder encodeInt32:zsThresholds[i]      forKey:[NSString stringWithFormat:@"zsThreshold%d", i]];
         
-        [anEncoder encodeInt32:dac[i]               forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];
-        [anEncoder encodeInt:overUnderThreshold[i]  forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
+        [anEncoder encodeInt32:dac[i]               forKey:[NSString stringWithFormat:@"dac%d", i]];
+        [anEncoder encodeInt:overUnderThreshold[i]  forKey:[NSString stringWithFormat:@"overUnderThreshold%d", i]];
+        [anEncoder encodeInt:nLbk[i]                forKey:[NSString stringWithFormat:@"nLbk%d", i]];
+        [anEncoder encodeInt:nLfwd[i]               forKey:[NSString stringWithFormat:@"nLfwd%d", i]];
     }
-    
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	
+//TD
     return objDictionary;
 }
 
@@ -2187,7 +2146,7 @@ static NSString* DT5720RunModeString[4] = {
     self.isDataWorkerRunning = YES;
 
     char data_buffer[11*1024*1024]; //digitizer RAM
-    BOOL isDataAvailable;
+    //BOOL isDataAvailable;
     
     while (!self.isTimeToStopDataWorker) {
 
