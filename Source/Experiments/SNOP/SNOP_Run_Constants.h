@@ -6,7 +6,13 @@
 //
 //
 
-//These constants define the numerical values of different run types in SNO+ 
+/*typedef struct  {
+	int   runValue;
+	NSString*	runString;
+} runType;*/
+
+//These constants define the numerical values of different run types in SNO+
+//runType kRunUndefined = {0, [NSString stringWithFormat:@"Undefined"]};
 #define kRunUndefined                               0
 #define kRunMaintainence                            1
 #define kRunStandardPhysicsRun                      2
@@ -16,3 +22,4 @@
 #define kRunAmellie                                 6
 #define kRunEca                                     7
 #define kRunPca                                     8
+

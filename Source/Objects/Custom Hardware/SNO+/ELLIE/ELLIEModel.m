@@ -883,8 +883,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [self _pushSmellieRunDocument];
     
-    //[runControl performSelectorOnMainThread:@selector(setForceRestart:) withObject:YES waitUntilDone:YES];
-    //[runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
