@@ -25,6 +25,25 @@
 @interface ORDT5720Controller : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* serialNumberPopup;
+	IBOutlet NSMatrix*      ttlEnabledMatrix;
+	IBOutlet NSButton*      gpoEnabledButton;
+	IBOutlet NSButton*      fpSoftwareTrigEnabledButton;
+	IBOutlet NSButton*      fpExternalTrigEnabledButton;
+	IBOutlet NSButton*      externalTrigEnabledButton;
+	IBOutlet NSButton*      softwareTrigEnabledButton;
+	IBOutlet NSMatrix*      gpiRunModeMatrix;
+	IBOutlet NSPopUpButton* clockSourcePU;
+	IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
+	IBOutlet NSButton*      testPatternEnabledButton;
+	IBOutlet NSButton*      trigOverlapEnabledButton;
+	IBOutlet NSPopUpButton* zsAlgorithmPU;
+    IBOutlet NSMatrix*		thresholdMatrix;
+    IBOutlet NSMatrix*		zsThresholdMatrix;
+    IBOutlet NSMatrix*		nLbkMatrix;
+    IBOutlet NSMatrix*		nLfwdMatrix;
+    IBOutlet NSMatrix*		dacMatrix;
+
+	IBOutlet NSMatrix*      logicTypeMatrix;
 	IBOutlet NSButton*		lockButton;
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSStepper* 	addressStepper;
@@ -45,34 +64,21 @@
     IBOutlet NSTextField*	registerReadWriteTextField;
     
     
-    IBOutlet NSMatrix*		thresholdMatrix;
     IBOutlet NSButton*		softwareTriggerButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
 	IBOutlet NSMatrix*		chanTriggerMatrix;
 	IBOutlet NSMatrix*		otherTriggerMatrix;
 	IBOutlet NSMatrix*		chanTriggerOutMatrix;
 	IBOutlet NSMatrix*		otherTriggerOutMatrix;
-	IBOutlet NSMatrix*		fpIOModeMatrix;
-	IBOutlet NSMatrix*		fpIOPatternLatchMatrix;
-	IBOutlet NSMatrix*		fpIOTrgInMatrix;
-	IBOutlet NSMatrix*		fpIOTrgOutMatrix;
-	IBOutlet NSMatrix*		fpIOTrgOutModeMatrix;
-	IBOutlet NSMatrix*		fpIOLVDS0Matrix;
-	IBOutlet NSMatrix*		fpIOLVDS1Matrix;
-	IBOutlet NSMatrix*		fpIOLVDS2Matrix;
-	IBOutlet NSMatrix*		fpIOLVDS3Matrix;
 	IBOutlet NSButton*		fpIOGetButton;
 	IBOutlet NSButton*		fpIOSetButton;
 	IBOutlet NSTextField*	postTriggerSettingTextField;
 	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
 	IBOutlet NSTextField*	coincidenceLevelTextField;
-    IBOutlet NSMatrix*		dacMatrix;
-	IBOutlet NSMatrix*		acquisitionModeMatrix;
 	IBOutlet NSMatrix*		countAllTriggersMatrix;
 	IBOutlet NSTextField*	customSizeTextField;
-	IBOutlet NSButton*	customSizeButton;
-	IBOutlet NSButton*	fixedSizeButton;
-	IBOutlet NSMatrix*		channelConfigMaskMatrix;
+	IBOutlet NSButton*      customSizeButton;
+	IBOutlet NSButton*      fixedSizeButton;
     IBOutlet NSMatrix*		overUnderMatrix;
 	IBOutlet NSPopUpButton* eventSizePopUp;
 	IBOutlet NSTextField*	eventSizeTextField;
@@ -82,7 +88,6 @@
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
     IBOutlet NSButton*		loadThresholdsButton;
-    IBOutlet NSButton *continousRunsButton;
 	
 	//rates page
 	IBOutlet NSMatrix*      rateTextFields;
@@ -118,15 +123,25 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) ttlEnabledChanged:(NSNotification*)aNote;
+- (void) gpoEnabledChanged:(NSNotification*)aNote;
+- (void) fpSoftwareTrigEnabledChanged:(NSNotification*)aNote;
+- (void) fpExternalTrigEnabledChanged:(NSNotification*)aNote;
+- (void) externalTrigEnabledChanged:(NSNotification*)aNote;
+- (void) softwareTrigEnabledChanged:(NSNotification*)aNote;
+- (void) gpiRunModeChanged:(NSNotification*)aNote;
+- (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) trigOnUnderThresholdChanged:(NSNotification*)aNote;
+- (void) testPatternEnabledChanged:(NSNotification*)aNote;
+- (void) trigOverlapEnabledChanged:(NSNotification*)aNote;
+- (void) zsAlgorithmChanged:(NSNotification*)aNote;
+- (void) logicTypeChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 
-#pragma mark •••Actions
-- (IBAction) settingLockAction:(id) sender;
-- (IBAction) serialNumberAction:(id)sender;
-
 - (void) validateInterfacePopup;
+
 #pragma mark ***Initialization
 - (id)		init;
 
@@ -137,6 +152,13 @@
 #pragma mark ***Interface Management
 - (void) eventSizeChanged:(NSNotification*)aNote;
 - (void) updateWindow;
+- (void) overUnderThresholdChanged: (NSNotification*) aNote;
+- (void) zsThresholdChanged: (NSNotification*) aNote;
+- (void) thresholdChanged: (NSNotification*) aNote;
+- (void) nlfwdChanged:(NSNotification*) aNote;
+- (void) dacChanged: (NSNotification*) aNote;
+
+
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) writeValueChanged: (NSNotification*) aNote;
 - (void) selectedRegIndexChanged: (NSNotification*) aNote;
@@ -145,32 +167,46 @@
 - (void) postTriggerSettingChanged:(NSNotification*)aNote;
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote;
 - (void) triggerOutMaskChanged:(NSNotification*)aNote;
-- (void) fpIOControlChanged:(NSNotification*)aNote;
 - (void) coincidenceLevelChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
-- (void) acquisitionModeChanged:(NSNotification*)aNote;
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
 - (void) customSizeChanged:(NSNotification*)aNote;
 - (void) isCustomSizeChanged:(NSNotification*)aNote;
-- (void) isFixedSizeChanged:(NSNotification*)aNote;
-- (void) channelConfigMaskChanged:(NSNotification*)aNote;
-- (void) dacChanged: (NSNotification*) aNote;
-- (void) overUnderChanged: (NSNotification*) aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
-- (void) thresholdChanged: (NSNotification*) aNote;
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
-- (void) continousRunsChanged:(NSNotification*)aNote;
 
 - (void) setBufferStateLabel;
 
 #pragma mark •••Actions
+- (IBAction) ttlEnabledAction:(id)sender;
+- (IBAction) gpoEnabledAction:(id)sender;
+- (IBAction) fpSoftwareTrigEnabledAction:(id)sender;
+- (IBAction) fpExternalTrigEnabledAction:(id)sender;
+- (IBAction) externalTrigEnabledAction:(id)sender;
+- (IBAction) softwareTrigEnabledAction:(id)sender;
+- (IBAction) gpiRunModeAction:(id)sender;
+- (IBAction) clockSourcePUAction:(id)sender;
+- (IBAction) trigOnUnderThresholdAction:(id)sender;
+- (IBAction) testPatternEnabledAction:(id)sender;
+- (IBAction) trigOverlapEnabledAction:(id)sender;
+- (IBAction) zsAlgorithmAction:(id)sender;
+- (IBAction) logicTypeAction:(id)sender;
+- (IBAction) thresholdAction: (id) sender;
+- (IBAction) zsThresholdAction: (id) sender;
+- (IBAction) nLbkAction: (id) sender;
+- (IBAction) nLfwdAction: (id) sender;
+- (IBAction) overUnderAction: (id) sender;
+- (IBAction) dacAction: (id) sender;
+
+- (IBAction) settingLockAction:(id) sender;
+- (IBAction) serialNumberAction:(id)sender;
 - (IBAction) eventSizeAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;
-- (IBAction) writeValueAction: (id) aSender;
-- (IBAction) selectRegisterAction: (id) aSender;
-- (IBAction) selectChannelAction: (id) aSender;
+- (IBAction) writeValueAction: (id) sender;
+- (IBAction) selectRegisterAction: (id) sender;
+- (IBAction) selectChannelAction: (id) sender;
 
 - (IBAction) basicReadAction: (id) sender;
 - (IBAction) basicWriteAction: (id) sender;
@@ -184,21 +220,14 @@
 - (IBAction) postTriggerSettingTextFieldAction:(id)sender;
 - (IBAction) triggerSourceMaskAction:(id)sender;
 - (IBAction) triggerOutMaskAction:(id)sender;
-- (IBAction) fpIOControlAction:(id)sender;
 - (IBAction) fpIOGetAction:(id)sender;
 - (IBAction) fpIOSetAction:(id)sender;
 - (IBAction) coincidenceLevelTextFieldAction:(id)sender;
 - (IBAction) generateTriggerAction:(id)sender;
-- (IBAction) acquisitionModeAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
 - (IBAction) customSizeAction:(id)sender;
 - (IBAction) isCustomSizeAction:(id)sender;
-- (IBAction) isFixedSizeAction:(id)sender;
-- (IBAction) channelConfigMaskAction:(id)sender;
-- (IBAction) dacAction: (id) aSender;
-- (IBAction) thresholdAction: (id) aSender;
-- (IBAction) overUnderAction: (id) aSender;
-- (IBAction)countinuousRunsAction:(id)sender;
+- (IBAction) countinuousRunsAction:(id)sender;
 
 #pragma mark •••Misc Helpers
 - (void)    populatePullDown;
