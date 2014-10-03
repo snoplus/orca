@@ -138,9 +138,6 @@ static NSString* DT5720RunModeString[4] = {
 };
 
 @interface ORDT5720Model (private)
-{
-}
-
 - (void) dataWorker:(NSDictionary*)arg;
 
 @end
