@@ -1667,7 +1667,8 @@ static NSString* DT5720RunModeString[4] = {
 {
     
     NSMutableArray* vmeReg = [NSMutableArray arrayWithCapacity:kNumberDT5720ControllerRegisters];
-    for (int i=0; i<kNumberDT5720ControllerRegisters; i++) {
+    int i;
+    for (i=0; i<kNumberDT5720ControllerRegisters; i++) {
         //[vmeReg addObject:[NSValue valueWithBytes:&ctrlReg[i] objCType:@encode(DT5720ControllerRegisterNamesStruct)]];
         [vmeReg addObject:[NSDictionary dictionaryWithObjectsAndKeys:
                            ctrlReg[i].regName, @"name",
