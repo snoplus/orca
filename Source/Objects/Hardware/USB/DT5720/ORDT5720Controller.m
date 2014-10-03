@@ -393,7 +393,7 @@
 {
     if(aNote){
         int i = [[[aNote userInfo] objectForKey:ORDT5720Chnl] intValue];
-        [[logicTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model logicType:i]];
+       [[logicTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model logicType:i]];
     }
     else {
         int i;

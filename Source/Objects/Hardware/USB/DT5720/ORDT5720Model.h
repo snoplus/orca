@@ -125,7 +125,7 @@ typedef struct  {
     unsigned short  thresholds[kNumDT5720Channels];
     unsigned short  nLbk[kNumDT5720Channels];
     unsigned short  nLfwd[kNumDT5720Channels];
-    BOOL            logicType[kNumDT5720Channels];
+    int             logicType[kNumDT5720Channels];
     int             zsAlgorithm;
     BOOL            trigOverlapEnabled;
     BOOL            testPatternEnabled;
@@ -206,8 +206,8 @@ typedef struct  {
 
 #pragma mark Accessors
 //------------------------------
-- (BOOL)            logicType:(unsigned short) i;
-- (void)            setLogicType:(unsigned short) i withValue:(BOOL)aLogicType;
+- (int)            logicType:(unsigned short) i;
+- (void)            setLogicType:(unsigned short) i withValue:(int)aLogicType;
 - (unsigned short)	zsThreshold:(unsigned short) i;
 - (void)			setZsThreshold:(unsigned short) i withValue:(unsigned long) aValue;
 //------------------------------

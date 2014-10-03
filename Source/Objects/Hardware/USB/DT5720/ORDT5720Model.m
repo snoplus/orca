@@ -131,10 +131,8 @@ static DT5720ControllerRegisterNamesStruct ctrlReg[kNumberDT5720ControllerRegist
 };
 
 static NSString* DT5720RunModeString[4] = {
-    @"Register-Controlled",
-    @"S-In Controlled",
-    @"S-In Gate",
-    @"Multi-Board Sync",
+    @"Register Controlled",
+    @"GPI Controlled",
 };
 
 @interface ORDT5720Model (private)
@@ -389,18 +387,21 @@ static NSString* DT5720RunModeString[4] = {
 #pragma mark Accessors
 //------------------------------
 //Reg Channel n ZS_Thres (0x1n24)
-- (BOOL) logicType:(unsigned short) i;
+- (int) logicType:(unsigned short) i;
 {
     return logicType[i];
 }
 
-- (void) setLogicType:(unsigned short) i withValue:(BOOL)aLogicType
+- (void) setLogicType:(unsigned short) i withValue:(int)aLogicType
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setLogicType:i withValue:logicType];
+    [[[self undoManager] prepareWithInvocationTarget:self] setLogicType:i withValue:[self logicType:i]];
+    
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
     logicType[i] = aLogicType;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelLogicTypeChanged object:self];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelLogicTypeChanged object:self userInfo:userInfo];
 }
 
 - (unsigned short) zsThreshold:(unsigned short) i
@@ -1180,7 +1181,6 @@ static NSString* DT5720RunModeString[4] = {
     [self readConfigurationROM];
     [self writeAcquistionControl:NO]; // Make sure it's off.
 	[self clearAllMemory];
-	[self softwareReset];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
@@ -1350,8 +1350,8 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeThreshold:(unsigned short) i
 {
-    unsigned long 	threshold = [self threshold:i];
-    [self writeLongBlock:&threshold
+    unsigned long 	aValue = [self threshold:i];
+    [self writeLongBlock:&aValue
                atAddress:reg[kThresholds].addressOffset + (i * 0x100)];
 }
 
@@ -1578,10 +1578,6 @@ static NSString* DT5720RunModeString[4] = {
 {
 	return [NSString stringWithFormat:@"DT5720 %lu",[self uniqueIdNumber]];
 }
-
-//- (void) initBoard:(int)i
-//{
-//}
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
@@ -2067,7 +2063,7 @@ static NSString* DT5720RunModeString[4] = {
 	
 	int i;
     for (i = 0; i < kNumDT5720Channels; i++){
-        [self setLogicType:i withValue:         [aDecoder decodeBoolForKey: [NSString stringWithFormat:@"logicType%d", i]]];
+        [self setLogicType:i withValue:         [aDecoder decodeIntForKey: [NSString stringWithFormat:@"logicType%d", i]]];
         [self setThreshold:i   withValue:       [aDecoder decodeInt32ForKey:[NSString stringWithFormat:@"threshold%d", i]]];
         [self setZsThreshold:i withValue:       [aDecoder decodeInt32ForKey:[NSString stringWithFormat:@"zsThreshold%d", i]]];
         
@@ -2100,7 +2096,7 @@ static NSString* DT5720RunModeString[4] = {
 	[anEncoder encodeBool:testPatternEnabled        forKey:@"testPatternEnabled"];
 	[anEncoder encodeBool:trigOverlapEnabled        forKey:@"trigOverlapEnabled"];
 	[anEncoder encodeInt:zsAlgorithm                forKey:@"zsAlgorithm"];
-	[anEncoder encodeBool:logicType                 forKey:@"logicType"];
+	[anEncoder encodeInt:logicType                 forKey:@"logicType"];
 	[anEncoder encodeInt:eventSize                  forKey:@"eventSize"];
 	[anEncoder encodeInt:enabledMask                forKey:@"enabledMask"];
 	[anEncoder encodeInt32:postTriggerSetting       forKey:@"postTriggerSetting"];
