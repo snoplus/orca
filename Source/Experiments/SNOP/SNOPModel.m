@@ -1382,7 +1382,7 @@ int runType = kRunUndefined;
     [ioArray setObject:[trigOutModeArray objectAtIndex:trigOutMode] forKey:@"trigger_output_mode"];
     [caenArray setObject:ioArray forKey:@"io"];
     
-    NSMutableDictionary* bufferInfo = [NSMutableArray arrayWithCapacity:20];
+    NSMutableDictionary* bufferInfo = [NSMutableDictionary dictionaryWithCapacity:20];
     [bufferInfo setObject:[NSNumber numberWithInt:[theCaen eventSize]] forKey:@"event_size"];
     [bufferInfo setObject:[NSNumber numberWithUnsignedLong:[theCaen postTriggerSetting]] forKey:@"post_trigger_size"];
     [bufferInfo setObject:[NSNumber numberWithUnsignedLong:[theCaen customSize]] forKey:@"custom_size"];
