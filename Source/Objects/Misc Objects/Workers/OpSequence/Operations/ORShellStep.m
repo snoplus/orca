@@ -115,27 +115,34 @@
 {
     [super runStep];
 	if (self.concurrentStep) [NSThread sleepForTimeInterval:5.0];
-
-	taskHandler = [[ORTaskHandler alloc] initWithLaunchPath:launchPath
-                                                arguments:[self resolvedScriptArrayForArray:argumentsArray]
-                                      terminationReceiver:self
-                                                 selector:@selector(taskComplete:)];
     
-	if (environment)      [[taskHandler task] setEnvironment: [self resolvedScriptDictionaryForDictionary:environment]];
-	if (currentDirectory) [[taskHandler task] setCurrentDirectoryPath: [self resolvedScriptValueForValue:currentDirectory]];
-	
-	[taskHandler setOutputReceiver:self
-                          selector:@selector(receiveOutputData:fromTaskHandler:)];
+    @try {
+        taskHandler = [[ORTaskHandler alloc] initWithLaunchPath:launchPath
+                                                    arguments:[self resolvedScriptArrayForArray:argumentsArray]
+                                          terminationReceiver:self
+                                                     selector:@selector(taskComplete:)];
+        
+        if (environment)      [[taskHandler task] setEnvironment: [self resolvedScriptDictionaryForDictionary:environment]];
+        if (currentDirectory) [[taskHandler task] setCurrentDirectoryPath: [self resolvedScriptValueForValue:currentDirectory]];
+        
+        [taskHandler setOutputReceiver:self
+                              selector:@selector(receiveOutputData:fromTaskHandler:)];
+        
+        [taskHandler setErrorReceiver:self
+                             selector:@selector(receiveErrorData:fromTaskHandler:)];
+        
+        [taskHandler launch];
     
-	[taskHandler setErrorReceiver:self
-                         selector:@selector(receiveErrorData:fromTaskHandler:)];
+        [taskStartedCondition lock];
+        [taskStartedCondition broadcast];
+        [taskStartedCondition unlock];
+    }
+    @catch (NSException* e){
+        [taskHandler release];
+        taskHandler = nil;
+        [self appendErrorString:@"Task=nil"];
+    }
     
-	[taskHandler launch];
-	
-	[taskStartedCondition lock];
-	[taskStartedCondition broadcast];
-	[taskStartedCondition unlock];
-	
 	while (![self isCancelled] && taskHandler){
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                  beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
