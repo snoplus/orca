@@ -793,9 +793,14 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [eventInfo setObject:lastTimeStamp forKey:@"timestamp"];
     [eventInfo setObject:[NSNumber numberWithUnsignedLong: secondsSince1970] forKey:@"time"];
  
-    [[self historyDBRef] addDocument:eventInfo tag:kDocumentAdded];
+    
+    id aDataBaseRef = [self historyDBRef];
+    [self checkDataBaseExists:aDataBaseRef];
+
+    
+    [aDataBaseRef addDocument:eventInfo tag:kDocumentAdded];
 	
-	[[self historyDBRef] updateEventCatalog:eventInfo documentId:@"eventCatalog" tag:kDocumentAdded];
+	[aDataBaseRef updateEventCatalog:eventInfo documentId:@"eventCatalog" tag:kDocumentAdded];
 
 }
 
