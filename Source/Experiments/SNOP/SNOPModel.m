@@ -1390,13 +1390,15 @@ int runType = kRunUndefined;
     [bufferInfo setObject:[NSNumber numberWithBool:[theCaen isCustomSize]] forKey:@"is_custom_size"];
     [bufferInfo setObject:[NSNumber numberWithBool:[theCaen isFixedSize]] forKey:@"fixed_event_size"];
     
+    [caenArray setObject:bufferInfo forKey:@"buffer"];
+    
     //Fetch the channel configuration information
     NSMutableDictionary* chanConfigInfo = [NSMutableDictionary dictionaryWithCapacity:20];
     int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
-    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[0] << [theCaen channelConfigMask]) & 0x1)] forKey:@"trigger_overlap"];
-    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[1] << [theCaen channelConfigMask]) & 0x1)] forKey:@"test_pattern"];
-    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[2] << [theCaen channelConfigMask]) & 0x1)] forKey:@"seq_memory_access"];
-    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[3] << [theCaen channelConfigMask]) & 0x1)] forKey:@"trig_on_under_threshold"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:(([theCaen channelConfigMask] >> chanConfigToMaskBit[0] ) & 0x1)] forKey:@"trigger_overlap"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:(([theCaen channelConfigMask] >> chanConfigToMaskBit[1] ) & 0x1)] forKey:@"test_pattern"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:(([theCaen channelConfigMask] >> chanConfigToMaskBit[2] ) & 0x1)] forKey:@"seq_memory_access"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:(([theCaen channelConfigMask] >> chanConfigToMaskBit[3] ) & 0x1)] forKey:@"trig_on_under_threshold"];
     [caenArray setObject:chanConfigInfo forKey:@"channel_configuration"];
     
     //get the run mode of the CAEN ADC, there is a runMode mask which is 00, 01, 10, 11 and corresponds to the four options in the CAEN GUI
@@ -1410,15 +1412,19 @@ int runType = kRunUndefined;
     int l;
     for(l=0;l<[theCaen numberOfChannels];l++){
         NSMutableDictionary* specificChannel = [NSMutableDictionary dictionaryWithCapacity:20];
-        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen enabledMask] << l) & 0x1)] forKey:@"enabled"];
+        [specificChannel removeAllObjects];
+        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen enabledMask] >> l) & 0x1)] forKey:@"enabled"];
         [specificChannel setObject:[NSNumber numberWithUnsignedShort:[theCaen threshold:l]] forKey:@"threshold"];
         [specificChannel setObject:[NSNumber numberWithFloat:[theCaen convertDacToVolts:[theCaen dac:l]]] forKey:@"offset"];
-        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerSourceMask] << l) & 0x1UL)] forKey:@"trigger_source"];
-        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerOutMask] << l) & 0x1UL)] forKey:@"trigger_output"];
+        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerSourceMask] >> l) & 0x1UL)] forKey:@"trigger_source"];
+        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerOutMask] >> l) & 0x1UL)] forKey:@"trigger_output"];
         [specificChannel setObject:[NSNumber numberWithInt:[theCaen overUnderThreshold:l]] forKey:@"over_under"];
-        [channelInfo setObject:specificChannel forKey:@"channels"];
-        [specificChannel release];
+        [channelInfo setObject:specificChannel forKey:[NSString stringWithFormat:@"%i",l]];
+        //[specificChannel removeAllObjects];
+        //[specificChannel release];
     }
+    
+    [caenArray setObject:channelInfo forKey:@"channels"];
 
     
     /*
