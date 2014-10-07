@@ -1384,9 +1384,9 @@ int runType = kRunUndefined;
     [caenArray setObject:ioArray forKey:@"io"];
     
     NSMutableDictionary* bufferInfo = [NSMutableDictionary dictionaryWithCapacity:20];
-    [bufferInfo setObject:[NSNumber numberWithInt:[theCaen eventSize]] forKey:@"event_size"];
-    [bufferInfo setObject:[NSNumber numberWithUnsignedLong:[theCaen postTriggerSetting]] forKey:@"post_trigger_size"];
-    [bufferInfo setObject:[NSNumber numberWithUnsignedLong:[theCaen customSize]] forKey:@"custom_size"];
+    [bufferInfo setObject:[NSNumber numberWithInt:(1024*1024./powf(2.,(float)[theCaen eventSize]) / 2)] forKey:@"event_size"];
+    [bufferInfo setObject:[NSNumber numberWithUnsignedLong:([theCaen postTriggerSetting] * 4)] forKey:@"post_trigger_size"]; 
+    [bufferInfo setObject:[NSNumber numberWithUnsignedLong:([theCaen customSize] * 4)] forKey:@"custom_size"];
     [bufferInfo setObject:[NSNumber numberWithBool:[theCaen isCustomSize]] forKey:@"is_custom_size"];
     [bufferInfo setObject:[NSNumber numberWithBool:[theCaen isFixedSize]] forKey:@"fixed_event_size"];
     
