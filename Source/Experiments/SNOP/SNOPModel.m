@@ -1224,7 +1224,7 @@ int runType = kRunUndefined;
     }
         
     //Get the trigger information and place into the DB
-    NSMutableDictionary * triggerMask = [NSMutableDictionary dictionaryWithCapacity:100];
+    //NSMutableDictionary * triggerMask = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Respective arrays that will be used to fill the main array 
     NSMutableArray * gtMask = [NSMutableArray arrayWithCapacity:100];
@@ -1325,7 +1325,7 @@ int runType = kRunUndefined;
     [mtcArray setObject:nhitMtcaArray forKey:@"mtca_nhit_matrix"];
     [mtcArray setObject:[NSNumber numberWithFloat:[aMTCcard dbFloatByIndex:kLockOutWidth]] forKey:@"lockout_width"];
     [mtcArray setObject:esumArray forKey:@"mtca_esum_matrix"];
-    [mtcArray setObject:triggerMask forKey:@"trigger_masks"];
+    //[mtcArray setObject:triggerMask forKey:@"trigger_masks"];
     
     [mtcArray setObject:[NSNumber numberWithBool:[aMTCcard isPedestalEnabledInCSR]] forKey:@"is_pedestal_enabled"];
     
