@@ -1408,7 +1408,6 @@ int runType = kRunUndefined;
     
     
     NSMutableDictionary* channelInfo = [NSMutableDictionary dictionaryWithCapacity:20];
-    
     int l;
     for(l=0;l<[theCaen numberOfChannels];l++){
         NSMutableDictionary* specificChannel = [NSMutableDictionary dictionaryWithCapacity:20];
@@ -1418,24 +1417,23 @@ int runType = kRunUndefined;
         [specificChannel setObject:[NSNumber numberWithFloat:[theCaen convertDacToVolts:[theCaen dac:l]]] forKey:@"offset"];
         [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerSourceMask] >> l) & 0x1UL)] forKey:@"trigger_source"];
         [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerOutMask] >> l) & 0x1UL)] forKey:@"trigger_output"];
-        [specificChannel setObject:[NSNumber numberWithInt:[theCaen overUnderThreshold:l]] forKey:@"over_under"];
+        [specificChannel setObject:[NSNumber numberWithUnsignedShort:[theCaen overUnderThreshold:l]] forKey:@"over_under_threshold"];
         [channelInfo setObject:specificChannel forKey:[NSString stringWithFormat:@"%i",l]];
         //[specificChannel removeAllObjects];
         //[specificChannel release];
     }
-    
     [caenArray setObject:channelInfo forKey:@"channels"];
-
     
-    /*
-     
-     int i;
-     unsigned short mask = 0;
-     for(i=0;i<[model numberOfChannels];i++){
-     if([[sender cellWithTag:i] intValue]) mask |= (1 << i);
-     }
-     
-     */
+    NSMutableDictionary *otherTrigInfo = [NSMutableDictionary dictionaryWithCapacity:20];
+    [otherTrigInfo setObject:[NSNumber numberWithBool:(([theCaen triggerSourceMask] >> 30) & 0x1UL)] forKey:@"external_trigger_enabled"];
+    [otherTrigInfo setObject:[NSNumber numberWithBool:(([theCaen triggerSourceMask] >> 31) & 0x1UL)] forKey:@"software_trigger_enabled"];
+    [otherTrigInfo setObject:[NSNumber numberWithBool:(([theCaen triggerOutMask] >> 30) & 0x1UL)] forKey:@"external_trigger_out"];
+    [otherTrigInfo setObject:[NSNumber numberWithBool:(([theCaen triggerOutMask] >> 31) & 0x1UL)] forKey:@"software_trigger_out"];
+    [otherTrigInfo setObject:[NSNumber numberWithBool:[theCaen countAllTriggers]] forKey:@"count_accepted"];
+    [otherTrigInfo setObject:[NSNumber numberWithUnsignedShort:[theCaen coincidenceLevel]] forKey:@"nhit"];
+    
+    [caenArray setObject:otherTrigInfo forKey:@"extra_trigger"];
+
     
     //[caenArray setObject:[NSNumber numberWithInt:[theCaen eventSize]] forKey:@"event_size"];
     [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen enabledMask]] forKey:@"enable_mask"];
