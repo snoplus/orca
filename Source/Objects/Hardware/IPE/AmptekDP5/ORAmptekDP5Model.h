@@ -152,7 +152,10 @@
         int crateUDPCommandPort;
         NSString* crateUDPCommandIP;
         int crateUDPReplyPort;
-        NSString* crateUDPCommand;
+        NSString* crateUDPCommand;//TODO: rename -tb-
+        NSString* textCommand;//TODO: rename -tb-
+
+
 		    //sender connection (client)
 	    int      UDP_COMMAND_CLIENT_SOCKET;
 	    uint32_t UDP_COMMAND_CLIENT_IP;
@@ -243,6 +246,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (NSString*) textCommand;
+- (void) setTextCommand:(NSString*)aTextCommand;
 - (int) resetEventCounterAtRunStart;
 - (void) setResetEventCounterAtRunStart:(int)aResetEventCounterAtRunStart;
 - (int) lowLevelRegInHex;
@@ -378,8 +383,13 @@
 - (int) openCommandSocket;
 - (int) isOpenCommandSocket;
 - (void) closeCommandSocket;
+- (int) sendTextCommand;
+- (int) sendTextCommandString:(NSString*)aString;
+- (int) readbackTextCommand;
+- (int) readbackTextCommandString:(NSString*)aString;
 - (int) sendUDPCommand;
 - (int) sendUDPCommandString:(NSString*)aString;
+- (int) sendUDPPacket:(unsigned char*)packet length:(int) aLength;
 - (int) sendBinaryString:(NSString*)aString;
 
 - (int) sendUDPCommandBinary;
@@ -524,6 +534,7 @@
 
 @end
 
+extern NSString* ORAmptekDP5ModelTextCommandChanged;
 extern NSString* ORAmptekDP5ModelResetEventCounterAtRunStartChanged;
 extern NSString* ORAmptekDP5ModelLowLevelRegInHexChanged;
 extern NSString* ORAmptekDP5ModelStatusRegHighChanged;

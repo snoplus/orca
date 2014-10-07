@@ -341,9 +341,19 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelResetEventCounterAtRunStartChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(textCommandChanged:)
+                         name : ORAmptekDP5ModelTextCommandChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) textCommandChanged:(NSNotification*)aNote
+{
+	[textCommandTextField setStringValue: [model textCommand]];
+}
 
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote
 {
@@ -736,6 +746,7 @@ return;
 	[self statusHighRegChanged:nil];
 	[self lowLevelRegInHexChanged:nil];
 	[self resetEventCounterAtRunStartChanged:nil];
+	[self textCommandChanged:nil];
 }
 
 - (void) setWindowTitle
@@ -888,6 +899,11 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) textCommandTextFieldAction:(id)sender
+{
+	[model setTextCommand:[sender stringValue]];	
+}
 
 - (void) resetEventCounterAtRunStartCBAction:(id)sender
 {
@@ -1239,7 +1255,22 @@ return;
 - (IBAction) crateUDPCommandSendButtonAction:(id)sender
 {
 	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-	[model sendUDPCommand];	
+	[self endEditing];
+    [model sendUDPCommand];	
+}
+
+- (IBAction) textCommandSendButtonAction:(id)sender
+{
+	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[self endEditing];
+	[model sendTextCommand];	
+}
+
+- (IBAction) textCommandReadbackButtonAction:(id)sender
+{
+	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[self endEditing];
+	[model readbackTextCommand];	
 }
 
 - (IBAction) crateUDPCommandSendBinaryButtonAction:(id)sender

@@ -27,6 +27,7 @@
 @interface ORAmptekDP5Controller : OrcaObjectController {
 
 	IBOutlet NSTabView*				tabView;
+	IBOutlet   NSTextField* textCommandTextField;
     
 	@private
 	
@@ -174,6 +175,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+- (void) textCommandChanged:(NSNotification*)aNote;
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote;
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
 - (void) statusHighRegChanged:(NSNotification*)aNote;
@@ -238,6 +240,7 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Actions
+- (IBAction) textCommandTextFieldAction:(id)sender;
 - (IBAction) resetEventCounterAtRunStartCBAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) statusHighRegTextFieldAction:(id)sender;
@@ -303,6 +306,8 @@
 - (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;
 
 - (IBAction) crateUDPCommandSendButtonAction:(id)sender; //TODO: rename -tb-
+- (IBAction) textCommandSendButtonAction:(id)sender; //TODO: rename -tb-
+- (IBAction) textCommandReadbackButtonAction:(id)sender; //TODO: rename -tb-
 - (IBAction) crateUDPCommandSendBinaryButtonAction:(id)sender;
 - (IBAction) crateUDPCommandTextFieldAction:(id)sender;
 - (IBAction) crateUDPCommandIPTextFieldAction:(id)sender;

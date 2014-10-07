@@ -546,6 +546,7 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelTextCommandChanged = @"ORAmptekDP5ModelTextCommandChanged";
 NSString* ORAmptekDP5ModelResetEventCounterAtRunStartChanged = @"ORAmptekDP5ModelResetEventCounterAtRunStartChanged";
 NSString* ORAmptekDP5ModelLowLevelRegInHexChanged = @"ORAmptekDP5ModelLowLevelRegInHexChanged";
 NSString* ORAmptekDP5ModelStatusRegHighChanged = @"ORAmptekDP5ModelStatusRegHighChanged";
@@ -644,6 +645,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 -(void) dealloc
 {
+    [textCommand release];
     [chargeBBFile release];
     [crateUDPDataCommand release];
     [crateUDPDataIP release];
@@ -752,6 +754,22 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (NSString*) textCommand
+{
+    if(textCommand==nil) return @"";
+    return textCommand;
+}
+
+- (void) setTextCommand:(NSString*)aTextCommand
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTextCommand:textCommand];
+    
+    [textCommand autorelease];
+    textCommand = [aTextCommand copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelTextCommandChanged object:self];
+}
 
 - (int) resetEventCounterAtRunStart
 {
@@ -1639,7 +1657,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG 	       NSLog(@"Called %@::%@! xxxxx \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 
     const int maxSizeOfReadbuffer=MAXDP5PACKETLENGTH *2;//was 4096 * 2; //typically MAXDP5PACKETLENGTH=32775
-    char readBuffer[maxSizeOfReadbuffer];
+    unsigned char readBuffer[maxSizeOfReadbuffer];
 
 	int retval=-1;
     sockaddr_fromLength = sizeof(sockaddr_from);
@@ -1662,15 +1680,24 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	        NSLog(@" %@::%@ Got UDP data from UDP_COMMAND_CLIENT_SOCKET  !  numBytes: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , retval);//TODO: DEBUG -tb-
             //is it the first response packet?
             if(countReceivedPackets==0 && retval>=6){
-                uint16_t packetLenFromHeader=0;
-                uint16_t dataLenFromHeader=0;
-                uint16_t *readBuf16 = (uint16_t *)(&(readBuffer[4]));
-                dataLenFromHeader = ntohs(*readBuf16);//on Intel machines, we need to swap ... -tb-
-                packetLenFromHeader = dataLenFromHeader + 8;
-                NSLog(@" %@::%@ DP5DataLen: %i   DP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,dataLenFromHeader,packetLenFromHeader);
-                expectedDP5PacketLen = packetLenFromHeader;
+                if(readBuffer[0]==0xf5 && readBuffer[1]==0xfa){
+                    uint16_t packetLenFromHeader=0;
+                    uint16_t dataLenFromHeader=0;
+                    uint16_t *readBuf16 = (uint16_t *)(&(readBuffer[4]));
+                    dataLenFromHeader = ntohs(*readBuf16);//on Intel machines, we need to swap ... -tb-
+                    packetLenFromHeader = dataLenFromHeader + 8;
+                    NSLog(@" %@::%@ DP5DataLen: %i   DP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,dataLenFromHeader,packetLenFromHeader);
+                    expectedDP5PacketLen = packetLenFromHeader;
+                    if(expectedDP5PacketLen<retval){//expect more packets
+                        waitForResponse = TRUE;
+                    }
+                }else{//ignore this packet, has bad header
+                    waitForResponse = FALSE;
+                    expectedDP5PacketLen = 0;//this
+                }
             }
             
+            #if 1
             //dump/debug !WARNING! SLOWS DOWN READOUT CONSIDERABLY (factor 1000 or so for MCA ...) -tb-
             int k;
             unsigned int val;
@@ -1678,6 +1705,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
                 val=readBuffer[k] & 0x000000ff;
                 NSLog(@"%i: 0x%02x (%u)\n",k,val,val);
             }
+            #endif
             
             //sum up packets if necessary, check received length
             memcpy(&(dp5Packet[currentDP5PacketLen]),readBuffer,retval);
@@ -1686,8 +1714,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             NSLog(@" %@::%@ currentDP5PacketLen: %i   expectedDP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,currentDP5PacketLen,expectedDP5PacketLen);
             if(currentDP5PacketLen >= expectedDP5PacketLen){
                 NSLog(@" %@::%@ RECEIVED FULL RESPONSE!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );
-                waitForResponse = FALSE;
                 [self parseReceivedDP5Packet];
+                currentDP5PacketLen  = 0;
+                countReceivedPackets = 0;
+                expectedDP5PacketLen = 0;
+                waitForResponse = FALSE;
             }
 	        //if(	waitForResponse) [self  receiveFromReplyServer ];
             
@@ -1803,6 +1834,12 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	//DEBUG 
     NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
     
+    //check length
+    if(currentDP5PacketLen<8){
+        NSLog(@"   ERROR: packet too small (<8 bytes) - NOT a valid DP5 packet!\n");
+        return -1;
+    }
+    
     //check header
     if(dp5Packet[0]==0xf5 && dp5Packet[1]==0xfa){
         NSLog(@"   MESSAGE: Header starts with 0xf5fa - OK\n");
@@ -1840,6 +1877,30 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     }
 
 
+    //parse contents
+    uint8_t PID1 = dp5Packet[2];
+    uint8_t PID2 = dp5Packet[3];
+    uint16_t length = dataLenFromHeader;
+    
+    //check acknowledge commands
+    if(PID1==0xff){
+        if(PID2==0){
+            NSLog(@"   MESSAGE: this was a ACKNOWLEDGE packet: OK\n");
+        }else{
+            NSLog(@"   ERROR: this was a ACKNOWLEDGE packet: error code %u (0x%x)\n",PID2,PID2);
+            //TODO: handle  error
+        }
+    }
+    
+    //check response packets (see page 55 of the "DP5 Programmer Guide" Rev A6)
+    if(PID1==0x82){
+        if(PID2==7){
+            NSLog(@"   MESSAGE: this is a configuration readback packet\n");
+            dp5Packet[length+6]=0;
+            NSLog(@"   readback is: %s\n",&(dp5Packet[6]));
+        }
+    }
+    
 
                 
     return 0;
@@ -1904,6 +1965,140 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 {
 	if(UDP_COMMAND_CLIENT_SOCKET>0) return 1; else return 0;
 }
+
+
+
+- (int) sendTextCommand
+{
+    return [self sendTextCommandString: textCommand];
+}
+
+
+
+- (int) sendTextCommandString:(NSString*)cmd;
+{
+	NSLog(@"Called %@::%@!  text command is: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd);//TODO: DEBUG -tb-
+
+    if([cmd length]>512){
+        NSLog(@"    ERROR: text command to long!\n");
+        return 0;
+    }
+
+
+    uint16_t len=[cmd length];
+    unsigned char buffer[520*2];
+    
+    buffer[0] =  0xf5;
+    buffer[1] =  0xfa;
+    buffer[2] =  0x20;
+    buffer[3] =  0x02;
+    buffer[4] =  (len >> 8);//length MSB
+    buffer[5] =  (len & 0xff);//length LSB
+    
+    int i;
+     
+    for(i=0; i<len; i++){
+        buffer[6+i] = [cmd characterAtIndex:i] & 0xff; //characterAtIndex: returns unichar = 16 bit
+    }
+    
+    
+    #if 1
+    {
+                //dump/debug !WARNING! SLOWS DOWN READOUT CONSIDERABLY  -tb-
+            int k;
+            unsigned int val;
+            for(k=0;k<len+6;k++){
+                val=buffer[k] & 0x000000ff;
+                NSLog(@"%i: 0x%02x (%u)\n",k,val,val);
+            }
+    }
+    #endif
+
+
+    //checksum
+    //int i;
+    uint16_t sum=0;
+    for(i=len+5; i>=0; i--) sum += buffer[i];          
+    uint16_t checkSum2er =   ~(sum) +1;//((chkmsb & 0xff)<<8) | (chklsb & 0xff);
+
+    buffer[len+6] =  checkSum2er >> 8;
+    buffer[len+7] =  checkSum2er & 0xff;
+
+
+    //send it
+    int retval = [self sendUDPPacket:buffer length:len+8];
+
+    return retval;
+    //return [self sendUDPCommandString: crateUDPCommand];
+}
+
+
+//----------
+- (int) readbackTextCommand
+{
+    return [self readbackTextCommandString: textCommand];
+}
+
+
+
+- (int) readbackTextCommandString:(NSString*)cmd;
+{
+	NSLog(@"Called %@::%@!  text command is: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd);//TODO: DEBUG -tb-
+
+    if([cmd length]>512){
+        NSLog(@"    ERROR: text command to long!\n");
+        return 0;
+    }
+
+
+    uint16_t len=[cmd length];
+    unsigned char buffer[520*2];
+    
+    buffer[0] =  0xf5;
+    buffer[1] =  0xfa;
+    buffer[2] =  0x20;
+    buffer[3] =  0x03;
+    buffer[4] =  (len >> 8);//length MSB
+    buffer[5] =  (len & 0xff);//length LSB
+    
+    int i;
+     
+    for(i=0; i<len; i++){
+        buffer[6+i] = [cmd characterAtIndex:i] & 0xff; //characterAtIndex: returns unichar = 16 bit
+    }
+    
+    
+    #if 1
+    {
+                //dump/debug !WARNING! SLOWS DOWN READOUT CONSIDERABLY  -tb-
+            int k;
+            unsigned int val;
+            for(k=0;k<len+6;k++){
+                val=buffer[k] & 0x000000ff;
+                NSLog(@"%i: 0x%02x (%u)\n",k,val,val);
+            }
+    }
+    #endif
+
+
+    //checksum
+    //int i;
+    uint16_t sum=0;
+    for(i=len+5; i>=0; i--) sum += buffer[i];          
+    uint16_t checkSum2er =   ~(sum) +1;//((chkmsb & 0xff)<<8) | (chklsb & 0xff);
+
+    buffer[len+6] =  checkSum2er >> 8;
+    buffer[len+7] =  checkSum2er & 0xff;
+
+
+    //send it
+    int retval = [self sendUDPPacket:buffer length:len+8];
+
+    return retval;
+    //return [self sendUDPCommandString: crateUDPCommand];
+}
+
+//-----
 
 
 
@@ -2038,10 +2233,10 @@ commands:
     if([aString hasPrefix:@"0x"]){
         [self sendBinaryString:aString];
         //we *always* expect a response from the DP5 -tb-
-        waitForResponse = TRUE;
-        currentDP5PacketLen = 0;
-        expectedDP5PacketLen = 0;
-        countReceivedPackets = 0;
+        waitForResponse = TRUE;    //TODO: this should be handled from "receiveFromReplyServer" -tb-
+        currentDP5PacketLen = 0;   //TODO: this should be handled from "receiveFromReplyServer" -tb-
+        expectedDP5PacketLen = 0;  //TODO: this should be handled from "receiveFromReplyServer" -tb-
+        countReceivedPackets = 0;  //TODO: this should be handled from "receiveFromReplyServer" -tb-
         return 0;
     }
 
@@ -2074,6 +2269,44 @@ commands:
     return retval;
 
 }
+
+
+//send to Amptek DP5
+- (int) sendUDPPacket:(unsigned char*)packet length:(int) aLength
+{
+    //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
+
+	NSLog(@"Called %@::%@! length: >%i<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aLength);//TODO: DEBUG -tb-
+
+    if(UDP_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
+    if(aLength==0)       return 1;
+    
+    
+    const void *buffer   = (const void *)packet; 
+	size_t length        = aLength;
+	const char* receiverIPAddr = [crateUDPCommandIP cStringUsingEncoding: NSASCIIStringEncoding];;
+
+	int retval=0;
+	
+  //	if(port==0) port = GLOBAL_UDP_CLIENT_PORT;//use default port
+	
+  memset((char *) &UDP_COMMAND_sockaddrin_to, 0, sizeof(UDP_COMMAND_sockaddrin_to));
+  UDP_COMMAND_sockaddrin_to.sin_family = AF_INET;
+  UDP_COMMAND_sockaddrin_to.sin_port = htons(crateUDPCommandPort);
+  if (inet_aton([crateUDPCommandIP cStringUsingEncoding:NSASCIIStringEncoding], &UDP_COMMAND_sockaddrin_to.sin_addr)==0) {
+	NSLog(@" %@::%@  inet_aton() failed \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    //fprintf(stderr, "ERROR: sendtoGlobalClient3: inet_aton() failed\n");
+	return 2;
+    //exit(1);
+  }
+    fprintf(stderr, "    sendtoGlobalClient3: UDP Client: IP: %s, port: %i\n",receiverIPAddr,crateUDPCommandPort);
+    //TODO: only recommended when using a char buffer ...  ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",buffer); //DEBUG
+	
+	retval = sendto(UDP_COMMAND_CLIENT_SOCKET, buffer, length, 0 /*flags*/, (struct sockaddr *)&UDP_COMMAND_sockaddrin_to, sockaddrin_to_len);
+    return retval;
+
+}
+
 
 
 
@@ -3495,6 +3728,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setTextCommand:[decoder decodeObjectForKey:@"textCommand"]];
 	[self setResetEventCounterAtRunStart:[decoder decodeIntForKey:@"resetEventCounterAtRunStart"]];
 	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
 	[self setTakeADCChannelData:[decoder decodeIntForKey:@"takeADCChannelData"]];
@@ -3567,6 +3801,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeObject:textCommand forKey:@"textCommand"];
 	[encoder encodeInt:resetEventCounterAtRunStart forKey:@"resetEventCounterAtRunStart"];
 	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
 	[encoder encodeInt:takeADCChannelData forKey:@"takeADCChannelData"];
