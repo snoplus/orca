@@ -1139,10 +1139,10 @@ int runType = kRunUndefined;
             [nhitMtcaArray setObject:tempArray forKey:@"threshold_value"];
         }
         else if(col == 1){
-            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_ADC"];
+            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_adc"];
         }
         else if(col == 2){
-            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_Nhit"];
+            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_nhit"];
         }
         else if(col == 3){
             [nhitMtcaArray setObject:tempArray forKey:@"dc_offset"];
@@ -1302,10 +1302,13 @@ int runType = kRunUndefined;
         }
 	}
     
+    
+    //TODO: REMOVE THIS AND ABOVE CODE FOR READING TRIGGGER MASK
     //Combine the mutable arrays containing all the triggers into the Dictionary;
-    [triggerMask setObject:gtMask forKey:@"global_trigger_mask"];
+    /*[triggerMask setObject:gtMask forKey:@"global_trigger_mask"];
     [triggerMask setObject:gtCrateMask forKey:@"crate_trigger_mask"];
-    [triggerMask setObject:pedCrateMask forKey:@"pedestal_trigger_mask"];
+    [triggerMask setObject:pedCrateMask forKey:@"pedestal_trigger_mask"];*/
+    
     
     //Fill an array with mtc information 
     NSMutableDictionary * mtcArray = [NSMutableDictionary dictionaryWithCapacity:20];
@@ -1315,13 +1318,21 @@ int runType = kRunUndefined;
     [mtcArray setObject:mtcGTWordMask forKey:@"gt_word_mask"];
     [mtcArray setObject:mtcPedestalWidth forKey:@"pedestal_width"];
     [mtcArray setObject:mtcNhit100LoPrescale forKey:@"nhit100_lo_prescale"];
-    [mtcArray setObject:mtcPulserPeriod forKey:@"pulsar_period"];
+    [mtcArray setObject:mtcPulserPeriod forKey:@"pulser_period"];
     [mtcArray setObject:mtcLow10MhzClock forKey:@"low_10Mhz_clock"];
     [mtcArray setObject:mtcFineSlope forKey:@"fine_slope"];
     [mtcArray setObject:mtcMinDelayOffset forKey:@"min_delay_offset"];
     [mtcArray setObject:nhitMtcaArray forKey:@"mtca_nhit_matrix"];
+    [mtcArray setObject:[NSNumber numberWithFloat:[aMTCcard dbFloatByIndex:kLockOutWidth]] forKey:@"lockout_width"];
     [mtcArray setObject:esumArray forKey:@"mtca_esum_matrix"];
     [mtcArray setObject:triggerMask forKey:@"trigger_masks"];
+    
+    [mtcArray setObject:[NSNumber numberWithBool:[aMTCcard isPedestalEnabledInCSR]] forKey:@"is_pedestal_enabled"];
+    
+    //Trigger masks
+    [mtcArray setObject:[NSNumber numberWithInt:[aMTCcard dbIntByIndex: kGtMask]] forKey:@"gt_mask"];
+    [mtcArray setObject:[NSNumber numberWithInt:[aMTCcard dbIntByIndex: kGtCrateMask]] forKey:@"crate_trigger_mask"];
+    [mtcArray setObject:[NSNumber numberWithInt:[aMTCcard dbIntByIndex: kPEDCrateMask]] forKey:@"pedestal_trigger_mask"];
     
     
     //make an MTC document
@@ -1550,14 +1561,14 @@ int runType = kRunUndefined;
     //Fill the configuration document with information
     [configDocDict setObject:@"configuration" forKey:@"type"];
     [configDocDict setObject:[NSNumber numberWithDouble:[[self stringDateFromDate:nil] doubleValue]] forKey:@"timestamp"];
-    [configDocDict setObject:@"0" forKey:@"config_id"]; //need to add in an update for this
+    [configDocDict setObject:@"0" forKey:@"config_version"]; //need to add in an update for this
     
      NSNumber * runNumberForConfig = [NSNumber numberWithUnsignedLong:[rc runNumber]];
     [configDocDict setObject:runNumberForConfig forKey:@"run"];
     
     [configDocDict setObject:svnVersion forKey:@"daq_version_build"];
     
-    [configDocDict setObject:mtcArray forKey:@"mtc_info"];
+    [configDocDict setObject:mtcArray forKey:@"mtc"];
     
     //reorganise the Fec32 cards to make it easier for couchDB
 
@@ -1595,7 +1606,7 @@ int runType = kRunUndefined;
     
     //NSLog(@"%@",organisedFec32Information);
     
-    [configDocDict setObject:fecCardArray forKey:@"fec32_card_info"];
+    [configDocDict setObject:fecCardArray forKey:@"fec32_card"];
     [configDocDict setObject:caenArray forKey:@"caen"];
     
     //collect the objects that correspond to the CAEN
