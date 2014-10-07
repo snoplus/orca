@@ -26,6 +26,7 @@
 #import "SBC_Config.h"
 #import "AutoTesting.h"
 #import "SBC_Link.h"
+#import "ORAdcInfoProviding.h"
 
 @class ORRateGroup;
 @class ORAlarm;
@@ -191,7 +192,7 @@ enum Gretina4FIFOStates {
 	kHalfFull
 };
 
-@interface ORGretina4Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
+@interface ORGretina4Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding>
 {
   @private
 	NSThread*		fpgaProgrammingThread;
@@ -486,6 +487,16 @@ enum Gretina4FIFOStates {
 
 #pragma mark ¥¥¥SPI Interface
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
+
+#pragma mark ***AdcProviding Protocol
+- (void) initBoard;
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan;
+- (unsigned short) gainForDisplay:(unsigned short) aChan;
+- (BOOL) onlineMaskBit:(int)bit;
+- (BOOL) partOfEvent:(unsigned short)aChannel;
+- (unsigned long) eventCount:(int)aChannel;
+- (void) clearEventCounts;
+- (void) postAdcInfoProvidingValueChanged;
 
 @end
 

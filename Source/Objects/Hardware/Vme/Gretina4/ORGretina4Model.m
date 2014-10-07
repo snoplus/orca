@@ -910,6 +910,7 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setLEDThreshold:chan withValue:ledThreshold[chan]];
 	ledThreshold[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelLEDThresholdChanged object:self];
+    [self postAdcInfoProvidingValueChanged];
 }
 
 - (void) setCFDDelay:(short)chan withValue:(int)aValue		
@@ -2520,6 +2521,57 @@ static struct {
     if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")])return YES;
     else return NO;
 }
+
+#pragma mark ***AdcProviding Protocol
+- (void) initBoard
+{
+    int i;
+    for(i=0;i<kNumGretina4Channels;i++) {
+        [self writeLEDThreshold:i];
+    }
+}
+
+- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+{
+    return [self ledThreshold:aChan];
+}
+
+- (unsigned short) gainForDisplay:(unsigned short) aChan
+{
+    return 0;
+}
+
+- (BOOL) onlineMaskBit:(int)bit
+{
+    return [self enabled:bit];
+}
+
+- (BOOL) partOfEvent:(unsigned short)aChannel
+{
+    //included to satisfy the protocol... change if needed
+    return NO;
+}
+
+- (unsigned long) eventCount:(int)aChannel
+{
+    return waveFormCount[aChannel];
+}
+
+- (void) clearEventCounts
+{
+    int i;
+    for(i=0;i<kNumGretina4Channels;i++){
+        waveFormCount[i]=0;
+    }
+}
+- (void) postAdcInfoProvidingValueChanged
+{
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ORAdcInfoProvidingValueChanged
+     object:self
+     userInfo: nil];
+}
+
 @end
 @implementation ORGretina4Model (private)
 
