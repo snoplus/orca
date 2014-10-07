@@ -50,6 +50,7 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 #define kOrcaConfigDocumentAdded @"kOrcaConfigDocumentAdded"
 #define kOrcaConfigDocumentUpdated @"kOrcaConfigDocumentUpdated"
 #define kMtcRunDocumentAdded @"kMtcRunDocumentAdded"
+#define kNumChanConfigBits 5 //used for the CAEN values 
 
 #define kMorcaCompactDB         @"kMorcaCompactDB"
 
@@ -1389,12 +1390,53 @@ int runType = kRunUndefined;
     [bufferInfo setObject:[NSNumber numberWithBool:[theCaen isCustomSize]] forKey:@"is_custom_size"];
     [bufferInfo setObject:[NSNumber numberWithBool:[theCaen isFixedSize]] forKey:@"fixed_event_size"];
     
+    //Fetch the channel configuration information
+    NSMutableDictionary* chanConfigInfo = [NSMutableDictionary dictionaryWithCapacity:20];
+    int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
+    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[0] << [theCaen channelConfigMask]) & 0x1)] forKey:@"trigger_overlap"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[1] << [theCaen channelConfigMask]) & 0x1)] forKey:@"test_pattern"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[2] << [theCaen channelConfigMask]) & 0x1)] forKey:@"seq_memory_access"];
+    [chanConfigInfo setObject:[NSNumber numberWithBool:((chanConfigToMaskBit[3] << [theCaen channelConfigMask]) & 0x1)] forKey:@"trig_on_under_threshold"];
+    [caenArray setObject:chanConfigInfo forKey:@"channel_configuration"];
+    
+    //get the run mode of the CAEN ADC, there is a runMode mask which is 00, 01, 10, 11 and corresponds to the four options in the CAEN GUI
+    NSArray* runModeArray = @[@"register_controlled",@"s_in_controller",@"s_in_gate",@"multi_board_sync"];
+    int acquitionMode = (int)[theCaen acquisitionMode];
+    [caenArray setObject:[NSString stringWithFormat:@"%@",[runModeArray objectAtIndex:acquitionMode]] forKey:@"run_mode"];
+    
+    
+    NSMutableDictionary* channelInfo = [NSMutableDictionary dictionaryWithCapacity:20];
+    
+    int l;
+    for(l=0;l<[theCaen numberOfChannels];l++){
+        NSMutableDictionary* specificChannel = [NSMutableDictionary dictionaryWithCapacity:20];
+        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen enabledMask] << l) & 0x1)] forKey:@"enabled"];
+        [specificChannel setObject:[NSNumber numberWithUnsignedShort:[theCaen threshold:l]] forKey:@"threshold"];
+        [specificChannel setObject:[NSNumber numberWithFloat:[theCaen convertDacToVolts:[theCaen dac:l]]] forKey:@"offset"];
+        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerSourceMask] << l) & 0x1UL)] forKey:@"trigger_source"];
+        [specificChannel setObject:[NSNumber numberWithBool:(([theCaen triggerOutMask] << l) & 0x1UL)] forKey:@"trigger_output"];
+        [specificChannel setObject:[NSNumber numberWithInt:[theCaen overUnderThreshold:l]] forKey:@"over_under"];
+        [channelInfo setObject:specificChannel forKey:@"channels"];
+        [specificChannel release];
+    }
+
+    
+    /*
+     
+     int i;
+     unsigned short mask = 0;
+     for(i=0;i<[model numberOfChannels];i++){
+     if([[sender cellWithTag:i] intValue]) mask |= (1 << i);
+     }
+     
+     */
+    
     //[caenArray setObject:[NSNumber numberWithInt:[theCaen eventSize]] forKey:@"event_size"];
     [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen enabledMask]] forKey:@"enable_mask"];
     //[caenArray setObject:[NSNumber numberWithUnsignedLong:[theCaen postTriggerSetting]] forKey:@"post_trigger_size"];
     [caenArray setObject:[NSNumber numberWithUnsignedLong:[theCaen triggerSourceMask]] forKey:@"trigger_source_mask"];
     [caenArray setObject:[NSNumber numberWithUnsignedLong:[theCaen triggerOutMask]] forKey:@"trigger_out_mask"];
-    [caenArray setObject:[NSNumber numberWithUnsignedLong:[theCaen frontPanelControlMask]] forKey:@"front_panel_control_mask"];
+    //[caenArray setObject:[NSNumber numberWithUnsignedLong:[theCaen frontPanelControlMask]] forKey:@"front_panel_control_mask"];
     [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen coincidenceLevel]] forKey:@"coincidence_level"];
     [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen acquisitionMode]] forKey:@"acquisition_mode"];
     [caenArray setObject:[NSNumber numberWithBool:[theCaen countAllTriggers]] forKey:@"count_all_triggers"];
@@ -1406,12 +1448,12 @@ int runType = kRunUndefined;
     [caenArray setObject:[NSNumber numberWithUnsignedLong:[theCaen numberBLTEventsToReadout]] forKey:@"number_blt_events"];
     [caenArray setObject:[NSNumber numberWithBool:[theCaen continuousMode]] forKey:@"continuous_mode"];
     
-    int l;
+    /*int l;
     for(l=0; l < [theCaen numberOfChannels]; l++){
         [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen dac:l]] forKey:[NSString stringWithFormat:@"dac_ch_%d",l]];
         [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen threshold:l]] forKey:[NSString stringWithFormat:@"thres_ch_%d",l]];
         [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen overUnderThreshold:l]] forKey:[NSString stringWithFormat:@"over_thres_ch_%d",l]];
-    }
+    }*/
     
     //FILL THE DATA FROM EACH FRONT END CARD HERE !!!!!
     
