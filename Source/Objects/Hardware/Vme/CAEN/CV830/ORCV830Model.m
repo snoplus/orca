@@ -815,18 +815,18 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
             }
             //for chan zero keep a rollover count
             if((enabledMask & 0x1)){
-                if(dataRecord[5]!=0){
-                    if(dataRecord[5]<lastChan0Count){
+                if(dataRecord[4]!=0){
+                    if(dataRecord[4]<lastChan0Count){
                         chan0RollOverCount++;
                     }
-                    lastChan0Count = dataRecord[5];
+                    lastChan0Count = dataRecord[4];
                     dataRecord[2] = chan0RollOverCount;
-                    dataRecord[5] += count0Offset;
+                    dataRecord[4] += count0Offset;
                 }
                 else {
                     //temp work around for erroronous counter transfers
                     dataRecord[2] = 0xffffffff;
-                    dataRecord[5] = 0xffffffff;
+                    dataRecord[4] = 0xffffffff;
                 }
             }
 
