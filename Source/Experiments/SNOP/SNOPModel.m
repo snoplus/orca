@@ -1188,16 +1188,16 @@ int runType = kRunUndefined;
              NSNumber * valueToDisplay = [NSNumber numberWithFloat:displayValue];
              
              if(row ==0) {
-                 [tempArray setObject:valueToDisplay forKey:@"ESUM_hi"];
+                 [tempArray setObject:valueToDisplay forKey:@"esum_hi"];
              }
              else if(row == 1){
-                 [tempArray setObject:valueToDisplay forKey:@"ESUM_lo"];
+                 [tempArray setObject:valueToDisplay forKey:@"esum_lo"];
              }
              else if(row == 2){
-                 [tempArray setObject:valueToDisplay forKey:@"OWLE_hi"];
+                 [tempArray setObject:valueToDisplay forKey:@"owle_hi"];
              }
              else if(row == 3){
-                 [tempArray setObject:valueToDisplay forKey:@"OWLE_lo"];
+                 [tempArray setObject:valueToDisplay forKey:@"owle_lo"];
              }
              else{
                  NSLog(@"OrcaDB::Cannot write the Mtca Esum DAC values to the OrcaDB");
@@ -1211,10 +1211,10 @@ int runType = kRunUndefined;
             [esumArray setObject:tempArray forKey:@"threshold_value"];
         }
         else if(col == 1){
-            [esumArray setObject:tempArray forKey:@"mv_per_ADC"];
+            [esumArray setObject:tempArray forKey:@"mv_per_adc"];
         }
         else if(col == 2){
-            [esumArray setObject:tempArray forKey:@"mv_per_Nhit"];
+            [esumArray setObject:tempArray forKey:@"mv_per_nhit"];
         }
         else if(col == 3){
             [esumArray setObject:tempArray forKey:@"dc_offset"];
