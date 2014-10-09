@@ -395,7 +395,7 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 
 - (IBAction) incDialog:(id)sender
 {
-	NSArray* models = [self collectObjectsOfClass:[model class]];
+	NSArray* models = [[model guardian] collectObjectsOfClass:[model class]];
 	if([models count]>1){
 		NSEnumerator* e = [models objectEnumerator];
 		id obj;
@@ -411,7 +411,7 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 
 - (IBAction) decDialog:(id)sender
 {
-	NSArray* models = [self collectObjectsOfClass:[model class]];
+	NSArray* models = [[model guardian] collectObjectsOfClass:[model class]];
 	if([models count]>1){
 		NSEnumerator* e = [models reverseObjectEnumerator];
 		id obj;
