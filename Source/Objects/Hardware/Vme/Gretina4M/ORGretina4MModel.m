@@ -577,7 +577,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (unsigned short) registerOffsetAt:(unsigned int)index
 {
-	if (index >= kNumberOfGretina4MRegisters) return @"";
+	if (index >= kNumberOfGretina4MRegisters) return 0;
 	return register_information[index].offset;
 }
 
@@ -589,7 +589,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index
 {
-	if (index >= kNumberOfFPGARegisters) return @"";
+	if (index >= kNumberOfFPGARegisters) return 0;
 	return fpga_register_information[index].offset;
 }
 

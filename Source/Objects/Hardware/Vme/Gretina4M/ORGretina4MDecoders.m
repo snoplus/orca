@@ -171,8 +171,8 @@
     NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1]&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1]&0x001f0000)>>16];
 
-    NSString* crateKey			= [self getCrateKey: crate];
-	NSString* cardKey			= [self getCardKey: card];
+    NSString* crateKey			= [self getCrateKey: (ptr[1]&0x01e00000)>>21];
+	NSString* cardKey			= [self getCardKey: (ptr[1]&0x001f0000)>>16];
 
     //recast pointer to short and point to the actual data header
     unsigned short* headerPtr = (unsigned short*)(ptr+2);
