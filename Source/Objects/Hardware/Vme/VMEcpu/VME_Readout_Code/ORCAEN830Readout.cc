@@ -50,36 +50,35 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                     uint32_t indexForRollOver = dataIndex;  //save a place for the roll over
                     data[dataIndex++] = 0;                  //channel 0 rollover
 					data[dataIndex++] = enabledMask;
-                
-					//get the header -- always the first word
-					uint32_t dataHeader = 0;
-					if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
-						LogBusError("Header Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
-					}
-					data[dataIndex++] = dataHeader;
-					
-					for(uint16_t i=0 ; i<numEnabledChannels ; i++){
-						uint32_t aValue;
-						if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(aValue), aValue) != sizeof(aValue)){
-							LogBusError("Data Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
-						}
+                    
+                    uint32_t indexForHeader         = dataIndex;
+                    uint32_t indexForFirstChannel   = dataIndex+1; //save a reference for the first chan location (1 past header)
+                    
+                    uint32_t numBytesToRead = (numEnabledChannels+1)*4;
+                    
+                    result = DMARead(baseAdd+eventBufferOffset,
+                                     0x0B, //(A32 non-privileged MBLT )
+                                     (uint32_t) 4,
+                                     (uint8_t*) (data+indexForHeader),
+                                     numBytesToRead);
+                    dataIndex += (numEnabledChannels+1); //bump the index and include the header
+                    
+                    if(chan0Enabled){
+                        uint32_t chan0Value = data[indexForFirstChannel];
                         //keep a rollover count for channel zero
-                        if(chan0Enabled && i==0){
-                            if(aValue!=0){
-                                if(aValue<lastChan0Count){
-                                    rollOverCount++;
-                                }
-                                lastChan0Count = aValue;
-                                data[indexForRollOver] = rollOverCount;
-                                data[dataIndex++]      = aValue+chan0Offset;
+                        if(chan0Value!=0){
+                            if(chan0Value<lastChan0Count){
+                                rollOverCount++;
                             }
-                            else {
-                                data[indexForRollOver] = 0xffffffff;
-                                data[dataIndex++]      = 0xffffffff;
-                            }
+                            lastChan0Count = chan0Value;
+                            data[indexForRollOver]      = rollOverCount;
+                            data[indexForFirstChannel]  = chan0Value + chan0Offset; //there's a timing offset
                         }
-                        else    data[dataIndex++]      = aValue;
-					}
+                        else {
+                            data[indexForRollOver]      = 0xffffffff;
+                            data[indexForFirstChannel]  = 0xffffffff;
+                        }
+                    }
 					
 					int32_t leaf_index;
 					//read out the children that are in the readout list
@@ -87,7 +86,6 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 					while(leaf_index >= 0) {
 						leaf_index = readout_card(leaf_index,lamData);
 					}
-					
 				}
 			}
 		}
