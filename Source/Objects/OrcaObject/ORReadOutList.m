@@ -112,6 +112,15 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     }
 }
 
+- (BOOL) alreadyInReadOutList:(id)anItem
+{
+    if(object == [anItem object])return YES;
+    for(id item in [object children]){
+        if([item alreadyInReadOutList:anItem])return YES;
+    }
+    return NO;
+}
+
 
 #pragma mark ¥¥¥ID Helpers
 //----++++----++++----++++----++++----++++----++++----++++----++++
@@ -336,12 +345,24 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 
 - (void) insertObject:(id)anObj atIndex:(unsigned)index
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] removeObject:anObj];
-	[children insertObject:anObj atIndex:index];
-    [[NSNotificationCenter defaultCenter]
-					postNotificationName:NSReadOutListChangedNotification
-                                  object:self];
-    
+    if(![self alreadyInReadOutList:anObj]){
+        [[[self undoManager] prepareWithInvocationTarget:self] removeObject:anObj];
+        [children insertObject:anObj atIndex:index];
+        [[NSNotificationCenter defaultCenter]
+                        postNotificationName:NSReadOutListChangedNotification
+                                      object:self];
+    }
+    else {
+        NSLog(@"%@ rejected! It is already in the readout list\n",[[anObj object] fullID]);
+    }
+}
+
+- (BOOL) alreadyInReadOutList:(id)anItem
+{
+    for(id item in children){
+        if([item alreadyInReadOutList:anItem])return YES;
+    }
+    return NO;
 }
 
 - (void) addObjectsFromArray:(NSArray*)anArray

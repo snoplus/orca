@@ -491,9 +491,7 @@ else {\
 	GET_CHILDREN; //macro: given an item, sets children array and guardian. 
 	
 	NSMutableArray* nodeItems = [NSMutableArray array];
-	NSEnumerator* e = [possibleItems objectEnumerator];
-	id anItem;
-	while(anItem = [e nextObject]){
+	for(id anItem in possibleItems){
 		if([guardian acceptsObject:[anItem object]]){
 			[nodeItems addObject:anItem];
 		}
