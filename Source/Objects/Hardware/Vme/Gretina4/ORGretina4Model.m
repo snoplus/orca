@@ -472,7 +472,7 @@ static struct {
 }
 - (unsigned short) registerOffsetAt:(unsigned int)index
 {
-	if (index >= kNumberOfGretina4Registers) return @"";
+	if (index >= kNumberOfGretina4Registers) return 0;
 	return register_information[index].offset;
 }
 
@@ -484,7 +484,7 @@ static struct {
 
 - (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index
 {
-	if (index >= kNumberOfFPGARegisters) return @"";
+	if (index >= kNumberOfFPGARegisters) return 0;
 	return fpga_register_information[index].offset;
 }
 
