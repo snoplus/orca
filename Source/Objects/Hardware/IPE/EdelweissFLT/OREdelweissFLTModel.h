@@ -447,6 +447,7 @@
 - (void) readTriggerParameters;
 - (void) writeTriggerParametersVerbose;
 - (void) writeTriggerParameters;
+- (void) writeTriggerParametersDisableAll;
 - (void) dumpTriggerParameters;
 - (void) setTriggerPar:(unsigned short)chan  withValue:(uint32_t) val;
 - (uint32_t) triggerPar:(unsigned short)chan;

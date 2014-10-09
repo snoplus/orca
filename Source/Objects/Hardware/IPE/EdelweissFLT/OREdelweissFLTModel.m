@@ -2436,6 +2436,18 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self writeThresholds];
 }
 
+- (void) writeTriggerParametersDisableAll
+{
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        //NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
+        [self writeTriggerPar:i value: (triggerPar[i] & 0xffff7fff)];//set ENABLE flag to zero
+    }    
+
+    //TODO: make own action -tb-
+    [self writeThresholds];
+}
+
 - (void) dumpTriggerParameters
 {
         NSLog(@"TriggerParameters\n");
@@ -4413,6 +4425,7 @@ for(chan=0; chan<6;chan++)
 	}
 	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fireRepeatedSoftwareTriggerInRun) object:nil];
 
+    [self writeTriggerParametersDisableAll];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];
     
