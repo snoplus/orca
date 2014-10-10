@@ -182,8 +182,11 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
 {
     if(!oldUserValueDictionary)oldUserValueDictionary = [[NSMutableDictionary dictionary] retain];
     
-    if(![oldUserValueDictionary objectForKey:aKey])return YES;
-    else if([[oldUserValueDictionary objectForKey:aKey] unsignedLongValue] != aValue)return YES;
+    if(![oldUserValueDictionary objectForKey:aKey] ||
+       [[oldUserValueDictionary objectForKey:aKey] unsignedLongValue] != aValue){
+        [oldUserValueDictionary setObject:[NSNumber numberWithUnsignedLong:aValue] forKey:aKey];
+        return YES;
+    }
     else return NO;
 }
 
