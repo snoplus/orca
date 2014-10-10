@@ -67,6 +67,7 @@
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
+    IBOutlet NSButton*      fullInitButton;
     IBOutlet NSButton*      initButton1;
     IBOutlet NSButton*      resetButton;
     IBOutlet NSButton*      clearFIFOButton;
@@ -232,6 +233,7 @@
 - (IBAction) readStatus:(id)sender;
 - (IBAction) resetBoard:(id)sender;
 - (IBAction) initBoardAction:(id)sender;
+- (IBAction) fullInitBoardAction:(id)sender;
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) findNoiseFloors:(id)sender;

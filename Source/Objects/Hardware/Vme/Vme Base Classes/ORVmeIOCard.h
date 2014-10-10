@@ -38,6 +38,7 @@
     unsigned long        exceptionCount;
     BOOL                 diagnosticsEnabled;
     NSMutableDictionary* diagnosticReport;
+    NSMutableDictionary* oldUserValueDictionary;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -57,6 +58,9 @@
                         addressOffset:(short)anOffset
                                  mask:(unsigned long)aMask
                             reportKey:(NSString*)aKey;
+- (BOOL) longValueChanged:(unsigned long)aValue valueKey:(NSString*)aKey;
+- (void) clearOldUserValues;
+
 - (void) verifyValue:(unsigned long)val1 matches:(unsigned long)val2 reportKey:aKey;
 - (void) clearDiagnosticsReport;
 - (void) briefDiagnosticsReport;

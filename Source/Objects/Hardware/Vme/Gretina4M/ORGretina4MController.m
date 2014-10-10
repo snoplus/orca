@@ -961,6 +961,7 @@
     	
     [settingLockButton      setState: locked];
     [initButton             setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [fullInitButton         setEnabled:!lockedOrRunningMaintenance && !downloading];
     [initButton1            setEnabled:!lockedOrRunningMaintenance && !downloading];
     [clearFIFOButton        setEnabled:!locked && !runInProgress && !downloading];
 	[noiseFloorButton       setEnabled:!locked && !runInProgress && !downloading];
@@ -1487,6 +1488,23 @@
                         localException);
     }
 }
+
+- (IBAction) fullInitBoardAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model clearOldUserValues];
+        [model initBoard];		//initialize and load hardware, but don't enable channels
+        NSLog(@"Initialized Gretina4M (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    }
+    @catch(NSException* localException) {
+        NSLog(@"Init of Gretina4M FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
+                        localException);
+    }
+}
+
 
 - (IBAction) clearFIFO:(id)sender
 {

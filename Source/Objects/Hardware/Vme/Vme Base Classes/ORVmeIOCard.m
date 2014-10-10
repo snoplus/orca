@@ -36,6 +36,7 @@ NSString* ORVmeDiagnosticsEnabledChanged             = @"ORVmeDiagnosticsEnabled
 - (void) dealloc
 {
     [diagnosticReport release];
+    [oldUserValueDictionary release];
     [super dealloc];
 }
 #pragma mark ¥¥¥Accessors
@@ -146,28 +147,46 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
                       mask:(unsigned long)aMask
                  reportKey:(NSString*)aKey
 {
-    unsigned long writeValue = aValue & aMask;
-    [[self adapter] writeLongBlock: &writeValue
-                         atAddress: [self baseAddress] + anOffset
-                        numToWrite: 1
-                        withAddMod: [self addressModifier]
-                     usingAddSpace: 0x01];
-    
-    if(diagnosticsEnabled){
-        NSLog(@"%@ addressOffset: (0x%08x) write: 0x%08x\n",[self fullID],anOffset,aValue);
+    if([self longValueChanged:aValue valueKey:aKey]){
+        unsigned long writeValue = aValue & aMask;
+        [[self adapter] writeLongBlock: &writeValue
+                             atAddress: [self baseAddress] + anOffset
+                            numToWrite: 1
+                            withAddMod: [self addressModifier]
+                         usingAddSpace: 0x01];
+        
+        if(diagnosticsEnabled){
+            NSLog(@"%@ addressOffset: (0x%08x) write: 0x%08x\n",[self fullID],anOffset,aValue);
 
-        unsigned long readBackValue = 0;
-        [[self adapter] readLongBlock: &readBackValue
-                            atAddress: [self baseAddress] + anOffset
-                           numToRead: 1
-                           withAddMod: [self addressModifier]
-                        usingAddSpace: 0x01];
-        
-        readBackValue &= aMask;
-        
-        [self verifyValue: writeValue matches:readBackValue reportKey:aKey];
-     }
+            unsigned long readBackValue = 0;
+            [[self adapter] readLongBlock: &readBackValue
+                                atAddress: [self baseAddress] + anOffset
+                               numToRead: 1
+                               withAddMod: [self addressModifier]
+                            usingAddSpace: 0x01];
+            
+            readBackValue &= aMask;
+            
+            [self verifyValue: writeValue matches:readBackValue reportKey:aKey];
+         }
+    }
 }
+
+- (void) clearOldUserValues
+{
+    [oldUserValueDictionary release];
+    oldUserValueDictionary=nil;
+}
+
+- (BOOL) longValueChanged:(unsigned long)aValue valueKey:(NSString*)aKey
+{
+    if(!oldUserValueDictionary)oldUserValueDictionary = [[NSMutableDictionary dictionary] retain];
+    
+    if(![oldUserValueDictionary objectForKey:aKey])return YES;
+    else if([[oldUserValueDictionary objectForKey:aKey] unsignedLongValue] != aValue)return YES;
+    else return NO;
+}
+
 
 - (BOOL) diagnosticsEnabled {return diagnosticsEnabled;}
 - (void) setDiagnosticsEnabled:(BOOL)aState
