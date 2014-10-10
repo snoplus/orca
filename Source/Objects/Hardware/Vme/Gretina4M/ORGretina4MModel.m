@@ -370,8 +370,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return baselineRestoredDelay;
 }
 
-- (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay
+- (void) setBaselineRestoredDelay:(short)aBaselineRestoredDelay
 {
+    if(aBaselineRestoredDelay<0)
+        aBaselineRestoredDelay = 0;
+
     [[[self undoManager] prepareWithInvocationTarget:self] setBaselineRestoredDelay:baselineRestoredDelay];
     
     baselineRestoredDelay = aBaselineRestoredDelay;
@@ -412,7 +415,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setNoiseWindow:(short)aNoiseWindow
 {
-    if(aNoiseWindow>0x7f)aNoiseWindow = 0x7f;
+    if(aNoiseWindow>0x7f) aNoiseWindow = 0x7f;
+    else if(aNoiseWindow<0) aNoiseWindow = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setNoiseWindow:noiseWindow];
     
     noiseWindow = aNoiseWindow;
@@ -427,7 +431,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setIntegrateTime:(short)aIntegrateTime
 {
-    if(aIntegrateTime>0x3ff)aIntegrateTime = 0x3ff;
+    if(aIntegrateTime>0x3ff)
+        aIntegrateTime = 0x3ff;
+    else if(aIntegrateTime<0)
+        aIntegrateTime = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setIntegrateTime:integrateTime];
     
     integrateTime = aIntegrateTime;
@@ -442,7 +449,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setCollectionTime:(short)aCollectionTime
 {
-    if(aCollectionTime>0x3ff)aCollectionTime = 0x3ff;
+    if(aCollectionTime>0x3ff)
+        aCollectionTime = 0x3ff;
+    else if(aCollectionTime<0)
+        aCollectionTime = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setCollectionTime:collectionTime];
     
     collectionTime = aCollectionTime;
@@ -458,6 +468,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setExtTrigLength:(short)aExtTrigLength
 {
     if(aExtTrigLength>0x7ff)aExtTrigLength = 0x7ff;
+    else if(aExtTrigLength<0) aExtTrigLength = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setExtTrigLength:extTrigLength];
     
     extTrigLength = aExtTrigLength;
@@ -473,7 +484,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPileUpWindow:(short)aPileUpWindow
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPileUpWindow:pileUpWindow];
-    
+//  This should be masked, but I don't know the max value. -SJM
+    if (pileUpWindow<0) {pileUpWindow=0;}
     pileUpWindow = aPileUpWindow;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MPileUpWindowChanged object:self];
@@ -487,6 +499,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setExternalWindow:(short)aExternalWindow
 {
     if(aExternalWindow>0x7ff) aExternalWindow = 0x7ff;
+    else if(aExternalWindow<0) aExternalWindow = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setExternalWindow:externalWindow];
     
     externalWindow = aExternalWindow;

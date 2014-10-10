@@ -300,7 +300,7 @@ enum Gretina4MFIFOStates {
 - (short) histEMultiplier;
 - (void) setHistEMultiplier:(short)aHistEMultiplier;
 - (unsigned short) baselineRestoredDelay;
-- (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay;
+- (void) setBaselineRestoredDelay:(short)aBaselineRestoredDelay;
 - (NSString*) firmwareStatusString;
 - (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
 - (short) integrateTime;
