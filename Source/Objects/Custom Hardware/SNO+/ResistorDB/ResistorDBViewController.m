@@ -201,15 +201,10 @@
     }
     
     NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* rc = nil;
-    int current_run_number = 0;
-	if([runObjects count]){
-        rc = [runObjects objectAtIndex:0];
-        current_run_number = [rc runNumber];
-    }
-    else{
-        NSLog(@"Unable to Fetch current run number and therefore unable to update resistor Database\n");
-    }
+    ORRunModel* rc = [runObjects objectAtIndex:0];
+    int current_run_number;
+    current_run_number = [rc runNumber];
+
     
     //Whenever we update the resistor document we are also going to need to change the run range
     NSMutableArray * runRange = [NSMutableArray arrayWithCapacity:20];
