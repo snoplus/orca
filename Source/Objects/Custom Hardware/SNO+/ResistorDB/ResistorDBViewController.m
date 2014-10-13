@@ -202,7 +202,7 @@
     
     NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* rc = [runObjects objectAtIndex:0];
-    int current_run_number;
+    unsigned int current_run_number;
     current_run_number = [rc runNumber];
 
     
