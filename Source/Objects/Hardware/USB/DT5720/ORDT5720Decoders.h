@@ -25,6 +25,8 @@
 
 @interface ORDT5720Decoder : ORBaseDecoder {
     @private 
+    BOOL getRatesFromDecodeStage;
+    NSMutableDictionary* actualCards;
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

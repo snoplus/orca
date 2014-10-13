@@ -31,6 +31,7 @@
 #import "ORTimeAxis.h"
 #import "ORCompositePlotView.h"
 #import "ORValueBarGroupView.h"
+#import "ORQueueView.h"
 
 #define kNumChanConfigBits 5
 #define kNumTrigSourceBits 10
@@ -78,12 +79,12 @@
                      selector : @selector(serialNumberChanged:)
                          name : ORDT5720ModelUSBInterfaceChanged
 						object: nil];
-	
-	[notifyCenter addObserver : self
-					 selector : @selector(lockChanged:)
-						 name : ORRunStatusChangedNotification
-					   object : nil];
-	
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(integrationChanged:)
+                         name : ORRateGroupIntegrationChangedNotification
+                       object : nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(logicTypeChanged:)
                          name : ORDT5720ModelLogicTypeChanged
@@ -93,15 +94,15 @@
                      selector : @selector(zsThresholdChanged:)
                          name : ORDT5720ZsThresholdChanged
                        object : model];
-   
+    
     [notifyCenter addObserver : self
                      selector : @selector(thresholdChanged:)
                          name : ORDT5720ThresholdChanged
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(overUnderThresholdChanged:)
-                         name : ORDT5720OverUnderThresholdChanged
+                     selector : @selector(numOverUnderZsThresholdChanged:)
+                         name : ORDT5720NumOverUnderZsThresholdChanged
                        object : model];
     
     [notifyCenter addObserver : self
@@ -115,8 +116,13 @@
                        object : model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(numOverUnderThresholdChanged:)
+                         name : ORDT5720NumOverUnderThresholdChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(dacChanged:)
-                         name : ORDT5720ChnlDacChanged
+                         name : ORDT5720DacChanged
                        object : model];
     
     [notifyCenter addObserver : self
@@ -275,9 +281,9 @@
 
 - (void) awakeFromNib
 {
-    lowLevelSize   = NSMakeSize(600,450);
-    basicSize      = NSMakeSize(1000,450); //NSMakeSize(280,400);
-    monitoringSize = NSMakeSize(783,320);
+    lowLevelSize   = NSMakeSize(300,360);
+    basicSize      = NSMakeSize(970,400);
+    monitoringSize = NSMakeSize(783,290);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -298,17 +304,15 @@
         
         [[logicTypeMatrix       cellAtRow:i column:0] setTag:i];
         [[zsThresholdMatrix     cellAtRow:i column:0] setTag:i];
-        [[zsThresholdMatrix     cellAtRow:i column:0] setTag:i];
-        [[numOverUnderMatrix    cellAtRow:i column:0] setTag:i];
         [[nLbkMatrix            cellAtRow:i column:0] setTag:i];
         [[nLfwdMatrix           cellAtRow:i column:0] setTag:i];
         [[thresholdMatrix       cellAtRow:i column:0] setTag:i];
-        [[overUnderthresholdMatrix cellAtRow:i column:0] setTag:i];
+        [[numOverUnderZsThresholdMatrix cellAtRow:i column:0] setTag:i];
+        [[numOverUnderThresholdMatrix cellAtRow:i column:0] setTag:i];
         [[dacMatrix             cellAtRow:i column:0] setTag:i];
         [[trigOnUnderThresholdMatrix cellAtRow:i column:0] setTag:i];
         [[triggerSourceEnableMaskMatrix cellAtRow:i column:0] setTag:i];
         [[triggerOutMatrix      cellAtRow:i column:0] setTag:i];
-        [[chanTriggerMatrix     cellAtRow:i column:0] setTag:i];
         [[enabled2MaskMatrix    cellAtRow:i column:0] setTag:i];
     }
     
@@ -316,12 +320,14 @@
     [super awakeFromNib];
 
     
-    NSString* key = [NSString stringWithFormat: @"orca.%@.selectedtab",[model fullID]];
+    NSString* key = [NSString stringWithFormat: @"orca.%@%lu.selectedtab",[model className],[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-	[rate0 setNumber:8 height:10 spacing:5];
+	[rate0 setNumber:4 height:10 spacing:5];
+    [queView setBarColor:[NSColor redColor]];
+
 }
 
 - (void) updateWindow
@@ -329,13 +335,15 @@
     [ super updateWindow ];
     
 	[self serialNumberChanged:nil];
-    
+    [self integrationChanged:nil];
+   
     [self logicTypeChanged:nil];
     [self zsThresholdChanged:nil];
     [self nlfwdChanged:nil];
     [self nlbkChanged:nil];
     [self thresholdChanged:nil];
-    [self overUnderThresholdChanged:nil];
+    [self numOverUnderZsThresholdChanged:nil];
+    [self numOverUnderThresholdChanged:nil];
     [self dacChanged:nil];
     [self zsAlgorithmChanged:nil];
     [self trigOnUnderThresholdChanged:nil];
@@ -371,13 +379,13 @@
 }
 
 #pragma mark •••Notification of Changes
+
 - (void) serialNumberChanged:(NSNotification*)aNote
 {
     if(![model serialNumber] || ![model usbInterface])[serialNumberPopup selectItemAtIndex:0];
     else [serialNumberPopup selectItemWithTitle:[model serialNumber]];
     [[self window] setTitle:[model title]];
 }
-
 - (void) interfacesChanged:(NSNotification*)aNote
 {
     [self populateInterfacePopup:[aNote object]];
@@ -387,6 +395,16 @@
 {
     [super setModel:aModel];
     [[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+}
+
+- (void) integrationChanged:(NSNotification*)aNotification
+{
+    ORRateGroup* theRateGroup = [aNotification object];
+    if(aNotification == nil || [model waveFormRateGroup] == theRateGroup || [aNotification object] == model){
+        double dValue = [[model waveFormRateGroup] integrationTime];
+        [integrationStepper setDoubleValue:dValue];
+        [integrationText setDoubleValue: dValue];
+    }
 }
 
 - (void) logicTypeChanged:(NSNotification*)aNote
@@ -405,7 +423,6 @@
 
 - (void) zsThresholdChanged:(NSNotification*) aNotification
 {
-    // Get the channel that changed and then set the GUI value using the model value.
     if(aNotification){
         int chnl = [[[aNotification userInfo] objectForKey:ORDT5720Chnl] intValue];
         [[zsThresholdMatrix cellWithTag:chnl] setIntValue:[model zsThreshold:chnl]];
@@ -416,11 +433,24 @@
             [[zsThresholdMatrix cellWithTag:i] setIntValue:[model zsThreshold:i]];
         }
     }
-}
+    [self basicLockChanged:nil];
 
+}
+- (void) numOverUnderZsThresholdChanged: (NSNotification*) aNotification
+{
+    if(aNotification){
+        int chnl = [[[aNotification userInfo] objectForKey:ORDT5720Chnl] intValue];
+        [[numOverUnderZsThresholdMatrix cellWithTag:chnl] setIntValue:[model numOverUnderZsThreshold:chnl]];
+    }
+    else {
+        int i;
+        for (i = 0; i < kNumDT5720Channels; i++){
+            [[numOverUnderZsThresholdMatrix cellWithTag:i] setIntValue:[model numOverUnderZsThreshold:i]];
+        }
+    }
+}
 - (void) nlfwdChanged:(NSNotification*) aNotification
 {
-    // Get the channel that changed and then set the GUI value using the model value.
     if(aNotification){
         int chnl = [[[aNotification userInfo] objectForKey:ORDT5720Chnl] intValue];
         [[nLfwdMatrix cellWithTag:chnl] setIntValue:[model nLfwd:chnl]];
@@ -449,7 +479,6 @@
 
 - (void) thresholdChanged:(NSNotification*) aNotification
 {
-    // Get the channel that changed and then set the GUI value using the model value.
     if(aNotification){
         int chnl = [[[aNotification userInfo] objectForKey:ORDT5720Chnl] intValue];
         [[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
@@ -462,16 +491,16 @@
     }
 }
 
-- (void) overUnderThresholdChanged: (NSNotification*) aNotification
+- (void) numOverUnderThresholdChanged: (NSNotification*) aNotification
 {
     if(aNotification){
         int chnl = [[[aNotification userInfo] objectForKey:ORDT5720Chnl] intValue];
-        [[numOverUnderMatrix cellWithTag:chnl] setIntValue:[model overUnderThreshold:chnl]];
+        [[numOverUnderThresholdMatrix cellWithTag:chnl] setIntValue:[model numOverUnderThreshold:chnl]];
     }
     else {
         int i;
         for (i = 0; i < kNumDT5720Channels; i++){
-            [[numOverUnderMatrix cellWithTag:i] setIntValue:[model overUnderThreshold:i]];
+            [[numOverUnderThresholdMatrix cellWithTag:i] setIntValue:[model numOverUnderThreshold:i]];
         }
     }
 }
@@ -493,6 +522,7 @@
 - (void) zsAlgorithmChanged:(NSNotification*)aNote
 {
     [zsAlgorithmPU selectItemAtIndex: [model zsAlgorithm]];
+    [self basicLockChanged:nil];
 }
 
 - (void) trigOnUnderThresholdChanged:(NSNotification*)aNote
@@ -508,13 +538,13 @@
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
     [eventSizePopUp selectItemAtIndex:	[model eventSize]];
-    [eventSizeTextField setIntValue:	1024*1024./powf(2.,(float)[model eventSize]) / 2]; //in Samples
+    [eventSizeTextField setStringValue:	[NSString stringWithFormat:@"%d K",(int)(1024*1024./powf(2.,(float)[model eventSize]))/1024]]; //in Samples
 }
 
 - (void) customSizeChanged:(NSNotification*)aNote
 {
     //todo: *4 in std mode, *5 in packed mode
-    [customSizeTextField setIntValue:([model customSize] * 4)];
+    [customSizeTextField setIntValue:[model customSize]];
 }
 
 - (void) isCustomSizeChanged:(NSNotification*)aNote
@@ -563,10 +593,8 @@
     int i;
     unsigned long mask = [model triggerSourceMask];
     for(i=0;i<kNumDT5720Channels;i++){
-        [[chanTriggerMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
+        [[triggerSourceEnableMaskMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
-    [[triggerSourceEnableMaskMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
-    [[triggerSourceEnableMaskMatrix cellWithTag:1] setIntValue:(mask & (1L << 31)) !=0];
 }
 
 - (void) triggerOutMaskChanged:(NSNotification*)aNote
@@ -576,9 +604,7 @@
     for(i=0;i<kNumDT5720Channels;i++){
         [[triggerOutMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
-    [[triggerOutMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
-    [[triggerOutMatrix cellWithTag:1] setIntValue:(mask & (1L << 31)) !=0];
-}
+ }
 
 - (void) fpExternalTrigEnabledChanged:(NSNotification*)aNote
 {
@@ -592,13 +618,12 @@
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
 {
-    //todo *4 in std mode *5 in packed mode
-    [postTriggerSettingTextField setIntValue:([model postTriggerSetting] * 4)];
+    [postTriggerSettingTextField setIntValue:[model postTriggerSetting]];
 }
 
 - (void) gpoEnabledChanged:(NSNotification*)aNote
 {
-    [gpoEnabledButton setIntValue: [model gpoEnabled]];
+    [gpoEnabledMatrix selectCellWithTag: [model gpoEnabled]];
 }
 
 - (void) ttlEnabledChanged:(NSNotification*)aNote
@@ -646,15 +671,20 @@
 	}
 	else {
 		int val = [model bufferState];
-		if(val) {
-			[bufferStateField setTextColor:[NSColor redColor]];
-			[bufferStateField setStringValue:@"Full"];
-		}
+        if(val == kDT5720BufferFull) {
+            [bufferStateField setTextColor:[NSColor redColor]];
+            [bufferStateField setStringValue:@"Full"];
+        }
+        else if(val == kDT5720BufferReady) {
+            [bufferStateField setTextColor:[NSColor blackColor]];
+            [bufferStateField setStringValue:@"Data"];
+        }
 		else {
 			[bufferStateField setTextColor:[NSColor blackColor]];
-			[bufferStateField setStringValue:@"Ready"];
+			[bufferStateField setStringValue:@"Empty"];
 		}
 	}
+    [queView setNeedsDisplay:YES];
 }
 
 - (void) totalRateChanged:(NSNotification*)aNotification
@@ -701,7 +731,8 @@
 		[channelPopUp setEnabled:!lockedOrRunningMaintenance];
 	}
 	else [channelPopUp setEnabled:NO];
-	
+    [writeValueTextField setEnabled:writeAllowed];
+    [writeValueStepper setEnabled:writeAllowed];
 }
 
 - (void) selectedRegChannelChanged:(NSNotification*) aNotification
@@ -757,30 +788,60 @@
 	[self setBufferStateLabel];
     
     [serialNumberPopup setEnabled:!locked];
-    [thresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-    [overUnderthresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-    [dacMatrix setEnabled:!lockedOrRunningMaintenance];
-
-    //[softwareTriggerButton setEnabled:!lockedOrRunningMaintenance];
-	[softwareTriggerButton setEnabled:YES];
-    [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance];
-	[triggerOutMatrix setEnabled:!lockedOrRunningMaintenance];
-	[fpIOGetButton setEnabled:!lockedOrRunningMaintenance];
-	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance];
-    [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance];
-    [triggerSourceEnableMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-    [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance];
-    [countAllTriggersMatrix setEnabled:!lockedOrRunningMaintenance];
-    [eventSizePopUp setEnabled:!lockedOrRunningMaintenance];
-    [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance];
-    [initButton setEnabled:!lockedOrRunningMaintenance];
+    
+    [logicTypeMatrix                setEnabled:!lockedOrRunningMaintenance];
+    [thresholdMatrix                setEnabled:!lockedOrRunningMaintenance];
+    
+    switch([model zsAlgorithm]){
+            
+        case kNoZeroSuppression:
+            [zsThresholdMatrix              setEnabled:NO];
+            [numOverUnderZsThresholdMatrix  setEnabled:NO];
+            [nLbkMatrix                     setEnabled:NO];
+            [nLfwdMatrix                    setEnabled:NO];
+            break;
+            
+        case kZeroLengthEncoding:
+            [zsThresholdMatrix              setEnabled:NO];
+            [numOverUnderZsThresholdMatrix  setEnabled:NO];
+            [nLbkMatrix                     setEnabled:!lockedOrRunningMaintenance];
+            [nLfwdMatrix                    setEnabled:!lockedOrRunningMaintenance];
+            break;
+            
+        case kFullSuppressionBasedOnAmplitude:
+            [zsThresholdMatrix              setEnabled:!lockedOrRunningMaintenance];
+            [numOverUnderZsThresholdMatrix  setEnabled:!lockedOrRunningMaintenance];
+            [nLbkMatrix                     setEnabled:NO];
+            [nLfwdMatrix                    setEnabled:NO];
+            break;
+    }
+    
+    [numOverUnderThresholdMatrix    setEnabled:!lockedOrRunningMaintenance];
+    [dacMatrix                      setEnabled:!lockedOrRunningMaintenance];
+    [trigOverlapEnabledButton       setEnabled:!lockedOrRunningMaintenance];
+    [testPatternEnabledButton       setEnabled:!lockedOrRunningMaintenance];
+    [triggerOutMatrix               setEnabled:!lockedOrRunningMaintenance];
+    [trigOnUnderThresholdMatrix     setEnabled:!lockedOrRunningMaintenance];
+    [fpSoftwareTrigEnabledButton    setEnabled:!lockedOrRunningMaintenance];
+    [fpExternalTrigEnabledButton    setEnabled:!lockedOrRunningMaintenance];
+    [postTriggerSettingTextField    setEnabled:!lockedOrRunningMaintenance];
+    [triggerSourceEnableMaskMatrix  setEnabled:!lockedOrRunningMaintenance];
+    [ttlEnabledMatrix               setEnabled:!lockedOrRunningMaintenance];
+    [gpoEnabledMatrix               setEnabled:!lockedOrRunningMaintenance];
+    [softwareTrigEnabledButton      setEnabled:!lockedOrRunningMaintenance];
+    [externalTrigEnabledButton      setEnabled:!lockedOrRunningMaintenance];
+    [gpiRunModeMatrix               setEnabled:!lockedOrRunningMaintenance];
+    [clockSourcePU                  setEnabled:!lockedOrRunningMaintenance];
+    
+    [coincidenceLevelTextField      setEnabled:!lockedOrRunningMaintenance];
+    [countAllTriggersMatrix         setEnabled:!lockedOrRunningMaintenance];
+    [eventSizePopUp                 setEnabled:!lockedOrRunningMaintenance];
+    [initButton                     setEnabled:!lockedOrRunningMaintenance];
 	
-	//these must NOT or can not be changed when run in progress
-    [customSizeTextField setEnabled:!locked && !runInProgress && [model isCustomSize]];
-	[customSizeButton setEnabled:!locked && !runInProgress];
-	[fixedSizeButton setEnabled:!locked && !runInProgress];
-    [eventSizePopUp setEnabled:!locked && !runInProgress];
-    [enabledMaskMatrix setEnabled:!locked && !runInProgress];
+    [customSizeTextField            setEnabled:!locked && !runInProgress && [model isCustomSize]];
+	[customSizeButton               setEnabled:!locked && !runInProgress];
+    [eventSizePopUp                 setEnabled:!locked && !runInProgress];
+    [enabledMaskMatrix              setEnabled:!locked && !runInProgress];
 }
 
 #pragma mark •••Actions
@@ -789,42 +850,42 @@
     [model setLogicType:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
-- (IBAction) zsThresholdAction: (id) sender
+- (IBAction) zsThresholdAction:(id) sender
 {
-    if ([sender intValue] != [model zsThreshold:[[sender selectedCell] tag]]){
-        [model setZsThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
-    }
+    [model setZsThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
+}
+
+- (IBAction) numOverUnderZsThresholdAction: (id) sender
+{
+    [model setNumOverUnderZsThreshold:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]]; // Set new value
 }
 
 - (IBAction) nLfwdAction: (id) sender
 {
-    if ([sender intValue] != [model nLbk:[[sender selectedCell] tag]]){
-        [model setNlfwd:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
-    }
+    [model setNlfwd:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
 }
 
 - (IBAction) nLbkAction: (id) sender
 {
-    if ([sender intValue] != [model nLbk:[[sender selectedCell] tag]]){
-        [model setNlbk:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
-    }
+    [model setNlbk:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
 }
 
 - (IBAction) thresholdAction:(id) sender
 {
-    if ([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
-        [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
-    }
+    [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; // Set new value
 }
 
-- (IBAction) overUnderAction: (id) sender
+- (IBAction) numOverUnderThresholdAction: (id) sender
 {
-    [model setOverUnderThreshold:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]]; // Set new value
+    [model setNumOverUnderThreshold:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]]; // Set new value
 }
 
 - (IBAction) dacAction:(id) sender
 {
-    [model setDac:[[sender selectedCell] tag] withValue:[model convertVoltsToDac:[[sender selectedCell] floatValue]]]; // Set new value
+    float aVoltage = [[sender selectedCell] floatValue];
+    if(aVoltage < -1)aVoltage = -1;
+    else if(aVoltage > 1)aVoltage = 1;
+    [model setDac:[[sender selectedCell] tag] withValue:[model convertVoltsToDac:aVoltage]]; // Set new value
 }
 
 - (IBAction) zsAlgorithmAction:(id)sender
@@ -854,14 +915,7 @@
 
 - (IBAction) customSizeAction:(id)sender
 {
-    NSUInteger maxNumSamples = (NSUInteger) 1024 * 1024./powf(2.,(float)[model eventSize]) / 2;
-    if(maxNumSamples > [sender intValue]) {
-        //todo /4 in std mode /5 in packed mode
-        [model setCustomSize:([sender intValue] / 4)];
-    }
-    else {
-        [model setCustomSize:maxNumSamples / 4];
-    }
+    [model setCustomSize:[sender intValue] ];
 }
 
 - (IBAction) isCustomSizeAction:(id)sender
@@ -936,7 +990,7 @@
 
 - (IBAction) gpoEnabledAction:(id)sender
 {
-    [model setGpoEnabled:[sender intValue]];
+    [model setGpoEnabled:[[sender selectedCell] tag]];
 }
 
 - (IBAction) ttlEnabledAction:(id)sender
@@ -1013,21 +1067,10 @@
                         localException);
 	}
 }
-
-- (IBAction) loadThresholdsAction: (id) sender
-{
-	@try {
-		[model writeThresholds];
-	}
-	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nThreshold loading failed", @"OK", nil, nil,
-                        localException);
-	}
-}
-
 - (IBAction) initBoardAction: (id) sender
 {
 	@try {
+        [self endEditing];
 		[model initBoard];
 	}
 	@catch(NSException* localException) {
@@ -1036,33 +1079,9 @@
 	}
 }
 
-- (void) postTriggerSettingAction:(id)sender
+- (IBAction) postTriggerSettingAction:(id)sender
 {
-	//todo /4 in std mode /5 in packed mode
-	[model setPostTriggerSetting:([sender intValue] / 4)];
-}
-
-- (IBAction) fpIOGetAction:(id)sender
-{
-	@try {
-		//[model readFrontPanelControl];
-	}
-	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@\nGet Front Panel Failed", @"OK", nil, nil,
-                        localException);
-	}
-}
-
-- (IBAction) fpIOSetAction:(id)sender
-{
-	@try {
-        [model writeFrontPanelIOControl];
-        [model writeFrontPanelTriggerOutEnableMask];
-	}
-	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@\nSet Front Panel Failed", @"OK", nil, nil,
-                        localException);
-	}
+	[model setPostTriggerSetting:[sender intValue]];
 }
 
 - (IBAction) generateTriggerAction:(id)sender
@@ -1097,6 +1116,13 @@
     [gSecurity tryToSetLock:ORDT5720LowLevelLock to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction) integrationAction:(id)sender
+{
+    [self endEditing];
+    if([sender doubleValue] != [[model waveFormRateGroup]integrationTime]){
+        [model setRateIntegrationTime:[sender doubleValue]];
+    }
+}
 
 #pragma mark ***Misc Helpers
 - (void) populatePullDown
@@ -1161,16 +1187,22 @@
 		[[self window] setContentView:tabView];
     }
 	
-    NSString* key = [NSString stringWithFormat: @"orca.%@.selectedtab",[model fullID]];
+    NSString* key = [NSString stringWithFormat: @"orca.%@%lu.selectedtab",[model className],[model uniqueIdNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
 
 #pragma mark •••Data Source
+
+- (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
+{
+    [model getQueMinValue:aMinValue maxValue:aMaxValue head:aHeadValue tail:aTailValue];
+    
+}
+
 - (double) getBarValue:(int)tag
 {
-	
 	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];
 }
 
@@ -1201,7 +1233,6 @@
 		
 	}
 }
-
 @end
 
 @implementation ORDT5720Controller (private)
@@ -1226,7 +1257,6 @@
 	}
 	else [serialNumberPopup selectItemAtIndex:0];
     [[self undoManager] enableUndoRegistration];
-	
 }
 
 @end

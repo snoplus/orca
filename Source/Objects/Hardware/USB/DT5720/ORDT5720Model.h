@@ -27,6 +27,7 @@
 @class ORAlarm;
 @class ORDataSet;
 @class ORRateGroup;
+@class ORSafeCircularBuffer;
 
 enum {
 	kOutputBuffer,			//0x0000
@@ -64,7 +65,7 @@ enum {
     kScratch,				//0xEF20
     kSWReset,				//0xEF24
     kSWClear,				//0xEF28
-    kConfigROMVersion,      //0xF000
+    kConfigROMVersion,      //0xF030
     kConfigROMBoard2,       //0xF034
 	kNumberDT5720Registers
 };
@@ -78,26 +79,16 @@ typedef struct  {
 	bool			dataReset;
 } DT5720RegisterNamesStruct;
 
-// DT5720 includes SW implemenation of V1718
-// V1718 registers follow
-enum {
-    kCtrlStatus,    //0x00
-    kCtrlCtrl,      //0x01
-    kCtrlFwRev,     //0x02
-    kCtrlFwDwnld,   //0x03
-    kCtrlFlEna,     //0x04
-    kCtrlIrqStat,   //0x05
-    kCtrlInReg,     //0x08
-    kCtrlOutRegS,   //0x0A
-    //the rest is probably not relevant
-	kNumberDT5720ControllerRegisters
-};
 
 enum {
     kNoZeroSuppression,
     kZeroLengthEncoding,
     kFullSuppressionBasedOnAmplitude
 };
+
+#define kDT5720BufferEmpty 0
+#define kDT5720BufferReady 1
+#define kDT5720BufferFull  3
 
 typedef struct  {
 	NSString*       regName;
@@ -122,6 +113,7 @@ typedef struct  {
     NSString*		serialNumber;
 	unsigned long   dataId;
     unsigned short  zsThresholds[kNumDT5720Channels];
+    unsigned short	numOverUnderZsThreshold[kNumDT5720Channels];
     unsigned short  thresholds[kNumDT5720Channels];
     unsigned short  nLbk[kNumDT5720Channels];
     unsigned short  nLfwd[kNumDT5720Channels];
@@ -143,7 +135,7 @@ typedef struct  {
 
     
 	unsigned short	dac[kNumDT5720Channels];
-	unsigned short	overUnderThreshold[kNumDT5720Channels];
+	unsigned short	numOverUnderThreshold[kNumDT5720Channels];
     unsigned long	customSize;
 	BOOL            isCustomSize;
     BOOL			countAllTriggers;
@@ -154,17 +146,13 @@ typedef struct  {
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumDT5720Channels];
     int				bufferState;
+    int				lastBufferState;
 	ORAlarm*        bufferFullAlarm;
 	int				bufferEmptyCount;
-	BOOL			isRunning;
     int				eventSize;
     unsigned long   numberBLTEventsToReadout;
     
-    unsigned long   vmeRegValue;
-    unsigned int    vmeRegIndex;
-    NSArray*        vmeRegArray;
-    BOOL            isNeedToSwap; //DT5720 talks little endian
-    BOOL            isVMEFIFOMode;
+     BOOL            isNeedToSwap; //DT5720 talks little endian
 
     
     unsigned short  selectedRegIndex;
@@ -177,19 +165,16 @@ typedef struct  {
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
 
+    BOOL            firstTime;
+    BOOL            isRunning;
     BOOL isDataWorkerRunning;
     BOOL isTimeToStopDataWorker;
-    NSMutableArray* dataArray;
+    ORSafeCircularBuffer* circularBuffer;
 }
 
-@property (nonatomic, assign) unsigned long vmeRegValue;
-@property (nonatomic, assign) unsigned int vmeRegIndex;
 @property (nonatomic, assign) BOOL isNeedToSwap;
-@property (nonatomic, copy) NSArray* vmeRegArray;
-@property (nonatomic, assign) BOOL isVMEFIFOMode;
 @property (assign) BOOL isDataWorkerRunning;
 @property (assign) BOOL isTimeToStopDataWorker;
-@property (nonatomic, assign) NSMutableArray* dataArray;
 
 #pragma mark ***USB
 - (id)              getUSBController;
@@ -206,21 +191,23 @@ typedef struct  {
 
 #pragma mark Accessors
 //------------------------------
-- (int)            logicType:(unsigned short) i;
+- (int)             logicType:(unsigned short) i;
 - (void)            setLogicType:(unsigned short) i withValue:(int)aLogicType;
 - (unsigned short)	zsThreshold:(unsigned short) i;
-- (void)			setZsThreshold:(unsigned short) i withValue:(unsigned long) aValue;
+- (void)			setZsThreshold:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
+- (unsigned short)	numOverUnderZsThreshold:(unsigned short) i;
+- (void)			setNumOverUnderZsThreshold:(unsigned short) i withValue:(unsigned short) aValue;
 - (unsigned short)	nLbk:(unsigned short) i;
 - (void)			setNlbk:(unsigned short) i withValue:(unsigned short) aValue;
 - (unsigned short)	nLfwd:(unsigned short) i;
 - (void)			setNlfwd:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
 - (unsigned short)	threshold:(unsigned short) i;
-- (void)			setThreshold:(unsigned short) i withValue:(unsigned long) aValue;
+- (void)			setThreshold:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
-- (unsigned short)	overUnderThreshold:(unsigned short) i;
-- (void)			setOverUnderThreshold:(unsigned short) i withValue:(unsigned short) aValue;
+- (unsigned short)	numOverUnderThreshold:(unsigned short) i;
+- (void)			setNumOverUnderThreshold:(unsigned short) i withValue:(unsigned short) aValue;
 //------------------------------
 - (unsigned short)	dac:(unsigned short) i;
 - (void)			setDac:(unsigned short) i withValue:(unsigned short) aValue;
@@ -289,10 +276,6 @@ typedef struct  {
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
 
 #pragma mark ***Register - General routines
-- (int)             readVmeCtrlRegister:(unsigned short) address toValue:(unsigned short*) value;
-- (void)            readVmeCtrlRegister;
-- (int)             writeVmeCtrlRegister:(unsigned short) address value:(unsigned short) value;
-- (void)            writeVmeCtrlRegister;
 - (void)			read;
 - (void)			write;
 - (void)			report;
@@ -303,7 +286,6 @@ typedef struct  {
 
 #pragma mark ***HW Init
 - (void)			initBoard;
-- (void)			initEmbeddedVMEController; //??? do we need this ???
 
 - (void)            writeZSThresholds;
 - (void)            writeZSThreshold:(unsigned short) i;
@@ -321,10 +303,11 @@ typedef struct  {
 - (void)			writeAcquistionControl:(BOOL)start;
 - (void)            trigger;
 - (void)            writeTriggerSourceEnableMask;
+- (void)            writeFrontPanelIOControl;
 - (void)            writeFrontPanelTriggerOutEnableMask;
 - (void)			writePostTriggerSetting;
-- (void)            writeFrontPanelIOControl;
 - (void)			writeChannelEnabledMask;
+- (void)			writeNumBLTEventsToReadout;
 - (void)			softwareReset;
 - (void)			clearAllMemory;
 - (void)			checkBufferAlarm;
@@ -354,10 +337,12 @@ typedef struct  {
 - (void)			runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 - (void)			takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void)			runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (BOOL) bumpRateFromDecodeStage:(short)channel;
 
 #pragma mark ***Helpers
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -365,15 +350,11 @@ typedef struct  {
 
 #pragma mark ***HW Read/Write API
 - (void)    setEndianness;
-- (void)    fillVmeRegArray;
 - (int)     writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) vmeAddress;
 - (int)     readLongBlock:(unsigned long*)  readValue atAddress:(unsigned int) vmeAddress;
 - (void)    writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue;
 - (void)    readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue;
-
-- (int) readMBLT:(unsigned long*) readValue
-       atAddress:(unsigned int) vmeAddress
-  numBytesToRead:(unsigned long) numBytes;
+- (int) readFifo:(char*)destBuff numBytesToRead:(unsigned long)    numBytes;
 
 
 @end
@@ -385,11 +366,12 @@ extern NSString* ORDT5720ModelSerialNumberChanged;
 
 extern NSString* ORDT5720ModelLogicTypeChanged;
 extern NSString* ORDT5720ZsThresholdChanged;
+extern NSString* ORDT5720NumOverUnderZsThresholdChanged;
 extern NSString* ORDT5720NlbkChanged;
 extern NSString* ORDT5720NlfwdChanged;
 extern NSString* ORDT5720ThresholdChanged;
-extern NSString* ORDT5720OverUnderThresholdChanged;
-extern NSString* ORDT5720ChnlDacChanged;
+extern NSString* ORDT5720NumOverUnderThresholdChanged;
+extern NSString* ORDT5720DacChanged;
 extern NSString* ORDT5720ModelZsAlgorithmChanged;
 extern NSString* ORDT5720ModelTrigOnUnderThresholdChanged;
 extern NSString* ORDT5720ModelTestPatternEnabledChanged;
