@@ -8,6 +8,7 @@
 
 #import "ResistorDBViewController.h"
 #import "ResistorDBModel.h"
+#import "ORRunModel.h"
 
 @interface ResistorDBViewController ()
 @property (assign) IBOutlet NSProgressIndicator *loadingFromDbWheel;
@@ -113,6 +114,10 @@
         reason = [[model currentQueryResults] objectForKey:@"reason"];
         info = [[model currentQueryResults] objectForKey:@"info"];
         
+        //download the start and end numbers
+        [model setStartRunNumber:[NSNumber numberWithInt:[[[[model currentQueryResults] objectForKey:@"run_range"] objectAtIndex:0] intValue]]];
+        [model setEndRunNumber:[NSNumber numberWithInt:[[[[model currentQueryResults] objectForKey:@"run_range"] objectAtIndex:1] intValue]]];
+        
         //pulledCable isn't a string but an integer!!!
         if([[[[model currentQueryResults] objectForKey:@"pulledCable"] stringValue] isEqualToString:@"0"]){
             pulledCableString = @"NO";
@@ -169,6 +174,9 @@
     
 }
 
+
+
+//This function builds the actual resistor document that will be posted to couchDb
 -(IBAction)updatePmtDatabase:(id)sender
 {
     //fetch the values from the database
@@ -192,7 +200,40 @@
         reasonString = [updateReasonBox stringValue];   //update from the reason string 
     }
     
+    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* rc = nil;
+    int current_run_number = 0;
+	if([runObjects count]){
+        rc = [runObjects objectAtIndex:0];
+        current_run_number = [rc runNumber];
+    }
+    else{
+        NSLog(@"Unable to Fetch current run number and therefore unable to update resistor Database\n");
+    }
+    
+    //Whenever we update the resistor document we are also going to need to change the run range
+    NSMutableArray * runRange = [NSMutableArray arrayWithCapacity:20];
+    [runRange setObject:[NSNumber numberWithInt:[[model startRunNumber] intValue]] atIndexedSubscript:0];
+    [runRange setObject:[NSNumber numberWithInt:current_run_number] atIndexedSubscript:1];
+    
+    //Update the old document with the new values
+    NSMutableDictionary *oldResistorDocDic = [[NSMutableDictionary alloc] initWithCapacity:10];
+    oldResistorDocDic = [[model currentQueryResults] mutableCopy];
+    [oldResistorDocDic setObject:runRange forKey:@"run_range"];
+    NSLog(@"currentResistor: %@",oldResistorDocDic);
+    [model updateResistorDb:oldResistorDocDic];
+    [oldResistorDocDic release];
+    
+    //Check that an object with the same run range and Crate/Card/Channel isn't being issued
+    
+    //Now issue the new run range
+    //TODO: Check this updates the run number when updating the resistor value
+    [runRange removeAllObjects];
+    [runRange setObject:[NSNumber numberWithInt:(current_run_number + 1)] atIndexedSubscript:0];
+    [runRange setObject:[NSNumber numberWithInt:-1] atIndexedSubscript:1];
+    
     NSString *infoString = [updateInfoForPull stringValue];
+    [resistorDocDic setObject:runRange forKey:@"run_range"];
     [resistorDocDic setObject:[NSNumber numberWithInt:cardNumber] forKey:@"slot"];
     [resistorDocDic setObject:infoString forKey:@"info"];
     [resistorDocDic setObject:pmtRemovedString forKey:@"PmtRemoved"];
@@ -208,7 +249,7 @@
     [resistorDocDic setObject:pmtReinstalledString forKey:@"PmtReInstalled"];
     [resistorDocDic setObject:[NSNumber numberWithInt:channelNumber] forKey:@"channel"];
     
-    [model updateResistorDb:resistorDocDic];
+    [model addNeweResistorDoc:resistorDocDic];
     [resistorDocDic release];
     
     //update the current query value

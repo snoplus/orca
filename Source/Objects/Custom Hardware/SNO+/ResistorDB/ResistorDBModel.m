@@ -13,6 +13,7 @@
 
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 #define kResistorDbDocumentPosted @"kResistorDbDocumentPosted"
+#define kResistorDbNewDocument @"kResistorDbNewDocument"
 
 NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
 NSString* resistorDBUpdated = @"resistorDBUpdated";
@@ -20,7 +21,9 @@ NSString* resistorDBUpdated = @"resistorDBUpdated";
 @implementation ResistorDBModel
 @synthesize
 currentQueryResults = _currentQueryResults,
-resistorDocument = _resistorDocument;
+resistorDocument = _resistorDocument,
+startRunNumber = _startRunNumber,
+endRunNumber = _endRunNumber;
 
 - (void) setUpImage
 {
@@ -32,6 +35,15 @@ resistorDocument = _resistorDocument;
 {
     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] updateDocument:aResistorDocDic documentId:[[self currentQueryResults] objectForKey:@"_id"] tag:kResistorDbDocumentPosted];
     
+    //Load only the new changes that have occured
+    [self loadPmtOnlineMaskToFe32FromCouchDb];
+}
+
+-(void) addNeweResistorDoc:(NSMutableDictionary*)aResistorDocDic
+{
+    [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] updateDocument:aResistorDocDic documentId:[[self currentQueryResults] objectForKey:@"_id"] tag:kResistorDbNewDocument];
+    
+    //Load only the new changes that have occured
     [self loadPmtOnlineMaskToFe32FromCouchDb];
 }
 
@@ -49,6 +61,9 @@ resistorDocument = _resistorDocument;
     
     NSHTTPURLResponse *response = nil;
 	NSError *connectionError;
+    
+    
+    //TODO:Remove hardcoding from the localHost database here
 	
 	NSString *urlName=[[NSString alloc] initWithFormat:
                        @"http:localhost:5984/resistor/_design/resistorQuery/_view/getPmtOnlineMask"];
@@ -104,8 +119,10 @@ resistorDocument = _resistorDocument;
                 
                 //check to see if the Fec32 is in the current crate and card combination
                 if(([crateFromDb intValue] == [aFec32Model crateNumber]) && ([cardFromDb intValue] && [aFec32Model slot])){
+                    
                     //now assign the mask for the crate and card/slot of interest
-                    [aFec32Model setOnlineMask:aPmtMask];
+                    //TODO:Check the setOnlineMask Functionality is working
+                    //[aFec32Model setOnlineMask:aPmtMask];
                     
                 }
                 
@@ -172,6 +189,9 @@ resistorDocument = _resistorDocument;
             if ([aTag isEqualToString:kResistorDbHeaderRetrieved])
             {
                 [self parseResistorDbResult:aResult];
+            }
+            else if ([aTag isEqualToString:kResistorDbNewDocument]){
+                
             }
             else if ([aTag isEqualToString:kResistorDbDocumentPosted])
             {
