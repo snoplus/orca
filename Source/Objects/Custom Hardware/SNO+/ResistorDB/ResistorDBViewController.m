@@ -8,7 +8,7 @@
 
 #import "ResistorDBViewController.h"
 #import "ResistorDBModel.h"
-#import "ORRunModel.h"
+
 
 @interface ResistorDBViewController ()
 @property (assign) IBOutlet NSProgressIndicator *loadingFromDbWheel;
@@ -200,16 +200,14 @@
         reasonString = [updateReasonBox stringValue];   //update from the reason string 
     }
     
-    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* rc = [runObjects objectAtIndex:0];
-    unsigned int current_run_number;
-    current_run_number = [rc runNumber];
+    unsigned int currentRunNumber;
+    currentRunNumber = [model getCurrentRunNumber];
 
     
     //Whenever we update the resistor document we are also going to need to change the run range
     NSMutableArray * runRange = [NSMutableArray arrayWithCapacity:20];
     [runRange setObject:[NSNumber numberWithInt:[[model startRunNumber] intValue]] atIndexedSubscript:0];
-    [runRange setObject:[NSNumber numberWithInt:current_run_number] atIndexedSubscript:1];
+    [runRange setObject:[NSNumber numberWithInt:currentRunNumber] atIndexedSubscript:1];
     
     //Update the old document with the new values
     NSMutableDictionary *oldResistorDocDic = [[NSMutableDictionary alloc] initWithCapacity:10];
@@ -224,7 +222,7 @@
     //Now issue the new run range
     //TODO: Check this updates the run number when updating the resistor value
     [runRange removeAllObjects];
-    [runRange setObject:[NSNumber numberWithInt:(current_run_number + 1)] atIndexedSubscript:0];
+    [runRange setObject:[NSNumber numberWithInt:(currentRunNumber + 1)] atIndexedSubscript:0];
     [runRange setObject:[NSNumber numberWithInt:-1] atIndexedSubscript:1];
     
     NSString *infoString = [updateInfoForPull stringValue];

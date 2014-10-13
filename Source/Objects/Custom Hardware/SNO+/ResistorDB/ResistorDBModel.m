@@ -10,6 +10,7 @@
 #import "ORCouchDB.h"
 #import "SNOPModel.h"
 #import "ORFec32Model.h"
+#import "ORRunModel.h"
 
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 #define kResistorDbDocumentPosted @"kResistorDbDocumentPosted"
@@ -28,6 +29,15 @@ endRunNumber = _endRunNumber;
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"resistor"]];
+}
+
+- (unsigned int) getCurrentRunNumber
+{
+    NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* rc = [runObjects objectAtIndex:0];
+    unsigned int current_run_number;
+    current_run_number = [rc runNumber];
+    return current_run_number;
 }
 
 

@@ -37,6 +37,7 @@
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel;
 - (void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic;
 - (void) addNeweResistorDoc:(NSMutableDictionary*)aResistorDocDic;
+- (unsigned int) getCurrentRunNumber;
 
 @end
 
