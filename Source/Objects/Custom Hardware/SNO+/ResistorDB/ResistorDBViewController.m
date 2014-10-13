@@ -213,7 +213,6 @@
     NSMutableDictionary *oldResistorDocDic = [[NSMutableDictionary alloc] initWithCapacity:10];
     oldResistorDocDic = [[model currentQueryResults] mutableCopy];
     [oldResistorDocDic setObject:runRange forKey:@"run_range"];
-    NSLog(@"currentResistor: %@",oldResistorDocDic);
     [model updateResistorDb:oldResistorDocDic];
     [oldResistorDocDic release];
     
