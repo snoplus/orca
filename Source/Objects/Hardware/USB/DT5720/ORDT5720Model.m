@@ -116,6 +116,7 @@ static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
     {@"Scratch",                0xEF20,	kReadWrite, true,	true, 	false},
     {@"SW Reset",               0xEF24,	kWriteOnly, false,	false, 	false},
     {@"SW Clear",               0xEF28,	kWriteOnly, false,	false, 	false},
+    {@"ConfigReload",           0xEF34,	kWriteOnly, false,	false, 	false},
     {@"Config ROM Ver",         0xF030,	kReadOnly,  false,	false, 	false},
     {@"Config ROM Board2",      0xF034,	kReadOnly,  false,	false, 	false}
 };
@@ -1209,14 +1210,14 @@ static NSString* DT5720RunModeString[4] = {
     [self readConfigurationROM];
     [self writeAcquistionControl:NO]; // Make sure it's off.
     [self clearAllMemory];
+    [self writeCustomSize];
+    [self writeBufferOrganization];
     [self writeZSThresholds];
     [self writeZSAmplReg];
     [self writeThresholds];
     [self writeNumOverUnderThresholds];
     [self writeDacs];
 	[self writeChannelConfiguration];
-    [self writeBufferOrganization];
-	[self writeCustomSize];
     [self writeTriggerSourceEnableMask];
     [self writeFrontPanelTriggerOutEnableMask];
     [self writePostTriggerSetting];
@@ -1411,7 +1412,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeBufferOrganization
 {
-    unsigned long aValue = eventSize; //(unsigned long)pow(2.,(float)eventSize);
+    unsigned long aValue = eventSize & 0xf; //(unsigned long)pow(2.,(float)eventSize);
     [self writeLongBlock:&aValue
                atAddress:reg[kBufferOrganization].addressOffset];
 }
@@ -1487,7 +1488,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeChannelEnabledMask
 {
-    unsigned long aValue = enabledMask;
+    unsigned long aValue = enabledMask & 0xf;
     [self writeLongBlock:&aValue
                atAddress:reg[kChanEnableMask].addressOffset];
     
@@ -1497,7 +1498,7 @@ static NSString* DT5720RunModeString[4] = {
 {
     unsigned long aValue = numberBLTEventsToReadout;
     [self writeLongBlock:&aValue
-               atAddress:reg[kChanEnableMask].addressOffset];
+               atAddress:reg[kBLTEventNum].addressOffset];
 }
 
 - (void) softwareReset
@@ -1509,6 +1510,13 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 - (void) clearAllMemory
+{
+    unsigned long aValue = 0;
+    [self writeLongBlock:&aValue
+               atAddress:reg[kSWClear].addressOffset];
+    
+}
+- (void) configReload
 {
     unsigned long aValue = 0;
     [self writeLongBlock:&aValue
@@ -1797,7 +1805,7 @@ static NSString* DT5720RunModeString[4] = {
 
     int num_read = 0;
     @try {
-        num_read = [[self usbInterface] readBytes:&resp length:sizeof(resp)];
+        num_read = [[self usbInterface] readBytes:&resp length:6];
 	}
     @catch (NSException* e) {
 		NSLog(@"DT5720 failed read respond at address: 0x%08x\n", anAddress);
@@ -1826,15 +1834,15 @@ static NSString* DT5720RunModeString[4] = {
     if (numBytes == 0) return 0;
     int maxBLTSize = 0x200000; //8 MBytes
     
-    int np = numBytes/maxBLTSize/2;
+    int np = numBytes/maxBLTSize;
     if(np*maxBLTSize != numBytes)np++;
     
     //request is an array of readLongBlock like requests
     unsigned char* outbuf = (unsigned char*)malloc(np * 8);
     
-    unsigned short AM        = 0x8;
-    unsigned short dSizeCode = 0x3;
-    unsigned int   DW        = 4;
+    unsigned short AM        = 0xB;
+    unsigned short dSizeCode = 0x2;
+    unsigned int   DW        = 0x4;
     unsigned int   count     = 0;
     int i;
     for(i=0;i<np;i++){
@@ -2199,19 +2207,21 @@ static NSString* DT5720RunModeString[4] = {
 //we need a lock token for @synchronized to copy data from the NSArray
 - (void) dataWorker:(NSDictionary*)arg
 {
-    NSAutoreleasePool* workerPool = [[NSAutoreleasePool alloc] init];
     self.isDataWorkerRunning = YES;
 
-    
     while (!self.isTimeToStopDataWorker) {
-
-        //is data available?
+        NSAutoreleasePool* workerPool = [[NSAutoreleasePool alloc] init];
         unsigned long acqStatus = 0;
         [self read:kAcqStatus returnValue:&acqStatus];
         BOOL isDataAvailable = (acqStatus >> 3) & 0x1;
-        bufferState = (acqStatus>>3) & 0x3;
-        
         if(isDataAvailable){
+            if((acqStatus >> 4) & 0x1) bufferState = kDT5720BufferFull;
+            else                       bufferState = kDT5720BufferReady;
+
+            //unsigned long aValue = 0;
+            //[self read:kEventSize returnValue:&aValue];
+            //NSLog(@"event size: %lu\n",aValue);
+            
             unsigned long totalDataSizeInLongs;
             unsigned long recordSizeBytes;
             if([self isCustomSize]){
@@ -2232,20 +2242,17 @@ static NSString* DT5720RunModeString[4] = {
             char* dp    = (char*)theData[2];                 //start after the ORCA header part
             int num     = [self readFifo:dp numBytesToRead:recordSizeBytes];
             if(num>0){
-                //-----------------------------------------------------------
-                //temp fake out for testing ----REMOVE--------
-                unsigned long* d = (unsigned long*)[eventData bytes];
-                d[2] = 0xa<<28 | totalDataSizeInLongs;
-                d[3] = 0x1;
-                //-----------------------------------------------------------
                 [circularBuffer writeData:eventData];
             }
         }
+        else bufferState = kDT5720BufferEmpty;
+        
+        //TBD...change to a short interval
         [NSThread sleepForTimeInterval:1];
-     }
+        [workerPool release];
+    }
     
     self.isDataWorkerRunning = NO;
-    [workerPool release];
 }
 
 

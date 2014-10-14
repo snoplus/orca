@@ -65,6 +65,7 @@ enum {
     kScratch,				//0xEF20
     kSWReset,				//0xEF24
     kSWClear,				//0xEF28
+    kConfigReload,			//0xEF34
     kConfigROMVersion,      //0xF030
     kConfigROMBoard2,       //0xF034
 	kNumberDT5720Registers
