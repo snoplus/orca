@@ -378,7 +378,7 @@ NSDate* burstStart = NULL;
                                         addThisToQueue = 0;
                                         
                                         [burstString release];
-                                        if(bString!=nil)burstString = bString;
+                                        if(bString!=nil)burstString = [bString retain];
                                         else            burstString = @"";
                                         
                                         //NSLog(@"precall \n");
