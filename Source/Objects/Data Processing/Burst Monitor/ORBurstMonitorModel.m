@@ -382,12 +382,12 @@ NSDate* burstStart = NULL;
                                         Bwords = [words mutableCopy];
                                         
                                         int iter;
-                                        NSString* bString;
+                                        NSString* bString = [NSMutableString stringWithString:@""];
                                         for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
                                         { 
                                             double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
                                             //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
-                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]]];
+                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
                                         }
                                         
                                         //Find characturistics of burst
@@ -412,7 +412,6 @@ NSDate* burstStart = NULL;
                                         
                                         [burstString release];
                                         if(bString!=nil)burstString = [bString retain];
-                                        else            burstString = @"";
                                         
                                         //NSLog(@"precall \n");
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //monitorqueues 2 lines
