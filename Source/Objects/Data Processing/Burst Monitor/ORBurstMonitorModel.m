@@ -74,26 +74,6 @@ NSDate* burstStart = NULL;
     [emailList release];
     [burstString release];
     
-    [Bchans release];
-    [Bcards release];
-    [Badcs release];
-    [Bsecs release];
-    [Bmics release];
-    [Bwords release];
-
-    
-    [chans release];
-    [cards release];
-    [adcs release];
-    [secs release];
-    [mics release];
-    [words release];
-    [Nchans release];
-    [Ncards release];
-    [Nadcs release];
-    [Nsecs release];
-    [Nmics release];
-
     [super dealloc];
 }
 
@@ -568,6 +548,7 @@ NSDate* burstStart = NULL;
     Nadcs   = [[NSMutableArray alloc] init];
     Nsecs   = [[NSMutableArray alloc] init];
     Nmics   = [[NSMutableArray alloc] init];
+    
     burstTell   = 0;
     burstState  = 0;
     novaState   = 0;
@@ -592,12 +573,14 @@ NSDate* burstStart = NULL;
    
 	[thePassThruObject          runTaskStopped:userInfo];
 	[thePassThruObject          setInvolvedInCurrentRun:NO];
-    //Clean up
+    //Clean up -- this are only used in the run process so just release them
+    //here. No need to release them in the dealloc.
     [chans release];
     [cards release];
     [adcs release];
     [secs release];
     [mics release];
+    
     [words release];
     [Nchans release];
     [Ncards release];
@@ -605,26 +588,21 @@ NSDate* burstStart = NULL;
     [Nsecs release];
     [Nmics release];
     
-    chans = nil;
-    cards = nil;
-    adcs = nil;
-    secs = nil;
-    mics = nil;
-    words = nil;
-    Nchans = nil;
-    Ncards = nil;
-    Nadcs = nil;
-    Nsecs = nil;
-    Nmics = nil;
+    [Bchans release];
+    [Bcards release];
+    [Badcs release];
+    [Bsecs release];
+    [Bmics release];
+    [Bwords release];
+
     
+
 }
 
 - (void) closeOutRun:(id)userInfo
 {
 	[thePassThruObject       closeOutRun:userInfo];
  
-
-    
     [self deleteQueues];
     
     [theDecoder release];
