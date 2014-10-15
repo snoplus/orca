@@ -51,7 +51,7 @@ endRunNumber = _endRunNumber;
 
 -(void) addNeweResistorDoc:(NSMutableDictionary*)aResistorDocDic
 {
-    [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] updateDocument:aResistorDocDic documentId:[[self currentQueryResults] objectForKey:@"_id"] tag:kResistorDbNewDocument];
+    [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] addDocument:aResistorDocDic tag:kResistorDbNewDocument];
     
     //Load only the new changes that have occured
     //[self loadPmtOnlineMaskToFe32FromCouchDb];

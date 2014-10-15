@@ -220,12 +220,14 @@
     
     //Now issue the new run range
     //TODO: Check this updates the run number when updating the resistor value
-    [runRange removeAllObjects];
-    [runRange setObject:[NSNumber numberWithInt:(currentRunNumber + 1)] atIndexedSubscript:0];
-    [runRange setObject:[NSNumber numberWithInt:-1] atIndexedSubscript:1];
+    //[runRange release];
+    
+    NSMutableArray * newRunRange = [NSMutableArray arrayWithCapacity:20];
+    [newRunRange setObject:[NSNumber numberWithInt:(currentRunNumber + 1)] atIndexedSubscript:0];
+    [newRunRange setObject:[NSNumber numberWithInt:-1] atIndexedSubscript:1];
     
     NSString *infoString = [updateInfoForPull stringValue];
-    [resistorDocDic setObject:runRange forKey:@"run_range"];
+    [resistorDocDic setObject:newRunRange forKey:@"run_range"];
     [resistorDocDic setObject:[NSNumber numberWithInt:cardNumber] forKey:@"slot"];
     [resistorDocDic setObject:infoString forKey:@"info"];
     [resistorDocDic setObject:pmtRemovedString forKey:@"PmtRemoved"];
@@ -243,6 +245,7 @@
     
     [model addNeweResistorDoc:resistorDocDic];
     [resistorDocDic release];
+    //[newRunRange release];
     
     //update the current query value
     NSLog(@"value: %i %i %i",crateNumber,cardNumber,channelNumber);
