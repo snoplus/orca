@@ -1403,6 +1403,7 @@ static NSString* DT5720RunModeString[4] = {
     unsigned long mask = 0;
     mask |= (zsAlgorithm & 0x3)           << 16;
     mask |= (trigOnUnderThreshold & 0x1)  <<  6;
+    mask |= 0x1    <<  4; //reserved bit (must be one)
     mask |= (testPatternEnabled & 0x1)    <<  3;
     mask |= (trigOverlapEnabled & 0x1)    <<  1;
     //note that pack2.5 is disabled.
@@ -1481,7 +1482,8 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writePostTriggerSetting
 {
-    [self writeLongBlock:&postTriggerSetting
+    unsigned long aValue = postTriggerSetting/4;
+    [self writeLongBlock:&aValue
                atAddress:reg[kPostTrigSetting].addressOffset];
     
 }
@@ -1546,7 +1548,7 @@ static NSString* DT5720RunModeString[4] = {
         }
     }
     if(isRunning){
-        [self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1.5];
+        [self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:.5];
     }
     else {
         [bufferFullAlarm clearAlarm];
@@ -1635,7 +1637,7 @@ static NSString* DT5720RunModeString[4] = {
     [self initBoard];
     [self startRates];
 
-    circularBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:100];
+    circularBuffer = [[ORSafeCircularBuffer alloc] initWithBufferSize:10000];
     //launch data pulling thread
     self.isTimeToStopDataWorker = NO;
     self.isDataWorkerRunning    = NO;
@@ -1840,9 +1842,9 @@ static NSString* DT5720RunModeString[4] = {
     //request is an array of readLongBlock like requests
     unsigned char* outbuf = (unsigned char*)malloc(np * 8);
     
-    unsigned short AM        = 0xB;
-    unsigned short dSizeCode = 0x2;
-    unsigned int   DW        = 0x4;
+    unsigned short AM        = 0xC;
+    unsigned short dSizeCode = 0x3;
+    unsigned int   DW        = 0x8;
     unsigned int   count     = 0;
     int i;
     for(i=0;i<np;i++){
@@ -2231,7 +2233,7 @@ static NSString* DT5720RunModeString[4] = {
                 unsigned long numSamplesPerEvent = 1024*1024./powf(2.,(float)[self eventSize]);
                 recordSizeBytes      = (4+numSamplesPerEvent/2)*4;
            }
-            totalDataSizeInLongs = recordSizeBytes*4 + 2;
+            totalDataSizeInLongs = recordSizeBytes/4 + 2;
 
             NSMutableData* eventData = [NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(long)];
             [eventData setLength:totalDataSizeInLongs*sizeof(long)];
@@ -2239,8 +2241,7 @@ static NSString* DT5720RunModeString[4] = {
             unsigned long* theData = (unsigned long*)[eventData bytes];
             theData[0]  = dataId | totalDataSizeInLongs;
             theData[1]  = ([self uniqueIdNumber] & 0xf)<<16; //rest is spare
-            char* dp    = (char*)theData[2];                 //start after the ORCA header part
-            int num     = [self readFifo:dp numBytesToRead:recordSizeBytes];
+            int num     = [self readFifo:(char*)(&theData[2]) numBytesToRead:recordSizeBytes];
             if(num>0){
                 [circularBuffer writeData:eventData];
             }
@@ -2248,7 +2249,7 @@ static NSString* DT5720RunModeString[4] = {
         else bufferState = kDT5720BufferEmpty;
         
         //TBD...change to a short interval
-        [NSThread sleepForTimeInterval:1];
+        [NSThread sleepForTimeInterval:.001];
         [workerPool release];
     }
     
