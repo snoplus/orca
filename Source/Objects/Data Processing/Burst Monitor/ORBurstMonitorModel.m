@@ -73,6 +73,27 @@ NSDate* burstStart = NULL;
     [queueLock release];
     [emailList release];
     [burstString release];
+    
+    [Bchans release];
+    [Bcards release];
+    [Badcs release];
+    [Bsecs release];
+    [Bmics release];
+    [Bwords release];
+
+    
+    [chans release];
+    [cards release];
+    [adcs release];
+    [secs release];
+    [mics release];
+    [words release];
+    [Nchans release];
+    [Ncards release];
+    [Nadcs release];
+    [Nsecs release];
+    [Nmics release];
+
     [super dealloc];
 }
 
@@ -341,11 +362,23 @@ NSDate* burstStart = NULL;
                                 }
                                 else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
                                     if(burstState == 1){
+                                        
+                                        [Bchans release];
                                         Bchans = [chans mutableCopy];
+                                        
+                                        [Bcards release];
                                         Bcards = [cards mutableCopy];
-                                        Badcs = [adcs mutableCopy];
-                                        Bsecs = [secs mutableCopy];
-                                        Bmics = [mics mutableCopy];
+
+                                        [Badcs  release];
+                                        Badcs  = [adcs mutableCopy];
+
+                                        [Bsecs  release];
+                                        Bsecs  = [secs mutableCopy];
+
+                                        [Bmics  release];
+                                        Bmics  = [mics mutableCopy];
+
+                                        [Bwords release];
                                         Bwords = [words mutableCopy];
                                         
                                         int iter;
@@ -413,6 +446,7 @@ NSDate* burstStart = NULL;
                                         [secs removeAllObjects];
                                         [mics removeAllObjects];
                                         [words removeAllObjects];
+                                        
                                         [Nchans removeAllObjects];
                                         [Ncards removeAllObjects];
                                         [Nadcs removeAllObjects];
@@ -523,29 +557,24 @@ NSDate* burstStart = NULL;
     queueMap = [[NSMutableDictionary dictionary] retain];
     
     //buffer  clear throut
-    if(!chans) chans = [[NSMutableArray alloc] init];
-    if(!cards) cards = [[NSMutableArray alloc] init];
-    if(!adcs) adcs = [[NSMutableArray alloc] init];
-    if(!secs) secs = [[NSMutableArray alloc] init];
-    if(!mics) mics = [[NSMutableArray alloc] init];
-    if(!words) words = [[NSMutableArray alloc] init];
-    if(!Bchans) Bchans = [[NSMutableArray alloc] init];
-    if(!Bcards) Bcards = [[NSMutableArray alloc] init];
-    if(!Badcs) Badcs = [[NSMutableArray alloc] init];
-    if(!Bsecs) Bsecs = [[NSMutableArray alloc] init];
-    if(!Bmics) Bmics = [[NSMutableArray alloc] init];
-    if(!Bwords) Bwords = [[NSMutableArray alloc] init];
-    if(!Nchans) Nchans = [[NSMutableArray alloc] init];
-    if(!Ncards) Ncards = [[NSMutableArray alloc] init];
-    if(!Nadcs) Nadcs = [[NSMutableArray alloc] init];
-    if(!Nsecs) Nsecs = [[NSMutableArray alloc] init];
-    if(!Nmics) Nmics = [[NSMutableArray alloc] init];
-    burstTell = 0;
-    burstState = 0;
-    novaState = 0;
-    novaP = 0;
-    quietSec=0;
-    loudSec=0;
+    chans   = [[NSMutableArray alloc] init];
+    cards   = [[NSMutableArray alloc] init];
+    adcs    = [[NSMutableArray alloc] init];
+    secs    = [[NSMutableArray alloc] init];
+    mics    = [[NSMutableArray alloc] init];
+    words   = [[NSMutableArray alloc] init];
+    
+    Nchans  = [[NSMutableArray alloc] init];
+    Ncards  = [[NSMutableArray alloc] init];
+    Nadcs   = [[NSMutableArray alloc] init];
+    Nsecs   = [[NSMutableArray alloc] init];
+    Nmics   = [[NSMutableArray alloc] init];
+    burstTell   = 0;
+    burstState  = 0;
+    novaState   = 0;
+    novaP       = 0;
+    quietSec    = 0;
+    loudSec     = 0;
     
     //start the monitoring
     [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
@@ -565,17 +594,18 @@ NSDate* burstStart = NULL;
 	[thePassThruObject          runTaskStopped:userInfo];
 	[thePassThruObject          setInvolvedInCurrentRun:NO];
     //Clean up
-    [chans removeAllObjects];
-    [cards removeAllObjects];
-    [adcs removeAllObjects];
-    [secs removeAllObjects];
-    [mics removeAllObjects];
-    [words removeAllObjects];
-    [Nchans removeAllObjects];
-    [Ncards removeAllObjects];
-    [Nadcs removeAllObjects];
-    [Nsecs removeAllObjects];
-    [Nmics removeAllObjects];
+    [chans release];
+    [cards release];
+    [adcs release];
+    [secs release];
+    [mics release];
+    [words release];
+    [Nchans release];
+    [Ncards release];
+    [Nadcs release];
+    [Nsecs release];
+    [Nmics release];
+    
 }
 
 - (void) closeOutRun:(id)userInfo
