@@ -273,9 +273,8 @@ NSDate* burstStart = NULL;
                         
                         unsigned long secondsSinceEpoch = ShiftAndExtract(ptr[2], 0, 0xffffffff);
                         unsigned long microseconds = ShiftAndExtract(ptr[3], 0, 0xffffffff);
-                        if(cardNum>=16){
-                            break;
-                        }
+                        if(cardNum<=15){ //was break here, now just skip section to include release
+                            
                         quietSec=0;
                         
                         
@@ -492,6 +491,7 @@ NSDate* burstStart = NULL;
                                 [burstData release];
                             }
                         }//end Filter
+                        }
                     }//end of valid event with recordlen>1
                 }
                 
