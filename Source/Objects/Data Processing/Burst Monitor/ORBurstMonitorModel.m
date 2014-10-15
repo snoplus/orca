@@ -606,6 +606,18 @@ NSDate* burstStart = NULL;
     [Nsecs release];
     [Nmics release];
     
+    chans = nil;
+    cards = nil;
+    adcs = nil;
+    secs = nil;
+    mics = nil;
+    words = nil;
+    Nchans = nil;
+    Ncards = nil;
+    Nadcs = nil;
+    Nsecs = nil;
+    Nmics = nil;
+    
 }
 
 - (void) closeOutRun:(id)userInfo
