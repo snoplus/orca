@@ -45,6 +45,7 @@
     NSMutableArray* adcs;
     NSMutableArray* secs;
     NSMutableArray* mics;
+    NSMutableArray* words;
     
     //burst channels
     NSMutableArray* Bchans;
@@ -52,6 +53,7 @@
     NSMutableArray* Badcs;
     NSMutableArray* Bsecs;
     NSMutableArray* Bmics;
+    NSMutableArray* Bwords;
     
     //neutron only buffer
     NSMutableArray* Nchans; 

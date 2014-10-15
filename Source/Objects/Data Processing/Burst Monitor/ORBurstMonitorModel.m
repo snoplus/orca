@@ -145,6 +145,7 @@ NSDate* burstStart = NULL;
     [adcs removeAllObjects];
     [secs removeAllObjects];
     [mics removeAllObjects];
+    [words removeAllObjects];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorNHitChanged object:self];
 }
 
@@ -262,6 +263,8 @@ NSDate* burstStart = NULL;
                 if (dataID == shaperID || burstForce==1) {
                     if (recordLen>1 || burstForce==1) {
                         //extract the card's info
+                        unsigned long firstword = ShiftAndExtract(ptr[0], 0, 0xffffffff);
+                        
                         unsigned short crateNum = ShiftAndExtract(ptr[1],21,0xf);
                         unsigned short cardNum  = ShiftAndExtract(ptr[1],16,0x1f);
                         unsigned short chanNum  = ShiftAndExtract(ptr[1],12,0xf);
@@ -281,6 +284,7 @@ NSDate* burstStart = NULL;
                         [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
                         [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
                         [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
+                        [words insertObject:[NSNumber numberWithLong:firstword] atIndex:0];
                         if((energy >= minimumEnergyAllowed && cardNum <= 15) || burstForce ==1){  //Filter
                             [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
                             //make a key for looking up the correct queue for this record
@@ -342,6 +346,7 @@ NSDate* burstStart = NULL;
                                         Badcs = [adcs mutableCopy];
                                         Bsecs = [secs mutableCopy];
                                         Bmics = [mics mutableCopy];
+                                        Bwords = [words mutableCopy];
                                         
                                         int iter;
                                         NSString* bString = @"";
@@ -373,6 +378,11 @@ NSDate* burstStart = NULL;
                                         addThisToQueue = 0;
                                         burstString = [bString mutableCopy];
                                         
+                                        //NSLog(@"precall \n");
+                                        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //monitorqueues 2 lines
+                                        //[self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:0]; //Has no effect
+                                        //NSLog(@"postcall \n");
+                                        
                                         //fixme //Try to start DelayedBurstEvent directly, but does not work
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //copied from monitorqueues, maybe?
@@ -399,6 +409,7 @@ NSDate* burstStart = NULL;
                                         [adcs removeAllObjects];
                                         [secs removeAllObjects];
                                         [mics removeAllObjects];
+                                        [words removeAllObjects];
                                         [Nchans removeAllObjects];
                                         [Ncards removeAllObjects];
                                         [Nadcs removeAllObjects];
@@ -434,6 +445,7 @@ NSDate* burstStart = NULL;
                                             [adcs removeObjectAtIndex:k];
                                             [secs removeObjectAtIndex:k];
                                             [mics removeObjectAtIndex:k];
+                                            [words removeObjectAtIndex:k];
                                             k=k-1;
                                         }
                                     }
@@ -513,11 +525,13 @@ NSDate* burstStart = NULL;
     if(!adcs) adcs = [[NSMutableArray alloc] init];
     if(!secs) secs = [[NSMutableArray alloc] init];
     if(!mics) mics = [[NSMutableArray alloc] init];
+    if(!words) words = [[NSMutableArray alloc] init];
     if(!Bchans) Bchans = [[NSMutableArray alloc] init];
     if(!Bcards) Bcards = [[NSMutableArray alloc] init];
     if(!Badcs) Badcs = [[NSMutableArray alloc] init];
     if(!Bsecs) Bsecs = [[NSMutableArray alloc] init];
     if(!Bmics) Bmics = [[NSMutableArray alloc] init];
+    if(!Bwords) Bwords = [[NSMutableArray alloc] init];
     if(!Nchans) Nchans = [[NSMutableArray alloc] init];
     if(!Ncards) Ncards = [[NSMutableArray alloc] init];
     if(!Nadcs) Nadcs = [[NSMutableArray alloc] init];
@@ -554,6 +568,7 @@ NSDate* burstStart = NULL;
     [adcs removeAllObjects];
     [secs removeAllObjects];
     [mics removeAllObjects];
+    [words removeAllObjects];
     [Nchans removeAllObjects];
     [Ncards removeAllObjects];
     [Nadcs removeAllObjects];
@@ -737,7 +752,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         burstTell = 0;
         NSLog(@"numBurstingChannels is %i \n", numBurstingChannels);
         NSLog(@"Burst Detected\n");
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //CB dissabled for now
         [self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:0];
     }
     //Check stall in buffer
@@ -826,7 +841,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         //someData.epMic=[[Bmics objectAtIndex:l] longValue];
        // unsigned long* testsec[4]; <<--this is not being used as a pointer. removed MAH 09/16/14
         unsigned long testsec[4];
-        testsec[0]=2621444; //idk why, its just this every time and it seems not to work with null
+        testsec[0]=[[Bwords objectAtIndex:l] longValue];
         testsec[1]=[[Badcs objectAtIndex:l] longValue]+(4096*[[Bchans objectAtIndex:l] longValue])+(65536*[[Bcards objectAtIndex:l] longValue]); // adc 3 digets, channel, card
         testsec[2]=[[Bsecs objectAtIndex:l] longValue];
         testsec[3]=[[Bmics objectAtIndex:l] longValue]; //CB works, make data file from array now
