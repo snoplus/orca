@@ -216,36 +216,37 @@
     [model updateResistorDb:oldResistorDocDic];
     [oldResistorDocDic release];
     
-    //Check that an object with the same run range and Crate/Card/Channel isn't being issued
-    
-    //Now issue the new run range
-    //TODO: Check this updates the run number when updating the resistor value
-    //[runRange release];
     
     NSMutableArray * newRunRange = [NSMutableArray arrayWithCapacity:20];
     [newRunRange setObject:[NSNumber numberWithInt:(currentRunNumber + 1)] atIndexedSubscript:0];
     [newRunRange setObject:[NSNumber numberWithInt:-1] atIndexedSubscript:1];
     
-    NSString *infoString = [updateInfoForPull stringValue];
-    [resistorDocDic setObject:newRunRange forKey:@"run_range"];
-    [resistorDocDic setObject:[NSNumber numberWithInt:cardNumber] forKey:@"slot"];
-    [resistorDocDic setObject:infoString forKey:@"info"];
-    [resistorDocDic setObject:pmtRemovedString forKey:@"PmtRemoved"];
-    [resistorDocDic setObject:SNOLowOccString forKey:@"SnoLowOcc"];
-    [resistorDocDic setObject:[[model currentQueryResults] objectForKey:@"SnoPmt"] forKey:@"SnoPmt"];
-    [resistorDocDic setObject:[NSNumber numberWithInt:crateNumber] forKey:@"crate"];
-    [resistorDocDic setObject:badCableString forKey:@"BadCable"];
-    [resistorDocDic setObject:reasonString forKey:@"reason"];
-    [resistorDocDic setObject:resistorStatus forKey:@"rPulled"];
-    [resistorDocDic setObject:@"" forKey:@"NewPmt"];
-    [resistorDocDic setObject:@"" forKey:@"date"];
-    [resistorDocDic setObject:[NSNumber numberWithInt:[pulledCableString intValue]] forKey:@"pulledCable"];
-    [resistorDocDic setObject:pmtReinstalledString forKey:@"PmtReInstalled"];
-    [resistorDocDic setObject:[NSNumber numberWithInt:channelNumber] forKey:@"channel"];
+    //Check the old runRange against the new runRange. If these are the same then we don't need to add a new document as it has already been updated. This will only occur if someone tries to update the resistor database on the same crate/card/channel combination within the same run.
     
-    [model addNeweResistorDoc:resistorDocDic];
-    [resistorDocDic release];
-    //[newRunRange release];
+    //Compare the old runRange against the new runRange
+    if( ( [[newRunRange objectAtIndex:0] intValue] !=  [[runRange objectAtIndex:0] intValue]) && ( [[newRunRange objectAtIndex:1] intValue] !=  [[runRange objectAtIndex:1] intValue]) ){
+        
+        NSLog(@"objects are not the same");
+        NSString *infoString = [updateInfoForPull stringValue];
+        [resistorDocDic setObject:newRunRange forKey:@"run_range"];
+        [resistorDocDic setObject:[NSNumber numberWithInt:cardNumber] forKey:@"slot"];
+        [resistorDocDic setObject:infoString forKey:@"info"];
+        [resistorDocDic setObject:pmtRemovedString forKey:@"PmtRemoved"];
+        [resistorDocDic setObject:SNOLowOccString forKey:@"SnoLowOcc"];
+        [resistorDocDic setObject:[[model currentQueryResults] objectForKey:@"SnoPmt"] forKey:@"SnoPmt"];
+        [resistorDocDic setObject:[NSNumber numberWithInt:crateNumber] forKey:@"crate"];
+        [resistorDocDic setObject:badCableString forKey:@"BadCable"];
+        [resistorDocDic setObject:reasonString forKey:@"reason"];
+        [resistorDocDic setObject:resistorStatus forKey:@"rPulled"];
+        [resistorDocDic setObject:@"" forKey:@"NewPmt"];
+        [resistorDocDic setObject:@"" forKey:@"date"];
+        [resistorDocDic setObject:[NSNumber numberWithInt:[pulledCableString intValue]] forKey:@"pulledCable"];
+        [resistorDocDic setObject:pmtReinstalledString forKey:@"PmtReInstalled"];
+        [resistorDocDic setObject:[NSNumber numberWithInt:channelNumber] forKey:@"channel"];
+        [model addNeweResistorDoc:resistorDocDic];
+        [resistorDocDic release];
+        
+    }
     
     //update the current query value
     NSLog(@"value: %i %i %i",crateNumber,cardNumber,channelNumber);
