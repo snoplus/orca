@@ -86,6 +86,7 @@
     ORDecoder*           theDecoder;
     NSMutableDictionary* runUserInfo;
     unsigned short       burstCount;
+    NSString*            burstString;
 }
 
 
@@ -140,7 +141,6 @@ extern NSString* ORBurstMonitorMinimumEnergyAllowedChanged;
 extern NSString* ORBurstMonitorQueueChanged;
 extern NSString* ORBurstMonitorEmailListChanged;
 extern NSString* ORBurstMonitorLock;
-//extern NSString* burstString; //CB string to email
 //extern NSDate* burstStart;
 
 @interface ORBurstData : NSObject

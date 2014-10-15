@@ -42,7 +42,6 @@ NSString* ORBurstMonitorMinimumEnergyAllowedChanged = @"ORBurstMonitorMinimumEne
 NSString* ORBurstMonitorQueueChanged                = @"ORBurstMonitorQueueChangedNotification";
 NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged";
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
-NSString* burstString = @"";
 NSDate* burstStart = NULL;
 
 
@@ -73,6 +72,7 @@ NSDate* burstStart = NULL;
     [runUserInfo release];
     [queueLock release];
     [emailList release];
+    [burstString release];
     [super dealloc];
 }
 
@@ -349,7 +349,7 @@ NSDate* burstStart = NULL;
                                         Bwords = [words mutableCopy];
                                         
                                         int iter;
-                                        NSString* bString = @"";
+                                        NSString* bString;
                                         for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
                                         { 
                                             double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
@@ -376,7 +376,10 @@ NSDate* burstStart = NULL;
                                         countsInBurst = countofNchan - 1;
                                         
                                         addThisToQueue = 0;
-                                        burstString = [bString mutableCopy];
+                                        
+                                        [burstString release];
+                                        if(bString!=nil)burstString = bString;
+                                        else            burstString = @"";
                                         
                                         //NSLog(@"precall \n");
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //monitorqueues 2 lines
@@ -537,7 +540,6 @@ NSDate* burstStart = NULL;
     if(!Nadcs) Nadcs = [[NSMutableArray alloc] init];
     if(!Nsecs) Nsecs = [[NSMutableArray alloc] init];
     if(!Nmics) Nmics = [[NSMutableArray alloc] init];
-    if(!burstString) burstString = [[NSString alloc] init];
     burstTell = 0;
     burstState = 0;
     novaState = 0;
@@ -881,7 +883,6 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     self.datePosted =   nil;
     self.epSec      =   nil;
     self.epMic      =   nil;
-    
     [super dealloc];
 }
 @end
