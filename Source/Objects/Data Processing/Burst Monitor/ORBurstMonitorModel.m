@@ -382,7 +382,7 @@ NSDate* burstStart = NULL;
                                         Bwords = [words mutableCopy];
                                         
                                         int iter;
-                                        NSString* bString = [NSMutableString stringWithString:@""];
+                                        NSString* bString = @"";
                                         for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
                                         { 
                                             double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
@@ -411,7 +411,7 @@ NSDate* burstStart = NULL;
                                         addThisToQueue = 0;
                                         
                                         [burstString release];
-                                        if(bString!=nil)burstString = [bString retain];
+                                        burstString = [bString retain];
                                         
                                         //NSLog(@"precall \n");
                                         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //monitorqueues 2 lines
