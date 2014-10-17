@@ -44,7 +44,6 @@ enum {
     kChanConfigBitSet,		//0x8004
     kChanConfigBitClr,		//0x8008
     kBufferOrganization,	//0x800C
-    kCustomSize,			//0x8020
     kAcqControl,			//0x8100
     kAcqStatus,				//0x8104
     kSWTrigger,				//0x8108
@@ -68,7 +67,7 @@ enum {
     kConfigReload,			//0xEF34
     kConfigROMVersion,      //0xF030
     kConfigROMBoard2,       //0xF034
-	kNumberDT5720Registers
+	kNumberDT5720Registers  //must be last
 };
 
 typedef struct  {
@@ -120,6 +119,7 @@ typedef struct  {
     unsigned short  nLfwd[kNumDT5720Channels];
     int             logicType[kNumDT5720Channels];
     int             zsAlgorithm;
+    BOOL            packed;
     BOOL            trigOverlapEnabled;
     BOOL            testPatternEnabled;
     BOOL            trigOnUnderThreshold;
@@ -137,8 +137,6 @@ typedef struct  {
     
 	unsigned short	dac[kNumDT5720Channels];
 	unsigned short	numOverUnderThreshold[kNumDT5720Channels];
-    unsigned long	customSize;
-	BOOL            isCustomSize;
     BOOL			countAllTriggers;
     unsigned short  coincidenceLevel;
 	unsigned long   triggerOutMask;
@@ -151,29 +149,29 @@ typedef struct  {
 	ORAlarm*        bufferFullAlarm;
 	int				bufferEmptyCount;
     int				eventSize;
-    unsigned long   numberBLTEventsToReadout;
-    
-     BOOL            isNeedToSwap; //DT5720 talks little endian
-
     
     unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   selectedRegValue;
 
-	//cached variables, valid only during running
+	//data taking, some are cached and only valid during running
 	unsigned int    statusReg;
 	unsigned long   location;
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
-
+    unsigned long   totalBytesTransfered;
+    float           totalByteRate;
+    NSDate*         lastTimeByteTotalChecked;
     BOOL            firstTime;
     BOOL            isRunning;
-    BOOL isDataWorkerRunning;
-    BOOL isTimeToStopDataWorker;
+    BOOL            isDataWorkerRunning;
+    BOOL            isTimeToStopDataWorker;
     ORSafeCircularBuffer* circularBuffer;
+    NSMutableData*  eventData;
+    BOOL            cachedPack;
+    BOOL            cachedZS;
 }
 
-@property (nonatomic, assign) BOOL isNeedToSwap;
 @property (assign) BOOL isDataWorkerRunning;
 @property (assign) BOOL isTimeToStopDataWorker;
 
@@ -215,6 +213,8 @@ typedef struct  {
 //------------------------------
 - (int)             zsAlgorithm;
 - (void)            setZsAlgorithm:(int)aZsAlgorithm;
+- (BOOL)            packed;
+- (void)            setPacked:(BOOL)aPacked;
 - (BOOL)            trigOnUnderThreshold;
 - (void)            setTrigOnUnderThreshold:(BOOL)aTrigOnUnderThreshold;
 - (BOOL)            testPatternEnabled;
@@ -224,10 +224,6 @@ typedef struct  {
 //------------------------------
 - (int)				eventSize;
 - (void)			setEventSize:(int)aEventSize;
-- (BOOL)            isCustomSize;
-- (void)            setIsCustomSize:(BOOL)aIsCustomSize;
-- (unsigned long)   customSize;
-- (void)            setCustomSize:(unsigned long)aCustomSize;
 //------------------------------
 - (BOOL)            clockSource;
 - (void)            setClockSource:(BOOL)aClockSource;
@@ -265,8 +261,6 @@ typedef struct  {
 //------------------------------
 
 - (int)				bufferState;
-- (unsigned long)	numberBLTEventsToReadout;
-- (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
 //------------------------------
 //rate related
@@ -300,7 +294,6 @@ typedef struct  {
 - (void)			writeDac:(unsigned short) pChan;
 - (void)			writeChannelConfiguration;
 - (void)			writeBufferOrganization;
-- (void)			writeCustomSize;
 - (void)			writeAcquistionControl:(BOOL)start;
 - (void)            trigger;
 - (void)            writeTriggerSourceEnableMask;
@@ -338,7 +331,8 @@ typedef struct  {
 - (void)			runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 - (void)			takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void)			runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (BOOL) bumpRateFromDecodeStage:(short)channel;
+- (BOOL)            bumpRateFromDecodeStage:(short)channel;
+- (float)           totalByteRate;
 
 #pragma mark ***Helpers
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
@@ -350,7 +344,6 @@ typedef struct  {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ***HW Read/Write API
-- (void)    setEndianness;
 - (int)     writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) vmeAddress;
 - (int)     readLongBlock:(unsigned long*)  readValue atAddress:(unsigned int) vmeAddress;
 - (void)    writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue;
@@ -374,12 +367,11 @@ extern NSString* ORDT5720ThresholdChanged;
 extern NSString* ORDT5720NumOverUnderThresholdChanged;
 extern NSString* ORDT5720DacChanged;
 extern NSString* ORDT5720ModelZsAlgorithmChanged;
+extern NSString* ORDT5720ModelPackedChanged;
 extern NSString* ORDT5720ModelTrigOnUnderThresholdChanged;
 extern NSString* ORDT5720ModelTestPatternEnabledChanged;
 extern NSString* ORDT5720ModelTrigOverlapEnabledChanged;
 extern NSString* ORDT5720ModelEventSizeChanged;
-extern NSString* ORDT5720ModelIsCustomSizeChanged;
-extern NSString* ORDT5720ModelCustomSizeChanged;
 extern NSString* ORDT5720ModelClockSourceChanged;
 extern NSString* ORDT5720ModelCountAllTriggersChanged;
 extern NSString* ORDT5720ModelGpiRunModeChanged;
@@ -397,7 +389,6 @@ extern NSString* ORDT5720ModelTtlEnabledChanged;
 
 
 
-extern NSString* ORDT5720ModelNumberBLTEventsToReadoutChanged;
 extern NSString* ORDT5720Chnl;
 extern NSString* ORDT5720SelectedRegIndexChanged;
 extern NSString* ORDT5720SelectedChannelChanged;

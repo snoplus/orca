@@ -131,6 +131,11 @@
                         object: model];
     
     [notifyCenter addObserver : self
+                     selector : @selector(packedChanged:)
+                         name : ORDT5720ModelPackedChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(testPatternEnabledChanged:)
                          name : ORDT5720ModelTestPatternEnabledChanged
                         object: model];
@@ -149,16 +154,6 @@
                      selector : @selector(eventSizeChanged:)
                          name : ORDT5720ModelEventSizeChanged
                         object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(customSizeChanged:)
-                         name : ORDT5720ModelCustomSizeChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(isCustomSizeChanged:)
-                         name : ORDT5720ModelIsCustomSizeChanged
-                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
@@ -271,9 +266,26 @@
                        object : nil];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(setBufferStateLabel)
+                     selector : @selector(setStatusStrings)
                          name : ORDT5720ModelBufferCheckChanged
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(scaleAction:)
+                         name : ORAxisRangeChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(miscAttributesChanged:)
+                         name : ORMiscAttributesChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateTimePlot:)
+                         name : ORRateAverageChangedNotification
+                       object : [[model waveFormRateGroup]timeRate]];
+    
+
     
 	[self registerRates];
 
@@ -346,12 +358,11 @@
     [self numOverUnderThresholdChanged:nil];
     [self dacChanged:nil];
     [self zsAlgorithmChanged:nil];
+    [self packedChanged:nil];
     [self trigOnUnderThresholdChanged:nil];
     [self testPatternEnabledChanged:nil];
     [self trigOverlapEnabledChanged:nil];
     [self eventSizeChanged:nil];
- 	[self customSizeChanged:nil];
-	[self isCustomSizeChanged:nil];
     [self clockSourceChanged:nil];
 	[self countAllTriggersChanged:nil];
     [self gpiRunModeChanged:nil];
@@ -372,13 +383,103 @@
     [self selectedRegIndexChanged:nil];
     [self selectedRegChannelChanged:nil];
     [self waveFormRateChanged:nil];
-    
+    [self rateGroupChanged:nil];
+    [self updateTimePlot:nil];
+
     [self basicLockChanged:nil];
     [self lowLevelLockChanged:nil];
-
 }
 
 #pragma mark •••Notification of Changes
+//a fake action from the scale object
+- (void) scaleAction:(NSNotification*)aNotification
+{
+    if(aNotification == nil || [aNotification object] == [rate0 xAxis]){
+        [model setMiscAttributes:[[rate0 xAxis]attributes] forKey:@"RateXAttributes"];
+    };
+    
+    if(aNotification == nil || [aNotification object] == [totalRate xAxis]){
+        [model setMiscAttributes:[[totalRate xAxis]attributes] forKey:@"TotalRateXAttributes"];
+    };
+    
+    if(aNotification == nil || [aNotification object] == [timeRatePlot xAxis]){
+        [model setMiscAttributes:[(ORAxis*)[timeRatePlot xAxis]attributes] forKey:@"TimeRateXAttributes"];
+    };
+    
+    if(aNotification == nil || [aNotification object] == [timeRatePlot yAxis]){
+        [model setMiscAttributes:[(ORAxis*)[timeRatePlot yAxis]attributes] forKey:@"TimeRateYAttributes"];
+    };
+    
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+    NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+    NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+    
+    if(aNote == nil || [key isEqualToString:@"RateXAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"RateXAttributes"];
+        if(attrib){
+            [[rate0 xAxis] setAttributes:attrib];
+            [rate0 setNeedsDisplay:YES];
+            [[rate0 xAxis] setNeedsDisplay:YES];
+            [rateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+        }
+    }
+    if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
+        if(attrib){
+            [[totalRate xAxis] setAttributes:attrib];
+            [totalRate setNeedsDisplay:YES];
+            [[totalRate xAxis] setNeedsDisplay:YES];
+            [totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+        }
+    }
+    if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
+        if(attrib){
+            [(ORAxis*)[timeRatePlot xAxis] setAttributes:attrib];
+            [timeRatePlot setNeedsDisplay:YES];
+            [[timeRatePlot xAxis] setNeedsDisplay:YES];
+        }
+    }
+    if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
+        if(attrib){
+            [(ORAxis*)[timeRatePlot yAxis] setAttributes:attrib];
+            [timeRatePlot setNeedsDisplay:YES];
+            [[timeRatePlot yAxis] setNeedsDisplay:YES];
+            [timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+        }
+    }
+}
+
+- (void) totalRateChanged:(NSNotification*)aNotification
+{
+    ORRateGroup* theRateObj = [aNotification object];
+    if(aNotification == nil || [model waveFormRateGroup] == theRateObj){
+        
+        [totalRateText setFloatValue: [theRateObj totalRate]];
+        [totalRate setNeedsDisplay:YES];
+    }
+}
+
+- (void) waveFormRateChanged:(NSNotification*)aNote
+{
+    ORRate* theRateObj = [aNote object];
+    [[rateTextFields cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
+    [rate0 setNeedsDisplay:YES];
+}
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+    if(!aNote || ([aNote object] == [[model waveFormRateGroup]timeRate])){
+        [timeRatePlot setNeedsDisplay:YES];
+    }
+}
+- (void) rateGroupChanged:(NSNotification*)aNotification
+{
+    [self registerRates];
+}
 
 - (void) serialNumberChanged:(NSNotification*)aNote
 {
@@ -436,6 +537,12 @@
     [self basicLockChanged:nil];
 
 }
+
+- (void) packedChanged:(NSNotification*)aNote
+{
+    [packedCB setIntValue: [model packed]];
+}
+
 - (void) numOverUnderZsThresholdChanged: (NSNotification*) aNotification
 {
     if(aNotification){
@@ -539,18 +646,6 @@
 {
     [eventSizePopUp selectItemAtIndex:	[model eventSize]];
     [eventSizeTextField setStringValue:	[NSString stringWithFormat:@"%d K",(int)(1024*1024./powf(2.,(float)[model eventSize]))/1024]]; //in Samples
-}
-
-- (void) customSizeChanged:(NSNotification*)aNote
-{
-    //todo: *4 in std mode, *5 in packed mode
-    [customSizeTextField setIntValue:[model customSize]];
-}
-
-- (void) isCustomSizeChanged:(NSNotification*)aNote
-{
-    [customSizeButton setIntValue:[model isCustomSize]];
-    [customSizeTextField setEnabled:[model isCustomSize]];
 }
 
 - (void) clockSourceChanged:(NSNotification*)aNote
@@ -663,7 +758,7 @@
 
 
 
-- (void) setBufferStateLabel
+- (void) setStatusStrings
 {
 	if(![gOrcaGlobals runInProgress]){
 		[bufferStateField setTextColor:[NSColor blackColor]];
@@ -677,7 +772,7 @@
         }
         else if(val == kDT5720BufferReady) {
             [bufferStateField setTextColor:[NSColor blackColor]];
-            [bufferStateField setStringValue:@"Data"];
+            [bufferStateField setStringValue:@"Not Empty"];
         }
 		else {
 			[bufferStateField setTextColor:[NSColor blackColor]];
@@ -685,23 +780,13 @@
 		}
 	}
     [queView setNeedsDisplay:YES];
-}
-
-- (void) totalRateChanged:(NSNotification*)aNotification
-{
-	ORRateGroup* theRateObj = [aNotification object];
-	if(aNotification == nil || [model waveFormRateGroup] == theRateObj){
-		
-		[totalRateText setFloatValue: [theRateObj totalRate]];
-		[totalRate setNeedsDisplay:YES];
-	}
-}
-
-- (void) waveFormRateChanged:(NSNotification*)aNote
-{
-    ORRate* theRateObj = [aNote object];
-    [[rateTextFields cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
-    [rate0 setNeedsDisplay:YES];
+    float transferRate = [model totalByteRate];
+    NSString* s;
+    if(transferRate>=500000)    s = [NSString stringWithFormat:@"%.2f MB/sec",transferRate/1000000.];
+    else if(transferRate>=1000) s = [NSString stringWithFormat:@"%.2f KB/sec",transferRate/1000.];
+    else                        s = [NSString stringWithFormat:@"%.2f B/sec",transferRate];
+    [transferRateField setStringValue:s];
+    
 }
 
 - (void) writeValueChanged:(NSNotification*) aNotification
@@ -785,7 +870,7 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORDT5720BasicLock];
     [basicLockButton setState: locked];
     
-	[self setBufferStateLabel];
+	[self setStatusStrings];
     
     [serialNumberPopup setEnabled:!locked];
     
@@ -838,8 +923,6 @@
     [eventSizePopUp                 setEnabled:!lockedOrRunningMaintenance];
     [initButton                     setEnabled:!lockedOrRunningMaintenance];
 	
-    [customSizeTextField            setEnabled:!locked && !runInProgress && [model isCustomSize]];
-	[customSizeButton               setEnabled:!locked && !runInProgress];
     [eventSizePopUp                 setEnabled:!locked && !runInProgress];
     [enabledMaskMatrix              setEnabled:!locked && !runInProgress];
 }
@@ -893,6 +976,11 @@
     [model setZsAlgorithm:[sender indexOfSelectedItem]];
 }
 
+- (void) packedAction:(id)sender
+{
+    [model setPacked:[sender intValue]];
+}
+
 - (IBAction) trigOnUnderThresholdAction:(id)sender
 {
     [model setTrigOnUnderThreshold:[[sender selectedCell] tag]];
@@ -911,16 +999,6 @@
 - (void) eventSizeAction:(id)sender
 {
     [model setEventSize:[sender indexOfSelectedItem]];
-}
-
-- (IBAction) customSizeAction:(id)sender
-{
-    [model setCustomSize:[sender intValue] ];
-}
-
-- (IBAction) isCustomSizeAction:(id)sender
-{
-    [model setIsCustomSize:[sender intValue]];
 }
 
 - (IBAction) clockSourceAction:(id)sender

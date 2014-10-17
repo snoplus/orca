@@ -45,12 +45,11 @@ NSString* ORDT5720ThresholdChanged                  = @"ORDT5720ThresholdChanged
 NSString* ORDT5720NumOverUnderThresholdChanged      = @"ORDT5720NumOverUnderThresholdChanged";
 NSString* ORDT5720DacChanged                        = @"ORDT5720DacChanged";
 NSString* ORDT5720ModelZsAlgorithmChanged           = @"ORDT5720ModelZsAlgorithmChanged";
+NSString* ORDT5720ModelPackedChanged                = @"ORDT5720ModelPackedChanged";
 NSString* ORDT5720ModelTrigOnUnderThresholdChanged  = @"ORDT5720ModelTrigOnUnderThresholdChanged";
 NSString* ORDT5720ModelTestPatternEnabledChanged    = @"ORDT5720ModelTestPatternEnabledChanged";
 NSString* ORDT5720ModelTrigOverlapEnabledChanged    = @"ORDT5720ModelTrigOverlapEnabledChanged";
 NSString* ORDT5720ModelEventSizeChanged             = @"ORDT5720ModelEventSizeChanged";
-NSString* ORDT5720ModelIsCustomSizeChanged          = @"ORDT5720ModelIsCustomSizeChanged";
-NSString* ORDT5720ModelCustomSizeChanged            = @"ORDT5720ModelCustomSizeChanged";
 NSString* ORDT5720ModelClockSourceChanged           = @"ORDT5720ModelClockSourceChanged";
 NSString* ORDT5720ModelCountAllTriggersChanged      = @"ORDT5720ModelCountAllTriggersChanged";
 NSString* ORDT5720ModelGpiRunModeChanged            = @"ORDT5720ModelGpiRunModeChanged";
@@ -66,7 +65,6 @@ NSString* ORDT5720ModelPostTriggerSettingChanged    = @"ORDT5720ModelPostTrigger
 NSString* ORDT5720ModelGpoEnabledChanged            = @"ORDT5720ModelGpoEnabledChanged";
 NSString* ORDT5720ModelTtlEnabledChanged            = @"ORDT5720ModelTtlEnabledChanged";
 
-NSString* ORDT5720ModelNumberBLTEventsToReadoutChanged    = @"ORDT5720ModelNumberBLTEventsToReadoutChanged";
 NSString* ORDT5720Chnl                                    = @"ORDT5720Chnl";
 NSString* ORDT5720SelectedRegIndexChanged                 = @"ORDT5720SelectedRegIndexChanged";
 NSString* ORDT5720SelectedChannelChanged                  = @"ORDT5720SelectedChannelChanged";
@@ -95,7 +93,6 @@ static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
     {@"Chan Config Bit Set",    0x8004,	kWriteOnly, true,	true, 	false},
     {@"Chan Config Bit Clr",    0x8008, kWriteOnly, true,	true, 	false},
     {@"Buffer Organization",    0x800C,	kReadWrite, true,	true, 	false},
-    {@"Custom Size",            0x8020,	kReadWrite, true,	true, 	false},
     {@"Acq Control",            0x8100,	kReadWrite, true,	true, 	false},
     {@"Acq Status",             0x8104,	kReadOnly,  false,	false, 	false},
     {@"SW Trigger",             0x8108,	kWriteOnly, false,	false, 	false},
@@ -137,7 +134,7 @@ static NSString* DT5720RunModeString[4] = {
 
 @implementation ORDT5720Model
 
-@synthesize isNeedToSwap,isDataWorkerRunning,isTimeToStopDataWorker;
+@synthesize isDataWorkerRunning,isTimeToStopDataWorker;
 
 - (id) init //designated initializer
 {
@@ -145,7 +142,6 @@ static NSString* DT5720RunModeString[4] = {
     [[self undoManager] disableUndoRegistration];
 	[self setEnabledMask:0xF];
     [self setEventSize:0xa];
-    [self setEndianness];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -190,6 +186,7 @@ static NSString* DT5720RunModeString[4] = {
     [serialNumber release];
 	[noUSBAlarm clearAlarm];
 	[noUSBAlarm release];
+    [lastTimeByteTotalChecked release];
     [super dealloc];
 }
 
@@ -317,11 +314,16 @@ static NSString* DT5720RunModeString[4] = {
 			[noUSBAlarm postAlarm];
 		}
 	}
-	
+    
 	[self setUpImage];
 	
 }
 
+- (float) totalByteRate
+{
+    return totalByteRate;
+}
+    
 - (void) interfaceAdded:(NSNotification*)aNote
 {
 	[[aNote object] claimInterfaceWithSerialNumber:[self serialNumber] for:self];
@@ -556,6 +558,18 @@ static NSString* DT5720RunModeString[4] = {
     }
 }
 
+- (BOOL) packed
+{
+    return packed;
+}
+
+- (void) setPacked:(BOOL)aPacked
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPacked:packed];
+    packed = aPacked;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelPackedChanged object:self];
+}
+
 - (BOOL) trigOnUnderThreshold
 {
     return trigOnUnderThreshold;
@@ -617,35 +631,8 @@ static NSString* DT5720RunModeString[4] = {
 }
 //------------------------------
 //Reg Custom Size (0x8020)
-- (BOOL) isCustomSize
-{
-    return isCustomSize;
-}
-
-- (void) setIsCustomSize:(BOOL)aIsCustomSize
-{
-    if(aIsCustomSize!=isCustomSize){
-        [[[self undoManager] prepareWithInvocationTarget:self] setIsCustomSize:isCustomSize];
-        isCustomSize = aIsCustomSize;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelIsCustomSizeChanged object:self];
-    }
-}
-
-- (unsigned long) customSize
-{
-    return customSize;
-}
-
-- (void) setCustomSize:(unsigned long)aCustomSize
-{
-   // NSUInteger maxNumSamples = (NSUInteger) 1024 * 1024./powf(2.,(float)[model eventSize]) / 2;
-
-    if(aCustomSize!=customSize){
-        [[[self undoManager] prepareWithInvocationTarget:self] setCustomSize:customSize];
-        customSize = aCustomSize;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCustomSizeChanged object:self];
-    }
-}
+//not supported
+//------------------------------
 //------------------------------
 //Reg Acquistion Control (0x8100)
 - (BOOL) clockSource
@@ -936,21 +923,6 @@ static NSString* DT5720RunModeString[4] = {
     }
 }
 
-- (unsigned long) numberBLTEventsToReadout
-{
-    return numberBLTEventsToReadout;
-}
-
-- (void) setNumberBLTEventsToReadout:(unsigned long) aValue
-{
-    if(aValue==0)aValue=1;
-    if(aValue!=numberBLTEventsToReadout){
-        [[[self undoManager] prepareWithInvocationTarget:self] setNumberBLTEventsToReadout:numberBLTEventsToReadout];
-        numberBLTEventsToReadout = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelNumberBLTEventsToReadoutChanged object:self];
-    }
-}
-
 #pragma mark ***Register - General routines
 - (short) getNumberRegisters
 {
@@ -1186,11 +1158,7 @@ static NSString* DT5720RunModeString[4] = {
 	[self read:kAcqControl returnValue:&aValue];
 	NSLogFont(theFont,@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
 	NSLogFont(theFont,@"Run Mode        : %@\n",DT5720RunModeString[aValue&0x3]);
-	
-	[self read:kCustomSize returnValue:&aValue];
-	if(aValue)NSLogFont(theFont,@"Custom Size     : %d\n",aValue);
-	else      NSLogFont(theFont,@"Custom Size     : Disabled\n");
-	
+		
 	[self read:kAcqStatus returnValue:&aValue];
 	NSLogFont(theFont,@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
 	NSLogFont(theFont,@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
@@ -1210,7 +1178,6 @@ static NSString* DT5720RunModeString[4] = {
     [self readConfigurationROM];
     [self writeAcquistionControl:NO]; // Make sure it's off.
     [self clearAllMemory];
-    [self writeCustomSize];
     [self writeBufferOrganization];
     [self writeZSThresholds];
     [self writeZSAmplReg];
@@ -1402,11 +1369,12 @@ static NSString* DT5720RunModeString[4] = {
 {
     unsigned long mask = 0;
     mask |= (zsAlgorithm & 0x3)           << 16;
+    mask |= (packed & 0x1)                << 11;
     mask |= (trigOnUnderThreshold & 0x1)  <<  6;
-    mask |= 0x1    <<  4; //reserved bit (must be one)
+    mask |= 0x1                           <<  4; //reserved bit (MUST be one)
     mask |= (testPatternEnabled & 0x1)    <<  3;
     mask |= (trigOverlapEnabled & 0x1)    <<  1;
-    //note that pack2.5 is disabled.
+    
     [self writeLongBlock:&mask
                atAddress:reg[kChanConfig].addressOffset];
 }
@@ -1418,12 +1386,6 @@ static NSString* DT5720RunModeString[4] = {
                atAddress:reg[kBufferOrganization].addressOffset];
 }
 
-- (void) writeCustomSize
-{
-    unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
-    [self writeLongBlock:&aValue
-               atAddress:reg[kCustomSize].addressOffset];
-}
 
 - (void) writeAcquistionControl:(BOOL)start
 {
@@ -1483,6 +1445,8 @@ static NSString* DT5720RunModeString[4] = {
 - (void) writePostTriggerSetting
 {
     unsigned long aValue = postTriggerSetting/4;
+    if(packed)aValue = aValue*1.25;
+    
     [self writeLongBlock:&aValue
                atAddress:reg[kPostTrigSetting].addressOffset];
     
@@ -1498,7 +1462,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeNumBLTEventsToReadout
 {
-    unsigned long aValue = numberBLTEventsToReadout;
+    unsigned long aValue = pow(2.,eventSize);
     [self writeLongBlock:&aValue
                atAddress:reg[kBLTEventNum].addressOffset];
 }
@@ -1531,7 +1495,7 @@ static NSString* DT5720RunModeString[4] = {
     if((bufferState == kDT5720BufferFull) && isRunning){
         bufferEmptyCount = 0;
         if(!bufferFullAlarm){
-            NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1720 (%@)",[self fullID]];
+            NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL DT5720 (%@)",[self fullID]];
             bufferFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
             [bufferFullAlarm setSticky:YES];
             [bufferFullAlarm setHelpString:@"The rate is too high. Adjust the Threshold accordingly."];
@@ -1555,6 +1519,18 @@ static NSString* DT5720RunModeString[4] = {
         [bufferFullAlarm release];
         bufferFullAlarm = nil;
     }
+    
+    if(lastTimeByteTotalChecked){
+        NSTimeInterval delta = fabs([lastTimeByteTotalChecked timeIntervalSinceNow]);
+        if(delta > 0){
+            totalByteRate = totalBytesTransfered/delta;
+        }
+        totalBytesTransfered=0;
+    }
+    
+    [lastTimeByteTotalChecked release];
+    lastTimeByteTotalChecked = [[NSDate date]retain];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelBufferCheckChanged object:self];
 }
 
@@ -1645,6 +1621,19 @@ static NSString* DT5720RunModeString[4] = {
     isRunning = YES;
     [self checkBufferAlarm];
 
+    unsigned long totalDataSizeInLongs;
+    unsigned long recordSizeBytes;
+    unsigned long numSamplesPerEvent = 1024*1024./pow(2.,[self eventSize]);
+    unsigned long numBlts = pow(2.,[self eventSize]);
+    
+    recordSizeBytes      = (4+numSamplesPerEvent/2)*4;
+    totalDataSizeInLongs = recordSizeBytes/4 + 2;
+    
+    eventData = [[NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(long)]retain];
+    [eventData setLength:numBlts*(totalDataSizeInLongs*sizeof(long))];
+    cachedPack = packed;
+    cachedZS   = zsAlgorithm;
+    
     [NSThread detachNewThreadSelector:@selector(dataWorker:) toTarget:self withObject:nil];
 }
 
@@ -1683,6 +1672,8 @@ static NSString* DT5720RunModeString[4] = {
     
     [self writeAcquistionControl:NO];
     isRunning = NO;
+    [eventData release];
+    eventData = nil;
 }
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
@@ -1692,19 +1683,6 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 #pragma mark ***Archival
-
--(void) setEndianness
-{
-    if (0x0000ABCD == htonl(0x0000ABCD)) {
-        self.isNeedToSwap = true;
-    }
-}
-
-#define swapShort(x) (((uint16_t)(x) <<  8) | ((uint16_t)(x)>>  8))
-#define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
-
-
-
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer in otherwise
 - (int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) anAddress
 {
@@ -1737,7 +1715,7 @@ static NSString* DT5720RunModeString[4] = {
 
     
     @try {
-		[[self usbInterface] writeBytes:cmdBuffer length:10];
+        [[self usbInterface] writeBytes:cmdBuffer length:10 pipe:0];
 	}
     @catch (NSException* e) {
 		NSLog(@"DT5720 failed write request at address: 0x%08x failed\n", anAddress);
@@ -1749,7 +1727,7 @@ static NSString* DT5720RunModeString[4] = {
     
     int num_read = 0;
     @try {
-        num_read = [[self usbInterface] readBytes:&status length:sizeof(status)];
+        num_read = [[self usbInterface] readBytes:&status length:sizeof(status) pipe:0];
 	}
     @catch (NSException* e) {
 		NSLog(@"DT5720 failed write respond at address: 0x%08x\n", anAddress);
@@ -1789,7 +1767,7 @@ static NSString* DT5720RunModeString[4] = {
     cmdBuffer[count++] = (char)((anAddress >> 24) & 0xFF);
     
     @try {
-		[[self usbInterface] writeBytes:cmdBuffer length:6];
+		[[self usbInterface] writeBytes:cmdBuffer length:6 pipe:0];
 	}
     @catch (NSException* e) {
 		NSLog(@"DT5720 failed read request at address: 0x%08x failed\n", anAddress);
@@ -1807,7 +1785,7 @@ static NSString* DT5720RunModeString[4] = {
 
     int num_read = 0;
     @try {
-        num_read = [[self usbInterface] readBytes:&resp length:6];
+        num_read = [[self usbInterface] readBytes:&resp length:6 pipe:0];
 	}
     @catch (NSException* e) {
 		NSLog(@"DT5720 failed read respond at address: 0x%08x\n", anAddress);
@@ -1826,19 +1804,17 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer otherwise
-//this isn't a user friendly function for performance reasons
-//numBytes must be multiple of 8
-//readValue must be atleast (numBytes + 2) long
-- (int) readFifo:(char*)destBuff numBytesToRead:(unsigned long)    numBytes
+- (int) readFifo:(char*)readBuffer numBytesToRead:(unsigned long)    numBytes
 {
     unsigned long fifoAddress = reg[kOutputBuffer].addressOffset;
     
     if (numBytes == 0) return 0;
-    int maxBLTSize = 0x200000; //8 MBytes
-    
+    int maxBLTSize = 0x100000; //8 MBytes
+    numBytes = (numBytes + 7) & ~7UL;
+
     int np = numBytes/maxBLTSize;
     if(np*maxBLTSize != numBytes)np++;
-    
+
     //request is an array of readLongBlock like requests
     unsigned char* outbuf = (unsigned char*)malloc(np * 8);
     
@@ -1884,7 +1860,7 @@ static NSString* DT5720RunModeString[4] = {
     
     //write the command block
     @try {
-        [[self usbInterface] writeBytes:outbuf length:count];
+        [[self usbInterface] writeBytes:outbuf length:count pipe:0];
         free(outbuf);
     }
     @catch (NSException* e) {
@@ -1895,20 +1871,23 @@ static NSString* DT5720RunModeString[4] = {
     }
   
     int num_read = 0;
-    char* readBuffer = (char*)malloc(numBytes + 2);
-    int status;
     @try {
-        num_read = [[self usbInterface] readBytes:readBuffer length:numBytes+2];
+        num_read = [[self usbInterface] readBytes:readBuffer length:numBytes+2 pipe:0];
         num_read -= 2;
-        if( num_read >= 0 ) {
-            memcpy(destBuff, readBuffer, num_read);
-            status = readBuffer[num_read] & 0xFF;
-            status += (readBuffer[num_read + 1] & 0xFF) << 8;
-        }
-        if (num_read != numBytes || (status & 0x20)) {
+        if( num_read < 0 ) {
+            // -----------------------------------------------------------
+            // it appears that the status word is 0x33 on a successful read
+            // when transfering multiple events if you ask for more data than
+            // what exists in the event buffer. Ignore the status word for now
+            // and just look at the num bytes read.
+            //           int status;
+            //           status = readBuffer[num_read] & 0xFF;
+            //           status += (readBuffer[num_read + 1] & 0xFF) << 8;
+            //       }
+            //       if (num_read != numBytes || (status & 0x20)) {
+            // -----------------------------------------------------------
             NSString* name = [self fullID];
             NSLogError(@"",name,@"Fifo read failed",nil);
-            free(readBuffer);
             return num_read;
         }
 
@@ -1916,133 +1895,12 @@ static NSString* DT5720RunModeString[4] = {
     @catch (NSException* e) {
         NSString* name = [self fullID];
         NSLogError(@"",name,@"Fifo read failed",[e reason],nil);
-        free(readBuffer);
         return -1;
     }
-    free(readBuffer);
 
     return num_read;
 }
 
-//original code from Jarek below
-#ifdef test
-//returns 0 if success; -1 if request fails, and number of bytes returned by digitizer otherwise
-//this isn't a user friendly function for performance reasons
-//numBytes must be multiple of 8
-//readValue must be atleast (numBytes + 2) long
-- (int) readFifo:(unsigned long*) readValue
-       atAddress:(unsigned int)     vmeAddress
-  numBytesToRead:(unsigned long) numBytes
-{
-    if (numBytes == 0) return 0;
-    
-    //64 bit cycles -> numBytes must be 8 aligned
-    const unsigned long aligned_num_bytes = (numBytes + 7) & ~7UL;
-    
-    //limited to 16 MB on linux why?
-    //chunk size in bytes, must be multiples of 8, max is 0xffff * 8
-    const unsigned long chunk_size = 0x8000 * 8; //bytes
-    
-    unsigned long num_transfers = (aligned_num_bytes - 1) / chunk_size + 1;
-    
-    //MBLT request is an array of readLongBlock like requests
-    char req[num_transfers * 8];
-    struct {
-        unsigned short commandID;
-        unsigned short num_cycles;
-        unsigned long address;
-    } mblt_req;
-    
-    mblt_req.commandID  = 0xC8BF;
-    mblt_req.num_cycles = chunk_size >> 4;
-    mblt_req.address    = vmeAddress; //this works in fifo mode, regardless what the vme controller says
-    
-    if (self.isNeedToSwap) {
-        mblt_req.commandID  = swapShort(mblt_req.commandID);
-        mblt_req.num_cycles = swapShort(mblt_req.num_cycles);
-        mblt_req.address    = swapLong(mblt_req.address);
-    }
-    
-    //req c struct is aligned in a different way than CAEN wants
-    char mblt_req_aligned[8];
-    *(unsigned short*)  mblt_req_aligned      = mblt_req.commandID;
-    *(unsigned short*) (mblt_req_aligned + 2) = mblt_req.num_cycles;
-    *(unsigned long*)  (mblt_req_aligned + 4) = mblt_req.address;
-    
-    int i;
-    for (i = 0; i < num_transfers - 1; ++i) {
-        memcpy(req + i*8, mblt_req_aligned, 8);
-    }
-    
-    //now the final readLongBlock request
-    mblt_req.commandID  = 0xC8BC;
-    mblt_req.num_cycles = (aligned_num_bytes - (num_transfers - 1) * chunk_size) >> 4;
-    mblt_req.address    = vmeAddress;
-    
-    if (self.isNeedToSwap) {
-        mblt_req.commandID  = swapShort(mblt_req.commandID);
-        mblt_req.num_cycles = swapShort(mblt_req.num_cycles);
-        mblt_req.address    = swapLong(mblt_req.address);
-    }
-    
-    size_t req_offset = (num_transfers - 1) * 8;
-    
-    *(unsigned short*) (req + req_offset)     = mblt_req.commandID;
-    *(unsigned short*) (req + req_offset + 2) = mblt_req.num_cycles;
-    *(unsigned long*)  (req + req_offset + 4) = mblt_req.address;
-    
-    @try {
-        [[self usbInterface] writeBytes:(void*) req length:sizeof(req)];
-    }
-    @catch (NSException* e) {
-        NSLog(@"DT5720 readFifo request at address: 0x%08x failed\n", vmeAddress);
-        NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-        return -1;
-    }
-    
-    //memset(read_buffer, 0, sizeof(read_buffer));
-    memset(readValue, 0, aligned_num_bytes + 2);
-    
-    int num_read = 0;
-    @try {
-        num_read = [[self usbInterface] readBytes:(void*) readValue length:aligned_num_bytes + 2];
-    }
-    @catch (NSException* e) {
-        NSLog(@"DT5720 failed readFifo respond at address: 0x%08x\n", vmeAddress);
-        NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-        return -1;
-    }
-    
-    unsigned short* resp_status = (unsigned short*) readValue + aligned_num_bytes;
-    if (self.isNeedToSwap) {
-        *resp_status = swapShort(*resp_status);
-    }
-    
-    if (num_read != aligned_num_bytes + 2 || (*resp_status & 0x20)) {
-        NSLog(@"DT5720 failed readFifo at address: 0x%08x\n", vmeAddress);
-        NSLog(@"DT5720 returned with bus error\n");
-        return num_read;
-    }
-    *resp_status = 0x0;
-    
-    /*
-     dw = 64 -> dsize = 3
-     DW = 0x08 it's in bytes
-     am = VME_MBLT_AM = 0x08
-     MAX_BLT_SIZE = 60 * 1024 //chunk used for everything
-     
-     opcode = 0xC000 | (AM << 8) | (2 << 6) | (dsize << 4);
-     opcode = 0xC000 | (0x08 << 8) | (0x02 << 6) | (0x03 << 4);
-     0xC000    0x0800        0x0080        0x0030
-     0xC8B0
-     
-     //    all transfers but the last one | FPBLT = 0xF
-     //    last transfer | FBLT = 0xC
-     */
-    
-    return 0;
-}
-#endif
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)aDecoder
@@ -2050,12 +1908,11 @@ static NSString* DT5720RunModeString[4] = {
     self = [super initWithCoder:aDecoder];
     [[self undoManager] disableUndoRegistration];
     [self setZsAlgorithm:           [aDecoder decodeIntForKey:      @"zsAlgorithm"]];
+    [self setPacked:                [aDecoder decodeBoolForKey:     @"packed"]];
     [self setTrigOnUnderThreshold:  [aDecoder decodeBoolForKey:     @"trigOnUnderThreshold"]];
     [self setTestPatternEnabled:    [aDecoder decodeBoolForKey:     @"testPatternEnabled"]];
     [self setTrigOverlapEnabled:    [aDecoder decodeBoolForKey:     @"trigOverlapEnabled"]];
     [self setEventSize:             [aDecoder decodeIntForKey:      @"eventSize"]];
-    [self setIsCustomSize:          [aDecoder decodeBoolForKey:     @"isCustomSize"]];
-    [self setCustomSize:            [aDecoder decodeInt32ForKey:    @"customSize"]];
     [self setClockSource:           [aDecoder decodeBoolForKey:     @"clockSource"]];
     [self setCountAllTriggers:      [aDecoder decodeBoolForKey:     @"countAllTriggers"]];
     [self setGpiRunMode:            [aDecoder decodeBoolForKey:     @"gpiRunMode"]];
@@ -2072,7 +1929,6 @@ static NSString* DT5720RunModeString[4] = {
 
     [self setCoincidenceLevel:      [aDecoder decodeIntForKey:      @"coincidenceLevel"]];
     [self setWaveFormRateGroup:     [aDecoder decodeObjectForKey:   @"waveFormRateGroup"]];
-    [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:  @"numberBLTEventsToReadout"]];
     
     if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
@@ -2102,13 +1958,12 @@ static NSString* DT5720RunModeString[4] = {
 {
     [super encodeWithCoder:anEncoder];
     
-    [anEncoder encodeInt:zsAlgorithm                forKey:@"zsAlgorithm"];
+    [anEncoder encodeInt: zsAlgorithm               forKey:@"zsAlgorithm"];
+    [anEncoder encodeBool:packed                    forKey:@"packed"];
     [anEncoder encodeBool:trigOnUnderThreshold      forKey:@"trigOnUnderThreshold"];
     [anEncoder encodeBool:testPatternEnabled        forKey:@"testPatternEnabled"];
     [anEncoder encodeBool:trigOverlapEnabled        forKey:@"trigOverlapEnabled"];
     [anEncoder encodeInt:eventSize                  forKey:@"eventSize"];
-    [anEncoder encodeBool:isCustomSize              forKey:@"isCustomSize"];
-    [anEncoder encodeInt32:customSize               forKey:@"customSize"];
     [anEncoder encodeBool:clockSource               forKey:@"clockSource"];
     [anEncoder encodeBool:countAllTriggers          forKey:@"countAllTriggers"];
     [anEncoder encodeBool:gpiRunMode                forKey:@"gpiRunMode"];
@@ -2125,7 +1980,6 @@ static NSString* DT5720RunModeString[4] = {
 
 	[anEncoder encodeInt:coincidenceLevel           forKey:@"coincidenceLevel"];
     [anEncoder encodeObject:waveFormRateGroup       forKey:@"waveFormRateGroup"];
-    [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
     
 	int i;
 	for (i = 0; i < kNumDT5720Channels; i++){
@@ -2158,8 +2012,6 @@ static NSString* DT5720RunModeString[4] = {
     [objDictionary setObject:[NSNumber numberWithInt:gpoEnabled]            forKey:@"gpoEnabled"];
     [objDictionary setObject:[NSNumber numberWithInt:ttlEnabled]            forKey:@"ttlEnabled"];
     [objDictionary setObject:[NSNumber numberWithInt:triggerSourceMask]     forKey:@"triggerSourceMask"];
-    [objDictionary setObject:[NSNumber numberWithInt:customSize]            forKey:@"customSize"];
-    [objDictionary setObject:[NSNumber numberWithInt:isCustomSize]          forKey:@"isCustomSize"];
     [objDictionary setObject:[NSNumber numberWithInt:countAllTriggers]      forKey:@"countAllTriggers"];
     [objDictionary setObject:[NSNumber numberWithInt:coincidenceLevel]      forKey:@"coincidenceLevel"];
     [objDictionary setObject:[NSNumber numberWithInt:triggerOutMask]        forKey:@"triggerOutMask"];
@@ -2219,30 +2071,34 @@ static NSString* DT5720RunModeString[4] = {
         if(isDataAvailable){
             if((acqStatus >> 4) & 0x1) bufferState = kDT5720BufferFull;
             else                       bufferState = kDT5720BufferReady;
-
-            //unsigned long aValue = 0;
-            //[self read:kEventSize returnValue:&aValue];
-            //NSLog(@"event size: %lu\n",aValue);
             
-            unsigned long totalDataSizeInLongs;
-            unsigned long recordSizeBytes;
-            if([self isCustomSize]){
-                recordSizeBytes      = (4+[self customSize]/2)*4;
-            }
-            else {
-                unsigned long numSamplesPerEvent = 1024*1024./powf(2.,(float)[self eventSize]);
-                recordSizeBytes      = (4+numSamplesPerEvent/2)*4;
-           }
-            totalDataSizeInLongs = recordSizeBytes/4 + 2;
-
-            NSMutableData* eventData = [NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(long)];
-            [eventData setLength:totalDataSizeInLongs*sizeof(long)];
             
             unsigned long* theData = (unsigned long*)[eventData bytes];
-            theData[0]  = dataId | totalDataSizeInLongs;
-            theData[1]  = ([self uniqueIdNumber] & 0xf)<<16; //rest is spare
-            int num     = [self readFifo:(char*)(&theData[2]) numBytesToRead:recordSizeBytes];
+            int num     = [self readFifo:(char*)theData numBytesToRead:[eventData length]];
             if(num>0){
+                unsigned long index=0;
+                do {
+                    unsigned long checkWord = theData[index]>>28 & 0xf;
+                    if(checkWord == 0xA){
+                        unsigned long theSize = theData[index] & 0xfffffff;
+                        NSMutableData* record = [NSMutableData dataWithCapacity:(theSize+2)*sizeof(long)];
+                        [record setLength:(theSize+2)*sizeof(long)];
+                        unsigned long* theRecord = (unsigned long*)[record bytes];
+                        theRecord[0]  = dataId | theSize+2;
+                        theRecord[1]  = (([self uniqueIdNumber] & 0xf)<<16) |
+                                        ((cachedZS              & 0x3)<< 1) |
+                                        ((cachedPack            & 0x1)<< 0) ;
+
+                        [record replaceBytesInRange:NSMakeRange(8, theSize*sizeof(long))
+                                          withBytes:(char*)&theData[index]
+                                                    length:theSize*sizeof(long)];
+                        [circularBuffer writeData:record];
+                        index += theSize;
+                        totalBytesTransfered += theSize*sizeof(long);
+                    }
+                    else break;
+                }while(index<num/4);
+                
                 [circularBuffer writeData:eventData];
             }
         }

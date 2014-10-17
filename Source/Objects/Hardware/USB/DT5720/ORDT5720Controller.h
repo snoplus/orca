@@ -39,13 +39,13 @@
     IBOutlet NSMatrix*		numOverUnderThresholdMatrix;
     IBOutlet NSMatrix*		dacMatrix;
     IBOutlet NSPopUpButton* zsAlgorithmPU;
+    IBOutlet NSButton*      packedCB;
+
     IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
     IBOutlet NSButton*      testPatternEnabledButton;
     IBOutlet NSButton*      trigOverlapEnabledButton;
     IBOutlet NSPopUpButton* eventSizePopUp;
     IBOutlet NSTextField*	eventSizeTextField;
-    IBOutlet NSTextField*	customSizeTextField;
-    IBOutlet NSButton*      customSizeButton;
 
     IBOutlet NSTextField*	postTriggerSettingTextField;
     IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix;
@@ -98,7 +98,7 @@
     IBOutlet ORCompositeTimeLineView* timeRatePlot;
     IBOutlet NSButton*                timeRateLogCB;
     IBOutlet NSTextField*             bufferStateField;
-	
+    IBOutlet NSTextField*             transferRateField;
     IBOutlet NSButton*		basicLockButton;
     IBOutlet NSButton*		lowLevelLockButton;
     IBOutlet ORQueueView*   queView;
@@ -132,12 +132,11 @@
 - (void) numOverUnderThresholdChanged: (NSNotification*) aNote;
 - (void) dacChanged: (NSNotification*) aNote;
 - (void) zsAlgorithmChanged:(NSNotification*)aNote;
+- (void) packedChanged:(NSNotification*)aNote;
 - (void) trigOnUnderThresholdChanged:(NSNotification*)aNote;
 - (void) testPatternEnabledChanged:(NSNotification*)aNote;
 - (void) trigOverlapEnabledChanged:(NSNotification*)aNote;
 - (void) eventSizeChanged:(NSNotification*)aNote;
-- (void) isCustomSizeChanged:(NSNotification*)aNote;
-- (void) customSizeChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
 - (void) gpiRunModeChanged:(NSNotification*)aNote;
@@ -153,6 +152,8 @@
 - (void) ttlEnabledChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
@@ -162,11 +163,13 @@
 - (void) selectedRegChannelChanged:(NSNotification*) aNote;
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNote;
 
+- (void) rateGroupChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) lowLevelLockChanged:(NSNotification*)aNote;
 
-- (void) setBufferStateLabel;
+- (void) setStatusStrings;
 
 #pragma mark •••Actions
 - (IBAction) serialNumberAction:(id)sender;
@@ -179,12 +182,11 @@
 - (IBAction) numOverUnderThresholdAction: (id) sender;
 - (IBAction) dacAction: (id) sender;
 - (IBAction) zsAlgorithmAction:(id)sender;
+- (IBAction) packedAction:(id)sender;
 - (IBAction) trigOnUnderThresholdAction:(id)sender;
 - (IBAction) testPatternEnabledAction:(id)sender;
 - (IBAction) trigOverlapEnabledAction:(id)sender;
 - (IBAction) eventSizeAction:(id)sender;
-- (IBAction) isCustomSizeAction:(id)sender;
-- (IBAction) customSizeAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
 - (IBAction) gpiRunModeAction:(id)sender;
