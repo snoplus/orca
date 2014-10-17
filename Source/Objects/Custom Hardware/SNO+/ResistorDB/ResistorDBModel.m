@@ -15,9 +15,12 @@
 #define kResistorDbHeaderRetrieved @"kResistorDbHeaderRetrieved"
 #define kResistorDbDocumentPosted @"kResistorDbDocumentPosted"
 #define kResistorDbNewDocument @"kResistorDbNewDocument"
+#define kCheckResistorDocExists @"kCheckResistorDocExists"
 
 NSString* resistorDBQueryLoaded     = @"resistorDBQueryLoaded";
 NSString* resistorDBUpdated = @"resistorDBUpdated";
+NSString* ORResistorDocExists = @"ORResistorDocExists";
+NSString* ORResistorDocNotExists= @"ORResistorDocNotExists";
 
 @implementation ResistorDBModel
 @synthesize
@@ -169,6 +172,13 @@ endRunNumber = _endRunNumber;
     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kResistorDbHeaderRetrieved];
  }
 
+- (void) checkIfDocumentExists:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel withRunRange:(NSMutableArray*)aRunRange
+{
+    //view to query (make the request within this string)
+    NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/checkIfDocExists?key=[%i,%i,%i,%i,%i]",aCrate,aCard,aChannel,[[aRunRange objectAtIndex:0] intValue],[[aRunRange objectAtIndex:1] intValue]];
+    [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kCheckResistorDocExists];
+}
+
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 {
     //Loop over all the FEC cards
@@ -191,6 +201,7 @@ endRunNumber = _endRunNumber;
 
 -(void)couchDBResult:(id)aResult tag:(NSString *)aTag op:(id)anOp{
     @synchronized(self){
+        @try {
         if([aResult isKindOfClass:[NSDictionary class]]){
             NSString* message = [aResult objectForKey:@"Message"];
             if(message){
@@ -203,13 +214,39 @@ endRunNumber = _endRunNumber;
             else if ([aTag isEqualToString:kResistorDbNewDocument]){
                 
             }
+            else if ([aTag isEqualToString:kCheckResistorDocExists]){
+            
+                @try {
+                    
+                    int counter = 0;
+                    for(id key in [aResult objectForKey:@"rows"]){
+                        counter = counter  + 1;
+                    }
+                    
+                    //if the document doesn't exist then post the notification
+                    NSLog(@"result: %@",[aResult objectForKey:@"rows"]);
+                    if(counter > 0){
+                        NSLog(@"This is an old file\n");
+                        [[NSNotificationCenter defaultCenter] postNotificationName:ORResistorDocExists object:self];
+                    }
+                    else if(counter == 0){
+                        NSLog(@"Issue a new file\n");
+                        [[NSNotificationCenter defaultCenter] postNotificationName:ORResistorDocNotExists object:self];
+                    }
+                    else{
+                        NSLog(@"Unknown error\n");
+                    }
+                    
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"Exception thrown: %@\n",exception);
+                }
+                
+                //
+                
+            }
             else if ([aTag isEqualToString:kResistorDbDocumentPosted])
             {
-                //NSMutableDictionary* resistorDoc = [[[self resistorDocument] mutableCopy] autorelease];
-                //[resistorDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
-                //[resistorDoc setObject:[aResult objectForKey:@"rev"] forKey:@"_rev"];
-                //NSLog(@"Posted to ResistorDB %@",resistorDoc);
-                //self.resistorDocument = resistorDoc;
                 
             }
             //If no tag is found for the query result
@@ -226,6 +263,11 @@ endRunNumber = _endRunNumber;
         else {
             //no docs found 
         }
+            
+        } //end of try
+        @catch (NSException *exception) {
+            NSLog(@"Exception Thrown due to inability to reach couchDb. Reason: %@\n",exception);
+        }
     }
 }
 
@@ -237,8 +279,6 @@ endRunNumber = _endRunNumber;
     //make notification here to tell controller that this has changed 
     [[NSNotificationCenter defaultCenter] postNotificationName:resistorDBQueryLoaded object:self];
 }
-
-
 
 - (void) makeMainController
 {

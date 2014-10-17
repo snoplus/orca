@@ -37,8 +37,11 @@
 - (void) queryResistorDb:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel;
 - (void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic;
 - (void) addNeweResistorDoc:(NSMutableDictionary*)aResistorDocDic;
+- (void) checkIfDocumentExists:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel withRunRange:(NSMutableArray*)aRunRange;
 - (unsigned int) getCurrentRunNumber;
 
 @end
 
 extern NSString* resistorDBQueryLoaded;
+extern NSString* ORResistorDocExists;
+extern NSString* ORResistorDocNotExists;

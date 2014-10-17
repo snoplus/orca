@@ -36,7 +36,10 @@
     IBOutlet NSTextField *updateInfoForPull;
     IBOutlet NSButton *updateDbButton;
     NSProgressIndicator *loadingFromDbWheel;
+    NSMutableDictionary *_resistorDocDic;
 }
+
+@property (nonatomic,copy) NSMutableDictionary* resistorDocDic;
 
 -(id)init;
 -(void)dealloc;
