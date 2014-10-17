@@ -213,7 +213,11 @@ resistorDocDic = _resistorDocDic;
     NSMutableDictionary *oldResistorDocDic = [[NSMutableDictionary alloc] initWithCapacity:10];
     oldResistorDocDic = [[model currentQueryResults] mutableCopy];
     [oldResistorDocDic setObject:runRange forKey:@"run_range"];
-    [model updateResistorDb:oldResistorDocDic];
+    
+    /* Strictly only allow a run range were the currentRunNumber is larger than the current run number*/
+    if(currentRunNumber >= [[model startRunNumber]intValue]){
+        [model updateResistorDb:oldResistorDocDic];
+    }
     [oldResistorDocDic release];
     
     
@@ -254,19 +258,20 @@ resistorDocDic = _resistorDocDic;
     int crateNumber = [[crateSelect stringValue] intValue];
     int cardNumber = [[cardSelect stringValue] intValue];
     int channelNumber = [[channelSelect stringValue] intValue];
-    NSLog(@"value: %i %i %i\n",crateNumber,cardNumber,channelNumber);
+    //NSLog(@"value: %i %i %i\n",crateNumber,cardNumber,channelNumber);
     [loadingFromDbWheel setHidden:NO];
     [loadingFromDbWheel startAnimation:nil];
     [model queryResistorDb:crateNumber withCard:cardNumber withChannel:channelNumber];
 }
 
--(void) noUpdateRequired
+-(void) noNewDocumentRequired
 {
+    [model updateResistorDb:self.resistorDocDic];
     //update the current query value
     int crateNumber = [[crateSelect stringValue] intValue];
     int cardNumber = [[cardSelect stringValue] intValue];
     int channelNumber = [[channelSelect stringValue] intValue];
-    NSLog(@"value: %i %i %i\n",crateNumber,cardNumber,channelNumber);
+    //NSLog(@"value: %i %i %i\n",crateNumber,cardNumber,channelNumber);
     [loadingFromDbWheel setHidden:NO];
     [loadingFromDbWheel startAnimation:nil];
     [model queryResistorDb:crateNumber withCard:cardNumber withChannel:channelNumber];
@@ -288,7 +293,7 @@ resistorDocDic = _resistorDocDic;
                         object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(noUpdateRequired)
+                     selector : @selector(noNewDocumentRequired)
                          name : ORResistorDocExists
                         object: model];
     

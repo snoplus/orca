@@ -175,7 +175,7 @@ endRunNumber = _endRunNumber;
 - (void) checkIfDocumentExists:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel withRunRange:(NSMutableArray*)aRunRange
 {
     //view to query (make the request within this string)
-    NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/checkIfDocExists?key=[%i,%i,%i,%i,%i]",aCrate,aCard,aChannel,[[aRunRange objectAtIndex:0] intValue],[[aRunRange objectAtIndex:1] intValue]];
+    NSString *requestString = [NSString stringWithFormat:@"_design/resistorQuery/_view/checkIfDocExists?key=[%i,%i,%i,%i]",aCrate,aCard,aChannel,[[aRunRange objectAtIndex:0] intValue]];
     [[self orcaDbRefWithEntryDB:self withDB:@"resistor"] getDocumentId:requestString tag:kCheckResistorDocExists];
 }
 
@@ -226,11 +226,11 @@ endRunNumber = _endRunNumber;
                     //if the document doesn't exist then post the notification
                     NSLog(@"result: %@",[aResult objectForKey:@"rows"]);
                     if(counter > 0){
-                        NSLog(@"This is an old file\n");
+                        NSLog(@"CouchDB::Resistor: Updating a current database document\n");
                         [[NSNotificationCenter defaultCenter] postNotificationName:ORResistorDocExists object:self];
                     }
                     else if(counter == 0){
-                        NSLog(@"Issue a new file\n");
+                        NSLog(@"CouchDB::Resistor: Creating a new database file with new Run Range\n");
                         [[NSNotificationCenter defaultCenter] postNotificationName:ORResistorDocNotExists object:self];
                     }
                     else{
