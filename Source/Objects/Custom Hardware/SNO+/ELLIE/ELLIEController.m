@@ -42,7 +42,6 @@
     [configForSmellie setObject:currentConfigurationVersion forKey:@"configuration_version"];
     
     //SMELLIE Configuration file
-
     //Make sure these buttons are working on start up for Smellie
     [smellieNumIntensitySteps setEnabled:YES];
     [smellieMaxIntensity setEnabled:YES];
@@ -81,6 +80,9 @@
     
     //[smellieRunName release];
     
+    /*Setting up TELLIE GUI */
+    [self initialiseTellie];
+
     return self;
 }
 
@@ -120,6 +122,86 @@
                        object:smellieConfigLaserHeadField];
     
 }
+
+
+//TELLIE Functions 
+
+//Check to see if Tellie setting are correct
+-(BOOL) areTellieSettingsValid
+{
+    return YES;
+}
+     
+-(void) initialiseTellie
+{
+    [self updateGuiTellieIsNotReady];
+    [telliePollButton setEnabled:YES];
+    
+}
+
+-(void) updateGuiTellieIsReady
+{
+    //Now we have confirmed the validation
+    [tellieValidateSettingsButton setEnabled:NO];
+    [tellieChangeSettings setEnabled:YES];
+    [startTellieButton setEnabled:YES];
+    [stopTellieButton setEnabled:YES];
+    [tellieChannelTf setEnabled:NO];
+    [telliePhotonsTf setEnabled:NO];
+    [telliePulseRateTf setEnabled:NO];
+    [telliePulseHeightTf setEnabled:NO];
+    [telliePulseWidthTf setEnabled:NO];
+}
+
+-(void) updateGuiTellieIsNotReady
+{
+    //Now we have confirmed the validation
+    [tellieValidateSettingsButton setEnabled:YES];
+    [tellieChangeSettings setEnabled:NO];
+    [startTellieButton setEnabled:NO];
+    [stopTellieButton setEnabled:NO];
+    [tellieChannelTf setEnabled:YES];
+    [telliePhotonsTf setEnabled:YES];
+    [telliePulseRateTf setEnabled:YES];
+    [telliePulseHeightTf setEnabled:YES];
+    [telliePulseWidthTf setEnabled:YES];
+}
+
+//Validate that the GUI settings make sense
+-(IBAction)validateTellieSettingsAction:(id)sender
+{
+    //Confirm the validation of the tellie fibre settings
+    BOOL settingsOk = [self areTellieSettingsValid];
+    
+    if(settingsOk){
+        [self updateGuiTellieIsReady];
+    }
+    else if (!settingsOk){
+        [self updateGuiTellieIsNotReady];
+    }
+    else{
+        NSLog(@"TELLIE_CONTROL:Please reset the Tellie GUI by closing it and reopening it\n");
+    }
+}
+
+//Poll the Tellie Fibre
+-(IBAction)pollTellieFibreAction:(id)sender
+{
+    [model pollTellieFibre];
+}
+
+
+//manual override to stop the Tellie Fibre firing
+-(IBAction)stopTellieFibreAction:(id)sender
+{
+    
+}
+
+-(IBAction)fireTellieFibreAction:(id)sender
+{
+    
+}
+
 
 //SMELLIE functions -------------------------
 

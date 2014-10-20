@@ -104,9 +104,19 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
-    
-    
 }
+
+
+/* TELLIE Functions */
+//This function polls the TELLIE hardware using an XMLPRC Server and requests the response from the hardware
+-(void) pollTellieFibre
+{
+    NSString *responseFromTellie = [[NSString alloc] init];
+    NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
+    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nullCommandArguments];
+    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+}
+
 
 - (void) fetchSmellieConfigurationInformation
 { 
@@ -152,7 +162,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
 {
     if([commandLineArgs count] != 3){
-        NSLog(@"Three command line arguments are required!");
+        NSLog(@"Three command line arguments are required!\n");
         return nil;
     }
     

@@ -78,9 +78,25 @@
     IBOutlet NSTextField *smellieConfigAttenutationFactor;
     
     IBOutlet NSButton *smellieConfigSubmitButton;
-        
+    
+    
+    
     //TELLIE interface ------------------------------------------
     
+    IBOutlet NSButton *tellieChangeSettings;
+    IBOutlet NSButton *startTellieButton;
+    IBOutlet NSButton *stopTellieButton;
+    IBOutlet NSTextField *tellieChannelTf;
+    IBOutlet NSTextField *telliePhotonsTf;
+    IBOutlet NSTextField *telliePulseRateTf;
+    IBOutlet NSTextField *telliePulseHeightTf;
+    IBOutlet NSTextField *telliePulseWidthTf;
+    IBOutlet NSButton *tellieValidateSettingsButton; //need to validate the values are correct before sending
+    IBOutlet NSTextField *tellieValidationStatusLabel;
+    IBOutlet NSTextField *tellieRunStatusLabel;
+    IBOutlet NSButton *tellieFireFibreButton;
+    IBOutlet NSButton *telliePollButton;
+    IBOutlet NSButton *tellieStopButton;
 }
 
 //@property (nonatomic,retain) NSMutableDictionary* smellieRunSettingsFromGUI;
@@ -106,6 +122,16 @@
 -(IBAction)executeSmellieCmdDirectAction:(id)sender;
 
 //TELLIE functions -----------------------------
+
+-(IBAction)fireTellieFibreAction:(id)sender;
+-(IBAction)pollTellieFibreAction:(id)sender;
+-(IBAction)stopTellieFibreAction:(id)sender;
+-(IBAction)validateTellieSettingsAction:(id)sender;
+
+-(BOOL) areTellieSettingsValid;
+-(void) initialiseTellie;
+-(void) updateGuiTellieIsReady;
+-(void) updateGuiTellieIsNotReady;
 
 @end
 
