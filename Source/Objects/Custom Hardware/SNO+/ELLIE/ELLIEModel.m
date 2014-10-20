@@ -112,8 +112,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) pollTellieFibre
 {
     NSString *responseFromTellie = [[NSString alloc] init];
-    NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nullCommandArguments];
+    //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
+    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
@@ -161,10 +161,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 //This calls a python script but can only take two command line arguments 
 -(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs
 {
-    if([commandLineArgs count] != 3){
+    /*if([commandLineArgs count] != 3){
         NSLog(@"Three command line arguments are required!\n");
         return nil;
-    }
+    }*/
     
     NSTask *task;
     task = [[NSTask alloc] init];
