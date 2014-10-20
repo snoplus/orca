@@ -91,12 +91,12 @@
         int j;
         for(j=0;j<numChans;j++){
             
-            NSMutableData* tmpData= [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
-            unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-            int wordCount = 0;
-
+             int wordCount = 0;
+            NSMutableData* tmpData = nil;
             if(!packed){
                 if(zeroSuppression == 0){
+                    tmpData= [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
+                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
                     //not packed, normal format
                     int k;
                     for(k=0;k<eventSize;k++){
@@ -108,6 +108,8 @@
                 else {
                     //not packed, but using zero length encoding
                     unsigned long size   = *ptr;
+                    tmpData= [[[NSMutableData alloc] initWithLength:2*size*sizeof(unsigned short)] autorelease];
+                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
                     int controlWordCount = 0;
                     while(1){
                         ptr++; //point to control word
@@ -145,7 +147,9 @@
             }
             else {
                 if(zeroSuppression == 0){
-                    //packed, no zero suppression
+                    tmpData= [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
+                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+                   //packed, no zero suppression
                     int k;
                     for(k=0;k<eventSize;k++){
                         unsigned long *d = ptr;
@@ -170,6 +174,8 @@
                 }
                 else {
                     unsigned long size = *ptr;
+                    tmpData= [[[NSMutableData alloc] initWithLength:2*size*sizeof(unsigned short)] autorelease];
+                    unsigned short* dPtr = (unsigned short*)[tmpData bytes];
                     int controlWordCount = 0;
                     while(1){
                         ptr++; //point to control word
@@ -218,7 +224,7 @@
                     
                 }
             }
-            [aDataSet loadWaveform:tmpData
+            if(tmpData)[aDataSet loadWaveform:tmpData
                             offset:0 //bytes!
                           unitSize:2 //unit size in bytes!
                             sender:self

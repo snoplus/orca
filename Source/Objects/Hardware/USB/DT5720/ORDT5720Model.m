@@ -446,16 +446,20 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) setNlbk:(unsigned short) i withValue:(unsigned short) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setNlbk:i withValue:nLbk[i]];
+    if(aValue<1)aValue=1;
+    if(aValue!=nLbk[i]){
+
+        [[[self undoManager] prepareWithInvocationTarget:self] setNlbk:i withValue:nLbk[i]];
     
-    nLbk[i] = aValue;
+        nLbk[i] = aValue;
     
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlbkChanged
-                                                        object:self
-                                                      userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlbkChanged
+                                                            object:self
+                                                          userInfo:userInfo];
+    }
 }
 
 - (unsigned short)	nLfwd:(unsigned short) i
@@ -466,14 +470,18 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) setNlfwd:(unsigned short) i withValue:(unsigned short) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setNlfwd:i withValue:nLfwd[i]];
-    nLfwd[i] = aValue;
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    if(aValue<1)aValue=1;
+    if(aValue!=nLfwd[i]){
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlfwdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
+        [[[self undoManager] prepareWithInvocationTarget:self] setNlfwd:i withValue:nLfwd[i]];
+        nLfwd[i] = aValue;
+        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+    
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720NlfwdChanged
+                                                            object:self
+                                                          userInfo:userInfo];
+    }
 }
 //------------------------------
 //Reg Channel n Threshold (0x1n80)
@@ -484,17 +492,19 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) setThreshold:(unsigned short) i withValue:(unsigned short) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:i withValue:[self threshold:i]];
+    if(aValue!=thresholds[i]){
+        [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:i withValue:[self threshold:i]];
     
-    thresholds[i] = aValue;
+        thresholds[i] = aValue;
     
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
+        NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+        [userInfo setObject:[NSNumber numberWithInt:i] forKey:ORDT5720Chnl];
     
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ThresholdChanged
-                                                        object:self
-                                                      userInfo:userInfo];
+        // Send out notification that the value has changed.
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ThresholdChanged
+                                                            object:self
+                                                          userInfo:userInfo];
+    }
 }
 //------------------------------
 //Reg Channel n Num Over/Under Threshold (0x1n84)

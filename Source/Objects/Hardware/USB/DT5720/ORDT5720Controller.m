@@ -328,7 +328,10 @@
         [[enabled2MaskMatrix    cellAtRow:i column:0] setTag:i];
     }
     
-    
+    [[eventSizePopUp itemAtIndex:0]setEnabled:NO];
+    [[eventSizePopUp itemAtIndex:1]setEnabled:NO];
+    [eventSizePopUp setAutoenablesItems:NO];
+
     [super awakeFromNib];
 
     
