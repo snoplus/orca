@@ -79,7 +79,6 @@ NSString* ORDT5720ModelBufferCheckChanged                 = @"ORDT5720ModelBuffe
 
 static DT5720RegisterNamesStruct reg[kNumberDT5720Registers] = {
 //  {regName            addressOffset, accessType, hwReset, softwareReset, clr},
-    {@"Output Buffer",          0x0000, kReadOnly,  true,	true, 	true},
     {@"ZS_Thres",               0x1024,	kReadWrite,	true,	true, 	false},
     {@"ZS_NsAmp",               0x1028,	kReadWrite, true,	true, 	false},
     {@"Thresholds",             0x1080,	kReadWrite, true,	true, 	false},
@@ -1368,7 +1367,9 @@ static NSString* DT5720RunModeString[4] = {
 - (void) writeChannelConfiguration
 {
     unsigned long mask = 0;
-    mask |= (zsAlgorithm & 0x3)           << 16;
+    if(zsAlgorithm == kNoZeroSuppression)  mask |= (0x0   << 16);
+    else if(zsAlgorithm == kZeroLengthEncoding) mask |= (0x2   << 16);
+    else                                   mask |= (0x3   << 16);
     mask |= (packed & 0x1)                << 11;
     mask |= (trigOnUnderThreshold & 0x1)  <<  6;
     mask |= 0x1                           <<  4; //reserved bit (MUST be one)
@@ -1392,7 +1393,7 @@ static NSString* DT5720RunModeString[4] = {
     unsigned long aValue = 0;
     aValue |= (clockSource & 0x1)       << 6;
     aValue |= (countAllTriggers & 0x1)  << 3;
-    aValue |= (start & 0x1)             << 2;
+    if(start) aValue |= (0x1 << 2);
     aValue |= (gpiRunMode & 0x1)        << 0;
     
     [self writeLongBlock:&aValue
@@ -1806,7 +1807,7 @@ static NSString* DT5720RunModeString[4] = {
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer otherwise
 - (int) readFifo:(char*)readBuffer numBytesToRead:(unsigned long)    numBytes
 {
-    unsigned long fifoAddress = reg[kOutputBuffer].addressOffset;
+    unsigned long fifoAddress = 0x0000;
     
     if (numBytes == 0) return 0;
     int maxBLTSize = 0x100000; //8 MBytes

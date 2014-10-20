@@ -803,7 +803,7 @@
 	short index = [model selectedRegIndex];
 	[self updatePopUpButton:registerAddressPopUp setting:index];
 	[self updateRegisterDescription:index];
-	
+
 	
 	BOOL readAllowed = [model getAccessType:index] == kReadOnly || [model getAccessType:index] == kReadWrite;
 	BOOL writeAllowed = [model getAccessType:index] == kWriteOnly || [model getAccessType:index] == kReadWrite;
@@ -850,7 +850,7 @@
     [writeValueStepper setEnabled:!lockedOrRunningMaintenance];
     [writeValueTextField setEnabled:!lockedOrRunningMaintenance];
     [registerAddressPopUp setEnabled:!lockedOrRunningMaintenance];
-	
+
     [self selectedRegIndexChanged:nil];
 	
     [basicWriteButton setEnabled:!lockedOrRunningMaintenance];
@@ -1211,11 +1211,10 @@
     [channelPopUp removeAllItems];
     
     for (i = 0; i < [model getNumberRegisters]; i++) {
-        [registerAddressPopUp insertItemWithTitle:[model
-												   getRegisterName:i]
+        [registerAddressPopUp insertItemWithTitle:[model getRegisterName:i]
 										  atIndex:i];
     }
-	
+
 	for (i = 0; i < kNumDT5720Channels ; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i]
 								  atIndex:i];

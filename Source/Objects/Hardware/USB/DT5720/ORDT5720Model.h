@@ -30,7 +30,6 @@
 @class ORSafeCircularBuffer;
 
 enum {
-	kOutputBuffer,			//0x0000
 	kZS_Thres,				//0x1024
 	kZS_NsAmp,				//0x1028
     kThresholds,			//0x1080
@@ -81,7 +80,7 @@ typedef struct  {
 
 
 enum {
-    kNoZeroSuppression,
+    kNoZeroSuppression ,
     kZeroLengthEncoding,
     kFullSuppressionBasedOnAmplitude
 };
