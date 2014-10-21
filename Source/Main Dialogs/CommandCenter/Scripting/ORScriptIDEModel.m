@@ -549,6 +549,14 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	return [self runScriptWithMessage:@""];
 }
 
+- (void) postCouchDBRecord:(NSDictionary*)aRecord
+{
+    NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:aRecord];
+    [values setObject:scriptName forKey:@"scriptName"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
+
 - (BOOL) runScriptWithMessage:(NSString*) startMessage
 {
 	parsedOK = YES;
