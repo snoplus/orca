@@ -117,6 +117,23 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
+-(void) fireTellieFibre:(NSArray*)fireCommands
+{
+    NSString *responseFromTellie = [[NSString alloc] init];
+    //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
+    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
+    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+}
+
+-(void) stopTellieFibre:(NSArray*)fireCommands
+{
+    NSString *responseFromTellie = [[NSString alloc] init];
+    //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
+    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
+    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+}
+
+/*Smellie Functions */
 
 - (void) fetchSmellieConfigurationInformation
 { 
@@ -127,7 +144,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [self setSmellieDBReadInProgress:YES];
     [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
-    
 }
 
 //complete this after the smellie documents have been recieved

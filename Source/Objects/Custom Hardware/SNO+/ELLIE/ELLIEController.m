@@ -27,6 +27,9 @@
     laserHeadSelected = NO;
     fibreSwitchOutputSelected = NO;
     
+    
+    @try{
+    
     //this function operates under the assumption that there is an initial file already in place
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
     
@@ -71,8 +74,16 @@
     [smellieAllLasersButton setEnabled:YES];
     [smellieMakeNewRunButton setEnabled:NO];
     
+    }
+    @catch (NSException *e) {
+        NSLog(@"CouchDB for ELLIE isn't connected properly. Please reload the ELLIE Gui and check the database connections\n");
+        NSLog(@"Reason for error %@",e);
+    }
+        
     //load most recent smellie config file 
     laserHeadDic = [[NSMutableDictionary alloc] initWithCapacity:100];
+        
+    
     
     //NSMutableDictionary *smellieRunInfo = [[NSMutableDictionary alloc] init];
     
@@ -82,6 +93,7 @@
     
     /*Setting up TELLIE GUI */
     [self initialiseTellie];
+
 
     return self;
 }
@@ -184,24 +196,96 @@
     }
 }
 
+-(IBAction)autoChangeTellieInput:(id)sender{
+    //make sure the trigger delay is given in increments of 5ns as specified by the TELLIE Group
+    /*if([sender isKindOfClass:[NSTextField class]]){
+        NSTextField * currentTextField = (NSTextField *)sender;
+        NSLog(@"value of textField %@",[currentTextField value]);
+        
+        
+        
+        NSLog(@"hello");
+    }
+    else{
+    
+    }*/
+    //NSLog(@"test value %@",[sender title]);
+}
+
+-(void)controlTextDidEndEditing:(NSNotification *)note {
+    NSTextField * changedField = [note object];
+    NSLog(@"changedField: %@",[changedField stringValue]);
+}
+
+
 //Poll the Tellie Fibre
 -(IBAction)pollTellieFibreAction:(id)sender
 {
     [model pollTellieFibre];
 }
 
-
 //manual override to stop the Tellie Fibre firing
 -(IBAction)stopTellieFibreAction:(id)sender
 {
-    
+    [model stopTellieFibre:nil];
 }
 
 -(IBAction)fireTellieFibreAction:(id)sender
 {
-    
+    [model fireTellieFibre:nil];
 }
 
+-(BOOL) isTellieChannelValid
+{
+    //Need logic to check the channel is correct here
+    return YES;
+}
+
+-(BOOL) isTelliePhotonNumberValid
+{
+    //Need a valid range for the number of photons for Tellie
+    return YES;
+}
+
+-(BOOL) isTelliePulseRateValid
+{
+    //Need a valid range for the Pulse rate of Tellie
+    return YES;
+}
+
+-(BOOL) isTelliePulseHeightValid
+{
+    //Need a valid pulse height range for Tellie
+    return YES;
+}
+
+-(BOOL) isTelliePulseWidthValid
+{
+    //Need a valid Pulse width range for Tellie
+    return YES;
+}
+
+-(BOOL) isTellieTriggerDelayValid
+{
+    //0 to 1275 ns (in 5ns discrete steps, so again, adjustment needed if user enters e.g. 1.0 ns)
+    int minimumTriggerDelay = 0;
+    int maximumTriggerDelay = 1275;
+    NSNumber *tellieTriggerDelay = [NSNumber numberWithInt:[[tellieTriggerDelayTf value] intValue]];
+    if( ([tellieTriggerDelay intValue] <= maximumTriggerDelay) && ([tellieTriggerDelay intValue] >= minimumTriggerDelay)){
+        NSLog(@"TELLIE_CONTROL: Setting Trigger Delay to %i ns\n",[tellieTriggerDelay intValue]);
+        return YES;
+    }
+    else{
+        NSLog(@"TELLIE_CONTROL: Trigger delay cannot be larger than 1275ns\n");
+        return NO;
+    }
+}
+
+-(BOOL) isTellieFibreDelayValid
+{
+    //Need a valid fibre delay range
+    return YES;
+}
 
 //SMELLIE functions -------------------------
 

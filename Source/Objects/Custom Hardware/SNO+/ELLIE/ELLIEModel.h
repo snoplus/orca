@@ -69,6 +69,8 @@
 
 //TELLIE Control Functions
 -(void) pollTellieFibre;
+-(void) fireTellieFibre:(NSArray*)fireCommands;
+-(void) stopTellieFibre:(NSArray*)fireCommands;
 
 
 @end

@@ -96,8 +96,14 @@
     IBOutlet NSTextField *tellieRunStatusLabel;
     IBOutlet NSButton *tellieFireFibreButton;
     IBOutlet NSButton *telliePollButton;
-    IBOutlet NSButton *tellieStopButton;
+    IBOutlet NSButton *tellieStopButton;    
+    IBOutlet NSTextField *tellieFibreDelayTf;
+    IBOutlet NSTextField *tellieTriggerDelayTf;
+    
+    
+    NSTextField *automaticallyChangeTellieTriggerInput;
 }
+
 
 //@property (nonatomic,retain) NSMutableDictionary* smellieRunSettingsFromGUI;
 
@@ -127,6 +133,7 @@
 -(IBAction)pollTellieFibreAction:(id)sender;
 -(IBAction)stopTellieFibreAction:(id)sender;
 -(IBAction)validateTellieSettingsAction:(id)sender;
+-(IBAction)autoChangeTellieInput:(id)sender;
 
 -(BOOL) areTellieSettingsValid;
 -(void) initialiseTellie;
