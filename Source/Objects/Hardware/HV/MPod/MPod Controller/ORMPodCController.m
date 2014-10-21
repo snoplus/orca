@@ -136,7 +136,7 @@
 
 - (void) updateButtons
 {
-	int pwr = [model systemParamAsInt:@"sysStatus"];
+	int pwr = [model systemParamAsInt:@"sysMainSwitch"];
 	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMPodCModelLock];
 	
 	[cratePowerButton setTitle:pwr?@"Turn Power Off...":@"Turn Power On..."];
