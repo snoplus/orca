@@ -205,6 +205,20 @@
     return NO;
 }
 
+-(void)controlTextDidBeginEditing:(NSNotification *)note{
+    
+}
+
+- (void)control:(NSControl *)control textView:(NSTextView *)fieldEditor doCommandBySelector:(SEL)commandSelector
+{
+    NSLog(@"Selector method is (%@)", NSStringFromSelector( commandSelector ) );
+    if (commandSelector == @selector(insertNewline:)) {
+        if([control isKindOfClass:[NSTextField class]]){
+            [control setBackgroundColor:[NSColor greenColor]];
+        }
+    }
+}
+
 -(void)controlTextDidEndEditing:(NSNotification *)note {
     NSTextField * changedField = [note object];
     
@@ -236,6 +250,9 @@
             }
         }
     } //end of checking trigger delay
+    
+    //set the background colour to green
+    [[note object] setBackgroundColor:[NSColor orangeColor]];
 }
 
 
