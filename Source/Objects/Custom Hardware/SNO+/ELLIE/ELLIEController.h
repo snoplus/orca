@@ -111,6 +111,7 @@
 -(void)dealloc;
 -(void) updateWindow;
 -(void) registerNotificationObservers;
+-(BOOL) isNumeric:(NSString *)s;
 
 //SMELLIE functions ----------------------------
 
@@ -133,7 +134,6 @@
 -(IBAction)pollTellieFibreAction:(id)sender;
 -(IBAction)stopTellieFibreAction:(id)sender;
 -(IBAction)validateTellieSettingsAction:(id)sender;
--(IBAction)autoChangeTellieInput:(id)sender;
 
 -(BOOL) areTellieSettingsValid;
 -(void) initialiseTellie;

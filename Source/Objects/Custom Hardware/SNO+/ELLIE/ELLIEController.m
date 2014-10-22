@@ -196,25 +196,46 @@
     }
 }
 
--(IBAction)autoChangeTellieInput:(id)sender{
-    //make sure the trigger delay is given in increments of 5ns as specified by the TELLIE Group
-    /*if([sender isKindOfClass:[NSTextField class]]){
-        NSTextField * currentTextField = (NSTextField *)sender;
-        NSLog(@"value of textField %@",[currentTextField value]);
-        
-        
-        
-        NSLog(@"hello");
+- (BOOL) isNumeric:(NSString *)s{
+    NSScanner *sc = [NSScanner scannerWithString: s];
+    if ( [sc scanFloat:NULL] )
+    {
+        return [sc isAtEnd];
     }
-    else{
-    
-    }*/
-    //NSLog(@"test value %@",[sender title]);
+    return NO;
 }
 
 -(void)controlTextDidEndEditing:(NSNotification *)note {
     NSTextField * changedField = [note object];
-    NSLog(@"changedField: %@",[changedField stringValue]);
+    
+    //check to see if the note is the trigger delay
+    if([note object] == tellieTriggerDelayTf)
+    {
+        int triggerDelayNumber = [changedField intValue];
+        //5ns discrete steps, so again, adjustment needed if user enters e.g. 1.0 ns)
+        int minimumNumberTriggerDelaySteps = 5;     //in ns
+        int minimumTriggerDelay = 0;                //in ns
+        int maxmiumTriggerDelay = 1275;             //in ns
+        int triggerDelayRemainder = (triggerDelayNumber  % minimumNumberTriggerDelaySteps);
+        
+        if(triggerDelayNumber  > maxmiumTriggerDelay){
+            NSLog(@"Tellie: Maximum Trigger Delay is 1275ns, setting to the maximum trigger delay\n");
+            [[note object] setIntValue:maxmiumTriggerDelay];
+        }
+        else if (triggerDelayNumber  < minimumTriggerDelay){
+            NSLog(@"Tellie: Minimum Trigger Delay is 0ns, setting to the minimum trigger delay\n");
+            [[note object] setIntValue:minimumTriggerDelay];
+        }
+        else{
+            if (triggerDelayRemainder == 0) {
+                //do nothing, this value is valid
+            }
+            else {
+                //Make the trigger delay divisible by 5
+                [[note object] setIntValue:(triggerDelayNumber  - triggerDelayRemainder)];
+            }
+        }
+    } //end of checking trigger delay
 }
 
 

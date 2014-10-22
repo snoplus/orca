@@ -62,7 +62,6 @@
 							<int key="NSvFlags">12</int>
 							<string key="NSFrame">{{25, 19}, {626, 656}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="804571440"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<array class="NSMutableArray" key="NSTabViewItems">
@@ -77,7 +76,6 @@
 												<int key="NSvFlags">12</int>
 												<string key="NSFrame">{{33, 23}, {541, 576}}</string>
 												<reference key="NSSuperview" ref="804571440"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="660027164"/>
 												<string key="NSReuseIdentifierKey">_NS:9</string>
 												<array class="NSMutableArray" key="NSTabViewItems">
@@ -100,7 +98,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{125, 102}, {96, 22}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="644682759"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -134,9 +131,9 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<dictionary key="NSAttributes" id="637611395"/>
+																								<dictionary key="NSAttributes" id="61005695"/>
 																							</object>
-																							<object class="NSDecimalNumberPlaceholder" key="NS.min" id="235785842">
+																							<object class="NSDecimalNumberPlaceholder" key="NS.min" id="141444689">
 																								<int key="NS.exponent">0</int>
 																								<int key="NS.length">0</int>
 																								<bool key="NS.negative">YES</bool>
@@ -144,7 +141,7 @@
 																								<int key="NS.mantissa.bo">1</int>
 																								<bytes key="NS.mantissa">AAAAAAAAAAAAAAAAAAAAAA</bytes>
 																							</object>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -188,7 +185,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{125, 72}, {96, 22}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="708163348"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -216,10 +212,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -247,8 +243,7 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{125, 44}, {96, 22}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="598117110"/>
+																					<reference key="NSNextKeyView" ref="248405889"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
 																					<object class="NSTextFieldCell" key="NSCell" id="920474731">
@@ -275,10 +270,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -301,20 +296,19 @@
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
-																				<object class="NSTextField" id="1051644853">
+																				<object class="NSTextField" id="466403357">
 																					<reference key="NSNextResponder" ref="107686250"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{125, 14}, {96, 22}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="49052579"/>
+																					<reference key="NSNextKeyView" ref="11618704"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
-																					<object class="NSTextFieldCell" key="NSCell" id="289240124">
+																					<object class="NSTextFieldCell" key="NSCell" id="352964006">
 																						<int key="NSCellFlags">-1804599231</int>
 																						<int key="NSCellFlags2">71304192</int>
 																						<reference key="NSSupport" ref="118580902"/>
-																						<object class="NSNumberFormatter" key="NSFormatter" id="812811391">
+																						<object class="NSNumberFormatter" key="NSFormatter" id="252887139">
 																							<dictionary class="NSMutableDictionary" key="NS.attributes">
 																								<boolean value="YES" key="allowsFloats"/>
 																								<integer value="1040" key="formatterBehavior"/>
@@ -334,10 +328,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -352,7 +346,7 @@
 																						</object>
 																						<string key="NSPlaceholderString">40</string>
 																						<string key="NSCellIdentifier">_NS:9</string>
-																						<reference key="NSControlView" ref="1051644853"/>
+																						<reference key="NSControlView" ref="466403357"/>
 																						<bool key="NSDrawsBackground">YES</bool>
 																						<reference key="NSBackgroundColor" ref="505863386"/>
 																						<reference key="NSTextColor" ref="1029637696"/>
@@ -365,7 +359,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-41, 102}, {153, 23}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="292431655"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -400,7 +393,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-41, 60}, {153, 34}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="247889031"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -422,7 +414,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-41, 44}, {153, 22}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="419389874"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -439,22 +430,21 @@
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
-																				<object class="NSTextField" id="598117110">
+																				<object class="NSTextField" id="248405889">
 																					<reference key="NSNextResponder" ref="107686250"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-41, 14}, {153, 22}}</string>
 																					<reference key="NSSuperview" ref="107686250"/>
-																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="1051644853"/>
+																					<reference key="NSNextKeyView" ref="466403357"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
-																					<object class="NSTextFieldCell" key="NSCell" id="985920342">
+																					<object class="NSTextFieldCell" key="NSCell" id="469733820">
 																						<int key="NSCellFlags">67108864</int>
 																						<int key="NSCellFlags2">71303168</int>
 																						<string key="NSContents">Fibre Delay (ns):</string>
 																						<reference key="NSSupport" ref="118580902"/>
 																						<string key="NSCellIdentifier">_NS:1535</string>
-																						<reference key="NSControlView" ref="598117110"/>
+																						<reference key="NSControlView" ref="248405889"/>
 																						<reference key="NSBackgroundColor" ref="258197017"/>
 																						<reference key="NSTextColor" ref="625002855"/>
 																					</object>
@@ -464,14 +454,12 @@
 																			</array>
 																			<string key="NSFrame">{{1, 1}, {234, 128}}</string>
 																			<reference key="NSSuperview" ref="800066541"/>
-																			<reference key="NSWindow"/>
 																			<reference key="NSNextKeyView" ref="243156656"/>
 																			<string key="NSReuseIdentifierKey">_NS:11</string>
 																		</object>
 																	</array>
 																	<string key="NSFrame">{{8, 246}, {236, 144}}</string>
 																	<reference key="NSSuperview" ref="660027164"/>
-																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="107686250"/>
 																	<string key="NSReuseIdentifierKey">_NS:9</string>
 																	<string key="NSOffsets">{0, 0}</string>
@@ -496,20 +484,19 @@
 																	<int key="NSTitlePosition">2</int>
 																	<bool key="NSTransparent">NO</bool>
 																</object>
-																<object class="NSBox" id="49052579">
+																<object class="NSBox" id="11618704">
 																	<reference key="NSNextResponder" ref="660027164"/>
 																	<int key="NSvFlags">12</int>
 																	<array class="NSMutableArray" key="NSSubviews">
-																		<object class="NSView" id="728369155">
-																			<reference key="NSNextResponder" ref="49052579"/>
+																		<object class="NSView" id="89414915">
+																			<reference key="NSNextResponder" ref="11618704"/>
 																			<int key="NSvFlags">274</int>
 																			<array class="NSMutableArray" key="NSSubviews">
 																				<object class="NSTextField" id="200251907">
-																					<reference key="NSNextResponder" ref="728369155"/>
+																					<reference key="NSNextResponder" ref="89414915"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{151, 101}, {96, 22}}</string>
-																					<reference key="NSSuperview" ref="728369155"/>
-																					<reference key="NSWindow"/>
+																					<reference key="NSSuperview" ref="89414915"/>
 																					<reference key="NSNextKeyView" ref="255687508"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -537,10 +524,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -564,12 +551,11 @@
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
 																				<object class="NSTextField" id="772552505">
-																					<reference key="NSNextResponder" ref="728369155"/>
+																					<reference key="NSNextResponder" ref="89414915"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{151, 72}, {96, 22}}</string>
-																					<reference key="NSSuperview" ref="728369155"/>
-																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="130733738"/>
+																					<reference key="NSSuperview" ref="89414915"/>
+																					<reference key="NSNextKeyView" ref="710751742"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
 																					<object class="NSTextFieldCell" key="NSCell" id="785228384">
@@ -596,10 +582,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -622,20 +608,19 @@
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
-																				<object class="NSTextField" id="557510823">
-																					<reference key="NSNextResponder" ref="728369155"/>
+																				<object class="NSTextField" id="912081092">
+																					<reference key="NSNextResponder" ref="89414915"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{151, 45}, {96, 22}}</string>
-																					<reference key="NSSuperview" ref="728369155"/>
-																					<reference key="NSWindow"/>
+																					<reference key="NSSuperview" ref="89414915"/>
 																					<reference key="NSNextKeyView" ref="458044276"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
-																					<object class="NSTextFieldCell" key="NSCell" id="926848521">
+																					<object class="NSTextFieldCell" key="NSCell" id="413966703">
 																						<int key="NSCellFlags">-1804599231</int>
 																						<int key="NSCellFlags2">71304192</int>
 																						<reference key="NSSupport" ref="118580902"/>
-																						<object class="NSNumberFormatter" key="NSFormatter" id="337184678">
+																						<object class="NSNumberFormatter" key="NSFormatter" id="501292028">
 																							<dictionary class="NSMutableDictionary" key="NS.attributes">
 																								<boolean value="YES" key="allowsFloats"/>
 																								<integer value="1040" key="formatterBehavior"/>
@@ -655,10 +640,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -673,7 +658,7 @@
 																						</object>
 																						<string key="NSPlaceholderString">3</string>
 																						<string key="NSCellIdentifier">_NS:9</string>
-																						<reference key="NSControlView" ref="557510823"/>
+																						<reference key="NSControlView" ref="912081092"/>
 																						<bool key="NSDrawsBackground">YES</bool>
 																						<reference key="NSBackgroundColor" ref="505863386"/>
 																						<reference key="NSTextColor" ref="1029637696"/>
@@ -682,11 +667,10 @@
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
 																				<object class="NSTextField" id="398847271">
-																					<reference key="NSNextResponder" ref="728369155"/>
+																					<reference key="NSNextResponder" ref="89414915"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-14, 99}, {153, 23}}</string>
-																					<reference key="NSSuperview" ref="728369155"/>
-																					<reference key="NSWindow"/>
+																					<reference key="NSSuperview" ref="89414915"/>
 																					<reference key="NSNextKeyView" ref="200251907"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -704,11 +688,10 @@
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
 																				<object class="NSTextField" id="255687508">
-																					<reference key="NSNextResponder" ref="728369155"/>
+																					<reference key="NSNextResponder" ref="89414915"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-15, 60}, {153, 34}}</string>
-																					<reference key="NSSuperview" ref="728369155"/>
-																					<reference key="NSWindow"/>
+																					<reference key="NSSuperview" ref="89414915"/>
 																					<reference key="NSNextKeyView" ref="772552505"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -725,22 +708,21 @@
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																				</object>
-																				<object class="NSTextField" id="130733738">
-																					<reference key="NSNextResponder" ref="728369155"/>
+																				<object class="NSTextField" id="710751742">
+																					<reference key="NSNextResponder" ref="89414915"/>
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{-8, 33}, {153, 34}}</string>
-																					<reference key="NSSuperview" ref="728369155"/>
-																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="557510823"/>
+																					<reference key="NSSuperview" ref="89414915"/>
+																					<reference key="NSNextKeyView" ref="912081092"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
-																					<object class="NSTextFieldCell" key="NSCell" id="147962361">
+																					<object class="NSTextFieldCell" key="NSCell" id="611177510">
 																						<int key="NSCellFlags">67108864</int>
 																						<int key="NSCellFlags2">71303168</int>
 																						<string key="NSContents">Trigger Delay  (ns):</string>
 																						<reference key="NSSupport" ref="118580902"/>
 																						<string key="NSCellIdentifier">_NS:1535</string>
-																						<reference key="NSControlView" ref="130733738"/>
+																						<reference key="NSControlView" ref="710751742"/>
 																						<reference key="NSBackgroundColor" ref="258197017"/>
 																						<reference key="NSTextColor" ref="625002855"/>
 																					</object>
@@ -749,16 +731,14 @@
 																				</object>
 																			</array>
 																			<string key="NSFrame">{{1, 1}, {265, 128}}</string>
-																			<reference key="NSSuperview" ref="49052579"/>
-																			<reference key="NSWindow"/>
+																			<reference key="NSSuperview" ref="11618704"/>
 																			<reference key="NSNextKeyView" ref="398847271"/>
 																			<string key="NSReuseIdentifierKey">_NS:11</string>
 																		</object>
 																	</array>
 																	<string key="NSFrame">{{246, 246}, {267, 144}}</string>
 																	<reference key="NSSuperview" ref="660027164"/>
-																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="728369155"/>
+																	<reference key="NSNextKeyView" ref="89414915"/>
 																	<string key="NSReuseIdentifierKey">_NS:9</string>
 																	<string key="NSOffsets">{0, 0}</string>
 																	<object class="NSTextFieldCell" key="NSTitleCell">
@@ -772,7 +752,7 @@
 																			<bytes key="NSWhite">MCAwLjgwMDAwMDAxMTkAA</bytes>
 																		</object>
 																	</object>
-																	<reference key="NSContentView" ref="728369155"/>
+																	<reference key="NSContentView" ref="89414915"/>
 																	<int key="NSBorderType">1</int>
 																	<int key="NSBoxType">0</int>
 																	<int key="NSTitlePosition">2</int>
@@ -791,7 +771,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{98, 29}, {139, 36}}</string>
 																					<reference key="NSSuperview" ref="269779175"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="186000861"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<object class="NSButtonCell" key="NSCell" id="189144321">
@@ -818,7 +797,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{282, 29}, {139, 36}}</string>
 																					<reference key="NSSuperview" ref="269779175"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="800066541"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<object class="NSButtonCell" key="NSCell" id="519248659">
@@ -839,14 +817,12 @@
 																			</array>
 																			<string key="NSFrame">{{1, 1}, {503, 82}}</string>
 																			<reference key="NSSuperview" ref="321863822"/>
-																			<reference key="NSWindow"/>
 																			<reference key="NSNextKeyView" ref="855069888"/>
 																			<string key="NSReuseIdentifierKey">_NS:11</string>
 																		</object>
 																	</array>
 																	<string key="NSFrame">{{8, 403}, {505, 98}}</string>
 																	<reference key="NSSuperview" ref="660027164"/>
-																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="269779175"/>
 																	<string key="NSReuseIdentifierKey">_NS:9</string>
 																	<string key="NSOffsets">{0, 0}</string>
@@ -880,7 +856,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{20, 13}, {99, 32}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="172468756"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -905,7 +880,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{335, 13}, {104, 32}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -930,7 +904,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{142, 13}, {171, 32}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="808692438"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -955,7 +928,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{24, 120}, {102, 22}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="989116084"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -977,7 +949,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{24, 100}, {102, 22}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="731292606"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -999,7 +970,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{130, 120}, {336, 22}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="824773316"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -1022,7 +992,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{131, 100}, {336, 22}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="16871816"/>
 																					<string key="NSReuseIdentifierKey">_NS:1535</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -1045,7 +1014,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{20, 59}, {143, 32}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="140477774"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -1070,7 +1038,6 @@
 																					<int key="NSvFlags">268</int>
 																					<string key="NSFrame">{{176, 59}, {150, 32}}</string>
 																					<reference key="NSSuperview" ref="262035685"/>
-																					<reference key="NSWindow"/>
 																					<reference key="NSNextKeyView" ref="470079840"/>
 																					<string key="NSReuseIdentifierKey">_NS:9</string>
 																					<bool key="NSEnabled">YES</bool>
@@ -1093,14 +1060,12 @@
 																			</array>
 																			<string key="NSFrame">{{1, 1}, {503, 160}}</string>
 																			<reference key="NSSuperview" ref="458044276"/>
-																			<reference key="NSWindow"/>
 																			<reference key="NSNextKeyView" ref="971259904"/>
 																			<string key="NSReuseIdentifierKey">_NS:11</string>
 																		</object>
 																	</array>
 																	<string key="NSFrame">{{8, 50}, {505, 176}}</string>
 																	<reference key="NSSuperview" ref="660027164"/>
-																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="262035685"/>
 																	<string key="NSReuseIdentifierKey">_NS:9</string>
 																	<string key="NSOffsets">{0, 0}</string>
@@ -1124,7 +1089,6 @@
 															</array>
 															<string key="NSFrame">{{10, 7}, {521, 538}}</string>
 															<reference key="NSSuperview" ref="332376978"/>
-															<reference key="NSWindow"/>
 															<reference key="NSNextKeyView" ref="321863822"/>
 															<string key="NSReuseIdentifierKey">_NS:11</string>
 														</object>
@@ -1938,10 +1902,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -1996,10 +1960,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -2194,10 +2158,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -2252,10 +2216,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -2310,10 +2274,10 @@
 																							</object>
 																							<object class="NSAttributedString" key="NS.nan">
 																								<string key="NSString">NaN</string>
-																								<reference key="NSAttributes" ref="637611395"/>
+																								<reference key="NSAttributes" ref="61005695"/>
 																							</object>
-																							<reference key="NS.min" ref="235785842"/>
-																							<reference key="NS.max" ref="235785842"/>
+																							<reference key="NS.min" ref="141444689"/>
+																							<reference key="NS.max" ref="141444689"/>
 																							<object class="NSDecimalNumberHandler" key="NS.rounding">
 																								<int key="NS.roundingmode">3</int>
 																								<bool key="NS.raise.overflow">YES</bool>
@@ -2508,7 +2472,6 @@
 										</array>
 										<string key="NSFrame">{{10, 33}, {606, 610}}</string>
 										<reference key="NSSuperview" ref="750044764"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="332376978"/>
 										<string key="NSReuseIdentifierKey">_NS:11</string>
 									</object>
@@ -4112,7 +4075,6 @@
 					</array>
 					<string key="NSFrameSize">{676, 699}</string>
 					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="750044764"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
@@ -5151,7 +5113,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">tellieFibreDelayTf</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="1051644853"/>
+						<reference key="destination" ref="466403357"/>
 					</object>
 					<int key="connectionID">831</int>
 				</object>
@@ -5159,7 +5121,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">tellieTriggerDelayTf</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="557510823"/>
+						<reference key="destination" ref="912081092"/>
 					</object>
 					<int key="connectionID">832</int>
 				</object>
@@ -5167,17 +5129,9 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">automaticallyChangeTellieTriggerInput</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="557510823"/>
+						<reference key="destination" ref="912081092"/>
 					</object>
 					<int key="connectionID">833</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">autoChangeTellieInput:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="557510823"/>
-					</object>
-					<int key="connectionID">834</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -5190,7 +5144,15 @@
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
-						<reference key="source" ref="557510823"/>
+						<reference key="source" ref="772552505"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">837</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="912081092"/>
 						<reference key="destination" ref="1001"/>
 					</object>
 					<int key="connectionID">836</int>
@@ -5475,7 +5437,7 @@
 							<reference ref="458044276"/>
 							<reference ref="800066541"/>
 							<reference ref="321863822"/>
-							<reference ref="49052579"/>
+							<reference ref="11618704"/>
 						</array>
 						<reference key="parent" ref="626245099"/>
 					</object>
@@ -5489,8 +5451,8 @@
 							<reference ref="419389874"/>
 							<reference ref="644682759"/>
 							<reference ref="708163348"/>
-							<reference ref="598117110"/>
-							<reference ref="1051644853"/>
+							<reference ref="248405889"/>
+							<reference ref="466403357"/>
 						</array>
 						<reference key="parent" ref="660027164"/>
 					</object>
@@ -6849,14 +6811,14 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">794</int>
-						<reference key="object" ref="49052579"/>
+						<reference key="object" ref="11618704"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="255687508"/>
 							<reference ref="398847271"/>
 							<reference ref="772552505"/>
 							<reference ref="200251907"/>
-							<reference ref="557510823"/>
-							<reference ref="130733738"/>
+							<reference ref="912081092"/>
+							<reference ref="710751742"/>
 						</array>
 						<reference key="parent" ref="660027164"/>
 					</object>
@@ -6866,7 +6828,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="617100931"/>
 						</array>
-						<reference key="parent" ref="49052579"/>
+						<reference key="parent" ref="11618704"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">474</int>
@@ -6887,7 +6849,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="785228384"/>
 						</array>
-						<reference key="parent" ref="49052579"/>
+						<reference key="parent" ref="11618704"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">486</int>
@@ -6908,7 +6870,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="538574599"/>
 						</array>
-						<reference key="parent" ref="49052579"/>
+						<reference key="parent" ref="11618704"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">476</int>
@@ -6921,7 +6883,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="773627556"/>
 						</array>
-						<reference key="parent" ref="49052579"/>
+						<reference key="parent" ref="11618704"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">484</int>
@@ -6930,71 +6892,71 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">820</int>
-						<reference key="object" ref="598117110"/>
+						<reference key="object" ref="248405889"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="985920342"/>
+							<reference ref="469733820"/>
 						</array>
 						<reference key="parent" ref="800066541"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">821</int>
-						<reference key="object" ref="985920342"/>
-						<reference key="parent" ref="598117110"/>
+						<reference key="object" ref="469733820"/>
+						<reference key="parent" ref="248405889"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">822</int>
-						<reference key="object" ref="1051644853"/>
+						<reference key="object" ref="466403357"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="289240124"/>
+							<reference ref="352964006"/>
 						</array>
 						<reference key="parent" ref="800066541"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">823</int>
-						<reference key="object" ref="289240124"/>
+						<reference key="object" ref="352964006"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="812811391"/>
+							<reference ref="252887139"/>
 						</array>
-						<reference key="parent" ref="1051644853"/>
+						<reference key="parent" ref="466403357"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">824</int>
-						<reference key="object" ref="812811391"/>
-						<reference key="parent" ref="289240124"/>
+						<reference key="object" ref="252887139"/>
+						<reference key="parent" ref="352964006"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">825</int>
-						<reference key="object" ref="130733738"/>
+						<reference key="object" ref="710751742"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="147962361"/>
+							<reference ref="611177510"/>
 						</array>
-						<reference key="parent" ref="49052579"/>
+						<reference key="parent" ref="11618704"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">826</int>
-						<reference key="object" ref="147962361"/>
-						<reference key="parent" ref="130733738"/>
+						<reference key="object" ref="611177510"/>
+						<reference key="parent" ref="710751742"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">827</int>
-						<reference key="object" ref="557510823"/>
+						<reference key="object" ref="912081092"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="926848521"/>
+							<reference ref="413966703"/>
 						</array>
-						<reference key="parent" ref="49052579"/>
+						<reference key="parent" ref="11618704"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">828</int>
-						<reference key="object" ref="926848521"/>
+						<reference key="object" ref="413966703"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="337184678"/>
+							<reference ref="501292028"/>
 						</array>
-						<reference key="parent" ref="557510823"/>
+						<reference key="parent" ref="912081092"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">829</int>
-						<reference key="object" ref="337184678"/>
-						<reference key="parent" ref="926848521"/>
+						<reference key="object" ref="501292028"/>
+						<reference key="parent" ref="413966703"/>
 					</object>
 				</array>
 			</object>
@@ -7375,574 +7337,9 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">836</int>
+			<int key="maxID">837</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">ELLIEController</string>
-					<string key="superclassName">OrcaObjectController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="allFibreValidator:">id</string>
-						<string key="allLaserValidator:">id</string>
-						<string key="autoChangeTellieInput:">id</string>
-						<string key="executeSmellieCmdDirectAction:">id</string>
-						<string key="fireTellieFibreAction:">id</string>
-						<string key="makeNewSmellieRun:">id</string>
-						<string key="onChangeAttenuationFactor:">id</string>
-						<string key="onClickAttenuator:">id</string>
-						<string key="onClickDetectorFibreReference:">id</string>
-						<string key="onClickFibeSwitchOutput:">id</string>
-						<string key="onClickFibreSwithInput:">id</string>
-						<string key="onClickLaserHead:">id</string>
-						<string key="onClickNiTriggerInputPin:">id</string>
-						<string key="onClickNiTriggerOutputPin:">id</string>
-						<string key="onClickNumOfPulses:">id</string>
-						<string key="onClickNumOfPulsesPerLaser:">id</string>
-						<string key="onClickSelfTestLasertTrigFreq:">id</string>
-						<string key="onClickSelfTestPmtSampleRate:">id</string>
-						<string key="onClickSubmitButton:">id</string>
-						<string key="onClickValidateSmellieConfig:">id</string>
-						<string key="onSelectOfSepiaInput:">id</string>
-						<string key="pollTellieFibreAction:">id</string>
-						<string key="setAllFibresAction:">id</string>
-						<string key="setAllLasersAction:">id</string>
-						<string key="stopTellieFibreAction:">id</string>
-						<string key="testButtonAction:">id</string>
-						<string key="validateIntensitySteps:">id</string>
-						<string key="validateLaserMaxIntensity:">id</string>
-						<string key="validateLaserMinIntensity:">id</string>
-						<string key="validateNumTriggersPerStep:">id</string>
-						<string key="validateSmellieTriggerFrequency:">id</string>
-						<string key="validateTellieSettingsAction:">id</string>
-						<string key="validationSmellieRunAction:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="allFibreValidator:">
-							<string key="name">allFibreValidator:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="allLaserValidator:">
-							<string key="name">allLaserValidator:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="autoChangeTellieInput:">
-							<string key="name">autoChangeTellieInput:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="executeSmellieCmdDirectAction:">
-							<string key="name">executeSmellieCmdDirectAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="fireTellieFibreAction:">
-							<string key="name">fireTellieFibreAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="makeNewSmellieRun:">
-							<string key="name">makeNewSmellieRun:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onChangeAttenuationFactor:">
-							<string key="name">onChangeAttenuationFactor:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickAttenuator:">
-							<string key="name">onClickAttenuator:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickDetectorFibreReference:">
-							<string key="name">onClickDetectorFibreReference:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickFibeSwitchOutput:">
-							<string key="name">onClickFibeSwitchOutput:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickFibreSwithInput:">
-							<string key="name">onClickFibreSwithInput:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickLaserHead:">
-							<string key="name">onClickLaserHead:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickNiTriggerInputPin:">
-							<string key="name">onClickNiTriggerInputPin:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickNiTriggerOutputPin:">
-							<string key="name">onClickNiTriggerOutputPin:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickNumOfPulses:">
-							<string key="name">onClickNumOfPulses:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickNumOfPulsesPerLaser:">
-							<string key="name">onClickNumOfPulsesPerLaser:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickSelfTestLasertTrigFreq:">
-							<string key="name">onClickSelfTestLasertTrigFreq:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickSelfTestPmtSampleRate:">
-							<string key="name">onClickSelfTestPmtSampleRate:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickSubmitButton:">
-							<string key="name">onClickSubmitButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onClickValidateSmellieConfig:">
-							<string key="name">onClickValidateSmellieConfig:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="onSelectOfSepiaInput:">
-							<string key="name">onSelectOfSepiaInput:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="pollTellieFibreAction:">
-							<string key="name">pollTellieFibreAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="setAllFibresAction:">
-							<string key="name">setAllFibresAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="setAllLasersAction:">
-							<string key="name">setAllLasersAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stopTellieFibreAction:">
-							<string key="name">stopTellieFibreAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="testButtonAction:">
-							<string key="name">testButtonAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validateIntensitySteps:">
-							<string key="name">validateIntensitySteps:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validateLaserMaxIntensity:">
-							<string key="name">validateLaserMaxIntensity:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validateLaserMinIntensity:">
-							<string key="name">validateLaserMinIntensity:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validateNumTriggersPerStep:">
-							<string key="name">validateNumTriggersPerStep:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validateSmellieTriggerFrequency:">
-							<string key="name">validateSmellieTriggerFrequency:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validateTellieSettingsAction:">
-							<string key="name">validateTellieSettingsAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="validationSmellieRunAction:">
-							<string key="name">validationSmellieRunAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="executeCmdBox">NSComboBox</string>
-						<string key="smellie375nmLaserButton">NSButton</string>
-						<string key="smellie405nmLaserButton">NSButton</string>
-						<string key="smellie440nmLaserButton">NSButton</string>
-						<string key="smellie500nmLaserButton">NSButton</string>
-						<string key="smellieAllFibresButton">NSButton</string>
-						<string key="smellieAllLasersButton">NSButton</string>
-						<string key="smellieConfigAttenuatorField">NSComboBox</string>
-						<string key="smellieConfigAttenutationFactor">NSTextField</string>
-						<string key="smellieConfigDetectorFibreRef">NSComboBox</string>
-						<string key="smellieConfigFsInputCh">NSComboBox</string>
-						<string key="smellieConfigFsOutputCh">NSComboBox</string>
-						<string key="smellieConfigLaserHeadField">NSComboBox</string>
-						<string key="smellieConfigSelfTestLaserTriggerFreq">NSTextField</string>
-						<string key="smellieConfigSelfTestNiTriggerInputPin">NSTextField</string>
-						<string key="smellieConfigSelfTestNiTriggerOutputPin">NSTextField</string>
-						<string key="smellieConfigSelfTestNoOfPulses">NSTextField</string>
-						<string key="smellieConfigSelfTestNoOfPulsesPerLaser">NSTextField</string>
-						<string key="smellieConfigSelfTestPmtSampleRate">NSTextField</string>
-						<string key="smellieConfigSepiaInputChannel">NSComboBox</string>
-						<string key="smellieConfigSubmitButton">NSButton</string>
-						<string key="smellieDirectArg1">NSTextField</string>
-						<string key="smellieDirectArg2">NSTextFieldCell</string>
-						<string key="smellieDirectCmd">NSTextField</string>
-						<string key="smellieDirectExecuteCmd">NSButton</string>
-						<string key="smellieFibreButtonFS007">NSButton</string>
-						<string key="smellieFibreButtonFS025">NSButton</string>
-						<string key="smellieFibreButtonFS037">NSButton</string>
-						<string key="smellieFibreButtonFS055">NSButton</string>
-						<string key="smellieFibreButtonFS107">NSButton</string>
-						<string key="smellieFibreButtonFS125">NSButton</string>
-						<string key="smellieFibreButtonFS137">NSButton</string>
-						<string key="smellieFibreButtonFS155">NSButton</string>
-						<string key="smellieFibreButtonFS207">NSButton</string>
-						<string key="smellieFibreButtonFS225">NSButton</string>
-						<string key="smellieFibreButtonFS237">NSButton</string>
-						<string key="smellieFibreButtonFS255">NSButton</string>
-						<string key="smellieMakeNewRunButton">NSButton</string>
-						<string key="smellieMaxIntensity">NSTextField</string>
-						<string key="smellieMinIntensity">NSTextField</string>
-						<string key="smellieNumIntensitySteps">NSTextField</string>
-						<string key="smellieNumTriggersPerLoop">NSTextField</string>
-						<string key="smellieOperationMode">NSComboBox</string>
-						<string key="smellieOperatorName">NSTextField</string>
-						<string key="smellieRunErrorTextField">NSTextField</string>
-						<string key="smellieRunName">NSTextField</string>
-						<string key="smellieTriggerFrequency">NSTextField</string>
-						<string key="startTellieButton">NSButton</string>
-						<string key="stopTellieButton">NSButton</string>
-						<string key="tellieChangeSettings">NSButton</string>
-						<string key="tellieChannelTf">NSTextField</string>
-						<string key="tellieFibreDelayTf">NSTextField</string>
-						<string key="tellieFireFibreButton">NSButton</string>
-						<string key="telliePhotonsTf">NSTextField</string>
-						<string key="telliePollButton">NSButton</string>
-						<string key="telliePulseHeightTf">NSTextField</string>
-						<string key="telliePulseRateTf">NSTextField</string>
-						<string key="telliePulseWidthTf">NSTextField</string>
-						<string key="tellieRunStatusLabel">NSTextField</string>
-						<string key="tellieStopButton">NSButton</string>
-						<string key="tellieTriggerDelayTf">NSTextField</string>
-						<string key="tellieValidateSettingsButton">NSButton</string>
-						<string key="tellieValidationStatusLabel">NSTextField</string>
-						<string key="testButton">NSButton</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="executeCmdBox">
-							<string key="name">executeCmdBox</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellie375nmLaserButton">
-							<string key="name">smellie375nmLaserButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellie405nmLaserButton">
-							<string key="name">smellie405nmLaserButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellie440nmLaserButton">
-							<string key="name">smellie440nmLaserButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellie500nmLaserButton">
-							<string key="name">smellie500nmLaserButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieAllFibresButton">
-							<string key="name">smellieAllFibresButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieAllLasersButton">
-							<string key="name">smellieAllLasersButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigAttenuatorField">
-							<string key="name">smellieConfigAttenuatorField</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigAttenutationFactor">
-							<string key="name">smellieConfigAttenutationFactor</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigDetectorFibreRef">
-							<string key="name">smellieConfigDetectorFibreRef</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigFsInputCh">
-							<string key="name">smellieConfigFsInputCh</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigFsOutputCh">
-							<string key="name">smellieConfigFsOutputCh</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigLaserHeadField">
-							<string key="name">smellieConfigLaserHeadField</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSelfTestLaserTriggerFreq">
-							<string key="name">smellieConfigSelfTestLaserTriggerFreq</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSelfTestNiTriggerInputPin">
-							<string key="name">smellieConfigSelfTestNiTriggerInputPin</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSelfTestNiTriggerOutputPin">
-							<string key="name">smellieConfigSelfTestNiTriggerOutputPin</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSelfTestNoOfPulses">
-							<string key="name">smellieConfigSelfTestNoOfPulses</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSelfTestNoOfPulsesPerLaser">
-							<string key="name">smellieConfigSelfTestNoOfPulsesPerLaser</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSelfTestPmtSampleRate">
-							<string key="name">smellieConfigSelfTestPmtSampleRate</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSepiaInputChannel">
-							<string key="name">smellieConfigSepiaInputChannel</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieConfigSubmitButton">
-							<string key="name">smellieConfigSubmitButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieDirectArg1">
-							<string key="name">smellieDirectArg1</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieDirectArg2">
-							<string key="name">smellieDirectArg2</string>
-							<string key="candidateClassName">NSTextFieldCell</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieDirectCmd">
-							<string key="name">smellieDirectCmd</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieDirectExecuteCmd">
-							<string key="name">smellieDirectExecuteCmd</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS007">
-							<string key="name">smellieFibreButtonFS007</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS025">
-							<string key="name">smellieFibreButtonFS025</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS037">
-							<string key="name">smellieFibreButtonFS037</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS055">
-							<string key="name">smellieFibreButtonFS055</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS107">
-							<string key="name">smellieFibreButtonFS107</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS125">
-							<string key="name">smellieFibreButtonFS125</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS137">
-							<string key="name">smellieFibreButtonFS137</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS155">
-							<string key="name">smellieFibreButtonFS155</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS207">
-							<string key="name">smellieFibreButtonFS207</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS225">
-							<string key="name">smellieFibreButtonFS225</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS237">
-							<string key="name">smellieFibreButtonFS237</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieFibreButtonFS255">
-							<string key="name">smellieFibreButtonFS255</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieMakeNewRunButton">
-							<string key="name">smellieMakeNewRunButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieMaxIntensity">
-							<string key="name">smellieMaxIntensity</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieMinIntensity">
-							<string key="name">smellieMinIntensity</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieNumIntensitySteps">
-							<string key="name">smellieNumIntensitySteps</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieNumTriggersPerLoop">
-							<string key="name">smellieNumTriggersPerLoop</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieOperationMode">
-							<string key="name">smellieOperationMode</string>
-							<string key="candidateClassName">NSComboBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieOperatorName">
-							<string key="name">smellieOperatorName</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieRunErrorTextField">
-							<string key="name">smellieRunErrorTextField</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieRunName">
-							<string key="name">smellieRunName</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="smellieTriggerFrequency">
-							<string key="name">smellieTriggerFrequency</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="startTellieButton">
-							<string key="name">startTellieButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="stopTellieButton">
-							<string key="name">stopTellieButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieChangeSettings">
-							<string key="name">tellieChangeSettings</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieChannelTf">
-							<string key="name">tellieChannelTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieFibreDelayTf">
-							<string key="name">tellieFibreDelayTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieFireFibreButton">
-							<string key="name">tellieFireFibreButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="telliePhotonsTf">
-							<string key="name">telliePhotonsTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="telliePollButton">
-							<string key="name">telliePollButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="telliePulseHeightTf">
-							<string key="name">telliePulseHeightTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="telliePulseRateTf">
-							<string key="name">telliePulseRateTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="telliePulseWidthTf">
-							<string key="name">telliePulseWidthTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieRunStatusLabel">
-							<string key="name">tellieRunStatusLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieStopButton">
-							<string key="name">tellieStopButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieTriggerDelayTf">
-							<string key="name">tellieTriggerDelayTf</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieValidateSettingsButton">
-							<string key="name">tellieValidateSettingsButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tellieValidationStatusLabel">
-							<string key="name">tellieValidationStatusLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="testButton">
-							<string key="name">testButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ELLIEController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ORTimedTextField</string>
-					<string key="superclassName">NSTextField</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORTimedTextField.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">OrcaObjectController</string>
-					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="copy:">id</string>
-						<string key="decDialog:">id</string>
-						<string key="incDialog:">id</string>
-						<string key="printDocument:">id</string>
-						<string key="saveDocument:">id</string>
-						<string key="saveDocumentAs:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="copy:">
-							<string key="name">copy:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="decDialog:">
-							<string key="name">decDialog:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="incDialog:">
-							<string key="name">incDialog:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="printDocument:">
-							<string key="name">printDocument:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="saveDocument:">
-							<string key="name">saveDocument:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="saveDocumentAs:">
-							<string key="name">saveDocumentAs:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">warningField</string>
-						<string key="NS.object.0">ORTimedTextField</string>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">warningField</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">warningField</string>
-							<string key="candidateClassName">ORTimedTextField</string>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/OrcaObjectController.h</string>
-					</object>
-				</object>
-			</array>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
