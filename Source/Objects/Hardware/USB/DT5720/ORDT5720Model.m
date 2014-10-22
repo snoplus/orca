@@ -1610,7 +1610,7 @@ static NSString* DT5720RunModeString[4] = {
 								 [NSNumber numberWithBool:YES],     @"variable",
 								 [NSNumber numberWithLong:-1],		@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Spectrum"];
+    [dataDictionary setObject:aDictionary forKey:@"waveform"];
     
     return dataDictionary;
 }
@@ -1643,7 +1643,6 @@ static NSString* DT5720RunModeString[4] = {
     eventData = [[NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(long)]retain];
     [eventData setLength:numBlts*(totalDataSizeInLongs*sizeof(long))];
     cachedPack = packed;
-    cachedZS   = zsAlgorithm;
     
     [NSThread detachNewThreadSelector:@selector(dataWorker:) toTarget:self withObject:nil];
 }
@@ -2030,26 +2029,26 @@ static NSString* DT5720RunModeString[4] = {
     [objDictionary setObject:[NSNumber numberWithInt:enabledMask]           forKey:@"enabledMask"];
     [objDictionary setObject:[NSNumber numberWithInt:eventSize]             forKey:@"eventSize"];
     
-    [self addCurrentState:objDictionary cArray:(short*)zsThresholds         forKey:@"zsThresholds"];
-    [self addCurrentState:objDictionary cArray:(short*)thresholds           forKey:@"thresholds"];
-    [self addCurrentState:objDictionary cArray:(short*)nLbk                 forKey:@"nLbk"];
-    [self addCurrentState:objDictionary cArray:(short*)nLfwd                forKey:@"nLfwd"];
-    [self addCurrentState:objDictionary cArray:(short*)logicType            forKey:@"logicType"];
-    [self addCurrentState:objDictionary cArray:(short*)dac                  forKey:@"dac"];
+    [self addCurrentState:objDictionary cArray:(long*)zsThresholds         forKey:@"zsThresholds"];
+    [self addCurrentState:objDictionary cArray:(long*)thresholds           forKey:@"thresholds"];
+    [self addCurrentState:objDictionary cArray:(long*)nLbk                 forKey:@"nLbk"];
+    [self addCurrentState:objDictionary cArray:(long*)nLfwd                forKey:@"nLfwd"];
+    [self addCurrentState:objDictionary cArray:(long*)logicType            forKey:@"logicType"];
+    [self addCurrentState:objDictionary cArray:(long*)dac                  forKey:@"dac"];
     
-    [self addCurrentState:objDictionary cArray:(short*)numOverUnderThreshold    forKey:@"numOverUnderThreshold"];
-    [self addCurrentState:objDictionary cArray:(short*)numOverUnderZsThreshold  forKey:@"numOverUnderZsThreshold"];
+    [self addCurrentState:objDictionary cArray:(long*)numOverUnderThreshold    forKey:@"numOverUnderThreshold"];
+    [self addCurrentState:objDictionary cArray:(long*)numOverUnderZsThreshold  forKey:@"numOverUnderZsThreshold"];
 
     
     return objDictionary;
 }
 
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey
 {
     NSMutableArray* ar = [NSMutableArray array];
     int i;
     for(i=0;i<kNumDT5720Channels;i++){
-        [ar addObject:[NSNumber numberWithShort:*anArray]];
+        [ar addObject:[NSNumber numberWithLong:*anArray]];
         anArray++;
     }
     [dictionary setObject:ar forKey:aKey];
@@ -2068,8 +2067,7 @@ static NSString* DT5720RunModeString[4] = {
 @end
 
 @implementation ORDT5720Model (private)
-//data is NSArray of NSData ever growing
-//we need a lock token for @synchronized to copy data from the NSArray
+//take the data, break it up into events, and pass it to the data taking thread with a circular buffer
 - (void) dataWorker:(NSDictionary*)arg
 {
     self.isDataWorkerRunning = YES;
@@ -2089,20 +2087,18 @@ static NSString* DT5720RunModeString[4] = {
             if(num>0){
                 unsigned long index=0;
                 do {
-                    unsigned long checkWord = theData[index]>>28 & 0xf;
-                    if(checkWord == 0xA){
+                    if((theData[index]>>28 & 0xf) == 0xA){
                         unsigned long theSize = theData[index] & 0xfffffff;
                         NSMutableData* record = [NSMutableData dataWithCapacity:(theSize+2)*sizeof(long)];
                         [record setLength:(theSize+2)*sizeof(long)];
                         unsigned long* theRecord = (unsigned long*)[record bytes];
                         theRecord[0]  = dataId | theSize+2;
                         theRecord[1]  = (([self uniqueIdNumber] & 0xf)<<16) |
-                                        ((cachedZS              & 0x3)<< 1) |
                                         ((cachedPack            & 0x1)<< 0) ;
 
                         [record replaceBytesInRange:NSMakeRange(8, theSize*sizeof(long))
                                           withBytes:(char*)&theData[index]
-                                                    length:theSize*sizeof(long)];
+                                             length:theSize*sizeof(long)];
                         [circularBuffer writeData:record];
                         index += theSize;
                         totalBytesTransfered += theSize*sizeof(long);
@@ -2110,7 +2106,6 @@ static NSString* DT5720RunModeString[4] = {
                     else break;
                 }while(index<num/4);
                 
-                [circularBuffer writeData:eventData];
             }
         }
         else bufferState = kDT5720BufferEmpty;

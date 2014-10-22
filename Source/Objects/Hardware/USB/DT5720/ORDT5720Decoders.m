@@ -48,26 +48,23 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long* ptr = (unsigned long*)someData;
-    unsigned long length = ExtractLength(*ptr);
+    unsigned long* ptr   = (unsigned long*)someData;
+    unsigned long length = ExtractLength(ptr[0]);
     
-    ptr++; //point to location
-    int unitNumber  = (*ptr>>16 & 0xf);
-    BOOL packed      = (*ptr>>0  & 0x1);
+    int unitNumber       = (ptr[1]>>16 & 0xf);
+    BOOL packed          = (ptr[1]>>0  & 0x1);
     NSString* unitKey    = [NSString stringWithFormat:@"Unit %2d",unitNumber];
     
-    ptr++; //this is the first word
-    
-    unsigned long eventLength = length;
-    while (eventLength > 3) { //make sure at least the CAEN header is there
-        if (*ptr == 0 || *ptr >> 28 != 0xa) break; //trailing zeros or
-        unsigned long eventSize = *ptr & 0x0fffffff;
+    unsigned long eventLength = length-2;
+    unsigned long index = 2;
+    while (eventLength > 4) { //make sure at least the CAEN header is there
+        if (ptr[index] == 0 || ptr[index] >> 28 != 0xa) break; //trailing zeros or
+        unsigned long eventSize = ptr[index] & 0x0fffffff;
         if (eventSize > eventLength) return length;
-        ptr++;
-        int  zeroSuppression      = (*ptr>>24  & 0x1);
-        unsigned long channelMask = *ptr & 0xf;
-
-        ptr += 3; //point to the start of data
+        index++;
+        int  zeroSuppression      = (ptr[index]>>24  & 0x1);
+        unsigned long channelMask = ptr[index] & 0xf;
+        index += 3;
         
         short numChans = 0;
         short chan[4];
@@ -100,34 +97,34 @@
                     //not packed, normal format
                     int k;
                     for(k=0;k<eventSize;k++){
-                        dPtr[wordCount++] =	 *ptr & 0x00000fff;
-                        dPtr[wordCount++] =	(*ptr & 0x0fff0000) >> 16;
-                        ptr++;
+                        dPtr[wordCount++] =	 ptr[index] & 0x00000fff;
+                        dPtr[wordCount++] =	(ptr[index] & 0x0fff0000) >> 16;
+                        index++;
                     }
                 }
                 else {
                     //not packed, but using zero length encoding
-                    unsigned long size   = *ptr;
+                    unsigned long size   = ptr[index];
                     tmpData= [[[NSMutableData alloc] initWithLength:2*size*sizeof(unsigned short)] autorelease];
                     unsigned short* dPtr = (unsigned short*)[tmpData bytes];
                     int controlWordCount = 0;
                     while(1){
-                        ptr++; //point to control word
-                        unsigned long controlWord = *ptr;
+                        index++; //point to control word
+                        unsigned long controlWord = ptr[index];
                         BOOL good = (controlWord >> 31);
                         unsigned long numStoredSkippedWords = controlWord&0xfffff;
                         int k;
 
                         if(good || controlWordCount>62){
-                            ptr++; //point to data
+                            index++; //point to data
                             for(k=0;k<numStoredSkippedWords;k++){
-                                dPtr[wordCount++] =	 *ptr & 0x00000fff;
+                                dPtr[wordCount++] =	 ptr[index] & 0x00000fff;
                                 if(wordCount>=2*size)break;
 
-                                dPtr[wordCount++] =	(*ptr & 0x0fff0000) >> 16;
+                                dPtr[wordCount++] =	(ptr[index] & 0x0fff0000) >> 16;
                                 if(wordCount>=2*size)break;
 
-                                ptr++;
+                                index++;
                             }
                         }
                         else {
@@ -152,7 +149,7 @@
                    //packed, no zero suppression
                     int k;
                     for(k=0;k<eventSize;k++){
-                        unsigned long *d = ptr;
+                        unsigned long *d = &ptr[index];
                         
                         dPtr[wordCount++] = (d[0]     & 0xFC0) | (d[0] & 0x7F);
                         if(wordCount>=2*eventSize)break;
@@ -169,25 +166,25 @@
                         dPtr[wordCount++] = (d[1]>>18 & 0xFC0) | (d[1]>>18 & 0x7F);
                         if(wordCount>=2*eventSize)break;
 
-                        ptr+=2;
+                        index+=2;
                     }
                 }
                 else {
-                    unsigned long size = *ptr;
+                    unsigned long size = ptr[index];
                     tmpData= [[[NSMutableData alloc] initWithLength:2*size*sizeof(unsigned short)] autorelease];
                     unsigned short* dPtr = (unsigned short*)[tmpData bytes];
                     int controlWordCount = 0;
                     while(1){
-                        ptr++; //point to control word
-                        unsigned long controlWord = *ptr;
+                        index++; //point to control word
+                        unsigned long controlWord = ptr[index];
                         BOOL good = (controlWord >> 31);
                         unsigned long numStoredSkippedWords = controlWord&0xfffff;
                         int k;
 
                         if(good || controlWordCount>62){
-                            ptr++; //point to data
+                            index++; //point to data
                             for(k=0;k<numStoredSkippedWords;k++){
-                                unsigned long *d = ptr;
+                                unsigned long *d = &ptr[index];
                                 
                                 dPtr[wordCount++] = (d[0]     & 0xFC0) | (d[0] & 0x7F);
                                 if(wordCount>=2*size)break;
@@ -205,7 +202,7 @@
                                 if(wordCount>=2*size)break;
                                 
                                 
-                                ptr+=2;
+                                index+=2;
                                 if(wordCount>=2*size)break;
                             }
                         }
@@ -256,24 +253,22 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    unsigned long length = ExtractLength(*ptr);
-    ptr += 2;
-    length -= 2;
+    unsigned long length = ExtractLength(ptr[0]);
     NSMutableString* dsc = [NSMutableString string];
     
-    if(length > 3) { //make sure we have at least the CAEN header
-        unsigned long eventLength     = ptr[0] & 0x0fffffffUL;
-        NSString* eventSize           = [NSString stringWithFormat:@"Event size = %lu\n", eventLength];
-        NSString* packed              = [NSString stringWithFormat:@"Packed: %@\n", (ptr[0] & 0x1UL)?@"YES":@"NO"];
-        NSString* isZeroLengthEncoded = [NSString stringWithFormat:@"Zero length enc: %@\n", ((ptr[0] >> 24) & 0x1UL)?@"YES":@"NO"];
-        NSString* sChannelMask        = [NSString stringWithFormat:@"Channel mask = 0x%02lx\n",  ptr[1] & 0xf];
-        NSString* eventCounter        = [NSString stringWithFormat:@"Event counter = 0x%06lx\n", ptr[2] & 0xffffffUL];
-        NSString* timeTag             = [NSString stringWithFormat:@"Time tag = 0x%08lx\n\n", ptr[3]];
+    if(length > 6) { //make sure we have at least the CAEN header
+        NSString* recordLen           = [NSString stringWithFormat:@"Record len = %lu\n",         length];
+        NSString* eventSize           = [NSString stringWithFormat:@"Event size = %lu\n",         ptr[2] & 0x0fffffff];
+        NSString* packed              = [NSString stringWithFormat:@"Packed: %@\n",              (ptr[2] & 0x1)?@"YES":@"NO"];
+        NSString* isZeroLengthEncoded = [NSString stringWithFormat:@"Zero length enc: %@\n",    ((ptr[3] >> 24) & 0x1)?@"YES":@"NO"];
+        NSString* sChannelMask        = [NSString stringWithFormat:@"Channel mask = 0x%02lx\n",   ptr[3] & 0xf];
+        NSString* eventCounter        = [NSString stringWithFormat:@"Event counter = 0x%06lx\n",  ptr[4] & 0xffffff];
+        NSString* timeTag             = [NSString stringWithFormat:@"Time tag = 0x%08lx\n\n",     ptr[5]];
         
-        [dsc appendFormat:@"%@%@%@%@%@%@", eventSize, packed, isZeroLengthEncoded, sChannelMask, eventCounter, timeTag];
+        [dsc appendFormat:@"%@%@%@%@%@%@%@", recordLen,eventSize, packed, isZeroLengthEncoded, sChannelMask, eventCounter, timeTag];
     }
     
-    return length;
+    return dsc;
 }
 
 @end

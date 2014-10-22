@@ -168,7 +168,6 @@ typedef struct  {
     ORSafeCircularBuffer* circularBuffer;
     NSMutableData*  eventData;
     BOOL            cachedPack;
-    BOOL            cachedZS;
 }
 
 @property (assign) BOOL isDataWorkerRunning;
@@ -336,7 +335,7 @@ typedef struct  {
 #pragma mark ***Helpers
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
