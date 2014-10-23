@@ -112,15 +112,16 @@
 - (ORCouchDB*) remoteDBRef;
 - (ORCouchDB*) remoteHistoryDBRef;
 - (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName;
-- (void) createDatabase;
+- (void) createDatabases;
 - (void) createDatabase:(ORCouchDB*)aDBRef;
+- (void) deleteDatabases;
+- (void) deleteDatabase:(ORCouchDB*)aDBRef;
 - (void) addUpdateHandler;
 - (void) addUpdateHandler:(ORCouchDB*)aDBRef;
 - (void) startReplication;
 - (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;
-- (void) deleteDatabase;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;

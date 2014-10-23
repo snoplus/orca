@@ -119,7 +119,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) wakeUp
 {
     if(![self aWake]){
-        [self createDatabase];
+        [self createDatabases];
         [self _startAllPeriodicOperations];
         [self registerNotificationObservers];
     }
@@ -131,7 +131,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     [self _cancelAllPeriodicOperations];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self deleteDatabase];
+	[self deleteDatabases];
 	[super sleep];
 }
 
@@ -247,7 +247,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
 {
-	[self deleteDatabase];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[self deleteDatabases];
+    int i;
+    for(i=0;i<15;i++){
+        if([ORCouchDBQueue operationCount]==0)break;
+        [NSThread sleepForTimeInterval:1];
+    }
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -315,10 +321,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if(stealthMode){
         if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
         [self _cancelAllPeriodicOperations];
-        [self deleteDatabase];
+        [self deleteDatabases];
     }
     else {
-        [self createDatabase];
+        [self createDatabases];
         [self _startAllPeriodicOperations];
     }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelStealthModeChanged object:self];
@@ -477,15 +483,31 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	else return [ORCouchDB couchHost:remoteHostName port:portNumber username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
-- (void) createDatabase
+- (void) createDatabases
 {
-    [self createDatabase:[self statusDBRef]];
-    [self addUpdateHandler:[self statusDBRef]];
+    [self createDatabase:   [self statusDBRef]];
+    [self addUpdateHandler: [self statusDBRef]];
+    if([remoteHostName length]){
+        [self createDatabase:    [self remoteDBRef]];
+        [self performSelector:@selector(startReplication) withObject:nil afterDelay:4];
+    }
 }
 
 - (void) createDatabase:(ORCouchDB*)aDBRef;
 {
 	[aDBRef createDatabase:kCreateDB views:nil];
+}
+
+- (void) deleteDatabases
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self deleteDatabase:[self statusDBRef]];
+    [self deleteDatabase:[self remoteDBRef]];
+}
+
+- (void) deleteDatabase:(ORCouchDB*)aDBRef;
+{
+    [aDBRef deleteDatabase:kDeleteDB];
 }
 
 - (void) addUpdateHandler
@@ -594,12 +616,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     }
 }
 
-
-- (void) deleteDatabase
-{
-	[[self statusDBRef] deleteDatabase:kDeleteDB];
-}
-
 - (void) updateProcesses
 {
 	if(!stealthMode){
@@ -681,14 +697,30 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                 }
             }
             
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+            
+            NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+            [dateFormatter setTimeZone:gmt];
+            NSString *lastTimeStamp = [dateFormatter stringFromDate:[NSDate date]];
+            NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+            unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+            [dateFormatter release];
+            
+            
+            if(![lastTimeStamp length]) lastTimeStamp = @"0";
+            
             NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        @"machineinfo",@"_id",
-                                        @"machineinfo",@"type",
-                                         [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
-                                         computerName(),@"name",
-                                         macAddress(),@"hw_address",
-                                         thisHostAdress,@"ip_address",
-                                         fullVersion(),@"version",nil];
+                                                    @"machineinfo", @"_id",
+                                                    @"machineinfo", @"type",
+                                                    [NSNumber numberWithLong:[[(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+                                                    computerName(), @"name",
+                                                    macAddress(),   @"hw_address",
+                                                    thisHostAdress, @"ip_address",
+                                                    fullVersion(),  @"version",
+                                                    lastTimeStamp,  @"timestamp",
+                                                    [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+nil];
             
             NSFileManager* fm = [NSFileManager defaultManager];
             
