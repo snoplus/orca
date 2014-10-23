@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13C64</string>
+		<string key="IBDocument.SystemVersion">13F34</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1265.19</string>
-		<string key="IBDocument.HIToolboxVersion">697.40</string>
+		<string key="IBDocument.AppKitVersion">1265.21</string>
+		<string key="IBDocument.HIToolboxVersion">698.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">3084</string>
@@ -9079,7 +9079,7 @@ ZSBjb250cm9sbGVyLg</string>
 																<object class="NSTextField" id="1040719583">
 																	<reference key="NSNextResponder" ref="564808900"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{363, 161}, {57, 14}}</string>
+																	<string key="NSFrame">{{430, 181}, {39, 14}}</string>
 																	<reference key="NSSuperview" ref="564808900"/>
 																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="203318388"/>
@@ -9087,7 +9087,7 @@ ZSBjb250cm9sbGVyLg</string>
 																	<object class="NSTextFieldCell" key="NSCell" id="373440074">
 																		<int key="NSCellFlags">67108928</int>
 																		<int key="NSCellFlags2">272761856</int>
-																		<string key="NSContents">VME--&gt;</string>
+																		<string key="NSContents">VME</string>
 																		<reference key="NSSupport" ref="26"/>
 																		<reference key="NSControlView" ref="1040719583"/>
 																		<reference key="NSBackgroundColor" ref="2735474"/>
@@ -9359,7 +9359,7 @@ ZSBjb250cm9sbGVyLg</string>
 																	<string key="NSFrame">{{235, 55}, {95, 65}}</string>
 																	<reference key="NSSuperview" ref="564808900"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="659723576"/>
+																	<reference key="NSNextKeyView" ref="932070311"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="6316914">
 																		<int key="NSCellFlags">67108864</int>
@@ -9469,6 +9469,37 @@ ZSBjb250cm9sbGVyLg</string>
 																		<object class="NSCustomResource" key="NSNormalImage">
 																			<string key="NSClassName">NSImage</string>
 																			<string key="NSResourceName">resistor</string>
+																		</object>
+																		<string key="NSAlternateContents"/>
+																		<string key="NSKeyEquivalent"/>
+																		<int key="NSPeriodicDelay">400</int>
+																		<int key="NSPeriodicInterval">75</int>
+																	</object>
+																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+																</object>
+																<object class="NSButton" id="932070311">
+																	<reference key="NSNextResponder" ref="564808900"/>
+																	<int key="NSvFlags">268</int>
+																	<string key="NSFrame">{{334, 98}, {72, 54}}</string>
+																	<reference key="NSSuperview" ref="564808900"/>
+																	<reference key="NSWindow"/>
+																	<reference key="NSNextKeyView" ref="659723576"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSButtonCell" key="NSCell" id="731993114">
+																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags2">134217728</int>
+																		<string key="NSContents"/>
+																		<object class="NSFont" key="NSSupport">
+																			<string key="NSName">LucidaGrande</string>
+																			<double key="NSSize">10</double>
+																			<int key="NSfFlags">1044</int>
+																		</object>
+																		<reference key="NSControlView" ref="932070311"/>
+																		<int key="NSButtonFlags">-2046017536</int>
+																		<int key="NSButtonFlags2">2</int>
+																		<object class="NSCustomResource" key="NSNormalImage">
+																			<string key="NSClassName">NSImage</string>
+																			<string key="NSResourceName">CameraPic</string>
 																		</object>
 																		<string key="NSAlternateContents"/>
 																		<string key="NSKeyEquivalent"/>
@@ -9657,7 +9688,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="913918342"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -14568,7 +14599,6 @@ ZSBjb250cm9sbGVyLg</string>
 						<string key="id">7203</string>
 						<reference key="object" ref="564808900"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="1040719583"/>
 							<reference ref="659723576"/>
 							<reference ref="1059428115"/>
 							<reference ref="311204902"/>
@@ -14585,6 +14615,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="897929019"/>
 							<reference ref="287725937"/>
 							<reference ref="343941654"/>
+							<reference ref="1040719583"/>
+							<reference ref="932070311"/>
 						</array>
 						<reference key="parent" ref="690175184"/>
 					</object>
@@ -14850,6 +14882,19 @@ ZSBjb250cm9sbGVyLg</string>
 						<string key="id">jlV-JW-DpT</string>
 						<reference key="object" ref="435370867"/>
 						<reference key="parent" ref="343941654"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">8qW-Gw-917</string>
+						<reference key="object" ref="932070311"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="731993114"/>
+						</array>
+						<reference key="parent" ref="564808900"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">dkT-dg-oUU</string>
+						<reference key="object" ref="731993114"/>
+						<reference key="parent" ref="932070311"/>
 					</object>
 				</array>
 			</object>
@@ -19115,6 +19160,18 @@ ZSBjb250cm9sbGVyLg</string>
 				<boolean value="NO" key="80.showNotes"/>
 				<string key="82.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="82.showNotes"/>
+				<string key="8qW-Gw-917.CustomClassName">ObjectFactory</string>
+				<object class="NSMutableDictionary" key="8qW-Gw-917.IBAttributePlaceholdersKey">
+					<string key="NS.key.0">ToolTip</string>
+					<object class="IBToolTipAttribute" key="NS.object.0">
+						<string key="name">ToolTip</string>
+						<reference key="object" ref="932070311"/>
+						<string key="toolTip">SNOPCameraModel</string>
+					</object>
+				</object>
+				<string key="8qW-Gw-917.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<reference key="8qW-Gw-917.IBUserGuides" ref="0"/>
+				<boolean value="NO" key="8qW-Gw-917.showNotes"/>
 				<string key="92.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="92.showNotes"/>
 				<string key="93.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -19180,6 +19237,8 @@ ZSBjb250cm9sbGVyLg</string>
 				<boolean value="NO" key="TnM-iL-ND2.showNotes"/>
 				<string key="d6s-CD-4n1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="d6s-CD-4n1.showNotes"/>
+				<string key="dkT-dg-oUU.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="dkT-dg-oUU.showNotes"/>
 				<string key="jlV-JW-DpT.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="jlV-JW-DpT.showNotes"/>
 				<string key="meR-3w-ssb.CustomClassName">ObjectFactory</string>
@@ -19315,6 +19374,7 @@ ZSBjb250cm9sbGVyLg</string>
 			<string key="Caen965">{16, 128}</string>
 			<string key="CamacCrateSmall">{283, 154}</string>
 			<string key="Camera">{75, 75}</string>
+			<string key="CameraPic">{77, 57}</string>
 			<string key="Changesfeed">{68.399999999999991, 53}</string>
 			<string key="CmdLabel">{70, 11}</string>
 			<string key="Comparator">{70, 41}</string>

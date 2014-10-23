@@ -3111,6 +3111,12 @@
 		CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */ = {isa = PBXBuildFile; fileRef = CED29CFB1482B02200BD3AB2 /* SIS3302Generic.nib */; };
 		CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */; };
 		CED38D1F165CDB6600358681 /* ANSIEscapeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */; };
+		DB6EC2E019F7FFD30048D4DD /* SNOPCameraController.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6EC2DE19F7FFD30048D4DD /* SNOPCameraController.h */; };
+		DB6EC2E119F7FFD30048D4DD /* SNOPCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB6EC2DF19F7FFD30048D4DD /* SNOPCameraController.m */; };
+		DB6EC2E419F800170048D4DD /* SNOPCameraModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6EC2E219F800170048D4DD /* SNOPCameraModel.h */; };
+		DB6EC2E519F800170048D4DD /* SNOPCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DB6EC2E319F800170048D4DD /* SNOPCameraModel.m */; };
+		DB6EC2E719F800C00048D4DD /* CameraPic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = DB6EC2E619F800C00048D4DD /* CameraPic.jpg */; };
+		DB6EC2E919F9055B0048D4DD /* SNOPCamera.xib in Resources */ = {isa = PBXBuildFile; fileRef = DB6EC2E819F9055B0048D4DD /* SNOPCamera.xib */; };
 		DB704A0F18EBA4D100839B42 /* ELLIEController.h in Headers */ = {isa = PBXBuildFile; fileRef = DB704A0D18EBA4D100839B42 /* ELLIEController.h */; };
 		DB704A1018EBA4D100839B42 /* ELLIEController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB704A0E18EBA4D100839B42 /* ELLIEController.m */; };
 		DB704A1318EBA4E100839B42 /* ELLIEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = DB704A1118EBA4E100839B42 /* ELLIEModel.h */; };
@@ -6390,6 +6396,12 @@
 		CED29CFB1482B02200BD3AB2 /* SIS3302Generic.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3302Generic.nib; sourceTree = "<group>"; };
 		CED38D1C165CDB6600358681 /* ANSIEscapeHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANSIEscapeHelper.h; sourceTree = "<group>"; };
 		CED38D1D165CDB6600358681 /* ANSIEscapeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ANSIEscapeHelper.m; sourceTree = "<group>"; };
+		DB6EC2DE19F7FFD30048D4DD /* SNOPCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPCameraController.h; sourceTree = "<group>"; };
+		DB6EC2DF19F7FFD30048D4DD /* SNOPCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPCameraController.m; sourceTree = "<group>"; };
+		DB6EC2E219F800170048D4DD /* SNOPCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPCameraModel.h; sourceTree = "<group>"; };
+		DB6EC2E319F800170048D4DD /* SNOPCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPCameraModel.m; sourceTree = "<group>"; };
+		DB6EC2E619F800C00048D4DD /* CameraPic.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = CameraPic.jpg; sourceTree = "<group>"; };
+		DB6EC2E819F9055B0048D4DD /* SNOPCamera.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOPCamera.xib; sourceTree = "<group>"; };
 		DB704A0D18EBA4D100839B42 /* ELLIEController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELLIEController.h; sourceTree = "<group>"; };
 		DB704A0E18EBA4D100839B42 /* ELLIEController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELLIEController.m; sourceTree = "<group>"; };
 		DB704A1118EBA4E100839B42 /* ELLIEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELLIEModel.h; sourceTree = "<group>"; };
@@ -10434,6 +10446,7 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				DB6EC2DD19F7FF810048D4DD /* Camera */,
 				DB9CA3CD190ECD7F00063A70 /* ResistorDB */,
 				DBEC755318EB9E9B0077D493 /* ELLIE */,
 				8499FF8E0DC9090400E82DB4 /* SNO Base Classes */,
@@ -13111,6 +13124,19 @@
 			path = "Source/Objects/Misc Objects/ANSIEscapeHelper";
 			sourceTree = SOURCE_ROOT;
 		};
+		DB6EC2DD19F7FF810048D4DD /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				DB6EC2DE19F7FFD30048D4DD /* SNOPCameraController.h */,
+				DB6EC2E819F9055B0048D4DD /* SNOPCamera.xib */,
+				DB6EC2DF19F7FFD30048D4DD /* SNOPCameraController.m */,
+				DB6EC2E219F800170048D4DD /* SNOPCameraModel.h */,
+				DB6EC2E619F800C00048D4DD /* CameraPic.jpg */,
+				DB6EC2E319F800170048D4DD /* SNOPCameraModel.m */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
 		DB9CA3CD190ECD7F00063A70 /* ResistorDB */ = {
 			isa = PBXGroup;
 			children = (
@@ -14746,6 +14772,8 @@
 				DB704A1318EBA4E100839B42 /* ELLIEModel.h in Headers */,
 				DB9CA3D6190ECF6000063A70 /* ResistorDBViewController.h in Headers */,
 				DB75B3E9190F2AC100D639E9 /* ResistorDBModel.h in Headers */,
+				DB6EC2E019F7FFD30048D4DD /* SNOPCameraController.h in Headers */,
+				DB6EC2E419F800170048D4DD /* SNOPCameraModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15685,6 +15713,8 @@
 				DB704A1618EBA61E00839B42 /* ellie.xib in Resources */,
 				DB9CA3DB190ED05000063A70 /* ResistorDBWindow.xib in Resources */,
 				DB75B3E6190F2AB900D639E9 /* resistor.png in Resources */,
+				DB6EC2E719F800C00048D4DD /* CameraPic.jpg in Resources */,
+				DB6EC2E919F9055B0048D4DD /* SNOPCamera.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16740,6 +16770,8 @@
 				DB704A1418EBA4E100839B42 /* ELLIEModel.m in Sources */,
 				DB9CA3D7190ECF6000063A70 /* ResistorDBViewController.m in Sources */,
 				DB75B3EA190F2AC100D639E9 /* ResistorDBModel.m in Sources */,
+				DB6EC2E119F7FFD30048D4DD /* SNOPCameraController.m in Sources */,
+				DB6EC2E519F800170048D4DD /* SNOPCameraModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
