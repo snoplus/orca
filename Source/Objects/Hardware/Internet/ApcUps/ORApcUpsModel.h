@@ -48,6 +48,7 @@
     ORAlarm*             powerOutAlarm;
     NSOperationQueue*    fileQueue;
     NSMutableSet*        eventLog;
+    NSArray*             sortedEventLog;
     float                lastBatteryValue;
     float                lowLimit[kNumApcUpsAdcChannels];
     float                hiLimit[kNumApcUpsAdcChannels];
@@ -76,6 +77,8 @@
 - (ORTimeRate*)timeRate:(int)aChannel;
 - (void) setDataValid:(BOOL)aState;
 - (void) clearEventLog;
+- (void) sortEventLog;
+- (NSArray*) sortedEventLog;
 
 #pragma mark ***Utilities
 - (void) pollHardware;

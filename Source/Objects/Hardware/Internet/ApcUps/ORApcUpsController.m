@@ -227,7 +227,7 @@
 
 - (void) eventLogChanged:(NSNotification*)aNote
 {
-    NSSet* events = [model eventLog];
+    NSArray* events = [model sortedEventLog];
     NSMutableString* eventLog = [NSMutableString stringWithString:@""];
     for (NSString *anEvent in events) {
         [eventLog appendFormat:@"%@\n",anEvent];

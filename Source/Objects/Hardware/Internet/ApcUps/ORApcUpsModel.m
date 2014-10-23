@@ -72,6 +72,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
  	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     
     [eventLog release];
+    [sortedEventLog release];
     [dataInValidAlarm   clearAlarm];
     [powerOutAlarm      clearAlarm];
     
@@ -194,7 +195,20 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     [eventLog release];
     eventLog = aEventLog;
 
+    [self sortEventLog];
+    
+}
+
+- (void) sortEventLog
+{
+    [sortedEventLog release];
+    sortedEventLog = [[[eventLog allObjects] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] retain];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
+}
+
+- (NSArray*) sortedEventLog
+{
+    return sortedEventLog;
 }
 
 - (NSString*) ipAddress
@@ -455,6 +469,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         }
         i++;
     }
+    [self sortEventLog];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORApcUpsModelEventLogChanged object:self];
     [self postCouchDBRecord];
 }
@@ -858,7 +874,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
     NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:valueDictionary];
     [values setObject:[NSNumber numberWithInt:30] forKey:@"pollTime"];
     
-    NSSet* events = [self eventLog];
+    NSArray* events = [self sortedEventLog];
     NSMutableString* eventLogString = [NSMutableString stringWithString:@""];
     for (NSString *anEvent in events) {
         [eventLogString appendFormat:@"%@\n",anEvent];
