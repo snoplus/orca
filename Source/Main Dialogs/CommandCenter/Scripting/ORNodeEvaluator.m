@@ -135,7 +135,7 @@
 
 - (NSUndoManager*) undoManager
 {
-	return [[NSApp delegate] undoManager];
+	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 
@@ -384,11 +384,11 @@
 	//needs to return NSDecimalNumber holding the obj pointer.
 	NSString* theClassName = VARIABLENAME(0);
 	Class theClass = NSClassFromString(theClassName);
-	if([theClass isEqualTo:[[[NSApp delegate] document] class]]){
-		return [[NSApp delegate] document];
+	if([theClass isEqualTo:[[(ORAppDelegate*)[NSApp delegate] document] class]]){
+		return [(ORAppDelegate*)[NSApp delegate] document];
 	}
 	else {
-		NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
+		NSArray* objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:theClass];
 		if([objects count] == 0)return _zero;
 		id anObj = [objects objectAtIndex:0];
 		if([anObj isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];

@@ -58,6 +58,7 @@
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runEnded:(NSNotification*)aNote;
 - (void) aboutToQuit:(NSNotification*)aNote;

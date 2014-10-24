@@ -118,7 +118,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+
+    
 	[notifyCenter addObserver : self
 					 selector : @selector(runStarted:)
 						 name : ORRunStartedNotification
@@ -158,7 +164,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     if(autoRunAtQuit && ![scriptRunner running]){
 		runPeriodically = NO; //disable for the final run
         [self runScript];
-        [[NSApp delegate] delayTermination];
+        [(ORAppDelegate*)[NSApp delegate] delayTermination];
     }
 }
 
@@ -168,6 +174,19 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	if(autoStartWithDocument){
 		[self runScript];
 	}
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    if(autoStartWithRun && ![scriptRunner running]){
+        [self parseScript];
+        if(!parsedOK){
+            NSString* reason = [NSString stringWithFormat:@"Script <%@> has errors",[self scriptName]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                                                                object:self
+                                                              userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+        }
+    }
 }
 
 - (void) runStarted:(NSNotification*)aNote
@@ -191,7 +210,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		return [[self scriptRunner] debugging]?@"Debugging":@"Running";
 	}
 	else if(nextPeriodicRun!=nil){
-		NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO] autorelease];
+		NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        [dateFormatter setDateFormat:@"%H:%M:%S"];
 		NSString* nextTime = [dateFormatter stringFromDate:nextPeriodicRun];
 		return [NSString stringWithFormat:@"Idle until %@",nextTime];
 	}

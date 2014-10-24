@@ -118,7 +118,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (id) displayDictionary
 {
 	id dic =nil;
-	@synchronized ([NSApp delegate]){
+	@synchronized ((ORAppDelegate*)[NSApp delegate]){
 		dic =  [[displayDictionary copy] autorelease];
 	}
 	return dic;
@@ -245,7 +245,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 {  
 	// yacc has a number of global variables so it is NOT thread safe
 	// Acquire the lock to ensure one parse processing at a time
-	@synchronized([NSApp delegate]){
+	@synchronized((ORAppDelegate*)[NSApp delegate]){
 		if([theString length]){
 			parsedOK = NO;
 			scriptExists = YES;
@@ -437,7 +437,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 - (id) display:(id)aValue forKey:(id)aKey
 {
-	@synchronized ([NSApp delegate]){
+	@synchronized ((ORAppDelegate*)[NSApp delegate]){
 		if(!displayDictionary){
 			displayDictionary = [[NSMutableDictionary alloc] init];
 		}
@@ -507,7 +507,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (void) run:(id)someArgs sender:(id)aSender
 {
 	if(!running){
-		@synchronized ([NSApp delegate]){
+		@synchronized ((ORAppDelegate*)[NSApp delegate]){
 			[displayDictionary release];
 			displayDictionary = nil;
 			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerDisplayDictionaryChanged object:self userInfo:nil waitUntilDone:NO];
