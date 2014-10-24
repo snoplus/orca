@@ -1618,7 +1618,7 @@ enum {
             if (rng < kMinArgumentForLog) rng = kMinArgumentForLog;
             fscl = dpos / rng;
         }
-    }
+    }aa
     
     /* calculate pin pixel value */
     pinPix = (pinVal-[self minValue]) * fscl;
