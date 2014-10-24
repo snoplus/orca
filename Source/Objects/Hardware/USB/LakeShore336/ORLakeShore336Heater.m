@@ -162,7 +162,7 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 

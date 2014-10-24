@@ -110,7 +110,7 @@
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		OREdelweissFLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
 			for(OREdelweissFLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -300,7 +300,7 @@ startIndex=0;
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		OREdelweissFLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
 			for(OREdelweissFLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];

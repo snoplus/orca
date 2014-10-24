@@ -255,7 +255,7 @@
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) updateButtons

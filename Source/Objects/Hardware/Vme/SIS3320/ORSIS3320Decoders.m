@@ -71,7 +71,7 @@
         if(!actualSIS3320Cards)actualSIS3320Cards = [[NSMutableDictionary alloc] init];
         obj = [actualSIS3320Cards objectForKey:aKey];
         if(!obj){
-            NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3320Model")];
+            NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3320Model")];
             for(ORSIS3320Model* aCard in listOfCards){
                 if([aCard slot] == card){
                     [actualSIS3320Cards setObject:aCard forKey:aKey];

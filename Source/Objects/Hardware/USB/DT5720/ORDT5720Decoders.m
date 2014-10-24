@@ -231,7 +231,7 @@
                 if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
                 ORDT5720Model* obj = [actualCards objectForKey:unitKey];
                 if(!obj){
-                    NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDT5720Model")];
+                    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDT5720Model")];
                     NSEnumerator* e = [listOfCards objectEnumerator];
                     ORDT5720Model* aCard;
                     while(aCard = [e nextObject]){

@@ -312,7 +312,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (void) setEmailEnabled:(BOOL)aEmailEnabled
 {
-    [[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setEmailEnabled:emailEnabled];
+    [[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setEmailEnabled:emailEnabled];
     emailEnabled = aEmailEnabled;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduleStatusSend) object:nil];
@@ -1289,7 +1289,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		eMailReasons = nil;
 	}
 	
-	@synchronized([NSApp delegate]){
+	@synchronized((ORAppDelegate*)[NSApp delegate]){
 		if(content){
 			NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
 			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];

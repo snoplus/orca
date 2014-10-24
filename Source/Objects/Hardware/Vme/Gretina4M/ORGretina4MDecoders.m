@@ -138,7 +138,7 @@
             if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
             ORGretina4MModel* obj = [actualGretinaCards objectForKey:aKey];
             if(!obj){
-                NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")];
+                NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")];
                 NSEnumerator* e = [listOfCards objectEnumerator];
                 ORGretina4MModel* aCard;
                 while(aCard = [e nextObject]){

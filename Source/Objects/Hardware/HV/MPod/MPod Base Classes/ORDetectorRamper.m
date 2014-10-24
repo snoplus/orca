@@ -89,7 +89,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) setStepWait:(short)aValue

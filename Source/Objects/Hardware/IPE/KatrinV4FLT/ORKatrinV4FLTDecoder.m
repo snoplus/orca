@@ -130,7 +130,7 @@
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
 			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -343,7 +343,7 @@ startIndex=traceStart16;
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
 			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -570,7 +570,7 @@ startIndex=traceStart16;
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
 			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -1000,7 +1000,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORKatrinV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
 			for(ORKatrinV4FLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){ //TODO: we might have multiple crates in the future -tb-
 					[actualFlts setObject:aFlt forKey:fltKey];

@@ -210,7 +210,7 @@
 
 - (void) setValues:(short)channel final:(BOOL)finalValues
 {
-	if(!finalValues)[[[NSApp delegate] undoManager] disableUndoRegistration];
+	if(!finalValues)[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
     
     int ftCnt = 2048 - (postRisingEdgeBugX-b.origin.x)*2048/b.size.width;
     [[dataSource model] setFtCnt:channel withValue:ftCnt];
@@ -222,7 +222,7 @@
     [[dataSource model] setPrerecnt:channel withValue:preCnt];
 
     
-	if(!finalValues)[[[NSApp delegate] undoManager] enableUndoRegistration];
+	if(!finalValues)[[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
 #pragma mark ¥¥¥Archival

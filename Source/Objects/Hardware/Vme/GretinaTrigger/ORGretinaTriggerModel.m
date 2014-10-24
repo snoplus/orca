@@ -1452,7 +1452,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 {
     if([self isMaster]){
         //reset the scaler
-        NSArray* scalers = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORCV830Model")];
+        NSArray* scalers = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORCV830Model")];
         for(id aScaler in scalers){
             [aScaler performSelector:NSSelectorFromString(@"remoteInitBoard")];
         }

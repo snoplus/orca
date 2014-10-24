@@ -107,7 +107,7 @@
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORIpeV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIpeV4FLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIpeV4FLTModel")];
 			for(ORIpeV4FLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -274,7 +274,7 @@ startIndex=traceStart16;
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		ORIpeV4FLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIpeV4FLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIpeV4FLTModel")];
 			for(ORIpeV4FLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
