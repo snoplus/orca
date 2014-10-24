@@ -311,7 +311,7 @@ static NSString* valueChangeString[kNumActions] = {
 
 - (NSUndoManager*) undoManager
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 - (void) installParamArray:(NSArray*)anArray

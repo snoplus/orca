@@ -256,7 +256,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) setRunInProgress:(BOOL)state
 {
     runInProgress = state;
-	[[[NSApp delegate] document] setStatusText:[self runModeString]];
+	[[(ORAppDelegate*)[NSApp delegate] document] setStatusText:[self runModeString]];
 }
 
 - (BOOL) testInProgress
@@ -267,7 +267,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) setTestInProgress:(BOOL)state
 {
     testInProgress = state;
-	[[[NSApp delegate] document] setStatusText:testInProgress?@"Testing":@""];
+	[[(ORAppDelegate*)[NSApp delegate] document] setStatusText:testInProgress?@"Testing":@""];
 }
 
 - (unsigned long)runType {
@@ -281,7 +281,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) addRunVeto:(NSString*)vetoName comment:(NSString*)aComment

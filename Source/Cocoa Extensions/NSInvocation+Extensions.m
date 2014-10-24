@@ -28,7 +28,7 @@
 
 - (void) _privateInvokeWithNoUndoOnTarget:(id)aTarget withAssociatedKey:(void *)akey
 {
-    NSUndoManager* undoer = [[[NSApp delegate]document] undoManager];
+    NSUndoManager* undoer = [[(ORAppDelegate*)[NSApp delegate]document] undoManager];
     [undoer disableUndoRegistration];
     @try {
         [self invokeWithTarget:aTarget];

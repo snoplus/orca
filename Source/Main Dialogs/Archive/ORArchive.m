@@ -134,7 +134,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 - (void) securityStateChanged:(NSNotification*)aNote
@@ -212,7 +212,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath
 {
-	[[[NSApp delegate] document] saveDocument:self];
+	[[(ORAppDelegate*)[NSApp delegate] document] saveDocument:self];
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 	}
@@ -239,12 +239,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction) archiveThisOrca:(id)sender
@@ -294,7 +294,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) deferedStartOldOrca:(NSString*)anOldOrcaPath
 {
-	[[[NSApp delegate] document] saveDocument:self];
+	[[(ORAppDelegate*)[NSApp delegate] document] saveDocument:self];
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 		[self unArchiveBinary:anOldOrcaPath];
@@ -464,7 +464,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
-	if(![[NSApp delegate] configLoadedOK]){
+	if(![(ORAppDelegate*)[NSApp delegate] configLoadedOK]){
 		NSLog(@"You currently do not have a valid config. It was NOT archived.\n");
 		return;
 	}
@@ -479,7 +479,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				NSLogColor([NSColor redColor], @"%@\n",error);
 			}
 		}
-		NSString* currentConfigPath = [[[[NSApp delegate] document] fileURL] path];
+		NSString* currentConfigPath = [[[(ORAppDelegate*)[NSApp delegate] document] fileURL] path];
 		if([fm copyItemAtPath:currentConfigPath toPath:archivePath error:&error]){
 			NSLog(@"Copied %@ to %@\n", currentConfigPath,archivePath);
 		}
@@ -573,7 +573,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 			}
 		}
         //euthanize self and restart. Use main thread
-        [[NSApp delegate] restart:self withConfig:configFile];
+        [(ORAppDelegate*)[NSApp delegate] restart:self withConfig:configFile];
 	}
 	@catch(NSException* e){
 	}

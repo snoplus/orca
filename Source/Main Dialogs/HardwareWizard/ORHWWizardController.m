@@ -305,7 +305,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (NSUndoManager *)undoManager
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 - (void) registerNotificationObservers
@@ -413,7 +413,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) statusTextChanged:(NSNotification*)aNotification
 {
-    if([[[NSApp delegate] document] statusText])[statusTextField setStringValue:[[[NSApp delegate] document] statusText]];		
+    if([[(ORAppDelegate*)[NSApp delegate] document] statusText])[statusTextField setStringValue:[[(ORAppDelegate*)[NSApp delegate] document] statusText]];		
 }
 
 - (void) actionChanged:(NSNotification*)aNotification
@@ -778,12 +778,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction) selectObject:(id) sender
@@ -910,7 +910,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (NSArray*) scanForObjects
 {
-    return [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORHWWizard)];
+    return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORHWWizard)];
 }
 
 - (void) installObjects:(NSArray*) theObjects
@@ -996,7 +996,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     
     //set up the container level
     //fill with nil objects at start, will fill in below.
-    NSArray* containers = [[[NSApp delegate] document] collectObjectsOfClass:containerClass]; 
+    NSArray* containers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:containerClass]; 
     [self setControlArray:[NSMutableArray array]];
     for(i=0;i<MAX([containerSelection maxValue],[containers count]);i++){
         [controlArray addObject:[NSNull null]];
@@ -1021,7 +1021,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         int containerTag = 0;
         [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
 		//set up this container's objects
-        NSArray* objectList = [[[NSApp delegate] document] collectObjectsOfClass:objectClass]; 
+        NSArray* objectList = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:objectClass]; 
         [self addObjectList:objectList atIndex:containerTag];
         
     }

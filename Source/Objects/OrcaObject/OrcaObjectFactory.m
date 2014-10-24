@@ -25,7 +25,7 @@
 #pragma mark ¥¥¥Initialization
 - (void)awakeFromNib
 {
-	[[[NSApp delegate] undoManager] disableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
 	
 	//these are objects that need to draw themselves in the catalog....
 	//otherwise we make the objects on demand when the user clicks
@@ -40,7 +40,7 @@
 		[self makeObject];
 	}
 	
-	[[[NSApp delegate] undoManager] enableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
 - (BOOL) isFlipped
@@ -57,9 +57,9 @@
 #pragma mark ¥¥¥Mouse Events
 -(void)mouseDown:(NSEvent*)theEvent
 {
-	[[[NSApp delegate] undoManager] disableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
     [self makeObject];
-	[[[NSApp delegate] undoManager] enableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 	
     [NSApp preventWindowOrdering];
     

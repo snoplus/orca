@@ -123,13 +123,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 #pragma mark ¥¥¥Accessors
 - (void) setLogBookFile:(NSString*)aFilePath
 {
-	[[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setLogBookFile:logBookFile];
+	[[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setLogBookFile:logBookFile];
 	
 	if(!aFilePath)aFilePath = [@"~/OrcaLogBook.rtfd" stringByExpandingTildeInPath];
 	if(![[aFilePath pathExtension] isEqualToString:@"rtfd"]){
@@ -399,12 +399,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction) alarmFilterAction:(id)sender
@@ -498,13 +498,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) insertConfigurationName:(id)sender
 {
-	NSString* theConfigFile = [NSString stringWithFormat:@"Configuration File: %@",[[[NSApp delegate] document] fileName]];
+	NSString* theConfigFile = [NSString stringWithFormat:@"Configuration File: %@",[[(ORAppDelegate*)[NSApp delegate] document] fileName]];
 	[logBookField insertText: theConfigFile];
 }
 
 - (IBAction) insertRunNumber:(id)sender
 {
-	NSArray* runControlObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+	NSArray* runControlObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 	NSString* theRun;
 	if([runControlObjects count]){
 		theRun = [NSString stringWithFormat:@"Run Number %lu",[[runControlObjects objectAtIndex:0] runNumber]];
@@ -556,7 +556,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (IBAction) saveLogBook:(id)sender
 {
 	if(!logBookFile)return;
-	if(logBookDirty)[[[NSApp delegate] document] updateChangeCount:NSChangeUndone];
+	if(logBookDirty)[[(ORAppDelegate*)[NSApp delegate] document] updateChangeCount:NSChangeUndone];
 	
 	if([logBookFile isEqualToString:@"untitled.rtfd"]){
 		[self saveAsLogBook:nil];
@@ -799,13 +799,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 		else if([tabIdentifer isEqualToString:@"logBook"])	return YES;
 		else return NO;
 	}
-    else  return [[NSApp delegate] validateMenuItem:menuItem];
+    else  return [(ORAppDelegate*)[NSApp delegate] validateMenuItem:menuItem];
 }
 
 - (void)textDidChange:(NSNotification *)notification
 {
 	if([notification object] == logBookField){
-		if(!logBookDirty)[[[NSApp delegate] document] updateChangeCount:NSChangeDone];
+		if(!logBookDirty)[[(ORAppDelegate*)[NSApp delegate] document] updateChangeCount:NSChangeDone];
 		logBookDirty = YES;
 		[saveLogBookButton setEnabled:YES];
 	}
@@ -815,9 +815,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 #pragma mark ¥¥¥Archivale
 - (void) decode:(NSCoder*) aDecoder
 {
-	[[[NSApp delegate] undoManager] disableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
 	[self setLogBookFile:[aDecoder decodeObjectForKey:@"LogBookFile"]];
-	[[[NSApp delegate] undoManager] enableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
 - (void) encode:(NSCoder*) anEncoder
@@ -840,7 +840,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 {
 	
 	// set printing properties
-	NSPrintInfo* pInfo = [[[NSApp delegate]document] printInfo];
+	NSPrintInfo* pInfo = [[(ORAppDelegate*)[NSApp delegate]document] printInfo];
 	[pInfo setHorizontalPagination:NSFitPagination];
 	[pInfo setHorizontallyCentered:NO];
 	[pInfo setVerticallyCentered:NO];
@@ -875,7 +875,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (IBAction) print:(id)sender
 {
 	// set printing properties
-	NSPrintInfo* pInfo = [[[NSApp delegate]document] printInfo];
+	NSPrintInfo* pInfo = [[(ORAppDelegate*)[NSApp delegate]document] printInfo];
 	[pInfo setHorizontalPagination:NSFitPagination];
 	[pInfo setHorizontallyCentered:NO];
 	[pInfo setVerticallyCentered:NO];

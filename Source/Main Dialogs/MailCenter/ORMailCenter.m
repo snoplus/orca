@@ -68,7 +68,7 @@
 //this method is needed so the global menu commands will be passes on correctly.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 #pragma mark ¥¥¥Accessors

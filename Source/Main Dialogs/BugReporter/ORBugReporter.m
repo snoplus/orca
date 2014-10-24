@@ -56,7 +56,7 @@
 //this method is needed so the global menu commands will be passes on correctly.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 #pragma mark •••Actions
@@ -254,7 +254,7 @@
     NSMutableArray* allEMails = [NSMutableArray array];
     [self putAlarmEMailsIntoArray:allEMails];
         
-    NSArray* allProcesses = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
+    NSArray* allProcesses = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
     for(id aProcess in allProcesses){
         [self putProcess:aProcess eMailsIntoArray:allEMails];
     }

@@ -95,7 +95,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 #pragma mark ¥¥¥Accessors
 - (NSUndoManager *)undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 

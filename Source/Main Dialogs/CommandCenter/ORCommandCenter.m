@@ -65,7 +65,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [self setSocketPort:port];
     [self setClients:[NSMutableArray array]];
     [[self undoManager] enableUndoRegistration];
-    NSArray* objectsToRegister = [[[NSApp delegate] document] collectObjectsRespondingTo:@selector(commandID)];
+    NSArray* objectsToRegister = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsRespondingTo:@selector(commandID)];
     NSEnumerator* e = [objectsToRegister objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
@@ -102,7 +102,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 
 - (NSUndoManager *)undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (NSString*) script
@@ -544,13 +544,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
                 else theObj = [destinationObjects objectForKey:objName];
                 if(!theObj){
                     //OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
-                    theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
+                    theObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:objName];
                     if(theObj){
                         [allObjs addObject:theObj];
                     }
                     else {
                         //finally, maybe it's just an object class name...send to all
-                        [allObjs addObjectsFromArray:[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(objName)]];
+                        [allObjs addObjectsFromArray:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(objName)]];
                     }
                 }
                 else [allObjs addObject:theObj];
@@ -661,7 +661,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 				}
 				else {
 					//OK, the obj isn't one of the preloaded objects. It might be an object fullID identifier.
-					theObj = [[[NSApp delegate] document] findObjectWithFullID:objName];
+					theObj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:objName];
 				}	
 			}
 		}
@@ -726,7 +726,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 		[[NSUserDefaults standardUserDefaults] synchronize];
 		[self setScript:[scriptIDEModel script]];
 		[self setScriptComments:[scriptIDEModel comments]];
-		NSArray* w = [[[NSApp delegate] document] findControllersWithModel:scriptIDEModel];
+		NSArray* w = [[(ORAppDelegate*)[NSApp delegate] document] findControllersWithModel:scriptIDEModel];
 		[w makeObjectsPerformSelector:@selector(setModel:) withObject:nil];
 		[w makeObjectsPerformSelector:@selector(close)];
 		[scriptIDEModel release];

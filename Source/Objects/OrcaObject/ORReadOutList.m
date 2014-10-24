@@ -33,7 +33,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 {
     NSString* aString = getNextString(aFile);
     //get the object represented by the string
-    id obj = [[[NSApp delegate] document] findObjectWithFullID:aString];
+    id obj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:aString];
     if(obj) {
         ORReadOutObject* anItem = [[ORReadOutObject alloc] initWithObject:obj];
         [anItem setOwner:anOwner];
@@ -215,7 +215,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 
 - (NSUndoManager *)undoManager
 {
-    return [[[NSApp delegate]document] undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document] undoManager];
 }
 
 - (BOOL) containsObject:(id) anObj

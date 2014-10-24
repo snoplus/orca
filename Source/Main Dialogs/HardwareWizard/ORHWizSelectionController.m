@@ -150,7 +150,7 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
 
 - (NSUndoManager *)undoManager
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 

@@ -198,12 +198,12 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (NSArray*) collectObjectsOfClass:(Class)aClass
 {
-	return [[[NSApp delegate] document] collectObjectsOfClass:aClass];
+	return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:aClass];
 }
 
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol
 {
-	return [[[NSApp delegate] document] collectObjectsConformingTo:aProtocol];
+	return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:aProtocol];
 }
 
 - (IBAction) printDocument:(id)sender
@@ -250,7 +250,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) incModelSortedBy:(SEL)aSelector
 {
 	[self endEditing];
-	NSMutableArray* allModels = [[[[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
+	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
 	int index = [allModels indexOfObject:model] + 1;
 	if(index>[allModels count]-1) index = 0;
@@ -261,7 +261,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) decModelSortedBy:(SEL)aSelector
 {
 	[self endEditing];
-	NSMutableArray* allModels = [[[[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
+	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
 	int index = [allModels indexOfObject:model] - 1;
 	if(index<0) index = [allModels count]-1;
@@ -389,7 +389,7 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender
 {
-	[[[NSApp delegate] document] duplicateDialog:self];
+	[[(ORAppDelegate*)[NSApp delegate] document] duplicateDialog:self];
 }
 
 

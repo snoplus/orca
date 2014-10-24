@@ -162,7 +162,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (id)document;
 {
-    return [[NSApp delegate]document];
+    return [(ORAppDelegate*)[NSApp delegate]document];
 }
 
 - (void) wakeUp {aWake = YES;}
@@ -541,7 +541,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) openHelp:(id)sender
 {
-	[[[NSApp delegate] helpCenter] showHelpCenterPage:[self helpURL]];
+	[[(ORAppDelegate*)[NSApp delegate] helpCenter] showHelpCenterPage:[self helpURL]];
 }
 
 - (void) doDoubleClick:(id)sender

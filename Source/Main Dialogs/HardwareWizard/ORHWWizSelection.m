@@ -96,7 +96,7 @@
 
 - (void) scanConfiguration
 {
-    NSArray* objects = [[[NSApp delegate] document] collectObjectsOfClass:selectionClass];
+    NSArray* objects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:selectionClass];
     [self setNumberOfItems:[objects count]];
     [self setMaxValue:0];
     if(level == kChannelLevel){
