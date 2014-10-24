@@ -140,15 +140,15 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
     [sbcs release];
     sbcs = nil;
-    sbcs = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
+    sbcs = [[[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")]retain];
 
     [shapers release];
     shapers = nil;
-    shapers = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")]retain];
+    shapers = [[[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")]retain];
     
     [runControl release];
     runControl = nil;
-    NSArray* anArray = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray* anArray = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if([anArray count])runControl = [[anArray objectAtIndex:0] retain];
 }
 
@@ -552,7 +552,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 
 - (NSUndoManager *)undoManager
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 - (void) postConnectionAlarm
@@ -1308,7 +1308,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     if([someObjects count]){
         [[self undoManager] disableUndoRegistration];
 
-        NSArray* dataTasks = [[[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")]retain];
+        NSArray* dataTasks = [[[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")]retain];
         for(id aDataTask in dataTasks){
             for(id anObj in someObjects){
                 [aDataTask removeObject:anObj];
@@ -1443,7 +1443,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 - (NSString*) diskStatus
 {
     NSString* s = @"";
-    NSArray* disks = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    NSArray* disks = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
     for(ORDataFileModel* aDisk in disks){
         if([aDisk involvedInCurrentRun]){
             [aDisk checkDiskStatus];

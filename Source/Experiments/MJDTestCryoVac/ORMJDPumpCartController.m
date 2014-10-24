@@ -42,13 +42,13 @@
 - (void) awakeFromNib
 {
 	[subComponentsView setGroup:model];
-	[testStandView0 setDelegate:[model testCryoStat:0]];
-	[testStandView1 setDelegate:[model testCryoStat:1]];
-	[testStandView2 setDelegate:[model testCryoStat:2]];
-	[testStandView3 setDelegate:[model testCryoStat:3]];
-	[testStandView4 setDelegate:[model testCryoStat:4]];
-	[testStandView5 setDelegate:[model testCryoStat:5]];
-	[testStandView6 setDelegate:[model testCryoStat:6]];
+	[testStandView0 setDelegate:(id)[model testCryoStat:0]];
+	[testStandView1 setDelegate:(id)[model testCryoStat:1]];
+	[testStandView2 setDelegate:(id)[model testCryoStat:2]];
+	[testStandView3 setDelegate:(id)[model testCryoStat:3]];
+	[testStandView4 setDelegate:(id)[model testCryoStat:4]];
+	[testStandView5 setDelegate:(id)[model testCryoStat:5]];
+	[testStandView6 setDelegate:(id)[model testCryoStat:6]];
 	
 	[testStandView0 setTag:0];
 	[testStandView1 setTag:1];

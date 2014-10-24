@@ -132,7 +132,7 @@ runStopImg = _runStopImg;
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
     if (!aNote) {//pull from XL3s
-        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         unsigned long xl3Mask = 0x7ffff;
         for (id xl3 in xl3s) {
             xl3Mask ^= 1 << [xl3 crateNumber];
@@ -306,9 +306,9 @@ runStopImg = _runStopImg;
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 /*
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
         [model hvPanicDown];
     }
@@ -318,12 +318,12 @@ runStopImg = _runStopImg;
 
 - (IBAction)hvMasterTriggersOFF:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 - (IBAction)hvMasterStatus:(id)sender

@@ -888,7 +888,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     [self setCurrentMuxEfficiency:[decoder decodeFloatForKey:@"NcdModelCurrentMuxEfficiency"]];
     [self setNominalSettingsFile:[decoder decodeObjectForKey:@"NcdModelNominalSettingsFile"]];
     [[NcdDetector sharedInstance] loadWithCoder:decoder];
-    [[NcdDetector sharedInstance] setDelegate:self];
+    [[NcdDetector sharedInstance] setDelegate:(id)self];
     
     
     ncdPulseChannelsTask = [[decoder decodeObjectForKey:ORNcdPulseChannelsTask] retain];
@@ -960,12 +960,12 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 
 - (void) standAloneMode:(BOOL)state
 {
-    NSArray* theTriggerCards = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
+    NSArray* theTriggerCards = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
     if([theTriggerCards count]){
         ORTrigger32Model* theTrigger = [theTriggerCards objectAtIndex:0];
         [theTrigger standAloneMode:state];	
     }
-    NSArray* theRunControlObjs = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray* theRunControlObjs = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if([theRunControlObjs count]){
         ORRunModel* theRunControl = [theRunControlObjs objectAtIndex:0];
         [theRunControl setRemoteControl:NO];
@@ -1316,7 +1316,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 #define kNcdPulserRecordSize 6
 - (void) shipPulserRecord:(ORHPPulserModel*)thePulser 
 {  
-    NSArray* triggerCards = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
+    NSArray* triggerCards = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
     if([triggerCards count]){
         @try {
             
@@ -1368,7 +1368,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
         }
     }
     if(taskId!= -1){
-        NSArray* triggerCards = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
+        NSArray* triggerCards = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
         if([triggerCards count]){
             @try {
                 
@@ -1631,7 +1631,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkBuilderConnection) object:nil];
 	//check that the dispatcher is connected
-    NSArray* dispatchers = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORDispatcherModel")];
+    NSArray* dispatchers = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORDispatcherModel")];
     if([dispatchers count] == 1){
 		//OK, only one dispatcher...see if it's connected.
 		[noDispatcherAlarm clearAlarm];

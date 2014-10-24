@@ -520,7 +520,7 @@
 				float newXMax = [xScale getValAbs:MAX(currentDragXValue,startDragXValue)];
 				float newYMin = [yScale getValAbs:MIN(currentDragYValue,startDragYValue)];
 				float newYMax = [yScale getValAbs:MAX(currentDragYValue,startDragYValue)];
-				NSUndoManager* undoManager = [[NSApp delegate] undoManager];
+				NSUndoManager* undoManager = [(ORAppDelegate*)[NSApp delegate] undoManager];
 				[undoManager beginUndoGrouping];
 				[xScale	setRngLow:newXMin withHigh:newXMax];
 				[yScale	setRngLow:newYMin withHigh:newYMax];

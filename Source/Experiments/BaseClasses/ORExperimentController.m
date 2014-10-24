@@ -376,9 +376,9 @@
 
 - (void) findRunControl:(NSNotification*)aNote
 {
-	runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRunModel,1"];
+	runControl = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORRunModel,1"];
 	if(!runControl){
-		runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
+		runControl = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
 	}
 	[self updateRunInfo:nil];
 	[startRunButton setEnabled:runControl!=nil];
@@ -736,7 +736,7 @@
 #pragma mark •••Toolbar
 - (IBAction) openHelp:(NSToolbarItem*)item 
 {
-	[[[NSApp delegate] helpCenter] showHelpCenter:nil];
+	[[(ORAppDelegate*)[NSApp delegate] helpCenter] showHelpCenter:nil];
 }
 
 - (IBAction) statusLog:(NSToolbarItem*)item 
@@ -766,7 +766,7 @@
 
 - (IBAction) openTaskMaster:(NSToolbarItem*)item 
 {
-    [[NSApp  delegate] showTaskMaster:self];
+    [(ORAppDelegate*)[NSApp delegate] showTaskMaster:self];
 }
 
 
@@ -1140,7 +1140,7 @@
 {
 	[aPopup removeAllItems];
 	[aPopup addItemWithTitle:@"--"];
-	NSArray* allCardsObservingProtocol = [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORAdcInfoProviding)];
+	NSArray* allCardsObservingProtocol = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORAdcInfoProviding)];
 	NSEnumerator* e = [allCardsObservingProtocol objectEnumerator];
 	id aCard;
 	while(aCard = [e nextObject]){

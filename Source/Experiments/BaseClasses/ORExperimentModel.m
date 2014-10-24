@@ -817,7 +817,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 
 - (void) postCouchDBRecord
 {
-    if([[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
+    if([[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
     int aSet;
     int numGroups = [segmentGroups count];

@@ -359,7 +359,7 @@ enum {
     [self clearFailedAlarm];
     passed = YES; //assume the best
     [self setLastTime:[NSDate date]];
-    NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
         [self setThePDSModel:[objects objectAtIndex:0]];
         [self setPdsMemento :[thePDSModel memento]];  //save the old values
@@ -367,7 +367,7 @@ enum {
         [thePDSModel setDisableForPulser:YES];
     }
 	
-    objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
+    objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         [self setThePulserModel:[objects objectAtIndex:0]];
         [self setPulserMemento :[thePulserModel memento]];  //save the old values
@@ -692,7 +692,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     //clear out the old one
     [self setCurrentShaper:nil channel:0];
     
-    NSArray* allShapers = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
+    NSArray* allShapers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
     int slot    = [[currentTube objectForKey:@"kAdcSlot"] intValue];    
     int channel = [[currentTube objectForKey:@"kAdcChannel"] intValue];
     unsigned long address = strtol([[currentTube objectForKey:@"kAdcHWAddress"] cStringUsingEncoding:NSASCIIStringEncoding],0,16);;
@@ -759,7 +759,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     //clear out the old one
     [self setCurrentMux:nil channel:0];
     
-    NSArray* allMuxes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
+    NSArray* allMuxes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
 	
     int muxBox      = [[currentTube objectForKey:@"kMuxBusNum"] intValue];  //arggggggg!!!! they switched box/bus  
     int muxBus      = [[currentTube objectForKey:@"kMuxBoxNum"] intValue];  //arggggggg!!!! they switched box/bus
@@ -822,7 +822,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
 - (void) findScopeForCurrentTube
 {
     int scopeChannel  = [[currentTube objectForKey:@"kScopeChannel"] intValue];
-    NSArray* allScopes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OROscBaseModel")];
+    NSArray* allScopes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OROscBaseModel")];
     [self setCurrentScopes:allScopes channel:scopeChannel];
 	
     if([allScopes count]==0){
@@ -942,23 +942,23 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
 
 - (void) restoreOldValues
 {
-    NSArray* allShapers = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
+    NSArray* allShapers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
     [allShapers makeObjectsPerformSelector:@selector(restoreAllThresholds)];
     [allShapers makeObjectsPerformSelector:@selector(loadThresholds)];
 	
-    NSArray* allMuxes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
+    NSArray* allMuxes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
     [allMuxes makeObjectsPerformSelector:@selector(restoreAllThresholds)];
     [allMuxes makeObjectsPerformSelector:@selector(loadThresholdDacs)];
 }
 
 - (void) setNewValues
 {
-    NSArray* allShapers = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
+    NSArray* allShapers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
     [allShapers makeObjectsPerformSelector:@selector(saveAllThresholds)];
     [allShapers makeObjectsPerformSelector:@selector(setAllThresholdsTo:) withObject:[NSNumber numberWithFloat:shaperThreshold]];
     [allShapers makeObjectsPerformSelector:@selector(loadThresholds)];
 	
-    NSArray* allMuxes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
+    NSArray* allMuxes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
     [allMuxes makeObjectsPerformSelector:@selector(saveAllThresholds)];
     [allMuxes makeObjectsPerformSelector:@selector(setAllThresholdsTo:) withObject:[NSNumber numberWithFloat:muxThreshold]];
     [allMuxes makeObjectsPerformSelector:@selector(loadThresholdDacs)];

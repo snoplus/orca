@@ -125,7 +125,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
     [self setFPDOnlyMode:!fpdOnlyMode];
     ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:1];
-    NSArray* cards = [[[NSApp delegate ]document] collectObjectsOfClass:NSClassFromString([aGroup adcClassName])];
+    NSArray* cards = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString([aGroup adcClassName])];
     for(id aCard in cards){
         if([self fpdOnlyMode]){
             if([aCard respondsToSelector:@selector(disableAllTriggersIfInVetoMode)]){

@@ -101,7 +101,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 }
 - (NSUndoManager*) undoManager
 {
-	return [[NSApp delegate] undoManager];
+	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) showDialogForSegment:(int)aSegment
@@ -146,13 +146,13 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) registerForRates
 {
-	NSArray* adcObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
+	NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
 	[segments makeObjectsPerformSelector:@selector(registerForRates:) withObject:adcObjects];
 }
 
 - (void) configurationChanged:(NSNotification*)aNote
 {
-	NSArray* adcObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
+	NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
 	[segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
 	[self registerForRates];
 	

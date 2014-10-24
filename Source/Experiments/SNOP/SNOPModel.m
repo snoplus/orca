@@ -775,7 +775,7 @@ configDocument  = _configDocument;
 
 - (void) zeroPedestalMasks
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]
      makeObjectsPerformSelector:@selector(zeroPedestalMasks)];
 }
 
@@ -866,7 +866,7 @@ configDocument  = _configDocument;
     }
     
     //Collect a series of objects from the ORMTCModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
     //Initialise the MTCModal
     ORMTCModel* aMTCcard = [objs objectAtIndex:0];
@@ -1059,7 +1059,7 @@ configDocument  = _configDocument;
     NSMutableArray * pedCrateMask = [NSMutableArray arrayWithCapacity:100];
     
     //Collect a series of objects from the ORMTCController
-    /*NSArray*  controllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCController")];
+    /*NSArray*  controllerObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCController")];
     
     //Initialise the MTCModal
     ORMTCController* aMTCController = [controllerObjs objectAtIndex:0];
@@ -1152,7 +1152,7 @@ configDocument  = _configDocument;
     NSMutableDictionary * fecCardArray = [NSMutableDictionary dictionaryWithCapacity:200];
     
     //Loop over all the FEC cards
-    NSArray * fec32ControllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    NSArray * fec32ControllerObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
     
     //Count all Fec32 Cards on the DAQ
     //int numberFec32Cards = 2; //PLACE THIS IN LATER: [fec32ControllerObjs count];

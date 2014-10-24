@@ -808,7 +808,7 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
     
     couchPostScheduled = NO;
 
-    if([[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]>0){
+    if([[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]>0){
 
         NSMutableDictionary* values = [NSMutableDictionary dictionary];
         NSMutableArray* regionColors = [NSMutableArray array];

@@ -276,7 +276,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) postCouchDBRecord
 {
-    if([[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
+    if([[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
     
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
     int aSet;
@@ -423,8 +423,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (detector group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil}; //will check for up to two HV crates (should just be one)
-    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
-    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    hvCrateObj[0] = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
+    hvCrateObj[1] = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
 
     ORSegmentGroup* group = [self segmentGroup:0]; //detector group
     int n = [group numSegments]; //both DAQ and Veto on the same HV supply for now
@@ -448,8 +448,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
-    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
-    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    hvCrateObj[0] = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
+    hvCrateObj[1] = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
     
     ORSegmentGroup* group = [self segmentGroup:0];
     int n = [group numSegments];    //both DAQ and Veto on the same HV supply now
@@ -493,8 +493,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
-    hvCrateObj[0] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
-    hvCrateObj[1] = [[[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
+    hvCrateObj[0] = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,0"];
+    hvCrateObj[1] = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORMPodCrateModel,1"];
     
     ORSegmentGroup* group = [self segmentGroup:0];
     //both DAQ and Veto on the same HV supply now
