@@ -233,7 +233,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 
 - (BOOL) changesAllowed
 {
-    return [[[NSApp delegate]document] documentCanBeChanged];
+    return [[(ORAppDelegate*)[NSApp delegate]document] documentCanBeChanged];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary

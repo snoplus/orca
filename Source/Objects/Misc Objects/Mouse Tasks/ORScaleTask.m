@@ -46,7 +46,7 @@
     startLoc 	= [view convertPoint:[event locationInWindow] fromView:nil];
     currentLoc 	= startLoc;
 	scaleFactor = [view scalePercent];
-    [[[NSApp delegate] undoManager] disableUndoRegistration];
+    [[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
 }
 
 - (void) mouseDragged:(NSEvent *)event
@@ -66,7 +66,7 @@
 - (void) mouseUp:(NSEvent *)event
 {
     [view setNeedsDisplay:YES];
-    [[[NSApp delegate] undoManager] enableUndoRegistration];
+    [[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
 

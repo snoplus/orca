@@ -622,7 +622,7 @@ static NSDictionary* xl3Ops;
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
     if (!owl_crate_master) { //cache owl master
-        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (id xl3 in xl3s) {
             if ([xl3 crateNumber] == 16) owl_crate_master = xl3;
         }
@@ -1435,13 +1435,13 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     /*
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
         [model hvPanicDown];
     }
      */
 
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 
     //[model hvMasterPanicDown];
     NSLog(@"Detector wide panic down started\n");
@@ -1449,12 +1449,12 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvMasterTriggerOffAction:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
 - (IBAction)hvMasterTriggerOnAction:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 //connection

@@ -191,7 +191,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) checkTargetObject
@@ -407,7 +407,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 - (void) loadProxyObjects
 {
 	if(!targetName){
-		NSArray* wizObjects = [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORHWWizard)];
+		NSArray* wizObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORHWWizard)];
 		OrcaObject* obj;
 		NSEnumerator* objEnumy = [wizObjects objectEnumerator];
 		while(obj = [objEnumy nextObject]){
@@ -422,7 +422,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	}
 	
 	
-	NSArray* objects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(targetName)];
+	NSArray* objects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(targetName)];
 	if([objects count]){
 		[self loadParams:[objects lastObject]];
 		[self setProxyObject:[objects lastObject]];
@@ -433,7 +433,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) loadTargetObject
 {
-	NSArray* objects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(targetName)];
+	NSArray* objects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(targetName)];
 	id obj;
 	BOOL found = NO;
 	NSEnumerator* e = [objects objectEnumerator];

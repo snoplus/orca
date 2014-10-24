@@ -145,7 +145,7 @@ NSString* TimedWorkerIsRunningChangedNotification       = @"TimedWorkerIsRunning
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 @end

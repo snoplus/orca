@@ -588,7 +588,7 @@
     else if ([menuItem action] == @selector(bringToFront:))		return changesAllowed & (selectedCount>0);
     else if ([menuItem action] == @selector(sendToBack:))		return changesAllowed & (selectedCount>0);
     else if ([menuItem action] == @selector(alignBottom:))		return changesAllowed & (selectedCount>0);
-	else return  [[NSApp delegate] validateMenuItem:menuItem];
+	else return  [(ORAppDelegate*)[NSApp delegate] validateMenuItem:menuItem];
 }
 
 - (void) clearSelections:(BOOL)shiftKeyDown
@@ -778,7 +778,7 @@
 			BOOL okToPaste = YES;
             OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
 			if([anObject solitaryObject]){
-				NSArray* existingObjects = [[[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
+				NSArray* existingObjects = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
 				if([existingObjects count]){
 					okToPaste = NO;
 					NSBeep();
@@ -1214,7 +1214,7 @@
                 NSPoint		newPoint  = NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y);
                 BOOL okToDrop = YES;
                 if([anObject solitaryObject]){
-                    NSArray* existingObjects = [[[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
+                    NSArray* existingObjects = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
                     if([existingObjects count]){
                         okToDrop = NO;
                         NSBeep();

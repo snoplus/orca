@@ -790,7 +790,7 @@ int filterGraph(nodeType*);
 {  
 	// yacc has a number of global variables so it is NOT thread safe
 	// Acquire the lock to ensure one parse processing at a time
-	@synchronized([NSApp delegate]){
+	@synchronized((ORAppDelegate*)[NSApp delegate]){
 		parsedOK = NO;
 		@try { 
 			

@@ -121,7 +121,7 @@
 {
 	//to make things simple, just clear the popup and add all existing data catalogs
 	//then reselect if possible
-	NSArray* allDataCatalogs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+	NSArray* allDataCatalogs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 	[dataCatalogPU removeAllItems];
 	[dataCatalogPU addItemWithTitle:@"No Selection"];
 	for(id anObject in allDataCatalogs){

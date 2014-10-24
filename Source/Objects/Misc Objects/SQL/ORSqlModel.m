@@ -160,7 +160,7 @@ static NSString* ORSqlModelInConnector 	= @"ORSqlModelInConnector";
     [notifyCenter addObserver : self
                      selector : @selector(applicationIsTerminating:)
                          name : @"ORAppTerminating"
-                       object : [NSApp delegate]];
+                       object : (ORAppDelegate*)[NSApp delegate]];
 	
     [notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
@@ -1407,7 +1407,7 @@ Table: Histogram2Ds
 	@try {
 		ORSqlConnection* sqlConnection = [[delegate sqlConnection] retain];
 		if([sqlConnection isConnected]){
-			unsigned long uptime = (unsigned long)[[[NSApp delegate] memoryWatcher] accurateUptime];
+			unsigned long uptime = (unsigned long)[[(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime];
 			NSString* hw_address = macAddress();
 		
 			NSString* mangledPw = [self manglePw];

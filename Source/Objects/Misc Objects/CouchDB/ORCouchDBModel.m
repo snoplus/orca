@@ -171,7 +171,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [notifyCenter addObserver : self
                      selector : @selector(applicationIsTerminating:)
                          name : @"ORAppTerminating"
-                       object : [NSApp delegate]];
+                       object : (ORAppDelegate*)[NSApp delegate]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
@@ -713,7 +713,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
             NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                     @"machineinfo", @"_id",
                                                     @"machineinfo", @"type",
-                                                    [NSNumber numberWithLong:[[(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+                                                    [NSNumber numberWithLong:[[(ORAppDelegate*)(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
                                                     computerName(), @"name",
                                                     macAddress(),   @"hw_address",
                                                     thisHostAdress, @"ip_address",

@@ -99,7 +99,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (NSView*) view

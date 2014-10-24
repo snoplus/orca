@@ -386,14 +386,14 @@
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
-		[model createDatabase];
+		[model createDatabases];
 	}
 }
 
 - (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
-		[model deleteDatabase];
+		[model deleteDatabases];
 	}
 }
 

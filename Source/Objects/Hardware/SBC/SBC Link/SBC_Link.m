@@ -283,7 +283,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 
 - (NSUndoManager*) undoManager
 {
-	return [[NSApp delegate] undoManager];
+	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (NSString*) sbcLockName

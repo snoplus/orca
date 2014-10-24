@@ -41,7 +41,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNOCableDB);
 {
 	if(!aPath)aPath = @"";
 
-    [[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setCableDBFilePath:cableDBFilePath];
+    [[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setCableDBFilePath:cableDBFilePath];
 	
 	[cableDBFilePath autorelease];
 	cableDBFilePath = [aPath copy];

@@ -222,7 +222,7 @@
 	}
 }
 
-- (unsigned int) draggingSourceOperationMaskForLocal:(BOOL)isLocal
+- (NSDragOperation) draggingSourceOperationMaskForLocal:(BOOL)isLocal
 {
 	return NSDragOperationCopy;
 }

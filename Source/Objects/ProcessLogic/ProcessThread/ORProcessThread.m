@@ -88,7 +88,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     [ notifyCenter addObserver: self
                       selector: @selector( documentIsClosing: )
                           name: ORDocumentClosedNotification
-                        object: [[NSApp delegate] document]];
+                        object: [(ORAppDelegate*)[NSApp delegate] document]];
     
     [ notifyCenter addObserver: self
                       selector: @selector( documentIsClosing: )
@@ -268,9 +268,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 		int i;
 		for(i=0;i<8;i++)crBits[i] = 0L;
 		
-        allProcesses      = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain];
-        allProcessElements = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessElementModel")] retain];
-        allEndNodes        = [[[[NSApp delegate] document] collectObjectsRespondingTo:@selector(isTrueEndNode)] retain];
+        allProcesses      = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain];
+        allProcessElements = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessElementModel")] retain];
+        allEndNodes        = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsRespondingTo:@selector(isTrueEndNode)] retain];
         [allProcesses makeObjectsPerformSelector:@selector(processIsStarting)];
         [allEndNodes makeObjectsPerformSelector:@selector(processIsStarting)];
         [NSThread detachNewThreadSelector:@selector(processThread) toTarget:self withObject:nil];
@@ -278,7 +278,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 		[[NSNotificationCenter defaultCenter] addObserver : self
 												 selector : @selector(stop)
 													 name : ORDocumentClosedNotification
-												   object : [[NSApp delegate] document]];
+												   object : [(ORAppDelegate*)[NSApp delegate] document]];
     }
 }
 

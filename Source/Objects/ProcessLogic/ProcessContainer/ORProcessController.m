@@ -347,7 +347,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 - (void) updateButtons
 {
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[model class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]];
     BOOL aDiffMasterExists = NO;
 	BOOL anyAddresses = ([[model emailList] count]>0);
     for(id aProcess in processes){

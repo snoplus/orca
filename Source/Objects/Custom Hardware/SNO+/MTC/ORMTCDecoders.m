@@ -107,7 +107,7 @@ mtcModel = _mtcModel;
     
     if([self isGetRatesFromDecodeStage]){
         if (![self mtcModel]) {
-            NSArray* mtcs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+            NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
             if (mtcs && [mtcs count] > 0) {
                 [self setMtcModel:[mtcs objectAtIndex:0]];
             }

@@ -112,7 +112,7 @@
 {
     NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 
-	self.currentQueue = [NSOperationQueue currentQueue];
+	self.currentQueue = (OROpSequenceQueue*)[NSOperationQueue currentQueue];
     
 	if(![self checkSkipConditions] && [self checkConditions]){
         [self runStep];

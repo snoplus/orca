@@ -156,7 +156,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         NSLog(@"Process '%@' is now at 'Master' status\n",[self shortName]);
     }
     if(masterProcess && updateImageForMasterChange){
-        NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+        NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
         for(id aProcess in processes){
             if(aProcess == self) continue;
             if([aProcess masterProcess]) {
@@ -950,7 +950,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 				s= [s stringByAppendingString:@"\n"];
 			}
 			if(adcCount){
-				NSArray* couchObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
+				NSArray* couchObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
 				if([couchObjs count]){
 					ORCouchDBModel* couchObj = [couchObjs objectAtIndex:0];
 					if(![couchObj replicationRunning]){
@@ -1054,7 +1054,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeatShutOffWarning) object:nil];
     
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
     //check if there is another process that is the Master. If so it will handle this.
     if(![self masterProcess]){
         for(id aProcess in processes){
@@ -1083,7 +1083,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
 	if([self heartbeatSeconds]==0)return;
 	
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
     BOOL skipReport = NO;
     //check if there is another process that is the Master. If so it will do a heartbeat report.
     if(![self masterProcess]){
@@ -1110,7 +1110,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
         theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
         
-        NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+        NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
         if([self masterProcess]){
             for(id aProcess in processes){
                 if(aProcess == self) continue;
@@ -1145,7 +1145,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (void) sendStartStopNotice:(BOOL)state
 {
     
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
     ORProcessModel* emailSource = self;
     if(![self masterProcess]){
         for(id aProcess in processes){
