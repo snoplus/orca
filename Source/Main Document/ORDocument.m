@@ -52,7 +52,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     if(self =[super init]){
 		[ORStatusController sharedStatusController];
         
-        [[NSApp delegate] setDocument:self];
+        [(ORAppDelegate*)[NSApp delegate] setDocument:self];
         [self setGroup:[[[ORGroup alloc] init] autorelease]];
         
        	[self setOrcaControllers:[NSMutableArray array]];
@@ -78,7 +78,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (id) initForURL:(NSURL *)url withContentsOfURL:(NSURL *)contentsURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     @try {
-        if([[NSApp delegate] document]){
+        if([(ORAppDelegate*)[NSApp delegate] document]){
             NSLogColor([NSColor redColor],@"Did not open [%@]. Only one experiment can be open at a time\n",[[url path] stringByAbbreviatingWithTildeInPath]);
             return nil;
         }
@@ -95,7 +95,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (id) initWithContentsOfURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
     @try {
-        if([[NSApp delegate] document]){
+        if([(ORAppDelegate*)[NSApp delegate] document]){
             NSLogColor([NSColor redColor],@"Did not open [%@]. Only one experiment can be open at a time\n",[[url path] stringByAbbreviatingWithTildeInPath]);
             return nil;
         }
@@ -126,7 +126,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     [[self undoManager] removeAllActions];
 	RestoreApplicationDockTileImage();
     
-	[[NSApp delegate] setDocument:nil];
+	[(ORAppDelegate*)[NSApp delegate] setDocument:nil];
     //[self setDbConnection:nil];
     [super dealloc];
 }
