@@ -122,6 +122,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         [self createDatabases];
         [self _startAllPeriodicOperations];
         [self registerNotificationObservers];
+        statusUpdateScheduled = NO;
+
     }
     [super wakeUp];
 }
@@ -131,7 +133,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     [self _cancelAllPeriodicOperations];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self deleteDatabases];
+	//[self deleteDatabases];
 	[super sleep];
 }
 
@@ -248,12 +250,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) applicationIsTerminating:(NSNotification*)aNote
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[self deleteDatabases];
-    int i;
-    for(i=0;i<15;i++){
-        if([ORCouchDBQueue operationCount]==0)break;
-        [NSThread sleepForTimeInterval:1];
-    }
+	//[self deleteDatabases];
+    //int i;
+    //for(i=0;i<15;i++){
+    //    if([ORCouchDBQueue operationCount]==0)break;
+    //    [NSThread sleepForTimeInterval:1];
+    //}
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -321,11 +323,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if(stealthMode){
         if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
         [self _cancelAllPeriodicOperations];
-        [self deleteDatabases];
+        //[self deleteDatabases];
     }
     else {
         [self createDatabases];
-        [self _startAllPeriodicOperations];
+       // [self _startAllPeriodicOperations];
     }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelStealthModeChanged object:self];
 }
@@ -491,6 +493,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         [self createDatabase:    [self remoteDBRef]];
         [self performSelector:@selector(startReplication) withObject:nil afterDelay:4];
     }
+    [self _startAllPeriodicOperations];
+
 }
 
 - (void) createDatabase:(ORCouchDB*)aDBRef;
