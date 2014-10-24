@@ -457,6 +457,8 @@
     *aYMin = 0;
     *aYMax = 0;
 	if(n==0) return;
+    //aahhh, but the dataset may be empty....
+    //added a check below
     double minY = 9E9;
     double maxY = -9E9;
     if ([dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
@@ -468,6 +470,9 @@
                           x:xVals
                           y:yVals];
         NSUInteger i, total = [yVals length]/sizeof(*aYMax);
+        
+        if(total==0)return; //data set was empty. prevents major hang in the axis setup
+        
         double* ptr = (double*)[yVals bytes];
         for(i=0;i<total;i++) {
 			maxY = MAX(maxY,ptr[i]);
@@ -482,6 +487,7 @@
 			minY = MIN(minY,yValue);
 		}
     }
+    
     *aYMin = minY;
     *aYMax = maxY;
 }
