@@ -58,7 +58,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(940,460);
+    settingSize     = NSMakeSize(950,460);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,490);
 	firmwareTabSize = NSMakeSize(340,187);
@@ -201,6 +201,12 @@
                          name : ORGretina4MNoiseFloorIntegrationTimeChanged
                        object : model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(forceFullInitChanged:)
+                         name : ORGretina4MForceFullInitChanged
+                       object : model];
+
+    
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
                          name : ORGretina4MEnabledChanged
@@ -446,7 +452,8 @@
     [super updateWindow];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self enabledChanged:nil];
+    [self forceFullInitChanged:nil];
+    [self enabledChanged:nil];
 	[self easySelectChanged:nil];
 	[self trapEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
@@ -738,6 +745,19 @@
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[enabledMatrix cellWithTag:chan] setState:[model enabled:chan]];
         [[enabled2Matrix cellWithTag:chan] setState:[model enabled:chan]];
+    }
+}
+- (void) forceFullInitChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[forceFullInitMatrix cellWithTag:i] setState:[model forceFullInit:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[forceFullInitMatrix cellWithTag:chan] setState:[model forceFullInit:chan]];
     }
 }
 
@@ -1292,6 +1312,13 @@
 	unsigned int index = [sender indexOfSelectedItem];
 	[model setRegisterIndex:index];
 	[self setRegisterDisplay:index];
+}
+
+- (IBAction) forceFullInitAction:(id)sender;
+{
+    if([sender intValue] != [model forceFullInit:[[sender selectedCell] tag]]){
+        [model setForceFullInit:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
 }
 
 - (IBAction) enabledAction:(id)sender

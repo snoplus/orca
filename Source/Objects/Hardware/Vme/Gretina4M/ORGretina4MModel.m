@@ -60,6 +60,8 @@ NSString* ORGretina4MNoiseFloorChanged			= @"ORGretina4MNoiseFloorChanged";
 NSString* ORGretina4MFIFOCheckChanged           = @"ORGretina4MFIFOCheckChanged";
 
 NSString* ORGretina4MTrapEnabledChanged         = @"ORGretina4MTrapEnabledChanged";
+
+NSString* ORGretina4MForceFullInitChanged       = @"ORGretina4MForceFullInitChanged";
 NSString* ORGretina4MEnabledChanged             = @"ORGretina4MEnabledChanged";
 NSString* ORGretina4MPoleZeroEnabledChanged     = @"ORGretina4MPoleZeroEnabledChanged";
 NSString* ORGretina4MPoleZeroMultChanged        = @"ORGretina4MPoleZeroMultChanged";
@@ -898,6 +900,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MEnabledChanged object:self userInfo:userInfo];
 }
 
+- (void) setForceFullInit:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setForceFullInit:chan withValue:forceFullInit[chan]];
+    forceFullInit[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MForceFullInitChanged object:self userInfo:userInfo];
+}
+
+
 - (void) setTrapEnabled:(short)chan withValue:(BOOL)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrapEnabled:chan withValue:trapEnabled[chan]];
@@ -1081,6 +1092,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
+- (BOOL) forceFullInit:(short)chan		{ return forceFullInit[chan]; }
 - (BOOL) enabled:(short)chan			{ return enabled[chan]; }
 - (BOOL) trapEnabled:(short)chan        { return trapEnabled[chan]; }
 - (BOOL) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
@@ -1548,7 +1560,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kControlStatus].offset + 4*chan
                        mask:0x00406C1D
-                  reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]];
+                  reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]
+              forceFullInit:forceFullInit[chan]];
 }
     
      
@@ -1582,12 +1595,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeNoiseWindow
 {
-    unsigned long theValue = noiseWindow;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kNoiseWindow].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:noiseWindow
+              addressOffset:register_information[kNoiseWindow].offset
+                       mask:0x7f
+                  reportKey:@"NoiseWindow"];
+
 }
 
 - (void) writeExternalWindow
@@ -1641,7 +1653,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kLEDThreshold].offset + 4*channel
                        mask:0xfff1ffff
-                  reportKey:[NSString stringWithFormat:@"LEDThreshold_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"LEDThreshold_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 
 }
 - (void) writeTrapThreshold:(int)channel
@@ -1650,7 +1663,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kTrapThreshold].offset + 4*channel
                        mask:0x80ffffff
-                  reportKey:[NSString stringWithFormat:@"TrapThreshold_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"TrapThreshold_%d",channel]
+              forceFullInit:forceFullInit[channel]];
     
 }
 
@@ -1665,7 +1679,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kWindowTiming].offset + 4*channel
                        mask:0x07ffffff
-                  reportKey:[NSString stringWithFormat:@"WindowTiming_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"WindowTiming_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 
 - (void) writeRisingEdgeWindow:(short)channel
@@ -1675,7 +1690,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kRisingEdgeWindow].offset + 4*channel
                        mask:0x007ff7ff
-                  reportKey:[NSString stringWithFormat:@"RisingEdgeWindow_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"RisingEdgeWindow_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 
 }
 
@@ -2189,7 +2205,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setEnabled:withValue:) getMethod:@selector(enabled:)];
     [a addObject:p];
- 
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Force Full Iit"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setForceFullInit:withValue:) getMethod:@selector(forceFullInit:)];
+    [a addObject:p];
+
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trap Enabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -2567,7 +2590,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
-		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
+        [self setForceFullInit:i withValue:[decoder decodeIntForKey:[@"forceFullInit"	    stringByAppendingFormat:@"%d",i]]];
+        [self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
 		[self setTrapEnabled:i	withValue:[decoder decodeIntForKey:[@"trapEnabled"	stringByAppendingFormat:@"%d",i]]];
 		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	    stringByAppendingFormat:@"%d",i]]];
@@ -2620,7 +2644,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
 	int i;
  	for(i=0;i<kNumGretina4MChannels;i++){
-		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:forceFullInit[i]	forKey:[@"forceFullInit"		stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:trapEnabled[i]	forKey:[@"trapEnabled"  stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:debug[i]			forKey:[@"debug"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];

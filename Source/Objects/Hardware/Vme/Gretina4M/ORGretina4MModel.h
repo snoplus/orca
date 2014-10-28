@@ -203,6 +203,7 @@ enum Gretina4MFIFOStates {
 	unsigned long   dataBuffer[kG4MDataPacketSize];
 
     BOOL			enabled[kNumGretina4MChannels];
+    BOOL			forceFullInit[kNumGretina4MChannels];
     BOOL			trapEnabled[kNumGretina4MChannels];
     BOOL			debug[kNumGretina4MChannels];
     BOOL			pileUp[kNumGretina4MChannels];
@@ -378,6 +379,7 @@ enum Gretina4MFIFOStates {
 - (void) setNoiseWindow:(short)aNoiseWindow;
 - (short) noiseWindow;
 
+- (void) setForceFullInit:(short)chan withValue:(BOOL)aValue;
 - (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
@@ -402,6 +404,7 @@ enum Gretina4MFIFOStates {
 - (void) setEasySelected:(short)chan withValue:(BOOL)aValue;
 
 - (BOOL) enabled:(short)chan;
+- (BOOL) forceFullInit:(short)chan;
 - (BOOL) trapEnabled:(short)chan;
 - (BOOL) poleZeroEnabled:(short)chan;
 - (BOOL) baselineRestoreEnabled:(short)chan;
@@ -575,6 +578,7 @@ extern NSString* ORGretina4MFpgaFilePathChanged;
 extern NSString* ORGretina4MNoiseFloorIntegrationTimeChanged;
 extern NSString* ORGretina4MNoiseFloorOffsetChanged;
 
+extern NSString* ORGretina4MForceFullInitChanged;
 extern NSString* ORGretina4MEnabledChanged;
 extern NSString* ORGretina4MTrapEnabledChanged;
 extern NSString* ORGretina4MDebugChanged;

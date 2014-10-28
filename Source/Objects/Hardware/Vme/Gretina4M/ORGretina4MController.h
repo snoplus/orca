@@ -42,7 +42,9 @@
 	IBOutlet   NSTextField* clockLockedField;
 
     //basic ops page
-	IBOutlet NSMatrix*		enabledMatrix;
+    IBOutlet NSMatrix*		enabledMatrix;
+    IBOutlet NSMatrix*		forceFullInitMatrix;
+    
 	IBOutlet NSMatrix*		trapEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroTauMatrix;
@@ -166,6 +168,7 @@
 - (void) chsrtChanged:(NSNotification*)aNote;
 - (void) prerecntChanged:(NSNotification*)aNote;
 - (void) postrecntChanged:(NSNotification*)aNote;
+- (void) forceFullInitChanged:(NSNotification*)aNote;
 
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) integrateTimeChanged:(NSNotification*)aNote;
@@ -253,6 +256,7 @@
 
 
 - (IBAction) enabledAction:(id)sender;
+- (IBAction) forceFullInitAction:(id)sender;
 - (IBAction) trapEnabledAction:(id)sender;
 - (IBAction) baselineRestoreEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
