@@ -157,7 +157,8 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
                  reportKey:(NSString*)aKey
              forceFullInit:(BOOL) forceFullInit
 {
-    if([self longValueChanged:aValue valueKey:aKey] || forceFullInit){
+    BOOL valueChanged = [self longValueChanged:aValue valueKey:aKey];
+    if( valueChanged || forceFullInit){
         unsigned long writeValue = aValue & aMask;
         [[self adapter] writeLongBlock: &writeValue
                              atAddress: [self baseAddress] + anOffset
