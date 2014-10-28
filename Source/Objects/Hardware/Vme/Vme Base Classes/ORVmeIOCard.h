@@ -54,10 +54,18 @@
 - (void)			clearExceptionCount;
 - (NSRange)			memoryFootprint;
 - (BOOL)			memoryConflictsWith:(NSRange)aRange;
+
+- (void)            writeAndCheckLong:(unsigned long)aValue
+                        addressOffset:(short)anOffset
+                                 mask:(unsigned long)aMask
+                            reportKey:(NSString*)aKey
+                        forceFullInit:(BOOL) forceFullInit;
+
 - (void)            writeAndCheckLong:(unsigned long)aValue
                         addressOffset:(short)anOffset
                                  mask:(unsigned long)aMask
                             reportKey:(NSString*)aKey;
+
 - (BOOL) longValueChanged:(unsigned long)aValue valueKey:(NSString*)aKey;
 - (void) clearOldUserValues;
 

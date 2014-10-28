@@ -142,12 +142,22 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
     return objDictionary;
 }
 
+
 - (void) writeAndCheckLong:(unsigned long)aValue
              addressOffset:(short)anOffset
                       mask:(unsigned long)aMask
                  reportKey:(NSString*)aKey
 {
-    if([self longValueChanged:aValue valueKey:aKey]){
+    return [self writeAndCheckLong:aValue addressOffset:anOffset mask:aMask reportKey:aKey forceFullInit:NO];
+}
+
+- (void) writeAndCheckLong:(unsigned long)aValue
+             addressOffset:(short)anOffset
+                      mask:(unsigned long)aMask
+                 reportKey:(NSString*)aKey
+             forceFullInit:(BOOL) forceFullInit
+{
+    if([self longValueChanged:aValue valueKey:aKey] || forceFullInit){
         unsigned long writeValue = aValue & aMask;
         [[self adapter] writeLongBlock: &writeValue
                              atAddress: [self baseAddress] + anOffset
