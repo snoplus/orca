@@ -121,7 +121,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     NSString *responseFromTellie = [[NSString alloc] init];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
+    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 

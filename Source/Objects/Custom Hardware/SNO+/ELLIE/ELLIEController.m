@@ -212,11 +212,11 @@
 - (void)control:(NSControl *)control textView:(NSTextView *)fieldEditor doCommandBySelector:(SEL)commandSelector
 {
     NSLog(@"Selector method is (%@)", NSStringFromSelector( commandSelector ) );
-    if (commandSelector == @selector(insertNewline:)) {
+    /*if (commandSelector == @selector(insertNewline:)) {
         if([control isKindOfClass:[NSTextField class]]){
             [control setBackgroundColor:[NSColor greenColor]];
         }
-    }
+    }*/
 }
 
 -(void)controlTextDidEndEditing:(NSNotification *)note {
