@@ -42,7 +42,7 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{707, 542}, {311, 334}}</string>
+				<string key="NSWindowRect">{{106, 655}, {292, 313}}</string>
 				<int key="NSWTFlags">544735232</int>
 				<string key="NSWindowTitle">SNOPCamera</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -93,7 +93,7 @@
 								<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</set>
-							<string key="NSFrame">{{89, 173}, {141, 118}}</string>
+							<string key="NSFrame">{{89, 152}, {141, 118}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="473173209"/>
@@ -158,7 +158,7 @@
 							<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 						</object>
 					</array>
-					<string key="NSFrameSize">{311, 334}</string>
+					<string key="NSFrameSize">{292, 313}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="501279785"/>

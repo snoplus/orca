@@ -38,5 +38,6 @@ void mtcatResetMtcat(SBC_Packet* aPacket);
 void mtcatResetAll(SBC_Packet* aPacket);
 void mtcatLoadCrateMask(SBC_Packet* aPacket);
 void mtcTellReadout(SBC_Packet* aPacket);
+void cameraResetAll(SBC_Packet* aPacket);
 
 #endif // __SNO_H__
