@@ -12,7 +12,8 @@ class ORCAEN830Readout : public ORVVmeCard
 private:
     bool     chan0Enabled;
     uint32_t lastChan0Count;
-	uint32_t rollOverCount;
+    uint32_t rollOverCount;
+    uint32_t errorCount;
 
 };
 

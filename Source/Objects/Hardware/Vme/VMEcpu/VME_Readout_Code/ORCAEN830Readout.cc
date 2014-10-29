@@ -5,8 +5,9 @@
 
 bool ORCAEN830Readout::Start()
 {
-	lastChan0Count  = 0x0;
-	rollOverCount      = 0x0;
+	lastChan0Count  = 0;
+	rollOverCount   = 0;
+    errorCount      = 0;
     uint32_t enabledMask = GetDeviceSpecificData()[0];
     if(enabledMask & (0x1)) chan0Enabled = true;
     else                    chan0Enabled = false;
@@ -75,6 +76,8 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                             data[indexForFirstChannel]  = chan0Value + chan0Offset; //there's a timing offset
                         }
                         else {
+                            errorCount++;
+                            LogMessage("Num Failed Rd: V830 0x%04x %d",baseAdd,errorCount);
                             data[indexForRollOver]      = 0xffffffff;
                             data[indexForFirstChannel]  = 0xffffffff;
                         }
