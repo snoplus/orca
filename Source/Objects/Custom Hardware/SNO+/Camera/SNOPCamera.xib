@@ -51,7 +51,7 @@
 				<string key="NSWindowContentMaxSize">{311, 317}</string>
 				<string key="NSWindowContentMinSize">{311, 317}</string>
 				<object class="NSView" key="NSWindowView" id="1006">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSButton" id="473173209">
@@ -59,7 +59,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{61, 97}, {197, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="755424598">
@@ -95,7 +94,6 @@
 							</set>
 							<string key="NSFrame">{{89, 152}, {141, 118}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="473173209"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
@@ -120,7 +118,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{65, 42}, {189, 34}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<string key="NSReuseIdentifierKey">_NS:1535</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="57724005">
@@ -159,8 +156,6 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{292, 313}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="501279785"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1680, 1028}}</string>

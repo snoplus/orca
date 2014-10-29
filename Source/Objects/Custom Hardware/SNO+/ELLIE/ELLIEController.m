@@ -205,19 +205,21 @@
     return NO;
 }
 
--(void)controlTextDidBeginEditing:(NSNotification *)note{
-    
-}
+/*-(void)controlTextDidBeginEditing:(NSNotification *)note{
+    [[note object] setBackgroundColor:[NSColor whiteColor]];
+    //[[note object] setForegroundColor:[NSColor whiteColor]];
+    //[[note object] setColor:[NSColor whiteColor]];
+}*/
 
-- (void)control:(NSControl *)control textView:(NSTextView *)fieldEditor doCommandBySelector:(SEL)commandSelector
+/*- (void)control:(NSControl *)control textView:(NSTextView *)fieldEditor doCommandBySelector:(SEL)commandSelector
 {
     NSLog(@"Selector method is (%@)", NSStringFromSelector( commandSelector ) );
-    /*if (commandSelector == @selector(insertNewline:)) {
+    if (commandSelector == @selector(insertNewline:)) {
         if([control isKindOfClass:[NSTextField class]]){
             [control setBackgroundColor:[NSColor greenColor]];
         }
-    }*/
-}
+    }
+}*/
 
 -(void)controlTextDidEndEditing:(NSNotification *)note {
     NSTextField * changedField = [note object];
@@ -233,11 +235,11 @@
         int triggerDelayRemainder = (triggerDelayNumber  % minimumNumberTriggerDelaySteps);
         
         if(triggerDelayNumber  > maxmiumTriggerDelay){
-            NSLog(@"Tellie: Maximum Trigger Delay is 1275ns, setting to the maximum trigger delay\n");
+            NSLog(@"Tellie: Maximum Trigger Delay is %i ns, setting to the maximum trigger delay\n",maxmiumTriggerDelay);
             [[note object] setIntValue:maxmiumTriggerDelay];
         }
         else if (triggerDelayNumber  < minimumTriggerDelay){
-            NSLog(@"Tellie: Minimum Trigger Delay is 0ns, setting to the minimum trigger delay\n");
+            NSLog(@"Tellie: Minimum Trigger Delay is %i ns, setting to the minimum trigger delay\n",minimumTriggerDelay);
             [[note object] setIntValue:minimumTriggerDelay];
         }
         else{
@@ -250,9 +252,40 @@
             }
         }
     } //end of checking trigger delay
+    else if ([note object] == tellieFibreDelayTf)
+    {
+        float fibreDelayNumber = [[note object] floatValue];
+        //0.25ns discrete steps
+        float minimumNumberFibreDelaySteps = 0.25;     //in ns
+        float minimumFibreDelay = 0;                //in ns
+        float maxmiumFibreDelay = 63.75;             //in ns
+        int fibreDelayRemainder = (int)(fibreDelayNumber*100)  % (int)(minimumNumberFibreDelaySteps*100);
+        
+        if(fibreDelayNumber  > maxmiumFibreDelay){
+            NSLog(@"Tellie: Maximum Trigger Delay is 1275ns, setting to the maximum trigger delay\n");
+            [[note object] setFloatValue:maxmiumFibreDelay];
+        }
+        else if (fibreDelayNumber  < minimumFibreDelay){
+            NSLog(@"Tellie: Minimum Trigger Delay is 0ns, setting to the minimum trigger delay\n");
+            [[note object] setFloatValue:minimumFibreDelay];
+        }
+        else{
+            if (fibreDelayNumber == 0) {
+                //do nothing, this value is valid
+            }
+            else {
+                //Make the trigger delay divisible by 5
+                [[note object] setFloatValue:(fibreDelayNumber  - ((float)fibreDelayRemainder/100.0))];
+            }
+        }
+    }
+    
+    
     
     //set the background colour to green
-    [[note object] setBackgroundColor:[NSColor orangeColor]];
+    //[[note object] setBackgroundColor:[NSColor greenColor]];
+    //[[note object] setForegroundColor:[NSColor greenColor]];
+    //[[note object] setColor:[NSColor greenColor]];
 }
 
 
