@@ -1568,7 +1568,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 
-    int status, retval=0;
+    //int status;
+    int retval=0;
 #if 0
 	if(UDP_REPLY_SERVER_SOCKET>0) [self stopListeningServerSocket];//still open, first close the socket
 	UDP_REPLY_SERVER_SOCKET = socket ( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
@@ -2436,7 +2437,7 @@ commands:
       
 
       
-	size_t length        = sendlen;
+	//size_t length        = sendlen;
 
 
     //const char *buffer   = [crateUDPCommand cStringUsingEncoding: NSASCIIStringEncoding];  //TODO: maybe use NSData and NSString::dataUsingEncoding:allowLossyConversion: ??? -tb-
@@ -4484,8 +4485,8 @@ if((len % 4) != 0){
 - (void) shipSltSecondCounter:(unsigned char)aType
 {
 	//aType = 1 start run, =2 stop run, = 3 start subrun, =4 stop subrun, see #defines in ORAmptekDP5Defs.h -tb-
-	unsigned long tl = [self readTimeLow]; 
-	unsigned long th = [self readTimeHigh]; 
+	//unsigned long tl = [self readTimeLow];
+	//unsigned long th = [self readTimeHigh];
 
 	
 #if 0 //TODO: omit #import "ORAmptekDP5Defs.h"

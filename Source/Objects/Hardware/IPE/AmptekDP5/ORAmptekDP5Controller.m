@@ -1574,7 +1574,7 @@ return;
 - (IBAction) sendCommandScript:(id)sender
 {
 	[self endEditing];
-	NSString *fullCommand = [NSString stringWithFormat: @"shellcommand %@",[model sltScriptArguments]];
+	//NSString *fullCommand = [NSString stringWithFormat: @"shellcommand %@",[model sltScriptArguments]];
 	//TODO: remove SLT stuff -tb-   2014 [model sendPMCCommandScript: fullCommand];  
 }
 

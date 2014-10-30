@@ -596,20 +596,20 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 	unsigned long length	= ExtractLength(ptr[0]);
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
-	unsigned char fiber		= ShiftAndExtract(ptr[1],12,0xf);
-	unsigned int totalChan		= ShiftAndExtract(ptr[4],0,0xffff);//channel map
-	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xf);
+	//unsigned char fiber		= ShiftAndExtract(ptr[1],12,0xf);
+	//unsigned int totalChan		= ShiftAndExtract(ptr[4],0,0xffff);//channel map
+	//unsigned char chan		= ShiftAndExtract(ptr[1],8,0xf);
 	unsigned int trigChan	= ShiftAndExtract(ptr[1],8,0xff);      //channel 0..41
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
-	NSString* fiberKey	    = [NSString stringWithFormat:@"Fiber %2d",fiber];	
-	NSString* channelKey	= [self getChannelKey: chan];	
+	//NSString* fiberKey	    = [NSString stringWithFormat:@"Fiber %2d",fiber];
+	//NSString* channelKey	= [self getChannelKey: chan];
 	NSString* trigChannelKey	= [self getChannelKey: trigChan];	
-	NSString* totalChannelKey	= [self getChannelKey: totalChan];	
+	//NSString* totalChannelKey	= [self getChannelKey: totalChan];
 	//unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
 	unsigned long startIndex  = 0;
 	unsigned long triggerAddr = ShiftAndExtract(ptr[6],0,0xfff);
-    uint32_t eventFifo4       = ptr[6]; //f4   
+   // uint32_t eventFifo4       = ptr[6]; //f4
 
 	//channel by channel histograms
 	//unsigned long energy = ptr[6];
