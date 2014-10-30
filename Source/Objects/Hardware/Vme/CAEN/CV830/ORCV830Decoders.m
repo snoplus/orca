@@ -76,21 +76,21 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    NSString* title= @"CV830 Scaler Record\n\n";
+    NSString* title= @"CV830 Scaler Record\n";
 	int crateNum			= ShiftAndExtract(ptr[1],21,0xf);
 	int cardNum				= ShiftAndExtract(ptr[1],16,0x1f);
-	int enabledMask			= ptr[2];
+	int enabledMask			= ptr[3];
 
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",crateNum];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",cardNum];
 	NSString* s = [NSString stringWithFormat:@"%@%@%@\n",title,crate,card];
-	s = [s stringByAppendingFormat:@"Enabled Mask:0X%08X\n",enabledMask];
+	s = [s stringByAppendingFormat:@"Enabled Mask:0x%08x\n",enabledMask];
 		
 	int i;
 	for(i=0;i<32;i++){
 		if(enabledMask & (0x1L<<i)){
             if((i==0) && (enabledMask&0x1)){
-                s = [s stringByAppendingFormat:@"Time: 0x%08lx 0x%08lx\n",ptr[3],ptr[6+i]];
+                s = [s stringByAppendingFormat:@"%d: 0x%lx - 0x%lx\n",i,ptr[2],ptr[5+i]];
             }
             else {
                 s = [s stringByAppendingFormat:@"%d: 0x%08lx",i,ptr[5+i]];

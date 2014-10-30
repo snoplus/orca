@@ -480,28 +480,9 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 - (void) initBoard
 {
 	@try {
-        //disable all channels
-        unsigned long aValue = 0;
-        [[self adapter] writeLongBlock:&aValue
-                             atAddress:[self baseAddress]+[self getAddressOffset:kChannelEnable]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-
-		[self softwareReset];
-        [self softwareClear];
-		[self writeDwellTime];
-		[self writeControlReg];
-        
-        //set up to read just one event at a time (Berr is enabled also)
-        aValue = 1;
-        [[self adapter] writeLongBlock:&aValue
-                             atAddress:[self baseAddress]+[self getAddressOffset:kBLTEventNum]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-        
-		[self writeEnabledMask];
+  		[self writeDwellTime];
+        [self writeEnabledMask];
+		[self writeControlReg]; //<--clears Counters,MEB, and trigger counter
 	}
 	@catch(NSException* localException){
 		NSLogColor([NSColor redColor],@"unable to init HW for CV830,%d,%d\n",[self crateNumber],[self slot]);
@@ -615,7 +596,7 @@ NSString* ORCV830ModelAllScalerValuesChanged	= @"ORCV830ModelAllScalerValuesChan
 	unsigned short aValue = 
 		(acqMode & 0x3)		|
 		(testMode << 3)		|
-        (1 << 4)			| //BERR enabled
+        (0 << 4)			| //BERR disabled
         (1 << 5)			| //header MUST be enabled
         (clearMeb << 6)		|
 		(autoReset << 7);
