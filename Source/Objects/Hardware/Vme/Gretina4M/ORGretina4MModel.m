@@ -2680,24 +2680,26 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [objDictionary setObject:[NSNumber numberWithInt:collectionTime] forKey:@"Collection Time"];
     [objDictionary setObject:[NSNumber numberWithInt:integrateTime] forKey:@"Integration Time"];
     
-	[self addCurrentState:objDictionary cArray:(short*)enabled forKey:@"Enabled"];
-	[self addCurrentState:objDictionary cArray:(short*)trapEnabled forKey:@"Trap Enabled"];
-	[self addCurrentState:objDictionary cArray:(short*)debug forKey:@"Debug Mode"];
-	[self addCurrentState:objDictionary cArray:(short*)pileUp forKey:@"Pile Up"];
-	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
-	[self addCurrentState:objDictionary cArray:(short*)poleZeroEnabled forKey:@"Pole Zero Enabled"];
-	[self addCurrentState:objDictionary cArray:(short*)baselineRestoreEnabled forKey:@"Baseline Restore Enabled"];
-	[self addCurrentState:objDictionary cArray:poleZeroMult forKey:@"Pole Zero Multiplier"];
-	[self addCurrentState:objDictionary cArray:(short*)pzTraceEnabled forKey:@"PZ Trace Enabled"];
-	[self addCurrentState:objDictionary cArray:mrpsrt forKey:@"Mrpsrt"];
-	[self addCurrentState:objDictionary cArray:ftCnt forKey:@"FtCnt"];
-	[self addCurrentState:objDictionary cArray:mrpsdv forKey:@"Mrpsdv"];
-	[self addCurrentState:objDictionary cArray:chpsrt forKey:@"Chpsrt"];
-	[self addCurrentState:objDictionary cArray:chpsdv forKey:@"Chpsdv"];
-	[self addCurrentState:objDictionary cArray:prerecnt forKey:@"Prerecnt"];
-	[self addCurrentState:objDictionary cArray:postrecnt forKey:@"Postrecnt"];
-	[self addCurrentState:objDictionary cArray:tpol forKey:@"TPol"];
-	[self addCurrentState:objDictionary cArray:(short*)presumEnabled forKey:@"PreSum Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)enabled       forKey:@"Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)forceFullInit forKey:@"forceFullInit"];
+	[self addCurrentState:objDictionary boolArray:(BOOL*)trapEnabled   forKey:@"Trap Enabled"];
+	[self addCurrentState:objDictionary boolArray:(BOOL*)debug         forKey:@"Debug Mode"];
+	[self addCurrentState:objDictionary boolArray:(BOOL*)pileUp        forKey:@"Pile Up"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)poleZeroEnabled forKey:@"Pole Zero Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)pzTraceEnabled forKey:@"PZ Trace Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)presumEnabled forKey:@"PreSum Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)baselineRestoreEnabled forKey:@"Baseline Restore Enabled"];
+
+	[self addCurrentState:objDictionary shortArray:triggerMode          forKey:@"Trigger Mode"];
+	[self addCurrentState:objDictionary shortArray:poleZeroMult         forKey:@"Pole Zero Multiplier"];
+	[self addCurrentState:objDictionary shortArray:mrpsrt               forKey:@"Mrpsrt"];
+	[self addCurrentState:objDictionary shortArray:ftCnt                forKey:@"FtCnt"];
+	[self addCurrentState:objDictionary shortArray:mrpsdv               forKey:@"Mrpsdv"];
+	[self addCurrentState:objDictionary shortArray:chpsrt               forKey:@"Chpsrt"];
+	[self addCurrentState:objDictionary shortArray:chpsdv               forKey:@"Chpsdv"];
+	[self addCurrentState:objDictionary shortArray:prerecnt             forKey:@"Prerecnt"];
+	[self addCurrentState:objDictionary shortArray:postrecnt            forKey:@"Postrecnt"];
+	[self addCurrentState:objDictionary shortArray:tpol                 forKey:@"TPol"];
 
     NSMutableArray* ar = [NSMutableArray array];
     int i;
@@ -2714,7 +2716,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return objDictionary;
 }
 
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey
+- (void) addCurrentState:(NSMutableDictionary*)dictionary shortArray:(short*)anArray forKey:(NSString*)aKey
 {
 	NSMutableArray* ar = [NSMutableArray array];
 	int i;
@@ -2723,6 +2725,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
 	[dictionary setObject:ar forKey:aKey];
 }
+
+- (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray forKey:(NSString*)aKey
+{
+    NSMutableArray* ar = [NSMutableArray array];
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        [ar addObject:[NSNumber numberWithBool:anArray[i]]];
+    }
+    [dictionary setObject:ar forKey:aKey];
+}
+
 
 - (NSArray*) autoTests 
 {

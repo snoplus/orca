@@ -212,6 +212,8 @@ enum Gretina4MFIFOStates {
     BOOL			pzTraceEnabled[kNumGretina4MChannels];
     BOOL			presumEnabled[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
+    BOOL			easySelected[kNumGretina4MChannels];
+    
     int				ledThreshold[kNumGretina4MChannels];
     short			trapThreshold[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
@@ -224,7 +226,6 @@ enum Gretina4MFIFOStates {
     short			prerecnt[kNumGretina4MChannels];
     short			postrecnt[kNumGretina4MChannels];
     short			tpol[kNumGretina4MChannels];
-    BOOL			easySelected[kNumGretina4MChannels];
     unsigned short  baselineRestoredDelay;
 
     short           clockSource;
@@ -525,7 +526,8 @@ enum Gretina4MFIFOStates {
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary shortArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray forKey:(NSString*)aKey;
 
 #pragma mark •••AutoTesting
 - (NSArray*) autoTests;
