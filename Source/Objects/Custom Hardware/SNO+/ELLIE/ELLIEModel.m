@@ -156,6 +156,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
     responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    
+    //TODO: Only post if there is a good reason.
+    
     [self updateTellieDocument:fireCommands];
 
 }
