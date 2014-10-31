@@ -63,6 +63,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
 @synthesize smellieSubRunInfo,
+tellieRunDoc,
 currentOrcaSettingsForSmellie,
 smellieDBReadInProgress = _smellieDBReadInProgress;
 
@@ -107,6 +108,37 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 }
 
 
+-(void) startTellieRun
+{
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    [aSnotModel setRunType:kRunTellie];
+    
+    if(![runControl isRunning]){
+        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+    }
+    
+    //check the run is going and that it is a tellie run
+    if(([runControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
+        //start the tellie run document
+        [self _pushInitialTellieRunDocument];
+    }
+    
+}
+
+-(void) stopTellieRun
+{
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    [aSnotModel setRunType:kRunUndefined];
+    
+    if([runControl isRunning]){
+        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    }
+}
+
 /* TELLIE Functions */
 //This function polls the TELLIE hardware using an XMLPRC Server and requests the response from the hardware
 -(void) pollTellieFibre
@@ -117,15 +149,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
--(void) fireTellieFibre:(NSArray*)fireCommands
+-(void) fireTellieFibre:(NSMutableDictionary*)fireCommands
 {
-    //TODO: Check a Tellie run is actually going
-    
-    
+    //Post to the Database what is about to happen
     NSString *responseFromTellie = [[NSString alloc] init];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
     responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    [self updateTellieDocument:fireCommands];
+
 }
 
 -(void) stopTellieFibre:(NSArray*)fireCommands
@@ -310,6 +342,63 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
+    
+    [runDocPool release];
+}
+
+-(void) _pushInitialTellieRunDocument
+{
+    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
+    
+    [runDocDict setObject:docType forKey:@"type"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
+    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
+    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
+    [runDocDict setObject:nil forKey:@"sub_run_info"];
+    
+    self.tellieRunDoc = runDocDict;
+    
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
+    
+    [runDocPool release];
+}
+
+- (void) updateTellieDocument:(NSDictionary*)subRunDoc
+{
+    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    NSMutableDictionary* runDocDict = [[self.tellieRunDoc mutableCopy] autorelease];
+    
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    NSMutableDictionary *subRunInfo = [[NSMutableDictionary alloc] initWithCapacity:100];
+    
+    [subRunInfo setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    [[runDocDict objectForKey:@"sub_run_info"] addObject:subRunInfo];
+    
+    //[valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    
+    
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] updateDocument:runDocDict
+                                   documentId:[runDocDict objectForKey:@"_id"]
+                                          tag:kTellieRunDocumentUpdated];
+    }
     
     [runDocPool release];
 }

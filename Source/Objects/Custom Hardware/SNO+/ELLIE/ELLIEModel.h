@@ -16,6 +16,7 @@
 @interface ELLIEModel :  OrcaObject{
     NSMutableDictionary* smellieRunSettings;
     NSMutableDictionary* currentOrcaSettingsForSmellie;
+    NSMutableDictionary* tellieRunDoc;
     NSTask* exampleTask;
     NSMutableDictionary* smellieRunHeaderDocList;
     ORRunModel* runControl;
@@ -26,6 +27,7 @@
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
+@property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
@@ -69,8 +71,10 @@
 
 //TELLIE Control Functions
 -(void) pollTellieFibre;
--(void) fireTellieFibre:(NSArray*)fireCommands;
+-(void) fireTellieFibre:(NSMutableDictionary*)fireCommands;
 -(void) stopTellieFibre:(NSArray*)fireCommands;
+-(void) startTellieRun;
+-(void) stopTellieRun;
 
 
 @end

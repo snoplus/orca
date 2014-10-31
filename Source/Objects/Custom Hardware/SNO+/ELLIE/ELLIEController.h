@@ -96,6 +96,8 @@
     
     IBOutlet NSButton *tellieValidateSettingsButton;
     
+    IBOutlet NSButton *startTellieRunButton;
+    IBOutlet NSButton *stopTellieRunButton;
     NSTextField *automaticallyChangeTellieTriggerInput;
 }
 
@@ -128,8 +130,11 @@
 -(IBAction)pollTellieFibreAction:(id)sender;
 -(IBAction)stopTellieFibreAction:(id)sender;
 -(IBAction)validateTellieSettingsAction:(id)sender;
+-(IBAction)startTellieRunAction:(id)sender;
+-(IBAction)stopTellieRunAction:(id)sender;
 
 -(BOOL) areTellieSettingsValid;
+-(BOOL) isTellieRunning;
 -(void) initialiseTellie;
 
 @end

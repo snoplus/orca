@@ -9,6 +9,8 @@
 #import "ELLIEController.h"
 #import "ELLIEModel.h"
 #import "SNOPModel.h"
+#import "SNOP_Run_Constants.h"
+#import "ORRunModel.h"
 
 
 @implementation ELLIEController
@@ -132,7 +134,19 @@
 }
 
 
-//TELLIE Functions 
+//TELLIE Functions
+
+
+-(IBAction)startTellieRunAction:(id)sender
+{
+    [model startTellieRun];
+}
+
+
+-(IBAction)stopTellieRunAction:(id)sender
+{
+    [model stopTellieRun];
+}
 
 //Check to see if Tellie setting are correct
 -(BOOL) areTellieSettingsValid
@@ -371,6 +385,29 @@
     }
 }
 
+
+-(BOOL)isTellieRunning
+{
+    BOOL tellieRunInProgress = NO;
+    NSArray*  snopModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel * aSnopModel = [snopModelObjects objectAtIndex:0];
+    int runType = [aSnopModel getRunType];
+    
+    //collect ORRunModel objects
+    NSArray*  runModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
+    
+
+    //check there is a tellie run going
+    if((runType == kRunTellie) && ([aRunModel isRunning])){
+        tellieRunInProgress = YES;
+    }
+    else{
+        tellieRunInProgress = NO;
+    }
+    return tellieRunInProgress;
+}
+
 -(IBAction)fireTellieFibreAction:(id)sender
 {
     [tellieTriggerDelayTf.window makeFirstResponder:nil];
@@ -379,10 +416,25 @@
     [telliePulseHeightTf.window makeFirstResponder:nil];
     [telliePulseRateTf.window makeFirstResponder:nil];
     
+    NSMutableDictionary *fireTellieCommands = [[NSMutableDictionary alloc] initWithCapacity:10];
+    [fireTellieCommands setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
+    [fireTellieCommands setObject:[NSNumber numberWithInt:[telliePulseHeightTf intValue]] forKey:@"pulse_height"];
+    [fireTellieCommands setObject:[NSNumber numberWithFloat:[telliePulseRateTf floatValue]] forKey:@"pulse_rate"];
+    [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
+    [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieFibreDelayTf floatValue]] forKey:@"fibre_delay"];
+    [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieTriggerDelayTf intValue]] forKey:@"trigger_delay"];
+    
     //check the settings are validated and have been set 
     if([self areTellieValuesCorrectlySet:[NSColor greenColor]]){
         //lock the settings
-        [model fireTellieFibre:nil];
+        
+        //check to see that tellie is running 
+        if([self isTellieRunning]){
+            [model fireTellieFibre:fireTellieCommands];
+        }
+        else{
+            NSLog(@"Tellie: Please start a Tellie run, before firing fibres");
+        }
     }
     else{
         NSLog(@"Tellie: Validate all settings for Tellie\n");
@@ -781,6 +833,36 @@
     
     
 }
+
+-(void) fetchCurrentTellieSubRunFile
+{
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSNumber *currentVersionNumber;
+    NSData *data = [NSData dataWithContentsOfURL:url];
+    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSError *error =  nil;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
+    if(!error){
+        @try{
+            //format the json response
+            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
+            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
+        }
+        @catch (NSException *e) {
+            NSLog(@"Error in fetching from the TellieDb: %@",e);
+        }
+    }
+    else{
+        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
+    }
+
+    
+    
+}
+
 
 -(NSNumber*) fetchRecentVersion
 {
