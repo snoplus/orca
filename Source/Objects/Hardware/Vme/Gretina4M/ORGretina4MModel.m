@@ -2719,8 +2719,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	NSMutableArray* ar = [NSMutableArray array];
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
-		[ar addObject:[NSNumber numberWithShort:*anArray]];
-		anArray++;
+		[ar addObject:[NSNumber numberWithShort:anArray[i]]];
 	}
 	[dictionary setObject:ar forKey:aKey];
 }
