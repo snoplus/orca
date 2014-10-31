@@ -119,6 +119,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void) fireTellieFibre:(NSArray*)fireCommands
 {
+    //TODO: Check a Tellie run is actually going
+    
+    
     NSString *responseFromTellie = [[NSString alloc] init];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
     responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
