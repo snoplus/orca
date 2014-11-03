@@ -116,16 +116,16 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //add run control object
     NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel * aRunControl = [runControlObjsArray objectAtIndex:0];
+    runControl = [runControlObjsArray objectAtIndex:0];
     
     
-    if(![aRunControl isRunning]){
+    if(![runControl isRunning]){
         [aSnotModel setRunType:kRunTellie];
-        [aRunControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     }
     
     //check the run is going and that it is a tellie run
-    if(([aRunControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
+    if(([runControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
         //start the tellie run document
         [self _pushInitialTellieRunDocument];
     }
@@ -141,10 +141,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //add run control object
     NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel * aRunControl = [runControlObjsArray objectAtIndex:0];
+    runControl = [runControlObjsArray objectAtIndex:0];
     
-    if([aRunControl isRunning]){
-        [aRunControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    if([runControl isRunning]){
+        [runControl performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:YES];
     }
 }
 
