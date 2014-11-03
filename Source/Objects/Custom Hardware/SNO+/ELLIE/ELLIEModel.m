@@ -113,9 +113,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    [aSnotModel setRunType:kRunTellie];
+    
+    //removed this to stop splurgingb
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
+    
+    
     
     if(![runControl isRunning]){
+        [aSnotModel setRunType:kRunTellie];
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     }
     
@@ -133,6 +139,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     [aSnotModel setRunType:kRunUndefined];
+    
+    //removed this to stop splurgingb
+    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [objs3 objectAtIndex:0];
     
     if([runControl isRunning]){
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];

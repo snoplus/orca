@@ -433,7 +433,7 @@
             [model fireTellieFibre:fireTellieCommands];
         }
         else{
-            NSLog(@"Tellie: Please start a Tellie run, before firing fibres");
+            NSLog(@"Tellie: Please start a Tellie run, before firing fibres\n");
         }
     }
     else{
