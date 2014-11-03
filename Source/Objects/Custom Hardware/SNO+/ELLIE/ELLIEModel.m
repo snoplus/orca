@@ -160,6 +160,17 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void) fireTellieFibre:(NSMutableDictionary*)fireCommands
 {
+    //add run control object
+    NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    runControl = [runControlObjsArray objectAtIndex:0];
+    
+    //start a new subrun
+    [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+    [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+    
+    //wait a small amount of time to establish sub run info 
+    [NSThread sleepForTimeInterval:0.5f];
+    
     //Post to the Database what is about to happen
     NSString *responseFromTellie = [[NSString alloc] init];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
@@ -167,7 +178,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
     
     //TODO: Only post if there is a good reason.
-    
     [self updateTellieDocument:fireCommands];
 
 }
