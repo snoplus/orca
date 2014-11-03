@@ -377,8 +377,12 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 {
 	[self writeThresholds];
 	[self writeFullScaleRange: fullScaleRange];
-    //[self write: kBitSet2 sendValue: kClearData];			// Clear data, 
-	//[self write: kBitClear2 sendValue: kClearData];			// Clear "Clear data" bit of status reg.
+    if(commonStopMode){
+        [self write: kBitSet2 sendValue: kCommonStopMode];
+    }
+    else {
+        [self write: kBitClear2 sendValue: kCommonStopMode];
+    }
     [self write: kEventCounterReset sendValue: 0x0000];		// Clear event counter
 }
 
