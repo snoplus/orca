@@ -350,11 +350,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	[theDecoder release];
 	theDecoder = [[ORDecoder alloc] initWithHeader:[aDataPacket fileHeader]];
 		
-	if(transferQueue){
-        [transferQueue release];
-        transferQueue = nil;
+	if(!transferQueue){
+        transferQueue       = [[ORSafeQueue alloc] init];
     }
-    transferQueue       = [[ORSafeQueue alloc] init];
     
     //cache the next object
     nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
@@ -529,6 +527,10 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 		}
 	}	
 	if([transferQueue count]==0)NSLog(@"Processing queue clear\n");
+    else {
+        NSLog(@"Processing queue NOT clear -- Forcing a flush\n");
+        [transferQueue removeAllObjects];
+    }
 	
 	//wait for the processing thread to exit.
 	NSLog(@"Waiting on processing thread\n");
