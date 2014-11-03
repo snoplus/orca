@@ -114,19 +114,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    //removed this to stop splurgingb
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    //add run control object
+    NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel * aRunControl = [runControlObjsArray objectAtIndex:0];
     
     
-    
-    if(![runControl isRunning]){
+    if(![aRunControl isRunning]){
         [aSnotModel setRunType:kRunTellie];
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        [aRunControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     }
     
     //check the run is going and that it is a tellie run
-    if(([runControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
+    if(([aRunControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
         //start the tellie run document
         [self _pushInitialTellieRunDocument];
     }
@@ -140,12 +139,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     [aSnotModel setRunType:kRunUndefined];
     
-    //removed this to stop splurgingb
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    runControl = [objs3 objectAtIndex:0];
+    //add run control object
+    NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel * aRunControl = [runControlObjsArray objectAtIndex:0];
     
-    if([runControl isRunning]){
-        [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
+    if([aRunControl isRunning]){
+        [aRunControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     }
 }
 
