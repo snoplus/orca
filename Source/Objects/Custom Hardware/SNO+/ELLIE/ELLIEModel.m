@@ -379,7 +379,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
-    [runDocDict setObject:nil forKey:@"sub_run_info"];
+    [runDocDict setObject:[NSString stringWithFormat:@"nil"] forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
     
@@ -401,6 +401,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary *subRunInfo = [[NSMutableDictionary alloc] initWithCapacity:100];
     
     [subRunInfo setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    [subRunInfo setObject:[NSString stringWithFormat:@"on"] forKey:@"test"];
     [[runDocDict objectForKey:@"sub_run_info"] addObject:subRunInfo];
     
     //[valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
