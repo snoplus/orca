@@ -396,7 +396,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     self.tellieRunDoc = runDocDict;
     
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
+    [[self orcaDbRefWithEntryDB:self withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
@@ -405,6 +405,26 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
     
     [runDocPool release];
+}
+
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+{
+    
+    //Collect a series of objects from the SNOPModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    
+    ORCouchDB* result = [ORCouchDB couchHost:aSnotModel.orcaDBIPAddress
+                                        port:aSnotModel.orcaDBPort
+                                    username:aSnotModel.orcaDBUserName
+                                         pwd:aSnotModel.orcaDBPassword
+                                    database:entryDB
+                                    delegate:self];
+    
+    if (aCouchDelegate)
+        [result setDelegate:aCouchDelegate];
+    
+    return [[result retain] autorelease];
 }
 
 - (void) updateTellieDocument:(NSDictionary*)subRunDoc
