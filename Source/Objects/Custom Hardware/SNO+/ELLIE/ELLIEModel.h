@@ -23,8 +23,13 @@
     ORRunController* theRunController;
     NSMutableArray *smellieSubRunInfo;
     bool _smellieDBReadInProgress;
+    
+    //tellie settings
+    NSMutableDictionary * tellieSubRunSettings;
+    
 }
 
+@property (nonatomic,retain) NSMutableDictionary* tellieSubRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;

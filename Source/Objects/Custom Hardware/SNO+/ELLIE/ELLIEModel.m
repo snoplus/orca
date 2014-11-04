@@ -65,6 +65,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize smellieSubRunInfo,
 tellieRunDoc,
 currentOrcaSettingsForSmellie,
+tellieSubRunSettings,
 smellieDBReadInProgress = _smellieDBReadInProgress;
 
 - (void) setUpImage
@@ -375,10 +376,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
     
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
+
     NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
@@ -432,22 +430,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [[self.tellieRunDoc mutableCopy] autorelease];
     
-    
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    
-    NSMutableDictionary *specificSubRun = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [specificSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-    [specificSubRun setObject:[NSString stringWithFormat:@"on"] forKey:@"test"];
-    
+    [self.tellieSubRunSettings setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+        
     NSMutableArray * subRunInfo = [[NSMutableArray alloc] initWithCapacity:10];
     subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-    [subRunInfo addObject:specificSubRun];
+    [subRunInfo addObject:self.tellieSubRunSettings];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
+    self.tellieSubRunSettings = nil; //reset tellie settings 
     
     
     //check to see if run is offline or not
