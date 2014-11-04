@@ -447,6 +447,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [subRunInfo addObject:specificSubRun];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
+    self.tellieRunDoc = runDocDict;
+    
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
