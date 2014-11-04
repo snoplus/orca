@@ -424,9 +424,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] updateDocument:runDocDict
-                                   documentId:[runDocDict objectForKey:@"_id"]
-                                          tag:kTellieRunDocumentUpdated];
+        [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"]
+                            updateDocument:runDocDict
+                                documentId:[runDocDict objectForKey:@"_id"]
+                                       tag:kTellieRunDocumentUpdated];
     }
     
     [runDocPool release];
@@ -491,6 +492,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             {
                 NSLog(@"Smellie configuration file Object: %@\n",aResult);
                 //[self parseSmellieConfigHeaderDoc:aResult];
+            }
+            else if ([aTag isEqualToString:kTellieRunDocumentAdded])
+            {
+                NSMutableDictionary* runDoc = [[[self tellieRunDoc] mutableCopy] autorelease];
+                [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
             }
             
             //If no tag is found for the query result
