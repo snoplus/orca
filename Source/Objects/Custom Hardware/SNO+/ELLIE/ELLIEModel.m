@@ -523,6 +523,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             {
                 NSMutableDictionary* runDoc = [[[self tellieRunDoc] mutableCopy] autorelease];
                 [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+                self.tellieRunDoc = runDoc;
             }
             
             //If no tag is found for the query result
