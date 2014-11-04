@@ -171,11 +171,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //wait a small amount of time to establish sub run info 
     [NSThread sleepForTimeInterval:0.5f];
     
+    //TODO:Add this back in 
     //Post to the Database what is about to happen
-    NSString *responseFromTellie = [[NSString alloc] init];
+    //NSString *responseFromTellie = [[NSString alloc] init];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
-    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    
+    //responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
+    //NSLog(@"Response from Tellie: %@\n",responseFromTellie);
     
     //TODO: Only post if there is a good reason.
     [self updateTellieDocument:fireCommands];
@@ -382,13 +384,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
     
+    NSMutableArray *subRunArray = [[NSMutableArray alloc] initWithCapacity:10];
+    
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
     [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
     [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
-    [runDocDict setObject:[NSString stringWithFormat:@"nil"] forKey:@"sub_run_info"];
+    [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
     
@@ -407,13 +411,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    NSMutableDictionary *subRunInfo = [[NSMutableDictionary alloc] initWithCapacity:100];
     
-    [subRunInfo setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-    [subRunInfo setObject:[NSString stringWithFormat:@"on"] forKey:@"test"];
-    [[runDocDict objectForKey:@"sub_run_info"] addObject:subRunInfo];
-    
-    //[valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    NSMutableDictionary *specificSubRun = [[NSMutableDictionary alloc] initWithCapacity:10];
+    [specificSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    [specificSubRun setObject:[NSString stringWithFormat:@"on"] forKey:@"test"];
+    [[runDocDict objectForKey:@"sub_run_info"] addObject:specificSubRun];
     
     
     //check to see if run is offline or not
