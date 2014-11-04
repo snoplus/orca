@@ -396,7 +396,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     self.tellieRunDoc = runDocDict;
     
-    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
+    [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
