@@ -450,7 +450,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"]
+        [[self orcaDbRefWithEntryDB:self withDB:@"tellie"]
                             updateDocument:runDocDict
                                 documentId:[runDocDict objectForKey:@"_id"]
                                        tag:kTellieRunDocumentUpdated];
