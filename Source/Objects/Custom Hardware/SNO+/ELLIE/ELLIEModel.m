@@ -415,7 +415,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary *specificSubRun = [[NSMutableDictionary alloc] initWithCapacity:10];
     [specificSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
     [specificSubRun setObject:[NSString stringWithFormat:@"on"] forKey:@"test"];
-    [[runDocDict objectForKey:@"sub_run_info"] addObject:specificSubRun];
+    
+    NSMutableArray * subRunInfo = [[NSMutableArray alloc] initWithCapacity:10];
+    subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
+    [subRunInfo addObject:specificSubRun];
+    [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
     
     //check to see if run is offline or not
