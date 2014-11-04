@@ -139,15 +139,6 @@
 
 -(IBAction)startTellieRunAction:(id)sender
 {
-    //update the subRun settings held in the model
-    NSMutableDictionary *tellieSettings = [[NSMutableDictionary alloc] initWithCapacity:10];
-    [tellieSettings setObject:[NSNumber numberWithInt:[tellieTriggerDelayTf intValue]] forKey:@"trigger_delay"];
-    [tellieSettings setObject:[NSNumber numberWithFloat:[tellieFibreDelayTf floatValue]] forKey:@"fibre_delay"];
-    [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseRateTf floatValue]] forKey:@"pulse_rate"];
-    [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseHeightTf intValue]] forKey:@"pulse_height"];
-    [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
-    [tellieSettings setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
-    [model setTellieSubRunSettings:tellieSettings];
     [model startTellieRun];
 }
 
@@ -439,6 +430,15 @@
         
         //check to see that tellie is running 
         if([self isTellieRunning]){
+            //update the subRun settings held in the model
+            NSMutableDictionary *tellieSettings = [[NSMutableDictionary alloc] initWithCapacity:10];
+            [tellieSettings setObject:[NSNumber numberWithInt:[tellieTriggerDelayTf intValue]] forKey:@"trigger_delay"];
+            [tellieSettings setObject:[NSNumber numberWithFloat:[tellieFibreDelayTf floatValue]] forKey:@"fibre_delay"];
+            [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseRateTf floatValue]] forKey:@"pulse_rate"];
+            [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseHeightTf intValue]] forKey:@"pulse_height"];
+            [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
+            [tellieSettings setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
+            [model setTellieSubRunSettings:tellieSettings];
             [model fireTellieFibre:fireTellieCommands];
         }
         else{

@@ -429,16 +429,17 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [[self.tellieRunDoc mutableCopy] autorelease];
+    NSMutableDictionary* subRunDocDict = [[self.tellieSubRunSettings mutableCopy] autorelease];
     
-    [self.tellieSubRunSettings setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
         
     NSMutableArray * subRunInfo = [[NSMutableArray alloc] initWithCapacity:10];
     subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-    [subRunInfo addObject:self.tellieSubRunSettings];
+    
+    [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
-    self.tellieSubRunSettings = nil; //reset tellie settings 
     
     
     //check to see if run is offline or not
