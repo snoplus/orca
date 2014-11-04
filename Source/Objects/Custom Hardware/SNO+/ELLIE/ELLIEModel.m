@@ -398,6 +398,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"tellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
     
+    //wait for main thread to receive acknowledgement from couchdb
+    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
+    while ([timeout timeIntervalSinceNow] > 0 && ![self.tellieRunDoc objectForKey:@"_id"]) {
+        [NSThread sleepForTimeInterval:0.1];
+    }
+    
     [runDocPool release];
 }
 
