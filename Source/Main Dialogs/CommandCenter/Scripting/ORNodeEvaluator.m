@@ -43,6 +43,7 @@
 - (id)		arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue;
 - (id)		doFunctionCall:(id)p;
 - (id)		valueArray:(id)p;
+- (id)      newTypeArray:(id)p;
 - (id)		doValueAppend:(id)p container:(id)aContainer;
 - (id)		defineArray:(id) p;
 - (id)		defineVariable:(id) p;
@@ -562,7 +563,8 @@
 			
 		case ';':				return [self processStatements:p];
 		case kFuncCall:			return [self doFunctionCall:p];
-		case '#':               return [self valueArray:p];
+        case '#':               return [self valueArray:p];
+        case '$':               return [self newTypeArray:p];
 		case kMakeArgList:		return [self doValueAppend:p container:aContainer];
 		case ',':				return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@"," stringByAppendingFormat:@"%@",NodeValue(1)]];
 			
@@ -1297,6 +1299,18 @@
     }
 }
 
+- (id) newTypeArray:(id)p
+{
+    if([[p nodeData] count] == 1){
+        return [NSMutableArray arrayWithObjects:NodeValue(0),nil];
+    }
+    else {
+        NSMutableArray* anArray = [NSMutableArray arrayWithArray:NodeValue(0)];
+        [anArray addObject:NodeValue(1)];
+        return anArray;
+    }
+}
+
 - (id) processIf:(id) p
 {
 	if (![NodeValue(0) isEqual: _zero])		  return NodeValue(1);
@@ -1863,6 +1877,7 @@
 				case RANDOM:            line = [NSMutableString stringWithString:@"[random]"];		break;
 				case kConfirmTimeOut:	line = [NSMutableString stringWithString:@"[confirmtimeout]"];	break;
                 case '#':				line = [NSMutableString stringWithString:@"[#]"];			break;
+                case '$':				line = [NSMutableString stringWithString:@"[$]"];			break;
                 case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;
             }
