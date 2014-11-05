@@ -27,6 +27,10 @@
 @interface ORAmptekDP5Controller : OrcaObjectController {
 
 	IBOutlet NSTabView*				tabView;
+    
+    //AmpTek DP5
+	IBOutlet   NSPopUpButton* spectrumRequestTypePU;
+	IBOutlet   NSPopUpButton* numSpectrumBinsPU;
 	IBOutlet   NSTextField* textCommandTextField;
     
 	@private
@@ -175,6 +179,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+- (void) spectrumRequestTypeChanged:(NSNotification*)aNote;
+- (void) numSpectrumBinsChanged:(NSNotification*)aNote;
 - (void) textCommandChanged:(NSNotification*)aNote;
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote;
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
@@ -240,6 +246,9 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Actions
+- (IBAction) spectrumRequestNowButtonAction:(id)sender;
+- (IBAction) spectrumRequestTypePUAction:(id)sender;
+- (IBAction) numSpectrumBinsPUAction:(id)sender;
 - (IBAction) textCommandTextFieldAction:(id)sender;
 - (IBAction) resetEventCounterAtRunStartCBAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;

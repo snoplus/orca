@@ -115,6 +115,7 @@
 		unsigned long   writeValue;
 		unsigned long	eventDataId;//TODO: remove or change -tb-
 		unsigned long	multiplicityId;//TODO: remove -tb-
+		unsigned long	spectrumEventId;
 		unsigned long	waveFormId;
 		unsigned long	fltEventId;
 		unsigned long   eventCounter;
@@ -122,9 +123,9 @@
         TimedWorker*    poller;
 		BOOL			pollingWasRunning;
 		ORReadOutList*	readOutGroup;
-		NSArray*		dataTakers;			//cache of data takers.
+		NSArray*		dataTakers;			//cache of data takers.   //TODO: remove   -tb-   2014 
 		BOOL			first;
-        BOOL            accessAllowedToHardwareAndSBC;
+        BOOL            accessAllowedToHardwareAndSBC;                //TODO: remove -tb-
 
 
 		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
@@ -209,13 +210,13 @@
     uint32_t BBCmdFFMask;
     NSString* crateUDPDataCommand;
     
-    //data taking: flags and vars
+    //data taking: flags and vars  //TODO: remove ALL SLT stuff -tb-   2014 
     int takeUDPstreamData;
     int takeRawUDPData;
     int takeADCChannelData;
     int takeEventData;
     int savedUDPSocketState;
-    uint32_t partOfRunFLTMask;
+    uint32_t partOfRunFLTMask;//TODO: remove SLT stuff -tb-   2014 
     
     //BB interface
     int idBBforWCommand;
@@ -229,6 +230,8 @@
     OREdelweissFLTModel *fltChargingFIC;
     
     int resetEventCounterAtRunStart;
+    int numSpectrumBins;
+    int spectrumRequestType;
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Initialization
@@ -246,6 +249,10 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (int) spectrumRequestType;
+- (void) setSpectrumRequestType:(int)aSpectrumRequestType;
+- (int) numSpectrumBins;
+- (void) setNumSpectrumBins:(int)aNumSpectrumBins;
 - (NSString*) textCommand;
 - (void) setTextCommand:(NSString*)aTextCommand;
 - (int) resetEventCounterAtRunStart;
@@ -383,6 +390,10 @@
 - (int) openCommandSocket;
 - (int) isOpenCommandSocket;
 - (void) closeCommandSocket;
+
+
+- (int) requestSpectrum;
+- (int) requestSpectrumOfType:(int)pid2;
 - (int) sendTextCommand;
 - (int) sendTextCommandString:(NSString*)aString;
 - (int) readbackTextCommand;
@@ -497,6 +508,8 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+- (unsigned long) spectrumEventId;
+- (void) setSpectrumEventId: (unsigned long) DataId;
 - (unsigned long) fltEventId;
 - (void) setFltEventId: (unsigned long) DataId;
 - (unsigned long) waveFormId;
@@ -534,6 +547,8 @@
 
 @end
 
+extern NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged;
+extern NSString* ORAmptekDP5ModelNumSpectrumBinsChanged;
 extern NSString* ORAmptekDP5ModelTextCommandChanged;
 extern NSString* ORAmptekDP5ModelResetEventCounterAtRunStartChanged;
 extern NSString* ORAmptekDP5ModelLowLevelRegInHexChanged;

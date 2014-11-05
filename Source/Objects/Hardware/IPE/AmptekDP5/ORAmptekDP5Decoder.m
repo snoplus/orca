@@ -24,6 +24,225 @@
 #import "ORDataSet.h"
 //#import "ORAmptekDP5Defs.h"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+@implementation ORAmptekDP5DecoderForSpectrum
+
+//-------------------------------------------------------------
+/** Data format for waveform
+ *
+ <pre>  
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^-----------------------data id
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+ 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx location = unique ID number (if multiple AmpTek DP5 boards present)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spectrum length (=MCAC) in 3-byte-words
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+
+ followed by original UDP packet data (max. ~  25000 bytes, ~6150 32-bit- words)
+ UDP packet is: 8 byte header/checksum + 3 * x * 256 byte + 64 byte status => multiple of 4 => can be saved as uint_32
+ <pre>  
+ */ 
+//-------------------------------------------------------------
+- (id) init
+{
+    self = [super init];
+    return self;
+}
+
+- (void) dealloc
+{
+    [super dealloc];
+}
+
+
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+
+	unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length	= ExtractLength(ptr[0]);
+	unsigned char location	= ptr[1];
+    uint32_t specLen        = ptr[4]; // ShiftAndExtract(ptr[1],0,0xffffffff);
+	//unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
+
+
+
+	//channel by channel histograms
+	//unsigned long energy = ptr[6];
+    //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
+
+
+    NSString* device    = [NSString stringWithFormat:@"DeviceId-%lu\n", location];
+
+
+    
+    
+
+	
+	
+//TODO: no offset -tb-
+//startIndex=traceStart16;
+//startIndex=0;
+
+//TODO: what is the best value for the 'mask'? 0xFFFF is appropriate for shorts ... -tb-
+
+
+	// Set up the waveform
+	NSMutableData* spectrumData = [NSMutableData dataWithCapacity: specLen*sizeof(long)];
+	//NSData* waveFormdata = [NSData dataWithBytes:someData length:specLen*sizeof(long)];
+    
+    int i;
+    unsigned char *cSpecData = (unsigned char *) (someData + 4*8+6);//set to start of spectrum data 
+    unsigned char cZero = 0;
+    for(i=0; i<specLen; i++){
+        [spectrumData appendBytes: (cSpecData+3*i) length: 3];
+        [spectrumData appendBytes: &cZero length: 1];
+    }
+
+	[aDataSet loadWaveform: spectrumData					//pass in the whole data set
+					offset: 0					// Offset in bytes (past header words)
+				  unitSize: sizeof(int32_t)					// unit size in bytes
+				startIndex:	0					// first Point Index (past the header offset!!!)
+					  mask:	0xFFFFFFFF							// when displayed all values will be masked with this value
+					sender: self 
+				  withKeys: @"AmptekDP5", @"Spectrum",device,nil];
+
+#if 0
+	// Set up the waveform
+	//NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
+	
+
+if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0xFFFF							// when displayed all values will be masked with this value
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"UDP-Raw",crateKey,stationKey,fiberKey,channelKey,nil];
+}else if((eventFlags4bit == 0x2)){//FLT event
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0xFFFF							// when displayed all values will be masked with this value
+			   specialBits:0x0000	
+				  bitNames: [NSArray arrayWithObjects:nil]
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"FLT-Event-old",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
+				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
+}else{
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0xFFFF							// when displayed all values will be masked with this value
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"UDP-ADC-Channels",crateKey,stationKey,totalChannelKey,nil];
+				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
+}
+
+
+
+    if(eventFlags4bit == 0x2){//FLT event
+        uint32_t energy         = ptr[6] & 0x00ffffff;
+        uint32_t shapingLength  = ptr[8] & 0x000000ff;
+        printf("energy:0x%08x sL:%i flt:%i chan:%i\n",energy,shapingLength,card,trigChan);
+        if(energy & 0x00800000){//energy is negative
+            energy = ~(energy | 0xff000000);
+	        //channel by channel histograms
+            if(shapingLength>0) energy=energy/shapingLength;
+	        [aDataSet histogram:energy 
+				        numBins:kPageLength sender:self  
+			           withKeys:@"IPE-SLT-EW-Energy", @"FLT-Energy (neg)" , crateKey,stationKey,trigChannelKey,nil];
+        }else{//energy is positive
+	        //channel by channel histograms
+            if(shapingLength>0) energy=energy/shapingLength;
+	        [aDataSet histogram:energy 
+				        numBins:kPageLength sender:self  
+			           withKeys:@"IPE-SLT-EW-Energy", @"FLT-Energy (pos)" , crateKey,stationKey,trigChannelKey,nil];
+        }
+    }
+
+#endif
+
+	
+    
+
+										
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+
+	unsigned long length	= ExtractLength(ptr[0]);
+	//unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
+	//unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
+	//unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
+    uint32_t location       = ptr[1];
+    uint32_t sec            = ptr[2];
+    uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
+    uint32_t specLen        = ptr[4]; // ShiftAndExtract(ptr[1],0,0xffffffff);
+    //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
+
+    
+    NSString* title= @"AmpTekDP5 Spectrum Record\n\n";
+
+	++ptr;		//skip the first word (dataID and length)
+    
+    NSString* device    = [NSString stringWithFormat:@"DeviceId   = %lu\n", location];
+    NSString* secStr    = 0;//[NSString stringWithFormat:@"Sec        = %d\n", sec];
+    NSString* subsecStr = 0;//[NSString stringWithFormat:@"SubSec     = %d\n", subsec];
+        secStr    = [NSString stringWithFormat:@"UTC-sec = 0x%08x\n", sec];
+        subsecStr = [NSString stringWithFormat:@"subsec = 0x%08x\n", subsec];
+    NSString* specLengthStr = [NSString stringWithFormat:@"Spectrum len = %lu\n", specLen];
+    
+    NSString* lengthStr = [NSString stringWithFormat:@"Length tot    = %lu\n", length];
+    
+
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,device,  
+                secStr, subsecStr, specLengthStr, lengthStr]; 
+}
+
+@end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @implementation ORAmptekDP5DecoderForEvent
 
 //-------------------------------------------------------------

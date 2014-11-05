@@ -201,8 +201,13 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelCrateUDPCommandChanged
 						object: model];
 
+    //[notifyCenter addObserver : self
+    //                 selector : @selector(isListeningOnServerSocketChanged:)
+    //                     name : ORAmptekDP5ModelIsListeningOnServerSocketChanged
+	//					object: model];
+
     [notifyCenter addObserver : self
-                     selector : @selector(isListeningOnServerSocketChanged:)
+                     selector : @selector(openCommandSocketChanged:)
                          name : ORAmptekDP5ModelIsListeningOnServerSocketChanged
 						object: model];
 
@@ -346,9 +351,41 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelTextCommandChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(numSpectrumBinsChanged:)
+                         name : ORAmptekDP5ModelNumSpectrumBinsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(spectrumRequestTypeChanged:)
+                         name : ORAmptekDP5ModelSpectrumRequestTypeChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) spectrumRequestTypeChanged:(NSNotification*)aNote
+{
+	//[spectrumRequestTypePU setIntValue: [model spectrumRequestType]];
+	[spectrumRequestTypePU selectItemAtIndex: [model spectrumRequestType]-1];
+}
+
+- (void) numSpectrumBinsChanged:(NSNotification*)aNote
+{
+	//[numSpectrumBinsPU setIntValue: [model numSpectrumBins]];
+    int val=[model numSpectrumBins];
+    val = val >> 8;//minimum is 256 = 0x100
+    int i,index=0;
+    for(i=0; i<6;i++){
+        if(val & 0x1) break;
+        index++;
+        val = val >> 1;
+    }
+    if(index==6)     NSLog(@"ERROR in %@::%@! numBins larger than 8192!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+	[numSpectrumBinsPU selectItemAtIndex: index];
+}
 
 - (void) textCommandChanged:(NSNotification*)aNote
 {
@@ -516,7 +553,7 @@ return;
 	[selectedFifoIndexPU selectItemWithTag: [model selectedFifoIndex]];
 }
 
-- (void) isListeningOnServerSocketChanged:(NSNotification*)aNote
+- (void) isListeningOnServerSocketChanged:(NSNotification*)aNote//used for AmpTek DP5???
 {
     if([model isListeningOnServerSocket]){
 	    [listeningForReplyIndicator  startAnimation: nil];
@@ -570,7 +607,7 @@ return;
 }
 
 
-- (void) openCommandSocketChanged:(NSNotification*)aNote
+- (void) openCommandSocketChanged:(NSNotification*)aNote//used for AmpTek DP5
 {
     if([model isOpenCommandSocket]){
 	    [openCommandSocketIndicator  startAnimation: nil];
@@ -747,6 +784,8 @@ return;
 	[self lowLevelRegInHexChanged:nil];
 	[self resetEventCounterAtRunStartChanged:nil];
 	[self textCommandChanged:nil];
+	[self numSpectrumBinsChanged:nil];
+	[self spectrumRequestTypeChanged:nil];
 }
 
 - (void) setWindowTitle
@@ -899,6 +938,25 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) spectrumRequestNowButtonAction:(id)sender
+{
+    [model requestSpectrum];
+}
+
+
+- (void) spectrumRequestTypePUAction:(id)sender
+{
+	[model setSpectrumRequestType:[sender indexOfSelectedItem]+1];	
+}
+
+- (void) numSpectrumBinsPUAction:(id)sender
+{
+    NSLog(@"Called %@::%@! index %i [sender intValue] %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem],[sender intValue]);//TODO: DEBUG -tb-
+    int numBins=0;
+    numBins = 256 << ([sender indexOfSelectedItem]);
+	[model setNumSpectrumBins:numBins];	
+}
 
 - (void) textCommandTextFieldAction:(id)sender
 {
@@ -1219,13 +1277,13 @@ return;
 - (IBAction) startUDPCommandConnectionButtonAction:(id)sender
 {
     [self openCommandSocketButtonAction:nil];
-    [self startListeningForReplyButtonAction:nil];
+    //[self startListeningForReplyButtonAction:nil];
 }
 
 - (IBAction) stopUDPCommandConnectionButtonAction:(id)sender
 {
     [self closeCommandSocketButtonAction:nil];
-    [self stopListeningForReplyButtonAction:nil];
+    //[self stopListeningForReplyButtonAction:nil];
 }
 
 //reply socket (server)
@@ -1294,7 +1352,7 @@ return;
 	[model setCrateUDPCommandIP:[sender stringValue]];	
 }
 
-- (IBAction) openCommandSocketButtonAction:(id)sender
+- (IBAction) openCommandSocketButtonAction:(id)sender//AmpTek DP5
 {
 	//debug NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 	[model openCommandSocket];	
@@ -1574,7 +1632,7 @@ return;
 - (IBAction) sendCommandScript:(id)sender
 {
 	[self endEditing];
-	//NSString *fullCommand = [NSString stringWithFormat: @"shellcommand %@",[model sltScriptArguments]];
+	//TODO: remove SLT stuff -tb-   2014 NSString *fullCommand = [NSString stringWithFormat: @"shellcommand %@",[model sltScriptArguments]];
 	//TODO: remove SLT stuff -tb-   2014 [model sendPMCCommandScript: fullCommand];  
 }
 

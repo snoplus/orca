@@ -546,6 +546,8 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged = @"ORAmptekDP5ModelSpectrumRequestTypeChanged";
+NSString* ORAmptekDP5ModelNumSpectrumBinsChanged = @"ORAmptekDP5ModelNumSpectrumBinsChanged";
 NSString* ORAmptekDP5ModelTextCommandChanged = @"ORAmptekDP5ModelTextCommandChanged";
 NSString* ORAmptekDP5ModelResetEventCounterAtRunStartChanged = @"ORAmptekDP5ModelResetEventCounterAtRunStartChanged";
 NSString* ORAmptekDP5ModelLowLevelRegInHexChanged = @"ORAmptekDP5ModelLowLevelRegInHexChanged";
@@ -754,6 +756,50 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+//this is the pid2 of the "Spectrum Request Packets", section 4.1.2, p.20, of DP5  Programmers Guide
+- (int) spectrumRequestType
+{
+    return spectrumRequestType;
+}
+
+- (void) setSpectrumRequestType:(int)aSpectrumRequestType
+{
+    if(aSpectrumRequestType<1) aSpectrumRequestType=1;
+    if(aSpectrumRequestType>4) aSpectrumRequestType=4;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpectrumRequestType:spectrumRequestType];
+    
+    spectrumRequestType = aSpectrumRequestType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSpectrumRequestTypeChanged object:self];
+}
+
+- (int) numSpectrumBins
+{
+    return numSpectrumBins;
+}
+
+- (void) setNumSpectrumBins:(int)aNumSpectrumBins
+{
+    NSLog(@"Called %@::%@! aNumSpectrumBins: %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aNumSpectrumBins);//TODO: DEBUG -tb-
+    if(aNumSpectrumBins < 256) aNumSpectrumBins = 256;
+    if(aNumSpectrumBins > 8192) aNumSpectrumBins = 8192;
+    //allowed values: 256, 512, 1024, 2048, 4096, 8192
+    int i, highestBit=0;
+    //search highest bit ...
+    for(i=0; i<15; i++){
+        if( (aNumSpectrumBins >> i) & 0x1){
+            highestBit = i;
+        }
+    }
+    NSLog(@"Called %@::%@! highest bit: %i setTo: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),highestBit, 0x1 << highestBit);//TODO: DEBUG -tb-
+    aNumSpectrumBins = 0x1 << highestBit;
+    [[[self undoManager] prepareWithInvocationTarget:self] setNumSpectrumBins:numSpectrumBins];
+    
+    numSpectrumBins = aNumSpectrumBins;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelNumSpectrumBinsChanged object:self];
+}
 
 - (NSString*) textCommand
 {
@@ -1111,15 +1157,15 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSelectedFifoIndexChanged object:self];
 }
 
-- (int) isListeningOnServerSocket
+- (int) isListeningOnServerSocket//used for DP5
 {
     return isListeningOnServerSocket;
 }
 
-- (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket
+- (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket//used for DP5, ((TODO: rename it -tb-
 {
     isListeningOnServerSocket = aIsListeningOnServerSocket;
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelIsListeningOnServerSocketChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelIsListeningOnServerSocketChanged object:self];
 }
 
 - (NSString*) crateUDPCommand
@@ -1568,7 +1614,6 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 	//debug NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 
-    //int status;
     int retval=0;
 #if 0
 	if(UDP_REPLY_SERVER_SOCKET>0) [self stopListeningServerSocket];//still open, first close the socket
@@ -1698,7 +1743,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
                 }
             }
             
-            #if 1
+            #if 0
             //dump/debug !WARNING! SLOWS DOWN READOUT CONSIDERABLY (factor 1000 or so for MCA ...) -tb-
             int k;
             unsigned int val;
@@ -1903,6 +1948,66 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     }
     
 
+    //check spectrum (+status) packets (see page 59 of the "DP5 Programmer Guide" Rev A6)
+    if(PID1==0x81){
+        int specLength=0;
+        switch(PID2){
+        case 0x1:
+        case 0x2: specLength =  256; break;
+        case 0x3:
+        case 0x4: specLength =  512; break;
+        case 0x5:
+        case 0x6: specLength = 1024; break;
+        case 0x7:
+        case 0x8: specLength = 2048; break;
+        case 0x9:
+        case 0xa: specLength = 4096; break;
+        case 0xb:
+        case 0xc: specLength = 8192; break;
+        default: specLength = -1;
+        }
+        if((PID2 %2) ==0){
+            NSLog(@"   MESSAGE: this is a spectrum+status packet, spectrum length is: %i\n",specLength);
+            //dp5Packet[length+6]=0;
+            //NSLog(@"   readback is: %s\n",&(dp5Packet[6]));
+        }else{
+            NSLog(@"   MESSAGE: this is a spectrum packet, spectrum length is: %i\n",specLength);
+        }
+        
+        
+        //ship the packet 
+        uint32_t data[8400];
+        uint32_t location = [self uniqueIdNumber];
+        int lengthBytes = 8*4 + currentDP5PacketLen; // 8 words header * 4 byte (each is uint32_t) + packet ...
+        if(lengthBytes%4)     NSLog(@"ERROR in %@::%@!  lengthBytes %i not multiple of 4! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,lengthBytes);//TODO: DEBUG -tb-
+
+        int length32 = lengthBytes/4;
+			time_t	ut_time;
+			time(&ut_time);
+
+			data[0] = spectrumEventId | (length32); 
+			data[1] = location;
+			data[2] = ut_time;	   //sec
+			data[3] = 0;	       //subsec
+			data[4] = specLength;  //spectrum length
+			data[5] = 0;	
+			data[6] = 0;	
+			data[7] = 0;	
+            
+            void *destination = (void*) &(data[8]);
+            memcpy(destination, dp5Packet, currentDP5PacketLen);
+            
+			//[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+			//													object:[NSData dataWithBytes:data length:lengthBytes]];
+            NSData* pdata = [[NSData alloc] initWithBytes:data length:lengthBytes];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
+            [pdata release];
+            pdata = nil;
+
+
+    }
+    
+
                 
     return 0;
 }
@@ -1968,6 +2073,27 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 
+
+
+
+
+- (int) requestSpectrum
+{
+    return [self requestSpectrumOfType: spectrumRequestType];
+}
+
+- (int) requestSpectrumOfType:(int)pid2
+{
+    switch(pid2){
+    case 1: return [self sendUDPCommandString: @"0xf5fa02010000fe0e"]; break;
+    case 2: return [self sendUDPCommandString: @"0xf5fa02020000fe0d"]; break;
+    case 3: return [self sendUDPCommandString: @"0xf5fa02030000fe0c"]; break;
+    case 4: return [self sendUDPCommandString: @"0xf5fa02040000fe0b"]; break;
+    default:
+	    NSLog(@"ERROR %@::%@ - request type not valid: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),pid2);//TODO: DEBUG -tb-
+    }
+    return -1;
+}
 
 - (int) sendTextCommand
 {
@@ -2437,7 +2563,7 @@ commands:
       
 
       
-	//size_t length        = sendlen;
+	size_t length        = sendlen;
 
 
     //const char *buffer   = [crateUDPCommand cStringUsingEncoding: NSASCIIStringEncoding];  //TODO: maybe use NSData and NSString::dataUsingEncoding:allowLossyConversion: ??? -tb-
@@ -2462,7 +2588,7 @@ commands:
     //TODO: only recommended when using a char buffer ...  ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",buffer); //DEBUG
 	
 	//retval = sendto(UDP_COMMAND_CLIENT_SOCKET, buffer, length, 0 /*flags*/, (struct sockaddr *)&UDP_COMMAND_sockaddrin_to, sockaddrin_to_len);
-	retval = sendto(UDP_COMMAND_CLIENT_SOCKET, sendline, sendlen, 0 /*flags*/, (struct sockaddr *)&UDP_COMMAND_sockaddrin_to, sockaddrin_to_len);
+	retval = sendto(UDP_COMMAND_CLIENT_SOCKET, sendline, length, 0 /*flags*/, (struct sockaddr *)&UDP_COMMAND_sockaddrin_to, sockaddrin_to_len);
     return retval;
 
 }
@@ -2552,6 +2678,18 @@ commands:
 
 - (int) receiveFromDataReplyServer
 {
+
+
+////UNUSED
+////UNUSED
+
+////UNUSED
+////UNUSED
+
+////UNUSED
+////UNUSED
+
+
 //TODO: changed to pthreads - needs cleanup -tb-
 // code moved to void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
  
@@ -3613,7 +3751,22 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 //DEBUG OUTPUT:
  	NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
+    //write "MCA disable"
+    [self sendTextCommandString: @"MCAE=OFF;"];
 
+    NSMutableString *argument = [[NSMutableString alloc] init];
+    
+    //write "number of bins" = MCAC (MCA Channels), p. 110
+    [argument setString: [NSString stringWithFormat: @"MCAC=%i;", numSpectrumBins]];
+ 	NSLog(@"WARNING: %@::%@:  write MCA: >%@< \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),argument);//TODO: DEBUG testing ...-tb-
+    [self sendTextCommandString: argument];
+    
+    
+    
+    //write "MCA enable"
+    [self sendTextCommandString: @"MCAE=ON;"];
+
+return ;
 
 	[self writeControlReg];
 	[self writePixelBusEnableReg];
@@ -3729,6 +3882,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setSpectrumRequestType:[decoder decodeIntForKey:@"spectrumRequestType"]];
+	[self setNumSpectrumBins:[decoder decodeIntForKey:@"numSpectrumBins"]];
 	[self setTextCommand:[decoder decodeObjectForKey:@"textCommand"]];
 	[self setResetEventCounterAtRunStart:[decoder decodeIntForKey:@"resetEventCounterAtRunStart"]];
 	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
@@ -3802,6 +3957,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:spectrumRequestType forKey:@"spectrumRequestType"];
+	[encoder encodeInt:numSpectrumBins forKey:@"numSpectrumBins"];
 	[encoder encodeObject:textCommand forKey:@"textCommand"];
 	[encoder encodeInt:resetEventCounterAtRunStart forKey:@"resetEventCounterAtRunStart"];
 	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
@@ -3855,6 +4012,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	
+    
+     //unused???
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORAmptekDP5DecoderForEvent",				@"decoder",
 								 [NSNumber numberWithLong:eventDataId],	@"dataId",
@@ -3864,6 +4023,18 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	
     [dataDictionary setObject:aDictionary forKey:@"AmptekDP5Event"];
 	
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORAmptekDP5DecoderForSpectrum",			@"decoder",
+				   [NSNumber numberWithLong:spectrumEventId],   @"dataId",
+				   [NSNumber numberWithBool:YES],				@"variable",
+				   [NSNumber numberWithLong:-1],			    @"length",
+				   nil];
+	
+    [dataDictionary setObject:aDictionary forKey:@"AmptekDP5Spectrum"];
+    
+    
+    
+//TODO: UNUSED    
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"ORAmptekDP5DecoderForMultiplicity",			@"decoder",
 				   [NSNumber numberWithLong:multiplicityId],   @"dataId",
@@ -3894,6 +4065,9 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
     return dataDictionary;
 }
 
+- (unsigned long) spectrumEventId	 { return spectrumEventId; }
+- (void) setSpectrumEventId: (unsigned long) aDataId    { spectrumEventId = aDataId; }
+
 - (unsigned long) fltEventId	     { return fltEventId; }
 - (void) setFltEventId: (unsigned long) aDataId    { fltEventId = aDataId; }
 - (unsigned long) eventDataId        { return eventDataId; }
@@ -3905,6 +4079,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) setDataIds:(id)assigner
 {
+    spectrumEventId = [assigner assignDataIds:kLongForm];
     eventDataId     = [assigner assignDataIds:kLongForm];
     multiplicityId  = [assigner assignDataIds:kLongForm];
     waveFormId  = [assigner assignDataIds:kLongForm];
@@ -3913,6 +4088,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
+    [self setSpectrumEventId:[anotherCard spectrumEventId]];
     [self setEventDataId:[anotherCard eventDataId]];
     [self setMultiplicityId:[anotherCard multiplicityId]];
     [self setWaveFormId:[anotherCard waveFormId]];
@@ -3940,7 +4116,7 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
        accessAllowedToHardwareAndSBC = NO;
     }
 
-	
+#if 0
     if(takeUDPstreamData){
         savedUDPSocketState = [self isOpenDataCommandSocket] | ([self isListeningOnDataServerSocket]<<1);
         //savedUDPSocketState=0;
@@ -3960,13 +4136,18 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	    }
         
     }
+#endif    
+    
+        savedUDPSocketState = [self isOpenCommandSocket] ;
+    if(![self isOpenCommandSocket]) [self openCommandSocket];
+
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORAmptekDP5Model"];    
     //----------------------------------------------------------------------------------------	
 	
-	pollingWasRunning = [poller isRunning];
-	if(pollingWasRunning) [poller stop];
+	//pollingWasRunning = [poller isRunning];
+	//if(pollingWasRunning) [poller stop];
 	
 	//[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
 	
@@ -3975,6 +4156,8 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
     //  for QuickStart: do not access the hardware (at least not registers relevant for SAMBA) -tb-
     if([[userInfo objectForKey:@"doinit"]intValue]){
         [self initBoard];		
+        
+#if 0
         //event mode
         if(takeEventData){
 		    //[self initBoard];		
@@ -3990,10 +4173,12 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             //[self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];
             //[self performSelector:@selector(loopCommandRequestUDPData) withObject:nil afterDelay: 10.0];//repeat every 10 seconds
         }
+#endif
+        
 	}	
 	
     
-    
+#if 0
     partOfRunFLTMask = 0;
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
 	
@@ -4008,7 +4193,6 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         }
          #endif
     }
-	
 
 	
 	//TODO: temporarily disabled ... [self readStatusReg];
@@ -4036,6 +4220,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	    //    [self load_HW_Config];
 	    ////TODO: remove SLT stuff -tb-   2014 [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
     }
+#endif	
 	
 }
 
@@ -4070,7 +4255,8 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         double elapsedTime = currDiffTime - lastDiffTime;
         
         //if takeUDPstreamData is checked, check every 0.5 sec. the UDP buffer ...
-        if(takeUDPstreamData) if(elapsedTime >= 0.5){// ----> x= this value (e.g. 1.0/0.5 ...)
+        //if(takeUDPstreamData) 
+        if(elapsedTime >= 1.5){// ----> x= this value (e.g. 1.0/0.5 ...)
 		    //code to be executed every x seconds -BEGIN
 		    //
 		    // 
@@ -4117,6 +4303,10 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             #endif
             
 
+
+
+
+#if 0
             //check for data
             int *rdIndex = &(dataReplyThreadData.rdIndex);//we cannot use references, we are in C, not C++
             if(*rdIndex>=0){
@@ -4322,6 +4512,12 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
                 
                 
             }//if(...buffersAreActive...    TODO: I could omit this check (?) -tb-
+#endif
+            
+            
+            
+            
+            
 		    //code to be executed every second -END
 		    lastDiffTime = currDiffTime;
 		}
@@ -4331,6 +4527,12 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
         
 	}
 	else {// the first time
+		    //./ DO SOMETHING
+            //DEBUG
+    NSLog(@"Called %@::%@: FIRST TIME\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+			NSLog(@"===================================\n");
+			NSLog(@"   Datataker Loop: first time: %f\n",currDiffTime);
+			NSLog(@"===================================\n");
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
         if(accessAllowedToHardwareAndSBC){
@@ -4429,6 +4631,9 @@ if((len % 4) != 0){
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+return;
+
+
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
@@ -4439,6 +4644,7 @@ if((len % 4) != 0){
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+return;
     if(accessAllowedToHardwareAndSBC){
     
     
@@ -4470,7 +4676,7 @@ if((len % 4) != 0){
     if(takeUDPstreamData){
     	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(loopCommandRequestUDPData) object:nil];
         if(! (savedUDPSocketState & 0x1)) [self closeDataCommandSocket];
-        if(! (savedUDPSocketState & 0x2)) [self stopListeningDataServerSocket];
+        //if(! (savedUDPSocketState & 0x2)) [self stopListeningDataServerSocket];
         savedUDPSocketState=0;
     }
 
@@ -4484,12 +4690,13 @@ if((len % 4) != 0){
   */ //-tb- 
 - (void) shipSltSecondCounter:(unsigned char)aType
 {
+return;
+#if 0 //TODO: omit #import "ORAmptekDP5Defs.h"
 	//aType = 1 start run, =2 stop run, = 3 start subrun, =4 stop subrun, see #defines in ORAmptekDP5Defs.h -tb-
-	//unsigned long tl = [self readTimeLow];
-	//unsigned long th = [self readTimeHigh];
+	unsigned long tl = [self readTimeLow]; 
+	unsigned long th = [self readTimeHigh]; 
 
 	
-#if 0 //TODO: omit #import "ORAmptekDP5Defs.h"
 
 	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:th low:tl ];
 #endif
@@ -4531,8 +4738,9 @@ if((len % 4) != 0){
 
 - (BOOL) doneTakingData
 {
-	//TODO: remove SLT stuff -tb-   2014 return [pmcLink doneTakingData];
-return 0;
+	//TODO: remove SLT stuff? -tb-   2014 return [pmcLink doneTakingData];
+    //see ORRUnModel::takeData: may return NO and empty buffers!!!! -tb-
+return YES;
 }
 
 - (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj

@@ -25,6 +25,15 @@
 @class ORDataPacket;
 @class ORDataSet;
 
+@interface ORAmptekDP5DecoderForSpectrum : ORBaseDecoder{
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+
+
 @interface ORAmptekDP5DecoderForEvent : ORIpeCardDecoder {
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
