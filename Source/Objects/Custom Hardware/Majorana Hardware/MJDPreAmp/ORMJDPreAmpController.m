@@ -101,8 +101,8 @@
     
     [[baselinePlot1 xAxis] setRngLow:0.0 withHigh:10000];
     [[baselinePlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[baselinePlot1 yAxis] setRngLow:0.0 withHigh:300.];
-    [[baselinePlot1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
+    [[baselinePlot1 yAxis] setRngLow:-15. withHigh:15.];
+    [[baselinePlot1 yAxis] setRngLimitsLow:-15. withHigh:15. withMinRng:4]; // rail of preamp at -12V - niko
     
     [[temperaturePlot xAxis] setRngLow:0.0 withHigh:10000];
     [[temperaturePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
@@ -111,7 +111,7 @@
     
     [[voltagePlot xAxis] setRngLow:0.0 withHigh:10000];
     [[voltagePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[voltagePlot yAxis] setRngLow:0.0 withHigh:300.];
+    [[voltagePlot yAxis] setRngLow:-30. withHigh:30.];
     [[voltagePlot yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
     
     [[leakageCurrentPlot0 xAxis] setRngLow:0.0 withHigh:10000];
