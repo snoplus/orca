@@ -1471,12 +1471,14 @@ return;
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    value = [model readReg:index forFifo: fifoIndex ];
-		    NSLog(@"FLTv4 reg: %@  for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index], fifoIndex, value, value);
+		    //NSLog(@"FLTv4 reg: %@  for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index], fifoIndex, value, value);
+            NSLog(@"FLTv4 reg: %@ (regIdx %i) for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index],index, fifoIndex, value, value);
 		    //NSLog(@"  (addr: 0x%08x = 0x%08x ... 0x%08x)  \n", ([model getAddress:index]|(fifoIndex << 14)), [model getAddress:index],  (fifoIndex << 14));
         }
 		else {
 		    value = [model readReg:index ];
-		    NSLog(@"SLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
+		    //NSLog(@"SLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
+            NSLog(@"SLTv4 reg: %@ (regIdx %i) has value: 0x%x (%i)\n",[model getRegisterName:index],index,value, value);
         }
 	}
 	@catch(NSException* localException) {
@@ -1497,11 +1499,13 @@ return;
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    [model writeReg:index forFifo: fifoIndex  value:val];
-    		NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ fifo# %i\n", val, val, [model getRegisterName:index], fifoIndex);
+    		//NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ fifo# %i\n", val, val, [model getRegisterName:index], fifoIndex);
+            NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ (idx:%i) fifo# %i\n", val, val, [model getRegisterName:index], index, fifoIndex);
         }
 		else {
 		    [model writeReg:index value:val];
-		    NSLog(@"wrote 0x%x to SLT reg: %@ \n",val,[model getRegisterName:index]);
+		    //NSLog(@"wrote 0x%x to SLT reg: %@ \n",val,[model getRegisterName:index]);
+            NSLog(@"wrote 0x%x to SLT reg: %@  (idx:%i)\n",val,[model getRegisterName:index],index);
         }
 	}
 	@catch(NSException* localException) {
