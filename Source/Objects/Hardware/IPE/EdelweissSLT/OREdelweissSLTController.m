@@ -341,9 +341,31 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelResetEventCounterAtRunStartChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useStandardUDPDataPortsChanged:)
+                         name : OREdelweissSLTModelUseStandardUDPDataPortsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fifoForUDPDataPortChanged:)
+                         name : OREdelweissSLTModelFifoForUDPDataPortChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) fifoForUDPDataPortChanged:(NSNotification*)aNote
+{
+	[fifoForUDPDataPortPU selectItemAtIndex: [model fifoForUDPDataPort]];
+}
+
+- (void) useStandardUDPDataPortsChanged:(NSNotification*)aNote
+{
+	[useStandardUDPDataPortsCB setIntValue: [model useStandardUDPDataPorts]];
+    //[fifoForUDPDataPortPU setEnabled: [model useStandardUDPDataPorts]];
+    [crateUDPDataPortTextField setEnabled: ![model useStandardUDPDataPorts]];
+}
 
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote
 {
@@ -735,6 +757,8 @@ return;
 	[self statusHighRegChanged:nil];
 	[self lowLevelRegInHexChanged:nil];
 	[self resetEventCounterAtRunStartChanged:nil];
+	[self useStandardUDPDataPortsChanged:nil];
+	[self fifoForUDPDataPortChanged:nil];
 }
 
 
@@ -883,6 +907,16 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) fifoForUDPDataPortPUAction:(id)sender
+{
+	[model setFifoForUDPDataPort:[sender indexOfSelectedItem]];	
+}
+
+- (void) useStandardUDPDataPortsCBAction:(id)sender
+{
+	[model setUseStandardUDPDataPorts:[sender intValue]];	
+}
 
 - (void) resetEventCounterAtRunStartCBAction:(id)sender
 {

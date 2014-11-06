@@ -82,6 +82,8 @@
 		//(P) command sender (client)
 	    IBOutlet   NSTextField* crateUDPDataIPTextField;
 	    IBOutlet   NSTextField* crateUDPDataPortTextField;
+	      IBOutlet   NSPopUpButton* fifoForUDPDataPortPU;
+	      IBOutlet   NSButton* useStandardUDPDataPortsCB;
 		IBOutlet NSButton*		openDataCommandSocketButton;
 		IBOutlet NSButton*		closeDataCommandSocketButton;
 	    IBOutlet NSProgressIndicator*   openDataCommandSocketIndicator;
@@ -171,6 +173,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) fifoForUDPDataPortChanged:(NSNotification*)aNote;
+- (void) useStandardUDPDataPortsChanged:(NSNotification*)aNote;
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote;
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
 - (void) statusHighRegChanged:(NSNotification*)aNote;
@@ -234,6 +238,8 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) fifoForUDPDataPortPUAction:(id)sender;
+- (IBAction) useStandardUDPDataPortsCBAction:(id)sender;
 - (IBAction) resetEventCounterAtRunStartCBAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) statusHighRegTextFieldAction:(id)sender;

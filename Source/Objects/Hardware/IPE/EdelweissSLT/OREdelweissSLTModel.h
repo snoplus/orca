@@ -175,6 +175,8 @@
 	
 	//UDP Data Packet tab
     int crateUDPDataPort;
+        int useStandardUDPDataPorts;
+        int fifoForUDPDataPort;
     NSString* crateUDPDataIP;
     int crateUDPDataReplyPort;
 		    //reply connection (server/listener)
@@ -237,6 +239,10 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) fifoForUDPDataPort;
+- (void) setFifoForUDPDataPort:(int)aFifoForUDPDataPort;
+- (int) useStandardUDPDataPorts;
+- (void) setUseStandardUDPDataPorts:(int)aUseStandardUDPDataPorts;
 - (int) resetEventCounterAtRunStart;
 - (void) setResetEventCounterAtRunStart:(int)aResetEventCounterAtRunStart;
 - (int) lowLevelRegInHex;
@@ -524,6 +530,8 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelFifoForUDPDataPortChanged;
+extern NSString* OREdelweissSLTModelUseStandardUDPDataPortsChanged;
 extern NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged;
 extern NSString* OREdelweissSLTModelLowLevelRegInHexChanged;
 extern NSString* OREdelweissSLTModelStatusRegHighChanged;

@@ -2305,16 +2305,25 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
 	          if(  (foundPos=strstr(buffer,"startFIFO"))  ){
 	              printf("handleKCommand: KWC >%s< command 11!\n",foundPos);//DEBUG
                   if(len > strlen("KWC_startFIFO_")){//must have at least one character as argument
-                      printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=15)!\n",buffer,strlen(buffer));//DEBUG
+                      printf("   msg: KWC >%s< command - length OK (strlen:%i should be >=15)!\n",buffer,strlen(buffer));//DEBUG
                       char *startptr, *endptr;
-                      unsigned long value=0;
+                      unsigned long numFIFO=0;
                       startptr=foundPos+strlen("startFIFO ");
-                      printf("   startptr:   >%s<  \n",startptr);//DEBUG
-                      value = strtoul((const char *)startptr,&endptr,0);
-                      printf("   value is %u, startptr: %p, endptr %p  \n",value,startptr,endptr);//DEBUG
-                      FIFOREADER::startFIFO(value);
-                      pbus->write(BBcsrReg(value),0xc);//c=0x8+0x4=mres+pres
-
+                      //printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      numFIFO = strtoul((const char *)startptr,&endptr,0);
+                      //printf("   numFIFO is %u, startptr: %p, endptr %p  \n",numFIFO,startptr,endptr);//DEBUG
+                      
+                      if(FIFOREADER::isRunningFIFO(numFIFO)){
+                          printf("   WARNING: FIFO %u is already running! Cmd 'startFIFO' ignored!\n",numFIFO);//DEBUG
+                      }else{
+                          if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
+                              printf("    WARNING: FIFO %u is still stopping and clearing! Cmd 'startFIFO' ignored!\n",numFIFO);//DEBUG
+                          }else{
+                              FIFOREADER::startFIFO(numFIFO);
+                              pbus->write(BBcsrReg(numFIFO),0x2);//enable FIFO
+                              printf("   Message: FIFO %u started\n",numFIFO);//DEBUG
+                          }
+                      }
                   }
                   else
                       printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
@@ -2323,14 +2332,27 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
 	          if(  (foundPos=strstr(buffer,"stopFIFO"))  ){
 	              printf("handleKCommand: KWC >%s< command 12!\n",foundPos);//DEBUG
                   if(len > strlen("KWC_stopFIFO_")){//must have at least one character as argument
-                      printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=14)!\n",buffer,strlen(buffer));//DEBUG
+                      printf("   msg: KWC >%s< command - length OK (strlen:%i should be >=14)!\n",buffer,strlen(buffer));//DEBUG
                       char *startptr, *endptr;
-                      unsigned long value=0;
+                      unsigned long numFIFO=0;
                       startptr=foundPos+strlen("stopFIFO ");
-                      printf("   startptr:   >%s<  \n",startptr);//DEBUG
-                      value = strtoul((const char *)startptr,&endptr,0);
-                      printf("   value is %u, startptr: %p, endptr %p  \n",value,startptr,endptr);//DEBUG
-                      FIFOREADER::stopFIFO(value);
+                      //printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      numFIFO = strtoul((const char *)startptr,&endptr,0);
+                      //printf("   numFIFO is %u, startptr: %p, endptr %p  \n",numFIFO,startptr,endptr);//DEBUG
+                      //tests
+                      //tests
+                      if(! FIFOREADER::isRunningFIFO(numFIFO)){
+                          printf("   WARNING: 'stopFIFO': FIFO %i is not running!\n",numFIFO);
+                          if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
+                              printf("   WARNING: 'stopFIFO': FIFO %i is still stopping!\n",numFIFO);
+                          }
+                      }
+                      FIFOREADER::stopFIFO(numFIFO);
+                      //disable and clear the FIFO; wait 1 sec. after disable to clear (WARNING: otherwise shuffling may occur 2014-11) -tb-
+                      pbus->write(BBcsrReg(numFIFO),0x0);//disable this FIFO
+                      //clear is delayed by 1 sec
+                      //pbus->write(BBcsrReg(numFIFO),0xc);//clear FIFO (c=0x8+0x4=mres+pres)
+                      FIFOREADER::markFIFOforClearAfterDelay(numFIFO);
                   }
                   else
                       printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
@@ -5284,8 +5306,23 @@ int32_t main(int32_t argc, char *argv[])
             }
         }
 
+        //check, whether there are FIFOs, which were disabled and still wait for enabling (new 2014-11) -tb-
+        //----------------------
+	    for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++){
+            if(FIFOREADER::isMarkedToClearAfterDelay(iFifo)){
+                int64_t timeDiff= FIFOREADER::usecElapsedDelaySinceMarkToClear(iFifo);
+                //TODO: DEBUG                 fprintf(stderr,"   timeDIff is %li\n", timeDiff );
+                if(timeDiff > 1000000LL){
+                    pbus->write(BBcsrReg(iFifo),0xc);//clear FIFO (c=0x8+0x4=mres+pres)
+                    FIFOREADER::unmarkFIFOforClearAfterDelay(iFifo);
+                }
+            }
+        }
+        
+        
 
         //check for requests to change the state (from K command)
+        //    (after switching to multiple FIFOs in 2013, this all is more or less useless [as it would effect ALL FIFOs]) -tb-
         //-----------------------
         if(goToState != frUNDEF){
             //DEBUG fprintf(stderr,"-------------requested state change!!!---- -- (%i , FIFOREADER::State %i)\n", goToState ,FIFOREADER::State);

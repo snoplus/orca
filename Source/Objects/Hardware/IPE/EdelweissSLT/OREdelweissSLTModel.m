@@ -547,6 +547,8 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelFifoForUDPDataPortChanged = @"OREdelweissSLTModelFifoForUDPDataPortChanged";
+NSString* OREdelweissSLTModelUseStandardUDPDataPortsChanged = @"OREdelweissSLTModelUseStandardUDPDataPortsChanged";
 NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged = @"OREdelweissSLTModelResetEventCounterAtRunStartChanged";
 NSString* OREdelweissSLTModelLowLevelRegInHexChanged = @"OREdelweissSLTModelLowLevelRegInHexChanged";
 NSString* OREdelweissSLTModelStatusRegHighChanged = @"OREdelweissSLTModelStatusRegHighChanged";
@@ -736,6 +738,39 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (int) fifoForUDPDataPort
+{
+    return fifoForUDPDataPort;
+}
+
+- (void) setFifoForUDPDataPort:(int)aFifoForUDPDataPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoForUDPDataPort:fifoForUDPDataPort];
+    fifoForUDPDataPort = aFifoForUDPDataPort;
+    if(fifoForUDPDataPort==0) fifoForUDPDataPort=0;
+    if(fifoForUDPDataPort>5) fifoForUDPDataPort=5;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelFifoForUDPDataPortChanged object:self];
+    if(useStandardUDPDataPorts){
+        [self setCrateUDPDataPort: 9941 + fifoForUDPDataPort];
+    }
+}
+
+- (int) useStandardUDPDataPorts
+{
+    return useStandardUDPDataPorts;
+}
+
+- (void) setUseStandardUDPDataPorts:(int)aUseStandardUDPDataPorts
+{
+    int oldState=useStandardUDPDataPorts;
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseStandardUDPDataPorts:useStandardUDPDataPorts];
+    useStandardUDPDataPorts = aUseStandardUDPDataPorts;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelUseStandardUDPDataPortsChanged object:self];
+    if(oldState==0 && useStandardUDPDataPorts){
+        [self setCrateUDPDataPort: 9941 + fifoForUDPDataPort];
+    }
+}
 
 - (int) resetEventCounterAtRunStart
 {
@@ -3239,6 +3274,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setFifoForUDPDataPort:[decoder decodeIntForKey:@"fifoForUDPDataPort"]];
+	[self setUseStandardUDPDataPorts:[decoder decodeIntForKey:@"useStandardUDPDataPorts"]];
 	[self setResetEventCounterAtRunStart:[decoder decodeIntForKey:@"resetEventCounterAtRunStart"]];
 	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
 	[self setTakeADCChannelData:[decoder decodeIntForKey:@"takeADCChannelData"]];
@@ -3312,6 +3349,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:fifoForUDPDataPort forKey:@"fifoForUDPDataPort"];
+	[encoder encodeInt:useStandardUDPDataPorts forKey:@"useStandardUDPDataPorts"];
 	[encoder encodeInt:resetEventCounterAtRunStart forKey:@"resetEventCounterAtRunStart"];
 	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
 	[encoder encodeInt:takeADCChannelData forKey:@"takeADCChannelData"];
@@ -3496,13 +3535,17 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         //event mode
         if(takeEventData){
 		    //[self initBoard];		
+            //init FLTs is done by RunControl, if they are in TaskManager ...
         }
         //UDP data stream mode
         if(takeUDPstreamData){
             //'re-init' stream loop
-            [self sendUDPDataCommandString: @"KWC_stopStreamLoop"];	
+            //---- deprecated --- [self sendUDPDataCommandString: @"KWC_stopStreamLoop"];	
+            [self sendUDPDataCommandString: [NSString stringWithFormat: @"KWC_stopFIFO %i",fifoForUDPDataPort]];	
             usleep(10000);//need to wait for a recvfrom() cycle ...
-            [self sendUDPDataCommandString: @"KWC_startStreamLoop"];	
+            sleep(1);
+            //---- deprecated --- [self sendUDPDataCommandString: @"KWC_startStreamLoop"];	
+            [self sendUDPDataCommandString: [NSString stringWithFormat: @"KWC_startFIFO %i",fifoForUDPDataPort]];	
             usleep(10000);
             [self loopCommandRequestUDPData];
             //[self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];

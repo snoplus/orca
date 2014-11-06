@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
+#include <sys/time.h> //for gettimeofday
 
 
 #if 0 //TODO: remove, moved to ipe4structure.h -tb-
@@ -348,6 +348,7 @@ public:
 		readfifo=0;  //set to 1 to activate readout
 		numfifo=0;   //my index
 	    //show_debug_info=0;
+        isWaitingToClearAfterDelay=0;// ... 0 = not waiting
 		
 		write2file=0;  // 0 = don't write to file; 1 = write file
 		write2file_len_sec=5;
@@ -461,7 +462,12 @@ public:
 	//int simulation_send_dummy_udp;
 	//int run_main_readout_loop; is global!
 	//int show_debug_info;
-	
+    
+    //handle dely between FIFO disable and FIFO clear (reset pointers mres, pres) command
+    int isWaitingToClearAfterDelay;//need to wait 1 sec between FIFO disable and FIFO clear (WARNING: otherwise shuffling may occur 2014-11) -tb-
+	struct timeval timeOfDisableFIFOcmd;
+    
+    
 	int write2file;  // 0 = don't write to file; 1 = write file
 	int write2file_len_sec;
 	int write2file_format;
@@ -528,11 +534,18 @@ public:
         }
     }
     
+    static int isRunningFIFO(unsigned int i){
+        if(i<FIFOREADER::availableNumFIFO){ 
+            return FifoReader[i].readfifo;
+        }
+        return 0;
+    }
+    
     static void stopFIFO(unsigned int i){
         if(i<FIFOREADER::availableNumFIFO){ 
             if(!FIFOREADER::FifoReader[i].readfifo){
                 //FIFO i is not running
-                printf("WARNING:   FIFO %i is not running!\n",i);
+                printf("WARNING:  FIFOREADER::stopFIFO: FIFO %i is not running!\n",i);
             }
             else
             {
@@ -544,6 +557,30 @@ public:
         }
     }
     
+    static void markFIFOforClearAfterDelay(unsigned int i){
+        FifoReader[i].isWaitingToClearAfterDelay = 1;
+        gettimeofday(&FifoReader[i].timeOfDisableFIFOcmd,NULL);
+    }
+
+    static void unmarkFIFOforClearAfterDelay(unsigned int i){
+        FifoReader[i].isWaitingToClearAfterDelay = 0;
+        gettimeofday(&FifoReader[i].timeOfDisableFIFOcmd,NULL);
+    }
+
+    static int isMarkedToClearAfterDelay(unsigned int i){
+        return FifoReader[i].isWaitingToClearAfterDelay;
+    }
+
+    static int64_t usecElapsedDelaySinceMarkToClear(unsigned int i){
+        int64_t timeDiff=0;
+        struct timeval now;
+        gettimeofday(&now,NULL);
+        timeDiff = (now.tv_usec - FifoReader[i].timeOfDisableFIFOcmd.tv_usec) + (now.tv_sec - FifoReader[i].timeOfDisableFIFOcmd.tv_sec)*1000000;
+        
+        return timeDiff;
+    }
+
+
     static void resetAllSynchronizingAndPackaging(){
         int i=0;
         for(i=0; i<FIFOREADER::availableNumFIFO; i++) 
