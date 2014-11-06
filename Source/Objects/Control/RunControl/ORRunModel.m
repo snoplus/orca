@@ -1194,7 +1194,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[runFailedAlarm setAcknowledged:NO];
 		[runFailedAlarm postAlarm];
         
-        NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@\n",[localException name]);
+        //NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@\n",[localException name]);
+        NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@, reason: %@\n",[localException name],[localException reason]);//please show more info -tb-
         
     }
 }
