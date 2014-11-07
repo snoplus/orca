@@ -1,0 +1,273 @@
+#import "~/Desktop/orca_files/eca_patterns.ofs"
+
+function eca_main(eca_pattern) {
+
+    pattern_number = 5; // 1: dbeta, 2: solar, 3: crate-by-crate, 4: penn bonus, 5: channel, 6: SNO-style
+    eca_type = 1; // 1: ped, 2: tslope, 3: qslope (not yet)
+    tslope_pattern = 1; // 1: 10 nsec coarse, 2: 5 nsec steps, 3: fine slope given coarse delay
+ 
+    sub_run_time = 1.0; // sec
+
+    coarse_delay = 170; // nsec, 10 nsec resolution in HW
+    fine_delay = 0; // clicks, 1 click -> 0.1 nsec, 255 clicks max
+    pedestal_width = 40; //nsec, 5 nsec resolution in HW
+    
+    rc = find(ORRunModel);
+    mtc = find(ORMTCModel,0,6);
+    snot = find(SNOPModel);
+  
+    if(!rc || !mtc || !snot) {
+        print("missing HW");
+        return 1;
+    }
+
+    //if (pattern_number == 0) {
+        // unset everything and quit
+        // injected_charge = 0;
+        // if (update_charge(injected_charge)) return 1;
+        // update_charge_and_mask(0, 0);
+        [snot zeroPedestalMasks];
+        //return 0;
+    //}
+
+    switch (pattern_number) {
+        case 2:
+            eca_pattern_num_steps = eca_pattern_solar(eca_pattern);
+            break;
+        case 1:
+            eca_pattern_num_steps = eca_pattern_dbeta(eca_pattern);
+            break;
+        case 3:
+            eca_pattern_num_steps = eca_pattern_diag(eca_pattern);
+            break;
+        case 4:
+            eca_pattern_num_steps = eca_pattern_penn(eca_pattern);
+            break;
+        case 5:
+            eca_pattern_num_steps = eca_pattern_channel(eca_pattern);
+            break;
+        case 6:
+            eca_pattern_num_steps = eca_pattern_sno(eca_pattern);
+            break;
+        default:
+            print "pattern_number: ", pattern_number, " unknown";
+            return;
+            break;
+    }
+
+    tslope_delays_num_steps = 256;
+    array tslope_delays_coarse[tslope_delays_num_steps];
+    array tslope_delays_fine[tslope_delays_num_steps];
+
+    switch (tslope_pattern) {
+        case 1:
+            tslope_delays_num_steps = 50;
+            for (idx=0; idx<50; idx++) {
+                tslope_delays_coarse[idx] = idx * 10 + 10;
+            }
+            break;
+
+        case 2:
+            tslope_delays_num_steps = 2*50;
+            for (idx=0; idx<100; idx++) {
+                tslope_delays_coarse[idx] = floor(idx/2) * 10 + 10;
+                tslope_delays_fine[idx] = idx % 2 * 50;
+            }
+            break;
+
+        case 3:
+            tslope_delays_num_steps = 256;
+            for (idx=0; idx<256; idx++) {
+                tslope_delays_coarse[idx] = coarse_delay;
+                tslope_delays_fine[idx] = idx;
+            }
+            break;
+
+        default:
+            print "tslope pattern: ", tslope_pattern, " unknown";
+            return;
+            
+            break;
+    }
+
+    switch (eca_type) {
+        case 1:
+            tslope_delays_num_steps = 1;
+            break;
+        default:
+            ;
+            break;
+    }
+
+    [snot updateEPEDStructWithCoarseDelay: 255 - floor(coarse_delay/10.0)
+                                fineDelay: fine_delay
+                           chargePulseAmp: 0x0
+                            pedestalWidth: pedestal_width
+                                  calType: eca_type * 10 + pattern_number
+    ];
+
+    //[mtc setThePulserRate:pulser_rate setToInfinity:NO];
+    //[mtc setDbObject:str(pulser_rate) forIndex: 3];
+
+    [mtc setupGTCorseDelay: coarse_delay];
+    print "PED coarse delay set to ", coarse_delay, " nsec.";
+    [mtc setupGTFineDelay: fine_delay];
+    print "PED fine delay set to ", fine_delay, " clicks, about ", fine_delay/10., " nsec."; 
+    [mtc setThePedestalWidth: pedestal_width];
+    print "PED width set to ", pedestal_width, " nsec.";
+    
+    //[snot setRunType:kRunEca];
+    //print "Setting the run type to an eca run";
+   
+    if ([rc isRunning]) {
+        [rc stopRun];
+        waituntil (![rc isRunning], 60);
+    }
+    
+    [rc startRun:YES];
+    waituntil(([rc elapsedRunTime] > 1), 10);
+
+    [mtc fireMTCPedestalsFixedRate];
+    [mtc setupGTCorseDelay: coarse_delay];
+    [mtc setupGTFineDelay: fine_delay];
+    [mtc setThePedestalWidth: pedestal_width];
+    sleep(2.0);
+    [mtc stopMTCPedestalsFixedRate];
+    [rc prepareForNewSubRun];
+
+    for (step=0; step < eca_pattern_num_steps; step++) {
+
+        update_pedestal_mask(eca_pattern[step]);
+        //update_charge_and_mask(0, 0x1 << ch);
+    
+        for (i=0; i < tslope_delays_num_steps; i++) {
+      
+            switch (eca_type) {
+                case 1:
+                    print "ECA: step ", step+1, "/", eca_pattern_num_steps;
+                    break;
+
+                case 2:
+                    ped_coarse_delay = tslope_delays_coarse[i];
+                    [mtc setupGTCorseDelay:ped_coarse_delay];
+
+                    ped_fine_delay = tslope_delays_fine[i];
+                    [mtc setupGTFineDelay:ped_fine_delay];
+        
+                    print "coarse delay ", ped_coarse_delay, " fine delay ", ped_fine_delay;
+                    
+                    [snot updateEPEDStructWithCoarseDelay: 255 - floor(ped_coarse_delay / 10.0)
+                                fineDelay: ped_fine_delay
+                           chargePulseAmp: 0x0
+                            pedestalWidth: pedestal_width
+                                  calType: eca_type * 10 + pattern_number];
+                    break;
+
+                case 3:
+                    //???
+                    //charge slopes
+                    //q_inj = i*5;
+                    //update_charge(q_inj);
+                    //print "Set injected charge to ", q_inj;
+                    break;
+
+                default:
+                    ;
+                    break;
+            }
+
+            //[snot updateEPEDStructWithStepNumber: step*tslope_delays_num_steps + i];
+            [snot updateEPEDStructWithStepNumber: step];
+
+            [rc startNewSubRun];
+            [snot shipEPEDRecord];
+            [mtc continueMTCPedestalsFixedRate];
+
+            start = time();
+            now = time();
+            while (now - start < sub_run_time) {
+                now = time();
+            }
+
+            [mtc stopMTCPedestalsFixedRate];
+            [rc prepareForNewSubRun];
+        }
+    }
+    
+    [rc stopRun];
+    waituntil (![rc isRunning], 60);
+
+    [snot zeroPedestalMasks];
+    //if (update_charge(0)) return 1;
+}
+
+function update_pedestal_mask(pattern_step)
+{
+     snot = find(SNOPModel); //isn't this meant to be ORSNOPModel ?
+     //print snot;
+     
+     //[snot updatePedestalMasks:pattern_step];
+     //return;
+     
+    array pt_step[19];
+    pt_step = pattern_step;
+    array pt_step_crate[16];
+
+    for (crate=0; crate<19; crate++) {
+    	   //if (crate == 2) { 
+    	      //    continue;
+    	         //}
+        xl3 = find(ORXL3Model,crate,0);
+        if (!xl3) {
+            continue;
+        }
+        
+        if( (crate != 2) || (crate != 3) || (crate != 4 )){
+               continue;
+        }
+
+        pt_step_crate = pt_step[crate];
+        for (slot=0; slot<16; slot++) {
+                
+            fec = find(ORFec32Model,crate,slot);
+            if (fec) {
+                slotNum = [fec stationNumber];
+                slotMask = pt_step_crate[slotNum];
+                //print "slotNum : %d",slotNum;
+                [fec setPedEnabledMask: slotMask];
+            }
+        }
+        [xl3 setPedestalInParallel];
+    }
+    //return 0;
+}
+
+function update_charge(injValue)
+{
+    for (crate=0; crate<19; crate++) {
+        xl3 = find(ORXL3Model,crate,0);
+        if (!xl3) {
+            print "crate %d not found!", crate;
+            return 1;
+        }
+        for (slot=0; slot<16; slot++) {
+            [xl3 loadSingleDacForSlot:slot dacNum:136 dacVal:injValue];
+        }
+    }
+    return 0;
+}
+
+function update_charge_and_mask(injValue, aMask)
+{
+    for (crate=0; crate<19; crate++) {
+        xl3 = find(ORXL3Model,crate,0);
+        if (!xl3) {
+            print "crate %d not found!", crate;
+            return 1;
+        }
+        [xl3 setXl3ChargeInjCharge:injValue];
+        [xl3 setXl3ChargeInjMask:aMask];
+        [xl3 compositeEnableChargeInjection];
+    }
+    return 0;
+}
