@@ -1489,6 +1489,39 @@ int runType = kRunUndefined;
     }
     
     
+    //Gersende and Chris (Xl3 printing status)
+    NSArray* xl3Objects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    
+    NSMutableDictionary * allXl3Info = [NSMutableDictionary dictionaryWithCapacity:10];
+    
+    //loop through all xl3 instances in Orca
+    for (id xl3 in xl3Objects) {
+        
+        NSMutableDictionary * crateXl3Info = [NSMutableDictionary dictionaryWithCapacity:10];
+        [crateXl3Info setObject:[NSString stringWithFormat:@"%@",[xl3 hvASwitch]?@"ON":@"OFF"] forKey:@"hvStatusA"];
+    
+        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:[xl3 hvNominalVoltageA]] forKey:@"hvNominalA"];
+        
+        [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvAVoltageReadValue]] forKey:@"hvVoltageReadValueA"];
+        
+        [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvACurrentReadValue]] forKey:@"hvCurrentReadValueA"];
+        
+        if([xl3 crateNumber] == 16) {
+            
+            [crateXl3Info setObject:[NSString stringWithFormat:@"%@",[xl3 hvBSwitch]?@"ON":@"OFF"] forKey:@"hvStatusB"];
+            
+            [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:[xl3 hvNominalVoltageB]] forKey:@"hvNominalB"];
+            
+            [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvBVoltageReadValue]] forKey:@"hvVoltageReadValueB"];
+            
+            [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvBCurrentReadValue]] forKey:@"hvCurrentReadValueB"];
+        }
+    
+    NSString * crateNumberAsString = [NSString stringWithFormat:@"%i",[xl3 crateNumber]];
+    [allXl3Info setObject:crateXl3Info forKey:crateNumberAsString];
+    
+    }
+    
     //Loop over all the FEC cards
     NSArray * fec32ControllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
     
@@ -1569,7 +1602,10 @@ int runType = kRunUndefined;
     [configDocDict setObject:svnVersion forKey:@"daq_version_build"];
     
     [configDocDict setObject:mtcArray forKey:@"mtc"];
-    
+
+    //add the xl3 information to configuration document
+    [configDocDict setObject:allXl3Info forKey:@"xl3s"];
+
     //reorganise the Fec32 cards to make it easier for couchDB
 
     //Loop through all the crates in the detector

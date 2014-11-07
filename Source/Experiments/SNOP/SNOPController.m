@@ -361,14 +361,21 @@ smellieRunFile;
 
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
-    if (!aNote) {//pull from XL3s
+    if (!aNote) {
+        //collect all instances of xl3 objects in Orca
         NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        
+        // bit wise mask of xl3s
         unsigned long xl3Mask = 0x7ffff;
+        
+        //loop through all xl3 instances in Orca
         for (id xl3 in xl3s) {
+            
             xl3Mask ^= 1 << [xl3 crateNumber];
             int mRow;
             int mColumn;
             bool found;
+            
             found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:[xl3 crateNumber]]];
             if (found) {
                 [[hvStatusMatrix cellAtRow:mRow column:1] setStringValue:[xl3 hvASwitch]?@"ON":@"OFF"];
