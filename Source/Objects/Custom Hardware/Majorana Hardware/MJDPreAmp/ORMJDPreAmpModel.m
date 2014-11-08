@@ -1107,8 +1107,8 @@ struct {
         else            aTemperature = [self adc:15];
         if(aTemperature >= maxAllowedTemperature){
  			if(!temperatureAlarm[aChip]){
-				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Preamp %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
-                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Preamp %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
+				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Controller %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
+                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Controller %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
 				[temperatureAlarm[aChip] setSticky:YES];
                 [temperatureAlarm[aChip] postAlarm];
 			}
@@ -1124,12 +1124,13 @@ struct {
 - (void) checkLeakageCurrentIsWithinLimits:(int)aChan
 {
     float maxAllowedLeakageCurrent = 50;//pA    
-    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %lu Channel %d Leakage Current",[self uniqueIdNumber], aChan];
+    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %d of Controller %lu: Leakage Current Alarm",aChan,[self uniqueIdNumber]];
     float aLeakageCurrent = [self leakageCurrent:aChan];
+    
     if(aLeakageCurrent >= maxAllowedLeakageCurrent){
         if(!leakageCurrentAlarm[aChan]){
             leakageCurrentAlarm[aChan] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %lu Channel %d leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber], aChan]];
+            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %d of Controller %lu: leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",aChan,[self uniqueIdNumber]]];
             [leakageCurrentAlarm[aChan] setSticky:YES];
         }
         [leakageCurrentAlarm[aChan] postAlarm];
@@ -1150,28 +1151,28 @@ struct {
     switch(anIndex){
         case 5:
 	  if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
-                alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
+                alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 6:
             if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
-                alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
+                alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 13:
             if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
-                alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
+                alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 14:
             if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
-                alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
+                alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
@@ -1180,7 +1181,7 @@ struct {
     if(postAlarm){
         if(!adcAlarm[anIndex]){
             adcAlarm[anIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
+            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Controller %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
             [adcAlarm[anIndex] setSticky:YES];
             [adcAlarm[anIndex] postAlarm];
         }
@@ -1218,12 +1219,15 @@ struct {
     float nanoToPico = 1000.;
     
     int currentChan = mjdPreAmpTable[adcChan].leakageCurrentIndex;
-    if(currentChan>0){
+    if(currentChan>=0){
         if([self feedBackResistor:adcChan] != 0){
             //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
             float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
             [self setLeakageCurrent:currentChan value:leakageCurrent];
+            //[self setLeakageCurrent:adcChan value:leakageCurrent];
             [self checkLeakageCurrentIsWithinLimits:currentChan];
+            
+            //NSLog(@"leakage adc channel %d, preamp %d = %f pA\n",adcChan,mjdPreAmpTable[adcChan].leakageCurrentIndex,leakageCurrent);
         }
         else  [self setLeakageCurrent:currentChan value:0];
     }
@@ -1243,7 +1247,7 @@ struct {
  
  
         
-        //just ten detectors per premap
+        //just ten detectors per preamp
         int i;
         for(i=0;i<10;i++){
             int detectorAdcChannel = detectorToAdc[i];

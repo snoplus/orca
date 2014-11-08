@@ -211,7 +211,7 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu (Rev %d)",[model uniqueIdNumber],[model boardRev]+1]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Controller %lu (Rev %d)",[model uniqueIdNumber],[model boardRev]+1]];
     [self settingsLockChanged:nil];
 }
 
