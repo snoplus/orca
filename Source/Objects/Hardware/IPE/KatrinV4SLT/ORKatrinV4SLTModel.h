@@ -27,7 +27,7 @@
 
 
 
-#import "ORIpeV4SLTModel.h"   //for kSltV4NumRegs declaration - maybe not necessary in the future any more -tb- 2014
+#import "ORIpeV4SLTModel.h"   //for kKatrinV4SLTNumRegs declaration - maybe not necessary in the future any more -tb- 2014
 
 
 
@@ -143,65 +143,65 @@
 
 
 
-#if 0
+#if 1
 //IPE V4 register definitions
 enum KatrinSLTV4Enum {
-	kSltV4ControlReg,
-	kSltV4StatusReg,
-	kSltV4CommandReg,
-	kSltV4InterruptReguestReg,
-	kSltV4InterruptMaskReg,
-	kSltV4RequestSemaphoreReg,
-	kSltV4HWRevisionReg,
-	kSltV4PixelBusErrorReg,
-	kSltV4PixelBusEnableReg,
+	kKatrinV4SLTControlReg,
+	kKatrinV4SLTStatusReg,
+	kKatrinV4SLTCommandReg,
+	kKatrinV4SLTInterruptReguestReg,
+	kKatrinV4SLTInterruptMaskReg,
+	kKatrinV4SLTRequestSemaphoreReg,
+	kKatrinV4SLTHWRevisionReg,
+	kKatrinV4SLTPixelBusErrorReg,
+	kKatrinV4SLTPixelBusEnableReg,
     //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
     /*       these 3 were actually never used -tb-
-	kSltV4PixelBusTestReg,
-	kSltV4AuxBusTestReg,
-	kSltV4DebugStatusReg,
+	kKatrinV4SLTPixelBusTestReg,
+	kKatrinV4SLTAuxBusTestReg,
+	kKatrinV4SLTDebugStatusReg,
     */
-	kSltV4VetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4VetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4DeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4DeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTVetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTVetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTDeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTDeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
 								//TODO: and dead time and veto time counter are confused, too -tb-
-	kSltV4RunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4RunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4SecondSetReg,
-	kSltV4SecondCounterReg,
-	kSltV4SubSecondCounterReg,
+	kKatrinV4SLTRunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTRunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTSecondSetReg,
+	kKatrinV4SLTSecondCounterReg,
+	kKatrinV4SLTSubSecondCounterReg,
     //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
-    /*      only kSltV4PageSelectReg, kSltV4PageManagerReg, kSltV4EventStatusReg were actually never used -tb-
-	kSltV4PageManagerReg,
-	kSltV4TriggerTimingReg,
+    /*      only kKatrinV4SLTPageSelectReg, kKatrinV4SLTPageManagerReg, kKatrinV4SLTEventStatusReg were actually never used -tb-
+	kKatrinV4SLTPageManagerReg,
+	kKatrinV4SLTTriggerTimingReg,
     */
-	kSltV4PageSelectReg,
+	kKatrinV4SLTPageSelectReg,
     /*
-	kSltV4NumberPagesReg,
-	kSltV4PageNumbersReg,
-	kSltV4EventStatusReg,
-	kSltV4ReadoutCSRReg,
-	kSltV4BufferSelectReg,
-	kSltV4ReadoutDefinitionReg,
+	kKatrinV4SLTNumberPagesReg,
+	kKatrinV4SLTPageNumbersReg,
+	kKatrinV4SLTEventStatusReg,
+	kKatrinV4SLTReadoutCSRReg,
+	kKatrinV4SLTBufferSelectReg,
+	kKatrinV4SLTReadoutDefinitionReg,
     */
-	kSltV4TPTimingReg,
-	kSltV4TPShapeReg,
-	kSltV4i2cCommandReg,
-	kSltV4epcsCommandReg,
-	kSltV4BoardIDLoReg,
-	kSltV4BoardIDHiReg,
-	kSltV4PROMsControlReg,
-	kSltV4PROMsBufferReg,
-	kSltV4DataFIFOReg,
-	kSltV4FIFOModeReg,
-	kSltV4FIFOStatusReg,
-	kSltV4PAEOffsetReg,
-	kSltV4PAFOffsetReg,
-	kSltV4FIFOCsrReg,
-	kSltV4FIFOxRequestReg,
-	kSltV4FIFOMaskReg,
-	kSltV4NumRegs //must be last
+	kKatrinV4SLTTPTimingReg,
+	kKatrinV4SLTTPShapeReg,
+	kKatrinV4SLTi2cCommandReg,
+	kKatrinV4SLTepcsCommandReg,
+	kKatrinV4SLTBoardIDLoReg,
+	kKatrinV4SLTBoardIDHiReg,
+	kKatrinV4SLTPROMsControlReg,
+	kKatrinV4SLTPROMsBufferReg,
+	kKatrinV4SLTDataFIFOReg,
+	kKatrinV4SLTFIFOModeReg,
+	kKatrinV4SLTFIFOStatusReg,
+	kKatrinV4SLTPAEOffsetReg,
+	kKatrinV4SLTPAFOffsetReg,
+	kKatrinV4SLTFIFOCsrReg,
+	kKatrinV4SLTFIFOxRequestReg,
+	kKatrinV4SLTFIFOMaskReg,
+	kKatrinV4SLTNumRegs //must be last
 };
 #endif
 
@@ -211,7 +211,7 @@ enum KatrinSLTV4Enum {
 
 
 
-extern IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs];
+extern IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs];
 
 
 
@@ -223,7 +223,7 @@ extern IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs];
 
 #if 0
 //this is in .m file
-static IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs] = {
+static IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },

@@ -39,6 +39,8 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelHitrateLimitIonChanged = @"OREdelweissFLTModelHitrateLimitIonChanged";
+NSString* OREdelweissFLTModelHitrateLimitHeatChanged = @"OREdelweissFLTModelHitrateLimitHeatChanged";
 NSString* OREdelweissFLTModelChargeFICFileChanged = @"OREdelweissFLTModelChargeFICFileChanged";
 NSString* OREdelweissFLTModelProgressOfChargeFICChanged = @"OREdelweissFLTModelProgressOfChargeFICChanged";
 NSString* OREdelweissFLTModelFicCardTriggerCmdChanged = @"OREdelweissFLTModelFicCardTriggerCmdChanged";
@@ -510,6 +512,34 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) hitrateLimitIon
+{
+    return hitrateLimitIon;
+}
+
+- (void) setHitrateLimitIon:(int)aHitrateLimitIon
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitrateLimitIon:hitrateLimitIon];
+    
+    hitrateLimitIon = aHitrateLimitIon;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitrateLimitIonChanged object:self];
+}
+
+- (int) hitrateLimitHeat
+{
+    return hitrateLimitHeat;
+}
+
+- (void) setHitrateLimitHeat:(int)aHitrateLimitHeat
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitrateLimitHeat:hitrateLimitHeat];
+    
+    hitrateLimitHeat = aHitrateLimitHeat;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitrateLimitHeatChanged object:self];
+}
 
 - (NSString*) chargeFICFile
 {
@@ -2328,8 +2358,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned short) hitRateLength { return hitRateLength; }
 - (void) setHitRateLength:(unsigned short)aHitRateLength
 {	
+ 	NSLog(@"%@::%@ aHitRateLength: %i   old: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aHitRateLength,hitRateLength);//TODO: DEBUG testing ...-tb-
+
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateLength:hitRateLength];
-    hitRateLength = [self restrictIntValue:aHitRateLength min:1 max:256]; //0->1sec, 1->2, 2->3 .... sec
+    hitRateLength = [self restrictIntValue:aHitRateLength min:0 max:8]; //new 2014-11: 0->1sec, 1->2, 2->4, 3->8 .... sec etc   //before 2014-11: 0->1sec, 1->2, 2->3 .... sec
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateLengthChanged object:self];
 }
@@ -2746,6 +2778,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	else return NO;
 }
 
+- (BOOL) hitRateRegulationIsOn:(unsigned short)aChan
+{    return (hitRateReg[aChan] & 0x10000)!=0;}
+
+
 - (unsigned short) selectedChannelValue { return selectedChannelValue; }
 - (void) setSelectedChannelValue:(unsigned short) aValue
 {
@@ -3000,11 +3036,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return control;
 }
 
+
+//TODO: we write the hitrate regulation limits, too; currently we have only one "Write" button in the GUI ...; make a button in the future! -tb- 2014-11
 - (void) writeRunControl
 {
-	unsigned long aValue = ((hitRateLength-1) & 0xf) << 16 ;
+ 	//DEBUG     NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
+    //  never used: uint32_t highestBit = fls(hitRateLengthSec); if(highestBit) highestBit --;
+	//  never used:  unsigned long aValue = ((highestBit) & 0xf) << 16 ;
+	//unsigned long aValue = ((hitRateLength-1) & 0xf) << 16 ; //before 2014-11
+	unsigned long aValue = ((hitRateLength) & 0xff) << 16 ;
 	aValue |= 0x80000000;//activate flag
-	[self writeReg:kFLTV4RunControlReg value:aValue];					
+	[self writeReg:kFLTV4RunControlReg value:aValue];	
+    
+                    //TODO: write the	ThreshAdjust reg (hitrate regulation limits) , too	
+    aValue =  ((hitrateLimitIon & 0xff) << 16)  | (hitrateLimitHeat & 0xff) ;
+	[self writeReg:kFLTV4ThreshAdjustReg value:aValue];					
 }
 
 - (void) writeControl
@@ -3773,8 +3820,11 @@ for(chan=0; chan<6;chan++)
 - (void) readHitRates
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+    
+    int hitRateLengthSec = 0x1 << hitRateLength;
 
-        //DEBUG OUTPUT:                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //DEBUG OUTPUT:     
+                    NSLog(@"%@::%@: UNDER CONSTRUCTION! hitRateLength: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),hitRateLength);//TODO : DEBUG testing ...-tb-
 	
 //TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
 //TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
@@ -3783,7 +3833,6 @@ for(chan=0; chan<6;chan++)
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
-        int hitRateLengthSec = hitRateLength;
 		float freq = 1.0/((double)hitRateLengthSec);
 				
 //		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
@@ -3805,16 +3854,17 @@ for(chan=0; chan<6;chan++)
 		int dataIndex = 0;
 		for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
-				unsigned long aValue = [aList longValueForCmd:dataIndex];
-				BOOL overflow = (aValue >> 31) & 0x1;
-				aValue = aValue & 0x7fffffff;
-				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
+                hitRateReg[chan] = [aList longValueForCmd:dataIndex];
+				unsigned long aValue = hitRateReg[chan];
+				BOOL overflow = (aValue == 0xffff);//(aValue >> 31) & 0x1;
+				aValue = aValue & 0xffff;
+				if((aValue *freq) != hitRate[chan] || overflow != hitRateOverFlow[chan]){
 					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
 					else					    hitRate[chan] = 0;
-        //DEBUG OUTPUT:                 NSLog(@"%@::%@: HR  for chan %i was 0x%08x (%i)  -> %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,aValue,aValue,hitRate[chan]);//TODO : DEBUG testing ...-tb-
+                    //DEBUG OUTPUT:                 NSLog(@"%@::%@: HR  for chan %i was 0x%08x (%i)  -> %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,aValue,aValue,hitRate[chan]);//TODO : DEBUG testing ...-tb-
 					
-					if(hitRateOverFlow[chan])hitRate[chan] = 0;
+					if(hitRateOverFlow[chan]) hitRate[chan] = 0;
 					hitRateOverFlow[chan] = overflow;
 					
 					oneChanged = YES;
@@ -3824,7 +3874,10 @@ for(chan=0; chan<6;chan++)
 				}
 //				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb-
 				dataIndex++;
-			}
+			}else{
+                hitRateReg[chan] = 0;
+            }
+            //DEBUG OUTPUT:      NSLog(@"%@::%@: chan %i   hitRateReg[chan]: 0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,hitRateReg[chan]);//TODO : DEBUG testing ...-tb-
 		}
 #if 0
 		
@@ -3845,7 +3898,7 @@ for(chan=0; chan<6;chan++)
 		
 		[self setHitRateTotal:newTotal];
 		
-		if(oneChanged){
+		if(1 || oneChanged){//TODO: need to store the hitrate regulation bit and OR together in "oneCHanged" -tb- 2014-11
 		    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];
 		}
 	}
@@ -3854,7 +3907,7 @@ for(chan=0; chan<6;chan++)
 	
 
 
-	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay: hitRateLengthSec];
 }
 
 
@@ -3909,6 +3962,8 @@ for(chan=0; chan<6;chan++)
     
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
+    [self setHitrateLimitIon:[decoder decodeIntForKey:@"hitrateLimitIon"]];
+    [self setHitrateLimitHeat:[decoder decodeIntForKey:@"hitrateLimitHeat"]];
     [self setChargeFICFile:[decoder decodeObjectForKey:@"chargeFICFile"]];
         [self setFicCardTriggerCmd:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]] forFiber:i];
         [self setFicCardADC23CtrlReg:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]] forFiber:i]; 
@@ -4041,6 +4096,8 @@ for(chan=0; chan<6;chan++)
 	
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
+        [encoder encodeInt:hitrateLimitIon forKey:@"hitrateLimitIon"];
+        [encoder encodeInt:hitrateLimitHeat forKey:@"hitrateLimitHeat"];
         [encoder encodeObject:chargeFICFile forKey:@"chargeFICFile"];
         [encoder encodeInt:ficCardTriggerCmd[i] forKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]];
         [encoder encodeInt:ficCardADC23CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]];
@@ -4373,7 +4430,7 @@ for(chan=0; chan<6;chan++)
 	if(ratesEnabled){//TODO: disabled ... -tb-
 		[self performSelector:@selector(readHitRates) 
 				   withObject:nil
-				   afterDelay: [self hitRateLength]];		//start reading out the rates
+				   afterDelay:  (0x1 << hitRateLength)];		//start reading out the rates
 	}
 		
 	if(runMode == kIpeFltV4_MonitoringDaqMode ){ ///obsolete ... kIpeFltV4_Histogram_DaqMode){
@@ -4555,7 +4612,7 @@ for(chan=0; chan<6;chan++)
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Hit Rate Length"];
-    [p setFormat:@"##0" upperLimit:4095 lowerLimit:255 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:8 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setHitRateLength:) getMethod:@selector(hitRateLength)];
     [a addObject:p];			
 

@@ -365,6 +365,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[useStandardUDPDataPortsCB setIntValue: [model useStandardUDPDataPorts]];
     //[fifoForUDPDataPortPU setEnabled: [model useStandardUDPDataPorts]];
     [crateUDPDataPortTextField setEnabled: ![model useStandardUDPDataPorts]];
+    [crateUDPDataReplyPortTextField setEnabled: ![model useStandardUDPDataPorts]];
 }
 
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote

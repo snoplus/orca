@@ -80,6 +80,9 @@
 	IBOutlet   NSMatrix*    gapMatrix;
 	IBOutlet   NSMatrix*    downSamplingMatrix;
 	IBOutlet   NSMatrix*    shapingLengthMatrix;
+		//hirate settings
+	    IBOutlet   NSTextField* hitrateLimitIonTextField;
+	    IBOutlet   NSTextField* hitrateLimitHeatTextField;
 		IBOutlet NSMatrix*		hitRateEnableMatrix;
 		IBOutlet NSPopUpButton*	hitRateLengthPU;
 		IBOutlet NSTextField*	hitRateLengthTextField;
@@ -192,6 +195,7 @@
 	
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
+		IBOutlet NSMatrix*		rateRegulationCBs;
 		
 		IBOutlet ORValueBarGroupView*		rate0;
 		IBOutlet ORValueBarGroupView*		totalRate;
@@ -250,6 +254,8 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) hitrateLimitIonChanged:(NSNotification*)aNote;
+- (void) hitrateLimitHeatChanged:(NSNotification*)aNote;
 - (void) chargeFICFileChanged:(NSNotification*)aNote;
 - (void) progressOfChargeFICChanged:(NSNotification*)aNote;
 //FIC card
@@ -352,6 +358,8 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) hitrateLimitIonTextFieldAction:(id)sender;
+- (IBAction) hitrateLimitHeatTextFieldAction:(id)sender;
 - (IBAction) chargeFICFileTextFieldAction:(id)sender;
 //- (IBAction) progressOfChargeFICIndicatorAction:(id)sender;
 - (IBAction) selectChargeFICFileButtonAction:(id) sender;

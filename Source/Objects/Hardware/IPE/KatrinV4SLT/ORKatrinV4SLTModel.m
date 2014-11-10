@@ -10,7 +10,7 @@
 //Astrophysics (CENPA) sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
+//the contract and the progrkKatrinV4SLTam should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
 //Washington reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
@@ -32,7 +32,8 @@
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
 #import "PMC_Link.h"
-#import "SLTv4_HW_Definitions.h"
+//#import "../SLTv4_Readout_Code/SLTv4_HW_Definitions.h"  //TODO: use own file name 2014 -tb-
+#import "SLTv4_HW_Definitions.h"  //TODO: use own file name 2014 -tb-
 #import "ORPMCReadWriteCommand.h"
 #import "SLTv4GeneralOperations.h"
 
@@ -43,62 +44,62 @@
 //IPE V4 register definitions
 //MOVED TO .h FILE !!!!!!!!!!!!!!!!     <---------------- NOTE!
 enum KatrinSLTV4Enum {
-	kSltV4ControlReg,
-	kSltV4StatusReg,
-	kSltV4CommandReg,
-	kSltV4InterruptReguestReg,
-	kSltV4InterruptMaskReg,
-	kSltV4RequestSemaphoreReg,
-	kSltV4HWRevisionReg,
-	kSltV4PixelBusErrorReg,
-	kSltV4PixelBusEnableReg,
+	kKatrinV4SLTControlReg,
+	kKatrinV4SLTStatusReg,
+	kKatrinV4SLTCommandReg,
+	kKatrinV4SLTInterruptReguestReg,
+	kKatrinV4SLTInterruptMaskReg,
+	kKatrinV4SLTRequestSemaphoreReg,
+	kKatrinV4SLTHWRevisionReg,
+	kKatrinV4SLTPixelBusErrorReg,
+	kKatrinV4SLTPixelBusEnableReg,
     //Auger Registers Removed for Bipolar Filter Upgrade 2013 -tb-
     /*       these 3 were actually never used -tb-
-	kSltV4PixelBusTestReg,
-	kSltV4AuxBusTestReg,
-	kSltV4DebugStatusReg,
+	kKatrinV4SLTPixelBusTestReg,
+	kKatrinV4SLTAuxBusTestReg,
+	kKatrinV4SLTDebugStatusReg,
     */
-	kSltV4VetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4VetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4DeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4DeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTVetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTVetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTDeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTDeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
 								//TODO: and dead time and veto time counter are confused, too -tb-
-	kSltV4RunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4RunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-	kSltV4SecondSetReg,
-	kSltV4SecondCounterReg,
-	kSltV4SubSecondCounterReg,
-	kSltV4PageManagerReg,
-	kSltV4TriggerTimingReg,
-	kSltV4PageSelectReg,
-	kSltV4NumberPagesReg,
-	kSltV4PageNumbersReg,
-	kSltV4EventStatusReg,
-	kSltV4ReadoutCSRReg,
-	kSltV4BufferSelectReg,
-	kSltV4ReadoutDefinitionReg,
-	kSltV4TPTimingReg,
-	kSltV4TPShapeReg,
-	kSltV4i2cCommandReg,
-	kSltV4epcsCommandReg,
-	kSltV4BoardIDLoReg,
-	kSltV4BoardIDHiReg,
-	kSltV4PROMsControlReg,
-	kSltV4PROMsBufferReg,
-	kSltV4DataFIFOReg,
-	kSltV4FIFOModeReg,           //    <-------------- //TODO: new for SLT bipolar -tb-
-	kSltV4FIFOStatusReg,
-	kSltV4PAEOffsetReg,
-	kSltV4PAFOffsetReg,
-	kSltV4FIFOCsrReg,
-	kSltV4FIFOxRequestReg,
-	kSltV4FIFOMaskReg,
-	kSltV4NumRegs //must be last
+	kKatrinV4SLTRunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTRunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
+	kKatrinV4SLTSecondSetReg,
+	kKatrinV4SLTSecondCounterReg,
+	kKatrinV4SLTSubSecondCounterReg,
+	kKatrinV4SLTPageManagerReg,
+	kKatrinV4SLTTriggerTimingReg,
+	kKatrinV4SLTPageSelectReg,
+	kKatrinV4SLTNumberPagesReg,
+	kKatrinV4SLTPageNumbersReg,
+	kKatrinV4SLTEventStatusReg,
+	kKatrinV4SLTReadoutCSRReg,
+	kKatrinV4SLTBufferSelectReg,
+	kKatrinV4SLTReadoutDefinitionReg,
+	kKatrinV4SLTTPTimingReg,
+	kKatrinV4SLTTPShapeReg,
+	kKatrinV4SLTi2cCommandReg,
+	kKatrinV4SLTepcsCommandReg,
+	kKatrinV4SLTBoardIDLoReg,
+	kKatrinV4SLTBoardIDHiReg,
+	kKatrinV4SLTPROMsControlReg,
+	kKatrinV4SLTPROMsBufferReg,
+	kKatrinV4SLTDataFIFOReg,
+	kKatrinV4SLTFIFOModeReg,           //    <-------------- //TODO: new for SLT bipolar -tb-
+	kKatrinV4SLTFIFOStatusReg,
+	kKatrinV4SLTPAEOffsetReg,
+	kKatrinV4SLTPAFOffsetReg,
+	kKatrinV4SLTFIFOCsrReg,
+	kKatrinV4SLTFIFOxRequestReg,
+	kKatrinV4SLTFIFOMaskReg,
+	kKatrinV4SLTNumRegs //must be last
 };
 #endif
 
 
-IpeRegisterNamesStruct regKatrinSLTV4[kSltV4NumRegs] = {
+IpeRegisterNamesStruct regKatrinSLTV4[kKatrinV4SLTNumRegs] = {
 {@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Status",				0xa80004,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"Command",			0xa80008,		1,			kIpeRegWriteable },
@@ -510,30 +511,30 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 
 - (void) writePageSelect:(unsigned long)aPageNum		{
     //NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    [self writeReg:kSltV4PageSelectReg value:aPageNum]; 
+    [self writeReg:kKatrinV4SLTPageSelectReg value:aPageNum]; 
 }
-- (void) writeSetInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdSetInh]; }
-- (void) writeClrInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
-- (void) writeSwTrigger			{ [self writeReg:kSltV4CommandReg value:kCmdSwTr];   }
-- (void) writeTpStart			{ [self writeReg:kSltV4CommandReg value:kCmdTpStart];   }
-- (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kCmdFwCfg];   }
-- (void) writeSltReset			{ [self writeReg:kSltV4CommandReg value:kCmdSltReset];   }
-- (void) writeFltReset			{ [self writeReg:kSltV4CommandReg value:kCmdFltReset];   }
-- (void) writeSwRq				{ [self writeReg:kSltV4CommandReg value:kCmdSwRq];   }
-- (void) writeClrCnt			{ [self writeReg:kSltV4CommandReg value:kCmdClrCnt];   }
-- (void) writeEnCnt				{ [self writeReg:kSltV4CommandReg value:kCmdEnCnt];   }
-- (void) writeDisCnt			{ [self writeReg:kSltV4CommandReg value:kCmdDisCnt];   }
+- (void) writeSetInhibit		{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSetInh]; }
+- (void) writeClrInhibit		{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdClrInh]; }
+- (void) writeSwTrigger			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSwTr];   }
+- (void) writeTpStart			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdTpStart];   }
+- (void) writeFwCfg				{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdFwCfg];   }
+- (void) writeSltReset			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSltReset];   }
+- (void) writeFltReset			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdFltReset];   }
+- (void) writeSwRq				{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdSwRq];   }
+- (void) writeClrCnt			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdClrCnt];   }
+- (void) writeEnCnt				{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdEnCnt];   }
+- (void) writeDisCnt			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdDisCnt];   }
 - (void) writeReleasePage		{
     NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    //[self writeReg:kSltV4PageManagerReg value:kPageMngRelease];
+    //[self writeReg:kKatrinV4SLTPageManagerReg value:kPageMngRelease];
 }
 - (void) writePageManagerReset	{
     NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-    //[self writeReg:kSltV4PageManagerReg value:kPageMngReset];   
+    //[self writeReg:kKatrinV4SLTPageManagerReg value:kPageMngReset];   
 }
-- (void) clearAllStatusErrorBits{ [self writeReg:kSltV4StatusReg value:kStatusClearAllMask];   }
+- (void) clearAllStatusErrorBits{ [self writeReg:kKatrinV4SLTStatusReg value:kStatusClearAllMask];   }
 
-- (void) writeFIFOcsrReset{ [self writeReg:kSltV4FIFOCsrReg value:kFIFOcsrResetMask];   }
+- (void) writeFIFOcsrReset{ [self writeReg:kKatrinV4SLTFIFOCsrReg value:kFIFOcsrResetMask];   }
 
 
 - (id) controllerCard		{ return self;	  }
@@ -779,7 +780,7 @@ NSString* ORKatrinV4SLTcpuLock							= @"ORKatrinV4SLTcpuLock";
 
 - (short) getNumberRegisters			
 { 
-    return kSltV4NumRegs; 
+    return kKatrinV4SLTNumRegs; 
 }
 
 - (NSString*) getRegisterName: (short) anIndex
@@ -1176,13 +1177,13 @@ NSLog(@"  arguments: %@ \n" , arguments);
 {
 	unsigned long data = 0;
     //NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-	data = [self readReg:kSltV4PageSelectReg];
+	data = [self readReg:kKatrinV4SLTPageSelectReg];
 	return data;
 }
 
 - (unsigned long) readStatusReg
 {
-	unsigned long data = [self readReg:kSltV4StatusReg];
+	unsigned long data = [self readReg:kKatrinV4SLTStatusReg];
 	[self setStatusReg:data];
 	return data;
 }
@@ -1279,7 +1280,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[pmcLink readLongBlockPmc:eventStatusBuffer
-					 atAddress:regKatrinSLTV4[kSltV4EventStatusReg].addressOffset
+					 atAddress:regKatrinSLTV4[kKatrinV4SLTEventStatusReg].addressOffset
 					 numToRead: 3];
 	
 */
@@ -1287,8 +1288,8 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (unsigned long long) readBoardID
 {
-	unsigned long low = [self readReg:kSltV4BoardIDLoReg];
-	unsigned long hi  = [self readReg:kSltV4BoardIDHiReg];
+	unsigned long low = [self readReg:kKatrinV4SLTBoardIDLoReg];
+	unsigned long hi  = [self readReg:kKatrinV4SLTBoardIDHiReg];
 	BOOL crc =(hi & 0x80000000)==0x80000000;
 	if(crc){
 		return (unsigned long long)(hi & 0xffff)<<32 | low;
@@ -1298,7 +1299,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (unsigned long) readControlReg
 {
-	return [self readReg:kSltV4ControlReg];
+	return [self readReg:kKatrinV4SLTControlReg];
 }
 
 - (void) printControlReg
@@ -1319,7 +1320,7 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (void) writeControlReg
 {
-	[self writeReg:kSltV4ControlReg value:controlReg];
+	[self writeReg:kKatrinV4SLTControlReg value:controlReg];
 }
 
 
@@ -1329,13 +1330,13 @@ NSLog(@"  arguments: %@ \n" , arguments);
 
 - (void) writePixelBusEnableReg
 {
-	[self writeReg:kSltV4PixelBusEnableReg value: [self pixelBusEnableReg]];
+	[self writeReg:kKatrinV4SLTPixelBusEnableReg value: [self pixelBusEnableReg]];
 }
 
 - (void) readPixelBusEnableReg
 {
     unsigned long val;
-	val = [self readReg:kSltV4PixelBusEnableReg];
+	val = [self readReg:kKatrinV4SLTPixelBusEnableReg];
 	[self setPixelBusEnableReg:val];	
 }
 
@@ -1351,19 +1352,19 @@ NSLog(@"  arguments: %@ \n" , arguments);
 //TODO: TEMPORARY WORKAROUND -tb-
 //TODO: TEMPORARY WORKAROUND -tb-
 //TODO: TEMPORARY WORKAROUND -tb-
-int kSltV4FIFOModeReg = kSltV4FIFOCsrReg -4;
-int kSltV4DataFIFOReg = kSltV4FIFOCsrReg -5;
+int kKatrinV4SLTFIFOModeReg = kKatrinV4SLTFIFOCsrReg -4;
+int kKatrinV4SLTDataFIFOReg = kKatrinV4SLTFIFOCsrReg -5;
 
 
     unsigned long mode,f1,f2,f3,f4;
     unsigned long flt,chan,energy,sec,subsec,multiplicity,p,toplen,ediff,evID;
-    mode = [self readReg:kSltV4FIFOModeReg];
+    mode = [self readReg:kKatrinV4SLTFIFOModeReg];
     NSLog(@"FIFO entries: %i events (words: %i) (reg 0x%08x) \n",(mode & 0x3fffff) / 4, mode & 0x3fffff, mode);//DEBUG -tb-
     if(mode & 0x3fffff){
-    	f1 = [self readReg:kSltV4DataFIFOReg];
-	    f2 = [self readReg:kSltV4DataFIFOReg];
-	    f3 = [self readReg:kSltV4DataFIFOReg];
-	    f4 = [self readReg:kSltV4DataFIFOReg];
+    	f1 = [self readReg:kKatrinV4SLTDataFIFOReg];
+	    f2 = [self readReg:kKatrinV4SLTDataFIFOReg];
+	    f3 = [self readReg:kKatrinV4SLTDataFIFOReg];
+	    f4 = [self readReg:kKatrinV4SLTDataFIFOReg];
     
         NSLog(@"FIFO entry: 0x%08x, 0x%08x, 0x%08x, 0x%08x   \n",f1,f2,f3,f4 );//DEBUG -tb-
         
@@ -1388,7 +1389,7 @@ int kSltV4DataFIFOReg = kSltV4FIFOCsrReg -5;
     
     
     unsigned long val;
-	val = [self readReg:kSltV4PixelBusEnableReg];
+	val = [self readReg:kKatrinV4SLTPixelBusEnableReg];
 	[self setPixelBusEnableReg:val];	
 }
 
@@ -1409,8 +1410,8 @@ return;
     //everything else moved to void setHostTimeToFLTsAndSLT(int32_t* args) on SBC called by [self setHostTimeToFLTsAndSLT]; ...
     //wait until we are not at the end of a second (<0.9 sec)
 	for(i=0;i<1000;i++){
-	    sltsubsecreg  = [self readReg:kSltV4SubSecondCounterReg];//first read subsec counter!
-	    sltsec        = [self readReg:kSltV4SecondCounterReg];
+	    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];//first read subsec counter!
+	    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
         sltsubsec1 = sltsubsecreg & 0x7ff  ;
         sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff  ; //100 usec counter
         sltsubsec = sltsubsec2 * 2000 + sltsubsec1;
@@ -1441,14 +1442,14 @@ return;
     }
 	
 	secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
-	[self writeReg:kSltV4SecondSetReg value:secSetpoint];
+	[self writeReg:kKatrinV4SLTSecondSetReg value:secSetpoint];
     
     //read back and check value:
     //Wait until next second srobe!
     for(i=0;i<10000;i++){// when the time already was set, this will leave the loop immediately
         usleep(100);
-	    sltsubsecreg  = [self readReg:kSltV4SubSecondCounterReg];//first read subsec counter!
-	    sltsec        = [self readReg:kSltV4SecondCounterReg];
+	    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];//first read subsec counter!
+	    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
         if(sltsec==secSetpoint) break;
     }
     if(i==10000) NSLog(@"ORKatrinV4SLTModel::loadSecondsReg: ERROR: could not read back SLT time %i (is %i)!\n",secSetpoint,sltsec);
@@ -1457,36 +1458,36 @@ return;
 
 - (void) writeInterruptMask
 {
-	[self writeReg:kSltV4InterruptMaskReg value:interruptMask];
+	[self writeReg:kKatrinV4SLTInterruptMaskReg value:interruptMask];
 }
 
 - (void) readInterruptMask
 {
-	[self setInterruptMask:[self readReg:kSltV4InterruptMaskReg]];
+	[self setInterruptMask:[self readReg:kKatrinV4SLTInterruptMaskReg]];
 }
 
 - (void) readInterruptRequest
 {
-	[self setInterruptMask:[self readReg:kSltV4InterruptReguestReg]];
+	[self setInterruptMask:[self readReg:kKatrinV4SLTInterruptReguestReg]];
 }
 
 - (void) printInterruptRequests
 {
-	[self printInterrupt:kSltV4InterruptReguestReg];
+	[self printInterrupt:kKatrinV4SLTInterruptReguestReg];
 }
 
 - (void) printInterruptMask
 {
-	[self printInterrupt:kSltV4InterruptMaskReg];
+	[self printInterrupt:kKatrinV4SLTInterruptMaskReg];
 }
 
 - (void) printInterrupt:(int)regIndex
 {
 	unsigned long data = [self readReg:regIndex];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	if(!data)NSLogFont(aFont,@"Interrupt Mask is Clear (No interrupts %@)\n",regIndex==kSltV4InterruptReguestReg?@"Requested":@"Enabled");
+	if(!data)NSLogFont(aFont,@"Interrupt Mask is Clear (No interrupts %@)\n",regIndex==kKatrinV4SLTInterruptReguestReg?@"Requested":@"Enabled");
 	else {
-		NSLogFont(aFont,@"The following interrupts are %@:\n",regIndex==kSltV4InterruptReguestReg?@"Requested":@"Enabled");
+		NSLogFont(aFont,@"The following interrupts are %@:\n",regIndex==kKatrinV4SLTInterruptReguestReg?@"Requested":@"Enabled");
 		NSString* s = @"";
 		if(data & (1<<0))s = [s stringByAppendingString: @" FLT Rq |"];
 		if(data & (1<<1))s = [s stringByAppendingString: @" WDog |"];
@@ -1512,7 +1513,7 @@ return;
 {
 	unsigned long value=0;
 	@try {
-        value = [self readReg: kSltV4HWRevisionReg];
+        value = [self readReg: kKatrinV4SLTHWRevisionReg];
 		[self setHwVersion: value];	
 	}
 	@catch (NSException* e){
@@ -1522,24 +1523,24 @@ return;
 
 - (unsigned long long) readDeadTime
 {
-	unsigned long low  = [self readReg:kSltV4DeadTimeCounterLoReg];
-	unsigned long high = [self readReg:kSltV4DeadTimeCounterHiReg];
+	unsigned long low  = [self readReg:kKatrinV4SLTDeadTimeCounterLoReg];
+	unsigned long high = [self readReg:kKatrinV4SLTDeadTimeCounterHiReg];
 	[self setDeadTime:((unsigned long long)high << 32) | low];
 	return deadTime;
 }
 
 - (unsigned long long) readVetoTime
 {
-	unsigned long low  = [self readReg:kSltV4VetoCounterLoReg];
-	unsigned long high = [self readReg:kSltV4VetoCounterHiReg];
+	unsigned long low  = [self readReg:kKatrinV4SLTVetoCounterLoReg];
+	unsigned long high = [self readReg:kKatrinV4SLTVetoCounterHiReg];
 	[self setVetoTime:((unsigned long long)high << 32) | low];
 	return vetoTime;
 }
 
 - (unsigned long long) readRunTime
 {
-	unsigned long long low  = [self readReg:kSltV4RunCounterLoReg];
-	unsigned long long high = [self readReg:kSltV4RunCounterHiReg];
+	unsigned long long low  = [self readReg:kKatrinV4SLTRunCounterLoReg];
+	unsigned long long high = [self readReg:kKatrinV4SLTRunCounterHiReg];
 	unsigned long long theTime = ((unsigned long long)high << 32) | low;
 	//NSLog(@"runtime lo %llx high %llx   ---   time %llx  %llu\n",low,high, theTime, theTime);
 	[self setRunTime:theTime];
@@ -1548,12 +1549,12 @@ return;
 
 - (unsigned long) readSecondsCounter
 {
-	return [self readReg:kSltV4SecondCounterReg];
+	return [self readReg:kKatrinV4SLTSecondCounterReg];
 }
 
 - (unsigned long) readSubSecondsCounter
 {
-	return [self readReg:kSltV4SubSecondCounterReg];
+	return [self readReg:kKatrinV4SLTSubSecondCounterReg];
 }
 
 - (unsigned long) getSeconds
@@ -2301,7 +2302,7 @@ return;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kSLTv4;	//should be unique
+	configStruct->card_info[index].hw_type_id	= kKatrinV4SLT;	//should be unique
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
 	configStruct->card_info[index].hw_mask[1] 	= multiplicityId;
 	configStruct->card_info[index].hw_mask[2] 	= eventFifoId;
@@ -2318,7 +2319,7 @@ return;
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
     
 	//for handling of different firmware versions
-    uint32_t sltRevision = [self readReg: kSltV4HWRevisionReg];
+    uint32_t sltRevision = [self readReg: kKatrinV4SLTHWRevisionReg];
 	configStruct->card_info[index].deviceSpecificData[6] = sltRevision;	
     //SLT specific settings END
     

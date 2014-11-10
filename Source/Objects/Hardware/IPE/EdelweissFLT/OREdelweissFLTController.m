@@ -540,9 +540,29 @@
                          name : OREdelweissFLTModelChargeFICFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(hitrateLimitHeatChanged:)
+                         name : OREdelweissFLTModelHitrateLimitHeatChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hitrateLimitIonChanged:)
+                         name : OREdelweissFLTModelHitrateLimitIonChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) hitrateLimitIonChanged:(NSNotification*)aNote
+{
+	[hitrateLimitIonTextField setIntValue: [model hitrateLimitIon]];
+}
+
+- (void) hitrateLimitHeatChanged:(NSNotification*)aNote
+{
+	[hitrateLimitHeatTextField setIntValue: [model hitrateLimitHeat]];
+}
 
 - (void) chargeFICFileChanged:(NSNotification*)aNote
 {
@@ -1533,6 +1553,8 @@
 	[self ficCardTriggerCmdChanged:nil];
 	[self progressOfChargeFICChanged:nil];
 	[self chargeFICFileChanged:nil];
+	[self hitrateLimitHeatChanged:nil];
+	[self hitrateLimitIonChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1816,7 +1838,8 @@
 {
 
 	[hitRateLengthTextField setIntValue:[model hitRateLength]];
-	[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
+	//[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
+	[hitRateLengthPU selectItemAtIndex:[model hitRateLength]];
 }
 
 - (void) hitRateEnabledMaskChanged:(NSNotification*)aNote
@@ -1833,6 +1856,7 @@
 - (void) hitRateChanged:(NSNotification*)aNote
 {
 	int chan;
+    //hitrate text fields
 	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 		id theCell = [rateTextFields cellWithTag:chan];
 		if([model hitRateOverFlow:chan]){
@@ -1846,9 +1870,18 @@
 			[theCell setFloatValue: [model hitRate:chan]];
 		}
 	}
+    
 	[rate0 setNeedsDisplay:YES];
 	[totalHitRateField setFloatValue:[model hitRateTotal]];
 	[totalRate setNeedsDisplay:YES];
+    
+    //hitrate regulation ON/OFF checkboxes
+	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
+		id theCell = [rateRegulationCBs  cellAtRow:chan column:0];
+        [theCell setIntValue: [model hitRateRegulationIsOn: chan]];
+        //DEBUG OUTPUT: 	NSLog(@"%@::%@:   [model hitRateRegulationIsOn: is %i  chan %i]  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), [model hitRateRegulationIsOn: chan],chan);//TODO: DEBUG testing ...-tb-
+    }
+    
 }
 
 - (void) totalRateChanged:(NSNotification*)aNote
@@ -1904,6 +1937,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) hitrateLimitIonTextFieldAction:(id)sender
+{
+	[model setHitrateLimitIon:[sender intValue]];	
+}
+
+- (void) hitrateLimitHeatTextFieldAction:(id)sender
+{
+	[model setHitrateLimitHeat:[sender intValue]];	
+}
 - (void) selectChargeFICFileButtonAction:(id) sender
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -3850,10 +3893,12 @@
 
 - (IBAction) hitRateLengthAction: (id) sender
 {
+ 	//DEBUG     NSLog(@"%@::%@ index: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
 	if([sender indexOfSelectedItem] != [model hitRateLength]){
         [self endEditing];
 		[[self undoManager] setActionName: @"Set Hit Rate Period"]; 
-		[model setHitRateLength:[[sender selectedItem] tag]];
+		//[model setHitRateLength:[[sender selectedItem] tag]];
+		[model setHitRateLength:[sender indexOfSelectedItem]];
 	}
 }
 

@@ -637,9 +637,9 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 	crateUDPCommandPort = 9940;
 	crateUDPCommandIP = @"localhost";
 	crateUDPReplyPort = 9940;
-    crateUDPDataPort = 994;
+    crateUDPDataPort = 9941;
     crateUDPDataIP = @"192.168.1.100";
-    crateUDPDataReplyPort = 12345;
+    crateUDPDataReplyPort = 9941;
 	
     return self;
 }
@@ -753,6 +753,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelFifoForUDPDataPortChanged object:self];
     if(useStandardUDPDataPorts){
         [self setCrateUDPDataPort: 9941 + fifoForUDPDataPort];
+        [self setCrateUDPDataReplyPort: 9941 + fifoForUDPDataPort];
     }
 }
 
@@ -769,6 +770,7 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelUseStandardUDPDataPortsChanged object:self];
     if(oldState==0 && useStandardUDPDataPorts){
         [self setCrateUDPDataPort: 9941 + fifoForUDPDataPort];
+        [self setCrateUDPDataReplyPort: 9941 + fifoForUDPDataPort];
     }
 }
 

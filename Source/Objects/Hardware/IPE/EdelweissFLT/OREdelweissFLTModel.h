@@ -75,7 +75,8 @@
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
 	unsigned long	hitRateId;
 	unsigned long	histogramId;
-	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (hitrate period, 8 bit, 0..255 seconds)
+	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (hitrate period, 8 bit, 2**hitRateLength seconds)
+	uint32_t		hitRateReg[kNumEWFLTHeatIonChannels];	//!< Actual value of the trigger rate/hitrate  register
 	float			hitRate[kNumEWFLTHeatIonChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumEWFLTHeatIonChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
@@ -193,6 +194,8 @@
     uint32_t ficCardADC01CtrlReg[kNumEWFLTFibers];
     uint32_t ficCardADC23CtrlReg[kNumEWFLTFibers];
     uint32_t ficCardTriggerCmd[kNumEWFLTFibers];
+    int hitrateLimitHeat;
+    int hitrateLimitIon;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -210,6 +213,10 @@
 - (BOOL) preRunChecks;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (int) hitrateLimitIon;
+- (void) setHitrateLimitIon:(int)aHitrateLimitIon;
+- (int) hitrateLimitHeat;
+- (void) setHitrateLimitHeat:(int)aHitrateLimitHeat;
 - (NSString*) chargeFICFile;
 - (void) setChargeFICFile:(NSString*)aChargeFICFile;
 - (int) progressOfChargeFIC;
@@ -479,6 +486,7 @@
 - (float) rate:(int)aChan;
 
 - (BOOL) hitRateOverFlow:(unsigned short)aChan;
+- (BOOL) hitRateRegulationIsOn:(unsigned short)aChan;
 - (float) hitRateTotal;
 
 - (ORTimeRate*) totalRate;
@@ -649,6 +657,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelHitrateLimitIonChanged;
+extern NSString* OREdelweissFLTModelHitrateLimitHeatChanged;
 extern NSString* OREdelweissFLTModelChargeFICFileChanged;
 extern NSString* OREdelweissFLTModelProgressOfChargeFICChanged;
 extern NSString* OREdelweissFLTModelFicCardTriggerCmdChanged;

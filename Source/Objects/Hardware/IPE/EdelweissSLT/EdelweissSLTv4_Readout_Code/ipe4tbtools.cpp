@@ -95,7 +95,6 @@ int numOfBits(uint32_t val)
 int count_ipe4reader_instances(void)
 {
 	char buf[1024 * 4];
-	char *cptr;
 	FILE *p;
 	int counter = 0;
 	p = popen("ps -e |grep ipe4reader | wc -l","r");
@@ -125,7 +124,7 @@ int kill_ipe4reader_instances(void)
     int pid = getpid();
 	    printf("    kill_ipe4reader_instances()': my own PID is %i\n",pid);
 	char buf[1024 * 4];
-	char *cptr;
+	//char *cptr;
 	FILE *p;
 	int val = 0;
 	p = popen("ps -e | awk '/ipe4reader/{ print $1 }'","r");
@@ -225,7 +224,7 @@ int fifoReadsFLTIndexChecker(int fltIndex, int numfifo, int availableNumFIFO, in
 #include <Pbus/Pbus.h>
 #include <akutil/semaphore.h>
 
-#pragma warning TODO remove -lkatrinhw4 in Makefile
+//TODO: #pragma warning TODO remove -lkatrinhw4 in Makefile
 //#include "hw4/baseregister.h"
 //#include "Pbus/pbusimp.h"
 //#include "katrinhw4/subrackkatrin.h"
@@ -565,7 +564,7 @@ void sendCommandFifo(unsigned char * buffer, int len)
 	for(i=2;i<len;i++){
 		b=buffer[i];
         // En fait, c'est le msb d'abors
-		printf("%lX ",b);
+		printf("%X ",b);
 		b=b+0x0100;
 		//write_word(driver_fpga,REG_CMD, b);
 		pbus->write(CmdFIFOReg ,  b);
@@ -639,7 +638,7 @@ void sendCommandFifoUnblockFiber(unsigned char * buffer, int len, int flt, int f
 	for(i=2;i<len;i++){
 		b=buffer[i];
         // En fait, c'est le msb d'abors
-		printf("%lX ",b);
+		printf("%X ",b);
 		b=b+0x0100;
 		//write_word(driver_fpga,REG_CMD, b);
 		pbus->write(CmdFIFOReg ,  b);
@@ -994,16 +993,16 @@ uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOf
     sltTimeLo = pbus->read(SLTTimeLowReg);
     sltTimeHi = pbus->read(SLTTimeHighReg);
     sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
-    if(beVerbose) printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+    if(beVerbose) printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016lx, %lu)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
     timeDiff=currentSec-sltTime;
     //if((timeDiff < -1) || (timeDiff >1)){
     if(timeDiff != 0){
-        if(beVerbose) printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
+        if(beVerbose) printf("    Set SLT timer: timeDiff:  %li - set timer!\n", timeDiff);
         currentSec = currentSec + 1;//maybe this is not necessary
         sltTime = (((uint64_t)currentSec) * 100000LL) + utcTimeCorrection100kHz;//TODO: +1: this is a fix for the timestamp error (SLT timer register sends ...-1 to BB)
         sltTimeLo =  sltTime        & 0xffffffff;
         sltTimeHi = (sltTime >> 32) & 0xffffffff;
-        if(beVerbose) printf("    Writing SLT timer reg: timeLo:  %li (0x%08x) - timeHi: %li  (0x%08x) \n", sltTimeLo, sltTimeLo, sltTimeHi, sltTimeHi);
+        if(beVerbose) printf("    Writing SLT timer reg: timeLo:  %u (0x%08x) - timeHi: %u  (0x%08x) \n", sltTimeLo, sltTimeLo, sltTimeHi, sltTimeHi);
         pbus->write(SLTTimeLowReg, sltTimeLo);
         //need to correct pd_fort/pd_faible in the status packet!!!!! -tb- 2014-07-18
         pbus->write(SLTTimeHighReg, sltTimeHi);
@@ -1012,7 +1011,7 @@ uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOf
             sltTimeLo = pbus->read(SLTTimeLowReg);
             sltTimeHi = pbus->read(SLTTimeHighReg);
             sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
-            if(beVerbose) printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+            if(beVerbose) printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016lx, %lu)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
         }
         #if 0
         pbus->write(SLTTimeLowReg, 0);
@@ -1022,7 +1021,7 @@ uint64_t setSLTtimerWithUTC(uint32_t flags, uint64_t utcTime, uint64_t utcTimeOf
 
 
     }else{
-        if(beVerbose) printf("   timeDiff:  %lli - OK!\n", timeDiff);
+        if(beVerbose) printf("   timeDiff:  %li - OK!\n", timeDiff);
     }
     
     return sltTime;
