@@ -20,7 +20,7 @@
 #ifndef _H_SLTV4HWDEFINITIONS_
 #define _H_SLTV4HWDEFINITIONS_
 
-#define kSLTv4    1
+#define kKatrinV4SLT    1
 #define kFLTv4    2
 
 
