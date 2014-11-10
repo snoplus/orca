@@ -21,6 +21,7 @@
 #define _H_SLTV4HWDEFINITIONS_
 
 #define kKatrinV4SLT    1
+#define kSLTv4    1
 #define kFLTv4    2
 
 
