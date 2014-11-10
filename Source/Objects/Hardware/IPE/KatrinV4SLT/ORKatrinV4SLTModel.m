@@ -2302,7 +2302,7 @@ return;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kKatrinV4SLT;	//should be unique
+	configStruct->card_info[index].hw_type_id	= kSLTv4;//TODO:    kKatrinV4SLT;	//should be unique 
 	configStruct->card_info[index].hw_mask[0] 	= eventDataId;
 	configStruct->card_info[index].hw_mask[1] 	= multiplicityId;
 	configStruct->card_info[index].hw_mask[2] 	= eventFifoId;
