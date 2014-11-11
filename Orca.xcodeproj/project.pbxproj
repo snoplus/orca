@@ -2913,6 +2913,14 @@
 		84ED10A01896F6C700C1AA71 /* ftpExpectGetScript in Resources */ = {isa = PBXBuildFile; fileRef = 84ED109F1896F6C700C1AA71 /* ftpExpectGetScript */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
 		84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE03BE120AFA4400B804B3 /* ORInverterModel.m */; };
+		84EE20201A12B1B400F6806E /* CV1730.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EE20181A12B1B400F6806E /* CV1730.nib */; };
+		84EE20211A12B1B400F6806E /* CV1730Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE20191A12B1B400F6806E /* CV1730Card.gif */; };
+		84EE20221A12B1B400F6806E /* ORCV1730Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE201A1A12B1B400F6806E /* ORCV1730Controller.h */; };
+		84EE20231A12B1B400F6806E /* ORCV1730Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE201B1A12B1B400F6806E /* ORCV1730Controller.m */; };
+		84EE20241A12B1B400F6806E /* ORCV1730Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE201C1A12B1B400F6806E /* ORCV1730Decoder.h */; };
+		84EE20251A12B1B400F6806E /* ORCV1730Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE201D1A12B1B400F6806E /* ORCV1730Decoder.m */; };
+		84EE20261A12B1B400F6806E /* ORCV1730Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE201E1A12B1B400F6806E /* ORCV1730Model.h */; };
+		84EE20271A12B1B400F6806E /* ORCV1730Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE201F1A12B1B400F6806E /* ORCV1730Model.m */; };
 		84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EE7DC410D2BEC200BBCBE5 /* adcText.tif */; };
 		84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */; };
 		84EE83FB10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */; };
@@ -6300,6 +6308,14 @@
 		84ED109F1896F6C700C1AA71 /* ftpExpectGetScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ftpExpectGetScript; sourceTree = "<group>"; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
 		84EE03BE120AFA4400B804B3 /* ORInverterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORInverterModel.m; path = Source/Objects/ProcessLogic/ProcessElements/Logic/Inverter/ORInverterModel.m; sourceTree = SOURCE_ROOT; };
+		84EE20181A12B1B400F6806E /* CV1730.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CV1730.nib; sourceTree = "<group>"; };
+		84EE20191A12B1B400F6806E /* CV1730Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = CV1730Card.gif; sourceTree = "<group>"; };
+		84EE201A1A12B1B400F6806E /* ORCV1730Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV1730Controller.h; sourceTree = "<group>"; };
+		84EE201B1A12B1B400F6806E /* ORCV1730Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV1730Controller.m; sourceTree = "<group>"; };
+		84EE201C1A12B1B400F6806E /* ORCV1730Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV1730Decoder.h; sourceTree = "<group>"; };
+		84EE201D1A12B1B400F6806E /* ORCV1730Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV1730Decoder.m; sourceTree = "<group>"; };
+		84EE201E1A12B1B400F6806E /* ORCV1730Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCV1730Model.h; sourceTree = "<group>"; };
+		84EE201F1A12B1B400F6806E /* ORCV1730Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCV1730Model.m; sourceTree = "<group>"; };
 		84EE7DC410D2BEC200BBCBE5 /* adcText.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adcText.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adcText.tif; sourceTree = SOURCE_ROOT; };
 		84EE83F810D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPMCReadWriteCommand.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.h"; sourceTree = SOURCE_ROOT; };
 		84EE83F910D6C52A00BBCBE5 /* ORPMCReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPMCReadWriteCommand.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORPMCReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
@@ -12896,6 +12912,21 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV419;
 			sourceTree = SOURCE_ROOT;
 		};
+		84EE20171A12B1B400F6806E /* CV1730 */ = {
+			isa = PBXGroup;
+			children = (
+				84EE20181A12B1B400F6806E /* CV1730.nib */,
+				84EE20191A12B1B400F6806E /* CV1730Card.gif */,
+				84EE201A1A12B1B400F6806E /* ORCV1730Controller.h */,
+				84EE201B1A12B1B400F6806E /* ORCV1730Controller.m */,
+				84EE201C1A12B1B400F6806E /* ORCV1730Decoder.h */,
+				84EE201D1A12B1B400F6806E /* ORCV1730Decoder.m */,
+				84EE201E1A12B1B400F6806E /* ORCV1730Model.h */,
+				84EE201F1A12B1B400F6806E /* ORCV1730Model.m */,
+			);
+			path = CV1730;
+			sourceTree = "<group>";
+		};
 		84F16AEC18900D530074B787 /* XTR6 */ = {
 			isa = PBXGroup;
 			children = (
@@ -13887,6 +13918,7 @@
 				8449A52D16AEDF5B00296104 /* CV1721 */,
 				844B9BE4132E527700FEDA6B /* CV1724 */,
 				84B74CE00FEBE9B90033E658 /* CV965 */,
+				84EE20171A12B1B400F6806E /* CV1730 */,
 			);
 			name = CAEN;
 			path = Source/Objects/Hardware/Vme/CAEN;
@@ -13988,6 +14020,7 @@
 				8434A1D8055B3287002D3102 /* ORFileIOHelpers.h in Headers */,
 				8434A1DB055B3287002D3102 /* ORDataTaker.h in Headers */,
 				8434A1DE055B3287002D3102 /* ORDataSet.h in Headers */,
+				84EE20221A12B1B400F6806E /* ORCV1730Controller.h in Headers */,
 				8434A1DF055B3287002D3102 /* ORDataTaskController.h in Headers */,
 				8434A1E1055B3287002D3102 /* ORDataTaskModel.h in Headers */,
 				8434A1E2055B3287002D3102 /* ORDataFileController.h in Headers */,
@@ -14540,6 +14573,7 @@
 				842376910ED46B7A00BECB64 /* OROrderedObjManager.h in Headers */,
 				8423770A0ED4710700BECB64 /* OROrderedObjHolding.h in Headers */,
 				84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */,
+				84EE20241A12B1B400F6806E /* ORCV1730Decoder.h in Headers */,
 				84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */,
 				84FAF2910EE8246200746B91 /* SBC_Job.h in Headers */,
 				84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */,
@@ -14552,6 +14586,7 @@
 				84E18C3A0F0A5D3B0096F0F3 /* NSNotifications+Extensions.h in Headers */,
 				84E18C560F0A640C0096F0F3 /* ORLineMarker.h in Headers */,
 				8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */,
+				84EE20261A12B1B400F6806E /* ORCV1730Model.h in Headers */,
 				8419227F0F0BC18800EF1C1C /* ORScriptIDEController.h in Headers */,
 				84499B790F13BB6E004B855B /* ORMksPdr2000Controller.h in Headers */,
 				84499B7B0F13BB6E004B855B /* ORMksPdr2000Decoders.h in Headers */,
@@ -15901,6 +15936,7 @@
 				8475EC3A1475A66F003A165D /* LabJack.nib in Resources */,
 				8475EC3B1475A66F003A165D /* LabJack.tif in Resources */,
 				8475EC3C1475A66F003A165D /* NoLabJackDriverHelp.plist in Resources */,
+				84EE20211A12B1B400F6806E /* CV1730Card.gif in Resources */,
 				8475EC431475A66F003A165D /* LabJackUE9.nib in Resources */,
 				8475EC441475A66F003A165D /* LabJackUE9.tif in Resources */,
 				CED29CFE1482B02200BD3AB2 /* SIS3302Generic.nib in Resources */,
@@ -15952,6 +15988,7 @@
 				842FCCB0197849C700B89723 /* EHS8260p.tif in Resources */,
 				84913CA71538698000597004 /* OutputCallBack.tif in Resources */,
 				84914473153C665500597004 /* OutputCallBackVeto.tif in Resources */,
+				84EE20201A12B1B400F6806E /* CV1730.nib in Resources */,
 				84BBE09D153CB5110084E6B1 /* TPG256A.nib in Resources */,
 				84BBE09E153CB5110084E6B1 /* TPG256A.tif in Resources */,
 				84F3085015483A4000663573 /* Mks660B.nib in Resources */,
@@ -16283,6 +16320,7 @@
 				8438C36A1845092600A6F4D6 /* ORBlockStep.m in Sources */,
 				847946D307330E5300C5E1FA /* ORPciBit3Controller.m in Sources */,
 				847946D507330E5300C5E1FA /* ORPciBit3Model.m in Sources */,
+				84EE20231A12B1B400F6806E /* ORCV1730Controller.m in Sources */,
 				847946D707330E5300C5E1FA /* ORPciBit3View.m in Sources */,
 				8402797307397B8700972B07 /* ORBit3Controller.m in Sources */,
 				8402797507397B8700972B07 /* ORBit3Model.m in Sources */,
@@ -16356,6 +16394,7 @@
 				84D29FEA1843EAC800D320DB /* OROpSequenceController.m in Sources */,
 				546D9DB20874BDD60072A274 /* OR2228AController.m in Sources */,
 				546D9DB40874BDD60072A274 /* OR2228ADecoders.m in Sources */,
+				84EE20271A12B1B400F6806E /* ORCV1730Model.m in Sources */,
 				546D9DB60874BDD60072A274 /* OR2228AModel.m in Sources */,
 				84D29FE81843EAC800D320DB /* OROpSequence.m in Sources */,
 				2A41A2B6089AB2A0003D77DD /* ORScalerSum.m in Sources */,
@@ -16711,6 +16750,7 @@
 				84B28E1C0F4C718400E2B056 /* ORHVRampModel.m in Sources */,
 				84B28E1E0F4C718400E2B056 /* ORHVSupply.m in Sources */,
 				84B28E240F4C718400E2B056 /* ORHV4032Controller.m in Sources */,
+				84EE20251A12B1B400F6806E /* ORCV1730Decoder.m in Sources */,
 				84B28E260F4C718400E2B056 /* ORHV4032Model.m in Sources */,
 				84B28E280F4C718400E2B056 /* ORHV4032Supply.m in Sources */,
 				84B28E360F4C7FD400E2B056 /* ORLDA102Controller.m in Sources */,

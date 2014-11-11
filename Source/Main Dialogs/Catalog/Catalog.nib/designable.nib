@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13C64</string>
-		<string key="IBDocument.InterfaceBuilderVersion">5056</string>
-		<string key="IBDocument.AppKitVersion">1265.19</string>
-		<string key="IBDocument.HIToolboxVersion">697.40</string>
+		<string key="IBDocument.SystemVersion">14A389</string>
+		<string key="IBDocument.InterfaceBuilderVersion">6250</string>
+		<string key="IBDocument.AppKitVersion">1343.14</string>
+		<string key="IBDocument.HIToolboxVersion">755.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">5056</string>
+			<string key="NS.object.0">6250</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -60,11 +60,11 @@
 							<string key="NSFrame">{{2, 0}, {881, 303}}</string>
 							<reference key="NSSuperview" ref="1018560493"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="896255428"/>
+							<reference key="NSNextKeyView" ref="119775354"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="666748857">
 									<object class="NSView" key="NSView" id="119775354">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="913918342"/>
 										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSCustomView" id="598391778">
@@ -72,6 +72,7 @@
 												<int key="NSvFlags">256</int>
 												<string key="NSFrame">{{25, 96}, {41, 31}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="1031317127"/>
 												<string key="NSClassName">OrcaObjectFactory</string>
 											</object>
@@ -80,6 +81,7 @@
 												<int key="NSvFlags">256</int>
 												<string key="NSFrame">{{91, 96}, {41, 31}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="814876527"/>
 												<string key="NSClassName">OrcaObjectFactory</string>
 											</object>
@@ -88,6 +90,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{15, 157}, {64, 83}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="567389743"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="981448400">
@@ -95,7 +98,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Run Control</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -118,6 +121,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{338, 26}, {82, 88}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="297537575"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="102303571">
@@ -125,7 +129,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Run Notes</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -148,6 +152,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{77, 140}, {128, 110}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="500193036"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="43480783">
@@ -155,7 +160,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Read Out Task</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -178,6 +183,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{580, 157}, {88, 83}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="474400717"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="478305396">
@@ -185,7 +191,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data Broadcaster</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -208,6 +214,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{306, 159}, {77, 80}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="604575016"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="548789655">
@@ -215,7 +222,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data File</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -238,6 +245,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{399, 163}, {80, 70}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="198182079"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="181387324">
@@ -245,7 +253,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data Replay</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -268,6 +276,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{15, 24}, {155, 47}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="802734033"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="641679282">
@@ -275,7 +284,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Run Script</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -298,6 +307,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{214, 24}, {93, 90}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="664401517"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="752107044">
@@ -305,7 +315,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Run List</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -328,6 +338,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{209, 157}, {93, 89}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="1028462943"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="902729761">
@@ -335,7 +346,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data Monitor</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -358,6 +369,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{493, 159}, {93, 47}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="101622764"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="994969517">
@@ -365,7 +377,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data Listener</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -388,6 +400,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{460, 24}, {93, 110}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="468173595"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="407297273">
@@ -395,7 +408,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data Explorer</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -418,6 +431,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{568, 24}, {93, 110}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="950992478"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="495736794">
@@ -425,7 +439,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Header Explorer</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -448,6 +462,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{698, 26}, {110, 96}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="913918342"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="999214538">
@@ -455,7 +470,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Data Filter</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -478,6 +493,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{706, 153}, {102, 91}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="598391778"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="448512372">
@@ -485,7 +501,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Remote Run Control</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -505,6 +521,8 @@
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 25}, {861, 265}}</string>
+										<reference key="NSSuperview" ref="913918342"/>
+										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="405281661"/>
 									</object>
 									<string key="NSLabel">Data Flow</string>
@@ -543,7 +561,7 @@
 																	<int key="NSCellFlags2">4194304</int>
 																	<string key="NSContents">&lt;---Requires 617 Driver</string>
 																	<object class="NSFont" key="NSSupport" id="191049644">
-																		<string key="NSName">.LucidaGrandeUI</string>
+																		<bool key="IBIsSystemFont">YES</bool>
 																		<double key="NSSize">10</double>
 																		<int key="NSfFlags">2843</int>
 																	</object>
@@ -553,7 +571,7 @@
 																		<int key="NSColorSpace">6</int>
 																		<string key="NSCatalogName">System</string>
 																		<string key="NSColorName">controlTextColor</string>
-																		<object class="NSColor" key="NSColor">
+																		<object class="NSColor" key="NSColor" id="682914369">
 																			<int key="NSColorSpace">3</int>
 																			<bytes key="NSWhite">MAA</bytes>
 																		</object>
@@ -591,7 +609,7 @@
 																	<int key="NSCellFlags2">134217728</int>
 																	<string key="NSContents">617 Controller</string>
 																	<object class="NSFont" key="NSSupport">
-																		<string key="NSName">.LucidaGrandeUI</string>
+																		<bool key="IBIsSystemFont">YES</bool>
 																		<double key="NSSize">10</double>
 																		<int key="NSfFlags">1044</int>
 																	</object>
@@ -620,7 +638,7 @@
 																	<int key="NSCellFlags2">134217728</int>
 																	<string key="NSContents">620 Controller</string>
 																	<object class="NSFont" key="NSSupport">
-																		<string key="NSName">.LucidaGrandeUI</string>
+																		<bool key="IBIsSystemFont">YES</bool>
 																		<double key="NSSize">10</double>
 																		<int key="NSfFlags">1044</int>
 																	</object>
@@ -660,9 +678,11 @@
 															<bytes key="NSWhite">MQA</bytes>
 														</object>
 													</object>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
+													<object class="NSColor" key="NSTextColor" id="683983843">
+														<int key="NSColorSpace">6</int>
+														<string key="NSCatalogName">System</string>
+														<string key="NSColorName">labelColor</string>
+														<reference key="NSColor" ref="682914369"/>
 													</object>
 												</object>
 												<reference key="NSContentView" ref="236210269"/>
@@ -708,7 +728,7 @@
 																	<int key="NSCellFlags2">134217728</int>
 																	<string key="NSContents">Bit3 Controller</string>
 																	<object class="NSFont" key="NSSupport">
-																		<string key="NSName">.LucidaGrandeUI</string>
+																		<bool key="IBIsSystemFont">YES</bool>
 																		<double key="NSSize">10</double>
 																		<int key="NSfFlags">1044</int>
 																	</object>
@@ -740,10 +760,7 @@
 													<string key="NSContents">Universal--works with 617/620/810 HW</string>
 													<reference key="NSSupport" ref="191049644"/>
 													<reference key="NSBackgroundColor" ref="832075202"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="683983843"/>
 												</object>
 												<reference key="NSContentView" ref="991900683"/>
 												<int key="NSBorderType">3</int>
@@ -816,7 +833,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Host</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -845,7 +862,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">PCI to Camac Controller</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -874,7 +891,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">PCI to PXI Controller</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -903,7 +920,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Dual-Port LAM</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -932,7 +949,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SIS A3818</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -967,17 +984,17 @@
 												<int key="NSvFlags">256</int>
 												<string key="NSFrame">{{10, 6}, {795, 257}}</string>
 												<reference key="NSSuperview" ref="18002578"/>
-												<reference key="NSNextKeyView" ref="17684287"/>
+												<reference key="NSNextKeyView" ref="919052917"/>
 												<array class="NSMutableArray" key="NSTabViewItems">
 													<object class="NSTabViewItem" id="959443513">
 														<object class="NSView" key="NSView" id="919052917">
-															<nil key="NSNextResponder"/>
+															<reference key="NSNextResponder" ref="612923000"/>
 															<int key="NSvFlags">274</int>
 															<array class="NSMutableArray" key="NSSubviews">
 																<object class="NSButton" id="648043127">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{46, 47}, {159, 143}}</string>
+																	<string key="NSFrame">{{46, 56}, {159, 143}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="216181659"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -986,7 +1003,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Vme Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1007,16 +1024,16 @@
 																<object class="NSButton" id="7354770">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{477, 43}, {252, 143}}</string>
+																	<string key="NSFrame">{{477, 52}, {252, 143}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
-																	<reference key="NSNextKeyView" ref="913918342"/>
+																	<reference key="NSNextKeyView" ref="612923000"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="918174373">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Vme64 Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1037,7 +1054,7 @@
 																<object class="NSButton" id="216181659">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{237, 43}, {38, 143}}</string>
+																	<string key="NSFrame">{{237, 52}, {38, 143}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="93430315"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -1046,7 +1063,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Bit 3</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1067,7 +1084,7 @@
 																<object class="NSButton" id="93430315">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{279, 43}, {38, 143}}</string>
+																	<string key="NSFrame">{{279, 52}, {38, 143}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="172691082"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -1076,7 +1093,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SBC</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1097,7 +1114,7 @@
 																<object class="NSButton" id="172691082">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{319, 43}, {43, 143}}</string>
+																	<string key="NSFrame">{{319, 52}, {43, 143}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="253098369"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -1106,7 +1123,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS3150</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1127,7 +1144,7 @@
 																<object class="NSButton" id="253098369">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{370, 43}, {36, 143}}</string>
+																	<string key="NSFrame">{{370, 52}, {36, 143}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="299468581"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -1136,7 +1153,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">V2718</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1157,7 +1174,7 @@
 																<object class="NSButton" id="408900352">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{393, 72}, {48, 18}}</string>
+																	<string key="NSFrame">{{393, 81}, {48, 18}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="7354770"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -1166,7 +1183,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents"/>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1187,7 +1204,7 @@
 																<object class="NSTextField" id="299468581">
 																	<reference key="NSNextResponder" ref="919052917"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{398, 162}, {74, 17}}</string>
+																	<string key="NSFrame">{{398, 171}, {74, 17}}</string>
 																	<reference key="NSSuperview" ref="919052917"/>
 																	<reference key="NSNextKeyView" ref="408900352"/>
 																	<bool key="NSEnabled">YES</bool>
@@ -1196,7 +1213,7 @@
 																		<int key="NSCellFlags2">272630784</int>
 																		<string key="NSContents">&lt;--not yet</string>
 																		<object class="NSFont" key="NSSupport" id="903138049">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">13</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1208,7 +1225,8 @@
 																	<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
 																</object>
 															</array>
-															<string key="NSFrame">{{10, 7}, {775, 222}}</string>
+															<string key="NSFrame">{{10, 7}, {775, 231}}</string>
+															<reference key="NSSuperview" ref="612923000"/>
 															<reference key="NSNextKeyView" ref="648043127"/>
 														</object>
 														<string key="NSLabel">Crates/Controllers</string>
@@ -1218,20 +1236,21 @@
 													<object class="NSTabViewItem" id="657421668">
 														<object class="NSView" key="NSView" id="739503231">
 															<nil key="NSNextResponder"/>
-															<int key="NSvFlags">256</int>
+															<int key="NSvFlags">274</int>
 															<array class="NSMutableArray" key="NSSubviews">
 																<object class="NSButton" id="302203056">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{47, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="599948996"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="458064508">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">260</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1254,13 +1273,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{82, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="486261819"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="633940000">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">830</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1283,13 +1303,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{126, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="793011242"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="208518212">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">775</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1312,13 +1333,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{156, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="573289186"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="199039406">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">1190</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1341,13 +1363,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{216, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="1072026517"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="287951889">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">785</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1370,13 +1393,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{244, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="818372768"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="988353350">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">265</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1399,13 +1423,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{273, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="491448044"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="218468906">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">419</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1428,13 +1453,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{302, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="523456418"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="627043185">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">1785</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1457,13 +1483,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{367, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="963506651"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="440822235">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">862</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1486,13 +1513,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{396, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="249779423"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="163725475">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">792</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1515,13 +1543,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{427, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="849773237"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="274695250">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">965</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1542,15 +1571,16 @@
 																<object class="NSButton" id="1006202446">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{514, 53}, {31, 150}}</string>
+																	<string key="NSFrame">{{509, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="575499545"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="286333897">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">1721</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1571,15 +1601,16 @@
 																<object class="NSButton" id="849773237">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{482, 53}, {31, 150}}</string>
+																	<string key="NSFrame">{{479, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="1006202446"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="599615014">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">1720</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1600,15 +1631,16 @@
 																<object class="NSButton" id="575499545">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{547, 53}, {31, 150}}</string>
+																	<string key="NSFrame">{{539, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="184579323"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="271630665">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">1724</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1626,18 +1658,49 @@
 																	</object>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																</object>
+																<object class="NSButton" id="184579323">
+																	<reference key="NSNextResponder" ref="739503231"/>
+																	<int key="NSvFlags">268</int>
+																	<string key="NSFrame">{{567, 53}, {31, 150}}</string>
+																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="820488310"/>
+																	<bool key="NSEnabled">YES</bool>
+																	<object class="NSButtonCell" key="NSCell" id="617118451">
+																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags2">134217728</int>
+																		<string key="NSContents">1730</string>
+																		<object class="NSFont" key="NSSupport">
+																			<bool key="IBIsSystemFont">YES</bool>
+																			<double key="NSSize">10</double>
+																			<int key="NSfFlags">1044</int>
+																		</object>
+																		<reference key="NSControlView" ref="184579323"/>
+																		<int key="NSButtonFlags">-2046017536</int>
+																		<int key="NSButtonFlags2">2</int>
+																		<object class="NSCustomResource" key="NSNormalImage">
+																			<string key="NSClassName">NSImage</string>
+																			<string key="NSResourceName">CV1730Card</string>
+																		</object>
+																		<string key="NSAlternateContents"/>
+																		<string key="NSKeyEquivalent"/>
+																		<int key="NSPeriodicDelay">400</int>
+																		<int key="NSPeriodicInterval">75</int>
+																	</object>
+																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+																</object>
 																<object class="NSButton" id="820488310">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{602, 53}, {31, 150}}</string>
+																	<string key="NSFrame">{{612, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="1033576399"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="110864094">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">812</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1658,15 +1721,16 @@
 																<object class="NSButton" id="1033576399">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{642, 53}, {31, 150}}</string>
+																	<string key="NSFrame">{{652, 53}, {31, 150}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="554572611"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="438080991">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">895</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1689,13 +1753,14 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{66, 210}, {48, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="61223388"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="929049335">
 																		<int key="NSCellFlags">68157504</int>
 																		<int key="NSCellFlags2">272761856</int>
 																		<string key="NSContents">Scalers</string>
 																		<object class="NSFont" key="NSSupport" id="26">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">11</double>
 																			<int key="NSfFlags">3100</int>
 																		</object>
@@ -1711,6 +1776,7 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{140, 210}, {48, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="618036456"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="633287820">
 																		<int key="NSCellFlags">68157504</int>
@@ -1729,6 +1795,7 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{258, 210}, {48, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="509878939"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="57645434">
 																		<int key="NSCellFlags">68157504</int>
@@ -1747,6 +1814,7 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{395, 210}, {48, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="980273307"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="420433755">
 																		<int key="NSCellFlags">68157504</int>
@@ -1763,8 +1831,9 @@
 																<object class="NSTextField" id="980273307">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{503, 210}, {56, 14}}</string>
+																	<string key="NSFrame">{{511, 210}, {56, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="157217631"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="184269297">
 																		<int key="NSCellFlags">68157504</int>
@@ -1781,8 +1850,9 @@
 																<object class="NSTextField" id="157217631">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{606, 210}, {33, 14}}</string>
+																	<string key="NSFrame">{{616, 210}, {33, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="726059598"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="794432483">
 																		<int key="NSCellFlags">68157504</int>
@@ -1799,8 +1869,9 @@
 																<object class="NSTextField" id="726059598">
 																	<reference key="NSNextResponder" ref="739503231"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{646, 210}, {33, 14}}</string>
+																	<string key="NSFrame">{{656, 210}, {33, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="819488913"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="390120573">
 																		<int key="NSCellFlags">68157504</int>
@@ -1825,7 +1896,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">977</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1845,6 +1916,7 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{706, 210}, {33, 14}}</string>
 																	<reference key="NSSuperview" ref="739503231"/>
+																	<reference key="NSNextKeyView" ref="302203056"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSTextFieldCell" key="NSCell" id="638863033">
 																		<int key="NSCellFlags">68157504</int>
@@ -1860,6 +1932,7 @@
 																</object>
 															</array>
 															<string key="NSFrame">{{10, 7}, {775, 231}}</string>
+															<reference key="NSNextKeyView" ref="491879359"/>
 														</object>
 														<string key="NSLabel">CAEN</string>
 														<reference key="NSColor" ref="2735474"/>
@@ -1881,7 +1954,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Trigger</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1910,7 +1983,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">4 Chan Trigger</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1939,7 +2012,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Trigger 32</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -1980,7 +2053,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">IP408</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2009,7 +2082,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">IPFifo</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2038,7 +2111,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">IP320</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2067,7 +2140,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">IP220</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2096,7 +2169,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">IP Carrier</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2155,7 +2228,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">eCPU</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2182,7 +2255,7 @@
 													</object>
 													<object class="NSTabViewItem" id="624725299">
 														<object class="NSView" key="NSView" id="17684287">
-															<reference key="NSNextResponder" ref="612923000"/>
+															<nil key="NSNextResponder"/>
 															<int key="NSvFlags">274</int>
 															<array class="NSMutableArray" key="NSSubviews">
 																<object class="NSTextField" id="774817744">
@@ -2219,10 +2292,7 @@
 																		<string key="NSContents">Box</string>
 																		<reference key="NSSupport" ref="903138049"/>
 																		<reference key="NSBackgroundColor" ref="832075202"/>
-																		<object class="NSColor" key="NSTextColor">
-																			<int key="NSColorSpace">3</int>
-																			<bytes key="NSWhite">MCAwLjgAA</bytes>
-																		</object>
+																		<reference key="NSTextColor" ref="683983843"/>
 																	</object>
 																	<int key="NSBorderType">3</int>
 																	<int key="NSBoxType">2</int>
@@ -2241,7 +2311,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Shaper</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2271,7 +2341,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">ADVME 1314</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2301,7 +2371,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">XVME-564</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2331,7 +2401,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS 3350</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2361,7 +2431,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS 3300</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2391,7 +2461,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS 3302</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2421,7 +2491,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS 3320</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2451,7 +2521,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS 3302 Gen FW</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2478,7 +2548,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Gretina v4</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2508,7 +2578,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">TimeStamp</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2538,7 +2608,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Gretina v4</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2565,7 +2635,7 @@
 																		<int key="NSCellFlags2">272892928</int>
 																		<string key="NSContents">v1.07 --^</string>
 																		<object class="NSFont" key="NSSupport" id="22">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">9</double>
 																			<int key="NSfFlags">3614</int>
 																		</object>
@@ -2588,7 +2658,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Gretina Trigger</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2646,7 +2716,6 @@
 																</object>
 															</array>
 															<string key="NSFrame">{{10, 7}, {775, 231}}</string>
-															<reference key="NSSuperview" ref="612923000"/>
 															<reference key="NSNextKeyView" ref="774817744"/>
 														</object>
 														<string key="NSLabel">ADCs/Digitizers</string>
@@ -2687,7 +2756,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS3800</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2716,7 +2785,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SIS3820</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2745,7 +2814,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">XyCom 200</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2774,7 +2843,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">VHQ224L HV</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2803,7 +2872,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">VHS4030 HV</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2832,7 +2901,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">VHSC040n</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2873,7 +2942,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">M Carrier</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2902,7 +2971,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">M321</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -2928,13 +2997,13 @@
 														<reference key="NSTabView" ref="612923000"/>
 													</object>
 												</array>
-												<reference key="NSSelectedTabViewItem" ref="624725299"/>
+												<reference key="NSSelectedTabViewItem" ref="959443513"/>
 												<reference key="NSFont" ref="22"/>
 												<int key="NSTvFlags">268435458</int>
 												<bool key="NSAllowTruncatedLabels">YES</bool>
 												<bool key="NSDrawsBackground">YES</bool>
 												<array class="NSMutableArray" key="NSSubviews">
-													<reference ref="17684287"/>
+													<reference ref="919052917"/>
 												</array>
 											</object>
 										</array>
@@ -2974,7 +3043,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Camac Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3004,7 +3073,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CC32</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3034,7 +3103,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CC-USB</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3064,7 +3133,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CC11C</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3094,7 +3163,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Lecroy 8013A Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3157,7 +3226,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">AD3512</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3186,7 +3255,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">AD811</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3215,7 +3284,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">AD413</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3244,7 +3313,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">JADC_L</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3273,7 +3342,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">ADC2249</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3302,7 +3371,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">JAM_F</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3344,7 +3413,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">DGF4c</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3373,7 +3442,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">8818w/Mem</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3414,7 +3483,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">TDC2228A</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3443,7 +3512,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">TDC3377</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3484,7 +3553,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">L4532</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3525,7 +3594,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">L2551</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3554,7 +3623,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">L2301</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3583,7 +3652,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">K3655</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3612,7 +3681,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">HV2132</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3641,7 +3710,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">BiRa 3251</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3670,7 +3739,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">BiRa 2351</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3699,7 +3768,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CMC 203</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -3743,7 +3812,7 @@
 								</object>
 								<object class="NSTabViewItem" id="820120392">
 									<object class="NSView" key="NSView" id="896255428">
-										<reference key="NSNextResponder" ref="913918342"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSBox" id="578222548">
@@ -3752,7 +3821,6 @@
 												<array class="NSMutableArray" key="NSSubviews"/>
 												<string key="NSFrame">{{314, 39}, {5, 223}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="118616358"/>
 												<string key="NSHuggingPriority">{750, 250}</string>
 												<string key="NSOffsets">{0, 0}</string>
@@ -3762,10 +3830,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="903138049"/>
 													<reference key="NSBackgroundColor" ref="832075202"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="683983843"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -3778,7 +3843,6 @@
 												<array class="NSMutableArray" key="NSSubviews"/>
 												<string key="NSFrame">{{713, 39}, {5, 223}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="183746186"/>
 												<string key="NSHuggingPriority">{750, 250}</string>
 												<string key="NSOffsets">{0, 0}</string>
@@ -3788,10 +3852,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="903138049"/>
 													<reference key="NSBackgroundColor" ref="832075202"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="683983843"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -3803,7 +3864,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{4, 62}, {151, 165}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="793561035"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="941299675">
@@ -3811,7 +3871,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">IPE-DAQ-V3 crate</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -3834,7 +3894,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{314, 35}, {139, 147}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="428983426"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="598437145">
@@ -3842,7 +3901,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">IPE-DAQ-V4 crate</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -3865,7 +3924,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{456, 35}, {68, 147}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="960533207"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="242241585">
@@ -3873,7 +3931,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">V4 Mini crate</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -3896,7 +3954,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{717, 96}, {120, 79}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="742917659"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="10762976">
@@ -3904,7 +3961,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">IPE Simulation</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -3927,7 +3984,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{741, 14}, {83, 74}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="913918342"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="826835408">
@@ -3935,7 +3991,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Amptek DP5</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -3958,7 +4014,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{734, 173}, {90, 81}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="173474703"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="662341481">
@@ -3966,7 +4021,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">IPE Slow Control</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -3989,7 +4044,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{167, 6}, {28, 233}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="1002916109"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="852243508">
@@ -3997,7 +4051,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4020,7 +4074,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{199, 6}, {29, 233}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="398438967"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="758526646">
@@ -4028,7 +4081,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">FLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4051,7 +4104,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{255, 6}, {28, 233}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="822776913"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="988403462">
@@ -4059,7 +4111,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4082,7 +4134,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{287, 6}, {30, 233}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="578222548"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="37550446">
@@ -4090,7 +4141,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">FLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4113,7 +4164,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{532, 31}, {30, 178}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="1071202672"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="404185448">
@@ -4121,7 +4171,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4144,7 +4194,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{661, 31}, {30, 178}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="174919842"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="666608737">
@@ -4152,7 +4201,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4175,7 +4224,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{558, 31}, {30, 178}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="221167880"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="220340296">
@@ -4183,7 +4231,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">FLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4206,7 +4254,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{612, 31}, {30, 178}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="39182296"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="307813104">
@@ -4214,7 +4261,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">FLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4237,7 +4284,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{190, 245}, {22, 14}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="706272607"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="296567324">
@@ -4257,7 +4303,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{543, 215}, {37, 14}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="276226726"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="598501898">
@@ -4277,7 +4322,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{605, 215}, {44, 14}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="135390104"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="580272709">
@@ -4297,7 +4341,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{263, 245}, {44, 14}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="493292451"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="316361211">
@@ -4317,7 +4360,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{684, 31}, {30, 178}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="801730959"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="1027340765">
@@ -4325,7 +4367,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">FLT</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4348,7 +4390,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{660, 215}, {56, 14}}</string>
 												<reference key="NSSuperview" ref="896255428"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="346561773"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="781108260">
@@ -4365,8 +4406,6 @@
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 25}, {861, 265}}</string>
-										<reference key="NSSuperview" ref="913918342"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="484635561"/>
 									</object>
 									<string key="NSLabel">IPE-DAQ</string>
@@ -4389,7 +4428,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">cPCI crate</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4418,7 +4457,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">PXI 6-slot Crate</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4447,7 +4486,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SBC</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4476,7 +4515,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">QWNxaXJpcwpEQzQ0MA</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4505,7 +4544,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">UFhJODMzNgpBZGFwdGVyA</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4534,7 +4573,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">UFhJNjI4OQpEaWdpdGl6ZXI</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -4570,7 +4609,6 @@
 												<int key="NSvFlags">292</int>
 												<string key="NSFrame">{{10, -3}, {807, 266}}</string>
 												<reference key="NSSuperview" ref="773035539"/>
-												<reference key="NSNextKeyView" ref="960441311"/>
 												<array class="NSMutableArray" key="NSTabViewItems">
 													<object class="NSTabViewItem" id="292408870">
 														<string key="NSIdentifier">1</string>
@@ -4590,7 +4628,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Univ HV Card</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4620,7 +4658,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Univ HV Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4685,7 +4723,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Amrel HV</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4714,7 +4752,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Zup HV</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4743,7 +4781,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">XTR6 HV</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4772,7 +4810,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">NHQ 226L HV</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4801,7 +4839,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">HV4032</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4844,7 +4882,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">TVBvZCBNaW5pIApDcmF0ZQ</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4867,14 +4905,13 @@
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{511, 34}, {223, 154}}</string>
 																	<reference key="NSSuperview" ref="960441311"/>
-																	<reference key="NSNextKeyView"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="575013197">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MPod Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4904,7 +4941,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">EHS8260p</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4934,7 +4971,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">EHQ8060n</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4964,7 +5001,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">EHS130n</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -4994,7 +5031,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">EDSF130p</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5024,7 +5061,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">TVBvZApDb250cm9sbGVyA</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5103,7 +5140,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">GPIB/ENET 100</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5132,7 +5169,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">ICS8065</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5161,7 +5198,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Tek 754 Scope</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5190,7 +5227,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Tek 220 Scope</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5219,7 +5256,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LeCroy 950 Scope</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5248,7 +5285,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">HP4405A Spec Analyzer</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5277,7 +5314,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33120a Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5306,7 +5343,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33220a Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5335,7 +5372,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33500 Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5364,7 +5401,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 6622a HV</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5393,7 +5430,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">HP3458a</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5422,7 +5459,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">USB-&gt;GPIB</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5464,7 +5501,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33220a Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5491,7 +5528,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">MotionNode</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5521,7 +5558,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">ADU200</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5551,7 +5588,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">MCA927</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5580,7 +5617,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LabJack</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5610,7 +5647,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LDA102</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5640,7 +5677,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LakeShore336</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5670,7 +5707,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">DT5720</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5719,7 +5756,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">USB-&gt;GPIB</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5746,7 +5783,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33500 Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -5798,7 +5835,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">ProXR16</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5828,7 +5865,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CC4189</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5858,7 +5895,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Neutron Monitor</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5888,7 +5925,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents"> MKS PDR2000</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5918,7 +5955,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">Q1RJIFRlbXAgCk1vbml0b3I</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5948,7 +5985,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">TGFrZSBTaG9yZSAyMTgKVGVtcCBNb25pdG9yA</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -5978,7 +6015,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">aVRyYW5zIEdhcwpNb25pdG9yA</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6008,7 +6045,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Rad7</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6038,7 +6075,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">TlBMIHBDb3Vsb21iCk1ldGVyA</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6068,7 +6105,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">QW1pIDI4NiAKTGV2ZWwgQ29udHJvbGxlcg</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6097,7 +6134,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MIT Pulser</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6127,7 +6164,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents"> Keithley 6487</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6157,7 +6194,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Arduino UNO</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6187,7 +6224,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Met637</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6217,7 +6254,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Met237</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6247,7 +6284,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">GT521</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6291,7 +6328,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">Qk9DIFRJQyAzCkhlYWQgQ29udHJvbGxlcg</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6320,7 +6357,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents"> Pfeiffer DCU</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6349,7 +6386,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">TPG256A</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6378,7 +6415,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Mks651c</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6407,7 +6444,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Varian TPS</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6436,7 +6473,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">S0pMMjIwIElvbiAKR2F1Z2UgQ29udHJvbGxlcg</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6465,7 +6502,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">RGA300</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6494,7 +6531,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Mks660B Baratron</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6523,7 +6560,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">TPG262</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6552,7 +6589,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CP8 Cryopump</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6581,7 +6618,7 @@
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">TM700</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -6641,7 +6678,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">TT CPX400DP</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6690,7 +6727,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">BootBar</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6720,7 +6757,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LanNetio230</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6750,7 +6787,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LabJack UE9</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6780,7 +6817,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">CB37</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6810,7 +6847,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33500 Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6837,7 +6874,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Aglient 33220a Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6864,7 +6901,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">LakeShore336</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6891,7 +6928,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">APC UPS</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -6973,7 +7010,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">VlhNIENvbnRyb2xsZXIKA</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7003,7 +7040,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">3D Scanning</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7033,7 +7070,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">WC1ZIFNjYW5uZXIKA</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7063,7 +7100,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Stepper Motor</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7128,10 +7165,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="903138049"/>
 													<reference key="NSBackgroundColor" ref="832075202"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="683983843"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -7150,7 +7184,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Container</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7180,7 +7214,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">       Container Outputs</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7210,7 +7244,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Script Task</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7240,7 +7274,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Manual Plot</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7270,7 +7304,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Manual 2DPlot</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7300,7 +7334,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Plot Link</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7330,7 +7364,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Ramper</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7360,7 +7394,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">CouchDB</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7390,7 +7424,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">CouchDB Listener</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7420,7 +7454,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">VGVzdCBEYXRhIEdlbmVyYXRvcgo</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7450,7 +7484,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">SQL DB</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7480,7 +7514,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Remote Socket</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7510,7 +7544,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Camera</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7540,7 +7574,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7570,7 +7604,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7600,7 +7634,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7630,7 +7664,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Container Inputs        </string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7686,7 +7720,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7712,7 +7746,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Process Container</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7741,7 +7775,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">U1BTVApSZWxheQ</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7770,7 +7804,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">U1BEVApSZWxheQ</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7799,7 +7833,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Push Button</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7828,7 +7862,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Push Button</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7857,7 +7891,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7886,7 +7920,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7915,7 +7949,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7944,7 +7978,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -7973,7 +8007,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8002,7 +8036,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8031,7 +8065,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8060,7 +8094,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8089,7 +8123,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Pulser</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8118,7 +8152,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">One Shot</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8147,7 +8181,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Comparator</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8176,7 +8210,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Rate</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8205,7 +8239,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Alarm</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8234,7 +8268,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Range Timer</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8263,7 +8297,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">T3V0cHV0ClJlbGF5A</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8292,7 +8326,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Adc</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8321,7 +8355,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Adc Processor</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8350,7 +8384,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Bit Processor</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8379,7 +8413,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Callback</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8408,7 +8442,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">2 Bit Processor</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8437,7 +8471,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string type="base64-UTF8" key="NSContents">T1JDQSBTY3JpcHQKA</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8466,7 +8500,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">RS Flip Flop</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8495,7 +8529,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Counter</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8524,7 +8558,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Fixed Value</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8553,7 +8587,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Count Down</string>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8582,7 +8616,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8611,7 +8645,7 @@ ZSBjb250cm9sbGVyLg</string>
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">1044</int>
 													</object>
@@ -8664,7 +8698,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">TmNkIE1haW4gQ29udHJvbGxlcgo</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8694,7 +8728,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Pulser Distribution</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8724,7 +8758,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Ncd Mux Box</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8753,7 +8787,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Ncd Multiplexer</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8783,7 +8817,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">SFYgUmFtcGluZwo</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8813,7 +8847,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Random Pulser</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8856,7 +8890,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Katrin</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8886,7 +8920,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">eGun</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8916,7 +8950,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Prespectrometer</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8946,7 +8980,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">TW9uaXRvciBTcGVjdHJvbWV0ZXIKA</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -8976,7 +9010,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">BAM Detector</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9006,7 +9040,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">PAC</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9036,7 +9070,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">PAC (Field Point)</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9078,7 +9112,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">nTCP Main Dialog</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9120,7 +9154,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MAJORANA Main Dialog</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9150,7 +9184,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MJD Preamp</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9180,7 +9214,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MJD Vacuum</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9210,7 +9244,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MJD Test Cryo Vac</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9240,7 +9274,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">RAID Monitor</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9322,7 +9356,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string type="base64-UTF8" key="NSContents">U05PKyBNb25pdG9yaW5nCg</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9352,7 +9386,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SNO+ Controller</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9382,7 +9416,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">MTC</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9412,7 +9446,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">XL1</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9442,7 +9476,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">XL2</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9472,7 +9506,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">XL3</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9502,7 +9536,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Fec32</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9532,7 +9566,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Daughter Card</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9562,7 +9596,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SNO Crate</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9592,7 +9626,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents"/>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9622,7 +9656,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">SNO Rack</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9652,7 +9686,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Halo</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9682,7 +9716,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Halo Burst Monitor</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9712,7 +9746,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">Symmetricom XL-GPS</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9754,7 +9788,7 @@ ZSBjb250cm9sbGVyLg</string>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">nEDM Coil Control</string>
 																		<object class="NSFont" key="NSSupport">
-																			<string key="NSName">.LucidaGrandeUI</string>
+																			<bool key="IBIsSystemFont">YES</bool>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
@@ -9798,13 +9832,14 @@ ZSBjb250cm9sbGVyLg</string>
 									<reference key="NSTabView" ref="913918342"/>
 								</object>
 							</array>
-							<reference key="NSSelectedTabViewItem" ref="820120392"/>
+							<reference key="NSSelectedTabViewItem" ref="666748857"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
+							<reference key="NSDelegate"/>
 							<array class="NSMutableArray" key="NSSubviews">
-								<reference ref="896255428"/>
+								<reference ref="119775354"/>
 							</array>
 						</object>
 					</array>
@@ -9813,7 +9848,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="913918342"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 877}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -9821,7 +9856,7 @@ ZSBjb250cm9sbGVyLg</string>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<bool key="usesAutoincrementingIDs">NO</bool>
-			<array class="NSMutableArray" key="connectionRecords">
+			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">window</string>
@@ -10528,7 +10563,6 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="963506651"/>
 							<reference ref="249779423"/>
 							<reference ref="1006202446"/>
-							<reference ref="849773237"/>
 							<reference ref="575499545"/>
 							<reference ref="820488310"/>
 							<reference ref="1033576399"/>
@@ -10541,6 +10575,8 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="726059598"/>
 							<reference ref="554572611"/>
 							<reference ref="819488913"/>
+							<reference ref="184579323"/>
+							<reference ref="849773237"/>
 						</array>
 						<reference key="parent" ref="657421668"/>
 					</object>
@@ -15035,6 +15071,19 @@ ZSBjb250cm9sbGVyLg</string>
 						<reference key="object" ref="826835408"/>
 						<reference key="parent" ref="173474703"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">1jY-Xi-4g1</string>
+						<reference key="object" ref="184579323"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="617118451"/>
+						</array>
+						<reference key="parent" ref="739503231"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">PoN-oY-phT</string>
+						<reference key="object" ref="617118451"/>
+						<reference key="parent" ref="184579323"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -15132,6 +15181,18 @@ ZSBjb250cm9sbGVyLg</string>
 				<string key="19.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="19.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="19.showNotes"/>
+				<string key="1jY-Xi-4g1.CustomClassName">ObjectFactory</string>
+				<object class="NSMutableDictionary" key="1jY-Xi-4g1.IBAttributePlaceholdersKey">
+					<string key="NS.key.0">ToolTip</string>
+					<object class="IBToolTipAttribute" key="NS.object.0">
+						<string key="name">ToolTip</string>
+						<reference key="object" ref="184579323"/>
+						<string key="toolTip">ORCaen1730Model</string>
+					</object>
+				</object>
+				<string key="1jY-Xi-4g1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<reference key="1jY-Xi-4g1.IBUserGuides" ref="0"/>
+				<boolean value="NO" key="1jY-Xi-4g1.showNotes"/>
 				<string key="24992.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="24992.showNotes"/>
 				<string key="24993.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -19148,6 +19209,7 @@ ZSBjb250cm9sbGVyLg</string>
 				<boolean value="NO" key="335.showNotes"/>
 				<string key="336.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="336.showNotes"/>
+				<reference key="337.IBNSViewMetadataGestureRecognizers" ref="0"/>
 				<string key="337.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="337.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="337.showNotes"/>
@@ -19325,6 +19387,8 @@ ZSBjb250cm9sbGVyLg</string>
 				<boolean value="NO" key="MmA-s5-LFY.showNotes"/>
 				<string key="O0d-G0-T1U.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="O0d-G0-T1U.showNotes"/>
+				<string key="PoN-oY-phT.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="PoN-oY-phT.showNotes"/>
 				<string key="QHS-oj-FDP.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="QHS-oj-FDP.showNotes"/>
 				<string key="S4y-Vr-Fg2.CustomClassName">ObjectFactory</string>
@@ -19444,6 +19508,13 @@ ZSBjb250cm9sbGVyLg</string>
 				<object class="IBPartialClassDescription">
 					<string key="className">ORCatalogController</string>
 					<string key="superclassName">NSWindowController</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Main Dialogs/Catalog/ORCatalogController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ORCatalogController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="saveDocument:">id</string>
 						<string key="saveDocumentAs:">id</string>
@@ -19460,7 +19531,7 @@ ZSBjb250cm9sbGVyLg</string>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORCatalogController.h</string>
+						<string key="minorKey">../Source/Main Dialogs/Catalog/ORCatalogController.m</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -19468,7 +19539,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<string key="superclassName">NSButton</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ObjectFactory.h</string>
+						<string key="minorKey">../Source/Objects/OrcaObject/ObjectFactory.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -19476,7 +19547,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<string key="superclassName">ObjectFactory</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/OrcaObjectFactory.h</string>
+						<string key="minorKey">../Source/Objects/OrcaObject/OrcaObjectFactory.h</string>
 					</object>
 				</object>
 			</array>
@@ -19513,7 +19584,7 @@ ZSBjb250cm9sbGVyLg</string>
 			<string key="AdcRate">{70, 41}</string>
 			<string key="AlarmElementOff">{53, 69}</string>
 			<string key="Ami286">{110, 57}</string>
-			<string key="AmptekDP5Card">{400, 274}</string>
+			<string key="AmptekDP5Card">{100, 69}</string>
 			<string key="AmrelHV">{40, 72}</string>
 			<string key="AndGate">{58, 32}</string>
 			<string key="ApcUpsIcon">{75, 81}</string>
@@ -19541,6 +19612,7 @@ ZSBjb250cm9sbGVyLg</string>
 			<string key="CRSetterOff">{36, 20}</string>
 			<string key="CTITemp">{50, 69}</string>
 			<string key="CV1721Card">{16, 128}</string>
+			<string key="CV1730Card">{16, 128}</string>
 			<string key="CV260Card">{16, 128}</string>
 			<string key="CV812">{16, 128}</string>
 			<string key="CV830">{16, 128}</string>
