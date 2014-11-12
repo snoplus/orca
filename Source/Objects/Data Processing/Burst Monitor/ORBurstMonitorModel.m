@@ -286,7 +286,6 @@ NSDate* burstStart = NULL;
                         [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
                         [words insertObject:[NSNumber numberWithLong:firstword] atIndex:0];
                         if((energy >= minimumEnergyAllowed && cardNum <= 15) || burstForce ==1){  //Filter
-                            [self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1];
                             //make a key for looking up the correct queue for this record
                             NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
                             
@@ -479,7 +478,7 @@ NSDate* burstStart = NULL;
                                     NSLog(@"extra trip: t=%lf, adc=%i, chan=%i-%i \n", lateTime, [[adcs objectAtIndex:0] intValue], [[cards objectAtIndex:0] intValue], [[chans objectAtIndex:0] intValue]);
                                     addThisToQueue = 0;
                                     //Clean up
-                                    [chans removeAllObjects];
+                                    [chans removeAllObjects]; //CB maybe crash because of this
                                     [cards removeAllObjects];
                                     [adcs removeAllObjects];
                                     [secs removeAllObjects];
@@ -779,7 +778,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //Check stall in buffer
     if(burstState == 1){
         quietSec++;
-        loudSec=[[secs objectAtIndex:1] longValue] - [[secs objectAtIndex:(secs.count-1)] longValue];
+        //loudSec = 1; //temp
+        loudSec=[[secs objectAtIndex:1] longValue] - [[secs objectAtIndex:(secs.count-1)] longValue];  //CB crash source??? use Bsecs?  can't, not writen yet
         if(quietSec > 30){
             burstForce=1;
             [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder];
