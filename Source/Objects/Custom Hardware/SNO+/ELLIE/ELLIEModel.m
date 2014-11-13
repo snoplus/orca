@@ -174,11 +174,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     //TODO:Add this back in 
     //Post to the Database what is about to happen
-    //NSString *responseFromTellie = [[NSString alloc] init];
-    //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
+    NSString *responseFromTellie = [[NSString alloc] init];
+    NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n 10",@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
     
-    //responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nil];
-    //NSLog(@"Response from Tellie: %@\n",responseFromTellie);
+    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
+    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
     
     //TODO: Only post if there is a good reason.
     [self updateTellieDocument:fireCommands];
