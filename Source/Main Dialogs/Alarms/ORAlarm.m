@@ -73,15 +73,23 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 
 - (NSString*) timePosted
 {
-	return [timePosted descriptionWithCalendarFormat:@"%a %m/%d/%y %I:%M  %p" timeZone:nil locale:nil];
+    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+    [dateFormatter setDateFormat:[NSDateFormatter dateFormatFromTemplate:@"MM/dd/yy HH:mm:ss" options:0 locale:[NSLocale currentLocale]]];
+    
+   return [dateFormatter stringFromDate:timePosted];
+
 }
 
 - (NSString*) timePostedUTC
 {
-	return [timePosted descriptionWithCalendarFormat:@"%a %m/%d/%y %I:%M  %p" timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil];
+    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+    [dateFormatter setDateFormat:[NSDateFormatter dateFormatFromTemplate:@"MM/dd/yy HH:mm:ss" options:0 locale:[NSLocale currentLocale]]];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+
+    return [dateFormatter stringFromDate:timePosted];
 }
 
-- (void) setTimePosted:(NSCalendarDate*)aDate
+- (void) setTimePosted:(NSDate*)aDate
 {
     [aDate retain];
     [timePosted release];
@@ -179,7 +187,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 #pragma mark •••Alarm Management
 - (void) postAlarm
 {
-    [self setTimePosted:[NSCalendarDate date]];
+    [self setTimePosted:[NSDate date]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmWasPostedNotification object:self];
 }
 
