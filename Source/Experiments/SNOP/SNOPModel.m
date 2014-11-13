@@ -276,7 +276,14 @@ int runType = kRunUndefined;
 - (void) updateEPEDStructWithStepNumber: (unsigned long) stepNumber
 {
     _epedStruct.stepNumber = stepNumber;
+    
 }
+
+- (void) updateEPEDStructWithNSlopePoint: (unsigned long) nTSlopePoints
+{
+    _epedStruct.nTSlopePoints = nTSlopePoints;
+}
+
 
 // orca script helper
 - (void) shipEPEDRecord
@@ -293,7 +300,7 @@ int runType = kRunUndefined;
         data[5] = _epedStruct.chargePulseAmp;
         data[6] = _epedStruct.stepNumber;
         data[7] = _epedStruct.calType;
-        data[8] = 0;
+        data[8] = 0;//_epedStruct.nTSlopePoints;
         data[9] = 0;
         
         NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(eped_rec_length)];

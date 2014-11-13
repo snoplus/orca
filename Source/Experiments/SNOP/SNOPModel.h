@@ -73,6 +73,7 @@
         unsigned long pedestalWidth;
         unsigned long calType; // pattern ID (1 to 4) + 10 * (1 ped, 2 tslope, 3 qslope)
         unsigned long stepNumber;
+        unsigned long nTSlopePoints;
     } _epedStruct;
     
     struct {
