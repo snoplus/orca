@@ -86,10 +86,10 @@ runDocument = _runDocument,
 smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
+snopRunTypeMask = snopRunTypeMask,
 mtcConfigDoc = _mtcConfigDoc;
 
 @synthesize smellieRunHeaderDocList;
-int runType = kRunUndefined;
 
 
 #pragma mark ¥¥¥Initialization
@@ -99,15 +99,22 @@ int runType = kRunUndefined;
     [self setImage:[NSImage imageNamed:@"SNOP"]];
 }
 
-- (int) getRunType
+- (unsigned long) getSnopRunTypeMask
 {
-    return runType;
+    return snopRunTypeMask;
 }
 
-- (void) setRunType:(int)aRunType
+- (void) setSnopRunTypeMask:(unsigned long)aSnopRunTypeMask
 {
-    runType = aRunType;
+    snopRunTypeMask = aSnopRunTypeMask;
 }
+
+//check to see if the current SNO+ runType mask has the correct settings
+- (void) checkRunTypeMask:(NSString*)aRunType
+{
+    
+}
+
 
 - (void) makeMainController
 {
@@ -705,7 +712,7 @@ int runType = kRunUndefined;
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
     //zero is the undefined run type otherwise specified
-    [self setRunType:kRunUndefined];
+    //[self setRunType:kRunUndefined];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 

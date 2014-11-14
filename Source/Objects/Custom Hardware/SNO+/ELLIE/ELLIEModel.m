@@ -121,12 +121,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     
     if(![runControl isRunning]){
-        [aSnotModel setRunType:kRunTellie];
+        //[aSnotModel setRunType:kRunTellie];
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     }
     
     //check the run is going and that it is a tellie run
-    if(([runControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
+    //if(([runControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
+    if([runControl isRunning]){
         //start the tellie run document
         [self _pushInitialTellieRunDocument];
     }
@@ -138,7 +139,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    [aSnotModel setRunType:kRunUndefined];
+    //[aSnotModel setRunType:kRunUndefined];
     
     //add run control object
     NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -700,7 +701,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Set the Run Type to a SMELLIE run
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    [theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
+    //[theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
     
     NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
     
@@ -1063,7 +1064,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Set the Run Type to a SMELLIE run
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    [theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
+    //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
     
     //used to be halt run but this now moves straight into a maintainence run 
     

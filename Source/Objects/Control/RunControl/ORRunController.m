@@ -715,7 +715,7 @@
     //Set the Run Type to a SMELLIE run
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    [theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
+    //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
 	[model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
@@ -732,7 +732,7 @@
     //Set the Run Type to a SMELLIE run
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    [theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
+    //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
     
     [model setForceRestart:YES];
     [model performSelector:@selector(stopRun) withObject:nil afterDelay:0];
@@ -745,7 +745,7 @@
     //Set the Run Type to a SMELLIE run
     NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    [theSNOPModel setRunType:kRunUndefined]; //sets to an undefined run
+    //[theSNOPModel setRunType:kRunUndefined]; //sets to an undefined run
     
     
     [statusField setStringValue:[self getStoppingString]];

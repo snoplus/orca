@@ -391,15 +391,15 @@
     BOOL tellieRunInProgress = NO;
     NSArray*  snopModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel * aSnopModel = [snopModelObjects objectAtIndex:0];
-    int runType = [aSnopModel getRunType];
+    //int runType = [aSnopModel getRunType];
     
     //collect ORRunModel objects
     NSArray*  runModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
     
 
-    //check there is a tellie run going
-    if((runType == kRunTellie) && ([aRunModel isRunning])){
+    //check there is a tellie run going (runType == kRunTellie) &&
+    if( ([aRunModel isRunning])){
         tellieRunInProgress = YES;
     }
     else{
