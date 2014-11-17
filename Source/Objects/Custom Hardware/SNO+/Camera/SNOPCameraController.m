@@ -72,7 +72,7 @@
         // In python script, make sure to iterate through all capture_script processes and kill them by PID otherwise it thinks that the processes are not killed because they are not owned by snotdaq but by python.
         
         // Wait for 15 sec so PTPCamera process has enough time to start up so we can kill it.
-        [model performSelector:@selector(runCaptureScript) withObject:nil afterDelay:30.0];
+        [model performSelector:@selector(runCaptureScript) withObject:nil afterDelay:15.0];
     }
     else
     {

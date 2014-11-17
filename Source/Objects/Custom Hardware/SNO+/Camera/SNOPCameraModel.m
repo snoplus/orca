@@ -146,6 +146,8 @@
         [cameraCaptureTask setLaunchPath  :@"/usr/bin/python"];
         [cameraCaptureTask setArguments   :@[@"/Users/snotdaq/Dev/cameracode/capture_script.py", @"-r"]];
         
+        [NSThread sleepForTimeInterval:10.0];
+        
         [aSequence addTaskObj:cameraCaptureTask];
         [aSequence setVerbose:YES];
         [aSequence setTextToDelegate:YES];
