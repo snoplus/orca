@@ -1514,23 +1514,28 @@ mtcConfigDoc = _mtcConfigDoc;
     for (id xl3 in xl3Objects) {
         
         NSMutableDictionary * crateXl3Info = [NSMutableDictionary dictionaryWithCapacity:10];
-        [crateXl3Info setObject:[NSString stringWithFormat:@"%@",[xl3 hvASwitch]?@"ON":@"OFF"] forKey:@"hvStatusA"];
+        [crateXl3Info setObject:[NSString stringWithFormat:@"%@",[xl3 hvASwitch]?@"ON":@"OFF"] forKey:@"hv_status_a"];
     
-        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:[xl3 hvNominalVoltageA]] forKey:@"hvNominalA"];
+        [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:[xl3 hvNominalVoltageA]] forKey:@"hv_nominal_a"];
         
-        [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvAVoltageReadValue]] forKey:@"hvVoltageReadValueA"];
+        [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvAVoltageReadValue]] forKey:@"hv_voltage_read_value_a"];
         
-        [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvACurrentReadValue]] forKey:@"hvCurrentReadValueA"];
+        [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvACurrentReadValue]] forKey:@"hv_current_read_value_a"];
+        
+        [crateXl3Info setObject:[NSNumber numberWithInt:[xl3 xl3Mode]] forKey:@"xl3_mode"];
+        
+        [crateXl3Info setObject:[NSNumber numberWithUnsignedLongLong:[xl3 relayMask]] forKey:@"hv_relay_mask"];
         
         if([xl3 crateNumber] == 16) {
             
-            [crateXl3Info setObject:[NSString stringWithFormat:@"%@",[xl3 hvBSwitch]?@"ON":@"OFF"] forKey:@"hvStatusB"];
+            [crateXl3Info setObject:[NSString stringWithFormat:@"%@",[xl3 hvBSwitch]?@"ON":@"OFF"] forKey:@"hv_status_b"];
             
-            [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:[xl3 hvNominalVoltageB]] forKey:@"hvNominalB"];
+            [crateXl3Info setObject:[NSNumber numberWithUnsignedLong:[xl3 hvNominalVoltageB]] forKey:@"hv_nominal_b"];
             
-            [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvBVoltageReadValue]] forKey:@"hvVoltageReadValueB"];
+            [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvBVoltageReadValue]] forKey:@"hv_voltage_read_value_b"];
             
-            [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvBCurrentReadValue]] forKey:@"hvCurrentReadValueB"];
+            [crateXl3Info setObject:[NSNumber numberWithFloat:[xl3 hvBCurrentReadValue]] forKey:@"hv_current_read_value_b"];
+            
         }
     
     NSString * crateNumberAsString = [NSString stringWithFormat:@"%i",[xl3 crateNumber]];
