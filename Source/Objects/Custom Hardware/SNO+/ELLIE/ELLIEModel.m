@@ -122,25 +122,26 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     if(![runControl isRunning]){
         //[aSnotModel setRunType:kRunTellie];
-        [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
+            [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        }
+        else{
+            NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
+        }
     }
-    
-    //check the run is going and that it is a tellie run
-    //if(([runControl isRunning]) && ([aSnotModel getRunType] == kRunTellie)){
-    if([runControl isRunning]){
-        //start the tellie run document
-        [self _pushInitialTellieRunDocument];
+    else if ([runControl isRunning])
+    {
+        if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
+            [self _pushInitialTellieRunDocument];
+        }
+        else{
+            NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
+        }
     }
-    
 }
 
 -(void) stopTellieRun
-{
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    //[aSnotModel setRunType:kRunUndefined];
-    
+{    
     //add run control object
     NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
@@ -699,8 +700,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //[runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
     //Set the Run Type to a SMELLIE run
-    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
+    //NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
     //[theSNOPModel setRunType:kRunSmellie]; //sets the run_type to a smellie run type
     
     NSLog(@"SMELLIE_RUN:Setting up a SMELLIE Run\n");
@@ -1062,15 +1063,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
     //Set the Run Type to a SMELLIE run
-    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
+    /*NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];*/
+    //add
     //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
-    
     //used to be halt run but this now moves straight into a maintainence run 
-    
     //end the run correctly if it is still running
-    
-    
     //[runControl haltRun];
     //TODO: Send stop smellie run notification 
     NSLog(@"SMELLIE_RUN:Stopping SMELLIE Run\n");

@@ -34,6 +34,7 @@
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
 
+
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
 @implementation SNOPController
@@ -49,18 +50,31 @@ smellieRunFile;
 -(id)init
 {
     self = [super initWithWindowNibName:@"SNOP"];
+    return self;
+}
+
+-(void)windowDidLoad
+{
     
-    //build dictionary from the runTypes in the GUI
-    self.snopRunTypeMaskDic = nil;
-    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] initWithCapacity:20];
-    int bitNumber = 0;
-    /*for(id member in globalRunTypesMatrix){
-        [tmp setObject:[NSNumber numberWithInt:bitNumber] forKey:[member ]]
-        bitNumber = bitNumber + 1;
+    /*if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
+        maskValue |= (0x1UL << i);
     }*/
     
+    //build run type dictionary from the runTypes in the GUI
+    self.snopRunTypeMaskDic = nil; //reset the current GUI information
+    NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithCapacity:20];
+    int i;
+    for(i=0;i<31;i++){
+        NSButtonCell * test = [[NSButtonCell alloc] init];
+        test = [globalRunTypesMatrix cellAtRow:i column:0];
+        NSString * keyString = [[NSString alloc] init];
+        keyString = [test title];
+        //this works
+        [temp setObject:[NSString stringWithFormat:@"empty"] forKey:keyString];
+
+    }
     
-    return self;
+    self.snopRunTypeMaskDic = temp;
 }
 
 
@@ -277,17 +291,31 @@ smellieRunFile;
     
 }
 
+
 - (IBAction)changedRunTypeMatrixAction:(id)sender
-{
+{    
     //write in the new runType mask
     unsigned long maskValue = 0;
     int i;
     //only goes up to 31 because there is some strange problem with objective c recasting implictly an unsigned long as a long
     for(i=0;i<31;i++){
         if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
+            NSButtonCell * test = [[NSButtonCell alloc] init];
+            test = [globalRunTypesMatrix cellAtRow:i column:0];
+            NSString * keyString = [[NSString alloc] init];
+            keyString = [test title];
+            [snopRunTypeMaskDic setObject:[NSNumber numberWithInt:[[globalRunTypesMatrix cellAtRow:i column:0] intValue]] forKey:keyString];
+            //set the actual bit mask
             maskValue |= (0x1UL << i);
         }
     }
+    
+    //self.runTypeMask = nil;
+    NSNumber * maskValueForStore = [[NSNumber alloc] init];
+    maskValueForStore = [NSNumber numberWithUnsignedLong:maskValue];
+    self.runTypeMask = maskValueForStore;
+    
+    [model setRunTypeMask:maskValueForStore];
     
     //A bit of test code to see a 32-bit word
     /*NSMutableString *str = [NSMutableString stringWithFormat:@""];
@@ -853,9 +881,13 @@ smellieRunFile;
     //Method for completing this without a new thread 
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
-    smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
-    [smellieThread start];
-    
+    if([model isRunTypeMaskedIn:@"Smellie"]){
+        smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
+        [smellieThread start];
+    }
+    else{
+        NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
+    }
     
     //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
     

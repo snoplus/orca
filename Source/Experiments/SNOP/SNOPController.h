@@ -140,6 +140,10 @@
 - (void) setDetectorTitle;
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
+-(void) windowDidLoad;
+
+//check to see if a run type is masking in 
+-(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
 
 @end
 @interface ORDetectorView (SNO)

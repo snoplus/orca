@@ -712,11 +712,6 @@
 	[startSubRunButton setEnabled:NO];
 	[restartRunButton setEnabled:NO];
 	[stopRunButton setEnabled:NO];
-    //Set the Run Type to a SMELLIE run
-    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
-	[model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
 - (IBAction) newRunAction:(id)sender
@@ -728,12 +723,6 @@
 	[stopRunButton setEnabled:NO];
 	[endSubRunButton setEnabled:YES];
 	[startSubRunButton setEnabled:NO];
-    
-    //Set the Run Type to a SMELLIE run
-    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
-    //[theSNOPModel setRunType:kRunMaintainence]; //sets the run_type to a smellie run type
-    
     [model setForceRestart:YES];
     [model performSelector:@selector(stopRun) withObject:nil afterDelay:0];
 }
@@ -743,8 +732,8 @@
     [self endEditing];
     
     //Set the Run Type to a SMELLIE run
-    NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
+    //NSArray*  objsSNOP = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //SNOPModel* theSNOPModel = [objsSNOP objectAtIndex:0];
     //[theSNOPModel setRunType:kRunUndefined]; //sets to an undefined run
     
     

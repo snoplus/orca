@@ -389,8 +389,7 @@
 -(BOOL)isTellieRunning
 {
     BOOL tellieRunInProgress = NO;
-    NSArray*  snopModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel * aSnopModel = [snopModelObjects objectAtIndex:0];
+    //NSArray*  snopModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     //int runType = [aSnopModel getRunType];
     
     //collect ORRunModel objects

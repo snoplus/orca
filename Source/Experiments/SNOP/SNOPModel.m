@@ -87,6 +87,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress,
 smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
 snopRunTypeMask = snopRunTypeMask,
+runTypeMask= runTypeMask,
 mtcConfigDoc = _mtcConfigDoc;
 
 @synthesize smellieRunHeaderDocList;
@@ -99,22 +100,23 @@ mtcConfigDoc = _mtcConfigDoc;
     [self setImage:[NSImage imageNamed:@"SNOP"]];
 }
 
-- (unsigned long) getSnopRunTypeMask
+- (NSMutableDictionary*) getSnopRunTypeMask
 {
     return snopRunTypeMask;
 }
 
-- (void) setSnopRunTypeMask:(unsigned long)aSnopRunTypeMask
+- (void) setSnopRunTypeMask:(NSMutableDictionary*)aSnopRunTypeMask
 {
     snopRunTypeMask = aSnopRunTypeMask;
 }
 
 //check to see if the current SNO+ runType mask has the correct settings
-- (void) checkRunTypeMask:(NSString*)aRunType
+-(BOOL)isRunTypeMaskedIn:(NSString*)aRunType
 {
-    
+    bool runTypeMaskedIn;
+    runTypeMaskedIn = [[self.snopRunTypeMask objectForKey:aRunType] boolValue];
+    return runTypeMaskedIn;
 }
-
 
 - (void) makeMainController
 {
@@ -1012,7 +1014,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
     [runDocDict setObject:@"run" forKey:@"type"];
     //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
-    [runDocDict setObject:[NSNumber numberWithUnsignedInt:[self getRunType]] forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedLong:[[self runTypeMask] unsignedLongValue]] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
