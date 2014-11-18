@@ -41,7 +41,6 @@
 - (NSString*) identifier;
 - (void) saveUsingFile:(NSFileHandle*)aFile;
 - (void) loadUsingFile:(NSFileHandle*)aFile;
-- (BOOL) alreadyInReadOutList:(id)anItem;
 
 @end
 
@@ -67,7 +66,6 @@
 
 - (BOOL) containsObject:(id) anObj;
 - (unsigned) indexOfObject:(id) anObj;
-- (BOOL)alreadyInReadOutList:(id)anItem;
 
 - (BOOL) acceptsObject:(id) anObject;
 - (void) moveObject:(id)anObj toIndex:(unsigned)index;
