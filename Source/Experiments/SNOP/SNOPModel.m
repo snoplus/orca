@@ -158,6 +158,11 @@ mtcConfigDoc = _mtcConfigDoc;
     }
 }
 
+-(void) initRunMaskHistory
+{
+    
+}
+
 - (void) initOrcaDBConnectionHistory
 {
 	self.orcaDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
@@ -713,8 +718,8 @@ mtcConfigDoc = _mtcConfigDoc;
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
     [self initSmellieRunDocsDic];
-    //zero is the undefined run type otherwise specified
-    //[self setRunType:kRunUndefined];
+
+
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -728,6 +733,8 @@ mtcConfigDoc = _mtcConfigDoc;
     self.debugDBName = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBName"];
     self.debugDBPort = [decoder decodeInt32ForKey:@"ORSNOPModelDebugDBPort"];
     self.debugDBIPAddress = [decoder decodeObjectForKey:@"ORSNOPModelDebugDBIPAddress"];
+    
+    self.runTypeMask = [decoder decodeObjectForKey:@"SNOPRunTypeMask"];
 	
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -748,6 +755,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [encoder encodeObject:self.debugDBName forKey:@"ORSNOPModelDebugDBName"];
     [encoder encodeInt32:self.debugDBPort forKey:@"ORSNOPModelDebugDBPort"];
     [encoder encodeObject:self.debugDBIPAddress forKey:@"ORSNOPModelDebugDBIPAddress"];
+    [encoder encodeObject:self.runTypeMask forKey:@"SNOPRunTypeMask"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet

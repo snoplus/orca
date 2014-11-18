@@ -141,6 +141,7 @@
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
+-(void) fetchRunMaskSettings;
 
 @end
 @interface ORDetectorView (SNO)

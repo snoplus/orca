@@ -170,8 +170,23 @@ smellieRunFile;
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
     [self fetchNhitSettings];
+    [self fetchRunMaskSettings];
     //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
+}
+
+-(void) fetchRunMaskSettings
+{
+    int i;
+    for(i=0;i<31;i++){
+        unsigned long mask = 0;
+        mask = [[model runTypeMask] unsignedLongValue];
+        //read the bitmask from the run mask
+        int valueToSetInMatrix = (int) ((mask >> i) & 0x1UL);
+        [[globalRunTypesMatrix cellAtRow:i column:0] setIntValue:valueToSetInMatrix];
+        
+    }
+    //[globalRunTypesMatrix
 }
 
 -(IBAction)setTellie:(id)sender
