@@ -19,10 +19,11 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t statusRegOffset	= GetDeviceSpecificData()[1];
     int32_t chan0Offset		    = (int32_t)GetDeviceSpecificData()[5];
     uint16_t statusWord;
-    uint32_t addressModifier    = 0x39;
+    uint32_t addressModifier    = GetAddressModifier();
     uint32_t baseAdd            = GetBaseAddress();
     int32_t result = VMERead(baseAdd + statusRegOffset,addressModifier, sizeof(statusWord),statusWord);
-    
+    uint32_t eventBufferMod    = 0x09;
+
     if(result != sizeof(statusWord)){
         LogBusError("Status Rd: V830 0x%04x %s",GetBaseAddress(),strerror(errno));
     }
@@ -54,14 +55,14 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                     
                     //get the header -- always the first word
                     uint32_t dataHeader = 0;
-                    if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
+                    if(VMERead(baseAdd + eventBufferOffset,eventBufferMod, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
                         LogBusError("Header Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
                     }
                     data[dataIndex++] = dataHeader;
                     
                     for(uint16_t i=0 ; i<numEnabledChannels ; i++){
                         uint32_t aValue;
-                        if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(aValue), aValue) != sizeof(aValue)){
+                        if(VMERead(baseAdd + eventBufferOffset,eventBufferMod, sizeof(aValue), aValue) != sizeof(aValue)){
                             LogBusError("Data Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
                         }
                         //keep a rollover count for channel zero
