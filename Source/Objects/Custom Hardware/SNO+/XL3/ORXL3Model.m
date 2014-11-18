@@ -108,6 +108,8 @@ extern NSString* ORSNOPRequestHVStatus;
 @synthesize
 xl3MegaBundleDataId = _xl3MegaBundleDataId,
 pmtBaseCurrentDataId = _pmtBaseCurrentDataId,
+relayHighMask = relayHighMask,
+relayLowMask = relayLowMask,
 cmosRateDataId = _cmosRateDataId,
 xl3FifoDataId = _xl3FifoDataId,
 xl3HvDataId = _xl3HvDataId,
