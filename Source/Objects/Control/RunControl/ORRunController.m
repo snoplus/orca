@@ -712,6 +712,7 @@
 	[startSubRunButton setEnabled:NO];
 	[restartRunButton setEnabled:NO];
 	[stopRunButton setEnabled:NO];
+    [model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
 - (IBAction) newRunAction:(id)sender
