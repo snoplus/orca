@@ -14,6 +14,7 @@ private:
     uint32_t lastChan0Count;
     uint32_t rollOverCount;
     uint32_t errorCount;
+    uint32_t goodCount;
 
 };
 

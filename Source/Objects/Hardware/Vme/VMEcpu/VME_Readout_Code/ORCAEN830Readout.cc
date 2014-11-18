@@ -8,6 +8,7 @@ bool ORCAEN830Readout::Start()
 	lastChan0Count  = 0;
 	rollOverCount   = 0;
     errorCount      = 0;
+    goodCount       = 0;
     uint32_t enabledMask = GetDeviceSpecificData()[0];
     if(enabledMask & (0x1)) chan0Enabled = true;
     else                    chan0Enabled = false;
@@ -22,7 +23,6 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t addressModifier    = GetAddressModifier();
     uint32_t baseAdd            = GetBaseAddress();
     int32_t result = VMERead(baseAdd + statusRegOffset,addressModifier, sizeof(statusWord),statusWord);
-    uint32_t eventBufferMod    = 0x09;
 
     if(result != sizeof(statusWord)){
         LogBusError("Status Rd: V830 0x%04x %s",GetBaseAddress(),strerror(errno));
@@ -55,14 +55,14 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                     
                     //get the header -- always the first word
                     uint32_t dataHeader = 0;
-                    if(VMERead(baseAdd + eventBufferOffset,eventBufferMod, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
+                    if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
                         LogBusError("Header Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
                     }
                     data[dataIndex++] = dataHeader;
                     
                     for(uint16_t i=0 ; i<numEnabledChannels ; i++){
                         uint32_t aValue;
-                        if(VMERead(baseAdd + eventBufferOffset,eventBufferMod, sizeof(aValue), aValue) != sizeof(aValue)){
+                        if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(aValue), aValue) != sizeof(aValue)){
                             LogBusError("Data Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
                         }
                         //keep a rollover count for channel zero
@@ -74,10 +74,11 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                                 lastChan0Count = aValue;
                                 data[indexForRollOver] = rollOverCount;
                                 data[dataIndex++]      = aValue+chan0Offset;
+                                goodCount++;
                             }
                             else {
                                 errorCount++;
-                                LogMessage("Bad Count: V830 0x%04x %d",baseAdd,errorCount);
+                                LogMessage("Bad Count: V830 0x%x %d/%d",baseAdd,errorCount,goodCount);
                                 data[indexForRollOver] = 0xffffffff;
                                 data[dataIndex++]      = 0xffffffff;
                             }
