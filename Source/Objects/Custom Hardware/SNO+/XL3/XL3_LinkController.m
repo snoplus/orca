@@ -603,6 +603,8 @@ static NSDictionary* xl3Ops;
 
     [hvRelayMaskLowField setIntValue:relayMask & 0xffffffff];
     [hvRelayMaskHighField setIntValue:relayMask >> 32];
+    
+    [self splitRelayMask:relayMask];
 
     unsigned char slot;
     unsigned char pmtic;
