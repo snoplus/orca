@@ -228,6 +228,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) dealloc 
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [firmwareStatusString release];
     [spiConnector release];
     [linkConnector release];
@@ -239,8 +241,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[progressLock release];
     [fileQueue cancelAllOperations];
     [fileQueue release];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
