@@ -837,6 +837,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
     [[steps lastObject] addSkipCondition: @"vacSystemPingOK" value: @"-1"]; //skip if ping is in warning state
     [[steps lastObject] addAndCondition:  @"vacSystemPingOK" value: @"1"]; 
+    [[steps lastObject] setNumAllowedErrors:5];
 
     //this step state is error free ONLY if the following values are met.
 	[[steps lastObject] require:          @"shouldUnbias" value:@"0"];
