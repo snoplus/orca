@@ -342,7 +342,7 @@ NSDate* burstStart = NULL;
                                     if(burstState == 1){
                                         
                                         [Bchans release];
-                                        Bchans = [chans mutableCopy];
+                                        Bchans = [chans mutableCopy]; //part of crashline
                                         
                                         [Bcards release];
                                         Bcards = [cards mutableCopy];
@@ -477,12 +477,6 @@ NSDate* burstStart = NULL;
                                     double lateTime = [[secs objectAtIndex:0] longValue] + 0.000001*[[mics objectAtIndex:0] longValue];
                                     NSLog(@"extra trip: t=%lf, adc=%i, chan=%i-%i \n", lateTime, [[adcs objectAtIndex:0] intValue], [[cards objectAtIndex:0] intValue], [[chans objectAtIndex:0] intValue]);
                                     addThisToQueue = 0;
-                                    //Clean up
-                                    [chans removeAllObjects]; //CB maybe crash because of this
-                                    [cards removeAllObjects];
-                                    [adcs removeAllObjects];
-                                    [secs removeAllObjects];
-                                    [mics removeAllObjects];
                                 }
                             }
                             if((addThisToQueue == 1) || (burstState + burstTell ==0)){
