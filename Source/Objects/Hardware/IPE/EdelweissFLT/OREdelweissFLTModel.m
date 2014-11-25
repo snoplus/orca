@@ -4418,6 +4418,8 @@ for(chan=0; chan<6;chan++)
 	}
 #endif	
 
+    [self initTrigger];//TODO: 
+
     if([[userInfo objectForKey:@"doinit"]intValue]){
 //TODO: remove the obsolete commands -tb-    
 	//[self setLedOff:NO];
