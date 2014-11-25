@@ -141,12 +141,12 @@ NSDate* burstStart = NULL;
 	[[[self undoManager] prepareWithInvocationTarget:self] setNHit:nHit];
     nHit = value;
     //buffer
-    [chans removeAllObjects];
-    [cards removeAllObjects];
-    [adcs removeAllObjects];
-    [secs removeAllObjects];
-    [mics removeAllObjects];
-    [words removeAllObjects];
+    //[chans removeAllObjects];
+    //[cards removeAllObjects];
+    //[adcs removeAllObjects];
+    //[secs removeAllObjects];
+    //[mics removeAllObjects];
+    //[words removeAllObjects];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorNHitChanged object:self];
 }
 
