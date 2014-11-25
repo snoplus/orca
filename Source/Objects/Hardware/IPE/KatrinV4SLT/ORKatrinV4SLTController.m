@@ -876,12 +876,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setMessageText:@"This will KILL the crate process before compiling and starting simulation mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
     [alert setInformativeText:@"Is this really what you want?"];
-    [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-        if (result == NSAlertFirstButtonReturn){
+        if (result == NSAlertSecondButtonReturn){
             [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
             BOOL rememberState = [[model sbcLink] forceReload];
             if(rememberState) [[model sbcLink] setForceReload: NO];
@@ -937,7 +937,32 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender
 {
-	//[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"This will KILL the crate process before compiling and starting using DMA mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertSecondButtonReturn){
+            [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+            BOOL rememberState = [[model sbcLink] forceReload];
+            if(rememberState) [[model sbcLink] setForceReload: NO];
+            //if(rememberState) [[model sbcLink] reloadClient];
+            //sleep(2);
+            [model sendLinkWithDmaLibConfigScriptON];  //this is not blocking but the script will run for several seconds so all subsequent commands shouldn't rely on the script! -tb-
+            //[self connectionAction: nil];
+            //[self toggleCrateAction: nil];
+            //[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //[[model sbcLink] startCrate];
+            if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+        }
+    }];
+#else
+    //[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
     NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting using DMA mode. "
 						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
                       @"Cancel",
@@ -947,6 +972,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       @selector(_SLTv4killCrateAndStartLinkWithDMADidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 }
 
 - (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -977,6 +1003,30 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[model sendLinkWithDmaLibConfigScriptOFF];  
 	NSLog(@"Sending link-with-dma-lib script is still under development. If it fails just stop and force-reload-start the crate.\n");
 #else
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"This will KILL the crate process before compiling and starting using DMA mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertSecondButtonReturn){
+            [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+            BOOL rememberState = [[model sbcLink] forceReload];
+            if(rememberState) [[model sbcLink] setForceReload: NO];
+            [model sendLinkWithDmaLibConfigScriptOFF];
+            //[self connectionAction: nil];
+            //[self toggleCrateAction: nil];
+            //[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //[[model sbcLink] startCrate];
+            if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+        }
+    }];
+#else
+    //[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
     NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting without DMA mode. "
 						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
                       @"Cancel",
@@ -986,6 +1036,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       @selector(_SLTv4killCrateAndStartLinkWithoutDMADidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 #endif
 }
 

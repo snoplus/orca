@@ -242,7 +242,7 @@
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-        if (result == NSAlertFirstButtonReturn){
+        if (result == NSAlertSecondButtonReturn){
             [model createDatabase];
         }
     }];
@@ -272,7 +272,7 @@
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-        if (result == NSAlertFirstButtonReturn){
+        if (result == NSAlertSecondButtonReturn){
             [model dropAllTables];
         }
     }];

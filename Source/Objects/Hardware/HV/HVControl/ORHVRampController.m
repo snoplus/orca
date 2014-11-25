@@ -488,12 +488,12 @@
         NSAlert *alert = [[[NSAlert alloc] init] autorelease];
         [alert setMessageText:@"High Voltage Set Value != Actual Value"];
         [alert setInformativeText:@"You can not Ramp HV until this problem is resolved.\nWhat would like to do?"];
-        [alert addButtonWithTitle:@"Cancle"];
+        [alert addButtonWithTitle:@"Cancel"];
         [alert addButtonWithTitle: @"Set DACs = ADC's"];
         [alert setAlertStyle:NSWarningAlertStyle];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-            if (result == NSAlertFirstButtonReturn){
+            if (result == NSAlertSecondButtonReturn){
                 [model resolveActualVsSetValueProblem];
                 [model initializeStates];
                 [model resetAdcs];
@@ -552,6 +552,9 @@
         [model startRamping];
         [self updateButtons];
         if (result == NSAlertFirstButtonReturn){
+            [model setStates:kHVRampPanic onlyControlled:YES];
+            [model startRamping];
+            [self updateButtons];
         }
     }];
 #else

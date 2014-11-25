@@ -1769,6 +1769,13 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
+            #if 0 //TODO: remove SLT stuff -tb-   2014
+                @try {
+                    [model autoCalibrate];
+                }
+                @catch(NSException* localException) {
+                }
+            #endif
         }
     }];
 #else

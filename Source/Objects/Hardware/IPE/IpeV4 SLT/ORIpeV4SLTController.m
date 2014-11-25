@@ -817,12 +817,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setMessageText:@"This will KILL the crate process before compiling and starting simulation mode. "];
     [alert setInformativeText:@"Is this really what you want?"];
-    [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-        if (result == NSAlertFirstButtonReturn){
+        if (result == NSAlertSecondButtonReturn){
             [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
             BOOL rememberState = [[model sbcLink] forceReload];
             if(rememberState) [[model sbcLink] setForceReload: NO];
@@ -946,12 +946,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
     [alert setMessageText:@"This will KILL the crate process before compiling and starting without DMA mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
     [alert setInformativeText:@"Is this really what you want?"];
-    [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert setAlertStyle:NSWarningAlertStyle];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-        if (result == NSAlertFirstButtonReturn){
+        if (result == NSAlertSecondButtonReturn){
             [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
             BOOL rememberState = [[model sbcLink] forceReload];
             if(rememberState) [[model sbcLink] setForceReload: NO];

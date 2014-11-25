@@ -107,7 +107,8 @@
             
             [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
                 if (result == NSAlertFirstButtonReturn){
-                 }
+                    [self sendit];
+                }
             }];
 #else
             NSBeginAlertSheet(@"ORCA Mail",
@@ -130,8 +131,7 @@
         [alert addButtonWithTitle:@"OK"];
         [alert setAlertStyle:NSWarningAlertStyle];
         
-        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-        }];
+        [alert beginSheetModalForWindow:[self window] completionHandler:nil];
 #else
         NSBeginAlertSheet(@"ORCA Mail",
 						  @"OK",

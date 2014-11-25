@@ -77,8 +77,7 @@
     [alert setInformativeText:@"Check Internet Connection"];
     [alert setAlertStyle:NSWarningAlertStyle];
     
-    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
-    }];
+    [alert beginSheetModalForWindow:[self window] completionHandler:nil];
 #else
     NSBeginAlertSheet (@"Load Failed",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Check Internet Connection");
 #endif
