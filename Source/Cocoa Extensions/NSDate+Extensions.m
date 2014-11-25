@@ -18,17 +18,13 @@
 }
 - (NSString*) utcDescription
 {
-    return [self descriptionFromTemplate:@"MM/dd/yy HH:mm:ss" timeZone:@""];
+    return [self descriptionFromTemplate:@"MM/dd/yy HH:mm:ss" timeZone:@"UTC"];
 }
 - (NSString*) descriptionFromTemplate:(NSString*)aTemplate
 {
     return [self descriptionFromTemplate:aTemplate timeZone:nil];
 }
 
-- (NSString*) utcDateStringFromTemplate:(NSString*)aTemplate
-{
-    return [self descriptionFromTemplate:aTemplate timeZone:@"UTC"];
-}
 - (NSString*) descriptionFromTemplate:(NSString*)aTemplate timeZone:(NSString*)aTimeZone
 {
     NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
