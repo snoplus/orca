@@ -340,9 +340,10 @@ NSDate* burstStart = NULL;
                                 }
                                 else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
                                     if(burstState == 1){
-                                        
+                                        @synchronized(Bchans) //maybe not Bchans
+                                        {
                                         [Bchans release];
-                                        Bchans = [chans mutableCopy]; //part of crashline
+                                        Bchans = [chans mutableCopy]; //part of crash line
                                         
                                         [Bcards release];
                                         Bcards = [cards mutableCopy];
@@ -429,6 +430,7 @@ NSDate* burstStart = NULL;
                                         [Nadcs removeAllObjects];
                                         [Nsecs removeAllObjects];
                                         [Nmics removeAllObjects];
+                                        }//end of synch
                                     }//end of burststate = 1 stuff
                                     loudSec=0;
                                     burstForce=0;
@@ -528,8 +530,7 @@ NSDate* burstStart = NULL;
     if(!queueLock)queueLock = [[NSRecursiveLock alloc] init];
     queueMap = [[NSMutableDictionary dictionary] retain];
     
-    //buffer  clear throut
-    chans   = [[NSMutableArray alloc] init];
+    chans   = [[NSMutableArray alloc] init]; //Def Bchans here? //crash source?  
     cards   = [[NSMutableArray alloc] init];
     adcs    = [[NSMutableArray alloc] init];
     secs    = [[NSMutableArray alloc] init];
@@ -580,14 +581,15 @@ NSDate* burstStart = NULL;
     [Nadcs release];
     [Nsecs release];
     [Nmics release];
-    
+    @synchronized(Bchans)
+    {
     [Bchans release];
     [Bcards release];
     [Badcs release];
     [Bsecs release];
     [Bmics release];
     [Bwords release];
-
+    }
     
 
 }
@@ -838,6 +840,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //this is the header of the data file
     NSMutableArray* anArrayOfData = [NSMutableArray array];
     //Make the data record from the burst array
+    @synchronized(Bchans)
+    {
     int BurstSize = Bchans.count;
     NSLog(@"Size of burst file: %i \n", (BurstSize - 1) );
     int l;
@@ -866,7 +870,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     [theBurstMonitoredObject processData:anArrayOfData decoder:theDecoder];
     //end of adding things to the data file
-    
+    }// end synch
+        
     for(NSMutableArray* aQueue in queueArray){
         //Data file writing was here before
         //for(ORBurstData* someData in aQueue)
