@@ -1082,7 +1082,7 @@ struct {
 			unsigned long asLong;
 		} theData;
 		
-		int index = 5;
+		int index = 4;
 		int i;
 		for(i=0;i<kMJDPreAmpDacChannels;i++){
 			theData.asFloat = [self adc:i];
