@@ -329,7 +329,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Software trigger of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Software Trigger", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Software Trigger", @"OK", nil, nil,
                         localException);
     }
 }
@@ -342,7 +342,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Software clear of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Software Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Software Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -355,7 +355,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Software reset of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Software Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Software Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -374,7 +374,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Read Scalers", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Read Scalers", @"OK", nil, nil,
                         localException);
     }
 }
@@ -386,7 +386,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Status of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Read Status", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Read Status", @"OK", nil, nil,
                         localException);
     }
 }

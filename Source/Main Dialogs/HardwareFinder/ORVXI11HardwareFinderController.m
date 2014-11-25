@@ -197,40 +197,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(VXI11HardwareFinderController);
     [sender setData:itemData forType:@"ORGroupDragBoardItem"];
 }
 
-#if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_6)
-// Means compiling on 10.7 or greater
-- (void) tableView:(NSTableView*)tableView draggingSession:(NSDraggingSession *)session 
+- (void) tableView:(NSTableView*)tableView draggingSession:(NSDraggingSession *)session
       endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
-#else
-// Compiling on 10.6 or lower
-- (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
-#endif
 {
     // The dragging session has ended, we can release the objects we had.
     [self _releaseCreatedObjects];
 }
 
-@end
-
-// This class is to get notification of the end of the drag.  It is only necessary
-// in versions < 10.7, because 10.7 has implemented a delegate call-back for NSTableView
-// Since for versions previous to 10.7, NSTableView implemented the informal NSDraggingSource
-// protocol, we can derive and overload the function that is called at the end of the 
-// dragging session.
-// M. Marino
-@implementation ORTableViewWithDropNotify
-
-
-
-#if !defined(MAC_OS_X_VERSION_10_6) || (MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_6)
-// Means compiling on 10.6 or lower 
-- (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
-{
-    [super draggedImage:anImage endedAt:aPoint operation:operation];    
-    id deleg = [self dataSource];
-    if ([deleg respondsToSelector:@selector(draggedImage:endedAt:operation:)]) {
-        [deleg draggedImage:anImage endedAt:aPoint operation:operation];
-    }
-}
-#endif
 @end

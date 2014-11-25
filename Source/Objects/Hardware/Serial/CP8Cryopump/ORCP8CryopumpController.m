@@ -746,11 +746,10 @@
 {
 	[firstStageTempField setFloatValue: [model firstStageTemp]];
 	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
+	NSDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
+		theDate = [NSDate dateWithTimeIntervalSince1970:t];
+		[timeField setObjectValue:[theDate description]];
 	}
 	else [timeField setObjectValue:@"--"];
 }
@@ -949,7 +948,21 @@
             s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
         }
 
-		NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"YES/Turn ON Cryopump"];
+        [alert setInformativeText:@"Really turn ON the cryopump?"];
+        [alert addButtonWithTitle:@"YES/Turn ON Cryopump"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn){
+                [model writeCryoPumpOn:YES];
+            }
+        }];
+#else
+        NSBeginAlertSheet(s,
 						  @"YES/Turn ON Cryopump",
 						  @"Cancel",
 						  nil,[self window],
@@ -958,13 +971,16 @@
 						  nil,
 						  nil,
 						  @"Really turn ON the cryopump?");
+#endif
 	}
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:YES];
 }
+#endif
 
 - (IBAction) closeConstraintPanel:(id)sender
 {
@@ -983,7 +999,21 @@
         if([[model pumpOffConstraints] count] && [model constraintsDisabled]){
             s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
         }
-		NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:@"Really turn OFF the cryopump?"];
+        [alert addButtonWithTitle:@"YES/Turn OFF Cryopump"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn){
+                [model writeCryoPumpOn:NO];
+             }
+        }];
+#else
+        NSBeginAlertSheet(s,
 					  @"YES/Turn OFF Cryopump",
 					  @"Cancel",
 					  nil,[self window],
@@ -992,14 +1022,16 @@
 					  nil,
 					  nil,
 					  @"Really turn OFF the cryopump?");
+#endif
 	}
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:NO];
 }
-
+#endif
 - (IBAction) openPurgeValveAction:(id)sender
 {
 	[self endEditing];
@@ -1011,7 +1043,21 @@
         if([[model purgeOpenConstraints] count] && [model constraintsDisabled]){
             s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
         }
-		NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:@"Really OPEN the purge valve?"];
+        [alert addButtonWithTitle:@"YES/OPEN Purge Valve"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn){
+                [model writePurgeValveOpen:YES];
+             }
+        }];
+#else
+        NSBeginAlertSheet(s,
 						  @"YES/OPEN Purge Valve",
 						  @"Cancel",
 						  nil,[self window],
@@ -1020,14 +1066,16 @@
 						  nil,
 						  nil,
 						  @"Really OPEN the purge valve?");
+#endif
 	}
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:YES];
 }
-
+#endif
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
 {
 	NSArray* allKeys = [constraints allKeys];
@@ -1049,7 +1097,21 @@
 - (IBAction) closePurgeValveAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Close Purge Valve",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Close Purge Valve"];
+    [alert setInformativeText:@"Really CLOSE the purge valve?"];
+    [alert addButtonWithTitle:@"YES/CLOSE Purge Valve"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model writePurgeValveOpen:NO];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Close Purge Valve",
 					  @"YES/CLOSE Purge Valve",
 					  @"Cancel",
 					  nil,[self window],
@@ -1058,13 +1120,15 @@
 					  nil,
 					  nil,
 					  @"Really CLOSE the purge valve?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) closePurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:NO];
 }
-
+#endif
 - (IBAction) openRoughingValveAction:(id)sender
 {
 	[self endEditing];
@@ -1076,7 +1140,21 @@
         if([[model roughingOpenConstraints] count] && [model constraintsDisabled]){
             s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
         }
-		NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:@"Really OPEN the Roughing valve?"];
+        [alert addButtonWithTitle:@"YES/OPEN Roughing Valve"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn){
+                [model writeRoughValveOpen:YES];
+            }
+        }];
+#else
+        NSBeginAlertSheet(s,
 					  @"YES/OPEN Roughing Valve",
 					  @"Cancel",
 					  nil,[self window],
@@ -1085,18 +1163,35 @@
 					  nil,
 					  nil,
 					  @"Really OPEN the Roughing valve?");
+#endif
 	}
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:YES];
 }
+#endif
 
 - (IBAction) closeRoughingValveAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Close Roughing Valve",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Close Roughing Valve"];
+    [alert setInformativeText:@"Really CLOSE the Roughing valve?"];
+    [alert addButtonWithTitle:@"YES/CLOSE Roughing Valve"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model writeRoughValveOpen:NO];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Close Roughing Valve",
 					  @"YES/CLOSE Roughing Valve",
 					  @"Cancel",
 					  nil,[self window],
@@ -1105,17 +1200,33 @@
 					  nil,
 					  nil,
 					  @"Really CLOSE the Roughing valve?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) closeRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:NO];
 }
-
+#endif
 - (IBAction) turnThermocoupleOnAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Turn ON Cryo Pump",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Turn ON Cryo Pump"];
+    [alert setInformativeText:@"Really turn ON the Thermocouple?"];
+    [alert addButtonWithTitle:@"YES/Turn ON Thermocouple"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model writeThermocoupleOn:YES];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Turn ON Cryo Pump",
 					  @"YES/Turn ON Thermocouple",
 					  @"Cancel",
 					  nil,[self window],
@@ -1124,17 +1235,33 @@
 					  nil,
 					  nil,
 					  @"Really turn ON the Thermocouple?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:YES];
 }
-
+#endif
 - (IBAction) turnThermocoupleOffAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Turn OFF Cryo Pump",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Turn OFF Cryo Pump"];
+    [alert setInformativeText:@"Really turn OFF the Thermocouple?"];
+    [alert addButtonWithTitle:@"Yes/Turn OFF Thermocouple"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model writeThermocoupleOn:NO];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Turn OFF Cryo Pump",
 					  @"YES/Turn OFF Thermocouple",
 					  @"Cancel",
 					  nil,[self window],
@@ -1143,18 +1270,20 @@
 					  nil,
 					  nil,
 					  @"Really turn OFF the Thermocouple?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:NO];
 }
-
+#endif
 
 - (IBAction) listPumpOnOffConstraintsAction:(id)sender
 {
 	if([[model pumpOnConstraints]count] || [[model pumpOffConstraints]count]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model pumpOnOffConstraintReport]);
         
     }
@@ -1163,7 +1292,7 @@
 - (IBAction) listPurgeOpenConstraintsAction:(id)sender
 {
 	if([[model pumpOnConstraints]count]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model purgeOpenConstraintReport]);
         
     }
@@ -1172,7 +1301,7 @@
 - (IBAction) listRoughingOpenConstraintsAction:(id)sender
 {
 	if([[model pumpOnConstraints]count]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model roughingOpenConstraintReport]);
         
     }

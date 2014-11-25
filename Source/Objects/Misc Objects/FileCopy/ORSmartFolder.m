@@ -41,23 +41,18 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChanged";
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORSmartFolder (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 - (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORSmartFolder
 - (id) init
 {
     if(self = [super init]){
-#if !defined(MAC_OS_X_VERSION_10_9)
-        [NSBundle loadNibNamed:@"SmartFolder" owner:self];
-#else
         [[NSBundle mainBundle] loadNibNamed:@"SmartFolder" owner:self topLevelObjects:&topLevelObjects];
-#endif
     }
     
     [self setDirectoryName:@"~"];
@@ -245,7 +240,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 {
 	NSString* path = @"~"; //default
 	if(useFolderStructure){
-		NSCalendarDate* date = [NSCalendarDate date];
+		NSDate* date = [NSDate date];
 		NSString* year  = [NSString stringWithFormat:@"%d",[date yearOfCommonEra]];
 		NSString* month = [NSString stringWithFormat:@"%02d",[date monthOfYear]];
 		path = [self directoryName];
@@ -692,23 +687,12 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setCanCreateDirectories:YES];
 	[openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             NSString* dirName = [[[openPanel URL]path]stringByAbbreviatingWithTildeInPath];
             [self setDirectoryName:dirName];
         }
     }];
-#else	
-	[openPanel beginSheetForDirectory:directoryName?directoryName:NSHomeDirectory()
-                                 file:nil
-                                types:nil
-                       modalForWindow:window?window:[view window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-    
-#endif
 }
 
 
@@ -719,6 +703,21 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     }
     NSString* s = ![self queueIsRunning]?@"You can always send them later.":
     [NSString stringWithFormat:@"Push 'Send' to send ALL files in:\n<%@>",[self finalDirectoryName]];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:[self queueIsRunning]?@"Stop Sending?":@"Send All Files?"];
+    [alert setInformativeText:s];
+    [alert addButtonWithTitle:[self queueIsRunning]?@"Stop":@"Send"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window]?[self window]:[view window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            if(![self queueIsRunning])[self sendAll];
+            else [self stopTheQueue];
+        }
+    }];
+#else
     NSBeginAlertSheet([self queueIsRunning]?@"Stop Sending?":@"Send All Files?",
                       [self queueIsRunning]?@"Stop":@"Send",
                       @"Cancel",
@@ -728,11 +727,26 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
                       nil,
                       nil,
                       @"%@",s);
+#endif
 }
 
 - (IBAction) deleteButtonAction:(id)sender
 {
     NSString* s = [NSString stringWithFormat:@"Push 'Delete' to delete files that are in:\n<%@/sentFiles>",[self finalDirectoryName]];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Delete All Sent Files?"];
+    [alert setInformativeText:s];
+    [alert addButtonWithTitle:@"Delete"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [self deleteAll];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"Delete All Sent Files?",
                       @"Delete",
                       @"Cancel",
@@ -742,7 +756,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
                       nil,
                       nil,
                       @"%@",s);
-    
+#endif
 }
 
 
@@ -847,18 +861,8 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORSmartFolder (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-
-{
-    if(returnCode){
-        NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [self setDirectoryName:dirName];
-    }
-}
-#endif
-
 - (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
@@ -874,4 +878,5 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
     }
 }
 @end
+#endif
 

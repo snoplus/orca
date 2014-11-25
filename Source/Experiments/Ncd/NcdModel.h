@@ -81,7 +81,7 @@
 		NSString*	nominalSettingsFile;
 		float		currentMuxEfficiency;
 		BOOL runningAtReducedEfficiency;
-		NSCalendarDate* reducedEfficiencyDate;
+		NSDate* reducedEfficiencyDate;
 }
 
 
@@ -96,8 +96,8 @@
 - (void) registerForRates;
 
 #pragma mark ¥¥¥Accessors
-- (NSCalendarDate*) reducedEfficiencyDate;
-- (void) setReducedEfficiencyDate:(NSCalendarDate*)aReducedEfficiencyDate;
+- (NSDate*) reducedEfficiencyDate;
+- (void) setReducedEfficiencyDate:(NSDate*)aReducedEfficiencyDate;
 - (BOOL) runningAtReducedEfficiency;
 - (void) setRunningAtReducedEfficiency:(BOOL)aRunningAtReducedEfficiency;
 - (float) currentMuxEfficiency;

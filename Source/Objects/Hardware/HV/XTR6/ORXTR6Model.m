@@ -177,7 +177,6 @@ NSString* ORXTR6Lock                            = @"ORXTR6Lock";
         NSSize netIconSize = [netConnectIcon size];
         netIconSize.height = theIconSize.height;
         netIconSize.width = 10;
-        [netConnectIcon setScalesWhenResized:YES];
         [netConnectIcon setSize:netIconSize];
         theIconSize.width += netIconSize.width;
     }

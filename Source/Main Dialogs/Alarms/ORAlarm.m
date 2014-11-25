@@ -73,20 +73,13 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 
 - (NSString*) timePosted
 {
-    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-    [dateFormatter setDateFormat:[NSDateFormatter dateFormatFromTemplate:@"MM/dd/yy HH:mm:ss" options:0 locale:[NSLocale currentLocale]]];
-    
-   return [dateFormatter stringFromDate:timePosted];
+   return [timePosted stdDescription];
 
 }
 
 - (NSString*) timePostedUTC
 {
-    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-    [dateFormatter setDateFormat:[NSDateFormatter dateFormatFromTemplate:@"MM/dd/yy HH:mm:ss" options:0 locale:[NSLocale currentLocale]]];
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
-
-    return [dateFormatter stringFromDate:timePosted];
+    return [timePosted descriptionFromTemplate:@"MM/dd/yy HH:mm:ss" timeZone:@"UTC"];
 }
 
 - (void) setTimePosted:(NSDate*)aDate
@@ -239,7 +232,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 - (NSDictionary*) alarmInfo
 {
 	return [NSDictionary dictionaryWithObjectsAndKeys:
-            [timePosted descriptionWithCalendarFormat:nil timeZone:nil locale:nil],	@"timePosted",
+            [timePosted description],	@"timePosted",
 							[NSNumber numberWithUnsignedLong:[self severity]],@"severity",
 							[self name],	   @"name",
                             [self helpString], @"help",

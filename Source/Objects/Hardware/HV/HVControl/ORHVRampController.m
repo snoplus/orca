@@ -28,16 +28,14 @@
 #import "ORAxis.h"
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORHVRampController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) _currentFileSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 - (void) _startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORHVRampController
 - (id) init
@@ -486,7 +484,25 @@
     [model pollHardware:model];
 	
     if(![model checkActualVsSetValues]){
-		NSBeginAlertSheet(@"High Voltage Set Value != Actual Value",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"High Voltage Set Value != Actual Value"];
+        [alert setInformativeText:@"You can not Ramp HV until this problem is resolved.\nWhat would like to do?"];
+        [alert addButtonWithTitle:@"Cancle"];
+        [alert addButtonWithTitle: @"Set DACs = ADC's"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn){
+                [model resolveActualVsSetValueProblem];
+                [model initializeStates];
+                [model resetAdcs];
+                [model startRamping];
+                [self updateButtons];
+            }
+        }];
+#else
+        NSBeginAlertSheet(@"High Voltage Set Value != Actual Value",
 						  @"Cancel",
 						  @"Set DACs = ADC's",
 						  nil,[self window],
@@ -495,6 +511,7 @@
 						  nil,
 						  nil,
 						  @"You can not Ramp HV until this problem is resolved.\nWhat would like to do?");
+#endif
     }
     else {
 		[model initializeStates];
@@ -522,6 +539,22 @@
 - (IBAction) panicAction:(id)sender
 {
     [self endEditing];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"HV Panic"];
+    [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        [model setStates:kHVRampPanic onlyControlled:YES];
+        [model startRamping];
+        [self updateButtons];
+        if (result == NSAlertFirstButtonReturn){
+        }
+    }];
+#else
     NSBeginAlertSheet(@"HV Panic",
 					  @"YES/Do it NOW",
 					  @"Cancel",
@@ -531,14 +564,29 @@
 					  nil,
 					  nil,
 					  @"Really Panic Selected High Voltage OFF?");
-	
-	
+#endif
 }
 
 - (IBAction) panicSystemAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"HV Panic",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"HV Panic"];
+    [alert setInformativeText:@"Really Panic ALL High Voltage OFF?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model setStates:kHVRampPanic onlyControlled:NO];
+            [model startRamping];
+            [self updateButtons];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"HV Panic",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,[self window],
@@ -547,12 +595,28 @@
 					  nil,
 					  nil,
 					  @"Really Panic ALL High Voltage OFF?");
+#endif
 }
 
 - (IBAction) syncAction:(id)sender;
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Sync DACs to ADCs",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Sync DACs to ADCs"];
+    [alert setInformativeText:@"Really move ADC values into DAC fields?"];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model forceDacToAdc];
+            [self updateButtons];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Sync DACs to ADCs",
 					  @"YES",
 					  @"Cancel",
 					  nil,[self window],
@@ -561,6 +625,7 @@
 					  nil,
 					  nil,
 					  @"Really move ADC values into DAC fields?");
+#endif
 }
 
 
@@ -581,7 +646,6 @@
 	[openPanel setCanChooseFiles:NO];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -589,15 +653,6 @@
             [model setDirName:dirName];
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory:NSHomeDirectory()
-								 file:nil
-								types:nil
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
 }
 
 
@@ -678,7 +733,6 @@
     if([model currentFile])	startingDir = [[model currentFile] stringByDeletingLastPathComponent];
     else					startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -686,15 +740,6 @@
             [model setCurrentFile:[theFolder stringByAppendingPathComponent:@"HVCurrents.txt"]];
         }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:startingDir
-								 file:nil
-								types:nil
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(_currentFileSelectionDidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
 }
 
 - (void) updateButtons
@@ -823,25 +868,8 @@
 @end
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORHVRampController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode){
-		NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		[model setDirName:dirName];
-	}
-}
-- (void)_currentFileSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode){
-		NSString* theFolder = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		[model setCurrentFile:[theFolder stringByAppendingPathComponent:@"HVCurrents.txt"]];
-	}
-}
-
-#endif
-
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
@@ -879,3 +907,4 @@
     }
 }
 @end
+#endif

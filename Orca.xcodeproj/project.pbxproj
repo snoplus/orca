@@ -2992,6 +2992,8 @@
 		84F50A30116B7151000275F2 /* ORCmdLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F50A2A116B7151000275F2 /* ORCmdLabelModel.h */; };
 		84F50A31116B7151000275F2 /* ORCmdLabelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F50A2B116B7151000275F2 /* ORCmdLabelModel.m */; };
 		84F50E14116CCAEE000275F2 /* loginExpectScript in Resources */ = {isa = PBXBuildFile; fileRef = 84F50E13116CCAEE000275F2 /* loginExpectScript */; };
+		84F5D68A1A167120009DC7EC /* NSDate+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F5D6881A167120009DC7EC /* NSDate+Extensions.h */; };
+		84F5D68B1A167120009DC7EC /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F5D6891A167120009DC7EC /* NSDate+Extensions.m */; };
 		84F5E10D0A151D9300707A0F /* ORBasicOpenGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F5E10B0A151D9300707A0F /* ORBasicOpenGLView.h */; };
 		84F5E10E0A151D9300707A0F /* ORBasicOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F5E10C0A151D9300707A0F /* ORBasicOpenGLView.m */; };
 		84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84F5E11A0A151E0B00707A0F /* OpenGL.framework */; };
@@ -6387,6 +6389,8 @@
 		84F50A2A116B7151000275F2 /* ORCmdLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCmdLabelModel.h; path = "Source/Objects/Misc Objects/CmdLabel/ORCmdLabelModel.h"; sourceTree = SOURCE_ROOT; };
 		84F50A2B116B7151000275F2 /* ORCmdLabelModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCmdLabelModel.m; path = "Source/Objects/Misc Objects/CmdLabel/ORCmdLabelModel.m"; sourceTree = SOURCE_ROOT; };
 		84F50E13116CCAEE000275F2 /* loginExpectScript */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = loginExpectScript; sourceTree = "<group>"; };
+		84F5D6881A167120009DC7EC /* NSDate+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Extensions.h"; sourceTree = "<group>"; };
+		84F5D6891A167120009DC7EC /* NSDate+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Extensions.m"; sourceTree = "<group>"; };
 		84F5E10B0A151D9300707A0F /* ORBasicOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBasicOpenGLView.h; path = "Source/Objects/Misc Objects/Views/OpenGLView/ORBasicOpenGLView.h"; sourceTree = SOURCE_ROOT; };
 		84F5E10C0A151D9300707A0F /* ORBasicOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBasicOpenGLView.m; path = "Source/Objects/Misc Objects/Views/OpenGLView/ORBasicOpenGLView.m"; sourceTree = SOURCE_ROOT; };
 		84F5E11A0A151E0B00707A0F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
@@ -13554,6 +13558,8 @@
 		F51E695703AE4775015F64B1 /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				84F5D6881A167120009DC7EC /* NSDate+Extensions.h */,
+				84F5D6891A167120009DC7EC /* NSDate+Extensions.m */,
 				840C7FDE1955CA0000E36622 /* NSApplication+Extensions.h */,
 				840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */,
 				84A9816B18E1D7A400BD3FB3 /* NSFileManager+Extensions.h */,
@@ -14589,6 +14595,7 @@
 				84EE20261A12B1B400F6806E /* ORCV1730Model.h in Headers */,
 				8419227F0F0BC18800EF1C1C /* ORScriptIDEController.h in Headers */,
 				84499B790F13BB6E004B855B /* ORMksPdr2000Controller.h in Headers */,
+				84F5D68A1A167120009DC7EC /* NSDate+Extensions.h in Headers */,
 				84499B7B0F13BB6E004B855B /* ORMksPdr2000Decoders.h in Headers */,
 				84499B7D0F13BB6E004B855B /* ORMksPdr2000Model.h in Headers */,
 				84499CC80F13E457004B855B /* ORCTITempController.h in Headers */,
@@ -16953,6 +16960,7 @@
 				842544EE12F1FF9F00472314 /* BamDetectorController.m in Sources */,
 				842544F012F1FF9F00472314 /* BamDetectorModel.m in Sources */,
 				842544F212F1FF9F00472314 /* BamDetectorView.m in Sources */,
+				84F5D68B1A167120009DC7EC /* NSDate+Extensions.m in Sources */,
 				8457D25612F9986E00D3E3B4 /* ORiSegHVCardController.m in Sources */,
 				8457D37812F9AB8A00D3E3B4 /* ORiSegHVCardDecoders.m in Sources */,
 				EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */,
@@ -17424,6 +17432,7 @@
 				" CFBundlerHelpBookFolder" = OrcaHelp;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -17500,6 +17509,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CFBundlerHelpBookFolder = OrcaHelp;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				CODE_SIGN_IDENTITY = "Don't Code Sign";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -17569,6 +17579,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
@@ -17663,6 +17674,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = "";
@@ -17682,6 +17694,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Deployment;
@@ -17698,6 +17711,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Default;

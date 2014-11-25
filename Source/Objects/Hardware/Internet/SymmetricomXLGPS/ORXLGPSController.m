@@ -282,8 +282,8 @@ static NSDictionary* gpsOps;
 
 - (void) ppoTimeChanged:(NSNotification*)aNote
 {
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-	NSDateComponents *componentsPpo = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
 						       fromDate:[model ppoTime]];
 
 	NSDateFormatter* frmt = [[[NSDateFormatter alloc] init] autorelease];
@@ -388,8 +388,8 @@ static NSDictionary* gpsOps;
 
 - (IBAction) ppoTimeAction:(id)sender
 {
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-	NSDateComponents *componentsNow = [gregorian components:(NSYearCalendarUnit) fromDate:[NSDate date]];
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+	NSDateComponents *componentsNow = [gregorian components:(NSCalendarUnitYear) fromDate:[NSDate date]];
 	[componentsNow setDay:[ppoDayField intValue]];
 	[componentsNow setHour:[ppoHourField intValue]];
 	[componentsNow setMinute:[ppoMinuteField intValue]];
@@ -420,10 +420,10 @@ static NSDictionary* gpsOps;
 
 - (IBAction) ppoTodayAction:(id)sender
 {
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-	NSDateComponents *componentsNow = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit)
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+	NSDateComponents *componentsNow = [gregorian components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay)
 						       fromDate:[NSDate date]];
-	NSDateComponents *componentsPpo = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
+	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
 						       fromDate:[model ppoTime]];
 	[componentsPpo setYear:[componentsNow year]];
 	[componentsPpo setMonth:[componentsNow month]];
@@ -434,10 +434,10 @@ static NSDictionary* gpsOps;
 
 - (IBAction) ppoNowAction:(id)sender
 {
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
-	NSDateComponents *componentsPpo = [gregorian components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit)
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay)
 						       fromDate:[model ppoTime]];
-	NSDateComponents *componentsNow = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
+	NSDateComponents *componentsNow = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
 						       fromDate:[NSDate date]];
 	[componentsPpo setHour:[componentsNow hour]];
 	[componentsPpo setMinute:[componentsNow minute]];

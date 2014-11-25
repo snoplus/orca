@@ -150,10 +150,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 31 //note that only enabled cha
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",crateNum];
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
     NSString* mask  = [NSString stringWithFormat:@"Mask  = 0x%x\n",cardNum];
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[3]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:ptr[3]];
 	int i;
-	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,date];
+	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@\n",title,crate,card,mask,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z"]];
 	for(i=0;i<kNumCV830Channels;i++){
 		if(enabledMask & (0x1L<<i)){
 			s = [s stringByAppendingFormat:@"%d:%lu\n",i,ptr[5+i]];

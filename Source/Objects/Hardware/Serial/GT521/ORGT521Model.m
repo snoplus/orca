@@ -302,7 +302,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     return cycleWillEnd;
 }
 
-- (void) setCycleWillEnd:(NSCalendarDate*)aCycleWillEnd
+- (void) setCycleWillEnd:(NSDate*)aCycleWillEnd
 {
     [aCycleWillEnd retain];
     [cycleWillEnd release];

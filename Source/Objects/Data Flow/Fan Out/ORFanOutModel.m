@@ -301,7 +301,7 @@ static NSString *kFanOutConnectorKey[10]  = {
             }
         }
         if(count==[self numberOfOutputs]+1 ){
-            NSRunAlertPanel(@"All Connectors Connected!",@"You must disconnect something.",nil,nil,nil);
+            ORRunAlertPanel(@"All Connectors Connected!",@"You must disconnect something.",nil,nil,nil);
             return NO;
         }
     }

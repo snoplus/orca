@@ -35,11 +35,6 @@
 #import "BiStateView.h"
 #import "SourceMask.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@interface NcdController (private)
--(void)fileSelectionReturn:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
 
 @implementation NcdController
 
@@ -429,7 +424,6 @@
     else {
         startingDir = NSHomeDirectory();
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
@@ -437,15 +431,6 @@
             [[NcdDetector sharedInstance] readMap];
         }
     }];
-#else	
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(readMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 
@@ -467,7 +452,6 @@
         defaultFile = @"TubeMapData";
         
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldStringValue:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -475,43 +459,8 @@
             [[NcdDetector sharedInstance] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
-#else	
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-}
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)readMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [[NcdDetector sharedInstance] setMapFileName:[[sheet filenames] objectAtIndex:0]];
-		[[NcdDetector sharedInstance] readMap];
-    }
-}
 
-- (void)saveMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [[NcdDetector sharedInstance] saveMapFileAs:[sheet filename]];
-    }
 }
-- (void)saveNominalFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model saveNominalSettingsTo:[sheet filename]];
-    }
-}
-- (void)openDiffNominalFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model setNominalSettingsFile: [[sheet filenames] objectAtIndex:0] ];
-    }
-}
-#endif
 
 - (IBAction) delete:(id)sender
 {
@@ -558,16 +507,16 @@
 - (IBAction) setMuxEfficiencyAction:(id)sender
 {
 	NSString* s = [NSString stringWithFormat:@"Reducing mux efficiency to: %.0f%%",[model currentMuxEfficiency] ];
-	int choice = NSRunAlertPanel(s,@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(s,@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){
 		[model modifiyMuxEfficiency];
 	}	
 }
 
 - (IBAction) restoreEfficiencyAction:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Restoring mux thresholds to previous values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Restoring mux thresholds to previous values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){
 		[model restoreMuxEfficiency];
 	}	
 }
@@ -576,8 +525,8 @@
 {
 	BOOL ok= YES;
 	if([model nominalSettingsFile]){
-		int choice = NSRunAlertPanel(@"Capturing mux and threshold settings to a NEW nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-		if(choice == NSAlertAlternateReturn){
+		BOOL choice = ORRunAlertPanel(@"Capturing mux and threshold settings to a NEW nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+		if(choice){
 			ok = YES;
 		}
 		else ok = NO;
@@ -590,7 +539,6 @@
 			if([startingDir length] == 0)startingDir = NSHomeDirectory();
 			defaultFileName = [[model nominalSettingsFile] lastPathComponent];
 		}
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         NSSavePanel* savePanel = [NSSavePanel savePanel];
         [savePanel setNameFieldStringValue:defaultFileName];
         [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
@@ -599,15 +547,7 @@
                 [model saveNominalSettingsTo:[[savePanel URL]path]];
             }
         }];
-#else	
 
-		[[NSSavePanel savePanel] beginSheetForDirectory:startingDir
-												   file:defaultFileName
-										 modalForWindow:[self window]
-										  modalDelegate:self
-										 didEndSelector:@selector(saveNominalFilePanelDidEnd:returnCode:contextInfo:)
-											contextInfo:NULL];
-#endif
 	}
 }
 
@@ -617,8 +557,8 @@
 {
 	BOOL ok= YES;
 	if([model nominalSettingsFile]){
-		int choice = NSRunAlertPanel(@"Selecting a different nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-		if(choice == NSAlertAlternateReturn){
+		BOOL choice = ORRunAlertPanel(@"Selecting a different nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+		if(choice){
 			ok = YES;
 		}
 		else ok = NO;
@@ -636,57 +576,47 @@
 		[openPanel setCanChooseFiles:YES];
 		[openPanel setAllowsMultipleSelection:NO];
 		[openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
                 [model setNominalSettingsFile: [[openPanel URL]path]];
             }
         }];
-#else	
-		[openPanel beginSheetForDirectory:startDir
-									 file:nil
-									types:nil
-						   modalForWindow:[self window]
-							modalDelegate:self
-						   didEndSelector:@selector(openDiffNominalFilePanelDidEnd:returnCode:contextInfo:)
-							  contextInfo:NULL];
-#endif
 	}
 }
 
 - (IBAction) restoreAllToNominal:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Restoring mux and shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Restoring mux and shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){
 		[model restoreToNomional];
 	}	
 }
 - (IBAction) restoreMuxesToNominal:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Restoring mux settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Restoring mux settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){
 		[model restoreMuxesToNomional];
 	}	
 }
 - (IBAction) restoreShapersToNominal:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Restoring shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Restoring shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){
 		[model restoreShapersToNominal];
 	}	
 }
 - (IBAction) restoreShaperGainsToNominal:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Restoring shaper gain settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Restoring shaper gain settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){
 		[model restoreShaperGainsToNominal];
 	}	
 }
 - (IBAction) restoreShaperThresoldsToNominal:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Restoring shaper thresholds settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Restoring shaper thresholds settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(choice){		
 		[model restoreShaperThresholdsToNominal];
 	}	
 }
@@ -949,7 +879,7 @@
 	else [muxEfficiencyField setStringValue:@"Previous"];
 
 	if([model runningAtReducedEfficiency]){
-		[reducedEfficiencyDateField setObjectValue: [NSDate  date]];
+		[reducedEfficiencyDateField setObjectValue: [[NSDate  date] description]];
 	}
 	else [reducedEfficiencyDateField setStringValue:@"---"];
 
@@ -1118,7 +1048,6 @@
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
@@ -1129,30 +1058,7 @@
             while(obj = [e nextObject])[obj setObject:fileName forKey:@"muxFile"];
         }
     }];
-#else	
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(fileSelectionReturn:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 @end
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@implementation NcdController (private)
--(void)fileSelectionReturn:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        NSArray* selected = [altMuxThresholdsController selectedObjects];
-        NSEnumerator* e = [selected objectEnumerator];
-        id obj;
-        while(obj = [e nextObject])[obj setObject:fileName forKey:@"muxFile"];
-    }
-}
-@end
-#endif

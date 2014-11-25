@@ -63,10 +63,9 @@
     BOOL doNotLock = ShiftAndExtract(dataPtr[1], 6, 0x1);
     
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
-    NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
-    [date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+    NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
     
-    theString = [theString stringByAppendingFormat:@"Date: %@\n",date];
+    theString = [theString stringByAppendingFormat:@"Date: %@\n",[date stdDescription]];
     theString = [theString stringByAppendingFormat:@"TimeStamp: %lld\n",(unsigned long long)dataPtr[3]<<32 | dataPtr[4]];
     
     theString = [theString stringByAppendingFormat:@"Locked:   %@\n",locked   ? @"YES":@"NO"];

@@ -369,11 +369,30 @@
     NSString* s1 = [NSString stringWithFormat:@"Really Turn %@ Constraint Checking for Module %d HV?",!currentState?@"OFF":@"ON",module];
     if(!currentState)s1 = [s1 stringByAppendingFormat:@"\n\n(HV will NOT ramp down if vac is bad)"];
     else            s1 = [s1 stringByAppendingFormat:@"\n\n(HV will ramp down on next check if vac is bad)"];
+    
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert setInformativeText:@""];
+    [alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Turn %@ HV Checks",!currentState?@"OFF":@"ON"]];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            if(module == 0) [model setIgnorePanicOnA:!currentState];
+            else            [model setIgnorePanicOnB:!currentState];
+        }
+        else {
+            if(module == 0) [model setIgnorePanicOnA:currentState];
+            else            [model setIgnorePanicOnB:currentState];
+        }
+    }];
+#else
     NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:
                               [NSNumber numberWithInt:module],@"module",
                               [NSNumber numberWithInt:currentState],@"currentState",
                               nil] retain]; //release in confirmDidFinish()
-    
     NSBeginAlertSheet(s1,
                       [NSString stringWithFormat:@"YES/Turn %@ HV Checks",!currentState?@"OFF":@"ON"],
 					  @"Cancel",
@@ -383,9 +402,11 @@
 					  nil,
 					  context,
 					  @"");
+#endif
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     int module = [[userInfo objectForKey:@"module"]intValue];
@@ -401,7 +422,7 @@
     }
     [userInfo release];
 }
-
+#endif
 
 
 
@@ -461,7 +482,6 @@
         startingDir = NSHomeDirectory();
     }
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -469,15 +489,7 @@
             [secondaryTableView reloadData];
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(readSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+
 }
 
 - (IBAction) saveSecondaryMapFileAction:(id)sender
@@ -499,7 +511,6 @@
         defaultFile = [self defaultSecondaryMapFilePath];
         
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -507,14 +518,6 @@
             [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
-#else
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 #pragma mark ¥¥¥Table Data Source

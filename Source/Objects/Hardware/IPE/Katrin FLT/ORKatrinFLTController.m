@@ -1186,7 +1186,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1199,7 +1199,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1243,7 +1243,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT status\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 	
@@ -1257,7 +1257,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT status\n");
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1292,7 +1292,7 @@
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Exception reading FLT HW Model Version\n");
-			NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+			ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
 							localException,[model stationNumber]);
 		}
     }
@@ -1437,7 +1437,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Test\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1450,7 +1450,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT reset\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1462,7 +1462,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT trigger\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1475,7 +1475,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT load time\n");
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 	
@@ -1489,7 +1489,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read time\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1557,7 +1557,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1582,7 +1582,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT init test Pattern\n");
-        NSRunAlertPanel([localException name], @"%@\nTest Pattern Init FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nTest Pattern Init FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }

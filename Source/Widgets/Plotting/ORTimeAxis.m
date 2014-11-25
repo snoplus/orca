@@ -173,14 +173,13 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
                     [theAxisColoredTicks lineToPoint:NSMakePoint(x,y-LONG_TICK)];			// draw long tick
 
 					if (!ival) {
-						NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:startTime];
-						axisNumberString = [aDate descriptionWithCalendarFormat:@"Newest"];
+						axisNumberString = @"Newest";
 						dateOffset = +20;
 					}
 					else if ((nthTick % 3) == 0) {
 						double theValue = val;
-						NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-theValue];
-						axisNumberString = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
+						NSDate *aDate = [NSDate dateWithTimeIntervalSince1970:startTime-theValue];
+						axisNumberString = [aDate descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 						nthTick = 0;
 					}
 					
@@ -231,8 +230,8 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 		float val = [self getPixAbs:[markerNumber floatValue]];
 		
 		float markerValue = [markerNumber floatValue];
-		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-markerValue];
-		NSString* label = [aDate descriptionWithCalendarFormat:@"%H:%M:%S"];
+		NSDate *aDate = [NSDate dateWithTimeIntervalSince1970:startTime-markerValue];
+		NSString* label = [aDate descriptionFromTemplate:@"HH:mm:ss"];
 		
 		if([self isXAxis]){
 			[NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 

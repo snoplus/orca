@@ -641,7 +641,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset and Init of Shaper FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Shaper Reset and Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Shaper Reset and Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -659,7 +659,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Read Gain of Shaper FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nFailed Read Gains", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFailed Read Gains", @"OK", nil, nil,
 						localException);
 	}
 	
@@ -688,7 +688,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Read Scalers of Shaper FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nFailed Read Scalers", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFailed Read Scalers", @"OK", nil, nil,
 						localException);
 	}
 }
@@ -751,7 +751,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Shaper Board FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
 						localException);
     }
 }

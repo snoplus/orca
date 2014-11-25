@@ -445,11 +445,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 					aPlist = [aPlist stringByAppendingString:embeddedPList];
 					aPlist = [aPlist stringByAppendingString:@"\r</plist>"];
 					NSPropertyListFormat format;
-					NSString *errorDesc = nil;
-					id anObj  = [NSPropertyListSerialization propertyListFromData: [aPlist dataUsingEncoding:NSASCIIStringEncoding]
-																 mutabilityOption: NSPropertyListMutableContainersAndLeaves
+					NSError *errorDesc = nil;
+                    
+                    
+                    id anObj  = [NSPropertyListSerialization propertyListWithData:[aPlist dataUsingEncoding:NSASCIIStringEncoding]
+                                                                           options: NSPropertyListMutableContainersAndLeaves
 																		   format: &format 
-																 errorDescription: &errorDesc];
+                                                                            error: &errorDesc];
 					if(anObj){
 						[embeddedPLists addObject:anObj];
 					}
@@ -616,12 +618,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
             }
         }
     }
-}
-- (NSCalendarDate*) currentTime
-{
-	NSCalendarDate* theDate = [NSCalendarDate date];
-	[theDate setCalendarFormat:@"%Y/%m/%d %H:%M:%S"];
-	return theDate;
 }
 
 - (id) executeSimpleCommand:(NSString*)aCommandString;

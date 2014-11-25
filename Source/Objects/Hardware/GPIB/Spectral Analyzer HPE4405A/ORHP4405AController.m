@@ -618,7 +618,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Freq Settings Load Failed");
-        NSRunAlertPanel( @"HP4405A Freq Settings Load Failed",
+        ORRunAlertPanel( @"HP4405A Freq Settings Load Failed",
 						@"%@",
 						@"OK",
 						nil,
@@ -636,7 +636,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Trigger Settings Load Failed");
-        NSRunAlertPanel( @"HP4405A Trigger Settings Load Failed",
+        ORRunAlertPanel( @"HP4405A Trigger Settings Load Failed",
 						@"%@",
 						@"OK",
 						nil,
@@ -653,7 +653,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A RF Burst Settings Load Failed");
-        NSRunAlertPanel( @"HP4405A RF Burst Settings Load Failed",
+        ORRunAlertPanel( @"HP4405A RF Burst Settings Load Failed",
 						@"%@",
 						@"OK",
 						nil,
@@ -669,7 +669,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Input Port Settings Load Failed");
-        NSRunAlertPanel( @"HP4405A Input Port Settings Load Failed",
+        ORRunAlertPanel( @"HP4405A Input Port Settings Load Failed",
 						@"%@",
 						@"OK",
 						nil,
@@ -686,7 +686,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Initiate Measurement Failed");
-        NSRunAlertPanel( @"HP4405A Initiate Measurement Failed",
+        ORRunAlertPanel( @"HP4405A Initiate Measurement Failed",
 						@"%@",
 						@"OK",
 						nil,
@@ -703,7 +703,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Pause Measurement Failed");
-        NSRunAlertPanel( @"HP4405A Pause Measurement Failed",
+        ORRunAlertPanel( @"HP4405A Pause Measurement Failed",
 						@"%@",
 						@"OK",
 						nil,
@@ -720,7 +720,7 @@
 	}
 	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"HP4405A Check Status Failed");
-        NSRunAlertPanel( @"HP4405A Check Status Failed",
+        ORRunAlertPanel( @"HP4405A Check Status Failed",
 						@"%@",
 						@"OK",
 						nil,

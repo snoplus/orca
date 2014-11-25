@@ -22,7 +22,11 @@
 @interface ORCmdLabelController : ORLabelController
 {
 	IBOutlet NSTableView*	commandTable;
-	IBOutlet NSForm*		detailsForm;
+    IBOutlet NSTextField*	objectField;
+    IBOutlet NSTextField*	setSelectorField;
+    IBOutlet NSTextField*	formatField;
+    IBOutlet NSTextField*	loadField;
+    IBOutlet NSTextField*	argField;
 	IBOutlet NSTextField*	itemCountField;
 	IBOutlet NSButton*		okButton;
 	IBOutlet NSButton*		okAllButton;

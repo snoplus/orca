@@ -33,14 +33,11 @@ NSString* ORStatusFlushSize				 = @"ORStatusFlushSize";
 
 ORStatusController* theLogger = nil;
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORStatusController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-- (void) loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveAsLogBookDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveStatusLogDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 #define kStatusConnection @"StatusConnection"
 #define kMaxTextSize 500000
@@ -85,9 +82,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	
 	[self loadAlarmHistory];
 	
-	NSCalendarDate* now  	= [NSCalendarDate calendarDate];
-	[now setCalendarFormat:@"%m%d%y %H:%M:%S"];
-	NSString* s = [NSString stringWithFormat:@"%@ ORCA started",now]; //don't change this string
+	NSString* s = [NSString stringWithFormat:@"%@ ORCA started",[[NSDate date] stdDescription]]; //don't change this string
 	[self updateAlarmLog:s];
 	
 	
@@ -250,7 +245,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 			}
 			else {
 				[[alarmLogView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
-													range:NSMakeRange([self alarmLogTextlength]-len,16)];
+													range:NSMakeRange([self alarmLogTextlength]-len,17)];
 
 			}
 		}
@@ -284,7 +279,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     @synchronized(self){
 
         //get the current date
-        NSCalendarDate* now = [NSCalendarDate date];
+        NSDate* now = [NSDate date];
         NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",[now yearOfCommonEra],[now monthOfYear],[now dayOfMonth]];
         aPath = [aPath stringByAppendingPathComponent:theFileName];
         BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];	
@@ -328,8 +323,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 		contents			= [[[statusView string] copy] autorelease];
     }
     
-    NSArray*	    lines				= [contents componentsSeparatedByString:@"\n"];
-    NSCalendarDate*	theReferenceDate	= [NSCalendarDate date];
+    NSArray*	lines				= [contents componentsSeparatedByString:@"\n"];
+    NSDate*     theReferenceDate	= [NSDate date];
     int count=0;
     for(NSString* aLine in [lines reverseObjectEnumerator]){
         //get first character
@@ -492,7 +487,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) insertDate:(id)sender
 {
-	NSString* theDate = [[NSCalendarDate calendarDate] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M"];
+	NSString* theDate = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm"];
 	[logBookField insertText:theDate];
 }
 
@@ -581,7 +576,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             startDir = NSHomeDirectory();
         }
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -597,14 +591,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             [saveLogBookButton setEnabled:NO];
         }
     }];
-#else
-    [savePanel beginSheetForDirectory:startDir
-								 file:nil
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(saveAsLogBookDidEnd:returnCode:contextInfo:)
-						  contextInfo:nil];
-#endif
 }
 
 - (IBAction) loadLogBook:(id)sender
@@ -622,7 +608,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Load Log Book"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -630,22 +615,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             [self setLogBookFile:fileName];
         }
     }];
-#else    
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadLogBookPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-	
 }
 
 - (IBAction) newLogBook:(id)sender
 {
-	int choice = NSRunAlertPanel(@"Starting a new logbook.",@"Is this really what you want?\nAny unsaved changes will be lost!",@"Cancel",@"Yes, Make New LogBook",nil);
-	if(choice == NSAlertAlternateReturn){		
+	BOOL choice = ORRunAlertPanel(@"Starting a new logbook.",@"Is this really what you want?\nAny unsaved changes will be lost!",@"Cancel",@"Yes, Make New LogBook",nil);
+	if(choice){
 		[logBookField setString:@""];
 		[self setLogBookFile:@"untitled"];
 	}
@@ -662,18 +637,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (void) alarmPosted:(NSNotification*)aNote
 {
 	ORAlarm* alarm = [aNote object];
-	NSCalendarDate* aDate = [NSCalendarDate dateWithNaturalLanguageString:[alarm timePosted]];
-	[aDate setCalendarFormat:@"%m%d%y %H:%M:%S"];
-	NSString* s = [NSString stringWithFormat:@"%@ Posted: %@ [%@]",aDate,[alarm name],[alarm severityName]];
+	NSString* s = [NSString stringWithFormat:@"%@ Posted: %@ [%@]",[alarm timePosted],[alarm name],[alarm severityName]];
 	[self updateAlarmLog:s];
 }
 
 - (void) alarmCleared:(NSNotification*)aNote
 {
 	ORAlarm* alarm = [aNote object];
-	NSCalendarDate* aDate = [NSCalendarDate dateWithNaturalLanguageString:[alarm timePosted]];
-	[aDate setCalendarFormat:@"%m%d%y %H:%M:%S"];
-	NSString* s = [NSString stringWithFormat:@"%@ Cleared: %@ [%@]",aDate,[alarm name],[alarm severityName]];
+	NSString* s = [NSString stringWithFormat:@"%@ Cleared: %@ [%@]",[alarm timePosted],[alarm name],[alarm severityName]];
 	[self updateAlarmLog:s];
 }
 
@@ -681,10 +652,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 {
 	ORAlarm* alarm = [aNote object];
 	
-	NSCalendarDate* aDate = [NSCalendarDate dateWithNaturalLanguageString:[alarm timePosted]];
-	[aDate setCalendarFormat:@"%m%d%y %H:%M:%S"];
-
-	NSString* s = [NSString stringWithFormat:@"%@ Acknowledged: %@ [%@]",aDate,[alarm name],[alarm severityName]];
+	NSString* s = [NSString stringWithFormat:@"%@ Acknowledged: %@ [%@]",[alarm timePosted],[alarm name],[alarm severityName]];
 	[self updateAlarmLog:s];
 }
 
@@ -709,6 +677,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) clearAlarmHistoryAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Really delete the Alarm history?"];
+    [alert setInformativeText:@"Deletion of the history can not be undone."];
+    [alert addButtonWithTitle:@"Yes, Delete It"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
+            alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
+            NSFileManager* fm = [NSFileManager defaultManager];
+            [fm removeItemAtPath:alarmHistoryPath error:nil];
+            [alarmLogView setString:@""];
+            NSLog(@"Alarm history deleted\n");
+        }
+    }];
+#else
 	NSBeginAlertSheet(@"Really delete the Alarm history?",
                       @"Cancel",
                       @"Yes, Delete It",
@@ -717,7 +704,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
                       @selector(deleteHistoryActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Deletion of the history can not be undone.");
-	
+#endif
 }
 
 - (IBAction) userInputAction:(id)sender
@@ -734,7 +721,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save Log As"];
     NSString* startDir = NSHomeDirectory(); //default to home
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -748,15 +734,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             }
          }
     }];
-#else
-    [savePanel beginSheetForDirectory:startDir
-                                 file:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveStatusLogDidEnd:returnCode:contextInfo:)
-                          contextInfo:nil];
-#endif
-    
 }
 #pragma  mark ¥¥¥Delegate Responsiblities
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
@@ -932,10 +909,8 @@ void NSLogAttr(NSAttributedString* s)
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     @try {
         
-        NSCalendarDate* now  	= [NSCalendarDate calendarDate];
-        [now setCalendarFormat:@"%m%d%y %H:%M:%S "];
-        
-        NSMutableAttributedString* now_Attr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@",now] attributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]] autorelease];
+        NSDate* now  	= [NSDate date];
+        NSMutableAttributedString* now_Attr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ ",[now stdDescription]] attributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]] autorelease];
         
         [now_Attr appendAttributedString:s];
         
@@ -1020,10 +995,8 @@ void NSLogError(NSString* aString,...)
         va_list myArgs;
         va_start(myArgs,aString);
         
-        NSCalendarDate* now = [NSCalendarDate calendarDate];
-        [now setCalendarFormat:@"%m/%d %H:%M:%S"];
-        
-        NSString* s1 = [NSString stringWithFormat:@"%@ %@",now,aString];
+        NSDate* now = [NSDate date];
+        NSString* s1 = [NSString stringWithFormat:@"%@ %@",[now stdDescription],aString];
         
         NSMutableArray* theArgs = [NSMutableArray arrayWithCapacity:10];
         while(1) {
@@ -1049,49 +1022,8 @@ void NSLogError(NSString* aString,...)
 	[pool release];
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORStatusController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
--(void)loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[sheet filenames] objectAtIndex:0];
-        [self setLogBookFile:fileName];
-    }
-}
-
-- (void) saveAsLogBookDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* newPath = [[sheet filenames] objectAtIndex:0];
-		
-		if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
-			newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
-		}
-		[logBookField writeRTFDToFile:newPath atomically:YES];
-        [self setLogBookFile:newPath];
-		
-		logBookDirty = NO;
-		[saveLogBookButton setEnabled:NO];
-		
-    }
-}
-
-- (void) saveStatusLogDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* newPath = [[sheet filenames] objectAtIndex:0];
-        if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
-            newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
-        }
-        @synchronized(self){
-           [statusView writeRTFDToFile:newPath atomically:YES];
-        }
-    }
-}
-
-
-
-#endif
 - (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
@@ -1104,3 +1036,4 @@ void NSLogError(NSString* aString,...)
 	}
 }
 @end
+#endif

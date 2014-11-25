@@ -47,6 +47,9 @@ NSString* appPath();
 NSString* launchPath();
 NSString* fullVersion();
 
+//alert panels for 10.10 and before
+BOOL ORRunAlertPanel(NSString* mainMessage, NSString* informativeMessage, NSString* defaultButtonTitle, NSString* alternateButtonTitle, NSString* otherButtonTitle, ...);
+
 #pragma mark ***private
 kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices);
 kern_return_t getMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize);

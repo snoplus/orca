@@ -1185,9 +1185,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     else                            NSLog(@"%@\n",aString);
     if(!sentryLog)sentryLog = [[NSMutableArray array] retain];
     
-    NSCalendarDate* now = [NSCalendarDate calendarDate];
-    [now setCalendarFormat:@"%m/%d %H:%M:%S"];
-    NSString* stringWithDate = [NSString stringWithFormat:@"%@ %@",now,aString];
+    NSDate* now = [NSDate date];
+    NSString* stringWithDate = [NSString stringWithFormat:@"%@ %@",[now stdDescription],aString];
 
     if(aString)[sentryLog addObject:stringWithDate];
 }

@@ -507,9 +507,7 @@ NSString* UVkWrite = @"W";
 	float pollTimeSecs = kMinutesToSecs * [mPollTimeMins floatValue];
 	NSDate *now = [NSDate date];	
 
-	NSString* lastPollTime = [now descriptionWithCalendarFormat: @"%H:%M:%S"
-	                                                   timeZone: nil   
-													     locale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
+	NSString* lastPollTime = [now descriptionFromTemplate: @"HH:mm:ss"];
 	NSString* lastPollTimeMsg = [NSString stringWithFormat: @"%@", lastPollTime];
 	
 	NSLog( @"ORUnivVoltModel - Last Poll Time ORUnivVoltModel: %@\n", lastPollTimeMsg );

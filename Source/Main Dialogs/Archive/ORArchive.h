@@ -57,13 +57,12 @@
 - (void) restart:(NSString*)binPath config:(NSString*)aConfigPath;
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath;
 - (void) deferedStartOldOrca:(NSString*)anOldOrcaPath;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 - (void) doTheSvnUpdate;
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
+
 @end
 
 @interface NSObject (ORArchive)

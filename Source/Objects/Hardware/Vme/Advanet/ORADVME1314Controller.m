@@ -142,7 +142,7 @@
         [model setOutputWithMask:[model writeMask] value:[model writeValue]];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
     }
 }
@@ -153,7 +153,7 @@
         [model dump];
     }
     @catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
 }
@@ -163,7 +163,7 @@
         [model syncWithHardware];
     }
     @catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
 }
@@ -173,7 +173,7 @@
         [model reset];
     }
     @catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
 }

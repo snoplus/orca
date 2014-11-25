@@ -465,7 +465,7 @@
 
 - (void) cycleStartedChanged:(NSNotification*)aNote
 {	
-	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
 	NSString* startDateString = [dateFormatter stringFromDate:[model cycleStarted]];
 	
 	[dateFormatter release];
@@ -475,7 +475,7 @@
 
 - (void) cycleWillEndChanged:(NSNotification*)aNote
 {
-	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
 	NSString* endDateString   = [dateFormatter stringFromDate:[model cycleWillEnd]];
 	[dateFormatter release];
 	NSString* s;
@@ -676,7 +676,21 @@
 
 - (IBAction) clearAllAction:(id)sender
 {
-	NSBeginAlertSheet(@"Clearing all data!",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clearing all data!"];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Yes, Clear All"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model sendClearData];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Clearing all data!",
                       @"Cancel",
                       @"Yes, Clear All",
                       nil,[self window],
@@ -684,16 +698,17 @@
                       @selector(clearDataSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
-	
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) clearDataSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
 		[model sendClearData];	
 	}
 }
-
+#endif
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {

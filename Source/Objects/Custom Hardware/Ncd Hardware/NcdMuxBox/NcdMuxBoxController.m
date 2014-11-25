@@ -463,7 +463,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Read of Mux %d Thresholds Failed.\n",[model muxID]);
-		NSRunAlertPanel([localException name], @"%@\nFailed Read of Mux Thresholds.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFailed Read of Mux Thresholds.", @"OK", nil, nil,
 						localException);
     }
 }
@@ -480,7 +480,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"Load of Mux %d Thresholds Failed.\n",[model muxID]);
-		NSRunAlertPanel([localException name], @"%@\nFailed Load of Mux Thresholds.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFailed Load of Mux Thresholds.", @"OK", nil, nil,
 						localException);
     }
 }

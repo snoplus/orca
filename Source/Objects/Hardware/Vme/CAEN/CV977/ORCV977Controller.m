@@ -360,7 +360,7 @@
 		[model read];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -371,7 +371,7 @@
 		[model write];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -414,7 +414,7 @@
 		[model clearOutputRegister];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nClear Output Reg of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nClear Output Reg of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:kClearOutput]);
     }
 }
@@ -426,7 +426,7 @@
 		[model clearSingleHitRegister];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nClear Single Hit Reg of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nClear Single Hit Reg of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:kSinglehitReadClear]);
     }
   
@@ -438,7 +438,7 @@
 		[model clearMultiHitRegister];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nClear Multi Hit Reg of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nClear Multi Hit Reg of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:kMultihitReadClear]);
     }
 }
@@ -449,7 +449,7 @@
 		[model initBoard];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
                         localException);
     }
  
@@ -460,7 +460,7 @@
 		[model reset];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nReset of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReset of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:kSoftwareReset]);
     }
  

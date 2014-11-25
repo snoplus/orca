@@ -27,11 +27,12 @@
 #import "ORCardContainerView.h"
 
 @interface ORRunController (private)
-- (void) populatePopups;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
 #endif
+- (void) populatePopups;
 @end
 
 @implementation ORRunController
@@ -552,7 +553,7 @@
 
 - (void) startTimeChanged:(NSNotification*)aNotification
 {
-	[timeStartedField setObjectValue:[model startTime]];
+	[timeStartedField setObjectValue:[[model startTime] descriptionFromTemplate:@"MM/dd/yy HH:mm:ss"]];
 }
 
 - (void) runModeChanged:(NSNotification *)notification
@@ -782,6 +783,24 @@
 {
     [self endEditing];
     if([runNumberText intValue] != [model runNumber]){
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:    @"Do you REALLY want to change the Run Number?"];
+        [alert setInformativeText:@"Having a unique run number is important for most experiments. If you change it you may end up with data with duplicate run numbers."];
+        [alert addButtonWithTitle:@"Yes/Change It"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if(result == NSAlertFirstButtonReturn){
+                //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
+                [self performSelector:@selector(deferredRunNumberChange) withObject:nil afterDelay:0];
+            }
+            else {
+                [runNumberText setIntValue:[model runNumber]];
+            }
+        }];
+#else
         NSBeginAlertSheet(@"Do you REALLY want to change the Run Number?",
                           @"Cancel",
                           @"Yes/Change It",
@@ -790,19 +809,10 @@
                           @selector(_changeRunNumberDidEnd:returnCode:contextInfo:),
                           nil,
                           nil,@"Having a unique run number is important for most experiments. If you change it you may end up with data with duplicate run numbers.");
+#endif
     }
 }
 
-- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertAlternateReturn){
-        //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
-        [self performSelector:@selector(deferredRunNumberChange) withObject:nil afterDelay:0];
-    }
-    else {
-        [runNumberText setIntValue:[model runNumber]];
-    }
-}
 
 - (void) deferredRunNumberChange
 {
@@ -820,6 +830,21 @@
 
 - (IBAction) chooseDir:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Do you REALLY want to change the Run Number Folder?"];
+    [alert setInformativeText:@"Having a unique run number is important for most experiments. If you change the run number folder you may end up with duplicate run numbers."];
+    [alert addButtonWithTitle:@"Yes/Select New Location"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
+            [self performSelector:@selector(deferredChooseDir) withObject:nil afterDelay:0];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Do you REALLY want to change the Run Number Folder?",
                       @"Cancel",
                       @"Yes/Select New Location",
@@ -828,47 +853,33 @@
                       @selector(_chooseDirAlertDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Having a unique run number is important for most experiments. If you change the run number folder you may end up with duplicate run numbers.");
+#endif
+
 }
 
-- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertAlternateReturn){
-        //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
-        [self performSelector:@selector(deferredChooseDir) withObject:nil afterDelay:0];
-    }
-}
+
 - (void) deferredChooseDir
 {
-        NSString* startDir = NSHomeDirectory(); //default to home
-        if([model definitionsFilePath]){
-            startDir = [[model definitionsFilePath]stringByDeletingLastPathComponent];
-            if([startDir length] == 0){
-                startDir = NSHomeDirectory();
-            }
+    NSString* startDir = NSHomeDirectory(); //default to home
+    if([model definitionsFilePath]){
+        startDir = [[model definitionsFilePath]stringByDeletingLastPathComponent];
+        if([startDir length] == 0){
+            startDir = NSHomeDirectory();
         }
-        NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-        [openPanel setCanChooseDirectories:YES];
-        [openPanel setCanChooseFiles:NO];
-        [openPanel setAllowsMultipleSelection:NO];
-        [openPanel setPrompt:@"Choose"];
-        
-    #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-        [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
-        [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-            if (result == NSFileHandlingPanelOKButton){
-                NSString* dirName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
-                [model setDirName:dirName];
-            }
-        }];
-    #else
-        [openPanel beginSheetForDirectory:startDir
-                                     file:nil
-                                    types:nil
-                           modalForWindow:[self window]
-                            modalDelegate:self
-                           didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                              contextInfo:NULL];
-    #endif
+    }
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:YES];
+    [openPanel setCanChooseFiles:NO];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* dirName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
+            [model setDirName:dirName];
+        }
+    }];
 }
 
 - (IBAction) definitionsFileAction:(id)sender
@@ -887,7 +898,6 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -902,15 +912,6 @@
             }
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(definitionsPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) runTypeAction:(id)sender
@@ -1069,6 +1070,25 @@
 @end
 
 @implementation ORRunController (private)
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
+        [self performSelector:@selector(deferredRunNumberChange) withObject:nil afterDelay:0];
+    }
+    else {
+        [runNumberText setIntValue:[model runNumber]];
+    }
+}
+- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
+        [self performSelector:@selector(deferredChooseDir) withObject:nil afterDelay:0];
+    }
+}
+#endif
 - (void) populatePopups
 {
 	[[model undoManager] disableUndoRegistration];
@@ -1108,31 +1128,6 @@
 
 	[[model undoManager] enableUndoRegistration];
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setDirName:dirName];
-    }
-}
-
-- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setDefinitionsFilePath:[[sheet filenames] objectAtIndex:0]];
-        if(![model readRunTypeNames]){
-            NSLogColor([NSColor redColor],@"Unable to parse <%@> as a run type def file.\n",[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]);
-            NSLogColor([NSColor redColor],@"File must be list of items of the form: itemNumber,itemName\n");	
-            [model setDefinitionsFilePath:nil];
-        }
-        else {
-            [self definitionsFileChanged:nil];
-        }
-    }
-}
-#endif
 
 
 @end

@@ -6204,11 +6204,11 @@ clean_up_mark:
 				theEvent.energy	= ([self read:energyAddress-1]>>16) & 0x7fff;	//15bits??
 			}			
 			
-			NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)theEvent.sec];
+			NSDate* theDate = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)theEvent.sec];
 			
 			NSLog(@"ChannelMap: 0x%0x\n",channelMap);
 			NSLog(@"EventID   : 0x%0x\n",theEvent.eventID);
-			NSLog(@"Time      : %@.%d\n",[theDate descriptionWithCalendarFormat:@"%m:%d:%y %H:%M:%S"],theEvent.subSec);
+			NSLog(@"Time      : %@.%d\n",theDate,theEvent.subSec);
 			NSLog(@"Energy    : %d\n",theEvent.energy);
 			
 		}

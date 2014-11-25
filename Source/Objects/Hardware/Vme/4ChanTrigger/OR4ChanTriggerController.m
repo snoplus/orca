@@ -327,7 +327,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board ID FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -349,7 +349,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board Status FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -363,7 +363,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -381,7 +381,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to enable Trigger 100MHz Clock: 0x%04x\n",[model lowerClock]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to enable Trigger 100MHz Clock", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to enable Trigger 100MHz Clock", @"OK", nil, nil,
 						localException);
     }
 }
@@ -394,7 +394,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to disable Trigger 100MHz Clock: 0x%04x\n",[model lowerClock]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to disable Trigger 100MHz Clock", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to disable Trigger 100MHz Clock", @"OK", nil, nil,
 						localException);
     }
 }
@@ -409,7 +409,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower 100MHz Clock: 0x%04x\n",[model lowerClock]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower 100MHz Clock: 0x%04lx", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower 100MHz Clock: 0x%04lx", @"OK", nil, nil,
 						localException,[model lowerClock]);
     }
 }
@@ -424,7 +424,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Upper 100MHz Clock: 0x%04x\n",[model upperClock]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper 100MHz Clock: 0x%04lx", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper 100MHz Clock: 0x%04lx", @"OK", nil, nil,
 						localException,[model upperClock]);
     }	
 }
@@ -455,7 +455,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to send soft Latch to trigger card.\n");
-		NSRunAlertPanel([localException name], @"%@\nSoft Latch FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSoft Latch FAILED\n", @"OK", nil, nil,
 						localException);
     }	
 }
@@ -473,7 +473,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to read clocks.\n");
-		NSRunAlertPanel([localException name], @"%@\nRead Clocks FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nRead Clocks FAILED\n", @"OK", nil, nil,
 						localException);
     }	
 }
@@ -485,7 +485,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to reset clock.\n");
-		NSRunAlertPanel([localException name], @"%@\nReset Clock FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nReset Clock FAILED\n", @"OK", nil, nil,
 						localException);
     }	
 }

@@ -25,12 +25,6 @@
 #import "SynthesizeSingleton.h"
 #import "ORScriptIDEModel.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@interface ORCommandCenterController (private)
-- (void)_processFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORCommandCenterController
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
@@ -141,7 +135,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Select"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:[self lastPath]]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
@@ -150,15 +143,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
             [self sendCommand:[NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:nil]];
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:[self lastPath]
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_processFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+
 }
 
 - (void) sendCommand:(NSString*)aCmd
@@ -241,16 +226,5 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 }
 
 @end
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@implementation ORCommandCenterController (private)
-- (void)_processFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* path = [[sheet filenames] objectAtIndex:0];
-        [self setLastPath:[path stringByDeletingLastPathComponent]];
-        [self sendCommand:[NSString stringWithContentsOfFile:path encoding:NSASCIIStringEncoding error:nil]];
-    }
-}
-@end
-#endif
+
 

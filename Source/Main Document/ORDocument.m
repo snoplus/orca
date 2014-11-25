@@ -8,7 +8,7 @@
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
@@ -297,7 +297,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	
     [docDict setObject:[svnVersion length]?svnVersion:@"0"   forKey:@"svnModVersion"];
 
-    [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
+    [docDict setObject:[NSString stringWithFormat:@"%@",[[NSDate date] stdDescription]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
 		
 	//setup and add Objects to object info list
@@ -771,11 +771,11 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		return YES;
 	}
     else if([[ORGlobal sharedGlobal] runInProgress]){
-        NSRunAlertPanel(@"Run In Progess", @"Experiment can NOT be closed.", nil, nil,nil);
+        ORRunAlertPanel(@"Run In Progess", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;
     }
     else if([self isDocumentEdited]){
-        NSRunAlertPanel(@"Document Unsaved", @"Experiment can NOT be closed.", nil, nil,nil);
+        ORRunAlertPanel(@"Document Unsaved", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;
     }
 	else {
@@ -790,8 +790,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 			s = @"Closing main window will close this experiment!";
 			buttonString = @"Close Experiment";
 		}
-        int choice = NSRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
-        if(choice == NSAlertAlternateReturn){
+        BOOL choice = ORRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
+        if(choice){
             //[[self undoManager] removeAllActions];
             [[NSNotificationCenter defaultCenter]
 			 postNotificationName:ORDocumentClosedNotification

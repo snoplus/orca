@@ -55,7 +55,7 @@ NSString* CBeValue		= @"Value";
 {
 	@try
 	{
-		NSLog( @"Date: %@, HV Value: %@\n", aDateOfAquistion, anHVEntry );
+		NSLog( @"Date: %@, HV Value: %@\n", [aDateOfAquistion stdDescription], anHVEntry );
 //	NSNumber* numObj = [NSNumber numberWithFloat: anHVEntry];
 //	NSLog( @"Number: %@\n", numObj );
 		NSArray* tmpTimePoint = [NSArray arrayWithObjects: aDateOfAquistion, anHVEntry, nil];

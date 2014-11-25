@@ -24,12 +24,14 @@
 #import "ORCouchDB.h"
 #import "ORValueBarGroupView.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORCouchDBController (private)
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORCouchDBController
 
@@ -272,6 +274,21 @@
 	
     if([model keepHistory]){
         NSString* s = [NSString stringWithFormat:@"Really DOs NOT keep a history: %@?\n",[model databaseName]];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:@"There will be NO history (only run status) kept if you deactivate this option."];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"Yes, Disable History"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if(result == NSAlertSecondButtonReturn){
+                [model setKeepHistory:NO];
+            }
+            else [model setKeepHistory:YES];
+        }];
+#else
         NSBeginAlertSheet(s,
                           @"Cancel",
                           @"Yes, Disable History",
@@ -280,6 +297,7 @@
                           @selector(historyActionDidEnd:returnCode:contextInfo:),
                           nil,
                           nil,@"There will be NO history (only run status) kept if you deactivate this option.");
+#endif
     }
     else [model setKeepHistory:YES];
 
@@ -289,6 +307,22 @@
 {
     if(![model stealthMode]){
         NSString* s = [NSString stringWithFormat:@"Really disable the database: %@?\n",[model databaseName]];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:@"There will be NO values automatically put in to the database if you activate this option."];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"Yes, Disable Database"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if(result == NSAlertSecondButtonReturn){
+                [model setStealthMode:YES];
+            }
+            else [model setStealthMode:NO];
+
+        }];
+#else
         NSBeginAlertSheet(s,
                           @"Cancel",
                           @"Yes, Disable Database",
@@ -297,6 +331,7 @@
                           @selector(stealthActionDidEnd:returnCode:contextInfo:),
                           nil,
                           nil,@"There will be NO values automatically put in to the database if you activate this option.");
+#endif
     }
     else [model setStealthMode:NO];
 }
@@ -335,7 +370,21 @@
 {
 	[self endEditing];
 	NSString* s = [NSString stringWithFormat:@"Really try to create a database named %@?\n",[model databaseName]];
-	NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s];
+    [alert setInformativeText:@"If the database already exists, this operation will do no harm."];
+    [alert addButtonWithTitle:@"Yes, Create Database"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model createDatabases];
+        }
+    }];
+#else
+    NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Create Database",
                       nil,[self window],
@@ -343,13 +392,28 @@
                       @selector(createActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"If the database already exists, this operation will do no harm.");
+#endif
 	
 }
 - (IBAction) deleteAction:(id)sender
 {
 	[self endEditing];
 	NSString* s = [NSString stringWithFormat:@"Really delete a database named %@?\n",[model databaseName]];
-	NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s];
+    [alert setInformativeText:@"If the database doesn't exist, this operation will do no harm."];
+    [alert addButtonWithTitle:@"Yes, Delete Database"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model deleteDatabases];
+        }
+    }];
+#else
+    NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Delete Database",
                       nil,[self window],
@@ -357,6 +421,7 @@
                       @selector(deleteActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"If the database doesn't exist, this operation will do no harm.");
+#endif
 	
 }
 
@@ -382,6 +447,7 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORCouchDBController (private)
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
@@ -414,4 +480,5 @@
 }
 
 @end
+#endif
 

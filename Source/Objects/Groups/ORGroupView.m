@@ -470,7 +470,6 @@
 	[openPanel setCanCreateDirectories:NO];
 	[openPanel setPrompt:@"Choose Image"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -480,16 +479,6 @@
             }
         }
     }];
-
-#else
-	[openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:[NSArray arrayWithObjects:@"pdf",@"tif",@"tiff",@"gif",@"png",@"jpeg",@"jpg",nil]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 //-------------------------------------------------------------------------------
@@ -1271,17 +1260,6 @@
     }
     return result;
 }
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* path = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
-			[group setBackgroundImagePath:path];
-		}
-	}
-}
-#endif
 @end
 
 

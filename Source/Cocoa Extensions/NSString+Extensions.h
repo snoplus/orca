@@ -52,6 +52,7 @@ typedef enum {
 - (unsigned int) unsignedIntValue;
 - (unsigned long long) unsignedLongLongValue;
 - (unsigned long) unsignedLongValue;
++ (NSString*) stringWithFormat:(NSString*)s parameters:(va_list)valist;
 
 + (NSString*) stringWithUSBDesc:(char*)aDesc;
 @end

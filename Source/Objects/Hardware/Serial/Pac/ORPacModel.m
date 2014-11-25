@@ -922,8 +922,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
                                 gainReadBack[147-i/2] = msb|lsb;
                             }
                             [self setGainReadBack:0 withValue:gainReadBack[0]]; //side effect -- force refresh
-                            NSCalendarDate* theDate = [NSCalendarDate date];
-                            [theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
+                            NSDate* theDate = [NSDate date];
                             [self setLastGainRead: theDate];
                             
                         }

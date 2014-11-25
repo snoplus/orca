@@ -285,7 +285,7 @@
 		[model clearData];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nReset of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReset of %@ failed", @"OK", nil, nil,
                         localException,@"Reset and Clear");
     }
 }
@@ -297,7 +297,7 @@
 		[model read];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -309,7 +309,7 @@
 		[model write];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -328,7 +328,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Report of %@ FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Making Report", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Making Report", @"OK", nil, nil,
                         localException);
     }
 }
@@ -341,7 +341,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Write of %@ thresholds FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
                         localException);
     }
 }

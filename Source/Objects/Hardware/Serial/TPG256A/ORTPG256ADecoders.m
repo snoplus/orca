@@ -94,8 +94,7 @@ static NSString* kTPG256AUnit[6] = {
 	for(i=0;i<6;i++){
 		theData.asLong = dataPtr[index];
 		
-		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
-		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+		NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		
 		theString = [theString stringByAppendingFormat:@"Gauge %d: %.2E %@\n",i,theData.asFloat,date];
 		index+=2;

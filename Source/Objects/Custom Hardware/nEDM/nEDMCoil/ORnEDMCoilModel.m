@@ -504,11 +504,7 @@ for (id obj in listOfADCs) [obj x];               \
                  magnetometerMap:MagnetometerMap] ) {
         [self _setUpRunning:YES];    
     } else {
-        [[NSAlert alertWithMessageText:@"Error"
-                         defaultButton:nil
-                       alternateButton:nil
-                           otherButton:nil
-             informativeTextWithFormat:@"Input matrices are inconsistent or non-existent.  Process can not be started."] runModal];
+         ORRunAlertPanel(@"Error", @"Input matrices are inconsistent or non-existent.  Process can not be started.", nil , nil,nil);
     }
 }
 
@@ -681,11 +677,7 @@ for (id obj in listOfADCs) [obj x];               \
 
     } @catch(NSException *e) {
         // This means something was wrong with the data, return NO!
-        [[NSAlert alertWithMessageText:@"Error"
-                         defaultButton:nil
-                       alternateButton:nil
-                           otherButton:nil
-             informativeTextWithFormat:@"%@",[e reason]] runModal];
+        ORRunAlertPanel(@"Error", @"%@", nil , nil,nil,[e reason]);
         return NO;
     }
     return YES;
@@ -714,23 +706,15 @@ for (id obj in listOfADCs) [obj x];               \
 
 - (void) _runAlertOnMainThread:(NSException*) exc
 {
-    // Save the static information in DB
-    NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                          @"event",@"type",
-                          [NSString stringWithFormat:@"%@",exc],@"error",
-                          nil];
-    NSDictionary* postDict = [NSDictionary dictionaryWithObjectsAndKeys:dict,@"Document",
-                              [self postToPath],@"Address",nil];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:@"ORCouchDBPostOrPutCustomRecord"
-                                                                        object:self
-                                                                      userInfo:postDict];
-    
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    ORRunAlertPanel(nil, @"%@", @"OK", nil, nil,exc);
+#else
     [[NSAlert alertWithMessageText:nil
                     defaultButton:nil
                   alternateButton:nil
                       otherButton:nil
         informativeTextWithFormat:@"%@",exc] runModal];
+#endif
 }
 
 - (void) _setRealProcessingTime:(NSTimeInterval)timeint
@@ -1604,10 +1588,10 @@ for (id obj in listOfADCs) [obj x];               \
     NSMutableData* sigmavT = [NSMutableData dataWithLength:m*n*sizeof(double)];
     NSMutableData* work = [NSMutableData data];
     
-    double* aPtr = (double*) [a bytes];
-    double* uPtr = (double*)[u bytes];
-    double* vTPtr = (double*)[vT bytes];
-    double* sigmavTPtr = (double*)[sigmavT bytes];
+   // double* aPtr = (double*) [a bytes];
+   // double* uPtr = (double*)[u bytes];
+   // double* vTPtr = (double*)[vT bytes];
+   // double* sigmavTPtr = (double*)[sigmavT bytes];
 //    aPtr[0]=1;
 //    aPtr[1]=0;
 //    aPtr[2]=0;
@@ -1618,7 +1602,7 @@ for (id obj in listOfADCs) [obj x];               \
     NSMutableData* b =[NSMutableData dataWithLength:[a length]];
     //
     b = [NSMutableData dataWithData:[self _transposeData:a withColumns:nChannel]];
-    double*  bPtr = (double*)[b bytes];
+    //double*  bPtr = (double*)[b bytes];
 //    NSMutableData* c =[NSMutableData dataWithLength:[b length]];
     if (regularizationParameter!=0) {
         // singular value decomposition of the feedback matrix

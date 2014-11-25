@@ -25,9 +25,11 @@
 #import "ORAxis.h"
 #import "ORTimedTextField.h"
 
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORMPodCController (private)
 - (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
+#endif
 
 @implementation ORMPodCController
 - (id) init
@@ -220,7 +222,21 @@
 {
 	BOOL pwr = [model power];
 
-	NSBeginAlertSheet([NSString stringWithFormat:@"Turn MPod HV Crate %@",pwr?@"OFF":@"ON"],
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:[NSString stringWithFormat:@"Turn MPod HV Crate %@",pwr?@"OFF":@"ON"]];
+    [alert setInformativeText:[NSString stringWithFormat:@"Really turn MPod HV Crate Power %@?",pwr?@"OFF":@"ON" ]];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model togglePower];
+        }
+    }];
+#else
+    NSBeginAlertSheet([NSString stringWithFormat:@"Turn MPod HV Crate %@",pwr?@"OFF":@"ON"],
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -230,10 +246,12 @@
 					  nil,
 					  nil,
 					  @"Really turn MPod HV Crate Power %@?",pwr?@"OFF":@"ON");
+#endif
 }
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORMPodCController (private)
 - (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
@@ -242,3 +260,4 @@
 	}
 }
 @end
+#endif

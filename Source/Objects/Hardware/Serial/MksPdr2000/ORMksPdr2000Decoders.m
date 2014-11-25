@@ -97,10 +97,9 @@ static NSString* kMkePdrUnit[2] = {
 	for(i=0;i<2;i++){
 		theData.asLong = dataPtr[index];
 		
-		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
-		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+		NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		
-		theString = [theString stringByAppendingFormat:@"Gauge %d: %.2E %@\n",i,theData.asFloat,date];
+		theString = [theString stringByAppendingFormat:@"Gauge %d: %.2E %@\n",i,theData.asFloat,[date stdDescription]];
 		index+=2;
 	}
 	return theString;

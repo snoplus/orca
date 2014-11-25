@@ -79,7 +79,7 @@ typedef enum eSBC_ThrottleConsts{
 	BOOL			goScriptFailed;
 	NSData*			leftOverData;
 	BOOL			isConnected;
-    NSCalendarDate*	timeConnected;
+    NSDate*         timeConnected;
 	int				socketfd;
 	int				irqfd;
 	int				startCrateState;
@@ -200,8 +200,8 @@ typedef enum eSBC_ThrottleConsts{
 - (int) portNumber;
 - (BOOL) isConnected;
 - (void) setIsConnected:(BOOL)aNewIsConnected;
-- (NSCalendarDate*) timeConnected;
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
+- (NSDate*) timeConnected;
+- (void) setTimeConnected:(NSDate*)newTimeConnected;
 - (void) setPortNumber:(int)aPort;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;

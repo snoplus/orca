@@ -30,9 +30,11 @@
 
 #define ORHardwareWizardItem @"ORHardwareWizardItem"
 
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORRamperController (private)
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
+#endif
 
 @implementation ORRamperController
 - (id) init
@@ -403,10 +405,26 @@
 
 - (IBAction) panic:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Global Panic!"];
+    [alert setInformativeText:@"REALLY Panic all enabled parameters to zero?\nIs this really what you want?"];
+    [alert addButtonWithTitle:@"Yes, Do Panic"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model startGlobalPanic];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Global Panic!",@"Cancel",@"YES/Do Panic",nil,[self window],self,@selector(sheetDidEnd:returnCode:contextInfo:),nil,nil, @"REALLY Panic all enabled parameters to zero?\nIs this really what you want?");
+#endif
 }
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORRamperController (private)
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -415,4 +433,5 @@
 	}
 }
 @end
+#endif
 

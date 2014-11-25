@@ -490,7 +490,6 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     }
     [anUnScaledImage unlockFocus];
     
-    [anUnScaledImage setScalesWhenResized:YES];
     
     return [anUnScaledImage autorelease];
 }

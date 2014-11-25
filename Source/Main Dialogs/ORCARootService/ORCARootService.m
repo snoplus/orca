@@ -165,7 +165,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
                           object: self 
 						  userInfo:userInfo];
 
-	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+	[self setTimeConnected:isConnected?[NSDate date]:nil];
 }
 
 - (void) clearHistory
@@ -237,12 +237,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     totalSent = aTotalSent;
 }
 
-- (NSCalendarDate*) timeConnected
+- (NSDate*) timeConnected
 {
 	return timeConnected;
 }
 
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected
+- (void) setTimeConnected:(NSDate*)newTimeConnected
 {
 	[timeConnected autorelease];
 	timeConnected=[newTimeConnected retain];	

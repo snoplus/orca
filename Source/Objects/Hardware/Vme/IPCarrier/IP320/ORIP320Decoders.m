@@ -84,9 +84,7 @@ static NSString* kIPSlotKey[4] = {
 	NSString* ipSlotKey		= [NSString stringWithFormat:@"IP    = %@\n",[self getSlotKey:*ptr&0x0000000f]];
 
 	ptr++;
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
-
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:*ptr];
 
 	NSString* adcString = @"";
 	int n = length - 3;
@@ -96,7 +94,7 @@ static NSString* kIPSlotKey[4] = {
 		adcString   = [adcString stringByAppendingFormat:@"ADC(%02lu) = 0x%lx\n",(*ptr>>16)&0x000000ff, *ptr&0x00000fff];
     }
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,date,adcString];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z\n"],adcString];
 }
 
 
@@ -166,8 +164,7 @@ static NSString* kIPSlotKey[4] = {
 	NSString* ipSlotKey		= [NSString stringWithFormat:@"IP    = %@\n",[self getSlotKey:*ptr&0x0000000f]];
 
 	ptr++;
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:*ptr];
 
 	NSString* adcString = @"";
 	int n = (length - 3)/2;
@@ -185,7 +182,7 @@ static NSString* kIPSlotKey[4] = {
 		theValue.asLong = *ptr;
 		[adcString stringByAppendingFormat:@"ADC(%02d) = %.4f\n",chan, theValue.asFloat];
     }
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,date,adcString];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z"],adcString];
 }
 
 

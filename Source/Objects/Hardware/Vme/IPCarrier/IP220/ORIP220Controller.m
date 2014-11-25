@@ -151,16 +151,32 @@
 
 - (IBAction) read:(id)sender
 {
-    NSBeginAlertSheet(@"IP220 Read",@"Cancel",@"YES/Read",nil,[self window],self,@selector(sheetDidEnd:returnCode:contextInfo:),nil,nil, @"Really read the IP220 Values into this dialog. Current values will be lost!");	
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"IP220 Read"];
+    [alert setInformativeText:@"Really read the IP220 Values into this dialog. Current values will be lost!"];
+    [alert addButtonWithTitle:@"Yes/Read"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model readBoard];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"IP220 Read",@"Cancel",@"YES/Read",nil,[self window],self,@selector(sheetDidEnd:returnCode:contextInfo:),nil,nil, @"Really read the IP220 Values into this dialog. Current values will be lost!");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode == NSAlertAlternateReturn){
 		[model readBoard];
 	}
 }
-
+#endif
 - (IBAction) write:(id)sender
 {
 	@try {
@@ -169,7 +185,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Write Op of IP220 Values FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed IP220 Write Op", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed IP220 Write Op", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -181,7 +197,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Reset Op of IP220 Values FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed IP220 Reset Op", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed IP220 Reset Op", @"OK", nil, nil,
                         localException);
 	}
 }

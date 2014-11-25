@@ -439,7 +439,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		if(fillStatus[index]!=aValue){
 			[self setLastChange:index];
 			if(sendOnValveChange){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Fill State Changed to %@ at %@\n",index,[self fillStatusName:aValue], time]];
 				[self scheduleStatusSend];
 			}
@@ -467,7 +467,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	if(index>=0 && index<4){
 		
 		[lastChange[index] release];
-		lastChange[index] = [[NSCalendarDate date] retain];
+		lastChange[index] = [[NSDate date] retain];
 		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORAmi286LastChange
@@ -500,7 +500,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 			[hiAlarm[index] postAlarm];
 			if(sendOnAlarm){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Hi Alarm posted at %@\n",index,time]];
 				[self scheduleStatusSend];
 			}
@@ -517,7 +517,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 			[lowAlarm[index] postAlarm];
 			if(sendOnAlarm){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Low Alarm posted at %@\n",index,time]];
 				[self scheduleStatusSend];
 			}
@@ -534,7 +534,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 			[expiredAlarm[index] postAlarm];
 			if(sendOnAlarm){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Expired Alarm posted at %@\n",index,time]];
 				[self scheduleStatusSend];
 			}
@@ -1200,7 +1200,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	int i;
 	for(i=0;i<4;i++){
 		if(enabledMask & (1<<i)) {
-			NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+			NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %ld minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
 			[self scheduleStatusSend];
 		}
@@ -1231,7 +1231,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[eMailLock lock];
 	if(!eMailReasons){
 		eMailReasons = [[NSMutableArray array] retain];
-		NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+		NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 		[eMailReasons addObject:[NSString stringWithFormat:@"EMailed originally triggered at %@\n",time]];
 	}
 	[eMailReasons addObject:aReason];
@@ -1277,7 +1277,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			stat = "N/A";
 			fillStat = "N/A";
 		}
-		content = [content stringByAppendingFormat:@"%2d: %5.1f %10s %7s       %@\n",i,level[i],stat,fillStat,[lastChange[i] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"]];
+		content = [content stringByAppendingFormat:@"%2d: %5.1f %10s %7s       %@\n",i,level[i],stat,fillStat,[lastChange[i] descriptionFromTemplate:@"MM/dd HH:mm:ss"]];
 	}
 	
 	if([eMailReasons count]){

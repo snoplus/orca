@@ -340,7 +340,7 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
                 NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
                 
                 s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
-                      lowestValueString, [lowDate descriptionWithCalendarFormat:nil timeZone:nil locale:nil], highestValueString, [highDate descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+                      lowestValueString, [lowDate stdDescription], highestValueString, [highDate stdDescription]];
             }
         }
         else s =  [NSString stringWithFormat:@"%@: Data Unavailable ", [self iconLabel]];

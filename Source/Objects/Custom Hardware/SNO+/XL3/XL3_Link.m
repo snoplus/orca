@@ -205,7 +205,7 @@ readFifoFlag = _readFifoFlag;
     @synchronized(self) {
         isConnected = aNewIsConnected;
         [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectionChanged object: self];
-        [self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+        [self setTimeConnected:isConnected?[NSDate date]:nil];
     }
 }
 
@@ -299,12 +299,12 @@ readFifoFlag = _readFifoFlag;
 	}
 }
 
-- (NSCalendarDate*) timeConnected
+- (NSDate*) timeConnected
 {
 	return timeConnected;
 }
 
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected
+- (void) setTimeConnected:(NSDate*)newTimeConnected
 {
 	[timeConnected autorelease];
 	timeConnected=[newTimeConnected retain];	
@@ -667,7 +667,7 @@ readFifoFlag = _readFifoFlag;
 			[NSThread detachNewThreadSelector:@selector(connectToPort) toTarget:self withObject:nil];
 
 			//[self setIsConnected: YES];
-			//[self setTimeConnected:[NSCalendarDate date]];
+			//[self setTimeConnected:[NSDate date]];
 			
 		}
 		@catch (NSException* localException) {

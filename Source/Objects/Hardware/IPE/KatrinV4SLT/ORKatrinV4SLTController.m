@@ -47,14 +47,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 };
 #endif
 
-
-
-
 @interface ORKatrinV4SLTController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 - (void) do:(SEL)aSelector name:(NSString*)aName;
 @end
 
@@ -675,7 +671,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Exception doing SLT dump trigger RAM page\n");
-			NSRunAlertPanel([localException name], @"%@\nSLT%d dump trigger RAM failed", @"OK", nil, nil,
+			ORRunAlertPanel([localException name], @"%@\nSLT%d dump trigger RAM failed", @"OK", nil, nil,
 							localException,[model stationNumber]);
 		}
 	}
@@ -733,7 +729,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception SLT init\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d InitBoard failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d InitBoard failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -767,7 +763,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT status\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 	
@@ -808,7 +804,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -822,7 +818,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -845,7 +841,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -876,9 +872,31 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) sendSimulationConfigScriptON:(id)sender
 {
-	//[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
-    NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting simulation mode. "
-						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"This will KILL the crate process before compiling and starting simulation mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+            BOOL rememberState = [[model sbcLink] forceReload];
+            if(rememberState) [[model sbcLink] setForceReload: NO];
+            [model sendSimulationConfigScriptON];
+            //[self connectionAction: nil];
+            //[self toggleCrateAction: nil];
+            //[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //[[model sbcLink] startCrate];
+            if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+        }
+    }];
+#else
+    //[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
+    NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting simulation mode. \nThere may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
                       @"Cancel",
                       @"Yes, Kill Crate",
                       nil,[self window],
@@ -886,8 +904,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       @selector(_SLTv4killCrateAndStartSimDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 //NSLog(@"This is my _killCrateDidEnd: -tb-\n");
@@ -905,7 +925,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
-
+#endif
 
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender
 {
@@ -1008,7 +1028,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception loading SLT pulser values\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d load pulser failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d load pulser failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1028,7 +1048,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Load Pattern File"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -1036,15 +1055,6 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
             [model setPatternFilePath:fileName];
         }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadPatternPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) loadPatternFile:(id)sender
@@ -1054,6 +1064,20 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) calibrateAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Threshold Calibration"];
+    [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
+    [alert addButtonWithTitle:@"Yes/Do Calibrate"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model autoCalibrate];
+        }
+    }];
+#else    
     NSBeginAlertSheet(@"Threshold Calibration",
                       @"Cancel",
                       @"Yes/Do Calibrate",
@@ -1062,22 +1086,14 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       @selector(calibrationSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards.");
+#endif
 }
 
 
 @end
 
 @implementation ORKatrinV4SLTController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
--(void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[sheet filenames] objectAtIndex:0];
-        [model setPatternFilePath:fileName];
-    }
-}
-#endif
-
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
@@ -1088,7 +1104,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		}
     }    
 }
-
+#endif
 - (void) do:(SEL)aSelector name:(NSString*)aName
 {
 	@try { 
@@ -1097,7 +1113,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing SLT %@\n",aName);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d %@ failed", @"OK", nil, nil,
                         localException,[model stationNumber],aName);
 	}
 }

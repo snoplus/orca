@@ -41,12 +41,6 @@ enum {
     kPatternPositionTag   = 1
 };
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORMotorController (private)
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORMotorController
 
 #pragma mark ¥¥¥Initialization
@@ -596,8 +590,8 @@ enum {
 - (IBAction) setStepCountAction:(id)sender
 {
     [self endEditing];
-    int choice = NSRunAlertPanel(@"You are setting the step count WITHOUT moving the motor!",@"Is this really what you want?",@"Cancel",@"YES/Change Count",nil);
-    if(choice == NSAlertAlternateReturn){
+    BOOL choice = ORRunAlertPanel(@"You are setting the step count WITHOUT moving the motor!",@"Is this really what you want?",@"Cancel",@"YES/Change Count",nil);
+    if(choice){
         @try {
             [model loadStepCount];	
             [model readMotor];
@@ -654,7 +648,6 @@ enum {
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -662,16 +655,6 @@ enum {
             [model setPatternFileName:filename];  
         }
     }];
-    
-#else 	
-    [openPanel beginSheetForDirectory:NSHomeDirectory()
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) startPatternRunAction:(id)sender
@@ -699,14 +682,3 @@ enum {
 
 @end
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORMotorController (private)
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* filename = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setPatternFileName:filename];
-    }
-}
-@end
-#endif

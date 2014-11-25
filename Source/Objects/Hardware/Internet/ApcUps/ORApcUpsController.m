@@ -376,6 +376,20 @@
 - (IBAction) maintenanceModeAction:(id)sender
 {
     if(![model maintenanceMode]){
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"Really Start Maintenance Mode."];
+        [alert setInformativeText:@"This will stop polling the UPS and allow unfetered access via the web interface. It will disable all power out alarms. It will automatically revert to normal operations in 30 minutes."];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"Yes, Go to Maintenance"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertSecondButtonReturn){
+                [model setMaintenanceMode:YES];
+             }
+        }];
+#else
         NSBeginAlertSheet(@"Really Start Maintenance Mode.",
                           @"Cancel",
                           @"Yes, Go to Maintenance",
@@ -384,21 +398,37 @@
                           @selector(maintenanceModeActionDidEnd:returnCode:contextInfo:),
                           nil,
                           nil,@"This will stop polling the UPS and allow unfetered access via the web interface. It will disable all power out alarms. It will automatically revert to normal operations in 30 minutes.");
+#endif
     }
     else {
         [model setMaintenanceMode:NO];
     }
 }
     
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) maintenanceModeActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
         [model setMaintenanceMode:YES];
     }
 }
-
+#endif
 - (IBAction) clearEventLogAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clear the Event Log."];
+    [alert setInformativeText:@"This will clear the persistant history event log kept by ORCA and refresh with only the latest events recorded by the UPS. Is that really what you want to do?"];
+    [alert addButtonWithTitle:@"Yes, Event Log"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model clearEventLog];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Clear the Event Log.",
                       @"Cancel",
                       @"Yes, Clear Event Log",
@@ -407,14 +437,17 @@
                       @selector(clearEventActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"This will clear the persistant history event log kept by ORCA and refresh with only the latest events recorded by the UPS. Is that really what you want to do?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
 		[model clearEventLog];
 	}
 }
+#endif
 - (IBAction) ipAddressAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	

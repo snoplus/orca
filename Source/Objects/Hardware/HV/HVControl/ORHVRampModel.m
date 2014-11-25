@@ -363,8 +363,8 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
             
 			NSString* currentRecord = @"";
 			if(saveCurrentToFile){
-				NSCalendarDate* theDate = [NSCalendarDate date];
-				currentRecord = [NSString stringWithFormat:@"%@ ",[theDate descriptionWithCalendarFormat:@"%d/%m/%y %H:%M:%S"]];
+				NSDate* theDate = [NSDate date];
+				currentRecord = [NSString stringWithFormat:@"%@ ",[theDate descriptionFromTemplate:@"dd/MM/yy HH:mm:ss"]];
 			}
             NSEnumerator* e = [[theModel supplies] objectEnumerator];
             ORHVSupply* aSupply;

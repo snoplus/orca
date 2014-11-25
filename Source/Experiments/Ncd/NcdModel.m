@@ -390,12 +390,12 @@ enum {
 
 #pragma mark ¥¥¥Accessors
 
-- (NSCalendarDate*) reducedEfficiencyDate
+- (NSDate*) reducedEfficiencyDate
 {
     return reducedEfficiencyDate;
 }
 
-- (void) setReducedEfficiencyDate:(NSCalendarDate*)aReducedEfficiencyDate
+- (void) setReducedEfficiencyDate:(NSDate*)aReducedEfficiencyDate
 {
     [aReducedEfficiencyDate retain];
     [reducedEfficiencyDate release];
@@ -686,7 +686,7 @@ enum {
 		
 		[[self detector] setMuxEfficiency:currentMuxEfficiency];
 		[self setRunningAtReducedEfficiency:YES];
-		[self setReducedEfficiencyDate:[NSCalendarDate date]];
+		[self setReducedEfficiencyDate:[NSDate date]];
 		NSLog(@"Running Mux efficiency at %0.f%%\n",currentMuxEfficiency);
 	}
 }

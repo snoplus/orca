@@ -123,9 +123,8 @@
 		
 		ORTimeLine* axis = (ORTimeLine*)[[ds plotView] xAxis];
 		NSTimeInterval startTime = [axis startTime];
-		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-[model minChannel]];
-		NSString* s = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
-		[roiMinField setStringValue: s];
+		NSDate *aDate = [NSDate dateWithTimeIntervalSince1970:startTime-[model minChannel]];
+		[roiMinField setStringValue: [aDate description]];
 	}
 	else {
 		[roiMinField setStringValue:@"---"];	
@@ -140,9 +139,8 @@
 		
 		ORTimeLine* axis = (ORTimeLine*)[[ds plotView] xAxis];
 		NSTimeInterval startTime = [axis startTime];
-		NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:startTime-[model maxChannel]];
-		NSString* s = [aDate descriptionWithCalendarFormat:@"%m/%d %H:%M:%S"];
-		[roiMaxField setStringValue: s];
+		NSDate* aDate = [NSDate dateWithTimeIntervalSince1970:startTime-[model maxChannel]];
+		[roiMaxField setStringValue: [aDate description]];
 	}
 	else {          
 		[roiMaxField setStringValue:@"---"];	

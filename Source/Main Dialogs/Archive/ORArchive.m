@@ -160,6 +160,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 - (IBAction) updateWithSvn:(id)sender
 {
     
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Full Update and Restart"];
+    [alert setInformativeText:@"Really do an Archive, SVN Update, Clean Build, and Restart?\n\nThis can take awhile."];
+    [alert addButtonWithTitle:@"Yes/Do It"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [self doTheSvnUpdate];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Full Update and Restart",
                       @"Cancel",
                       @"Yes/Do it",
@@ -168,14 +182,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
                       @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really do an Archive, SVN Update, Clean Build, and Restart?\n\nThis can take awhile.");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [self doTheSvnUpdate];
     }
 }
+#endif
 - (void) doTheSvnUpdate
 {
 	[operationStatusField setTimeOut:1000];
@@ -192,21 +209,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		[openPanel setAllowsMultipleSelection:NO];
 		[openPanel setPrompt:@"Choose ORCA Location"];
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton){
                 [self performSelector:@selector(deferedSvnUpdate:) withObject:[[openPanel URL] path] afterDelay:0];
             }
         }];
-#else 	
-		[openPanel beginSheetForDirectory: [@"~" stringByExpandingTildeInPath]
-									 file: nil
-									types: nil
-						   modalForWindow: [self window]
-							modalDelegate: self
-						   didEndSelector: @selector(updateWithSvnPanelDidEnd:returnCode:contextInfo:)
-							  contextInfo: NULL];
-#endif
+
 	}
 }
 
@@ -269,22 +277,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.7-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:[kOldBinaryPath stringByExpandingTildeInPath]]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [self performSelector:@selector(deferedStartOldOrca:) withObject:[[openPanel URL] path] afterDelay:0];
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory: [kOldBinaryPath stringByExpandingTildeInPath]
-								 file: nil
-								types: nil
-					   modalForWindow: [self window]
-						modalDelegate: self
-					   didEndSelector: @selector(startOldOrcaPanelDidEnd:returnCode:contextInfo:)
-						  contextInfo: NULL];
-#endif
+
 }
 
 - (void) updateStatus:(NSString*)aString
@@ -380,20 +379,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[self restart:binPath config:nil];
 }
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific 
-- (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self performSelector:@selector(deferedSvnUpdate:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
-    }
-}
-- (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self performSelector:@selector(deferedStartOldOrca:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
-    }
-}
-#endif
 
 @end
 

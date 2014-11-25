@@ -139,7 +139,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 - (void) doNoPowerAlert:(NSException*)exception action:(NSString*)message
 {
     NSLogColor([NSColor redColor],@"****** Check Crate Power and Cable ******\n");
-    NSRunAlertPanel([exception name], @"%@\nFailed: <%@>", @"OK", nil, nil,exception,message);
+    ORRunAlertPanel([exception name], @"%@\nFailed: <%@>", @"OK", nil, nil,exception,message);
 }
 
 #pragma mark ¥¥¥Notifications

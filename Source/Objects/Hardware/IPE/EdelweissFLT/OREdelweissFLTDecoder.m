@@ -132,9 +132,9 @@
     NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",ShiftAndExtract(ptr[1],8,0xff)];
 		
 	
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ptr[2]];
-	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
-	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
+	NSDate* theDate = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ptr[2]];
+	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionFromTemplate:@"MM/dd/yy"]];
+	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionFromTemplate:@"HH:mm:ss"]];
 	
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n",     ptr[2]];
 	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %lu\n",     ptr[3]];
@@ -435,8 +435,7 @@ startIndex=0;
     uint32_t hitRateLengthSec	= ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
     uint32_t newTotal			= ptr[4];
 
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ut_time];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:ut_time];
 	
 	NSMutableString *hrString = [NSMutableString stringWithFormat:@"UTTime     = %d\nHitrateLen = %d\nTotal HR   = %d\n",
 						  ut_time,hitRateLengthSec,newTotal];
@@ -450,7 +449,7 @@ startIndex=0;
 		else
 			[hrString appendString: [NSString stringWithFormat:@"Chan %2d    = %d\n", chan,hitrate] ];
 	}
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,date,hrString];
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,[date descriptionFromTemplate:@"m/d/y H:M:S z\n"],hrString];
 }
 @end
 

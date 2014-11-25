@@ -213,7 +213,6 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     NSView*     borderView   = [[[self window] contentView] superview];
     NSData*     pdfData		 = [borderView dataWithPDFInsideRect: cRect];
     NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
-	[tempImage setScalesWhenResized:YES];
 	
 	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSSize imageSize = [tempImage size];

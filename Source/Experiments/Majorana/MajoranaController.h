@@ -77,7 +77,9 @@
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote;
 - (void) setDetectorTitle;
 - (void) viewTypeChanged:(NSNotification*)aNote;
-
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+#endif
 #pragma mark ***Actions
 - (IBAction) ignorePanicOnBAction:(id)sender;
 - (IBAction) ignorePanicOnAAction:(id)sender;

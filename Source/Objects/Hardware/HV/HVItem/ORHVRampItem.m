@@ -48,7 +48,7 @@
 	}
 	@catch(NSException* localException) {
 		[self stopRamper];
-		NSRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
 						localException,[self itemName]);
 	}
 }

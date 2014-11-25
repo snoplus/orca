@@ -306,11 +306,9 @@
 {
 	[[tempMatrix cellWithTag:index] setFloatValue:[model temp:index]];
 	unsigned long t = [model timeMeasured:index];
-	NSCalendarDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[[timeMatrix cellWithTag:index] setObjectValue:theDate];
+		NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:t];
+		[[timeMatrix cellWithTag:index] setObjectValue:[theDate stdDescription]];
 	}
 	else [[timeMatrix cellWithTag:index] setObjectValue:@"--"];
 }

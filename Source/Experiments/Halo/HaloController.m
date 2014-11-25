@@ -28,13 +28,6 @@
 #import "OR1DHistoPlot.h"
 #import "ORCompositePlotView.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface HaloController (private)
-- (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation HaloController
 #pragma mark •••Initialization
 -(id)init
@@ -255,7 +248,7 @@
 - (void) nextHeartBeatChanged:(NSNotification*)aNote
 {
 	if([model heartbeatSeconds]){
-		[nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[[model nextHeartbeat]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]]];
+		[nextHeartbeatField setStringValue:[NSString stringWithFormat:@"Next Heartbeat: %@",[[model nextHeartbeat]stdDescription]]];
 	}
 	else [nextHeartbeatField setStringValue:@"No Heartbeat Scheduled"];
 }
@@ -463,7 +456,6 @@
         startingDir = NSHomeDirectory();
     }
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -471,15 +463,7 @@
             [secondaryTableView reloadData];
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(readSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+
 }
 
 - (IBAction) saveSecondaryMapFileAction:(id)sender
@@ -501,7 +485,6 @@
         defaultFile = [self defaultSecondaryMapFilePath];
         
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -509,14 +492,6 @@
             [[model segmentGroup:1] saveMapFileAs:[[savePanel URL]path]];
         }
     }];
-#else
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveSecondaryMapFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 - (IBAction) addAddress:(id)sender
 {
@@ -577,6 +552,20 @@
 
 - (IBAction) toggleSystems:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Toggle Primary Machine"];
+    [alert setInformativeText:@"Really switch which machine is the one in control of the run?"];
+    [alert addButtonWithTitle:@"Yes/Switch Machines"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [[model haloSentry] toggleSystems];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Toggle Primary Machine",
                       @"Cancel",
                       @"Yes/Switch Machines",
@@ -585,16 +574,33 @@
                       @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really switch which machine is the one in control of the run?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [[model haloSentry] toggleSystems];
     }
 }
+#endif
 - (IBAction) updateRemoteShapersAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Update Remote Shapers"];
+    [alert setInformativeText:@"Really send the Threshods and Gains to the other machine?\nThey will be loaded into HW at start of next run."];
+    [alert addButtonWithTitle:@"Yes/Update"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [[model haloSentry] updateRemoteShapers];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"Update Remote Shapers",
                       @"Cancel",
                       @"Yes/Update",
@@ -603,15 +609,17 @@
                       @selector(_updateShaperSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really send the Threshods and Gains to the other machine?\nThey will be loaded into HW at start of next run.");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _updateShaperSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [[model haloSentry] updateRemoteShapers];
     }
 }
-
+#endif
 - (IBAction) sentryLockAction:(id)sender
 {
     [gSecurity tryToSetLock:HaloModelSentryLock to:[sender intValue] forWindow:[self window]];
@@ -698,22 +706,3 @@
 @end
 
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation HaloController (Private)
-- (void) readSecondaryMapFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[[model segmentGroup:1] readMap:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-		[secondaryTableView reloadData];
-    }
-}
-
-- (void) saveSecondaryMapFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [[model segmentGroup:1] saveMapFileAs:[sheet filename]];
-		NSLog(@"Saved Veto HW Map: %@\n",[sheet filename]);
-    }
-}
-@end
-#endif

@@ -101,9 +101,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 {
 	if( [sender tag] != 1 ) { // jump & close or cancel
 		[dialogueView orderOut:self];
-		[[NSApplication sharedApplication]  endSheet:dialogueView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        [[[NSApplication sharedApplication] keyWindow] endSheet:dialogueView];
+#else
+        [[NSApplication sharedApplication]  endSheet:dialogueView];
+#endif
 	}
-	
+
 	if( [sender tag] == -1 ) return;
 
 	[self showLine:[lineNumberField intValue]];

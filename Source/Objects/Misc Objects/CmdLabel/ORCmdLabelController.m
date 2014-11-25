@@ -73,7 +73,11 @@
 	
     BOOL locked = [gSecurity isLocked:ORLabelLock];
     [commandTable setEnabled: !locked];
-    [detailsForm setEnabled: !locked];
+    [objectField setEnabled: !locked];
+    [loadField setEnabled: !locked];
+    [setSelectorField setEnabled: !locked];
+    [formatField setEnabled: !locked];
+    [argField setEnabled: !locked];
 	[okButton setEnabled: !locked];;
 	[okAllButton setEnabled: !locked];;
 	[removeButton setEnabled: !locked];;
@@ -93,11 +97,11 @@
 	if(theSelectedSet){
 		int rowIndex = [theSelectedSet firstIndex];
 		id obj = [model commandAtIndex:rowIndex];
-		[[detailsForm cellAtIndex:0] setStringValue: [obj objectForKey:@"Object"]];
-		[[detailsForm cellAtIndex:1] setStringValue: [obj objectForKey:@"SetSelector"]];
-		[[detailsForm cellAtIndex:2] setStringValue: [obj objectForKey:@"DisplayFormat"]];
-		[[detailsForm cellAtIndex:3] setStringValue: [obj objectForKey:@"LoadSelector"]];
-		[[detailsForm cellAtIndex:4] setStringValue: [obj objectForKey:@"Value"]];
+		[objectField setStringValue: [obj objectForKey:@"Object"]];
+		[setSelectorField setStringValue: [obj objectForKey:@"SetSelector"]];
+		[formatField setStringValue: [obj objectForKey:@"DisplayFormat"]];
+		[loadField setStringValue: [obj objectForKey:@"LoadSelector"]];
+		[argField setStringValue: [obj objectForKey:@"Value"]];
 	}
 	[self fillItemCount];
 }
@@ -171,19 +175,19 @@
 		
 		NSString* s;
 		
-		s = [[detailsForm cellAtIndex:0] stringValue];
+		s = [objectField stringValue];
 		[obj setObject:s?s:@"" forKey:@"Object"];
 		
-		s = [[detailsForm cellAtIndex:1] stringValue];
+		s = [setSelectorField stringValue];
 		[obj setObject:s?s:@"" forKey:@"SetSelector"];
 		
-		s = [[detailsForm cellAtIndex:2] stringValue];
+		s = [formatField stringValue];
 		[obj setObject:s?s:@"" forKey:@"DisplayFormat"];
 
-		s = [[detailsForm cellAtIndex:3] stringValue];
+		s = [loadField stringValue];
 		[obj setObject:s?s:@"" forKey:@"LoadSelector"];
 		
-		s = [[detailsForm cellAtIndex:4] stringValue];
+		s = [argField stringValue];
 		[obj setObject:s?s:@"" forKey:@"Value"];
 		
 		[model postDetailsChanged];

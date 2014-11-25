@@ -856,8 +856,11 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 			id plist = nil;
 			//this just wrapps the data in a top level dictionary to make it easy for orca root decoders
 			someData = [NSDictionary dictionaryWithObject:someData	forKey:@"DataRecord"];
-			plist = [NSPropertyListSerialization dataFromPropertyList:someData
-															   format:NSPropertyListXMLFormat_v1_0 errorDescription:nil];
+
+            plist = [NSPropertyListSerialization dataWithPropertyList:someData
+                                                               format:NSPropertyListXMLFormat_v1_0
+                                                              options:NSPropertyListImmutable
+                                                                error:nil];
 			
 			
 			if([plist length]){
@@ -995,10 +998,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	
     NSString* state = [NSString stringWithFormat:@"%@,%d %@\n",typeString,theObjID,ptr[3]?@"Started":@"Stopped"];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
-
-    return [NSString stringWithFormat:@"%@%@%@",title,state,date];               
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:ptr[2]];
+    return [NSString stringWithFormat:@"%@%@%@\n",title,state,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss %z"]];
 }
 
 @end
@@ -1049,15 +1050,14 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	NSPropertyListFormat format;
 	NSData *plistXML = [NSData dataWithBytes:&ptr[5] length:ptr[4]];
 	id result = [NSPropertyListSerialization
-						  propertyListFromData:plistXML
-						  mutabilityOption:NSPropertyListMutableContainersAndLeaves
-						  format:&format errorDescription:nil];
+                        propertyListWithData:plistXML
+                        options:NSPropertyListMutableContainersAndLeaves
+                        format:&format
+                        error:nil];
 	
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
-	
-    return [NSString stringWithFormat:@"%@%@%@Data:%@",title,date,idString,result];               
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:ptr[2]];	
+    return [NSString stringWithFormat:@"%@%@%@Data:%@",title,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z\n"],idString,result];
 }
 @end
 

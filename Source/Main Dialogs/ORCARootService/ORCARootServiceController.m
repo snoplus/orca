@@ -252,8 +252,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 - (void) timeConnectedChanged:(NSNotification*)aNotification
 {
 	if([[self orcaRootService] isConnected]){
-		[timeField setStringValue: [NSString stringWithFormat:@"At: %@",[[[self orcaRootService] timeConnected] descriptionWithCalendarFormat:@"%H:%M:%S %m/%d"]]];
-	}
+        NSDate* timeConnected = [[self orcaRootService] timeConnected];
+        [timeField setStringValue: [NSString stringWithFormat:@"At: %@",[timeConnected stdDescription]]];
+
+    }
 	else {
 		[timeField setStringValue: @""];
 	}

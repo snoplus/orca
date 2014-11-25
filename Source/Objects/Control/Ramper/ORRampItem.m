@@ -809,7 +809,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		}
 		@catch(NSException* localException) {
 			[self stopRamper];
-			NSRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
+			ORRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
 								localException,[self itemName]);
 		}
 	}
@@ -822,7 +822,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 			[targetObject turnOff];
 		}
 		@catch(NSException* localException) {
-			NSRunAlertPanel([localException name], @"%@\n\nUnable to turn off %@", @"OK", nil, nil,
+			ORRunAlertPanel([localException name], @"%@\n\nUnable to turn off %@", @"OK", nil, nil,
 							localException,[self itemName]);
 		}
 	}

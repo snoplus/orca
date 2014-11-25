@@ -190,7 +190,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset and Init of Caen265 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Reset and Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen265 Reset and Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -215,7 +215,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Probe Caen265 Board FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
 						localException);
     }
 }
@@ -229,7 +229,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Trigger of Caen265 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Trigger", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen265 Trigger", @"OK", nil, nil,
                         localException);
     }
 	

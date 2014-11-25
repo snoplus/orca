@@ -21,7 +21,7 @@
 #import "ORSqlConnection.h"
 #import "ORSqlResult.h"
 
-NSCalendarDate		*MCPYear0000;
+NSDate* MCPYear0000;
 
 @implementation ORSqlResult
 
@@ -145,22 +145,22 @@ NSCalendarDate		*MCPYear0000;
                     theCurrentObj = [NSNumber numberWithDouble:atof(theData)];
                     break;
                 case FIELD_TYPE_TIMESTAMP:
-                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y%m%d%H%M%S"];
+                    theCurrentObj = [NSDate dateFromString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y%m%d%H%M%S"];
                     [theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
                     break;
                 case FIELD_TYPE_DATE:
-                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y-%m-%d"];
+                    theCurrentObj = [NSDate dateFromString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y-%m-%d"];
                     [theCurrentObj setCalendarFormat:@"%Y-%m-%d"];
                     break;
                 case FIELD_TYPE_TIME:
                     theCurrentObj = [NSString stringWithUTF8String:theData];
 				    break;
                 case FIELD_TYPE_DATETIME:
-                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y-%m-%d %H:%M:%S"];
+                    theCurrentObj = [NSDate dateFromString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y-%m-%d %H:%M:%S"];
                     [theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
                     break;
                 case FIELD_TYPE_YEAR:
-                    theCurrentObj = [NSCalendarDate dateWithString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y"];
+                    theCurrentObj = [NSDate dateFromString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y"];
                     [theCurrentObj setCalendarFormat:@"%Y"];
                     if (! theCurrentObj) {
                         theCurrentObj = MCPYear0000;

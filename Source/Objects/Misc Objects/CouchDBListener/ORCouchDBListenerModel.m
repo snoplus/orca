@@ -169,7 +169,7 @@ NSString* ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged = @"ORCouchD
         [self log:message];
         NSMutableDictionary* returnDic = [NSMutableDictionary dictionaryWithDictionary:doc];
         NSMutableDictionary* response = [NSMutableDictionary dictionaryWithObjectsAndKeys:message,@"content",
-                                         [[NSDate date] description],@"timestamp",returnVal,@"return",
+                                         [[NSDate date] stdDescription],@"timestamp",returnVal,@"return",
                                          nil];
         if (ok) [response setObject:[NSNumber numberWithBool:ok] forKey:@"ok"];
         [returnDic setObject:response forKey:@"response"];

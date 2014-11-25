@@ -438,7 +438,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
     return cycleWillEnd;
 }
 
-- (void) setCycleWillEnd:(NSCalendarDate*)aCycleWillEnd
+- (void) setCycleWillEnd:(NSDate*)aCycleWillEnd
 {
     [aCycleWillEnd retain];
     [cycleWillEnd release];
@@ -463,11 +463,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 		if(cycleNumber>1) totalTime += holdTime;
 		else			  totalTime += 6;
 	}
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 
 	NSDate* endTime = [aCycleStarted dateByAddingTimeInterval:totalTime];
-#else
-	NSDate* endTime = [aCycleStarted addTimeInterval:totalTime];
-#endif
 	[self setCycleWillEnd:endTime]; 
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMet637ModelCycleStartedChanged object:self];
@@ -628,9 +624,9 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) setDate
 { 
-	unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSMinuteCalendarUnit | NSHourCalendarUnit;
+	unsigned unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay | NSCalendarUnitMinute | NSCalendarUnitHour;
 	NSDate *today = [NSDate date];
-	NSCalendar *gregorian = [[[NSCalendar alloc]  initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+	NSCalendar *gregorian = [[[NSCalendar alloc]  initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
 	NSDateComponents *comps = [gregorian components:unitFlags fromDate:today];
 	[self addCmdToQueue:[NSString stringWithFormat:@"D %02d/%02d/%02d",[comps month],[comps day],[comps year]-2000]]; 
 	[self addCmdToQueue:[NSString stringWithFormat:@"T %02d:%02d",[comps hour],[comps minute]]]; 

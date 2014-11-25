@@ -989,32 +989,32 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 
 - (int) second 
 {
-	return [[NSCalendarDate date] secondOfMinute];
+	return [[NSDate date] secondOfMinute];
 }
 
 - (int) minute 
 {
-	return [[NSCalendarDate date] minuteOfHour];
+	return [[NSDate date] minuteOfHour];
 }
 
 - (int) hour 
 {
-	return [[NSCalendarDate date] hourOfDay];
+	return [[NSDate date] hourOfDay];
 }
 
 - (int) day 
 {
-	return [[NSCalendarDate date] dayOfMonth];
+	return [[NSDate date] dayOfMonth];
 }
 
 - (int) month 
 {
-	return [[NSCalendarDate date] monthOfYear];
+	return [[NSDate date] monthOfYear];
 }
 
-- (int)year 
+- (int) year
 {
-	return [[NSCalendarDate date] yearOfCommonEra];
+	return [[NSDate date] yearOfCommonEra];
 }
 
 @end

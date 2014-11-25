@@ -32,11 +32,6 @@
 
 @interface ORPacController (private)
 - (void) populatePortListPopup;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
-- (void) readGainFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
-- (void) saveGainFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
-#endif
 @end
 
 @implementation ORPacController
@@ -499,11 +494,9 @@
 {
 	[[adcMatrix cellWithTag:0] setFloatValue:[model convertedLcm]];
 	unsigned long t = [model lcmTimeMeasured];
-	NSCalendarDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[[timeMatrix cellWithTag:0] setObjectValue:theDate];
+		NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:t];
+		[[timeMatrix cellWithTag:0] setObjectValue:[theDate descriptionFromTemplate:@"MM/dd HH:mm:SS"]];
 	}
 	else [[timeMatrix cellWithTag:0] setObjectValue:@"--"];
 }
@@ -526,11 +519,9 @@
 {
 	[[adcMatrix cellWithTag:index+1] setFloatValue:[model convertedAdc:index]];
 	unsigned long t = [model timeMeasured:index];
-	NSCalendarDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[[timeMatrix cellWithTag:index+1] setObjectValue:theDate];
+		NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:t];
+		[[timeMatrix cellWithTag:index+1] setObjectValue:[theDate stdDescription]];
 	}
 	else [[timeMatrix cellWithTag:index+1] setObjectValue:@"--"];
 }
@@ -750,7 +741,6 @@
         defaultFile = @"OrcaScript";
     }
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -758,14 +748,6 @@
             [model setLogFile:[[[savePanel URL] path] stringByAbbreviatingWithTildeInPath]];
         }
     }];
-#else
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(selectLogFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) logToFileAction:(id)sender
@@ -902,22 +884,12 @@
         startingDir = NSHomeDirectory();
     }
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model readGainFile:[[openPanel URL] path]];
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(readGainFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) saveGainFileAction:(id)sender
@@ -939,7 +911,6 @@
         defaultFile = [model lastGainFile];
         
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -947,14 +918,6 @@
             [model saveGainFile:[[savePanel URL]path]];
         }
     }];
-#else
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveGainFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 #pragma  mark •••Delegate Responsiblities
@@ -981,29 +944,5 @@
         [portListPopup addItemWithTitle:[aPort name]];
 	}
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) readGainFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model readGainFile:[[sheet filenames] objectAtIndex:0]];
-		
-    }
-}
-
-- (void) saveGainFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model saveGainFile:[sheet filename]];
-    }
-}
-
-- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setLogFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-    }
-}
-#endif
 @end
 

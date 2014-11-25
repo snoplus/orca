@@ -26,13 +26,6 @@
 #import "ORSerialPortModel.h"
 #import "ORSerialPortController.h"
 
-@interface ORVXMController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _saveListPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo;
-- (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
-@end
-
 @implementation ORVXMController
 
 #pragma mark ***Initialization
@@ -694,8 +687,8 @@
 {
     if([model useCmdQueue])[model addZeroCmd];
     else {
-        int choice = NSRunAlertPanel(@"About to reset position counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-        if(choice == NSAlertAlternateReturn){
+        BOOL choice = ORRunAlertPanel(@"About to reset position counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+        if(choice){
             [model addZeroCmd];
         }
     }
@@ -734,7 +727,6 @@
     if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
     else		 startingDir = NSHomeDirectory();
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:@"Save to:"];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -742,14 +734,6 @@
             [model saveListTo:[[savePanel URL]path]];
         }
     }];
-#else 		
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:@"VXMCmdList"
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_saveListPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
 }
 
 - (IBAction) loadListAction:(id)sender
@@ -763,7 +747,6 @@
     if([model listFile]) startingDir = [[model listFile] stringByDeletingLastPathComponent];
     else				 startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -771,15 +754,6 @@
             [cmdQueueTable reloadData];
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_loadListPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 
@@ -810,23 +784,5 @@
 
 @end
 
-@implementation ORVXMController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model saveListTo:[sheet filename]];
-    }
-}
-- (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model loadListFrom:[sheet filename]];
-        [cmdQueueTable reloadData];
-    }
-}
-
-#endif
-@end
 
 

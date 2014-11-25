@@ -246,14 +246,21 @@
 {	
 	[self calibrate];
 	[[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
+#else
     [NSApp endSheet:[self window] returnCode:NSOKButton];
-
+#endif
 }
 
 - (IBAction) cancel:(id)sender
 {
     [[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseCancel];
+#else 
     [NSApp endSheet:[self window] returnCode:NSCancelButton];
+#endif
 }
 
 #pragma mark •••Table Data Source

@@ -941,7 +941,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	else s = [NSString stringWithFormat:@"Run%@%d",fileSuffix,runNumber];
 	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];
 	if(useDatedFileNames){
-		NSCalendarDate* theDate = [NSCalendarDate date];
+		NSDate* theDate = [NSDate date];
 		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
 	}
 	return s;

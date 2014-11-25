@@ -35,13 +35,6 @@
 #define ORDataTakerItem @"ORDataTaker Drag Item"
 #define kManualRefresh 1E10
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@interface ORDataTaskController (Private)
-- (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORDataTaskController
 - (id) init
 {
@@ -322,7 +315,6 @@
     else {
         startingDir = NSHomeDirectory();
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -331,15 +323,7 @@
             [self reloadObjects:nil];
         }
     }];
-#else
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_loadListPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+
 }
 
 - (IBAction) saveAsAction:(id)sender
@@ -352,7 +336,6 @@
     if([model lastFile])startingDir = [[model lastFile] stringByDeletingLastPathComponent];
     else startingDir = NSHomeDirectory();
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -360,14 +343,6 @@
             [model saveReadOutListTo:[[savePanel URL]path]];
         }
     }];
-#else
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_saveListPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 #pragma mark ¥¥¥Data Source Methods
@@ -463,7 +438,7 @@ else {\
     // This method is used by NSOutlineView to determine a valid drop target.  Based on the mouse position, the outline view will suggest a proposed drop location.  This method must return a value that indicates which dragging operation the data source will perform.  The data source may "re-target" a drop if desired by calling setDropItem:dropChildIndex: and returning something other than NSDragOperationNone.  One may choose to re-target for various reasons (eg. for better visual feedback when inserting into a sorted position).
     //	[ov setDropItem:item dropChildIndex:index]; // No-op?
     //	return NSOutlineViewDropOnItemIndex;
-    return NSDragOperationAll;
+    return NSDragOperationEvery;
     // Possible return values?
     //NSDragOperationNone
     //NSDragOperationCopy
@@ -688,25 +663,3 @@ else {\
 }
 
 @end
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@implementation ORDataTaskController (Private)
-
-- (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setLastFile:[sheet filename]];
-        [model saveReadOutListTo:[sheet filename]];
-    }
-}
-
-- (void) _loadListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setLastFile:[sheet filename]];
-        [model loadReadOutListFrom:[sheet filename]];
-        [self reloadObjects:nil];
-    }
-}
-@end
-#endif

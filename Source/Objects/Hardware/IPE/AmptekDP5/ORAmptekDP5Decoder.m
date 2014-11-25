@@ -88,7 +88,7 @@
     //uint32_t traceStart16 = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
 
 
-    NSString* device    = [NSString stringWithFormat:@"DeviceId-%lu\n", location];
+    NSString* device    = [NSString stringWithFormat:@"DeviceId-%hhu\n", location];
 
 
     
@@ -207,12 +207,12 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 
 	++ptr;		//skip the first word (dataID and length)
     
-    NSString* device    = [NSString stringWithFormat:@"DeviceId   = %lu\n", location];
+    NSString* device    = [NSString stringWithFormat:@"DeviceId   = %u\n", location];
     NSString* secStr    = 0;//[NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = 0;//[NSString stringWithFormat:@"SubSec     = %d\n", subsec];
         secStr    = [NSString stringWithFormat:@"UTC-sec = 0x%08x\n", sec];
         subsecStr = [NSString stringWithFormat:@"subsec = 0x%08x\n", subsec];
-    NSString* specLengthStr = [NSString stringWithFormat:@"Spectrum len = %lu\n", specLen];
+    NSString* specLengthStr = [NSString stringWithFormat:@"Spectrum len = %u\n", specLen];
     
     NSString* lengthStr = [NSString stringWithFormat:@"Length tot    = %lu\n", length];
     

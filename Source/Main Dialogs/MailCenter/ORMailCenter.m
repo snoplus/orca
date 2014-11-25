@@ -90,14 +90,27 @@
 		[[self window] endEditingFor:nil];		
 	}
 	
-	NSString* address = [[mailForm cellWithTag:0] stringValue];
-	NSString* subject = [[mailForm cellWithTag:2] stringValue];
+	NSString* address = [toField stringValue];
+	NSString* subject = [subjectField stringValue];
 	if([address length]!=0 && [address rangeOfString:@"@"].location != NSNotFound){
 		if([subject length]!=0){
 			[self sendit];
 		}
 		else {
-			NSBeginAlertSheet(@"ORCA Mail",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            [alert setMessageText:@"ORCA Mail"];
+            [alert setInformativeText:@"No Subject..."];
+            [alert addButtonWithTitle:@"Send Anyway"];
+            [alert addButtonWithTitle:@"Cancel"];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            
+            [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+                if (result == NSAlertFirstButtonReturn){
+                 }
+            }];
+#else
+            NSBeginAlertSheet(@"ORCA Mail",
 							  @"Cancel",
 							  @"Send Anyway",
 							  nil,
@@ -105,11 +118,22 @@
 							  self,
 							  @selector(noSubjectSheetDidEnd:returnCode:contextInfo:),
 							  nil,
-							  nil,@"No Subject...");	
+							  nil,@"No Subject...");
+#endif
 		}
 	}
 	else {
-		NSBeginAlertSheet(@"ORCA Mail",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"ORCA Mail"];
+        [alert setInformativeText:@"No Destination Address Given"];
+        [alert addButtonWithTitle:@"OK"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        }];
+#else
+        NSBeginAlertSheet(@"ORCA Mail",
 						  @"OK",
 						  nil,
 						  nil,
@@ -118,10 +142,11 @@
 						  @selector(noAddressSheetDidEnd:returnCode:contextInfo:),
 						  nil,
 						  nil,@"No Destination Address Given");
+#endif
 	}
 	
 	
-} 
+}
 	
 - (void) sendit
 {
@@ -133,15 +158,16 @@
 	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 	
 	ORMailer* mailer = [ORMailer mailer];
-	[mailer setTo:[[mailForm cellWithTag:0] stringValue]];
-	[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
-	[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
+	[mailer setTo:[toField stringValue]];
+	[mailer setCc:[ccField stringValue]];
+	[mailer setSubject:[subjectField stringValue]];
 	[mailer setBody:theContent];
 	[mailer send:delegate];
 	[theContent release];
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	
@@ -153,5 +179,5 @@
 		[self sendit];
 	}
 }
-
+#endif
 @end

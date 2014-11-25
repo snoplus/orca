@@ -856,9 +856,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 		NSDate* creationDate = [attrib objectForKey:NSFileCreationDate];
 		NSTimeInterval fileAge = fabs([creationDate timeIntervalSinceNow]);	
         if(fileAge >= 60*60*24*7){
-			NSDate* now = [NSCalendarDate date];
-			NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S" allowNaturalLanguage:NO] autorelease];
-			
+			NSDate* now = [NSDate date];
 			NSFileManager* fm = [NSFileManager defaultManager];
 			NSString* folderPath = [[fullPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"History"];
 			if(![fm fileExistsAtPath: folderPath]){
@@ -866,7 +864,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 			}
 			
 			NSString* newPath = [folderPath stringByAppendingPathComponent:[fullPath lastPathComponent]];
-			newPath = [newPath stringByAppendingFormat:@"_%@",[dateFormatter stringFromDate:now]];
+            newPath = [newPath stringByAppendingFormat:@"_%@",[now descriptionFromTemplate:@"yy_MM_dd_HH_mm_ss"]];
 			[fm moveItemAtPath:fullPath toPath:newPath error:nil];
 			writeHeader = YES;
             [self incrementProcessRunNumber];
@@ -1103,10 +1101,10 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         NSString* theContent = @"";
         theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
         theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process at:\n"];
-        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
         theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
         theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
-                      [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
+                      nextHeartbeat, [nextHeartbeat utcDateStringFromTemplate:@"MM/dd/yy HH:mm:ss"]];
         theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
         theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
         
@@ -1206,11 +1204,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	if([self heartbeatSeconds]){
 		[nextHeartbeat release];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
-#else
-		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
-#endif
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelNextHeartBeatChanged object:self];
 	

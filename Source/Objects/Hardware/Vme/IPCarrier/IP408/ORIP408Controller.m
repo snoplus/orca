@@ -163,7 +163,7 @@
         [model setReadValue:value];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
     }
 }
@@ -175,7 +175,7 @@
         [model setOutputWithMask:[model writeMask] value:[model writeValue]];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
     }
 }

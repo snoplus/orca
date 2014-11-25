@@ -365,7 +365,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     NSView*     borderView   = [[[self window] contentView] superview];
     NSData*     pdfData		 = [borderView dataWithPDFInsideRect: cRect];
     NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
-	[tempImage setScalesWhenResized:YES];
 	
 	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSSize imageSize = [tempImage size];

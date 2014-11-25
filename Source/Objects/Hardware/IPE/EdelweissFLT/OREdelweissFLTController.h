@@ -590,10 +590,6 @@
 - (IBAction) noiseFloorOffsetAction:(id)sender;
 
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 	
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter;

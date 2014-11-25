@@ -55,7 +55,11 @@
 - (IBAction)closePassWordPanel:(id)sender
 {
     [passWordPanel orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+#else
     [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
     [self autorelease];
 }
 
@@ -66,7 +70,11 @@
 - (void) _panelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     int returnValue = kPasswordCancelled;
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
     if(returnCode == NSOKButton){
+#endif
         if([[passWordField stringValue] isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword]]){
 	    returnValue = kGoodPassword;
         }

@@ -2302,7 +2302,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 	@catch(NSException* localException) {
         NSLog(@"SIS3302 Reg Dump FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3302 Reg Dump FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3302 Reg Dump FAILED", @"OK", nil, nil,
                         localException);
     }
 }

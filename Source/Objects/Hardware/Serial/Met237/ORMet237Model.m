@@ -204,7 +204,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     return cycleWillEnd;
 }
 
-- (void) setCycleWillEnd:(NSCalendarDate*)aCycleWillEnd
+- (void) setCycleWillEnd:(NSDate*)aCycleWillEnd
 {
     [aCycleWillEnd retain];
     [cycleWillEnd release];
@@ -446,12 +446,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 		[self setCycleNumber:1];
 		NSDate* now = [NSDate date];
 		[self setCycleStarted:now];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 
         NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
-#else
-        NSDate* endTime = [now addTimeInterval:[self cycleDuration]*60];
-#endif
-		[self setCycleWillEnd:endTime]; 
+		[self setCycleWillEnd:endTime];
 		[self clearBuffer];
 		[self startCountingByComputer];
 		[self checkCycle];
@@ -611,11 +607,7 @@ NSString* ORMet237Lock = @"ORMet237Lock";
 			[self stopCounting];
 			[self getRecord];
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 
 			NSDate* endTime = [now dateByAddingTimeInterval:[self cycleDuration]*60];
-#else
-			NSDate* endTime = [now addTimeInterval:[self cycleDuration]*60];
-#endif
 			
 			[self setCycleStarted:now];
 			[self setCycleWillEnd:endTime]; 

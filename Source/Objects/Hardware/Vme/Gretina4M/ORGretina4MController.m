@@ -33,14 +33,6 @@
 #import "ORValueBarGroupView.h"
 #import "ORGretinaCntView.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORGretina4MController (private)
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-						 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo;
-@end
-#endif
-
 @implementation ORGretina4MController
 
 -(id)init
@@ -1496,7 +1488,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1511,7 +1503,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of Gretina4M FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1527,7 +1519,7 @@
     }
     @catch(NSException* localException) {
         NSLog(@"Init of Gretina4M FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1541,7 +1533,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina4M FIFO FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M FIFO Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M FIFO Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1573,7 +1565,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1601,7 +1593,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"LED Threshold Finder for Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1665,7 +1657,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1712,22 +1704,13 @@
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Select FPGA Binary File"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setFpgaFilePath:[[openPanel URL]path]];
             [model startDownLoadingMainFPGA];
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory:NSHomeDirectory()
-								 file:nil
-								types:nil //[NSArray arrayWithObjects:@"bin",nil]
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
+
 }
 
 - (IBAction) stopLoadingMainFPGAAction:(id)sender
@@ -1770,16 +1753,3 @@
 }
 @end
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORGretina4MController (private)
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-						 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo
-{
-    if(returnCode){
-		[model setFpgaFilePath:[sheet filename]];
-		[model startDownLoadingMainFPGA];
-    }
-}
-@end
-#endif

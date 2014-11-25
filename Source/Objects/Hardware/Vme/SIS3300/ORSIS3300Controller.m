@@ -686,7 +686,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset and Init of SIS3300 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3300 Reset and Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3300 Reset and Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -726,7 +726,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3300 Thresholds write FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3300 Write FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3300 Write FAILED", @"OK", nil, nil,
                         localException);
     }
 }
@@ -739,7 +739,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3300 Thresholds read FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3300 Read FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3300 Read FAILED", @"OK", nil, nil,
                         localException);
     }
 }

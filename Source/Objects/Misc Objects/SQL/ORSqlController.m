@@ -233,7 +233,21 @@
 {
 	[self endEditing];
 	NSString* s = [NSString stringWithFormat:@"Really try to create a database named %@ on %@?\n",[model dataBaseName],[model hostName]];
-	NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s];
+    [alert setInformativeText:@"If the database and tables already exist, this operation will do no harm."];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Create Database"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model createDatabase];
+        }
+    }];
+#else
+    NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Create Database",
                       nil,[self window],
@@ -241,6 +255,7 @@
                       @selector(createActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"If the database and tables already exist, this operation will do no harm.");
+#endif
 	
 }
 
@@ -248,7 +263,21 @@
 {
 	[self endEditing];
 	NSString* s = [NSString stringWithFormat:@"Really drop all tables in %@ on %@?\n",[model dataBaseName],[model hostName]];
-	NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s];
+    [alert setInformativeText:@"You can recreate the database with the 'Create Database' button"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Drop All"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model dropAllTables];
+        }
+    }];
+#else
+    NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Drop All",
                       nil,[self window],
@@ -256,10 +285,12 @@
                       @selector(dropActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"You can recreate the database with the 'Create Database' button");
+#endif
 	
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
@@ -273,5 +304,5 @@
 		[model dropAllTables];
 	}
 }
-
+#endif
 @end

@@ -403,10 +403,10 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 	theContent = [theContent stringByAppendingFormat:@"This report was generated automatically by HALO at:\n"];
-	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date] stdDescription] ];
 	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
-                  [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
+                  nextHeartbeat, [nextHeartbeat utcDescription]];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     NSString* haloReport = [haloSentry report];
     if([haloReport length] == 0)haloReport = @"Halo report was empty of content";
@@ -480,11 +480,8 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 {
 	if([self heartbeatSeconds]){
 		[nextHeartbeat release];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
-#else
-		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
-#endif
+
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:HaloModelNextHeartBeatChanged object:self];
 	

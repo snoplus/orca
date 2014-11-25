@@ -95,7 +95,7 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
     NSBezierPath* 	theAxisColoredTicks = [NSBezierPath bezierPath];
     [theAxisColoredTicks setLineWidth:3];
     NSString* theDateFormat = [self dateFormat];
-	if(!theDateFormat)theDateFormat = @"%m/%d/%y %H:%M:%S";
+	if(!theDateFormat)theDateFormat = @"m/d/y H:M:S";
 	gridCount = 0;    
     tstep  = [self getValRel:[self optimalLabelSeparation]];
     
@@ -190,8 +190,8 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 					if(suffix == 'k')ival *= 1000;
 					else if(suffix == 'M') ival *= 1000000;
 					else if(suffix == 'G') ival *= 1000000000;
-					NSCalendarDate *aDate = [NSCalendarDate dateWithTimeIntervalSince1970:ival+startTime];
-					axisNumberString = [aDate descriptionWithCalendarFormat:theDateFormat];
+					NSDate *aDate = [NSDate dateWithTimeIntervalSince1970:ival+startTime];
+					axisNumberString = [aDate descriptionFromTemplate:theDateFormat];
 					nthTick = 0;
 				
 					

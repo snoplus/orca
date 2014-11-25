@@ -322,13 +322,13 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 
 - (void) updatePpoCommand
 {
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
 	NSDateFormatter* frmt = [[[NSDateFormatter alloc] init] autorelease];
 	NSDate* ppoDate = [[[NSDate alloc] initWithTimeInterval:(ppoTimeOffset - [[NSTimeZone systemTimeZone] secondsFromGMT]) sinceDate:ppoTime] autorelease];
 	[frmt setDateFormat:@"D"];
 	int day = [[frmt stringFromDate:ppoDate] intValue];
 
-	NSDateComponents *componentsPpo = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
+	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
 						       fromDate:ppoDate];
 			
 	NSString* time = [NSString stringWithFormat:@"%03d:%02d:%02d:%02d", day, [componentsPpo hour], [componentsPpo minute], [componentsPpo second]];

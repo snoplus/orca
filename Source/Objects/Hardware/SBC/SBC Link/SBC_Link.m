@@ -578,15 +578,15 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
         [connectionDroppedAlarm release];
         connectionDroppedAlarm = nil;
     }
-	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+	[self setTimeConnected:isConnected?[NSDate date]:nil];
 }
 
-- (NSCalendarDate*) timeConnected
+- (NSDate*) timeConnected
 {
 	return timeConnected;
 }
 
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected
+- (void) setTimeConnected:(NSDate*)newTimeConnected
 {
 	[timeConnected autorelease];
 	timeConnected=[newTimeConnected retain];	
@@ -1784,7 +1784,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 			irqfd = [self connectToPort:portNumber+1];
 			
 			[self setIsConnected: YES];
-			[self setTimeConnected:[NSCalendarDate date]];
+			[self setTimeConnected:[NSDate date]];
 			[self setReloading:NO];
 			
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);

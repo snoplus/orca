@@ -25,11 +25,13 @@
 #import "ORTimeAxis.h"
 #import "ORSerialPortController.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORRad7Controller (private)
 - (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) loadDialogFromHWPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) eraseAllDataPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
+#endif
 
 @implementation ORRad7Controller
 
@@ -844,7 +846,21 @@
 - (IBAction) updateSettingsAction:(id)sender
 {
 	
-	NSBeginAlertSheet(@"Load Dialog With Hardware Settings",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Load Dialog With Hardware Settings"];
+    [alert setInformativeText:@"Really replace the settings in the dialog with the current HW settings?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model loadDialogFromHardware];
+       }
+    }];
+#else
+    NSBeginAlertSheet(@"Load Dialog With Hardware Settings",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -854,13 +870,28 @@
 					  nil,
 					  nil,
 					  @"Really replace the settings in the dialog with the current HW settings?");
+#endif
 	
 }
 
 - (IBAction) eraseAllDataAction:(id)sender
 {
 	
-	NSBeginAlertSheet(@"Erase All Data",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Erase All Data"];
+    [alert setInformativeText:@"Really erase ALL data?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model dataErase];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Erase All Data",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -870,6 +901,7 @@
 					  nil,
 					  nil,
 					  @"Really erase ALL data?");
+#endif
 	
 }
 
@@ -924,32 +956,13 @@
 	else		[openPanel setPrompt:@"Choose File That Removes RadLink"];
     NSString* startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
 			[model loadFirmwareFile:[[openPanel URL]path] index:index];
         }
     }];
-#else 
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(getFirmwareFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)getFirmwareFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model loadFirmwareFile:[[sheet filenames] objectAtIndex:0] index:[radLinkSelectionMatrix selectedRow]];
-    }
-}
-#endif
 
 - (IBAction) pollTimeAction:(id)sender
 {
@@ -983,7 +996,21 @@
 
 - (IBAction) saveUserSettings:(id)sender;
 {
-	NSBeginAlertSheet(@"Save Settings As New User Protocol",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Save Settings As New User Protocol"];
+    [alert setInformativeText:@"Really make the current settings the new user protocol?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model saveUser];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Save Settings As New User Protocol",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -993,6 +1020,7 @@
 					  nil,
 					  nil,
 					  @"Really make the current settings the new user protocol?");
+#endif
 }
 
 - (IBAction) dumpUserValuesAction:(id)sender
@@ -1034,6 +1062,8 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+
 @implementation ORRad7Controller (private)
 
 - (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
@@ -1052,4 +1082,4 @@
 }
 
 @end
-
+#endif

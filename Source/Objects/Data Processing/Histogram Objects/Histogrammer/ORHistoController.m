@@ -26,11 +26,6 @@
 #import "ORMultiPlot.h"
 #import "ORDataSet.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-@interface ORHistoController (private)
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
 
 @implementation ORHistoController
 
@@ -332,23 +327,12 @@
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setCanCreateDirectories:YES];
     [openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* directoryName = [[[openPanel URL]path] stringByAbbreviatingWithTildeInPath];
             [model setDirectoryName:directoryName];
        }
     }];
-#else
-    [openPanel beginSheetForDirectory:NSHomeDirectory()
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-    
 }
 
 - (IBAction) writeFileAction:(id)sender
@@ -358,6 +342,21 @@
 
 - (IBAction) clearAllAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clear Counts"];
+    [alert setInformativeText:@"Really Clear them? You will not be able to undo this."];
+    [alert addButtonWithTitle:@"Yes/Clear It"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [[model dataSet] clear];
+            [outlineView reloadData];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Clear Counts",
                       @"Cancel",
                       @"Yes/Clear It",
@@ -366,9 +365,11 @@
                       @selector(_clearSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really Clear them? You will not be able to undo this.");
+#endif
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
@@ -378,6 +379,7 @@
         //[outlineView setNeedsDisplay:YES];
     }    
 }
+#endif
 
 - (IBAction)delete:(id)sender
 {
@@ -500,15 +502,4 @@
 }
 @end
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-@implementation ORHistoController (private)
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* directoryName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setDirectoryName:directoryName];
-    }
-}
-@end
-#endif
 

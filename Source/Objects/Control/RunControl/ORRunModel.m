@@ -436,12 +436,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return [startTime description];
 }
 
-- (NSCalendarDate*)startTime
+- (NSDate*)startTime
 {
     return startTime;
 }
 
-- (void) setStartTime:(NSCalendarDate*)aDate
+- (void) setStartTime:(NSDate*)aDate
 {
     [aDate retain];
     [startTime release];
@@ -452,12 +452,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 object: self];
 }
 
-- (NSCalendarDate*)subRunStartTime
+- (NSDate*)subRunStartTime
 {
     return subRunStartTime;
 }
 
-- (void) setSubRunStartTime:(NSCalendarDate*)aDate
+- (void) setSubRunStartTime:(NSDate*)aDate
 {
     [aDate retain];
     [subRunStartTime release];
@@ -467,12 +467,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 postNotificationName:ORRunStartTimeChangedNotification
 	 object: self];
 }
-- (NSCalendarDate*)subRunEndTime
+- (NSDate*)subRunEndTime
 {
     return subRunEndTime;
 }
 
-- (void) setSubRunEndTime:(NSCalendarDate*)aDate
+- (void) setSubRunEndTime:(NSDate*)aDate
 {
     [aDate retain];
     [subRunEndTime release];
@@ -936,7 +936,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) prepareForNewSubRunStage2
 {
     [self setRunningState:eRunBetweenSubRuns];
-    [self setSubRunEndTime:[NSCalendarDate date]];
+    [self setSubRunEndTime:[NSDate date]];
     [self setElapsedBetweenSubRunTime:0];
     //ship between sub run record
     //get the time(UT!)
@@ -994,7 +994,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     [self setSubRunNumber:[self subRunNumber]+1];
     [self setRunningState:eRunInProgress];
-    [self setSubRunStartTime:[NSCalendarDate date]];
+    [self setSubRunStartTime:[NSDate date]];
     [self setElapsedSubRunTime:0];
     //ship new sub run record
     //get the time(UT!)
@@ -1163,8 +1163,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[readoutThread setStackSize:4*1024*1024];
 		[readoutThread start];
 		 
-        [self setStartTime:[NSCalendarDate date]];
-		[self setSubRunStartTime:[NSCalendarDate date]];
+        [self setStartTime:[NSDate date]];
+		[self setSubRunStartTime:[NSDate date]];
 		[self setElapsedRunTime:0];
         [self setElapsedSubRunTime:0];
         
@@ -1962,8 +1962,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithUnsignedLong:[self runNumber]],		@"run",
 							 [NSNumber numberWithUnsignedLong:[self subRunNumber]],		@"subrun",
 							 [NSNumber numberWithUnsignedLong:[self runningState]],		@"state",
-							 [[self startTime] description],							@"startTime",
-							 [[self subRunStartTime]description],						@"subRunStartTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedRunTime]],	@"elapsedTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedSubRunTime]],@"elapsedSubRunTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedBetweenSubRunTime]],@"elapsedBetweenSubRunTime",
@@ -1973,7 +1971,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithBool:[self offlineRun]],				@"offlineRun",
 							 [NSNumber numberWithBool:[self timedRun]],					@"timedRun",
 							 [NSNumber numberWithUnsignedLong:[self timeLimit]],		@"timeLimit",
-							 nil];	
+                             [[self startTime] stdDescription],                         @"startTime",
+                             [[self subRunStartTime] stdDescription],                   @"subRunStartTime",
+
+							 nil];
 }
 
 #pragma mark ¥¥¥Archival

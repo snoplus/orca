@@ -600,15 +600,15 @@
 		case MAKEEXCEPTION:	return [self makeException:p];
         case NSDATECOMPONENTS:
         {
-            NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+            NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
             return  [cal components:
-                     NSYearCalendarUnit |
-                     NSMonthCalendarUnit |
-                     NSWeekdayCalendarUnit |
-                     NSDayCalendarUnit |
-                     NSHourCalendarUnit |
-                     NSMinuteCalendarUnit |
-                     NSSecondCalendarUnit
+                     NSCalendarUnitYear |
+                     NSCalendarUnitMonth |
+                     NSCalendarUnitWeekday |
+                     NSCalendarUnitDay |
+                     NSCalendarUnitHour |
+                     NSCalendarUnitMinute |
+                     NSCalendarUnitSecond
                            fromDate:[NSDate date]];
         }
         case SEEDRANDOM:        {
@@ -848,10 +848,7 @@
 	id output = NodeValue(0);
 	
 	if(logFileHandle){
-        NSCalendarDate* now  	= [NSCalendarDate calendarDate];
-        [now setCalendarFormat:@"%m%d%y %H:%M:%S"];
-        
-        NSString* s1 = [NSString stringWithFormat:@"%@ %@\n",now,output];
+        NSString* s1 = [NSString stringWithFormat:@"%@ %@\n",[NSDate date],output];
 		[logFileHandle writeData:[s1 dataUsingEncoding:NSASCIIStringEncoding]];
 	}
 	

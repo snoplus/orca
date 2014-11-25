@@ -2301,7 +2301,7 @@ enum {
 
 - (NSTimeInterval) timeFromADEIDate:(NSString*)aDate
 {
-	NSCalendarDate *theDate = [NSCalendarDate dateWithString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
+	NSDate *theDate = [NSDate dateFromString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
 	return [theDate timeIntervalSince1970];
 }
 

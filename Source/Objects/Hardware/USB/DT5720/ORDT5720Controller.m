@@ -1097,7 +1097,7 @@
 		[model read];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -1109,7 +1109,7 @@
 		[model write];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -1144,7 +1144,7 @@
 		[model report];
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -1155,7 +1155,7 @@
 		[model initBoard];
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -1171,7 +1171,7 @@
 		[model trigger];
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nSoftware Trigger Failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSoftware Trigger Failed", @"OK", nil, nil,
                         localException);
 	}
 }

@@ -122,7 +122,7 @@
 	}
 	@catch(NSException* localException) {
 	    NSLog(@"Load of Pulser Distribution Data FAILED.\n");
-	    NSRunAlertPanel([localException name], @"%@\nLoad of Pulser Distribution Data FAILED", @"OK", nil, nil,
+	    ORRunAlertPanel([localException name], @"%@\nLoad of Pulser Distribution Data FAILED", @"OK", nil, nil,
                         localException);
 		
 	}

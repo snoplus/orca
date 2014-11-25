@@ -28,13 +28,6 @@
 #import "ORScriptView.h"
 #import "ORNodeEvaluator.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-@interface ORScriptIDEController (private)
-- (void) loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORScriptIDEController
 -(id)init
 {
@@ -561,7 +554,12 @@
 - (IBAction) cancelLoadSaveAction:(id)sender
 {
 	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+
+    [[[NSApplication sharedApplication]keyWindow]  endSheet:loadSaveView];
+#else
+    [[NSApplication sharedApplication]  endSheet:loadSaveView];
+#endif
 }
 
 - (IBAction) parseScript:(id) sender
@@ -627,11 +625,15 @@
 
 - (IBAction) loadSaveAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [[self window] beginSheet:loadSaveView completionHandler:nil];
+#else
 	[[NSApplication sharedApplication] beginSheet:loadSaveView
 								   modalForWindow:[self window]
 									modalDelegate:self
 								   didEndSelector:NULL
 									  contextInfo:NULL];
+#endif
 	[lastFileField setStringValue:[[model lastFile] stringByAbbreviatingWithTildeInPath]];
 }
 
@@ -639,7 +641,12 @@
 - (IBAction) loadFileAction:(id) sender
 {
 	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [[[NSApplication sharedApplication]keyWindow]  endSheet:loadSaveView];
+#else
+    [[NSApplication sharedApplication]  endSheet:loadSaveView];
+#endif
+
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseDirectories:NO];
     [openPanel setCanChooseFiles:YES];
@@ -650,30 +657,23 @@
     if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
     else		 startingDir = NSHomeDirectory();
     
-//File ops changed in 10.6. The old functions were depreciated and the new ones now use Blocks.    
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             [model loadScriptFromFile:[[openPanel URL]path]];
         }
     }];
-#else	
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 
 - (IBAction) saveAsFileAction:(id) sender
 {
 	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [[[NSApplication sharedApplication]keyWindow]  endSheet:loadSaveView];
+#else
+    [[NSApplication sharedApplication]  endSheet:loadSaveView];
+#endif
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save As"];
     [savePanel setCanCreateDirectories:YES];
@@ -691,8 +691,6 @@
         defaultFile = @"Untitled";
     }
     
-//File ops changed in 10.6. The old functions were depreciated and the new ones now use Blocks.    
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -701,21 +699,16 @@
             [model saveScriptToFile:[[savePanel URL] path]];
         }
     }];
-
-#else 	
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) saveFileAction:(id) sender
 {
 	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+	[[[NSApplication sharedApplication]keyWindow]  endSheet:loadSaveView];
+#else
+    [[NSApplication sharedApplication]  endSheet:loadSaveView];
+#endif
 	if(![model lastFile]){
 		[self saveAsFileAction:nil];
 	}
@@ -843,24 +836,3 @@
  
 }
 @end
-
-//pre 10.6 panel call backs. 10.6 and higher uses blocks.
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 
-@implementation ORScriptIDEController (private)
-
-- (void)loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model loadScriptFromFile:[[[sheet filenames] objectAtIndex:0]stringByAbbreviatingWithTildeInPath]];
-    }
-}
-- (void)saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self endEditing];
-        [model saveScriptToFile:[sheet filename]];
-    }
-}
-@end
-#endif
-

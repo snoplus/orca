@@ -111,23 +111,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
 	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
 	if(![noKill isEqualToString:@"NoKill"]){
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         NSString* bundleID = [[NSRunningApplication currentApplication] bundleIdentifier];
 		NSArray* launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
         if([launchedApps count]>1)[NSApp terminate:self];
-#else
-		NSString* myName = [[NSProcessInfo processInfo] processName];
-		int myPid        = [[NSProcessInfo processInfo] processIdentifier];
-		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
-		for(id anApp in launchedApps){
-			NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
-			int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
-			
-			if([otherProcessName isEqualToString:myName] && otherProcessPid != myPid){
-				[NSApp terminate:self];
-			}
-		}
-#endif
+
 	}
  
 	return self;
@@ -243,7 +230,9 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 }
 
 - (void) applicationWillTerminate:(NSNotification *)aNotification
+
 {
+
 	[queue cancelAllOperations];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
         NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"];
@@ -369,15 +358,12 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 - (IBAction) terminate:(id)sender
 {
-	BOOL okToQuit = YES;
-	int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
+    BOOL okToQuit = YES;
+    int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
 	if(runningProcessCount>0){
-		NSString* s = [NSString stringWithFormat:@"Quitting will stop %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];		
-		int choice = NSRunAlertPanel(s,@"Is this really what you want?",@"Cancel",@"Stop Processes and Quit",nil);
-		if(choice == NSAlertAlternateReturn){
-			okToQuit = YES;
-		}
-		else okToQuit = NO;
+        NSString* s = [NSString stringWithFormat:@"Quitting will stop %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];
+        okToQuit = ORRunAlertPanel(s, @"Is this really what you want?", @"Cancel", @"Stop Processes and Quit",nil);
+
 	}
 	if(okToQuit){
         delayTermination = NO;
@@ -422,7 +408,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 - (void) setDocument:(id)aDocument
 {
 	if(aDocument && document){
-		NSRunAlertPanel(@"Experiment Already Open",@"Only one experiment can be active at a time.",nil,nil,nil,nil);
+		ORRunAlertPanel(@"Experiment Already Open",@"Only one experiment can be active at a time.",nil,nil,nil);
 		[NSException raise:@"Document already open" format:@""];
 	}
 	document = aDocument;
@@ -497,7 +483,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 					[self closeSplashWindow];
 					NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
 					NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
-					NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
+					ORRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
 				}
 				else {
 					NSLog(@"Opened Configuration: %@\n",lastFile);
@@ -541,8 +527,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		[self closeSplashWindow];
 		NSLogColor([NSColor redColor],@"Number of processors: %d\n",count);
 		if([[NSUserDefaults standardUserDefaults] objectForKey:@"IgnoreSingleCPUWarning"] == nil){
-			int result = NSRunInformationalAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",nil,@"OK/Don't remind me",nil);
-			if(result == -1){
+			BOOL result = ORRunAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",@"OK/Don't remind me",nil,nil);
+			if(result){
 				[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"IgnoreSingleCPUWarning"];    
 				[[NSUserDefaults standardUserDefaults] synchronize];
 			}
