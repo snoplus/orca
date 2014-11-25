@@ -1104,7 +1104,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
         theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
         theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
-                      nextHeartbeat, [nextHeartbeat utcDateStringFromTemplate:@"MM/dd/yy HH:mm:ss"]];
+                      nextHeartbeat, [nextHeartbeat utcDescription]];
         theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
         theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
         

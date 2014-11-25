@@ -12,7 +12,6 @@
 - (NSString*) stdDescription;
 - (NSString*) utcDescription;
 - (NSString*) descriptionFromTemplate:(NSString*)aTemplate;
-- (NSString*) utcDateStringFromTemplate:(NSString*)aTemplate;
 - (NSString*) descriptionFromTemplate:(NSString*)aTemplate timeZone:(NSString*)aTimeZone;
 - (NSInteger) secondOfMinute;
 - (NSInteger) minuteOfHour;
