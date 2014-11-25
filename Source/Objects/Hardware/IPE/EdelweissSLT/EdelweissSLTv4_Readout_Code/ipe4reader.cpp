@@ -1178,8 +1178,21 @@ printf("    inet_aton(MY_UDP_SERVER_IP_ADDR %s, &servaddr.sin_addr ... 0x%08x );
    }
 
 
-    return retval;
+    return retval;//TODO: is always 0!!!
 }
+
+
+
+int FIFOREADER::myUDPServerSocket(void)
+{
+    return MY_UDP_SERVER_SOCKET;
+}
+
+int FIFOREADER::isConnectedUDPServerSocket(void)
+{
+    return (MY_UDP_SERVER_SOCKET >0);
+}
+
 
 
 void FIFOREADER::initAllUDPServerSockets(void)
@@ -2325,6 +2338,7 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
                           if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
                               printf("    WARNING: FIFO %lu is still stopping and clearing! Cmd 'startFIFO' ignored!\n",numFIFO);//DEBUG
                           }else{
+                              if(! FIFOREADER::isConnectedUDPServerSocketForFIFO(numFIFO)) FIFOREADER::initUDPServerSocketForFIFO(numFIFO);
                               FIFOREADER::startFIFO(numFIFO);
                               pbus->write(BBcsrReg(numFIFO),0x2);//enable FIFO
                               printf("   Message: FIFO %lu started\n",numFIFO);//DEBUG

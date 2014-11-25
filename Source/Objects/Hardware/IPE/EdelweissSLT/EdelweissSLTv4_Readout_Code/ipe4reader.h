@@ -337,6 +337,8 @@ public:
     int sendtoUDPClients(int flag, const void *buffer, size_t length);
 
     int initUDPServerSocket(void);
+    int myUDPServerSocket(void);
+    int isConnectedUDPServerSocket(void);
     int recvfromServer(unsigned char *readBuffer, int maxSizeOfReadbuffer);
     void endUDPServerSocket(void);
     static void initAllUDPServerSockets(void);
@@ -518,6 +520,21 @@ public:
 	/*--------------------------------------------------------------------
 	 vars and functions for FIFO buffer
 	 --------------------------------------------------------------------*/
+    static int isConnectedUDPServerSocketForFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            return FIFOREADER::FifoReader[i].isConnectedUDPServerSocket();
+        }
+        return 0;
+    }
+    
+    static int initUDPServerSocketForFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            return FIFOREADER::FifoReader[i].initUDPServerSocket();
+        }
+        return 0;
+    }
+    
+    
     static void startFIFO(int i){
         if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
             if(FIFOREADER::FifoReader[i].readfifo){
