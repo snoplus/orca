@@ -34,22 +34,48 @@
     NSMutableDictionary* objMap;
     BOOL isRunning;
     float pollingFrequency;
+    float proportionalTerm;
+    float integralTerm;
+    float feedbackThreshold;
+    float regularizationParameter;
     NSTimeInterval realProcessingTime;
+    NSUInteger SenNumChannels;
+    NSUInteger SenNumCoils;
     int NumberOfChannels;
     int NumberOfCoils;
     BOOL debugRunning;
+    BOOL dynamicMode;
     BOOL verbose;
+    BOOL postDataToDB;
     NSDate* lastProcessStartDate;
     
     
     NSMutableData* FeedbackMatData;
+    NSMutableData* SensitivityMatData;
+    NSData*        CurVector;
+    NSMutableData* CurrentMemory;
+    NSUInteger     CurrentMemorySize;
     
     NSData* FieldTarget;
+    NSArray* StartCurrent;
     
     NSMutableArray* listOfADCs;
     NSMutableData*  currentADCValues;
+    NSString*       RunComment;
     NSMutableArray* MagnetometerMap;
     NSMutableArray* OrientationMatrix;
+    NSMutableArray* ActiveChannelMap;
+    NSMutableArray* SensorInfo;
+    NSMutableArray* SensorDirectInfo;
+    
+    NSString* postToPath;
+    NSTimeInterval postToDBPeriod;
+    
+    // For Cache during run
+    NSMutableData* _FieldVectorLocal;
+    NSMutableData* _PrevCurrentLocal;
+    NSMutableData* _CurrentDataLocal;
+    NSMutableData* _DCurrentLocal;
 }
 
 - (void) setUpImage;
@@ -57,10 +83,20 @@
 - (int) rackNumber;
 - (BOOL) isRunning;
 - (BOOL) debugRunning;
+- (BOOL) dynamicMode;
 - (void) setDebugRunning:(BOOL)debug;
+- (void) setDynamicMode:(BOOL)dynamic;
 - (float) realProcessingTime;
 - (float) pollingFrequency;
+- (float) proportionalTerm;
+- (float) integralTerm;
+- (float) feedbackThreshold;
+- (float) regularizationParameter;
 - (void) setPollingFrequency:(float)aFrequency;
+- (void) setProportionalTerm:(float)aValue;
+- (void) setIntegralTerm:(float)aValue;
+- (void) setFeedbackThreshold:(float)aValue;
+- (void) setRegularizationParameter:(float)aValue;
 - (void) toggleRunState;
 - (void) connectAllPowerSupplies;
 
@@ -71,25 +107,58 @@
 - (int) numberOfChannels;
 - (int) numberOfCoils;
 - (int) mappedChannelAtChannel:(int)aChan;
+- (int) activeChannelAtChannel:(int)aChan;
 - (double) conversionMatrix:(int)channel coil:(int)aCoil;
+- (double) sensitivityMatrix:(int)coil channel:(int)aChannel;
 
-- (void) initializeConversionMatrixWithPlistFile:(NSString*)plistFile;
+- (void) setRunComment:(NSString*)aString;
 - (void) initializeMagnetometerMapWithPlistFile:(NSString*)plistFile;
 - (void) initializeOrientationMatrixWithPlistFile:(NSString*)plistFile;
+- (void) initializeSensitivityMatrixWithPlistFile:(NSString*)plistFile;
+- (void) initializeActiveChannelMapWithPlistFile:(NSString*)plistFile;
+- (void) initializeSensorInfoWithPlistFile:(NSString*)plistFile;
 
+- (void) saveFeedbackInPlistFile:(NSString*)plistFile;
 - (void) saveCurrentFieldInPlistFile:(NSString*)plistFile;
 - (void) loadTargetFieldWithPlistFile:(NSString*)plistFile;
 - (void) setTargetFieldToZero;
+- (void) setTargetField;
+
+- (void) saveCurrentStartCurrentInPlistFile:(NSString*)plistFile;
+- (void) loadStartCurrentWithPlistFile:(NSString*)plistFile;
+- (void) setStartCurrentToZero;
+- (void) startWithStartCurrent;
 
 - (void) resetConversionMatrix;
 - (void) resetMagnetometerMap;
 - (void) resetOrientationMatrix;
+- (void) resetSensitivityMatrix;
+- (void) resetActiveChannelMap;
+- (void) resetSensorInfo;
 
+- (void) buildFeedback;
+- (void) saveFeedbackInPlistFile:(NSString*)plistFile;
+- (void) buildReplaceFeedback;
+
+- (NSString*) runComment;
 - (NSArray*) magnetometerMap;
 - (NSArray*) orientationMatrix;
 - (NSData*)  feedbackMatData;
+- (NSData*)  sensitivityMatData;
+- (NSArray*) activeChannelMap;
+- (NSArray*) sensorInfo;
+- (NSArray*) sensorDirectInfo;
+
+- (void) setPostToPath:(NSString*)aPath;
+- (NSString*) postToPath;
+
+- (void) setPostDataToDB:(BOOL)postData;
+- (BOOL) postDataToDB;
+- (void) setPostDataToDBPeriod:(NSTimeInterval)period;
+- (NSTimeInterval) postDataToDBPeriod;
 
 - (BOOL) verbose;
+- (BOOL) withStartCurrent;
 - (void) setVerbose:(BOOL)aVerb;
 
 - (void) initializeForRunning;
@@ -103,9 +172,15 @@
 - (void) setVoltage:(double)volt atCoil:(int)coil;
 - (void) setCurrent:(double)current atCoil:(int)coil;
 - (double) readBackSetCurrentAtCoil:(int)coil;
+- (double) getCurrent:(int)coil;
 - (double) readBackSetVoltageAtCoil:(int)coil;
 - (double) fieldAtMagnetometer:(int)magn;
 - (double) targetFieldAtMagnetometer:(int)magn;
+- (double) startCurrentAtCoil:(int)coil;
+- (double) xPositionAtChannel:(int)magn;
+- (double) yPositionAtChannel:(int)magn;
+- (double) zPositionAtChannel:(int)magn;
+- (NSString*) fieldDirectionAtChannel:(int)magn;
 
 #pragma mark •••ORGroup
 - (void) objectCountChanged;
@@ -129,9 +204,22 @@
 
 extern NSString* ORnEDMCoilPollingActivityChanged;
 extern NSString* ORnEDMCoilPollingFrequencyChanged;
+extern NSString* ORnEDMCoilProportionalTermChanged;
+extern NSString* ORnEDMCoilIntegralTermChanged;
+extern NSString* ORnEDMCoilFeedbackThresholdChanged;
+extern NSString* ORnEDMCoilRegularizationParameterChanged;
+extern NSString* ORnEDMCoilRunCommentChanged;
 extern NSString* ORnEDMCoilADCListChanged;
 extern NSString* ORnEDMCoilHWMapChanged;
+extern NSString* ORnEDMCoilActiveChannelMapChanged;
+extern NSString* ORnEDMCoilSensitivityMapChanged;
+extern NSString* ORnEDMCoilSensorInfoChanged;
 extern NSString* ORnEDMCoilDebugRunningHasChanged;
+extern NSString* ORnEDMCoilDynamicModeHasChanged;
 extern NSString* ORnEDMCoilVerboseHasChanged;
 extern NSString* ORnEDMCoilRealProcessTimeHasChanged;
 extern NSString* ORnEDMCoilTargetFieldHasChanged;
+extern NSString* ORnEDMCoilStartCurrentHasChanged;
+extern NSString* ORnEDMCoilPostToPathHasChanged;
+extern NSString* ORnEDMCoilPostDataToDBHasChanged;
+extern NSString* ORnEDMCoilPostDataToDBPeriodHasChanged;

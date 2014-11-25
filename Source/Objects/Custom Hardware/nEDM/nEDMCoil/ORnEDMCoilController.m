@@ -53,9 +53,10 @@
     
 	[groupView setGroup:model];
     
-    controlSize		= NSMakeSize(720,610);
+    controlSize		= NSMakeSize(840,640);
     powerSupplySize	= NSMakeSize(450,549);
     adcSize         = NSMakeSize(350,589);
+    configSize      = NSMakeSize(760,640);
     
     blankView = [[NSView alloc] init];
     [coilText setFrameCenterRotation:90];// CGAffineTransformMakeRotation(M_PI/4);
@@ -104,7 +105,32 @@
 	[notifyCenter addObserver : self
 					 selector : @selector(runRateChanged:)
 						 name : ORnEDMCoilPollingFrequencyChanged
-					   object : nil];   
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(proportionalTermChanged:)
+						 name : ORnEDMCoilProportionalTermChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(integralTermChanged:)
+						 name : ORnEDMCoilIntegralTermChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(feedbackThresholdChanged:)
+						 name : ORnEDMCoilFeedbackThresholdChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(regularizationParameterChanged:)
+						 name : ORnEDMCoilRegularizationParameterChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(runCommentChanged:)
+						 name : ORnEDMCoilRunCommentChanged
+					   object : nil];
     
     [notifyCenter addObserver : self
 					 selector : @selector(runStatusChanged:)
@@ -119,7 +145,17 @@
     [notifyCenter addObserver : self
 					 selector : @selector(channelMapChanged:)
 						 name : ORnEDMCoilHWMapChanged
-					   object : nil];   
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(sensitivityMapChanged:)
+						 name : ORnEDMCoilSensitivityMapChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(sensorInfoChanged:)
+						 name : ORnEDMCoilSensorInfoChanged
+					   object : nil];
     
     [notifyCenter addObserver : self
 					 selector : @selector(objectsAdded:)
@@ -134,7 +170,12 @@
     [notifyCenter addObserver : self
 					 selector : @selector(debugRunningChanged:)
 						 name : ORnEDMCoilDebugRunningHasChanged
-					   object : nil];      
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(dynamicModeChanged:)
+						 name : ORnEDMCoilDynamicModeHasChanged
+					   object : nil];
 
     [notifyCenter addObserver : self
 					 selector : @selector(refreshIPAddressesDone:)
@@ -150,6 +191,31 @@
 					 selector : @selector(realProcessFrequencyChanged:)
 						 name : ORnEDMCoilRealProcessTimeHasChanged
 					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(postDataToDBChanged:)
+						 name : ORnEDMCoilPostDataToDBHasChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(postToPathChanged:)
+						 name : ORnEDMCoilPostToPathHasChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(postToDBPeriodChanged:)
+						 name : ORnEDMCoilPostDataToDBPeriodHasChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(targetFieldChanged:)
+						 name : ORnEDMCoilTargetFieldHasChanged
+					   object : nil];
+    
+    [notifyCenter addObserver : self
+					 selector : @selector(startCurrentChanged:)
+						 name : ORnEDMCoilStartCurrentHasChanged
+					   object : nil];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -164,7 +230,10 @@
             break;
         case 2:
             temp = adcSize;
-            break;            
+            break;
+        case 3:
+            temp = configSize;
+            break;
         default:
             return;
     }
@@ -182,6 +251,31 @@
 - (void) runRateChanged:(NSNotification *)aNote
 {
     [runRateField setFloatValue:[model pollingFrequency]];
+}
+
+- (void) proportionalTermChanged:(NSNotification *)aNote
+{
+    [proportionalTermField setFloatValue:[model proportionalTerm]];
+}
+
+- (void) integralTermChanged:(NSNotification *)aNote
+{
+    [integralTermField setFloatValue:[model integralTerm]];
+}
+
+- (void) feedbackThresholdChanged:(NSNotification *)aNote
+{
+    [feedbackThresholdField setFloatValue:[model feedbackThreshold]];
+}
+
+- (void) regularizationParameterChanged:(NSNotification *)aNote
+{
+    [regularizationParameterField setFloatValue:[model regularizationParameter]];
+}
+
+- (void) runCommentChanged:(NSNotification *)aNote
+{
+    [runCommentField setStringValue:[model runComment]];
 }
 
 - (void) runStatusChanged:(NSNotification *)aNote
@@ -209,9 +303,49 @@
     [debugModeButton setState:[model debugRunning]];
 }
 
+- (void) dynamicModeChanged:(NSNotification*)aNote
+{
+    [dynamicModeButton setState:[model dynamicMode]];
+}
+
 - (void) processVerboseChanged:(NSNotification *)aNote
 {
     [processVerbose setState:[model verbose]];
+}
+
+- (void) postDataToDBChanged:(NSNotification*)aNote
+{
+    BOOL postData = [model postDataToDB];
+    [postDataToDBButton setState:postData];
+    [postDatabaseNameText setEnabled:postData];
+    [postDatabaseDesignDocText setEnabled:postData];
+    [postDatabaseDesignUpdateText setEnabled:postData];
+    [postDatabasePeriodText setEnabled:postData];
+
+}
+
+- (void) postToPathChanged:(NSNotification*)aNote
+{
+    NSString* updatePath = [model postToPath];
+    if ([updatePath length] == 0) {
+        [postDatabaseDesignDocText setStringValue:@""];
+        [postDatabaseDesignUpdateText setStringValue:@""];
+        [postDatabaseNameText setStringValue:@""];
+    } else {
+        NSArray* components = [updatePath componentsSeparatedByString:@"/"];
+        NSUInteger count = [components count];
+        if (count != 1 && count != 5) return;
+        [postDatabaseNameText setStringValue:[components objectAtIndex:0]];
+        if (count > 1) {
+            [postDatabaseDesignDocText setStringValue:[components objectAtIndex:2]];
+            [postDatabaseDesignUpdateText setStringValue:[components objectAtIndex:4]];
+        }
+    }
+}
+
+- (void) postToDBPeriodChanged:(NSNotification *)aNote
+{
+    [postDatabasePeriodText setFloatValue:[model postDataToDBPeriod]];
 }
 
 - (void) updateWindow
@@ -220,14 +354,25 @@
     [self populateListADCs];
     [self _buildPopUpButtons];
     [self modelADCListChanged:nil];
-    [self channelMapChanged:nil];    
+    [self channelMapChanged:nil];
+    [self sensitivityMapChanged:nil];
+    [self sensorInfoChanged:nil];
     //[self documentLockChanged:nil];
 	[self viewChanged:nil];
-	[self runRateChanged:nil];    
+	[self runRateChanged:nil];
+    [self proportionalTermChanged:nil];
+    [self integralTermChanged:nil];
+    [self feedbackThresholdChanged:nil];
+    [self regularizationParameterChanged:nil];
+    [self runCommentChanged:nil];
 	[self runStatusChanged:nil];
     [self debugRunningChanged:nil];
+    [self dynamicModeChanged:nil];
     [self processVerboseChanged:nil];
+    [self postToPathChanged:nil];
+    [self postDataToDBChanged:nil];
     [self realProcessFrequencyChanged:nil];
+    [self postToDBPeriodChanged:nil];
     [groupView setNeedsDisplay:YES];
 }
 
@@ -257,17 +402,41 @@
     } else {
         [magnetometerMapButton setTitle:@"Reset Magn. Channel Map"];
     }
-    if([model feedbackMatData] == nil) {
-        [feedBackMapButton setTitle:@"Load Feedback Matrix"];
-        [feedBackNotifier setHidden:YES];
-    } else {
-        [feedBackMapButton setTitle:@"Reset Feedback Matrix"];
-        [feedBackNotifier setHidden:NO];
-    }
-        
+
+    
     [hardwareMap reloadData];
     [feedbackMatrix reloadData];
     [orientationMatrix reloadData];
+}
+
+- (void) sensitivityMapChanged:(NSNotification*)aNote
+{
+    // Make sure the buttons have the correct titles
+    if ([model sensitivityMatData] == nil) {
+        [sensitivityMapButton setTitle:@"Load Sensitivity Map"];
+    } else {
+        [sensitivityMapButton setTitle:@"Reset Sensitivity Map"];
+    }
+    if ([model activeChannelMap] == nil) {
+        [activeChannelMapButton setTitle:@"Load Active Ch Map"];
+    } else {
+        [activeChannelMapButton setTitle:@"Reset Active Ch Map"];
+    }
+    
+    [sensitivityMatrix reloadData];
+    [activeChannelMap reloadData];
+}
+
+- (void) sensorInfoChanged:(NSNotification*)aNote
+{
+    //Make sure the buttons have the correct title
+    if ([model sensorInfo] == nil || [model sensorDirectInfo] == nil) {
+        [loadSensorInformationButton setTitle:@"Load Sensorinformation"];
+    } else {
+        [loadSensorInformationButton setTitle:@"Reset Sensorinformation"];
+    }
+    [sensorInfo reloadData];
+    [sensorDirectInfo reloadData];
 }
 
 #pragma mark •••Table View protocol
@@ -275,14 +444,19 @@
 
 - (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
+    NSUInteger nChannel = [model numberOfChannels];
+    NSUInteger nCoil = [model numberOfCoils];
     if (aTableView == listOfRegisteredADCs) return [[model listOfADCs] count];
     if (aTableView == hardwareMap) return [[model magnetometerMap] count];
+    if (aTableView == activeChannelMap) return [[model activeChannelMap] count];
+    if (aTableView == sensorInfo) return [[model sensorInfo] count];
     if (aTableView == orientationMatrix) return [[model orientationMatrix] count];
     if (aTableView == currentValues) return [model coilChannels];
-    if (aTableView == fieldValues || aTableView == targetFieldValues) return [model numberOfChannels];
+    if (aTableView == fieldValues || aTableView == targetFieldValues) return nChannel;
+    if (aTableView == currentValues || aTableView == startCurrentValues) return nCoil;
     if (aTableView == feedbackMatrix) {
-        if ([aTableView numberOfColumns] != [model numberOfChannels]) {
-            while ([aTableView numberOfColumns] > [model numberOfChannels] &&
+        if ([aTableView numberOfColumns] != nChannel) {
+            while ([aTableView numberOfColumns] > nChannel &&
                    [aTableView numberOfColumns] > 1) {
                 
                 [aTableView removeTableColumn:[[aTableView tableColumns] objectAtIndex:[aTableView numberOfColumns]-1]];
@@ -290,7 +464,7 @@
             NSTableColumn* firstColumn = [[aTableView tableColumns] objectAtIndex:0];
             [firstColumn setIdentifier:@"0"];
             [[[firstColumn dataCell] formatter] setMaximumFractionDigits:3];
-            while ([aTableView numberOfColumns] < [model numberOfChannels]) {
+            while ([aTableView numberOfColumns] < nChannel) {
                 NSTableColumn* newColumn = [[NSTableColumn alloc]
                                             initWithIdentifier:[NSString stringWithFormat:@"%d",[aTableView numberOfColumns]]];
                 [newColumn setWidth:[firstColumn width]];
@@ -300,8 +474,52 @@
                 [newColumn release]; //fix memory leak. MAH 11/29/13
             }
         }
-        return [model numberOfCoils];
+        return nCoil;
     }
+    if (aTableView == sensitivityMatrix) {
+        if ([aTableView numberOfColumns] != nCoil) {
+            while ([aTableView numberOfColumns] > nCoil &&
+                   [aTableView numberOfColumns] > 1) {
+                
+                [aTableView removeTableColumn:[[aTableView tableColumns] objectAtIndex:[aTableView numberOfColumns]-1]];
+            }
+            NSTableColumn* firstColumn = [[aTableView tableColumns] objectAtIndex:0];
+            [firstColumn setIdentifier:@"0"];
+            [[[firstColumn dataCell] formatter] setMaximumFractionDigits:3];
+            while ([aTableView numberOfColumns] < nCoil) {
+                NSTableColumn* newColumn = [[NSTableColumn alloc]
+                                            initWithIdentifier:[NSString stringWithFormat:@"%d",[aTableView numberOfColumns]]];
+                [newColumn setWidth:[firstColumn width]];
+                [newColumn setDataCell:[firstColumn dataCell]];
+                [[newColumn headerCell] setStringValue:[newColumn identifier]];
+                [aTableView addTableColumn:newColumn];
+                [newColumn release]; //fix memory leak. MAH 11/29/13
+            }
+        }
+        return nChannel;
+    }
+//    if (aTableView == sensorInfo) {
+//        if ([aTableView numberOfColumns] != [[[model sensorInfo] objectAtIndex:0] count]) {
+//            while ([aTableView numberOfColumns] > [[[model sensorInfo] objectAtIndex:0] count] &&
+//                   [aTableView numberOfColumns] > 1) {
+//
+//                [aTableView removeTableColumn:[[aTableView tableColumns] objectAtIndex:[aTableView numberOfColumns]-1]];
+//            }
+//            NSTableColumn* firstColumn = [[aTableView tableColumns] objectAtIndex:0];
+//            [firstColumn setIdentifier:@"0"];
+//            [[[firstColumn dataCell] formatter] setMaximumFractionDigits:3];
+//            while ([aTableView numberOfColumns] < [[[model sensorInfo] objectAtIndex:0] count]) {
+//                NSTableColumn* newColumn = [[NSTableColumn alloc]
+//                                            initWithIdentifier:[NSString stringWithFormat:@"%d",[aTableView numberOfColumns]]];
+//                [newColumn setWidth:[firstColumn width]];
+//                [newColumn setDataCell:[firstColumn dataCell]];
+//                [[newColumn headerCell] setStringValue:[newColumn identifier]];
+//                [aTableView addTableColumn:newColumn];
+//                [newColumn release]; //fix memory leak. MAH 11/29/13
+//            }
+//        }
+//        return [[model sensorInfo] count];
+//    }
     return 0;
 }
 
@@ -325,7 +543,7 @@
     if (aTableView == currentValues) {
         NSString* ident = [aTableColumn identifier];
         if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
-        if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithInt:0.0];
+        if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithFloat:[model getCurrent:rowIndex]];
     }
     if (aTableView == fieldValues) {
         NSString* ident = [aTableColumn identifier];
@@ -337,6 +555,28 @@
         if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
         if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithFloat:[model targetFieldAtMagnetometer:rowIndex]];
     }
+    if (aTableView == startCurrentValues) {
+        NSString* ident = [aTableColumn identifier];
+        if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kValues"]) return [NSNumber numberWithFloat:[model startCurrentAtCoil:rowIndex]];
+    }
+    if (aTableView == sensitivityMatrix) {
+        return [NSNumber numberWithDouble:[model sensitivityMatrix:[[aTableColumn identifier] intValue] channel:rowIndex]];
+    }
+    if (aTableView == activeChannelMap) {
+        NSString* ident = [aTableColumn identifier];
+        if ([ident isEqualToString:@"kChannel"]) return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kScaling"]) return [NSNumber numberWithFloat:[model activeChannelAtChannel:rowIndex]];
+    }
+    if (aTableView == sensorInfo) {
+        NSString* ident = [aTableColumn identifier];
+        if ([ident isEqualToString:@"kChannel"])return [NSNumber numberWithInt:rowIndex];
+        if ([ident isEqualToString:@"kx (m)"]) return [NSNumber numberWithFloat:[model xPositionAtChannel:rowIndex]];
+        if ([ident isEqualToString:@"ky (m)"]) return [NSNumber numberWithFloat:[model yPositionAtChannel:rowIndex]];
+        if ([ident isEqualToString:@"kz (m)"]) return [NSNumber numberWithFloat:[model zPositionAtChannel:rowIndex]];
+        if ([ident isEqualToString:@"kField Direction"]) return [NSString stringWithString:[model fieldDirectionAtChannel:rowIndex]];
+    }
+    
     return @"";
 }
 
@@ -362,6 +602,11 @@
 - (void) targetFieldChanged:(NSNotification*)aNote
 {
     [targetFieldValues reloadData];
+}
+
+- (void) startCurrentChanged:(NSNotification*)aNote
+{
+    [startCurrentValues reloadData];
 }
 
 #pragma mark •••Accessors
@@ -447,6 +692,31 @@
     [model setPollingFrequency:[sender floatValue]];
 }
 
+- (void) proportionalTermAction:(id)sender
+{
+    [model setProportionalTerm:[sender floatValue]];
+}
+
+- (void) integralTermAction:(id)sender
+{
+    [model setIntegralTerm:[sender floatValue]];
+}
+
+- (void) feedbackThresholdAction:(id)sender
+{
+    [model setFeedbackThreshold:[sender floatValue]];
+}
+
+- (void) regularizationParameterAction:(id)sender
+{
+    [model setRegularizationParameter:[sender floatValue]];
+}
+
+- (void) runCommentAction:(id)sender
+{
+    [model setRunComment:[runCommentField stringValue]];
+}
+
 - (void) addADCAction:(id)sender
 {
     NSString* adcName = [[listOfAdcs selectedItem] title];
@@ -517,14 +787,20 @@
     
 }
 
-// import feedback matrix
-- (IBAction) readPrimaryMapFileAction:(id)sender
+- (IBAction)saveFeedbackMatrixAction:(id)sender{
+    [self _saveFile:sender
+       withSelector:@selector(saveFeedbackInPlistFile:)
+        withMessage:@"Save Current Fields As"];
+}
+
+// import sensitivity matrix
+- (IBAction) loadSensitivityMatrixAction:(id)sender
 {
-    if ([model feedbackMatData] == nil) {
+    if ([model sensitivityMatData] == nil) {
         [self _readFile:sender
-           withSelector:@selector(initializeConversionMatrixWithPlistFile:)
-            withMessage:@"Choose Feedback Matrix File"];
-    } else [model resetConversionMatrix];
+           withSelector:@selector(initializeSensitivityMatrixWithPlistFile:)
+            withMessage:@"Choose Sensitivity Matrix File"];
+    } else [model resetSensitivityMatrix];
 }
 
 // import magnetometer channel map
@@ -538,7 +814,34 @@
         
 }
 
-// import magnetometer channel map
+// import active channel map
+- (IBAction) loadAcitveChannelMapAction:(id)sender
+{
+    if ([model activeChannelMap] == nil) {
+        [self _readFile:sender
+           withSelector:@selector(initializeActiveChannelMapWithPlistFile:)
+            withMessage:@"Choose ActiveChannel Map File"];
+    } else [model resetActiveChannelMap];
+    
+}
+
+// build new Feedback Matrix
+- (IBAction) buildNewFeedbackMatrixAction:(id)sender{
+    // here would be a new thread useful
+    [model buildFeedback];
+}
+
+// import Sensor Info Map
+- (IBAction)loadSensorInformationAction:(id)sender
+{
+    if ([model sensorInfo] == nil){
+        [self _readFile:sender
+           withSelector:@selector(initializeSensorInfoWithPlistFile:)
+            withMessage:@"Choose SensorInfo File"];
+    } else [model resetSensorInfo];
+}
+
+// import magnetometer orientation map
 - (IBAction) readPrimaryOrientationMatrixFileAction:(id)sender
 {
     if ([model orientationMatrix] == nil) {
@@ -564,6 +867,12 @@
 - (IBAction) debugCommandAction:(id)sender
 {
     [model setDebugRunning:[debugModeButton state]];
+}
+
+- (IBAction) dynamicModeCommandAction:(id)sender
+{
+    [model setDynamicMode:[dynamicModeButton state]];
+
 }
 
 - (IBAction) connectAllAction:(id)sender
@@ -593,6 +902,27 @@
     [model setVerbose:[processVerbose state]];
 }
 
+- (IBAction) postDataToDBAction:(id)sender
+{
+    [model setPostDataToDB:[sender state]];
+}
+
+- (IBAction) postToPathAction:(id)sender
+{
+    NSString* dbname = [postDatabaseNameText stringValue];
+    NSString* designdoc = [postDatabaseDesignDocText stringValue];
+    NSString* updatename = [postDatabaseDesignUpdateText stringValue];
+    if ([dbname length] == 0) {
+        [model setPostToPath:nil];
+    } else
+    {
+        if ([updatename length] != 0 && [designdoc length] != 0) {
+            dbname = [dbname stringByAppendingFormat:@"/_design/%@/_update/%@",designdoc,updatename];
+        }
+        [model setPostToPath:dbname];
+    }
+}
+
 - (IBAction) refreshCurrentAndFieldValuesAction:(id)sender
 {
     [currentValues reloadData];
@@ -612,9 +942,45 @@
         withMessage:@"Save Current Fields As"];
 }
 
+- (IBAction) setTargetFieldAction:(id)sender
+{
+    [model setTargetField];
+}
+
 - (IBAction) setTargetFieldToZeroAction:(id)sender
 {
     [model setTargetFieldToZero];
+}
+
+- (IBAction) loadStartCurrentValuesAction:(id)sender
+{
+    [self _readFile:sender
+       withSelector:@selector(loadStartCurrentWithPlistFile:)
+        withMessage:@"Choose Start Current File"];
+}
+- (IBAction) saveCurrentStartCurrentAsStartCurrentAction:(id)sender
+{
+    [self _saveFile:sender
+       withSelector:@selector(saveCurrentStartCurrentInPlistFile:)
+        withMessage:@"Save Current Start Current As"];
+}
+
+- (IBAction) setStartCurrentToZeroAction:(id)sender
+{
+    [model setStartCurrentToZero];
+}
+
+
+- (IBAction) postToDBPeriodAction:(id)sender
+{
+    [model setPostDataToDBPeriod:[sender floatValue]];
+}
+
+- (IBAction)SaveFeedbackAction:(id)sender
+{
+    [self _saveFile:sender
+       withSelector:@selector(saveFeedbackInPlistFile:)
+        withMessage:@"Save new Feedback Matrix as"];
 }
 
 //---------------------------------------------------------------
