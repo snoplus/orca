@@ -1064,9 +1064,13 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     // perform the run loop
     // This ends whenever the socket changes
     @try{
-        while( socket == currentSocket &&
-              [rl runMode:NSDefaultRunLoopMode
-               beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+        while( socket == currentSocket ) {
+            @autoreleasepool {
+                if (![rl runMode:NSDefaultRunLoopMode
+                 beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]) break;
+            }
+        }
+
     } @catch (NSException* e) {
         [self _setSocket:nil];
         [self _setIsConnected:NO];
