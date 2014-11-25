@@ -173,9 +173,9 @@ NSString* ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged = @"ORCouchD
                                          nil];
         if (ok) [response setObject:[NSNumber numberWithBool:ok] forKey:@"ok"];
         [returnDic setObject:response forKey:@"response"];
-        [[self statusDBRef] updateDocument:returnDic
-                                documentId:[returnDic objectForKey:@"_id"]
-                                       tag:nil];
+        [[self statusDBRef:updatePath] addDocument:returnDic
+                                        documentId:[returnDic objectForKey:@"_id"]
+                                               tag:nil];
     }
 }
 
