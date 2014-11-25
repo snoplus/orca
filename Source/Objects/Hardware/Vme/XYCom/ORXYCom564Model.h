@@ -121,6 +121,8 @@ typedef enum {
 - (void)                    setInterpretADC: (EInterpretXy564ADC)anInt;
 - (EInterpretXy564ADC)      interpretADC;
 
+- (void) convertedValues:(double*)ptr range:(NSRange)aRange;
+
 - (int) averageValueNumber;
 - (void) setAverageValueNumber:(int)aValue;
 
@@ -133,6 +135,8 @@ typedef enum {
 - (EXyCom564ChannelGain) getGain:(unsigned short) aChannel;
 - (uint16_t) getAdcValueAtChannel:(int)chan;
 - (uint16_t) getAdcAverageValueAtChannel:(int)chan;
+- (void) getAdcValues:(uint16_t*)ptr range:(NSRange)range;
+- (void) getAdcAverageValues:(uint16_t*)ptr range:(NSRange)range;
 - (BOOL) isPolling;
 - (NSTimeInterval) pollSpeed;
 
