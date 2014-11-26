@@ -112,32 +112,32 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) startTellieRun
 {
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
+    //NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    //SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
     //add run control object
     NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
     
     
-    if(![runControl isRunning]){
+    //if(![runControl isRunning]){
         //[aSnotModel setRunType:kRunTellie];
-        if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
-            [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
-        }
-        else{
-            NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
-        }
-    }
-    else if ([runControl isRunning])
-    {
-        if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
-            [self _pushInitialTellieRunDocument];
-        }
-        else{
-            NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
-        }
-    }
+        //if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
+    [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
+        //}
+        //else{
+        //    NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
+        //}
+    //}
+    //else if ([runControl isRunning])
+    //{
+        //if([aSnotModel isRunTypeMaskedIn:@"Tellie"]){
+    [self _pushInitialTellieRunDocument];
+        //}
+        //else{
+        //    NSLog(@"Tellie Run Type is not masked in. Please add this to the runType Mask\n");
+        //}
+    //}
 }
 
 -(void) stopTellieRun
@@ -179,11 +179,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSString *responseFromTellie = [[NSString alloc] init];
     NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n 10",@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
     
+    //TODO: Only post if there is a good reason.
+    [self updateTellieDocument:fireCommands];
+    
     responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
     
-    //TODO: Only post if there is a good reason.
-    [self updateTellieDocument:fireCommands];
+
 
 }
 
@@ -247,7 +249,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSTask *task;
     task = [[NSTask alloc] init];
     [task setLaunchPath: @"/usr/bin/python"]; // Tell the task to execute the ssh command
-    [task setArguments: [NSArray arrayWithObjects: pythonScriptFilePath, [commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],nil]];
+    
+    if([commandLineArgs count] == 3){ //this is the case for smellie commands 
+        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2], nil]];
+    }
+    
+    else if ([commandLineArgs count] == 13){ //this is the case for the fire tellie commands
+        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],[commandLineArgs objectAtIndex:3],[commandLineArgs objectAtIndex:4],[commandLineArgs objectAtIndex:5],[commandLineArgs objectAtIndex:6],[commandLineArgs objectAtIndex:7],[commandLineArgs objectAtIndex:8],[commandLineArgs objectAtIndex:9],[commandLineArgs objectAtIndex:10],[commandLineArgs objectAtIndex:11],[commandLineArgs objectAtIndex:12], nil]];
+    }
+    else if ([commandLineArgs count] == 0){  //this is for the tellie poll script
+        [task setArguments:[NSArray arrayWithObjects:pythonScriptFilePath, nil]];
+    }
+    else{
+        return @"unable to call python script with correct number of arguments";
+    }
     
     NSPipe *pipe;
     pipe = [NSPipe pipe];
