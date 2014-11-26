@@ -340,7 +340,7 @@ NSDate* burstStart = NULL;
                                 }
                                 else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
                                     if(burstState == 1){
-                                        @synchronized(Bchans) //maybe not Bchans
+                                        @synchronized(self) //maybe not Bchans
                                         {
                                         [Bchans release];
                                         Bchans = [chans mutableCopy]; //part of crash line
@@ -581,7 +581,7 @@ NSDate* burstStart = NULL;
     [Nadcs release];
     [Nsecs release];
     [Nmics release];
-    @synchronized(Bchans)
+    @synchronized(self)
     {
     [Bchans release];
     [Bcards release];
@@ -840,7 +840,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //this is the header of the data file
     NSMutableArray* anArrayOfData = [NSMutableArray array];
     //Make the data record from the burst array
-    @synchronized(Bchans)
+    @synchronized(self)
     {
     int BurstSize = Bchans.count;
     NSLog(@"Size of burst file: %i \n", (BurstSize - 1) );
