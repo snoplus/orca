@@ -896,13 +896,13 @@ smellieRunFile;
     //Method for completing this without a new thread 
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
-    if([model isRunTypeMaskedIn:@"Smellie"]){
-        smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
-        [smellieThread start];
-    }
-    else{
-        NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
-    }
+    //if([model isRunTypeMaskedIn:@"Smellie"]){
+    smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
+    [smellieThread start];
+    //}
+    //else{
+    //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
+    //}
     
     //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
     
