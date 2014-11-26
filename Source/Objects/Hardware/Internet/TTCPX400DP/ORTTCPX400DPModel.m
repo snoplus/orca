@@ -1065,10 +1065,13 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     // This ends whenever the socket changes
     @try{
         while( socket == currentSocket ) {
-            @autoreleasepool {
-                if (![rl runMode:NSDefaultRunLoopMode
-                 beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]) break;
+            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+            if (![rl runMode:NSDefaultRunLoopMode
+             beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]) {
+               [pool drain];
+               break;
             }
+            [pool drain];
         }
 
     } @catch (NSException* e) {
