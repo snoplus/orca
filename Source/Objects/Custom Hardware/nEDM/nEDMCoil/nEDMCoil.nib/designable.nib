@@ -75,6 +75,7 @@
 							<string key="NSFrame">{{35, 10}, {672, 594}}</string>
 							<reference key="NSSuperview" ref="620053127"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="559404880"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="366956884">
 									<string key="NSIdentifier">1</string>
@@ -316,6 +317,7 @@
 												<string key="NSFrame">{{14, 14}, {116, 13}}</string>
 												<reference key="NSSuperview" ref="559404880"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="853270752">
 													<int key="NSCellFlags">67108864</int>
@@ -338,6 +340,7 @@
 												<string key="NSFrame">{{15, 86}, {610, 347}}</string>
 												<reference key="NSSuperview" ref="559404880"/>
 												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="771978856"/>
 												<array class="NSMutableArray" key="NSTabViewItems">
 													<object class="NSTabViewItem" id="545014683">
 														<string key="NSIdentifier">1</string>
@@ -848,7 +851,7 @@
 																										<bool key="NS.raise.dividebyzero">YES</bool>
 																									</object>
 																									<string key="NS.decimal">.</string>
-																									<string key="NS.thousand"/>
+																									<string key="NS.thousand">,</string>
 																									<bool key="NS.hasthousands">YES</bool>
 																									<bool key="NS.localized">YES</bool>
 																									<bool key="NS.allowsfloats">YES</bool>
@@ -908,7 +911,6 @@
 																			<int key="NSvFlags">-2147483392</int>
 																			<string key="NSFrame">{{1, 393}, {197, 11}}</string>
 																			<reference key="NSSuperview" ref="751470682"/>
-																			<reference key="NSNextKeyView" ref="141484155"/>
 																			<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																			<string key="NSControlAction">_doScroller:</string>
 																			<reference key="NSControlTarget" ref="751470682"/>
@@ -1009,7 +1011,7 @@
 																					<string key="NSFrameSize">{125, 260}</string>
 																					<reference key="NSSuperview" ref="122622224"/>
 																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="1014815428"/>
+																					<reference key="NSNextKeyView" ref="977744665"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1023,9 +1025,11 @@
 																						<reference key="NSTableView" ref="252315542"/>
 																					</object>
 																					<object class="_NSCornerView" key="NSCornerView" id="1014815428">
-																						<nil key="NSNextResponder"/>
+																						<reference key="NSNextResponder" ref="752035657"/>
 																						<int key="NSvFlags">-2147483392</int>
 																						<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
+																						<reference key="NSSuperview" ref="752035657"/>
+																						<reference key="NSWindow"/>
 																						<reference key="NSNextKeyView" ref="176023455"/>
 																					</object>
 																					<array class="NSMutableArray" key="NSTableColumns">
@@ -1101,7 +1105,7 @@
 																										<bool key="NS.raise.dividebyzero">YES</bool>
 																									</object>
 																									<string key="NS.decimal">.</string>
-																									<string key="NS.thousand"/>
+																									<string key="NS.thousand">,</string>
 																									<bool key="NS.hasthousands">YES</bool>
 																									<bool key="NS.localized">YES</bool>
 																									<bool key="NS.allowsfloats">YES</bool>
@@ -1145,6 +1149,19 @@
 																			<int key="NScvFlags">4</int>
 																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 																		</object>
+																		<object class="NSClipView" id="176023455">
+																			<reference key="NSNextResponder" ref="752035657"/>
+																			<int key="NSvFlags">2338</int>
+																			<array class="NSMutableArray" key="NSSubviews">
+																				<reference ref="238117397"/>
+																			</array>
+																			<string key="NSFrame">{{1, 0}, {125, 17}}</string>
+																			<reference key="NSSuperview" ref="752035657"/>
+																			<reference key="NSWindow"/>
+																			<reference key="NSNextKeyView" ref="238117397"/>
+																			<reference key="NSDocView" ref="238117397"/>
+																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
+																		</object>
 																		<object class="NSScroller" id="881439262">
 																			<reference key="NSNextResponder" ref="752035657"/>
 																			<int key="NSvFlags">-2147483392</int>
@@ -1175,29 +1192,18 @@
 																			<string key="NSAction">_doScroller:</string>
 																			<double key="NSPercent">0.99199999999999999</double>
 																		</object>
-																		<object class="NSClipView" id="176023455">
-																			<reference key="NSNextResponder" ref="752035657"/>
-																			<int key="NSvFlags">2338</int>
-																			<array class="NSMutableArray" key="NSSubviews">
-																				<reference ref="238117397"/>
-																			</array>
-																			<string key="NSFrame">{{1, 0}, {125, 17}}</string>
-																			<reference key="NSSuperview" ref="752035657"/>
-																			<reference key="NSWindow"/>
-																			<reference key="NSNextKeyView" ref="238117397"/>
-																			<reference key="NSDocView" ref="238117397"/>
-																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
-																		</object>
+																		<reference ref="1014815428"/>
 																	</array>
 																	<string key="NSFrame">{{17, 6}, {127, 278}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="122622224"/>
+																	<reference key="NSNextKeyView" ref="1014815428"/>
 																	<int key="NSsFlags">133682</int>
 																	<reference key="NSVScroller" ref="881439262"/>
 																	<reference key="NSHScroller" ref="977744665"/>
 																	<reference key="NSContentView" ref="122622224"/>
 																	<reference key="NSHeaderClipView" ref="176023455"/>
+																	<reference key="NSCornerView" ref="1014815428"/>
 																	<bytes key="NSScrollAmts">QSAAAEEgAABBcAAAQXAAAA</bytes>
 																	<double key="NSMinMagnification">0.25</double>
 																	<double key="NSMaxMagnification">4</double>
@@ -1217,7 +1223,7 @@
 																					<string key="NSFrameSize">{125, 260}</string>
 																					<reference key="NSSuperview" ref="195437047"/>
 																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="30513626"/>
+																					<reference key="NSNextKeyView" ref="993693807"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1231,9 +1237,11 @@
 																						<reference key="NSTableView" ref="388467565"/>
 																					</object>
 																					<object class="_NSCornerView" key="NSCornerView" id="30513626">
-																						<nil key="NSNextResponder"/>
+																						<reference key="NSNextResponder" ref="39608229"/>
 																						<int key="NSvFlags">-2147483392</int>
 																						<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
+																						<reference key="NSSuperview" ref="39608229"/>
+																						<reference key="NSWindow"/>
 																						<reference key="NSNextKeyView" ref="494490028"/>
 																					</object>
 																					<array class="NSMutableArray" key="NSTableColumns">
@@ -1309,7 +1317,7 @@
 																										<bool key="NS.raise.dividebyzero">YES</bool>
 																									</object>
 																									<string key="NS.decimal">.</string>
-																									<string key="NS.thousand"/>
+																									<string key="NS.thousand">,</string>
 																									<bool key="NS.hasthousands">YES</bool>
 																									<bool key="NS.localized">YES</bool>
 																									<bool key="NS.allowsfloats">YES</bool>
@@ -1353,6 +1361,19 @@
 																			<int key="NScvFlags">4</int>
 																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 																		</object>
+																		<object class="NSClipView" id="494490028">
+																			<reference key="NSNextResponder" ref="39608229"/>
+																			<int key="NSvFlags">2338</int>
+																			<array class="NSMutableArray" key="NSSubviews">
+																				<reference ref="935670119"/>
+																			</array>
+																			<string key="NSFrame">{{1, 0}, {125, 17}}</string>
+																			<reference key="NSSuperview" ref="39608229"/>
+																			<reference key="NSWindow"/>
+																			<reference key="NSNextKeyView" ref="935670119"/>
+																			<reference key="NSDocView" ref="935670119"/>
+																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
+																		</object>
 																		<object class="NSScroller" id="571971853">
 																			<reference key="NSNextResponder" ref="39608229"/>
 																			<int key="NSvFlags">-2147483392</int>
@@ -1383,29 +1404,18 @@
 																			<string key="NSAction">_doScroller:</string>
 																			<double key="NSPercent">0.99199999999999999</double>
 																		</object>
-																		<object class="NSClipView" id="494490028">
-																			<reference key="NSNextResponder" ref="39608229"/>
-																			<int key="NSvFlags">2338</int>
-																			<array class="NSMutableArray" key="NSSubviews">
-																				<reference ref="935670119"/>
-																			</array>
-																			<string key="NSFrame">{{1, 0}, {125, 17}}</string>
-																			<reference key="NSSuperview" ref="39608229"/>
-																			<reference key="NSWindow"/>
-																			<reference key="NSNextKeyView" ref="935670119"/>
-																			<reference key="NSDocView" ref="935670119"/>
-																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
-																		</object>
+																		<reference ref="30513626"/>
 																	</array>
 																	<string key="NSFrame">{{152, 6}, {127, 278}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="195437047"/>
+																	<reference key="NSNextKeyView" ref="30513626"/>
 																	<int key="NSsFlags">133682</int>
 																	<reference key="NSVScroller" ref="571971853"/>
 																	<reference key="NSHScroller" ref="993693807"/>
 																	<reference key="NSContentView" ref="195437047"/>
 																	<reference key="NSHeaderClipView" ref="494490028"/>
+																	<reference key="NSCornerView" ref="30513626"/>
 																	<bytes key="NSScrollAmts">QSAAAEEgAABBcAAAQXAAAA</bytes>
 																	<double key="NSMinMagnification">0.25</double>
 																	<double key="NSMaxMagnification">4</double>
@@ -1467,7 +1477,7 @@
 																					<string key="NSFrameSize">{125, 260}</string>
 																					<reference key="NSSuperview" ref="783569341"/>
 																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="490086137"/>
+																					<reference key="NSNextKeyView" ref="1003704055"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1481,9 +1491,11 @@
 																						<reference key="NSTableView" ref="283765261"/>
 																					</object>
 																					<object class="_NSCornerView" key="NSCornerView" id="490086137">
-																						<nil key="NSNextResponder"/>
+																						<reference key="NSNextResponder" ref="827281583"/>
 																						<int key="NSvFlags">-2147483392</int>
 																						<string key="NSFrame">{{-22, 0}, {12, 17}}</string>
+																						<reference key="NSSuperview" ref="827281583"/>
+																						<reference key="NSWindow"/>
 																						<reference key="NSNextKeyView" ref="839380002"/>
 																					</object>
 																					<array class="NSMutableArray" key="NSTableColumns">
@@ -1559,7 +1571,7 @@
 																										<bool key="NS.raise.dividebyzero">YES</bool>
 																									</object>
 																									<string key="NS.decimal">.</string>
-																									<string key="NS.thousand"/>
+																									<string key="NS.thousand">,</string>
 																									<bool key="NS.hasthousands">YES</bool>
 																									<bool key="NS.localized">YES</bool>
 																									<bool key="NS.allowsfloats">YES</bool>
@@ -1603,6 +1615,19 @@
 																			<int key="NScvFlags">4</int>
 																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 																		</object>
+																		<object class="NSClipView" id="839380002">
+																			<reference key="NSNextResponder" ref="827281583"/>
+																			<int key="NSvFlags">2338</int>
+																			<array class="NSMutableArray" key="NSSubviews">
+																				<reference ref="139403861"/>
+																			</array>
+																			<string key="NSFrame">{{1, 0}, {125, 17}}</string>
+																			<reference key="NSSuperview" ref="827281583"/>
+																			<reference key="NSWindow"/>
+																			<reference key="NSNextKeyView" ref="139403861"/>
+																			<reference key="NSDocView" ref="139403861"/>
+																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
+																		</object>
 																		<object class="NSScroller" id="537615035">
 																			<reference key="NSNextResponder" ref="827281583"/>
 																			<int key="NSvFlags">-2147483392</int>
@@ -1633,29 +1658,18 @@
 																			<string key="NSAction">_doScroller:</string>
 																			<double key="NSPercent">0.99199999999999999</double>
 																		</object>
-																		<object class="NSClipView" id="839380002">
-																			<reference key="NSNextResponder" ref="827281583"/>
-																			<int key="NSvFlags">2338</int>
-																			<array class="NSMutableArray" key="NSSubviews">
-																				<reference ref="139403861"/>
-																			</array>
-																			<string key="NSFrame">{{1, 0}, {125, 17}}</string>
-																			<reference key="NSSuperview" ref="827281583"/>
-																			<reference key="NSWindow"/>
-																			<reference key="NSNextKeyView" ref="139403861"/>
-																			<reference key="NSDocView" ref="139403861"/>
-																			<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
-																		</object>
+																		<reference ref="490086137"/>
 																	</array>
 																	<string key="NSFrame">{{287, 6}, {127, 278}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="783569341"/>
+																	<reference key="NSNextKeyView" ref="490086137"/>
 																	<int key="NSsFlags">133682</int>
 																	<reference key="NSVScroller" ref="537615035"/>
 																	<reference key="NSHScroller" ref="1003704055"/>
 																	<reference key="NSContentView" ref="783569341"/>
 																	<reference key="NSHeaderClipView" ref="839380002"/>
+																	<reference key="NSCornerView" ref="490086137"/>
 																	<bytes key="NSScrollAmts">QSAAAEEgAABBcAAAQXAAAA</bytes>
 																	<double key="NSMinMagnification">0.25</double>
 																	<double key="NSMaxMagnification">4</double>
@@ -1685,7 +1699,7 @@
 																<object class="NSButton" id="510429859">
 																	<reference key="NSNextResponder" ref="771978856"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{442, 10}, {123, 28}}</string>
+																	<string key="NSFrame">{{436, 10}, {129, 28}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="141484155"/>
@@ -1708,7 +1722,7 @@
 																<object class="NSButton" id="168377971">
 																	<reference key="NSNextResponder" ref="771978856"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{442, 37}, {123, 28}}</string>
+																	<string key="NSFrame">{{436, 37}, {129, 28}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="510429859"/>
@@ -1731,7 +1745,7 @@
 																<object class="NSButton" id="584002636">
 																	<reference key="NSNextResponder" ref="771978856"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{442, 64}, {123, 28}}</string>
+																	<string key="NSFrame">{{436, 64}, {129, 28}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="168377971"/>
@@ -1754,7 +1768,7 @@
 																<object class="NSButton" id="461381412">
 																	<reference key="NSNextResponder" ref="771978856"/>
 																	<int key="NSvFlags">268</int>
-																	<string key="NSFrame">{{442, 91}, {123, 28}}</string>
+																	<string key="NSFrame">{{436, 91}, {129, 28}}</string>
 																	<reference key="NSSuperview" ref="771978856"/>
 																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="584002636"/>
@@ -1790,6 +1804,7 @@
 												<int key="NSTvFlags">268435456</int>
 												<bool key="NSAllowTruncatedLabels">YES</bool>
 												<bool key="NSDrawsBackground">YES</bool>
+												<reference key="NSDelegate"/>
 												<array class="NSMutableArray" key="NSSubviews">
 													<reference ref="771978856"/>
 												</array>
@@ -2238,7 +2253,7 @@
 															<bool key="NS.raise.dividebyzero">YES</bool>
 														</object>
 														<string key="NS.decimal">.</string>
-														<string key="NS.thousand"/>
+														<string key="NS.thousand">,</string>
 														<bool key="NS.hasthousands">YES</bool>
 														<bool key="NS.localized">YES</bool>
 														<bool key="NS.allowsfloats">YES</bool>
@@ -4546,6 +4561,14 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
+					<string key="className">ORCardContainerView</string>
+					<string key="superclassName">ORGroupView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/Misc Objects/Views/CardContainerView/ORCardContainerView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">ORGroupView</string>
 					<string key="superclassName">NSView</string>
 					<dictionary class="NSMutableDictionary" key="actions">
@@ -4638,30 +4661,155 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
+					<string key="className">ORGroupView</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="alignBottom:">id</string>
+						<string key="alignHorizontalCenters:">id</string>
+						<string key="alignLeft:">id</string>
+						<string key="alignRight:">id</string>
+						<string key="alignTop:">id</string>
+						<string key="alignVerticalCenters:">id</string>
+						<string key="arrangeInCircle:">id</string>
+						<string key="bringToFront:">id</string>
+						<string key="clearBackgroundImage:">id</string>
+						<string key="copy:">id</string>
+						<string key="cut:">id</string>
+						<string key="delete:">id</string>
+						<string key="getInfo:">id</string>
+						<string key="paste:">id</string>
+						<string key="selectAll:">id</string>
+						<string key="selectBackgroundImage:">id</string>
+						<string key="sendToBack:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="alignBottom:">
+							<string key="name">alignBottom:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignHorizontalCenters:">
+							<string key="name">alignHorizontalCenters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignLeft:">
+							<string key="name">alignLeft:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignRight:">
+							<string key="name">alignRight:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignTop:">
+							<string key="name">alignTop:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="alignVerticalCenters:">
+							<string key="name">alignVerticalCenters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="arrangeInCircle:">
+							<string key="name">arrangeInCircle:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="bringToFront:">
+							<string key="name">bringToFront:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clearBackgroundImage:">
+							<string key="name">clearBackgroundImage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="cut:">
+							<string key="name">cut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="delete:">
+							<string key="name">delete:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="getInfo:">
+							<string key="name">getInfo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="paste:">
+							<string key="name">paste:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectAll:">
+							<string key="name">selectAll:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectBackgroundImage:">
+							<string key="name">selectBackgroundImage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="sendToBack:">
+							<string key="name">sendToBack:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/Groups/ORGroupView.m</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ORTimedTextField</string>
+					<string key="superclassName">NSTextField</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/Misc Objects/Views/TimedTextField/ORTimedTextField.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
 					<string key="className">ORnEDMCoilController</string>
 					<string key="superclassName">OrcaObjectController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="addADCAction:">id</string>
+						<string key="buildNewFeedbackMatrixAction:">id</string>
 						<string key="connectAllAction:">id</string>
 						<string key="debugCommandAction:">id</string>
+						<string key="dynamicModeCommandAction:">id</string>
+						<string key="feedbackThresholdAction:">id</string>
 						<string key="handleToBeAddedADC:">id</string>
+						<string key="integralTermAction:">id</string>
+						<string key="loadAcitveChannelMapAction:">id</string>
+						<string key="loadSensitivityMatrixAction:">id</string>
+						<string key="loadSensorInformationAction:">id</string>
+						<string key="loadStartCurrentValuesAction:">id</string>
 						<string key="loadTargetFieldValuesAction:">id</string>
+						<string key="postDataToDBAction:">id</string>
+						<string key="postToDBPeriodAction:">id</string>
+						<string key="postToPathAction:">id</string>
 						<string key="processVerboseAction:">id</string>
+						<string key="proportionalTermAction:">id</string>
 						<string key="readPrimaryMagnetometerMapFileAction:">id</string>
-						<string key="readPrimaryMapFileAction:">id</string>
 						<string key="readPrimaryOrientationMatrixFileAction:">id</string>
 						<string key="refreshCurrentAndFieldValuesAction:">id</string>
 						<string key="refreshIPsAction:">id</string>
+						<string key="regularizationParameterAction:">id</string>
 						<string key="removeSelectedADCs:">id</string>
 						<string key="runAction:">id</string>
+						<string key="runCommentAction:">id</string>
 						<string key="runRateAction:">id</string>
 						<string key="saveCurrentFieldAsTargetFieldAction:">id</string>
+						<string key="saveCurrentStartCurrentAsStartCurrentAction:">id</string>
+						<string key="saveFeedbackMatrixAction:">id</string>
 						<string key="sendCommandAction:">id</string>
+						<string key="setStartCurrentToZeroAction:">id</string>
+						<string key="setTargetFieldAction:">id</string>
 						<string key="setTargetFieldToZeroAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="addADCAction:">
 							<string key="name">addADCAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="buildNewFeedbackMatrixAction:">
+							<string key="name">buildNewFeedbackMatrixAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="connectAllAction:">
@@ -4672,24 +4820,64 @@
 							<string key="name">debugCommandAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="dynamicModeCommandAction:">
+							<string key="name">dynamicModeCommandAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="feedbackThresholdAction:">
+							<string key="name">feedbackThresholdAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="handleToBeAddedADC:">
 							<string key="name">handleToBeAddedADC:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="integralTermAction:">
+							<string key="name">integralTermAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadAcitveChannelMapAction:">
+							<string key="name">loadAcitveChannelMapAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadSensitivityMatrixAction:">
+							<string key="name">loadSensitivityMatrixAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadSensorInformationAction:">
+							<string key="name">loadSensorInformationAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadStartCurrentValuesAction:">
+							<string key="name">loadStartCurrentValuesAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="loadTargetFieldValuesAction:">
 							<string key="name">loadTargetFieldValuesAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="postDataToDBAction:">
+							<string key="name">postDataToDBAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="postToDBPeriodAction:">
+							<string key="name">postToDBPeriodAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="postToPathAction:">
+							<string key="name">postToPathAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="processVerboseAction:">
 							<string key="name">processVerboseAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="readPrimaryMagnetometerMapFileAction:">
-							<string key="name">readPrimaryMagnetometerMapFileAction:</string>
+						<object class="IBActionInfo" key="proportionalTermAction:">
+							<string key="name">proportionalTermAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="readPrimaryMapFileAction:">
-							<string key="name">readPrimaryMapFileAction:</string>
+						<object class="IBActionInfo" key="readPrimaryMagnetometerMapFileAction:">
+							<string key="name">readPrimaryMagnetometerMapFileAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="readPrimaryOrientationMatrixFileAction:">
@@ -4704,12 +4892,20 @@
 							<string key="name">refreshIPsAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="regularizationParameterAction:">
+							<string key="name">regularizationParameterAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="removeSelectedADCs:">
 							<string key="name">removeSelectedADCs:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="runAction:">
 							<string key="name">runAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runCommentAction:">
+							<string key="name">runCommentAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="runRateAction:">
@@ -4720,8 +4916,24 @@
 							<string key="name">saveCurrentFieldAsTargetFieldAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="saveCurrentStartCurrentAsStartCurrentAction:">
+							<string key="name">saveCurrentStartCurrentAsStartCurrentAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveFeedbackMatrixAction:">
+							<string key="name">saveFeedbackMatrixAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="sendCommandAction:">
 							<string key="name">sendCommandAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setStartCurrentToZeroAction:">
+							<string key="name">setStartCurrentToZeroAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setTargetFieldAction:">
+							<string key="name">setTargetFieldAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="setTargetFieldToZeroAction:">
@@ -4730,41 +4942,71 @@
 						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="activeChannelMap">NSTableView</string>
+						<string key="activeChannelMapButton">NSButton</string>
 						<string key="addADCButton">NSButton</string>
+						<string key="buildNewFeedbackMatrixButton">NSButton</string>
 						<string key="coilText">NSTextField</string>
 						<string key="commandPopUp">NSPopUpButton</string>
 						<string key="currentValues">NSTableView</string>
 						<string key="debugModeButton">NSButton</string>
 						<string key="deleteADCButton">NSButton</string>
-						<string key="feedBackMapButton">NSButton</string>
+						<string key="dynamicModeButton">NSButton</string>
 						<string key="feedBackNotifier">NSTextField</string>
 						<string key="feedbackMatrix">NSTableView</string>
+						<string key="feedbackThresholdField">NSTextField</string>
 						<string key="fieldValues">NSTableView</string>
 						<string key="groupView">ORGroupView</string>
 						<string key="hardwareMap">NSTableView</string>
 						<string key="inputValueText">NSTextField</string>
+						<string key="integralTermField">NSTextField</string>
 						<string key="listOfAdcs">NSPopUpButton</string>
 						<string key="listOfRegisteredADCs">NSTableView</string>
+						<string key="loadSensorInformationButton">NSButton</string>
 						<string key="lockDocField">NSTextField</string>
 						<string key="magnetometerMapButton">NSButton</string>
 						<string key="orientationMatrix">NSTableView</string>
 						<string key="orientationMatrixButton">NSButton</string>
 						<string key="outputNumberPopUp">NSPopUpButton</string>
 						<string key="postDataToDBButton">NSButton</string>
-						<string key="postToDBText">NSTextField</string>
+						<string key="postDatabaseDesignDocText">NSTextField</string>
+						<string key="postDatabaseDesignUpdateText">NSTextField</string>
+						<string key="postDatabaseNameText">NSTextField</string>
+						<string key="postDatabasePeriodText">NSTextField</string>
 						<string key="processIndicate">NSProgressIndicator</string>
 						<string key="processVerbose">NSButton</string>
+						<string key="proportionalTermField">NSTextField</string>
 						<string key="realProcessFrequencyField">NSTextField</string>
 						<string key="refreshIPIndicate">NSProgressIndicator</string>
 						<string key="refreshIPsButton">NSButton</string>
+						<string key="regularizationParameterField">NSTextField</string>
+						<string key="runCommentField">NSTextField</string>
 						<string key="runRateField">NSTextField</string>
+						<string key="saveFeedBackMapButton">NSButton</string>
+						<string key="sensitivityMapButton">NSButton</string>
+						<string key="sensitivityMatrix">NSTableView</string>
+						<string key="sensorDirectInfo">NSTableView</string>
+						<string key="sensorInfo">NSTableView</string>
+						<string key="startCurrentValues">NSTableView</string>
 						<string key="startStopButton">NSButton</string>
 						<string key="tabView">NSTabView</string>
 						<string key="targetFieldValues">NSTableView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="activeChannelMap">
+							<string key="name">activeChannelMap</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="activeChannelMapButton">
+							<string key="name">activeChannelMapButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="addADCButton">
 							<string key="name">addADCButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="buildNewFeedbackMatrixButton">
+							<string key="name">buildNewFeedbackMatrixButton</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="coilText">
@@ -4787,8 +5029,8 @@
 							<string key="name">deleteADCButton</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="feedBackMapButton">
-							<string key="name">feedBackMapButton</string>
+						<object class="IBToOneOutletInfo" key="dynamicModeButton">
+							<string key="name">dynamicModeButton</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="feedBackNotifier">
@@ -4798,6 +5040,10 @@
 						<object class="IBToOneOutletInfo" key="feedbackMatrix">
 							<string key="name">feedbackMatrix</string>
 							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="feedbackThresholdField">
+							<string key="name">feedbackThresholdField</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="fieldValues">
 							<string key="name">fieldValues</string>
@@ -4815,6 +5061,10 @@
 							<string key="name">inputValueText</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="integralTermField">
+							<string key="name">integralTermField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="listOfAdcs">
 							<string key="name">listOfAdcs</string>
 							<string key="candidateClassName">NSPopUpButton</string>
@@ -4822,6 +5072,10 @@
 						<object class="IBToOneOutletInfo" key="listOfRegisteredADCs">
 							<string key="name">listOfRegisteredADCs</string>
 							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="loadSensorInformationButton">
+							<string key="name">loadSensorInformationButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="lockDocField">
 							<string key="name">lockDocField</string>
@@ -4847,8 +5101,20 @@
 							<string key="name">postDataToDBButton</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="postToDBText">
-							<string key="name">postToDBText</string>
+						<object class="IBToOneOutletInfo" key="postDatabaseDesignDocText">
+							<string key="name">postDatabaseDesignDocText</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="postDatabaseDesignUpdateText">
+							<string key="name">postDatabaseDesignUpdateText</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="postDatabaseNameText">
+							<string key="name">postDatabaseNameText</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="postDatabasePeriodText">
+							<string key="name">postDatabasePeriodText</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="processIndicate">
@@ -4858,6 +5124,10 @@
 						<object class="IBToOneOutletInfo" key="processVerbose">
 							<string key="name">processVerbose</string>
 							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="proportionalTermField">
+							<string key="name">proportionalTermField</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="realProcessFrequencyField">
 							<string key="name">realProcessFrequencyField</string>
@@ -4871,9 +5141,41 @@
 							<string key="name">refreshIPsButton</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="regularizationParameterField">
+							<string key="name">regularizationParameterField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="runCommentField">
+							<string key="name">runCommentField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="runRateField">
 							<string key="name">runRateField</string>
 							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="saveFeedBackMapButton">
+							<string key="name">saveFeedBackMapButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sensitivityMapButton">
+							<string key="name">sensitivityMapButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sensitivityMatrix">
+							<string key="name">sensitivityMatrix</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sensorDirectInfo">
+							<string key="name">sensorDirectInfo</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="sensorInfo">
+							<string key="name">sensorInfo</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="startCurrentValues">
+							<string key="name">startCurrentValues</string>
+							<string key="candidateClassName">NSTableView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="startStopButton">
 							<string key="name">startStopButton</string>
@@ -4896,22 +5198,43 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ORnEDMCoilController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="SaveFeedbackAction:">id</string>
+						<string key="buildNewFeedbackMatrixAction:">id</string>
 						<string key="connectAllAction:">id</string>
 						<string key="debugCommandAction:">id</string>
+						<string key="dynamicModeCommandAction:">id</string>
 						<string key="handleToBeAddedADC:">id</string>
+						<string key="loadAcitveChannelMapAction:">id</string>
+						<string key="loadSensitivityMatrixAction:">id</string>
+						<string key="loadSensorInformationAction:">id</string>
+						<string key="loadStartCurrentValuesAction:">id</string>
 						<string key="loadTargetFieldValuesAction:">id</string>
+						<string key="postDataToDBAction:">id</string>
+						<string key="postToDBPeriodAction:">id</string>
+						<string key="postToPathAction:">id</string>
 						<string key="processVerboseAction:">id</string>
 						<string key="readPrimaryMagnetometerMapFileAction:">id</string>
-						<string key="readPrimaryMapFileAction:">id</string>
 						<string key="readPrimaryOrientationMatrixFileAction:">id</string>
 						<string key="refreshCurrentAndFieldValuesAction:">id</string>
 						<string key="refreshIPsAction:">id</string>
 						<string key="removeSelectedADCs:">id</string>
 						<string key="saveCurrentFieldAsTargetFieldAction:">id</string>
+						<string key="saveCurrentStartCurrentAsStartCurrentAction:">id</string>
+						<string key="saveFeedbackMatrixAction:">id</string>
 						<string key="sendCommandAction:">id</string>
+						<string key="setStartCurrentToZeroAction:">id</string>
+						<string key="setTargetFieldAction:">id</string>
 						<string key="setTargetFieldToZeroAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="SaveFeedbackAction:">
+							<string key="name">SaveFeedbackAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="buildNewFeedbackMatrixAction:">
+							<string key="name">buildNewFeedbackMatrixAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="connectAllAction:">
 							<string key="name">connectAllAction:</string>
 							<string key="candidateClassName">id</string>
@@ -4920,12 +5243,44 @@
 							<string key="name">debugCommandAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="dynamicModeCommandAction:">
+							<string key="name">dynamicModeCommandAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="handleToBeAddedADC:">
 							<string key="name">handleToBeAddedADC:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="loadAcitveChannelMapAction:">
+							<string key="name">loadAcitveChannelMapAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadSensitivityMatrixAction:">
+							<string key="name">loadSensitivityMatrixAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadSensorInformationAction:">
+							<string key="name">loadSensorInformationAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="loadStartCurrentValuesAction:">
+							<string key="name">loadStartCurrentValuesAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="loadTargetFieldValuesAction:">
 							<string key="name">loadTargetFieldValuesAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="postDataToDBAction:">
+							<string key="name">postDataToDBAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="postToDBPeriodAction:">
+							<string key="name">postToDBPeriodAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="postToPathAction:">
+							<string key="name">postToPathAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="processVerboseAction:">
@@ -4934,10 +5289,6 @@
 						</object>
 						<object class="IBActionInfo" key="readPrimaryMagnetometerMapFileAction:">
 							<string key="name">readPrimaryMagnetometerMapFileAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="readPrimaryMapFileAction:">
-							<string key="name">readPrimaryMapFileAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="readPrimaryOrientationMatrixFileAction:">
@@ -4960,8 +5311,24 @@
 							<string key="name">saveCurrentFieldAsTargetFieldAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="saveCurrentStartCurrentAsStartCurrentAction:">
+							<string key="name">saveCurrentStartCurrentAsStartCurrentAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveFeedbackMatrixAction:">
+							<string key="name">saveFeedbackMatrixAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="sendCommandAction:">
 							<string key="name">sendCommandAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setStartCurrentToZeroAction:">
+							<string key="name">setStartCurrentToZeroAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setTargetFieldAction:">
+							<string key="name">setTargetFieldAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="setTargetFieldToZeroAction:">
@@ -4972,6 +5339,100 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">../Source/Objects/Custom Hardware/nEDM/nEDMCoil/ORnEDMCoilController.m</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">OrcaObjectController</string>
+					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="copy:">id</string>
+						<string key="decDialog:">id</string>
+						<string key="incDialog:">id</string>
+						<string key="printDocument:">id</string>
+						<string key="saveDocument:">id</string>
+						<string key="saveDocumentAs:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="decDialog:">
+							<string key="name">decDialog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="incDialog:">
+							<string key="name">incDialog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="printDocument:">
+							<string key="name">printDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveDocument:">
+							<string key="name">saveDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveDocumentAs:">
+							<string key="name">saveDocumentAs:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">warningField</string>
+						<string key="NS.object.0">ORTimedTextField</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">warningField</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">warningField</string>
+							<string key="candidateClassName">ORTimedTextField</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/OrcaObject/OrcaObjectController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">OrcaObjectController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="copy:">id</string>
+						<string key="decDialog:">id</string>
+						<string key="incDialog:">id</string>
+						<string key="printDocument:">id</string>
+						<string key="saveDocument:">id</string>
+						<string key="saveDocumentAs:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="decDialog:">
+							<string key="name">decDialog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="incDialog:">
+							<string key="name">incDialog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="printDocument:">
+							<string key="name">printDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveDocument:">
+							<string key="name">saveDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveDocumentAs:">
+							<string key="name">saveDocumentAs:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/OrcaObject/OrcaObjectController.m</string>
 					</object>
 				</object>
 			</array>
