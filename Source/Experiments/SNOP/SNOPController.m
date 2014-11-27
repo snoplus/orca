@@ -910,6 +910,11 @@ smellieRunFile;
     
 }
 
+-(IBAction)eStop:(id)sender
+{
+    [model eStopPoll];
+}
+
 - (IBAction) stopSmellieRunAction:(id)sender
 {
     [smellieLoadRunFile setEnabled:YES];

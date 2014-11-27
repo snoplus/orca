@@ -111,6 +111,7 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;
 
+- (IBAction) eStop:(id)sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;

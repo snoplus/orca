@@ -168,6 +168,8 @@
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 
+-(void) eStopPoll;
+
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
