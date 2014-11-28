@@ -1064,10 +1064,17 @@ mtcConfigDoc = _mtcConfigDoc;
         run_number = [rc runNumber];
     }
     
+    //Collect a series of objects from the ORMTCModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    
+    //Initialise the MTCModal
+    ORMTCModel* aMTCcard = [objs objectAtIndex:0];
+    
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"type"];
     //[runDocDict setObject:[self getRunType] forKey:@"run_type"];
+    [runDocDict setObject:[NSNumber numberWithUnsignedLong:[aMTCcard mtcStatusGTID]] forKey:@"start_gtid"];
     [runDocDict setObject:[NSNumber numberWithUnsignedLong:[[self runTypeMask] unsignedLongValue]] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[NSNumber numberWithDouble:[[self stringUnixFromDate:nil] doubleValue]] forKey:@"timestamp_start"];
@@ -1109,11 +1116,7 @@ mtcConfigDoc = _mtcConfigDoc;
         [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
     }
     
-    //Collect a series of objects from the ORMTCModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
-    //Initialise the MTCModal
-    ORMTCModel* aMTCcard = [objs objectAtIndex:0];
     
     NSMutableDictionary* configDocDict = [NSMutableDictionary dictionaryWithCapacity:1000];
     
