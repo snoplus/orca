@@ -979,7 +979,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 //NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 	//called
-	if(returnCode == NSAlertAlternateReturn){		
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSAlertFirstButtonReturn){
+#else
+    if(returnCode == NSAlertAlternateReturn){
+#endif
 		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
 		BOOL rememberState = [[model sbcLink] forceReload];
 		if(rememberState) [[model sbcLink] setForceReload: NO];
@@ -1044,8 +1048,12 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 //NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 	//called
-	if(returnCode == NSAlertAlternateReturn){		
-		[[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+	if(returnCode == NSAlertFirstButtonReturn){
+#else
+    if(returnCode == NSAlertAlternateReturn){
+#endif
+        [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
 		BOOL rememberState = [[model sbcLink] forceReload];
 		if(rememberState) [[model sbcLink] setForceReload: NO];
 	    [model sendLinkWithDmaLibConfigScriptOFF];  
