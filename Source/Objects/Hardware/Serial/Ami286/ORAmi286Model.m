@@ -772,9 +772,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     if(state) {
         [serialPort open];
 		[serialPort setSpeed:9600];
-		[serialPort setParityOdd];
-		[serialPort setStopBits2:1];
-		[serialPort setDataBits:7];
+		[serialPort setParityNone];
+		[serialPort setStopBits2:0];
+		[serialPort setDataBits:8];
         [serialPort commitChanges];
     }
     else      [serialPort close];

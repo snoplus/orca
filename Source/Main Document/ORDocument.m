@@ -71,6 +71,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         
         
         [ORCommandCenter sharedCommandCenter];
+       // [[ORUSB sharedUSB] searchForDevices];
+
     }
     return self;
 }
@@ -532,7 +534,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		 object:self];
 		
 		@try {
-			[[ORUSB sharedUSB] awakeAfterDocumentLoaded];
+			//[[ORUSB sharedUSB] awakeAfterDocumentLoaded];
 			[group awakeAfterDocumentLoaded];
 		}
 		@catch(NSException* localException) {

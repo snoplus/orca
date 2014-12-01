@@ -600,7 +600,7 @@
 		case MAKEEXCEPTION:	return [self makeException:p];
         case NSDATECOMPONENTS:
         {
-            NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific            NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
             return  [cal components:
                      NSCalendarUnitYear |
                      NSCalendarUnitMonth |
@@ -610,6 +610,18 @@
                      NSCalendarUnitMinute |
                      NSCalendarUnitSecond
                            fromDate:[NSDate date]];
+#else
+            NSCalendar* cal = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+            return  [cal components:
+                     NSYearCalendarUnit |
+                     NSMonthCalendarUnit |
+                     NSWeekdayCalendarUnit |
+                     NSDayCalendarUnit |
+                     NSHourCalendarUnit |
+                     NSMinuteCalendarUnit |
+                     NSSecondCalendarUnit
+                           fromDate:[NSDate date]];
+#endif
         }
         case SEEDRANDOM:        {
             time_t t;

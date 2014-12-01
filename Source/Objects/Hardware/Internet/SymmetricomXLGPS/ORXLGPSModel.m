@@ -322,15 +322,22 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 
 - (void) updatePpoCommand
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+#else
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+#endif
 	NSDateFormatter* frmt = [[[NSDateFormatter alloc] init] autorelease];
 	NSDate* ppoDate = [[[NSDate alloc] initWithTimeInterval:(ppoTimeOffset - [[NSTimeZone systemTimeZone] secondsFromGMT]) sinceDate:ppoTime] autorelease];
 	[frmt setDateFormat:@"D"];
 	int day = [[frmt stringFromDate:ppoDate] intValue];
 
-	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
 						       fromDate:ppoDate];
-			
+#else 
+	NSDateComponents *componentsPpo = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit)
+                                                   fromDate:ppoDate];
+#endif
 	NSString* time = [NSString stringWithFormat:@"%03d:%02d:%02d:%02d", day, [componentsPpo hour], [componentsPpo minute], [componentsPpo second]];
 
 	if ([self ppoRepeats]) {

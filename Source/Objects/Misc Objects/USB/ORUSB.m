@@ -48,8 +48,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (id) init
 {
-	self = [super init];
-	
+	self = [super init];	
 	return self;
 }
 

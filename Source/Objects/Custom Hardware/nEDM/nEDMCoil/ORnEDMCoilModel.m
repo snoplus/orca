@@ -1185,7 +1185,7 @@ for (id obj in listOfADCs) [obj x];               \
     // Build the array from the plist
     NSArray *RawSensitivityMatrix = [NSArray arrayWithContentsOfFile:plistFile];
     if ([self _checkArray:RawSensitivityMatrix]) {
-        nil;
+        //nil;
     } else {
         NSLog(@"Length of rows is incosistent");
         return;

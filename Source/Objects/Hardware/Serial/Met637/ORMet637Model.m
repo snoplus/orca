@@ -624,9 +624,15 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 
 - (void) setDate
 { 
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific	
 	unsigned unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay | NSCalendarUnitMinute | NSCalendarUnitHour;
 	NSDate *today = [NSDate date];
 	NSCalendar *gregorian = [[[NSCalendar alloc]  initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+#else
+	unsigned unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit | NSMinuteCalendarUnit | NSHourCalendarUnit;
+	NSDate *today = [NSDate date];
+	NSCalendar *gregorian = [[[NSCalendar alloc]  initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+#endif
 	NSDateComponents *comps = [gregorian components:unitFlags fromDate:today];
 	[self addCmdToQueue:[NSString stringWithFormat:@"D %02d/%02d/%02d",[comps month],[comps day],[comps year]-2000]]; 
 	[self addCmdToQueue:[NSString stringWithFormat:@"T %02d:%02d",[comps hour],[comps minute]]]; 

@@ -277,11 +277,19 @@ configDocument  = _configDocument;
 	if([runObjects count]){
 		ORRunModel* rc = [runObjects objectAtIndex:0];
         _rhdrStruct.runNumber = [rc runNumber];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific            
         NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
         NSDateComponents *cmpStartTime = [gregorian components:
                                                  (NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay |
                                                   NSCalendarUnitHour | NSCalendarUnitMinute |NSCalendarUnitSecond)
                                                       fromDate:[NSDate date]];
+#else
+        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        NSDateComponents *cmpStartTime = [gregorian components:
+                                          (NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit |
+                                           NSHourCalendarUnit | NSMinuteCalendarUnit |NSSecondCalendarUnit)
+                                                      fromDate:[NSDate date]];
+#endif
         _rhdrStruct.date = [cmpStartTime day] + [cmpStartTime month] * 100 + [cmpStartTime year] * 10000;
         _rhdrStruct.time = [cmpStartTime second] * 100 + [cmpStartTime minute] * 10000 + [cmpStartTime hour] * 1000000;
 	}
