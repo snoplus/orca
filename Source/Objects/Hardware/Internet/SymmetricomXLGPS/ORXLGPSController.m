@@ -283,7 +283,7 @@ static NSDictionary* gpsOps;
 - (void) ppoTimeChanged:(NSNotification*)aNote
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific            
-	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdenifierGregorian] autorelease];
+	NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
 	NSDateComponents *componentsPpo = [gregorian components:(NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond)
 						       fromDate:[model ppoTime]];
 #else
