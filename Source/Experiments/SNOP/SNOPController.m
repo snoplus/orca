@@ -932,10 +932,12 @@ smellieRunFile;
     if([model isEStopPolling]){
         //cancel the E stop polling and change button
         [eStopButton setTitle:@"Start Polling"];
+        [pollingStatus setStringValue:@"Not Polling"];
         [model setIsEStopPolling:NO];
     }
     else{
         [eStopButton setTitle:@"Stop Polling"];
+        [pollingStatus setStringValue:@"Polling"];
         [model setIsEStopPolling:YES];
         [model eStopPolling];
     }

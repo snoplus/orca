@@ -736,6 +736,7 @@ mtcConfigDoc = _mtcConfigDoc;
                 
                     NSLog(@"PANIC DOWN\n");
                     [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+                    [self setIsEStopPolling:NO];
                 }
                 else{
                     NSLog(@"Panic Down enabled but automatic shutdown is not enabled\n");

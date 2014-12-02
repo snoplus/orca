@@ -87,6 +87,8 @@
     IBOutlet NSButton *emergyencyStopEnabled;
     IBOutlet NSButton *eStopButton;
     
+    IBOutlet NSTextField *pollingStatus;
+    
     
     NSImage* _runStopImg;
     NSMutableDictionary *smellieRunFileList;
