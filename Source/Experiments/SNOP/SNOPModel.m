@@ -707,133 +707,48 @@ mtcConfigDoc = _mtcConfigDoc;
     return nil;
 }
 
--(void) eStopPolling
+-(void) testerHv
 {
-    SBC_Link * sbcLink = [self sbcLink];
-    eStopThread = [[NSThread alloc] initWithTarget:self selector:@selector(fullEStopPoll:) object:sbcLink];
-    [eStopThread start];
-    //@try {
-        //[self performSelectorInBackground:@selector(fullEStopPoll) withObject:nil];
-        //[NSThread detachNewThreadSelector:@selector(fullEStopPoll) toTarget:self withObject:nil];
-    //}
-    //@catch (NSException *exception) {
-      //  NSLog(@"Unable to start polling thread because %@\n",exception);
-    //}
-    //[self performSelectorInBackground:@selector(fullEStopPoll) withObject:nil];
-    /*BOOL hvStatus = TRUE;
-    //while (hvStatus) {
-        hvStatus = [self eStopPoll];
-    //}
-    NSLog(@"panic!!!!");*/
-    //issue notification!!!
+    __block bool hvStatus =TRUE;
+    
+    dispatch_queue_t eStopQueue = dispatch_queue_create("eStopQueue", NULL);
+    
+    dispatch_async(eStopQueue, ^{
+        while (hvStatus) {
+            sleep(3.0); //1s
+        
+            //[NSThread sleepForTimeInterval:1.0];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                hvStatus = (BOOL)[self eStopPoll];
+            });
+            //[self performSelectorOnMainThread:@selector(eStopPoll:) withObject:hvStatus waitUntilDone:YES];
+            //NSLog(@"status %ld",hvStatus);
+        
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(isEmergencyStopEnabled){
+                
+                NSLog(@"PANIC DOWN\n");
+                [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+            }
+            else{
+                NSLog(@"Panic Down enabled but automatic shutdown is not enabled\n");
+            }
+        });
+    });
 }
 
--(void) fullEStopPoll:(SBC_Link*)sbcLink
+-(void) eStopPolling
 {
-    NSAutoreleasePool *eStopPollPool = [[NSAutoreleasePool alloc] init];
-
-    //@autoreleasepool {
-    NSLog(@"Started emergency stop polling\n");
-    bool hvStatus = TRUE;
-    //SBC_Link *sbcLink = [[SBC_Link alloc] init];
-    //NSNumber *hvStatus = [[NSNumber alloc] initWithBool:TRUE]
-    
-    BOOL isTimeToquit = NO;
-    while (!isTimeToquit) {
-        //SBC_Link *sbcLink = [[SBC_Link alloc] init];
-        SBC_Packet aPacket;
-        [NSThread sleepForTimeInterval:0.1];
-        //SBC_Link *sbcLink = [[SBC_Link alloc] init];
-        @try {
-            //bool hvStatus = TRUE;
-            //[hvStatus setValue:[NSNumber numberWithBool:[self eStopPoll]]];
-            //[hvStatus release];
-            //hvStatus = [self eStopPoll];
-            //SBC_Link *sbcLink = [[SBC_Link alloc] init];
-            //sbcLink = [self sbcLink];
-            //long hvStatus = 0;
-            if( sbcLink != nil )
-            {
-                //NSLog(@"Made SBC Link.\n");
-                //long hvStatus = 0;
-                //SBC_Packet aPacket;
-                aPacket.cmdHeader.destination = kSNO;
-                aPacket.cmdHeader.cmdID = kSNOReadHVStop;
-                aPacket.cmdHeader.numberBytesinPayload = 1.0 * sizeof( long );
-                unsigned long* payloadPtr = malloc(sizeof(aPacket.payload));//(unsigned long*) aPacket.payload;
-                payloadPtr[0] = 0;
-                /*NSLog(@"sbc retain count %i\n",[sbcLink retainCount]);
-                NSLog(@"self count %i\n",[self retainCount]);
-                NSLog(@"thread count %i\n",[[NSThread currentThread] retainCount]);
-                NSLog(@"autorelease pool %i\n",[eStopPollPool retainCount]);
-                NSLog(@"size of packet %i\n",1.0*sizeof(aPacket));*/
-                
-                //unsigned long* responsePtr = malloc(sizeof(aPacket.payload));//(unsigned long*) aPacket.payload;
-                @try
-                {
-                    [sbcLink send: &aPacket receive: &aPacket];
-                    //responsePtr = (unsigned long*)aPacket.payload;
-                    //hvStatus = (BOOL)responsePtr[0];
-                    hvStatus = (BOOL)aPacket.payload[0];
-                    //NSLog(@"size of responsPtr %i\n",[responsePtr[0] free])
-                    //free(responsePtr);
-                    //NSLog(@"hv_status %ld",hvStatus);
-                    /*if( errorCode )
-                     {
-                     @throw [NSException exceptionWithName:@"Reset All Camera error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-                     }*/
-                }
-                @catch( NSException* e )
-                {
-                    NSLog( @"SBC failed pol hv\n" );
-                    NSLog( @"Error: %@ with reason: %@\n", [e name], [e reason] );
-                    //@throw e;
-                }
-                //free(responsePtr);
-                free(payloadPtr);
-                //free(aPacket.cmdHeader.numberBytesinPayload);
-                
-            } //end of if statement
-        }
-        @catch (NSException *exception) {
-            NSLog(@"Unable to poll eStop because error: %@\n",exception);
-        }
-        //[aPacket.payload
-
-
-        
-        if([[NSThread currentThread] isCancelled]) isTimeToquit = YES;
-        
-        if(!hvStatus){
-            isTimeToquit = YES;
-        }
-        
-        
-        //[sbcLink release];
-        //hvStatus = [self eStopPoll];
-        //[NSThread sleepForTimeInterval:0.5];
-    }
-    
-    if(isEmergencyStopEnabled){
-        NSLog(@"panic and ramp down");
-        [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
-    }
-    else{
-        NSLog(@"panic but automatic shutdown is not enabled");
-    }
-    
-    [eStopPollPool release];
-    [[NSThread currentThread] cancel];
-    [[NSThread currentThread] release];
-    //}
-    //issue notification!!!
+    [self testerHv];
 }
 
 -(BOOL) eStopPoll
 {
     SBC_Link *sbcLink = [[SBC_Link alloc] init];
     sbcLink = [self sbcLink];
-   long hvStatus = 0;
+   long hvStatus = 1;
     if( sbcLink != nil )
     {
         //NSLog(@"Made SBC Link.\n");
@@ -863,7 +778,9 @@ mtcConfigDoc = _mtcConfigDoc;
         }
     
     } //end of if statement
-    return (BOOL)hvStatus ;
+    //return (BOOL)hvStatus ;
+    //NSLog(@"status");
+    return (BOOL)hvStatus;
         
 }
 

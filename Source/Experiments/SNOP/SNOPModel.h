@@ -207,7 +207,7 @@
 - (void) getSmellieRunListInfo;
 - (NSMutableDictionary*)smellieTestFct;
 -(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
-
+-(void) testerHv;
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
