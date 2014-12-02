@@ -85,6 +85,7 @@
     
     //eStop buttons
     IBOutlet NSButton *emergyencyStopEnabled;
+    IBOutlet NSButton *eStopButton;
     
     
     NSImage* _runStopImg;

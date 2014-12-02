@@ -91,6 +91,7 @@ smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
 snopRunTypeMask = snopRunTypeMask,
 runTypeMask= runTypeMask,
+isEStopPolling = isEStopPolling,
 isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc;
 
@@ -717,25 +718,31 @@ mtcConfigDoc = _mtcConfigDoc;
     
     dispatch_async(eStopQueue, ^{
         while (hvStatus) {
-            sleep(3.0); //1s
+            sleep(3.0); //3s
         
-            //[NSThread sleepForTimeInterval:1.0];
+            if(!isEStopPolling) break;
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 hvStatus = (BOOL)[self eStopPoll];
             });
-            //[self performSelectorOnMainThread:@selector(eStopPoll:) withObject:hvStatus waitUntilDone:YES];
-            //NSLog(@"status %ld",hvStatus);
         
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if(isEmergencyStopEnabled){
+            
+            if(isEStopPolling){
+            
+                if(isEmergencyStopEnabled ){
                 
-                NSLog(@"PANIC DOWN\n");
-                [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+                    NSLog(@"PANIC DOWN\n");
+                    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+                }
+                else{
+                    NSLog(@"Panic Down enabled but automatic shutdown is not enabled\n");
+                }
             }
             else{
-                NSLog(@"Panic Down enabled but automatic shutdown is not enabled\n");
+                NSLog(@"Emergency Stop has stopped polling");
             }
         });
     });
@@ -743,6 +750,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
 -(void) eStopPolling
 {
+    NSLog(@"Started Polling Emergyencu Stop...");
     [self testerHv];
 }
 

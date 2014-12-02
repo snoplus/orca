@@ -902,13 +902,9 @@ smellieRunFile;
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
     //if([model isRunTypeMaskedIn:@"Smellie"]){
-<<<<<<< HEAD
-        smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
-        [smellieThread start];
-=======
+
     smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
     [smellieThread start];
->>>>>>> master
     //}
     //else{
     //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
@@ -933,12 +929,17 @@ smellieRunFile;
 
 -(IBAction)eStop:(id)sender
 {
-    //if([eStopPollingThread isCancelled])
-    //eStopPollingThread = [[NSThread alloc] initWithTarget:model selector:@selector(eStopPolling) object:nil];
-    //[eStopPollingThread start]
-    //[model startEStopThread];
-    //[model eStopPoll];
-    [model eStopPolling];
+    if([model isEStopPolling]){
+        //cancel the E stop polling and change button
+        [eStopButton setTitle:@"Start Polling"];
+        [model setIsEStopPolling:NO];
+    }
+    else{
+        [eStopButton setTitle:@"Stop Polling"];
+        [model setIsEStopPolling:YES];
+        [model eStopPolling];
+    }
+
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender

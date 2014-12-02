@@ -101,6 +101,7 @@
     NSThread * eStopThread;
     
     bool isEmergencyStopEnabled;
+    bool isEStopPolling;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -132,6 +133,7 @@
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
 @property (nonatomic,assign) bool isEmergencyStopEnabled;
+@property (nonatomic,assign) bool isEStopPolling;
 
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
