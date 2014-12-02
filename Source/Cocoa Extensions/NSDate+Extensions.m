@@ -70,7 +70,7 @@
     NSDateComponents* components = [gregorian components:(NSCalendarUnitSecond) fromDate:self];
     return [components second];
 #else
-    NSCalendar* gregorian               = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+    NSCalendar* gregorian               = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
     NSDateComponents* components = [gregorian components:NSSecondCalendarUnit fromDate:self];
     return [components second];
 #endif
