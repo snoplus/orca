@@ -1469,7 +1469,7 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvMasterTriggerOffAction:(id)sender
 {
     NSLog(@"Stop all polling of XL3s");
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingCMOSRates:) withObject:NO];
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
     
     [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
