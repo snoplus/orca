@@ -43,6 +43,9 @@
     //Run Types Information
     IBOutlet NSMatrix*  globalRunTypesMatrix;
     
+    //Xl3 Mode
+    IBOutlet NSMatrix * globalxl3Mode;
+    
     //Run information
     IBOutlet NSTextField* currentRunNumber;
     IBOutlet NSTextField* currentRunType;
@@ -147,6 +150,9 @@
 
 //eStop functions
 - (IBAction) enmergencyStopToggle:(id)sender;
+
+//xl3 mode sttaus
+- (IBAction)updatexl3Mode:(id)sender;
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;

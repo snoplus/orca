@@ -643,6 +643,41 @@ smellieRunFile;
     NSLog(@"Detector wide panic down started\n");
 }
 
+- (IBAction)updatexl3Mode:(id)sender{
+    
+    int i =0;
+    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    for (id xl3 in xl3s) {
+        ORXL3Model * anXl3 = xl3;
+        //[xl3 xl3Mode];
+        NSString *xl3ModeDescription = [NSString stringWithFormat:@"--"];
+        if([anXl3 xl3Mode] == 1) xl3ModeDescription = [NSString stringWithFormat:@"init"];
+        else if ([anXl3 xl3Mode] == 2) xl3ModeDescription = [NSString stringWithFormat:@"normal"];
+        else if ([anXl3 xl3Mode] == 3) xl3ModeDescription = [NSString stringWithFormat:@"CGT"];
+        else xl3ModeDescription = [NSString stringWithFormat:@"unknown"];
+        
+        if([anXl3 crateNumber] == 16){
+            i++;
+        [[globalxl3Mode cellAtRow:16 column:0] setStringValue:xl3ModeDescription];
+            if(i>0){
+                [[globalxl3Mode cellAtRow:17 column:0] setStringValue:xl3ModeDescription];
+            }
+        }
+        else if ([anXl3 crateNumber] > 16){
+            [[globalxl3Mode cellAtRow:([anXl3 crateNumber]+1) column:0] setStringValue:xl3ModeDescription];
+        }
+        else{
+            [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
+        }
+        //setStringValue:[xl3 xl3Mode] stringValue]];
+        /*if([anXl3 crateNumber] >= 16); //skip for 16B
+        {
+            [[globalxl3Mode cellAtRow:[anXl3 crateNumber] column:0] setStringValue:xl3ModeDescription];
+        }*/
+    }
+    
+}
+
 - (IBAction)hvMasterTriggersOFF:(id)sender
 {
     [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
