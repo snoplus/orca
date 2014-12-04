@@ -226,8 +226,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	}
 }
 
-- (BOOL) isValid {return YES;}  //<<<----remove
-
 - (float) temp:(int)index
 {
 	if(index>=0 && index<8)return temp[index];
