@@ -940,9 +940,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
     if([serialPort isOpen]){ 
 		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
-        if(![aCmd hasPrefix:@"++"]){
-            [cmdQueue enqueue:@"\0x3"];
-        }
 		[cmdQueue enqueue:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
@@ -1485,10 +1482,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			[cmdQueue removeAllObjects];
 			[self setLastRequest:@"PowerUpSequence"]; //fake a command
 		}
-        else if([theResponse rangeOfString:@">" options:NSCaseInsensitiveSearch].location != NSNotFound){
-            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-            [self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:waitTime];
-        }
 		else if([theResponse rangeOfString:@"?ERR" options:NSCaseInsensitiveSearch].location != NSNotFound){
 			tempVerbose = NO;
 			[cmdQueue removeAllObjects];
