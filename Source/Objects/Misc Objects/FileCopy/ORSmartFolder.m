@@ -52,7 +52,14 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 - (id) init
 {
     if(self = [super init]){
-        [[NSBundle mainBundle] loadNibNamed:@"SmartFolder" owner:self topLevelObjects:&topLevelObjects];
+        
+        
+#if !defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9 // 10.9-specific
+        [NSBundle loadNibNamed:@"NcdCableCheckTask" owner:self];
+#else
+        [[NSBundle mainBundle] loadNibNamed:@"SmartFolder" owner:self topLevelObjects:&ncdCableCheckTaskObjects];
+#endif
+
     }
     
     [self setDirectoryName:@"~"];
