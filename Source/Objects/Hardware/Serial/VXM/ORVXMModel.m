@@ -642,11 +642,10 @@ NSString* ORVXMLock							= @"ORVXMLock";
         
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [self sendCommand:@"K"]; //NO <CR>
 
-        NSString* aCmd = [NSString stringWithFormat:@"setMA%dM%x\r",motorIndex+1,[[self motor: motorIndex] motorType]];
+        NSString* aCmd = [NSString stringWithFormat:@"K,C,setMA%dM%x\r",motorIndex+1,[[self motor: motorIndex] motorType]];
         [self sendCommand:aCmd];
-        [ORTimer delay:2];
+        //[ORTimer delay:2];
        
         abortAllRepeats = YES;
     }
