@@ -41,6 +41,7 @@
 - (void) makeGateValves:(VacuumGVStruct*)pipeList num:(int)numItems;
 - (void) makeStaticLabels:(VacuumStaticLabelStruct*)labelItems num:(int)numItems;
 - (void) makeDynamicLabels:(VacuumDynamicLabelStruct*)labelItems num:(int)numItems;
+- (void) makeTempGroups:(TempGroup*)labelItems num:(int)numItems;
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) resetVisitationFlag;
@@ -308,10 +309,15 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
             ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
             [aRegionlabel setValue:  [(ORLakeShore210Model*)lakeShore convertedValue:7]];
             [aRegionlabel setIsValid:[(ORLakeShore210Model*)lakeShore isValid]];
+
+            ORVacuumTempGroup* aTempGroup    = (ORVacuumTempGroup*)[self regionValueObj:kLakeShoreTemps];
+            int i;
+            for(i=0;i<8;i++){
+                [aTempGroup setTemp:i  value:[(ORLakeShore210Model*)lakeShore convertedValue:i]];
+                [aTempGroup setIsValid:[(ORLakeShore210Model*)lakeShore isValid]];
+            }
         }
-
     }
-
 }
 
 
@@ -770,7 +776,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		case kRegionNegPump:		return @"Neg Pump";
 		case kRegionDiaphramPump:	return @"Diaphram Pump";
 		case kRegionBelowTurbo:		return @"Below Turbo";
-		case kRegionLakeShore:		return @"LakeShore";
+        case kRegionLakeShore:		return @"LakeShore";
+        case kLakeShoreTemps:		return @"LakeShoreTemps";
 		default: return nil;
 	}
 }
@@ -1106,7 +1113,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{kVacPressureItem, kRegionBaratron,		4, 0,  @"Baratron",	330, 510,	390, 540},
 		{kVacPressureItem, kRegionDiaphramPump,	3, 3,  @"Assumed",	370, 100,	430, 130},
 		{kVacPressureItem, kRegionDryN2,		99, 99,@"Assumed",	370, 50,	430, 80},
-		{kVacPressureItem, kRegionLakeShore,    9, 0,  @"LakeShore",405, 510,	465, 540},
+        {kVacPressureItem, kRegionLakeShore,    9, 0,  @"LakeShore",405, 510,	465, 540}
 	};
 	
 #define kNumVacLines 10
@@ -1147,12 +1154,18 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{kVacHGateV, 16,	@"Turbo",		k1BitReadBack,				50, 260,	kRegionAboveTurbo,	kRegionBelowTurbo,		kControlNone},	//this is a virtual valve-- really the turbo on/off
 		{kVacVGateV, 17,	@"PRV",			kManualOnlyShowClosed,		230, 350,	kRegionRGA,			kUpToAir,				kControlNone},	//PRV
 	};
-	
+    
+    #define kNumTempGroups 1
+    TempGroup temperatureGroup[kNumTempGroups] = {
+        {kVacTempGroup, kLakeShoreTemps,    9, 0,  @"Temps (K)",130, 250,	190, 380},
+    };
+    
 	[self makeLines:vacLines					num:kNumVacLines];
 	[self makePipes:vacPipeList					num:kNumVacPipes];
 	[self makeGateValves:gvList					num:kNumVacGVs];
 	[self makeStaticLabels:staticLabelItems		num:kNumStaticLabelItems];
 	[self makeDynamicLabels:dynamicLabelItems	num:kNumStatusItems];
+    [self makeTempGroups:temperatureGroup       num:kNumTempGroups];
 }
 
 - (void) makePipes:( VacuumPipeStruct*)pipeList num:(int)numItems
@@ -1229,6 +1242,15 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	ORVacuumValueLabel* aLabel = [self regionValueObj:kRegionDryN2];
 	[aLabel setIsValid:YES];
 	[aLabel setValue:1.0E3];
+}
+
+- (void)  makeTempGroups:(TempGroup*)labelItems num:(int)numItems
+{
+    int i;
+    for(i=0;i<numItems;i++){
+        NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
+        [[[ORVacuumTempGroup alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];
+    }
 }
 
 - (void) makeLines:( VacuumLineStruct*)lineItems num:(int)numItems
@@ -1378,7 +1400,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		[partDictionary setObject:[NSMutableArray array] forKey:@"GateValves"];		
 		[partDictionary setObject:[NSMutableArray array] forKey:@"ValueLabels"];		
 		[partDictionary setObject:[NSMutableArray array] forKey:@"StatusLabels"];		
-		[partDictionary setObject:[NSMutableArray array] forKey:@"StaticLabels"];		
+        [partDictionary setObject:[NSMutableArray array] forKey:@"StaticLabels"];
 	}
 	if(!valueDictionary){
 		valueDictionary = [[NSMutableDictionary dictionary] retain];
@@ -1397,10 +1419,14 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumGateValve")]){
 		[[partDictionary objectForKey:@"GateValves"] addObject:aPart];
 	}
-	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumValueLabel")]){
-		[[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
-		[valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
-	}
+    else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumValueLabel")]){
+        [[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
+        [valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
+    }
+    else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumTempGroup")]){
+        [[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
+        [valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
+    }
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumStatusLabel")]){
 		[[partDictionary objectForKey:@"StatusLabels"] addObject:aPart];
 		[statusDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
@@ -1475,6 +1501,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	return [valueDictionary objectForKey:[NSNumber numberWithInt:aRegion]];
 }
+
 - (id) component:(int)aComponentTag
 {
 	for(OrcaObject* anObj in [self orcaObjects]){
