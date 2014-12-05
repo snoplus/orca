@@ -31,6 +31,8 @@
 #import "NSNotifications+Extensions.h"
 #import "NSFileManager+Extensions.h"
 
+#import "libkern/OSAtomic.h" //needed for OSQueueHead, OSAtomicDequeue, etc. -tb-
+
 #import <netdb.h>
 #import <sys/types.h>
 #import <sys/socket.h>

@@ -17352,7 +17352,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RelaunchOrca;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 				VALID_ARCHS = i386;
 			};
 			name = Development;
@@ -17496,7 +17496,7 @@
 					"-lnetsnmp",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -17571,7 +17571,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -17642,7 +17642,7 @@
 					"-lz",
 				);
 				PRODUCT_NAME = Orca;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -17683,7 +17683,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 			};
 			name = Development;
 		};
@@ -17702,7 +17702,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 			};
 			name = Deployment;
 		};
@@ -17720,7 +17720,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 			};
 			name = Default;
 		};
