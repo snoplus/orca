@@ -97,6 +97,7 @@ static const int currentVersion = 1;           // Current version
     [configFolder release];
     [md5Queue cancelAllOperations];
     [md5Queue release];
+    [openFilePath release];
     [super dealloc];
 }
 
