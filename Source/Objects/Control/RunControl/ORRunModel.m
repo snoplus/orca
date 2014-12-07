@@ -125,7 +125,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
     [runStoppedByVetoAlarm clearAlarm];
 	[runStoppedByVetoAlarm release];
-	
+    
+    [subRunStartTime release];
+    [subRunEndTime release];
+    [dataTypeAssigner release];
+    [dataTypeAssigner release];
     [super dealloc];
 }
 

@@ -74,6 +74,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
         [transferQueue release];
         transferQueue = nil;
     }
+    [dataTimer release];
+    [mainTimer release];
 	
     [queueFullAlarm clearAlarm];
     [queueFullAlarm release];
@@ -81,7 +83,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [dataTakers release];
 	[theDecoder release];
     [recordsPending release];
-    
+    [lastFile release];
     [super dealloc];
 }
 
