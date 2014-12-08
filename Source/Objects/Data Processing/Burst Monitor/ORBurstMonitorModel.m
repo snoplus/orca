@@ -581,16 +581,6 @@ NSDate* burstStart = NULL;
     [Nadcs release];
     [Nsecs release];
     [Nmics release];
-    @synchronized(self)
-    {
-    [Bchans release];
-    [Bcards release];
-    [Badcs release];
-    [Bsecs release];
-    [Bmics release];
-    [Bwords release];
-    }
-    
 
 }
 
