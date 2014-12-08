@@ -1605,6 +1605,8 @@
 		84759CF50B6036D600123411 /* OrcaScript.ym in Sources */ = {isa = PBXBuildFile; fileRef = 84759CF40B6036D600123411 /* OrcaScript.ym */; };
 		84759D070B603B9400123411 /* ORCommandClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434A3E5055C223A002D3102 /* ORCommandClient.h */; };
 		84759E9B0B6189E700123411 /* OrcaScriptGuide.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84759A990B6025E200123411 /* OrcaScriptGuide.rtf */; };
+		8475D8171A3665BC00EE4DE4 /* ORMJDInterlocks.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475D8151A3665BC00EE4DE4 /* ORMJDInterlocks.h */; };
+		8475D8181A3665BC00EE4DE4 /* ORMJDInterlocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 8475D8161A3665BC00EE4DE4 /* ORMJDInterlocks.m */; };
 		8475EC0B14759D53003A165D /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8475EC0714759D53003A165D /* libusb-1.0.a */; };
 		8475EC0C14759D53003A165D /* libusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 8475EC0814759D53003A165D /* libusb.h */; };
 		8475EC3A1475A66F003A165D /* LabJack.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8475EC271475A66F003A165D /* LabJack.nib */; };
@@ -4880,6 +4882,8 @@
 		847599850B5FF26500123411 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		84759A990B6025E200123411 /* OrcaScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = OrcaScriptGuide.rtf; sourceTree = "<group>"; };
 		84759CF40B6036D600123411 /* OrcaScript.ym */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = OrcaScript.ym; path = "Source/Main Dialogs/CommandCenter/Scripting/OrcaScript.ym"; sourceTree = SOURCE_ROOT; };
+		8475D8151A3665BC00EE4DE4 /* ORMJDInterlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDInterlocks.h; sourceTree = "<group>"; };
+		8475D8161A3665BC00EE4DE4 /* ORMJDInterlocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDInterlocks.m; sourceTree = "<group>"; };
 		8475EC0714759D53003A165D /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
 		8475EC0814759D53003A165D /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		8475EC271475A66F003A165D /* LabJack.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LabJack.nib; path = Source/Objects/Hardware/USB/LabJack/LabJackU12/LabJack.nib; sourceTree = SOURCE_ROOT; };
@@ -12833,6 +12837,8 @@
 				84E966CC11848BEF008D9119 /* MajoranaDetectorView.m */,
 				84E966CD11848BEF008D9119 /* MajoranaModel.h */,
 				84E966CE11848BEF008D9119 /* MajoranaModel.m */,
+				8475D8151A3665BC00EE4DE4 /* ORMJDInterlocks.h */,
+				8475D8161A3665BC00EE4DE4 /* ORMJDInterlocks.m */,
 				841EBDE51831645E00450A3C /* ORMJDSegmentGroup.h */,
 				841EBDE61831645E00450A3C /* ORMJDSegmentGroup.m */,
 			);
@@ -14235,6 +14241,7 @@
 				844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */,
 				2A556A370842A69900BBCB17 /* ORDGF4cDecoders.h in Headers */,
 				2A5D19D2086760D200C969E0 /* xiaUtilities.h in Headers */,
+				8475D8171A3665BC00EE4DE4 /* ORMJDInterlocks.h in Headers */,
 				54F5B709087206D9003AC228 /* KatrinController.h in Headers */,
 				54F5B70A087206D9003AC228 /* KatrinModel.h in Headers */,
 				546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */,
@@ -16939,6 +16946,7 @@
 				84E9F6A1123FE4D600116607 /* ORNHQ226LController.m in Sources */,
 				84E9F6A3123FE4D600116607 /* ORNHQ226LDecoders.m in Sources */,
 				84E9F6A5123FE4D600116607 /* ORNHQ226LModel.m in Sources */,
+				8475D8181A3665BC00EE4DE4 /* ORMJDInterlocks.m in Sources */,
 				840AC59912638B5D007B6CAF /* nTPCPadPlaneView.m in Sources */,
 				2D24A8D3126F516D00BA2E2E /* ORIpeSimulationController.m in Sources */,
 				2D24A8D5126F516D00BA2E2E /* ORIpeSimulationDecoder.m in Sources */,
