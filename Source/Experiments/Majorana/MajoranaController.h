@@ -23,7 +23,6 @@
 
 @class ORColorScale;
 @class ORSegmentGroup;
-@class OROpSequenceController;
 
 @interface MajoranaController : ORExperimentController {
  
@@ -51,9 +50,12 @@
     //items in the  subComponet tab view
     IBOutlet ORGroupView*   subComponentsView;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet OROpSequenceController* seqController0;
-    IBOutlet OROpSequenceController* seqController1;
 
+    IBOutlet NSTextField*   lastTimeCheckedField;
+    IBOutlet NSTableView*   module1InterlockTable;
+    IBOutlet NSTableView*   module2InterlockTable;
+
+    
 	NSView *blankView;
     NSSize detectorSize;
     NSSize subComponentViewSize;
@@ -65,6 +67,7 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) updateLastConstraintCheck:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
@@ -90,6 +93,8 @@
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) autoscaleSecondayColorScale:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) resetInterLocksOnModule0:(id)sender;
+- (IBAction) resetInterLocksOnModule1:(id)sender;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 

@@ -31,7 +31,7 @@
 #import "ORPlotView.h"
 #import "ORCompositePlotView.h"
 #import "ORiSegHVCard.h"
-#import "OROpSequenceController.h"
+#import "ORMJDInterlocks.h"
 
 @implementation MajoranaController
 #pragma mark ¥¥¥Initialization
@@ -42,8 +42,6 @@
 }
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:seqController0];
-    [[NSNotificationCenter defaultCenter] removeObserver:seqController1];
     [blankView release];
     [super dealloc];
 }
@@ -62,10 +60,11 @@
 {
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(500,700);
+	subComponentViewSize = NSMakeSize(580,500);
 	detectorMapViewSize	 = NSMakeSize(990,565);
 	vetoMapViewSize		 = NSMakeSize(460,565);
-	
+    [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
+    [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	[subComponentsView setGroup:model];
@@ -98,8 +97,6 @@
     [(ORPlot*)[valueHistogramsPlot plotWithTag: 10] setName:@"Detectors"];
     [valueHistogramsPlot setShowLegend:YES];
     
-    [seqController0 setIdIndex:0];
-    [seqController1 setIdIndex:1];
 }
 
 
@@ -179,6 +176,19 @@
                      selector : @selector(ignorePanicOnBChanged:)
                          name : MajoranaModelIgnorePanicOnBChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateInterlockStates:)
+                         name : ORMJDInterlocksStateChanged
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateLastConstraintCheck:)
+                         name : ORMajoranaModelLastConstraintCheckChanged
+                        object: nil];
+    
+    
+    
 }
 
 - (void) updateWindow
@@ -202,8 +212,25 @@
     
     //interlocks
     [self groupChanged:nil];
+    [module1InterlockTable reloadData];
+    [module2InterlockTable reloadData];
+    [self updateLastConstraintCheck:nil];
+}
+- (void) updateLastConstraintCheck:(NSNotification*)aNote
+{
+    if([model lastConstraintCheck]) [lastTimeCheckedField setStringValue:[[model lastConstraintCheck] stdDescription]];
+    else [lastTimeCheckedField setStringValue:@"Never"];
 }
 
+- (void) updateInterlockStates:(NSNotification*)aNote
+{
+    if([aNote object] == [model mjdInterlocks:0]){
+        [module1InterlockTable reloadData];
+    }
+    else {
+        [module2InterlockTable setNeedsDisplay:YES];
+   }
+}
 
 - (void) stringMapChanged:(NSNotification*)aNote
 {
@@ -223,7 +250,6 @@
 {
 	if(note == nil || [note object] == model || [[note object] guardian] == model){
 		[subComponentsView setNeedsDisplay:YES];
-        [model updateAllowedToRunStates];
 	}
 }
 - (void) pollTimeChanged:(NSNotification*)aNotification
@@ -425,9 +451,22 @@
 #endif
 
 
+- (IBAction) resetInterLocksOnModule0:(id)sender
+{
+    [[model mjdInterlocks:0] reset:YES];
+    [model setPollTime:[model pollTime]];
+}
+
+- (IBAction) resetInterLocksOnModule1:(id)sender
+{
+    [[model mjdInterlocks:1] reset:YES];
+    [model setPollTime:[model pollTime]];
+}
 
 - (IBAction) pollTimeAction:(id)sender
 {
+    [[model mjdInterlocks:0] reset:YES];
+    [[model mjdInterlocks:1] reset:YES];
 	[model setPollTime:[sender indexOfSelectedItem]];
 }
 - (IBAction) viewTypeAction:(id)sender
@@ -598,6 +637,18 @@
         }
 		else return [model stringMap:rowIndex objectForKey:[aTableColumn identifier]];
 	}
+    else if(aTableView == module1InterlockTable){
+        ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:0];
+        
+        if([[aTableColumn identifier] isEqualToString:@"name"]) return [mjdInterLocks stateName:rowIndex];
+        else                                                    return [mjdInterLocks stateStatus:rowIndex];
+    }
+    else if(aTableView == module2InterlockTable){
+        ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:1];
+        if([[aTableColumn identifier] isEqualToString:@"name"]) return [mjdInterLocks stateName:rowIndex];
+        else                                                    return [mjdInterLocks stateStatus:rowIndex];
+    }
+
 	else return nil;
 }
 
@@ -607,6 +658,14 @@
         aTableView == secondaryValuesView){
         return [[model segmentGroup:1] numSegments];
     }
+    else if((aTableView == module1InterlockTable) || (aTableView == module2InterlockTable) ){
+        int module;
+        if(aTableView == module1InterlockTable) module = 0;
+        else                                    module = 1;
+        ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:module];
+        return [mjdInterLocks numStates];
+    }
+
     else if(aTableView == stringMapTableView)return kMaxNumStrings;
 
 
@@ -681,6 +740,7 @@
 		}
 	}
 }
+
 - (void) forceHVUpdate:(int)segIndex
 {
     ORDetectorSegment* aSegment = [[model segmentGroup:0] segment:segIndex];
