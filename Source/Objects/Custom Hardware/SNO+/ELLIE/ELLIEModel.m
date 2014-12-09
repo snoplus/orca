@@ -186,8 +186,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //responseFromTellie = [self performSelector:@selector(callPythonScript:withCmdLineArgs:) onThread:[NSThread currentThread] withObject:tellieCommandLineArguments waitUntilDone:YES];
     
     double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
-    double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000);
-    double timeToSleep = 1.0*numberOfShots*timeBetweenShotsInMicroSeconds;
+    double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
+    double timeToSleep = 1.2*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot 
     
     
     //hold the fire command on this thread
@@ -196,7 +196,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         NSLog(@"Response from Tellie Fire command: %@\n",responseFromTellie);
     });
 
-    NSLog(@"in here");
+    //NSLog(@"in here");
     [NSThread sleepForTimeInterval:timeToSleep];
     
     //[NSThread sleepForTimeInterval:1.0];
