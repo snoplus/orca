@@ -769,8 +769,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    
-    for(int laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
+    int laserHeadIndex =0;
+    for(laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
         
         for (id specificConfigValue in configForSmellie){
             if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
@@ -785,10 +785,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
     
-    for(int inputChannelIndex =0; inputChannelIndex < 6; inputChannelIndex++){
+    int inputChannelIndex = 0;
+    for(inputChannelIndex =0; inputChannelIndex < 6; inputChannelIndex++){
 
         for (id specificConfigValue in configForSmellie){
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
+            
+            if([[specificConfigValue objectForKey:@"fibreSwitchInputConnected"] isEqualToString:[NSString stringWithFormat:@"Channel%i",inputChannelIndex]]){
                 
                 //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
                 
@@ -804,7 +806,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
     
-    for(int outputChannelIndex =1; outputChannelIndex < 13; outputChannelIndex++){
+    for(int outputChannelIndex =1; outputChannelIndex < 15; outputChannelIndex++){
         
         for (id specificConfigValue in configForSmellie){
             if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
@@ -971,7 +973,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             [self setFibreSwitch:inputFibneSwitchChannel withOutputChannel:[NSString stringWithFormat:@"%@",[fibreSwitchOutputToFibre objectForKey:fibreKey]]];
             [NSThread sleepForTimeInterval:1.0f];
             
-            int increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
+            
+            /* Check to see if the maximum intensity is the same as the minimum intensity */
+            int increment;
+            if(maxLaserIntensity != minLaserIntensity){
+                increment = (maxLaserIntensity - minLaserIntensity)/[numOfIntensitySteps floatValue];
+            }
+            else{
+                increment = 0;
+            }
             //NSNumber *incrementInteger = [NSNUmber numberWithFloat:increment];
             
             //Loop through each intensity of a SMELLIE run 
