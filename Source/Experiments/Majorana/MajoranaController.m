@@ -60,7 +60,7 @@
 {
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
-	subComponentViewSize = NSMakeSize(580,500);
+	subComponentViewSize = NSMakeSize(580,530);
 	detectorMapViewSize	 = NSMakeSize(990,565);
 	vetoMapViewSize		 = NSMakeSize(460,565);
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
@@ -305,11 +305,13 @@
 - (void) ignorePanicOnBChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnBCB setIntValue: [model ignorePanicOnB]];
+    [ignore2Field setStringValue: [model ignorePanicOnB]?@"HV Ramp will be IGNORED":@""];
 }
 
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnACB setIntValue: [model ignorePanicOnA]];
+    [ignore1Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
 }
 
 - (void) specialUpdate:(NSNotification*)aNote

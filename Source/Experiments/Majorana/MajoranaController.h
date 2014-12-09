@@ -54,7 +54,8 @@
     IBOutlet NSTextField*   lastTimeCheckedField;
     IBOutlet NSTableView*   module1InterlockTable;
     IBOutlet NSTableView*   module2InterlockTable;
-
+    IBOutlet NSTextField*   ignore1Field;
+    IBOutlet NSTextField*   ignore2Field;
     
 	NSView *blankView;
     NSSize detectorSize;

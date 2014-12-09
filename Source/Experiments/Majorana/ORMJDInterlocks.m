@@ -25,8 +25,8 @@
 
 //do NOT change this list without changing the enum states in the .h file
 static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
-    { kMJDInterlocks_Idle,               @"State"},
-    { kMJDInterlocks_Ping,               @"Ping"},
+    { kMJDInterlocks_Idle,               @"State Machine"},
+    { kMJDInterlocks_Ping,               @"Ping Vac System"},
     { kMJDInterlocks_PingWait,           @"Ping Response"},
     { kMJDInterlocks_CheckHVisOn,        @"HV Status"},
     { kMJDInterlocks_UpdateVacSystem,    @"Update Vac System"},
@@ -249,7 +249,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES){
                     //it worked. move on.
                     retryCount = 0;
-                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"Sent" color:normalColor];
+                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"HV Status Sent" color:normalColor];
 
                     if(hvIsOn){
                         [self setState:kMJDInterlocks_GetOKToBias     status:@"Skipped" color:normalColor];
@@ -409,11 +409,15 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             retryCount=0;
             if(hvIsOn){
                 [delegate rampDownHV:module vac:module];
-                [self setState:kMJDInterlocks_HVRampDown status:@"HV Ramp Down!"  color:badColor];
-                [self addToReport:@"HV Ramped Down"];
                 if((module == 0 && [delegate ignorePanicOnA]) ||
                    (module == 1 && [delegate ignorePanicOnB])){
-                    [self addToReport:@"HV Did NOT actually ramp down, because the 'Skip Ramp Down Option' was selected "];
+                    [self addToReport:@"HV should be ramped down, but was ignored"];
+                    [self addToReport:@"HV Did NOT actually ramp down, because the 'Ignore Ramp Down Actions' was selected"];
+                    [self setState:kMJDInterlocks_HVRampDown status:@"HV Ramp Ignored!"  color:badColor];
+               }
+                else {
+                    [self addToReport:@"HV ramp down started"];
+                    [self setState:kMJDInterlocks_HVRampDown status:@"HV Ramp Down!"  color:badColor];
                 }
                 
             }
