@@ -328,7 +328,7 @@
     else if([note object] == tellieNumofShots){
         int currentNumberOfShots = [[note object] intValue];
         int minimumNumOfShots = 1;
-        int maxiumumNumOfShots = 16000;
+        int maxiumumNumOfShots = 65000;
         
         
         if(currentNumberOfShots > maxiumumNumOfShots){

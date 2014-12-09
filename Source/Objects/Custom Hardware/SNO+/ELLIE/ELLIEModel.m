@@ -901,8 +901,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [currentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
     
     //Set the Mtcd for smellie settings
-    NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay to 900ns \n",[[NSNumber numberWithUnsignedShort:900] unsignedShortValue]);
-    [theMTCModel setupGTCorseDelay:[[NSNumber numberWithInt:900] intValue]];
+    //NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay to 900ns \n",[[NSNumber numberWithUnsignedShort:900] unsignedShortValue]);
+    //[theMTCModel setupGTCorseDelay:[[NSNumber numberWithInt:900] intValue]];
     
     
     
@@ -912,7 +912,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     }
     else{
         //Stop the current run and start a new run 
-        //[runControl setForceRestart:YES];
+        [runControl setForceRestart:YES];
         [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
         [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
         //[runControl:@selector(stopRun) withObject:nil afterDelay:0];
