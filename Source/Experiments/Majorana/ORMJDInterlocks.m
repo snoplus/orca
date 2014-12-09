@@ -319,7 +319,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     else {
                         [self setState:kMJDInterlocks_GetShouldUnBias status:@"OK for Bias" color:okColor];
                         [self setState:kMJDInterlocks_FinalState      status:@"OK for Bias" color:okColor];
-                        [self setState:kMJDInterlocks_HVRampDown      status:@"Skipped"     color:normalColor];
+                        if(hvIsOn)[self setState:kMJDInterlocks_HVRampDown      status:@"Leave HV ON"  color:okColor];
+                        else      [self setState:kMJDInterlocks_HVRampDown      status:@"HV is OFF"     color:normalColor];
                         
                         lockHVDialog = NO;
                         [self setCurrentState:kMJDInterlocks_HandleHVDialog];
