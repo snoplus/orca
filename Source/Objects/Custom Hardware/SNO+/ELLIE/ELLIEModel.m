@@ -782,7 +782,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         }
     } //end of looping through each laserHeadIndex
     
-    
     NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
     
     int inputChannelIndex = 0;
@@ -790,7 +789,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
         for (id specificConfigValue in configForSmellie){
             
-            if([[specificConfigValue objectForKey:@"fibreSwitchInputConnected"] isEqualToString:[NSString stringWithFormat:@"Channel%i",inputChannelIndex]]){
+            
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
+            //if([[specificConfigValue objectForKey:@"fibreSwitchInputConnected"] isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
                 
                 //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
                 
@@ -984,8 +985,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             }
             //NSNumber *incrementInteger = [NSNUmber numberWithFloat:increment];
             
-            //Loop through each intensity of a SMELLIE run 
-            for(int intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
+            //Loop through each intensity of a SMELLIE run
+            int intensityLoopInt;
+            for(intensityLoopInt = minLaserIntensity;intensityLoopInt <= maxLaserIntensity; intensityLoopInt = intensityLoopInt + increment){
                 
                 
                 //if run control cancels the run
@@ -1121,6 +1123,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     [self _pushSmellieRunDocument];
     
+    [runControl setForceRestart:YES]; 
     [runControl performSelectorOnMainThread:@selector(stopRun) withObject:nil waitUntilDone:YES];
     [runControl performSelectorOnMainThread:@selector(startRun) withObject:nil waitUntilDone:YES];
     
