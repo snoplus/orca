@@ -472,8 +472,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
 			
 			NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"forceLoad"]; //this is from relaunch argument
-			if(![lastFile length])lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
             BOOL relaunched = [lastFile length]!=0;
+			if(![lastFile length])lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
 			
 			if([lastFile length]){
 				NSLog(@"Trying to open: %@\n",lastFile);
@@ -489,6 +489,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 					NSLog(@"Opened Configuration: %@\n",lastFile);
 				}
 			}
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"forceLoad"];
 			if([[[NSUserDefaults standardUserDefaults] objectForKey: OROrcaSecurityEnabled] boolValue]){
 				NSLog(@"Orca global security is enabled.\n");
 			}
