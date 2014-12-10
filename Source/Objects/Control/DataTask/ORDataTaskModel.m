@@ -270,8 +270,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	enableTimer = aState;
 	if(enableTimer){
 		[self clearTimeHistogram];
-		dataTimer = [[ORTimer alloc]init];
-		mainTimer = [[ORTimer alloc]init];
+		if(!dataTimer)dataTimer = [[ORTimer alloc]init];
+		if(!mainTimer)mainTimer = [[ORTimer alloc]init];
 		[dataTimer start];
 		[mainTimer start];
 	}
@@ -300,8 +300,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
 	if(enableTimer){
 		[timerLock lock];	//start critical section
-		dataTimer = [[ORTimer alloc]init];
-		mainTimer = [[ORTimer alloc]init];
+		if(!dataTimer) dataTimer = [[ORTimer alloc]init];
+		if(!mainTimer) mainTimer = [[ORTimer alloc]init];
 		[dataTimer start];
 		[mainTimer start];
 		[timerLock unlock];	//end critical section
