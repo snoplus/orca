@@ -35,7 +35,6 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[cardRates release];
     [cratePowerAlarm clearAlarm];
     [cratePowerAlarm release];
 	[super dealloc];
@@ -123,18 +122,6 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {
 	return [self objectConnectedTo:[self crateAdapterConnectorKey]];
 }
-
-- (NSDictionary*) cardRates
-{
-	return cardRates;
-}
-- (void) setCardRates:(NSMutableDictionary*)newCardRates
-{
-	[cardRates autorelease];
-	cardRates=[newCardRates retain];
-}
-
-
 
 - (void) doNoPowerAlert:(NSException*)exception action:(NSString*)message
 {
