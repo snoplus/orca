@@ -290,7 +290,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) setColorAxisAttributes:(NSDictionary*)newColorAxisAttributes
 {
-	[colorAxisAttributes release];
+	[colorAxisAttributes autorelease];
     colorAxisAttributes = [newColorAxisAttributes copy];
 }
 
