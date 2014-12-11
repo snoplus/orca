@@ -784,30 +784,49 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSMutableDictionary *laserToInputFibreMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
     
-    int inputChannelIndex = 0;
-    for(inputChannelIndex =0; inputChannelIndex < 6; inputChannelIndex++){
+    //int inputChannelIndex = 0;
+    //for(inputChannelIndex =1; inputChannelIndex < 6; inputChannelIndex++){
 
-        for (id specificConfigValue in configForSmellie){
+    for (id specificConfigValue in configForSmellie){
             
             
-            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput0"]]
+               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput1"]]
+               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput2"]]
+               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput3"]]
+               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput4"]]
+               || [specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput5"]]){
+                
+                NSString *fibreSwitchInputConnected = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"];
+                NSString* parsedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+                
+                NSString * laserHeadReference = [[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"];
+                
+                [laserToInputFibreMapping setObject:parsedFibreReference forKey:laserHeadReference];
+                
+                
+                //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
+                
+                //[specificConfigValue objectForKey:@"fibreSwitchInputConnected"];
+                
             //if([[specificConfigValue objectForKey:@"fibreSwitchInputConnected"] isEqualToString:[NSString stringWithFormat:@"laserInput%i",inputChannelIndex]]){
                 
                 //NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
                 
                 //NSString* updatedFibreReference = [fibreSwitchInputConnected stringByReplacingOccurrencesOfString:@"Channel" withString:@""];
                 
-                NSString* laserHeadReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+                /*NSString* laserHeadReference = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
 
-                [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:laserHeadReference];
-            }
-        }
+                [laserToInputFibreMapping setObject:[NSString stringWithFormat:@"%i",inputChannelIndex] forKey:laserHeadReference];*/
+    }
+       // }
 
     }
     
     NSMutableDictionary *fibreSwitchOutputToFibre = [[NSMutableDictionary alloc] initWithCapacity:10];
     
-    for(int outputChannelIndex =1; outputChannelIndex < 15; outputChannelIndex++){
+    int outputChannelIndex = 0;
+    for(outputChannelIndex = 1; outputChannelIndex < 15; outputChannelIndex++){
         
         for (id specificConfigValue in configForSmellie){
             if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"Channel%i",outputChannelIndex]]){
@@ -1046,7 +1065,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 if(slaveMode){
                     NSLog(@"SMELLIE_RUN: Pulsing at %f Hz for %f seconds \n",[triggerFrequencyInSlaveMode floatValue],timeToPulse);
                     //Wait a certain amount of time for slave Mode
-                    [NSThread sleepForTimeInterval:5.0f];
+                    [NSThread sleepForTimeInterval:timeToPulse];
                 }
                 
                 [smellieSubRunInfo addObject:valuesToFillPerSubRun];
