@@ -492,7 +492,7 @@
             [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
             [tellieSettings setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
             [tellieSettings setObject:[NSNumber numberWithInt:[tellieNumofShots intValue]] forKey:@"number_of_shots"];
-            [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieVariableDelay floatValue]]
+            [tellieSettings setObject:[NSNumber numberWithFloat:[tellieVariableDelay floatValue]]
                                    forKey:@"pulse_by_pulse_extra_delay"];
             [model setPulseByPulseDelay:[tellieVariableDelay floatValue]];
             [model setTellieSubRunSettings:tellieSettings];
