@@ -204,7 +204,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //reduce the pulse by pulse delay to a percentage
     pulseByPulseDelay = pulseByPulseDelay/100.0;
     
-    double timeToSleep = 1.0*pulseByPulseDelay*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
+    double timeToSleep = (1.0+pulseByPulseDelay)*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
     
     
     //hold the fire command on this thread
