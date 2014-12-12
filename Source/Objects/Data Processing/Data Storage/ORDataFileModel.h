@@ -41,7 +41,6 @@
         NSFileHandle*	filePointer;
         unsigned long long	dataFileSize;
         NSString*		fileName;
-        NSString*		statusFileName;
 
         int				statusStart;
         BOOL			saveConfiguration;

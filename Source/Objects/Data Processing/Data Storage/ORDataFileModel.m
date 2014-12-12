@@ -91,7 +91,6 @@ static const int currentVersion = 1;           // Current version
     [diskFillingAlarm release];
     [filePointer release];
     [fileName release];
-    [statusFileName release];
     [dataFolder release];
     [statusFolder release];
     [configFolder release];
@@ -590,7 +589,7 @@ static const int currentVersion = 1;           // Current version
     int statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
     if(runMode == kNormalRun){
 	    //start a copy of the Status File
-	    statusFileName = [[NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]] retain];
+	    NSString* statusFileName = [NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]];
         
         [statusFolder ensureExists:[statusFolder finalDirectoryName]];
         NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
