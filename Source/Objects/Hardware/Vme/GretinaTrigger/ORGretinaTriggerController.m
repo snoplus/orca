@@ -328,7 +328,7 @@
 
 - (void) initStateChanged:(NSNotification*)aNote
 {
-    [initStateField setStringValue:[model initStateName]];
+    [initStateField setStringValue:[model initialStateName]];
     [stateStatusTable reloadData];
 }
 

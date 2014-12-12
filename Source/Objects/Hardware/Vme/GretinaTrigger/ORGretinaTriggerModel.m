@@ -935,7 +935,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaTriggerModelInitStateChanged object:self];
     
 }
-- (NSString*) initStateName
+- (NSString*) initialStateName
 {
     return [self stateName:initializationState];
 }
@@ -1187,7 +1187,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     
     unsigned short masterPreMask = 0;
     if(verbose) NSLog(@"\n");
-    if(verbose) NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
+    if(verbose) NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initialStateName]);
 
     [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
 
@@ -1477,7 +1477,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stepRouter) object:nil];
     
     if(verbose) NSLog(@"\n");
-    if(verbose) NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initStateName]);
+    if(verbose) NSLog(@"%@ Running Step: %@\n",[self isMaster]?@"Master":@"Router",[self initialStateName]);
     //read a few registers that we will use repeatedly and display
     [self readDisplayRegs]; //read a few registers that we will use repeatedly and display
     int i;

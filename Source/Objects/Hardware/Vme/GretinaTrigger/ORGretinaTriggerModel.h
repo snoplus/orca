@@ -315,7 +315,7 @@ enum {
 - (void) setVerbose:(BOOL)aVerbose;
 - (short) initState;
 - (void) setInitState:(short)aState;
-- (NSString*) initStateName;
+- (NSString*) initialStateName;
 - (void) setupStateArray;
 - (NSString*) stateName:(int)anIndex;
 - (unsigned short) inputLinkMask;
