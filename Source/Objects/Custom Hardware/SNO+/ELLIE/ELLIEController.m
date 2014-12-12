@@ -355,7 +355,7 @@
             [[note object] setIntValue:maximumVariableDelay];
         }
         else if (currentVariableDelay < minimumVariableDelay){
-            NSLog(@"Tellie: Variable pulse by pulse delay cannot be more than %f\n",minimumVariableDelay);
+            NSLog(@"Tellie: Variable pulse by pulse delay cannot be less than %f\n",minimumVariableDelay);
             [[note object] setIntValue:minimumVariableDelay];
         }
         else{
