@@ -63,6 +63,7 @@ NSString* ORELLIERunFinished = @"ORELLIERunFinished";
 @synthesize exampleTask;
 @synthesize smellieRunHeaderDocList;
 @synthesize smellieSubRunInfo,
+pulseByPulseDelay,
 tellieRunDoc,
 currentOrcaSettingsForSmellie,
 tellieSubRunSettings,
@@ -187,13 +188,29 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
     double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000.0);
-    double timeToSleep = 1.2*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot 
+    if(pulseByPulseDelay < 0.1){
+        NSLog(@"Pulse by pulse delay is too small. Setting to 0.1");
+        pulseByPulseDelay = 0.1;
+    }
+    else if (pulseByPulseDelay > 25.0)
+    {
+        NSLog(@"Pulse by pulse delay is too small. Setting to 25.0");
+        pulseByPulseDelay = 25.0;
+    }
+    else{
+        //do nothing 
+    }
+    
+    //reduce the pulse by pulse delay to a percentage
+    pulseByPulseDelay = pulseByPulseDelay/100.0;
+    
+    double timeToSleep = 1.0*pulseByPulseDelay*numberOfShots*timeBetweenShotsInMicroSeconds; //20% grace period for each shot
     
     
     //hold the fire command on this thread
     dispatch_sync(dispatch_get_current_queue(), ^{
         responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
-        NSLog(@"Response from Tellie Fire command: %@\n",responseFromTellie);
+        NSLog(@"Response from Tellie FIRE command: %@\n",responseFromTellie);
     });
 
     //NSLog(@"in here");
@@ -203,7 +220,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     __block NSString * responseFromPoll = [[NSString alloc] init];
     dispatch_sync(dispatch_get_current_queue(), ^{
         responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
-        NSLog(@"Response from Tellie Fire command: %@\n",responseFromPoll);
+        NSLog(@"Response from Tellie READ command: %@\n",responseFromPoll);
     });
     
     @try {

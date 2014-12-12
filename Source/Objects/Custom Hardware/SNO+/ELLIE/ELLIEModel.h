@@ -23,6 +23,7 @@
     ORRunController* theRunController;
     NSMutableArray *smellieSubRunInfo;
     bool _smellieDBReadInProgress;
+    float pulseByPulseDelay;
     
     //tellie settings
     NSMutableDictionary * tellieSubRunSettings;
@@ -37,6 +38,7 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableArray* smellieSubRunInfo;
 @property (nonatomic,assign) bool smellieDBReadInProgress;
+@property (nonatomic,assign) float pulseByPulseDelay;
 
 -(void) setUpImage;
 -(void) makeMainController;

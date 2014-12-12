@@ -343,6 +343,25 @@
             //do nothing 
         }
     }
+    //check the number of shots value
+    else if([note object] == tellieVariableDelay){
+        float currentVariableDelay = [[note object] floatValue];
+        float minimumVariableDelay = 0.1;
+        float maximumVariableDelay= 25.0;
+        
+        
+        if(currentVariableDelay > maximumVariableDelay){
+            NSLog(@"Tellie: Variable pulse by pulse delay cannot be more than %f\n",maximumVariableDelay);
+            [[note object] setIntValue:maximumVariableDelay];
+        }
+        else if (currentVariableDelay < minimumVariableDelay){
+            NSLog(@"Tellie: Variable pulse by pulse delay cannot be more than %f\n",minimumVariableDelay);
+            [[note object] setIntValue:minimumVariableDelay];
+        }
+        else{
+            //do nothing
+        }
+    }
     
     //check any other delegate accidentally assigned to the file's owner 
     else{
@@ -375,6 +394,7 @@
     [telliePulseWidthTf setBackgroundColor:aColor];
     [telliePulseHeightTf setBackgroundColor:aColor];
     [telliePulseRateTf setBackgroundColor:aColor];
+    [tellieVariableDelay setBackgroundColor:aColor];
 }
 
 -(BOOL)areTellieValuesCorrectlySet:(NSColor*)aColor{
@@ -386,6 +406,7 @@
     backgroundColorSet *= [[telliePulseHeightTf backgroundColor] isEqualTo:aColor];
     backgroundColorSet *= [[telliePulseRateTf backgroundColor] isEqualTo:aColor];
     backgroundColorSet *= [[tellieNumofShots backgroundColor] isEqualTo:aColor];
+    backgroundColorSet *= [[tellieVariableDelay backgroundColor] isEqualTo:aColor];
     backgroundColorSet *= [[tellieChannelTf backgroundColor] isEqualTo:aColor];
     return backgroundColorSet;
 }
@@ -400,6 +421,7 @@
     [telliePulseRateTf.window makeFirstResponder:nil];
     [tellieChannelTf.window makeFirstResponder:nil];
     [tellieNumofShots.window makeFirstResponder:nil];
+    [tellieVariableDelay.window makeFirstResponder:nil];
 
     //check the settings are validated and have been set
     if([self areTellieValuesCorrectlySet:[NSColor orangeColor]]){
@@ -441,6 +463,7 @@
     [telliePulseRateTf.window makeFirstResponder:nil];
     [tellieChannelTf.window makeFirstResponder:nil];
     [tellieNumofShots.window makeFirstResponder:nil];
+    [tellieVariableDelay.window makeFirstResponder:nil];
     
     
     NSMutableDictionary *fireTellieCommands = [[NSMutableDictionary alloc] initWithCapacity:10];
@@ -451,6 +474,8 @@
     [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieFibreDelayTf floatValue]] forKey:@"fibre_delay"];
     [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieTriggerDelayTf intValue]] forKey:@"trigger_delay"];
     [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieNumofShots intValue]] forKey:@"number_of_shots"];
+    [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieVariableDelay floatValue]]
+        forKey:@"pulse_by_pulse_extra_delay"];
     
     //check the settings are validated and have been set 
     if([self areTellieValuesCorrectlySet:[NSColor greenColor]]){
@@ -467,6 +492,9 @@
             [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
             [tellieSettings setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
             [tellieSettings setObject:[NSNumber numberWithInt:[tellieNumofShots intValue]] forKey:@"number_of_shots"];
+            [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieVariableDelay floatValue]]
+                                   forKey:@"pulse_by_pulse_extra_delay"];
+            
             [model setTellieSubRunSettings:tellieSettings];
             
             tellieThread = [[NSThread alloc] initWithTarget:model selector:@selector(fireTellieFibre:) object:fireTellieCommands];

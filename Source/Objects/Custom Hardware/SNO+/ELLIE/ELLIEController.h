@@ -102,6 +102,8 @@
     
     IBOutlet NSTextField * tellieNumofShots;
     
+    IBOutlet NSTextField * tellieVariableDelay;
+    
     NSThread *tellieThread;
 }
 
