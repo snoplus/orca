@@ -3760,8 +3760,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
     [argument setString: [NSString stringWithFormat: @"MCAC=%i;", numSpectrumBins]];
  	NSLog(@"WARNING: %@::%@:  write MCA: >%@< \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),argument);//TODO: DEBUG testing ...-tb-
     [self sendTextCommandString: argument];
-    
-    
+    [argument release];
     
     //write "MCA enable"
     [self sendTextCommandString: @"MCAE=ON;"];
