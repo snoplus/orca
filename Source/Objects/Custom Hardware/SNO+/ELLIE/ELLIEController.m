@@ -494,7 +494,7 @@
             [tellieSettings setObject:[NSNumber numberWithInt:[tellieNumofShots intValue]] forKey:@"number_of_shots"];
             [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieVariableDelay floatValue]]
                                    forKey:@"pulse_by_pulse_extra_delay"];
-            
+            [model setPulseByPulseDelay:[tellieVariableDelay floatValue]];
             [model setTellieSubRunSettings:tellieSettings];
             
             tellieThread = [[NSThread alloc] initWithTarget:model selector:@selector(fireTellieFibre:) object:fireTellieCommands];
