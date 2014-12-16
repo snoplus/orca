@@ -488,6 +488,11 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
 {
     if(state) {
         [serialPort open];
+        [serialPort setSpeed:9600];
+        [serialPort setParityOdd];
+        [serialPort setStopBits2:1];
+        [serialPort setDataBits:7];
+        [serialPort commitChanges];
         [serialPort writeString:@"EN;"]; //turn echo on
     }
     else      [serialPort close];
