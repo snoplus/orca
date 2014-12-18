@@ -216,7 +216,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         //lots depends on whether or not we are already biased.
         case kMJDInterlocks_CheckHVisOn:
-            
             hvIsOn = [delegate anyHvOnVMECrate:module];
             [self setState:kMJDInterlocks_CheckHVisOn status:[NSString stringWithFormat:@"HV is %@",hvIsOn?@"ON":@"OFF"] color:normalColor];
             if(pingedSuccessfully){
@@ -243,7 +242,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         //send the HV Bias state to the Vac system
         case kMJDInterlocks_UpdateVacSystem:
             if([queue operationCount]!=0){
-                [self setState:kMJDInterlocks_UpdateVacSystem status:@"Waiting On Queue" color:normalColor];
+                [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
             }
             else if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES){
@@ -288,13 +287,14 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             }
             else {
                 if([queue operationCount]==0){
+                    self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                                             [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setDetectorsBiased:%d];",hvIsOn],
                                             [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",2*[delegate pollTime]],
                                             
                                             nil];
                     [self sendCommands:cmds];
-                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"Waiting on Queue" color:normalColor];
+                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
                 }
             }
             break;
@@ -302,14 +302,13 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         //HV is ON... see if we need to unbias
         case kMJDInterlocks_GetShouldUnBias:
             if([queue operationCount]!=0){
-                [self setState:kMJDInterlocks_GetShouldUnBias status:@"Waiting On Queue" color:normalColor];
+                [self setState:kMJDInterlocks_GetShouldUnBias status:@"Trying Connection" color:normalColor];
             }
             else if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"shouldUnBias"]){
                     //it worked. move on.
                     retryCount = 0;
                     shouldUnBias = [[remoteOpStatus objectForKey:@"shouldUnBias"] boolValue];
-
                     if(shouldUnBias){
                         [self setState:kMJDInterlocks_GetShouldUnBias status:@"Vac says Unbias" color:badColor];
                         [self setState:kMJDInterlocks_FinalState      status:@"Vac says Unbias" color:badColor];
@@ -346,9 +345,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             }
             else {
                 if([queue operationCount]==0){
+                    self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];", nil];
                     [self sendCommands:cmds];
-                    [self setState:kMJDInterlocks_GetShouldUnBias status:@"Waiting on Queue" color:normalColor];
+                    [self setState:kMJDInterlocks_GetShouldUnBias status:@"Trying Connection" color:normalColor];
                 }
             }
             break;
@@ -357,7 +357,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         //HV is off... see if we would be allowed to bias HV
         case kMJDInterlocks_GetOKToBias:
             if([queue operationCount]!=0){
-                [self setState:kMJDInterlocks_GetOKToBias status:@"Waiting On Queue" color:normalColor];
+                [self setState:kMJDInterlocks_GetOKToBias status:@"Trying Connection" color:normalColor];
             }
             else if(remoteOpStatus){
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"okToBias"]){
@@ -369,14 +369,12 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     if(okToBias){
                         [self setState:kMJDInterlocks_FinalState status:@"OK to Bias" color:okColor];
                         lockHVDialog = NO;
-                        [self setCurrentState:kMJDInterlocks_HandleHVDialog];
                     }
                     else {
                         [self setState:kMJDInterlocks_FinalState status:@"Do NOT Bias" color:badColor];
-                        
                         lockHVDialog = YES;
-                        [self setCurrentState:kMJDInterlocks_HandleHVDialog];
                     }
+                    [self setCurrentState:kMJDInterlocks_HandleHVDialog];
                 }
                 else {
                     if(retryCount>=kAllowedConnectionRetry){
@@ -399,9 +397,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             }
             else {
                 if([queue operationCount]==0){
+                    self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"okToBias = [ORMJDVacuumModel,1 okToBiasDetector];", nil];
                     [self sendCommands:cmds];
-                    [self setState:kMJDInterlocks_GetOKToBias status:@"Waiting on Queue" color:normalColor];
+                    [self setState:kMJDInterlocks_GetOKToBias status:@"Trying Connection" color:normalColor];
                 }
             }
         break;
@@ -482,7 +481,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         [queue setMaxConcurrentOperationCount:1]; //can only do one at a time
     }
     ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
-    ORSendCommandOp* anOp = [[ORSendCommandOp alloc] initWithRemoteObj:remObj commands:cmdArray delegate:self];
+    [remObj setConnectionTimeout:5];
+    if(![remObj isConnected])[remObj connect];
+
+    ORResponseWaitOp* anOp = [[ORResponseWaitOp alloc] initWithRemoteObj:remObj commands:cmdArray delegate:self];
     [queue addOperation:anOp];
     [anOp release];
 }
@@ -510,6 +512,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
     else return nil;
 }
+
 - (void) disconnect
 {
     ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
@@ -569,7 +572,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 @end
 
-@implementation ORSendCommandOp
+@implementation ORResponseWaitOp
+
+@synthesize doneWithLoop;
+
 - (id) initWithRemoteObj:(ORRemoteSocketModel*)aRemObj commands:(NSArray*)cmdArray delegate:(ORMJDInterlocks*)aDelegate
 {
     self = [super init];
@@ -587,26 +593,32 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (void) main
 {
-    [remObj setConnectionTimeout:5];
-    if(![remObj isConnected])[remObj connect];
-    BOOL isConnected = [remObj isConnected];
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    
+    NSTimeInterval startTime = [NSDate timeIntervalSinceReferenceDate];
+    while (![self isCancelled]){
+        NSTimeInterval totalTime = [NSDate timeIntervalSinceReferenceDate] - startTime;
+        if(totalTime>10 || [remObj isConnected]){
+            break;
+        }
+        [NSThread sleepForTimeInterval:.1];
+    }
+    
     NSMutableDictionary* result = [NSMutableDictionary dictionary];
-    if(isConnected){
+    if([remObj isConnected]){
         for(id aCmd in cmds){
             if([self isCancelled])break;
             [remObj sendString:aCmd];
-            NSTimeInterval totalTime = 0;
             
             NSString* aKey = nil;
             NSArray* parts = [aCmd componentsSeparatedByString:@"="];
             if([parts count]==2){
                 aKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
             }
+            NSTimeInterval startTime = [NSDate timeIntervalSinceReferenceDate];
             while (![self isCancelled]){
-                [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                         beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-                totalTime += 0.1;
-                if(totalTime>2)break;
+                NSTimeInterval totalTime = [NSDate timeIntervalSinceReferenceDate] - startTime;
+                if(totalTime>10)break;
                 if(aKey){
                     if([remObj responseExistsForKey:aKey]){
                         id aValue = [remObj responseForKey:aKey];
@@ -617,7 +629,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if([remObj responseExistsForKey:@"Error"]){
                     id aValue = [remObj responseForKey:@"Error"];  //clear the error
                     [result setObject:aValue forKey:@"Error"];
-
                     break;
                 }
                 if([remObj responseExistsForKey:@"Success"]){
@@ -625,13 +636,14 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     break;
                 }
             }
-
         }
-        [remObj disconnect];
         [result setObject:[NSNumber numberWithBool:YES] forKey:@"connected"];
     }
     else [result setObject:[NSNumber numberWithBool:NO] forKey:@"connected"];
     [delegate setRemoteOpStatus:result];
+    
+    [remObj disconnect];
+    [pool release];
 }
 @end
 

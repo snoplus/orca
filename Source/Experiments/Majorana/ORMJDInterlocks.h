@@ -75,13 +75,13 @@ typedef struct {
 - (void)        reset:(BOOL)continueRunning;
 - (void)        addToReport:(NSString*)aString;
 
-@property (assign) MajoranaModel*  delegate;
-@property (assign,nonatomic) BOOL            isRunning;
-@property (retain) NSDictionary*   remoteOpStatus;
-@property (assign,nonatomic) int             currentState;
-@property (assign,nonatomic) int             module;
-@property (retain,nonatomic) NSMutableArray* stateStatus;
-@property (retain) NSMutableArray* finalReport;
+@property (assign) MajoranaModel*             delegate;
+@property (assign,nonatomic) BOOL             isRunning;
+@property (retain) NSDictionary*              remoteOpStatus;
+@property (assign,nonatomic) int              currentState;
+@property (assign,nonatomic) int              module;
+@property (retain,nonatomic) NSMutableArray*  stateStatus;
+@property (retain) NSMutableArray*            finalReport;
 
 @end
 
@@ -104,12 +104,14 @@ extern NSString* ORMJDInterlocksIsRunningChanged;
 extern NSString* ORMJDInterlocksStateChanged;
 
 
-@interface ORSendCommandOp : NSOperation
+@interface ORResponseWaitOp : NSOperation
 {
-    ORMJDInterlocks*                   delegate;
-    NSArray*            cmds;
-    ORRemoteSocketModel* remObj;
+    ORMJDInterlocks*        delegate;
+    NSArray*                cmds;
+    ORRemoteSocketModel*    remObj;
+    BOOL                    doneWithLoop;
 }
 - (id)   initWithRemoteObj:(ORRemoteSocketModel*)aRemObj commands:(NSArray*)aCmd delegate:(ORMJDInterlocks*)aDelegate;
 - (void) main;
+@property (assign) BOOL doneWithLoop;
 @end

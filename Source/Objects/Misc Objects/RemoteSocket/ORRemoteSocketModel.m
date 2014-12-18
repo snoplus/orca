@@ -19,14 +19,12 @@
 //-------------------------------------------------------------
 
 #import "ORRemoteSocketModel.h"
-#import <sys/socket.h>
-#import <netinet/in.h>
-#import <netdb.h>
-#import <arpa/inet.h>
+#import "NetSocket.h"
 
-NSString* ORRSRemotePortChanged		= @"ORRSRemotePortChanged";
-NSString* ORRSRemoteHostChanged		= @"ORRSRemoteHostChanged";
-NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
+NSString* ORRSRemotePortChanged		 = @"ORRSRemotePortChanged";
+NSString* ORRSRemoteHostChanged		 = @"ORRSRemoteHostChanged";
+NSString* ORRemoteSocketLock		 = @"ORRemoteSocketLock";
+NSString* ORRSRemoteConnectedChanged = @"ORRSRemoteConnectedChanged";
 
 @implementation ORRemoteSocketModel
 #pragma mark ***Initialization
@@ -37,7 +35,11 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	if(isConnected) {
 		[self disconnect];
 	}
-	[remoteHost release];
+    
+    [socket setDelegate:nil];
+    [socket release];
+    
+    [remoteHost release];
 	[responseDictionary release];
 	[super dealloc];
 }
@@ -61,18 +63,6 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 }
 
 #pragma mark ***Accessors
-- (SimpleCocoaConnection*)c
-{
-	return c;
-}
-
-- (void) setC:(SimpleCocoaConnection *)con
-{
-	[c release];
-	[con retain];
-	c = con;
-}
-
 - (void) setNewHost:(NSString*)newHost andPort:(int)newPort
 {
 	[self setRemoteHost:newHost];
@@ -83,19 +73,6 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 {
 	if(remoteHost)	return remoteHost;
 	else			return @"";
-}
-
-- (NSString*) remoteHostName
-{
-	if([remoteHost length]){
-		struct in_addr IPaddr;
-		struct hostent *host;
-		inet_pton(AF_INET, [remoteHost UTF8String], &IPaddr);
-		host = gethostbyaddr((char *) &IPaddr, sizeof(IPaddr),AF_INET);
-        if(host) return [NSString stringWithUTF8String:(host->h_name)];
-        else return @"";
-	}
-	else return @"";
 }
 
 - (void) setRemoteHost:(NSString *)newHost
@@ -135,6 +112,7 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 - (void) setIsConnected:(BOOL)flag
 {
 	isConnected = flag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRSRemoteConnectedChanged object:self];
 }
 
 - (int) connectionTimeout
@@ -159,78 +137,38 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	defaultStringEncoding = encoding;
 }
 
-#pragma mark Connecting
-
-- (SCCInit) connect
+- (NetSocket*) socket
 {
-	if(isConnected)		return SCCInitError_Connected;
-	if(!remoteHost)		return SCCInitError_Host;
-	if(remotePort < 1)	return SCCInitError_Port;
-	
-	int filedescriptor = -1;
-	CFSocketRef socket = CFSocketCreate(kCFAllocatorDefault, PF_INET, SOCK_STREAM, IPPROTO_TCP, 1, NULL, NULL);
-	
-	if(socket) {
-		
-		filedescriptor = CFSocketGetNative(socket);
-		
-		//this code prevents the socket from existing after the server has crashed or been forced to close
-		
-		int yes = 1;
-		setsockopt(filedescriptor, SOL_SOCKET, SO_REUSEADDR, (void*)&yes, sizeof(yes));
-		
-		struct sockaddr_in addr4;
-		memset(&addr4, 0, sizeof(addr4));
-		addr4.sin_len = sizeof(addr4);
-		addr4.sin_family = AF_INET;
-		addr4.sin_port = htons(remotePort);
-		inet_pton(AF_INET, [remoteHost UTF8String], &addr4.sin_addr);
-		
-		NSData* address4 = [NSData dataWithBytes:&addr4 length:sizeof(addr4)];
-		
-		int retVal = CFSocketConnectToAddress(socket, (CFDataRef)address4, [self connectionTimeout]);
-		CFRelease(socket);
-        
-		if(retVal == kCFSocketError)   return SCCInitError_NoConnection;
-		if(retVal == kCFSocketTimeout) return SCCInitError_Timeout;
-		if(retVal != kCFSocketSuccess) return SCCInitError_Unknown;
-		
-	} 
-	else return SCCInitError_NoSocket;
-	
-	NSFileHandle* fileHandle = [[[NSFileHandle alloc] initWithFileDescriptor:filedescriptor closeOnDealloc:YES] autorelease];
-	if(fileHandle) {
-		SimpleCocoaConnection* connection = [[SimpleCocoaConnection alloc] initWithFileHandle:fileHandle delegate:self];
-		if(connection) {
-			[self setC:connection];
-			[self setIsConnected:YES];
-		}
-		[connection release];
-	}
-	return SCCInitOK;
+    return socket;
+}
+
+- (void) setSocket:(NetSocket*)aSocket
+{
+    [aSocket retain];
+    [socket release];
+    socket = aSocket;
+    [socket setDelegate:self];
+}
+
+#pragma mark Connecting
+- (void) connect
+{
+    if(remoteHost && remotePort){
+        [self setSocket:[NetSocket netsocketConnectedToHost:remoteHost port:remotePort]];
+    }
 }
 
 - (void) disconnect
 {
-//	if([delegate respondsToSelector:@selector(connectionWillClose:)])
-//		[delegate performSelector:@selector(connectionWillClose:) withObject:self];
-	[self setC:nil];
-	[self setIsConnected:NO];
-//	if([delegate respondsToSelector:@selector(connectionDidClose:)])
-//		[delegate performSelector:@selector(connectionDidClose:) withObject:self];
+    [socket close];
+    [self setIsConnected:[socket isConnected]];
 }
-
-- (void) closeConnection:(SimpleCocoaConnection*)con
-{
-	[self disconnect];
-}
-
 
 #pragma mark Sending and Receiving
 - (BOOL) sendData:(NSData*)data
 {
 	@try {
-		[[c fileHandle] writeData:data];
+        [socket writeData:data];
     }
     @catch (NSException* exception) {
 		return NO;
@@ -248,35 +186,52 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
 	return [self sendData:[string dataUsingEncoding:encoding]];
 }
 
-- (void) processMessage:(NSString*)message fromConnection:(SimpleCocoaConnection*)con
+- (void) processMessage:(NSString*)message
 {
-	if(!responseDictionary)responseDictionary = [[NSMutableDictionary dictionary] retain];
+    @synchronized(self){
+        if(!responseDictionary)responseDictionary = [[NSMutableDictionary dictionary] retain];
+    }
 	message = [[message trimSpacesFromEnds] removeNLandCRs];
 	NSArray* parts = [message componentsSeparatedByString:@":"];
-	if([parts count]==2) [responseDictionary setObject:[parts objectAtIndex:1] forKey:[parts objectAtIndex:0]];
+    if([parts count]==2){
+        NSString* aKey   = [[parts objectAtIndex:0]trimSpacesFromEnds];
+        NSString* aValue = [[parts objectAtIndex:1]trimSpacesFromEnds];
+        if([aKey length]!=0 && [aValue length]!=0){
+            @synchronized(self){
+                [responseDictionary setObject:aValue forKey:aKey];
+            }
+        }
+    }
 }
 
 - (BOOL) responseExistsForKey:(NSString*)aKey
 {
-	if([responseDictionary objectForKey:aKey])return YES;
-	else return NO;
+    BOOL itExists = NO;
+    @synchronized(self){
+        itExists = [responseDictionary objectForKey:aKey]!=nil;
+    }
+	return itExists;
 }
 
 - (void) removeResponseForKey:(NSString*)aKey
 {
-	[responseDictionary removeObjectForKey:aKey];
+    @synchronized(self){
+        [responseDictionary removeObjectForKey:aKey];
+    }
 }
 
 - (id) responseForKey:(NSString*)aKey
 {
 	if(aKey){
-		id theValue =  [[[responseDictionary objectForKey:aKey] retain] autorelease];
-		[responseDictionary removeObjectForKey:aKey];
+        id theValue = nil;
+        @synchronized(self){
+            theValue =  [[[responseDictionary objectForKey:aKey] retain] autorelease];
+            [responseDictionary removeObjectForKey:aKey];
+        }
 		return theValue;
 	}
 	else return nil;
 }
-
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -295,115 +250,34 @@ NSString* ORRemoteSocketLock		= @"ORRemoteSocketLock";
     [encoder encodeObject:remoteHost forKey:@"remoteHost"];
     [encoder encodeInt:remotePort    forKey:@"remotePort"];
 }
+
+#pragma mark ***Delegate Methods
+- (void) netsocketConnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIsConnected:[socket isConnected]];
+    }
+}
+
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIsConnected:NO];
+    }
+}
+
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+{
+    if(inNetSocket == socket){
+        NSString* theString = [[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding];
+        NSArray* parts = [theString componentsSeparatedByString:@"\n"];
+        for(NSString* aPart in parts){
+            if([aPart length]==0) continue;
+            else if([aPart rangeOfString:@"OrcaHeartBeat"].location != NSNotFound) continue;
+            else if([aPart rangeOfString:@"runStatus"].location     != NSNotFound) continue;
+            else [self processMessage:aPart];
+        }
+        [theString release];
+    }
+}
 @end
-
-@interface SimpleCocoaConnection (PrivateMethods)
-- (void)setRemoteAddress:(NSString*)newAddress;
-- (void)setRemotePort:(int)newPort;
-@end
-
-@implementation SimpleCocoaConnection
-- (id) initWithFileHandle:(NSFileHandle*)fh delegate:(id)initDelegate
-{
-    if(self = [super init]) {
-		fileHandle = [fh retain];
-		connectionDelegate = [initDelegate retain];
-		
-		// Get IP address of remote client
-		CFSocketRef socket = CFSocketCreateWithNative(kCFAllocatorDefault, [fileHandle fileDescriptor], kCFSocketNoCallBack, NULL, NULL);
-		CFDataRef addrData = CFSocketCopyPeerAddress(socket);
-		CFRelease(socket);
-		
-		if(addrData) {
-			struct sockaddr_in* sock = (struct sockaddr_in*)CFDataGetBytePtr(addrData);
-			[self setRemotePort:(sock->sin_port)];
-			char* naddr = inet_ntoa(sock->sin_addr);
-			[self setRemoteAddress:[NSString stringWithCString:naddr encoding:NSASCIIStringEncoding]];
-			CFRelease(addrData);
-		} 
-		else {
-			[self setRemoteAddress:@"NULL"];
-		}
-		
-		// Register for notification when data arrives
-		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-		[nc addObserver:self
-			   selector:@selector(dataReceivedNotification:)
-				   name:NSFileHandleReadCompletionNotification
-				 object:fileHandle];
-		[fileHandle readInBackgroundAndNotify];
-	}
-	return self;
-}
-
-- (void) dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[connectionDelegate release];
-	[fileHandle closeFile];
-	[fileHandle release];
-	[remoteAddress release];
-	[super dealloc];
-}
-
-- (NSString*) description
-{
-	return [NSString stringWithFormat:@"%@:%d",[self remoteAddress],[self remotePort]];
-}
-
-#pragma mark Accessor Methods
-
-- (NSFileHandle*) fileHandle 
-{
-	return fileHandle;
-}
-
-- (void) setRemoteAddress:(NSString*)newAddress
-{
-	[remoteAddress release];
-	remoteAddress = [newAddress copy];
-}
-
-- (NSString*) remoteAddress
-{
-	return remoteAddress;
-}
-
-- (void) setRemotePort:(int)newPort
-{
-	remotePort = newPort;
-}
-
-- (int) remotePort
-{
-	return remotePort;
-}
-
-#pragma mark Notification Methods
-
-- (void) dataReceivedNotification:(NSNotification*)notification
-{
-	NSData *data = [[notification userInfo] objectForKey:NSFileHandleNotificationDataItem];
-	
-	if ([data length] == 0) {
-		// NSFileHandle's way of telling us that the client closed the connection
-		[connectionDelegate closeConnection:self];
-	} 
-	else {
-		[fileHandle readInBackgroundAndNotify];
-		NSString *received = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-		if([received characterAtIndex:0] == 0x04) { // End-Of-Transmission sent by client
-			return;
-		}
-		NSArray* parts = [received componentsSeparatedByString:@"\n"];
-		for(NSString* aPart in parts){
-			if([aPart length]==0) continue;
-			else if([aPart rangeOfString:@"OrcaHeartBeat"].location != NSNotFound) continue; 
-			else if([aPart rangeOfString:@"runStatus"].location     != NSNotFound) continue; 
-			else [connectionDelegate processMessage:aPart fromConnection:self];
-		}
-	}
-}
-
-@end
-
