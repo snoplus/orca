@@ -211,7 +211,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	}
 	else if(nextPeriodicRun!=nil){
 		NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-        [dateFormatter setDateFormat:@"%H:%M:%S"];
+        [dateFormatter setDateFormat:@"HH:mm:ss"];
 		NSString* nextTime = [dateFormatter stringFromDate:nextPeriodicRun];
 		return [NSString stringWithFormat:@"Idle until %@",nextTime];
 	}
