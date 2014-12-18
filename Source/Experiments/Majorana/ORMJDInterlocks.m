@@ -635,6 +635,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [remObj responseForKey:@"Success"]; //clear the success flag
                     break;
                 }
+                [NSThread sleepForTimeInterval:.1];
             }
         }
         [result setObject:[NSNumber numberWithBool:YES] forKey:@"connected"];
