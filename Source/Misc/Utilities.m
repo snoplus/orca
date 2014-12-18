@@ -534,12 +534,11 @@ kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices)
     return kernResult;
 }
         
-BOOL ORRunAlertPanel(NSString* mainMessage, NSString* msg, NSString* alternateButtonTitle , NSString* defaultButtonTitle,NSString* otherButtonTitle, ...)
+BOOL ORRunAlertPanel(NSString* mainMessage, NSString* msg, NSString* defaultButtonTitle, NSString* alternateButtonTitle,NSString* otherButtonTitle, ...)
 {
     
     va_list ap;
     va_start(ap, otherButtonTitle);
-    
     BOOL result;
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 //    10.10-specific
 
