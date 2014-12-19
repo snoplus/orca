@@ -1547,7 +1547,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    
     [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
     
     [dataTypeAssigner assignDataIds];
@@ -1647,7 +1646,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[NSThread setThreadPriority:.7];
 	
 	[self setRunPaused:NO];
-	
 }
 
 
@@ -1658,12 +1656,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
 	[NSThread setThreadPriority:1];
-	//alloc a large block to force the memory system to clean house
-	char* p = malloc(1024*1024*50);
-	if(p){
-		*p=1; //use it so the compile doesn't optimize it away.
-		free(p);
-	}
 
 	dataTakingThreadRunning = YES;
     [self clearExceptionCount];
