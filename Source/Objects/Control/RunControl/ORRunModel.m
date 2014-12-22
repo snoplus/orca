@@ -1967,6 +1967,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithBool:[self offlineRun]],				@"offlineRun",
 							 [NSNumber numberWithBool:[self timedRun]],					@"timedRun",
 							 [NSNumber numberWithUnsignedLong:[self timeLimit]],		@"timeLimit",
+                             [NSNumber numberWithUnsignedLong:[self runType]],          @"runType",
+                             runTypeNames,                                              @"runTypeNames",
                              [[self startTime] stdDescription],                         @"startTime",
                              [[self subRunStartTime] stdDescription],                   @"subRunStartTime",
 
