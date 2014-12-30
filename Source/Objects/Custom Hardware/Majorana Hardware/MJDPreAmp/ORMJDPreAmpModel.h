@@ -62,6 +62,7 @@
 }
 
 - (void) setUpArrays;
+- (NSString*) connectedObjectName;
 
 #pragma mark ¥¥¥Accessors
 - (int)  boardRev;
@@ -176,6 +177,7 @@ extern NSString* ORMJDBaselineVoltageArrayChanged;
 extern NSString* ORMJDFeedBackResistorChanged;
 extern NSString* ORMJDBaselineVoltageChanged;
 extern NSString* ORMJDPreAmpModelDetectorNameChanged;
+extern NSString* ORMJDPreAmpModelConnectionChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;

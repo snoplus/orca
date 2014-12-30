@@ -102,6 +102,7 @@
 - (void) setPlot:(id)aPlotter xAttributes:(id)attrib;
 - (void) setPlot:(id)aPlotter yAttributes:(id)attrib;
 - (void) deferredPlotUpdate;
+- (void) setWindowTitle;
 
 - (NSString*) adcName:(int)adcIndex;
 

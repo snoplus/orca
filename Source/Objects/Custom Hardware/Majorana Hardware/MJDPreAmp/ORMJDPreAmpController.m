@@ -25,6 +25,7 @@
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
+#import "ORVmeCard.h"
 
 @implementation ORMJDPreAmpController
 
@@ -211,8 +212,13 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"Controller %lu (Rev %d)",[model uniqueIdNumber],[model boardRev]+1]];
+    [self setWindowTitle];
     [self settingsLockChanged:nil];
+}
+
+- (void) setWindowTitle
+{
+    [[self window] setTitle:[NSString stringWithFormat:@"Preamp %lu (Rev %d) -> %@",[model uniqueIdNumber],[model boardRev]+1,[model connectedObjectName]]];
 }
 
 #pragma mark ¥¥¥Notifications
@@ -361,6 +367,17 @@
                      selector : @selector(boardRevChanged:)
                          name : ORMJDPreAmpModelBoardRevChanged
 						object: model];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(setWindowTitle)
+                         name : ORMJDPreAmpModelConnectionChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(setWindowTitle)
+                         name : ORVmeCardSlotChangedNotification
+                        object: nil];
+   
 }
 
 - (void) updateWindow
@@ -393,8 +410,8 @@
 - (void) boardRevChanged:(NSNotification*)aNote
 {
 	[boardRevPU selectItemAtIndex: [model boardRev]];
-    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu (Rev %d)",[model uniqueIdNumber],[model boardRev]+1]];
-}
+    [self setWindowTitle];
+ }
 
 - (void) useSBCChanged:(NSNotification*)aNote
 {

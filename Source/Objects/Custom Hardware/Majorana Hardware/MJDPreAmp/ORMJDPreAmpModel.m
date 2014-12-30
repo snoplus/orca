@@ -49,6 +49,7 @@ NSString* ORMJDBaselineVoltageArrayChanged  = @"ORMJDBaselineVoltageArrayChanged
 NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
 NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
 NSString* ORMJDPreAmpModelDetectorNameChanged		= @"ORMJDPreAmpModelDetectorNameChanged";
+NSString* ORMJDPreAmpModelConnectionChanged		= @"ORMJDPreAmpModelConnectionChanged";
 
 
 #pragma mark ¥¥¥Local Strings
@@ -206,12 +207,29 @@ struct {
 
 - (void) makeConnectors
 {
-    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(2,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width/2- kConnectorSize/2,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
 	[aConnector setConnectorType: 'SPII' ];
 	[aConnector addRestrictedConnectionType: 'SPIO' ]; 
 	[aConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
     [[self connectors] setObject:aConnector forKey:MJDPreAmpInputConnector];
     [aConnector release];
+}
+
+- (void) connectionChanged
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelConnectionChanged object:self];
+}
+
+- (NSString*) connectedObjectName
+{
+    NSString* name = @"";
+    ORConnector* inputConnector = [[self connectors] objectForKey:MJDPreAmpInputConnector];
+    ORConnector* otherObjConnector = [inputConnector connector];
+    OrcaObject* digitizerObj = [otherObjConnector objectLink];
+    name = [digitizerObj fullID];
+    name = [name stringByReplacingOccurrencesOfString:@"OR" withString:@""];
+    name = [name stringByReplacingOccurrencesOfString:@"Model" withString:@""];
+    return name;
 }
 
 - (void) setUpImage
