@@ -40,6 +40,7 @@
     IBOutlet NSTextField*	cmdField;
     IBOutlet NSTextView*	outputView;
     IBOutlet NSButton*		sendCmdButton;
+    IBOutlet NSButton*		sendCntrlCButton;
     IBOutlet NSButton*		clearDisplayButton;
 	IBOutlet NSMatrix*		eolTypeMatrix;
     IBOutlet NSButton*		listFireWireDevicesButton;
@@ -72,6 +73,7 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) optionAction:(id)sender;
 - (IBAction) sendAction:(id)sender;
+- (IBAction) sendCntrlCAction:(id)sender;
 - (IBAction) clearDisplayAction:(id)sender;
 
 @end
