@@ -270,8 +270,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		
 		//the serial port may break the data up into small chunks, so we have to accumulate the chunks until
 		//we get a full piece.
-		theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@""];
-		theString = [[theString componentsSeparatedByString:@">"] componentsJoinedByString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        theString = [theString stringByReplacingOccurrencesOfString:@">" withString:@""];
 		
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString];	
@@ -282,8 +282,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
                 NSString* theResponse = [[[buffer substringToIndex:lineRange.location+1] copy] autorelease];
                 [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
 				theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-				theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-				
 				if([theResponse length] != 0){
 					[self process_response:theResponse];
 				}
@@ -940,6 +938,10 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
     if([serialPort isOpen]){ 
 		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
+        if(![aCmd hasPrefix:@"++"]){
+            [cmdQueue enqueue:[NSString stringWithFormat:@"%c",0x03]];
+            [cmdQueue enqueue:@"++Delay"];
+        }
 		[cmdQueue enqueue:aCmd];
 		if(!lastRequest){
 			[self processOneCommandFromQueue];
@@ -1387,7 +1389,11 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if([cmdQueue count] == 0) return;
 	NSString* aCmd = [cmdQueue dequeue];
 	if(aCmd){
-		if([aCmd isEqualToString:@"++StartHWInit"]){
+        if([aCmd isEqualToString:@"++Delay"]){
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processOneCommandFromQueue) object:nil];
+            [self performSelector:@selector(processOneCommandFromQueue) withObject:self afterDelay:.5];
+        }
+        else if([aCmd isEqualToString:@"++StartHWInit"]){
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 			[self setOperationState:kRad7Initializing];
 			[self goToNextCommand];
@@ -1437,8 +1443,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 				aCmd = [aCmd stringByAppendingString:@"\r\n"];
 				
 				//NSLog(@"Rad7: writing: %@\n",aCmd);
-				[self startTimeOut];
-				[serialPort writeString:aCmd];
+                [self startTimeOut];
+                [serialPort writeString:aCmd];
 			}
 			if(!lastRequest){
 				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:1];
@@ -1507,9 +1513,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 				
 				[self handleDataRecord:theResponse];
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(goToNextCommand) object:nil];
-				[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:2];
+				[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:3];
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearTempVerbose) object:nil];
-				[self performSelector:@selector(clearTempVerbose) withObject:nil afterDelay:2];
+				[self performSelector:@selector(clearTempVerbose) withObject:nil afterDelay:3];
 			}
 			else {
 				switch(currentRequest){
