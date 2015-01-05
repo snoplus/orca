@@ -139,7 +139,7 @@ static struct {
 	{@"SETUP RECYCLE",   kSetupRecycle,  .5,	3},
 	{@"SETUP CYCLE",     kSetupCycle,	 .5,	4},
 	{@"SETUP SAVUSER",   kSetupSave,	 .5,	3},
-	{@"DATA FREE",		 kDataFree,		 .5,	3},
+	{@"DATA FREE",		 kDataFree,		  3,	3},
 	{@"DATA ERASE",		 kDataErase,	 .5,	3},
 	{@"DATA COM",		 kDataCom,		 10,	3}, //prints whole run
 	{@"TEST COM",		 kTestCom,		  3,	2}, //prints current cycle
@@ -1391,7 +1391,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(aCmd){
         if([aCmd isEqualToString:@"++Delay"]){
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processOneCommandFromQueue) object:nil];
-            [self performSelector:@selector(processOneCommandFromQueue) withObject:self afterDelay:.5];
+            [self performSelector:@selector(processOneCommandFromQueue) withObject:self afterDelay:.2];
         }
         else if([aCmd isEqualToString:@"++StartHWInit"]){
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
@@ -1438,16 +1438,14 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 				}
 			}
 			if(aCmd){
-				aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-				aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-				aCmd = [aCmd stringByAppendingString:@"\r\n"];
-				
-				//NSLog(@"Rad7: writing: %@\n",aCmd);
+                aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+                aCmd = [aCmd stringByAppendingString:@"\r\n"];
                 [self startTimeOut];
                 [serialPort writeString:aCmd];
 			}
 			if(!lastRequest){
-				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:1];
+				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.2];
 			}
 		}
 	}
@@ -1457,9 +1455,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {	
     dataValid = YES;
 	theResponse = [theResponse removeExtraSpaces];
-	//NSLog(@"%@\n",requestCount,theResponse);
 	if(firmwareLoading){
-		//NSLog(@"%@\n",theResponse);
 		if([theResponse rangeOfString:@"OK" options:NSCaseInsensitiveSearch].location != NSNotFound){
 			okCount++;
 			if(firmwareLoading){
