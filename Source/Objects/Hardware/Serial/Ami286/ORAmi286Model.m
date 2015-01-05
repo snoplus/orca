@@ -67,6 +67,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) clearReasons;
 - (void) changeTimerExpired: (NSTimer*) aTimer;
 - (void) pollLevels;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORAmi286Model
@@ -909,6 +910,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		}
 	}
 	[self addCmdToQueue:@"++ShipRecords"];
+    [self postCouchDBRecord];
 }
 
 - (void) loadAlarmsToHardware
@@ -1317,4 +1319,72 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	
 	[self performSelector:@selector(pollLevels) withObject:nil afterDelay:pollTime];
 }
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithFloat:level[0]],
+                             [NSNumber numberWithFloat:level[1]],
+                             [NSNumber numberWithFloat:level[2]],
+                             [NSNumber numberWithFloat:level[3]],
+                             nil], @"level",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:fillStatus[0]],
+                             [NSNumber numberWithInt:fillStatus[1]],
+                             [NSNumber numberWithInt:fillStatus[2]],
+                             [NSNumber numberWithInt:fillStatus[3]],
+                             nil], @"fillStatus",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:fillState[0]],
+                             [NSNumber numberWithInt:fillState[1]],
+                             [NSNumber numberWithInt:fillState[2]],
+                             [NSNumber numberWithInt:fillState[3]],
+                             nil], @"fillState",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:hiAlarmLevel[0]],
+                             [NSNumber numberWithInt:hiAlarmLevel[1]],
+                             [NSNumber numberWithInt:hiAlarmLevel[2]],
+                             [NSNumber numberWithInt:hiAlarmLevel[3]],
+                             nil], @"fillState",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:lowAlarmLevel[0]],
+                             [NSNumber numberWithInt:lowAlarmLevel[1]],
+                             [NSNumber numberWithInt:lowAlarmLevel[2]],
+                             [NSNumber numberWithInt:lowAlarmLevel[3]],
+                             nil], @"lowAlarmLevel",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:hiFillPoint[0]],
+                             [NSNumber numberWithInt:hiFillPoint[1]],
+                             [NSNumber numberWithInt:hiFillPoint[2]],
+                             [NSNumber numberWithInt:hiFillPoint[3]],
+                             nil], @"hiFillPoint",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:lowFillPoint[0]],
+                             [NSNumber numberWithInt:lowFillPoint[1]],
+                             [NSNumber numberWithInt:lowFillPoint[2]],
+                             [NSNumber numberWithInt:lowFillPoint[3]],
+                             nil], @"lowFillPoint",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:alarmStatus[0]],
+                             [NSNumber numberWithInt:alarmStatus[1]],
+                             [NSNumber numberWithInt:alarmStatus[2]],
+                             [NSNumber numberWithInt:alarmStatus[3]],
+                             nil], @"alarmStatus",
+                            
+                            [NSNumber numberWithBool:   isValid],               @"isValid",
+                            [NSNumber numberWithInt:    enabledMask],           @"enabledMask",
+                            [NSNumber numberWithBool:   [serialPort isOpen]],   @"portOpen",
+                            
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
+
 @end
