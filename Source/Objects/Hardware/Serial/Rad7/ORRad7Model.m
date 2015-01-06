@@ -1492,7 +1492,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			expectedCount= 1;
 			currentRequest = kRad7CommErr;
 			[self setOperationState:kRad7Idle];
-			NSLog(@"Rad7 Comm Error. Flushing Cmd Queue.\n");
+            NSLogError(@"",@"Comm Error",@"Rad7",[NSString stringWithFormat:@"unit %lu",[self uniqueIdNumber]],nil);
+
 			id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
 			
 			if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
