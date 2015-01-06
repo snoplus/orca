@@ -1348,7 +1348,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
                              [NSNumber numberWithInt:hiAlarmLevel[1]],
                              [NSNumber numberWithInt:hiAlarmLevel[2]],
                              [NSNumber numberWithInt:hiAlarmLevel[3]],
-                             nil], @"fillState",
+                             nil], @"hiAlarmLevel",
                             
                             [NSArray arrayWithObjects:
                              [NSNumber numberWithInt:lowAlarmLevel[0]],
