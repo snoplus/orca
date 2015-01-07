@@ -1391,7 +1391,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(aCmd){
         if([aCmd isEqualToString:@"++Delay"]){
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processOneCommandFromQueue) object:nil];
-            [self performSelector:@selector(processOneCommandFromQueue) withObject:self afterDelay:.2];
+            [self performSelector:@selector(processOneCommandFromQueue) withObject:self afterDelay:2];
         }
         else if([aCmd isEqualToString:@"++StartHWInit"]){
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
