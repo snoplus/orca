@@ -111,6 +111,8 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                          name : @"MPodPowerRestoredNotification"
                        object : nil];
     
+    [self slowPoll];
+
 }
 
 - (id) controllerCard
