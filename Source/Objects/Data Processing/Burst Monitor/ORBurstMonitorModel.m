@@ -203,6 +203,130 @@ NSDate* burstStart = NULL;
 	[emailList removeObjectAtIndex:anIndex];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBurstMonitorEmailListChanged object:self];
 }
+- (int) boreX:(int) card Channel:(int) chan // finds x coord of this card and channel
+{
+    int X;
+    X=0;
+    if(card == 8 || card == 10 || card == 13 || card == 15 || card == 5) //square cards
+    {
+        if(chan==4 || chan ==5)
+        {
+            X = X + 250;
+        }
+        if(chan==0 || chan ==1)
+        {
+            X = X + 500;
+        }
+        if(chan==6 || chan ==7)
+        {
+            X = X + 750;
+        }
+        if(chan==2 || chan ==3)
+        {
+            X = X + 1000;
+        }
+        if(card == 13 || card == 15 || card ==5) //left cards, card 5 set to card 13
+        {
+            X = X - 1250;
+        }
+    }
+    else if(card == 11 || card == 14 )
+    {
+        if(chan==4 || chan ==5)
+        {
+            X = X + 500;
+        }
+        if(chan==0 || chan ==1)
+        {
+            X = X + 750;
+        }
+        if(chan==6 || chan ==7)
+        {
+            X = X + 1000;
+        }
+        if(chan==2 || chan ==3)
+        {
+            X = X + 0;
+        }
+        if(card == 11) //left card
+        {
+            X = X - 1000;
+        }
+    }
+    else if(card == 9 || card == 12 )
+    {
+        if(chan==4 || chan ==5)
+        {
+            X = X + 1000;
+        }
+        if(chan==0 || chan ==1)
+        {
+            X = X + 0;
+        }
+        if(chan==6 || chan ==7)
+        {
+            X = X + 250;
+        }
+        if(chan==2 || chan ==3)
+        {
+            X = X + 500;
+        }
+        if(card == 9) //left card
+        {
+            X = X - 1000;
+        }        
+    }
+    return X;
+}
+- (int) boreY:(int) card Channel:(int) chan // finds x coord of this card and channel
+{
+    int Y;
+    Y=0;
+    if(card == 8 || card == 10 || card == 13 || card == 15 || card == 5) //square cards
+    {
+        if(chan==4 || chan ==5 || chan==6 || chan ==7)
+        {
+            Y = Y + 250;
+        }
+        if(card == 15)
+        {
+            Y = Y + 500;
+        }
+        if(card == 10)
+        {
+            Y = Y - 250;
+        }
+        if(card == 8)
+        {
+            Y = Y - 750;
+        }
+    }
+    else if(card == 11 || card == 14 )
+    {
+        Y = Y - 250;
+        if(chan==0 || chan ==1)
+        {
+            Y = Y - 250;
+        }
+        if(card == 14) //top card
+        {
+            Y = Y + 1000;
+        }
+    }
+    else if(card == 9 || card == 12 )
+    {
+        Y = Y + 250;
+        if(chan==6 || chan ==7)
+        {
+            Y = Y + 250;
+        }
+        if(card == 9) //top card
+        {
+            Y = Y - 1000;
+        }
+    }
+    return Y;
+}
 
 - (int) channelsCheck:(NSMutableArray*) aChans
 {
@@ -366,7 +490,12 @@ NSDate* burstStart = NULL;
                                         { 
                                             double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
                                             //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
-                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i \n", iter, countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", iter, countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                            if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
+                                            {
+                                                bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <--"]];
+                                            }
+                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
                                         }
                                         
                                         //Find characturistics of burst
@@ -386,6 +515,45 @@ NSDate* burstStart = NULL;
                                         durSec = (endTime - startTime);
                                         NSLog(@"Burst duration is %f, start is %f, end is %f, adc %i \n", durSec, startTime, endTime, adcStart);
                                         countsInBurst = countofNchan - 1;
+                                            
+                                        //Position of burst
+                                        int BurstLen = Bchans.count;
+                                        int m;
+                                        Xcenter = 0;
+                                        Ycenter = 0;
+                                        int Xsqr;
+                                        int Ysqr;
+                                        Xsqr = 0;
+                                        Ysqr = 0;
+                                        for(m=1;m<BurstLen; m++)
+                                        {
+                                            int Xposn;
+                                            int Yposn;
+                                            Xposn = [self boreX:[[Bcards objectAtIndex:m] intValue] Channel:[[Bchans objectAtIndex:m] intValue]];
+                                            Yposn = [self boreY:[[Bcards objectAtIndex:m] intValue] Channel:[[Bchans objectAtIndex:m] intValue]];
+                                            [Bx insertObject:[NSNumber numberWithInt:Xposn] atIndex:0];
+                                            [By insertObject:[NSNumber numberWithInt:Yposn] atIndex:0];
+                                            Xcenter = Xcenter + Xposn;
+                                            Xsqr = Xsqr + (Xposn * Xposn);
+                                            Ycenter = Ycenter + Yposn;
+                                            Ysqr = Ysqr + (Yposn * Yposn);
+                                        }
+                                        Xcenter = Xcenter / (BurstLen - 1);
+                                        Ycenter = Ycenter / (BurstLen - 1);
+                                        Rcenter = sqrt((Xcenter*Xcenter) + (Ycenter*Ycenter));
+                                        phi = atan(Ycenter/Xcenter);
+                                        Xsqr = Xsqr / (BurstLen - 1);
+                                        Ysqr = Ysqr / (BurstLen - 1);
+                                        Xrms = Xsqr - (Xcenter * Xcenter);
+                                        Yrms = Ysqr - (Ycenter * Ycenter);
+                                        Rrms = Xrms + Yrms;
+                                        Xrms = sqrt(Xrms);
+                                        Yrms = sqrt(Yrms);
+                                        Rrms = sqrt(Rrms);
+                                        rSqrNorm = ((BurstLen-1) * ((Xcenter/250.0) * (Xcenter/250.0)) * 0.145877) + ((BurstLen-1) * ((Ycenter/250.0) * (Ycenter/250.0)) * 0.241784);
+                                        [Bx release];
+                                        [By release];
+                                        //NSLog(@"Burst position is (%i,%i) mm from center, spread of (%i,%i) \n", Xcenter, Ycenter, Xrms, Yrms);
                                         
                                         addThisToQueue = 0;
                                         
@@ -797,6 +965,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"Number of counts in the burst: %d\n",countsInBurst];
     theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
+    theContent = [theContent stringByAppendingFormat:@"Position: (x,y)=(%i+-%f,%i+-%f) mm, phi=%f, r=%f mm, rms=%f mm  \n", Xcenter, Xrms, Ycenter, Yrms, phi, Rcenter, Rrms];
+    theContent = [theContent stringByAppendingFormat:@"SN expected: (x,y)=(0+-655,0+-508) mm, r=0 mm, rms=829 mm  \n"];
+    theContent = [theContent stringByAppendingFormat:@"Likelyhood of central position: chisquared %f/2, p = %f \n", rSqrNorm, exp(-0.5*rSqrNorm)];
     theContent = [theContent stringByAppendingFormat:@"Duration of burst: %f seconds \n",durSec];
     theContent = [theContent stringByAppendingFormat:@"Num Bursts this run: %d\n",burstCount];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];

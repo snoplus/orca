@@ -54,6 +54,16 @@
     NSMutableArray* Bsecs;
     NSMutableArray* Bmics;
     NSMutableArray* Bwords;
+    NSMutableArray* Bx;   //position from center in mm
+    NSMutableArray* By;
+    int Xcenter;
+    int Ycenter;
+    double Rcenter;
+    double phi;
+    double Xrms;
+    double Yrms;
+    double Rrms;
+    double rSqrNorm;
     
     //neutron only buffer
     NSMutableArray* Nchans; 
