@@ -792,8 +792,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 			s = @"Closing main window will close this experiment!";
 			buttonString = @"Close Experiment";
 		}
-        BOOL choice = ORRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
-        if(choice){
+        BOOL cancel = ORRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
+        if(!cancel){
             //[[self undoManager] removeAllActions];
             [[NSNotificationCenter defaultCenter]
 			 postNotificationName:ORDocumentClosedNotification
