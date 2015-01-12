@@ -225,12 +225,12 @@ NSDate* burstStart = NULL;
         {
             X = X + 1000;
         }
-        if(card == 13 || card == 15 || card ==5) //left cards, card 5 set to card 13
+        if(card == 13 || card == 15 || card == 5) //left cards, card 5 set to card 13
         {
             X = X - 1250;
         }
     }
-    else if(card == 11 || card == 14 )
+    else if(card == 11 || card == 14)
     {
         if(chan==4 || chan ==5)
         {
@@ -301,7 +301,7 @@ NSDate* burstStart = NULL;
             Y = Y - 750;
         }
     }
-    else if(card == 11 || card == 14 )
+    else if(card == 11 || card == 14)
     {
         Y = Y - 250;
         if(chan==0 || chan ==1)
@@ -493,7 +493,7 @@ NSDate* burstStart = NULL;
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", iter, countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
                                             if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
                                             {
-                                                bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <--"]];
+                                                bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <---"]];
                                             }
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
                                         }
@@ -517,7 +517,7 @@ NSDate* burstStart = NULL;
                                         countsInBurst = countofNchan - 1;
                                             
                                         //Position of burst
-                                        int BurstLen = Bchans.count;
+                                        int BurstLen = Nchans.count;
                                         int m;
                                         Xcenter = 0;
                                         Ycenter = 0;
@@ -529,23 +529,25 @@ NSDate* burstStart = NULL;
                                         {
                                             int Xposn;
                                             int Yposn;
-                                            Xposn = [self boreX:[[Bcards objectAtIndex:m] intValue] Channel:[[Bchans objectAtIndex:m] intValue]];
-                                            Yposn = [self boreY:[[Bcards objectAtIndex:m] intValue] Channel:[[Bchans objectAtIndex:m] intValue]];
+                                            Xposn = [self boreX:[[Ncards objectAtIndex:m] intValue] Channel:[[Nchans objectAtIndex:m] intValue]];
+                                            Yposn = [self boreY:[[Ncards objectAtIndex:m] intValue] Channel:[[Nchans objectAtIndex:m] intValue]];
                                             [Bx insertObject:[NSNumber numberWithInt:Xposn] atIndex:0];
                                             [By insertObject:[NSNumber numberWithInt:Yposn] atIndex:0];
                                             Xcenter = Xcenter + Xposn;
+                                            //NSLog(@"xposn is %i \n", Xposn);
                                             Xsqr = Xsqr + (Xposn * Xposn);
                                             Ycenter = Ycenter + Yposn;
                                             Ysqr = Ysqr + (Yposn * Yposn);
                                         }
+                                        //NSLog(@"xcenter is %i \n", Xcenter);
                                         Xcenter = Xcenter / (BurstLen - 1);
                                         Ycenter = Ycenter / (BurstLen - 1);
                                         Rcenter = sqrt((Xcenter*Xcenter) + (Ycenter*Ycenter));
                                         phi = atan(Ycenter/Xcenter);
                                         Xsqr = Xsqr / (BurstLen - 1);
                                         Ysqr = Ysqr / (BurstLen - 1);
-                                        Xrms = Xsqr - (Xcenter * Xcenter);
-                                        Yrms = Ysqr - (Ycenter * Ycenter);
+                                        Xrms = (Xsqr - (Xcenter * Xcenter))*(BurstLen - 1)/(BurstLen - 2);
+                                        Yrms = (Ysqr - (Ycenter * Ycenter))*(BurstLen - 1)/(BurstLen - 2);
                                         Rrms = Xrms + Yrms;
                                         Xrms = sqrt(Xrms);
                                         Yrms = sqrt(Yrms);
