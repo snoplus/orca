@@ -646,12 +646,15 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 					int index = [[parts objectAtIndex:0] intValue];
 					if(index<14){
 						NSMutableDictionary* dict = [stringMap objectAtIndex:index];
-						[dict setObject:[parts objectAtIndex:0] forKey:@"kStringNum"];
+                        [dict setObject:[parts objectAtIndex:0] forKey:@"kStringNum"];
 						[dict setObject:[parts objectAtIndex:1] forKey:@"kDet1"];
 						[dict setObject:[parts objectAtIndex:2] forKey:@"kDet2"];
 						[dict setObject:[parts objectAtIndex:3] forKey:@"kDet3"];
 						[dict setObject:[parts objectAtIndex:4] forKey:@"kDet4"];
-						[dict setObject:[parts objectAtIndex:5] forKey:@"kDet5"];
+                        [dict setObject:[parts objectAtIndex:5] forKey:@"kDet5"];
+                        //added....
+                        if([parts objectAtIndex:6])[dict setObject:[parts objectAtIndex:6] forKey:@"kStringName"];
+                        else [dict setObject:@"-" forKey:@"kStringName"];
 					}
 				}
 			}
@@ -671,15 +674,22 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (NSString*) mapFileAsString
 {
    	NSMutableString* stringRep = [NSMutableString string];
-    [stringRep appendFormat:@"String,Det1,Det2,Det3,Det4,Det5\n"];
-	for(id item in stringMap)[stringRep appendFormat:@"%@,%@,%@,%@,%@,%@\n",
+    [stringRep appendFormat:@"Index,Det1,Det2,Det3,Det4,Det5,Name\n"];
+    for(id item in stringMap){
+        //special, handle the lastest additions
+        NSString* name = [item objectForKey:@"kStringName"];
+        if([name length]==0)name = @"-";
+        
+        [stringRep appendFormat:@"%@,%@,%@,%@,%@,%@,%@\n",
                               [item objectForKey:@"kStringNum"],
                               [item objectForKey:@"kDet1"],
                               [item objectForKey:@"kDet2"],
                               [item objectForKey:@"kDet3"],
                               [item objectForKey:@"kDet4"],
-                              [item objectForKey:@"kDet5"]
+                              [item objectForKey:@"kDet5"],
+                              name
                               ];
+    }
     [stringRep deleteCharactersInRange:NSMakeRange([stringRep length]-1,1)];
     return stringRep;
 }
@@ -776,6 +786,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     int numSegments = [self numberSegmentsInGroup:0];
     int i;
     for(i = 0; i<numSegments; i++){
+        [segmentGroup setSegment:i object:@"-" forKey:@"kStringName"];
         [segmentGroup setSegment:i object:[NSNumber numberWithInt:999] forKey:@"kStringNum"];
         [segmentGroup setSegment:i object:[NSNumber numberWithInt:999] forKey:@"kPosition"];
     }
@@ -829,6 +840,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                                   @"-",						 @"kDet3",
                                   @"-",						 @"kDet4",
                                   @"-",						 @"kDet5",
+                                  @"-",                      @"kStringName",
                                   nil]];
 		}
 	}

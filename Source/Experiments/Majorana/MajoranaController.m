@@ -61,7 +61,7 @@
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(580,530);
-	detectorMapViewSize	 = NSMakeSize(990,565);
+	detectorMapViewSize	 = NSMakeSize(1050,565);
 	vetoMapViewSize		 = NSMakeSize(460,565);
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
     [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
@@ -634,7 +634,7 @@
     else if(aTableView == stringMapTableView){
         if([[aTableColumn identifier] isEqualToString:@"kStringNum"]){
             int stringIndex = [[model stringMap:rowIndex objectForKey:[aTableColumn identifier]]intValue];
-            NSString* stringId = [NSString stringWithFormat:@"%d,%d",stringIndex/7+1,stringIndex%7+1];
+            NSString* stringId = [NSString stringWithFormat:@"%d",stringIndex];
             return stringId;
         }
 		else return [model stringMap:rowIndex objectForKey:[aTableColumn identifier]];
