@@ -207,9 +207,9 @@ NSDate* burstStart = NULL;
 {
     int X;
     X=0;
-    if(card == 8 || card == 10 || card == 13 || card == 15 || card == 5) //square cards
+    if(card == 8 || card == 10 || card == 13 || card == 15) //square cards
     {
-        if(chan==4 || chan ==5)
+        if(chan==4 || chan == 5)
         {
             X = X + 250;
         }
@@ -225,7 +225,7 @@ NSDate* burstStart = NULL;
         {
             X = X + 1000;
         }
-        if(card == 13 || card == 15 || card == 5) //left cards, card 5 set to card 13
+        if(card == 13 || card == 15) //left cards
         {
             X = X - 1250;
         }
@@ -253,7 +253,7 @@ NSDate* burstStart = NULL;
             X = X - 1000;
         }
     }
-    else if(card == 9 || card == 12 )
+    else if(card == 9 || card == 12 || card ==5)
     {
         if(chan==4 || chan ==5)
         {
@@ -271,7 +271,7 @@ NSDate* burstStart = NULL;
         {
             X = X + 500;
         }
-        if(card == 9) //left card
+        if(card == 9) //left card, card 5 is card 12
         {
             X = X - 1000;
         }        
@@ -282,7 +282,7 @@ NSDate* burstStart = NULL;
 {
     int Y;
     Y=0;
-    if(card == 8 || card == 10 || card == 13 || card == 15 || card == 5) //square cards
+    if(card == 8 || card == 10 || card == 13 || card == 15) //square cards
     {
         if(chan==4 || chan ==5 || chan==6 || chan ==7)
         {
@@ -313,14 +313,14 @@ NSDate* burstStart = NULL;
             Y = Y + 1000;
         }
     }
-    else if(card == 9 || card == 12 )
+    else if(card == 9 || card == 12 || card == 5)
     {
         Y = Y + 250;
         if(chan==6 || chan ==7)
         {
             Y = Y + 250;
         }
-        if(card == 9) //top card
+        if(card == 9) //bottom card
         {
             Y = Y - 1000;
         }
@@ -543,7 +543,25 @@ NSDate* burstStart = NULL;
                                         Xcenter = Xcenter / (BurstLen - 1);
                                         Ycenter = Ycenter / (BurstLen - 1);
                                         Rcenter = sqrt((Xcenter*Xcenter) + (Ycenter*Ycenter));
-                                        phi = atan(Ycenter/Xcenter);
+                                        if(Xcenter == 0)
+                                        {
+                                            if(Ycenter > 0)
+                                            {
+                                                phi = 3.14159/2;
+                                            }
+                                            else
+                                            {
+                                                phi = 3.14159*1.5;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            phi = atan((1.0*Ycenter)/Xcenter);
+                                        }
+                                        if(Xcenter < 0)
+                                        {
+                                            phi = phi + 3.14159;
+                                        }
                                         Xsqr = Xsqr / (BurstLen - 1);
                                         Ysqr = Ysqr / (BurstLen - 1);
                                         Xrms = (Xsqr - (Xcenter * Xcenter))*(BurstLen - 1)/(BurstLen - 2);
