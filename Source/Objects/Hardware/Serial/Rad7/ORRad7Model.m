@@ -1787,7 +1787,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
             }
         }
         else if([aString rangeOfString:@"Units" options:NSCaseInsensitiveSearch].location != NSNotFound){
-            NSLog(@"%@: Reboot is finished\n",[self fullID]);
+            if(poweringUp)NSLog(@"%@: Reboot is finished\n",[self fullID]);
         }
         else if([aString rangeOfString:@"DATA COM"].location != NSNotFound){
             gettingData = YES;
