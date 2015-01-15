@@ -399,11 +399,12 @@
 	[self pollTimeChanged:nil];
 	[self adcEnabledMaskChanged:nil];
 	[self updateTimePlot:nil];
-	[self baselineVoltageArrayChanged:nil];
-	[self feedbackResistorArrayChanged:nil];
+	[self baselineVoltageChanged:nil];
+	[self feedbackResistorChanged:nil];
 	[self detectorNameChanged:nil];
 	[self useSBCChanged:nil];
 	[self boardRevChanged:nil];
+    [self adcChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -582,10 +583,20 @@
 
 - (void) feedbackResistorChanged:(NSNotification*)aNote
 {
- 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-    if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
-    else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
-	else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+    int chan;
+    if(!aNote){
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+            else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+            else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+        else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+        else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+    }
 }
 
 - (void) baselineVoltageArrayChanged:(NSNotification*)aNote
@@ -600,11 +611,20 @@
 
 - (void) baselineVoltageChanged:(NSNotification*)aNote
 {
- 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-    if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
-    else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
-	else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
-   
+    int chan;
+    if(!aNote){
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+            else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+            else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
+        }
+    }
+    else {
+        chan= [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+        else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+        else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
+   }
 }
 
 - (void) loopForeverChanged:(NSNotification*)aNote
