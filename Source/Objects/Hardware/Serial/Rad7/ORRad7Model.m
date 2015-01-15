@@ -29,7 +29,7 @@
 #import "ORSafeQueue.h"
 
 #pragma mark ***External Strings
-NSString* ORRad7ModelFirmwareLoadingChanged = @"ORRad7ModelFirmwareLoadingChanged";
+NSString* ORRad7ModelRadLinkLoadingChanged = @"ORRad7ModelRadLinkLoadingChanged";
 NSString* ORRad7ModelHumidityMaxLimitChanged = @"ORRad7ModelHumidityMaxLimitChanged";
 NSString* ORRad7ModelPumpCurrentMaxLimitChanged = @"ORRad7ModelPumpCurrentMaxLimitChanged";
 NSString* ORRad7ModelPumpCurrentAlarmChanged = @"ORRad7ModelPumpCurrentAlarmChanged";
@@ -42,7 +42,6 @@ NSString* ORRad7ModelDeleteDataOnStartChanged = @"ORRad7ModelDeleteDataOnStartCh
 NSString* ORRad7ModelRunToPrintChanged	= @"ORRad7ModelRunToPrintChanged";
 NSString* ORRad7ModelDataPointArrayChanged = @"ORRad7ModelDataPointArrayChanged";
 NSString* ORRad7ModelRunStateChanged	= @"ORRad7ModelRunStateChanged";
-NSString* ORRad7ModelOperationStateChanged = @"ORRad7ModelOperationStateChanged";
 NSString* ORRad7ModelTUnitsChanged		= @"ORRad7ModelTUnitsChanged";
 NSString* ORRad7ModelRUnitsChanged		= @"ORRad7ModelRUnitsChanged";
 NSString* ORRad7ModelFormatChanged		= @"ORRad7ModelFormatChanged";
@@ -59,6 +58,9 @@ NSString* ORRad7ModelPortNameChanged	= @"ORRad7ModelPortNameChanged";
 NSString* ORRad7ModelPortStateChanged	= @"ORRad7ModelPortStateChanged";
 NSString* ORRad7ModelStatusChanged		= @"ORRad7ModelStatusChanged";
 NSString* ORRad7ModelUpdatePlot			= @"ORRad7ModelUpdatePlot";
+NSString* ORRad7ModelCommandStateChanged= @"ORRad7ModelCommandStateChanged";
+NSString* ORRad7ModelStatusStringChanged= @"ORRad7ModelStatusStringChanged";
+
 
 NSString* ORRad7Lock = @"ORRad7Lock";
 
@@ -67,12 +69,9 @@ NSString* ORRad7Lock = @"ORRad7Lock";
 
 @interface ORRad7Model (private)
 - (void) timeout;
-- (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
-- (void) goToNextCommand;
 - (void) handleSetupReview:(NSString*)aLine lineNumber:(int) lineNumber;
 - (void) handleStatusInfo:(NSString*)aLine lineNumber:(int) lineNumber;
-- (void) handleSetupParam:(NSString*)aLine lineNumber:(int) lineNumber;
 - (void) handleDataFree:(NSString*)aLine lineNumber:(int) lineNumber;
 - (void) handleDataCom:(NSString*)aLine lineNumber:(int) lineNumber;
 - (void) handleDataRecord:(NSString*)aLine;
@@ -83,68 +82,19 @@ NSString* ORRad7Lock = @"ORRad7Lock";
 - (double) convertTime:(NSArray*)parts;
 - (void) resetDataSet;
 - (void) clearTempVerbose;
-- (void) deferredEndOfFirmwareLoad:(NSString*) contents;
-- (void) deferredEndOfFirmwareLoad1;
-- (void) deferredEndOfFirmwareLoad2;
-- (void) deferredEndOfFirmwareLoad3;
-- (void) deferredEndOfFirmwareLoad4;
+- (void) deferredRadLinkLoad:(NSString*) contents;
+- (void) resetBaudRatesAfterRadLinkLoad;
+- (void) resetBaudRatesAfterRadLinkLoad2;
+- (void) commandLoop;
+- (void) chunkPrecheck:(NSString*)aString;
+- (void) chunkPostcheck:(NSString*)aString;
+- (void) flushAllCommands;
 @end
 
 @implementation ORRad7Model
 
-enum {
-	kRad7PowerUp,
-	kSpecialStatus,
-	kSpecialStart,
-	kSpecialStop,
-	kSetupReview,
-	kSetupMode,
-	kSetupPump,
-	kSetupThoron,
-	kSetupTone,
-	kSetupFormat,
-	kSetupUnits,
-	kSetupProtocol,
-	kSetupRecycle,
-	kSetupCycle,
-	kSetupSave,
-	kDataFree,
-	kDataErase,
-	kDataCom,
-	kTestCom,
-	kDumpValues,
-	kNumberRad7Cmds //must be last
-};
 #define kRad7CmdTimeout  10
 #define kRad7CommErr  -999
-
-static struct {
-	NSString* commandName;
-	unsigned int cmdId;
-	float        waitTime;
-	unsigned int expectedReturnLines;
-} rad7Cmds[kNumberRad7Cmds] = {
-	{@"PowerUpSequence", kRad7PowerUp,	 5,		17},
-	{@"SPECIAL STATUS",  kSpecialStatus, 0.5,	6},
-	{@"SPECIAL START",   kSpecialStart,  0.5,	3},
-	{@"SPECIAL STOP",    kSpecialStop,   0.5,	3},
-	{@"SETUP REVIEW",    kSetupReview,	 2,		13},
-	{@"SETUP MODE",      kSetupMode,	 .5,	3},
-	{@"SETUP PUMP",      kSetupPump,	 .5,	3},
-	{@"SETUP THORON",    kSetupThoron,   .5,	3},
-	{@"SETUP TONE",      kSetupTone,	 .5,	3},
-	{@"SETUP FORMAT",    kSetupFormat,	 .5,	3},
-	{@"SETUP UNITS",     kSetupUnits,	 .5,	3},
-	{@"SETUP PROTOCOL",  kSetupProtocol, .5,	3},
-	{@"SETUP RECYCLE",   kSetupRecycle,  .5,	3},
-	{@"SETUP CYCLE",     kSetupCycle,	 .5,	4},
-	{@"SETUP SAVUSER",   kSetupSave,	 .5,	3},
-	{@"DATA FREE",		 kDataFree,		  3,	3},
-	{@"DATA ERASE",		 kDataErase,	 .5,	3},
-	{@"DATA COM",		 kDataCom,		 10,	3}, //prints whole run
-	{@"TEST COM",		 kTestCom,		  3,	2}, //prints current cycle
-	{@"++DumpUser",      kDumpValues,	  3,	13},
-};
 
 #define kNumberRad7FormatNames 4
 static NSString* rad7FormatNames[kNumberRad7FormatNames] = {
@@ -212,7 +162,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
 	[cmdQueue release];
-	[lastRequest release];
     [portName release];
 	[stopRunFilePath release];
     if([serialPort isOpen]){
@@ -236,6 +185,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(pollTime){
 		[self pollHardware];
 	}
+    else {
+        [self setStatusString:@"Idle"];
+    }
 }
 
 - (void) setUpImage
@@ -264,44 +216,87 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) dataReceived:(NSNotification*)note
 {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-		
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        if(!poweringUp && !rebooting && !radLinkLoading && !gettingData && !gettingReview) [self startTimeOut]; //reset the timeout
+        
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
 		
-		//the serial port may break the data up into small chunks, so we have to accumulate the chunks until
-		//we get a full piece.
-        theString = [theString stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        theString = [theString stringByReplacingOccurrencesOfString:@">" withString:@""];
-		
         if(!buffer)buffer = [[NSMutableString string] retain];
-        [buffer appendString:theString];	
-		
-        do {
-            NSRange lineRange = [buffer rangeOfString:@"\r"];
-            if(lineRange.location!= NSNotFound){
-                NSString* theResponse = [[[buffer substringToIndex:lineRange.location+1] copy] autorelease];
-                [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
-				theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-				if([theResponse length] != 0){
-					[self process_response:theResponse];
-				}
+        [buffer appendString:theString]; //accumulate into the buffer
+        
+        [self chunkPrecheck:buffer]; //some of the responses are very long. Check for the special cases
+        
+        if(gettingData){
+            [self setStatusString:[NSString stringWithFormat:@"Received: %d bytes",[buffer length]]];
+        }
+        else if(radLinkLoading && !rebooting){
+            [self setStatusString:[NSString stringWithFormat:@"Loaded: %d/%d bytes",[buffer length],radLinkSize]];
+        }
+        else if(gettingReview){
+            [self setStatusString:[NSString stringWithFormat:@"Getting Data: %d bytes (Takes a while -- Be patient)",[buffer length]]];
+        }
+       
+        NSUInteger eofLocation = [buffer rangeOfString:@"\r\n>"].location;
+        if(eofLocation!= NSNotFound){
+            //we got a '>'.
+            [self chunkPostcheck:buffer]; //check that the special cases are done
+            
+            //take the string out of the buffer
+            NSString* theResponse = [[[buffer substringToIndex:eofLocation+3] copy] autorelease];
+            [buffer deleteCharactersInRange:NSMakeRange(0,eofLocation+3)];
+            
+            if([theResponse length] == 3){
+                //case #1. Got just the '>' from sending the control-C
+                //tell the state machine we got it
+                gotCarrot = YES;
             }
-        } while([buffer rangeOfString:@"\r"].location!= NSNotFound);
+            else {
+                theResponse = [theResponse stringByReplacingOccurrencesOfString:@">" withString:@""];
+                theResponse  = [theResponse stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                //case #2. Got the '>' at the end of a response
+                gotResponse = YES;
+                [self process_response:theResponse];
+                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+            }
+        }
 	}
 }
 
 #pragma mark ***Accessors
-
-- (BOOL) firmwareLoading
+- (int) commandState
 {
-    return firmwareLoading;
+    return commandState;
+}
+- (void) setCommandState:(int)aState
+{
+    commandState = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelCommandStateChanged object:self];
+
+}
+- (NSString*)statusString
+{
+    if([statusString length]==0)return @"";
+    else return statusString;
 }
 
-- (void) setFirmwareLoading:(BOOL)aFirmwareLoading
+- (void) setStatusString:(NSString*)aString
 {
-    firmwareLoading = aFirmwareLoading;
+    [statusString autorelease];
+    statusString = [aString copy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusStringChanged object:self];
+    
+}
+- (BOOL) radLinkLoading
+{
+    return radLinkLoading;
+}
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelFirmwareLoadingChanged object:self];
+- (void) setRadLinkLoading:(BOOL)aRadLinkLoading
+{
+    radLinkLoading = aRadLinkLoading;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelRadLinkLoadingChanged object:self];
 }
 
 - (float) humidityMaxLimit
@@ -460,29 +455,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
     runState = aRunState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelRunStateChanged object:self];
-}
-
-- (int) operationState
-{
-    return operationState;
-}
-
-- (void) setOperationState:(int)aOperationState
-{
-    operationState = aOperationState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelOperationStateChanged object:self];
-}
-
-- (NSString*) operationStateString
-{
-	switch(operationState){
-		case kRad7Idle:				return @"Idle";
-		case kRad7UpdatingSettings: return @"Updating Settings";
-		case kRad7DumpingSettings:  return @"Dumping Settings";
-		case kRad7Initializing:		return @"Initialing HW";
-		case kRad7ExecutingGroup:	return @"Executing Cmd Group";
-		default: return @"Idle";
-	}
 }
 
 - (int) tUnits
@@ -731,45 +703,9 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	}
 }
 
-
-
-
 - (unsigned long) timeMeasured
 {
 	return timeMeasured;
-}
-
-- (NSString*) lastRequest
-{
-	return lastRequest;
-}
-
-- (void) setLastRequest:(NSString*)aRequest
-{
-	if(aRequest){
-		int i;
-		for(i=0;i<kNumberRad7Cmds;i++){
-			if([aRequest hasPrefix:rad7Cmds[i].commandName]){
-				
-				currentRequest = rad7Cmds[i].cmdId;
-				waitTime       = rad7Cmds[i].waitTime;
-				expectedCount  = rad7Cmds[i].expectedReturnLines;
-				
-				requestCount = 0;
-				[lastRequest autorelease];
-				lastRequest  = [aRequest copy];  
-			}
-			else if([aRequest hasPrefix:@"++"]){
-				waitTime       = 0;
-				expectedCount  = 0;
-				
-			}
-		}
-	}
-	else {
-		[lastRequest autorelease];
-		lastRequest  = [aRequest copy];  
-	}
 }
 
 - (BOOL) portWasOpen
@@ -849,6 +785,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	return statusDictionary;
 }
+
 
 
 #pragma mark ***Archival
@@ -936,52 +873,45 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 #pragma mark *** Commands
 - (void) addCmdToQueue:(NSString*)aCmd
 {
-    if([serialPort isOpen]){ 
+    if([serialPort isOpen]){
 		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
-        if(![aCmd hasPrefix:@"++"]){
-            [cmdQueue enqueue:[NSString stringWithFormat:@"%c",0x03]];
-            [cmdQueue enqueue:@"++Delay"];
-        }
+        aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+        aCmd = [aCmd stringByAppendingString:@"\r\n"];
+        
 		[cmdQueue enqueue:aCmd];
-		if(!lastRequest){
-			[self processOneCommandFromQueue];
-		}
+        if(commandState == kRad7QueueIdle){
+            commandState = kRad7SendCntrlC;
+            [self commandLoop];
+        }
 	}
 }
 
 - (void) specialStart
 {
-	NSLog(@"Starting Rad7\n");
+	NSLog(@"Starting %@\n",[self fullID]);
 	[self setRunState:kRad7RunStateUnKnown];
 	if(deleteDataOnStart)	{
 		[self resetDataSet];
 		[self addCmdToQueue:@"DATA ERASE YES"];
 	}
 	[self initHardware];
-	[self addCmdToQueue:@"++StartGroup"];
-	[self addCmdToQueue:@"SPECIAL STATUS"];
 	[self addCmdToQueue:@"SPECIAL START"];
 	[self addCmdToQueue:@"SPECIAL STATUS"];
-	[self addCmdToQueue:@"++EndGroup"];
 }
 
 - (void) specialStop
 {
-	NSLog(@"Stopping Rad7\n");
+    NSLog(@"Stopping %@\n",[self fullID]);
 	[self setRunState:kRad7RunStateUnKnown];
-	[self addCmdToQueue:@"++StartGroup"];
-	[self addCmdToQueue:@"SPECIAL STATUS"];
 	[self addCmdToQueue:@"SPECIAL STOP"];
 	[self addCmdToQueue:@"SPECIAL STATUS"];
-	[self addCmdToQueue:@"++EndGroup"];
 }
 
 - (void) specialStatus
 {
-	[self addCmdToQueue:@"++StartGroup"];
 	[self addCmdToQueue:@"SPECIAL STATUS"];
 	[self addCmdToQueue:@"DATA FREE"];
-	[self addCmdToQueue:@"++EndGroup"];
 }
 
 - (void) dataErase
@@ -1099,26 +1029,12 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) loadDialogFromHardware
 {
-	if(operationState == kRad7Idle){
-		[self addCmdToQueue:@"SETUP REVIEW"];
-		[self addCmdToQueue:@"++HWReviewDone"];
-		[self setOperationState:kRad7UpdatingSettings];
-		NSLog(@"Getting settings from Rad7.... Takes a long time... Be Patient.\n");
-	}
-	else NSLog(@"Can not load Rad7 Dialog from HW -- some other operation is in progress\n");
-}
-
-- (void) dumpUserValues
-{
-	[self addCmdToQueue:@"++DumpUser"];
-	[self setOperationState:kRad7DumpingSettings];
-	[self addCmdToQueue:@"++HWReviewDone"];
-	NSLog(@"Getting settings from Rad7.... Takes a long time... Be Patient.\n");
+    [self addCmdToQueue:@"SETUP REVIEW"];
+    NSLog(@"Getting settings from Rad7.... Takes a long time... Be Patient.\n");
 }
 
 - (void) initHardware
 {
-	[self addCmdToQueue:@"++StartHWInit"];
 	[self setupProtocol];
 	if(protocol == kRad7ProtocolNone){
 		[self setupMode];
@@ -1130,14 +1046,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self setupTone];
 	[self setupFormat];
 	[self setupUnits];
-	
-	[self addCmdToQueue:@"++HWInitDone"];
-	
-}
-
-- (void) readData
-{
-	//[self addCmdToQueue:@"++ShipRecords"];
 }
 
 - (id) statusForKey:(id)aKey
@@ -1154,7 +1062,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	if(pollTime){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 	}
-	
 }
 
 - (int) numPoints
@@ -1286,29 +1193,49 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     return dataValid && [serialPort isOpen];
 }
 
-- (void) loadFirmwareFile:(NSString*)filePath index:(int)index;
+- (void) loadRadLinkFile:(NSString*)filePath index:(int)index;
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-	
-	NSString* contents = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];;
-	if(index==0){
-		if(![serialPort isOpen])[self openPort:YES];
-		[serialPort setSpeed:1200];
-		[serialPort setParityNone];
-		[serialPort setStopBits2:NO];
-		[serialPort setDataBits:8];
-		[serialPort commitChanges];
-		[self setFirmwareLoading:YES];
-		okCount = 0;
-	}
-	else {
-		[cmdQueue removeAllObjects];
-		[self setLastRequest:nil];
-		[self addCmdToQueue:@"SPECIAL S-Load"];
-		NSLog(@"%@: Firmware removed. Communication will be impossible until firmware is reloaded\n",[self fullID]);
-	}
-	[self performSelector:@selector(deferredEndOfFirmwareLoad:) withObject:contents afterDelay:2];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+    
+	NSString* contents = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
+    radLinkSize = [contents length];
+    [self flushAllCommands];
+    if([contents length]){
+        [self setRadLinkLoading:YES];
+        if(index==0){
+            if(![serialPort isOpen])[self openPort:YES];
+            [serialPort setSpeed:1200];
+            [serialPort setParityNone];
+            [serialPort setStopBits2:NO];
+            [serialPort setDataBits:8];
+            [serialPort commitChanges];
+            okCount = 0;
+            
+            NSLog(@"%@: Loading RadLink file: %@. Will reboot Rad7 after loading.\n",[self fullID],[filePath stringByAbbreviatingWithTildeInPath]);
+        }
+        else {
+            NSLog(@"%@: Turning off polling\n",[self fullID]);
+            [self setPollTime:0];
+            [serialPort writeString:@"SPECIAL S-Load\r\n"];
 
+            NSLog(@"%@: UnLoading RadLink. Communication will be impossible until radLink is reloaded\n",[self fullID]);
+            unLoading = YES;
+        }
+       [self performSelector:@selector(deferredRadLinkLoad:) withObject:contents afterDelay:2];
+    }
+    else {
+        NSLog(@"%@: <%@> was empty.. nothing to load\n",[self fullID],[filePath stringByAbbreviatingWithTildeInPath]);
+    }
+}
+- (void) stopOpsAndInterrupt
+{
+    NSLog(@"Manual Interrupt of %@\n",[self fullID]);
+    NSLog(@"Buffer Cleared of %d bytes\n",[buffer length]);
+    [self flushAllCommands];
+
+    [serialPort writeString:[NSString stringWithFormat:@"%c",0x03]];
+    [self setStatusString:@"Idle"];
 }
 @end
 
@@ -1319,256 +1246,138 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
 														object:self];
 }
-
-- (void) deferredEndOfFirmwareLoad:(NSString*) contents
+- (void) deferredRadLinkLoad:(NSString *)contents
 {
-	if([contents length]) [serialPort writeString:contents];
-	else NSLog(@"%@: Firmware contents was empty.. nothing to load\n");
+    [serialPort writeString:contents];
 }
 
-- (void) deferredEndOfFirmwareLoad1
+- (void) resetBaudRatesAfterRadLinkLoad
 {
-	if(![serialPort isOpen])[self openPort:YES];
-	[serialPort setSpeed:1200];	//reset our port
-	[serialPort setParityNone];
-	[serialPort setStopBits2:NO];
-	[serialPort setDataBits:8];
-	[serialPort commitChanges];
-	
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
-	[self addCmdToQueue:@"Special setbaud 9600"];
-	[self performSelector:@selector(deferredEndOfFirmwareLoad2) withObject:nil afterDelay:2];
+    //after a RadLink load the Rad7 is at 1200 baud. We have to reset our serial port to 1200 baud
+    //and then reset the Rad7 to 9600 and then reset the serial port back to 9600
+    if(![serialPort isOpen])[self openPort:YES];
+    [serialPort setSpeed:1200];	//reset our port
+    [serialPort setParityNone];
+    [serialPort setStopBits2:NO];
+    [serialPort setDataBits:8];
+    [serialPort commitChanges];
+    
+    [serialPort writeString:@"Special setbaud 9600\r\n"];
+    
+    [self performSelector:@selector(resetBaudRatesAfterRadLinkLoad2) withObject:nil afterDelay:2];
 }
 
-- (void) deferredEndOfFirmwareLoad2
-{	
-	[self addCmdToQueue:@"Special setbaud 9600"];
-	if(![serialPort isOpen])[self openPort:YES];
-	[serialPort setSpeed:9600];	//reset our port
-	[serialPort setParityNone];
-	[serialPort setStopBits2:NO];
-	[serialPort setDataBits:8];
-	[serialPort commitChanges];
-	[self performSelector:@selector(deferredEndOfFirmwareLoad3) withObject:nil afterDelay:2];
+- (void) resetBaudRatesAfterRadLinkLoad2
+{
+    [serialPort setSpeed:9600];	//reset our port
+    [serialPort setParityNone];
+    [serialPort setStopBits2:NO];
+    [serialPort setDataBits:8];
+    [serialPort commitChanges];
+    [self performSelector:@selector(deferredPollHardware) withObject:nil afterDelay:2];
 }
 
-- (void) deferredEndOfFirmwareLoad3
-{	
-	[self pollHardware];
-	[self performSelector:@selector(deferredEndOfFirmwareLoad4) withObject:nil afterDelay:2];
-}
-
-- (void) deferredEndOfFirmwareLoad4
-{	
+- (void) deferredPollHardware
+{
+    [self flushAllCommands];
 	[self pollHardware];
 }
+
 
 - (void) timeout
 {
-    dataValid = YES;
+    dataValid = NO;
 	NSLogError(@"command timeout",@"Rad7",nil);
-	[cmdQueue removeAllObjects];
-	[self setLastRequest:nil];
-	[self setOperationState:kRad7Idle];
-	[self setLastRequest:nil];
+    [self setStatusString:@"Timed out. No Response."];
+    [self flushAllCommands];
 }
+
 - (void) clearTempVerbose
 {
 	tempVerbose = NO;
 }
 
-- (void) goToNextCommand
-{
-	[self setLastRequest:nil];			 //clear the last request
-	[self processOneCommandFromQueue];	 //do the next command in the queue
-}
-
-- (void) processOneCommandFromQueue
-{
-	if([cmdQueue count] == 0) return;
-	NSString* aCmd = [cmdQueue dequeue];
-	if(aCmd){
-        if([aCmd isEqualToString:@"++Delay"]){
-            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processOneCommandFromQueue) object:nil];
-            [self performSelector:@selector(processOneCommandFromQueue) withObject:self afterDelay:2];
-        }
-        else if([aCmd isEqualToString:@"++StartHWInit"]){
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-			[self setOperationState:kRad7Initializing];
-			[self goToNextCommand];
-		}
-		else if([aCmd isEqualToString:@"++StartGroup"]){
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-			[self setOperationState:kRad7ExecutingGroup];
-			[self goToNextCommand];
-		}
-		else if([aCmd isEqualToString:@"++HWInitDone"] || 
-				[aCmd isEqualToString:@"++HWReviewDone"]){
-			if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-			[self setOperationState:kRad7Idle];
-			[self goToNextCommand];
-		}
-		else if([aCmd isEqualToString:@"++EndGroup"]){
-			id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
-			
-			if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
-			else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
-			else											 [self setRunState:kRad7RunStateStopped];
-			[self setOperationState:kRad7Idle];
-			if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-			
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
-			[self goToNextCommand];
-		}
-		else {
-			[self setLastRequest:aCmd];
-			if([aCmd isEqualToString:@"++DumpUser"])aCmd = @"SETUP REVIEW";
-			else if(currentRequest == kSpecialStart){
-				id runStatus = [statusDictionary objectForKey:kRad7RunStatus];
-				if(!runStatus){
-					aCmd = nil;
-					[self setLastRequest:nil];
-					NSLog(@"Rad7 start command ignored -- status is unknown\n");
-				}
-				else if(![runStatus isEqualToString:@"IDLE"]){
-					aCmd = nil;
-					[self setLastRequest:nil];
-					NSLog(@"Rad7 start command ignored -- already counting\n");
-				}
-			}
-			if(aCmd){
-                aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-                aCmd = [aCmd stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-                aCmd = [aCmd stringByAppendingString:@"\r\n"];
-                [self startTimeOut];
-                [serialPort writeString:aCmd];
-			}
-			if(!lastRequest){
-				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.2];
-			}
-		}
-	}
-}
-
 - (void) process_response:(NSString*)theResponse
-{	
-    dataValid = YES;
-	theResponse = [theResponse removeExtraSpaces];
-	if(firmwareLoading){
-		if([theResponse rangeOfString:@"OK" options:NSCaseInsensitiveSearch].location != NSNotFound){
-			okCount++;
-			if(firmwareLoading){
-				if(okCount==1){
-					NSLog(@"%@: Firmware loading\n",[self fullID]);
-				}
-				else {
-					NSLog(@"%@: Firmware done loading\n",[self fullID]);
-					NSLog(@"%@: Waiting until reboot is finished\n",[self fullID]);
-				}
-			}
-		}
-		else if([theResponse rangeOfString:@"Units" options:NSCaseInsensitiveSearch].location != NSNotFound){
-			if(firmwareLoading){
-				NSLog(@"%@: Reboot is finished\n",[self fullID]);	
-				[self setFirmwareLoading:NO];
-				[self performSelector:@selector(deferredEndOfFirmwareLoad1) withObject:nil afterDelay:2];
-			}
-		}
-	}
-	else {
-		if([theResponse rangeOfString:@"DURRIDGE" options:NSCaseInsensitiveSearch].location != NSNotFound){
-			tempVerbose = NO;
-			//special unsolidated response after power up
-			NSLog(@"Rad7 going thru power up -- all queued commands cleared\n");
-			[cmdQueue removeAllObjects];
-			[self setLastRequest:@"PowerUpSequence"]; //fake a command
-		}
-		else if([theResponse rangeOfString:@"?ERR" options:NSCaseInsensitiveSearch].location != NSNotFound){
-			tempVerbose = NO;
-			[cmdQueue removeAllObjects];
-			[self setLastRequest:nil];
-			requestCount = 0;
-			expectedCount= 1;
-			currentRequest = kRad7CommErr;
-			[self setOperationState:kRad7Idle];
+{
+    
+    if([theResponse length]!=0){
+        
+        dataValid = YES;
+        if([theResponse rangeOfString:@"?ERR" options:NSCaseInsensitiveSearch].location != NSNotFound){
+            tempVerbose = NO;
+            [self flushAllCommands];
+            
             NSLogError(@"",@"Comm Error",@"Rad7",[NSString stringWithFormat:@"unit %lu",[self uniqueIdNumber]],nil);
 
-			id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
-			
-			if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
-			else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
-			else											 [self setRunState:kRad7RunStateStopped];
-			[self setOperationState:kRad7Idle];
-			
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
-		}
-		else {
-			//check for data dump
-			NSArray* parts = [theResponse componentsSeparatedByString:@" "];
-			if([parts count] == 23){
-				
-				[self handleDataRecord:theResponse];
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(goToNextCommand) object:nil];
-				[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:3];
-				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(clearTempVerbose) object:nil];
-				[self performSelector:@selector(clearTempVerbose) withObject:nil afterDelay:3];
-			}
-			else {
-				switch(currentRequest){
-						
-					case kRad7PowerUp:
-					case kSetupReview:
-					case kDumpValues:
-						[self handleSetupReview:theResponse lineNumber:requestCount];
-						break;
-						
-					case kSetupMode:
-					case kSetupPump:
-					case kSetupThoron:
-					case kSetupTone:
-					case kSetupFormat:
-					case kSetupUnits:
-					case kSetupProtocol:
-					case kSetupRecycle:
-					case kSetupCycle:
-						[self handleSetupParam:theResponse lineNumber:requestCount];
-						break;
-						
-					case kDataErase:
-						break;	
-						
-					case kDataFree:
-						[self handleDataFree:theResponse lineNumber:requestCount];
-						break;	
-						
-					case kDataCom:
-						[self handleDataCom:theResponse lineNumber:requestCount];
-						break;
-						
-					case kTestCom:
-						[self handleTestCom:theResponse lineNumber:requestCount];
-						break;	
-						
-					case kSpecialStatus:
-						[self handleStatusInfo:theResponse lineNumber:requestCount];
-						break;
-				}
-				
-				requestCount++;
-				
-				if(requestCount == expectedCount){
-					[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-					[self performSelector:@selector(goToNextCommand) withObject:nil afterDelay:waitTime];
-				}
-			}
-		}
-	}
+            id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
+            
+            if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
+            else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
+            else											 [self setRunState:kRad7RunStateStopped];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
+        }
+        else if([theResponse rangeOfString:@"SPECIAL STATUS"].location != NSNotFound){
+            NSArray* lines = [theResponse componentsSeparatedByString:@"\r"];
+            int lineNumber = 0;
+            for(id aLine in lines){
+                [self handleStatusInfo:aLine lineNumber:lineNumber++];
+            }
+            
+            id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
+            
+            if(!runStateString)								 [self setRunState:kRad7RunStateUnKnown];
+            else if([runStateString isEqualToString:@"LIVE"])[self setRunState:kRad7RunStateCounting];
+            else											 [self setRunState:kRad7RunStateStopped];
+
+
+        }
+        else if([theResponse rangeOfString:@"DATA FREE"].location != NSNotFound){
+            NSArray* lines = [theResponse componentsSeparatedByString:@"\r"];
+            int lineNumber = 0;
+            for(id aLine in lines){
+                [self handleDataFree:aLine lineNumber:lineNumber++];
+            }
+        }
+        else if([theResponse rangeOfString:@"SETUP REVIEW"].location != NSNotFound){
+            NSArray* lines = [theResponse componentsSeparatedByString:@"\r"];
+            int lineNumber = 0;
+            for(id aLine in lines){
+                [self handleSetupReview:aLine lineNumber:lineNumber++];
+            }
+        }
+        else if([theResponse rangeOfString:@"DATA COM"].location != NSNotFound){
+            NSArray* lines = [theResponse componentsSeparatedByString:@"\r"];
+            int lineNumber = 0;
+            for(id aLine in lines){
+                [self handleDataCom:aLine lineNumber:lineNumber++];
+            }
+        }
+        else if([theResponse rangeOfString:@"TEST COM"].location != NSNotFound){
+            NSArray* lines = [theResponse componentsSeparatedByString:@"\r"];
+            int lineNumber = 0;
+            for(id aLine in lines){
+                [self handleTestCom:aLine lineNumber:lineNumber++];
+            }
+        }
+    }
+    if(pollTime)[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+   
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelStatusChanged object:self];
 }
+
+- (void) flushAllCommands
+{
+    [cmdQueue removeAllObjects];
+    [buffer release];
+    buffer = nil;
+    commandState = kRad7Idle;
+    [self commandLoop];
+}
+
 - (void) handleDataRecord:(NSString*)aLine
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSArray* parts = [aLine componentsSeparatedByString:@" "];
+	NSArray* parts = [aLine componentsSeparatedByString:@","];
 	if([parts count] >= 23){
 		if(dataRecordCount == 0){
 			[self setDataPointArray:[NSMutableArray array]];
@@ -1637,17 +1446,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		}
 		
 		dataRecordCount++;
-		/*
-		 ORRad7DataPt* aPt = [[[ORRad7DataPt alloc] init] autorelease];
-		 [aPt setTime:[self convertTime:parts]];
-		 [aPt setValue:[[parts objectAtIndex:20] doubleValue]];
-		 //[aPt setCounts:[[parts objectAtIndex:6] doubleValue]];
-		 [aPt setRh:[[parts objectAtIndex:15] doubleValue]];
-		 [dataPointArray addObject:aPt];
-		 if([dataPointArray count]>kMaxNumInHistory)[dataPointArray removeObjectsInRange:NSMakeRange(0,500)];
-		 [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelUpdatePlot 
-		 object:self];
-		 */
+
 	}
 }
 
@@ -1669,33 +1468,29 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	return (double)t1;
 }
 
-
-
-- (void) handleSetupParam:(NSString*)aLine lineNumber:(int) lineNumber
-{
-	// nothing to do for now
-}
-
 - (void) handleTestCom:(NSString*)aLine lineNumber:(int) lineNumber
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	if(lineNumber == 1){
+	if(lineNumber == 0){
 		NSLog(@"Rad7: Incomplete Test Data Follows\n");		
-		//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 		dataRecordCount = 0;
+        gettingData = YES;
 	}
+    else if(lineNumber > 1){
+        NSLog(@"%@\n",aLine);
+    }
 }
 
 - (void) handleDataCom:(NSString*)aLine lineNumber:(int) lineNumber
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	if(lineNumber == 2){
-		NSLog(@"Rad7: %@\n",aLine);		
-		//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-		if([aLine rangeOfString:@"DATA TRANSFER" options:NSCaseInsensitiveSearch].location != NSNotFound){
-			dataRecordCount = 0;
-		}
+	if(lineNumber <= 2){
+        dataRecordCount = 0;
+        if([aLine hasPrefix:@"NO"]){
+            NSLog(@"%@ -- No Data Stored\n",[self fullID]);
+        }
 	}
+    else {
+        [self handleDataRecord:aLine];
+    }
 }
 
 - (void) handleDataFree:(NSString*)aLine lineNumber:(int) lineNumber
@@ -1711,6 +1506,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (void) handleStatusInfo:(NSString*)aLine lineNumber:(int) lineNumber
 {
+    aLine = [aLine removeExtraSpaces];
+    if([aLine length]==0)return;
 	if(!statusDictionary) statusDictionary = [[NSMutableDictionary dictionary] retain];
 	if(lineNumber < 2)return; //don't care about these
 	else if(lineNumber == 2){
@@ -1718,7 +1515,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 		aLine = [aLine stringByReplacingOccurrencesOfString:@"WAT-40" withString:@"WAT40 "];
 		aLine = [aLine stringByReplacingOccurrencesOfString:@"WAT250" withString:@"WAT250 "];
 		aLine = [aLine stringByReplacingOccurrencesOfString:@"NORMAL" withString:@"NORMAL "];
-		aLine = [aLine removeExtraSpaces];
 		NSArray* parts = [aLine componentsSeparatedByString:@" "];
 		if([parts count] == 5){
 			int thisRunNum = [[[parts objectAtIndex:0] substringToIndex:2] intValue];
@@ -1878,14 +1674,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			NSString* value = [[parts objectAtIndex:1] trimSpacesFromEnds];
 			NSString* value1 = @"";
 			if([parts count]>=3)value1 = [[parts objectAtIndex:2] trimSpacesFromEnds];
-			if(currentRequest == kDumpValues){
-				if([tag isEqualToString:@"CYCLE"])			NSLog(@"Cycle: %@:%@\n",value,value1);
-				else if([tag isEqualToString:@"RECYCLE"])	NSLog(@"Recycle: %@\n",value);
-				else if([tag isEqualToString:@"MODE"])		NSLog(@"Mode: %@\n",value);
-				else if([tag isEqualToString:@"THORON"])	NSLog(@"Thoron: %@\n",value);
-				else if([tag isEqualToString:@"PUMP"])		NSLog(@"Pump Mode: %@\n",value);
-			}
-			else {
+
 				if([tag isEqualToString:@"PUMP"])[self setPumpMode:[self convertPumpModeStringToIndex:value]];
 				else if([tag isEqualToString:@"MODE"])[self setMode:[self convertModeStringToIndex:value]];
 				else if([tag isEqualToString:@"THORON"])[self setThoron:[self convertThoronStringToIndex:value]];
@@ -1896,7 +1685,6 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 				else if([tag isEqualToString:@"PROTOCOL"])[self setProtocol:[self convertProtocolStringToIndex:value]];
 				else if([tag isEqualToString:@"UNITS"])[self convertUnitsString:value];
 			}
-		}
 		
 	}
 }
@@ -1906,6 +1694,130 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:kRad7CmdTimeout];
 }
+
+- (void) commandLoop
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(commandLoop) object:nil];
+    switch (commandState) {
+        case kRad7SendCntrlC:
+            if([cmdQueue count]){
+                gotCarrot = NO;
+                [serialPort writeString:[NSString stringWithFormat:@"%c",0x03]];
+                [self setStatusString:@"Sending Cntrl-C"];
+                [self startTimeOut];
+                commandState = kRad7WaitForCarrot;
+            }
+            else {
+                commandState = kRad7QueueIdle;
+                [self setStatusString:@"Idle"];
+            }
+        break;
+        
+        case kRad7WaitForCarrot:
+            if(gotCarrot){
+                NSString* aCmd = [cmdQueue dequeue];
+                if(aCmd){
+                    gotResponse = NO;
+                    commandState = kRad7WaitForResponse;
+                    [serialPort writeString:aCmd];
+                    [self setStatusString:[NSString stringWithFormat:@"Sending Command: %@",aCmd]];
+                    [self startTimeOut];
+                }
+                else {
+                    commandState = kRad7QueueIdle;
+                    [self setStatusString:@"Idle"];
+               }
+            }
+        break;
+        
+        case kRad7WaitForResponse:
+            if(gotResponse){
+                commandState = kRad7SendCntrlC;
+            }
+        break;
+    }
+    if(commandState != kRad7QueueIdle){
+        [self performSelector:@selector(commandLoop) withObject:self afterDelay:.1];
+    }
+}
+- (void) chunkPrecheck:(NSString*)aString
+{
+    if(radLinkLoading){
+        if([aString rangeOfString:@"OK." options:NSCaseInsensitiveSearch].location != NSNotFound){
+            [buffer release];
+            buffer = nil;
+            if(unLoading){
+                [self setRadLinkLoading:NO];
+                NSLog(@"%@: RadLink done unloading\n",[self fullID]);
+                unLoading = NO;
+                [self setStatusString:@"RadLink unloaded. No Communication Possible"];
+            }
+            else {
+                NSLog(@"%@: RadLink done loading\n",[self fullID]);
+                NSLog(@"%@: Waiting until reboot is finished\n",[self fullID]);
+                [self setStatusString:@"Download finished. Rebooting in a few seconds."];
+                rebooting = YES;
+           }
+        }
+        else if([aString rangeOfString:@"DURRIDGE"].location != NSNotFound){
+            [buffer release];
+            buffer = nil;
+            tempVerbose = NO;
+            NSLog(@"%@ Starting Reboot.\n",[self fullID]);
+            [self setStatusString:@"Starting Reboot"];
+        }
+        else if([aString rangeOfString:@"Units" options:NSCaseInsensitiveSearch].location != NSNotFound){
+             [buffer release];
+             buffer = nil;
+             NSLog(@"%@: Reboot is finished\n",[self fullID]);
+             [self setStatusString:@"Reboot Done"];
+             [self setRadLinkLoading:NO];
+             rebooting = NO;
+            [self performSelector:@selector(resetBaudRatesAfterRadLinkLoad) withObject:nil afterDelay:2];
+        }
+    }
+    else {
+        if([aString rangeOfString:@"DURRIDGE"].location != NSNotFound){
+            if(!poweringUp){
+                tempVerbose = NO;
+                poweringUp = YES;
+                [self flushAllCommands];
+                NSLog(@"%@ going thru power up -- all queued commands cleared\n",[self fullID]);
+                [self setStatusString:@"Going phru power up cycle"];
+            }
+        }
+        else if([aString rangeOfString:@"Units" options:NSCaseInsensitiveSearch].location != NSNotFound){
+            NSLog(@"%@: Reboot is finished\n",[self fullID]);
+        }
+        else if([aString rangeOfString:@"DATA COM"].location != NSNotFound){
+            gettingData = YES;
+        }
+        else if([aString rangeOfString:@"SETUP REVIEW"].location != NSNotFound){
+            gettingReview = YES;
+        }
+    }
+  }
+
+- (void) chunkPostcheck:(NSString*)aString
+{
+    if(poweringUp){
+        poweringUp = NO;
+        NSLog(@"%@ power up sequence has finished\n",[self fullID]);
+        [self setStatusString:@"Idle"];
+        poweringUp = NO;
+        [buffer release];
+        buffer = nil;
+    }
+    else if(gettingData){
+        gettingData = NO;
+        [self setStatusString:@"Idle"];
+    }
+    else if(gettingReview){
+        gettingReview = NO;
+        [self setStatusString:@"Idle"];
+    }
+}
+
 @end
 
 @implementation ORRad7DataPt

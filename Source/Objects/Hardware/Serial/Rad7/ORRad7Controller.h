@@ -26,7 +26,7 @@
 @interface ORRad7Controller : ObjWithHistoryController
 {	
 	IBOutlet NSTabView*		tabView;	
-	IBOutlet NSTextField*	firmwareLoadingField;
+	IBOutlet NSTextField*	radLinkLoadingField;
 	IBOutlet NSView*		totalView;
 	IBOutlet NSTextField*	alarmLimitTextField;
 	IBOutlet NSTextField*	humidityMaxLimitTextField;
@@ -38,7 +38,7 @@
 	IBOutlet NSButton*		verboseCB;
 	IBOutlet NSButton*		deleteDataOnStartCB;
 	IBOutlet NSTextField*	runToPrintTextField;
-	IBOutlet NSTextField*   operationStateField;
+	IBOutlet NSTextField*   statusStateField;
 	IBOutlet NSPopUpButton* rUnitsPU;
 	IBOutlet NSPopUpButton* tUnitsPU;
 	IBOutlet NSPopUpButton* formatPU;
@@ -56,7 +56,6 @@
 	
 	IBOutlet NSButton*		startTestButton;
 	IBOutlet NSButton*		stopTestButton;
-	IBOutlet NSButton*		initHWButton;
 	IBOutlet NSButton*		loadDialogButton;
 	IBOutlet NSButton*		saveUserProtocolButton;
 	IBOutlet NSButton*		eraseAllDataButton;
@@ -106,7 +105,7 @@
 	IBOutlet NSTextField*   userRecycleField;
 	
 	IBOutlet NSPanel*		radLinkSelectionPanel;
-	IBOutlet NSPanel*		radLinkLoadPanel;
+    IBOutlet NSPanel*		radLinkLoadPanel;
 	IBOutlet NSButton*		radLinkSelectionContinueButton;
 	IBOutlet NSMatrix*		radLinkSelectionMatrix;
 	IBOutlet NSButton*		radLinkButton;
@@ -131,7 +130,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
-- (void) firmwareLoadingChanged:(NSNotification*)aNote;
+- (void) radLinkLoadingChanged:(NSNotification*)aNote;
 - (void) humidityMaxLimitChanged:(NSNotification*)aNote;
 - (void) pumpCurrentMaxLimitChanged:(NSNotification*)aNote;
 - (void) pumpCurrentAlarmChanged:(NSNotification*)aNote;
@@ -144,7 +143,6 @@
 - (void) runToPrintChanged:(NSNotification*)aNote;
 - (void) runStateChanged:(NSNotification*)aNote;
 - (void) updateButtons;
-- (void) operationStateChanged:(NSNotification*)aNote;
 - (void) tUnitsChanged:(NSNotification*)aNote;
 - (void) rUnitsChanged:(NSNotification*)aNote;
 - (void) formatChanged:(NSNotification*)aNote;
@@ -158,13 +156,14 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
+- (void) statusStringChanged:(NSNotification*)aNote;
 - (BOOL) portLocked;
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) updatePlot:(NSNotification*)aNote;
-- (void) getFirmwareFile;
+- (void) getRadLinkFile;
 
 #pragma mark ***Actions
 - (IBAction) humidityMaxLimitTextFieldAction:(id)sender;
@@ -190,11 +189,9 @@
 - (IBAction) lockAction:(id) sender;
 - (IBAction) updateSettingsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
-- (IBAction) initAction:(id)sender;
 - (IBAction) getStatusAction:(id)sender;
 - (IBAction) startAction:(id)sender;
 - (IBAction) stopAction:(id)sender;
-- (IBAction) dumpUserValuesAction:(id)sender;
 - (IBAction) saveUserSettings:(id)sender;
 - (IBAction) eraseAllDataAction:(id)sender;
 - (IBAction) printRunAction:(id)sender;
@@ -204,6 +201,7 @@
 - (IBAction) doRadLinkLoad:(id)sender;
 - (IBAction) closeLinkSelectionPanel:(id)sender;
 - (IBAction) closeLinkLoadPanel:(id)sender;
+- (IBAction) sendControlC:(id)sender;
 
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter;

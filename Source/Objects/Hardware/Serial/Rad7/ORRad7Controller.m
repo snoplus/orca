@@ -191,12 +191,7 @@
                      selector : @selector(rUnitsChanged:)
                          name : ORRad7ModelRUnitsChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(operationStateChanged:)
-                         name : ORRad7ModelOperationStateChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(statusChanged:)
                          name : ORRad7ModelStatusChanged
@@ -268,11 +263,18 @@
                          name : ORRad7ModelHumidityMaxLimitChanged
 						object: model];
 	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusStringChanged:)
+                         name : ORRad7ModelStatusStringChanged
+                        object: model];
+
+    
 	[serialPortController registerNotificationObservers];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(firmwareLoadingChanged:)
-                         name : ORRad7ModelFirmwareLoadingChanged
+                     selector : @selector(radLinkLoadingChanged:)
+                         name : ORRad7ModelRadLinkLoadingChanged
 						object: model];
 
 }
@@ -294,7 +296,6 @@
 	[self tUnitsChanged:nil];
 	[self rUnitsChanged:nil];
 	[self statusChanged:nil];
-	[self operationStateChanged:nil];
 	[self runStateChanged:nil];
 	[self updatePlot:nil];
 	[self runToPrintChanged:nil];
@@ -306,14 +307,15 @@
 	[self humidityAlarmChanged:nil];
 	[self pumpCurrentAlarmChanged:nil];
 	[self pumpCurrentMaxLimitChanged:nil];
-	[self humidityMaxLimitChanged:nil];
+    [self humidityMaxLimitChanged:nil];
+    [self statusStringChanged:nil];
 	[serialPortController updateWindow];
-	[self firmwareLoadingChanged:nil];
+	[self radLinkLoadingChanged:nil];
 }
 
-- (void) firmwareLoadingChanged:(NSNotification*)aNote
+- (void) radLinkLoadingChanged:(NSNotification*)aNote
 {
-	[firmwareLoadingField setStringValue: [model firmwareLoading]?@"Busy":@""];
+	[radLinkLoadingField setStringValue: [model radLinkLoading]?@"Busy":@""];
 	[self updateButtons];
 }
 
@@ -422,9 +424,9 @@
 }
 
 
-- (void) operationStateChanged:(NSNotification*)aNote
+- (void) statusStringChanged:(NSNotification *)aNote
 {
-	[operationStateField setStringValue: [model operationStateString]];
+	[statusStateField setStringValue: [model statusString]];
 	[self updateButtons];
 }
 
@@ -532,21 +534,20 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORRad7Lock];
-	BOOL firmwareLoading = [model firmwareLoading];
+	BOOL radLinkLoading = [model radLinkLoading];
     [lockButton setState: locked];
 	
-	[serialPortController updateButtons:locked && !firmwareLoading];
+	[serialPortController updateButtons:locked && !radLinkLoading];
 	
-    [pollTimePopup setEnabled:!locked && !firmwareLoading];
-	[pollNowButton setEnabled:!firmwareLoading];
-    [deleteHistoryButton setEnabled:!locked && !firmwareLoading];
-    [radLinkButton setEnabled:!locked && !firmwareLoading];
+    [pollTimePopup setEnabled:!locked && !radLinkLoading];
+	[pollNowButton setEnabled:!radLinkLoading];
+    [deleteHistoryButton setEnabled:!locked && !radLinkLoading];
+    [radLinkButton setEnabled:!locked && !radLinkLoading];
 	
-	//int opState = [model operationState];
 	int runState = [model runState];
 	//BOOL idle = (opState==kRad7Idle);
 	BOOL counting = runState == kRad7RunStateCounting;
-	if(!locked && !firmwareLoading){
+	if(!locked && !radLinkLoading){
 		if(runState== kRad7RunStateUnKnown){
 			[startTestButton	setEnabled:	 NO];
 			[stopTestButton		setEnabled:  NO];
@@ -599,24 +600,24 @@
 	
 	//[initHWButton		setEnabled:  !counting && idle && !locked];
 	
-	[rUnitsPU setEnabled:	!counting && !locked && !firmwareLoading];
-	[tUnitsPU setEnabled:	!counting && !locked && !firmwareLoading];
-	[formatPU setEnabled:	!counting && !locked && !firmwareLoading];
-	[tonePU setEnabled:		!counting && !locked && !firmwareLoading];
-	[protocolPU setEnabled:	!counting && !locked && !firmwareLoading];
+	[rUnitsPU setEnabled:	!counting && !locked && !radLinkLoading];
+	[tUnitsPU setEnabled:	!counting && !locked && !radLinkLoading];
+	[formatPU setEnabled:	!counting && !locked && !radLinkLoading];
+	[tonePU setEnabled:		!counting && !locked && !radLinkLoading];
+	[protocolPU setEnabled:	!counting && !locked && !radLinkLoading];
 	
-	[saveUserProtocolButton setEnabled:([(ORRad7Model*)model protocol] == kRad7ProtocolNone) && !firmwareLoading ];
+	[saveUserProtocolButton setEnabled:([(ORRad7Model*)model protocol] == kRad7ProtocolNone) && !radLinkLoading ];
 	
-	[alarmLimitTextField setEnabled:!locked && !firmwareLoading];
-	[maxRadonTextField setEnabled:	!locked && !firmwareLoading];
+	[alarmLimitTextField setEnabled:!locked && !radLinkLoading];
+	[maxRadonTextField setEnabled:	!locked && !radLinkLoading];
 	
 	
 	if([(ORRad7Model*)model protocol] == kRad7ProtocolUser || [(ORRad7Model*)model protocol] == kRad7ProtocolNone){
-		[pumpModePU setEnabled:	!counting && !locked && !firmwareLoading];
-		[thoronPU setEnabled:	!counting && !locked && !firmwareLoading];
-		[modePU setEnabled:		!counting && !locked && !firmwareLoading];
-		[recycleTextField setEnabled: !counting && !locked && !firmwareLoading];
-		[cycleTimeTextField setEnabled: !counting && !locked && !firmwareLoading];
+		[pumpModePU setEnabled:	!counting && !locked && !radLinkLoading];
+		[thoronPU setEnabled:	!counting && !locked && !radLinkLoading];
+		[modePU setEnabled:		!counting && !locked && !radLinkLoading];
+		[recycleTextField setEnabled: !counting && !locked && !radLinkLoading];
+		[cycleTimeTextField setEnabled: !counting && !locked && !radLinkLoading];
 		
 	}
 	else {
@@ -920,7 +921,7 @@
 			modalDelegate:self didEndSelector:NULL contextInfo:nil];
 	}	
 	else {
-		[self doRadLinkLoad:self];
+        [self getRadLinkFile];
 	}
 }
 
@@ -939,12 +940,12 @@
 
 - (IBAction) doRadLinkLoad:(id)sender
 {
-	[radLinkLoadPanel orderOut:nil];
+    [radLinkLoadPanel orderOut:nil];
     [NSApp endSheet:radLinkLoadPanel];
-	[self getFirmwareFile];
+    [self getRadLinkFile];
 }
 
-- (void) getFirmwareFile
+- (void) getRadLinkFile
 {
 	int index = [radLinkSelectionMatrix selectedRow];
 
@@ -959,7 +960,7 @@
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-			[model loadFirmwareFile:[[openPanel URL]path] index:index];
+			[model loadRadLinkFile:[[openPanel URL]path] index:index];
         }
     }];
 }
@@ -967,11 +968,6 @@
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
-}
-
-- (IBAction) initAction:(id)sender
-{
-	[model initHardware];
 }
 
 - (IBAction) getStatusAction:(id)sender
@@ -1023,11 +1019,10 @@
 #endif
 }
 
-- (IBAction) dumpUserValuesAction:(id)sender
+- (IBAction) sendControlC:(id)sender
 {
-	[model dumpUserValues];
+    [model stopOpsAndInterrupt];
 }
-
 - (IBAction) printRunAction:(id)sender
 {
 	[self endEditing];
