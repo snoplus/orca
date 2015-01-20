@@ -77,6 +77,7 @@
     int numBurstChan;
     double durSec; //The number of seconds the burst takes to finish
     int countsInBurst;
+    double chanpvalue;
     int quietSec;
     int loudSec;
     int burstForce;

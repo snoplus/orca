@@ -350,6 +350,33 @@ NSDate* burstStart = NULL;
     return numChan;
 }
 
+- (double) chanprob:(int) counts Channels:(int) chns Prob:(double) pr Filled:(int) nfull
+{
+    if((counts == 0) && (chns == 0))
+    {
+        return pr;
+    }
+    else if(counts == 0 || (chns < 0) || (chns > counts))
+    {
+        return 0;
+    }
+    else{
+        return ([self chanprob:(counts - 1) Channels:chns Prob:(pr * nfull/64.0) Filled:nfull] +
+                [self chanprob:(counts - 1) Channels:(chns - 1) Prob:(pr * (64.0 - nfull)/64.0) Filled:(nfull + 1)] );
+    }
+}
+- (double) fewprob:(int) co Channels:(int) ch
+{
+    if(ch == 0)
+    {
+        return 0.0;
+    }
+    else
+    {
+        return ([self chanprob:co Channels:ch Prob:1 Filled:0] + [self fewprob:co Channels:(ch - 1)]);
+    }
+}
+
 #pragma mark •••Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
@@ -972,6 +999,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     burstCount++;
     [queueLock lock]; //--begin critial section
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
+    //calc chan prob
+    if(countsInBurst < 20)
+    {
+        chanpvalue = [self fewprob:countsInBurst Channels:numBurstChan];
+    }
+    else{
+        chanpvalue = 999.999;
+    }
     //send email to announce the burst
     NSString* theContent = @"";
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
@@ -985,6 +1020,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"Number of counts in the burst: %d\n",countsInBurst];
     theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
+    theContent = [theContent stringByAppendingFormat:@"Probability of number of channels or less given number of counts: %f\n",chanpvalue];
     theContent = [theContent stringByAppendingFormat:@"Position: (x,y)=(%i+-%f,%i+-%f) mm, phi=%f, r=%f mm, rms=%f mm  \n", Xcenter, Xrms, Ycenter, Yrms, phi, Rcenter, Rrms];
     theContent = [theContent stringByAppendingFormat:@"SN expected: (x,y)=(0+-655,0+-508) mm, r=0 mm, rms=829 mm  \n"];
     theContent = [theContent stringByAppendingFormat:@"Likelyhood of central position: chisquared %f/2, p = %f \n", rSqrNorm, exp(-0.5*rSqrNorm)];
