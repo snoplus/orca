@@ -524,6 +524,11 @@ NSDate* burstStart = NULL;
                                             }
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
                                         }
+                                        numSecTillBurst = [[secs objectAtIndex:(countofchan-1)] longValue] + 0.000001*[[mics objectAtIndex:(countofchan-1)] longValue];
+                                        //NSTimeInterval secTillBurst = [NSTimeIntervalSince1970 timeZoneForSecondsFromGMT:numSecTillBurst];
+                                        //Bdate = [NSDate dateWithTimeIntervalSince1970:numSecTillBurst];
+                                        //NSLog(@"Bdate is %@ \n", Bdate);
+                                            
                                         
                                         //Find characturistics of burst
                                         NSMutableArray* reChans = [[Nchans mutableCopy] autorelease]; //MAH added autorelease to prevent memory leak
@@ -1008,10 +1013,13 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         chanpvalue = 999.999;
     }
     //send email to announce the burst
+    int numMicTillBurst = (1000000*fmod(numSecTillBurst,1));
     NSString* theContent = @"";
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
+    theContent = [theContent stringByAppendingFormat:@"First event in burst:\n"];
+    theContent = [theContent stringByAppendingFormat:@"%@, %i us (UTC) {Possibly fast}\n", [NSDate dateWithTimeIntervalSince1970:numSecTillBurst], numMicTillBurst];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"Time Window: %f sec\n",timeWindow];
     theContent = [theContent stringByAppendingFormat:@"Events/Window Needed: %d\n",nHit];

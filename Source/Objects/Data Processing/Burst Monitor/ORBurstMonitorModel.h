@@ -64,6 +64,7 @@
     double Yrms;
     double Rrms;
     double rSqrNorm;
+    double numSecTillBurst;
     
     //neutron only buffer
     NSMutableArray* Nchans; 
