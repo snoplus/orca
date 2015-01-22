@@ -146,6 +146,7 @@ enum {
 - (void)            clearEventCounts;
 - (unsigned long)   getCounter:(int)counterTag forGroup:(int)groupTag;
 - (void)            clearData;
+- (void)            writeOneShotReset;
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) 		getRegisterName: (short) anIndex;

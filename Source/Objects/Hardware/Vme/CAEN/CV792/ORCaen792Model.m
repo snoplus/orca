@@ -495,6 +495,18 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
                      usingAddSpace:0x01];
 }
 
+- (void) writeOneShotReset
+{
+    unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kSingleShotReset].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
+}
+
+
 - (void) writeSlideConstReg
 {
     unsigned short aValue = slideConstant;
