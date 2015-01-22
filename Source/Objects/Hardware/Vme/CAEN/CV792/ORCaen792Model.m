@@ -91,6 +91,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 #define kEmptyEnable    0x1000
 #define kSlideSubEnable 0x2000 //used
 #define kAllTrg         0x4000 //used
+#define kSoftReset      0x0080
 
 @interface ORCaen792Model (private)
 - (void) startCyclingZeroSuppression;
@@ -551,17 +552,24 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (void) initBoard
 {
-    [self writeOneShotReset];
+    [self doSoftClear];
     [self writeThresholds];
     [self writeIPed];
     [self writeBit2Register];
     [self writeSlideConstReg];
 }
 
+- (void) doSoftClear
+{
+    // Clear unit
+    [self write:kBitSet1   sendValue:kSoftReset];   // set Soft Reset bit,
+    [self write:kBitClear1 sendValue:kSoftReset];   // Clear "Soft Reset" bit of status reg.
+}
+
 - (void) clearData
 {
     // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];		// Clear data,
+    [self write:kBitSet2   sendValue:kClearData];		// set Clear data bit,
     [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
 }
 
