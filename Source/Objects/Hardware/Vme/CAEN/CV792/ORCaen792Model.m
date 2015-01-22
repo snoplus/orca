@@ -551,11 +551,11 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (void) initBoard
 {
+    [self writeOneShotReset];
     [self writeThresholds];
     [self writeIPed];
     [self writeBit2Register];
     [self writeSlideConstReg];
-    [self clearData];
 }
 
 - (void) clearData
