@@ -120,6 +120,7 @@ struct {
 - (void) updateTrends;
 - (void) calculateLeakageCurrentForAdc:(int) aChan;
 - (void) postCouchDBRecord;
+- (void) clearAllAlarms;
 @end
 
 #pragma mark ¥¥¥Implementation
@@ -218,6 +219,14 @@ struct {
 - (void) connectionChanged
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelConnectionChanged object:self];
+    id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
+    if(connectedObj){
+        connected = YES;
+    }
+    else {
+        connected = NO;
+        [self clearAllAlarms];
+    }
 }
 
 - (NSString*) connectedObjectName
@@ -357,6 +366,7 @@ struct {
 	}
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+        [self clearAllAlarms];
 	}
 }
 
@@ -908,12 +918,12 @@ struct {
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
-        
-	[self readAllAdcs];
-    [self updateTrends];
-    [self postCouchDBRecord];
-
-	if(shipValues)[self shipRecords];
+    if(connected){
+        [self readAllAdcs];
+        [self updateTrends];
+        [self postCouchDBRecord];
+        if(shipValues)[self shipRecords];
+    }
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
@@ -1117,6 +1127,8 @@ struct {
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits
 {
+    if(!connected)return;
+    
     float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
     int aChip;
     float aTemperature;
@@ -1141,7 +1153,9 @@ struct {
 
 - (void) checkLeakageCurrentIsWithinLimits:(int)aChan
 {
-    float maxAllowedLeakageCurrent = 50;//pA    
+    if(!connected)return;
+
+    float maxAllowedLeakageCurrent = 50;//pA
     NSString* alarmName  = [NSString stringWithFormat:@"Preamp %d of Controller %lu: Leakage Current Alarm",aChan,[self uniqueIdNumber]];
     float aLeakageCurrent = [self leakageCurrent:aChan];
     
@@ -1162,6 +1176,8 @@ struct {
 
 - (void) checkAdcIsWithinLimits:(int)anIndex
 {
+    if(!connected)return;
+
     if(anIndex != 5 && anIndex!=6 && anIndex!= 13 && anIndex!= 14)return;
     float aValue = [self adc:anIndex];
     BOOL postAlarm = NO;
@@ -1215,6 +1231,23 @@ struct {
 
 #pragma mark ¥¥¥Private Implementation
 @implementation ORMJDPreAmpModel (private)
+
+- (void) clearAllAlarms
+{
+    int i;
+    for(i=0;i<2;i++){
+        [temperatureAlarm[i] clearAlarm];
+        [temperatureAlarm[i] release];
+        temperatureAlarm[i] = nil;
+    }
+    for(i=0;i<kMJDPreAmpAdcChannels;i++){
+        [adcAlarm[i] clearAlarm];
+        [adcAlarm[i] release];
+        adcAlarm[i] = nil;
+        [self setAdc:i value:0];
+    }
+}
+
 - (void) updateTrends
 {
     int chan;

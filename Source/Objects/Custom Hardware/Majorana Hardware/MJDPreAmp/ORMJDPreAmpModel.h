@@ -59,6 +59,7 @@
     NSDate*         lastDataBaseUpdate;
     BOOL            useSBC;
     int             boardRev;
+    BOOL            connected;
 }
 
 - (void) setUpArrays;
