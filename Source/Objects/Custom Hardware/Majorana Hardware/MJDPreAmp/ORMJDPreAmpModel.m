@@ -1117,7 +1117,7 @@ struct {
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits
 {
-    float maxAllowedTemperature = 500; //temporarily set high because the temp readout isn't working right
+    float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
     int aChip;
     float aTemperature;
     for(aChip=0;aChip<2;aChip++){
