@@ -181,6 +181,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 - (void) postAlarm
 {
     [self setTimePosted:[NSDate date]];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmWasPostedNotification object:self];
 }
 
@@ -231,13 +232,27 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 }
 - (NSDictionary*) alarmInfo
 {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+    
+    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+    [dateFormatter setTimeZone:gmt];
+    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:timePosted];
+    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+    [dateFormatter release];
+
+    
+    
 	return [NSDictionary dictionaryWithObjectsAndKeys:
-            [timePosted description],	@"timePosted",
-							[NSNumber numberWithUnsignedLong:[self severity]],@"severity",
-							[self name],	   @"name",
-                            [self helpString], @"help",
-                            [NSNumber numberWithInt:[self acknowledged]], @"acknowledged",
-							nil];
+            [timePosted description],                           @"timePosted",
+            [NSNumber numberWithUnsignedLong:[self severity]],  @"severity",
+            [self name],                                        @"name",
+            [self helpString],                                  @"help",
+            lastTimeStamp,                                      @"timestamp",
+            [NSNumber numberWithUnsignedLong: secondsSince1970],@"time",
+            [NSNumber numberWithInt:[self acknowledged]],       @"acknowledged",
+            nil];
 }
 
 
