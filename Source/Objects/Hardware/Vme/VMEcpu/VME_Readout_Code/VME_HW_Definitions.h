@@ -45,5 +45,6 @@
 #define kCaen1721  23
 #define kPollingTimeStamp  24
 #define kCaen792   25
+#define kSIS3305   26
 
 #endif
