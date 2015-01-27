@@ -2378,6 +2378,38 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
                       printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
               }
 	          else 
+	          if(  (foundPos=strstr(buffer,"usleep"))  ){
+	              printf("handleKCommand: KWC >%s< command 13!\n",foundPos);//DEBUG
+                  if(len > int(strlen("KWC_usleep_"))){//must have at least one character as argument
+                      printf("   msg: KWC >%s< command - length OK (strlen:%lu should be >=12)!\n",buffer,strlen(buffer));//DEBUG
+                      char *startptr, *endptr;
+                      unsigned long numUSec=0;
+                      startptr=foundPos+strlen("usleep ");
+                      //printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      numUSec = strtoul((const char *)startptr,&endptr,0);
+                      printf("   numUSec is %u, startptr: %p, endptr %p  \n",numUSec,startptr,endptr);//DEBUG
+                      usleep(numUSec);
+                      //tests
+                      //tests
+                      #if 0
+                      if(! FIFOREADER::isRunningFIFO(numFIFO)){
+                          printf("   WARNING: 'stopFIFO': FIFO %lu is not running!\n",numFIFO);
+                          if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
+                              printf("   WARNING: 'stopFIFO': FIFO %lu is still stopping!\n",numFIFO);
+                          }
+                      }
+                      FIFOREADER::stopFIFO(numFIFO);
+                      //disable and clear the FIFO; wait 1 sec. after disable to clear (WARNING: otherwise shuffling may occur 2014-11) -tb-
+                      pbus->write(BBcsrReg(numFIFO),0x0);//disable this FIFO
+                      //clear is delayed by 1 sec
+                      //pbus->write(BBcsrReg(numFIFO),0xc);//clear FIFO (c=0x8+0x4=mres+pres)
+                      FIFOREADER::markFIFOforClearAfterDelay(numFIFO);
+                      #endif
+                  }
+                  else
+                      printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
+              }
+	          else 
               {
 	              printf("handleKCommand: WARNING KWC >%s< command unknown!\n",buffer);//DEBUG
 	          }
