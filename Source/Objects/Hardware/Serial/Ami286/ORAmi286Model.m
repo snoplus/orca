@@ -68,6 +68,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) changeTimerExpired: (NSTimer*) aTimer;
 - (void) pollLevels;
 - (void) postCouchDBRecord;
+- (void) clearAlarms:(int)aChan;
 @end
 
 @implementation ORAmi286Model
@@ -375,6 +376,13 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     
     enabledMask = anEnabledMask;
 	
+    int i;
+    for(i=0;i<4;i++){
+        if((enabledMask & (0x1<<i)) == 0){
+            [self clearAlarms:i];
+        }
+    }
+    
 	[[self undoManager] disableUndoRegistration];
 	[self setEmailEnabled:emailEnabled];
 	[[self undoManager] enableUndoRegistration];
@@ -530,7 +538,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		}
 		if(alarmStatus[index] & (1<<6)){
 			if(!expiredAlarm[index]){
-				expiredAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Expired" severity:kRangeAlarm];
+				expiredAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Expired" severity:kInformationAlarm]; //more alarms will be tripped if the level drop. so this alarm is just for information.
 				[expiredAlarm[index] setSticky:YES];
 			}
 			[expiredAlarm[index] postAlarm];
@@ -908,6 +916,9 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:STATUS:ALARM:CONDITION?",i+1]];
 			if(i<2)[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:FILL:STATE?",i+1]];
 		}
+        else {
+            [self clearAlarms:i];
+        }
 	}
 	[self addCmdToQueue:@"++ShipRecords"];
     [self postCouchDBRecord];
@@ -1111,6 +1122,22 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 @end
 
 @implementation ORAmi286Model (private)
+
+- (void) clearAlarms:(int)aChan
+{
+    [hiAlarm[aChan] clearAlarm];
+    [hiAlarm[aChan] release];
+    hiAlarm[aChan] = nil;
+    
+    [lowAlarm[aChan] clearAlarm];
+    [lowAlarm[aChan] release];
+    lowAlarm[aChan] = nil;
+    
+    [expiredAlarm[aChan] clearAlarm];
+    [expiredAlarm[aChan] release];
+    expiredAlarm[aChan] = nil;
+}
+
 - (void) runStarted:(NSNotification*)aNote
 {
 }
