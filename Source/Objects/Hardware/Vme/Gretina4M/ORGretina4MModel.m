@@ -372,10 +372,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return baselineRestoredDelay;
 }
 
-- (void) setBaselineRestoredDelay:(short)aBaselineRestoredDelay
+- (void) setBaselineRestoredDelay:(long)aBaselineRestoredDelay
 {
-    if(aBaselineRestoredDelay<0)
+    if (aBaselineRestoredDelay < 0) {
         aBaselineRestoredDelay = 0;
+    }
+    
+    if(aBaselineRestoredDelay > 0xFFFF)
+        aBaselineRestoredDelay = 0xFFFF;
 
     [[[self undoManager] prepareWithInvocationTarget:self] setBaselineRestoredDelay:baselineRestoredDelay];
     
@@ -1120,6 +1124,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (float) noiseWindowConverted      { return noiseWindow    * 640./(float)0x40; }		//convert to ¬¨¬µs
 - (float) externalWindowConverted	{ return externalWindow * 4/(float)0x190;   }		//convert to ¬¨¬µs
 - (float) pileUpWindowConverted     { return pileUpWindow * 10/(float)0x400;  }		//convert to ¬¨¬µs
+- (float) BLRDelayConverted         { return baselineRestoredDelay * 10/(float)0x400;  }		//convert to ¬¨¬µs
 - (float) extTrigLengthConverted    { return extTrigLength  * 4/(float)0x190;   }		//convert to ¬¨¬µs
 - (float) collectionTimeConverted   { return collectionTime * 4.5/(float)0x1C2; }		//convert to ¬¨¬µs
 - (float) integrateTimeConverted    { return integrateTime  * 4.5/(float)0x1C2; }		//convert to ¬¨¬µs
@@ -1133,6 +1138,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setNoiseWindowConverted:(float)aValue      { [self setNoiseWindow:     aValue*0x40/640.]; } //ns -> raw
 - (void) setExternalWindowConverted:(float)aValue   { [self setExternalWindow:  aValue*0x190/4.0]; } //us -> raw
 - (void) setPileUpWindowConverted:(float)aValue     { [self setPileUpWindow:    aValue*0x400/10.0];  } //us -> raw
+- (void) setBLRDelayConverted:(float)aValue         { [self setBaselineRestoredDelay:aValue*0x400/10.0];} //us -> raw
 - (void) setExtTrigLengthConverted:(float)aValue    { [self setExtTrigLength:   aValue*0x190/4.0];  } //us -> raw
 - (void) setCollectionTimeConverted:(float)aValue   { [self setCollectionTime:  aValue*0x1C2/4.5]; } //us -> raw
 - (void) setIntegrateTimeConverted:(float)aValue    { [self setIntegrateTime:   aValue*0x1C2/4.5];  } //us -> raw
@@ -1488,8 +1494,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 - (void) initBoard
-{
-    //disable all channels
+{       //disable all channels
     int i;
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];

@@ -532,7 +532,7 @@
 
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote
 {
-	[baselineRestoredDelayField setIntValue: [model baselineRestoredDelay]];
+	[baselineRestoredDelayField setFloatValue: [model BLRDelayConverted]];
 }
 
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote
@@ -1028,7 +1028,7 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             BOOL usingTrap      = [model trapEnabled:i];
             BOOL presumEnabled  = [model presumEnabled:i];
-            //BOOL baselineRestoreEnabled = [model baselineRestoreEnabled:i];
+            BOOL baselineRestoreEnabled = [model baselineRestoreEnabled:i];
             
             [[ledThresholdMatrix cellWithTag:i] setEnabled:!usingTrap];
             [[trapThresholdMatrix cellWithTag:i] setEnabled:usingTrap];
@@ -1038,10 +1038,10 @@
             [[chpsdvMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
             
             // The following lines force BLR to be enabled for PZ to be enabled.
-//            [[poleZeroEnabledMatrix  cellWithTag:i] setEnabled:baselineRestoreEnabled];
-//            if (!baselineRestoreEnabled) {
-//                [model setPoleZeroEnabled:i withValue:NO];
-//            }
+            [[poleZeroEnabledMatrix  cellWithTag:i] setEnabled:baselineRestoreEnabled];
+            if (!baselineRestoreEnabled) {
+                [model setPoleZeroEnabled:i withValue:NO];
+            }
         }
     }
 }
@@ -1213,7 +1213,7 @@
 
 - (IBAction) baselineRestoredDelayAction:(id)sender
 {
-	[model setBaselineRestoredDelay:[sender intValue]];
+	[model setBLRDelayConverted:[sender floatValue]];
 }
 
 - (IBAction) noiseWindowAction:(id)sender

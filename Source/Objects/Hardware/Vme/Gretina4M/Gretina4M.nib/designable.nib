@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
 		<string key="IBDocument.SystemVersion">13F34</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6250</string>
+		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
 		<string key="IBDocument.AppKitVersion">1265.21</string>
 		<string key="IBDocument.HIToolboxVersion">698.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6250</string>
+			<string key="NS.object.0">6254</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -71,7 +71,6 @@
 							<string key="NSFrame">{{-7, -10}, {952, 459}}</string>
 							<reference key="NSSuperview" ref="945648727"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="346413685"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="79809759">
 									<object class="NSView" key="NSView" id="346413685">
@@ -493,6 +492,25 @@
 																	<string key="NSContents">µs</string>
 																	<reference key="NSSupport" ref="26"/>
 																	<reference key="NSControlView" ref="811759045"/>
+																	<reference key="NSBackgroundColor" ref="916403514"/>
+																	<reference key="NSTextColor" ref="789408210"/>
+																</object>
+																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+																<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
+															</object>
+															<object class="NSTextField" id="773777023">
+																<reference key="NSNextResponder" ref="991476746"/>
+																<int key="NSvFlags">256</int>
+																<string key="NSFrame">{{438, 13}, {22, 14}}</string>
+																<reference key="NSSuperview" ref="991476746"/>
+																<reference key="NSWindow"/>
+																<bool key="NSEnabled">YES</bool>
+																<object class="NSTextFieldCell" key="NSCell" id="691424846">
+																	<int key="NSCellFlags">67108864</int>
+																	<int key="NSCellFlags2">71303168</int>
+																	<string key="NSContents">µs</string>
+																	<reference key="NSSupport" ref="26"/>
+																	<reference key="NSControlView" ref="773777023"/>
 																	<reference key="NSBackgroundColor" ref="916403514"/>
 																	<reference key="NSTextColor" ref="789408210"/>
 																</object>
@@ -3328,7 +3346,6 @@
 																<string key="NSFrame">{{855, 231}, {25, 5}}</string>
 																<reference key="NSSuperview" ref="117923030"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
 																<string key="NSHuggingPriority">{250, 750}</string>
 																<string key="NSOffsets">{0, 0}</string>
 																<object class="NSTextFieldCell" key="NSTitleCell">
@@ -12162,7 +12179,6 @@
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
-							<reference key="NSDelegate"/>
 							<array class="NSMutableArray" key="NSSubviews">
 								<reference ref="346413685"/>
 							</array>
@@ -14801,6 +14817,7 @@
 							<reference ref="834056180"/>
 							<reference ref="277067591"/>
 							<reference ref="63660845"/>
+							<reference ref="773777023"/>
 						</array>
 						<reference key="parent" ref="346413685"/>
 					</object>
@@ -21144,6 +21161,19 @@
 						<reference key="object" ref="31362570"/>
 						<reference key="parent" ref="341611424"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">Jee-fe-Pgu</string>
+						<reference key="object" ref="773777023"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="691424846"/>
+						</array>
+						<reference key="parent" ref="352527687"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">Ert-6q-2vf</string>
+						<reference key="object" ref="691424846"/>
+						<reference key="parent" ref="773777023"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -21199,6 +21229,7 @@
 				<string key="1291.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="1291.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="1291.showNotes"/>
+				<reference key="1298.IBNSViewMetadataGestureRecognizers" ref="0"/>
 				<string key="1298.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="1298.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="1298.showNotes"/>
@@ -23414,6 +23445,8 @@
 				<string key="Eeh-9Y-a5b.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="Eeh-9Y-a5b.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="Eeh-9Y-a5b.showNotes"/>
+				<string key="Ert-6q-2vf.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="Ert-6q-2vf.showNotes"/>
 				<string key="H9h-oB-q5B.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="H9h-oB-q5B.showNotes"/>
 				<integer value="1040" key="HhV-Vv-Jlx.IBNumberFormatterBehaviorMetadataKey"/>
@@ -23438,6 +23471,10 @@
 				<boolean value="NO" key="JHG-XD-ss2.showNotes"/>
 				<string key="JYe-CZ-lrk.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="JYe-CZ-lrk.showNotes"/>
+				<boolean value="NO" key="Jee-fe-Pgu.IBNSControlSetsMaxLayoutWidthAtFirstLayoutMetadataKey"/>
+				<string key="Jee-fe-Pgu.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<reference key="Jee-fe-Pgu.IBUserGuides" ref="0"/>
+				<boolean value="NO" key="Jee-fe-Pgu.showNotes"/>
 				<string key="KYJ-FW-o4I.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="KYJ-FW-o4I.showNotes"/>
 				<boolean value="NO" key="L0O-MK-b9n.IBNSControlSetsMaxLayoutWidthAtFirstLayoutMetadataKey"/>

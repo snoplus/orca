@@ -302,7 +302,7 @@ enum Gretina4MFIFOStates {
 - (short) histEMultiplier;
 - (void) setHistEMultiplier:(short)aHistEMultiplier;
 - (unsigned short) baselineRestoredDelay;
-- (void) setBaselineRestoredDelay:(short)aBaselineRestoredDelay;
+- (void) setBaselineRestoredDelay:(long)aBaselineRestoredDelay;
 - (NSString*) firmwareStatusString;
 - (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
 - (short) integrateTime;
@@ -435,6 +435,7 @@ enum Gretina4MFIFOStates {
 - (void) setNoiseWindowConverted:(float)aValue;
 - (void) setExternalWindowConverted:(float)aValue;
 - (void) setPileUpWindowConverted:(float)aValue;
+- (void) setBLRDelayConverted:(float)aValue;
 - (void) setExtTrigLengthConverted:(float)aValue;
 - (void) setCollectionTimeConverted:(float)aValue;
 - (void) setIntegrateTimeConverted:(float)aValue;
@@ -442,6 +443,7 @@ enum Gretina4MFIFOStates {
 - (float) noiseWindowConverted;
 - (float) externalWindowConverted;
 - (float) pileUpWindowConverted;
+- (float) BLRDelayConverted;
 - (float) extTrigLengthConverted;
 - (float) collectionTimeConverted;
 - (float) integrateTimeConverted;
