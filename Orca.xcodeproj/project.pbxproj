@@ -806,6 +806,7 @@
 		842DAEBE0A82CA8400C942A2 /* ORBiRa2351IController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842DAEB80A82CA8400C942A2 /* ORBiRa2351IController.m */; };
 		842DAEBF0A82CA8400C942A2 /* ORBiRa2351IModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 842DAEB90A82CA8400C942A2 /* ORBiRa2351IModel.h */; };
 		842DAEC00A82CA8400C942A2 /* ORBiRa2351IModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 842DAEBA0A82CA8400C942A2 /* ORBiRa2351IModel.m */; };
+		842F87BE1A40BD9B00FECB61 /* ORRemoteSocketModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 842F87BD1A40BD9B00FECB61 /* ORRemoteSocketModel.m */; };
 		842FCCAF197849C700B89723 /* EHS8260p.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842FCCA7197849C700B89723 /* EHS8260p.nib */; };
 		842FCCB0197849C700B89723 /* EHS8260p.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842FCCA8197849C700B89723 /* EHS8260p.tif */; };
 		842FCCB1197849C700B89723 /* OREHS8260pController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842FCCA9197849C700B89723 /* OREHS8260pController.h */; };
@@ -1540,7 +1541,6 @@
 		8471D4791588DF3C0039894D /* ORRemoteSocketController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8471D4731588DF3C0039894D /* ORRemoteSocketController.h */; };
 		8471D47A1588DF3C0039894D /* ORRemoteSocketController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8471D4741588DF3C0039894D /* ORRemoteSocketController.m */; };
 		8471D47B1588DF3C0039894D /* ORRemoteSocketModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8471D4751588DF3C0039894D /* ORRemoteSocketModel.h */; };
-		8471D47C1588DF3C0039894D /* ORRemoteSocketModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8471D4761588DF3C0039894D /* ORRemoteSocketModel.m */; };
 		8471D47D1588DF3C0039894D /* RemoteSocket.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8471D4771588DF3C0039894D /* RemoteSocket.nib */; };
 		8471D47E1588DF3C0039894D /* RemoteSocket.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8471D4781588DF3C0039894D /* RemoteSocket.tif */; };
 		8472AA6B12DB44B400DEEB02 /* EHQ8060n.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8472AA4C12DB44B300DEEB02 /* EHQ8060n.nib */; };
@@ -2643,6 +2643,14 @@
 		84CC16D10FAF157000CEE642 /* ORMCA927Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CC16CA0FAF157000CEE642 /* ORMCA927Controller.m */; };
 		84CC16D20FAF157000CEE642 /* ORMCA927Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CC16CB0FAF157000CEE642 /* ORMCA927Model.h */; };
 		84CC16D30FAF157000CEE642 /* ORMCA927Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CC16CC0FAF157000CEE642 /* ORMCA927Model.m */; };
+		84CD6BF41A1E34D90089026F /* Gretina4A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CD6BE91A1E34D90089026F /* Gretina4A.nib */; };
+		84CD6BF51A1E34D90089026F /* Gretina4ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CD6BEA1A1E34D90089026F /* Gretina4ACard.gif */; };
+		84CD6BF71A1E34D90089026F /* ORGretina4AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CD6BEC1A1E34D90089026F /* ORGretina4AController.h */; };
+		84CD6BF81A1E34D90089026F /* ORGretina4AController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CD6BED1A1E34D90089026F /* ORGretina4AController.m */; };
+		84CD6BF91A1E34D90089026F /* ORGretina4ADecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CD6BEE1A1E34D90089026F /* ORGretina4ADecoders.h */; };
+		84CD6BFA1A1E34D90089026F /* ORGretina4ADecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CD6BEF1A1E34D90089026F /* ORGretina4ADecoders.m */; };
+		84CD6BFB1A1E34D90089026F /* ORGretina4AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CD6BF01A1E34D90089026F /* ORGretina4AModel.h */; };
+		84CD6BFC1A1E34D90089026F /* ORGretina4AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CD6BF11A1E34D90089026F /* ORGretina4AModel.m */; };
 		84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3630EA4EB2E0060076A /* Fec32.gif */; };
 		84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3640EA4EB2E0060076A /* Fec32.nib */; };
 		84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3650EA4EB2E0060076A /* Fec32Card.gif */; };
@@ -4341,6 +4349,7 @@
 		842F19B903B8F060005F64B1 /* ORRunModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRunModel.h; path = Source/Objects/Control/RunControl/ORRunModel.h; sourceTree = SOURCE_ROOT; };
 		842F2341047D3655005F64B1 /* ThreadWorker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ThreadWorker.m; path = "Source/Objects/Misc Objects/Workers/ThreadWorker.m"; sourceTree = SOURCE_ROOT; };
 		842F2343047D365F005F64B1 /* ThreadWorker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ThreadWorker.h; path = "Source/Objects/Misc Objects/Workers/ThreadWorker.h"; sourceTree = SOURCE_ROOT; };
+		842F87BD1A40BD9B00FECB61 /* ORRemoteSocketModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRemoteSocketModel.m; sourceTree = "<group>"; };
 		842FCCA7197849C700B89723 /* EHS8260p.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = EHS8260p.nib; sourceTree = "<group>"; };
 		842FCCA8197849C700B89723 /* EHS8260p.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = EHS8260p.tif; sourceTree = "<group>"; };
 		842FCCA9197849C700B89723 /* OREHS8260pController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OREHS8260pController.h; sourceTree = "<group>"; };
@@ -4815,7 +4824,6 @@
 		8471D4731588DF3C0039894D /* ORRemoteSocketController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRemoteSocketController.h; path = "Source/Objects/Misc Objects/RemoteSocket/ORRemoteSocketController.h"; sourceTree = SOURCE_ROOT; };
 		8471D4741588DF3C0039894D /* ORRemoteSocketController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRemoteSocketController.m; path = "Source/Objects/Misc Objects/RemoteSocket/ORRemoteSocketController.m"; sourceTree = SOURCE_ROOT; };
 		8471D4751588DF3C0039894D /* ORRemoteSocketModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRemoteSocketModel.h; path = "Source/Objects/Misc Objects/RemoteSocket/ORRemoteSocketModel.h"; sourceTree = SOURCE_ROOT; };
-		8471D4761588DF3C0039894D /* ORRemoteSocketModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRemoteSocketModel.m; path = "Source/Objects/Misc Objects/RemoteSocket/ORRemoteSocketModel.m"; sourceTree = SOURCE_ROOT; };
 		8471D4771588DF3C0039894D /* RemoteSocket.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RemoteSocket.nib; path = "Source/Objects/Misc Objects/RemoteSocket/RemoteSocket.nib"; sourceTree = SOURCE_ROOT; };
 		8471D4781588DF3C0039894D /* RemoteSocket.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RemoteSocket.tif; path = "Source/Objects/Misc Objects/RemoteSocket/RemoteSocket.tif"; sourceTree = SOURCE_ROOT; };
 		8472AA4C12DB44B300DEEB02 /* EHQ8060n.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = EHQ8060n.nib; path = Source/Objects/Hardware/HV/MPod/EHQ8060n/EHQ8060n.nib; sourceTree = SOURCE_ROOT; };
@@ -5993,6 +6001,14 @@
 		84CC16CA0FAF157000CEE642 /* ORMCA927Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Controller.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Controller.m; sourceTree = SOURCE_ROOT; };
 		84CC16CB0FAF157000CEE642 /* ORMCA927Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Model.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Model.h; sourceTree = SOURCE_ROOT; };
 		84CC16CC0FAF157000CEE642 /* ORMCA927Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Model.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Model.m; sourceTree = SOURCE_ROOT; };
+		84CD6BE91A1E34D90089026F /* Gretina4A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Gretina4A.nib; sourceTree = "<group>"; };
+		84CD6BEA1A1E34D90089026F /* Gretina4ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Gretina4ACard.gif; sourceTree = "<group>"; };
+		84CD6BEC1A1E34D90089026F /* ORGretina4AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretina4AController.h; sourceTree = "<group>"; };
+		84CD6BED1A1E34D90089026F /* ORGretina4AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretina4AController.m; sourceTree = "<group>"; };
+		84CD6BEE1A1E34D90089026F /* ORGretina4ADecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretina4ADecoders.h; sourceTree = "<group>"; };
+		84CD6BEF1A1E34D90089026F /* ORGretina4ADecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretina4ADecoders.m; sourceTree = "<group>"; };
+		84CD6BF01A1E34D90089026F /* ORGretina4AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretina4AModel.h; sourceTree = "<group>"; };
+		84CD6BF11A1E34D90089026F /* ORGretina4AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretina4AModel.m; sourceTree = "<group>"; };
 		84CDDA3B047167C7005F64B1 /* ORGpibDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGpibDeviceModel.m; path = "Source/Objects/Hardware/GPIB/GPIB Base Classes/ORGpibDeviceModel.m"; sourceTree = SOURCE_ROOT; };
 		84CDDA3C047167C7005F64B1 /* ORGpibDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGpibDeviceModel.h; path = "Source/Objects/Hardware/GPIB/GPIB Base Classes/ORGpibDeviceModel.h"; sourceTree = SOURCE_ROOT; };
 		84CDDA3F04716AA9005F64B1 /* ORHPPulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHPPulserModel.h; sourceTree = "<group>"; };
@@ -9527,7 +9543,7 @@
 				8471D4731588DF3C0039894D /* ORRemoteSocketController.h */,
 				8471D4741588DF3C0039894D /* ORRemoteSocketController.m */,
 				8471D4751588DF3C0039894D /* ORRemoteSocketModel.h */,
-				8471D4761588DF3C0039894D /* ORRemoteSocketModel.m */,
+				842F87BD1A40BD9B00FECB61 /* ORRemoteSocketModel.m */,
 				8471D4771588DF3C0039894D /* RemoteSocket.nib */,
 				8471D4781588DF3C0039894D /* RemoteSocket.tif */,
 			);
@@ -12287,6 +12303,21 @@
 			path = Source/Objects/Hardware/USB/MCA927;
 			sourceTree = SOURCE_ROOT;
 		};
+		84CD6BE81A1E34D90089026F /* Gretina4A */ = {
+			isa = PBXGroup;
+			children = (
+				84CD6BE91A1E34D90089026F /* Gretina4A.nib */,
+				84CD6BEA1A1E34D90089026F /* Gretina4ACard.gif */,
+				84CD6BEC1A1E34D90089026F /* ORGretina4AController.h */,
+				84CD6BED1A1E34D90089026F /* ORGretina4AController.m */,
+				84CD6BEE1A1E34D90089026F /* ORGretina4ADecoders.h */,
+				84CD6BEF1A1E34D90089026F /* ORGretina4ADecoders.m */,
+				84CD6BF01A1E34D90089026F /* ORGretina4AModel.h */,
+				84CD6BF11A1E34D90089026F /* ORGretina4AModel.m */,
+			);
+			path = Gretina4A;
+			sourceTree = "<group>";
+		};
 		84CDDA4504717079005F64B1 /* Misc */ = {
 			isa = PBXGroup;
 			children = (
@@ -13770,8 +13801,9 @@
 				8467E6A406480F0A00A35E6A /* Trigger32 */,
 				84749D0A07D6526F001553EC /* MCarrier */,
 				845115E104030088005F64B1 /* IPCarrier */,
-				84DF49FF162DCE6B00261144 /* Gretina4M */,
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
+				84DF49FF162DCE6B00261144 /* Gretina4M */,
+				84CD6BE81A1E34D90089026F /* Gretina4A */,
 				840463B8183515AC00F69B23 /* GretinaTrigger */,
 				844445FE0E815C0D00A1440D /* XYCom */,
 				84E2063C11AD7841007D757F /* SIS3800 */,
@@ -14204,6 +14236,7 @@
 				84D9826A079605CD0074A035 /* ORL2551Decoders.h in Headers */,
 				84D9826B079605CD0074A035 /* ORL2551Model.h in Headers */,
 				84D98347079716E90074A035 /* TimedWorker.h in Headers */,
+				84CD6BF71A1E34D90089026F /* ORGretina4AController.h in Headers */,
 				84607295079F015300C9F572 /* ORCamacCardDecoder.h in Headers */,
 				8408591407A1935D0056503B /* ORBaseDecoder.h in Headers */,
 				84FE07D107B403ED00E2CB0E /* NSString+Extensions.h in Headers */,
@@ -14227,6 +14260,7 @@
 				1C50F9F408033CA9008D18EA /* ORADC2249Controller.h in Headers */,
 				1C50F9F608033CA9008D18EA /* ORADC2249Decoders.h in Headers */,
 				1C50F9F808033CA9008D18EA /* ORADC2249Model.h in Headers */,
+				84CD6BF91A1E34D90089026F /* ORGretina4ADecoders.h in Headers */,
 				84538DF50803462500615B6D /* OR1DHistoDecoders.h in Headers */,
 				84538DFE0803462F00615B6D /* OR2DHistoDecoders.h in Headers */,
 				84539C510807247A00615B6D /* ORRemoteRunController.h in Headers */,
@@ -14270,6 +14304,7 @@
 				849DDE6708F466630052AFC6 /* ORAD3511Model.h in Headers */,
 				849DE3EF08F597410052AFC6 /* ORK3655Controller.h in Headers */,
 				849DE3F108F597410052AFC6 /* ORK3655Model.h in Headers */,
+				84CD6BFB1A1E34D90089026F /* ORGretina4AModel.h in Headers */,
 				849DE73708F6F1FA0052AFC6 /* ORMacController.h in Headers */,
 				842FCCB3197849C700B89723 /* OREHS8260pDecoders.h in Headers */,
 				849DE73908F6F1FA0052AFC6 /* ORMacModel.h in Headers */,
@@ -15217,6 +15252,7 @@
 				8434A248055B3287002D3102 /* StatusWindow.nib in Resources */,
 				8434A249055B3287002D3102 /* Document.nib in Resources */,
 				8434A250055B3287002D3102 /* Crate.gif in Resources */,
+				84CD6BF41A1E34D90089026F /* Gretina4A.nib in Resources */,
 				8434A251055B3287002D3102 /* VmeCrate.nib in Resources */,
 				8434A253055B3287002D3102 /* 617Card.gif in Resources */,
 				8434A256055B3287002D3102 /* Orca.icns in Resources */,
@@ -15745,6 +15781,7 @@
 				84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */,
 				84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */,
 				84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */,
+				84CD6BF51A1E34D90089026F /* Gretina4ACard.gif in Resources */,
 				84D258680FA7340B00626276 /* MotionNode.gif in Resources */,
 				84D258690FA7340B00626276 /* MotionNode.nib in Resources */,
 				84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */,
@@ -16453,6 +16490,7 @@
 				84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */,
 				840E00050944B29000049827 /* ORProcessController.m in Sources */,
 				840E00070944B29000049827 /* ORProcessModel.m in Sources */,
+				842F87BE1A40BD9B00FECB61 /* ORRemoteSocketModel.m in Sources */,
 				840E000B0944B29000049827 /* ORProcessElementController.m in Sources */,
 				840E000D0944B29000049827 /* ORProcessElementModel.m in Sources */,
 				840E000F0944B29000049827 /* ORProcessEndNode.m in Sources */,
@@ -16532,6 +16570,7 @@
 				849C68130A2CC4B700511E30 /* ORCCUSBController.m in Sources */,
 				84AC6A520A34F9A900A0018E /* NcdPulseChannelsTask.m in Sources */,
 				84A16C580A7EB7D1005BC151 /* ORJADCLController.m in Sources */,
+				84CD6BFA1A1E34D90089026F /* ORGretina4ADecoders.m in Sources */,
 				84A16C5C0A7EB7D1005BC151 /* ORJADCLModel.m in Sources */,
 				8472AD710A82BD8F0069A069 /* ORBiRa3251OController.m in Sources */,
 				8472AD730A82BD8F0069A069 /* ORBiRa3251OModel.m in Sources */,
@@ -16566,6 +16605,7 @@
 				8475974E0B5EF26500123411 /* ORSqlController.m in Sources */,
 				847597500B5EF26500123411 /* ORSqlModel.m in Sources */,
 				84F7E2340B68281A00E52AA5 /* ORCrateLabelView.m in Sources */,
+				84CD6BF81A1E34D90089026F /* ORGretina4AController.m in Sources */,
 				849E7C9B0B6957BF00353D50 /* ORADU200Controller.m in Sources */,
 				849E7C9D0B6957BF00353D50 /* ORADU200Model.m in Sources */,
 				84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */,
@@ -16750,6 +16790,7 @@
 				84B28D7D0F4C658500E2B056 /* ORNplpCMeterController.m in Sources */,
 				84B28D7F0F4C658500E2B056 /* ORNplpCMeterDecoders.m in Sources */,
 				84B28D810F4C658500E2B056 /* ORNplpCMeterModel.m in Sources */,
+				84CD6BFC1A1E34D90089026F /* ORGretina4AModel.m in Sources */,
 				84B28D8D0F4C66BE00E2B056 /* ORVXMController.m in Sources */,
 				84B28D8F0F4C66BE00E2B056 /* ORVXMDecoders.m in Sources */,
 				84B28D910F4C66BE00E2B056 /* ORVXMModel.m in Sources */,
@@ -17096,7 +17137,6 @@
 				84184822157FA478004EC81F /* ORCV830Decoders.m in Sources */,
 				84184824157FA478004EC81F /* ORCV830Model.m in Sources */,
 				8471D47A1588DF3C0039894D /* ORRemoteSocketController.m in Sources */,
-				8471D47C1588DF3C0039894D /* ORRemoteSocketModel.m in Sources */,
 				84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */,
 				84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */,
 				84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */,
@@ -17357,7 +17397,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RelaunchOrca;
 				SDKROOT = "";
@@ -17394,9 +17434,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = RelaunchOrca;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 				VALID_ARCHS = i386;
 			};
 			name = Deployment;
@@ -17430,9 +17470,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = RelaunchOrca;
-				SDKROOT = macosx10.8;
+				SDKROOT = "";
 				VALID_ARCHS = i386;
 			};
 			name = Default;
@@ -17494,7 +17534,7 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -17569,7 +17609,7 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -17641,7 +17681,7 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -17688,7 +17728,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = "";
@@ -17708,7 +17748,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = "";
 			};
@@ -17726,7 +17766,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = "";
 			};
