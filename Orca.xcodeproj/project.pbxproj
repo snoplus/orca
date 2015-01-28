@@ -308,6 +308,15 @@
 		54F5B709087206D9003AC228 /* KatrinController.h in Headers */ = {isa = PBXBuildFile; fileRef = 54F5B6FD087206D9003AC228 /* KatrinController.h */; };
 		54F5B70A087206D9003AC228 /* KatrinModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 54F5B6FE087206D9003AC228 /* KatrinModel.h */; };
 		54F5B70B087206D9003AC228 /* KatrinModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F5B6FF087206D9003AC228 /* KatrinModel.m */; };
+		5B5A404F1A79385C00543633 /* ORSIS3305Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A40461A79385C00543633 /* ORSIS3305Controller.h */; };
+		5B5A40501A79385C00543633 /* ORSIS3305Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A40471A79385C00543633 /* ORSIS3305Controller.m */; };
+		5B5A40511A79385C00543633 /* ORSIS3305Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A40481A79385C00543633 /* ORSIS3305Decoders.h */; };
+		5B5A40521A79385C00543633 /* ORSIS3305Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A40491A79385C00543633 /* ORSIS3305Decoders.m */; };
+		5B5A40531A79385C00543633 /* ORSIS3305Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A404A1A79385C00543633 /* ORSIS3305Model.h */; };
+		5B5A40541A79385C00543633 /* ORSIS3305Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B5A404B1A79385C00543633 /* ORSIS3305Model.m */; };
+		5B5A40551A79385C00543633 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */; };
+		5B5A40561A79385C00543633 /* SIS3305.nib in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404D1A79385C00543633 /* SIS3305.nib */; };
+		5B5A40571A79385C00543633 /* SIS3305Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404E1A79385C00543633 /* SIS3305Card.gif */; };
 		8400D08D09AD40CE000C1DA4 /* ORcPCICard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */; };
 		8400D67A09AF96C5000C1DA4 /* ORTaskSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */; };
 		8400D67B09AF96C6000C1DA4 /* ORTaskSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */; };
@@ -3807,6 +3816,15 @@
 		54F5B6FD087206D9003AC228 /* KatrinController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = KatrinController.h; path = Source/Experiments/Katrin/KatrinController.h; sourceTree = SOURCE_ROOT; };
 		54F5B6FE087206D9003AC228 /* KatrinModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = KatrinModel.h; path = Source/Experiments/Katrin/KatrinModel.h; sourceTree = SOURCE_ROOT; };
 		54F5B6FF087206D9003AC228 /* KatrinModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = KatrinModel.m; path = Source/Experiments/Katrin/KatrinModel.m; sourceTree = SOURCE_ROOT; };
+		5B5A40461A79385C00543633 /* ORSIS3305Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3305Controller.h; sourceTree = "<group>"; };
+		5B5A40471A79385C00543633 /* ORSIS3305Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3305Controller.m; sourceTree = "<group>"; };
+		5B5A40481A79385C00543633 /* ORSIS3305Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3305Decoders.h; sourceTree = "<group>"; };
+		5B5A40491A79385C00543633 /* ORSIS3305Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3305Decoders.m; sourceTree = "<group>"; };
+		5B5A404A1A79385C00543633 /* ORSIS3305Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSIS3305Model.h; sourceTree = "<group>"; };
+		5B5A404B1A79385C00543633 /* ORSIS3305Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3305Model.m; sourceTree = "<group>"; };
+		5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
+		5B5A404D1A79385C00543633 /* SIS3305.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3305.nib; sourceTree = "<group>"; };
+		5B5A404E1A79385C00543633 /* SIS3305Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3305Card.gif; sourceTree = "<group>"; };
 		8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICard.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICard.h"; sourceTree = SOURCE_ROOT; };
 		8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTaskSequence.h; sourceTree = "<group>"; };
 		8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTaskSequence.m; sourceTree = "<group>"; };
@@ -7202,6 +7220,22 @@
 			name = Katrin;
 			path = Source/Experiments/Katrin;
 			sourceTree = SOURCE_ROOT;
+		};
+		5B5A40451A79385C00543633 /* SIS3305 */ = {
+			isa = PBXGroup;
+			children = (
+				5B5A40461A79385C00543633 /* ORSIS3305Controller.h */,
+				5B5A40471A79385C00543633 /* ORSIS3305Controller.m */,
+				5B5A40481A79385C00543633 /* ORSIS3305Decoders.h */,
+				5B5A40491A79385C00543633 /* ORSIS3305Decoders.m */,
+				5B5A404A1A79385C00543633 /* ORSIS3305Model.h */,
+				5B5A404B1A79385C00543633 /* ORSIS3305Model.m */,
+				5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */,
+				5B5A404D1A79385C00543633 /* SIS3305.nib */,
+				5B5A404E1A79385C00543633 /* SIS3305Card.gif */,
+			);
+			path = SIS3305;
+			sourceTree = "<group>";
 		};
 		8402796907397B8700972B07 /* Bit3 Adaptor */ = {
 			isa = PBXGroup;
@@ -13785,6 +13819,7 @@
 		F51E69A103AE4776015F64B1 /* Vme */ = {
 			isa = PBXGroup;
 			children = (
+				5B5A40451A79385C00543633 /* SIS3305 */,
 				B38DEE4114E02B40003914FF /* Advanet */,
 				F51E69E003AE4776015F64B1 /* Vme Base Classes */,
 				8493CC790C99FA4B00B46CD4 /* VMEcpu */,
@@ -14052,6 +14087,7 @@
 				8434A1C9055B3287002D3102 /* ORGpibEnetModel.h in Headers */,
 				8434A1CA055B3287002D3102 /* ORGpibDeviceController.h in Headers */,
 				8434A1CB055B3287002D3102 /* OROscBaseModel.h in Headers */,
+				5B5A40511A79385C00543633 /* ORSIS3305Decoders.h in Headers */,
 				8434A1CC055B3287002D3102 /* ORTek754DController.h in Headers */,
 				8434A1CE055B3287002D3102 /* ORTek754DModel.h in Headers */,
 				8434A1CF055B3287002D3102 /* NcdMuxController.h in Headers */,
@@ -14322,6 +14358,7 @@
 				8408A4BF09071C6A004A3B34 /* ORHV2132Model.h in Headers */,
 				84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */,
 				84E24F42093E703100E963DF /* ORBitProcessing.h in Headers */,
+				5B5A40551A79385C00543633 /* ORSISRegisterDefs.h in Headers */,
 				840E00040944B29000049827 /* ORProcessController.h in Headers */,
 				840E00060944B29000049827 /* ORProcessModel.h in Headers */,
 				840E000A0944B29000049827 /* ORProcessElementController.h in Headers */,
@@ -14631,6 +14668,7 @@
 				84C37D2D0EF834DD00E77E09 /* SNOController.h in Headers */,
 				84C37D2F0EF834DD00E77E09 /* SNOModel.h in Headers */,
 				84C37E250EF8408F00E77E09 /* ORPSUPTubePosition.h in Headers */,
+				5B5A404F1A79385C00543633 /* ORSIS3305Controller.h in Headers */,
 				84E18C3A0F0A5D3B0096F0F3 /* NSNotifications+Extensions.h in Headers */,
 				84E18C560F0A640C0096F0F3 /* ORLineMarker.h in Headers */,
 				8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */,
@@ -15089,6 +15127,7 @@
 				8449A53A16AEDF5B00296104 /* ORCV1721Decoder.h in Headers */,
 				8449A53C16AEDF5B00296104 /* ORCV1721Model.h in Headers */,
 				8449A54216AEE44300296104 /* ORCAEN1721Readout.hh in Headers */,
+				5B5A40531A79385C00543633 /* ORSIS3305Model.h in Headers */,
 				8449A55116B0781B00296104 /* ORGretinaCntView.h in Headers */,
 				84DA76C216B803E00045F22A /* ORAdcRateController.h in Headers */,
 				84DA76C416B803E00045F22A /* ORAdcRateModel.h in Headers */,
@@ -15500,6 +15539,7 @@
 				84B4897E094506C000DFC618 /* OneShot.nib in Resources */,
 				84B4897F094506C000DFC618 /* OneShot.tif in Resources */,
 				840B72200948AE3A00B1B135 /* smallLock.tif in Resources */,
+				5B5A40571A79385C00543633 /* SIS3305Card.gif in Resources */,
 				840B78F9094A47AF00B1B135 /* Inverter.tif in Resources */,
 				840B795A094A564E00B1B135 /* NandGate.tif in Resources */,
 				840B798C094A589200B1B135 /* NorGate.tif in Resources */,
@@ -16057,6 +16097,7 @@
 				84FEB88915A31F42005D798C /* L2301Card.gif in Resources */,
 				2D51C60A15B5A115000F0ACD /* EdelweissFLT.nib in Resources */,
 				2D51C60B15B5A115000F0ACD /* EdelweissFLTCard.gif in Resources */,
+				5B5A40561A79385C00543633 /* SIS3305.nib in Resources */,
 				84880EEE15B8950D0073CDFC /* MJDStrings.tif in Resources */,
 				8432B5E915D56C7C00C5FB5D /* CouchHistoryValuesMap.txt in Resources */,
 				8432B6BE15D92D4700C5FB5D /* MJDString.tif in Resources */,
@@ -16308,6 +16349,7 @@
 				8483E56E058652E400C28344 /* ORDataController.m in Sources */,
 				843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */,
 				847CCA69058E8C75003522C8 /* ORQueue.m in Sources */,
+				5B5A40521A79385C00543633 /* ORSIS3305Decoders.m in Sources */,
 				847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */,
 				84F03CDB059A145E00275624 /* ORGlobal.m in Sources */,
 				84F18E6805AF49A8001799E6 /* ORHeartBeat.m in Sources */,
@@ -16780,6 +16822,7 @@
 				84B28CE50F4C597900E2B056 /* ORBocTIC3Model.m in Sources */,
 				84B28CFB0F4C5DBB00E2B056 /* ORAmi286Controller.m in Sources */,
 				84B28CFD0F4C5DBB00E2B056 /* ORAmi286Decoders.m in Sources */,
+				5B5A40501A79385C00543633 /* ORSIS3305Controller.m in Sources */,
 				84B28CFF0F4C5DBB00E2B056 /* ORAmi286Model.m in Sources */,
 				84B28D220F4C614000E2B056 /* ORXYScannerController.m in Sources */,
 				84B28D240F4C614000E2B056 /* ORXYScannerDecoders.m in Sources */,
@@ -17194,6 +17237,7 @@
 				846F314117E8819000A5F1DA /* ORApcUpsModel.m in Sources */,
 				841E0A4317F46296009E4190 /* ORCaen792Decoders.m in Sources */,
 				84BAC04917F4A72100695DA8 /* ORCV977Controller.m in Sources */,
+				5B5A40541A79385C00543633 /* ORSIS3305Model.m in Sources */,
 				84BAC04D17F4A72100695DA8 /* ORCV977Model.m in Sources */,
 				847D308E17FF0B3000D2D8BC /* ORNMon5085Controller.m in Sources */,
 				847D309017FF0B3000D2D8BC /* ORNMon5085Model.m in Sources */,
