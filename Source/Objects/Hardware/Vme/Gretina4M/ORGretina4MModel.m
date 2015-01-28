@@ -1621,7 +1621,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
  
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kPileupWindow].offset
-                       mask:0x07ff07ff
+                       mask:0xffffffff
                   reportKey:@"PileupWindow"];
 
 }
