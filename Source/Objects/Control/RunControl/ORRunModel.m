@@ -1643,7 +1643,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     lastRunNumberShipped	= data[2];
 	
     [self sendHeartBeat:nil];
-	[NSThread setThreadPriority:.7];
+	[NSThread setThreadPriority:1];
 	
 	[self setRunPaused:NO];
 }

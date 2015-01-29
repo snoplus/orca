@@ -669,7 +669,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 - (void) sendDataFromQueue
 {
 	NSAutoreleasePool *threadPool = [[NSAutoreleasePool allocWithZone:nil] init];
-	[NSThread setThreadPriority:.8];
+	[NSThread setThreadPriority:1];
     id theNextObject =  [self objectConnectedTo: ORDataTaskDataOut];
 	BOOL flushMessagePrintedOnce = NO;
     BOOL timeToQuit              = NO;
