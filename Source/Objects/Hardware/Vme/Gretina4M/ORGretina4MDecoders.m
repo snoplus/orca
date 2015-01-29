@@ -142,7 +142,7 @@
                 NSEnumerator* e = [listOfCards objectEnumerator];
                 ORGretina4MModel* aCard;
                 while(aCard = [e nextObject]){
-                    if([aCard slot] == card){
+                    if([aCard slot] == card && [aCard crateNumber] == crate){
                         [actualGretinaCards setObject:aCard forKey:aKey];
                         obj = aCard;
                         break;
