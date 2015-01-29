@@ -933,15 +933,16 @@
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
 {
-    ORRate* theRateObj = [aNote object];		
+    ORRate* theRateObj = [aNote object];
     [[rateTextFields cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
     [rate0 setNeedsDisplay:YES];
+    
 }
 
-- (void) totalRateChanged:(NSNotification*)aNotification
+- (void) totalRateChanged:(NSNotification*)aNote
 {
-	ORRateGroup* theRateObj = [aNotification object];
-	if(aNotification == nil || [model waveFormRateGroup] == theRateObj){
+	ORRateGroup* theRateObj = [aNote object];
+	if(aNote == nil || [model waveFormRateGroup] == theRateObj){
 		
 		[totalRateText setFloatValue: [theRateObj totalRate]];
 		[totalRate setNeedsDisplay:YES];
@@ -1065,14 +1066,14 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M Card (Slot %d)",[model slot]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M (Crate %d Slot %d)",[model crateNumber],[model slot]]];
     [dataWindowView initBugs];
     [dataWindowView setNeedsDisplay:YES];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M Card (Slot %d)",[model slot]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M (Crate %d Slot %d)",[model crateNumber],[model slot]]];
 }
 
 - (void) integrationChanged:(NSNotification*)aNotification
