@@ -686,7 +686,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) setByteRateSent:(float)aRate
 {    
-	byteRateSent = aRate/(float)kSBCRateIntegrationTime;
+	byteRateSent = aRate;
 }
 
 - (float)byteRateSent
@@ -696,7 +696,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) setByteRateReceived:(float)aRate
 {    
-	byteRateReceived = aRate/(float)kSBCRateIntegrationTime;
+	byteRateReceived = aRate;
 }
 
 - (float)byteRateReceived
