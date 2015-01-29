@@ -528,8 +528,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		[self closeSplashWindow];
 		NSLogColor([NSColor redColor],@"Number of processors: %d\n",count);
 		if([[NSUserDefaults standardUserDefaults] objectForKey:@"IgnoreSingleCPUWarning"] == nil){
-			BOOL result = ORRunAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",@"OK/Don't remind me",nil,nil);
-			if(result){
+			BOOL cancel = ORRunAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",@"OK/Don't remind me",nil,nil);
+			if(!cancel){
 				[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"IgnoreSingleCPUWarning"];    
 				[[NSUserDefaults standardUserDefaults] synchronize];
 			}

@@ -619,8 +619,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) newLogBook:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Starting a new logbook.",@"Is this really what you want?\nAny unsaved changes will be lost!",@"Cancel",@"Yes, Make New LogBook",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(@"Starting a new logbook.",@"Is this really what you want?\nAny unsaved changes will be lost!",@"Cancel",@"Yes, Make New LogBook",nil);
+	if(!cancel){
 		[logBookField setString:@""];
 		[self setLogBookFile:@"untitled"];
 	}
