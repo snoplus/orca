@@ -507,16 +507,16 @@
 - (IBAction) setMuxEfficiencyAction:(id)sender
 {
 	NSString* s = [NSString stringWithFormat:@"Reducing mux efficiency to: %.0f%%",[model currentMuxEfficiency] ];
-	BOOL choice = ORRunAlertPanel(s,@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(s,@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model modifiyMuxEfficiency];
 	}	
 }
 
 - (IBAction) restoreEfficiencyAction:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Restoring mux thresholds to previous values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(@"Restoring mux thresholds to previous values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model restoreMuxEfficiency];
 	}	
 }
@@ -525,8 +525,8 @@
 {
 	BOOL ok= YES;
 	if([model nominalSettingsFile]){
-		BOOL choice = ORRunAlertPanel(@"Capturing mux and threshold settings to a NEW nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-		if(choice){
+		BOOL cancel = ORRunAlertPanel(@"Capturing mux and threshold settings to a NEW nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+		if(!cancel){
 			ok = YES;
 		}
 		else ok = NO;
@@ -557,8 +557,8 @@
 {
 	BOOL ok= YES;
 	if([model nominalSettingsFile]){
-		BOOL choice = ORRunAlertPanel(@"Selecting a different nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-		if(choice){
+		BOOL cancel = ORRunAlertPanel(@"Selecting a different nominal settings file!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+		if(!cancel){
 			ok = YES;
 		}
 		else ok = NO;
@@ -587,36 +587,36 @@
 
 - (IBAction) restoreAllToNominal:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Restoring mux and shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(@"Restoring mux and shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model restoreToNomional];
 	}	
 }
 - (IBAction) restoreMuxesToNominal:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Restoring mux settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(@"Restoring mux settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model restoreMuxesToNomional];
 	}	
 }
 - (IBAction) restoreShapersToNominal:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Restoring shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(@"Restoring shaper settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model restoreShapersToNominal];
 	}	
 }
 - (IBAction) restoreShaperGainsToNominal:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Restoring shaper gain settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){
+	BOOL cancel = ORRunAlertPanel(@"Restoring shaper gain settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model restoreShaperGainsToNominal];
 	}	
 }
 - (IBAction) restoreShaperThresoldsToNominal:(id)sender
 {
-	BOOL choice = ORRunAlertPanel(@"Restoring shaper thresholds settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-	if(choice){		
+	BOOL cancel = ORRunAlertPanel(@"Restoring shaper thresholds settings to to nominal values",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+	if(!cancel){
 		[model restoreShaperThresholdsToNominal];
 	}	
 }

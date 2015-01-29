@@ -687,8 +687,8 @@
 {
     if([model useCmdQueue])[model addZeroCmd];
     else {
-        BOOL choice = ORRunAlertPanel(@"About to reset position counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
-        if(choice){
+        BOOL cancel = ORRunAlertPanel(@"About to reset position counter to zero!",@"Is this really what you want?\n",@"Cancel",@"Yes, Do it",nil);
+        if(!cancel){
             [model addZeroCmd];
         }
     }

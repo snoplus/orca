@@ -590,8 +590,8 @@ enum {
 - (IBAction) setStepCountAction:(id)sender
 {
     [self endEditing];
-    BOOL choice = ORRunAlertPanel(@"You are setting the step count WITHOUT moving the motor!",@"Is this really what you want?",@"Cancel",@"YES/Change Count",nil);
-    if(choice){
+    BOOL cancel = ORRunAlertPanel(@"You are setting the step count WITHOUT moving the motor!",@"Is this really what you want?",@"Cancel",@"YES/Change Count",nil);
+    if(!cancel){
         @try {
             [model loadStepCount];	
             [model readMotor];
