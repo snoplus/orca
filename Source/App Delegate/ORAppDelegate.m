@@ -358,7 +358,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 - (IBAction) terminate:(id)sender
 {
-    BOOL cancel = YES;
+    BOOL cancel = NO;
     int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
 	if(runningProcessCount>0){
         NSString* s = [NSString stringWithFormat:@"Quitting will stop %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];
