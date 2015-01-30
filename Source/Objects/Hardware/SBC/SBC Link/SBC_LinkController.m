@@ -636,7 +636,7 @@
             else {
                 theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %-9u Polling     : %u Hz\n",theRunInfo.readCycles/10000,theRunInfo.pollingRate]];
             }
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %u\n",theRunInfo.lostByteCount]];
 			
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9lu Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9lu Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
