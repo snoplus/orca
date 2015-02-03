@@ -460,7 +460,7 @@ static struct {
 
 - (void) setSPIWriteValue:(unsigned long)aWriteValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:spiWriteValue];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSPIWriteValue:spiWriteValue];
     spiWriteValue = aWriteValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelSPIWriteValueChanged object:self];
 }
