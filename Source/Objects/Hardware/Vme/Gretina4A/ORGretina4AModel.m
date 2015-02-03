@@ -18,7 +18,7 @@
 
 //-------------------------------------------------------------------------
 
-#pragma mark ***Imported Files
+#pragma mark - Imported Files
 #import "ORGretina4AModel.h"
 #import "ORDataTypeAssigner.h"
 #import "ORHWWizParam.h"
@@ -32,143 +32,143 @@
 #import "MJDCmds.h"
 #import "ORRunModel.h"
 
-#define kCurrentFirmwareVersion 0x107
+#define kCurrentFirmwareVersion 0x10
 #define kFPGARemotePath @"GretinaFPGA.bin"
 
-NSString* ORGretina4ARegisterIndexChanged		= @"ORGretina4ARegisterIndexChanged";
-NSString* ORGretina4ARegisterWriteValueChanged	= @"ORGretina4ARegisterWriteValueChanged";
-NSString* ORGretina4ASPIWriteValueChanged	    = @"ORGretina4ASPIWriteValueChanged";
-NSString* ORGretina4AFpgaDownProgressChanged	= @"ORGretina4AFpgaDownProgressChanged";
+NSString* ORGretina4ARegisterIndexChanged               = @"ORGretina4ARegisterIndexChanged";
+NSString* ORGretina4ARegisterWriteValueChanged          = @"ORGretina4ARegisterWriteValueChanged";
+NSString* ORGretina4ASPIWriteValueChanged               = @"ORGretina4ASPIWriteValueChanged";
+NSString* ORGretina4AFpgaDownProgressChanged            = @"ORGretina4AFpgaDownProgressChanged";
 NSString* ORGretina4AMainFPGADownLoadStateChanged		= @"ORGretina4AMainFPGADownLoadStateChanged";
 NSString* ORGretina4AFpgaFilePathChanged				= @"ORGretina4AFpgaFilePathChanged";
 NSString* ORGretina4ANoiseFloorIntegrationTimeChanged	= @"ORGretina4ANoiseFloorIntegrationTimeChanged";
-NSString* ORGretina4ANoiseFloorOffsetChanged        = @"ORGretina4ANoiseFloorOffsetChanged";
-NSString* ORGretina4ARateGroupChangedNotification	= @"ORGretina4ARateGroupChangedNotification";
-NSString* ORGretina4ANoiseFloorChanged	= @"ORGretina4ANoiseFloorChanged";
-NSString* ORGretina4AFIFOCheckChanged	= @"ORGretina4AFIFOCheckChanged";
+NSString* ORGretina4ANoiseFloorOffsetChanged            = @"ORGretina4ANoiseFloorOffsetChanged";
+NSString* ORGretina4ARateGroupChangedNotification       = @"ORGretina4ARateGroupChangedNotification";
+NSString* ORGretina4ANoiseFloorChanged                  = @"ORGretina4ANoiseFloorChanged";
+NSString* ORGretina4AFIFOCheckChanged                   = @"ORGretina4AFIFOCheckChanged";
 NSString* ORGretina4AModelFirmwareStatusStringChanged	= @"ORGretina4AModelFirmwareStatusStringChanged";
 
 
-NSString* ORGretina4AModelInitStateChanged          = @"ORGretina4AModelInitStateChanged";
-NSString* ORGretina4ACardInited                     = @"ORGretina4ACardInited";
+NSString* ORGretina4AModelInitStateChanged              = @"ORGretina4AModelInitStateChanged";
+NSString* ORGretina4ACardInited                         = @"ORGretina4ACardInited";
 
-NSString* ORGretina4AForceFullInitChanged       = @"ORGretina4AForceFullInitChanged";
-NSString* ORGretina4AEnabledChanged             = @"ORGretina4AEnabledChanged";
+NSString* ORGretina4AForceFullInitChanged               = @"ORGretina4AForceFullInitChanged";
+NSString* ORGretina4AEnabledChanged                     = @"ORGretina4AEnabledChanged";
 
-NSString* ORGretina4AMainFPGADownLoadInProgressChanged		= @"ORGretina4AMainFPGADownLoadInProgressChanged";
-NSString* ORGretina4ASettingsLock				= @"ORGretina4ASettingsLock";
-NSString* ORGretina4ARegisterLock				= @"ORGretina4ARegisterLock";
-NSString* ORGretina4ALockChanged                = @"ORGretina4ALockChanged";
+NSString* ORGretina4AMainFPGADownLoadInProgressChanged	= @"ORGretina4AMainFPGADownLoadInProgressChanged";
+NSString* ORGretina4ASettingsLock                       = @"ORGretina4ASettingsLock";
+NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterLock";
+NSString* ORGretina4ALockChanged                        = @"ORGretina4ALockChanged";
 
-NSString* ORGretina4AFirmwareVersionChanged      = @"ORGretina4AFirmwareVersionChanged";
-NSString* ORGretina4AFifoEmpty0Changed      = @"ORGretina4AFifoEmpty0Changed";
-NSString* ORGretina4AFifoEmpty1Changed      = @"ORGretina4AFifoEmpty1Changed";
-NSString* ORGretina4AFifoAlmostEmptyChanged      = @"ORGretina4AFifoAlmostEmptyChanged";
-NSString* ORGretina4AFifoHalfFullChanged      = @"ORGretina4AFifoHalfFullChanged";
-NSString* ORGretina4AFifoAlmostFullChanged      = @"ORGretina4AFifoAlmostFullChanged";
-NSString* ORGretina4AFifoFull0Changed      = @"ORGretina4AFifoFull0Changed";
-NSString* ORGretina4AFifoFull1Changed      = @"ORGretina4AFifoFull1Changed";
-NSString* ORGretina4APhSuccessChanged      = @"ORGretina4APhSuccessChanged";
-NSString* ORGretina4APhFailureChanged      = @"ORGretina4APhFailureChanged";
-NSString* ORGretina4APhHuntingUpChanged      = @"ORGretina4APhHuntingUpChanged";
-NSString* ORGretina4APhHuntingDownChanged      = @"ORGretina4APhHuntingDownChanged";
-NSString* ORGretina4APhCheckingChanged      = @"ORGretina4APhCheckingChanged";
-NSString* ORGretina4AAcqDcmCtrlStatusChanged      = @"ORGretina4AAcqDcmCtrlStatusChanged";
-NSString* ORGretina4AAcqDcmLockChanged      = @"ORGretina4AAcqDcmLockChanged";
-NSString* ORGretina4AAcqDcmResetChanged      = @"ORGretina4AAcqDcmResetChanged";
-NSString* ORGretina4AAcqPhShiftOverflowChanged      = @"ORGretina4AAcqPhShiftOverflowChanged";
-NSString* ORGretina4AAcqDcmClockStoppedChanged      = @"ORGretina4AAcqDcmClockStoppedChanged";
-NSString* ORGretina4AAdcDcmCtrlStatusChanged      = @"ORGretina4AAdcDcmCtrlStatusChanged";
-NSString* ORGretina4AAdcDcmLockChanged      = @"ORGretina4AAdcDcmLockChanged";
-NSString* ORGretina4AAdcDcmResetChanged      = @"ORGretina4AAdcDcmResetChanged";
-NSString* ORGretina4AAdcPhShiftOverflowChanged      = @"ORGretina4AAdcPhShiftOverflowChanged";
-NSString* ORGretina4AAdcDcmClockStoppedChanged      = @"ORGretina4AAdcDcmClockStoppedChanged";
-NSString* ORGretina4AUserPackageDataChanged      = @"ORGretina4AUserPackageDataChanged";
-NSString* ORGretina4ARouterVetoEn0Changed      = @"ORGretina4ARouterVetoEn0Changed";
-NSString* ORGretina4APreampResetDelayEnChanged      = @"ORGretina4APreampResetDelayEnChanged";
-NSString* ORGretina4APileupWaveformOnlyMode0Changed      = @"ORGretina4APileupWaveformOnlyMode0Changed";
-NSString* ORGretina4ALedThreshold0Changed      = @"ORGretina4ALedThreshold0Changed";
-NSString* ORGretina4APreampResetDelay0Changed      = @"ORGretina4APreampResetDelay0Changed";
-NSString* ORGretina4ACFDFractionChanged  = @"ORGretina4ACFDFractionChanged";
-NSString* ORGretina4ARawDataLengthChanged      = @"ORGretina4ARawDataLengthChanged";
-NSString* ORGretina4ARawDataWindowChanged      = @"ORGretina4ARawDataWindowChanged";
-NSString* ORGretina4ADWindowChanged      = @"ORGretina4ADWindowChanged";
-NSString* ORGretina4AKWindowChanged      = @"ORGretina4AKWindowChanged";
-NSString* ORGretina4AMWindowChanged      = @"ORGretina4AMWindowChanged";
-NSString* ORGretina4AD2WindowChanged      = @"ORGretina4AD2WindowChanged";
-NSString* ORGretina4ADiscWidthChanged  = @"ORGretina4ADiscWidthChanged";
-NSString* ORGretina4ABaselineStartChanged      = @"ORGretina4ABaselineStart0Changed";
-NSString* ORGretina4ADacChannelSelectChanged      = @"ORGretina4ADacChannelSelectChanged";
-NSString* ORGretina4ADacAttenuationChanged      = @"ORGretina4ADacAttenuationChanged";
-NSString* ORGretina4AIlaConfigChanged  = @"ORGretina4AIlaConfigChanged";
-NSString* ORGretina4APhaseHuntChanged      = @"ORGretina4APhaseHuntChanged";
-NSString* ORGretina4ALoadbaselineChanged      = @"ORGretina4ALoadbaselineChanged";
-NSString* ORGretina4APhaseHuntDebugChanged      = @"ORGretina4APhaseHuntDebugChanged";
-NSString* ORGretina4APhaseHuntProceedChanged      = @"ORGretina4APhaseHuntProceedChanged";
-NSString* ORGretina4APhaseDecChanged      = @"ORGretina4APhaseDecChanged";
-NSString* ORGretina4APhaseIncChanged      = @"ORGretina4APhaseIncChanged";
-NSString* ORGretina4ASerdesPhaseIncChanged      = @"ORGretina4ASerdesPhaseIncChanged";
-NSString* ORGretina4ASerdesPhaseDecChanged      = @"ORGretina4ASerdesPhaseDecChanged";
-NSString* ORGretina4ADiagMuxControlChanged  = @"ORGretina4ADiagMuxControlChanged";
-NSString* ORGretina4APeakSensitivityChanged      = @"ORGretina4APeakSensitivityChanged";
-NSString* ORGretina4ADiagInputChanged      = @"ORGretina4ADiagInputChanged";
-NSString* ORGretina4ADiagChannelEventSelChanged  = @"ORGretina4ADiagChannelEventSelChanged";
-NSString* ORGretina4ARj45SpareIoMuxSelChanged      = @"ORGretina4ARj45SpareIoMuxSelChanged";
-NSString* ORGretina4ARj45SpareIoDirChanged      = @"ORGretina4ARj45SpareIoDirChanged";
-NSString* ORGretina4ALedStatusChanged  = @"ORGretina4ALedStatusChanged";
-NSString* ORGretina4ALiveTimestampLsbChanged      = @"ORGretina4ALiveTimestampLsbChanged";
-NSString* ORGretina4ALiveTimestampMsbChanged      = @"ORGretina4ALiveTimestampMsbChanged";
-NSString* ORGretina4ADiagIsyncChanged      = @"ORGretina4ADiagIsyncChanged";
-NSString* ORGretina4ASerdesSmLostLockChanged      = @"ORGretina4ASerdesSmLostLockChanged";
-NSString* ORGretina4AOverflowFlagChan0Changed      = @"ORGretina4AOverflowFlagChan0Changed";
-NSString* ORGretina4AOverflowFlagChan1Changed      = @"ORGretina4AOverflowFlagChan1Changed";
-NSString* ORGretina4AOverflowFlagChan2Changed      = @"ORGretina4AOverflowFlagChan2Changed";
-NSString* ORGretina4AOverflowFlagChan3Changed      = @"ORGretina4AOverflowFlagChan3Changed";
-NSString* ORGretina4AOverflowFlagChan4Changed      = @"ORGretina4AOverflowFlagChan4Changed";
-NSString* ORGretina4AOverflowFlagChan5Changed      = @"ORGretina4AOverflowFlagChan5Changed";
-NSString* ORGretina4AOverflowFlagChan6Changed      = @"ORGretina4AOverflowFlagChan6Changed";
-NSString* ORGretina4AOverflowFlagChan7Changed      = @"ORGretina4AOverflowFlagChan7Changed";
-NSString* ORGretina4AOverflowFlagChan8Changed      = @"ORGretina4AOverflowFlagChan8Changed";
-NSString* ORGretina4AOverflowFlagChan9Changed      = @"ORGretina4AOverflowFlagChan9Changed";
-NSString* ORGretina4ATriggerConfigChanged  = @"ORGretina4ATriggerConfigChanged";
-NSString* ORGretina4APhaseErrorCountChanged  = @"ORGretina4APhaseErrorCountChanged";
-NSString* ORGretina4APhaseStatusChanged      = @"ORGretina4APhaseStatusChanged";
-NSString* ORGretina4APhase0Changed      = @"ORGretina4APhase0Changed";
-NSString* ORGretina4APhase1Changed      = @"ORGretina4APhase1Changed";
-NSString* ORGretina4APhase2Changed      = @"ORGretina4APhase2Changed";
-NSString* ORGretina4APhase3Changed      = @"ORGretina4APhase3Changed";
-NSString* ORGretina4ASerdesPhaseValueChanged  = @"ORGretina4ASerdesPhaseValueChanged";
-NSString* ORGretina4APcbRevisionChanged      = @"ORGretina4APcbRevisionChanged";
-NSString* ORGretina4AFwTypeChanged      = @"ORGretina4AFwTypeChanged";
-NSString* ORGretina4AMjrCodeRevisionChanged      = @"ORGretina4AMjrCodeRevisionChanged";
-NSString* ORGretina4AMinCodeRevisionChanged      = @"ORGretina4AMinCodeRevisionChanged";
-NSString* ORGretina4ACodeDateChanged      = @"ORGretina4ACodeDateChanged";
-NSString* ORGretina4ATSErrCntCtrlChanged  = @"ORGretina4ATSErrCntCtrlChanged";
-NSString* ORGretina4ATSErrorCountChanged  = @"ORGretina4ATSErrorCountChanged";
-NSString* ORGretina4ADroppedEventCountChanged      = @"ORGretina4ADroppedEventCountChanged";
-NSString* ORGretina4AAcceptedEventCountChanged      = @"ORGretina4AAcceptedEventCountChanged";
-NSString* ORGretina4AAhitCountChanged      = @"ORGretina4AAhitCountChanged";
-NSString* ORGretina4ADiscCountChanged      = @"ORGretina4ADiscCountChanged";
-NSString* ORGretina4AAuxIoReadChanged      = @"ORGretina4AAuxIoReadChanged";
-NSString* ORGretina4AAuxIoWriteChanged      = @"ORGretina4AAuxIoWriteChanged";
-NSString* ORGretina4AAuxIoConfigChanged      = @"ORGretina4AAuxIoConfigChanged";
-NSString* ORGretina4ASdPemChanged      = @"ORGretina4ASdPemChanged";
-NSString* ORGretina4ASdSmLostLockFlagChanged      = @"ORGretina4ASdSmLostLockFlagChanged";
-NSString* ORGretina4AAdcConfigChanged      = @"ORGretina4AAdcConfigChanged";
-NSString* ORGretina4AConfigMainFpgaChanged      = @"ORGretina4AConfigMainFpgaChanged";
-NSString* ORGretina4APowerOkChanged      = @"ORGretina4APowerOkChanged";
-NSString* ORGretina4AOverVoltStatChanged      = @"ORGretina4AOverVoltStatChanged";
-NSString* ORGretina4AUnderVoltStatChanged      = @"ORGretina4AUnderVoltStatChanged";
-NSString* ORGretina4ATemp0SensorChanged      = @"ORGretina4ATemp0SensorChanged";
-NSString* ORGretina4ATemp1SensorChanged      = @"ORGretina4ATemp1SensorChanged";
-NSString* ORGretina4ATemp2SensorChanged      = @"ORGretina4ATemp2SensorChanged";
-NSString* ORGretina4AClkSelect0Changed      = @"ORGretina4AClkSelect0Changed";
-NSString* ORGretina4AClkSelect1Changed      = @"ORGretina4AClkSelect1Changed";
-NSString* ORGretina4AFlashModeChanged      = @"ORGretina4AFlashModeChanged";
-NSString* ORGretina4ASerialNumChanged      = @"ORGretina4ASerialNumChanged";
-NSString* ORGretina4ABoardRevNumChanged      = @"ORGretina4ABoardRevNumChanged";
-NSString* ORGretina4AVhdlVerNumChanged      = @"ORGretina4AVhdlVerNumChanged";
-NSString* ORGretina4AFifoAccessChanged      = @"ORGretina4AFifoAccessChanged";
+NSString* ORGretina4AFirmwareVersionChanged             = @"ORGretina4AFirmwareVersionChanged";
+NSString* ORGretina4AFifoEmpty0Changed                  = @"ORGretina4AFifoEmpty0Changed";
+NSString* ORGretina4AFifoEmpty1Changed                  = @"ORGretina4AFifoEmpty1Changed";
+NSString* ORGretina4AFifoAlmostEmptyChanged             = @"ORGretina4AFifoAlmostEmptyChanged";
+NSString* ORGretina4AFifoHalfFullChanged                = @"ORGretina4AFifoHalfFullChanged";
+NSString* ORGretina4AFifoAlmostFullChanged              = @"ORGretina4AFifoAlmostFullChanged";
+NSString* ORGretina4AFifoFull0Changed                   = @"ORGretina4AFifoFull0Changed";
+NSString* ORGretina4AFifoFull1Changed                   = @"ORGretina4AFifoFull1Changed";
+NSString* ORGretina4APhSuccessChanged                   = @"ORGretina4APhSuccessChanged";
+NSString* ORGretina4APhFailureChanged                   = @"ORGretina4APhFailureChanged";
+NSString* ORGretina4APhHuntingUpChanged                 = @"ORGretina4APhHuntingUpChanged";
+NSString* ORGretina4APhHuntingDownChanged               = @"ORGretina4APhHuntingDownChanged";
+NSString* ORGretina4APhCheckingChanged                  = @"ORGretina4APhCheckingChanged";
+NSString* ORGretina4AAcqDcmCtrlStatusChanged            = @"ORGretina4AAcqDcmCtrlStatusChanged";
+NSString* ORGretina4AAcqDcmLockChanged                  = @"ORGretina4AAcqDcmLockChanged";
+NSString* ORGretina4AAcqDcmResetChanged                 = @"ORGretina4AAcqDcmResetChanged";
+NSString* ORGretina4AAcqPhShiftOverflowChanged          = @"ORGretina4AAcqPhShiftOverflowChanged";
+NSString* ORGretina4AAcqDcmClockStoppedChanged          = @"ORGretina4AAcqDcmClockStoppedChanged";
+NSString* ORGretina4AAdcDcmCtrlStatusChanged            = @"ORGretina4AAdcDcmCtrlStatusChanged";
+NSString* ORGretina4AAdcDcmLockChanged                  = @"ORGretina4AAdcDcmLockChanged";
+NSString* ORGretina4AAdcDcmResetChanged                 = @"ORGretina4AAdcDcmResetChanged";
+NSString* ORGretina4AAdcPhShiftOverflowChanged          = @"ORGretina4AAdcPhShiftOverflowChanged";
+NSString* ORGretina4AAdcDcmClockStoppedChanged          = @"ORGretina4AAdcDcmClockStoppedChanged";
+NSString* ORGretina4AUserPackageDataChanged             = @"ORGretina4AUserPackageDataChanged";
+NSString* ORGretina4ARouterVetoEn0Changed               = @"ORGretina4ARouterVetoEn0Changed";
+NSString* ORGretina4APreampResetDelayEnChanged          = @"ORGretina4APreampResetDelayEnChanged";
+NSString* ORGretina4APileupMode0Changed                 = @"ORGretina4APileupMode0Changed";
+NSString* ORGretina4ADroppedEventCountModeChanged       = @"ORGretina4ADroppedEventCountModeChanged";
+NSString* ORGretina4AEventCountModeChanged              = @"ORGretina4AEventCountModeChanged";
+NSString* ORGretina4AAHitCountModeChanged               = @"ORGretina4AAHitCountModeChanged";
+NSString* ORGretina4ADiscCountModeChanged               = @"ORGretina4ADiscCountModeChanged";
+NSString* ORGretina4AEventExtentionModeChanged          = @"ORGretina4AEventExtentionModeChanged";
+NSString* ORGretina4APileupExtentionModeChanged         = @"ORGretina4APileupExtentionModeChanged";
+NSString* ORGretina4ACounterResetChanged                = @"ORGretina4ACounterResetChanged";
+NSString* ORGretina4APileupWaveformOnlyModeChanged      = @"ORGretina4APileupWaveformOnlyModeChanged";
+NSString* ORGretina4ALedThreshold0Changed               = @"ORGretina4ALedThreshold0Changed";
+NSString* ORGretina4APreampResetDelay0Changed           = @"ORGretina4APreampResetDelay0Changed";
+NSString* ORGretina4ACFDFractionChanged                 = @"ORGretina4ACFDFractionChanged";
+NSString* ORGretina4ARawDataLengthChanged               = @"ORGretina4ARawDataLengthChanged";
+NSString* ORGretina4ARawDataWindowChanged               = @"ORGretina4ARawDataWindowChanged";
+NSString* ORGretina4ADWindowChanged                     = @"ORGretina4ADWindowChanged";
+NSString* ORGretina4AKWindowChanged                     = @"ORGretina4AKWindowChanged";
+NSString* ORGretina4AMWindowChanged                     = @"ORGretina4AMWindowChanged";
+NSString* ORGretina4AD2WindowChanged                    = @"ORGretina4AD2WindowChanged";
+NSString* ORGretina4ADiscWidthChanged                   = @"ORGretina4ADiscWidthChanged";
+NSString* ORGretina4ABaselineStartChanged               = @"ORGretina4ABaselineStart0Changed";
+NSString* ORGretina4ADacChannelSelectChanged            = @"ORGretina4ADacChannelSelectChanged";
+NSString* ORGretina4ADacAttenuationChanged              = @"ORGretina4ADacAttenuationChanged";
+NSString* ORGretina4AIlaConfigChanged                   = @"ORGretina4AIlaConfigChanged";
+NSString* ORGretina4APhaseHuntChanged                   = @"ORGretina4APhaseHuntChanged";
+NSString* ORGretina4ALoadbaselineChanged                = @"ORGretina4ALoadbaselineChanged";
+NSString* ORGretina4APhaseHuntDebugChanged              = @"ORGretina4APhaseHuntDebugChanged";
+NSString* ORGretina4APhaseHuntProceedChanged            = @"ORGretina4APhaseHuntProceedChanged";
+NSString* ORGretina4APhaseDecChanged                    = @"ORGretina4APhaseDecChanged";
+NSString* ORGretina4APhaseIncChanged                    = @"ORGretina4APhaseIncChanged";
+NSString* ORGretina4ASerdesPhaseIncChanged              = @"ORGretina4ASerdesPhaseIncChanged";
+NSString* ORGretina4ASerdesPhaseDecChanged              = @"ORGretina4ASerdesPhaseDecChanged";
+NSString* ORGretina4ADiagMuxControlChanged              = @"ORGretina4ADiagMuxControlChanged";
+NSString* ORGretina4APeakSensitivityChanged             = @"ORGretina4APeakSensitivityChanged";
+NSString* ORGretina4ADiagInputChanged                   = @"ORGretina4ADiagInputChanged";
+NSString* ORGretina4ADiagChannelEventSelChanged         = @"ORGretina4ADiagChannelEventSelChanged";
+NSString* ORGretina4ARj45SpareIoMuxSelChanged           = @"ORGretina4ARj45SpareIoMuxSelChanged";
+NSString* ORGretina4ARj45SpareIoDirChanged              = @"ORGretina4ARj45SpareIoDirChanged";
+NSString* ORGretina4ALedStatusChanged                   = @"ORGretina4ALedStatusChanged";
+NSString* ORGretina4ALiveTimestampLsbChanged            = @"ORGretina4ALiveTimestampLsbChanged";
+NSString* ORGretina4ALiveTimestampMsbChanged            = @"ORGretina4ALiveTimestampMsbChanged";
+NSString* ORGretina4ADiagIsyncChanged                   = @"ORGretina4ADiagIsyncChanged";
+NSString* ORGretina4ASerdesSmLostLockChanged            = @"ORGretina4ASerdesSmLostLockChanged";
+NSString* ORGretina4AOverflowFlagChanChanged            = @"ORGretina4AOverflowFlagChanChanged";
+NSString* ORGretina4ATriggerConfigChanged               = @"ORGretina4ATriggerConfigChanged";
+NSString* ORGretina4APhaseErrorCountChanged             = @"ORGretina4APhaseErrorCountChanged";
+NSString* ORGretina4APhaseStatusChanged                 = @"ORGretina4APhaseStatusChanged";
+NSString* ORGretina4APhase0Changed                      = @"ORGretina4APhase0Changed";
+NSString* ORGretina4APhase1Changed                      = @"ORGretina4APhase1Changed";
+NSString* ORGretina4APhase2Changed                      = @"ORGretina4APhase2Changed";
+NSString* ORGretina4APhase3Changed                      = @"ORGretina4APhase3Changed";
+NSString* ORGretina4ASerdesPhaseValueChanged            = @"ORGretina4ASerdesPhaseValueChanged";
+NSString* ORGretina4APcbRevisionChanged                 = @"ORGretina4APcbRevisionChanged";
+NSString* ORGretina4AFwTypeChanged                      = @"ORGretina4AFwTypeChanged";
+NSString* ORGretina4AMjrCodeRevisionChanged             = @"ORGretina4AMjrCodeRevisionChanged";
+NSString* ORGretina4AMinCodeRevisionChanged             = @"ORGretina4AMinCodeRevisionChanged";
+NSString* ORGretina4ACodeDateChanged                    = @"ORGretina4ACodeDateChanged";
+NSString* ORGretina4ATSErrCntCtrlChanged                = @"ORGretina4ATSErrCntCtrlChanged";
+NSString* ORGretina4ATSErrorCountChanged                = @"ORGretina4ATSErrorCountChanged";
+NSString* ORGretina4ADroppedEventCountChanged           = @"ORGretina4ADroppedEventCountChanged";
+NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedEventCountChanged";
+NSString* ORGretina4AAhitCountChanged                   = @"ORGretina4AAhitCountChanged";
+NSString* ORGretina4ADiscCountChanged                   = @"ORGretina4ADiscCountChanged";
+NSString* ORGretina4AAuxIoReadChanged                   = @"ORGretina4AAuxIoReadChanged";
+NSString* ORGretina4AAuxIoWriteChanged                  = @"ORGretina4AAuxIoWriteChanged";
+NSString* ORGretina4AAuxIoConfigChanged                 = @"ORGretina4AAuxIoConfigChanged";
+NSString* ORGretina4ASdPemChanged                       = @"ORGretina4ASdPemChanged";
+NSString* ORGretina4ASdSmLostLockFlagChanged            = @"ORGretina4ASdSmLostLockFlagChanged";
+NSString* ORGretina4AAdcConfigChanged                   = @"ORGretina4AAdcConfigChanged";
+NSString* ORGretina4AConfigMainFpgaChanged              = @"ORGretina4AConfigMainFpgaChanged";
+NSString* ORGretina4APowerOkChanged                     = @"ORGretina4APowerOkChanged";
+NSString* ORGretina4AOverVoltStatChanged                = @"ORGretina4AOverVoltStatChanged";
+NSString* ORGretina4AUnderVoltStatChanged               = @"ORGretina4AUnderVoltStatChanged";
+NSString* ORGretina4ATemp0SensorChanged                 = @"ORGretina4ATemp0SensorChanged";
+NSString* ORGretina4ATemp1SensorChanged                 = @"ORGretina4ATemp1SensorChanged";
+NSString* ORGretina4ATemp2SensorChanged                 = @"ORGretina4ATemp2SensorChanged";
+NSString* ORGretina4AClkSelect0Changed                  = @"ORGretina4AClkSelect0Changed";
+NSString* ORGretina4AClkSelect1Changed                  = @"ORGretina4AClkSelect1Changed";
+NSString* ORGretina4AFlashModeChanged                   = @"ORGretina4AFlashModeChanged";
+NSString* ORGretina4ASerialNumChanged                   = @"ORGretina4ASerialNumChanged";
+NSString* ORGretina4ABoardRevNumChanged                 = @"ORGretina4ABoardRevNumChanged";
+NSString* ORGretina4AVhdlVerNumChanged                  = @"ORGretina4AVhdlVerNumChanged";
+NSString* ORGretina4AFifoAccessChanged                  = @"ORGretina4AFifoAccessChanged";
+NSString* ORGretina4ATriggerPolarityChanged             = @"ORGretina4ATriggerPolarityChanged";
 
 @interface ORGretina4AModel (private)
 //firmware loading
@@ -191,9 +191,8 @@ NSString* ORGretina4AFifoAccessChanged      = @"ORGretina4AFifoAccessChanged";
 
 @implementation ORGretina4AModel
 
-#pragma mark •••Static Declarations
+#pragma mark - Static Declarations
 typedef struct {
-    unsigned long index;
     unsigned long offset;
     NSString* name;
     BOOL canRead;
@@ -203,57 +202,62 @@ typedef struct {
 } Gretina4ARegisterInformation;
 
 static Gretina4ARegisterInformation register_information[kNumberOfGretina4ARegisters] = {
-    { 0x0000,	@"Board Id",                YES,	 NO,	 NO,	 NO,	kBoardId },
-    { 0x0004,	@"Programming Done",        YES,	YES,	 NO,	 NO,	kProgrammingDone },
-    { 0x0020,	@"Hardware Status",         YES,	 NO,	 NO,	 NO,	kHardwareStatus },
-    { 0x0024,	@"User Package Data",       YES,	YES,	 NO,	 NO,	kUserPackageData },
-    { 0x0040,	@"Channel Control",         YES,	YES,	YES,	 NO,	kChannelControl },
-    { 0x0080,	@"Led Threshold",           YES,	YES,	YES,	 NO,	kLedThreshold },
-    { 0x00C0,	@"CFD Fraction",            YES,	YES,	YES,	 NO,	kCFDFraction },
-    { 0x0100,	@"Raw Data Length",         YES,	YES,	YES,	 NO,	kRawDataLength },
-    { 0x0140,	@"Raw Data Window",         YES,	YES,	YES,	 NO,	kRawDataWindow },
-    { 0x0180,	@"D Window",                YES,	YES,	YES,	 NO,	kDWindow },
-    { 0x01C0,	@"K Window",                YES,	YES,	YES,	 NO,	kKWindow },
-    { 0x0200,	@"M Window",                YES,	YES,	YES,	 NO,	kMWindow },
-    { 0x0240,	@"D2 Window",               YES,	YES,	YES,	 NO,	kD2Window },
-    { 0x0280,	@"Disc Width",              YES,	YES,	YES,	 NO,	kDiscWidth },
-    { 0x02C0,	@"Baseline Start",          YES,	YES,	YES,	 NO,	kBaselineStart },
-    { 0x0400,	@"Dac",                     YES,	YES,	 NO,	 NO,	kDac },
-    { 0x0408,	@"Ila Config",              YES,	YES,	 NO,	 NO,	kIlaConfig },
-    { 0x040C,	@"Channel Pulsed Control",	 NO,	YES,	 NO,	 NO,	kChannelPulsedControl },
-    { 0x0410,	@"Diag Mux Control",        YES,	YES,	 NO,	 NO,	kDiagMuxControl },
-    { 0x0414,	@"Peak Sensitivity",        YES,	YES,	 NO,	 NO,	kPeakSensitivity },
-    { 0x041C,	@"Diag Channel Input",      YES,	YES,	 NO,	 NO,	kDiagChannelInput },
-    { 0x0420,	@"Diag Channel Event Sel",	YES,	YES,	 NO,	 NO,	kDiagChannelEventSel },
-    { 0x0424,	@"Rj45 Spare Dout Control",	YES,	YES,	 NO,	 NO,	kRj45SpareDoutControl },
-    { 0x0428,	@"Led Status",              YES,     NO,	 NO,	 NO,	kLedStatus },
-    { 0x0480,	@"Lat Timestamp Lsb",       YES,	 NO,	 NO,	 NO,	kLatTimestampLsb },
-    { 0x0488,	@"Lat Timestamp Msb",       YES,	 NO,	 NO,	 NO,	kLatTimestampMsb },
-    { 0x048C,	@"Live Timestamp Lsb",      YES,	 NO,	 NO,	 NO,	kLiveTimestampLsb },
-    { 0x0490,	@"Live Timestamp Msb",      YES,	 NO,	 NO,	 NO,	kLiveTimestampMsb },
-    { 0x0494,	@"Fbus Sdata Send0",        YES,	 NO,	YES,	 NO,	kFbusSdataSend },
-    { 0x04B8,	@"Fbus Unused0",            YES,	 NO,	YES,	 NO,	kFbusUnused },
-    { 0x04D4,	@"Fbus Sdata Receive0",     YES,	 NO,	YES,	 NO,	kFbusSdataReceive },
-    { 0x0500,	@"Master Logic Status",     YES,	YES,	 NO,	 NO,	kMasterLogicStatus },
-    { 0x0504,	@"Trigger Config",          YES,	YES,	 NO,	 NO,	kTriggerConfig },
-    { 0x0508,	@"Phase Error Count",       YES,	 NO,	 NO,	 NO,	kPhaseErrorCount },
-    { 0x050C,	@"Phase Status",            YES,	 NO,	 NO,	 NO,	kPhaseStatus },
-    { 0x0510,	@"Phase Offset0",           YES,	 NO,	YES,	 NO,	kPhaseOffset },
-    { 0x051C,	@"Serdes Phase Value",      YES,	 NO,	 NO,	 NO,	kSerdesPhaseValue },
-    { 0x0600,	@"Code Revision",           YES,	 NO,	 NO,	 NO,	kCodeRevision },
-    { 0x0604,	@"Code Date",               YES,	 NO,	 NO,	 NO,	kCodeDate },
-    { 0x0608,	@"TS Err Cnt Ctrl",         YES,	YES,	 NO,	 NO,	kTSErrCntCtrl },
-    { 0x060C,	@"TS Error Count",          YES,	 NO,	 NO,	 NO,	kTSErrorCount },
-    { 0x0700,	@"Dropped Event Count",     YES,	 NO,	YES,	 NO,	kDroppedEventCount },
-    { 0x0740,	@"Accepted Event Count",	YES,	 NO,	YES,	 NO,	kAcceptedEventCount },
-    { 0x0780,	@"Ahit Count",              YES,	 NO,	YES,	 NO,	kAhitCount },
-    { 0x07C0,	@"Disc Count",              YES,	 NO,	YES,	 NO,	kDiscCount },
-    { 0x0848,	@"Sd Config",               YES,	YES,	 NO,	 NO,	kSdConfig },
-    { 0x0900,	@"Fpga Ctrl Reg",           YES,	YES,	 NO,	 NO,	kFpgaCtrlReg },
-    { 0x0908,	@"Vme Aux Status",          YES,	 NO,	 NO,	 NO,	kVmeAuxStatus },
-    { 0x0910,	@"Vme Gp Ctrl",             YES,	YES,	 NO,	 NO,	kVmeGpCtrl },
-    { 0x0920,	@"Fpga Version",            YES,	 NO,	 NO,	 NO,	kFpgaVersion },
-    { 0x1000,	@"Fifo",                    NO,      NO,	 NO,	 NO,	kFifo },
+    { 0x0000,	@"Board Id",                YES,	 NO,	 NO,	 kBoardId },
+    { 0x0004,	@"Programming Done",        YES,	YES,	 NO,	 kProgrammingDone },
+    { 0x0020,	@"Hardware Status",         YES,	 NO,	 NO,	 kHardwareStatus },
+    { 0x0024,	@"User Package Data",       YES,	YES,	 NO,	 kUserPackageData },
+    { 0x0040,	@"Channel Control",         YES,	YES,	 NO,	 kChannelControl },
+    { 0x0080,	@"Led Threshold",           YES,	YES,	 NO,	 kLedThreshold },
+    { 0x00C0,	@"CFD Fraction",            YES,	YES,	 NO,	 kCFDFraction },
+    { 0x0100,	@"Raw Data Length",         YES,	YES,	 NO,	 kRawDataLength },
+    { 0x0140,	@"Raw Data Window",         YES,	YES,	 NO,	 kRawDataWindow },
+    { 0x0180,	@"D Window",                YES,	YES,	 NO,	 kDWindow },
+    { 0x01C0,	@"K Window",                YES,	YES,	 NO,	 kKWindow },
+    { 0x0200,	@"M Window",                YES,	YES,	 NO,	 kMWindow },
+    { 0x0240,	@"D2 Window",               YES,	YES,	 NO,	 kD2Window },
+    { 0x0280,	@"Disc Width",              YES,	YES,	 NO,	 kDiscWidth },
+    { 0x02C0,	@"Baseline Start",          YES,	YES,	 NO,	 kBaselineStart },
+    { 0x0400,	@"Dac",                     YES,	YES,	 NO,	 kDac },
+    { 0x0408,	@"Ila Config",              YES,	YES,	 NO,	 kIlaConfig },
+    { 0x040C,	@"Channel Pulsed Control",	 NO,	YES,	 NO,	 kChannelPulsedControl },
+    { 0x0410,	@"Diag Mux Control",        YES,	YES,	 NO,	 kDiagMuxControl },
+    { 0x0414,	@"Peak Sensitivity",        YES,	YES,	 NO,	 kPeakSensitivity },
+    { 0x0418,	@"Baseline Delay",          YES,	YES,	 NO,	 kBaselineDelay },
+    { 0x041C,	@"Diag Channel Input",      YES,	YES,	 NO,	 kDiagChannelInput },
+    { 0x0420,	@"Ext Discriminator Select",YES,	YES,	 NO,	 kExtDiscSel },
+    { 0x0424,	@"Rj45 Spare Dout Control",	YES,	YES,	 NO,	 kRj45SpareDoutControl },
+    { 0x0428,	@"Led Status",              YES,     NO,	 NO,	 kLedStatus },
+    { 0x0480,	@"Lat Timestamp Lsb",       YES,	 NO,	 NO,	 kLatTimestampLsb },
+    { 0x0488,	@"Lat Timestamp Msb",       YES,	 NO,	 NO,	 kLatTimestampMsb },
+    { 0x048C,	@"Live Timestamp Lsb",      YES,	 NO,	 NO,	 kLiveTimestampLsb },
+    { 0x0490,	@"Live Timestamp Msb",      YES,	 NO,	 NO,	 kLiveTimestampMsb },
+    { 0x0494,	@"Fbus Sdata Send0",        YES,	 NO,	YES,	 kFbusSdataSend },
+    { 0x04B8,	@"Fbus Unused0",            YES,	 NO,	YES,	 kFbusUnused },
+    { 0x04D4,	@"Fbus Sdata Receive0",     YES,	 NO,	YES,	 kFbusSdataReceive },
+    { 0x0500,	@"Master Logic Status",     YES,	YES,	 NO,	 kMasterLogicStatus },
+    { 0x0504,	@"Trigger Config",          YES,	YES,	 NO,	 kTriggerConfig },
+    { 0x0508,	@"Phase Error Count",       YES,	 NO,	 NO,	 kPhaseErrorCount },
+    { 0x050C,	@"Phase Status",            YES,	 NO,	 NO,	 kPhaseStatus },
+    { 0x0510,	@"Phase Offset0",           YES,	 NO,	YES,	 kPhaseOffset },
+    { 0x051C,	@"Serdes Phase Value",      YES,	 NO,	 NO,	 kSerdesPhaseValue },
+    { 0x0600,	@"Code Revision",           YES,	 NO,	 NO,	 kCodeRevision },
+    { 0x0604,	@"Code Date",               YES,	 NO,	 NO,	 kCodeDate },
+    { 0x0608,	@"TS Err Cnt Enable",       YES,	YES,	 NO,	 kTSErrCntEnable },
+    { 0x060C,	@"TS Error Count",          YES,	 NO,	 NO,	 kTSErrorCount },
+    { 0x0700,	@"Dropped Event Count",     YES,	 NO,	YES,	 kDroppedEventCount },
+    { 0x0740,	@"Accepted Event Count",	YES,	 NO,	YES,	 kAcceptedEventCount },
+    { 0x0780,	@"Ahit Count",              YES,	 NO,	YES,	 kAhitCount },
+    { 0x07C0,	@"Disc Count",              YES,	 NO,	YES,	 kDiscCount },
+    { 0x0800,	@"Aux IO Read",             YES,	 YES,	YES,	 kAuxIORead },
+    { 0x0804,	@"Aux IO Write",            YES,	 YES,	YES,	 kAuxIOWrite },
+    { 0x0808,	@"Aux IO Config",           YES,	 YES,	YES,	 kAuxIOConfig },
+    
+    { 0x0848,	@"Sd Config",               YES,	YES,	 NO,	 kSdConfig },
+    { 0x0900,	@"Fpga Ctrl Reg",           YES,	YES,	 NO,	 kFpgaCtrlReg },
+    { 0x0908,	@"Vme Aux Status",          YES,	 NO,	 NO,	 kVmeAuxStatus },
+    { 0x0910,	@"Vme Gp Ctrl",             YES,	YES,	 NO,	 kVmeGpCtrl },
+    { 0x0920,	@"Fpga Version",            YES,	 NO,	 NO,	 kFpgaVersion },
+    { 0x1000,	@"Fifo",                    NO,      NO,	 NO,	 kFifo },
 };
 
 static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegisters] = {
@@ -270,7 +274,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     {0x98C,	@"Flash Command Register", YES, YES, NO, NO}                       
 };                                                        
 
-#pragma mark ***Boilerplate
+#pragma mark - Boilerplate
 - (id) init 
 {
     self = [super init];
@@ -411,7 +415,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     return (([self slot]+1)&0x1f)<<20;
 }
 
-#pragma mark ***Accessors
+#pragma mark - Accessors
 - (ORConnector*) linkConnector
 {
     return linkConnector;
@@ -436,7 +440,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     spiConnector = aConnector;
 }
 
-#pragma mark ***Low-level registers and diagnostics
+#pragma mark - Low-level registers and diagnostics
 - (unsigned long) spiWriteValue
 {
     return spiWriteValue;
@@ -659,7 +663,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
-#pragma mark ***Firmware loading
+#pragma mark - Firmware loading
 - (BOOL) downLoadMainFPGAInProgress
 {
 	return downLoadMainFPGAInProgress;
@@ -816,7 +820,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
-#pragma mark ***noise floor
+#pragma mark - noise floor
 - (BOOL) noiseFloorRunning
 {
     return noiseFloorRunning;
@@ -999,7 +1003,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [[self undoManager] enableUndoRegistration];
 }
 
-#pragma mark ***rates
+#pragma mark - rates
 - (ORRateGroup*) waveFormRateGroup
 {
     return waveFormRateGroup;
@@ -1038,7 +1042,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 	else return 0;
 }
 
-#pragma mark •••Hardware Parameters
+#pragma mark - Hardware Parameters
 - (void) initParams
 {
     
@@ -1069,7 +1073,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-#pragma mark •••Hardware Access
+#pragma mark - Hardware Access
 - (void) initBoard
 {
     //disable all channels
@@ -1082,12 +1086,15 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     //write the channel level params
     for(i=0;i<kNumGretina4AChannels;i++) {
+        [self writeLedThreshold:i];
+        [self writeCFDFraction:i];
     }
     //enable channels
     [self resetFIFO];
     
     for(i=0;i<kNumGretina4AChannels;i++){
-    }
+        [self writeControlReg:i enabled:YES];
+   }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACardInited object:self];
 }
@@ -1170,11 +1177,45 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (unsigned long) readControlReg:(short)channel
 {
-    return 0;
-}
+    unsigned long theValue = 0 ;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_information[kChannelControl].offset + 4*channel
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    return theValue;}
 
 - (void) writeControlReg:(short)chan enabled:(BOOL)forceEnable
 {
+    /* writeControlReg writes the current model state to the board.  If forceEnable is NO, *
+     * then all the channels are disabled.  Otherwise, the channels are enabled according  *
+     * to the model state.                                                                 */
+    
+    BOOL startStop;
+    if(forceEnable)	startStop= enabled[chan];
+    else			startStop = NO;
+    
+    unsigned long theValue =
+    (startStop                        << 0) |
+    (pileupMode[chan]                 << 2) |
+    (preampResetDelay[chan]           << 3) |
+    ((triggerPolarity[chan] & 0x7)    << 10) |
+    (droppedEventCountMode[chan]      << 20) |
+    (eventCountMode[chan]             << 21) |
+    (aHitCountMode[chan]              << 22) |
+    (discCountMode[chan]              << 23) |
+    ((eventExtentionMode[chan] & 0x3) << 24) |
+    (pileupExtentionMode[chan]        << 26) |
+    (counterReset[chan]               << 27) |
+    (pileupWaveformOnlyMode[chan]     << 30);
+
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kChannelControl].offset + 4*chan
+                       mask:0x4FF00C0D //mask off the reserved bits
+                  reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]
+              forceFullInit:forceFullInit[chan]];
+
 }
 
 
@@ -1318,17 +1359,31 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                usingAddSpace:0x01];
     NSLog(@"Gretina: 0x%0x   HV1: 0x%0x   HV2: 0x%0x\n",theValue1,theValue2,theValue3);
 }
+
 - (void) writeLedThreshold:(short)channel
 {
-    unsigned long theValue = (ledThreshold[channel] & 0x1FFFF);
+    
+    unsigned long theValue = ((preampResetDelay[channel] & 0x000000ff)<<16) | (ledThreshold[channel] & 0x00ffffff);
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kLedThreshold].offset + 4*channel
-                       mask:0xfff1ffff
+                       mask:0x00ffffff
                   reportKey:[NSString stringWithFormat:@"LedThreshold_%d",channel]
               forceFullInit:forceFullInit[channel]];
     
 }
-#pragma mark •••Clock Sync
+
+- (void) writeCFDFraction:(short)channel
+{
+    
+    unsigned long theValue = ((cFDFraction[channel] & 0x00001fff)<<16);
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kCFDFraction].offset + 4*channel
+                       mask:0x00001fff
+                  reportKey:[NSString stringWithFormat:@"CFDFraction_%d",channel]
+              forceFullInit:forceFullInit[channel]];
+    
+}
+#pragma mark - Clock Sync
 - (short) initState {return initializationState;}
 - (void) setInitState:(short)aState
 {
@@ -1433,7 +1488,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 
 
-#pragma mark •••Data Taker
+#pragma mark - Data Taker
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -1463,7 +1518,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     return dataDictionary;
 }
 
-#pragma mark •••HW Wizard
+#pragma mark - HW Wizard
 -(BOOL) hasParmetersToRamp
 {
 	return YES;
@@ -1481,20 +1536,71 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
+    [p setOncePerCard:YES];
     [p setName:@"Init"];
     [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
+ 
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Enabled"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setEnabled:withValue:) getMethod:@selector(enabled:)];
+    [a addObject:p];
     
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Pile Up Mode"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setPileupMode:withValue:) getMethod:@selector(pileupMode:)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"PreampResetDelay Enabled"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setPreampResetDelayEn:withValue:) getMethod:@selector(preampResetDelayEn:)];
+    [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Dropped Event Count Mode"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setDroppedEventCountMode:withValue:) getMethod:@selector(droppedEventCountMode:)];
+    [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Event Count Mode"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setEventCountMode:withValue:) getMethod:@selector(eventCountMode:)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"LED Threshold"];
+    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setLedThreshold:withValue:) getMethod:@selector(ledThreshold:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"CFD Fraction"];
+    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setCFDFraction:withValue:) getMethod:@selector(cFDFraction:)];
+    [p setCanBeRamped:YES];
+    [a addObject:p];
+
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Force Full Init"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setForceFullInit:withValue:) getMethod:@selector(forceFullInit:)];
+    [a addObject:p];
+
     return a;
 }
-
 
 - (NSArray*) wizardSelections
 {
     NSMutableArray* a = [NSMutableArray array];
-    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel  name:@"Crate" className:@"ORVmeCrateModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel     name:@"Card" className:@"ORGretina4A"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel    name:@"Channel" className:@"ORGretina4A"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel  name:@"Crate"   className:@"ORVmeCrateModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel     name:@"Card"    className:@"ORGretina4AModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel    name:@"Channel" className:@"ORGretina4AModel"]];
     return a;
 }
 
@@ -1718,11 +1824,10 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 	return index+1;
 }
 
-#pragma mark •••Archival
+#pragma mark - Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    
     [[self undoManager] disableUndoRegistration];
     [self setSpiConnector:              [decoder decodeObjectForKey:@"spiConnector"]];
     [self setLinkConnector:             [decoder decodeObjectForKey:@"linkConnector"]];
@@ -1740,116 +1845,118 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
-    [self setFirmwareVersion:   [decoder decodeInt32ForKey: @"firmwareVersion"]];
-    [self setFifoEmpty0:   [decoder decodeBoolForKey: @"fifoEmpty"]];
-    [self setFifoEmpty1:   [decoder decodeBoolForKey: @"fifoEmpty1"]];
+    [self setFirmwareVersion:   [decoder decodeInt32ForKey:@"firmwareVersion"]];
+    [self setFifoEmpty0:        [decoder decodeBoolForKey: @"fifoEmpty"]];
+    [self setFifoEmpty1:        [decoder decodeBoolForKey: @"fifoEmpty1"]];
     [self setFifoAlmostEmpty:   [decoder decodeBoolForKey: @"fifoAlmostEmpty"]];
-    [self setFifoHalfFull:   [decoder decodeBoolForKey: @"fifoHalfFull"]];
-    [self setFifoAlmostFull:   [decoder decodeBoolForKey: @"fifoAlmostFull"]];
-    [self setFifoFull0:   [decoder decodeBoolForKey: @"fifoFull"]];
-    [self setFifoFull1:   [decoder decodeBoolForKey: @"fifoFull1"]];
-    [self setPhSuccess:   [decoder decodeBoolForKey: @"phSuccess"]];
-    [self setPhFailure:   [decoder decodeBoolForKey: @"phFailure"]];
-    [self setPhHuntingUp:   [decoder decodeBoolForKey: @"phHuntingUp"]];
-    [self setPhHuntingDown:   [decoder decodeBoolForKey: @"phHuntingDown"]];
-    [self setPhChecking:   [decoder decodeBoolForKey: @"phChecking"]];
-    [self setAcqDcmCtrlStatus:   [decoder decodeInt32ForKey: @"acqDcmCtrlStatus"]];
-    [self setAcqDcmLock:   [decoder decodeBoolForKey: @"acqDcmLock"]];
-    [self setAcqDcmReset:   [decoder decodeBoolForKey: @"acqDcmReset"]];
-    [self setAcqPhShiftOverflow:   [decoder decodeBoolForKey: @"acqPhShiftOverflow"]];
-    [self setAcqDcmClockStopped:   [decoder decodeBoolForKey: @"acqDcmClockStopped"]];
-    [self setAdcDcmCtrlStatus:   [decoder decodeInt32ForKey: @"adcDcmCtrlStatus"]];
-    [self setAdcDcmLock:   [decoder decodeBoolForKey: @"adcDcmLock"]];
-    [self setAdcDcmReset:   [decoder decodeBoolForKey: @"adcDcmReset"]];
-    [self setAdcPhShiftOverflow:   [decoder decodeBoolForKey: @"adcPhShiftOverflow"]];
-    [self setAdcDcmClockStopped:   [decoder decodeBoolForKey: @"adcDcmClockStopped"]];
-    [self setUserPackageData:   [decoder decodeInt32ForKey: @"userPackageData"]];
-    [self setDacChannelSelect:   [decoder decodeInt32ForKey: @"dacChannelSelect"]];
-    [self setDacAttenuation:   [decoder decodeInt32ForKey: @"dacAttenuation"]];
-    [self setIlaConfig:   [decoder decodeInt32ForKey: @"ilaConfig"]];
-    [self setPhaseHunt:   [decoder decodeBoolForKey: @"phaseHunt"]];
-    [self setLoadbaseline:   [decoder decodeBoolForKey: @"loadbaseline"]];
-    [self setPhaseHuntDebug:   [decoder decodeBoolForKey: @"phaseHuntDebug"]];
-    [self setPhaseHuntProceed:   [decoder decodeBoolForKey: @"phaseHuntProceed"]];
-    [self setPhaseDec:   [decoder decodeBoolForKey: @"phaseDec"]];
-    [self setPhaseInc:   [decoder decodeBoolForKey: @"phaseInc"]];
-    [self setSerdesPhaseInc:   [decoder decodeBoolForKey: @"serdesPhaseInc"]];
-    [self setSerdesPhaseDec:   [decoder decodeBoolForKey: @"serdesPhaseDec"]];
-    [self setDiagMuxControl:   [decoder decodeInt32ForKey: @"diagMuxControl"]];
-    [self setPeakSensitivity:   [decoder decodeInt32ForKey: @"peakSensitivity"]];
-    [self setDiagInput:   [decoder decodeInt32ForKey: @"diagInput"]];
-    [self setDiagChannelEventSel:   [decoder decodeInt32ForKey: @"diagChannelEventSel"]];
-    [self setRj45SpareIoMuxSel:   [decoder decodeInt32ForKey: @"rj45SpareIoMuxSel"]];
-    [self setRj45SpareIoDir:   [decoder decodeBoolForKey: @"rj45SpareIoDir"]];
-    [self setLedStatus:   [decoder decodeInt32ForKey: @"ledStatus"]];
-    [self setLiveTimestampLsb:   [decoder decodeInt32ForKey: @"liveTimestampLsb"]];
-    [self setLiveTimestampMsb:   [decoder decodeInt32ForKey: @"liveTimestampMsb"]];
-    [self setDiagIsync:   [decoder decodeBoolForKey: @"diagIsync"]];
-    [self setSerdesSmLostLock:   [decoder decodeBoolForKey: @"serdesSmLostLock"]];
-    [self setOverflowFlagChan0:   [decoder decodeBoolForKey: @"overflowFlagChan"]];
-    [self setOverflowFlagChan1:   [decoder decodeBoolForKey: @"overflowFlagChan1"]];
-    [self setOverflowFlagChan2:   [decoder decodeBoolForKey: @"overflowFlagChan2"]];
-    [self setOverflowFlagChan3:   [decoder decodeBoolForKey: @"overflowFlagChan3"]];
-    [self setOverflowFlagChan4:   [decoder decodeBoolForKey: @"overflowFlagChan4"]];
-    [self setOverflowFlagChan5:   [decoder decodeBoolForKey: @"overflowFlagChan5"]];
-    [self setOverflowFlagChan6:   [decoder decodeBoolForKey: @"overflowFlagChan6"]];
-    [self setOverflowFlagChan7:   [decoder decodeBoolForKey: @"overflowFlagChan7"]];
-    [self setOverflowFlagChan8:   [decoder decodeBoolForKey: @"overflowFlagChan8"]];
-    [self setOverflowFlagChan9:   [decoder decodeBoolForKey: @"overflowFlagChan9"]];
-    [self setTriggerConfig:   [decoder decodeInt32ForKey: @"triggerConfig"]];
-    [self setPhaseErrorCount:   [decoder decodeInt32ForKey: @"phaseErrorCount"]];
-    [self setPhaseStatus:   [decoder decodeInt32ForKey: @"phaseStatus"]];
-    [self setSerdesPhaseValue:   [decoder decodeInt32ForKey: @"serdesPhaseValue"]];
-    [self setPcbRevision:   [decoder decodeInt32ForKey: @"pcbRevision"]];
-    [self setFwType:   [decoder decodeInt32ForKey: @"fwType"]];
-    [self setMjrCodeRevision:   [decoder decodeInt32ForKey: @"mjrCodeRevision"]];
-    [self setMinCodeRevision:   [decoder decodeInt32ForKey: @"minCodeRevision"]];
-    [self setCodeDate:   [decoder decodeInt32ForKey: @"codeDate"]];
-    [self setTSErrCntCtrl:   [decoder decodeInt32ForKey: @"tSErrCntCtrl"]];
-    [self setTSErrorCount:   [decoder decodeInt32ForKey: @"tSErrorCount"]];
-    [self setAuxIoRead:   [decoder decodeInt32ForKey: @"auxIoRead"]];
-    [self setAuxIoWrite:   [decoder decodeInt32ForKey: @"auxIoWrite"]];
-    [self setAuxIoConfig:   [decoder decodeInt32ForKey: @"auxIoConfig"]];
-    [self setSdPem:   [decoder decodeInt32ForKey: @"sdPem"]];
-    [self setSdSmLostLockFlag:   [decoder decodeBoolForKey: @"sdSmLostLockFlag"]];
-    [self setAdcConfig:   [decoder decodeInt32ForKey: @"adcConfig"]];
-    [self setConfigMainFpga:   [decoder decodeBoolForKey: @"configMainFpga"]];
-    [self setPowerOk:   [decoder decodeBoolForKey: @"powerOk"]];
-    [self setOverVoltStat:   [decoder decodeBoolForKey: @"overVoltStat"]];
-    [self setUnderVoltStat:   [decoder decodeBoolForKey: @"underVoltStat"]];
-    [self setTemp0Sensor:   [decoder decodeBoolForKey: @"temp0Sensor"]];
-    [self setTemp1Sensor:   [decoder decodeBoolForKey: @"temp1Sensor"]];
-    [self setTemp2Sensor:   [decoder decodeBoolForKey: @"temp2Sensor"]];
-    [self setClkSelect0:   [decoder decodeBoolForKey: @"clkSelect0"]];
-    [self setClkSelect1:   [decoder decodeBoolForKey: @"clkSelect1"]];
-    [self setFlashMode:   [decoder decodeBoolForKey: @"flashMode"]];
-    [self setSerialNum:   [decoder decodeInt32ForKey: @"serialNum"]];
-    [self setBoardRevNum:   [decoder decodeInt32ForKey: @"boardRevNum"]];
-    [self setVhdlVerNum:   [decoder decodeInt32ForKey: @"vhdlVerNum"]];
-    [self setFifoAccess:   [decoder decodeInt32ForKey: @"fifoAccess"]];
+    [self setFifoHalfFull:      [decoder decodeBoolForKey: @"fifoHalfFull"]];
+    [self setFifoAlmostFull:    [decoder decodeBoolForKey: @"fifoAlmostFull"]];
+    [self setFifoFull0:         [decoder decodeBoolForKey: @"fifoFull"]];
+    [self setFifoFull1:         [decoder decodeBoolForKey: @"fifoFull1"]];
+    [self setPhSuccess:         [decoder decodeBoolForKey: @"phSuccess"]];
+    [self setPhFailure:         [decoder decodeBoolForKey: @"phFailure"]];
+    [self setPhHuntingUp:       [decoder decodeBoolForKey: @"phHuntingUp"]];
+    [self setPhHuntingDown:     [decoder decodeBoolForKey: @"phHuntingDown"]];
+    [self setPhChecking:        [decoder decodeBoolForKey: @"phChecking"]];
+    [self setAcqDcmCtrlStatus:  [decoder decodeInt32ForKey:@"acqDcmCtrlStatus"]];
+    [self setAcqDcmLock:        [decoder decodeBoolForKey: @"acqDcmLock"]];
+    [self setAcqDcmReset:       [decoder decodeBoolForKey: @"acqDcmReset"]];
+    [self setAcqPhShiftOverflow:[decoder decodeBoolForKey: @"acqPhShiftOverflow"]];
+    [self setAcqDcmClockStopped:[decoder decodeBoolForKey: @"acqDcmClockStopped"]];
+    [self setAdcDcmCtrlStatus:  [decoder decodeInt32ForKey:@"adcDcmCtrlStatus"]];
+    [self setAdcDcmLock:        [decoder decodeBoolForKey: @"adcDcmLock"]];
+    [self setAdcDcmReset:       [decoder decodeBoolForKey: @"adcDcmReset"]];
+    [self setAdcPhShiftOverflow:[decoder decodeBoolForKey: @"adcPhShiftOverflow"]];
+    [self setAdcDcmClockStopped:[decoder decodeBoolForKey: @"adcDcmClockStopped"]];
+    [self setUserPackageData:   [decoder decodeInt32ForKey:@"userPackageData"]];
+    [self setDacChannelSelect:  [decoder decodeInt32ForKey:@"dacChannelSelect"]];
+    [self setDacAttenuation:    [decoder decodeInt32ForKey:@"dacAttenuation"]];
+    [self setIlaConfig:         [decoder decodeInt32ForKey:@"ilaConfig"]];
+    [self setPhaseHunt:         [decoder decodeBoolForKey: @"phaseHunt"]];
+    [self setLoadbaseline:      [decoder decodeBoolForKey: @"loadbaseline"]];
+    [self setPhaseHuntDebug:    [decoder decodeBoolForKey: @"phaseHuntDebug"]];
+    [self setPhaseHuntProceed:  [decoder decodeBoolForKey: @"phaseHuntProceed"]];
+    [self setPhaseDec:          [decoder decodeBoolForKey: @"phaseDec"]];
+    [self setPhaseInc:          [decoder decodeBoolForKey: @"phaseInc"]];
+    [self setSerdesPhaseInc:    [decoder decodeBoolForKey: @"serdesPhaseInc"]];
+    [self setSerdesPhaseDec:    [decoder decodeBoolForKey: @"serdesPhaseDec"]];
+    [self setDiagMuxControl:    [decoder decodeInt32ForKey:@"diagMuxControl"]];
+    [self setPeakSensitivity:   [decoder decodeInt32ForKey:@"peakSensitivity"]];
+    [self setDiagInput:         [decoder decodeInt32ForKey:@"diagInput"]];
+    [self setDiagChannelEventSel:[decoder decodeInt32ForKey:@"diagChannelEventSel"]];
+    [self setRj45SpareIoMuxSel:  [decoder decodeInt32ForKey:@"rj45SpareIoMuxSel"]];
+    [self setRj45SpareIoDir:    [decoder decodeBoolForKey: @"rj45SpareIoDir"]];
+    [self setLedStatus:         [decoder decodeInt32ForKey:@"ledStatus"]];
+    [self setLiveTimestampLsb:  [decoder decodeInt32ForKey:@"liveTimestampLsb"]];
+    [self setLiveTimestampMsb:  [decoder decodeInt32ForKey:@"liveTimestampMsb"]];
+    [self setDiagIsync:         [decoder decodeBoolForKey: @"diagIsync"]];
+    [self setSerdesSmLostLock:  [decoder decodeBoolForKey: @"serdesSmLostLock"]];
+    [self setTriggerConfig:     [decoder decodeInt32ForKey:@"triggerConfig"]];
+    [self setPhaseErrorCount:   [decoder decodeInt32ForKey:@"phaseErrorCount"]];
+    [self setPhaseStatus:       [decoder decodeInt32ForKey:@"phaseStatus"]];
+    [self setSerdesPhaseValue:  [decoder decodeInt32ForKey:@"serdesPhaseValue"]];
+    [self setPcbRevision:       [decoder decodeInt32ForKey:@"pcbRevision"]];
+    [self setFwType:            [decoder decodeInt32ForKey:@"fwType"]];
+    [self setMjrCodeRevision:   [decoder decodeInt32ForKey:@"mjrCodeRevision"]];
+    [self setMinCodeRevision:   [decoder decodeInt32ForKey:@"minCodeRevision"]];
+    [self setCodeDate:          [decoder decodeInt32ForKey:@"codeDate"]];
+    [self setTSErrCntCtrl:      [decoder decodeInt32ForKey:@"tSErrCntCtrl"]];
+    [self setTSErrorCount:      [decoder decodeInt32ForKey:@"tSErrorCount"]];
+    [self setAuxIoRead:         [decoder decodeInt32ForKey:@"auxIoRead"]];
+    [self setAuxIoWrite:        [decoder decodeInt32ForKey:@"auxIoWrite"]];
+    [self setAuxIoConfig:       [decoder decodeInt32ForKey:@"auxIoConfig"]];
+    [self setSdPem:             [decoder decodeInt32ForKey:@"sdPem"]];
+    [self setSdSmLostLockFlag:  [decoder decodeBoolForKey: @"sdSmLostLockFlag"]];
+    [self setAdcConfig:         [decoder decodeInt32ForKey:@"adcConfig"]];
+    [self setConfigMainFpga:    [decoder decodeBoolForKey: @"configMainFpga"]];
+    [self setPowerOk:           [decoder decodeBoolForKey: @"powerOk"]];
+    [self setOverVoltStat:      [decoder decodeBoolForKey: @"overVoltStat"]];
+    [self setUnderVoltStat:     [decoder decodeBoolForKey: @"underVoltStat"]];
+    [self setTemp0Sensor:       [decoder decodeBoolForKey: @"temp0Sensor"]];
+    [self setTemp1Sensor:       [decoder decodeBoolForKey: @"temp1Sensor"]];
+    [self setTemp2Sensor:       [decoder decodeBoolForKey: @"temp2Sensor"]];
+    [self setClkSelect0:        [decoder decodeBoolForKey: @"clkSelect0"]];
+    [self setClkSelect1:        [decoder decodeBoolForKey: @"clkSelect1"]];
+    [self setFlashMode:         [decoder decodeBoolForKey: @"flashMode"]];
+    [self setSerialNum:         [decoder decodeInt32ForKey:@"serialNum"]];
+    [self setBoardRevNum:       [decoder decodeInt32ForKey:@"boardRevNum"]];
+    [self setVhdlVerNum:        [decoder decodeInt32ForKey:@"vhdlVerNum"]];
+    [self setFifoAccess:        [decoder decodeInt32ForKey:@"fifoAccess"]];
 
 	
 	int i;
 	for(i=0;i<kNumGretina4AChannels;i++){
-        [self setForceFullInit:i withValue:[decoder decodeIntForKey:[@"forceFullInit"	    stringByAppendingFormat:@"%d",i]]];
-        [self setRouterVetoEn:i withValue:   [decoder decodeBoolForKey: [NSString stringWithFormat:@"routerVetoEn%d",i]]]; //0-10
-        [self setPreampResetDelayEn:i withValue:   [decoder decodeBoolForKey: [NSString stringWithFormat:@"preampResetDelayEn%d",i]]]; //0-10
-        [self setPileupWaveformOnlyMode:i withValue:   [decoder decodeBoolForKey: [NSString stringWithFormat:@"pileupWaveformOnlyMode%d",i]]]; //0-10
-        [self setLedThreshold:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"ledThreshold%d",i]]]; //0-10;
-        [self setPreampResetDelay:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"preampResetDelay%d",i]]]; //0-10
-        [self setRawDataLength:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"rawDataLength%d",i]]]; //0-10
-        [self setRawDataWindow:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"rawDataWindow%d",i]]]; //0-10
-        [self setDWindow:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"dWindow%d",i]]]; //0-10
-        [self setDWindow:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"kWindow%d",i]]]; //0-10
-        [self setMWindow:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"mWindow%d",i]]]; //0-10
-        [self setD2Window:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"d2Window%d",i]]]; //0-10
-        [self setBaselineStart:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"baselineStart%d",i]]]; //0-10
-        [self setDroppedEventCount:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"droppedEventCount%d",i]]]; //0-10
-        [self setAcceptedEventCount:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"acceptedEventCount%d",i]]]; //0-10
-        [self setAhitCount:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"ahitCount%d",i]]]; //0-10
-        [self setDiscCount:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"discCount%d",i]]]; //0-10
-        [self setCFDFraction:i   withValue:[decoder decodeInt32ForKey: [NSString stringWithFormat:@"cFDFraction%d",i]]];
-        [self setDiscWidth:i   withValue:[decoder decodeInt32ForKey: [NSString stringWithFormat:@"discWidth%d",i]]];
+        [self setOverflowFlagChan:i         withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"overflowFlagChan%d",i]]];
+        [self setForceFullInit:i            withValue:  [decoder decodeIntForKey:   [NSString stringWithFormat:@"forceFullInit%d",i]]];
+        [self setRouterVetoEn:i             withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"routerVetoEn%d",i]]]; //0-10
+        [self setPreampResetDelayEn:i       withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"preampResetDelayEn%d",i]]]; //0-10
+        [self setPileupMode:i               withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"pileupMode%d",i]]]; //0-10
+        [self setDroppedEventCountMode:i    withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"droppedEventCountMode%d",i]]]; //0-10
+        [self setEventCountMode:i           withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"eventCountMode%d",i]]]; //0-10
+        
+        [self setAHitCountMode:i           withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"aHitCountMode%d",i]]]; //0-10
+        [self setDiscCountMode:i           withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"discCountMode%d",i]]]; //0-10
+        [self setEventExtentionMode:i      withValue:  [decoder decodeInt32ForKey:  [NSString stringWithFormat:@"eventExtentionMode%d",i]]]; //0-10
+        [self setPileupExtentionMode:i     withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"pileExtentionMode%d",i]]]; //0-10
+        [self setCounterReset:i            withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"counterReset%d",i]]]; //0-10
+        [self setPileupWaveformOnlyMode:i  withValue:  [decoder decodeBoolForKey:  [NSString stringWithFormat:@"pileupWaveformOnlyMode%d",i]]]; //0-10
+        
+        [self setLedThreshold:i             withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"ledThreshold%d",i]]]; //0-10;
+        [self setPreampResetDelay:i         withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"preampResetDelay%d",i]]]; //0-10
+        [self setRawDataLength:i            withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"rawDataLength%d",i]]]; //0-10
+        [self setRawDataWindow:i            withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"rawDataWindow%d",i]]]; //0-10
+        [self setDWindow:i                  withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"dWindow%d",i]]]; //0-10
+        [self setDWindow:i                  withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"kWindow%d",i]]]; //0-10
+        [self setMWindow:i                  withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"mWindow%d",i]]]; //0-10
+        [self setD2Window:i                 withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"d2Window%d",i]]]; //0-10
+        [self setBaselineStart:i            withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"baselineStart%d",i]]]; //0-10
+        [self setDroppedEventCount:i        withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"droppedEventCount%d",i]]]; //0-10
+        [self setAcceptedEventCount:i       withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"acceptedEventCount%d",i]]]; //0-10
+        [self setAhitCount:i                withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"ahitCount%d",i]]]; //0-10
+        [self setDiscCount:i                withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"discCount%d",i]]]; //0-10
+        [self setCFDFraction:i              withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"cFDFraction%d",i]]];
+        [self setDiscWidth:i                withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"discWidth%d",i]]];
+        [self setTriggerPolarity:i          withValue:  [decoder decodeInt32ForKey: [NSString stringWithFormat:@"triggerPolarity%d",i]]];
     }
     for(i=0;i<4;i++){
         [self setPhase0:i withValue:   [decoder decodeInt32ForKey: [NSString stringWithFormat:@"phase0%d",i]]]; //0-3
@@ -1922,16 +2029,6 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt32:liveTimestampMsb           forKey:@"liveTimestampMsb"];
     [encoder encodeBool:diagIsync                   forKey:@"diagIsync"];
     [encoder encodeBool:serdesSmLostLock            forKey:@"serdesSmLostLock"];
-    [encoder encodeBool:overflowFlagChan0           forKey:@"overflowFlagChan0"];
-    [encoder encodeBool:overflowFlagChan1           forKey:@"overflowFlagChan1"];
-    [encoder encodeBool:overflowFlagChan2           forKey:@"overflowFlagChan2"];
-    [encoder encodeBool:overflowFlagChan3           forKey:@"overflowFlagChan3"];
-    [encoder encodeBool:overflowFlagChan4           forKey:@"overflowFlagChan4"];
-    [encoder encodeBool:overflowFlagChan5           forKey:@"overflowFlagChan5"];
-    [encoder encodeBool:overflowFlagChan6           forKey:@"overflowFlagChan6"];
-    [encoder encodeBool:overflowFlagChan7           forKey:@"overflowFlagChan7"];
-    [encoder encodeBool:overflowFlagChan8           forKey:@"overflowFlagChan8"];
-    [encoder encodeBool:overflowFlagChan9           forKey:@"overflowFlagChan9"];
     [encoder encodeInt32:triggerConfig              forKey:@"triggerConfig"];
     [encoder encodeInt32:phaseErrorCount            forKey:@"phaseErrorCount"];
     [encoder encodeInt32:phaseStatus                forKey:@"phaseStatus"];
@@ -1940,8 +2037,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt32:fwType                     forKey:@"fwType"];
     [encoder encodeInt32:mjrCodeRevision            forKey:@"mjrCodeRevision"];
     [encoder encodeInt32:minCodeRevision            forKey:@"minCodeRevision"];
-    [encoder encodeInt32:codeDate                      forKey:@"codeDate"];
-    [encoder encodeInt32:tSErrCntCtrl                  forKey:@"tSErrCntCtrl"];
+    [encoder encodeInt32:codeDate                   forKey:@"codeDate"];
+    [encoder encodeInt32:tSErrCntCtrl               forKey:@"tSErrCntCtrl"];
     [encoder encodeInt32:tSErrorCount               forKey:@"tSErrorCount"];
     [encoder encodeInt32:auxIoRead                  forKey:@"auxIoRead"];
     [encoder encodeInt32:auxIoWrite                 forKey:@"auxIoWrite"];
@@ -1956,7 +2053,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeBool:temp0Sensor                 forKey:@"temp0Sensor"];
     [encoder encodeBool:temp1Sensor                 forKey:@"temp1Sensor"];
     [encoder encodeBool:temp2Sensor                 forKey:@"temp2Sensor"];
-    [encoder encodeBool:clkSelect0                   forKey:@"clkSelect0"];
+    [encoder encodeBool:clkSelect0                  forKey:@"clkSelect0"];
     [encoder encodeBool:clkSelect1                  forKey:@"clkSelect1"];
     [encoder encodeBool:flashMode                   forKey:@"flashMode"];
     [encoder encodeInt32:serialNum                  forKey:@"serialNum"];
@@ -1967,13 +2064,25 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     
 	int i;
  	for(i=0;i<kNumGretina4AChannels;i++){
-        [encoder encodeInt:forceFullInit[i]	forKey:[@"forceFullInit"		stringByAppendingFormat:@"%d",i]];
-
+        [encoder encodeInt:forceFullInit[i]             forKey:[@"forceFullInit"		stringByAppendingFormat:@"%d",i]];
+        [encoder encodeBool:overflowFlagChan[i]         forKey:[NSString stringWithFormat:@"overflowFlagChan%d",i]]; //0-10
         [encoder encodeBool:routerVetoEn[i]             forKey:[NSString stringWithFormat:@"routerVetoEn%d",i]]; //0-10
         [encoder encodeBool:preampResetDelayEn[i]       forKey:[NSString stringWithFormat:@"preampResetDelayEn%d",i]]; //0-10
-        [encoder encodeBool:pileupWaveformOnlyMode[i]   forKey:[NSString stringWithFormat:@"pileupWaveformOnlyMode%d",i]]; //0-10
+        [encoder encodeBool:pileupMode[i]               forKey:[NSString stringWithFormat:@"pileupMode%d",i]]; //0-10
+        [encoder encodeInt32:triggerPolarity[i]         forKey:[NSString stringWithFormat:@"triggerPolarity%d",i]]; //0-10
         [encoder encodeInt32:ledThreshold[i]            forKey:[NSString stringWithFormat:@"ledThreshold%d",i]]; //0-10
+        [encoder encodeInt32:cFDFraction[i]            forKey:[NSString stringWithFormat:@"cFDFraction%d",i]]; //0-10
         [encoder encodeInt32:preampResetDelay[i]        forKey:[NSString stringWithFormat:@"preampResetDelay%d",i]]; //0-10
+        [encoder encodeBool:droppedEventCountMode[i]    forKey:[NSString stringWithFormat:@"droppedEventCountMode%d",i]]; //0-10
+        
+        [encoder encodeBool:aHitCountMode[i]            forKey:[NSString stringWithFormat:@"aHitCountMode%d",i]]; //0-10
+        [encoder encodeBool:discCountMode[i]            forKey:[NSString stringWithFormat:@"discCountMode%d",i]]; //0-10
+        [encoder encodeInt32:eventExtentionMode[i]      forKey:[NSString stringWithFormat:@"eventExtentionMode%d",i]]; //0-10
+        [encoder encodeBool:pileupExtentionMode[i]      forKey:[NSString stringWithFormat:@"pileExtentionMode%d",i]]; //0-10
+        [encoder encodeBool:counterReset[i]             forKey:[NSString stringWithFormat:@"counterReset%d",i]]; //0-10
+        [encoder encodeBool:pileupWaveformOnlyMode[i]   forKey:[NSString stringWithFormat:@"pileupWaveformOnlyMode%d",i]]; //0-10
+        
+        [encoder encodeBool:eventCountMode[i]           forKey:[NSString stringWithFormat:@"eventCountMode%d",i]]; //0-10
         [encoder encodeInt32:rawDataLength[i]           forKey:[NSString stringWithFormat:@"rawDataLength%d",i]]; //0-10
         [encoder encodeInt32:rawDataWindow[i]           forKey:[NSString stringWithFormat:@"rawDataWindow%d",i]]; //0-10
         [encoder encodeInt32:dWindow[i]                 forKey:[NSString stringWithFormat:@"dWindow%d",i]]; //0-10
@@ -1989,7 +2098,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
         [encoder encodeInt32:discWidth[i]               forKey:[NSString stringWithFormat:@"discWidth%d",i]]; //0-10
     }
     for(i=0;i<4;i++){
-        [encoder encodeInt32:phase0[i]       forKey:[NSString stringWithFormat:@"phase0%d",i]]; //0-3
+        [encoder encodeInt32:phase0[i]      forKey:[NSString stringWithFormat:@"phase0%d",i]]; //0-3
         [encoder encodeInt32:phase1[i]      forKey:[NSString stringWithFormat:@"phase1%d",i]]; //0-3
         [encoder encodeInt32:phase2[i]      forKey:[NSString stringWithFormat:@"phase2%d",i]]; //0-3
         [encoder encodeInt32:phase3[i]      forKey:[NSString stringWithFormat:@"phase3%d",i]]; //0-3
@@ -2000,8 +2109,32 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    NSMutableArray* ar = [NSMutableArray array];
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++)[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
+    [objDictionary setObject:ar forKey:@"LED Threshold"];
+
     
-    [self addCurrentState:objDictionary boolArray:(BOOL*)forceFullInit forKey:@"forceFullInit"];
+    [ar removeAllObjects];
+    for(i=0;i<kNumGretina4AChannels;i++)[ar addObject:[NSNumber numberWithLong:cFDFraction[i]]];
+    [objDictionary setObject:ar forKey:@"CFD Fraction"];
+
+    [ar removeAllObjects];
+    for(i=0;i<kNumGretina4AChannels;i++)[ar addObject:[NSNumber numberWithLong:triggerPolarity[i]]];
+    [objDictionary setObject:ar forKey:@"Trigger Polarity"];
+
+    
+    [self addCurrentState:objDictionary boolArray:(BOOL*)forceFullInit              forKey:@"forceFullInit"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)pileupMode                 forKey:@"pileupMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)preampResetDelayEn         forKey:@"preampResetDelayEn"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)droppedEventCountMode      forKey:@"droppedEventCountMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)eventCountMode             forKey:@"eventCountMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)aHitCountMode              forKey:@"aHitCountMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)discCountMode              forKey:@"discCountMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)eventExtentionMode         forKey:@"eventExtentionMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)pileupExtentionMode        forKey:@"pileExtentionMode"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)counterReset               forKey:@"counterReset"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)pileupWaveformOnlyMode     forKey:@"pileupWaveformOnlyMode"];
 
     return objDictionary;
 }
@@ -2027,7 +2160,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-#pragma mark •••AutoTesting
+#pragma mark - AutoTesting
 - (NSArray*) autoTests
 {
 	NSMutableArray* myTests = [NSMutableArray array];
@@ -2036,7 +2169,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-#pragma mark •••SPI Interface
+#pragma mark - SPI Interface
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData
 {
     /*
@@ -2070,7 +2203,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-#pragma mark •••AdcProviding Protocol
+#pragma mark - AdcProviding Protocol
 - (BOOL) onlineMaskBit:(int)bit
 {
    return [self enabled:bit];
@@ -2115,7 +2248,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self setLedThreshold:chan withValue:aValue];
 }
-#pragma mark •••
+#pragma mark - Accessors
 
 //------------------- Address = 0x0000  Bit Field = 31..16 ---------------
 - (unsigned long) firmwareVersion
@@ -2521,14 +2654,197 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
+
+//------------------- Address = 0x0040  Bit Field = 10..11 ---------------
+- (unsigned long) triggerPolarity:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return triggerPolarity[anIndex];
+}
+
+- (void) setTriggerPolarity:(int)anIndex withValue:(unsigned long)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    if(aValue > 0xFFFF)aValue = 0xFFFF;
+    
+    if(triggerPolarity[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setTriggerPolarity:anIndex withValue:triggerPolarity[anIndex]];
+        triggerPolarity[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATriggerPolarityChanged object:self userInfo:userInfo];
+    }
+}
+
 //------------------- Address = 0x0040  Bit Field = 30 ---------------
-- (BOOL) pileupWaveformOnlyMode:(int)anIndex
+- (BOOL) pileupMode:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return pileupMode[anIndex];
+}
+
+- (void) setPileupMode:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    
+    if(pileupMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setPileupMode:anIndex withValue:pileupMode[anIndex]];
+        pileupMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupMode0Changed object:self userInfo:userInfo];
+    }
+}
+
+//------------------- Address = 0x0040  Bit Field = 20 ---------------
+- (BOOL)  droppedEventCountMode:(int)anIndex;
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return droppedEventCountMode[anIndex];
+}
+- (void)    setDroppedEventCountMode:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+
+    if(droppedEventCountMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDroppedEventCountMode:anIndex withValue:droppedEventCountMode[anIndex]];
+        droppedEventCountMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADroppedEventCountModeChanged object:self userInfo:userInfo];
+    }
+}
+
+//------------------- Address = 0x0040  Bit Field = 21 ---------------
+- (BOOL)  eventCountMode:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return eventCountMode[anIndex];
+   
+}
+- (void)    setEventCountMode:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    
+    if(eventCountMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setEventCountMode:anIndex withValue:eventCountMode[anIndex]];
+        eventCountMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventCountModeChanged object:self userInfo:userInfo];
+    }
+  
+}
+//------------------- Address = 0x0040  Bit Field = 22 ---------------
+- (BOOL)  aHitCountMode:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return aHitCountMode[anIndex];
+    
+}
+- (void)  setAHitCountMode:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    
+    if(aHitCountMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setAHitCountMode:anIndex withValue:aHitCountMode[anIndex]];
+        aHitCountMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAHitCountModeChanged object:self userInfo:userInfo];
+    }
+    
+}
+//------------------- Address = 0x0040  Bit Field = 23 ---------------
+- (BOOL)  discCountMode:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return discCountMode[anIndex];
+    
+}
+- (void)  setDiscCountMode:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    
+    if(discCountMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setDiscCountMode:anIndex withValue:discCountMode[anIndex]];
+        discCountMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountModeChanged object:self userInfo:userInfo];
+    }
+    
+}
+//------------------- Address = 0x0040  Bit Field = 24..25 ---------------
+- (unsigned long) eventExtentionMode:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return eventExtentionMode[anIndex];
+}
+
+- (void) setEventExtentionMode:(int)anIndex withValue:(unsigned long)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    if(aValue > 0x3)aValue = 0x3;
+    
+    if(eventExtentionMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setEventExtentionMode:anIndex withValue:eventExtentionMode[anIndex]];
+        eventExtentionMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventExtentionModeChanged object:self userInfo:userInfo];
+    }
+}
+
+//------------------- Address = 0x0040  Bit Field = 26 ---------------
+- (BOOL)  pileupExtentionMode:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return pileupExtentionMode[anIndex];
+    
+}
+- (void)    setPileupExtentionMode:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    
+    if(pileupExtentionMode[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setPileupExtentionMode:anIndex withValue:pileupExtentionMode[anIndex]];
+        pileupExtentionMode[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupExtentionModeChanged object:self userInfo:userInfo];
+    }
+    
+}
+
+//------------------- Address = 0x0040  Bit Field = 27 ---------------
+- (BOOL)  counterReset:(int)anIndex
+{
+    if( anIndex<0 || anIndex>10 )return 0;
+    return counterReset[anIndex];
+    
+}
+- (void)    setCounterReset:(int)anIndex withValue:(BOOL)aValue
+{
+    if(anIndex < 0 || anIndex > 10)  return;
+    
+    if(counterReset[anIndex] != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setCounterReset:anIndex withValue:counterReset[anIndex]];
+        counterReset[anIndex] = aValue;
+        
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACounterResetChanged object:self userInfo:userInfo];
+    }
+}
+
+//------------------- Address = 0x0040  Bit Field = 30 ---------------
+- (BOOL)  pileupWaveformOnlyMode:(int)anIndex
 {
     if( anIndex<0 || anIndex>10 )return 0;
     return pileupWaveformOnlyMode[anIndex];
+    
 }
-
-- (void) setPileupWaveformOnlyMode:(int)anIndex withValue:(BOOL)aValue
+- (void)    setPileupWaveformOnlyMode:(int)anIndex withValue:(BOOL)aValue
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
@@ -2537,8 +2853,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
         pileupWaveformOnlyMode[anIndex] = aValue;
         
         NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupWaveformOnlyMode0Changed object:self userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupWaveformOnlyModeChanged object:self userInfo:userInfo];
     }
+    
 }
 
 //------------------- Address = 0x0080  Bit Field = 15..0 ---------------
@@ -2593,6 +2910,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setCFDFraction:(int)anIndex withValue:(unsigned long)aValue
 {
     if(anIndex < 0 || anIndex > 10)  return;
+    
+    aValue &= 0x0001fff;
     
     if(cFDFraction[anIndex] != aValue){
         [[[self undoManager] prepareWithInvocationTarget:self] setCFDFraction:anIndex withValue:cFDFraction[anIndex]];
@@ -3107,155 +3426,24 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
-//------------------- Address = 0x0500  Bit Field = 22 ---------------
-- (BOOL) overflowFlagChan0
+//------------------- Address = 0x0500  Bit Field = 22,23,24,25,26,27,28,29,30,31 ---------------
+- (BOOL) overflowFlagChan:(int)anIndex
 {
-    return overflowFlagChan0;
+    if(anIndex>=0 && anIndex<kNumGretina4AChannels) return overflowFlagChan[anIndex];
+    else return 0;
 }
 
-- (void) setOverflowFlagChan0:(BOOL)aValue
+- (void) setOverflowFlagChan:(int)anIndex withValue:(BOOL)aValue
 {
-    if(overflowFlagChan0 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan0:overflowFlagChan0];
-        overflowFlagChan0 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan0Changed object:self];
+    if(anIndex>=0 && anIndex<kNumGretina4AChannels){
+        if(overflowFlagChan[anIndex] != aValue){
+            [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan:anIndex withValue:anIndex];
+            overflowFlagChan[anIndex] = aValue;
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChanChanged object:self];
+        }
     }
 }
 
-//------------------- Address = 0x0500  Bit Field = 23 ---------------
-- (BOOL) overflowFlagChan1
-{
-    return overflowFlagChan1;
-}
-
-- (void) setOverflowFlagChan1:(BOOL)aValue
-{
-    if(overflowFlagChan1 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan1:overflowFlagChan1];
-        overflowFlagChan1 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan1Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 24 ---------------
-- (BOOL) overflowFlagChan2
-{
-    return overflowFlagChan2;
-}
-
-- (void) setOverflowFlagChan2:(BOOL)aValue
-{
-    if(overflowFlagChan2 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan2:overflowFlagChan2];
-        overflowFlagChan2 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan2Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 25 ---------------
-- (BOOL) overflowFlagChan3
-{
-    return overflowFlagChan3;
-}
-
-- (void) setOverflowFlagChan3:(BOOL)aValue
-{
-    if(overflowFlagChan3 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan3:overflowFlagChan3];
-        overflowFlagChan3 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan3Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 26 ---------------
-- (BOOL) overflowFlagChan4
-{
-    return overflowFlagChan4;
-}
-
-- (void) setOverflowFlagChan4:(BOOL)aValue
-{
-    if(overflowFlagChan4 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan4:overflowFlagChan4];
-        overflowFlagChan4 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan4Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 27 ---------------
-- (BOOL) overflowFlagChan5
-{
-    return overflowFlagChan5;
-}
-
-- (void) setOverflowFlagChan5:(BOOL)aValue
-{
-    if(overflowFlagChan5 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan5:overflowFlagChan5];
-        overflowFlagChan5 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan5Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 28 ---------------
-- (BOOL) overflowFlagChan6
-{
-    return overflowFlagChan6;
-}
-
-- (void) setOverflowFlagChan6:(BOOL)aValue
-{
-    if(overflowFlagChan6 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan6:overflowFlagChan6];
-        overflowFlagChan6 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan6Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 29 ---------------
-- (BOOL) overflowFlagChan7
-{
-    return overflowFlagChan7;
-}
-
-- (void) setOverflowFlagChan7:(BOOL)aValue
-{
-    if(overflowFlagChan7 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan7:overflowFlagChan7];
-        overflowFlagChan7 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan7Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 30 ---------------
-- (BOOL) overflowFlagChan8
-{
-    return overflowFlagChan8;
-}
-
-- (void) setOverflowFlagChan8:(BOOL)aValue
-{
-    if(overflowFlagChan8 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan8:overflowFlagChan8];
-        overflowFlagChan8 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan8Changed object:self];
-    }
-}
-
-//------------------- Address = 0x0500  Bit Field = 31 ---------------
-- (BOOL) overflowFlagChan9
-{
-    return overflowFlagChan9;
-}
-
-- (void) setOverflowFlagChan9:(BOOL)aValue
-{
-    if(overflowFlagChan9 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan9:overflowFlagChan9];
-        overflowFlagChan9 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChan9Changed object:self];
-    }
-}
 
 //------------------- Address = 0x0504  Bit Field = N/A ---------------
 - (unsigned long) triggerConfig

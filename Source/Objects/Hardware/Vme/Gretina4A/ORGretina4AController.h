@@ -16,8 +16,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h"
 #import "ORGretina4AModel.h"
@@ -34,7 +32,7 @@
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      registerLockButton;
     IBOutlet NSTextField*   lockStateField;
-
+    
     //Low-level registers and diagnostics
     IBOutlet NSPopUpButton*	registerIndexPU;
     IBOutlet NSTextField*	registerWriteValueField;
@@ -91,8 +89,23 @@
     IBOutlet NSButton*      statusButton;
 
     //hardware setup
-    IBOutlet NSMatrix*		enabledMatrix;
     IBOutlet NSMatrix*		forceFullInitMatrix;
+    IBOutlet NSMatrix*		enabledMatrix;
+    IBOutlet NSMatrix*      ledThresholdMatrix;
+    IBOutlet NSMatrix*      cFDFractionMatrix;
+    
+    IBOutlet NSMatrix*      pileupModeMatrix;
+    IBOutlet NSMatrix*      premapResetDelayEnMatrix;
+    IBOutlet NSMatrix*      premapResetDelayMatrix;
+    IBOutlet NSMatrix*      droppedEventCountModeMatrix;
+    IBOutlet NSMatrix*      eventCountModeMatrix;
+    IBOutlet NSMatrix*      triggerPolarityMatrix;
+    IBOutlet NSMatrix*      aHitCountModeMatrix;
+    IBOutlet NSMatrix*      discCountModeMatrix;
+    IBOutlet NSMatrix*      eventExtentionModeMatrix;
+    IBOutlet NSMatrix*      pileupExtentionModeMatrix;
+    IBOutlet NSMatrix*      counterResetMatrix;
+    IBOutlet NSMatrix*      pileupWaveformOnlyModeMatrix;
 
     NSView *blankView;
     NSSize settingSize;
@@ -105,34 +118,34 @@
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark •••Notification Registration
+#pragma mark - Notification Registration
 - (void) registerNotificationObservers;
 - (void) registerRates;
 - (void) updateWindow;
 
-#pragma mark •••Boilerplate
+#pragma mark - Boilerplate
 - (void) slotChanged:(NSNotification*)aNote;
 
-#pragma mark •••Security
+#pragma mark - Security
 - (void) checkGlobalSecurity;
 - (void) lockChanged:(NSNotification*) aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) registerLockChanged:(NSNotification*)aNote;
 
-#pragma mark •••Low-level registers and diagnostics
+#pragma mark - Low-level registers and diagnostics
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) setRegisterDisplay:(unsigned int)index;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
 - (void) spiWriteValueChanged:(NSNotification*)aNote;
 - (void) diagnosticsEnabledChanged:(NSNotification*)aNote;
 
-#pragma mark •••firmware loading
+#pragma mark - firmware loading
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote;
 - (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote;
 - (void) fpgaFilePathChanged:(NSNotification*)aNote;
 
-#pragma mark •••rates
+#pragma mark - rates
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
@@ -141,16 +154,17 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 
-#pragma mark •••noise floor
+#pragma mark - noise floor
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
 - (void) noiseFloorChanged:(NSNotification*)aNote;
 
-#pragma mark •••SerDes and Clock Distribution
+#pragma mark - SerDes and Clock Distribution
 - (void) updateClockLocked;
 - (void) initSerDesStateChanged:(NSNotification*) aNote;
 
-#pragma mark •••Card Params
+#pragma mark - Card Params
+- (void) enabledChanged:(NSNotification*)aNote;
 - (void) forceFullInitChanged:(NSNotification*)aNote;
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) fifoEmptyChanged:(NSNotification*)aNote;
@@ -178,9 +192,22 @@
 - (void) userPackageDataChanged:(NSNotification*)aNote;
 - (void) routerVetoEnChanged:(NSNotification*)aNote;
 - (void) preampResetDelayEnChanged:(NSNotification*)aNote;
-- (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote;
+- (void) pileupModeChanged:(NSNotification*)aNote;
+- (void) droppedEventCountModeChanged:(NSNotification*)aNote;
+- (void) eventCountModeChanged:(NSNotification*)aNote;
 - (void) ledThresholdChanged:(NSNotification*)aNote;
+- (void) cfdFractionChanged:(NSNotification*)aNote;
 - (void) preampResetDelayChanged:(NSNotification*)aNote;
+- (void) triggerPolarityChanged:(NSNotification*)aNote;
+- (void) aHitCountModeChanged:(NSNotification*)aNote;
+- (void) discCountModeChanged:(NSNotification*)aNote;
+- (void) eventExtentionModeChanged:(NSNotification*)aNote;
+- (void) pileupExtentionModeChanged:(NSNotification*)aNote;
+- (void) counterResetChanged:(NSNotification*)aNote;
+- (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote;
+
+
+
 - (void) rawDataLengthChanged:(NSNotification*)aNote;
 - (void) rawDataWindowChanged:(NSNotification*)aNote;
 - (void) dWindowChanged:(NSNotification*)aNote;
@@ -207,15 +234,6 @@
 - (void) diagIsyncChanged:(NSNotification*)aNote;
 - (void) serdesSmLostLockChanged:(NSNotification*)aNote;
 - (void) overflowFlagChanChanged:(NSNotification*)aNote;
-- (void) overflowFlagChan1Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan2Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan3Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan4Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan5Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan6Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan7Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan8Changed:(NSNotification*)aNote;
-- (void) overflowFlagChan9Changed:(NSNotification*)aNote;
 - (void) phaseStatusChanged:(NSNotification*)aNote;
 - (void) phaseChanged:(NSNotification*)aNote;
 - (void) phase1Changed:(NSNotification*)aNote;
@@ -229,7 +247,7 @@
 - (void) droppedEventCountChanged:(NSNotification*)aNote;
 - (void) acceptedEventCountChanged:(NSNotification*)aNote;
 - (void) ahitCountChanged:(NSNotification*)aNote;
-- (void) discCountChanged:(NSNotification*)aNote;
+
 - (void) auxIoReadChanged:(NSNotification*)aNote;
 - (void) auxIoWriteChanged:(NSNotification*)aNote;
 - (void) auxIoConfigChanged:(NSNotification*)aNote;
@@ -251,23 +269,40 @@
 - (void) vhdlVerNumChanged:(NSNotification*)aNote;
 - (void) fifoAccessChanged:(NSNotification*)aNote;
 
-#pragma mark •••Actions
-#pragma mark •••Security
+#pragma mark - Actions
+#pragma mark - Security
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) registerLockAction:(id) sender;
 
-#pragma mark •••firmware loading
+#pragma mark - Firmware loading
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
 
-#pragma mark •••noise floor
+#pragma mark - Noise floor
 - (IBAction) findNoiseFloors:(id)sender;
 - (IBAction) noiseFloorOffsetAction:(id)sender;
 - (IBAction) openNoiseFloorPanel:(id)sender;
 - (IBAction) closeNoiseFloorPanel:(id)sender;
 - (IBAction) noiseFloorIntegrationAction:(id)sender;
 
-#pragma mark •••Low-level registers and diagnostics
+#pragma mark - Register Actions
+- (IBAction) enabledAction:(id)sender;
+- (IBAction) cdfFractionAction:(id)sender;
+- (IBAction) ledThresholdAction:(id)sender;
+- (IBAction) pileupModeAction:(id)sender;
+- (IBAction) preampResetDelayEnAction:(id)sender;
+- (IBAction) preampResetDelayAction:(id)sender;
+- (IBAction) droppedEventCountModeAction:(id)sender;
+- (IBAction) eventCountModeAction:(id)sender;
+- (IBAction) triggerPolarityAction:(id)sender;
+- (IBAction) aHitCountModeAction:(id)sender;
+- (IBAction) discCountModeAction:(id)sender;
+- (IBAction) eventExtentionModeAction:(id)sender;
+- (IBAction) pileupExtentionModeAction:(id)sender;
+- (IBAction) counterResetAction:(id)sender;
+- (IBAction) pileupWaveformOnlyModeAction:(id)sender;
+
+#pragma mark - Low-level registers and diagnostics
 - (IBAction) registerIndexPUAction:(id)sender;
 - (IBAction) readRegisterAction:(id)sender;
 - (IBAction) writeRegisterAction:(id)sender;
@@ -281,7 +316,7 @@
 - (IBAction) diagnosticsReportAction:(id)sender;
 - (IBAction) diagnosticsEnableAction:(id)sender;
 
-#pragma mark •••hardware access
+#pragma mark - Hardware access
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) readStatus:(id)sender;
 - (IBAction) resetBoard:(id)sender;
@@ -290,7 +325,7 @@
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) forceFullInitAction:(id)sender;
 
-#pragma mark •••Data Source
+#pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (double)  getBarValue:(int)tag;
 - (int)     numberPointsInPlot:(id)aPlotter;

@@ -61,9 +61,6 @@
 	[registerIndexPU setAutoenablesItems:NO];
     
 	int i;
-    for(i=0;i<kNumberOfGretina4ARegisters;i++){
-        [[enabledMatrix cellAtRow:i column:0] setTag:i];
-    }
 	for (i=0;i<kNumberOfGretina4ARegisters;i++) {
         NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i], [model registerNameAt:i]];
         
@@ -77,6 +74,23 @@
 		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4ARegisters)];
 	}
 
+    for (i=0;i<kNumberOfGretina4ARegisters;i++) {
+        [[enabledMatrix                 cellAtRow:i column:0] setTag:i];
+        [[enabled2Matrix                cellAtRow:i column:0] setTag:i];
+        [[ledThresholdMatrix            cellAtRow:i column:0] setTag:i];
+        [[cFDFractionMatrix             cellAtRow:i column:0] setTag:i];
+        [[pileupModeMatrix              cellAtRow:i column:0] setTag:i];
+        [[premapResetDelayEnMatrix      cellAtRow:i column:0] setTag:i];
+        [[premapResetDelayMatrix        cellAtRow:i column:0] setTag:i];
+        [[triggerPolarityMatrix         cellAtRow:i column:0] setTag:i];
+        [[aHitCountModeMatrix           cellAtRow:i column:0] setTag:i];
+        [[discCountModeMatrix           cellAtRow:i column:0] setTag:i];
+        [[eventExtentionModeMatrix      cellAtRow:i column:0] setTag:i];
+        [[pileupExtentionModeMatrix     cellAtRow:i column:0] setTag:i];
+        [[counterResetMatrix            cellAtRow:i column:0] setTag:i];
+        [[pileupWaveformOnlyModeMatrix  cellAtRow:i column:0] setTag:i];
+   }
+    
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4A%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
@@ -224,6 +238,11 @@
    	[self registerRates];
     
     [notifyCenter addObserver : self
+                     selector : @selector(enabledChanged:)
+                         name : ORGretina4AEnabledChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(forceFullInitChanged:)
                          name : ORGretina4AForceFullInitChanged
                        object : model];
@@ -358,14 +377,65 @@
                         object: model];
     
     [notifyCenter addObserver : self
+                     selector : @selector(pileupModeChanged:)
+                         name : ORGretina4APileupMode0Changed
+                        object: model];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(droppedEventCountModeChanged:)
+                         name : ORGretina4ADroppedEventCountModeChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(eventCountModeChanged:)
+                         name : ORGretina4AEventCountModeChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerPolarityChanged:)
+                         name : ORGretina4ATriggerPolarityChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(aHitCountModeChanged:)
+                         name :ORGretina4AAHitCountModeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(discCountModeChanged:)
+                         name : ORGretina4ADiscCountModeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(eventExtentionModeChanged:)
+                         name : ORGretina4AEventExtentionModeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pileupExtentionModeChanged:)
+                         name : ORGretina4APileupExtentionModeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(counterResetChanged:)
+                         name : ORGretina4ACounterResetChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(pileupWaveformOnlyModeChanged:)
-                         name : ORGretina4APileupWaveformOnlyMode0Changed
+                         name : ORGretina4APileupWaveformOnlyModeChanged
                         object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(ledThresholdChanged:)
                          name : ORGretina4ALedThreshold0Changed
                         object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cfdFractionChanged:)
+                         name : ORGretina4ACFDFractionChanged
+                        object: model];
+
     
     [notifyCenter addObserver : self
                      selector : @selector(preampResetDelayChanged:)
@@ -499,52 +569,7 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(overflowFlagChanChanged:)
-                         name : ORGretina4AOverflowFlagChan0Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan1Changed:)
-                         name : ORGretina4AOverflowFlagChan1Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan2Changed:)
-                         name : ORGretina4AOverflowFlagChan2Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan3Changed:)
-                         name : ORGretina4AOverflowFlagChan3Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan4Changed:)
-                         name : ORGretina4AOverflowFlagChan4Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan5Changed:)
-                         name : ORGretina4AOverflowFlagChan5Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan6Changed:)
-                         name : ORGretina4AOverflowFlagChan6Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan7Changed:)
-                         name : ORGretina4AOverflowFlagChan7Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan8Changed:)
-                         name : ORGretina4AOverflowFlagChan8Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(overflowFlagChan9Changed:)
-                         name : ORGretina4AOverflowFlagChan9Changed
+                         name : ORGretina4AOverflowFlagChanChanged
                         object: model];
     
     [notifyCenter addObserver : self
@@ -779,6 +804,7 @@
     [self initSerDesStateChanged:nil];
     
     //Card Params
+    [self enabledChanged:nil];
     [self forceFullInitChanged:nil];
     [self firmwareVersionChanged:nil];
     [self fifoEmptyChanged:nil];
@@ -806,10 +832,21 @@
     [self userPackageDataChanged:nil];
     [self routerVetoEnChanged:nil];
     [self preampResetDelayEnChanged:nil];
+    [self pileupModeChanged:nil];
+    [self droppedEventCountModeChanged:nil];
+    [self eventCountModeChanged:nil];
+    [self aHitCountModeChanged:nil];
+    [self discCountModeChanged:nil];
+    [self eventExtentionModeChanged:nil];
+    [self pileupExtentionModeChanged:nil];
+    [self counterResetChanged:nil];
     [self pileupWaveformOnlyModeChanged:nil];
+
+    
     [self ledThresholdChanged:nil];
+    [self cfdFractionChanged:nil];
+    [self triggerPolarityChanged:nil];
     [self preampResetDelayChanged:nil];
-    [self cFDFractionChanged:nil];
     [self rawDataLengthChanged:nil];
     [self rawDataWindowChanged:nil];
     [self dWindowChanged:nil];
@@ -841,15 +878,6 @@
     [self diagIsyncChanged:nil];
     [self serdesSmLostLockChanged:nil];
     [self overflowFlagChanChanged:nil];
-    [self overflowFlagChan1Changed:nil];
-    [self overflowFlagChan2Changed:nil];
-    [self overflowFlagChan3Changed:nil];
-    [self overflowFlagChan4Changed:nil];
-    [self overflowFlagChan5Changed:nil];
-    [self overflowFlagChan6Changed:nil];
-    [self overflowFlagChan7Changed:nil];
-    [self overflowFlagChan8Changed:nil];
-    [self overflowFlagChan9Changed:nil];
     [self triggerConfigChanged:nil];
     [self phaseErrorCountChanged:nil];
     [self phaseStatusChanged:nil];
@@ -1179,6 +1207,21 @@
 }
 
 #pragma mark •••CardParameters
+- (void) enabledChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
+            [[enabled2Matrix cellWithTag:i] setState:[model enabled:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[enabledMatrix cellWithTag:chan] setState:[model enabled:chan]];
+        [[enabled2Matrix cellWithTag:chan] setState:[model enabled:chan]];
+    }
+}
 - (void) firmwareVersionChanged:(NSNotification*)aNote
 {
 }
@@ -1256,19 +1299,197 @@
 }
 - (void) preampResetDelayEnChanged:(NSNotification*)aNote
 {
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[premapResetDelayEnMatrix cellWithTag:i] setIntValue:[model preampResetDelayEn:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[premapResetDelayEnMatrix cellWithTag:chan] setIntValue:[model preampResetDelayEn:chan]];
+    }
 }
-- (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote
+- (void) pileupModeChanged:(NSNotification*)aNote
 {
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[pileupModeMatrix cellWithTag:i] setIntValue:[model pileupMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[pileupModeMatrix cellWithTag:chan] setIntValue:[model pileupMode:chan]];
+    }
 }
+
+- (void) droppedEventCountModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[droppedEventCountModeMatrix cellWithTag:i] setIntValue:[model droppedEventCountMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[droppedEventCountModeMatrix cellWithTag:chan] setIntValue:[model droppedEventCountMode:chan]];
+    }
+}
+
+- (void) eventCountModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[eventCountModeMatrix cellWithTag:i] setIntValue:[model eventCountMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[eventCountModeMatrix cellWithTag:chan] setIntValue:[model eventCountMode:chan]];
+    }
+}
+
 - (void) ledThresholdChanged:(NSNotification*)aNote
 {
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[ledThresholdMatrix cellWithTag:i] setIntValue:[model ledThreshold:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[ledThresholdMatrix cellWithTag:chan] setIntValue:[model ledThreshold:chan]];
+    }
 }
-- (void) cFDFractionChanged:(NSNotification*)aNote
+
+- (void) cfdFractionChanged:(NSNotification*)aNote
 {
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[cFDFractionMatrix cellWithTag:i] setIntValue:[model cFDFraction:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[cFDFractionMatrix cellWithTag:chan] setIntValue:[model cFDFraction:chan]];
+    }
+}
+
+- (void) triggerPolarityChanged:(NSNotification*)aNote;
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[triggerPolarityMatrix cellAtRow:i column:0] selectItemAtIndex:[model triggerPolarity:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[triggerPolarityMatrix cellAtRow:chan column:0] selectItemAtIndex:[model triggerPolarity:chan]];
+    }
+   
 }
 - (void) preampResetDelayChanged:(NSNotification*)aNote
 {
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[premapResetDelayMatrix cellWithTag:i] setIntValue:[model preampResetDelay:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[premapResetDelayMatrix cellWithTag:chan] setIntValue:[model preampResetDelay:chan]];
+    }
 }
+
+- (void) aHitCountModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[aHitCountModeMatrix cellWithTag:i] setIntValue:[model aHitCountMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[aHitCountModeMatrix cellWithTag:chan] setIntValue:[model aHitCountMode:chan]];
+    }
+}
+- (void) discCountModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[discCountModeMatrix cellWithTag:i] setIntValue:[model discCountMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[discCountModeMatrix cellWithTag:chan] setIntValue:[model discCountMode:chan]];
+    }
+}
+- (void) eventExtentionModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[eventExtentionModeMatrix cellAtRow:i column:0] selectItemAtIndex:[model eventExtentionMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[eventExtentionModeMatrix cellAtRow:chan column:0] selectItemAtIndex:[model eventExtentionMode:chan]];
+    }
+}
+
+- (void) pileupExtentionModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[pileupExtentionModeMatrix cellWithTag:i] setIntValue:[model pileupExtentionMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[pileupExtentionModeMatrix cellWithTag:chan] setIntValue:[model pileupExtentionMode:chan]];
+    }
+}
+
+- (void) counterResetChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[counterResetMatrix cellWithTag:i] setIntValue:[model counterReset:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[counterResetMatrix cellWithTag:chan] setIntValue:[model counterReset:chan]];
+    }
+}
+
+- (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4AChannels;i++){
+            [[pileupWaveformOnlyModeMatrix cellWithTag:i] setIntValue:[model pileupWaveformOnlyMode:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[pileupWaveformOnlyModeMatrix cellWithTag:chan] setIntValue:[model pileupWaveformOnlyMode:chan]];
+    }
+}
+
 - (void) rawDataLengthChanged:(NSNotification*)aNote
 {
 }
@@ -1362,36 +1583,10 @@
 - (void) overflowFlagChanChanged:(NSNotification*)aNote
 {
 }
-- (void) overflowFlagChan1Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan2Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan3Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan4Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan5Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan6Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan7Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan8Changed:(NSNotification*)aNote
-{
-}
-- (void) overflowFlagChan9Changed:(NSNotification*)aNote
-{
-}
 - (void) triggerConfigChanged:(NSNotification*)aNote
 {
 }
+
 - (void) phaseErrorCountChanged:(NSNotification*)aNote
 {
 }
@@ -1508,6 +1703,12 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) enabledAction:(id)sender
+{
+    if([sender intValue] != [model enabled:[[sender selectedCell] tag]]){
+        [model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
 - (IBAction) diagnosticsClearAction:(id)sender
 {
     [model clearDiagnosticsReport];
@@ -1811,6 +2012,100 @@
 - (IBAction) compareToSnapShotAction:(id)sender
 {
     [model compareToSnapShot];
+}
+
+- (IBAction) ledThresholdAction:(id)sender
+{
+    if([sender intValue] != [model ledThreshold:[[sender selectedCell] tag]]){
+        [model setLedThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+- (IBAction) cdfFractionAction:(id)sender;
+{
+    if([sender intValue] != [model cFDFraction:[[sender selectedCell] tag]]){
+        [model setCFDFraction:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) triggerPolarityAction:(id)sender
+{
+    if([sender intValue] != [model triggerPolarity:[[sender selectedCell] indexOfSelectedItem]]){
+        [model setTriggerPolarity:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+    }
+}
+
+- (IBAction) aHitCountModeAction:(id)sender
+{
+    if([sender intValue] != [model aHitCountMode:[[sender selectedCell] tag]]){
+        [model setAHitCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) discCountModeAction:(id)sender
+{
+    if([sender intValue] != [model discCountMode:[[sender selectedCell] tag]]){
+        [model setDiscCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) eventExtentionModeAction:(id)sender
+{
+    if([sender intValue] != [model eventExtentionMode:[[sender selectedCell] indexOfSelectedItem]]){
+        [model setEventExtentionMode:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+    }
+}
+- (IBAction) pileupExtentionModeAction:(id)sender
+{
+    if([sender intValue] != [model pileupExtentionMode:[[sender selectedCell] tag]]){
+        [model setPileupExtentionMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) counterResetAction:(id)sender
+{
+    if([sender intValue] != [model counterReset:[[sender selectedCell] tag]]){
+        [model setCounterReset:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) pileupWaveformOnlyModeAction:(id)sender
+{
+    if([sender intValue] != [model pileupWaveformOnlyMode:[[sender selectedCell] tag]]){
+        [model setPileupWaveformOnlyMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) pileupModeAction:(id)sender
+{
+    if([sender intValue] != [model pileupMode:[[sender selectedCell] tag]]){
+        [model setPileupMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) preampResetDelayEnAction:(id)sender
+{
+    if([sender intValue] != [model preampResetDelayEn:[[sender selectedCell] tag]]){
+        [model setPreampResetDelayEn:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+
+- (IBAction) preampResetDelayAction:(id)sender
+{
+    if([sender intValue] != [model preampResetDelay:[[sender selectedCell] tag]]){
+        [model setPreampResetDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+- (IBAction) droppedEventCountModeAction:(id)sender
+{
+    if([sender intValue] != [model droppedEventCountMode:[[sender selectedCell] tag]]){
+        [model setDroppedEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
+- (IBAction) eventCountModeAction:(id)sender
+{
+    if([sender intValue] != [model eventCountMode:[[sender selectedCell] tag]]){
+        [model setEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
 }
 
 #pragma mark •••Data Source

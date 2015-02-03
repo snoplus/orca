@@ -105,37 +105,41 @@ enum {
     kChannelPulsedControl,	//[18]	0x040C	channel_pulsed_control
     kDiagMuxControl,        //[19]	0x0410	diag_mux_control
     kPeakSensitivity,       //[20]	0x0414	peak_sensitivity
-    kDiagChannelInput,      //[21]	0x041C	diag_channel_input
-    kDiagChannelEventSel,	//[22]	0x0420	diag_channel_event_sel
-    kRj45SpareDoutControl,	//[23]	0x0424	rj45_spare_dout_control
-    kLedStatus,             //[24]	0x0428	led_status
-    kLatTimestampLsb,       //[25]	0x0480	lat_timestamp_lsb
-    kLatTimestampMsb,       //[26]	0x0488	lat_timestamp_msb
-    kLiveTimestampLsb,      //[27]	0x048C	live_timestamp_lsb
-    kLiveTimestampMsb,      //[28]	0x0490	live_timestamp_msb
-    kFbusSdataSend,         //[29]	0x0494	fbus_sdata_send0
-    kFbusUnused,            //[30]	0x04B8	fbus_unused0
-    kFbusSdataReceive,      //[31]	0x04D4	fbus_sdata_receive0
-    kMasterLogicStatus,     //[32]	0x0500	master_logic_status
-    kTriggerConfig,         //[33]	0x0504	trigger_config
-    kPhaseErrorCount,       //[34]	0x0508	Phase_Error_count
-    kPhaseStatus,           //[35]	0x050C	Phase_Status
-    kPhaseOffset,           //[36]	0x0510	phase_offset0
-    kSerdesPhaseValue,      //[37]	0x051C	Serdes_Phase_Value
-    kCodeRevision,          //[38]	0x0600	code_revision
-    kCodeDate,              //[39]	0x0604	code_date
-    kTSErrCntCtrl,          //[40]	0x0608	TS_err_cnt_ctrl
-    kTSErrorCount,          //[41]	0x060C	TS_error_count
-    kDroppedEventCount,     //[42]	0x0700	dropped_event_count0
-    kAcceptedEventCount,	//[43]	0x0740	accepted_event_count0
-    kAhitCount,             //[44]	0x0780	ahit_count0
-    kDiscCount,             //[45]	0x07C0	disc_count0
-    kSdConfig,              //[46]	0x0848	sd_config
-    kFpgaCtrlReg,           //[47]	0x0900	fpga_ctrl_reg
-    kVmeAuxStatus,          //[48]	0x0908	vme_aux_status
-    kVmeGpCtrl,             //[49]	0x0910	vme_gp_ctrl
-    kFpgaVersion,           //[50]	0x0920	fpga_version
-    kFifo,                  //[51]	0x1000	fifo
+    kBaselineDelay,         //[21]  0x418   baseline delay
+    kDiagChannelInput,      //[22]	0x041C	diag_channel_input
+    kExtDiscSel,            //[23]	0x0420	ext_desc_sel
+    kRj45SpareDoutControl,	//[24]	0x0424	rj45_spare_dout_control
+    kLedStatus,             //[25]	0x0428	led_status
+    kLatTimestampLsb,       //[26]	0x0480	lat_timestamp_lsb
+    kLatTimestampMsb,       //[27]	0x0488	lat_timestamp_msb
+    kLiveTimestampLsb,      //[28]	0x048C	live_timestamp_lsb
+    kLiveTimestampMsb,      //[29]	0x0490	live_timestamp_msb
+    kFbusSdataSend,         //[30]	0x0494	fbus_sdata_send0
+    kFbusUnused,            //[31]	0x04B8	fbus_unused0
+    kFbusSdataReceive,      //[32]	0x04D4	fbus_sdata_receive0
+    kMasterLogicStatus,     //[33]	0x0500	master_logic_status
+    kTriggerConfig,         //[34]	0x0504	trigger_config
+    kPhaseErrorCount,       //[35]	0x0508	Phase_Error_count
+    kPhaseStatus,           //[36]	0x050C	Phase_Status
+    kPhaseOffset,           //[37]	0x0510	phase_offset0
+    kSerdesPhaseValue,      //[38]	0x051C	Serdes_Phase_Value
+    kCodeRevision,          //[39]	0x0600	code_revision
+    kCodeDate,              //[40]	0x0604	code_date
+    kTSErrCntEnable,        //[41]	0x0608	TS_err_cnt_enable
+    kTSErrorCount,          //[42]	0x060C	TS_error_count
+    kDroppedEventCount,     //[43]	0x0700	dropped_event_count0
+    kAcceptedEventCount,	//[44]	0x0740	accepted_event_count0
+    kAhitCount,             //[45]	0x0780	ahit_count0
+    kDiscCount,             //[46]	0x07C0	disc_count0
+    kAuxIORead,             //[47]	0x0800	aux_io_read
+    kAuxIOWrite,            //[48]	0x0804	aux_io_write
+    kAuxIOConfig,           //[49]	0x0808	aux_io_config
+    kSdConfig,              //[50]	0x0848	sd_config
+    kFpgaCtrlReg,           //[51]	0x0900	fpga_ctrl_reg
+    kVmeAuxStatus,          //[52]	0x0908	vme_aux_status
+    kVmeGpCtrl,             //[53]	0x0910	vme_gp_ctrl
+    kFpgaVersion,           //[54]	0x0920	fpga_version
+    kFifo,                  //[55]	0x1000	fifo
     kNumberOfGretina4ARegisters	//must be last
 };
 
@@ -175,9 +179,9 @@ enum Gretina4AFIFOStates {
     ORConnector* linkConnector; //we won't draw this connector but need a reference to it
     
     //noise floor
-	BOOL    oldEnabled[kNumGretina4AChannels];
-	unsigned long     oldLedThreshold[kNumGretina4AChannels];
-	unsigned long     newLedThreshold[kNumGretina4AChannels];
+	BOOL            oldEnabled[kNumGretina4AChannels];
+	unsigned long   oldLedThreshold[kNumGretina4AChannels];
+	unsigned long   newLedThreshold[kNumGretina4AChannels];
 	BOOL    noiseFloorRunning;
 	int     noiseFloorState;
 	int     noiseFloorWorkingChannel;
@@ -257,7 +261,18 @@ enum Gretina4AFIFOStates {
     unsigned long userPackageData;
     BOOL routerVetoEn[kNumGretina4AChannels];
     BOOL preampResetDelayEn[kNumGretina4AChannels];
+    BOOL pileupMode[kNumGretina4AChannels];
+    BOOL droppedEventCountMode[kNumGretina4AChannels];
+    BOOL eventCountMode[kNumGretina4AChannels];
+    
+    BOOL aHitCountMode[kNumGretina4AChannels];
+    BOOL discCountMode[kNumGretina4AChannels];
+    unsigned long eventExtentionMode[kNumGretina4AChannels];
+    BOOL pileupExtentionMode[kNumGretina4AChannels];
+    BOOL counterReset[kNumGretina4AChannels];
     BOOL pileupWaveformOnlyMode[kNumGretina4AChannels];
+    
+    unsigned long triggerPolarity[kNumGretina4AChannels];
     unsigned long ledThreshold[kNumGretina4AChannels];
     unsigned long preampResetDelay[kNumGretina4AChannels];
     unsigned long cFDFraction[kNumGretina4AChannels];
@@ -291,16 +306,7 @@ enum Gretina4AFIFOStates {
     unsigned long liveTimestampMsb;
     BOOL diagIsync;
     BOOL serdesSmLostLock;
-    BOOL overflowFlagChan0;
-    BOOL overflowFlagChan1;
-    BOOL overflowFlagChan2;
-    BOOL overflowFlagChan3;
-    BOOL overflowFlagChan4;
-    BOOL overflowFlagChan5;
-    BOOL overflowFlagChan6;
-    BOOL overflowFlagChan7;
-    BOOL overflowFlagChan8;
-    BOOL overflowFlagChan9;
+    BOOL overflowFlagChan[kNumGretina4AChannels];
     unsigned long triggerConfig;
     unsigned long phaseErrorCount;
     unsigned long phaseStatus;
@@ -437,6 +443,7 @@ enum Gretina4AFIFOStates {
 - (void)            writeControlReg:(short)channel enabled:(BOOL)enabled;
 - (BOOL)            fifoIsEmpty;
 - (void)            writeLedThreshold:(short)channel;
+- (void)            writeCFDFraction:(short)channel;
 
 #pragma mark •••Data Taker
 - (unsigned long)   dataId;
@@ -543,6 +550,24 @@ enum Gretina4AFIFOStates {
 - (void)    setRouterVetoEn:(int)anIndex withValue:(BOOL)aValue;
 - (BOOL)  preampResetDelayEn:(int)anIndex;
 - (void)    setPreampResetDelayEn:(int)anIndex withValue:(BOOL)aValue;
+- (BOOL)  pileupMode:(int)anIndex;
+- (void)    setPileupMode:(int)anIndex withValue:(BOOL)aValue;
+- (BOOL)  droppedEventCountMode:(int)anIndex;
+- (void)    setDroppedEventCountMode:(int)anIndex withValue:(BOOL)aValue;
+- (BOOL)  eventCountMode:(int)anIndex;
+- (void)    setEventCountMode:(int)anIndex withValue:(BOOL)aValue;
+- (unsigned long)  triggerPolarity:(int)anIndex;
+- (void)    setTriggerPolarity:(int)anIndex withValue:(unsigned long)aValue;
+- (BOOL)  aHitCountMode:(int)anIndex;
+- (void)  setAHitCountMode:(int)anIndex withValue:(BOOL)aValue;
+- (BOOL)  discCountMode:(int)anIndex;
+- (void)  setDiscCountMode:(int)anIndex withValue:(BOOL)aValue;
+- (unsigned long) eventExtentionMode:(int)anIndex;
+- (void) setEventExtentionMode:(int)anIndex withValue:(unsigned long)aValue;
+- (BOOL)  pileupExtentionMode:(int)anIndex;
+- (void)    setPileupExtentionMode:(int)anIndex withValue:(BOOL)aValue;
+- (BOOL)  counterReset:(int)anIndex;
+- (void)    setCounterReset:(int)anIndex withValue:(BOOL)aValue;
 - (BOOL)  pileupWaveformOnlyMode:(int)anIndex;
 - (void)    setPileupWaveformOnlyMode:(int)anIndex withValue:(BOOL)aValue;
 - (unsigned long)  ledThreshold:(int)anIndex;
@@ -611,26 +636,8 @@ enum Gretina4AFIFOStates {
 - (void)    setDiagIsync:(BOOL)aValue;
 - (BOOL)  serdesSmLostLock;
 - (void)    setSerdesSmLostLock:(BOOL)aValue;
-- (BOOL)  overflowFlagChan0;
-- (void)    setOverflowFlagChan0:(BOOL)aValue;
-- (BOOL)  overflowFlagChan1;
-- (void)    setOverflowFlagChan1:(BOOL)aValue;
-- (BOOL)  overflowFlagChan2;
-- (void)    setOverflowFlagChan2:(BOOL)aValue;
-- (BOOL)  overflowFlagChan3;
-- (void)    setOverflowFlagChan3:(BOOL)aValue;
-- (BOOL)  overflowFlagChan4;
-- (void)    setOverflowFlagChan4:(BOOL)aValue;
-- (BOOL)  overflowFlagChan5;
-- (void)    setOverflowFlagChan5:(BOOL)aValue;
-- (BOOL)  overflowFlagChan6;
-- (void)    setOverflowFlagChan6:(BOOL)aValue;
-- (BOOL)  overflowFlagChan7;
-- (void)    setOverflowFlagChan7:(BOOL)aValue;
-- (BOOL)  overflowFlagChan8;
-- (void)    setOverflowFlagChan8:(BOOL)aValue;
-- (BOOL)  overflowFlagChan9;
-- (void)    setOverflowFlagChan9:(BOOL)aValue;
+- (BOOL)    overflowFlagChan:(int)anIndex;
+- (void)    setOverflowFlagChan:(int)anIndex withValue:(BOOL)aValue;
 - (unsigned long)  triggerConfig;
 - (void)    setTriggerConfig:(unsigned long)aValue;
 - (unsigned long)  phaseErrorCount;
@@ -768,9 +775,18 @@ extern NSString* ORGretina4AAdcDcmClockStoppedChanged;
 extern NSString* ORGretina4AUserPackageDataChanged;
 extern NSString* ORGretina4ARouterVetoEn0Changed;
 extern NSString* ORGretina4APreampResetDelayEnChanged;
-extern NSString* ORGretina4APileupWaveformOnlyMode0Changed;
+extern NSString* ORGretina4APileupMode0Changed;
+extern NSString* ORGretina4ADroppedEventCountModeChanged;
+extern NSString* ORGretina4AEventCountModeChanged;
+extern NSString* ORGretina4AAHitCountModeChanged;
+extern NSString* ORGretina4ADiscCountModeChanged;
+extern NSString* ORGretina4AEventExtentionModeChanged;
+extern NSString* ORGretina4APileupExtentionModeChanged;
+extern NSString* ORGretina4ACounterResetChanged;
+extern NSString* ORGretina4APileupWaveformOnlyModeChanged;
 extern NSString* ORGretina4ALedThreshold0Changed;
 extern NSString* ORGretina4APreampResetDelay0Changed;
+extern NSString* ORGretina4ATriggerPolarityChanged;
 extern NSString* ORGretina4ACFDFractionChanged;
 extern NSString* ORGretina4ARawDataLengthChanged;
 extern NSString* ORGretina4ARawDataWindowChanged;
@@ -802,16 +818,7 @@ extern NSString* ORGretina4ALiveTimestampLsbChanged;
 extern NSString* ORGretina4ALiveTimestampMsbChanged;
 extern NSString* ORGretina4ADiagIsyncChanged;
 extern NSString* ORGretina4ASerdesSmLostLockChanged;
-extern NSString* ORGretina4AOverflowFlagChan0Changed;
-extern NSString* ORGretina4AOverflowFlagChan1Changed;
-extern NSString* ORGretina4AOverflowFlagChan2Changed;
-extern NSString* ORGretina4AOverflowFlagChan3Changed;
-extern NSString* ORGretina4AOverflowFlagChan4Changed;
-extern NSString* ORGretina4AOverflowFlagChan5Changed;
-extern NSString* ORGretina4AOverflowFlagChan6Changed;
-extern NSString* ORGretina4AOverflowFlagChan7Changed;
-extern NSString* ORGretina4AOverflowFlagChan8Changed;
-extern NSString* ORGretina4AOverflowFlagChan9Changed;
+extern NSString* ORGretina4AOverflowFlagChanChanged;
 extern NSString* ORGretina4ATriggerConfigChanged;
 extern NSString* ORGretina4APhaseErrorCountChanged;
 extern NSString* ORGretina4APhaseStatusChanged;
