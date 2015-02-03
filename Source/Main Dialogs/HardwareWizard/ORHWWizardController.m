@@ -1585,7 +1585,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				}
 				
 				if(numberOfSettableArguments <= 1){
-					if([paramObj useValue]){
+					if([paramObj useValue] || [paramObj oncePerCard]){
 						//no channels to deal with, just do the action
 						unsigned long chanMask = [wizObject wizMask];
 						if(chanMask & 0xffffffff){									

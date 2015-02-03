@@ -100,7 +100,14 @@
 - (void)setUseValue:(BOOL)flag {
     useValue = flag;
 }
+- (BOOL)oncePerCard {
+    
+    return oncePerCard;
+}
 
+- (void)setOncePerCard:(BOOL)flag {
+    oncePerCard = flag;
+}
 
 - (SEL) selector
 {
