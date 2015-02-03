@@ -2088,6 +2088,7 @@ static struct {
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:YES];
+    [p setOncePerCard:YES];
     [p setName:@"Init"];
     [p setSetMethodSelector:@selector(initBoard:)];
     [a addObject:p];

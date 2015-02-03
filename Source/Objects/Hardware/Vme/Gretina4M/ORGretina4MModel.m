@@ -2315,6 +2315,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
+    [p setOncePerCard:YES];
     [p setName:@"Init"];
     [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
@@ -2327,8 +2328,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     NSMutableArray* a = [NSMutableArray array];
     [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORVmeCrateModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORGretina4M"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORGretina4M"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORGretina4MModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORGretina4MModel"]];
     return a;
 }
 
@@ -2708,11 +2709,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
     NSMutableArray* ar = [NSMutableArray array];
     int i;
-	for(i=0;i<kNumGretina4MChannels;i++){
-		[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
-	}
+	for(i=0;i<kNumGretina4MChannels;i++)[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
     [objDictionary setObject:ar forKey:@"LED Threshold"];
+    
+    [ar removeAllObjects];
+    for(i=0;i<kNumGretina4MChannels;i++)[ar addObject:[NSNumber numberWithLong:trapThreshold[i]]];
     [objDictionary setObject:ar forKey:@"TRAP Threshold"];
+    
     [objDictionary setObject:[NSNumber numberWithInt:downSample]        forKey:@"Down Sample"];
     [objDictionary setObject:[NSNumber numberWithInt:clockSource]       forKey:@"Clock Source"];
     [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier]   forKey:@"Hist E Multiplier"];
