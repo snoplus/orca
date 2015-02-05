@@ -24,14 +24,17 @@
 #define kMcaRunMode			0
 #define kEnergyRunMode		1
 
-#define kSISLed						0x0001L
+#define kSISLed1	0x0001L
+#define kSISLed2	0x0002L
+#define kSISLed3	0x0003L
+
 #define kSIS3305MaxEnergyWaveform	510
 
 #define CSRMask(state,A) ((state)?(A):(A<<16))
 
 
 // Config addresses
-#pragma mark --- Config Registers
+#pragma mark - Config Registers
 
 #define kSIS3305ControlStatus                     0x0	  /* read/write; D32 */
 #define kSIS3305ModID                             0x4	  /* read only; D32 */

@@ -34,7 +34,7 @@ NSString* ORSIS3305ModelTDCMeasurementEnabledChanged    = @"ORSIS3305ModelTDCMea
 NSString* ORSIS3305ModelPulseModeChanged				= @"ORSIS3305ModelPulseModeChanged";
 NSString* ORSIS3305ModelFirmwareVersionChanged			= @"ORSIS3305ModelFirmwareVersionChanged";
 NSString* ORSIS3305ModelBufferWrapEnabledChanged		= @"ORSIS3305ModelBufferWrapEnabledChanged";
-NSString* ORSIS3305ModelCfdControlChanged				= @"ORSIS3305ModelCfdControlChanged";
+//NSString* ORSIS3305ModelCfdControlChanged				= @"ORSIS3305ModelCfdControlChanged";
 NSString* ORSIS3305ModelShipTimeRecordAlsoChanged		= @"ORSIS3305ModelShipTimeRecordAlsoChanged";
 NSString* ORSIS3305ModelMcaUseEnergyCalculationChanged  = @"ORSIS3305ModelMcaUseEnergyCalculationChanged";
 NSString* ORSIS3305ModelMcaEnergyOffsetChanged			= @"ORSIS3305ModelMcaEnergyOffsetChanged";
@@ -79,6 +79,7 @@ NSString* ORSIS3305ExternalGateEnabledChanged	= @"ORSIS3305ExternalGateEnabledCh
 NSString* ORSIS3305ExtendedThresholdEnabledChanged = @"ORSIS3305ExtendedThresholdEnabledChanged";
 
 NSString* ORSIS3305ClockSourceChanged			= @"ORSIS3305ClockSourceChanged";
+NSString* ORSIS3305EventSavingModeChanged		= @"ORSIS3305EventSavingModeChanged";
 NSString* ORSIS3305ChannelEnabledChanged		= @"ORSIS3305ChannelEnabledChanged";
 
 NSString* ORSIS3305RateGroupChangedNotification	= @"ORSIS3305RateGroupChangedNotification";
@@ -87,10 +88,23 @@ NSString* ORSIS3305SettingsLock					= @"ORSIS3305SettingsLock";
 NSString* ORSIS3305TriggerOutEnabledChanged		= @"ORSIS3305TriggerOutEnabledChanged";
 NSString* ORSIS3305HighEnergySuppressChanged	= @"ORSIS3305HighEnergySuppressChanged";
 NSString* ORSIS3305ThresholdChanged				= @"ORSIS3305ThresholdChanged";
+
+NSString* ORSIS3305ThresholdModeChanged         = @"ORSIS3305ThresholdModeChanged";
+
+NSString* ORSIS3305GTThresholdOnChanged         = @"ORSIS3305GTThresholdOnChanged";
+NSString* ORSIS3305GTThresholdOffChanged        = @"ORSIS3305GTThresholdOffChanged";
+NSString* ORSIS3305LTThresholdOnChanged         = @"ORSIS3305LTThresholdOnChanged";
+NSString* ORSIS3305LTThresholdOffChanged        = @"ORSIS3305LTThresholdOffChanged";
+
 NSString* ORSIS3305ThresholdArrayChanged		= @"ORSIS3305ThresholdArrayChanged";
-NSString* ORSIS3305HighThresholdChanged			= @"ORSIS3305HighThresholdChanged";
-NSString* ORSIS3305HighThresholdArrayChanged	= @"ORSIS3305HighThresholdArrayChanged";
-NSString* ORSIS3305GtChanged					= @"ORSIS3305GtChanged";
+//NSString* ORSIS3305HighThresholdChanged			= @"ORSIS3305HighThresholdChanged";
+//NSString* ORSIS3305HighThresholdArrayChanged	= @"ORSIS3305HighThresholdArrayChanged";
+
+NSString* ORSIS3305LTThresholdEnabledChanged    = @"ORSIS3305LTThresholdEnabledChanged";
+NSString* ORSIS3305GTThresholdEnabledChanged    = @"ORSIS3305GTThresholdEnabledChanged";
+
+//NSString* ORSIS3305LtChanged					= @"ORSIS3305LtChanged";
+//NSString* ORSIS3305GtChanged					= @"ORSIS3305GtChanged";
 NSString* ORSIS3305SampleDone					= @"ORSIS3305SampleDone";
 NSString* ORSIS3305IDChanged					= @"ORSIS3305IDChanged";
 NSString* ORSIS3305GateLengthChanged			= @"ORSIS3305GateLengthChanged";
@@ -122,7 +136,7 @@ typedef struct {
 	NSString* name;
 } SIS3305GammaRegisterInformation;
 
-#define kNumSIS3305ReadRegs 93
+#define kNumSIS3305ReadRegs 92
 
 static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs] = {
 	{0x00000,  @"Control/Status"},
@@ -237,7 +251,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     {0x03040,  @"Sampling Status (ADC2 ch5-ch8)"},
     {0x03044,  @"Next Sample Address (ADC2 ch5-ch8)"},
     {0x03048,  @"Direct Memory Event Counter (ADC2 ch5-ch8)"},
-    {0x0304C,  @"Direct Memory ACtual Event Start Address (ADC2 ch5-ch8)"},
+    {0x0304C,  @"Direct Memory Actual Event Start Address (ADC2 ch5-ch8)"},
     
     {0x03050,  @"Actual Sample Value (ADC2 ch5-ch6)"},
     {0x03054,  @"Actual Sample Value (ADC2 ch7-ch8)"},
@@ -259,7 +273,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     self = [super init];
     [[self undoManager] disableUndoRegistration];
     [self setAddressModifier:0x09];
-    [self setBaseAddress:0x08000000];
+    [self setBaseAddress:0x41000000];
     [self initParams];
 	
     [[self undoManager] enableUndoRegistration];
@@ -276,9 +290,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[internalTriggerDelays release];
 	[endAddressThresholds release];
  	[thresholds release];
-	[highThresholds release];
+//	[highThresholds release];
 	
-	[cfdControls release];
+//	[cfdControls release];
     [dacOffsets release];
 	[sumGs release];
 	[sampleLengths release];
@@ -317,11 +331,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 
 #pragma mark - Accessors
-- (BOOL) channelEnabled:(short)chan{
-    return enabled[chan];
-}
 
-
+#pragma mark -- Board Settings
 
 - (int) clockSource
 {
@@ -335,18 +346,436 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ClockSourceChanged object:self];
 }
 
+- (short) eventSavingMode:(short)aGroup
+{
+    return eventSavingMode[aGroup];
+}
+
+- (void) setEventSavingModeOf:(short)aGroup toValue:(short)aMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventSavingModeOf:aGroup toValue:aMode];
+    eventSavingMode[aGroup] = [self limitIntValue:aMode min:0 max:3];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EventSavingModeChanged object:self];
+}
+
 
 - (BOOL) TDCMeasurementEnabled {
     return TDCMeasurementEnabled;
 }
 
 - (void) setTDCMeasurementEnabled: (BOOL)aState {
-
+    
     [[[self undoManager] prepareWithInvocationTarget:self] setPulseMode:TDCMeasurementEnabled];
- 
+    
     TDCMeasurementEnabled = aState;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelTDCMeasurementEnabledChanged object:self];
+}
+
+- (float) firmwareVersion
+{
+    return firmwareVersion;
+}
+
+- (void) setFirmwareVersion:(float)aFirmwareVersion
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFirmwareVersion:firmwareVersion];
+    
+    firmwareVersion = aFirmwareVersion;
+    if(firmwareVersion >= 15.0  && runMode == kMcaRunMode)[self setRunMode:kEnergyRunMode];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelFirmwareVersionChanged object:self];
+}
+
+
+- (BOOL) shipTimeRecordAlso
+{
+    return shipTimeRecordAlso;
+}
+
+- (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipTimeRecordAlso:shipTimeRecordAlso];
+    
+    shipTimeRecordAlso = aShipTimeRecordAlso;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelShipTimeRecordAlsoChanged object:self];
+}
+
+
+#pragma mark -- Group settings
+/*
+ Internal trigger enabling
+ 
+ The internal trigger enable mask is 8-bits, each representing a channel
+ 
+ */
+//- (short) internalTriggerEnabledMask { return internalTriggerEnabledMask; }
+/*
+ Internal trigger enabling
+ 
+ The internal trigger enable mask is 8-bits, each representing a channel
+ 
+ 
+ */
+
+- (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerEnabled:chan withValue:internalTriggerEnabled[chan]];
+    internalTriggerEnabled[chan] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305InternalTriggerEnabledChanged object:self];
+}
+- (BOOL) internalTriggerEnabled:(short)chan { return internalTriggerEnabled[chan]; }
+
+- (short) externalTriggerEnabledMask { return externalTriggerEnabledMask; }
+
+
+
+#pragma mark -- Channel settings
+
+- (BOOL) enabled:(short)chan{
+    return enabled[chan];
+}
+
+- (void) setEnabled:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
+    enabled[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ChannelEnabledChanged object:self userInfo:userInfo];
+}
+
+//- (BOOL) LTThresholdEnabled:(short)aChan;
+//- (BOOL) GTThresholdEnabled:(short)aChan;
+//- (void) setLTThresholdEnabled:(short)aChan withValue:(BOOL)aValue;
+//- (void) setGTThresholdEnabled:(short)aChan withValue:(BOOL)aValue;
+
+- (BOOL) LTThresholdEnabled:(short)aChan{    return LTThresholdEnabled[aChan];}
+- (BOOL) GTThresholdEnabled:(short)aChan{    return GTThresholdEnabled[aChan];}
+
+- (void) setLTThresholdEnabled:(short)aChan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLTThresholdEnabled:aChan withValue:aValue];
+    LTThresholdEnabled[aChan] = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LTThresholdEnabledChanged object:self];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
+
+}
+
+- (void) setGTThresholdEnabled:(short)aChan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setGTThresholdEnabled:aChan withValue:aValue];
+
+    if (aValue<=3 && aValue>=0) {
+        GTThresholdEnabled[aChan] = aValue;
+    }
+    else
+        NSLog(@"That wasn't supposed to happen...");
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdEnabledChanged object:self];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
+
+}
+
+
+//- (short) ltMask { return ltMask; }
+//- (BOOL) lt:(short)chan	 { return ltMask & (1<<chan); }
+//- (void) setLtMask:(long)aMask
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setLtMask:ltMask];
+//    ltMask = aMask;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LtChanged object:self];
+//}
+//
+//- (void) setLtBit:(short)chan withValue:(BOOL)aValue
+//{
+//    unsigned char aMask = ltMask;
+//    if(aValue)aMask |= (1<<chan);
+//    else aMask &= ~(1<<chan);
+//    [self setLtMask:aMask];
+//}
+//
+//- (short) gtMask { return gtMask; }
+//- (BOOL) gt:(short)chan	 { return gtMask & (1<<chan); }
+//- (void) setGtMask:(long)aMask
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setGtMask:gtMask];
+//    gtMask = aMask;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GtChanged object:self];
+//}
+//
+//- (void) setGtBit:(short)chan withValue:(BOOL)aValue
+//{
+//    unsigned char aMask = gtMask;
+//    if(aValue)aMask |= (1<<chan);
+//    else aMask &= ~(1<<chan);
+//    [self setGtMask:aMask];
+//}
+
+- (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax
+{
+    if(aValue<aMin)return aMin;
+    else if(aValue>aMax)return aMax;
+    else return aValue;
+}
+
+//- (int) threshold:(short)aChan { return [[thresholds objectAtIndex:aChan]intValue]; }
+
+
+//- (void) setThreshold:(short)aChan withValue:(int)aValue
+//{
+//    aValue = [self limitIntValue:aValue min:0 max:0x1FFFF];
+//    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
+//    
+//    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+//
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdChanged object:self];
+//    //ORAdcInfoProviding protocol requirement
+//    [self postAdcInfoProvidingValueChanged];
+//}
+
+
+/* 
+    A note on the way threshod modes are implemented
+    threshold mode (thresholdMode) is a composite of which thresholds are enabled (GT, LT, GT&LT, !(GT||LT) ).
+    You may want to set individually which of these is true, or you may just want to set the mode. 
+    In order to encode this correctly for saving,
+ 
+ */
+
+- (short) thresholdMode:(short)chan
+{
+    /*
+        0: Disabled
+        1: GT
+        2: LT
+        3: GT AND LT
+     */
+    
+    BOOL gt = [self GTThresholdEnabled:chan];
+    BOOL lt = [self LTThresholdEnabled:chan];
+    short mode = -1;
+
+    mode = gt + 2*lt;
+    
+//    if (!gt && !lt)
+//        mode = 0;
+//    else if (gt && !lt)
+//        mode = 1;
+//    else if (!gt && lt)
+//        mode = 2;
+//    else if (gt && lt)
+//        mode = 3;
+//    else
+//        mode = -1;
+    
+    
+//    WARNING: THIS MAY NOT WORK RIGHT YET - SJM
+//    if (mode !=thresholdMode[chan]) {
+//        [self setThresholdMode:chan withValue:mode];
+//    }
+    
+    return mode;
+}
+
+- (void) setThresholdMode:(short)chan withValue:(short)aValue
+{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setGTThresholdEnabled:chan withValue:[self GTThresholdEnabled:chan]];
+//    [[[self undoManager] prepareWithInvocationTarget:self] setLTThresholdEnabled:chan withValue:[self LTThresholdEnabled:chan]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setThresholdMode:chan withValue:[self thresholdMode:chan]];
+    
+    thresholdMode[chan] = aValue;
+    switch (aValue) {
+        case 0:
+            [self setGTThresholdEnabled:chan withValue:NO];
+            [self setLTThresholdEnabled:chan withValue:NO];
+            break;
+        case 1:
+            [self setGTThresholdEnabled:chan withValue:YES];
+            [self setLTThresholdEnabled:chan withValue:NO];
+            break;
+        case 2:
+            [self setGTThresholdEnabled:chan withValue:NO];
+            [self setLTThresholdEnabled:chan withValue:YES];
+            break;
+        case 3:
+            [self setGTThresholdEnabled:chan withValue:YES];
+            [self setLTThresholdEnabled:chan withValue:YES];
+            break;
+        default:    // I make the default case to enable both, but we shouldn't get here -SJM
+            [self setGTThresholdEnabled:chan withValue:YES];
+            [self setLTThresholdEnabled:chan withValue:YES];
+            NSLog(@"Threshold mode was somehow set to %d, please report this error!",aValue);
+            break;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
+
+    //ORAdcInfoProviding protocol requirement ?
+    [self postAdcInfoProvidingValueChanged];
+    
+    return;
+}
+
+
+
+- (int) LTThresholdOn:(short)aChan { return LTThresholdOn[aChan]; }
+- (void) setLTThresholdOn:(short)aChan withValue:(int)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0x3FF];
+    [[[self undoManager] prepareWithInvocationTarget:self] setLTThresholdOn:aChan withValue:[self LTThresholdOn:aChan]];
+    
+    LTThresholdOn[aChan] = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LTThresholdOnChanged object:self];
+    //ORAdcInfoProviding protocol requirement
+    [self postAdcInfoProvidingValueChanged];
+}
+
+- (int) LTThresholdOff:(short)aChan { return LTThresholdOff[aChan]; }
+- (void) setLTThresholdOff:(short)aChan withValue:(int)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0x3FF];
+    [[[self undoManager] prepareWithInvocationTarget:self] setLTThresholdOff:aChan withValue:[self LTThresholdOff:aChan]];
+    
+    LTThresholdOff[aChan] = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LTThresholdOffChanged object:self];
+    //ORAdcInfoProviding protocol requirement
+    [self postAdcInfoProvidingValueChanged];
+}
+
+- (int) GTThresholdOn:(short)aChan { return GTThresholdOn[aChan]; }
+- (void) setGTThresholdOn:(short)aChan withValue:(int)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0x3FF];
+    [[[self undoManager] prepareWithInvocationTarget:self] setGTThresholdOn:aChan withValue:[self GTThresholdOn:aChan]];
+    
+    GTThresholdOn[aChan] = aValue;
+//    [GTThresholdOn replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdOnChanged object:self];
+    //ORAdcInfoProviding protocol requirement
+    [self postAdcInfoProvidingValueChanged];
+}
+
+- (int) GTThresholdOff:(short)aChan { return GTThresholdOff[aChan]; }
+- (void) setGTThresholdOff:(short)aChan withValue:(int)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0x3FF];
+    [[[self undoManager] prepareWithInvocationTarget:self] setGTThresholdOff:aChan withValue:[self GTThresholdOff:aChan]];
+    
+    GTThresholdOff[aChan] = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdOffChanged object:self];
+    //ORAdcInfoProviding protocol requirement
+    [self postAdcInfoProvidingValueChanged];
+}
+
+//- (int) highThreshold:(short)aChan { return [[highThresholds objectAtIndex:aChan]intValue]; }
+//- (void) setHighThreshold:(short)aChan withValue:(int)aValue
+//{
+//    aValue = [self limitIntValue:aValue min:0 max:0x1FFFF];
+//    [[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChan withValue:[self highThreshold:aChan]];
+//    [highThresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305HighThresholdChanged object:self];
+//    //ORAdcInfoProviding protocol requirement
+//    [self postAdcInfoProvidingValueChanged];
+//}
+
+- (unsigned short) gain:(unsigned short) aChan
+{
+    return 0;
+}
+- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain
+{
+}
+//- (BOOL) partOfEvent:(unsigned short)chan
+//{
+////    return (gtMask & (1L<<chan)) != 0;
+//}
+
+//- (BOOL)onlineMaskBit:(int)bit
+//{
+//    //translate back to the triggerEnabled Bit
+////    return (gtMask & (1L<<bit)) != 0;
+//}
+
+- (unsigned short) sampleLength:(short)aChan {
+    return [[sampleLengths objectAtIndex:aChan] unsignedShortValue];
+}
+
+- (void) setSampleLength:(short)aChan withValue:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
+    aValue = [self limitIntValue:aValue min:4 max:0xfffc];
+    aValue = (aValue/4)*4;
+    [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [self calculateSampleValues];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SampleLengthChanged object:self];
+}
+
+- (unsigned short) dacOffset:(short)aChan { return [[dacOffsets objectAtIndex:aChan]intValue]; }
+- (void) setDacOffset:(short)aChan withValue:(int)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0xffff];
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacOffset:aChan withValue:[self dacOffset:aChan]];
+    [dacOffsets replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305DacOffsetChanged object:self];
+}
+
+- (short) gateLength:(short)aChan { return [[gateLengths objectAtIndex:aChan] shortValue]; }
+- (void) setGateLength:(short)aChan withValue:(short)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0x3f];
+    [[[self undoManager] prepareWithInvocationTarget:self] setGateLength:aChan withValue:[self gateLength:aChan]];
+    [gateLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GateLengthChanged object:self];
+}
+
+- (short) pulseLength:(short)aChan { return [[pulseLengths objectAtIndex:aChan] shortValue]; }
+- (void) setPulseLength:(short)aChan withValue:(short)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:0xff];
+    [[[self undoManager] prepareWithInvocationTarget:self] setPulseLength:aChan withValue:[self pulseLength:aChan]];
+    [pulseLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305PulseLengthChanged object:self];
+}
+
+- (short) sumG:(short)aChan { return [[sumGs objectAtIndex:aChan] shortValue]; }
+- (void) setSumG:(short)aChan withValue:(short)aValue
+{
+    short temp = [self peakingTime:aChan];
+    aValue = [self limitIntValue:aValue min:0 max:0x3ff];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSumG:aChan withValue:[self sumG:aChan]];
+    if (aValue < temp) aValue = temp;
+    [sumGs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SumGChanged object:self];
+}
+
+- (short) peakingTime:(short)aChan { return [[peakingTimes objectAtIndex:aChan] shortValue]; }
+- (void) setPeakingTime:(short)aChan withValue:(short)aValue
+{
+    short temp = [self sumG:aChan];
+    aValue = [self limitIntValue:aValue min:0 max:0x3ff];
+    [[[self undoManager] prepareWithInvocationTarget:self] setPeakingTime:aChan withValue:[self peakingTime:aChan]];
+    if (temp < aValue) [self setSumG:aChan withValue:aValue];
+    [peakingTimes replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305PeakingTimeChanged object:self];
+}
+
+
+- (short) internalTriggerDelay:(short)aChan { return [[internalTriggerDelays objectAtIndex:aChan] shortValue]; }
+- (void) setInternalTriggerDelay:(short)aChan withValue:(short)aValue
+{
+    aValue = [self limitIntValue:aValue min:0 max:firmwareVersion<15?63:255];
+    [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerDelay:aChan withValue:[self internalTriggerDelay:aChan]];
+    
+    
+    [internalTriggerDelays replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305InternalTriggerDelayChanged object:self];
+    
+    //force a constraint check by reloading the pretrigger delay
+    [self setPreTriggerDelay:aChan/2 withValue:[self preTriggerDelay:aChan/2]];
 }
 
 
@@ -354,6 +783,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 
 
+#pragma mark -- Unsorted 
 - (BOOL) pulseMode
 {
     return pulseMode;
@@ -368,140 +798,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelPulseModeChanged object:self];
 }
 
-- (float) firmwareVersion
-{
-    return firmwareVersion;
-}
-
-- (void) setFirmwareVersion:(float)aFirmwareVersion
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFirmwareVersion:firmwareVersion];
-    
-    firmwareVersion = aFirmwareVersion;
-	if(firmwareVersion >= 15.0  && runMode == kMcaRunMode)[self setRunMode:kEnergyRunMode];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelFirmwareVersionChanged object:self];
-}
-
-- (BOOL) shipTimeRecordAlso
-{
-    return shipTimeRecordAlso;
-}
-
-- (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setShipTimeRecordAlso:shipTimeRecordAlso];
-    
-    shipTimeRecordAlso = aShipTimeRecordAlso;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelShipTimeRecordAlsoChanged object:self];
-}
-
-//- (BOOL) mcaUseEnergyCalculation {
-//    return mcaUseEnergyCalculation;
-//}
-
-//- (void) setMcaUseEnergyCalculation:(BOOL)aMcaUseEnergyCalculation
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaUseEnergyCalculation:mcaUseEnergyCalculation];
-//    mcaUseEnergyCalculation = aMcaUseEnergyCalculation;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaUseEnergyCalculationChanged object:self];
-//}
-
-//- (int) mcaEnergyOffset { return mcaEnergyOffset; }
-
-//- (void) setMcaEnergyOffset:(int)aMcaEnergyOffset
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaEnergyOffset:mcaEnergyOffset];
-//	mcaEnergyOffset = [self limitIntValue:aMcaEnergyOffset min:0 max:0xfffff];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaEnergyOffsetChanged object:self];
-//}
-
-//- (int) mcaEnergyMultiplier { return mcaEnergyMultiplier; }
-
-//- (void) setMcaEnergyMultiplier:(int)aMcaEnergyMultiplier
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaEnergyMultiplier:mcaEnergyMultiplier];
-//	mcaEnergyMultiplier = [self limitIntValue:aMcaEnergyMultiplier min:0 max:0xffff];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaEnergyMultiplierChanged object:self];
-//}
-
-//- (int) mcaEnergyDivider { return mcaEnergyDivider; }
-
-//- (void) setMcaEnergyDivider:(int)aMcaEnergyDivider
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaEnergyDivider:mcaEnergyDivider];
-//	mcaEnergyDivider = [self limitIntValue:aMcaEnergyDivider min:1 max:16];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaEnergyDividerChanged object:self];
-//}
-
-//- (int) mcaMode { return mcaMode; }
-
-//- (void) setMcaMode:(int)aMcaMode
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaMode:mcaMode];
-//    mcaMode = aMcaMode;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaModeChanged object:self];
-//}
-
-//- (BOOL) mcaPileupEnabled { return mcaPileupEnabled; }
-
-//- (void) setMcaPileupEnabled:(BOOL)aMcaPileupEnabled
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaPileupEnabled:mcaPileupEnabled];
-//    mcaPileupEnabled = aMcaPileupEnabled;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaPileupEnabledChanged object:self];
-//}
-
-//- (int) mcaHistoSize {
-//    return mcaHistoSize;
-//}
-
-//- (void) setMcaHistoSize:(int)aMcaHistoSize
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaHistoSize:mcaHistoSize];
-//    mcaHistoSize = aMcaHistoSize;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaHistoSizeChanged object:self];
-//}
-
-//- (unsigned long) mcaNofScansPreset { return mcaNofScansPreset; }
-//- (void) setMcaNofScansPreset:(unsigned long)aMcaNofScansPreset
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaNofScansPreset:mcaNofScansPreset];
-//    mcaNofScansPreset = aMcaNofScansPreset;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaNofScansPresetChanged object:self];
-//}
-//
-//- (BOOL) mcaAutoClear { return mcaAutoClear; }
-//- (void) setMcaAutoClear:(BOOL)aMcaAutoClear
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaAutoClear:mcaAutoClear];
-//    mcaAutoClear = aMcaAutoClear;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaAutoClearChanged object:self];
-//}
-//
-//- (unsigned long) mcaPrescaleFactor { return mcaPrescaleFactor; }
-//- (void) setMcaPrescaleFactor:(unsigned long)aMcaPrescaleFactor
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaPrescaleFactor:mcaPrescaleFactor];
-//    mcaPrescaleFactor = aMcaPrescaleFactor;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaPrescaleFactorChanged object:self];
-//}
-//
-//- (BOOL) mcaLNESetup { return mcaLNESetup; }
-//- (void) setMcaLNESetup:(BOOL)aMcaLNESetup
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaLNESetup:mcaLNESetup];
-//    mcaLNESetup = aMcaLNESetup;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaLNESetupChanged object:self];
-//}
-//
-//- (unsigned long) mcaNofHistoPreset { return mcaNofHistoPreset; }
-//- (void) setMcaNofHistoPreset:(unsigned long)aMcaNofHistoPreset
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setMcaNofHistoPreset:mcaNofHistoPreset];
-//    mcaNofHistoPreset = aMcaNofHistoPreset;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelMcaNofHistoPresetChanged object:self];
-//}
 
 - (BOOL) internalExternalTriggersOred {
     return internalExternalTriggersOred;
@@ -795,11 +1091,17 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	int i;
 	for(i=0;i<kNumSIS3305Channels;i++){
 		[self setThreshold:i withValue:0x64];
-		[self setHighThreshold:i withValue:0x0];
+//		[self setHighThreshold:i withValue:0x0];
 		[self setPeakingTime:i withValue:250];
 		[self setSumG:i withValue:263];
 		[self setInternalTriggerDelay:i withValue:0];
 		[self setDacOffset:i withValue:30000];
+        [self setLTThresholdEnabled:i withValue:YES];
+        [self setGTThresholdEnabled:i withValue:YES];
+        [self setLTThresholdOff:i withValue:1023];
+        [self setLTThresholdOn:i withValue:1023];
+        [self setGTThresholdOff:i withValue:1023];
+        [self setGTThresholdOn:i withValue:1023];
 	}
 	for(i=0;i<kNumSIS3305Groups;i++){
 		[self setSampleLength:i withValue:2048];
@@ -810,11 +1112,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		[self setSampleStartIndex:i withValue:0];
 		[self setEnergyPeakingTime:i withValue:100];
 		[self setEnergyGapTime:i withValue:25];
+        [self setInternalTriggerEnabled:i withValue:YES];
 	}
 	
 	[self setShipEnergyWaveform:NO];
 	[self setShipSummedWaveform:NO];
-	[self setGtMask:0xff];
 	[self setTriggerOutEnabledMask:0x0];
 	[self setHighEnergySuppressMask:0x0];
 	[self setInputInvertedMask:0x0];
@@ -824,7 +1126,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self setExtendedThresholdEnabledMask:0x00];
 	
 	[self setBufferWrapEnabledMask:0x0];
-	[self setInternalTriggerEnabledMask:0xff];
 	[self setExternalTriggerEnabledMask:0x0];
 	
 }
@@ -857,7 +1158,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) initParams
 {
 	[self setUpArrays];
-	[self setDefaults];
+//	[self setDefaults];
 }
 
 - (void) setRateIntegrationTime:(double)newIntegrationTime
@@ -901,24 +1202,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	}
 }
 
-- (short) internalTriggerEnabledMask { return internalTriggerEnabledMask; }
-- (void) setInternalTriggerEnabledMask:(short)aMask
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerEnabledMask:internalTriggerEnabledMask];
-	internalTriggerEnabledMask = aMask;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305InternalTriggerEnabledChanged object:self];
-}
 
-- (BOOL) internalTriggerEnabled:(short)chan { return internalTriggerEnabledMask & (1<<chan); }
-- (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
-{
-	unsigned char aMask = internalTriggerEnabledMask;
-	if(aValue)aMask |= (1<<chan);
-	else aMask &= ~(1<<chan);
-	[self setInternalTriggerEnabledMask:aMask];
-}
-
-- (short) externalTriggerEnabledMask { return externalTriggerEnabledMask; }
 - (void) setExternalTriggerEnabledMask:(short)aMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setExternalTriggerEnabledMask:externalTriggerEnabledMask];
@@ -1107,167 +1391,30 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	}
 }
 
-- (short) gtMask { return gtMask; }
-- (BOOL) gt:(short)chan	 { return gtMask & (1<<chan); }
-- (void) setGtMask:(long)aMask	
-{ 
-	[[[self undoManager] prepareWithInvocationTarget:self] setGtMask:gtMask];
-	gtMask = aMask;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GtChanged object:self];
-}
-
-- (void) setGtBit:(short)chan withValue:(BOOL)aValue		
-{ 
-	unsigned char aMask = gtMask;
-	if(aValue)aMask |= (1<<chan);
-	else aMask &= ~(1<<chan);
-	[self setGtMask:aMask];
-}
-
-- (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax
-{
-	if(aValue<aMin)return aMin;
-	else if(aValue>aMax)return aMax;
-	else return aValue;
-}
-
-- (int) threshold:(short)aChan { return [[thresholds objectAtIndex:aChan]intValue]; }
-- (void) setThreshold:(short)aChan withValue:(int)aValue 
-{ 
-	aValue = [self limitIntValue:aValue min:0 max:0x1FFFF];
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
-    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdChanged object:self];
-	//ORAdcInfoProviding protocol requirement
-	[self postAdcInfoProvidingValueChanged];
-}
-
-- (int) highThreshold:(short)aChan { return [[highThresholds objectAtIndex:aChan]intValue]; }
-- (void) setHighThreshold:(short)aChan withValue:(int)aValue
-{
-	aValue = [self limitIntValue:aValue min:0 max:0x1FFFF];
-	[[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChan withValue:[self highThreshold:aChan]];
-	[highThresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305HighThresholdChanged object:self];
-	//ORAdcInfoProviding protocol requirement
-	[self postAdcInfoProvidingValueChanged];
-}
-
-- (unsigned short) gain:(unsigned short) aChan
-{
-    return 0;
-}
-- (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain
-{
-}
-- (BOOL) partOfEvent:(unsigned short)chan
-{
-	return (gtMask & (1L<<chan)) != 0;
-}
-- (BOOL)onlineMaskBit:(int)bit
-{
-	//translate back to the triggerEnabled Bit
-	return (gtMask & (1L<<bit)) != 0;
-}
-
-- (unsigned short) sampleLength:(short)aChan {
-    return [[sampleLengths objectAtIndex:aChan] unsignedShortValue];
-}
-
-- (void) setSampleLength:(short)aChan withValue:(int)aValue 
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
-	aValue = [self limitIntValue:aValue min:4 max:0xfffc];
-	aValue = (aValue/4)*4;
-    [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-	[self calculateSampleValues];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SampleLengthChanged object:self];
-}
-
-- (unsigned short) dacOffset:(short)aChan { return [[dacOffsets objectAtIndex:aChan]intValue]; }
-- (void) setDacOffset:(short)aChan withValue:(int)aValue 
-{
-	aValue = [self limitIntValue:aValue min:0 max:0xffff];
-    [[[self undoManager] prepareWithInvocationTarget:self] setDacOffset:aChan withValue:[self dacOffset:aChan]];
-    [dacOffsets replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305DacOffsetChanged object:self];
-}
-
-- (short) gateLength:(short)aChan { return [[gateLengths objectAtIndex:aChan] shortValue]; }
-- (void) setGateLength:(short)aChan withValue:(short)aValue 
-{ 
-	aValue = [self limitIntValue:aValue min:0 max:0x3f];
-    [[[self undoManager] prepareWithInvocationTarget:self] setGateLength:aChan withValue:[self gateLength:aChan]];
-    [gateLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GateLengthChanged object:self];
-}
-
-- (short) pulseLength:(short)aChan { return [[pulseLengths objectAtIndex:aChan] shortValue]; }
-- (void) setPulseLength:(short)aChan withValue:(short)aValue 
-{ 
-	aValue = [self limitIntValue:aValue min:0 max:0xff];
-    [[[self undoManager] prepareWithInvocationTarget:self] setPulseLength:aChan withValue:[self pulseLength:aChan]];
-    [pulseLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305PulseLengthChanged object:self];
-}
-
-- (short) sumG:(short)aChan { return [[sumGs objectAtIndex:aChan] shortValue]; }
-- (void) setSumG:(short)aChan withValue:(short)aValue 
-{ 
-	short temp = [self peakingTime:aChan];
-	aValue = [self limitIntValue:aValue min:0 max:0x3ff];
-    [[[self undoManager] prepareWithInvocationTarget:self] setSumG:aChan withValue:[self sumG:aChan]];
-	if (aValue < temp) aValue = temp;
-    [sumGs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SumGChanged object:self];
-}
-
-- (short) peakingTime:(short)aChan { return [[peakingTimes objectAtIndex:aChan] shortValue]; }
-- (void) setPeakingTime:(short)aChan withValue:(short)aValue 
-{ 
-	short temp = [self sumG:aChan];
-	aValue = [self limitIntValue:aValue min:0 max:0x3ff];
-    [[[self undoManager] prepareWithInvocationTarget:self] setPeakingTime:aChan withValue:[self peakingTime:aChan]];
-	if (temp < aValue) [self setSumG:aChan withValue:aValue];
-    [peakingTimes replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305PeakingTimeChanged object:self];
-}
 
 
-- (short) internalTriggerDelay:(short)aChan { return [[internalTriggerDelays objectAtIndex:aChan] shortValue]; }
-- (void) setInternalTriggerDelay:(short)aChan withValue:(short)aValue 
-{ 
-	aValue = [self limitIntValue:aValue min:0 max:firmwareVersion<15?63:255];
-    [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerDelay:aChan withValue:[self internalTriggerDelay:aChan]];
-	
 
-    [internalTriggerDelays replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305InternalTriggerDelayChanged object:self];
-
-	//force a constraint check by reloading the pretrigger delay
-	[self setPreTriggerDelay:aChan/2 withValue:[self preTriggerDelay:aChan/2]];
-}
-
-
-- (short) cfdControl:(short)aChannel 
-{ 
-	if(aChannel>=kNumSIS3305Channels)return 0;
-	return [[cfdControls objectAtIndex:aChannel] intValue]; 
-}
-- (void) setCfdControl:(short)aChannel withValue:(short)aValue 
-{ 
- 	if(aChannel>=kNumSIS3305Channels)return;
-	[[[self undoManager] prepareWithInvocationTarget:self] setCfdControl:aChannel withValue:[self cfdControl:aChannel]];
-    int cfd = [self limitIntValue:aValue min:0 max:0x3];
-	[cfdControls replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:cfd]];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelCfdControlChanged object:self];
-}
+//- (short) cfdControl:(short)aChannel 
+//{ 
+//	if(aChannel>=kNumSIS3305Channels)return 0;
+//	return [[cfdControls objectAtIndex:aChannel] intValue]; 
+//}
+//- (void) setCfdControl:(short)aChannel withValue:(short)aValue 
+//{ 
+// 	if(aChannel>=kNumSIS3305Channels)return;
+//	[[[self undoManager] prepareWithInvocationTarget:self] setCfdControl:aChannel withValue:[self cfdControl:aChannel]];
+//    int cfd = [self limitIntValue:aValue min:0 max:0x3];
+//	[cfdControls replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:cfd]];
+//	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelCfdControlChanged object:self];
+//}
+//
 
 - (short) energyDecimation:(short)aGroup 
 { 
 	if(aGroup>=kNumSIS3305Groups)return 0;
 	return [[energyDecimations objectAtIndex:aGroup] intValue]; 
 }
+
 - (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue 
 { 
  	if(aGroup>=kNumSIS3305Groups)return;
@@ -1486,23 +1633,40 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return (unsigned long) -1;
 }
 
-- (unsigned long) getThresholdRegOffsets:(int) channel 
+- (unsigned long) getGTThresholdRegOffsets:(int) channel
 {
-//    switch (channel) {
-//        case 0: return 	kSIS3305TriggerThresholdAdc1;
-//		case 1: return 	kSIS3305TriggerThresholdAdc2;
-//		case 2: return 	kSIS3305TriggerThresholdAdc3;
-//		case 3: return 	kSIS3305TriggerThresholdAdc4;
-//		case 4:	return 	kSIS3305TriggerThresholdAdc5;
-//		case 5: return 	kSIS3305TriggerThresholdAdc6;
-//		case 6: return 	kSIS3305TriggerThresholdAdc7;
-//		case 7: return 	kSIS3305TriggerThresholdAdc8;
-//    }
+//    "Greater than"-threshold registers
+    switch (channel) {
+        case 0: return 	kSIS3305TriggerGateGTThresholdsADC1;
+        case 1: return 	kSIS3305TriggerGateGTThresholdsADC2;
+        case 2: return 	kSIS3305TriggerGateGTThresholdsADC3;
+        case 3: return 	kSIS3305TriggerGateGTThresholdsADC4;
+        case 4:	return 	kSIS3305TriggerGateGTThresholdsADC5;
+        case 5: return 	kSIS3305TriggerGateGTThresholdsADC6;
+        case 6: return 	kSIS3305TriggerGateGTThresholdsADC7;
+        case 7: return 	kSIS3305TriggerGateGTThresholdsADC8;
+    }
     return (unsigned long) -1;
 }
 
-- (unsigned long) getHighThresholdRegOffsets:(int) channel 
+- (unsigned long) getLTThresholdRegOffsets:(int) channel
 {
+//  "Less than"-threshold registers
+    switch (channel) {
+        case 0: return 	kSIS3305TriggerGateLTThresholdsADC1;
+        case 1: return 	kSIS3305TriggerGateLTThresholdsADC2;
+        case 2: return 	kSIS3305TriggerGateLTThresholdsADC3;
+        case 3: return 	kSIS3305TriggerGateLTThresholdsADC4;
+        case 4:	return 	kSIS3305TriggerGateLTThresholdsADC5;
+        case 5: return 	kSIS3305TriggerGateLTThresholdsADC6;
+        case 6: return 	kSIS3305TriggerGateLTThresholdsADC7;
+        case 7: return 	kSIS3305TriggerGateLTThresholdsADC8;
+    }
+    return (unsigned long) -1;
+}
+
+//- (unsigned long) getHighThresholdRegOffsets:(int) channel 
+//{
 //    switch (channel) {
 //        case 0: return 	kSIS3305HighEnergyThresholdAdc1;
 //		case 1: return 	kSIS3305HighEnergyThresholdAdc2;
@@ -1513,8 +1677,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //		case 6: return 	kSIS3305HighEnergyThresholdAdc7;
 //		case 7: return 	kSIS3305HighEnergyThresholdAdc8;
 //    }
-    return (unsigned long) -1;
-}
+//    return (unsigned long) -1;
+//}
 
 - (unsigned long) getExtendedThresholdRegOffsets:(int) channel 
 {
@@ -1601,12 +1765,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (unsigned long) getEventConfigOffsets:(int)group
 {
-//	switch (group) {
-//		case 0: return kSIS3305EventConfigAdc12;
-//		case 1: return kSIS3305EventConfigAdc34;
-//		case 2: return kSIS3305EventConfigAdc56;
-//		case 3: return kSIS3305EventConfigAdc78;
-//	}
+	switch (group) {
+		case 0: return kSIS3305EventConfigADC14;
+		case 1: return kSIS3305EventConfigADC58;
+	}
 	return (unsigned long) -1;
 }
 
@@ -1658,7 +1820,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	return (unsigned long) -1;
 }
 
-#pragma mark - Hardware Access
+#pragma mark - - Hardware Access
+
+#pragma mark Read
 - (void) readModuleID:(BOOL)verbose
 {	
 	unsigned long result = 0;
@@ -1674,10 +1838,345 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self setFirmwareVersion:[s floatValue]];
 	if(verbose){
 		NSLog(@"SIS3305 ID: %x  Firmware:%.2f\n",moduleID,firmwareVersion);
-		if(moduleID != 0x3302)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3302 object is 0x%x HW\n",moduleID);
+		if(moduleID != 0x3305)NSLogColor([NSColor redColor], @"Warning: HW mismatch. 3305 object is 0x%x HW\n",moduleID);
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305IDChanged object:self];
 }
+
+- (unsigned long) acqReg
+{
+    unsigned long aValue = 0;
+    [[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + kSIS3305AcquisitionControl
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return aValue;
+}
+
+- (void) readLTThresholds:(BOOL)verbose
+{
+    int i;
+    if(verbose) NSLog(@"Reading LT Thresholds:\n");
+    
+    for(i =0; i < kNumSIS3305Channels; i++) {
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress: [self baseAddress] + [self getLTThresholdRegOffsets:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            unsigned short onThresh     = (aValue & 0x3FF);
+            unsigned short offThresh    = ((aValue>>16) & 0x3FF);
+            BOOL triggerModeLT          = (aValue>>31) & 0x1;
+            
+            //              NSLog(@"%d: %8s %2s 0x%4x\n",
+//            NSLog(@"LT(%d): 0x%04x  == ",i,aValue);
+//            NSLog(@"%d: %2s 0x%04x\n",
+//                  //                                        triggerDisabled ? "Trig Out Disabled"   : "Trig Out Enabled",
+//                  triggerModeLT   ? "GT enabled"            : "  " ,
+//                  onThresh,
+//                  offThresh);
+            NSLog(@"%d: %2s On:0x%04x Off:0x%04x\n",
+                  i,
+                  triggerModeLT   ? "LT enabled"            : "LT disabled" ,
+                  onThresh,
+                  offThresh);
+        }
+    }
+}
+
+- (void) readGTThresholds:(BOOL)verbose
+{
+    int i;
+    if(verbose) NSLog(@"Reading GT Thresholds:\n");
+    
+    for(i =0; i < kNumSIS3305Channels; i++) {
+        unsigned long aValue;
+        [[self adapter] readLongBlock: &aValue
+                            atAddress: [self baseAddress] + [self getGTThresholdRegOffsets:i]
+                            numToRead: 1
+                           withAddMod: [self addressModifier]
+                        usingAddSpace: 0x01];
+        
+        if(verbose){
+            unsigned short onThresh = (aValue       & 0x3FF);
+            unsigned short offThresh= ((aValue>>16) & 0x3FF);
+            
+            BOOL triggerModeGT    = (aValue>>31) & 0x1;
+            //              NSLog(@"%d: %8s %2s 0x%4x\n",
+            NSLog(@"%d: %2s On:0x%04x Off:0x%04x\n",
+                  i,
+                  triggerModeGT   ? "GT enabled"            : "GT disabled" ,
+                  onThresh,
+                  offThresh);
+        }
+    }
+}
+
+- (void) readThresholds:(BOOL)verbose
+{
+    [self readLTThresholds:verbose];
+    [self readGTThresholds:verbose];
+    
+    return;
+}
+
+//- (void) readHighThresholds:(BOOL)verbose
+//{
+//    int i;
+//    if(verbose) NSLog(@"Reading High Thresholds:\n");
+//    
+//    for(i = 0; i < kNumSIS3305Channels; i++) {
+//        unsigned long aValue;
+//        [[self adapter] readLongBlock: &aValue
+//                            atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
+//                            numToRead: 1
+//                           withAddMod: [self addressModifier]
+//                        usingAddSpace: 0x01];
+//        if(verbose){
+//            unsigned short thresh = (aValue&0xffff);
+//            NSLog(@"%d: 0x%4x\n",i,thresh);
+//        }
+//    }
+//}
+
+- (void) regDump
+{
+    @try {
+        NSFont* font = [NSFont fontWithName:@"Monaco" size:11];
+        NSLogFont(font,@"Reg Dump for SIS3305 (Slot %d)\n",[self slot]);
+        NSLogFont(font,@"-----------------------------------\n");
+        NSLogFont(font,@"[Add Offset]   Value        Name\n");
+        NSLogFont(font,@"-----------------------------------\n");
+        
+        ORCommandList* aList = [ORCommandList commandList];
+        int i;
+        for(i=0;i<kNumSIS3305ReadRegs;i++){
+            [aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + register_information[i].offset
+                                                                   numToRead: 1
+                                                                  withAddMod: [self addressModifier]
+                                                               usingAddSpace: 0x01]];
+        }
+        [self executeCommandList:aList];
+        
+        //if we get here, the results can retrieved in the same order as sent
+        for(i=0;i<kNumSIS3305ReadRegs;i++){
+            NSLogFont(font, @"[0x%08x] 0x%08x    %@\n",register_information[i].offset,[aList longValueForCmd:i],register_information[i].name);
+        }
+        
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3305 Reg Dump FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3305 Reg Dump FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (void) briefReport
+{
+    NSLog(@"Brief Report\n");
+
+    [self readThresholds:YES];
+    //	[self readHighThresholds:YES];
+    unsigned long eventConfig = 0;
+    [[self adapter] readLongBlock:&eventConfig
+                        atAddress:[self baseAddress] + kSIS3305EventConfigADC14
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    NSLog(@"EventConfig: 0x%08x\n",eventConfig);
+    
+    //	unsigned long pretrigger = 0;
+    //	[[self adapter] readLongBlock:&pretrigger
+    //						atAddress:[self baseAddress] + kSIS3305PreTriggerDelayTriggerGateLengthAdc14
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    //
+    //	NSLog(@"pretrigger: 0x%08x\n",pretrigger);
+    
+    //	unsigned long rawDataBufferConfig = 0;
+    //	[[self adapter] readLongBlock:&rawDataBufferConfig
+    //						atAddress:[self baseAddress] + kSIS3305RawDataBufferConfigAdc12
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    //
+    //	NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
+    
+    unsigned long actualNextSampleAddress1 = 0;
+    [[self adapter] readLongBlock:&actualNextSampleAddress1
+                        atAddress:[self baseAddress] + kSIS3305ActualSampleAddressADC14
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
+    
+    unsigned long actualNextSampleAddress2 = 0;
+    [[self adapter] readLongBlock:&actualNextSampleAddress2
+                        atAddress:[self baseAddress] + kSIS3305ActualSampleAddressADC58
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
+    
+    //	unsigned long prevNextSampleAddress1 = 0;
+    //	[[self adapter] readLongBlock:&prevNextSampleAddress1
+    //						atAddress:[self baseAddress] + kSIS3305PreviousBankSampleAddressA
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    //
+    //	NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
+    
+    //	unsigned long prevNextSampleAddress2 = 0;
+    //	[[self adapter] readLongBlock:&prevNextSampleAddress2
+    //						atAddress:[self baseAddress] + kSIS3305PreviousBankSampleAddressAdc2
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    //
+    //	NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
+    
+    //	unsigned long triggerSetup1 = 0;
+    //	[[self adapter] readLongBlock:&triggerSetup1
+    //						atAddress:[self baseAddress] + kSIS3305TriggerSetupAdc1
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    //
+    //	NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
+    
+    //	unsigned long triggerSetup2 = 0;
+    //	[[self adapter] readLongBlock:&triggerSetup2
+    //						atAddress:[self baseAddress] + kSIS3305TriggerSetupAdc2
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    //
+    //	NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
+    
+    //	unsigned long energySetupGP = 0;
+    //	[[self adapter] readLongBlock:&energySetupGP
+    //						atAddress:[self baseAddress] + kSIS3305EnergySetupGPAdc12
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    
+    //	NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
+    
+    //	unsigned long EnergyGateLen = 0;
+    //	[[self adapter] readLongBlock:&EnergyGateLen
+    //						atAddress:[self baseAddress] + kSIS3305EnergyGateLengthAdc12
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    
+    //	NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
+    
+    //	unsigned long EnergySampleLen = 0;
+    //	[[self adapter] readLongBlock:&EnergySampleLen
+    //						atAddress:[self baseAddress] + kSIS3305EnergySampleLengthAdc12
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    
+    //	NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
+    
+    //	unsigned long EnergySampleStartIndex = 0;
+    //	[[self adapter] readLongBlock:&EnergySampleStartIndex
+    //						atAddress:[self baseAddress] + kSIS3305EnergySampleStartIndex1Adc12
+    //						numToRead:1
+    //					   withAddMod:[self addressModifier]
+    //					usingAddSpace:0x01];
+    
+    //	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
+}
+
+
+//- (void) readMcaStatus
+//{
+//	static unsigned long mcaStatusAddress[kNumMcaStatusRequests] = {
+//		//order is important here....
+//		kSIS3305AcquisitionControl,
+//		kSIS3305McaScanHistogramCounter,
+//		kSIS3305McaMultiScanScanCounter,
+//
+//		kSIS3305McaTriggerStartCounterAdc1,
+//		kSIS3305McaPileupCounterAdc1,
+//		kSIS3305McaEnergy2LowCounterAdc1,
+//		kSIS3305McaEnergy2HighCounterAdc1,
+//
+//		kSIS3305McaTriggerStartCounterAdc2,
+//		kSIS3305McaPileupCounterAdc2,
+//		kSIS3305McaEnergy2LowCounterAdc2,
+//		kSIS3305McaEnergy2HighCounterAdc2,
+//
+//		kSIS3305McaTriggerStartCounterAdc3,
+//		kSIS3305McaPileupCounterAdc3,
+//		kSIS3305McaEnergy2LowCounterAdc3,
+//		kSIS3305McaEnergy2HighCounterAdc3,
+//
+//		kSIS3305McaTriggerStartCounterAdc4,
+//		kSIS3305McaPileupCounterAdc4,
+//		kSIS3305McaEnergy2LowCounterAdc4,
+//		kSIS3305McaEnergy2HighCounterAdc4,
+//
+//		kSIS3305McaTriggerStartCounterAdc5,
+//		kSIS3305McaPileupCounterAdc5,
+//		kSIS3305McaEnergy2LowCounterAdc5,
+//		kSIS3305McaEnergy2HighCounterAdc5,
+//
+//		kSIS3305McaTriggerStartCounterAdc6,
+//		kSIS3305McaPileupCounterAdc6,
+//		kSIS3305McaEnergy2LowCounterAdc6,
+//		kSIS3305McaEnergy2HighCounterAdc6,
+//
+//		kSIS3305McaTriggerStartCounterAdc7,
+//		kSIS3305McaPileupCounterAdc7,
+//		kSIS3305McaEnergy2LowCounterAdc7,
+//		kSIS3305McaEnergy2HighCounterAdc7,
+//
+//		kSIS3305McaTriggerStartCounterAdc8,
+//		kSIS3305McaPileupCounterAdc8,
+//		kSIS3305McaEnergy2LowCounterAdc8,
+//		kSIS3305McaEnergy2HighCounterAdc8
+//		//order is important here....
+//	};
+//	
+//	ORCommandList* aList = [ORCommandList commandList];
+//	int i;
+//	for(i=0;i<kNumMcaStatusRequests;i++){
+//		[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + mcaStatusAddress[i]
+//															   numToRead: 1
+//															  withAddMod: [self addressModifier]
+//														   usingAddSpace: 0x01]];
+//	}
+//	[self executeCommandList:aList];
+//	
+//	//if we get here, the results can retrieved in the same order as sent
+//	for(i=0;i<kNumMcaStatusRequests;i++){
+//		mcaStatusResults[i] = [aList longValueForCmd:i];
+//	}
+//	
+//	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305McaStatusChanged object:self];
+//} 
+
+//- (unsigned long) mcaStatusResult:(int)index
+//{
+//	if(index>=0 && index<kNumMcaStatusRequests){
+//		return mcaStatusResults[index];
+//	}
+//	else return 0;
+//}
+
+
+#pragma mark Write
 
 - (void) writeAcquistionRegister
 {
@@ -1716,15 +2215,38 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 
 
-- (void) setLed:(BOOL)state
+- (void) setLed1:(BOOL)state
 {
-	unsigned long aValue = CSRMask(state,kSISLed);
+    state = state << 0;
+	unsigned long aValue = CSRMask(state,kSISLed1);
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kSIS3305ControlStatus
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
+
+- (void) setLed:(short)ledNum to:(BOOL)state;
+{
+    state = state << 1;
+    unsigned long aValue = CSRMask(state,kSISLed2);
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3305ControlStatus
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) setLedApplicationMode:(BOOL)state
+{
+    unsigned long aValue = CSRMask(state,kSISLed3);
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + kSIS3305ControlStatus
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
 
 - (void) forceTrigger
 {
@@ -1734,114 +2256,143 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+
+    NSLog(@"SIS3305 Trigger forced");
+    return;
 }
 
-
-- (unsigned long) acqReg
-{
- 	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + kSIS3305AcquisitionControl
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	return aValue;
-}
 
 - (void) writeThresholds
-{   
+{
+    [self writeLTThresholds];
+    [self writeGTThresholds];
+}
+
+- (void) writeLTThresholds
+{
 	ORCommandList* aList = [ORCommandList commandList];
 	int i;
 	unsigned long thresholdMask;
-	for(i = 0; i < kNumSIS3305Channels; i++) {
+	for(i = 0; i < kNumSIS3305Channels; i++)
+    {
 		thresholdMask = 0;
-		BOOL trigEnabled   = [self triggerOutEnabled:i];
-		BOOL gtEnabled = [self gt:i];
-		if(!trigEnabled)					  thresholdMask |= (1<<26); //logic is inverted on the hw
-		if(gtEnabled)						  thresholdMask |= (1<<25);
-		if([self extendedThresholdEnabled:i]) thresholdMask |= (1<<23);
-		
-		//------------------------------------------------
-		//only firmware version >= 15xx
-		if([self cfdControl:i] == 0)      thresholdMask |= (0x0 & 0x3) << 20;
-		else if([self cfdControl:i] == 1) thresholdMask |= (0x2 & 0x3) << 20;
-		else if([self cfdControl:i] == 2) thresholdMask |= (0x3 & 0x3) << 20;
-		//------------------------------------------------
-		
-		//------------------------------------------------
-		//only firmware version >= 1512
-		BOOL hesEnabled = [self highEnergySuppress:i];
-		if (hesEnabled)						thresholdMask |= (1<<24);
-		//------------------------------------------------
-		
-		thresholdMask |= ([self threshold:i] & 0xffff)+ 0x10000;
-		
-		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
-													   atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
-													  numToWrite: 1
-													  withAddMod: [self addressModifier]
+
+        thresholdMask |= ([self LTThresholdOn:i]    & 0x3ff)    <<0;
+        thresholdMask |= ([self LTThresholdOff:i]   & 0x3ff)    <<16;
+        thresholdMask |= ([self LTThresholdEnabled:i]&0x1)      <<31;
+        
+        [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+                                                       atAddress: [self baseAddress] + [self getLTThresholdRegOffsets:i]
+                                                      numToWrite: 1
+                                                      withAddMod: [self addressModifier]
                                                    usingAddSpace: 0x01]];
-		if([self extendedThresholdEnabled:i]){
-			unsigned long aThresholdValue = [self threshold:i]+0x2000000;
-			[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
-														   atAddress: [self baseAddress] + [self getExtendedThresholdRegOffsets:i]
-														  numToWrite: 1
-														  withAddMod: [self addressModifier]
-													   usingAddSpace: 0x01]];
-		}
-	}
+    }
+    
 	[self executeCommandList:aList];
+}
+- (void) writeGTThresholds
+{
+    ORCommandList* aList = [ORCommandList commandList];
+    int i;
+    unsigned long thresholdMask;
+    for(i = 0; i < kNumSIS3305Channels; i++)
+    {
+        thresholdMask = 0;
+        
+        thresholdMask |= ([self GTThresholdOn:i]    & 0x3ff)    <<0;
+        thresholdMask |= ([self GTThresholdOff:i]   & 0x3ff)    <<16;
+        thresholdMask |= ([self GTThresholdEnabled:i]&0x1)      <<31;
+
+        [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+                                                       atAddress: [self baseAddress] + [self getGTThresholdRegOffsets:i]
+                                                      numToWrite: 1
+                                                      withAddMod: [self addressModifier]
+                                                   usingAddSpace: 0x01]];
+    }
+    
+    [self executeCommandList:aList];
 }
 
--(void) writeHighThresholds
-{
-	ORCommandList* aList = [ORCommandList commandList];
-	int i;
-	for(i = 0; i < kNumSIS3305Channels; i++) {
-		if(![self extendedThresholdEnabled:i]){
-		unsigned long aThresholdValue = [self highThreshold:i]+0x10000;
-		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
-													   atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
-													  numToWrite: 1
-													  withAddMod: [self addressModifier]
-												   usingAddSpace: 0x01]];
-		}
-		if([self extendedThresholdEnabled:i]){
-		unsigned long aThresholdValue = [self highThreshold:i]+0x2000000;
-		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
-													   atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
-													  numToWrite: 1
-													  withAddMod: [self addressModifier]
-												   usingAddSpace: 0x01]];
-		}
-	}
-	[self executeCommandList:aList];
-}
+//-(void) writeHighThresholds
+//{
+//	ORCommandList* aList = [ORCommandList commandList];
+//	int i;
+//	for(i = 0; i < kNumSIS3305Channels; i++) {
+//		if(![self extendedThresholdEnabled:i]){
+//		unsigned long aThresholdValue = [self highThreshold:i]+0x10000;
+//		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
+//													   atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
+//													  numToWrite: 1
+//													  withAddMod: [self addressModifier]
+//												   usingAddSpace: 0x01]];
+//		}
+//		if([self extendedThresholdEnabled:i]){
+//		unsigned long aThresholdValue = [self highThreshold:i]+0x2000000;
+//		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aThresholdValue
+//													   atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
+//													  numToWrite: 1
+//													  withAddMod: [self addressModifier]
+//												   usingAddSpace: 0x01]];
+//		}
+//	}
+//	[self executeCommandList:aList];
+//}
 
 - (void) writeEventConfiguration
 {
-	//******the extern/internal gates seem to have an inverted logic, so the extern/internal gate matrixes in IB are swapped.
+	//******?the extern/internal gates seem to have an inverted logic, so the extern/internal gate matrixes in IB are swapped.
+    /* 
+        The are two event config registers, one for each channel group. They control the following:
+        [2:0]   - Event saving mode
+        3       unused
+        4       - ADC Gate mode (else trigger mode)
+        5       - Enable global trigger/Gate (synchronous mode)
+        6       - Enable internal trigger/gate (asynchronous mode)
+        7       unused
+        8       - Enable ADC event sampling with next external trigger (TDC) (else with enable)
+        9       - Enable "timestamp clear with sample enable" bit
+        10      - Disable timestamp clear
+        11      unused
+        12      - Grey code enable
+        [14:13] unused
+        15      - ADC memory write via VME test enable
+        16      - Disable "direct memory header" bit
+        17      unused (and apparently Enable "direct memory TDC measurement" bit?)
+        18      - Enable "Direct memory stop arm for trigger after pretrigger delay" bit
+        19      unused
+        [23:20] - ADC event header programmable info bits
+        [31:24] - ADC event header programmable ID bits
+                    24: reads as 0= ADC chip 1, 1= ADC chip 2
+    */
+    
 	int i;
-	unsigned long tempIntGateMask  = internalGateEnabledMask;
-	unsigned long tempExtGateMask  = externalGateEnabledMask;
+//	unsigned long tempIntGateMask  = internalGateEnabledMask;
+//	unsigned long tempExtGateMask  = externalGateEnabledMask;
+    
 	ORCommandList* aList = [ORCommandList commandList];
-	for(i=0;i<kNumSIS3305Channels/2;i++){
+	for(i=0;i<kNumSIS3305Groups;i++){
 		unsigned long aValueMask = 0x0;
-		aValueMask |= ((internalTriggerEnabledMask & (1<<(i*2)))!=0)     << 2;
-		aValueMask |= ((internalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 10;
-		
-		aValueMask |= ((externalTriggerEnabledMask & (1<<(i*2)))!=0)     << 3;
-		aValueMask |= ((externalTriggerEnabledMask & (1<<((i*2)+1)))!=0) << 11;
-		
-		aValueMask |= ((tempIntGateMask & (1<<(i*2)))!=0)       << 4;
-		aValueMask |= ((tempIntGateMask & (1<<((i*2)+1)))!=0)   << 12;
-		
-		aValueMask |= ((tempExtGateMask & (1<<(i*2)))!=0)       << 5;
-		aValueMask |= ((tempExtGateMask & (1<<((i*2)+1)))!=0)   << 13;
-		
-		aValueMask |= ((inputInvertedMask & (1<<(i*2)))!=0)       << 0;
-		aValueMask |= ((inputInvertedMask & (1<<((i*2)+1)))!=0)   << 8;
-		
+        
+        aValueMask |= (eventSavingMode[i]               & 0x7)    << 0;
+        // bit 3: unused
+        // bit 4 ADC Gate Mode (ERROR: should implement)
+        aValueMask |= (globalTriggerEnabled[i]          & 0x1)    << 5;
+        aValueMask |= ([self internalTriggerEnabled:i]  &0x1)     << 6;
+		// bit 7: unused
+        // bit 8: enable "ADC event sampling with next external trigger" (ERROR: should implement)
+        // bit 9: enable timestamp clear with sample enable (ERROR: should implement)
+        // bit 10: disable timestamp clear (ERROR: should implement)
+        // bit 11: unused
+        // bit 12: Gray code enable (ERROR: should implement)
+        // bit 13,14: unused
+        // bit 15: ADC Memory write via VME Test Enable (ERROR: should implement)
+        // bit 16: Disable "direct memory header" bit (ERROR: should implement)
+        // bit 17: unused
+        // bit 18: Enable "direct memory stop arm for trigger after pretrigger delay" (ERROR: should implement)
+        // bit 19: unused
+        // bit 20-23: ADC event header programmable info bits 0-3
+        // bit 24-31: ADC event header programmable ID bits 0-7
+        
 		[aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
 													   atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
 													  numToWrite: 1
@@ -1862,6 +2413,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self executeCommandList:aList];
 	
 }
+
 
 - (void) writePreTriggerDelayAndTriggerGateDelay
 {
@@ -2075,276 +2627,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	}
 }
 
-- (void) readThresholds:(BOOL)verbose
-{   
-	int i;
-	if(verbose) NSLog(@"Reading Thresholds:\n");
-	
-	for(i =0; i < kNumSIS3305Channels; i++) {
-		unsigned long aValue;
-		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + [self getThresholdRegOffsets:i]
-							numToRead: 1
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-		
-		if(verbose){
-			unsigned short thresh = (aValue&0xffff);
-			BOOL triggerDisabled  = (aValue>>26) & 0x1;
-			BOOL triggerModeGT    = (aValue>>25) & 0x1;
-			NSLog(@"%d: %8s %2s 0x%4x\n",i, triggerDisabled ? "Trig Out Disabled": "Trig Out Enabled",  triggerModeGT?"GT":"  " ,thresh);
-		}
-	}
-}
-
-- (void) readHighThresholds:(BOOL)verbose
-{
-	int i;
-	if(verbose) NSLog(@"Reading High Thresholds:\n");
-	
-	for(i = 0; i < kNumSIS3305Channels; i++) {
-		unsigned long aValue;
-		[[self adapter] readLongBlock: &aValue
-							atAddress: [self baseAddress] + [self getHighThresholdRegOffsets:i]
-							numToRead: 1
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-		if(verbose){
-			unsigned short thresh = (aValue&0xffff);
-			NSLog(@"%d: 0x%4x\n",i,thresh);
-		}
-	}
-}
-
-- (void) regDump
-{
-	@try {
-		NSFont* font = [NSFont fontWithName:@"Monaco" size:11];
-		NSLogFont(font,@"Reg Dump for SIS3305 (Slot %d)\n",[self slot]);
-		NSLogFont(font,@"-----------------------------------\n");
-		NSLogFont(font,@"[Add Offset]   Value        Name\n");
-		NSLogFont(font,@"-----------------------------------\n");
-		
-		ORCommandList* aList = [ORCommandList commandList];
-		int i;
-		for(i=0;i<kNumSIS3305ReadRegs;i++){
-			[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + register_information[i].offset
-																   numToRead: 1
-																  withAddMod: [self addressModifier]
-															   usingAddSpace: 0x01]];
-		}
-		[self executeCommandList:aList];
-		
-		//if we get here, the results can retrieved in the same order as sent
-		for(i=0;i<kNumSIS3305ReadRegs;i++){
-			NSLogFont(font, @"[0x%08x] 0x%08x    %@\n",register_information[i].offset,[aList longValueForCmd:i],register_information[i].name);
-		}
-		
-	}
-	@catch(NSException* localException) {
-        NSLog(@"SIS3305 Reg Dump FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3305 Reg Dump FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (void) briefReport
-{
-	[self readThresholds:YES];
-	[self readHighThresholds:YES];
-	unsigned long EventConfig = 0;
-	[[self adapter] readLongBlock:&EventConfig
-						atAddress:[self baseAddress] + kSIS3305EventConfigADC14
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	NSLog(@"EventConfig: 0x%08x\n",EventConfig);
-	
-//	unsigned long pretrigger = 0;
-//	[[self adapter] readLongBlock:&pretrigger
-//						atAddress:[self baseAddress] + kSIS3305PreTriggerDelayTriggerGateLengthAdc14
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-//	
-//	NSLog(@"pretrigger: 0x%08x\n",pretrigger);
-	
-//	unsigned long rawDataBufferConfig = 0;
-//	[[self adapter] readLongBlock:&rawDataBufferConfig
-//						atAddress:[self baseAddress] + kSIS3305RawDataBufferConfigAdc12
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-//	
-//	NSLog(@"rawDataBufferConfig: 0x%08x\n",rawDataBufferConfig);
-	
-	unsigned long actualNextSampleAddress1 = 0;
-	[[self adapter] readLongBlock:&actualNextSampleAddress1
-						atAddress:[self baseAddress] + kSIS3305ActualSampleAddressADC14
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"actualNextSampleAddress1: 0x%08x\n",actualNextSampleAddress1);
-	
-	unsigned long actualNextSampleAddress2 = 0;
-	[[self adapter] readLongBlock:&actualNextSampleAddress2
-						atAddress:[self baseAddress] + kSIS3305ActualSampleAddressADC58
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];	
-	
-	NSLog(@"actualNextSampleAddress2: 0x%08x\n",actualNextSampleAddress2);
-	
-//	unsigned long prevNextSampleAddress1 = 0;
-//	[[self adapter] readLongBlock:&prevNextSampleAddress1
-//						atAddress:[self baseAddress] + kSIS3305PreviousBankSampleAddressA
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-//	
-//	NSLog(@"prevNextSampleAddress1: 0x%08x\n",prevNextSampleAddress1);
-	
-//	unsigned long prevNextSampleAddress2 = 0;
-//	[[self adapter] readLongBlock:&prevNextSampleAddress2
-//						atAddress:[self baseAddress] + kSIS3305PreviousBankSampleAddressAdc2
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-//	
-//	NSLog(@"prevNextSampleAddress2: 0x%08x\n",prevNextSampleAddress2);
-	
-//	unsigned long triggerSetup1 = 0;
-//	[[self adapter] readLongBlock:&triggerSetup1
-//						atAddress:[self baseAddress] + kSIS3305TriggerSetupAdc1
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-//	
-//	NSLog(@"triggerSetup1: 0x%08x\n",triggerSetup1);
-	
-//	unsigned long triggerSetup2 = 0;
-//	[[self adapter] readLongBlock:&triggerSetup2
-//						atAddress:[self baseAddress] + kSIS3305TriggerSetupAdc2
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-//	
-//	NSLog(@"triggerSetup2: 0x%08x\n",triggerSetup2);
-	
-//	unsigned long energySetupGP = 0;
-//	[[self adapter] readLongBlock:&energySetupGP
-//						atAddress:[self baseAddress] + kSIS3305EnergySetupGPAdc12
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-	
-//	NSLog(@"energySetupGP: 0x%08x\n",energySetupGP);
-	
-//	unsigned long EnergyGateLen = 0;
-//	[[self adapter] readLongBlock:&EnergyGateLen
-//						atAddress:[self baseAddress] + kSIS3305EnergyGateLengthAdc12
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-	
-//	NSLog(@"EnergyGateLen: 0x%08x\n",EnergyGateLen);
-	
-//	unsigned long EnergySampleLen = 0;
-//	[[self adapter] readLongBlock:&EnergySampleLen
-//						atAddress:[self baseAddress] + kSIS3305EnergySampleLengthAdc12
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-	
-//	NSLog(@"EnergySampleLen: 0x%08x\n",EnergySampleLen);
-	
-//	unsigned long EnergySampleStartIndex = 0;
-//	[[self adapter] readLongBlock:&EnergySampleStartIndex
-//						atAddress:[self baseAddress] + kSIS3305EnergySampleStartIndex1Adc12
-//						numToRead:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];	
-	
-//	NSLog(@"EnergySampleStartIndex: 0x%08x\n",EnergySampleStartIndex);
-}
-
-
-//- (void) readMcaStatus
-//{
-//	static unsigned long mcaStatusAddress[kNumMcaStatusRequests] = {
-//		//order is important here....
-//		kSIS3305AcquisitionControl,
-//		kSIS3305McaScanHistogramCounter,
-//		kSIS3305McaMultiScanScanCounter,
-//		
-//		kSIS3305McaTriggerStartCounterAdc1,
-//		kSIS3305McaPileupCounterAdc1,
-//		kSIS3305McaEnergy2LowCounterAdc1,
-//		kSIS3305McaEnergy2HighCounterAdc1,
-//		
-//		kSIS3305McaTriggerStartCounterAdc2,
-//		kSIS3305McaPileupCounterAdc2,
-//		kSIS3305McaEnergy2LowCounterAdc2,
-//		kSIS3305McaEnergy2HighCounterAdc2,
-//		
-//		kSIS3305McaTriggerStartCounterAdc3,
-//		kSIS3305McaPileupCounterAdc3,
-//		kSIS3305McaEnergy2LowCounterAdc3,
-//		kSIS3305McaEnergy2HighCounterAdc3,
-//		
-//		kSIS3305McaTriggerStartCounterAdc4,
-//		kSIS3305McaPileupCounterAdc4,
-//		kSIS3305McaEnergy2LowCounterAdc4,
-//		kSIS3305McaEnergy2HighCounterAdc4,
-//		
-//		kSIS3305McaTriggerStartCounterAdc5,
-//		kSIS3305McaPileupCounterAdc5,
-//		kSIS3305McaEnergy2LowCounterAdc5,
-//		kSIS3305McaEnergy2HighCounterAdc5,
-//		
-//		kSIS3305McaTriggerStartCounterAdc6,
-//		kSIS3305McaPileupCounterAdc6,
-//		kSIS3305McaEnergy2LowCounterAdc6,
-//		kSIS3305McaEnergy2HighCounterAdc6,
-//		
-//		kSIS3305McaTriggerStartCounterAdc7,
-//		kSIS3305McaPileupCounterAdc7,
-//		kSIS3305McaEnergy2LowCounterAdc7,
-//		kSIS3305McaEnergy2HighCounterAdc7,
-//		
-//		kSIS3305McaTriggerStartCounterAdc8,
-//		kSIS3305McaPileupCounterAdc8,
-//		kSIS3305McaEnergy2LowCounterAdc8,
-//		kSIS3305McaEnergy2HighCounterAdc8
-//		//order is important here....
-//	};
-//	
-//	ORCommandList* aList = [ORCommandList commandList];
-//	int i;
-//	for(i=0;i<kNumMcaStatusRequests;i++){
-//		[aList addCommand: [ORVmeReadWriteCommand readLongBlockAtAddress: [self baseAddress] + mcaStatusAddress[i]
-//															   numToRead: 1
-//															  withAddMod: [self addressModifier]
-//														   usingAddSpace: 0x01]];
-//	}
-//	[self executeCommandList:aList];
-//	
-//	//if we get here, the results can retrieved in the same order as sent
-//	for(i=0;i<kNumMcaStatusRequests;i++){
-//		mcaStatusResults[i] = [aList longValueForCmd:i];
-//	}
-//	
-//	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305McaStatusChanged object:self];
-//} 
-
-//- (unsigned long) mcaStatusResult:(int)index
-//{
-//	if(index>=0 && index<kNumMcaStatusRequests){
-//		return mcaStatusResults[index];
-//	}
-//	else return 0;
-//}
 
 - (void) executeCommandList:(ORCommandList*) aList
 {
@@ -2367,7 +2649,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self writeEnergyNumberToSum];
 	[self writeTriggerSetups];
 	[self writeThresholds];
-	[self writeHighThresholds];
+//	[self writeHighThresholds];
 //	[self writeDacOffsets];
 //	[self resetSamplingLogic];
 	[self writeBufferControl];
@@ -2592,9 +2874,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"GT"];
+    [p setName:@"LTThresholdEnabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setGtBit:withValue:) getMethod:@selector(gt:)];
+    [p setSetMethod:@selector(setLTThresholdEnabled:withValue:) getMethod:@selector(LTThresholdEnabled:)];
+    [a addObject:p];
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"GTThresholdEnabled"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setGTThresholdEnabled:withValue:) getMethod:@selector(GTThresholdEnabled:)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -2661,11 +2949,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[p setCanBeRamped:YES];
     [a addObject:p];
 	
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD"];
-    [p setFormat:@"##0" upperLimit:0x2 lowerLimit:0 stepSize:1 units:@"Index"];
-    [p setSetMethod:@selector(setCfdControl:withValue:) getMethod:@selector(cfdControl:)];
-    [a addObject:p];
+//    p = [[[ORHWWizParam alloc] init] autorelease];
+//    [p setName:@"CFD"];
+//    [p setFormat:@"##0" upperLimit:0x2 lowerLimit:0 stepSize:1 units:@"Index"];
+//    [p setSetMethod:@selector(setCfdControl:withValue:) getMethod:@selector(cfdControl:)];
+//    [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Gate Length"];
@@ -2786,8 +3074,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
 	if([param isEqualToString:@"Threshold"])						return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"highThreshold"])				return [[cardDictionary objectForKey:@"highThresholds"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"CFD"])							return [[cardDictionary objectForKey:@"cfdControls"] objectAtIndex:aChannel];
+//	else if([param isEqualToString:@"highThreshold"])				return [[cardDictionary objectForKey:@"highThresholds"] objectAtIndex:aChannel];
+//	else if([param isEqualToString:@"CFD"])							return [[cardDictionary objectForKey:@"cfdControls"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"GateLength"])					return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PulseLength"])					return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"SumG"])						return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
@@ -2841,7 +3129,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self reset];
 	[self initBoard];
 
-	[self setLed:YES];
+	[self setLed1:YES];
 //	[self clearTimeStamp];
 	
 	firstTime	= YES;
@@ -3031,7 +3319,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	
 	[self disarmSampleLogic];
     [waveFormRateGroup stop];
-	[self setLed:NO];
+	[self setLed1:NO];
 	
 	int group;
 	for(group=0;group<kNumSIS3305Groups;group++){
@@ -3125,24 +3413,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 #pragma mark - Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
+    /*
+        These are all the parameters that are saved when a configuration file is saved
+     */
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setPulseMode:[decoder decodeBoolForKey:@"pulseMode"]];
+    [self setPulseMode:                 [decoder decodeBoolForKey:@"pulseMode"]];
     [self setFirmwareVersion:			[decoder decodeFloatForKey:@"firmwareVersion"]];
     [self setShipTimeRecordAlso:		[decoder decodeBoolForKey:@"shipTimeRecordAlso"]];
-//    [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
-//    [self setMcaEnergyOffset:			[decoder decodeIntForKey:@"mcaEnergyOffset"]];
-//    [self setMcaEnergyMultiplier:		[decoder decodeIntForKey:@"mcaEnergyMultiplier"]];
-//    [self setMcaEnergyDivider:			[decoder decodeIntForKey:@"mcaEnergyDivider"]];
-//    [self setMcaMode:					[decoder decodeIntForKey:@"mcaMode"]];
-//    [self setMcaPileupEnabled:			[decoder decodeBoolForKey:@"mcaPileupEnabled"]];
-//    [self setMcaHistoSize:				[decoder decodeIntForKey:@"mcaHistoSize"]];
-//    [self setMcaNofScansPreset:			[decoder decodeInt32ForKey:@"mcaNofScansPreset"]];
-//    [self setMcaAutoClear:				[decoder decodeBoolForKey:@"mcaAutoClear"]];
-//    [self setMcaPrescaleFactor:			[decoder decodeInt32ForKey:@"mcaPrescaleFactor"]];
-//    [self setMcaLNESetup:				[decoder decodeBoolForKey:@"mcaLNESetup"]];
-//    [self setMcaNofHistoPreset:			[decoder decodeInt32ForKey:@"mcaNofHistoPreset"]];
 	
     [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
@@ -3159,20 +3438,35 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self setTriggerOutEnabledMask:		[decoder decodeInt32ForKey:@"triggerOutEnabledMask"]];
 	[self setHighEnergySuppressMask:	[decoder decodeInt32ForKey:@"highEnergySuppressMask"]];
     [self setInputInvertedMask:			[decoder decodeInt32ForKey:@"inputInvertedMask"]];
-    [self setInternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"internalTriggerEnabledMask"]];
+    
+    for (int i=0; i<kNumSIS3305Groups; i++) {
+        [self setInternalTriggerEnabled:i       withValue:[decoder decodeInt32ForKey:@"internalTriggerEnabled"]];
+    }
     [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
     [self setExtendedThresholdEnabledMask:[decoder decodeInt32ForKey:@"extendedThresholdEnabledMask"]];
     [self setInternalGateEnabledMask:	[decoder decodeInt32ForKey:@"internalGateEnabledMask"]];
     [self setExternalGateEnabledMask:	[decoder decodeInt32ForKey:@"externalGateEnabledMask"]];
     [self setAdc50KTriggerEnabledMask:	[decoder decodeInt32ForKey:@"adc50KtriggerEnabledMask"]];
-	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
+//	[self setGtMask:					[decoder decodeIntForKey:@"gtMask"]];
 	[self setShipEnergyWaveform:		[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
 	[self setShipSummedWaveform:		[decoder decodeBoolForKey:@"shipSummedWaveform"]];
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 	
+    // becauase these are set up as c-arrays, we have to step through them
+    for (int chan = 0; chan<kNumSIS3305Channels; chan++)
+    {
+        //threshold mode can't be set directly, since we store the individual LT ang GT enabled with the encoder
+        [self setLTThresholdEnabled:chan    withValue:[decoder decodeIntegerForKey:[@"LTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdEnabled:chan    withValue:[decoder decodeIntegerForKey:[@"GTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
+        [self setLTThresholdOn:chan         withValue:[decoder decodeIntegerForKey:[@"LTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
+        [self setLTThresholdOff:chan        withValue:[decoder decodeIntegerForKey:[@"LTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdOn:chan         withValue:[decoder decodeIntegerForKey:[@"GTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdOff:chan        withValue:[decoder decodeIntegerForKey:[@"GTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
+    }
+    
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
 	thresholds  =				[[decoder decodeObjectForKey:@"thresholds"] retain];
-	highThresholds =			[[decoder decodeObjectForKey:@"highThresholds"] retain];
+//	highThresholds =			[[decoder decodeObjectForKey:@"highThresholds"] retain];
     dacOffsets  =				[[decoder decodeObjectForKey:@"dacOffsets"] retain];
 	gateLengths =				[[decoder decodeObjectForKey:@"gateLengths"] retain];
 	pulseLengths =				[[decoder decodeObjectForKey:@"pulseLengths"] retain];
@@ -3194,8 +3488,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		[self setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
 	}
 	
+//    int aChan;
+//    for (aChan = 0; aChan<kNumSIS3305Channels; aChan++) {
+////        [self setLTThresholdEnabled:aChan withValue:[decoder]]
+
+//    }
+    
 	//firmware 15xx
-    cfdControls =					[[decoder decodeObjectForKey:@"cfdControls"] retain];
+//    cfdControls =					[[decoder decodeObjectForKey:@"cfdControls"] retain];
     [self setBufferWrapEnabledMask:	[decoder decodeInt32ForKey:@"bufferWrapEnabledMask"]];
 	
 	if(!waveFormRateGroup){
@@ -3216,9 +3516,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
+    /*
+        This takes all the things that have been initialized in initWithCoder and writes values to them
+        This should be called when a configuration is saved.
+    */
     [super encodeWithCoder:encoder];
 	
-	[encoder encodeBool:pulseMode forKey:@"pulseMode"];
+	[encoder encodeBool:pulseMode               forKey:@"pulseMode"];
 	[encoder encodeFloat:firmwareVersion		forKey:@"firmwareVersion"];
 	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
 //	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];
@@ -3234,8 +3538,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //	[encoder encodeBool:mcaLNESetup				forKey:@"mcaLNESetup"];
 //	[encoder encodeInt32:mcaNofHistoPreset		forKey:@"mcaNofHistoPreset"];
 	
-	[encoder encodeInt:runMode					forKey:@"runMode"];
-    [encoder encodeInt:gtMask					forKey:@"gtMask"];
+    //channel-level c-arrays:
+    for (int chan=0; chan<kNumSIS3305Channels; chan++) {
+        [encoder encodeInteger:LTThresholdEnabled[chan]		forKey:[@"LTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInteger:GTThresholdEnabled[chan]		forKey:[@"GTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInteger:LTThresholdOn[chan]          forKey:[@"LTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInteger:LTThresholdOff[chan]         forKey:[@"LTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInteger:GTThresholdOn[chan]          forKey:[@"GTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInteger:GTThresholdOff[chan]         forKey:[@"GTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
+
+    }
+    
+    [encoder encodeInt:runMode					forKey:@"runMode"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt:lemoInEnabledMask		forKey:@"lemoInEnabledMask"];
 	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
@@ -3265,7 +3579,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
 	[encoder encodeObject:sampleLengths			forKey:@"sampleLengths"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
-	[encoder encodeObject:highThresholds		forKey:@"highThresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
 	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
 	[encoder encodeObject:pulseLengths			forKey:@"pulseLengths"];
@@ -3278,16 +3591,22 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[encoder encodeObject:triggerDecimations	forKey:@"triggerDecimations"];
 	[encoder encodeObject:energyTauFactors		forKey:@"energyTauFactors"];
 	//firmware 15xx
-	[encoder encodeObject:cfdControls			forKey:@"cfdControls"];
-	[encoder encodeInt32:bufferWrapEnabledMask	forKey:@"bufferWrapEnabledMask"];
+//	[encoder encodeObject:cfdControls			forKey:@"cfdControls"];
+    [encoder encodeInt32:bufferWrapEnabledMask	forKey:@"bufferWrapEnabledMask"];
+
 	
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
+    /* 
+        This dictionary is what gets written to the header of each run data file.
+        The parameters must be included below for the values to show up there.
+     */
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	
-    [objDictionary setObject: [NSNumber numberWithLong:gtMask]						forKey:@"gtMask"];	
+    [objDictionary setObject: [NSNumber numberWithLong:LTThresholdEnabled]			forKey:@"LTThresholdEnabled"];
+    [objDictionary setObject: [NSNumber numberWithLong:GTThresholdEnabled]			forKey:@"GTThresholdEnabled"];
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]					forKey:@"clockSource"];
 	[objDictionary setObject: [NSNumber numberWithLong:adc50KTriggerEnabledMask]	forKey:@"adc50KtriggerEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:triggerOutEnabledMask]		forKey:@"triggerOutEnabledMask"];
@@ -3323,7 +3642,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[objDictionary setObject:sampleLengths		forKey:@"sampleLengths"];
 	[objDictionary setObject: dacOffsets		forKey:@"dacOffsets"];
     [objDictionary setObject: thresholds		forKey:@"thresholds"];	
-    [objDictionary setObject: highThresholds	forKey:@"highThresholds"];	
     [objDictionary setObject: gateLengths		forKey:@"gateLengths"];	
     [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
     [objDictionary setObject: sumGs				forKey:@"sumGs"];	
@@ -3335,7 +3653,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[objDictionary setObject: energyGateLengths		forKey:@"energyGateLengths"];
 	
 	//firmware 15xx
-	[objDictionary setObject: cfdControls		forKey:@"cfdControls"];	
+//	[objDictionary setObject: cfdControls		forKey:@"cfdControls"];	
 	[objDictionary setObject: [NSNumber numberWithLong:bufferWrapEnabledMask]		forKey:@"bufferWrapEnabledMask"];
 	
     return objDictionary;
@@ -3348,10 +3666,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[myTests addObject:[ORVmeWriteOnlyTest test:kSIS3305KeyReset wordSize:4 name:@"Reset"]];
 	//TO DO.. add more tests
 	
-	int i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[myTests addObject:[ORVmeReadWriteTest test:[self getThresholdRegOffsets:i] wordSize:4 validMask:0x1ffff name:@"Threshold"]];
-	}
+//	int i;
+//	for(i=0;i<kNumSIS3305Channels;i++){
+//		[myTests addObject:[ORVmeReadWriteTest test:[self getThresholdRegOffsets:i] wordSize:4 validMask:0x1ffff name:@"Threshold"]];
+//	}
 	return myTests;
 }
 
@@ -3392,8 +3710,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) setUpArrays
 {
+    /*
+        This method allocates memory to these arrays, in case they haven't been allocated yet. 
+        Should be called by initWithCoder
+     */
 	if(!thresholds)				thresholds			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
-	if(!highThresholds)			highThresholds			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
+//	if(!highThresholds)			highThresholds			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!dacOffsets)				dacOffsets			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!gateLengths)			gateLengths			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!pulseLengths)			pulseLengths		  = [[self arrayOfLength:kNumSIS3305Channels] retain];
@@ -3401,7 +3723,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	if(!peakingTimes)			peakingTimes		  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!internalTriggerDelays)	internalTriggerDelays = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!energyTauFactors)		energyTauFactors	  = [[self arrayOfLength:kNumSIS3305Channels] retain];
-	if(!cfdControls)			cfdControls		      = [[self arrayOfLength:kNumSIS3305Channels] retain];
+//	if(!cfdControls)			cfdControls		      = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	
 	if(!sampleLengths)		sampleLengths		= [[self arrayOfLength:kNumSIS3305Groups] retain];
 	if(!preTriggerDelays)	preTriggerDelays	= [[self arrayOfLength:kNumSIS3305Groups] retain];

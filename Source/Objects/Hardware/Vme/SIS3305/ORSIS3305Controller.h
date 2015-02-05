@@ -48,8 +48,20 @@
 	
 	IBOutlet NSButton*		internalExternalTriggersOredCB;
     
-    IBOutlet NSMatrix*		channelEnabledMatrix;
-
+    IBOutlet NSMatrix*		channelEnabled14Matrix;
+    IBOutlet NSMatrix*		channelEnabled58Matrix;
+    IBOutlet NSMatrix*      ledEnabledMatrix;
+    IBOutlet NSMatrix*      ledApplicationModeMatrix;
+    
+    IBOutlet NSMatrix*      GTThresholdOn14Matrix;
+    IBOutlet NSMatrix*      GTThresholdOn58Matrix;
+    IBOutlet NSMatrix*      GTThresholdOff14Matrix;
+    IBOutlet NSMatrix*      GTThresholdOff58Matrix;
+    IBOutlet NSMatrix*      LTThresholdOn14Matrix;
+    IBOutlet NSMatrix*      LTThresholdOn58Matrix;
+    IBOutlet NSMatrix*      LTThresholdOff14Matrix;
+    IBOutlet NSMatrix*      LTThresholdOff58Matrix;
+    
 	IBOutlet NSMatrix*		internalTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		externalTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		extendedThresholdEnabledMatrix;
@@ -77,7 +89,11 @@
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
-	IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSPopUpButton* eventSavingMode14PU;
+    IBOutlet NSPopUpButton* eventSavingMode58PU;
+    IBOutlet NSMatrix*      thresholdMode14PUMatrix;
+    IBOutlet NSMatrix*      thresholdMode58PUMatrix;
 
 	IBOutlet NSMatrix*		inputInvertedMatrix;
 	IBOutlet NSMatrix*		triggerOutEnabledMatrix;
@@ -86,7 +102,7 @@
 	IBOutlet NSMatrix*		gtMatrix;
 	IBOutlet NSMatrix*		dacOffsetMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
-	IBOutlet NSMatrix*		highThresholdMatrix;
+//	IBOutlet NSMatrix*		highThresholdMatrix;
 	IBOutlet NSMatrix*		gateLengthMatrix;
 	IBOutlet NSMatrix*		pulseLengthMatrix;
 	IBOutlet NSMatrix*		sumGMatrix;
@@ -102,6 +118,7 @@
     IBOutlet NSButton*      briefReportButton;
     IBOutlet NSButton*      regDumpButton;
     IBOutlet NSButton*      probeButton;
+    IBOutlet NSButton*      forceTriggerButton;
 	
 	IBOutlet NSPopUpButton*	triggerDecimation0;
 	IBOutlet NSPopUpButton*	triggerDecimation1;
@@ -156,24 +173,12 @@
 - (void) pulseModeChanged:(NSNotification*)aNote;
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) bufferWrapEnabledChanged:(NSNotification*)aNote;
-- (void) cfdControlChanged:(NSNotification*)aNote;
+//- (void) cfdControlChanged:(NSNotification*)aNote;
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote;
-//- (void) mcaEnergyCalculationValues;
-//- (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote;
-//- (void) mcaEnergyOffsetChanged:(NSNotification*)aNote;
-//- (void) mcaEnergyMultiplierChanged:(NSNotification*)aNote;
-//- (void) mcaEnergyDividerChanged:(NSNotification*)aNote;
-//- (void) mcaStatusChanged:(NSNotification*)aNote;
-//- (void) mcaModeChanged:(NSNotification*)aNote;
-//- (void) mcaPileupEnabledChanged:(NSNotification*)aNote;
-//- (void) mcaHistoSizeChanged:(NSNotification*)aNote;
-//- (void) mcaNofScansPresetChanged:(NSNotification*)aNote;
-//- (void) mcaAutoClearChanged:(NSNotification*)aNote;
-//- (void) mcaPrescaleFactorChanged:(NSNotification*)aNote;
-//- (void) mcaLNESetupChanged:(NSNotification*)aNote;
-//- (void) mcaNofHistoPresetChanged:(NSNotification*)aNote;
 
 - (void) channelEnabledChanged:(NSNotification*)aNote;
+- (void) ledEnabledChanged:(NSNotification*)aNote;
+- (void) ledApplicationModeChanged:(NSNotification*)aNote;
 
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
@@ -203,6 +208,9 @@
 - (void) extendedThresholdEnabledChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) eventSavingMode14Changed:(NSNotification*)aNote;
+- (void) eventSavingMode58Changed:(NSNotification*)aNote;
+- (void) thresholdModeChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
@@ -215,9 +223,9 @@
 - (void) highEnergySuppressChanged:(NSNotification*)aNote;
 - (void) inputInvertedChanged:(NSNotification*)aNote;
 - (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote;
-- (void) gtChanged:(NSNotification*)aNote;
+//- (void) gtChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
-- (void) highThresholdChanged:(NSNotification*)aNote;
+//- (void) highThresholdChanged:(NSNotification*)aNote;
 - (void) gateLengthChanged:(NSNotification*)aNote;
 - (void) pulseLengthChanged:(NSNotification*)aNote;
 - (void) sumGChanged:(NSNotification*)aNote;
@@ -277,6 +285,9 @@
 - (IBAction) lemoOutModeAction:(id)sender;
 
 - (IBAction) clockSourceAction:(id)sender;
+- (IBAction) eventSavingMode14Action:(id)sender;
+- (IBAction) eventSavingMode58Action:(id)sender;
+//- (IBAction) thresholdModeAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) initBoard:(id)sender;
@@ -289,9 +300,19 @@
 - (IBAction) inputInvertedAction:(id)sender;
 - (IBAction) triggerOutEnabledAction:(id)sender;
 - (IBAction) highEnergySuppressAction:(id)sender;
-- (IBAction) gtAction:(id)sender;
+//- (IBAction) gtAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
-- (IBAction) highThresholdAction:(id)sender;
+
+- (IBAction) GTThresholdOn14Action:(id)sender;
+- (IBAction) GTThresholdOn58Action:(id)sender;
+- (IBAction) GTThresholdOff14Action:(id)sender;
+- (IBAction) GTThresholdOff58Action:(id)sender;
+- (IBAction) LTThresholdOn14Action:(id)sender;
+- (IBAction) LTThresholdOn58Action:(id)sender;
+- (IBAction) LTThresholdOff14Action:(id)sender;
+- (IBAction) LTThresholdOff58Action:(id)sender;
+
+//- (IBAction) highThresholdAction:(id)sender;
 - (IBAction) gateLengthAction:(id)sender;
 - (IBAction) pulseLengthAction:(id)sender;
 - (IBAction) sumGAction:(id)sender;
@@ -299,6 +320,7 @@
 - (IBAction) internalTriggerDelayAction:(id)sender;
 - (IBAction) briefReport:(id)sender;
 - (IBAction) regDump:(id)sender;
+- (IBAction) forceTriggerAction:(id)sender;
 
 #pragma mark - Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

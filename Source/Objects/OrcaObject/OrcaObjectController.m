@@ -48,8 +48,8 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 {
 	//   commented out this registerNotification because the registerNotification 
 	//   that is done in 'setMode' is sufficifient
-	//   [self registerNotificationObservers];
-     [self updateWindow];	
+    [self registerNotificationObservers];
+    [self updateWindow];
 }
 
 - (void) close

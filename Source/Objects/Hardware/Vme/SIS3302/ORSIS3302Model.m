@@ -3285,7 +3285,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setPulseMode:[decoder decodeBoolForKey:@"pulseMode"]];
+    [self setPulseMode:                 [decoder decodeBoolForKey:@"pulseMode"]];
     [self setFirmwareVersion:			[decoder decodeFloatForKey:@"firmwareVersion"]];
     [self setShipTimeRecordAlso:		[decoder decodeBoolForKey:@"shipTimeRecordAlso"]];
     [self setMcaUseEnergyCalculation:	[decoder decodeBoolForKey:@"mcaUseEnergyCalculation"]];
@@ -3374,8 +3374,8 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	
-	[encoder encodeBool:pulseMode forKey:@"pulseMode"];
+    
+	[encoder encodeBool:pulseMode               forKey:@"pulseMode"];
 	[encoder encodeFloat:firmwareVersion		forKey:@"firmwareVersion"];
 	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
 	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];

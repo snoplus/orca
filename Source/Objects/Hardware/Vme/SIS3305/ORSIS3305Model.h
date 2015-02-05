@@ -39,14 +39,18 @@
     
     BOOL			enabled[kNumSIS3305Channels];
 	//clocks and delays (Acquistion control reg)
-	int	 clockSource;
-    BOOL TDCMeasurementEnabled;
+	int             clockSource;
+    short           eventSavingMode[kNumSIS3305Groups];
+    BOOL            TDCMeasurementEnabled;
+    BOOL            ledEnable[3];
 	
 	unsigned long   lostDataId;
 	unsigned long   dataId;
 	unsigned long   mcaId;
 	
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
+    BOOL            internalTriggerEnabled[kNumSIS3305Groups];
+    BOOL            globalTriggerEnabled[kNumSIS3305Groups];
 	short			internalTriggerEnabledMask; 
 	short			externalTriggerEnabledMask;
 	short			extendedThresholdEnabledMask;
@@ -56,13 +60,24 @@
 	short			triggerOutEnabledMask;
 	short			highEnergySuppressMask;
 	short			adc50KTriggerEnabledMask;
-	short			gtMask;
+//    short			ltMask;
+//    short			gtMask;
 	bool			waitingForSomeChannels;
     short			bufferWrapEnabledMask;
-	
-	NSMutableArray*	cfdControls;
+
+    BOOL    LTThresholdEnabled[kNumSIS3305Channels];
+    BOOL    GTThresholdEnabled[kNumSIS3305Channels];
+    short   thresholdMode[kNumSIS3305Channels];         // this is complicated, since, setting any of these three could change another...
+    
+//	NSMutableArray*	cfdControls;
 	NSMutableArray* thresholds;
-	NSMutableArray* highThresholds;
+    
+    int     GTThresholdOn[kNumSIS3305Channels];
+    int     GTThresholdOff[kNumSIS3305Channels];
+    int     LTThresholdOn[kNumSIS3305Channels];
+    int     LTThresholdOff[kNumSIS3305Channels];
+    
+//	NSMutableArray* highThresholds;
     NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
 	NSMutableArray* pulseLengths;
@@ -140,38 +155,15 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
-- (BOOL) channelEnabled:(short)chan;
+- (BOOL) enabled:(short)chan;
+- (void) setEnabled:(short)chan withValue:(BOOL)aValue;
 - (BOOL) pulseMode;
 - (void) setPulseMode:(BOOL)aPulseMode;
 - (float) firmwareVersion;
 - (void) setFirmwareVersion:(float)aFirmwareVersion;
 - (BOOL) shipTimeRecordAlso;
 - (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso;
-//- (BOOL) mcaUseEnergyCalculation;
-//- (void) setMcaUseEnergyCalculation:(BOOL)aMcaUseEnergyCalculation;
-//- (int) mcaEnergyOffset;
-//- (void) setMcaEnergyOffset:(int)aMcaEnergyOffset;
-//- (int) mcaEnergyMultiplier;
-//- (void) setMcaEnergyMultiplier:(int)aMcaEnergyMultiplier;
-//- (int) mcaEnergyDivider;
-//- (void) setMcaEnergyDivider:(int)aMcaEnergyDivider;
-//- (unsigned long) mcaStatusResult:(int)index;
-//- (int) mcaMode;
-//- (void) setMcaMode:(int)aMcaMode;
-//- (BOOL) mcaPileupEnabled;
-//- (void) setMcaPileupEnabled:(BOOL)aMcaPileupEnabled;
-//- (int) mcaHistoSize;
-//- (void) setMcaHistoSize:(int)aMcaHistoSize;
-//- (unsigned long) mcaNofScansPreset;
-//- (void) setMcaNofScansPreset:(unsigned long)aMcaNofScansPreset;
-//- (BOOL) mcaAutoClear;
-//- (void) setMcaAutoClear:(BOOL)aMcaAutoClear;
-//- (unsigned long) mcaPrescaleFactor;
-//- (void) setMcaPrescaleFactor:(unsigned long)aMcaPrescaleFactor;
-//- (BOOL) mcaLNESetup;
-//- (void) setMcaLNESetup:(BOOL)aMcaLNESetup;
-//- (unsigned long) mcaNofHistoPreset;
-//- (void) setMcaNofHistoPreset:(unsigned long)aMcaNofHistoPreset;
+
 - (BOOL) internalExternalTriggersOred;
 - (void) setInternalExternalTriggersOred:(BOOL)aInternalExternalTriggersOred;
 - (unsigned short) lemoInEnabledMask;
@@ -198,7 +190,8 @@
 - (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue;
 - (int) energyPeakingTime:(short)aGroup;
 - (void) setEnergyPeakingTime:(short)aGroup withValue:(int)aValue;
-- (unsigned long) getThresholdRegOffsets:(int) channel;
+- (unsigned long) getGTThresholdRegOffsets:(int) channel;
+- (unsigned long) getLTThresholdRegOffsets:(int) channel;
 - (unsigned long) getExtendedThresholdRegOffsets:(int) channel;
 - (unsigned long) getTriggerSetupRegOffsets:(int) channel; 
 - (unsigned long) getTriggerExtSetupRegOffsets:(int)channel;
@@ -240,6 +233,9 @@
 
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
+
+- (short) eventSavingMode:(short)aGroup;
+- (void) setEventSavingModeOf:(short)aGroup toValue:(short)aMode;
 
 - (short) bufferWrapEnabledMask;
 - (void) setBufferWrapEnabledMask:(short)aMask;
@@ -298,23 +294,46 @@
 - (void) setShipSummedWaveform:(BOOL)aState;
 - (NSString*) energyBufferAssignment;
 
-- (short) gtMask;
-- (void) setGtMask:(long)aMask;
-- (BOOL) gt:(short)chan;
-- (void) setGtBit:(short)chan withValue:(BOOL)aValue;
+//- (short) ltMask;
+//- (short) gtMask;
+//- (void) setLtMask:(long)aMask;
+//- (void) setGtMask:(long)aMask;
+//- (BOOL) lt:(short)chan;
+//- (BOOL) gt:(short)chan;
+//- (void) setLtBit:(short)chan withValue:(BOOL)aValue;
+//- (void) setGtBit:(short)chan withValue:(BOOL)aValue;
+
 - (short) internalTriggerDelay:(short)chan;
 - (void) setInternalTriggerDelay:(short)chan withValue:(short)aValue;
 - (int) triggerDecimation:(short)aGroup;
 - (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue;
 - (short) energyDecimation:(short)aGroup;
 - (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue;
-- (short) cfdControl:(short)aChannel;
-- (void) setCfdControl:(short)aChannel withValue:(short)aValue;
+//- (short) cfdControl:(short)aChannel;
+//- (void) setCfdControl:(short)aChannel withValue:(short)aValue;
 
-- (int) threshold:(short)chan;
-- (void) setThreshold:(short)chan withValue:(int)aValue;
-- (int) highThreshold:(short)chan;
-- (void) setHighThreshold:(short)chan withValue:(int)aValue;
+- (int) threshold:(short)chan;                  // should be properly removed
+- (void) setThreshold:(short)chan withValue:(int)aValue;    // should be properly removed
+
+- (BOOL) LTThresholdEnabled:(short)aChan;
+- (BOOL) GTThresholdEnabled:(short)aChan;
+- (void) setLTThresholdEnabled:(short)aChan withValue:(BOOL)aValue;
+- (void) setGTThresholdEnabled:(short)aChan withValue:(BOOL)aValue;
+
+- (short) thresholdMode:(short)chan;
+- (void) setThresholdMode:(short)chan withValue:(short)aValue;
+
+- (int) GTThresholdOn:(short)aChan;
+- (void) setGTThresholdOn:(short)aChan withValue:(int)aValue;
+- (int) GTThresholdOff:(short)aChan;
+- (void) setGTThresholdOff:(short)aChan withValue:(int)aValue;
+- (int) LTThresholdOn:(short)aChan;
+- (void) setLTThresholdOn:(short)aChan withValue:(int)aValue;
+- (int) LTThresholdOff:(short)aChan;
+- (void) setLTThresholdOff:(short)aChan withValue:(int)aValue;
+
+//- (int) highThreshold:(short)chan;
+//- (void) setHighThreshold:(short)chan withValue:(int)aValue;
 - (unsigned short) dacOffset:(short)chan;
 - (void) setDacOffset:(short)aChan withValue:(int)aValue;
 - (void) setPulseLength:(short)aChan withValue:(short)aValue;
@@ -337,17 +356,21 @@
 - (void) calculateSampleValues;
 - (void) calculateEnergyGateLength;
 
-#pragma mark --- Hardware Access
+#pragma mark - Hardware Access
 - (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax;
 - (void) initBoard;
 - (void) readModuleID:(BOOL)verbose;
 - (void) writeAcquistionRegister;
 - (void) writeEventConfiguration;
 - (void) writeThresholds;
-- (void) writeHighThresholds;
+//- (void) writeHighThresholds;
+- (void) readLTThresholds:(BOOL)verbose;
+- (void) readGTThresholds:(BOOL)verbose;
 - (void) readThresholds:(BOOL)verbose;
-- (void) readHighThresholds:(BOOL)verbose;
-- (void) setLed:(BOOL)state;
+//- (void) readHighThresholds:(BOOL)verbose;
+- (void) setLed:(short)ledNum to:(BOOL)state;
+
+
 - (void) briefReport;
 - (void) regDump;
 //- (void) resetSamplingLogic;
@@ -431,10 +454,11 @@
 @end
 
 //CSRg
+#pragma mark --- CSR
 extern NSString* ORSIS3305ModelPulseModeChanged;
 extern NSString* ORSIS3305ModelFirmwareVersionChanged;
 extern NSString* ORSIS3305ModelBufferWrapEnabledChanged;
-extern NSString* ORSIS3305ModelCfdControlChanged;
+//extern NSString* ORSIS3305ModelCfdControlChanged;
 extern NSString* ORSIS3305ModelShipTimeRecordAlsoChanged;
 extern NSString* ORSIS3305ModelMcaUseEnergyCalculationChanged;
 extern NSString* ORSIS3305ModelMcaEnergyOffsetChanged;
@@ -474,14 +498,22 @@ extern NSString* ORSIS3305AcqRegChanged;
 extern NSString* ORSIS3305EventConfigChanged;
 
 extern NSString* ORSIS3305ChannelEnabledChanged;
+extern NSString* ORSIS3305ThresholdModeChanged;
+
+extern NSString* ORSIS3305LTThresholdEnabledChanged;
+extern NSString* ORSIS3305GTThresholdEnabledChanged;
+extern NSString* ORSIS3305GTThresholdOnChanged;
+extern NSString* ORSIS3305GTThresholdOffChanged;
+extern NSString* ORSIS3305LTThresholdOnChanged;
+extern NSString* ORSIS3305LTThresholdOffChanged;
 
 extern NSString* ORSIS3305ClockSourceChanged;
 extern NSString* ORSIS3305TriggerOutEnabledChanged;
 extern NSString* ORSIS3305HighEnergySuppressChanged;
 extern NSString* ORSIS3305ThresholdChanged;
 extern NSString* ORSIS3305ThresholdArrayChanged;
-extern NSString* ORSIS3305HighThresholdChanged;
-extern NSString* ORSIS3305HighThresholdArrayChanged;
+//extern NSString* ORSIS3305HighThresholdChanged;
+//extern NSString* ORSIS3305HighThresholdArrayChanged;
 extern NSString* ORSIS3305GtChanged;
 
 extern NSString* ORSIS3305SettingsLock;

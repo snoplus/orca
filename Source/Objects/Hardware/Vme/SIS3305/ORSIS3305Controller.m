@@ -67,14 +67,31 @@
 	[rateFormatter setFormat:@"##0.0;0;-##0.0"];
 	
 	int i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		NSCell* theCell = [thresholdMatrix cellAtRow:i column:0];
-		[theCell setFormatter:numberFormatter];
-	}
-	for(i=0;i<kNumSIS3305Channels;i++){
-		NSCell* theCell = [highThresholdMatrix cellAtRow:i column:0];
-		[theCell setFormatter:numberFormatter];
-	}
+//	for(i=0;i<kNumSIS3305Channels/kNumSIS3305Groups;i++){
+//		NSCell* theCell = [GTThresholdOn14Matrix cellAtRow:i column:0];
+//		[theCell setFormatter:numberFormatter];
+//        theCell = [GTThresholdOn58Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//        theCell = [GTThresholdOff14Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//        theCell = [GTThresholdOff58Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//	}
+//    for(i=0;i<kNumSIS3305Channels/kNumSIS3305Groups;i++){
+//        NSCell* theCell = [LTThresholdOn14Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//        theCell = [LTThresholdOn58Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//        theCell = [LTThresholdOff14Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//        theCell = [LTThresholdOff58Matrix cellAtRow:i column:0];
+//        [theCell setFormatter:numberFormatter];
+//    }
+
+    //	for(i=0;i<kNumSIS3305Channels;i++){
+//		NSCell* theCell = [highThresholdMatrix cellAtRow:i column:0];
+//		[theCell setFormatter:numberFormatter];
+//	}
 	for(i=0;i<kNumSIS3305Channels;i++){
 		NSCell* theCell = [rateTextFields cellAtRow:i column:0];
 		[theCell setFormatter:rateFormatter];
@@ -148,293 +165,262 @@
                      selector : @selector(channelEnabledChanged:)
                          name : ORSIS3305ChannelEnabledChanged
                        object : model];
-    
+
     [notifyCenter addObserver : self
-                     selector : @selector(integrationChanged:)
-                         name : ORRateGroupIntegrationChangedNotification
-                       object : nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerOutEnabledChanged:)
-                         name : ORSIS3305TriggerOutEnabledChanged
+                     selector : @selector(thresholdModeChanged:)
+                         name : ORSIS3305ThresholdModeChanged
                        object : model];
 
-	[notifyCenter addObserver : self
-                     selector : @selector(highEnergySuppressChanged:)
-                         name : ORSIS3305HighEnergySuppressChanged
-                       object : model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(inputInvertedChanged:)
-                         name : ORSIS3305InputInvertedChanged
-                       object : model];
-	
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(adc50KTriggerEnabledChanged:)
-                         name : ORSIS3305Adc50KTriggerEnabledChanged
-                       object : model];
-	
     [notifyCenter addObserver : self
-                     selector : @selector(gtChanged:)
-                         name : ORSIS3305GtChanged
+                     selector : @selector(thresholdModeChanged:)
+                         name : ORSIS3305LTThresholdEnabledChanged
                        object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(thresholdChanged:)
-                         name : ORSIS3305ThresholdChanged
-                       object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(highThresholdChanged:)
-                         name : ORSIS3305HighThresholdChanged
-                       object : model];	
     
+    [notifyCenter addObserver : self
+                     selector : @selector(thresholdModeChanged:)
+                         name : ORSIS3305GTThresholdEnabledChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(GTThresholdOnChanged:)
+                         name : ORSIS3305GTThresholdOnChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(GTThresholdOffChanged:)
+                         name : ORSIS3305GTThresholdOffChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(LTThresholdOnChanged:)
+                         name : ORSIS3305LTThresholdOnChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(LTThresholdOffChanged:)
+                         name : ORSIS3305LTThresholdOffChanged
+                       object : model];
+
+    
+    //
+//    
+//    [notifyCenter addObserver : self
+//                     selector : @selector(integrationChanged:)
+//                         name : ORRateGroupIntegrationChangedNotification
+//                       object : nil];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(triggerOutEnabledChanged:)
+//                         name : ORSIS3305TriggerOutEnabledChanged
+//                       object : model];
+//
+//	[notifyCenter addObserver : self
+//                     selector : @selector(highEnergySuppressChanged:)
+//                         name : ORSIS3305HighEnergySuppressChanged
+//                       object : model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(inputInvertedChanged:)
+//                         name : ORSIS3305InputInvertedChanged
+//                       object : model];
+//	
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(adc50KTriggerEnabledChanged:)
+//                         name : ORSIS3305Adc50KTriggerEnabledChanged
+//                       object : model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(gtChanged:)
+//                         name : ORSIS3305GtChanged
+//                       object : model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(thresholdChanged:)
+//                         name : ORSIS3305ThresholdChanged
+//                       object : model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(highThresholdChanged:)
+//                         name : ORSIS3305HighThresholdChanged
+//                       object : model];	
+//    
 	[notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3305ClockSourceChanged
 						object: model];
-			
+//
+////    [notifyCenter addObserver : self
+////                     selector : @selector(eventConfigChanged:)
+// //                        name : ORSIS3305EventConfigChanged
+////						object: model];
+//		
 //    [notifyCenter addObserver : self
-//                     selector : @selector(eventConfigChanged:)
- //                        name : ORSIS3305EventConfigChanged
+//                     selector : @selector(gateLengthChanged:)
+//                         name : ORSIS3305GateLengthChanged
 //						object: model];
-		
-    [notifyCenter addObserver : self
-                     selector : @selector(gateLengthChanged:)
-                         name : ORSIS3305GateLengthChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(pulseLengthChanged:)
-                         name : ORSIS3305PulseLengthChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(sumGChanged:)
-                         name : ORSIS3305SumGChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(peakingTimeChanged:)
-                         name : ORSIS3305PeakingTimeChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(internalTriggerDelayChanged:)
-                         name : ORSIS3305InternalTriggerDelayChanged
-						object: model];	
-
-	[notifyCenter addObserver : self
-                     selector : @selector(triggerDecimationChanged:)
-                         name : ORSIS3305TriggerDecimationChanged
-						object: model];	
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(energyDecimationChanged:)
-                         name : ORSIS3305EnergyDecimationChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(lemoOutModeChanged:)
-                         name : ORSIS3305LemoOutModeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(lemoInModeChanged:)
-                         name : ORSIS3305LemoInModeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dacOffsetChanged:)
-                         name : ORSIS3305DacOffsetChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(sampleLengthChanged:)
-                         name : ORSIS3305SampleLengthChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(sampleStartIndexChanged:)
-                         name : ORSIS3305SampleStartIndexChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(preTriggerDelayChanged:)
-                         name : ORSIS3305ModelPreTriggerDelayChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerGateLengthChanged:)
-                         name : ORSIS3305ModelTriggerGateLengthChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(energyPeakingTimeChanged:)
-                         name : ORSIS3305ModelEnergyPeakingTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(energyGapTimeChanged:)
-                         name : ORSIS3305ModelEnergyGapTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(energySampleStartIndex1Changed:)
-                         name : ORSIS3305ModelEnergySampleStartIndex1Changed
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(energySampleStartIndex2Changed:)
-                         name : ORSIS3305ModelEnergySampleStartIndex2Changed
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(energyNumberToSumChanged:)
-                         name : ORSIS3305ModelEnergyNumberToSumChanged
-						object: model];	
-    
-	[notifyCenter addObserver : self
-                     selector : @selector(energyTauFactorChanged:)
-                         name : ORSIS3305ModelEnergyTauFactorChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(energySampleStartIndex3Changed:)
-                         name : ORSIS3305ModelEnergySampleStartIndex3Changed
-						object: model];
-
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(pulseLengthChanged:)
+//                         name : ORSIS3305PulseLengthChanged
+//						object: model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(sumGChanged:)
+//                         name : ORSIS3305SumGChanged
+//						object: model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(peakingTimeChanged:)
+//                         name : ORSIS3305PeakingTimeChanged
+//						object: model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(internalTriggerDelayChanged:)
+//                         name : ORSIS3305InternalTriggerDelayChanged
+//						object: model];	
+//
+//	[notifyCenter addObserver : self
+//                     selector : @selector(triggerDecimationChanged:)
+//                         name : ORSIS3305TriggerDecimationChanged
+//						object: model];	
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(energyDecimationChanged:)
+//                         name : ORSIS3305EnergyDecimationChanged
+//						object: model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(lemoOutModeChanged:)
+//                         name : ORSIS3305LemoOutModeChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(lemoInModeChanged:)
+//                         name : ORSIS3305LemoInModeChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(dacOffsetChanged:)
+//                         name : ORSIS3305DacOffsetChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(sampleLengthChanged:)
+//                         name : ORSIS3305SampleLengthChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(sampleStartIndexChanged:)
+//                         name : ORSIS3305SampleStartIndexChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(preTriggerDelayChanged:)
+//                         name : ORSIS3305ModelPreTriggerDelayChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(triggerGateLengthChanged:)
+//                         name : ORSIS3305ModelTriggerGateLengthChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energyPeakingTimeChanged:)
+//                         name : ORSIS3305ModelEnergyPeakingTimeChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energyGapTimeChanged:)
+//                         name : ORSIS3305ModelEnergyGapTimeChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energySampleStartIndex1Changed:)
+//                         name : ORSIS3305ModelEnergySampleStartIndex1Changed
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energySampleStartIndex2Changed:)
+//                         name : ORSIS3305ModelEnergySampleStartIndex2Changed
+//						object: model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energyNumberToSumChanged:)
+//                         name : ORSIS3305ModelEnergyNumberToSumChanged
+//						object: model];	
+//    
+//	[notifyCenter addObserver : self
+//                     selector : @selector(energyTauFactorChanged:)
+//                         name : ORSIS3305ModelEnergyTauFactorChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energySampleStartIndex3Changed:)
+//                         name : ORSIS3305ModelEnergySampleStartIndex3Changed
+//						object: model];
+//
     [notifyCenter addObserver : self
                      selector : @selector(runModeChanged:)
                          name : ORSIS3305ModelRunModeChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(energyGateLengthChanged:)
-                         name : ORSIS3305ModelEnergyGateLengthChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(energySetShipWaveformChanged:)
-                         name : ORSIS3305SetShipWaveformChanged
-						object: model];
-
-	[notifyCenter addObserver : self
-                     selector : @selector(energySetShipSummedWaveformChanged:)
-                         name : ORSIS3305SetShipSummedWaveformChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(lemoInEnabledMaskChanged:)
-                         name : ORSIS3305ModelLemoInEnabledMaskChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(internalExternalTriggersOredChanged:)
-                         name : ORSIS3305ModelInternalExternalTriggersOredChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(extendedThresholdEnabledChanged:)
-                         name : ORSIS3305ExtendedThresholdEnabledChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(internalTriggerEnabledChanged:)
-                         name : ORSIS3305InternalTriggerEnabledChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(externalTriggerEnabledChanged:)
-                         name : ORSIS3305ExternalTriggerEnabledChanged
-						object: model];
-
-	[notifyCenter addObserver : self
-                     selector : @selector(internalGateEnabledChanged:)
-                         name : ORSIS3305InternalGateEnabledChanged
-						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(externalGateEnabledChanged:)
-                         name : ORSIS3305ExternalGateEnabledChanged
-						object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energyGateLengthChanged:)
+//                         name : ORSIS3305ModelEnergyGateLengthChanged
+//						object: model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(energySetShipWaveformChanged:)
+//                         name : ORSIS3305SetShipWaveformChanged
+//						object: model];
+//
+//	[notifyCenter addObserver : self
+//                     selector : @selector(energySetShipSummedWaveformChanged:)
+//                         name : ORSIS3305SetShipSummedWaveformChanged
+//						object: model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(lemoInEnabledMaskChanged:)
+//                         name : ORSIS3305ModelLemoInEnabledMaskChanged
+//						object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(internalExternalTriggersOredChanged:)
+//                         name : ORSIS3305ModelInternalExternalTriggersOredChanged
+//						object: model];
+//	
+//    [notifyCenter addObserver : self
+//                     selector : @selector(extendedThresholdEnabledChanged:)
+//                         name : ORSIS3305ExtendedThresholdEnabledChanged
+//						object: model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(internalTriggerEnabledChanged:)
+//                         name : ORSIS3305InternalTriggerEnabledChanged
+//						object: model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(externalTriggerEnabledChanged:)
+//                         name : ORSIS3305ExternalTriggerEnabledChanged
+//						object: model];
+//
+//	[notifyCenter addObserver : self
+//                     selector : @selector(internalGateEnabledChanged:)
+//                         name : ORSIS3305InternalGateEnabledChanged
+//						object: model];
+//	
+//	[notifyCenter addObserver : self
+//                     selector : @selector(externalGateEnabledChanged:)
+//                         name : ORSIS3305ExternalGateEnabledChanged
+//						object: model];
 	
 	[self registerRates];
 
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaNofHistoPresetChanged:)
-//                         name : ORSIS3305ModelMcaNofHistoPresetChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaLNESetupChanged:)
-//                         name : ORSIS3305ModelMcaLNESetupChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaPrescaleFactorChanged:)
-//                         name : ORSIS3305ModelMcaPrescaleFactorChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaAutoClearChanged:)
-//                         name : ORSIS3305ModelMcaAutoClearChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaNofScansPresetChanged:)
-//                         name : ORSIS3305ModelMcaNofScansPresetChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaHistoSizeChanged:)
-//                         name : ORSIS3305ModelMcaHistoSizeChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaPileupEnabledChanged:)
-//                         name : ORSIS3305ModelMcaPileupEnabledChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaModeChanged:)
-//                         name : ORSIS3305ModelMcaModeChanged
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaStatusChanged:)
-//                         name : ORSIS3305McaStatusChanged
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaEnergyDividerChanged:)
-//                         name : ORSIS3305ModelMcaEnergyDividerChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaEnergyMultiplierChanged:)
-//                         name : ORSIS3305ModelMcaEnergyMultiplierChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaEnergyOffsetChanged:)
-//                         name : ORSIS3305ModelMcaEnergyOffsetChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(mcaUseEnergyCalculationChanged:)
-//                         name : ORSIS3305ModelMcaUseEnergyCalculationChanged
-//						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(shipTimeRecordAlsoChanged:)
                          name : ORSIS3305ModelShipTimeRecordAlsoChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(cfdControlChanged:)
-                         name : ORSIS3305ModelCfdControlChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -484,9 +470,9 @@
 	[self triggerOutEnabledChanged:nil];
 	[self highEnergySuppressChanged:nil];
 	[self adc50KTriggerEnabledChanged:nil];
-	[self gtChanged:nil];
-	[self thresholdChanged:nil];
-	[self highThresholdChanged:nil];
+//	[self gtChanged:nil];
+//	[self thresholdChanged:nil];
+//	[self highThresholdChanged:nil];
 	[self gateLengthChanged:nil];
 	[self pulseLengthChanged:nil];
 	[self sumGChanged:nil];
@@ -530,21 +516,18 @@
 	[self externalGateEnabledChanged:nil];
 	
 	[self runModeChanged:nil];
-//	[self mcaNofHistoPresetChanged:nil];
-//	[self mcaLNESetupChanged:nil];
-//	[self mcaPrescaleFactorChanged:nil];
-//	[self mcaAutoClearChanged:nil];
-//	[self mcaNofScansPresetChanged:nil];
-//	[self mcaHistoSizeChanged:nil];
-//	[self mcaPileupEnabledChanged:nil];
-//	[self mcaModeChanged:nil];
-//	[self mcaStatusChanged:nil];
-//	[self mcaEnergyDividerChanged:nil];
-//	[self mcaEnergyMultiplierChanged:nil];
-//	[self mcaEnergyOffsetChanged:nil];
-//	[self mcaUseEnergyCalculationChanged:nil];
 	[self shipTimeRecordAlsoChanged:nil];
-	[self cfdControlChanged:nil];
+    
+    //channel settings
+    [self channelEnabledChanged:nil];
+    [self eventSavingMode14Changed:nil];
+    [self eventSavingMode58Changed:nil];
+    [self GTThresholdOffChanged:nil];
+    [self GTThresholdOnChanged:nil];
+    [self LTThresholdOffChanged:nil];
+    [self LTThresholdOnChanged:nil];
+    [self thresholdModeChanged:nil];
+    
 	[self bufferWrapEnabledChanged:nil];
 	[self firmwareVersionChanged:nil];
 	[self clockSourceChanged:nil];
@@ -704,14 +687,15 @@
 {
     short i;
     for(i=0;i<kNumSIS3305Channels;i++){
-        [[triggerOutEnabledMatrix cellWithTag:i] setState:[model channelEnabled:i]];
+        [[channelEnabled14Matrix cellWithTag:i] setState:[model enabled:i]];
+        [[channelEnabled58Matrix cellWithTag:i] setState:[model enabled:i]];
     }
 }
 
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumSIS3305Channels;i++){
 		[[internalTriggerEnabledMatrix cellWithTag:i] setState:[model internalTriggerEnabled:i]];
 	}
 }
@@ -719,7 +703,7 @@
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumSIS3305Channels;i++){
 		[[externalTriggerEnabledMatrix cellWithTag:i] setState:[model externalTriggerEnabled:i]];
 	}
 }
@@ -727,7 +711,7 @@
 - (void) extendedThresholdEnabledChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumSIS3305Channels;i++){
 		[[extendedThresholdEnabledMatrix cellWithTag:i] setState:[model extendedThresholdEnabled:i]];
 	}
 }
@@ -735,7 +719,7 @@
 - (void) internalGateEnabledChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumSIS3305Channels;i++){
 		[[internalGateEnabledMatrix cellWithTag:i] setState:[model internalGateEnabled:i]];
 	}
 }
@@ -743,14 +727,14 @@
 - (void) externalGateEnabledChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumSIS3305Channels;i++){
 		[[externalGateEnabledMatrix cellWithTag:i] setState:[model externalGateEnabled:i]];
 	}
 }
 - (void) energyTauFactorChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<8;i++){
+	for(i=0;i<kNumSIS3305Channels;i++){
 		[[energyTauFactorMatrix cellWithTag:i] setIntValue:[model energyTauFactor:i]];
 	}
 }
@@ -855,6 +839,27 @@
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
 }
 
+- (void) eventSavingMode14Changed:(NSNotification*)aNote
+{
+    [eventSavingMode14PU selectItemAtIndex: [model eventSavingMode:1]]; // 1 is for group 1
+}
+
+- (void) eventSavingMode58Changed:(NSNotification*)aNote
+{
+    [eventSavingMode58PU selectItemAtIndex: [model eventSavingMode:2]];   // 2 is for group 2
+}
+
+- (void) thresholdModeChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3305Channels/kNumSIS3305Groups;i++){
+        [[thresholdMode14PUMatrix cellAtRow:i column:0] selectItemAtIndex:[model thresholdMode:i]];
+//        [[thresholdMode14PUMatrix cellWithTag:i] selectItemAtIndex:[model thresholdMode:i]];
+        [[thresholdMode58PUMatrix cellAtRow:i column:0] selectItemAtIndex:[model thresholdMode:(i+4)]];    // +4 corrects for split matrix
+//        [[thresholdMode58PUMatrix cellWithTag:i] selectItemAtIndex:[model thresholdMode:(i+4)]];    // +4 corrects for split matrix
+    }
+}
+
 - (void) inputInvertedChanged:(NSNotification*)aNote
 {
 	short i;
@@ -895,44 +900,78 @@
 	[self settingsLockChanged:nil];
 }
 
-- (void) gtChanged:(NSNotification*)aNote
+
+- (void) LTThresholdOnChanged:(NSNotification*)aNote
 {
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[gtMatrix cellWithTag:i] setState:[model gt:i]];
-	}
+    // This method combins 1-4 and 5-8.
+    short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
+    for (short chan=0; chan<chPerGroup; chan++) {
+        [[LTThresholdOn14Matrix cellWithTag:chan] setIntValue:[model LTThresholdOn:chan]];
+        [[LTThresholdOn58Matrix cellWithTag:(chan)] setIntValue:[model LTThresholdOn:(chan+4)]];
+    }
+    
 }
 
-- (void) thresholdChanged:(NSNotification*)aNote
+- (void) LTThresholdOffChanged:(NSNotification*)aNote
 {
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		//float volts = (0.0003*[model threshold:i])-5.0;
-		[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
-	}
+    // This method combins 1-4 and 5-8.
+    short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
+    for (short chan=0; chan<chPerGroup; chan++) {
+        [[LTThresholdOff14Matrix cellWithTag:chan] setIntValue:[model LTThresholdOff:chan]];
+        [[LTThresholdOff58Matrix cellWithTag:(chan)] setIntValue:[model LTThresholdOff:(chan+4)]];
+    }
 }
 
-- (void) highThresholdChanged:(NSNotification*)aNote
+- (void) GTThresholdOnChanged:(NSNotification*)aNote
 {
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[highThresholdMatrix cellWithTag:i] setIntValue:[model highThreshold:i]];
-	}
+    // This method combins 1-4 and 5-8.
+    short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
+    for (short chan=0; chan<chPerGroup; chan++) {
+        [[GTThresholdOn14Matrix cellWithTag:chan] setIntValue:[model GTThresholdOn:chan]];
+        [[GTThresholdOn58Matrix cellWithTag:chan] setIntValue:[model GTThresholdOn:(chan+4)]];
+    }
 }
 
-- (void) cfdControlChanged:(NSNotification*)aNote
+- (void) GTThresholdOffChanged:(NSNotification*)aNote
 {
-	[cfdControl0 selectItemAtIndex:[model cfdControl:0]];
-	[cfdControl1 selectItemAtIndex:[model cfdControl:1]];
-	[cfdControl2 selectItemAtIndex:[model cfdControl:2]];
-	[cfdControl3 selectItemAtIndex:[model cfdControl:3]];
-	[cfdControl4 selectItemAtIndex:[model cfdControl:4]];
-	[cfdControl5 selectItemAtIndex:[model cfdControl:5]];
-	[cfdControl6 selectItemAtIndex:[model cfdControl:6]];
-	[cfdControl7 selectItemAtIndex:[model cfdControl:7]];
-	
-	[self settingsLockChanged:nil];
+    // This method combins 1-4 and 5-8.
+    short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
+    for (short chan=0; chan<chPerGroup; chan++) {
+        [[GTThresholdOff14Matrix cellWithTag:chan]      setIntValue:[model GTThresholdOff:chan]];
+        [[GTThresholdOff58Matrix cellWithTag:(chan)]  setIntValue:[model GTThresholdOff:(chan+4)]];
+    }
 }
+
+//- (void) thresholdChanged:(NSNotification*)aNote
+//{
+//	short i;
+//	for(i=0;i<kNumSIS3305Channels;i++){
+//		//float volts = (0.0003*[model threshold:i])-5.0;
+//		[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+//	}
+//}
+
+//- (void) highThresholdChanged:(NSNotification*)aNote
+//{
+//	short i;
+//	for(i=0;i<kNumSIS3305Channels;i++){
+//		[[highThresholdMatrix cellWithTag:i] setIntValue:[model highThreshold:i]];
+//	}
+//}
+
+//- (void) cfdControlChanged:(NSNotification*)aNote
+//{
+//	[cfdControl0 selectItemAtIndex:[model cfdControl:0]];
+//	[cfdControl1 selectItemAtIndex:[model cfdControl:1]];
+//	[cfdControl2 selectItemAtIndex:[model cfdControl:2]];
+//	[cfdControl3 selectItemAtIndex:[model cfdControl:3]];
+//	[cfdControl4 selectItemAtIndex:[model cfdControl:4]];
+//	[cfdControl5 selectItemAtIndex:[model cfdControl:5]];
+//	[cfdControl6 selectItemAtIndex:[model cfdControl:6]];
+//	[cfdControl7 selectItemAtIndex:[model cfdControl:7]];
+//	
+//	[self settingsLockChanged:nil];
+//}
 
 - (void) sampleLengthChanged:(NSNotification*)aNote
 {
@@ -1090,7 +1129,7 @@
 	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
     BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
 	
-	[settingLockButton			setState: locked];
+//	[settingLockButton			setState: locked];
 
     [runModePU					setEnabled:!locked && !runInProgress];
     [pulseModeButton			setEnabled:!locked && !runInProgress];
@@ -1100,6 +1139,7 @@
 	[briefReportButton			setEnabled:!lockedOrRunningMaintenance];
 	[regDumpButton				setEnabled:!lockedOrRunningMaintenance];
 	[probeButton				setEnabled:!lockedOrRunningMaintenance];
+    [forceTriggerButton			setEnabled:!lockedOrRunningMaintenance];
 	
     [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
 	[energyTauFactorMatrix			setEnabled:!lockedOrRunningMaintenance];
@@ -1110,7 +1150,11 @@
 	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
 	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
 
-	[clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
+    [clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
+    [eventSavingMode14PU			setEnabled:!lockedOrRunningMaintenance];
+    [eventSavingMode58PU			setEnabled:!lockedOrRunningMaintenance];
+    [thresholdMode14PUMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [thresholdMode58PUMatrix        setEnabled:!lockedOrRunningMaintenance];
 	[triggerDecimation0				setEnabled:!lockedOrRunningMaintenance];
 	[triggerDecimation1				setEnabled:!lockedOrRunningMaintenance];
 	[triggerDecimation2				setEnabled:!lockedOrRunningMaintenance];
@@ -1120,9 +1164,9 @@
 	[energyDecimation2				setEnabled:!lockedOrRunningMaintenance];
 	[energyDecimation3				setEnabled:!lockedOrRunningMaintenance];
 
-	[gtMatrix						setEnabled:!lockedOrRunningMaintenance];
+//	[gtMatrix						setEnabled:!lockedOrRunningMaintenance];
 	[inputInvertedMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[thresholdMatrix				setEnabled:!lockedOrRunningMaintenance];
+//	[thresholdMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[internalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
 	[externalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
 	[internalGateEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
@@ -1161,40 +1205,50 @@
 	//	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
 	//	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
 	
+    
+    
 	
-	if(![model shipSummedWaveform])	[energyShipWaveformButton		setEnabled:!locked && !runInProgress];
-	else [energyShipWaveformButton			setEnabled:NO];
-	if(![model shipEnergyWaveform])	[energyShipSummedWaveformButton setEnabled:!locked && !runInProgress && firmwareGEV15xx];
-	else [energyShipSummedWaveformButton	setEnabled:NO];
-	if([model shipSummedWaveform]) [energyNumberToSumField			setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	else [energyNumberToSumField			setEnabled:NO];
+	if(![model shipSummedWaveform])
+        [energyShipWaveformButton		setEnabled:!locked && !runInProgress];
+	else
+        [energyShipWaveformButton			setEnabled:NO];
+    
+	if(![model shipEnergyWaveform])
+        [energyShipSummedWaveformButton setEnabled:!locked && !runInProgress && firmwareGEV15xx];
+	else
+        [energyShipSummedWaveformButton	setEnabled:NO];
+    
+	if([model shipSummedWaveform])
+        [energyNumberToSumField			setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+	else
+        [energyNumberToSumField			setEnabled:NO];
 	
 	int i;
 	
-	for(i=0;i<kNumSIS3305Channels;i++){
-		if([model highEnergySuppress:i] && ([model cfdControl:i]!=0))[[highThresholdMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
-		else [[highThresholdMatrix cellWithTag:i]	setEnabled:NO];
-	}
+//	for(i=0;i<kNumSIS3305Channels;i++){
+//		if([model highEnergySuppress:i] && ([model cfdControl:i]!=0))[[highThresholdMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
+//		else [[highThresholdMatrix cellWithTag:i]	setEnabled:NO];
+//	}
 		
 	for(i=0;i<kNumSIS3305Groups;i++){
 		if([model bufferWrapEnabled:i])[[sampleStartIndexMatrix	cellWithTag:i]setEnabled:!locked && !runInProgress];
 		else [[sampleStartIndexMatrix cellWithTag:i]	setEnabled:NO];
 	}
 	
-	for(i=0;i<kNumSIS3305Channels;i++){
-		if([model cfdControl:i]!=0)[[highEnergySuppressMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
-		else [[highEnergySuppressMatrix cellWithTag:i]	setEnabled:NO];
-	}
+//	for(i=0;i<kNumSIS3305Channels;i++){
+//		if([model cfdControl:i]!=0)[[highEnergySuppressMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
+//		else [[highEnergySuppressMatrix cellWithTag:i]	setEnabled:NO];
+//	}
 	
-	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl3					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl4					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl5					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl6					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	[cfdControl7					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	
+//	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl3					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl4					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl5					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl6					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	[cfdControl7					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
+//	
 	
 }
 
@@ -1299,13 +1353,152 @@
 
 - (void) pulseModeAction:(id)sender
 {
-	[model setPulseMode:[sender intValue]];	
+	[model setPulseMode:[sender intValue]];
 }
 
 - (void) shipTimeRecordAlsoAction:(id)sender
 {
 	[model setShipTimeRecordAlso:[sender intValue]];	
 }
+
+
+- (IBAction) channelEnabledMaskAction:(id)sender
+{
+    [model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+ //   - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
+
+}
+
+//
+//- (IBAction) thresholdModeAction:(id)sender
+//{
+//    short chan = [[sender selectedCell] tag];
+//    int value =  [[sender selectedCell] intValue];
+//    
+//    [model setThresholdMode:chan withValue:value];
+//}
+
+- (IBAction) GTThresholdOn14Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag];
+    int value =  [[sender selectedCell] intValue];
+
+    //this should be done in the model as well, in case anyone uses a script to set it
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model GTThresholdOn:chan]){
+        [model setGTThresholdOn:chan withValue:value];
+//    }
+}
+
+- (IBAction) GTThresholdOn58Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag] + 4;   // chans 5-8 are a new matrix, so they will be 4 off
+    int value =  [[sender selectedCell] intValue];
+    
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model GTThresholdOn:chan]){
+        [model setGTThresholdOn:chan withValue:value];
+//    }
+}
+
+- (IBAction) GTThresholdOff14Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag];
+    int value =  [[sender selectedCell] intValue];
+    
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model GTThresholdOff:chan]){
+        [model setGTThresholdOff:chan withValue:value];
+//    }
+}
+
+- (IBAction) GTThresholdOff58Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag] + 4;   // chans 5-8 are a new matrix, so they will be 4 off
+    int value =  [[sender selectedCell] intValue];
+    
+    if(value>1023)
+        value = 1023;   
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model GTThresholdOff:chan]){
+        [model setGTThresholdOff:chan withValue:value];
+//    }
+}
+
+- (IBAction) LTThresholdOn14Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag];
+    int value = [sender intValue];
+    
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model LTThresholdOn:chan]){
+        [model setLTThresholdOn:chan withValue:value];
+//    }
+}
+
+- (IBAction) LTThresholdOn58Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag] + 4;   // chans 5-8 are a new matrix, so they will be 4 off
+    int value = [sender intValue];
+    
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model LTThresholdOn:chan]){
+        [model setLTThresholdOn:chan withValue:value];
+//    }
+}
+
+- (IBAction) LTThresholdOff14Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag];
+    int value = [sender intValue];
+    
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model LTThresholdOff:chan]){
+        [model setLTThresholdOff:chan withValue:value];
+//    }
+}
+
+- (IBAction) LTThresholdOff58Action:(id)sender
+{
+    short chan = [[sender selectedCell] tag] + 4;   // chans 5-8 are a new matrix, so they will be 4 off
+    int value = [sender intValue];
+    
+    if(value>1023)
+        value = 1023;
+    else if(value < 0)
+        value = 0;
+    
+//    if(value != [model LTThresholdOff:chan]){
+        [model setLTThresholdOff:chan withValue:value];
+//    }
+}
+
 
 //- (IBAction) mcaUseEnergyCalculationAction:(id)sender
 //{
@@ -1486,6 +1679,36 @@
 	[model setClockSource:[sender indexOfSelectedItem]];	
 }
 
+- (IBAction) eventSavingMode14Action:(id)sender
+{
+    short mode = [sender indexOfSelectedItem];
+    
+    [model setEventSavingModeOf:1 toValue:mode];    // 1 is for group 1
+}
+
+- (IBAction) eventSavingMode58Action:(id)sender
+{
+    short mode = [sender indexOfSelectedItem];
+    
+    [model setEventSavingModeOf:2 toValue:mode];    // 2 is for group 2
+}
+
+- (IBAction) thresholdMode14Action:(id)sender
+{
+    short chan = [sender selectedRow] ;
+    short value = [[sender selectedCell] indexOfSelectedItem];
+    
+    [model setThresholdMode:chan withValue:value];
+}
+
+- (IBAction) thresholdMode58Action:(id)sender
+{
+    short chan = [sender selectedRow]+4 ;                       // +4 corrects for split matrix
+    short value = [[sender selectedCell] indexOfSelectedItem];
+    
+    [model setThresholdMode:chan withValue:value];
+}
+
 - (IBAction) triggerOutEnabledAction:(id)sender
 {
 	[model setTriggerOutEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
@@ -1506,9 +1729,20 @@
 	[model setAdc50KTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) gtAction:(id)sender
+- (IBAction) LTThresoldEnabledAction:(id)sender
 {
-	[model setGtBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+    short chan = [[sender selectedCell] tag];
+    short value = [sender intValue];
+    
+    [model setLTThresholdEnabled:chan withValue:value];
+}
+
+- (IBAction) GTThresoldEnabledAction:(id)sender
+{
+    short chan = [[sender selectedCell] tag];
+    short value = [sender intValue];
+    
+    [model setGTThresholdEnabled:chan withValue:value];
 }
 
 - (IBAction) bufferWrapEnabledAction:(id)sender
@@ -1537,17 +1771,17 @@
 	}
 }
 
-- (IBAction) highThresholdAction:(id)sender
-{
-    if([sender intValue] != [model highThreshold:[[sender selectedCell] tag]]){
-		[model setHighThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
+//- (IBAction) highThresholdAction:(id)sender
+//{
+//    if([sender intValue] != [model highThreshold:[[sender selectedCell] tag]]){
+//		[model setHighThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+//	}
+//}
 
 - (IBAction) cfdControlAction:(id)sender
 {
     //if([sender intValue] != [model cfdControl:[sender tag]]){
-		[model setCfdControl:[sender tag] withValue:[sender indexOfSelectedItem]];
+//		[model setCfdControl:[sender tag] withValue:[sender indexOfSelectedItem]];
 	//}
 }
 
@@ -1596,7 +1830,7 @@
 - (IBAction) pulseLengthAction:(id)sender
 {
     if([sender intValue] != [model pulseLength:[[sender selectedCell] tag]]){
-		[model setPulseLength:[[sender selectedCell] tag] withValue:[sender intValue]];
+//		[model setPulseLength:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
@@ -1727,6 +1961,20 @@
 	if(ok)[model regDump];
 }
 
+- (IBAction) forceTriggerAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model initBoard];
+        [model forceTrigger];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3305 Force Trigger FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3305 Force Trigger FAILED", @"OK", nil, nil,
+                        localException);
+    }
+    
+}
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
 
