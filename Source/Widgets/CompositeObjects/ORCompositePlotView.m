@@ -44,6 +44,7 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    self.delegate   = nil;
 	self.xAxis      = nil;
 	self.yAxis      = nil;
 	self.legend     = nil;

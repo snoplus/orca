@@ -37,6 +37,7 @@
 
 - (void) dealloc
 {
+    delegate = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [plotArray release];
     [attributes release];
