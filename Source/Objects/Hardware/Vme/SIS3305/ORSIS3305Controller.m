@@ -133,7 +133,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
                          name : ORSIS3305SettingsLock
-                        object: nil];
+                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(rateGroupChanged:)
@@ -463,6 +463,7 @@
 - (void) updateWindow
 {
     [super updateWindow];
+    
     [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
@@ -1105,7 +1106,7 @@
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORSIS3305SettingsLock to:secure];
-    [settingLockButton setEnabled:secure];
+    //[settingLockButton setEnabled:secure];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem 
@@ -1129,7 +1130,7 @@
 	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
     BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
 	
-//	[settingLockButton			setState: locked];
+	//[settingLockButton			setState: locked];
 
     [runModePU					setEnabled:!locked && !runInProgress];
     [pulseModeButton			setEnabled:!locked && !runInProgress];

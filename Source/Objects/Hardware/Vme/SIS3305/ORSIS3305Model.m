@@ -3417,6 +3417,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         These are all the parameters that are saved when a configuration file is saved
      */
     self = [super initWithCoder:decoder];
+    
     [[self undoManager] disableUndoRegistration];
 	
     [self setPulseMode:                 [decoder decodeBoolForKey:@"pulseMode"]];
@@ -3456,12 +3457,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     for (int chan = 0; chan<kNumSIS3305Channels; chan++)
     {
         //threshold mode can't be set directly, since we store the individual LT ang GT enabled with the encoder
-        [self setLTThresholdEnabled:chan    withValue:[decoder decodeIntegerForKey:[@"LTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
-        [self setGTThresholdEnabled:chan    withValue:[decoder decodeIntegerForKey:[@"GTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
-        [self setLTThresholdOn:chan         withValue:[decoder decodeIntegerForKey:[@"LTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
-        [self setLTThresholdOff:chan        withValue:[decoder decodeIntegerForKey:[@"LTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
-        [self setGTThresholdOn:chan         withValue:[decoder decodeIntegerForKey:[@"GTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
-        [self setGTThresholdOff:chan        withValue:[decoder decodeIntegerForKey:[@"GTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
+        [self setLTThresholdEnabled:chan    withValue:[decoder decodeIntForKey:[@"LTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdEnabled:chan    withValue:[decoder decodeIntForKey:[@"GTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
+        [self setLTThresholdOn:chan         withValue:[decoder decodeIntForKey:[@"LTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
+        [self setLTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"LTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdOn:chan         withValue:[decoder decodeIntForKey:[@"GTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"GTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
     }
     
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
@@ -3540,12 +3541,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	
     //channel-level c-arrays:
     for (int chan=0; chan<kNumSIS3305Channels; chan++) {
-        [encoder encodeInteger:LTThresholdEnabled[chan]		forKey:[@"LTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
-        [encoder encodeInteger:GTThresholdEnabled[chan]		forKey:[@"GTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
-        [encoder encodeInteger:LTThresholdOn[chan]          forKey:[@"LTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
-        [encoder encodeInteger:LTThresholdOff[chan]         forKey:[@"LTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
-        [encoder encodeInteger:GTThresholdOn[chan]          forKey:[@"GTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
-        [encoder encodeInteger:GTThresholdOff[chan]         forKey:[@"GTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:LTThresholdEnabled[chan]		forKey:[@"LTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:GTThresholdEnabled[chan]		forKey:[@"GTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:LTThresholdOn[chan]          forKey:[@"LTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:LTThresholdOff[chan]         forKey:[@"LTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:GTThresholdOn[chan]          forKey:[@"GTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:GTThresholdOff[chan]         forKey:[@"GTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
 
     }
     
