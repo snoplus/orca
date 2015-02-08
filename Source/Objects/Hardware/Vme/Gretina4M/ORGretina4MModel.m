@@ -1426,7 +1426,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					usingAddSpace:0x01];
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
-	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+	if(verbose)NSLog(@"Main FPGA version: 0x%x \n", mainVersion);
     
 	if (mainVersion < kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);

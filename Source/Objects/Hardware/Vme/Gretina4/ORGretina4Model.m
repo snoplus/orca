@@ -1253,7 +1253,7 @@ static struct {
 					usingAddSpace:0x01];
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
-	NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+	NSLog(@"Main FPGA version: 0x%x \n", mainVersion);
 		
 	if (mainVersion != kCurrentFirmwareVersion){
 		NSLogColor([NSColor redColor],@"Main FPGA version does not match: it should be 0x%x, but now it is 0x%x \n", kCurrentFirmwareVersion,mainVersion);
@@ -1849,7 +1849,7 @@ static struct {
 					usingAddSpace:0x01];
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
-	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+	if(verbose)NSLog(@"Main FPGA version: 0x%x \n", mainVersion);
     
 	if (mainVersion != kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
