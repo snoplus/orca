@@ -788,7 +788,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
-	
+    
+    [self setLastRequest:nil];
+    [cmdQueue removeAllObjects];
+
 	[[self undoManager] disableUndoRegistration];
 	[self setEmailEnabled:emailEnabled];
 	[[self undoManager] enableUndoRegistration];
@@ -1151,7 +1154,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     isValid = NO;
 	NSLogError(@"command timeout",@"AMI 286",nil);
 	[self setLastRequest:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
+    [cmdQueue removeAllObjects];
 }
 
 - (void) processOneCommandFromQueue
