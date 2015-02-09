@@ -517,14 +517,19 @@ NSDate* burstStart = NULL;
                                         { 
                                             double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
                                             //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
-                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", iter, countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", (countofchan - iter), countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
                                             if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
                                             {
                                                 bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <---"]];
                                             }
+                                            if([[Bsecs objectAtIndex:iter] intValue] == [[Nsecs objectAtIndex:(countofNchan-1)] intValue] &&
+                                               [[Bmics objectAtIndex:iter] intValue] == [[Nmics objectAtIndex:(countofNchan-1)] intValue])
+                                            {
+                                                bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <= Burst Start"]];
+                                                numSecTillBurst = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
+                                            }
                                             bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
                                         }
-                                        numSecTillBurst = [[secs objectAtIndex:(countofchan-1)] longValue] + 0.000001*[[mics objectAtIndex:(countofchan-1)] longValue];
                                         //NSTimeInterval secTillBurst = [NSTimeIntervalSince1970 timeZoneForSecondsFromGMT:numSecTillBurst];
                                         //Bdate = [NSDate dateWithTimeIntervalSince1970:numSecTillBurst];
                                         //NSLog(@"Bdate is %@ \n", Bdate);
@@ -673,7 +678,7 @@ NSDate* burstStart = NULL;
                                     int k=0;
                                     for(k = nHit-1; k<chans.count; k++) //remove old things from the buffer (was k<countofchan, this terminates the function);
                                     {
-                                        if(([[secs objectAtIndex:k] longValue] + 0.000001*[[mics objectAtIndex:k] longValue])<(removedSec+0.000001*removedMic))
+                                        if(([[secs objectAtIndex:k] longValue] + 0.000001*[[mics objectAtIndex:k] longValue])<(removedSec-5+0.000001*removedMic)) //CB 10 sec early
                                         {
                                             //NSLog(@"removeing stuff, index is %i, time is %li.%li \n", k,[[secs objectAtIndex:k] longValue],[[mics objectAtIndex:k] longValue]);
                                             [chans removeObjectAtIndex:k];
@@ -1019,7 +1024,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
     theContent = [theContent stringByAppendingFormat:@"First event in burst:\n"];
-    theContent = [theContent stringByAppendingFormat:@"%@, %i us (UTC) {Possibly fast}\n", [NSDate dateWithTimeIntervalSince1970:numSecTillBurst], numMicTillBurst];
+    theContent = [theContent stringByAppendingFormat:@"%@, %i us (UTC), time from SBC cards \n", [NSDate dateWithTimeIntervalSince1970:numSecTillBurst], numMicTillBurst];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"Time Window: %f sec\n",timeWindow];
     theContent = [theContent stringByAppendingFormat:@"Events/Window Needed: %d\n",nHit];
@@ -1034,6 +1039,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Likelyhood of central position: chisquared %f/2, p = %f \n", rSqrNorm, exp(-0.5*rSqrNorm)];
     theContent = [theContent stringByAppendingFormat:@"Duration of burst: %f seconds \n",durSec];
     theContent = [theContent stringByAppendingFormat:@"Num Bursts this run: %d\n",burstCount];
+    theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+    theContent = [theContent stringByAppendingString:@"Counts from 5 seconds before the burst untill the next out-of-burst above-threshold event \n"];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:burstString];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
