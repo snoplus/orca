@@ -472,7 +472,11 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
     [self ramper:i].maxVoltage = MIN([self supplyVoltageLimit],aValue);
     [super setMaxVoltage:i withValue:aValue];
 }
-- (int) maxVoltage:(int)i { return [self ramper:i].maxVoltage; }
+- (int) maxVoltage:(int)i
+{
+    if([self ramper:i]) return [self ramper:i].maxVoltage;
+    else return kMaxVoltage;
+}
 - (int) supplyVoltageLimit
 {
     //subclassed should override
