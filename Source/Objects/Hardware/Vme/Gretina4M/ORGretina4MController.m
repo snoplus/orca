@@ -198,6 +198,11 @@
                          name : ORGretina4MForceFullInitChanged
                        object : model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(forceFullInitCardChanged:)
+                         name : ORGretina4MForceFullInitCardChanged
+                       object : model];
+
     
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
@@ -444,6 +449,7 @@
     [super updateWindow];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
+    [self forceFullInitCardChanged:nil];
     [self forceFullInitChanged:nil];
     [self enabledChanged:nil];
 	[self easySelectChanged:nil];
@@ -739,6 +745,13 @@
         [[enabled2Matrix cellWithTag:chan] setState:[model enabled:chan]];
     }
 }
+
+- (void) forceFullInitCardChanged:(NSNotification*)aNote
+{
+    [forceFullInitCardButton setIntValue:[model forceFullInitCard]];
+}
+
+
 - (void) forceFullInitChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -1732,6 +1745,11 @@
 - (IBAction) compareToSnapShotAction:(id)sender
 {
     [model compareToSnapShot];
+}
+
+- (IBAction) forceFullInitCardAction:(id)sender
+{
+    [model setForceFullInitCard:[sender intValue]];
 }
 
 #pragma mark •••Data Source

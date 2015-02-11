@@ -202,6 +202,7 @@ enum Gretina4MFIFOStates {
 	unsigned long   dataId;
 	unsigned long   dataBuffer[kG4MDataPacketSize];
 
+    BOOL            forceFullInitCard;
     BOOL			enabled[kNumGretina4MChannels];
     BOOL			forceFullInit[kNumGretina4MChannels];
     BOOL			trapEnabled[kNumGretina4MChannels];
@@ -297,6 +298,8 @@ enum Gretina4MFIFOStates {
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
 
 #pragma mark ***Accessors
+- (BOOL) forceFullInitCard;
+- (void) setForceFullInitCard:(BOOL)aForceFullInitCard;
 - (short) initState;
 - (void) setInitState:(short)aState;
 - (short) histEMultiplier;
@@ -582,6 +585,7 @@ extern NSString* ORGretina4MFpgaFilePathChanged;
 extern NSString* ORGretina4MNoiseFloorIntegrationTimeChanged;
 extern NSString* ORGretina4MNoiseFloorOffsetChanged;
 
+extern NSString* ORGretina4MForceFullInitCardChanged;
 extern NSString* ORGretina4MForceFullInitChanged;
 extern NSString* ORGretina4MEnabledChanged;
 extern NSString* ORGretina4MTrapEnabledChanged;
@@ -615,5 +619,5 @@ extern NSString* ORGretina4MPresumEnabledChanged;
 extern NSString* ORGretina4MEasySelectedChanged;
 extern NSString* ORGretina4MModelHistEMultiplierChanged;
 extern NSString* ORGretina4MModelInitStateChanged;
+extern NSString* ORGretina4MForceFullInitCardChanged;
 extern NSString* ORGretina4MLockChanged;
-

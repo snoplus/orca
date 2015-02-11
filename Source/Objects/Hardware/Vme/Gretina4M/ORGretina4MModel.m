@@ -89,6 +89,8 @@ NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdCh
 NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
 NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultiplierChanged";
 NSString* ORGretina4MModelInitStateChanged      = @"ORGretina4MModelInitStateChanged";
+NSString* ORGretina4MForceFullInitCardChanged   = @"ORGretina4MForceFullInitCardChanged";
+
 NSString* ORGretina4MLockChanged                = @"ORGretina4MLockChanged";
 
 
@@ -353,6 +355,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 #pragma mark ***Accessors
+- (BOOL) forceFullInitCard
+{
+    return forceFullInitCard;
+}
+
+- (void) setForceFullInitCard:(BOOL)aForceFullInitCard
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setForceFullInitCard:forceFullInitCard];
+    forceFullInitCard = aForceFullInitCard;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MForceFullInitCardChanged object:self];
+}
+
 - (short) histEMultiplier
 {
     return histEMultiplier;
@@ -1588,7 +1602,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:clocksource
               addressOffset:fpga_register_information[kVMEGPControl].offset
                        mask:0x3
-                  reportKey:@"ClockSource"];
+                  reportKey:@"ClockSource"
+              forceFullInit:forceFullInitCard];
 
 }
 
@@ -1603,7 +1618,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:noiseWindow
               addressOffset:register_information[kNoiseWindow].offset
                        mask:0x7f
-                  reportKey:@"NoiseWindow"];
+                  reportKey:@"NoiseWindow"
+              forceFullInit:forceFullInitCard];
 
 }
 
@@ -1612,7 +1628,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:externalWindow
               addressOffset:register_information[kExternalWindow].offset
                        mask:0x7ff
-                  reportKey:@"ExternalWindow"];
+                  reportKey:@"ExternalWindow"
+              forceFullInit:forceFullInitCard];
 }
 
 - (void) writePileUpWindow
@@ -1622,16 +1639,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kPileupWindow].offset
                        mask:0xffffffff
-                  reportKey:@"PileupWindow"];
-
+                  reportKey:@"PileupWindow"
+              forceFullInit:forceFullInitCard];
 }
+
 - (void) writeExtTrigLength
 {
     [self writeAndCheckLong:extTrigLength
               addressOffset:register_information[kExtTrigSlidingLength].offset
                        mask:0x7ff
-                  reportKey:@"ExtTrigLength"];
-
+                  reportKey:@"ExtTrigLength"
+              forceFullInit:forceFullInitCard];
 }
 
 - (void) writeCollectionTime
@@ -1639,7 +1657,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:collectionTime
               addressOffset:register_information[kCollectionTime].offset
                        mask:0x3ff
-                  reportKey:@"CollectionTime"];
+                  reportKey:@"CollectionTime"
+              forceFullInit:forceFullInitCard];
+
 }
 
 
@@ -1648,7 +1668,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:integrateTime
               addressOffset:register_information[kIntegrateTime].offset
                        mask:0x3ff
-                  reportKey:@"IntegrationTime"];
+                  reportKey:@"IntegrationTime"
+              forceFullInit:forceFullInitCard];
+
 
 }
 
@@ -2583,6 +2605,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setNoiseFloorIntegrationTime:	[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
     [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
     [self setHistEMultiplier:			[decoder decodeIntForKey:@"histEMultiplier"]];
+    [self setForceFullInitCard:			[decoder decodeBoolForKey:@"forceFullInitCard"]];
 
     
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
@@ -2647,6 +2670,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
     [encoder encodeInt:histEMultiplier              forKey:@"histEMultiplier"];
+    [encoder encodeBool:forceFullInitCard           forKey:@"forceFullInitCard"];
     
 	int i;
  	for(i=0;i<kNumGretina4MChannels;i++){
@@ -2719,6 +2743,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [objDictionary setObject:[NSNumber numberWithInt:downSample]        forKey:@"Down Sample"];
     [objDictionary setObject:[NSNumber numberWithInt:clockSource]       forKey:@"Clock Source"];
     [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier]   forKey:@"Hist E Multiplier"];
+    [objDictionary setObject:[NSNumber numberWithInt:forceFullInitCard] forKey:@"forceFullInitCard"];
 
 	
     return objDictionary;

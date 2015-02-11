@@ -44,6 +44,7 @@
     //basic ops page
     IBOutlet NSMatrix*		enabledMatrix;
     IBOutlet NSMatrix*		forceFullInitMatrix;
+    IBOutlet NSButton*      forceFullInitCardButton;
     
 	IBOutlet NSMatrix*		trapEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
@@ -169,6 +170,7 @@
 - (void) prerecntChanged:(NSNotification*)aNote;
 - (void) postrecntChanged:(NSNotification*)aNote;
 - (void) forceFullInitChanged:(NSNotification*)aNote;
+- (void) forceFullInitCardChanged:(NSNotification*)aNote;
 
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) integrateTimeChanged:(NSNotification*)aNote;
@@ -218,6 +220,7 @@
 - (void) initSerDesStateChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) forceFullInitCardAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
