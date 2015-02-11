@@ -1732,7 +1732,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    if((theValue & kGretina4MFIFOEmpty)!=0)		return kEmpty;
+    if((theValue & kGretina4MFIFOEmpty)!=0)             return kEmpty;
     else if((theValue & kGretina4MFIFOAllFull)!=0)		return kFull;
     else if((theValue & kGretina4MFIFOAlmostFull)!=0)	return kAlmostFull;
     else if((theValue & kGretina4MFIFOAlmostEmpty)!=0)	return kAlmostEmpty;
@@ -1742,12 +1742,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) writeDownSample
 {
     unsigned long theValue = (downSample << 28);
-    [[self adapter] writeLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
-                        numToWrite:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-}
+    [self writeAndCheckLong:theValue
+              addressOffset:[self baseAddress] + register_information[kProgrammingDone].offset
+                       mask:0x70000000
+                  reportKey:@"downSample"
+              forceFullInit:forceFullInitCard];
+ }
 
 - (short) readExternalWindow
 {
