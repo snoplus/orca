@@ -1967,7 +1967,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 		totalRecordsChecked = 0;
 		totalErrors = 0;
 		startBlockSize = 1000;
-		endBlockSize   = 300000;
+		endBlockSize   = 1000000;
 		productionSpeedValueValid = NO;
 		productionSpeed = 0;
 		doingProductionTest = NO;

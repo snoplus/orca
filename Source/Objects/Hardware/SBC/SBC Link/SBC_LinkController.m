@@ -66,11 +66,11 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-    [[plotter xAxis] setRngLimitsLow:0 withHigh:300 withMinRng:300];
+    [[plotter xAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:1000];
     [[plotter yAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
 	
 	[[histogram xAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
-    [[histogram yAxis] setRngLimitsLow:0 withHigh:100 withMinRng:10];
+    [[histogram yAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
 
     [plotter setUseGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
@@ -92,7 +92,7 @@
 	[aPlot1 release];
 	
 	[payloadSizeSlider setMinValue:0];
-	[payloadSizeSlider setMaxValue:300];
+	[payloadSizeSlider setMaxValue:1000];
 	[ipNumberComboBox reloadData];
 	[self setDriverInfo];
 	if([[model driverScriptName] length] == 0){
