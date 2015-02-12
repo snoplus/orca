@@ -359,6 +359,13 @@ static struct {
     [aGuardian assumeDisplayOf:linkConnector];
 }
 
+- (void) disconnect
+{
+    [spiConnector disconnect];
+    [linkConnector disconnect];
+    [super disconnect];
+}
+
 #pragma mark ***Accessors
 - (short) initState {return initializationState;}
 - (void) setInitState:(short)aState
