@@ -819,6 +819,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	
 	exitCBTest    = YES;
 	cbTestRunning = NO;
+    
+    [self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;

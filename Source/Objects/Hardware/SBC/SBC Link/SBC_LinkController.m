@@ -98,7 +98,9 @@
 	if([[model driverScriptName] length] == 0){
 		[downloadDriverButton setEnabled:NO];
 	}
-	[bytesReceivedRateAxis setLabel:@"KBytes/Second"];
+    [bytesReceivedRateAxis setLabel:@"KBytes/Second"];
+    [bytesReceivedRateAxis setLog:YES];
+    [bytesReceivedRateAxis setRngLimitsLow:0 withHigh:100000 withMinRng:1000];
 	[queView setBarColor:[NSColor redColor]];
 }
 
