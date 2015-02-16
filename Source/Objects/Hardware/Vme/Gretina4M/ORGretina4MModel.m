@@ -319,6 +319,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
+- (void) disconnect
+{
+    [spiConnector disconnect];
+    [linkConnector disconnect];
+    [super disconnect];
+}
 
 - (void) setGuardian:(id)aGuardian
 {
