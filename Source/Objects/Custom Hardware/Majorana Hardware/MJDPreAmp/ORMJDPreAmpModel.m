@@ -822,23 +822,105 @@ struct {
     else {
         for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
             if(adcEnabledMask & (0x1<<chan)){
-                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-                ((chan%8)<<10)         |            //set chan
-                (mjdPreAmpTable[chan].conversionType << 5)   |
-                (0x1 << 4)             |            //use internal voltage reference for conversion
-                (mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
                 
                 //-------------------------------------------------------
                 //don't like the following where we have to read four times, but seems we have no choice
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 //-------------------------------------------------------
+                
+                unsigned long controlWord;
+                if( (chan%8)==0 ){
+                
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // one latency here (will show up at power cycling the chips)
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |(((chan%8)+1)<<10)                             //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
+                if( ((chan%8)>0) && ((chan%8)<5) ){
+                 
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |(((chan%8)+1)<<10)                             //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];                    
+                }
+                if( (chan%8)==5 ){
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |(((chan%8)+1)<<10)                             //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // one latency here
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
+                if( (chan%8)==6 ){
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // one write enough
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
+                if( (chan%8)==7 ){
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // catch up previous writes
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
             }
         }
         
     }
+    NSLog(@"---------------------------------------\n");
+    NSLog(@"Reading out the two ADC octal chips\n");
+    NSLog(@"---------------------------------------\n");
     for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
         if(adcEnabledMask & (0x1<<chan)){
             //int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
@@ -855,7 +937,7 @@ struct {
             
             float convertedValue = (-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
 			
-            if(verbose)NSLog(@"%d: %d %d %d %.2f (%.2f)\n",chan,adcValue,mjdPreAmpTable[chan].adcOffset,-adcValue+mjdPreAmpTable[chan].adcOffset,(-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept,convertedValue);
+            if(verbose)NSLog(@"[%d], raw: %d, converted:%.2f\n",chan,adcValue,convertedValue);
             
             
             if(boardRev == 0){  //Orginal Board Rev 1
