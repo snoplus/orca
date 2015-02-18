@@ -90,10 +90,41 @@ void readPreAmpAdcs(SBC_Packet* aPacket)
         uint32_t rawValue = 0;
         if(enabledMask & (0x1<<i)){
             //don't like it, but have to do this four times
-            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
-            rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
-			rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
-			rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            //rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            //rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+			//rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+			//rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            if( i==0 ){
+               
+                // one latency here
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( (i>0) && (i<5) ){
+                
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( i==5 ){
+                
+                // one latency here
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i+1]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( i==6 ){
+                
+                // one write here
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            }
+            if( i==7 ){
+                
+                // catch up with previous writes here
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
+            }
         }
         else rawValue=0;
         p->adc[i] = rawValue;
