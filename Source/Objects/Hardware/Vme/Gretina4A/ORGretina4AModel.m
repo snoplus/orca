@@ -53,6 +53,7 @@ NSString* ORGretina4AModelFirmwareStatusStringChanged	= @"ORGretina4AModelFirmwa
 NSString* ORGretina4AModelInitStateChanged              = @"ORGretina4AModelInitStateChanged";
 NSString* ORGretina4ACardInited                         = @"ORGretina4ACardInited";
 
+NSString* ORGretina4AForceFullCardInitChanged           = @"ORGretina4AForceFullCardInitChanged";
 NSString* ORGretina4AForceFullInitChanged               = @"ORGretina4AForceFullInitChanged";
 NSString* ORGretina4AEnabledChanged                     = @"ORGretina4AEnabledChanged";
 
@@ -109,6 +110,7 @@ NSString* ORGretina4AMWindowChanged                     = @"ORGretina4AMWindowCh
 NSString* ORGretina4AD3WindowChanged                    = @"ORGretina4AD3WindowChanged";
 NSString* ORGretina4ADiscWidthChanged                   = @"ORGretina4ADiscWidthChanged";
 NSString* ORGretina4ABaselineStartChanged               = @"ORGretina4ABaselineStart0Changed";
+NSString* ORGretina4ABaselineDelayChanged               = @"ORGretina4ABaselineDelayChanged";
 NSString* ORGretina4AP1WindowChanged                    = @"ORGretina4AP1WindowChanged";
 NSString* ORGretina4AP2WindowChanged                    = @"ORGretina4AP2WindowChanged";
 NSString* ORGretina4ADacChannelSelectChanged            = @"ORGretina4ADacChannelSelectChanged";
@@ -174,6 +176,8 @@ NSString* ORGretina4ABoardRevNumChanged                 = @"ORGretina4ABoardRevN
 NSString* ORGretina4AVhdlVerNumChanged                  = @"ORGretina4AVhdlVerNumChanged";
 NSString* ORGretina4AFifoAccessChanged                  = @"ORGretina4AFifoAccessChanged";
 NSString* ORGretina4ATriggerPolarityChanged             = @"ORGretina4ATriggerPolarityChanged";
+NSString* ORGretina4AWindowCompMinChanged               = @"ORGretina4AWindowCompMinChanged";
+NSString* ORGretina4AWindowCompMaxChanged               = @"ORGretina4AWindowCompMaxChanged";
 
 @interface ORGretina4AModel (private)
 //firmware loading
@@ -1073,8 +1077,15 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4AChannels;i++){
         enabled[i]			= YES;
     }
-    
     fifoResetCount = 0;
+}
+
+- (BOOL) forceFullCardInit		{ return forceFullCardInit; }
+- (void) setForceFullCardInit:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setForceFullCardInit:forceFullCardInit];
+    forceFullCardInit = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AForceFullCardInitChanged object:self];
 }
 
 - (BOOL) forceFullInit:(short)chan		{ return forceFullInit[chan]; }
@@ -1120,6 +1131,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writePeakSensitivity];
     [self writeTriggerConfig];
     [self writeP2Window];
+    [self writeBaselineDelay];
+    [self writeWindowCompMin];
+    [self writeWindowCompMax];
 
     [self loadWindowDelays];
     
@@ -1409,7 +1423,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
               addressOffset:register_information[kChannelPulsedControl].offset
                        mask:0x00000fff
                   reportKey:@"PulsedControl"
-              forceFullInit:YES];
+              forceFullInit:forceFullCardInit];
     
 }
 
@@ -1487,7 +1501,6 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                        mask:0x0000007F
                   reportKey:[NSString stringWithFormat:@"KWindow_%d",channel]
               forceFullInit:forceFullInit[channel]];
-    
 }
 
 - (void) writeMWindow:(short)channel
@@ -1500,7 +1513,6 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                        mask:0x0000007F
                   reportKey:[NSString stringWithFormat:@"MWindow_%d",channel]
               forceFullInit:forceFullInit[channel]];
-    
 }
 
 - (void) writeD3Window:(short)channel
@@ -1533,8 +1545,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kP2Window].offset
                        mask:0x000001FF
-                  reportKey:@"P2Window"];
-    
+                  reportKey:@"P2Window"
+              forceFullInit:forceFullCardInit];
 }
 
 - (void) writeDiscWidth:(short)channel
@@ -1562,7 +1574,38 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
               forceFullInit:forceFullInit[channel]];
     
 }
-
+- (void) writeBaselineDelay
+{
+    unsigned long theValue = (baselineStart[0] & 0x00003fff);
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kBaselineDelay].offset
+                       mask:0x00003fff
+                  reportKey:@"BaselineDelay"
+              forceFullInit:forceFullCardInit];
+    
+}
+- (void) writeWindowCompMin
+{
+    //***NOTE that we only write the first value of the array to all channels
+    unsigned long theValue = (windowCompMin & 0x0000ffff);
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kWindowCompMin].offset
+                       mask:0x0000ffff
+                  reportKey:@"WindowCompMin"
+              forceFullInit:forceFullCardInit];
+    
+}
+- (void) writeWindowCompMax
+{
+    //***NOTE that we only write the first value of the array to all channels
+    unsigned long theValue = (windowCompMax & 0x0000ffff);
+    [self writeAndCheckLong:theValue
+              addressOffset:register_information[kWindowCompMax].offset
+                       mask:0x0000ffff
+                  reportKey:@"WindowCompMax"
+              forceFullInit:forceFullCardInit];
+    
+}
 - (void) writePeakSensitivity
 {
     //***NOTE that we only write the first value of the array to all channels
@@ -1570,7 +1613,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kPeakSensitivity].offset
                        mask:0x00000003
-                  reportKey:@"PeakSensitivity"];
+                  reportKey:@"PeakSensitivity"
+              forceFullInit:forceFullCardInit];
+
 }
 - (void) writeTriggerConfig
 {
@@ -1579,7 +1624,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kTriggerConfig].offset
                        mask:0x00000003
-                  reportKey:@"TriggerConfig"];
+                  reportKey:@"TriggerConfig"
+              forceFullInit:forceFullCardInit];
+
 }
 
 #pragma mark - Clock Sync
@@ -2133,6 +2180,10 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setWriteFlag:         [decoder decodeInt32ForKey:@"writeFlag"]];
     [self setDecimationFactor:  [decoder decodeInt32ForKey:@"decimationFactor"]];
     [self setP2Window:          [decoder decodeInt32ForKey:@"p2Window"]];
+    [self setForceFullCardInit: [decoder decodeIntForKey:  @"forceFullInit"]];
+    [self setBaselineDelay:     [decoder decodeIntForKey:  @"baselineDelay"]];
+    [self setWindowCompMin:     [decoder decodeIntForKey:  @"windowCompMin"]];
+    [self setWindowCompMax:     [decoder decodeIntForKey:  @"windowCompMax"]];
 
 	
 	int i;
@@ -2277,8 +2328,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt32:writeFlag                  forKey:@"writeFlag"];
     [encoder encodeInt32:decimationFactor           forKey:@"decimationFactor"];
     [encoder encodeInt32:p2Window                   forKey:@"p2Window"];
+    [encoder encodeInt32:forceFullCardInit          forKey:@"forceFullCardInit"];
+    [encoder encodeInt32:baselineDelay              forKey:@"baselineDelay"];
+    [encoder encodeInt32:windowCompMin              forKey:@"windowCompMin"];
+    [encoder encodeInt32:windowCompMax              forKey:@"windowCompMax"];
 
-    
 	int i;
  	for(i=0;i<kNumGretina4AChannels;i++){
         [encoder encodeInt:forceFullInit[i]             forKey:[@"forceFullInit"		stringByAppendingFormat:@"%d",i]];
@@ -2366,6 +2420,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [objDictionary setObject:[NSNumber numberWithInt:writeFlag] forKey:@"writeFlag"];
     [objDictionary setObject:[NSNumber numberWithInt:decimationFactor] forKey:@"decimationFactor"];
     [objDictionary setObject:[NSNumber numberWithInt:p2Window] forKey:@"p2Window"];
+    [objDictionary setObject:[NSNumber numberWithInt:forceFullCardInit] forKey:@"forceFullCardInit"];
 
     return objDictionary;
 }
@@ -2845,6 +2900,40 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
+//------------------- Address = 0x028  Bit Field = 15..0 ---------------
+- (unsigned long) windowCompMin
+{
+    return windowCompMin;
+}
+
+- (void) setWindowCompMin:(unsigned long)aValue
+{
+    if(aValue > 0xFFFF)aValue = 0xFFFF;
+    
+    if(windowCompMin != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMin:windowCompMin];
+        windowCompMin = aValue;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMinChanged object:self];
+    }
+}
+//------------------- Address = 0x032  Bit Field = 15..0 ---------------
+- (unsigned long) windowCompMax
+{
+    return windowCompMax;
+}
+
+- (void) setWindowCompMax:(unsigned long)aValue
+{
+    if(aValue > 0xFFFF)aValue = 0xFFFF;
+    
+    if(windowCompMax != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMax:windowCompMax];
+        windowCompMax = aValue;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMaxChanged object:self];
+    }
+}
 //------------------- Address = 0x0040  Bit Field = 1 ---------------
 - (BOOL) routerVetoEn:(int)anIndex
 {
@@ -3581,6 +3670,23 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
         [[[self undoManager] prepareWithInvocationTarget:self] setPeakSensitivity:peakSensitivity];
         peakSensitivity = aValue;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APeakSensitivityChanged object:self];
+    }
+}
+//------------------- Address = 0x0418  Bit Field = 13..0 ---------------
+- (unsigned long) baselineDelay
+{
+    return baselineDelay;
+}
+
+- (void) setBaselineDelay:(unsigned long)aValue
+{
+    if(aValue > 0x3FFF)aValue = 0x3FFF;
+    
+    if(baselineDelay != aValue){
+        [[[self undoManager] prepareWithInvocationTarget:self] setBaselineDelay:baselineDelay];
+        baselineDelay = aValue;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineDelayChanged object:self];
     }
 }
 

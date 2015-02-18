@@ -35,7 +35,9 @@
     
     //Low-level registers and diagnostics
     IBOutlet NSPopUpButton*	registerIndexPU;
+    IBOutlet NSTextField*	selectedChannelField;
     IBOutlet NSTextField*	registerWriteValueField;
+    IBOutlet NSTextField*	channelSelectionField;
     IBOutlet NSButton*		writeRegisterButton;
     IBOutlet NSButton*		readRegisterButton;
     IBOutlet NSTextField*	registerStatusField;
@@ -89,10 +91,12 @@
     IBOutlet NSButton*      statusButton;
 
     //hardware setup
+    IBOutlet NSButton*		forceFullCardInitCB;
     IBOutlet NSMatrix*		forceFullInitMatrix;
     IBOutlet NSMatrix*		enabledMatrix;
     IBOutlet NSMatrix*      ledThresholdMatrix;
     IBOutlet NSMatrix*      cFDFractionMatrix;
+    IBOutlet NSPopUpButton* decimationFactorPU;
     
     IBOutlet NSMatrix*      pileupModeMatrix;
     IBOutlet NSMatrix*      premapResetDelayEnMatrix;
@@ -102,11 +106,28 @@
     IBOutlet NSMatrix*      triggerPolarityMatrix;
     IBOutlet NSMatrix*      aHitCountModeMatrix;
     IBOutlet NSMatrix*      discCountModeMatrix;
-    IBOutlet NSMatrix*      eventExtentionModeMatrix;
-    IBOutlet NSMatrix*      pileupExtentionModeMatrix;
+    IBOutlet NSMatrix*      eventExtensionModeMatrix;
+    IBOutlet NSMatrix*      pileupExtensionModeMatrix;
     IBOutlet NSMatrix*      counterResetMatrix;
     IBOutlet NSMatrix*      pileupWaveformOnlyModeMatrix;
+    IBOutlet NSTextField*   windowCompMinField;
+    IBOutlet NSTextField*   windowCompMaxField;
+    IBOutlet NSTextField*   rawDataLengthField; //bad name in docs. really raw_data_offset
+    IBOutlet NSTextField*   rawDataWindowField; //bad name in docs. really max length of event packet
+    IBOutlet NSTextField*   dWindowField;
+    IBOutlet NSTextField*   kWindowField;
+    IBOutlet NSTextField*   mWindowField;
+    IBOutlet NSTextField*   d3WindowField;
+    IBOutlet NSTextField*   discWidthField;
+    IBOutlet NSTextField*   baselineStartField;
+    IBOutlet NSTextField*   baselineDelayField;
+    IBOutlet NSTextField*   p1WindowField;
+    IBOutlet NSTextField*   p2WindowField;
+    IBOutlet NSTextField*   peakSensitivityField;
+    IBOutlet NSPopUpButton*      triggerConfigPU;
+    IBOutlet NSButton*      writeFlagCB;
 
+    
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
@@ -133,6 +154,7 @@
 - (void) registerLockChanged:(NSNotification*)aNote;
 
 #pragma mark - Low-level registers and diagnostics
+- (void) selectedChannelChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) setRegisterDisplay:(unsigned int)index;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
@@ -165,6 +187,7 @@
 
 #pragma mark - Card Params
 - (void) enabledChanged:(NSNotification*)aNote;
+- (void) forceFullCardInitChanged:(NSNotification*)aNote;
 - (void) forceFullInitChanged:(NSNotification*)aNote;
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) fifoEmptyChanged:(NSNotification*)aNote;
@@ -192,6 +215,8 @@
 - (void) userPackageDataChanged:(NSNotification*)aNote;
 - (void) routerVetoEnChanged:(NSNotification*)aNote;
 - (void) preampResetDelayEnChanged:(NSNotification*)aNote;
+- (void) decimationFactorChanged:(NSNotification*)aNote;
+- (void) writeFlagChanged:(NSNotification*)aNote;
 - (void) pileupModeChanged:(NSNotification*)aNote;
 - (void) droppedEventCountModeChanged:(NSNotification*)aNote;
 - (void) eventCountModeChanged:(NSNotification*)aNote;
@@ -201,10 +226,11 @@
 - (void) triggerPolarityChanged:(NSNotification*)aNote;
 - (void) aHitCountModeChanged:(NSNotification*)aNote;
 - (void) discCountModeChanged:(NSNotification*)aNote;
-- (void) eventExtentionModeChanged:(NSNotification*)aNote;
-- (void) pileupExtentionModeChanged:(NSNotification*)aNote;
+- (void) eventExtensionModeChanged:(NSNotification*)aNote;
+- (void) pileupExtensionModeChanged:(NSNotification*)aNote;
 - (void) counterResetChanged:(NSNotification*)aNote;
 - (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote;
+- (void) triggerConfigChanged:(NSNotification*)aNote;
 
 
 
@@ -213,8 +239,13 @@
 - (void) dWindowChanged:(NSNotification*)aNote;
 - (void) kWindowChanged:(NSNotification*)aNote;
 - (void) mWindowChanged:(NSNotification*)aNote;
-- (void) d2WindowChanged:(NSNotification*)aNote;
+- (void) d3WindowChanged:(NSNotification*)aNote;
 - (void) baselineStartChanged:(NSNotification*)aNote;
+- (void) baselineDelayChanged:(NSNotification*)aNote;
+- (void) windowCompMinChanged:(NSNotification*)aNote;
+- (void) windowCompMaxChanged:(NSNotification*)aNote;
+- (void) p1WindowChanged:(NSNotification*)aNote;
+- (void) p2WindowChanged:(NSNotification*)aNote;
 - (void) dacChannelSelectChanged:(NSNotification*)aNote;
 - (void) dacAttenuationChanged:(NSNotification*)aNote;
 - (void) phaseHuntChanged:(NSNotification*)aNote;
@@ -270,6 +301,9 @@
 - (void) fifoAccessChanged:(NSNotification*)aNote;
 
 #pragma mark - Actions
+- (IBAction) decimationFactorAction:(id)sender;
+- (IBAction) writeFlagAction:(id)sender;
+
 #pragma mark - Security
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) registerLockAction:(id) sender;
@@ -289,6 +323,7 @@
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) cdfFractionAction:(id)sender;
 - (IBAction) ledThresholdAction:(id)sender;
+- (IBAction) writeFlagAction:(id)sender;
 - (IBAction) pileupModeAction:(id)sender;
 - (IBAction) preampResetDelayEnAction:(id)sender;
 - (IBAction) preampResetDelayAction:(id)sender;
@@ -297,12 +332,27 @@
 - (IBAction) triggerPolarityAction:(id)sender;
 - (IBAction) aHitCountModeAction:(id)sender;
 - (IBAction) discCountModeAction:(id)sender;
-- (IBAction) eventExtentionModeAction:(id)sender;
-- (IBAction) pileupExtentionModeAction:(id)sender;
+- (IBAction) eventExtensionModeAction:(id)sender;
+- (IBAction) pileupExtensionModeAction:(id)sender;
 - (IBAction) counterResetAction:(id)sender;
 - (IBAction) pileupWaveformOnlyModeAction:(id)sender;
+- (IBAction) rawDataLengthAction:(id)sender;
+- (IBAction) rawDataWindowAction:(id)sender;
+- (IBAction) dWindowAction:(id)sender;
+- (IBAction) kWindowAction:(id)sender;
+- (IBAction) mWindowAction:(id)sender;
+- (IBAction) d3WindowAction:(id)sender;
+- (IBAction) discWidthAction:(id)sender;
+- (IBAction) baselineStartAction:(id)sender;
+- (IBAction) baselineDelayAction:(id)sender;
+- (IBAction) p1WindowAction:(id)sender;
+- (IBAction) p2WindowAction:(id)sender;
+- (IBAction) triggerConfigAction:(id)sender;
+- (IBAction) windowCompMinAction:(id)sender;
+- (IBAction) windowCompMaxAction:(id)sender;
 
 #pragma mark - Low-level registers and diagnostics
+- (IBAction) selectedChannelAction:(id)sender;
 - (IBAction) registerIndexPUAction:(id)sender;
 - (IBAction) readRegisterAction:(id)sender;
 - (IBAction) writeRegisterAction:(id)sender;
@@ -315,6 +365,7 @@
 - (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
 - (IBAction) diagnosticsEnableAction:(id)sender;
+- (IBAction) peakSensitivityAction:(id)sender;
 
 #pragma mark - Hardware access
 - (IBAction) probeBoard:(id)sender;
@@ -324,6 +375,7 @@
 - (IBAction) fullInitBoardAction:(id)sender;
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) forceFullInitAction:(id)sender;
+- (IBAction) forceFullCardInitAction:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

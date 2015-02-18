@@ -47,7 +47,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(950,460);
+    settingSize     = NSMakeSize(1000,480);
     rateSize		= NSMakeSize(790,340);
     registerTabSize	= NSMakeSize(400,490);
 	firmwareTabSize = NSMakeSize(340,187);
@@ -59,16 +59,19 @@
 	// Setup register popup buttons
 	[registerIndexPU removeAllItems];
 	[registerIndexPU setAutoenablesItems:NO];
-    
+    int errCount = 0;
 	int i;
 	for (i=0;i<kNumberOfGretina4ARegisters;i++) {
         NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i], [model registerNameAt:i]];
-        
+        if(i!=[model registerEnumAt:i]){
+            errCount++;
+        }
 		[registerIndexPU insertItemWithTitle:s	atIndex:i];
-		[[registerIndexPU itemAtIndex:i] setEnabled:![model displayRegisterOnMainPage:i] && ![model displayFPGARegisterOnMainPage:i]];
+		[[registerIndexPU itemAtIndex:i] setEnabled:YES];
 	}
+    if(errCount)NSLogColor([NSColor redColor], @"Programming Error... Mismatch in Gretina4A register definitions and eNums\n");
 	// And now the FPGA registers
-	for (i=0;i<kNumberOfFPGARegisters;i++) {
+    for (i=0;i<kNumberOfFPGARegisters;i++) {
         NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model fpgaRegisterOffsetAt:i], [model fpgaRegisterNameAt:i]];
 
 		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4ARegisters)];
@@ -85,8 +88,8 @@
         [[triggerPolarityMatrix         cellAtRow:i column:0] setTag:i];
         [[aHitCountModeMatrix           cellAtRow:i column:0] setTag:i];
         [[discCountModeMatrix           cellAtRow:i column:0] setTag:i];
-        [[eventExtentionModeMatrix      cellAtRow:i column:0] setTag:i];
-        [[pileupExtentionModeMatrix     cellAtRow:i column:0] setTag:i];
+        [[eventExtensionModeMatrix      cellAtRow:i column:0] setTag:i];
+        [[pileupExtensionModeMatrix     cellAtRow:i column:0] setTag:i];
         [[counterResetMatrix            cellAtRow:i column:0] setTag:i];
         [[pileupWaveformOnlyModeMatrix  cellAtRow:i column:0] setTag:i];
    }
@@ -221,6 +224,11 @@
 						object: model];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(selectedChannelChanged:)
+                         name : ORGretina4ASelectedChannelChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(registerWriteValueChanged:)
                          name : ORGretina4ARegisterWriteValueChanged
 						object: model];
@@ -246,6 +254,12 @@
                      selector : @selector(forceFullInitChanged:)
                          name : ORGretina4AForceFullInitChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(forceFullCardInitChanged:)
+                         name : ORGretina4AForceFullCardInitChanged
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(firmwareVersionChanged:)
                          name : ORGretina4AFirmwareVersionChanged
@@ -375,12 +389,27 @@
                      selector : @selector(preampResetDelayEnChanged:)
                          name : ORGretina4APreampResetDelayEnChanged
                         object: model];
-    
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(writeFlagChanged:)
+                         name : ORGretina4AWriteFlagChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(decimationFactorChanged:)
+                         name : ORGretina4ADecimationFactorChanged
+                        object: model];
+   
     [notifyCenter addObserver : self
                      selector : @selector(pileupModeChanged:)
                          name : ORGretina4APileupMode0Changed
                         object: model];
  
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerConfigChanged:)
+                         name : ORGretina4ATriggerConfigChanged
+                        object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(droppedEventCountModeChanged:)
                          name : ORGretina4ADroppedEventCountModeChanged
@@ -407,13 +436,13 @@
                         object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(eventExtentionModeChanged:)
-                         name : ORGretina4AEventExtentionModeChanged
+                     selector : @selector(eventExtensionModeChanged:)
+                         name : ORGretina4AEventExtensionModeChanged
                         object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(pileupExtentionModeChanged:)
-                         name : ORGretina4APileupExtentionModeChanged
+                     selector : @selector(pileupExtensionModeChanged:)
+                         name : ORGretina4APileupExtensionModeChanged
                         object: model];
 
     [notifyCenter addObserver : self
@@ -468,15 +497,45 @@
                         object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(d2WindowChanged:)
-                         name : ORGretina4AD2WindowChanged
+                     selector : @selector(d3WindowChanged:)
+                         name : ORGretina4AD3WindowChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(discWidthChanged:)
+                         name : ORGretina4ADiscWidthChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(windowCompMinChanged:)
+                         name : ORGretina4AWindowCompMinChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(windowCompMaxChanged:)
+                         name : ORGretina4AWindowCompMaxChanged
+                        object: model];
+  
     [notifyCenter addObserver : self
                      selector : @selector(baselineStartChanged:)
                          name : ORGretina4ABaselineStartChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(baselineDelayChanged:)
+                         name : ORGretina4ABaselineDelayChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(p1WindowChanged:)
+                         name : ORGretina4AP1WindowChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(p2WindowChanged:)
+                         name : ORGretina4AP2WindowChanged
+                        object: model];
+  
     [notifyCenter addObserver : self
                      selector : @selector(dacChannelSelectChanged:)
                          name : ORGretina4ADacChannelSelectChanged
@@ -776,6 +835,7 @@
     [self lockChanged:nil];
 
     //Low-level registers and diagnostics
+    [self selectedChannelChanged:nil];
     [self registerIndexChanged:nil];
     [self registerWriteValueChanged:nil];
     [self spiWriteValueChanged:nil];
@@ -806,6 +866,7 @@
     //Card Params
     [self enabledChanged:nil];
     [self forceFullInitChanged:nil];
+    [self forceFullCardInitChanged:nil];
     [self firmwareVersionChanged:nil];
     [self fifoEmptyChanged:nil];
     [self fifoEmpty1Changed:nil];
@@ -832,13 +893,15 @@
     [self userPackageDataChanged:nil];
     [self routerVetoEnChanged:nil];
     [self preampResetDelayEnChanged:nil];
+    [self decimationFactorChanged:nil];
+    [self writeFlagChanged:nil];
     [self pileupModeChanged:nil];
     [self droppedEventCountModeChanged:nil];
     [self eventCountModeChanged:nil];
     [self aHitCountModeChanged:nil];
     [self discCountModeChanged:nil];
-    [self eventExtentionModeChanged:nil];
-    [self pileupExtentionModeChanged:nil];
+    [self eventExtensionModeChanged:nil];
+    [self pileupExtensionModeChanged:nil];
     [self counterResetChanged:nil];
     [self pileupWaveformOnlyModeChanged:nil];
 
@@ -852,9 +915,14 @@
     [self dWindowChanged:nil];
     [self kWindowChanged:nil];
     [self mWindowChanged:nil];
-    [self d2WindowChanged:nil];
+    [self d3WindowChanged:nil];
+    [self windowCompMinChanged:nil];
+    [self windowCompMixChanged:nil];
     [self discWidthChanged:nil];
     [self baselineStartChanged:nil];
+    [self baselineDelayChanged:nil];
+    [self p1WindowChanged:nil];
+    [self p2WindowChanged:nil];
     [self dacChannelSelectChanged:nil];
     [self dacAttenuationChanged:nil];
     [self ilaConfigChanged:nil];
@@ -971,6 +1039,7 @@
     
     [registerLockButton setState: locked];
     [registerWriteValueField setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [channelSelectionField setEnabled:!lockedOrRunningMaintenance && !downloading];
     [registerIndexPU setEnabled:!lockedOrRunningMaintenance && !downloading];
     [readRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
     [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -988,35 +1057,24 @@
 - (void) setRegisterDisplay:(unsigned int)index
 {
     if (index < kNumberOfGretina4ARegisters) {
-        if (![model displayRegisterOnMainPage:index]) {
-            [writeRegisterButton setEnabled:[model canWriteRegister:index]];
-            [registerWriteValueField setEnabled:[model canWriteRegister:index]];
-            [readRegisterButton setEnabled:[model canReadRegister:index]];
-            [registerStatusField setStringValue:@""];
-        } else {
-            [writeRegisterButton setEnabled:NO];
-            [registerWriteValueField setEnabled:NO];
-            [readRegisterButton setEnabled:NO];
-            [registerStatusField setTextColor:[NSColor redColor]];
-            [registerStatusField setStringValue:@"Set value in Basic Ops."];
-        }
+        [writeRegisterButton setEnabled:[model canWriteRegister:index]];
+        [registerWriteValueField setEnabled:[model canWriteRegister:index]];
+        [readRegisterButton setEnabled:[model canReadRegister:index]];
+        [selectedChannelField setEnabled:[model hasChannels:index]];
+        
+        [registerStatusField setStringValue:@""];
     }
     else {
-        if (![model displayFPGARegisterOnMainPage:index]) {
-            index -= kNumberOfGretina4ARegisters;
-            [writeRegisterButton setEnabled:[model canWriteFPGARegister:index]];
-            [registerWriteValueField setEnabled:[model canWriteFPGARegister:index]];
-            [readRegisterButton setEnabled:[model canReadFPGARegister:index]];
-            [registerStatusField setStringValue:@""];
-        } else {
-            [writeRegisterButton setEnabled:NO];
-            [registerWriteValueField setEnabled:NO];
-            [readRegisterButton setEnabled:NO];
-            [registerStatusField setTextColor:[NSColor redColor]];
-            [registerStatusField setStringValue:@"Set value in Basic Ops."];
-        }
-    }
-    
+        index -= kNumberOfGretina4ARegisters;
+        [writeRegisterButton setEnabled:[model canWriteFPGARegister:index]];
+        [registerWriteValueField setEnabled:[model canWriteFPGARegister:index]];
+        [readRegisterButton setEnabled:[model canReadFPGARegister:index]];
+        [registerStatusField setStringValue:@""];
+     }
+}
+- (void) selectedChannelChanged:(NSNotification*)aNote
+{
+    [selectedChannelField setIntValue: [model selectedChannel]];
 }
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
@@ -1192,6 +1250,11 @@
     [initSerDesStateField setStringValue:[model initSerDesStateName]];
 }
 
+- (void) forceFullCardInitChanged:(NSNotification*)aNote
+{
+    [forceFullCardInitCB setIntValue:[model forceFullCardInit]];
+}
+
 - (void) forceFullInitChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -1310,6 +1373,18 @@
         [[premapResetDelayEnMatrix cellWithTag:chan] setIntValue:[model preampResetDelayEn:chan]];
     }
 }
+
+- (void) decimationFactorChanged:(NSNotification*)aNote
+{
+    [decimationFactorPU  selectItemAtIndex:[model decimationFactor]];
+}
+
+- (void) writeFlagChanged:(NSNotification*)aNote
+{
+    [writeFlagCB  setIntValue:[model writeFlag]];
+}
+
+
 - (void) pileupModeChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
@@ -1434,31 +1509,31 @@
         [[discCountModeMatrix cellWithTag:chan] setIntValue:[model discCountMode:chan]];
     }
 }
-- (void) eventExtentionModeChanged:(NSNotification*)aNote
+- (void) eventExtensionModeChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4AChannels;i++){
-            [[eventExtentionModeMatrix cellAtRow:i column:0] selectItemAtIndex:[model eventExtentionMode:i]];
+            [[eventExtensionModeMatrix cellAtRow:i column:0] selectItemAtIndex:[model eventExtensionMode:i]];
         }
     }
     else {
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[eventExtentionModeMatrix cellAtRow:chan column:0] selectItemAtIndex:[model eventExtentionMode:chan]];
+        [[eventExtensionModeMatrix cellAtRow:chan column:0] selectItemAtIndex:[model eventExtensionMode:chan]];
     }
 }
 
-- (void) pileupExtentionModeChanged:(NSNotification*)aNote
+- (void) pileupExtensionModeChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4AChannels;i++){
-            [[pileupExtentionModeMatrix cellWithTag:i] setIntValue:[model pileupExtentionMode:i]];
+            [[pileupExtensionModeMatrix cellWithTag:i] setIntValue:[model pileupExtensionMode:i]];
         }
     }
     else {
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[pileupExtentionModeMatrix cellWithTag:chan] setIntValue:[model pileupExtentionMode:chan]];
+        [[pileupExtensionModeMatrix cellWithTag:chan] setIntValue:[model pileupExtensionMode:chan]];
     }
 }
 
@@ -1492,28 +1567,69 @@
 
 - (void) rawDataLengthChanged:(NSNotification*)aNote
 {
+    //waveform Offset
+    [rawDataLengthField setIntValue:[model rawDataLength:0]];
 }
+
 - (void) rawDataWindowChanged:(NSNotification*)aNote
 {
+    [rawDataWindowField setIntValue:[model rawDataWindow:0]];
 }
+
 - (void) dWindowChanged:(NSNotification*)aNote
 {
+    [dWindowField setIntValue:[model dWindow:0]];
 }
 - (void) kWindowChanged:(NSNotification*)aNote
 {
+    [kWindowField setIntValue:[model kWindow:0]];
 }
 - (void) mWindowChanged:(NSNotification*)aNote
 {
+    [mWindowField setIntValue:[model mWindow:0]];
 }
-- (void) d2WindowChanged:(NSNotification*)aNote
+- (void) d3WindowChanged:(NSNotification*)aNote
 {
+    [d3WindowField setIntValue:[model d3Window:0]];
 }
 - (void) discWidthChanged:(NSNotification*)aNote
 {
+    [discWidthField setIntValue:[model discWidth:0]];
 }
+
+- (void) windowCompMinChanged:(NSNotification*)aNote
+{
+    [windowCompMinField setIntValue:[model windowCompMin]];
+}
+
+- (void) windowCompMaxChanged:(NSNotification*)aNote
+{
+    [windowCompMaxField setIntValue:[model windowCompMax]];
+}
+
 - (void) baselineStartChanged:(NSNotification*)aNote
 {
+    [baselineStartField setIntValue:[model baselineStart:0]];
 }
+- (void) baselineDelayChanged:(NSNotification*)aNote
+{
+    [baselineDelayField setIntValue:[model baselineDelay]];
+}
+
+- (void) p1WindowChanged:(NSNotification*)aNote
+{
+    [p1WindowField setIntValue:[model p1Window:0]];
+}
+- (void) p2WindowChanged:(NSNotification*)aNote
+{
+    [p2WindowField setIntValue:[model p2Window]];
+}
+
+- (void) peakSensitivityChanged:(NSNotification*)aNote
+{
+    [peakSensitivityField setIntValue:[model peakSensitivity]];
+}
+
 - (void) dacChannelSelectChanged:(NSNotification*)aNote
 {
 }
@@ -1550,9 +1666,6 @@
 - (void) diagMuxControlChanged:(NSNotification*)aNote
 {
 }
-- (void) peakSensitivityChanged:(NSNotification*)aNote
-{
-}
 - (void) diagInputChanged:(NSNotification*)aNote
 {
 }
@@ -1585,6 +1698,7 @@
 }
 - (void) triggerConfigChanged:(NSNotification*)aNote
 {
+    [triggerConfigPU selectItemAtIndex:[model triggerConfig]];
 }
 
 - (void) phaseErrorCountChanged:(NSNotification*)aNote
@@ -1725,12 +1839,23 @@
     [model setDiagnosticsEnabled:[sender intValue]];
     [self settingsLockChanged:nil]; //update buttons
 }
+- (IBAction) peakSensitivityAction:(id)sender;
+{
+    [model setPeakSensitivity:[sender intValue]];
+}
 
 - (IBAction) registerIndexPUAction:(id)sender
 {
 	unsigned int index = [sender indexOfSelectedItem];
 	[model setRegisterIndex:index];
 	[self setRegisterDisplay:index];
+}
+
+- (IBAction) forceFullCardInitAction:(id)sender;
+{
+    if([sender intValue] != [model forceFullCardInit]){
+        [model setForceFullCardInit:[sender intValue]];
+    }
 }
 
 - (IBAction) forceFullInitAction:(id)sender;
@@ -1760,28 +1885,40 @@
 	unsigned long aValue = 0;
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4ARegisters) {
-		aValue = [model readRegister:index];
-		NSLog(@"Gretina4A(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
+        unsigned long address   = [model registerOffsetAt:index];
+        if([model hasChannels:index])address += [model selectedChannel]*0x04;
+        aValue = [model readFromAddress:address];
+
+        NSLog(@"Gretina4A(%d,%d) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
 	} 
 	else {
 		index -= kNumberOfGretina4ARegisters;
 		aValue = [model readFPGARegister:index];	
-		NSLog(@"Gretina4A(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model fpgaRegisterNameAt:index],aValue,aValue);
+		NSLog(@"Gretina4A(%d,%d) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [model fpgaRegisterNameAt:index],aValue,aValue);
 	}
 }
 
 - (IBAction) writeRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = [model registerWriteValue];
-	unsigned int index = [model registerIndex];
+	unsigned long aValue    = [model registerWriteValue];
+	unsigned int index      = [model registerIndex];
+    
 	if (index < kNumberOfGretina4ARegisters) {
-		[model writeRegister:index withValue:aValue];
-	} 
+        unsigned long address   = [model registerOffsetAt:index];
+        if([model hasChannels:index])address += [model selectedChannel]*0x04;
+        [model writeToAddress:address aValue:aValue];
+        NSLog(@"Wrote to Gretina4A(%d,%d) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
+	}
 	else {
 		index -= kNumberOfGretina4ARegisters;
 		[model writeFPGARegister:index withValue:aValue];	
+        NSLog(@"Wrote to Gretina4A(%d,%d) %@: %u (0x%08x)\n",[model crateNumber],[model slot], [model fpgaRegisterNameAt:index],aValue,aValue);
 	}
+}
+- (IBAction) selectedChannelAction:(id)sender
+{
+    [model setSelectedChannel:[sender intValue]];
 }
 
 - (IBAction) registerWriteValueAction:(id)sender
@@ -2016,9 +2153,7 @@
 
 - (IBAction) ledThresholdAction:(id)sender
 {
-    if([sender intValue] != [model ledThreshold:[[sender selectedCell] tag]]){
-        [model setLedThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setLedThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 - (IBAction) cdfFractionAction:(id)sender;
 {
@@ -2029,83 +2164,137 @@
 
 - (IBAction) triggerPolarityAction:(id)sender
 {
-    if([sender intValue] != [model triggerPolarity:[[sender selectedCell] indexOfSelectedItem]]){
-        [model setTriggerPolarity:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
-    }
+    [model setTriggerPolarity:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) aHitCountModeAction:(id)sender
 {
-    if([sender intValue] != [model aHitCountMode:[[sender selectedCell] tag]]){
-        [model setAHitCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setAHitCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) discCountModeAction:(id)sender
 {
-    if([sender intValue] != [model discCountMode:[[sender selectedCell] tag]]){
-        [model setDiscCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setDiscCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) eventExtentionModeAction:(id)sender
+- (IBAction) eventExtensionModeAction:(id)sender
 {
-    if([sender intValue] != [model eventExtentionMode:[[sender selectedCell] indexOfSelectedItem]]){
-        [model setEventExtentionMode:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
-    }
+    [model setEventExtensionMode:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
-- (IBAction) pileupExtentionModeAction:(id)sender
+
+- (IBAction) pileupExtensionModeAction:(id)sender
 {
-    if([sender intValue] != [model pileupExtentionMode:[[sender selectedCell] tag]]){
-        [model setPileupExtentionMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setPileupExtensionMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) counterResetAction:(id)sender
 {
-    if([sender intValue] != [model counterReset:[[sender selectedCell] tag]]){
-        [model setCounterReset:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setCounterReset:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) pileupWaveformOnlyModeAction:(id)sender
 {
-    if([sender intValue] != [model pileupWaveformOnlyMode:[[sender selectedCell] tag]]){
-        [model setPileupWaveformOnlyMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setPileupWaveformOnlyMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
-
+- (IBAction) decimationFactorAction:(id)sender
+{
+    [model setDecimationFactor:[sender indexOfSelectedItem]];
+}
+- (IBAction) writeFlagAction:(id)sender
+{
+    [model setWriteFlag:[sender intValue]];
+}
 - (IBAction) pileupModeAction:(id)sender
 {
-    if([sender intValue] != [model pileupMode:[[sender selectedCell] tag]]){
-        [model setPileupMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setPileupMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) preampResetDelayEnAction:(id)sender
 {
-    if([sender intValue] != [model preampResetDelayEn:[[sender selectedCell] tag]]){
-        [model setPreampResetDelayEn:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setPreampResetDelayEn:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) preampResetDelayAction:(id)sender
 {
-    if([sender intValue] != [model preampResetDelay:[[sender selectedCell] tag]]){
-        [model setPreampResetDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setPreampResetDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
+
 - (IBAction) droppedEventCountModeAction:(id)sender
 {
-    if([sender intValue] != [model droppedEventCountMode:[[sender selectedCell] tag]]){
-        [model setDroppedEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setDroppedEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
+
 - (IBAction) eventCountModeAction:(id)sender
 {
-    if([sender intValue] != [model eventCountMode:[[sender selectedCell] tag]]){
-        [model setEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
-    }
+    [model setEventCountMode:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) rawDataLengthAction:(id)sender
+{
+    //10 ns/count
+    [model setRawDataLength:0 withValue:[sender intValue]];
+}
+
+- (IBAction) rawDataWindowAction:(id)sender
+{
+    [model setRawDataWindow:0 withValue:[sender intValue]];
+}
+- (IBAction) dWindowAction:(id)sender
+{
+    [model setDWindow:0 withValue:[sender intValue]];
+}
+
+- (IBAction) kWindowAction:(id)sender
+{
+    [model setKWindow:0 withValue:[sender intValue]];
+}
+
+- (IBAction) mWindowAction:(id)sender
+{
+    [model setMWindow:0 withValue:[sender intValue]];
+}
+
+- (IBAction) d3WindowAction:(id)sender
+{
+    [model setD3Window:0 withValue:[sender intValue]];
+}
+
+- (IBAction) discWidthAction:(id)sender
+{
+    [model setDiscWidth:0 withValue:[sender intValue]];
+}
+
+- (IBAction) baselineStartAction:(id)sender
+{
+    [model setBaselineStart:0 withValue:[sender intValue]];
+}
+- (IBAction) baselineDelayAction:(id)sender
+{
+    [model setBaselineDelay:[sender intValue]];
+}
+
+
+- (IBAction) p1WindowAction:(id)sender
+{
+    [model setP1Window:0 withValue:[sender intValue]];
+}
+
+- (IBAction) p2WindowAction:(id)sender
+{
+    [model setP2Window:[sender intValue]];
+}
+
+- (IBAction) triggerConfigAction:(id)sender
+{
+    [model setTriggerConfig:[sender indexOfSelectedItem]];
+}
+- (IBAction) windowCompMinAction:(id)sender
+{
+    [model setWindowCompMin:[sender intValue]];
+}
+- (IBAction) windowCompMaxAction:(id)sender
+{
+    [model setWindowCompMax:[sender intValue]];
 }
 
 #pragma mark •••Data Source
