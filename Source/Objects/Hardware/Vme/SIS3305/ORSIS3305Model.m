@@ -3440,7 +3440,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self setHighEnergySuppressMask:	[decoder decodeInt32ForKey:@"highEnergySuppressMask"]];
     [self setInputInvertedMask:			[decoder decodeInt32ForKey:@"inputInvertedMask"]];
     
-    for (int i=0; i<kNumSIS3305Groups; i++) {
+    int i;
+    for (i=0; i<kNumSIS3305Groups; i++) {
         [self setInternalTriggerEnabled:i       withValue:[decoder decodeInt32ForKey:@"internalTriggerEnabled"]];
     }
     [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
@@ -3454,7 +3455,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 	
     // becauase these are set up as c-arrays, we have to step through them
-    for (int chan = 0; chan<kNumSIS3305Channels; chan++)
+    int chan;
+    for (chan = 0; chan<kNumSIS3305Channels; chan++)
     {
         //threshold mode can't be set directly, since we store the individual LT ang GT enabled with the encoder
         [self setLTThresholdEnabled:chan    withValue:[decoder decodeIntForKey:[@"LTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
@@ -3540,7 +3542,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //	[encoder encodeInt32:mcaNofHistoPreset		forKey:@"mcaNofHistoPreset"];
 	
     //channel-level c-arrays:
-    for (int chan=0; chan<kNumSIS3305Channels; chan++) {
+    int chan;
+    for (chan=0; chan<kNumSIS3305Channels; chan++) {
         [encoder encodeInt:LTThresholdEnabled[chan]		forKey:[@"LTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
         [encoder encodeInt:GTThresholdEnabled[chan]		forKey:[@"GTThresholdEnabled"	stringByAppendingFormat:@"%d",chan]];
         [encoder encodeInt:LTThresholdOn[chan]          forKey:[@"LTThresholdOn"		stringByAppendingFormat:@"%d",chan]];
