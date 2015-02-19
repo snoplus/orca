@@ -906,7 +906,8 @@
 {
     // This method combins 1-4 and 5-8.
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
-    for (short chan=0; chan<chPerGroup; chan++) {
+    short chan;
+    for (chan=0; chan<chPerGroup; chan++) {
         [[LTThresholdOn14Matrix cellWithTag:chan] setIntValue:[model LTThresholdOn:chan]];
         [[LTThresholdOn58Matrix cellWithTag:(chan)] setIntValue:[model LTThresholdOn:(chan+4)]];
     }
@@ -917,7 +918,8 @@
 {
     // This method combins 1-4 and 5-8.
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
-    for (short chan=0; chan<chPerGroup; chan++) {
+    short chan;
+    for (chan=0; chan<chPerGroup; chan++) {
         [[LTThresholdOff14Matrix cellWithTag:chan] setIntValue:[model LTThresholdOff:chan]];
         [[LTThresholdOff58Matrix cellWithTag:(chan)] setIntValue:[model LTThresholdOff:(chan+4)]];
     }
@@ -927,7 +929,8 @@
 {
     // This method combins 1-4 and 5-8.
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
-    for (short chan=0; chan<chPerGroup; chan++) {
+    short chan;
+    for (chan=0; chan<chPerGroup; chan++) {
         [[GTThresholdOn14Matrix cellWithTag:chan] setIntValue:[model GTThresholdOn:chan]];
         [[GTThresholdOn58Matrix cellWithTag:chan] setIntValue:[model GTThresholdOn:(chan+4)]];
     }
@@ -937,7 +940,8 @@
 {
     // This method combins 1-4 and 5-8.
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
-    for (short chan=0; chan<chPerGroup; chan++) {
+    short chan;
+    for (chan=0; chan<chPerGroup; chan++) {
         [[GTThresholdOff14Matrix cellWithTag:chan]      setIntValue:[model GTThresholdOff:chan]];
         [[GTThresholdOff58Matrix cellWithTag:(chan)]  setIntValue:[model GTThresholdOff:(chan+4)]];
     }
