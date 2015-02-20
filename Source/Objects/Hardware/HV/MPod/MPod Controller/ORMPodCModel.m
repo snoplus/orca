@@ -455,14 +455,10 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
                 [self decodeValueArray:[s componentsSeparatedByString:@"="]];
             }   
         }
-        [self performSelectorOnMainThread:@selector(sendParametersUsingMainThread) withObject:nil waitUntilDone:YES];
+        
+        [delegate performSelectorOnMainThread:@selector(setParameterDictionary:) withObject:dictionaryFromWalk waitUntilDone:YES];
     }
     [thePool release];
-}
-
-- (void) sendParametersUsingMainThread
-{
-  	[delegate setParameterDictionary:dictionaryFromWalk];
 }
 
 - (void)decodeValueArray:(NSArray*)parts
