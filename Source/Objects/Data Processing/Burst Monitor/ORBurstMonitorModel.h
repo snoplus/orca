@@ -82,6 +82,9 @@
     int quietSec;
     int loudSec;
     int burstForce;
+    int peakN;
+    int lowN;
+    double adcP;
     
     //burst tags
     unsigned short burstTell; //1 if a bust still needs printing

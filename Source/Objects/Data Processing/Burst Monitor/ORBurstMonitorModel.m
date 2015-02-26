@@ -376,6 +376,14 @@ NSDate* burstStart = NULL;
         return ([self chanprob:co Channels:ch Prob:1 Filled:0] + [self fewprob:co Channels:(ch - 1)]);
     }
 }
+unsigned long long fact(unsigned long long num)
+{
+    if (num == 0) {
+        return 1;
+    } else {
+        return (num * fact(num - 1));
+    }
+}
 
 #pragma mark •••Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
@@ -535,7 +543,7 @@ NSDate* burstStart = NULL;
                                         //NSLog(@"Bdate is %@ \n", Bdate);
                                             
                                         
-                                        //Find characturistics of burst
+                                        //Find channel likelyhood of burst 
                                         NSMutableArray* reChans = [[Nchans mutableCopy] autorelease]; //MAH added autorelease to prevent memory leak
                                         int j; //MAH -- declaration has to be outside the loop for XCode < 5.x
                                         for(j=0; j<[reChans count]; j++)
@@ -546,6 +554,44 @@ NSDate* burstStart = NULL;
                                         [reChans removeObjectAtIndex:(0)];
                                         int numChan = [self channelsCheck:(reChans)];
                                         numBurstChan = numChan;
+                                            
+                                        //Find ADC likelyhood of burst
+                                        peakN = 0;
+                                        lowN = 0;
+                                        int n;
+                                        for(n=1; n<[Nadcs count]; n++)
+                                        {
+                                            if([[Nadcs objectAtIndex:n] intValue]>400 && [[Nadcs objectAtIndex:n] intValue]<900)
+                                            {
+                                                lowN = lowN + 1;
+                                            }
+                                            else
+                                            {
+                                                if([[Nadcs objectAtIndex:n] intValue]>899 && [[Nadcs objectAtIndex:n] intValue]<1400)
+                                                {
+                                                    peakN = peakN + 1;
+                                                }
+                                            }
+                                        }
+                                        adcP = 0;
+                                        double peakP=0.86; //mod this later possibly
+                                        double peakExpect = peakP*(peakN+lowN);
+                                        for(n=0; n<(peakN + lowN + 1); n++)
+                                        {
+                                            double partP = ( fact(peakN + lowN)/(fact(n)*fact(peakN + lowN - n)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
+                                            double partDisk = fabs(n-(peakP*(peakN + lowN)));
+                                            if ((partDisk+0.01)>fabs(peakN - peakExpect))
+                                            {
+                                                adcP = adcP + partP;
+                                            }
+                                            
+                                        }
+                                        NSLog(@"adcP is %f, peak/lowN is %i, %i \n", adcP, peakN, lowN); //fixme CB remove when confident this works
+                                        
+                                        
+                                            
+                                            
+                                        //Report basic traits before veto
                                         double startTime = ([[Nsecs objectAtIndex:(countofNchan-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(countofNchan-1)] longValue]);
                                         double endTime = ([[Nsecs objectAtIndex:1] longValue] + 0.000001*[[Nmics objectAtIndex:1] longValue]);
                                         int adcStart = ([[Nadcs objectAtIndex:(countofNchan-1)] intValue]);
@@ -1034,6 +1080,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Number of counts in the burst: %d\n",countsInBurst];
     theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
     theContent = [theContent stringByAppendingFormat:@"Probability of number of channels or less given number of counts: %f\n",chanpvalue];
+    theContent = [theContent stringByAppendingFormat:@"Number of events with neutron-like energy: %d\n",peakN + lowN];
+    theContent = [theContent stringByAppendingFormat:@"Likelyhood of neutron energy distribution: %f\n",adcP];
     theContent = [theContent stringByAppendingFormat:@"Position: (x,y)=(%i+-%f,%i+-%f) mm, phi=%f, r=%f mm, rms=%f mm  \n", Xcenter, Xrms, Ycenter, Yrms, phi, Rcenter, Rrms];
     theContent = [theContent stringByAppendingFormat:@"SN expected: (x,y)=(0+-655,0+-508) mm, r=0 mm, rms=829 mm  \n"];
     theContent = [theContent stringByAppendingFormat:@"Likelyhood of central position: chisquared %f/2, p = %f \n", rSqrNorm, exp(-0.5*rSqrNorm)];
