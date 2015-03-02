@@ -365,15 +365,19 @@ NSDate* burstStart = NULL;
                 [self chanprob:(counts - 1) Channels:(chns - 1) Prob:(pr * (64.0 - nfull)/64.0) Filled:(nfull + 1)] );
     }
 }
-- (double) fewprob:(int) co Channels:(int) ch
+- (double) diffprob:(int) co Channels:(int) ch Expect:(double) ex Found:(int) fd
 {
     if(ch == 0)
     {
         return 0.0;
     }
-    else
+    else if((fabs(ch-ex)+0.01) > fabs(fd-ex))
     {
-        return ([self chanprob:co Channels:ch Prob:1 Filled:0] + [self fewprob:co Channels:(ch - 1)]);
+        return ([self chanprob:co Channels:ch Prob:1 Filled:0] + [self diffprob:co Channels:(ch - 1) Expect:ex Found:fd]);
+    }
+    else 
+    {
+        return ([self diffprob:co Channels:(ch - 1) Expect:ex Found:fd]);
     }
 }
 unsigned long long fact(unsigned long long num)
@@ -1056,9 +1060,12 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [queueLock lock]; //--begin critial section
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
     //calc chan prob
+    double exChan =999.999;
     if(countsInBurst < 20)
     {
-        chanpvalue = [self fewprob:countsInBurst Channels:numBurstChan];
+        exChan = 64.0*(1.0-exp(-(countsInBurst/64.0)));
+        chanpvalue = [self diffprob:countsInBurst Channels:countsInBurst Expect:exChan Found:numBurstChan];
+        NSLog(@"chanpvalue is %f, expected is %f \n", chanpvalue, exChan);
     }
     else{
         chanpvalue = 999.999;
@@ -1079,7 +1086,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"Number of counts in the burst: %d\n",countsInBurst];
     theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
-    theContent = [theContent stringByAppendingFormat:@"Probability of number of channels or less given number of counts: %f\n",chanpvalue];
+    theContent = [theContent stringByAppendingFormat:@"Epected number of channels: %f, Probablility given number of counts: %f \n", exChan, chanpvalue];
     theContent = [theContent stringByAppendingFormat:@"Number of events with neutron-like energy: %d\n",peakN + lowN];
     theContent = [theContent stringByAppendingFormat:@"Likelyhood of neutron energy distribution: %f\n",adcP];
     theContent = [theContent stringByAppendingFormat:@"Position: (x,y)=(%i+-%f,%i+-%f) mm, phi=%f, r=%f mm, rms=%f mm  \n", Xcenter, Xrms, Ycenter, Yrms, phi, Rcenter, Rrms];
