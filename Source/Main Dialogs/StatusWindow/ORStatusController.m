@@ -270,6 +270,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	return [contents autorelease];
 }
 
+- (void) doSnapShot
+{
+    [self doPeriodicSnapShotToPath:[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]];
+}
+
 - (void) doPeriodicSnapShotToPath:(NSString*) aPath
 {
 	if([aPath length] == 0) return;

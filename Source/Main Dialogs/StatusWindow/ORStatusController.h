@@ -62,6 +62,7 @@
 - (NSString*) alarmLogContents;
 - (void) populateFilterPopup;
 - (void) loadAlarmHistory;
+- (void) doSnapShot;
 - (void) doPeriodicSnapShotToPath:(NSString*) aPath;
 - (void) mailSent:(NSString*)address;
 

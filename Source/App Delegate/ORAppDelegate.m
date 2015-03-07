@@ -720,7 +720,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		}
 		//if(heartbeatCount%30 == 0){
 			if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
-				[[ORStatusController sharedStatusController] doPeriodicSnapShotToPath:[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]];
+                [[ORStatusController sharedStatusController] performSelectorOnMainThread:@selector(doSnapShot) withObject:nil waitUntilDone:YES];
 			}
 		//}
 	}
