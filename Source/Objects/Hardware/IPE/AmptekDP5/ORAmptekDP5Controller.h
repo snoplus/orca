@@ -27,6 +27,8 @@
 @interface ORAmptekDP5Controller : OrcaObjectController {
 
 	IBOutlet NSTabView*				tabView;
+	IBOutlet NSPopUpButton*         spectrumRequestRatePU;
+    IBOutlet NSProgressIndicator*   isPollingSpectrumIndicator;
     
     //AmpTek DP5
 	IBOutlet   NSPopUpButton* spectrumRequestTypePU;
@@ -36,37 +38,37 @@
 	@private
 	
     //BB commands
-    IBOutlet   NSTextField* eventFifoStatusRegTextField;
+//TODO: rm   slt - -    IBOutlet   NSTextField* eventFifoStatusRegTextField;
 	IBOutlet   NSButton* resetEventCounterAtRunStartCB;
 	IBOutlet   NSTextField* statusHighRegTextField;
 	IBOutlet   NSTextField* statusLowRegTextField;
-	IBOutlet   NSButton* useBroadcastIdBBCB;
-	IBOutlet   NSTextField* idBBforWCommandTextField;
-	IBOutlet   NSTextField* crateUDPDataCommandTextField;
-	IBOutlet   NSTextField* BBCmdFFMaskTextField;
-    IBOutlet   NSMatrix*		BBCmdFFMaskMatrix;
-	IBOutlet   NSTextField* cmdWArg4TextField;
-	IBOutlet   NSTextField* cmdWArg3TextField;
-	IBOutlet   NSTextField* cmdWArg2TextField;
-	IBOutlet   NSTextField* cmdWArg1TextField;
+//TODO: rm   slt - - 	IBOutlet   NSButton* useBroadcastIdBBCB;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* idBBforWCommandTextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* crateUDPDataCommandTextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* BBCmdFFMaskTextField;
+//TODO: rm   slt - -     IBOutlet   NSMatrix*		BBCmdFFMaskMatrix;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* cmdWArg4TextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* cmdWArg3TextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* cmdWArg2TextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* cmdWArg1TextField;
     
         //DAQ mode
 	    IBOutlet   NSTextField* sltDAQModeTextField;
 		IBOutlet NSPopUpButton* sltDAQModePU;
-	IBOutlet   NSButton* takeEventDataCB;
-	IBOutlet   NSButton* takeUDPstreamDataCB;
+//TODO: rm   slt - - 	IBOutlet   NSButton* takeEventDataCB;
+//TODO: rm   slt - - 	IBOutlet   NSButton* takeUDPstreamDataCB;
 	IBOutlet   NSButton* takeADCChannelDataCB;
 	IBOutlet   NSButton* takeRawUDPDataCB;
         
         //UDP Data tab ----
-	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
-	IBOutlet   NSTextField* chargeBBFileTextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* numRequestedUDPPacketsTextField;
+//TODO: rm   slt - - 	IBOutlet   NSTextField* chargeBBFileTextField;
     
         //control reg tab
 		IBOutlet NSButton*		writeControlRegButton;
 	    IBOutlet NSTextField*   controlRegNumFifosTextField;
-	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
-	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
+//TODO: rm   slt - -	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
+//TODO: rm   slt - -	    IBOutlet NSTextField*	pixelBusEnableRegTextField;
 		
 	    // UDP K-Cmd tab   -----
 	    //udp connection
@@ -88,6 +90,8 @@
 
 	    // UDP Data Packet reader tab -----
 		//(P) command sender (client)
+        #if 0
+        //removed - remained from SLT
 	    IBOutlet   NSTextField* crateUDPDataIPTextField;
 	    IBOutlet   NSTextField* crateUDPDataPortTextField;
 		IBOutlet NSButton*		openDataCommandSocketButton;
@@ -98,7 +102,7 @@
 		IBOutlet NSButton*		startListeningForDataReplyButton;
 		IBOutlet NSButton*		stopListeningForDataReplyButton;
 	    IBOutlet NSProgressIndicator*   listeningForDataReplyIndicator;
-		
+		#endif
 		
 		IBOutlet NSTextField*	hwVersionField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
@@ -112,7 +116,7 @@
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
-		IBOutlet NSMatrix*		interruptMaskMatrix;
+//TODO: rm   slt 		IBOutlet NSMatrix*		interruptMaskMatrix;
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
@@ -132,7 +136,7 @@
 		IBOutlet NSButton*		regWriteButton;
 		IBOutlet NSButton*		regReadButton;
 		//IBOutlet NSPopUpButton*	indexPopUp;
-	    IBOutlet NSPopUpButton* selectedFifoIndexPU;
+//slt - - 	    IBOutlet NSPopUpButton* selectedFifoIndexPU;
 		IBOutlet NSButton*		setSWInhibitButton;
 		IBOutlet NSButton*		relSWInhibitButton;
 		IBOutlet NSButton*		forceTriggerButton;
@@ -162,11 +166,9 @@
 		NSSize					controlSize;
 		NSSize					statusSize;
 		NSSize					lowLevelSize;
-		NSSize					cpuManagementSize;
-		NSSize					cpuTestsSize;
-		NSSize					udpKCmdSize;
-		NSSize					streamingSize;
-		NSSize					udpDReadSize;
+		NSSize					networkConnectionSize;
+		NSSize					testSize;
+		NSSize					aboutSize;
 };
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Initialization
@@ -179,6 +181,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+- (void) isPollingSpectrumChanged:(NSNotification*)aNote;
+- (void) spectrumRequestRateChanged:(NSNotification*)aNote;
 - (void) spectrumRequestTypeChanged:(NSNotification*)aNote;
 - (void) numSpectrumBinsChanged:(NSNotification*)aNote;
 - (void) textCommandChanged:(NSNotification*)aNote;
@@ -188,33 +192,36 @@
 - (void) statusLowRegChanged:(NSNotification*)aNote;
 - (void) takeADCChannelDataChanged:(NSNotification*)aNote;
 - (void) takeRawUDPDataChanged:(NSNotification*)aNote;
-- (void) chargeBBFileChanged:(NSNotification*)aNote;
-- (void) useBroadcastIdBBChanged:(NSNotification*)aNote;
-- (void) idBBforWCommandChanged:(NSNotification*)aNote;
-- (void) takeEventDataChanged:(NSNotification*)aNote;
-- (void) takeUDPstreamDataChanged:(NSNotification*)aNote;
-- (void) crateUDPDataCommandChanged:(NSNotification*)aNote;
-- (void) BBCmdFFMaskChanged:(NSNotification*)aNote;
-- (void) cmdWArg4Changed:(NSNotification*)aNote;
-- (void) cmdWArg3Changed:(NSNotification*)aNote;
-- (void) cmdWArg2Changed:(NSNotification*)aNote;
-- (void) cmdWArg1Changed:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) chargeBBFileChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) useBroadcastIdBBChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) idBBforWCommandChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) takeEventDataChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) takeUDPstreamDataChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) crateUDPDataCommandChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) BBCmdFFMaskChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) cmdWArg4Changed:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) cmdWArg3Changed:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) cmdWArg2Changed:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) cmdWArg1Changed:(NSNotification*)aNote;
 - (void) sltDAQModeChanged:(NSNotification*)aNote;
-- (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote;
-- (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote;
-- (void) crateUDPDataIPChanged:(NSNotification*)aNote;
-- (void) crateUDPDataPortChanged:(NSNotification*)aNote;
-- (void) eventFifoStatusRegChanged:(NSNotification*)aNote;
-- (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
-- (void) selectedFifoIndexChanged:(NSNotification*)aNote;
-- (void) isListeningOnServerSocketChanged:(NSNotification*)aNote;
-- (void) isListeningOnDataServerSocketChanged:(NSNotification*)aNote;
+//TODO: rm   slt - - - (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote;
+
+
+//slt - - (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote;
+//slt - - (void) crateUDPDataIPChanged:(NSNotification*)aNote;
+//slt - - (void) crateUDPDataPortChanged:(NSNotification*)aNote;
+//slt - - (void) eventFifoStatusRegChanged:(NSNotification*)aNote;
+//slt - - (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
+//slt - - (void) selectedFifoIndexChanged:(NSNotification*)aNote;
+- (void) isListeningOnServerSocketChanged:(NSNotification*)aNote; 
+//slt - - (void) isListeningOnDataServerSocketChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandIPChanged:(NSNotification*)aNote;
 - (void) crateUDPCommandPortChanged:(NSNotification*)aNote;
 - (void) openCommandSocketChanged:(NSNotification*)aNote;
-- (void) openDataCommandSocketChanged:(NSNotification*)aNote;
-- (void) crateUDPReplyPortChanged:(NSNotification*)aNote;
+
+//slt - (void) openDataCommandSocketChanged:(NSNotification*)aNote;
+//slt - - (void) crateUDPReplyPortChanged:(NSNotification*)aNote;
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote;
 - (void) clockTimeChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
@@ -222,7 +229,7 @@
 - (void) hwVersionChanged:(NSNotification*) aNote;
 
 - (void) patternFilePathChanged:(NSNotification*)aNote;
-- (void) interruptMaskChanged:(NSNotification*)aNote;
+//TODO: rm   slt - (void) interruptMaskChanged:(NSNotification*)aNote;
 - (void) nextPageDelayChanged:(NSNotification*)aNote;
 - (void) pageSizeChanged:(NSNotification*)aNote;
 - (void) displayEventLoopChanged:(NSNotification*)aNote;
@@ -230,7 +237,7 @@
 - (void) populatePullDown;
 - (void) updateWindow;
 - (void) setWindowTitle;
-- (void) checkGlobalSecurity;
+- (void) checkGlobalSecurity; 
 - (void) settingsLockChanged:(NSNotification*)aNote;
 
 - (void) endAllEditing:(NSNotification*)aNote;
@@ -246,6 +253,7 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Actions
+- (IBAction) spectrumRequestRatePUAction:(id)sender;
 - (IBAction) spectrumRequestNowButtonAction:(id)sender;
 - (IBAction) spectrumRequestTypePUAction:(id)sender;
 - (IBAction) numSpectrumBinsPUAction:(id)sender;
@@ -254,35 +262,31 @@
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) statusHighRegTextFieldAction:(id)sender;
 - (IBAction) statusLowRegTextFieldAction:(id)sender;
-- (IBAction) chargeBBFileTextFieldAction:(id)sender;
-- (IBAction) useBroadcastIdBBCBAction:(id)sender;
-- (IBAction) idBBforWCommandTextFieldAction:(id)sender;
-- (IBAction) takeEventDataCBAction:(id)sender;
-- (IBAction) takeUDPstreamDataCBAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) chargeBBFileTextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) useBroadcastIdBBCBAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) idBBforWCommandTextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) takeEventDataCBAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) takeUDPstreamDataCBAction:(id)sender;
 - (IBAction) takeADCChannelDataCBAction:(id)sender;
 - (IBAction) takeRawUDPDataCBAction:(id)sender;
-- (IBAction) crateUDPDataCommandTextFieldAction:(id)sender;
-- (IBAction) BBCmdFFMaskTextFieldAction:(id)sender;
-- (IBAction) BBCmdFFMaskMatrixAction:(id)sender;
-- (IBAction) cmdWArg4TextFieldAction:(id)sender;
-- (IBAction) cmdWArg3TextFieldAction:(id)sender;
-- (IBAction) cmdWArg2TextFieldAction:(id)sender;
-- (IBAction) cmdWArg1TextFieldAction:(id)sender;
+
+
 - (IBAction) sltDAQModePUAction:(id)sender;
 - (IBAction) sltDAQModeTextFieldAction:(id)sender;
 - (IBAction) readAllControlSettingsFromHWButtonAction:(id)sender;
 
-- (IBAction) eventFifoStatusRegTextFieldAction:(id)sender;
-- (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
-- (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
-- (IBAction) writePixelBusEnableRegButtonAction:(id)sender;
-- (IBAction) readPixelBusEnableRegButtonAction:(id)sender;
-- (IBAction) writeControlRegButtonAction:(id)sender;
-- (IBAction) readControlRegButtonAction:(id)sender;
+//TODO: rm   slt - -- (IBAction) eventFifoStatusRegTextFieldAction:(id)sender;
+//slt - - - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
+//slt - - - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
+//TODO: rm   slt - -- (IBAction) writePixelBusEnableRegButtonAction:(id)sender;
+//TODO: rm   slt - -- (IBAction) readPixelBusEnableRegButtonAction:(id)sender;
+//TODO: rm   slt - -- (IBAction) writeControlRegButtonAction:(id)sender;
+//TODO: rm   slt - -- (IBAction) readControlRegButtonAction:(id)sender;
 
 
-- (IBAction) selectedFifoIndexPUAction:(id)sender;
+//slt - - - (IBAction) selectedFifoIndexPUAction:(id)sender;
 
+#if 0
 //ADC data UDP connection
 - (IBAction) startUDPDataConnectionButtonAction:(id)sender;
 - (IBAction) stopUDPDataConnectionButtonAction:(id)sender;
@@ -295,16 +299,28 @@
 - (IBAction) stopListeningForDataReplyButtonAction:(id)sender;
 - (IBAction) crateUDPDataRequestDataPCommandSendButtonAction:(id)sender;
 - (IBAction) crateUDPDataChargeBBFileCommandSendButtonAction:(id)sender;
-- (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) numRequestedUDPPacketsTextFieldAction:(id)sender;
 - (IBAction) testUDPDataConnectionButtonAction:(id)sender;
 - (IBAction) crateUDPDataSendWCommandButtonAction:(id)sender;//send BB Command
+
+//TODO: rm   slt - - - (IBAction) crateUDPDataCommandTextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) BBCmdFFMaskTextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) BBCmdFFMaskMatrixAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) cmdWArg4TextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) cmdWArg3TextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) cmdWArg2TextFieldAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) cmdWArg1TextFieldAction:(id)sender;
+
 
 - (IBAction) sendUDPDataTab0x0ACommandAction:(id)sender;//send 0x0A Command
 - (IBAction) UDPDataTabSendBloqueCommandButtonAction:(id)sender;
 - (IBAction) UDPDataTabSendDebloqueCommandButtonAction:(id)sender;
-- (IBAction) UDPDataTabSendDemarrageCommandButtonAction:(id)sender;
+- (IBAction) UDPDataTabSendDemarrageCommandButtonAction:(id)sender;   
 
-- (IBAction) crateUDPDataCommandSendButtonAction:(id)sender;
+//TODO: rm   slt - - - (IBAction) crateUDPDataCommandSendButtonAction:(id)sender;
+
+
+#endif
 
 
 //K command UDP connection
@@ -312,7 +328,8 @@
 - (IBAction) startUDPCommandConnectionButtonAction:(id)sender;
 - (IBAction) startListeningForReplyButtonAction:(id)sender;
 - (IBAction) stopListeningForReplyButtonAction:(id)sender;
-- (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;
+
+//slt - (IBAction) crateUDPReplyPortTextFieldAction:(id)sender;
 
 - (IBAction) crateUDPCommandSendButtonAction:(id)sender; //TODO: rename -tb-
 - (IBAction) textCommandSendButtonAction:(id)sender; //TODO: rename -tb-
@@ -333,7 +350,7 @@
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;
 - (IBAction) nextPageDelayAction:(id)sender;
-- (IBAction) interruptMaskAction:(id)sender;
+//TODO: rm   slt - (IBAction) interruptMaskAction:(id)sender;
 - (IBAction) pageSizeAction:(id)sender;
 - (IBAction) displayTriggerAction:(id)sender;
 - (IBAction) displayEventLoopAction:(id)sender;

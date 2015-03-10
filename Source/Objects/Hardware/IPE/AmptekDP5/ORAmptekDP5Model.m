@@ -546,6 +546,8 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelIsPollingSpectrumChanged = @"ORAmptekDP5ModelIsPollingSpectrumChanged";
+NSString* ORAmptekDP5ModelSpectrumRequestRateChanged = @"ORAmptekDP5ModelSpectrumRequestRateChanged";
 NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged = @"ORAmptekDP5ModelSpectrumRequestTypeChanged";
 NSString* ORAmptekDP5ModelNumSpectrumBinsChanged = @"ORAmptekDP5ModelNumSpectrumBinsChanged";
 NSString* ORAmptekDP5ModelTextCommandChanged = @"ORAmptekDP5ModelTextCommandChanged";
@@ -635,12 +637,19 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	[self setSecondsSetInitWithHost: YES];
 	[self registerNotificationObservers];
 	//some defaults
-	crateUDPCommandPort = 9940;
-	crateUDPCommandIP = @"localhost";
-	crateUDPReplyPort = 9940;
-    crateUDPDataPort = 994;
-    crateUDPDataIP = @"192.168.1.100";
-    crateUDPDataReplyPort = 12345;
+	crateUDPCommandPort = 10001;
+	crateUDPCommandIP = @"192.168.1.102";
+    
+    
+    
+    
+    
+    //TODO: REMOVE
+//	crateUDPReplyPort = 9940;
+    
+//    crateUDPDataPort = 994;
+//    crateUDPDataIP = @"192.168.1.100";
+//    crateUDPDataReplyPort = 12345;
 	
     return self;
 }
@@ -648,9 +657,6 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 -(void) dealloc
 {
     [textCommand release];
-    [chargeBBFile release];
-    [crateUDPDataCommand release];
-    [crateUDPDataIP release];
     [crateUDPCommand release];
     [crateUDPCommandIP release];
     [sltScriptArguments release];
@@ -756,6 +762,50 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (int) isPollingSpectrum
+{
+    return isPollingSpectrum;
+}
+
+- (void) setIsPollingSpectrum:(int)aIsPollingSpectrum
+{
+    isPollingSpectrum = aIsPollingSpectrum;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelIsPollingSpectrumChanged object:self];
+}
+
+
+//currently not used any more - instead, we are polling gettimeofday ... in takeData ... -tb-
+- (void) requestSpectrumTimedWorker
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestSpectrumTimedWorker) object:nil];
+
+    NSLog(@"POLL  -----  Called %@::%@!  spectrumRequestRate: %i  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), spectrumRequestRate);//TODO: DEBUG -tb-
+    [self requestSpectrum];
+    
+    if(isPollingSpectrum)
+    	[self performSelector:@selector(requestSpectrumTimedWorker) withObject:nil afterDelay: spectrumRequestRate];
+
+}
+
+
+
+- (int) spectrumRequestRate
+{
+    return spectrumRequestRate;
+}
+
+- (void) setSpectrumRequestRate:(int)aSpectrumRequestRate
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpectrumRequestRate:spectrumRequestRate];
+    
+    spectrumRequestRate = aSpectrumRequestRate;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSpectrumRequestRateChanged object:self];
+}
+
+
 //this is the pid2 of the "Spectrum Request Packets", section 4.1.2, p.20, of DP5  Programmers Guide
 - (int) spectrumRequestType
 {
@@ -844,6 +894,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelLowLevelRegInHexChanged object:self];
 }
 
+
+
+//TODO: rm   slt - - 
+#if 0
 - (unsigned long) statusHighReg
 {
     return statusHighReg;
@@ -865,6 +919,14 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     statusLowReg = aStatusRegLow;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelStatusRegLowChanged object:self];
 }
+#endif
+
+
+
+
+
+
+
 
 - (int) takeADCChannelData
 {
@@ -892,6 +954,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelTakeRawUDPDataChanged object:self];
 }
 
+
+
+
+#if 0
 - (NSString *) chargeBBFile
 {
     if(chargeBBFile==0) return @"";
@@ -929,6 +995,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     idBBforWCommand = aIdBBforWCommand;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelIdBBforWCommandChanged object:self];
 }
+
+
+
+
 
 - (int) takeEventData
 {
@@ -1001,8 +1071,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 - (void) setCmdWArg3:(int)aCmdWArg3
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg3:cmdWArg3];
+{  
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmdWArg3:cmdWArg3]; 
     cmdWArg3 = aCmdWArg3;
     if(cmdWArg3<0) cmdWArg3=0;     if(cmdWArg3>0xff) cmdWArg3=0xff; 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCmdWArg3Changed object:self];
@@ -1034,6 +1104,16 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCmdWArg1Changed object:self];
 }
 
+#endif
+
+
+
+
+
+
+
+
+
 - (int) sltDAQMode
 {
     return sltDAQMode;
@@ -1048,6 +1128,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSltDAQModeChanged object:self];
 }
 
+
+
+#if 0
 - (int) numRequestedUDPPackets
 {
     return numRequestedUDPPackets;
@@ -1059,6 +1142,12 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     numRequestedUDPPackets = aNumRequestedUDPPackets;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelNumRequestedUDPPacketsChanged object:self];
 }
+#endif
+
+
+
+
+
 
 - (int) isListeningOnDataServerSocket
 {
@@ -1085,6 +1174,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 }
 
+
+
+
+
+#if 0
 - (int) crateUDPDataReplyPort
 {
     return crateUDPDataReplyPort;
@@ -1121,7 +1215,15 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     crateUDPDataPort = aCrateUDPDataPort;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCrateUDPDataPortChanged object:self];
 }
+#endif
 
+
+
+
+
+
+
+#if 0
 - (unsigned long) eventFifoStatusReg
 {
     return eventFifoStatusReg;
@@ -1156,6 +1258,12 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     selectedFifoIndex = aSelectedFifoIndex;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSelectedFifoIndexChanged object:self];
 }
+#endif
+
+
+
+
+
 
 - (int) isListeningOnServerSocket//used for DP5
 {
@@ -1174,6 +1282,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     return crateUDPCommand;
 }
 
+
+
+
 - (void) setCrateUDPCommand:(NSString*)aCrateUDPCommand
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCrateUDPCommand:crateUDPCommand];
@@ -1182,6 +1293,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCrateUDPCommandChanged object:self];
 }
 
+
+
+
+
+#if 0
 - (int) crateUDPReplyPort
 {
     return crateUDPReplyPort;
@@ -1193,6 +1309,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     crateUDPReplyPort = aCrateUDPReplyPort;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCrateUDPReplyPortChanged object:self];
 }
+#endif
+
+
+
+
 
 - (NSString*) crateUDPCommandIP
 {
@@ -1427,18 +1548,6 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelNextPageDelayChanged object:self];
 	
-}
-
-- (unsigned long) interruptMask
-{
-    return interruptMask;
-}
-
-- (void) setInterruptMask:(unsigned long)aInterruptMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setInterruptMask:interruptMask];
-    interruptMask = aInterruptMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelInterruptMaskChanged object:self];
 }
 
 - (ORReadOutList*) readOutGroup
@@ -1947,10 +2056,19 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         }
     }
     
-
+    
+    
+    //check status packets and spectrum (+optional status) packets
+    int specLength=0;
+    int hasStatus=0;
+    int statusOffset=0;
+    //check status packet
+    if(PID1==0x80){
+        hasStatus=1;
+        statusOffset=6;
+    }
     //check spectrum (+status) packets (see page 59 of the "DP5 Programmer Guide" Rev A6)
     if(PID1==0x81){
-        int specLength=0;
         switch(PID2){
         case 0x1:
         case 0x2: specLength =  256; break;
@@ -1967,12 +2085,45 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         default: specLength = -1;
         }
         if((PID2 %2) ==0){
-            NSLog(@"   MESSAGE: this is a spectrum+status packet, spectrum length is: %i\n",specLength);
+            hasStatus = 1;
+            statusOffset = 6 + specLength *3;
+            NSLog(@"   MESSAGE: this is a spectrum+status packet, spectrum length is: %i     statusOffset: %i\n",specLength,statusOffset);
             //dp5Packet[length+6]=0;
             //NSLog(@"   readback is: %s\n",&(dp5Packet[6]));
         }else{
-            NSLog(@"   MESSAGE: this is a spectrum packet, spectrum length is: %i\n",specLength);
+            hasStatus = 0;
+            statusOffset = 0;
+            NSLog(@"   MESSAGE: this is a pure spectrum packet, spectrum length is: %i\n",specLength);
         }
+        
+        //show status
+        if(hasStatus){
+            uint32_t var32=0;
+            uint16_t var16=0;
+            uint8_t var8=0;
+            NSLog(@"STATUS:    (statusOffset: %i)\n",statusOffset);
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kFastCountOffset])) );
+            NSLog(@"    kFastCountOffset: %i (0x%08x)\n",var32,var32);
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kSlowCountOffset])) );
+            NSLog(@"    kSlowCountOffset: %i (0x%08x)\n",var32,var32);
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset +  kGPCounterOffset])) );
+            NSLog(@"    kGPCounterOffset: %i (0x%08x)\n",var32,var32);
+            
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kAccTimeOffset])) );
+            //NSLog(@"    kAccTimeOffset: %i (0x%08x)\n",var32,var32);
+            NSLog(@"    kAccTimeOffset: %i x 100 mS  + %i mS (0x%08x)\n",/*dp5Packet[statusOffset + kAccTimeOffset],*/ var32>>8,var32 & 0xf,var32);
+            
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kRealtimeOffset])) );
+            NSLog(@"    kRealtimeOffset: %i  x 1 mS (0x%08x)\n",var32,var32);
+            
+            var8 = dp5Packet[statusOffset + kFirmwareVersionOffset] ;
+            NSLog(@"    kFirmwareVersionOffset: %i.%i  \n",(var8 >>4),var8 & 0x0f);
+            
+            var8 = dp5Packet[statusOffset + kFPGAVersionOffset] ;
+            NSLog(@"    kFPGAVersionOffset: %i.%i  \n",(var8 >>4),var8 & 0x0f);
+            
+        }
+        
         
         
         //ship the packet 
@@ -2154,6 +2305,17 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
     //send it
     int retval = [self sendUDPPacket:buffer length:len+8];
+
+
+
+        //we *always* expect a response from the DP5 -tb-
+        waitForResponse = TRUE;    //TODO: this should be handled from "receiveFromReplyServer" -tb-
+        currentDP5PacketLen = 0;   //TODO: this should be handled from "receiveFromReplyServer" -tb-
+        expectedDP5PacketLen = 0;  //TODO: this should be handled from "receiveFromReplyServer" -tb-
+        countReceivedPackets = 0;  //TODO: this should be handled from "receiveFromReplyServer" -tb-
+
+
+
 
     return retval;
     //return [self sendUDPCommandString: crateUDPCommand];
@@ -2603,6 +2765,10 @@ commands:
 
 
 //  UDP data packet connection ---------------------
+
+//TODO: rm
+
+#if 0
 //reply socket (server)
 - (int) startListeningDataServerSocket
 {
@@ -2657,6 +2823,21 @@ commands:
 	
 	return 0;
 }
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+//TODO: rm
+#if 0
 
 
 - (void) stopListeningDataServerSocket
@@ -2671,6 +2852,7 @@ commands:
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(receiveFromDataReplyServer) object:nil];
 }
+
 
 
 
@@ -2803,10 +2985,17 @@ for(l=0;l<2500;l++){
     return retval;
 }
 
+#endif
 
 
 
 
+
+
+
+
+//TODO: remove it ...
+#if 0
 //command data socket (client)
 - (int) openDataCommandSocket
 {
@@ -3009,99 +3198,37 @@ for(l=0;l<2500;l++){
     if(useBroadcastIdBB) arg1=0xff;
     return [self sendUDPDataWCommandRequestPacketArg1: arg1 arg2: 0x0A arg3: 0x00  arg4: 0x07];  
 }
+#endif
+
+
+
+
+
+
+
 
 
 
 #pragma mark ***HW Access
 
-- (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes
-{
+
+
+
+
+
 #if 0
 
-    //DEBUG 	    
-    NSLog(@"%@::%@ \n", NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
 
-   long buf32[1024+2]; //cannot exceed size of cmd FIFO
-   //uint32_t buf32[257]; //cannot exceed size of cmd FIFO
-   int num32ToSend = (numBytes+3)/4 + 1;//round up if not multiple of 4; add 1 for first word containing numBytes
-   if(numBytes>1024+2) return -1;
-   buf32[0]=numBytes;
-   char* buf=(char*)&buf32[1];
-   int i;
-   for(i=0; i<numBytes; i++) buf[i]=data[i];
-   
-	if(![pmcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
-	}
-	else {
-        NSLog(@"%@::%@ buf32[0] before: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[0],buf32[0]);//TODO: DEBUG testing ...-tb-    
-        NSLog(@"%@::%@ buf32[1] before: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[1],buf32[1]);//TODO: DEBUG testing ...-tb-    
-		[pmcLink writeGeneral:buf32 operation:kChargeBBWithFile numToWrite:num32ToSend];
-        NSLog(@"%@::%@ buf32[0] after: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[0],buf32[0]);//TODO: DEBUG testing ...-tb-    
-        NSLog(@"%@::%@ buf32[1] after: %i (0x%08x)\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),buf32[1],buf32[1]);//TODO: DEBUG testing ...-tb-    
-	}
-   
-#endif   
+
+- (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes
+{
    return 0;
 }
 
 
 - (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData forFLT:(OREdelweissFLTModel*) aFLT
 {
-#if 0
-    fltChargingBB = aFLT;
-
-    //DEBUG 	    
-    NSLog(@"%@::%@ data length: %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[theData length]);//TODO: DEBUG testing ...-tb-
-
-	if(![pmcLink isConnected]){
-		NSLog(@"   ERROR: Crate Computer (PMC) Not Connected!\n"); 
-		//[NSException raise:@"Not Connected" format:@"Socket not connected."];
-        return 0;
-	}
-   
-   
-	
-	NSLog(@"Charge BB FPGA\n");
-	
-	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kPMC;//kSBC_Command;//kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kAmptekDP5chargeBB;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(AmptekDP5chargeBBStruct) + numLongs*sizeof(long);
-	
-	AmptekDP5chargeBBStruct* payloadPtr	= (AmptekDP5chargeBBStruct*)aPacket.payload;
-	payloadPtr->fileSize					= [theData length];
-	
-	const char* dataPtr						= (const char*)[theData bytes];
-	//really should be an error check here that the file isn't bigger than the max payload size
-	char* p = (char*)payloadPtr + sizeof(AmptekDP5chargeBBStruct);
-	bcopy(dataPtr, p, [theData length]);
-	
-	@try {
-		//launch the load job. The response will be a job status record
-		[pmcLink send:&aPacket receive:&aPacket];
-		SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
-		long running = responsePtr->running;
-		if(running){
-			NSLog(@"BB charge in progress on the SBC on the IPE crate.\n");
-			[pmcLink monitorJobFor:self statusSelector:@selector(chargeBBStatus:)];
-		}
-//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
-//		}
-//		else NSLog(@"Looks like success.\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"BB charge failed. %@\n",localException);
-		[NSException raise:@"BB charge Failed" format:@"%@",localException];
-	}
-   
-   
-   
-   
-#endif
 
 
 
@@ -3133,82 +3260,22 @@ for(l=0;l<2500;l++){
 - (int)           chargeFICusingSBCinBackgroundWithData:(NSData*)theData forFLT:(OREdelweissFLTModel*) aFLT
 {
 
-#if 0
-
-
-
-    fltChargingFIC = aFLT;
-
-    //DEBUG 	    
-    NSLog(@"%@::%@ data length: %i\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),[theData length]);//TODO: DEBUG testing ...-tb-
-
-	if(![pmcLink isConnected]){
-		NSLog(@"   ERROR: Crate Computer (PMC) Not Connected!\n"); 
-		//[NSException raise:@"Not Connected" format:@"Socket not connected."];
-        return 0;
-	}
-   
-   
-	
-	NSLog(@"Charge FIC FPGA\n");
-	
-	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kPMC;//kSBC_Command;//kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kAmptekDP5chargeFIC;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(AmptekDP5chargeBBStruct) + numLongs*sizeof(long);
-	
-	AmptekDP5chargeBBStruct* payloadPtr	= (AmptekDP5chargeBBStruct*)aPacket.payload;
-	payloadPtr->fileSize					= [theData length];
-	
-	const char* dataPtr						= (const char*)[theData bytes];
-	//really should be an error check here that the file isn't bigger than the max payload size
-	char* p = (char*)payloadPtr + sizeof(AmptekDP5chargeBBStruct);
-	bcopy(dataPtr, p, [theData length]);
-	
-	@try {
-		//launch the load job. The response will be a job status record
-		[pmcLink send:&aPacket receive:&aPacket];
-		SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
-		long running = responsePtr->running;
-		if(running){
-			NSLog(@"FIC charge in progress on the SBC on the IPE crate.\n");
-			[pmcLink monitorJobFor:self statusSelector:@selector(chargeFICStatus:)];
-		}
-//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
-//		}
-//		else NSLog(@"Looks like success.\n");
-	}
-	@catch(NSException* localException) {
-		NSLog(@"FIC charge failed. %@\n",localException);
-		[NSException raise:@"FIC charge Failed" format:@"%@",localException];
-	}
-   
-   
-   
-   
-#endif   
    return 0;
 }
 
 - (void) chargeFICStatus:(ORSBCLinkJobStatus*) jobStatus
 {
-	if(![jobStatus running]){
-		NSLog(@"SLT job NOT running: job message: %@   progress: %i finalStatus: %i\n",[jobStatus message],[jobStatus  progress],[jobStatus  finalStatus]);
-        if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: [jobStatus  progress]];
-        if([jobStatus  finalStatus]==666){//job killed
-            if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: 101];
-        }
-        usleep(10000);
-        if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: 0];
-	}
-    else{
-		//NSLog(@"SLT: %@   progress: %i\n",[jobStatus message],[jobStatus  progress]);
-		NSLog(@"SLT job running: job message: %@   progress: %i finalStatus: %i\n",[jobStatus message],[jobStatus  progress],[jobStatus  finalStatus]);
-        if(fltChargingFIC) [fltChargingFIC setProgressOfChargeFIC: [jobStatus  progress]];
-    }
 }
+
+
+
+
+
+#endif
+
+
+
+
 
 
 
@@ -3256,11 +3323,11 @@ for(l=0;l<2500;l++){
 {
 //DEBUG OUTPUT: 	
 NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
-    [self readControlReg];
-    [self readPixelBusEnableReg];
+//TODO: rm   slt - -     [self readControlReg];
+//TODO: rm   slt - -     [self readPixelBusEnableReg];
 }
 
-
+//TODO: rm   slt - - 
 
 - (void) checkPresence
 {
@@ -3434,15 +3501,16 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (void) readAllStatus
 {
-	[self readControlReg];
-	[self readStatusReg];
+	//TODO: rm   slt - -[self readControlReg];
+//TODO: rm   slt - - 	[self readStatusReg];
 	//[self readReadOutControlReg];
 	[self getTime];
-	[self readEventFifoStatusReg];
+//TODO: rm   slt - - 	[self readEventFifoStatusReg];
 }
 
 
-
+//TODO: rm   slt - -
+#if 0
 - (unsigned long) readControlReg
 {
 	unsigned long data = [self readReg:kEWSltV4ControlReg];
@@ -3466,8 +3534,16 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	NSLogFont(aFont,@"Invert  : 0x%02x\n",(data & kCtrlInvert) >> 16);
 	NSLogFont(aFont,@"NumFIFOs: 0x%02x\n",(data & kCtrlNumFIFOs) >> 28);
 }
+#endif
 
 
+
+
+
+
+
+//TODO: rm   slt - - 
+#if 0
 - (unsigned long) readStatusReg
 {
 	unsigned long data = [self readReg:kEWSltV4StatusReg];
@@ -3491,7 +3567,6 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	[self setStatusHighReg:data];
 	return data;
 }
-
 
 - (void) printStatusReg
 {
@@ -3530,9 +3605,19 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 }
 
+#endif
 
 
 
+
+
+
+
+
+
+
+//TODO: rm   slt - -
+#if 0
 - (void) writePixelBusEnableReg
 {
 	[self writeReg:kEWSltV4PixelBusEnableReg value: [self pixelBusEnableReg]];
@@ -3544,7 +3629,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	val = [self readReg:kEWSltV4PixelBusEnableReg];
 	[self setPixelBusEnableReg:val];	
 }
-
+#endif
 
 
 
@@ -3647,12 +3732,13 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	return theMap;
 }
 
-
+//TODO: rm   slt - - 
+#if 0
 - (void) readEventFifoStatusReg
 {
 	[self setEventFifoStatusReg:[self readReg:kSltV4EventFIFOStatusReg]];
 }
-
+#endif
 
 - (unsigned long long) readBoardID
 {
@@ -3730,8 +3816,10 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 - (unsigned long long) getTime
 {
-	unsigned long th = [self readTimeHigh]; 
-	unsigned long tl = [self readTimeLow]; 
+//TODO: rm   slt - - 	unsigned long th = [self readTimeHigh]; 
+//TODO: rm   slt - - 	unsigned long tl = [self readTimeLow]; 
+	unsigned long th = 1; 
+	unsigned long tl = 2; 
 	[self setClockTime: (((unsigned long long) th) << 32) | tl];
 //DEBUG OUTPUT: 	NSLog(@"   %@::%@: tl: 0x%08x,  th: 0x%08x  clockTime: 0x%016qx  (%li)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),tl,th,clockTime,clockTime);//TODO: DEBUG testing ...-tb-
 	return clockTime;
@@ -3767,8 +3855,8 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 
 return ;
 
-	[self writeControlReg];
-	[self writePixelBusEnableReg];
+//TODO: rm   slt - - 	[self writeControlReg];
+//TODO: rm   slt - - 	[self writePixelBusEnableReg];
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];
@@ -3810,9 +3898,9 @@ return ;
 	//inhibitSource = savedInhibitSource;
 	//-----------------------------------------------
 	
-	[self printStatusReg];
-	[self printStatusLowHighReg];
-	[self printControlReg];
+//TODO: rm   slt - - 	[self printStatusReg];
+//TODO: rm   slt - - 	[self printStatusLowHighReg];
+//TODO: rm   slt - - 	[self printControlReg];
 }
 
 - (void) reset
@@ -3881,6 +3969,7 @@ return ;
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setSpectrumRequestRate:[decoder decodeIntForKey:@"spectrumRequestRate"]];
 	[self setSpectrumRequestType:[decoder decodeIntForKey:@"spectrumRequestType"]];
 	[self setNumSpectrumBins:[decoder decodeIntForKey:@"numSpectrumBins"]];
 	[self setTextCommand:[decoder decodeObjectForKey:@"textCommand"]];
@@ -3888,6 +3977,9 @@ return ;
 	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
 	[self setTakeADCChannelData:[decoder decodeIntForKey:@"takeADCChannelData"]];
 	[self setTakeRawUDPData:[decoder decodeIntForKey:@"takeRawUDPData"]];
+    
+//TODO: rm   slt - - 
+#if 0
 	[self setChargeBBFile:[decoder decodeObjectForKey:@"chargeBBFile"]];
 	[self setUseBroadcastIdBB:[decoder decodeIntForKey:@"useBroadcastIdBB"]];
 	[self setIdBBforWCommand:[decoder decodeIntForKey:@"idBBforWCommand"]];
@@ -3899,15 +3991,16 @@ return ;
 	[self setCmdWArg3:[decoder decodeIntForKey:@"cmdWArg3"]];
 	[self setCmdWArg2:[decoder decodeIntForKey:@"cmdWArg2"]];
 	[self setCmdWArg1:[decoder decodeIntForKey:@"cmdWArg1"]];
-	[self setSltDAQMode:[decoder decodeIntForKey:@"sltDAQMode"]];
+	[self setCrateUDPReplyPort:[decoder decodeIntForKey:@"crateUDPReplyPort"]];
+	[self setPixelBusEnableReg:[decoder decodeInt32ForKey:@"pixelBusEnableReg"]];
+	[self setSelectedFifoIndex:[decoder decodeIntForKey:@"selectedFifoIndex"]];
 	[self setNumRequestedUDPPackets:[decoder decodeIntForKey:@"numRequestedUDPPackets"]];
 	[self setCrateUDPDataReplyPort:[decoder decodeIntForKey:@"crateUDPDataReplyPort"]];
 	[self setCrateUDPDataIP:[decoder decodeObjectForKey:@"crateUDPDataIP"]];
 	[self setCrateUDPDataPort:[decoder decodeIntForKey:@"crateUDPDataPort"]];
-	[self setPixelBusEnableReg:[decoder decodeInt32ForKey:@"pixelBusEnableReg"]];
-	[self setSelectedFifoIndex:[decoder decodeIntForKey:@"selectedFifoIndex"]];
+#endif
+	[self setSltDAQMode:[decoder decodeIntForKey:@"sltDAQMode"]];
 	[self setCrateUDPCommand:[decoder decodeObjectForKey:@"crateUDPCommand"]];
-	[self setCrateUDPReplyPort:[decoder decodeIntForKey:@"crateUDPReplyPort"]];
 	[self setCrateUDPCommandIP:[decoder decodeObjectForKey:@"crateUDPCommandIP"]];
 	[self setCrateUDPCommandPort:[decoder decodeIntForKey:@"crateUDPCommandPort"]];
 	[self setSltScriptArguments:[decoder decodeObjectForKey:@"sltScriptArguments"]];
@@ -3922,7 +4015,7 @@ return ;
 
 	//status reg
 	[self setPatternFilePath:		[decoder decodeObjectForKey:@"ORAmptekDP5ModelPatternFilePath"]];
-	[self setInterruptMask:			[decoder decodeInt32ForKey:@"ORAmptekDP5ModelInterruptMask"]];
+//TODO: rm   slt 	[self setInterruptMask:			[decoder decodeInt32ForKey:@"ORAmptekDP5ModelInterruptMask"]];
 	[self setPulserDelay:			[decoder decodeFloatForKey:@"ORAmptekDP5ModelPulserDelay"]];
 	[self setPulserAmp:				[decoder decodeFloatForKey:@"ORAmptekDP5ModelPulserAmp"]];
 		
@@ -3956,6 +4049,7 @@ return ;
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeInt:spectrumRequestRate forKey:@"spectrumRequestRate"];
 	[encoder encodeInt:spectrumRequestType forKey:@"spectrumRequestType"];
 	[encoder encodeInt:numSpectrumBins forKey:@"numSpectrumBins"];
 	[encoder encodeObject:textCommand forKey:@"textCommand"];
@@ -3963,26 +4057,10 @@ return ;
 	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
 	[encoder encodeInt:takeADCChannelData forKey:@"takeADCChannelData"];
 	[encoder encodeInt:takeRawUDPData forKey:@"takeRawUDPData"];
-	[encoder encodeObject:chargeBBFile forKey:@"chargeBBFile"];
-	[encoder encodeInt:useBroadcastIdBB forKey:@"useBroadcastIdBB"];
-	[encoder encodeInt:idBBforWCommand forKey:@"idBBforWCommand"];
 	[encoder encodeInt:takeEventData forKey:@"takeEventData"];
 	[encoder encodeInt:takeUDPstreamData forKey:@"takeUDPstreamData"];
-	[encoder encodeObject:crateUDPDataCommand forKey:@"crateUDPDataCommand"];
-	[encoder encodeInt32:BBCmdFFMask forKey:@"BBCmdFFMask"];
-	[encoder encodeInt:cmdWArg4 forKey:@"cmdWArg4"];
-	[encoder encodeInt:cmdWArg3 forKey:@"cmdWArg3"];
-	[encoder encodeInt:cmdWArg2 forKey:@"cmdWArg2"];
-	[encoder encodeInt:cmdWArg1 forKey:@"cmdWArg1"];
 	[encoder encodeInt:sltDAQMode forKey:@"sltDAQMode"];
-	[encoder encodeInt:numRequestedUDPPackets forKey:@"numRequestedUDPPackets"];
-	[encoder encodeInt:crateUDPDataReplyPort forKey:@"crateUDPDataReplyPort"];
-	[encoder encodeObject:crateUDPDataIP forKey:@"crateUDPDataIP"];
-	[encoder encodeInt:crateUDPDataPort forKey:@"crateUDPDataPort"];
-	[encoder encodeInt32:pixelBusEnableReg forKey:@"pixelBusEnableReg"];
-	[encoder encodeInt:selectedFifoIndex forKey:@"selectedFifoIndex"];
 	[encoder encodeObject:crateUDPCommand forKey:@"crateUDPCommand"];
-	[encoder encodeInt:crateUDPReplyPort forKey:@"crateUDPReplyPort"];
 	[encoder encodeObject:crateUDPCommandIP forKey:@"crateUDPCommandIP"];
 	[encoder encodeInt:crateUDPCommandPort forKey:@"crateUDPCommandPort"];
 	[encoder encodeBool:secondsSetInitWithHost forKey:@"secondsSetInitWithHost"];
@@ -3991,7 +4069,7 @@ return ;
 	
 	//status reg
 	[encoder encodeObject:patternFilePath forKey:@"ORAmptekDP5ModelPatternFilePath"];
-	[encoder encodeInt32:interruptMask	 forKey:@"ORAmptekDP5ModelInterruptMask"];
+//TODO: rm   slt 	[encoder encodeInt32:interruptMask	 forKey:@"ORAmptekDP5ModelInterruptMask"];
 	[encoder encodeFloat:pulserDelay	 forKey:@"ORAmptekDP5ModelPulserDelay"];
 	[encoder encodeFloat:pulserAmp		 forKey:@"ORAmptekDP5ModelPulserAmp"];
 		
@@ -4115,6 +4193,11 @@ NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class])
        accessAllowedToHardwareAndSBC = NO;
     }
 
+
+
+
+
+//TODO: rm
 #if 0
     if(takeUDPstreamData){
         savedUDPSocketState = [self isOpenDataCommandSocket] | ([self isListeningOnDataServerSocket]<<1);
@@ -4220,11 +4303,20 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	    ////TODO: remove SLT stuff -tb-   2014 [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
     }
 #endif	
+
+    //readout/poll loop
+    if(spectrumRequestRate > 0){
+	    //[self performSelector:@selector(requestSpectrumTimedWorker) withObject:nil afterDelay: spectrumRequestRate];
+        [self setIsPollingSpectrum:YES];
+    }
 	
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
+        //spectrum readout is started in "takeData"!
+
         // -------TIMER-VARIABLES-----------
         static struct timeval starttime, /*stoptime,*/ currtime;//    struct timezone tz; is obsolete ... -tb-
         //struct timezone	timeZone;
@@ -4237,6 +4329,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 		//event readout controlled by the SLT cpu now. ORCA reads out 
 		//the resulting data from a generic circular buffer in the pmc code.
 //...        
+        
         
         //additionally we generate events here
         //start timer -------TIMER------------
@@ -4252,6 +4345,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         currDiffTime =      (  (double)(currtime.tv_sec  - starttime.tv_sec)  ) +
                     ( ((double)(currtime.tv_usec - starttime.tv_usec)) * 0.000001 );
         double elapsedTime = currDiffTime - lastDiffTime;
+        
         
         //if takeUDPstreamData is checked, check every 0.5 sec. the UDP buffer ...
         //if(takeUDPstreamData) 
@@ -4301,225 +4395,32 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             }
             #endif
             
-
-
-
-
-#if 0
-            //check for data
-            int *rdIndex = &(dataReplyThreadData.rdIndex);//we cannot use references, we are in C, not C++
-            if(*rdIndex>=0){
-			    NSLog(@"   ReadBuffer:   %i   hasPackets: %i   hasBytes: %i  numADCsInDataStream: %i numfifo: %i numStatPak: %i\n",*rdIndex, 
-                    dataReplyThreadData.hasDataPackets[*rdIndex],
-                    dataReplyThreadData.hasDataBytes[*rdIndex],
-                    dataReplyThreadData.numADCsInDataStream[*rdIndex],
-                    dataReplyThreadData.numfifo[*rdIndex],
-                    dataReplyThreadData.numStatusPackets[*rdIndex]);
-            }else{
-			    NSLog(@"   ReadBuffer:   %i   \n",*rdIndex);
-            }
-            
-            if(dataReplyThreadData.rdIndex>=0){//i.e. != -1   TODO: I could omit this check (?) -tb-
-                TypeIpeCrateStatusBlock *crateStatusBlock= &(dataReplyThreadData.crateStatusBlock[*rdIndex]);
-
-                //if data is available, reorder UDP paket data and write it to run file
-                if(dataReplyThreadData.hasDataPackets[dataReplyThreadData.rdIndex]){
-                
-                
-                //sending raw UDP packet
-                #if 1
-                    //send the first UDP packet as 'waveform' packet
-                    //
-                        if(takeRawUDPData){
-                          NSLog(@"     -> ship UDP packets: status packets: %i; data packets: %i\n",dataReplyThreadData.numStatusPackets[*rdIndex],dataReplyThreadData.numDataPackets[*rdIndex]);
-
-                            int k;
-                            //ship status packets
-                            for(k=0;k<dataReplyThreadData.numStatusPackets[*rdIndex];k++){
-                                    char *udpData = dataReplyThreadData.statusBuf[*rdIndex][k];
-                                    int length=  dataReplyThreadData.statusBufSize[*rdIndex][k];
-                                    [self shipUDPPacket:aDataPacket data:udpData len:length index:k type:0x1];
-                          NSLog(@"       ship UDP packets: status packets: len %i; index: %i\n",length,k);
-                            }
-
-                            //ship raw UDP packets
-                            int countShipped=0;
-                            int sumDataPackets=dataReplyThreadData.numDataPackets[*rdIndex];
-                            for(k=0;k<kMaxNumUDPDataPackets;k++){
-                                if(dataReplyThreadData.adcBufReceivedFlag[*rdIndex][k]){
-                                    char *udpData = dataReplyThreadData.adcBuf[*rdIndex][k];
-                                    int length=  dataReplyThreadData.adcBufSize[*rdIndex][k];
-                                    [self shipUDPPacket:aDataPacket data:udpData len:length index:k  type:0x3];
-                                    countShipped++;
-                                    if(countShipped==sumDataPackets) break;
-                                }
-                            }
-                        }
-
-                #endif
-                
-                  if(takeADCChannelData){
-                
-                    //read out data
-                    //    reorder UDP packets to build ADC traces according to one channel
-                    //TODO: submit maxPacketSize in status packet ... (extend crate status struct in ipe4reader) -tb- 
-                    int ipe4readerVersion = dataReplyThreadData.crateStatusBlock[*rdIndex].version;
-                    int ipe4readerSWVersion = ipe4readerVersion % 100;
-                    NSLog(@"    statusPacket from ipe4reader version:   %i (sw version: %i)\n",ipe4readerVersion,ipe4readerSWVersion);
-
-                    int MaxUDPPacketSizeBytes=1444;
-                    int M=(-4) / 2;//max. number of shorts (1444-4)/2=720
-                    //int NA=dataReplyThreadData.numADCsInDataStream[*rdIndex];//TODO: take from crate status packet -tb- DONE
-                    int NA=dataReplyThreadData.crateStatusBlock[*rdIndex].numFIFOnumADCs & 0xffff;//take from crate status packet -tb-
-                    int maxUDPSizeSetting=dataReplyThreadData.crateStatusBlock[*rdIndex].maxUDPSize;//take from crate status packet -tb-
-
-//TODO:
-if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
-//TODO: I could try to detect num of ADCs by checking number of bytes in buffer - need to sum up all UDP data packet size (without header) -tb-
-
-
-                    if(ipe4readerSWVersion < 10){//version before 2014-01-08, fixed UDP packed size 1444
-                        MaxUDPPacketSizeBytes=1444;
-                        M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
-                    }else{//we have variable packet size
-                        int mupsb = (720/NA)*NA*2+4 ;//(1440 / (2*NA)) * 2 * NA + 4;
-                        //maxUDPSizeSetting==0 is ipe4reader version <10 and should already have been handled (see above)
-                        if(maxUDPSizeSetting==-1){//auto mode: compute size by numADCs
-                            if(MaxUDPPacketSizeBytes != mupsb) NSLog(@"  --------->  parser correction:  udpDataPacketSize: old: %i new:%i\n", MaxUDPPacketSizeBytes,mupsb);
-                            MaxUDPPacketSizeBytes = mupsb;
-                        }else{
-                            //mupsb = 1444; //this should become standard, quick fix
-                            if(MaxUDPPacketSizeBytes != maxUDPSizeSetting) NSLog(@"  --------->  parser correction:  udpDataPacketSize: old: %i new:%i\n", MaxUDPPacketSizeBytes,maxUDPSizeSetting);
-                            MaxUDPPacketSizeBytes = maxUDPSizeSetting;
-                        }
-                        
-                        M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
-                    }
-                    int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
-                    int     i, j, j_swapit, toffset;
-                    int64_t K,t;
-                    //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
-                    for(i=0; i<kMaxNumADCChan/*720*/; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;
-                    uint16_t *P;
-                    uint16_t *data16;
-                    int packetCounter=0;
-                    bool reachedMaxTimesample=false;
-                    for(i=0; i<kMaxNumUDPDataPackets;i++){// i counts the UDP packets
-                        if(dataReplyThreadData.adcBufReceivedFlag[*rdIndex][i]){
-                            //check: P should also be == i
-                            P = (uint16_t*)(&dataReplyThreadData.adcBuf[*rdIndex][i][0]);
-                            K = *P * M;
-                            t = K/NA; 
-                            toffset = K % NA; //toffset is more or less the abs. ADC channel number ... -tb-
-                            int len;
-                            len=(dataReplyThreadData.adcBufSize[*rdIndex][i]-4) / 2;
-                            data16=(uint16_t*)(&dataReplyThreadData.adcBuf[*rdIndex][i][4]);
-                            j_swapit=1;
-                            for(j=0; j<len; j++){//j loops through UDP packet data
-                                if(t>=100000){//we have too much data, probably the number of sent ADC channels has changed/increased: stop assembling event records
-                                    reachedMaxTimesample=true;
-                                    break;
-                                }
-                                //if(i<2 || (len<720)) NSLog(@" A i:%i j:%i index  (toffset,t)=(%i,%i)  len %i (%i)\n",(int)i,(int)j,(int)toffset,(int)t,(int)len,(int)dataReplyThreadData.adcBufSize[*rdIndex][i]);
-                                dataReplyThreadData.adcTraceBuf[*rdIndex][toffset][t]=*(data16+j+j_swapit);
-                                //we need to swap each pair of shorts (uint16_t) - this is the sequence in the UDP packets ...
-                                j_swapit = -j_swapit;// ->toggles between 1 and -1 ...
-                                //unswapped: dataReplyThreadData.adcTraceBuf[*rdIndex][toffset][t]=*(data16+j);
-                                dataReplyThreadData.adcTraceBufCount[*rdIndex][toffset]++; //count the number of shorts
-                                toffset++; 
-                                if(toffset==NA){toffset=0; t++;}
-                            }//for(j...
-                            if(reachedMaxTimesample){
-                                NSLog(@"    reachedMaxTimesample - leave loop! t is %i (should be 100000) double break \n",(int)t);
-                                break;
-                            }
-                            //debug if(i<10 || t>99996) NSLog(@" E  index  (toffset,t)=(%i,%i)  len %i \n",(int)toffset,(int)t,(int)len);
-                        }
-
-                        if(packetCounter==dataReplyThreadData.hasDataPackets[*rdIndex]){
-                            NSLog(@"    packetCounter==dataReplyThreadData.hasDataPackets[*rdIndex]: we handled all data packets - leave loop! t is %i (should be 100000) regular break \n",(int)t);
-                            break;
-                        }
-                        packetCounter++;
-                    }//for(i...
-                    if(t<100000){
-                        NSLog(@"    end of  loop! t is %i t<100000 (should be 100000) missing UDP packets? \n",(int)t);
-                    }
-                    if(reachedMaxTimesample){
-                        NSLog(@"    reachedMaxTimesample - leave loop! t is %i (should be 100000) double break ; handled packetCounter %i, in buffer packets %i \n",(int)t,packetCounter,dataReplyThreadData.hasDataPackets[*rdIndex]);
-                    }
-                    
-                    
-                    //    now ship recorded data
-                    int chan;
-                    uint16_t dataWord16 = 0; 
-                    uint32_t locationWord = 0;//			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-                    uint32_t headerData = 0; 
-                    int numTSamples=100000;
-                    int traceLength=10000;//<---------------   <<-------  <<<----   configure the length of a single trace record here (number of shorts/uint16_t)
-                                          //<---------------   <<-------  <<<----   tested: 1000, 2000, 4000, 10000
-                    int numTraces=numTSamples/traceLength; //                             = 100,   50,   25,    10
-                    NSLog(@" Shipping num of ADC channels:%i  \n",(int)NA);
-                    
-                    for(chan=0;chan<NA;chan++){
-                        if(dataReplyThreadData.adcTraceBufCount[*rdIndex][toffset]<100000){
-                            NSLog(@"    channel %i, trace %i has missing samples (%i out of 100000) \n",chan,(int)i,(int)dataReplyThreadData.adcTraceBufCount[*rdIndex][chan]);
-
-                        }
-                        unsigned long totalLength = (9 + traceLength/2);	// header (uint32_t) + traceLength shorts (16 bit)
-                        unsigned long header = waveFormId | totalLength;
-                        t=0;
-                        for(i=0; i<numTraces; i++){//default is: ship numTraces=10 packets with traceLength=10000 sample points
-
-                            NSMutableData* theADCTraceData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
-                            [theADCTraceData appendBytes:&header length:4];				           //ORCA header word
- 						    locationWord = (chan&0xff)<<8; 
-							[theADCTraceData appendBytes:&locationWord length:4];		           //which crate, which card info
-                            headerData = crateStatusBlock->PPS_count; //second
-							[theADCTraceData appendBytes:&headerData length:4];		           
-                            headerData = i * traceLength; //sub second
-							[theADCTraceData appendBytes:&headerData length:4];		           
-                            headerData = chan & 0xffff; //total number of channel in packet (was 'channel map')
-							[theADCTraceData appendBytes:&headerData length:4];		           
-                            headerData = i; //event ID
-							[theADCTraceData appendBytes:&headerData length:4];		           
-                            headerData = numfifo; //numfifo (was energy)
-							[theADCTraceData appendBytes:&headerData length:4];		           
-                            uint32_t eventFlags     = 0;//0 = ADC trace
-							[theADCTraceData appendBytes:&eventFlags length:4];		           
-                            headerData = 0; //
-							[theADCTraceData appendBytes:&headerData length:4];	
-                            //append ADC values	           
-                            for(j=0; j<traceLength; j++){
-                                dataWord16 = dataReplyThreadData.adcTraceBuf[*rdIndex][chan][t];
-							    [theADCTraceData appendBytes:&dataWord16 length:sizeof(dataWord16)];		           
-                                t++;
-                            }
-                            [aDataPacket addData:theADCTraceData]; //ship the waveform
-
-                        }
-                    }
-                    
-                    
-                    
-                    //mark buffer as free
-                    dataReplyThreadData.hasDataPackets[dataReplyThreadData.rdIndex]=0;
-                    dataReplyThreadData.hasDataBytes[dataReplyThreadData.rdIndex]=0;
-                  }//if(takeADCChannelData ...
-                  
-                }//if( ...bufferHasData...
-                
-                
-            }//if(...buffersAreActive...    TODO: I could omit this check (?) -tb-
-#endif
-            
-            
-            
-            
-            
 		    //code to be executed every second -END
 		    lastDiffTime = currDiffTime;
 		}
+        
+        if(isPollingSpectrum){
+            double diffTimeSinceLastRequest =      (  (double)(currtime.tv_sec  - lastRequestTime.tv_sec)  ) +
+                    ( ((double)(currtime.tv_usec - lastRequestTime.tv_usec)) * 0.000001 );
+            if( diffTimeSinceLastRequest > spectrumRequestRate ){
+
+	 NSLog(@"=== waitForResponse: %i   expectedDP5PacketLen: %i=========\n", waitForResponse,expectedDP5PacketLen);
+
+                //TODO
+                if(waitForResponse){//we are still waiting for a reply of a previous request, do not send a new command ...
+			        NSLog(@"================PENDING===================\n");
+                    usleep(100000);
+                }else{
+			        NSLog(@"================START NEW REQUEST===================\n");
+                    [self requestSpectrum];
+                    gettimeofday(&lastRequestTime,NULL);
+                }
+            }else{//if we have plenty of time, we may take a small nap
+                if( (spectrumRequestRate-diffTimeSinceLastRequest) > 0.5){
+                    usleep(100);
+                }
+            }
+        }
 
 
 
@@ -4534,6 +4435,14 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
 			NSLog(@"===================================\n");
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
+        
+        
+        
+    sleep(3);
+        
+        
+        
+        
         if(accessAllowedToHardwareAndSBC){
 
 #if 0 //TODO: omit #import "ORAmptekDP5Defs.h"
@@ -4556,6 +4465,13 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
         //see below ... gettimeofday(&starttime,NULL);
         gettimeofday(&starttime,NULL);
         //start timer -------TIMER------------
+
+        //if(isPollingSpectrum){
+            lastRequestTime = starttime;
+            [self setIsPollingSpectrum:YES];
+
+        //}
+
 
 	}
 }
@@ -4630,6 +4546,9 @@ if((len % 4) != 0){
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestSpectrumTimedWorker) object:nil];
+    [self setIsPollingSpectrum:NO];
+        
 return;
 
 
@@ -4643,6 +4562,9 @@ return;
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestSpectrumTimedWorker) object:nil];
+        [self setIsPollingSpectrum:NO];
+        
 return;
     if(accessAllowedToHardwareAndSBC){
     
@@ -4671,6 +4593,9 @@ return;
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
 	}
 	
+    
+//TODO: rm   slt - - 
+#if 0
     //restore socket activity (on or off)
     if(takeUDPstreamData){
     	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(loopCommandRequestUDPData) object:nil];
@@ -4678,6 +4603,8 @@ return;
         //if(! (savedUDPSocketState & 0x2)) [self stopListeningDataServerSocket];
         savedUDPSocketState=0;
     }
+#endif
+
 
     
 	[dataTakers release];
@@ -4849,7 +4776,7 @@ return YES;
 	}  
 	for (k=0;k<2000;k++){
 		if (xyProj[k%20]) {
-			tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff);
+			tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff); 
 		}
 	}
 	

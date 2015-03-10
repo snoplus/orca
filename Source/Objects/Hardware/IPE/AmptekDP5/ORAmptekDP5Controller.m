@@ -75,11 +75,9 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 	controlSize			= NSMakeSize(650,670);
     statusSize			= NSMakeSize(650,670);
     lowLevelSize		= NSMakeSize(650,500);
-    cpuManagementSize	= NSMakeSize(650,500);
-    cpuTestsSize		= NSMakeSize(650,450);
-    udpKCmdSize		    = NSMakeSize(650,670);
-    streamingSize		= NSMakeSize(650,670);
-    udpDReadSize		= NSMakeSize(650,670);
+    networkConnectionSize	= NSMakeSize(650,500);
+    testSize    		= NSMakeSize(650,650);
+    aboutSize		    = NSMakeSize(650,470);
 	
 	[[self window] setTitle:@"Amptek DP5"];	//TODO: use enumbering
 	
@@ -147,11 +145,6 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(interruptMaskChanged:)
-                         name : ORAmptekDP5ModelInterruptMaskChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
                      selector : @selector(nextPageDelayChanged:)
                          name : ORAmptekDP5ModelNextPageDelayChanged
 						object: model];
@@ -191,10 +184,24 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelCrateUDPCommandIPChanged
 						object: model];
 
+
+
+
+#if 0
+    [notifyCenter addObserver : self
+                     selector : @selector(interruptMaskChanged:)
+                         name : ORAmptekDP5ModelInterruptMaskChanged
+						object: model];
+	
     [notifyCenter addObserver : self
                      selector : @selector(crateUDPReplyPortChanged:)
                          name : ORAmptekDP5ModelCrateUDPReplyPortChanged
 						object: model];
+#endif
+
+
+
+                
 
     [notifyCenter addObserver : self
                      selector : @selector(crateUDPCommandChanged:)
@@ -210,7 +217,7 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                      selector : @selector(openCommandSocketChanged:)
                          name : ORAmptekDP5ModelIsListeningOnServerSocketChanged
 						object: model];
-
+#if 0
     [notifyCenter addObserver : self
                      selector : @selector(selectedFifoIndexChanged:)
                          name : ORAmptekDP5ModelSelectedFifoIndexChanged
@@ -250,15 +257,16 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                      selector : @selector(numRequestedUDPPacketsChanged:)
                          name : ORAmptekDP5ModelNumRequestedUDPPacketsChanged
 						object: model];
+#endif
 
+
+
+
+//TODO: rm   slt - - 
+#if 0
     [notifyCenter addObserver : self
                      selector : @selector(openDataCommandSocketChanged:)
                          name : ORAmptekDP5ModelOpenCloseDataCommandSocketChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(sltDAQModeChanged:)
-                         name : ORAmptekDP5ModelSltDAQModeChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -291,6 +299,21 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelCrateUDPDataCommandChanged
 						object: model];
 
+
+#endif
+
+
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sltDAQModeChanged:)
+                         name : ORAmptekDP5ModelSltDAQModeChanged
+						object: model];
+
+
+
+
+//TODO: rm   slt - - 
+#if 0
     [notifyCenter addObserver : self
                      selector : @selector(takeUDPstreamDataChanged:)
                          name : ORAmptekDP5ModelTakeUDPstreamDataChanged
@@ -315,6 +338,14 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                      selector : @selector(chargeBBFileChanged:)
                          name : ORAmptekDP5ModelChargeBBFileChanged
 						object: model];
+#endif
+
+
+
+
+
+
+
 
     [notifyCenter addObserver : self
                      selector : @selector(takeRawUDPDataChanged:)
@@ -361,9 +392,35 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelSpectrumRequestTypeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(spectrumRequestRateChanged:)
+                         name : ORAmptekDP5ModelSpectrumRequestRateChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(isPollingSpectrumChanged:)
+                         name : ORAmptekDP5ModelIsPollingSpectrumChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) isPollingSpectrumChanged:(NSNotification*)aNote
+{
+	//[isPollingSpectrumIndicator setIntValue: [model isPollingSpectrum]];
+    if([model isPollingSpectrum]){
+	    [isPollingSpectrumIndicator  startAnimation: nil];
+    }else{
+	    [isPollingSpectrumIndicator  stopAnimation: nil];
+    }
+}
+
+- (void) spectrumRequestRateChanged:(NSNotification*)aNote
+{
+	//[spectrumRequestRatePU setIntValue: [model spectrumRequestRate]];
+	[spectrumRequestRatePU selectItemWithTag: [model spectrumRequestRate]];
+}
 
 - (void) spectrumRequestTypeChanged:(NSNotification*)aNote
 {
@@ -416,7 +473,7 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
             //DEBUG OUTPUT:
             static int debFlag=1;if(debFlag) NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));debFlag=0;//TODO: DEBUG testing ...-tb-
 return;
-	[statusHighRegTextField setIntValue: [model statusHighReg]];
+//TODO: rm   slt - - 	[statusHighRegTextField setIntValue: [model statusHighReg]];
 }
 
 - (void) statusLowRegChanged:(NSNotification*)aNote
@@ -424,7 +481,7 @@ return;
             //DEBUG OUTPUT:
             static int debFlag=1;if(debFlag) NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));debFlag=0;//TODO: DEBUG testing ...-tb-
 return;
-	[statusLowRegTextField setIntValue: [model statusLowReg]];
+//TODO: rm   slt - - 	[statusLowRegTextField setIntValue: [model statusLowReg]];
 }
 
 - (void) takeADCChannelDataChanged:(NSNotification*)aNote
@@ -437,6 +494,10 @@ return;
 	[takeRawUDPDataCB setIntValue: [model takeRawUDPData]];
 }
 
+
+
+//TODO: remove
+#if 0
 - (void) chargeBBFileChanged:(NSNotification*)aNote
 {
 	[chargeBBFileTextField setStringValue: [model chargeBBFile]];
@@ -474,7 +535,7 @@ return;
 	[BBCmdFFMaskTextField setIntValue: [model BBCmdFFMask]];
    	int i;
 	for(i=0;i<8;i++){
-		[[BBCmdFFMaskMatrix cellWithTag:i] setIntValue: ([model BBCmdFFMask] & (0x1 <<i))];//cellWithTag:i is not defined for all i, but it works anyway
+		//[[BBCmdFFMaskMatrix cellWithTag:i] setIntValue: ([model BBCmdFFMask] & (0x1 <<i))];//cellWithTag:i is not defined for all i, but it works anyway
 	}    
 
 }
@@ -498,6 +559,19 @@ return;
 {
 	[cmdWArg1TextField setIntValue: [model cmdWArg1]];
 }
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void) sltDAQModeChanged:(NSNotification*)aNote
 {
@@ -506,10 +580,18 @@ return;
     [sltDAQModePU selectItemWithTag:[model sltDAQMode]];
 }
 
+
+
+
+//TODO: rm   slt - - 
+#if 0
+
 - (void) numRequestedUDPPacketsChanged:(NSNotification*)aNote
 {
 	[numRequestedUDPPacketsTextField setIntValue: [model numRequestedUDPPackets]];
 }
+
+
 
 - (void) crateUDPDataReplyPortChanged:(NSNotification*)aNote
 {
@@ -525,7 +607,6 @@ return;
 {
 	[crateUDPDataPortTextField setIntValue: [model crateUDPDataPort]];
 }
-
 - (void) eventFifoStatusRegChanged:(NSNotification*)aNote
 {
 	//[eventFifoStatusRegTextField setIntValue: [model eventFifoStatusReg]];
@@ -552,6 +633,13 @@ return;
 {
 	[selectedFifoIndexPU selectItemWithTag: [model selectedFifoIndex]];
 }
+#endif
+
+
+
+
+
+
 
 - (void) isListeningOnServerSocketChanged:(NSNotification*)aNote//used for AmpTek DP5???
 {
@@ -568,6 +656,11 @@ return;
 	}
 }
 
+
+
+
+
+#if 0
 - (void) isListeningOnDataServerSocketChanged:(NSNotification*)aNote
 {
 	//[isListeningOnDataServerSocketNo Outlet setIntValue: [model isListeningOnDataServerSocket]];
@@ -586,15 +679,33 @@ return;
 }
 
 
+#endif
+
+
+
+
+
 - (void) crateUDPCommandChanged:(NSNotification*)aNote
 {
 	[crateUDPCommandTextField setStringValue: [model crateUDPCommand]];
 }
 
+
+
+#if 0
 - (void) crateUDPReplyPortChanged:(NSNotification*)aNote
 {
 	[crateUDPReplyPortTextField setIntValue: [model crateUDPReplyPort]];
 }
+#endif
+
+
+
+
+
+
+
+
 
 - (void) crateUDPCommandIPChanged:(NSNotification*)aNote
 {
@@ -623,6 +734,9 @@ return;
 
 }
 
+
+
+#if 0
 - (void) openDataCommandSocketChanged:(NSNotification*)aNote
 {
     if([model isOpenDataCommandSocket]){
@@ -638,6 +752,11 @@ return;
 	}
 
 }
+#endif
+
+
+
+
 
 
 - (void) sltScriptArgumentsChanged:(NSNotification*)aNote
@@ -675,11 +794,9 @@ return;
         case  0: [self resizeWindowToSize:controlSize];			break;
 		case  1: [self resizeWindowToSize:statusSize];			break;
 		case  2: [self resizeWindowToSize:lowLevelSize];	    break;
-		case  3: [self resizeWindowToSize:cpuManagementSize];	break;
-		case  4: [self resizeWindowToSize:cpuTestsSize];	    break;
-		case  5: [self resizeWindowToSize:udpKCmdSize];				break;
-		case  6: [self resizeWindowToSize:streamingSize];	    break;
-		case  7: [self resizeWindowToSize:udpDReadSize];	    break;
+		case  3: [self resizeWindowToSize:networkConnectionSize];	break;
+		case  4: [self resizeWindowToSize:testSize];	    break;
+		case  5: [self resizeWindowToSize:aboutSize];				break;
 		default: [self resizeWindowToSize:controlSize];	            break;
     }
 }
@@ -712,15 +829,6 @@ return;
 	[nextPageDelayField  setFloatValue:[model nextPageDelay]*102.3/100.];
 }
 
-- (void) interruptMaskChanged:(NSNotification*)aNote
-{
-	unsigned long aMaskValue = [model interruptMask];
-	int i;
-	for(i=0;i<16;i++){
-		if(aMaskValue & (1L<<i))[[interruptMaskMatrix cellWithTag:i] setIntValue:1];
-		else [[interruptMaskMatrix cellWithTag:i] setIntValue:0];
-	}
-}
 
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
@@ -742,7 +850,6 @@ return;
 	[self pageSizeChanged:nil];	
 	[self displayEventLoopChanged:nil];	
 	[self displayTriggerChanged:nil];	
-	[self interruptMaskChanged:nil];
 	[self nextPageDelayChanged:nil];
     [self pollRateChanged:nil];
     [self pollRunningChanged:nil];
@@ -752,31 +859,44 @@ return;
 	[self sltScriptArgumentsChanged:nil];
 	[self crateUDPCommandPortChanged:nil];
 	[self crateUDPCommandIPChanged:nil];
-	[self crateUDPReplyPortChanged:nil];
 	[self crateUDPCommandChanged:nil];
 	[self isListeningOnServerSocketChanged:nil];
+    
+    [self openCommandSocketChanged:nil];
+    
+    
+    
+#if 0
 	[self selectedFifoIndexChanged:nil];
 	[self pixelBusEnableRegChanged:nil];
 	[self eventFifoStatusRegChanged:nil];
-    [self openCommandSocketChanged:nil];
+    
+    
     [self openDataCommandSocketChanged:nil];
 	[self crateUDPDataPortChanged:nil];
 	[self crateUDPDataIPChanged:nil];
 	[self crateUDPDataReplyPortChanged:nil];
 	[self isListeningOnDataServerSocketChanged:nil];
-	[self numRequestedUDPPacketsChanged:nil];
+#endif
+
+
+
 	[self sltDAQModeChanged:nil];
+//TODO: rm   slt - - 
+#if 0
+	[self crateUDPDataCommandChanged:nil];
+	[self numRequestedUDPPacketsChanged:nil];
 	[self cmdWArg1Changed:nil];
 	[self cmdWArg2Changed:nil];
 	[self cmdWArg3Changed:nil];
 	[self cmdWArg4Changed:nil];
 	[self BBCmdFFMaskChanged:nil];
-	[self crateUDPDataCommandChanged:nil];
 	[self takeUDPstreamDataChanged:nil];
 	[self takeEventDataChanged:nil];
 	[self idBBforWCommandChanged:nil];
 	[self useBroadcastIdBBChanged:nil];
 	[self chargeBBFileChanged:nil];
+#endif
 	[self takeRawUDPDataChanged:nil];
 	[self takeADCChannelDataChanged:nil];
 	[self statusLowRegChanged:nil];
@@ -786,6 +906,8 @@ return;
 	[self textCommandChanged:nil];
 	[self numSpectrumBinsChanged:nil];
 	[self spectrumRequestTypeChanged:nil];
+	[self spectrumRequestRateChanged:nil];
+	[self isPollingSpectrumChanged:nil];
 }
 
 - (void) setWindowTitle
@@ -845,7 +967,7 @@ return;
 	short index = [model selectedRegIndex];
 	BOOL readAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegReadable)>0;
 	BOOL writeAllowed = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegWriteable)>0;
-	BOOL needsIndex = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegNeedsIndex)>0;
+//TODO: rm   slt - -	BOOL needsIndex = !lockedOrRunningMaintenance && ([model getAccessType:index] & kIpeRegNeedsIndex)>0;
 	
 	[regWriteButton setEnabled:writeAllowed];
 	[regReadButton setEnabled:readAllowed];
@@ -853,7 +975,7 @@ return;
 	[regWriteValueStepper setEnabled:writeAllowed];
 	[regWriteValueTextField setEnabled:writeAllowed];
 
-    [selectedFifoIndexPU setEnabled: needsIndex];
+//TODO: rm   slt - -    [selectedFifoIndexPU setEnabled: needsIndex];
 }
 
 - (void) endAllEditing:(NSNotification*)aNotification
@@ -914,6 +1036,10 @@ return;
         [registerPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
     }
 
+
+
+//TODO: rm   slt - -
+#if 0
 	// Clear all the popup items.
     [selectedFifoIndexPU removeAllItems];
     
@@ -924,6 +1050,7 @@ return;
     }
     [selectedFifoIndexPU insertItemWithTitle: @"All" atIndex:i];
     [[selectedFifoIndexPU itemAtIndex:i] setTag: i];//TODO: do I need this??? -tb-
+#endif
 
 }
 
@@ -938,6 +1065,12 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) spectrumRequestRatePUAction:(id)sender
+{
+	//[model setSpectrumRequestRate:[sender intValue]];	
+	[model setSpectrumRequestRate:[[spectrumRequestRatePU selectedItem] tag]];	
+}
 
 - (void) spectrumRequestNowButtonAction:(id)sender
 {
@@ -976,12 +1109,12 @@ return;
 
 - (void) statusHighRegTextFieldAction:(id)sender
 {
-	[model setStatusHighReg:[sender intValue]];	
+//TODO: rm   slt - - 	[model setStatusHighReg:[sender intValue]];	
 }
 
 - (void) statusLowRegTextFieldAction:(id)sender
 {
-	[model setStatusLowReg:[sender intValue]];	
+//TODO: rm   slt - - 	[model setStatusLowReg:[sender intValue]];	
 }
 
 - (void) takeADCChannelDataCBAction:(id)sender
@@ -994,6 +1127,12 @@ return;
 	[model setTakeRawUDPData:[sender intValue]];	
 }
 
+
+
+
+
+//TODO: remove
+#if 0
 - (void) chargeBBFileTextFieldAction:(id)sender
 {
 	[model setChargeBBFile:[sender stringValue]];	
@@ -1029,6 +1168,7 @@ return;
 	[model setBBCmdFFMask:[sender intValue]];	
 }
 
+
 - (IBAction) BBCmdFFMaskMatrixAction:(id)sender
 {
 	//debug 
@@ -1062,12 +1202,17 @@ return;
 {
 	[model setCmdWArg1:[sender intValue]];	
 }
+#endif
 
 - (IBAction) sltDAQModePUAction:(id)sender
 {
 	[model setSltDAQMode:[[sltDAQModePU selectedItem] tag]];	
 	//[model setSltDAQMode:[[sender selectedItem] tag]];	
 }
+
+
+
+
 
 - (void) sltDAQModeTextFieldAction:(id)sender
 {
@@ -1080,6 +1225,13 @@ return;
 }
 
 
+
+
+
+
+
+//TODO: rm
+#if 0
 - (void) eventFifoStatusRegTextFieldAction:(id)sender
 {
 	[model setEventFifoStatusReg:[sender intValue]];	
@@ -1125,12 +1277,20 @@ return;
 	[model readControlReg];	
 }
 
+#endif
 
+
+
+
+
+
+
+
+#if 0
 - (void) selectedFifoIndexPUAction:(id)sender
 {
 	[model setSelectedFifoIndex:[sender indexOfSelectedItem]];	//sender is selectedFifoIndexPU
 }
-
 
 
 //ADC data UDP connection
@@ -1145,7 +1305,6 @@ return;
     [self closeDataCommandSocketButtonAction:nil];
     [self stopListeningForDataReplyButtonAction:nil];
 }
-
 
 - (void) crateUDPDataReplyPortTextFieldAction:(id)sender
 {
@@ -1269,6 +1428,14 @@ return;
 
 
 
+#endif
+
+
+
+
+
+
+
 
 
 
@@ -1276,12 +1443,15 @@ return;
 //UDP command Connection Start/Stop all
 - (IBAction) startUDPCommandConnectionButtonAction:(id)sender
 {
+NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    
     [self openCommandSocketButtonAction:nil];
     //[self startListeningForReplyButtonAction:nil];
 }
 
 - (IBAction) stopUDPCommandConnectionButtonAction:(id)sender
 {
+NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
     [self closeCommandSocketButtonAction:nil];
     //[self stopListeningForReplyButtonAction:nil];
 }
@@ -1342,10 +1512,21 @@ return;
 	[model setCrateUDPCommand:[sender stringValue]];	
 }
 
+
+
+
+
+//TODO: rm
+#if 0
 - (void) crateUDPReplyPortTextFieldAction:(id)sender
 {
 	[model setCrateUDPReplyPort:[sender intValue]];	
 }
+#endif
+
+
+
+
 
 - (void) crateUDPCommandIPTextFieldAction:(id)sender
 {
@@ -1418,16 +1599,7 @@ return;
     [model setPollingInterval:[[pollRatePopup selectedItem] tag]];
 }
 
-- (IBAction) interruptMaskAction:(id)sender
-{
-	unsigned long aMaskValue = 0;
-	int i;
-	for(i=0;i<16;i++){
-		if([[interruptMaskMatrix cellWithTag:i] intValue]) aMaskValue |= (1L<<i);
-		else aMaskValue &= ~(1L<<i);
-	}
-	[model setInterruptMask:aMaskValue];	
-}
+
 
 - (IBAction) nextPageDelayAction:(id)sender
 {
@@ -1467,7 +1639,7 @@ return;
 
 - (IBAction) readStatus:(id)sender
 {
-	[model readStatusReg];
+//TODO: rm   slt - - 	[model readStatusReg];
 }
 
 - (IBAction) reportAllAction:(id)sender
@@ -1476,10 +1648,15 @@ return;
 	NSLogFont(aFont, @"SLT station# %d Report:\n",[model stationNumber]);
 
 	@try {
+    
+    
+//TODO: rm   
+//TODO: rm   implement for Amptek!!!!
+//TODO: rm  
 		NSLogFont(aFont, @"Board ID: %lld\n",[model readBoardID]);
-		[model printStatusReg];
-		[model printStatusLowHighReg];
-		[model printControlReg];
+//TODO: rm   slt - - 		[model printStatusReg];
+//TODO: rm   slt - - 		[model printStatusLowHighReg];
+//TODO: rm   slt - -		[model printControlReg];
 		NSLogFont(aFont,@"--------------------------------------\n");
 		NSLogFont(aFont,@"SLT Time   : %lld\n",[model getTime]);
 		//[model printInterruptMask];
@@ -1530,6 +1707,10 @@ return;
 
 - (IBAction) readRegAction: (id) sender
 {
+
+//TODO: implemet it
+#if 0
+
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
 		//unsigned long value = [model readReg:index];
@@ -1552,9 +1733,17 @@ return;
         ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed (B)", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
+#endif
 }
+
+
+
 - (IBAction) writeRegAction: (id) sender
 {
+
+//TODO: implemet it
+#if 0
+
 	[self endEditing];
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
@@ -1576,6 +1765,7 @@ return;
         ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
+#endif
 }
 
 - (IBAction) hwVersionAction: (id) sender

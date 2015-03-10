@@ -45,6 +45,36 @@
 #define IsBitSet(A,B) (((A) & (B)) == (B))
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
 
+
+
+//Amptek constants
+//status packet
+#define kStatusLen 64
+#define kFastCountOffset  0
+#define kSlowCountOffset  4
+#define kGPCounterOffset  8
+#define kAccTimeOffset    12
+#define kUnusedOffset     16
+#define kRealtimeOffset   20
+#define kFirmwareVersionOffset   24
+#define kFPGAVersionOffset       25
+#define kSerialNumberOffset      26
+#define kFlags1Offset            35
+#define kFlags2Offset            36
+#define kFirmwareBuildNumberOffset            37
+#define kFlags4Offset            38
+#define kDeviceIDOffset          39
+
+#define D0 0x01
+#define D1 0x02
+#define D2 0x04
+#define D3 0x08
+#define D4 0x10
+#define D5 0x20
+#define D6 0x40
+#define D7 0x80
+
+
 //control reg bit masks
 #define kCtrlInvert 	(0x00000001 << 16) //RW
 #define kCtrlLedOff 	(0x00000001 << 15) //RW
@@ -107,7 +137,7 @@
 	@private
 		unsigned long	hwVersion;
 		NSString*		patternFilePath;
-		unsigned long	interruptMask;
+//TODO: rm   slt 		unsigned long	interruptMask;
 		unsigned long	nextPageDelay;
 		float			pulserAmp;
 		float			pulserDelay;
@@ -140,9 +170,9 @@
 		// PMC_Link*		pmcLink;  //TODO: remove SLT stuff -tb-   2014 
         
 		unsigned long controlReg;
-		unsigned long statusReg;//deprecated 2013-06 -tb-
-        unsigned long statusLowReg; //was statusRegLow
-        unsigned long statusHighReg;//was statusRegHigh
+        unsigned long statusReg;//deprecated 2013-06 -tb-
+//TODO: rm   slt - -         unsigned long statusLowReg; //was statusRegLow
+//TODO: rm   slt - -         unsigned long statusHighReg;//was statusRegHigh
 		unsigned long long clockTime;
 		
         NSString* sltScriptArguments;
@@ -152,7 +182,7 @@
 		    //vars in GUI
         int crateUDPCommandPort;
         NSString* crateUDPCommandIP;
-        int crateUDPReplyPort;
+//TODO: rm            int crateUDPReplyPort;
         NSString* crateUDPCommand;//TODO: rename -tb-
         NSString* textCommand;//TODO: rename -tb-
 
@@ -178,38 +208,49 @@
         int expectedDP5PacketLen; //for adding up UDP packets ...
         int waitForResponse; //a flag ...
 		
+        
+        
+        
+        
+        
+        #if 0
     int selectedFifoIndex;
     unsigned long pixelBusEnableReg;
     unsigned long eventFifoStatusReg;
-	
+	#endif
 	
 	//UDP Data Packet tab
-    int crateUDPDataPort;
-    NSString* crateUDPDataIP;
-    int crateUDPDataReplyPort;
+//TODO: from SLT         int crateUDPDataPort;
+//TODO: from SLT         NSString* crateUDPDataIP;
+//TODO: from SLT     int crateUDPDataReplyPort;
 		    //reply connection (server/listener)
-	    int                UDP_DATA_REPLY_SERVER_SOCKET;//=-1;
-        struct sockaddr_in UDP_DATA_REPLY_servaddr;
+//TODO: from SLT  	    int                UDP_DATA_REPLY_SERVER_SOCKET;//=-1;
+//TODO: from SLT          struct sockaddr_in UDP_DATA_REPLY_servaddr;
         struct sockaddr_in sockaddr_data_from;
         socklen_t sockaddr_data_fromLength;
 		    //sender connection (client)
-	    int      UDP_DATA_COMMAND_CLIENT_SOCKET;
+//TODO: from SLT          	    int      UDP_DATA_COMMAND_CLIENT_SOCKET;
 	    uint32_t UDP_DATA_COMMAND_CLIENT_IP;
-        struct sockaddr_in UDP_DATA_COMMAND_sockaddrin_to;
+       struct sockaddr_in UDP_DATA_COMMAND_sockaddrin_to;
     int isListeningOnDataServerSocket;
     int requestStoppingDataServerSocket;
-    int numRequestedUDPPackets;
+//TODO: from SLT        int numRequestedUDPPackets;
 	    //pthread handling
 	    pthread_t dataReplyThread;
         pthread_mutex_t dataReplyThread_mutex;
     int sltDAQMode;
+    
+#if 0
     int cmdWArg1;
     int cmdWArg2;
     int cmdWArg3;
     int cmdWArg4;
+    
     uint32_t BBCmdFFMask;
     NSString* crateUDPDataCommand;
-    
+#endif
+
+
     //data taking: flags and vars  //TODO: remove ALL SLT stuff -tb-   2014 
     int takeUDPstreamData;
     int takeRawUDPData;
@@ -219,19 +260,23 @@
     uint32_t partOfRunFLTMask;//TODO: remove SLT stuff -tb-   2014 
     
     //BB interface
-    int idBBforWCommand;
-    bool useBroadcastIdBB;
-    NSString * chargeBBFile;
-    int lowLevelRegInHex;
+//TODO: from SLT         int idBBforWCommand;
+//TODO: from SLT         bool useBroadcastIdBB;
+//TODO: from SLT         NSString * chargeBBFile;
+         int lowLevelRegInHex;
     
     //BB charging
-    OREdelweissFLTModel *fltChargingBB;
+//TODO: REMOVE IT slt        OREdelweissFLTModel *fltChargingBB;
     //FIC charging
-    OREdelweissFLTModel *fltChargingFIC;
+//TODO: REMOVE IT slt        OREdelweissFLTModel *fltChargingFIC;
     
     int resetEventCounterAtRunStart;
     int numSpectrumBins;
     int spectrumRequestType;
+    int spectrumRequestRate;
+    int isPollingSpectrum;
+    struct timeval lastRequestTime;//    struct timezone tz; is obsolete ... -tb-
+    
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Initialization
@@ -249,6 +294,11 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (int) isPollingSpectrum;
+- (void) setIsPollingSpectrum:(int)aIsPollingSpectrum;
+- (void) requestSpectrumTimedWorker;
+- (int) spectrumRequestRate;
+- (void) setSpectrumRequestRate:(int)aSpectrumRequestRate;
 - (int) spectrumRequestType;
 - (void) setSpectrumRequestType:(int)aSpectrumRequestType;
 - (int) numSpectrumBins;
@@ -259,24 +309,36 @@
 - (void) setResetEventCounterAtRunStart:(int)aResetEventCounterAtRunStart;
 - (int) lowLevelRegInHex;
 - (void) setLowLevelRegInHex:(int)aLowLevelRegInHex;
-- (unsigned long) statusHighReg;
-- (void) setStatusHighReg:(unsigned long)aStatusRegHigh;
-- (unsigned long) statusLowReg;
-- (void) setStatusLowReg:(unsigned long)aStatusRegLow;
+
+//TODO: rm   slt - - - (unsigned long) statusHighReg;
+//TODO: rm   slt - - - (void) setStatusHighReg:(unsigned long)aStatusRegHigh;
+//TODO: rm   slt - - - (unsigned long) statusLowReg;
+//TODO: rm   slt - - - (void) setStatusLowReg:(unsigned long)aStatusRegLow;
+
+
 - (int) takeADCChannelData;
 - (void) setTakeADCChannelData:(int)aTakeADCChannelData;
 - (int) takeRawUDPData;
 - (void) setTakeRawUDPData:(int)aTakeRawUDPData;
+
+
+
+//TODO: rm
+#if 0
 - (NSString *) chargeBBFile;
 - (void) setChargeBBFile:(NSString *)aChargeBBFile;
 - (bool) useBroadcastIdBB;
 - (void) setUseBroadcastIdBB:(bool)aUseBroadcastIdBB;
 - (int) idBBforWCommand;
 - (void) setIdBBforWCommand:(int)aIdBBforWCommand;
+
+
+
 - (int) takeEventData;
 - (void) setTakeEventData:(int)aTakeEventData;
 - (int) takeUDPstreamData;
 - (void) setTakeUDPstreamData:(int)aTakeUDPstreamData;
+
 - (NSString*) crateUDPDataCommand;
 - (void) setCrateUDPDataCommand:(NSString*)aCrateUDPDataCommand;
 - (uint32_t) BBCmdFFMask;
@@ -289,34 +351,52 @@
 - (void) setCmdWArg2:(int)aCmdWArg2;
 - (int) cmdWArg1;
 - (void) setCmdWArg1:(int)aCmdWArg1;
+#endif
+
+
+
+
 - (int) sltDAQMode;
 - (void) setSltDAQMode:(int)aSltDAQMode;
-- (int) numRequestedUDPPackets;
-- (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets;
+//TODO: rm   slt - - - (int) numRequestedUDPPackets;
+//TODO: rm   slt - - - (void) setNumRequestedUDPPackets:(int)aNumRequestedUDPPackets; 
 - (int) isListeningOnDataServerSocket;
 - (void) setIsListeningOnDataServerSocket:(int)aIsListeningOnDataServerSocket;
 - (int) requestStoppingDataServerSocket;
 - (void) setRequestStoppingDataServerSocket:(int)aValue;
 
 
-- (int) crateUDPDataReplyPort;
-- (void) setCrateUDPDataReplyPort:(int)aCrateUDPDataReplyPort;
-- (NSString*) crateUDPDataIP;
-- (void) setCrateUDPDataIP:(NSString*)aCrateUDPDataIP;
-- (int) crateUDPDataPort;
-- (void) setCrateUDPDataPort:(int)aCrateUDPDataPort;
+//TODO: rm   slt - - - (int) crateUDPDataReplyPort;
+//TODO: rm   slt - - - (void) setCrateUDPDataReplyPort:(int)aCrateUDPDataReplyPort;
+//TODO: rm   slt - - - (NSString*) crateUDPDataIP;
+//TODO: rm   slt - - - (void) setCrateUDPDataIP:(NSString*)aCrateUDPDataIP;
+//TODO: rm   slt - - - (int) crateUDPDataPort;
+//TODO: rm   slt - - - (void) setCrateUDPDataPort:(int)aCrateUDPDataPort;
+
+
+#if 0
 - (unsigned long) eventFifoStatusReg;
 - (void) setEventFifoStatusReg:(unsigned long)aEventFifoStatusReg;
 - (unsigned long) pixelBusEnableReg;
 - (void) setPixelBusEnableReg:(unsigned long)aPixelBusEnableReg;
 - (int) selectedFifoIndex;
 - (void) setSelectedFifoIndex:(int)aSelectedFifoIndex;
+#endif
+
+
+
 - (int) isListeningOnServerSocket;
 - (void) setIsListeningOnServerSocket:(int)aIsListeningOnServerSocket;
 - (NSString*) crateUDPCommand;
 - (void) setCrateUDPCommand:(NSString*)aCrateUDPCommand;
+
+#if 0
 - (int) crateUDPReplyPort;
 - (void) setCrateUDPReplyPort:(int)aCrateUDPReplyPort;
+#endif
+
+
+
 - (NSString*) crateUDPCommandIP;
 - (void) setCrateUDPCommandIP:(NSString*)aCrateUDPCommandIP;
 - (int) crateUDPCommandPort;
@@ -344,8 +424,8 @@
 
 - (unsigned long) nextPageDelay;
 - (void) setNextPageDelay:(unsigned long)aDelay;
-- (unsigned long) interruptMask;
-- (void) setInterruptMask:(unsigned long)aInterruptMask;
+//TODO: rm   slt - (unsigned long) interruptMask;
+//TODO: rm   slt - (void) setInterruptMask:(unsigned long)aInterruptMask;
 - (float) pulserDelay;
 - (void) setPulserDelay:(float)aPulserDelay;
 - (float) pulserAmp;
@@ -408,8 +488,8 @@
 
 
 
-//UNUSED:
-//UNUSED:
+#if 0
+//TODO: UNUSED:
 //  UDP data packet connection
 //reply socket (server)
 - (int) startListeningDataServerSocket;
@@ -433,39 +513,39 @@
 - (int) sendUDPDataTabBloqueCommand;
 - (int) sendUDPDataTabDebloqueCommand;
 - (int) sendUDPDataTabDemarrageCommand;
-
+#endif
 
 #pragma mark ***HW Access
 //note that most of these method can raise 
 //exceptions either directly or indirectly
-- (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes;
-- (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
-- (void)          chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus;
-- (int)           chargeFICusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
-- (void)          chargeFICStatus:(ORSBCLinkJobStatus*) jobStatus;
-- (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;
+//TODO: REMOVE IT slt- (int)           chargeBBWithFile:(char*)data numBytes:(int) numBytes;
+//TODO: REMOVE IT slt- (int)           chargeBBusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
+//TODO: REMOVE IT slt- (void)          chargeBBStatus:(ORSBCLinkJobStatus*) jobStatus;
+//TODO: REMOVE IT slt- (int)           chargeFICusingSBCinBackgroundWithData:(NSData*)theData   forFLT:(OREdelweissFLTModel*) aFLT;
+//TODO: REMOVE IT slt- (void)          chargeFICStatus:(ORSBCLinkJobStatus*) jobStatus;
+- (int)           writeToCmdFIFO:(char*)data numBytes:(int) numBytes;  
 - (void)		  readAllControlSettingsFromHW;
 
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
-- (unsigned long) readControlReg;
-- (void)		  writeControlReg;
-- (void)		  printControlReg;
-- (unsigned long) readStatusReg;
-- (unsigned long) readStatusLowReg;
-- (unsigned long) readStatusHighReg;
-- (void)		  printStatusReg;
-- (void)          printStatusLowHighReg;
+//TODO: rm   slt - -- (unsigned long) readControlReg;
+//TODO: rm   slt - -- (void)		  writeControlReg;
+//TODO: rm   slt - -- (void)		  printControlReg;
+//TODO: rm   slt - - - (unsigned long) readStatusReg;
+//TODO: rm   slt - - - (unsigned long) readStatusLowReg;
+//TODO: rm   slt - - - (unsigned long) readStatusHighReg;
+//TODO: rm   slt - - - (void)		  printStatusReg;
+//TODO: rm   slt - - - (void)          printStatusLowHighReg;
 
-- (void) writePixelBusEnableReg;
-- (void) readPixelBusEnableReg;
+//TODO: rm   slt - - - (void) writePixelBusEnableReg;
+//TODO: rm   slt - -- (void) readPixelBusEnableReg;
 
 - (void)		writeFwCfg;
 - (void)		writeSltReset;
 - (void)		writeFltReset;
 - (void)		writeEvRes;
 - (unsigned long long) readBoardID;
-- (void) readEventFifoStatusReg;
+//TODO: rm   slt - - - (void) readEventFifoStatusReg;
 
 #if 0 //deprecated 2013-06 -tb-
 - (void)		  writeInterruptMask;
@@ -547,6 +627,8 @@
 
 @end
 
+extern NSString* ORAmptekDP5ModelIsPollingSpectrumChanged;
+extern NSString* ORAmptekDP5ModelSpectrumRequestRateChanged;
 extern NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged;
 extern NSString* ORAmptekDP5ModelNumSpectrumBinsChanged;
 extern NSString* ORAmptekDP5ModelTextCommandChanged;
@@ -574,7 +656,7 @@ extern NSString* ORAmptekDP5ModelCrateUDPDataReplyPortChanged;
 extern NSString* ORAmptekDP5ModelCrateUDPDataIPChanged;
 extern NSString* ORAmptekDP5ModelCrateUDPDataPortChanged;
 extern NSString* ORAmptekDP5ModelEventFifoStatusRegChanged;
-extern NSString* ORAmptekDP5ModelOpenCloseDataCommandSocketChanged;
+   //TODO: extern NSString* ORAmptekDP5ModelOpenCloseDataCommandSocketChanged;
 extern NSString* ORAmptekDP5ModelPixelBusEnableRegChanged;
 extern NSString* ORAmptekDP5ModelSelectedFifoIndexChanged;
 extern NSString* ORAmptekDP5ModelIsListeningOnServerSocketChanged;
