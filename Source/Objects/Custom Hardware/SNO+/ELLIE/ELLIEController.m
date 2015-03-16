@@ -1338,6 +1338,9 @@ BOOL isNumeric(NSString *s)
         //hardcoded command to kill external software on SNODROp (SMELLIE DAQ software)
         cmd = @"110";
     }
+    else if(cmdIndex == 10){
+        cmd = @"22110"; //c
+    }
     else{
         cmd = @"0"; //not sure what is going on here
     }
