@@ -918,9 +918,7 @@ struct {
         }
         
     }
-    NSLog(@"---------------------------------------\n");
-    NSLog(@"Reading out the two ADC octal chips\n");
-    NSLog(@"---------------------------------------\n");
+
     for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
         if(adcEnabledMask & (0x1<<chan)){
             //int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
