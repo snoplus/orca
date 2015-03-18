@@ -984,7 +984,8 @@
     NSError *error =  nil;
     NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
     if(!error){
-        NSLog(@"sucessful query\n");
+        NSLog(@"sucessful query with config version %i\n",[currentVersion intValue]);
+
     }
     else{
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
@@ -1024,6 +1025,7 @@
             NSString *attentuatorConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"splitterTypeConnected"]];
             NSString *fibreSwitchInputConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"fibreSwitchInputConnected"]];
             NSString *attenutationFactor = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"attenuationFactor"]];
+            NSString *gainControlFactor = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"gainControlFactor"]];
             
             @try{
                 //try and select the correct index of the combo boxes to make this work 
@@ -1031,6 +1033,7 @@
                 [smellieConfigAttenuatorField selectItemAtIndex:[smellieConfigAttenuatorField indexOfItemWithObjectValue:attentuatorConnected]];
                 [smellieConfigFsInputCh selectItemAtIndex:[smellieConfigFsInputCh indexOfItemWithObjectValue:fibreSwitchInputConnected]];
                 [smellieConfigAttenutationFactor setStringValue:attenutationFactor];
+                [smellieConfigGainControl setStringValue:gainControlFactor];
                 laserHeadSelected = YES;
             }
             @catch (NSException * error) {
@@ -1169,6 +1172,36 @@ BOOL isNumeric(NSString *s)
         else{
             NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the attenutation Factor\n");
             [smellieConfigAttenutationFactor setFloatValue:0.0];
+        }
+    }
+}
+
+-(IBAction)onChangeGainControlVoltage:(id)sender
+{
+    if(laserHeadSelected){
+        float gainVoltageFactor = [smellieConfigGainControl floatValue];
+        BOOL isGainVoltageFactorNumeric = isNumeric([smellieConfigAttenutationFactor stringValue]);
+        if(isGainVoltageFactorNumeric == YES){
+            //check the gain control factor makes sense
+            if((gainVoltageFactor < 0.0) || (gainVoltageFactor > 0.5)){
+                NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter an attentuation factor between 0.0 and 0.5\n");
+                [smellieConfigAttenutationFactor setFloatValue:0.0];
+            }
+            else{
+                NSString *currentSepiaInputChannel = [NSString stringWithFormat:@"laserInput%@",[smellieConfigSepiaInputChannel objectValueOfSelectedItem]];
+                //copy the current object into an array
+                NSMutableDictionary *currentSmellieConfigForSepiaInput = [[configForSmellie objectForKey:currentSepiaInputChannel] mutableCopy];
+                [currentSmellieConfigForSepiaInput
+                 setObject:[NSString stringWithString:[smellieConfigGainControl stringValue]]
+                 forKey:@"gainControlFactor"];
+                
+                [configForSmellie setObject:currentSmellieConfigForSepiaInput forKey:currentSepiaInputChannel];
+            }
+            
+        }
+        else{
+            NSLog(@"SMELLIE_CONFIGURATION_BUILDER: Please enter a numerical value for the gain Control Factor\n");
+            [smellieConfigGainControl setFloatValue:0.0];
         }
     }
 }

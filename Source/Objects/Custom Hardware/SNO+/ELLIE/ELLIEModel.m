@@ -675,6 +675,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:smellieMasterModeFlag];
 }
 
+-(void)setGainControlWithGainVoltage:(NSString*)gainVoltage
+{
+    NSArray * gainControlFlag = @[@"22110",gainVoltage,@"0"]; //gain control settings with gain voltage
+    [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/smellie/smellieConnection_V2.py" withCmdLineArgs:gainControlFlag];
+}
+
 -(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2
 {
     //Make sure all the arguments default to a safe value if not specified
@@ -795,6 +801,22 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                 NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
                 
                 [laserHeadToSepiaMapping setObject:[NSString stringWithFormat:@"%i",laserHeadIndex] forKey:laserHeadConnected];
+            }
+        }
+    } //end of looping through each laserHeadIndex
+    
+    NSMutableDictionary *laserHeadToGainControlMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
+    laserHeadIndex =0;
+    for(laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
+        
+        for (id specificConfigValue in configForSmellie){
+            if([specificConfigValue isEqualToString:[NSString stringWithFormat:@"laserInput%i",laserHeadIndex]]){
+                
+                NSString *laserHeadConnected = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"laserHeadConnected"]];
+                
+                NSString *laserGainControl = [NSString stringWithFormat:@"%@",[[configForSmellie objectForKey:specificConfigValue] objectForKey:@"gainControlFactor"]];
+                
+                [laserHeadToGainControlMapping setObject:[NSString stringWithFormat:@"%@",laserGainControl] forKey:laserHeadConnected];
             }
         }
     } //end of looping through each laserHeadIndex
@@ -990,6 +1012,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         //set the laser switch which corresponds to the laserHead mapping to Sepia
         NSLog(@"SMELLIE_RUN:Setting the Laser Switch to Channel:%@ which corresponds to the %@ Laser\n",[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]],laserKey);
         [self setLaserSwitch:[NSString stringWithFormat:@"%@",[laserHeadToSepiaMapping objectForKey:laserKey]]];
+        
+        //set the gain Control
+        NSLog(@"SMELLIE_RUN:Setting the gain control to: %i V\n",[[laserHeadToGainControlMapping objectForKey:laserKey] floatValue]);
+        [self setGainControlWithGainVoltage:[NSString stringWithFormat:@"%@",[laserHeadToGainControlMapping objectForKey:laserKey]]];
         
         //Loop through each Fibre
         for(id fibreKey in fibreArray){

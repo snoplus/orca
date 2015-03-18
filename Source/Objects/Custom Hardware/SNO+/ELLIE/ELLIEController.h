@@ -76,6 +76,7 @@
     IBOutlet NSTextField *smellieConfigAttenutationFactor;
     
     IBOutlet NSButton *smellieConfigSubmitButton;
+    IBOutlet NSTextField *smellieConfigGainControl;
     
     
     
