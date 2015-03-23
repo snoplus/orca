@@ -124,7 +124,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
     [group sleep];
     [group release];
-	
+    [customRunParameters release];
+
     [[self undoManager] removeAllActions];
 	RestoreApplicationDockTileImage();
     
@@ -382,7 +383,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	if([exp count]){
 		[objectInfoDictionary setObject:exp forKey:@"Experiments"];
 	}
-	
+    if(customRunParameters){
+        [objectInfoDictionary setObject:customRunParameters forKey:@"Custom"];
+        [customRunParameters release];
+        customRunParameters = nil;
+    }
 	//add the Object Info into the dictionary from our argument list.
 	if([objectInfoDictionary count]){
 		[dictionary setObject:objectInfoDictionary forKey:@"ObjectInfo"];
@@ -393,6 +398,12 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
 	return [group addParametersToDictionary:dictionary];
+}
+
+- (void) addCustomRunParameters:(id)anObject forKey:(NSString*)aKey
+{
+    if(!customRunParameters)customRunParameters = [[NSMutableDictionary dictionary] retain];
+    [customRunParameters setObject:anObject forKey:aKey];
 }
 
 #pragma mark ¥¥¥Archival

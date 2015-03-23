@@ -44,7 +44,7 @@
 	BOOL					logBookDirty;
 	NSString*				logBookFile;
 	NSDate*					lastSnapShot;
-
+    unsigned  long long     alarmLogSize;
 }
 
 #pragma mark ¥¥¥Accessors

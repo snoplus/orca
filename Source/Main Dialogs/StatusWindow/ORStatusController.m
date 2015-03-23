@@ -82,6 +82,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	
 	[self loadAlarmHistory];
 	
+    if(alarmLogSize > 2*1000*1000){
+        NSLogColor([NSColor redColor],@"The Alarm Log is getting big (%luMB). Please consider clearing it. Otherwise ORCA will take a long time starting\n",alarmLogSize/(1000*1000));
+    }
+    
 	NSString* s = [NSString stringWithFormat:@"%@ ORCA started",[[NSDate date] stdDescription]]; //don't change this string
 	[self updateAlarmLog:s];
 	
@@ -99,9 +103,34 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	//load the alarm history
 	NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
 	alarmHistoryPath = [alarmHistoryPath stringByAppendingPathComponent:@"Alarms"];
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
+    alarmLogSize= ([[fm attributesOfItemAtPath:alarmHistoryPath error:nil] fileSize]);
+
 	NSString* s = [NSString stringWithContentsOfFile:alarmHistoryPath encoding:NSASCIIStringEncoding error:nil];
 	NSArray* lines = [s componentsSeparatedByString:@"\n"];
+    int total = [lines count];
+    BOOL displayPercent = NO;
+    if(total<100000){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
+                                                            object:self
+                                                          userInfo:[NSDictionary dictionaryWithObject:@"Loading Alarm History" forKey:@"Message"]];
+    }
+    else {
+        displayPercent = YES;
+    }
+    int n = 0;
+    int lastPercent=0;
 	for(id aLine in lines)	{
+        n++;
+        int percent = (int)(100 * n/(float)total);
+        if(displayPercent && (percent != lastPercent)){
+            NSString* s = [NSString stringWithFormat:@"Loading Alarm History (%d%%)",percent];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
+                                                            object:self
+                                                          userInfo:[NSDictionary dictionaryWithObject:s forKey:@"Message"]];
+            lastPercent = percent;
+        }
 		[self printAlarm:aLine];
 	}
 }
