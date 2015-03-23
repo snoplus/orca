@@ -830,7 +830,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState
 {
-    if([gOrcaGlobals runInProgress]){
+    if([gOrcaGlobals runRunning]){
 		
 		//get the time(UT!)
 		time_t	ut_time;
