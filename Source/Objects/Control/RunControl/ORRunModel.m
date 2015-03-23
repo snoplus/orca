@@ -1053,6 +1053,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                         object: self
                                                       userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
 
+    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
+    
+    [dataTypeAssigner assignDataIds];
+
     //------
     //at this stage, some object may need extra time. If so they will post a wait request
     [self waitOnObjects:[NSNumber numberWithBool:doInit]];
@@ -1094,13 +1098,18 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
 	[self setRunningState:eRunStarting];
     
+    [self performSelector:@selector(startRunStage0:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
+}
+
+- (void) startRunStage0:(NSNumber*)doInitBool
+{
     if(selectedRunTypeScript){
         savedRunType = runType; //run type scripts can changed the run type, but we need to change it back then at the end
         savedSelectedRunTypeScript = selectedRunTypeScript;
         NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
         for (ORRunScriptModel* aScript in theScripts){
             if([aScript selectionIndex] == selectedRunTypeScript){
-                [aScript setSelectorOK:@selector(startRunStage0:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
+                [aScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
                 if(![aScript runScript]){
                     [self runAbortFromScript];
                 }
@@ -1108,31 +1117,27 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             }
         }
     }
-	else [self performSelector:@selector(startRunStage0:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
-}
-
-- (void) startRunStage0:(NSNumber*)doInitBool
-{
-	if(startScript){
-		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
-		[self setStartScriptState:@"Running"];
-		if(![startScript runScript]){
-			[self runAbortFromScript];
-		}
-	}
-	else [self performSelector:@selector(startRunStage1:) withObject:doInitBool afterDelay:0];
-}
+    else [self performSelector:@selector(startRunStage1:) withObject:doInitBool afterDelay:0];
+ }
 
 - (void) startRunStage1:(NSNumber*)doInitBool
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
-                                                    object: self
-                                                  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
-    [self startRunStage2:doInitBool];
+    if(startScript){
+        [startScript setSelectorOK:@selector(startRunStage2:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
+        [self setStartScriptState:@"Running"];
+        if(![startScript runScript]){
+            [self runAbortFromScript];
+        }
+    }
+    else [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
+ 
 }
 
 - (void) startRunStage2:(NSNumber*)doInitBool
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                        object: self
+                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startRunStage2:) object:doInitBool];
     if([objectsRequestingStateChangeWait count]==0)[self startRunStage3:doInitBool];
     else {
@@ -1152,7 +1157,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [runFailedAlarm clearAlarm];
         client =  [self objectConnectedTo: ORRunModelRunControlConnection];
                 
-        [self runStarted:doInit];//was doInitBool, needs BOOL, not NSNumber -tb-
+        [self runStarted:doInit];
         
         //start the threaddo
         if(dataTakingThreadRunning){
@@ -1545,12 +1550,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) runStarted:(BOOL)doInit
 {
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
-    
-    [dataTypeAssigner assignDataIds];
-	
     [heartBeatTimer invalidate];
     [heartBeatTimer release];
     heartBeatTimer = nil;
