@@ -40,6 +40,7 @@
         int				scaleFactor;
 		SEL				afterSaveSelector;
 		id				afterSaveTarget;
+        NSMutableDictionary* customRunParameters;
 }
 
 #pragma mark ¥¥¥Initializations
@@ -67,6 +68,7 @@
 - (void) assignUniqueIDNumber:(id)anObject;
 - (void) resetAlreadyVisitedInChainSearch;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) addCustomRunParameters:(id)anObject forKey:(NSString*)aKey;
 
 #pragma mark ¥¥¥Orca Dialog Management
 - (void)    duplicateDialog:(id)dialog;
