@@ -58,12 +58,6 @@ static NSString* ORRunListDataOut	= @"ORRunListDataOut";
 @implementation ORRunListModel
 
 #pragma mark •••initialization
-- (id) init
-{
-    self = [super init];
-	[self registerNotificationObservers];
-    return self;
-}
 
 - (void) dealloc
 {
