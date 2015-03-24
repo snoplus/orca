@@ -735,15 +735,12 @@ enum {
 {
 	if([self isXAxis]){
 		//there may be a calibration in place, it might have units
-		id theCalibration = [self calibration];
+		ORCalibration* theCalibration = [self calibration];
 		if([theCalibration useCalibration]){
-			NSString* calibrationUnits = [theCalibration units];
-			if([calibrationUnits length])return calibrationUnits;
-			else return @"";
+			return [theCalibration units];
 		}
-		else return @"";
 	}
-	else return @"";
+    return @"";
 }
 
 - (NSString*) label
@@ -751,15 +748,13 @@ enum {
 	NSString* label = [attributes objectForKey:ORAxisLabel];
 	if([self isXAxis]){
 		//there may be a calibration in place
-		id theCalibration = [self calibration];
+		ORCalibration* theCalibration = [self calibration];
 		if([theCalibration useCalibration]){
-			NSString* calibrationLabel = [theCalibration label];
-			if([calibrationLabel length]) return calibrationLabel;
-			else return @"";
+			return [theCalibration label];
 		}
 	}
-	if(!label)return @"";
-	else return label;
+    if([label length]==0)return @"";
+    else return label;
 }
 
 - (long) axisMinLimit
@@ -1373,7 +1368,7 @@ enum {
 	BOOL isOpposite = [self oppositePosition];
 	if([self isXAxis]){
 		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
-		float xc = [self frame].size.width/2;
+		float xc = [self frame].size.width/2 - kXAxisRoomLeft;
 		if(isOpposite) [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,[self frame].size.height - labelSize.height) withAttributes:labelAttributes];
 		else	       [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,0) withAttributes:labelAttributes];
 	}
