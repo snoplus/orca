@@ -29,7 +29,6 @@
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [self setDelegate:nil];
 		[self setDefaults];
     }
     return self;
@@ -323,7 +322,7 @@
 	[[self xScale] drawMarkInFrame:[self bounds] usingColor:[NSColor blackColor]];
 	[[self yScale] drawMarkInFrame:[self bounds] usingColor:[NSColor blackColor]];
 		
-    if ( [self delegate] && [[self delegate] respondsToSelector:@selector(plotViewDidDraw:)] ) {
+    if ([[self delegate] respondsToSelector:@selector(plotViewDidDraw:)] ) {
         [[self delegate] plotViewDidDraw:self];
 	}
 	
