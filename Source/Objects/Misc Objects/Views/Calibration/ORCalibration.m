@@ -263,6 +263,18 @@
 #endif
 }
 
+- (IBAction) remove:(id)sender
+{
+    [model setCalibration:nil];
+    [self calibrate];
+    [[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
+#else
+    [NSApp endSheet:[self window] returnCode:NSOKButton];
+#endif
+}
+
 #pragma mark •••Table Data Source
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
@@ -288,12 +300,6 @@
 @end
 
 @implementation ORCalibration
-- (id) init
-{
-	self = [super init];
-	[self calibrate];	
-	return self;
-}
 
 - (void)dealloc
 {
@@ -308,6 +314,11 @@
 {
     if(!calibrationArray) calibrationArray = [[NSMutableArray array]retain];
 	return calibrationArray;
+}
+
+- (BOOL) isValidCalibration
+{
+    return [[NSMutableArray arrayWithArray:calibrationArray] count]>0;
 }
 
 - (void) calibrate
@@ -388,7 +399,7 @@
 
 - (void) setUnits:(NSString*)unitString
 {
-	if(!unitString) unitString = @"";
+	if([unitString length]==0) unitString = @"";
 	[units autorelease];
 	units = [unitString copy];
 }
@@ -396,27 +407,27 @@
 
 - (NSString*) label
 {
-	if(!label)return @"Energy";
+	if([label length]==0)return @"Energy";
 	else return label;
 }
 
 - (void) setLabel:(NSString*)aString
 {
-	if(!aString) label = @"Energy";
+	if([aString length]==0) label = @"Energy";
 	[label autorelease];
 	label = [aString copy];
 }
 
 - (void) setCalibrationName:(NSString*)nameString
 {
-	if(!nameString) nameString = @"";
+    if([nameString length]==0) nameString = @"";
 	[calibrationName autorelease];
 	calibrationName = [nameString copy];
 }
 
 - (NSString*) calibrationName
 {
-    if(!calibrationName) return @"";
+    if([calibrationName length]==0) return @"";
 	else return calibrationName;
 }
 
