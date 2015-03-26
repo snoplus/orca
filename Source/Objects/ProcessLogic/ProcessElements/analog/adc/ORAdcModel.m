@@ -48,6 +48,8 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 
 @implementation ORAdcModel
 
+@synthesize lastValue;
+
 - (void) dealloc
 {
     [highText release];
@@ -59,6 +61,7 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 	[alarmGradient release];
 	[resetDate release];
 	[lowDate release];
+    [lastValue release];
 
 	[super dealloc];
 }
@@ -322,7 +325,15 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
             isValid = [hwObject dataForChannelValid:[self bit]];
         }
         if(isValid){
-            s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
+            NSString* currentValue = [self iconValue];
+            s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],currentValue];
+            if([lastValue length]){
+                if([lastValue isEqualToString:currentValue]){
+                    s = [s stringByAppendingString:@"(Unchanged!) "];
+                }
+            }
+            self.lastValue = currentValue;
+            
             NSString* theFormat = @"%.1f";
             if([displayFormat length] != 0)									theFormat = displayFormat;
             if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";

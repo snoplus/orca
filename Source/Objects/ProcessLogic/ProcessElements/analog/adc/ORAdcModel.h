@@ -49,7 +49,9 @@
 	double  highestValue;
 	double	lowestValue;
     BOOL	trackMaxMin;
+    NSString* lastValue;
 }
+@property (retain) NSString* lastValue;
 
 #pragma mark ***Accessors
 - (BOOL) trackMaxMin;
