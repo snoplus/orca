@@ -56,8 +56,9 @@ NSString* kLastCrashLog              = @"~/Library/Logs/CrashReporter/LastOrca.c
 NSString* OROrcaAboutToQuitNotice    = @"OROrcaAboutToQuitNotice";
 NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
-#define kORSplashScreenDelay 1
-#define kHeartbeatPeriod 30
+#define kORSplashScreenDelay    1
+#define kHeartbeatPeriod        30 //seconds
+#define kLogSnapShotPeriod      15 //minutes
 
 @implementation ORAppDelegate
 
@@ -717,12 +718,13 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 			unsigned long now = (unsigned long)[[NSDate date]timeIntervalSince1970];
 			NSString* contents = [NSString stringWithFormat:@"Time:%lu\nNext:%lu",now,now+kHeartbeatPeriod];
 			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-		}
-		//if(heartbeatCount%30 == 0){
+        }
+
+		if(heartbeatCount%(kLogSnapShotPeriod*60/kHeartbeatPeriod) == 0){
 			if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
                 [[ORStatusController sharedStatusController] performSelectorOnMainThread:@selector(doSnapShot) withObject:nil waitUntilDone:YES];
 			}
-		//}
+		}
 	}
 	@catch(NSException* e){
 	}
