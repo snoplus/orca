@@ -46,7 +46,12 @@
 - (void) awakeFromNib
 {
 	[self populateSelectionPU];
-	[self loadUI:[model calibration]];
+    ORCalibration* theCalibration = [model calibration];
+    if(!theCalibration){
+        theCalibration = [[ORCalibration alloc]init];
+        [model setCalibration:theCalibration];
+    }
+	[self loadUI:theCalibration];
 }
 
 - (void) loadUI:(ORCalibration*) aCalibration
