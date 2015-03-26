@@ -316,29 +316,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
         NSDate* now = [NSDate date];
         NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",[now yearOfCommonEra],[now monthOfYear],[now dayOfMonth]];
         aPath = [aPath stringByAppendingPathComponent:theFileName];
-        BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];	
-        NSString* contents = nil;
-        if(!lastSnapShot || !fileExists){
-            contents = [[ORStatusController sharedStatusController] contents];
-        }
-        else {
-            NSTimeInterval timeSinceLastSnapShot = [now timeIntervalSinceDate:lastSnapShot];
-            contents = [self contentsTail:(unsigned long)timeSinceLastSnapShot includeDurationHeader:NO];
-        }
-        
+        BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];
+        NSString* contents = [[ORStatusController sharedStatusController] contents];
         if([contents length]){
             
             [lastSnapShot release];
             lastSnapShot = [now retain];
             
-            if(!fileExists){
-                [contents writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+            if(fileExists){
+                [[NSFileManager defaultManager] removeItemAtPath:aPath error:nil];
             }
-            else {
-                NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:aPath];
-                [fp seekToEndOfFile];
-                [fp writeData:[contents dataUsingEncoding:NSASCIIStringEncoding]];
-            }
+            [contents writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
         }
     }
 }
@@ -910,28 +898,24 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 //----------------------------------------------------------------------------------------------------
 void _nsLog(NSString* s,...)
 {
-	
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    NSColor* aColor = [NSColor blackColor];
-    @try {
-        va_list myArgs;
-        va_start(myArgs,s);
-        
-        NSAttributedString* s1 = [[[NSAttributedString alloc]
-                                   initWithString:[[[NSString alloc] initWithFormat:s
-                                                                             locale:nil
-                                                                          arguments:myArgs] autorelease]
-                                   attributes:[NSDictionary dictionaryWithObject:aColor
-                                                                          forKey:NSForegroundColorAttributeName ]]autorelease];
-        va_end(myArgs);
-        NSLogAttr(s1);        
-        
-	}
-	@catch(NSException* localException) {
-	}
-	
- 	[pool release];
-	
+    @synchronized([ORStatusController sharedStatusController]){
+        NSColor* aColor = [NSColor blackColor];
+        @try {
+            va_list myArgs;
+            va_start(myArgs,s);
+            
+            NSAttributedString* s1 = [[[NSAttributedString alloc]
+                                       initWithString:[[[NSString alloc] initWithFormat:s
+                                                                                 locale:nil
+                                                                              arguments:myArgs] autorelease]
+                                       attributes:[NSDictionary dictionaryWithObject:aColor
+                                                                              forKey:NSForegroundColorAttributeName ]]autorelease];
+            va_end(myArgs);
+            NSLogAttr(s1);        
+        }
+        @catch(NSException* localException) {
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1009,9 +993,6 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
                                                                           forKey:NSFontAttributeName ]] autorelease];
         va_end(myArgs);
         NSLogAttr(s1);
-
-        
-        
 	}
 	@catch(NSException* localException) {
 	}
