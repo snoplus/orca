@@ -50,6 +50,8 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 @implementation ORProcessModel
 
+@synthesize lastReportContent,lastReportTime;
+
 #pragma mark ¥¥¥initialization
 - (id) init
 {
@@ -70,6 +72,8 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[shortName release];
 	[testModeAlarm clearAlarm];
     [testModeAlarm release];
+    [lastReportContent release];
+    [lastReportTime release];
 	[super dealloc];
 }
 
@@ -1099,14 +1103,17 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	
     if(!skipReport){
         NSString* theContent = @"";
+        NSDate* theCurrentTime = [NSDate date];
         theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-        theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process at:\n"];
-        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
+        theContent = [theContent stringByAppendingFormat:@"This report was generated automatically by a process at:\n"];
+        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",theCurrentTime];
         theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
         theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
                       nextHeartbeat, [nextHeartbeat utcDescription]];
-        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
-        theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+        NSString* currentReport = [self report];
+
+        theContent = [theContent stringByAppendingFormat:@"%@\n",currentReport];
         
         NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
         if([self masterProcess]){
@@ -1115,13 +1122,24 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                 theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess report]];
             }
         }
+        
+        if([lastReportContent length] && (lastReportTime!=nil)){
+            //append last report for comparision
+            theContent = [theContent stringByAppendingString:@"\n"];
+            theContent = [theContent stringByAppendingString:@"=====================================================\n"];
+            theContent = [theContent stringByAppendingFormat:@"Last report sent %@ (Local ORCA Time)\n",lastReportTime];
+            theContent = [theContent stringByAppendingString:@"Last report is appended for comparison.\n"];
+            theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+            theContent = [theContent stringByAppendingFormat:@"%@\n",lastReportContent];
+        }
+        self.lastReportContent = currentReport;
+        self.lastReportTime    = theCurrentTime;
 
-        theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
         theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
         for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
-        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 
-     
         NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
         [self sendMail:userInfo];
     }

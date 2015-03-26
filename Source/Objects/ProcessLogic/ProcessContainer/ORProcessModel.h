@@ -52,7 +52,12 @@
     int         outOfRangeHiCount;
     int         lastOutOfRangeLowCount;
     int         lastOutOfRangeHiCount;
+    NSString*   lastReportContent;
+    NSDate*     lastReportTime;
 }
+
+@property (retain) NSString* lastReportContent;
+@property (retain) NSDate* lastReportTime;
 
 - (NSString*) report;
 
@@ -132,6 +137,7 @@
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 @end
+
 
 @interface OrcaObject (ProcessModel)
 - (void) setUseAltView:(BOOL)aState; 
