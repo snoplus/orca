@@ -50,9 +50,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	
 	NSString* s = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.rootservice.ServiceHostName"];
 	hostNameIndex = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.rootservice.HostNameIndex"];
-	connectionHistory = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.rootservice.ServiceHistory"];
-	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
+	NSArray* theHistory = [[NSUserDefaults standardUserDefaults] arrayForKey: @"orca.rootservice.ServiceHistory"];
 
+	if(!theHistory)connectionHistory = [[NSMutableArray alloc] init];
+    else {
+        connectionHistory = [[NSMutableArray alloc] initWithArray:theHistory];
+    }
 	if(s){
 		if(![connectionHistory containsObject:s])[connectionHistory addObject:s];
 	}
