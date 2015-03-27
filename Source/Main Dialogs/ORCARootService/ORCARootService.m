@@ -125,7 +125,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     hostName = [aName copy];    	
 
 	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
-	if(![connectionHistory containsObject:hostName]){
+	if(![connectionHistory containsObject:hostName] && [hostName length]!=0){
 		[connectionHistory addObject:hostName];
 	}
 	if(aName)hostNameIndex = [connectionHistory indexOfObject:aName];
@@ -176,7 +176,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	[connectionHistory release];
 	connectionHistory = nil;
 
-	[self setHostName:kORCARootServiceHost];
+	[self setHostName:hostName];
 	
 }
 
