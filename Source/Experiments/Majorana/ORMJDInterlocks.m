@@ -22,6 +22,7 @@
 #import "MajoranaModel.h"
 #import "ORTaskSequence.h"
 #import "ORRemoteSocketModel.h"
+#import "ORAlarm.h"
 
 //do NOT change this list without changing the enum states in the .h file
 static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
@@ -64,6 +65,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     self.stateStatus = nil;
     self.finalReport = nil;
     self.remoteOpStatus = nil;
+    [interlockFailureAlarm clearAlarm];
+    [interlockFailureAlarm release];
     [queue cancelAllOperations];
     [queue release];
     [super dealloc];
@@ -190,9 +193,11 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             if(![self pingTaskRunning]){
                 if(pingedSuccessfully){
                     retryCount = 0;
+                    [self clearInterlockFailureAlarm];
                     [self setState:kMJDInterlocks_Ping status:@"OK" color:okColor];
                     [self setState:kMJDInterlocks_PingWait status:@"Got Response" color:normalColor];
                     [self setCurrentState:kMJDInterlocks_CheckHVisOn];
+                    [self clearInterlockFailureAlarm];
                 }
                 else {
                     if(retryCount>=kAllowedPingRetry){
@@ -205,6 +210,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     }
                     else {
                         retryCount++;
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c failed ping. HV will rampDown.",'A'+module]];
                         [self setState:kMJDInterlocks_PingWait status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedPingRetry] color:badColor];
                         [self setState:kMJDInterlocks_Ping status:@"Will Retry" color:concernColor];
                         retryState = kMJDInterlocks_Ping;  //force a re-ping next time around
@@ -248,6 +254,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES){
                     //it worked. move on.
                     retryCount = 0;
+                    [self clearInterlockFailureAlarm];
                     [self setState:kMJDInterlocks_UpdateVacSystem status:@"HV Status Sent" color:normalColor];
 
                     if(hvIsOn){
@@ -278,6 +285,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     else {
                         //no connection
                         retryCount++;
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c unreachable. HV will rampDown.",'A'+module]];
                         [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_UpdateVacSystem;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -308,6 +316,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"shouldUnBias"]){
                     //it worked. move on.
                     retryCount = 0;
+                    [self clearInterlockFailureAlarm];
                     shouldUnBias = [[remoteOpStatus objectForKey:@"shouldUnBias"] boolValue];
                     if(shouldUnBias){
                         [self setState:kMJDInterlocks_GetShouldUnBias status:@"Vac says Unbias" color:badColor];
@@ -335,6 +344,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     else {
                         //no connection
                         retryCount++;
+                         [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c unreachable. HV will rampDown.",'A'+module]];
                         [self setState:kMJDInterlocks_GetShouldUnBias status:[NSString stringWithFormat:@"Waited: %d/%d",retryCount,kAllowedResponseRetry] color:badColor];
                         retryState = kMJDInterlocks_GetShouldUnBias;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -363,6 +373,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if([[remoteOpStatus objectForKey:@"connected"] boolValue]==YES && [remoteOpStatus objectForKey:@"okToBias"]){
                     //it worked. move on.
                     retryCount = 0;
+                    [self clearInterlockFailureAlarm];
+
                     okToBias = [[remoteOpStatus objectForKey:@"okToBias"] boolValue];
                     [self setState:kMJDInterlocks_GetOKToBias status:okToBias?@"OK to Bias":@"NOT OK to Bias" color:okToBias?okColor:badColor];
                     [self setState:kMJDInterlocks_HVRampDown status:@"HV Already OFF" color:normalColor];
@@ -388,6 +400,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     }
                     else {
                         retryCount++;
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c unreachable. HV will rampDown.",'A'+module]];
                         [self setState:kMJDInterlocks_GetOKToBias status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_GetOKToBias;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -465,6 +478,32 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
     NSLog(@"------------------------------------------------\n");
 }
+
+- (void) postInterlockFailureAlarm:(NSString*)reason
+{
+    BOOL hvOn = [delegate anyHvOnVMECrate:module];
+    if(hvOn){
+        if(!interlockFailureAlarm){
+            interlockFailureAlarm = [[ORAlarm alloc] initWithName:reason severity:kEmergencyAlarm];
+            [interlockFailureAlarm setSticky:YES];
+            [interlockFailureAlarm setHelpString:[NSString stringWithFormat:@"HV will be ramped down soon on Vac %c because [%@].\nThis alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it", 'A'+module,reason]];
+            [interlockFailureAlarm postAlarm];
+        }
+    }
+    else {
+        [self clearInterlockFailureAlarm];
+    }
+}
+
+- (void) clearInterlockFailureAlarm
+{
+    if(interlockFailureAlarm){
+        [interlockFailureAlarm clearAlarm];
+        [interlockFailureAlarm release];
+        interlockFailureAlarm = nil;
+    }
+}
+
 @end
 
 

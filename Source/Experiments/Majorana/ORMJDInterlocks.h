@@ -20,6 +20,7 @@
 
 @class MajoranaModel;
 @class ORRemoteSocketModel;
+@class ORAlarm;
 
 //do NOT change this list without changing the StateInfo array in the .m file
 enum {
@@ -60,6 +61,7 @@ typedef struct {
     BOOL                lockHVDialog;
     NSOperationQueue*   queue;
     NSDictionary*       remoteOpStatus;
+    ORAlarm*            interlockFailureAlarm;
 }
 
 - (id)          initWithDelegate:(MajoranaModel*)aDelegate module:(int)aModule;
@@ -74,6 +76,8 @@ typedef struct {
 - (void)        setState:(int)currentState status:(NSString*)aString color:(NSColor*)aColor;
 - (void)        reset:(BOOL)continueRunning;
 - (void)        addToReport:(NSString*)aString;
+- (void)        postInterlockFailureAlarm:(NSString*)reason;
+- (void)        clearInterlockFailureAlarm;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;
