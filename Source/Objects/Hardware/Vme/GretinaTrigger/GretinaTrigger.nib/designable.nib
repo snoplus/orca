@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13E28</string>
-		<string key="IBDocument.InterfaceBuilderVersion">5056</string>
-		<string key="IBDocument.AppKitVersion">1265.21</string>
-		<string key="IBDocument.HIToolboxVersion">698.00</string>
+		<string key="IBDocument.SystemVersion">14C1514</string>
+		<string key="IBDocument.InterfaceBuilderVersion">6751</string>
+		<string key="IBDocument.AppKitVersion">1344.72</string>
+		<string key="IBDocument.HIToolboxVersion">757.30</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">5056</string>
+			<string key="NS.object.0">6751</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -101,7 +101,7 @@
 																	<int key="NSCellFlags2">134348800</int>
 																	<string key="NSContents">Probe Board</string>
 																	<object class="NSFont" key="NSSupport" id="26">
-																		<string key="NSName">.LucidaGrandeUI</string>
+																		<bool key="IBIsSystemFont">YES</bool>
 																		<double key="NSSize">11</double>
 																		<int key="NSfFlags">3100</int>
 																	</object>
@@ -123,7 +123,7 @@
 															<object class="NSButton" id="96231862">
 																<reference key="NSNextResponder" ref="898885083"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{18, 4}, {118, 28}}</string>
+																<string key="NSFrame">{{18, 4}, {122, 28}}</string>
 																<reference key="NSSuperview" ref="898885083"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="466984602"/>
@@ -237,7 +237,7 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Board Ops</string>
 													<object class="NSFont" key="NSSupport" id="436134005">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">10</double>
 														<int key="NSfFlags">2843</int>
 													</object>
@@ -250,9 +250,14 @@
 															<bytes key="NSWhite">MQA</bytes>
 														</object>
 													</object>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
+													<object class="NSColor" key="NSTextColor" id="1042297751">
+														<int key="NSColorSpace">6</int>
+														<string key="NSCatalogName">System</string>
+														<string key="NSColorName">labelColor</string>
+														<object class="NSColor" key="NSColor" id="465352766">
+															<int key="NSColorSpace">3</int>
+															<bytes key="NSWhite">MAA</bytes>
+														</object>
 													</object>
 												</object>
 												<reference key="NSContentView" ref="898885083"/>
@@ -633,10 +638,7 @@
 														<int key="NSColorSpace">6</int>
 														<string key="NSCatalogName">System</string>
 														<string key="NSColorName">controlTextColor</string>
-														<object class="NSColor" key="NSColor" id="465352766">
-															<int key="NSColorSpace">3</int>
-															<bytes key="NSWhite">MAA</bytes>
-														</object>
+														<reference key="NSColor" ref="465352766"/>
 													</object>
 												</object>
 												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -1560,7 +1562,7 @@
 													<int key="NSCellFlags2">272892928</int>
 													<string key="NSContents">U    R    L    H    G    F    E    D    C    B    A</string>
 													<object class="NSFont" key="NSSupport" id="22">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">9</double>
 														<int key="NSfFlags">3614</int>
 													</object>
@@ -2244,15 +2246,12 @@
 													<int key="NSCellFlags2">134217728</int>
 													<string key="NSContents">Box</string>
 													<object class="NSFont" key="NSSupport" id="267063406">
-														<string key="NSName">.LucidaGrandeUI</string>
+														<bool key="IBIsSystemFont">YES</bool>
 														<double key="NSSize">13</double>
 														<int key="NSfFlags">1044</int>
 													</object>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -2275,10 +2274,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="267063406"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -2301,10 +2297,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="267063406"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -2439,6 +2432,7 @@
 															<bytes key="NSRGB">MC44OTgwMzkyODE0IDAuODk4MDM5MjgxNCAwLjg5ODAzOTI4MTQAA</bytes>
 														</object>
 														<int key="NScvFlags">2</int>
+														<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 													</object>
 													<object class="NSScroller" id="566053975">
 														<reference key="NSNextResponder" ref="932293859"/>
@@ -2449,6 +2443,8 @@
 														<reference key="NSNextKeyView" ref="966302996"/>
 														<bool key="NSEnabled">YES</bool>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+														<string key="NSControlAction">_doScroller:</string>
+														<reference key="NSControlTarget" ref="932293859"/>
 														<int key="NSsFlags">1</int>
 														<reference key="NSTarget" ref="932293859"/>
 														<string key="NSAction">_doScroller:</string>
@@ -2461,6 +2457,8 @@
 														<reference key="NSWindow"/>
 														<reference key="NSNextKeyView" ref="229819655"/>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+														<string key="NSControlAction">_doScroller:</string>
+														<reference key="NSControlTarget" ref="932293859"/>
 														<reference key="NSTarget" ref="932293859"/>
 														<string key="NSAction">_doScroller:</string>
 														<double key="NSCurValue">1</double>
@@ -3075,10 +3073,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="267063406"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -3101,10 +3096,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="267063406"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -3127,10 +3119,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="267063406"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -3153,10 +3142,7 @@
 													<string key="NSContents">Box</string>
 													<reference key="NSSupport" ref="267063406"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<int key="NSBorderType">3</int>
 												<int key="NSBoxType">2</int>
@@ -3304,10 +3290,7 @@
 													<string key="NSContents">Options</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgwMDAwMDAxMTkAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<reference key="NSContentView" ref="764747972"/>
 												<int key="NSBorderType">1</int>
@@ -3510,10 +3493,7 @@
 													<string key="NSContents">Misc Info</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgwMDAwMDAxMTkAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<reference key="NSContentView" ref="238524729"/>
 												<int key="NSBorderType">1</int>
@@ -3683,6 +3663,7 @@
 														<reference key="NSDocView" ref="274605011"/>
 														<reference key="NSBGColor" ref="1063954933"/>
 														<int key="NScvFlags">4</int>
+														<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 													</object>
 													<object class="NSClipView" id="978178200">
 														<reference key="NSNextResponder" ref="660134848"/>
@@ -3694,8 +3675,7 @@
 														<reference key="NSSuperview" ref="660134848"/>
 														<reference key="NSNextKeyView" ref="351824254"/>
 														<reference key="NSDocView" ref="351824254"/>
-														<reference key="NSBGColor" ref="1063954933"/>
-														<int key="NScvFlags">4</int>
+														<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 													</object>
 													<object class="NSScroller" id="287591536">
 														<reference key="NSNextResponder" ref="660134848"/>
@@ -3704,6 +3684,8 @@
 														<reference key="NSSuperview" ref="660134848"/>
 														<reference key="NSNextKeyView" ref="465230675"/>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+														<string key="NSControlAction">_doScroller:</string>
+														<reference key="NSControlTarget" ref="660134848"/>
 														<int key="NSsFlags">1</int>
 														<reference key="NSTarget" ref="660134848"/>
 														<string key="NSAction">_doScroller:</string>
@@ -3716,6 +3698,8 @@
 														<reference key="NSSuperview" ref="660134848"/>
 														<reference key="NSNextKeyView" ref="809018287"/>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+														<string key="NSControlAction">_doScroller:</string>
+														<reference key="NSControlTarget" ref="660134848"/>
 														<reference key="NSTarget" ref="660134848"/>
 														<string key="NSAction">_doScroller:</string>
 														<double key="NSCurValue">1</double>
@@ -4024,6 +4008,7 @@
 																<int key="NSvFlags">256</int>
 																<string key="NSFrame">{{202, 36}, {62, 28}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="671175222"/>
 																<string key="NSHuggingPriority">{250, 750}</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="149374251">
@@ -4047,6 +4032,7 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{15, 90}, {55, 17}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="766738847"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="923869842">
 																	<int key="NSCellFlags">67108928</int>
@@ -4065,6 +4051,7 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{72, 90}, {189, 17}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="808330584"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="413402578">
 																	<int key="NSCellFlags">67108928</int>
@@ -4083,6 +4070,7 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{17, 70}, {242, 12}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="45705077"/>
 																<int key="NSpiFlags">16652</int>
 																<double key="NSMaxValue">100</double>
 															</object>
@@ -4091,6 +4079,7 @@
 																<int key="NSvFlags">256</int>
 																<string key="NSFrame">{{13, 36}, {62, 28}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="865809669"/>
 																<string key="NSHuggingPriority">{250, 750}</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="135839342">
@@ -4114,6 +4103,7 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{81, 41}, {98, 17}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="459314052"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="980684981">
 																	<int key="NSCellFlags">67108928</int>
@@ -4132,6 +4122,7 @@
 																<int key="NSvFlags">268</int>
 																<string key="NSFrame">{{16, 8}, {245, 17}}</string>
 																<reference key="NSSuperview" ref="952715784"/>
+																<reference key="NSNextKeyView" ref="66084713"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="810581018">
 																	<int key="NSCellFlags">67108928</int>
@@ -4148,10 +4139,12 @@
 														</array>
 														<string key="NSFrame">{{1, 1}, {277, 117}}</string>
 														<reference key="NSSuperview" ref="366878801"/>
+														<reference key="NSNextKeyView" ref="870189159"/>
 													</object>
 												</array>
 												<string key="NSFrame">{{26, 348}, {279, 133}}</string>
 												<reference key="NSSuperview" ref="760914554"/>
+												<reference key="NSNextKeyView" ref="952715784"/>
 												<string key="NSOffsets">{0, 0}</string>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
@@ -4159,10 +4152,7 @@
 													<string key="NSContents">Main FPGA</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="64228528"/>
-													<object class="NSColor" key="NSTextColor">
-														<int key="NSColorSpace">3</int>
-														<bytes key="NSWhite">MCAwLjgAA</bytes>
-													</object>
+													<reference key="NSTextColor" ref="1042297751"/>
 												</object>
 												<reference key="NSContentView" ref="952715784"/>
 												<int key="NSBorderType">1</int>
@@ -4172,6 +4162,7 @@
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 25}, {811, 487}}</string>
+										<reference key="NSNextKeyView" ref="366878801"/>
 									</object>
 									<string key="NSLabel">Firmware</string>
 									<reference key="NSColor" ref="821686124"/>
@@ -4183,6 +4174,7 @@
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
+							<reference key="NSDelegate"/>
 							<array class="NSMutableArray" key="NSSubviews">
 								<reference ref="679441087"/>
 							</array>
@@ -4204,7 +4196,7 @@
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<bool key="usesAutoincrementingIDs">NO</bool>
-			<array class="NSMutableArray" key="connectionRecords">
+			<array key="connectionRecords">
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">dumpFPGARegsButton</string>
@@ -7531,14 +7523,6 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">OHexFormatter</string>
-					<string key="superclassName">NSFormatter</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/OHexFormatter.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">ORGretinaTriggerController</string>
 					<string key="superclassName">OrcaObjectController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
@@ -7836,7 +7820,103 @@
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORGretinaTriggerController.h</string>
+						<string key="minorKey">../Source/Objects/Hardware/Vme/GretinaTrigger/ORGretinaTriggerController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ORGretinaTriggerController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="doNotLockAction:">id</string>
+						<string key="downloadMainFPGAAction:">id</string>
+						<string key="dumpFPGARegsAction:">id</string>
+						<string key="dumpRegsAction:">id</string>
+						<string key="isMasterAction:">id</string>
+						<string key="numTimesToRetryAction:">id</string>
+						<string key="probeBoard:">id</string>
+						<string key="readRegisterAction:">id</string>
+						<string key="registerIndexPUAction:">id</string>
+						<string key="registerLockAction:">id</string>
+						<string key="registerWriteValueAction:">id</string>
+						<string key="settingLockAction:">id</string>
+						<string key="shipRecordAction:">id</string>
+						<string key="stopLoadingMainFPGAAction:">id</string>
+						<string key="testSandBoxAction:">id</string>
+						<string key="verboseAction:">id</string>
+						<string key="writeRegisterAction:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="doNotLockAction:">
+							<string key="name">doNotLockAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="downloadMainFPGAAction:">
+							<string key="name">downloadMainFPGAAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="dumpFPGARegsAction:">
+							<string key="name">dumpFPGARegsAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="dumpRegsAction:">
+							<string key="name">dumpRegsAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="isMasterAction:">
+							<string key="name">isMasterAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="numTimesToRetryAction:">
+							<string key="name">numTimesToRetryAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="probeBoard:">
+							<string key="name">probeBoard:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="readRegisterAction:">
+							<string key="name">readRegisterAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="registerIndexPUAction:">
+							<string key="name">registerIndexPUAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="registerLockAction:">
+							<string key="name">registerLockAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="registerWriteValueAction:">
+							<string key="name">registerWriteValueAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="settingLockAction:">
+							<string key="name">settingLockAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="shipRecordAction:">
+							<string key="name">shipRecordAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stopLoadingMainFPGAAction:">
+							<string key="name">stopLoadingMainFPGAAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="testSandBoxAction:">
+							<string key="name">testSandBoxAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="verboseAction:">
+							<string key="name">verboseAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="writeRegisterAction:">
+							<string key="name">writeRegisterAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/Hardware/Vme/GretinaTrigger/ORGretinaTriggerController.m</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -7844,7 +7924,7 @@
 					<string key="superclassName">NSTextField</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ORTimedTextField.h</string>
+						<string key="minorKey">../Source/Objects/Misc Objects/Views/TimedTextField/ORTimedTextField.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -7897,7 +7977,48 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/OrcaObjectController.h</string>
+						<string key="minorKey">../Source/Objects/OrcaObject/OrcaObjectController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">OrcaObjectController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="copy:">id</string>
+						<string key="decDialog:">id</string>
+						<string key="incDialog:">id</string>
+						<string key="printDocument:">id</string>
+						<string key="saveDocument:">id</string>
+						<string key="saveDocumentAs:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="decDialog:">
+							<string key="name">decDialog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="incDialog:">
+							<string key="name">incDialog:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="printDocument:">
+							<string key="name">printDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveDocument:">
+							<string key="name">saveDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveDocumentAs:">
+							<string key="name">saveDocumentAs:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">../Source/Objects/OrcaObject/OrcaObjectController.m</string>
 					</object>
 				</object>
 			</array>
@@ -7919,8 +8040,8 @@
 			<string key="Gretina4Card">{16, 128}</string>
 			<string key="GretinaTrigger">{16, 128}</string>
 			<string key="Locked">{33, 36}</string>
-			<string key="NSMenuCheckmark">{11, 11}</string>
-			<string key="NSMenuMixedState">{10, 3}</string>
+			<string key="NSMenuCheckmark">{12, 12}</string>
+			<string key="NSMenuMixedState">{10, 2}</string>
 			<string key="NSSwitch">{15, 15}</string>
 			<string key="Unlocked">{33, 36}</string>
 		</dictionary>
