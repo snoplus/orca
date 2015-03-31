@@ -24,7 +24,6 @@
 #import "SBC_Config.h"
 #import "AutoTesting.h"
 #import "ORSISRegisterDefs.h"
-#import "ORAdcInfoProviding.h"
 
 #define kNumMcaStatusRequests 35 //don't change this unless you know what you are doing....
 
@@ -32,7 +31,7 @@
 @class ORAlarm;
 @class ORCommandList;
 
-@interface ORSIS3305Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding>
+@interface ORSIS3305Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
 {
   @private
 	BOOL			isRunning;
@@ -242,8 +241,8 @@
 - (BOOL) bufferWrapEnabled:(short)chan;
 - (void) setBufferWrapEnabled:(short)chan withValue:(BOOL)aValue;
 
-- (short) internalTriggerEnabledMask;
-- (void) setInternalTriggerEnabledMask:(short)aMask;
+//- (short) internalTriggerEnabledMask;
+//- (void) setInternalTriggerEnabledMask:(short)aMask;
 - (BOOL) internalTriggerEnabled:(short)chan;
 - (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue;
 
@@ -312,8 +311,8 @@
 //- (short) cfdControl:(short)aChannel;
 //- (void) setCfdControl:(short)aChannel withValue:(short)aValue;
 
-- (int) threshold:(short)chan;                  // should be properly removed
-- (void) setThreshold:(short)chan withValue:(int)aValue;    // should be properly removed
+//- (int) threshold:(short)chan;                  // should be properly removed
+//- (void) setThreshold:(short)chan withValue:(int)aValue;    // should be properly removed
 
 - (BOOL) LTThresholdEnabled:(short)aChan;
 - (BOOL) GTThresholdEnabled:(short)aChan;

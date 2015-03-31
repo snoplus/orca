@@ -611,9 +611,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
 
     //ORAdcInfoProviding protocol requirement ?
-    [self postAdcInfoProvidingValueChanged];
+    //[self postAdcInfoProvidingValueChanged];
     
-    return;
 }
 
 
@@ -628,7 +627,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LTThresholdOnChanged object:self];
     //ORAdcInfoProviding protocol requirement
-    [self postAdcInfoProvidingValueChanged];
+    //[self postAdcInfoProvidingValueChanged];
 }
 
 - (int) LTThresholdOff:(short)aChan { return LTThresholdOff[aChan]; }
@@ -641,7 +640,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LTThresholdOffChanged object:self];
     //ORAdcInfoProviding protocol requirement
-    [self postAdcInfoProvidingValueChanged];
+    //[self postAdcInfoProvidingValueChanged];
 }
 
 - (int) GTThresholdOn:(short)aChan { return GTThresholdOn[aChan]; }
@@ -655,7 +654,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdOnChanged object:self];
     //ORAdcInfoProviding protocol requirement
-    [self postAdcInfoProvidingValueChanged];
+    //[self postAdcInfoProvidingValueChanged];
 }
 
 - (int) GTThresholdOff:(short)aChan { return GTThresholdOff[aChan]; }
@@ -668,7 +667,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdOffChanged object:self];
     //ORAdcInfoProviding protocol requirement
-    [self postAdcInfoProvidingValueChanged];
+    //[self postAdcInfoProvidingValueChanged];
 }
 
 //- (int) highThreshold:(short)aChan { return [[highThresholds objectAtIndex:aChan]intValue]; }
@@ -1970,7 +1969,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     }
     @catch(NSException* localException) {
         NSLog(@"SIS3305 Reg Dump FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3305 Reg Dump FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3305 Reg Dump FAILED", @"OK", nil, nil,
                         localException);
     }
 }
@@ -3678,13 +3677,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 
 //ORAdcInfoProviding protocol requirement
-- (void) postAdcInfoProvidingValueChanged
-{
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORAdcInfoProvidingValueChanged
-	 object:self
-	 userInfo: nil];
-}
+//- (void) postAdcInfoProvidingValueChanged
+//{
+//	[[NSNotificationCenter defaultCenter]
+//	 postNotificationName:ORAdcInfoProvidingValueChanged
+//	 object:self
+//	 userInfo: nil];
+//}
 //for adcProvidingProtocol... but not used for now
 - (unsigned long) eventCount:(int)channel
 {
