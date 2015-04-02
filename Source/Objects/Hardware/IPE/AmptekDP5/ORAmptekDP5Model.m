@@ -2099,7 +2099,6 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         //show status
         if(hasStatus){
             uint32_t var32=0;
-            uint16_t var16=0;
             uint8_t var8=0;
             NSLog(@"STATUS:    (statusOffset: %i)\n",statusOffset);
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kFastCountOffset])) );
