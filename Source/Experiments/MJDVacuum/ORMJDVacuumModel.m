@@ -140,12 +140,14 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	[super addObjects:someObjects];
 	[self checkAllConstraints];
+    [self registerNotificationObservers];
 }
 
 - (void) removeObjects:(NSArray*)someObjects
 {
 	[super removeObjects:someObjects];
 	[self checkAllConstraints];
+    [self registerNotificationObservers];
 }
 
 - (void) registerNotificationObservers
@@ -286,12 +288,12 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) baratronChanged:(NSNotification*)aNote
 {
-    if([self coolerMode] == kThermosyphon){
+    //if([self coolerMode] == kThermosyphon){ //changed to always display value
         ORMks660BModel* baratron         = [aNote object];
         ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionBaratron];
         [aRegionlabel setValue:  [baratron pressure]];
         [aRegionlabel setIsValid:[baratron isValid]];
-    }
+    //}
 }
 
 - (void) lakeShoreChanged:(NSNotification*)aNote
