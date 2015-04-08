@@ -2402,7 +2402,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned short) hitRateLength { return hitRateLength; }
 - (void) setHitRateLength:(unsigned short)aHitRateLength
 {	
- 	NSLog(@"%@::%@ aHitRateLength: %i   old: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aHitRateLength,hitRateLength);//TODO: DEBUG testing ...-tb-
+ 	//DEBUG   -tb-   NSLog(@"%@::%@ aHitRateLength: %i   old: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aHitRateLength,hitRateLength);//TODO: DEBUG testing ...-tb-
 
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateLength:hitRateLength];
     hitRateLength = [self restrictIntValue:aHitRateLength min:0 max:8]; //new 2014-11: 0->1sec, 1->2, 2->4, 3->8 .... sec etc   //before 2014-11: 0->1sec, 1->2, 2->3 .... sec
