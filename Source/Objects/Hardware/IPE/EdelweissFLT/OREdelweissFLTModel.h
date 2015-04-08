@@ -144,6 +144,7 @@
     int totalTriggerNRegister;
     uint32_t controlRegister;
     int repeatSWTriggerMode;
+    double repeatSWTriggerDelay;
     int swTriggerIsRepeating;
     int32_t fiberOutMask;
     int fiberSelectForBBStatusBits;
@@ -196,6 +197,7 @@
     uint32_t ficCardTriggerCmd[kNumEWFLTFibers];
     int hitrateLimitHeat;
     int hitrateLimitIon;
+    BOOL saveIonChanFilterOutputRecords;//unused
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -213,6 +215,8 @@
 - (BOOL) preRunChecks;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (BOOL) saveIonChanFilterOutputRecords;
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords;
 - (int) hitrateLimitIon;
 - (void) setHitrateLimitIon:(int)aHitrateLimitIon;
 - (int) hitrateLimitHeat;
@@ -343,6 +347,8 @@
 - (void) setSwTriggerIsRepeating:(int)aSwTriggerIsRepeating;
 - (int) repeatSWTriggerMode;
 - (void) setRepeatSWTriggerMode:(int)aRepeatSWTriggerMode;
+- (double) repeatSWTriggerDelay;
+- (void) setRepeatSWTriggerDelay:(double)aRepeatSWTriggerDelay;
 - (uint32_t) controlRegister;
 - (void) setControlRegister:(uint32_t)aControlRegister;
 - (int) statusLatency;//obsolete 2014 -tb-
@@ -657,6 +663,8 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged;
+extern NSString* OREdelweissFLTModelRepeatSWTriggerDelayChanged;
 extern NSString* OREdelweissFLTModelHitrateLimitIonChanged;
 extern NSString* OREdelweissFLTModelHitrateLimitHeatChanged;
 extern NSString* OREdelweissFLTModelChargeFICFileChanged;

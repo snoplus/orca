@@ -31,6 +31,7 @@
     
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSButton* saveIonChanFilterOutputRecordsCB;//unused
 	IBOutlet   NSProgressIndicator* progressOfChargeBBIndicator;
 	IBOutlet   NSTextField* progressOfChargeBBTextField;
 	IBOutlet   NSTextField* chargeBBFileForFiberTextField;
@@ -141,6 +142,7 @@
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
 		
 	IBOutlet   NSTextField* repeatSWTriggerModeTextField;
+	IBOutlet   NSTextField* repeatSWTriggerDelayTextField;
 		
 		IBOutlet NSPopUpButton*	repeatSWTriggerModePU;
 		IBOutlet NSProgressIndicator*	swTriggerProgress;
@@ -254,6 +256,8 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote;
+- (void) repeatSWTriggerDelayChanged:(NSNotification*)aNote;
 - (void) hitrateLimitIonChanged:(NSNotification*)aNote;
 - (void) hitrateLimitHeatChanged:(NSNotification*)aNote;
 - (void) chargeFICFileChanged:(NSNotification*)aNote;
@@ -358,6 +362,8 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) saveIonChanFilterOutputRecordsCBAction:(id)sender;
+- (IBAction) repeatSWTriggerDelayTextFieldAction:(id)sender;
 - (IBAction) hitrateLimitIonTextFieldAction:(id)sender;
 - (IBAction) hitrateLimitHeatTextFieldAction:(id)sender;
 - (IBAction) chargeFICFileTextFieldAction:(id)sender;

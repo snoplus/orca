@@ -92,6 +92,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
     uint32_t partOfRunFLTMask = GetDeviceSpecificData()[0];
     uint32_t runFlags   = GetDeviceSpecificData()[3];//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
     uint32_t takeEventData   = runFlags & kTakeEventDataFlag;//this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
+    uint32_t saveIonChanFilterOutputRecords   = runFlags & kSaveIonChanFilterOutputRecordsFlag; 
     
     uint32_t versionSLTFPGA = GetDeviceSpecificData()[7];
     
@@ -305,9 +306,8 @@ pbus->write(FLTReadPageNumReg(flt+1),tmpNumPage);
 }                                
 pbus->write(FLTReadPageNumReg(flt+1),numPage);
 */
-
-                                uint32_t debugFlag=1;
-                                if(debugFlag && (chan>=6) && (chan<=17)){
+                                //save ion channel filter output
+                                if(saveIonChanFilterOutputRecords && (chan>=6) && (chan<=17)){
                                     //ship data record
                                     ensureDataCanHold(9 + waveformLength/2); 
                                     location   = ((crate & 0x01e)<<21) | (((flt+1) & 0x0000001f)<<16)  | (((chan+32) & 0xff) << 8); // | ((filterIndex & 0xf)<<4)  | (filterShapingLength & 0xf)  ;

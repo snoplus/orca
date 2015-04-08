@@ -29,6 +29,7 @@
 	
     //BB commands
     IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSButton* saveIonChanFilterOutputRecordsCB;
 	IBOutlet   NSButton* resetEventCounterAtRunStartCB;
 	IBOutlet   NSTextField* statusHighRegTextField;
 	IBOutlet   NSTextField* statusLowRegTextField;
@@ -173,6 +174,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote;
 - (void) fifoForUDPDataPortChanged:(NSNotification*)aNote;
 - (void) useStandardUDPDataPortsChanged:(NSNotification*)aNote;
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote;
@@ -238,6 +240,7 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) saveIonChanFilterOutputRecordsCBAction:(id)sender;
 - (IBAction) fifoForUDPDataPortPUAction:(id)sender;
 - (IBAction) useStandardUDPDataPortsCBAction:(id)sender;
 - (IBAction) resetEventCounterAtRunStartCBAction:(id)sender;

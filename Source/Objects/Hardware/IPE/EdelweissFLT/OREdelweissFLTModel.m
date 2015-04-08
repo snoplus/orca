@@ -39,6 +39,8 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged = @"OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged";
+NSString* OREdelweissFLTModelRepeatSWTriggerDelayChanged = @"OREdelweissFLTModelRepeatSWTriggerDelayChanged";
 NSString* OREdelweissFLTModelHitrateLimitIonChanged = @"OREdelweissFLTModelHitrateLimitIonChanged";
 NSString* OREdelweissFLTModelHitrateLimitHeatChanged = @"OREdelweissFLTModelHitrateLimitHeatChanged";
 NSString* OREdelweissFLTModelChargeFICFileChanged = @"OREdelweissFLTModelChargeFICFileChanged";
@@ -294,6 +296,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		for(i=0;i<kNumEWFLTHeatIonChannels;i++) [triggerParameter addObject:[NSNumber numberWithInt:0]];
 	}
     
+    repeatSWTriggerDelay = 1.0;//default
+
     [self registerNotificationObservers];
 
     return self;
@@ -512,6 +516,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (BOOL) saveIonChanFilterOutputRecords
+{
+    return saveIonChanFilterOutputRecords;
+}
+
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSaveIonChanFilterOutputRecords:saveIonChanFilterOutputRecords];
+    
+    saveIonChanFilterOutputRecords = aSaveIonChanFilterOutputRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged object:self];
+}
 
 - (int) hitrateLimitIon
 {
@@ -1855,6 +1873,32 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRepeatSWTriggerModeChanged object:self];
 }
+
+
+- (double) repeatSWTriggerDelay
+{
+    return repeatSWTriggerDelay;
+}
+
+- (void) setRepeatSWTriggerDelay:(double)aRepeatSWTriggerDelay
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRepeatSWTriggerDelay:repeatSWTriggerDelay];
+    
+    repeatSWTriggerDelay = aRepeatSWTriggerDelay;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRepeatSWTriggerDelayChanged object:self];
+}
+
+
+
+
+
+
+
+
+
+
+
 
 - (uint32_t) controlRegister
 {
@@ -3823,11 +3867,8 @@ for(chan=0; chan<6;chan++)
     
     int hitRateLengthSec = 0x1 << hitRateLength;
 
-        //DEBUG OUTPUT:     
-                    NSLog(@"%@::%@: UNDER CONSTRUCTION! hitRateLength: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),hitRateLength);//TODO : DEBUG testing ...-tb-
+        //DEBUG OUTPUT:                         NSLog(@"%@::%@: UNDER CONSTRUCTION! hitRateLength: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),hitRateLength);//TODO : DEBUG testing ...-tb-
 	
-//TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
-//TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
 	@try {
 		
 		BOOL oneChanged = NO;
@@ -3962,6 +4003,8 @@ for(chan=0; chan<6;chan++)
     
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
+    //[self setSaveIonChanFilterOutputRecords:[decoder decodeBoolForKey:@"saveIonChanFilterOutputRecords"]];
+    [self setRepeatSWTriggerDelay:[decoder decodeDoubleForKey:@"repeatSWTriggerDelay"]];
     [self setHitrateLimitIon:[decoder decodeIntForKey:@"hitrateLimitIon"]];
     [self setHitrateLimitHeat:[decoder decodeIntForKey:@"hitrateLimitHeat"]];
     [self setChargeFICFile:[decoder decodeObjectForKey:@"chargeFICFile"]];
@@ -4094,11 +4137,14 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
-    int i;
-    for(i=0; i<kNumEWFLTFibers; i++){
+        [encoder encodeDouble:repeatSWTriggerDelay forKey:@"repeatSWTriggerDelay"];
         [encoder encodeInt:hitrateLimitIon forKey:@"hitrateLimitIon"];
         [encoder encodeInt:hitrateLimitHeat forKey:@"hitrateLimitHeat"];
         [encoder encodeObject:chargeFICFile forKey:@"chargeFICFile"];
+        //[encoder encodeBool:saveIonChanFilterOutputRecords forKey:@"saveIonChanFilterOutputRecords"];
+        
+    int i;
+    for(i=0; i<kNumEWFLTFibers; i++){
         [encoder encodeInt:ficCardTriggerCmd[i] forKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]];
         [encoder encodeInt:ficCardADC23CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]];
         [encoder encodeInt:ficCardADC01CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC01CtrlReg%i",i]]; 
@@ -4366,7 +4412,7 @@ for(chan=0; chan<6;chan++)
 	//now: sw trigg.
     [self writeCommandSoftwareTrigger];
 
-	if([self swTriggerIsRepeating])[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+	if([self swTriggerIsRepeating] && [self repeatSWTriggerMode])[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:repeatSWTriggerDelay];
 
 }
 
@@ -4447,7 +4493,8 @@ for(chan=0; chan<6;chan++)
 	if([self repeatSWTriggerMode] == 1){
 	    NSLog(@"Start SW Trigger\n");//TODO: debug output -tb-
 		[self setSwTriggerIsRepeating: 1];  //-> call writeCommandSoftwareTrigger frequently
-	    [self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+	    //[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+	    [self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:repeatSWTriggerDelay];
 	}
 
 }

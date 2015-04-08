@@ -547,6 +547,7 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged = @"OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged";
 NSString* OREdelweissSLTModelFifoForUDPDataPortChanged = @"OREdelweissSLTModelFifoForUDPDataPortChanged";
 NSString* OREdelweissSLTModelUseStandardUDPDataPortsChanged = @"OREdelweissSLTModelUseStandardUDPDataPortsChanged";
 NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged = @"OREdelweissSLTModelResetEventCounterAtRunStartChanged";
@@ -738,6 +739,20 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) saveIonChanFilterOutputRecords
+{
+    return saveIonChanFilterOutputRecords;
+}
+
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSaveIonChanFilterOutputRecords:saveIonChanFilterOutputRecords];
+    
+    saveIonChanFilterOutputRecords = aSaveIonChanFilterOutputRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged object:self];
+}
 
 - (int) fifoForUDPDataPort
 {
@@ -3276,6 +3291,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setSaveIonChanFilterOutputRecords:[decoder decodeBoolForKey:@"saveIonChanFilterOutputRecords"]];
 	[self setFifoForUDPDataPort:[decoder decodeIntForKey:@"fifoForUDPDataPort"]];
 	[self setUseStandardUDPDataPorts:[decoder decodeIntForKey:@"useStandardUDPDataPorts"]];
 	[self setResetEventCounterAtRunStart:[decoder decodeIntForKey:@"resetEventCounterAtRunStart"]];
@@ -3351,6 +3367,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:saveIonChanFilterOutputRecords forKey:@"saveIonChanFilterOutputRecords"];
 	[encoder encodeInt:fifoForUDPDataPort forKey:@"fifoForUDPDataPort"];
 	[encoder encodeInt:useStandardUDPDataPorts forKey:@"useStandardUDPDataPorts"];
 	[encoder encodeInt:resetEventCounterAtRunStart forKey:@"resetEventCounterAtRunStart"];
@@ -4276,6 +4293,7 @@ if((len % 4) != 0){
 	unsigned long runFlagsMask = 0;
 	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
     if(takeEventData)  runFlagsMask |= kTakeEventDataFlag;
+    if(saveIonChanFilterOutputRecords)  runFlagsMask |= kSaveIonChanFilterOutputRecordsFlag;
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
     
     //for handling of different firmware versions

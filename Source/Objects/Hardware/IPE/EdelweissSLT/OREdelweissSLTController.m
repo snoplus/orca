@@ -350,9 +350,19 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelFifoForUDPDataPortChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(saveIonChanFilterOutputRecordsChanged:)
+                         name : OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote
+{
+	[saveIonChanFilterOutputRecordsCB setIntValue: [model saveIonChanFilterOutputRecords]];
+}
 
 - (void) fifoForUDPDataPortChanged:(NSNotification*)aNote
 {
@@ -759,6 +769,7 @@ return;
 	[self resetEventCounterAtRunStartChanged:nil];
 	[self useStandardUDPDataPortsChanged:nil];
 	[self fifoForUDPDataPortChanged:nil];
+	[self saveIonChanFilterOutputRecordsChanged:nil];
 }
 
 
@@ -907,6 +918,11 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) saveIonChanFilterOutputRecordsCBAction:(id)sender
+{
+	[model setSaveIonChanFilterOutputRecords:[sender intValue]];	
+}
 
 - (void) fifoForUDPDataPortPUAction:(id)sender
 {

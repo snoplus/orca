@@ -550,9 +550,29 @@
                          name : OREdelweissFLTModelHitrateLimitIonChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatSWTriggerDelayChanged:)
+                         name : OREdelweissFLTModelRepeatSWTriggerDelayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(saveIonChanFilterOutputRecordsChanged:)
+                         name : OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote
+{
+	//unused [saveIonChanFilterOutputRecordsCB setObjectValue: [model saveIonChanFilterOutputRecords]];
+}
+
+- (void) repeatSWTriggerDelayChanged:(NSNotification*)aNote
+{
+	[repeatSWTriggerDelayTextField setDoubleValue: [model repeatSWTriggerDelay]];
+}
 
 - (void) hitrateLimitIonChanged:(NSNotification*)aNote
 {
@@ -1555,6 +1575,8 @@
 	[self chargeFICFileChanged:nil];
 	[self hitrateLimitHeatChanged:nil];
 	[self hitrateLimitIonChanged:nil];
+	[self repeatSWTriggerDelayChanged:nil];
+	[self saveIonChanFilterOutputRecordsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1937,6 +1959,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) saveIonChanFilterOutputRecordsCBAction:(id)sender
+{
+	//unused [model setSaveIonChanFilterOutputRecords:[sender objectValue]];	
+}
+
+- (void) repeatSWTriggerDelayTextFieldAction:(id)sender
+{
+	[model setRepeatSWTriggerDelay:[sender doubleValue]];	
+}
 
 - (void) hitrateLimitIonTextFieldAction:(id)sender
 {
