@@ -60,9 +60,7 @@
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-			
-	OHexFormatter *numberFormatter = [[[OHexFormatter alloc] init] autorelease];
-	
+				
 	NSNumberFormatter *rateFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	[rateFormatter setFormat:@"##0.0;0;-##0.0"];
 	
