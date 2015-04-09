@@ -134,7 +134,7 @@ NSString* ORTimeRoiCurveFitChanged = @"ORTimeRoiCurveFitChanged";
 	long endTimeOffset		 = [self maxChannel];
 	NSTimeInterval startTime = startingTime - startTimeOffset;
 	NSTimeInterval endTime	 = startingTime - endTimeOffset;
-	long numPts				 = fabs(endTimeOffset-startTimeOffset);
+	long numPts				 = labs(endTimeOffset-startTimeOffset);
 											  
 	long count = 0;
 	double minY = 9.9E99;
