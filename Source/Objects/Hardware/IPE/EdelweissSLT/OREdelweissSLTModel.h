@@ -222,6 +222,7 @@
     OREdelweissFLTModel *fltChargingFIC;
     
     int resetEventCounterAtRunStart;
+    BOOL saveIonChanFilterOutputRecords;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -239,6 +240,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (BOOL) saveIonChanFilterOutputRecords;
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords;
 - (int) fifoForUDPDataPort;
 - (void) setFifoForUDPDataPort:(int)aFifoForUDPDataPort;
 - (int) useStandardUDPDataPorts;
@@ -530,6 +533,7 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged;
 extern NSString* OREdelweissSLTModelFifoForUDPDataPortChanged;
 extern NSString* OREdelweissSLTModelUseStandardUDPDataPortsChanged;
 extern NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged;
