@@ -209,18 +209,18 @@
 			//origins must be 0,0 so we have to do a bit of adjustment here
 			if(x<0){
 				box.origin.x = 0;
-				box.size.width += fabs(x) * scaleFactor;
+				box.size.width += abs(x) * scaleFactor;
 			}
 			if(y<0){
 				box.origin.y = 0;
-				box.size.height += fabs(y) * scaleFactor;
+				box.size.height += abs(y) * scaleFactor;
 			}
 			NSEnumerator* e = [[group orcaObjects] objectEnumerator];
 			OrcaObject* obj;
 			while(obj = [e nextObject]){
 				NSRect aFrame = [obj frame];
-				if(x<0)aFrame.origin.x += fabs(x);
-				if(y<0)aFrame.origin.y += fabs(y);
+				if(x<0)aFrame.origin.x += abs(x);
+				if(y<0)aFrame.origin.y += abs(y);
 				[obj setFrame:aFrame];
 			}
 			
@@ -278,8 +278,8 @@
     OrcaObject* obj;
     while(obj = [e nextObject]){
         NSRect aFrame = [obj frame];
-        aFrame.origin.x -= fabs(x);
-        aFrame.origin.y -= fabs(y);
+        aFrame.origin.x -= abs(x);
+        aFrame.origin.y -= abs(y);
         [obj setFrame:aFrame];
     }
     

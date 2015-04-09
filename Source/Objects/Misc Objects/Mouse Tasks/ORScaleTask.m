@@ -52,7 +52,7 @@
 - (void) mouseDragged:(NSEvent *)event
 {
 	int delta  = currentLoc.y - startLoc.y;
-	if(fabs(delta) > 5){
+	if(abs(delta) > 5){
 		if(delta>0)delta = 1;
 		else       delta = -1;
 		scaleFactor += delta;
