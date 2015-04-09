@@ -157,12 +157,12 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atIntermediateGoal
 {
-	return abs([delegate voltage:channel] - [delegate hwGoal:channel]) < kTolerance;
+	return fabsf([delegate voltage:channel] - [delegate hwGoal:channel]) < kTolerance;
 }
 
 - (BOOL) atTarget
 {
-	return abs([delegate voltage:channel] - target) < kTolerance;
+	return fabsf([delegate voltage:channel] - target) < kTolerance;
 }
 
 - (int) stepSize
