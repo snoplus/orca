@@ -1302,7 +1302,7 @@ NSString* UVkWrite = @"W";
 		NSNumber* HVLimit = [NSNumber numberWithFloat: 2300.0];
 		
 		int statusInt = 1;
-		float difference = abs( measuredHVFloat - [demandHV floatValue] );  
+		float difference = fabsf( measuredHVFloat - [demandHV floatValue] );  
 		if (  difference > [mvdZ floatValue])
 			statusInt = eHVUTripForHVError;
 		NSNumber* status = [NSNumber numberWithInt: statusInt];
