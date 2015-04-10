@@ -1,4 +1,4 @@
-//-------------------------------------------------------------------------
+ //-------------------------------------------------------------------------
 //  ORSIS3305Controller.h
 //
 //  Created by Mark A. Howe on Wednesday 9/30/08.
@@ -101,8 +101,7 @@
 	[aPlot release];
 
 	[rate0 setNumber:8 height:10 spacing:5];
-
-	
+    
 	[super awakeFromNib];
 	
 }
@@ -163,7 +162,12 @@
                      selector : @selector(channelEnabledChanged:)
                          name : ORSIS3305ChannelEnabledChanged
                        object : model];
-
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(tapDelayChanged:)
+                         name : ORSIS3305TapDelayChanged
+                       object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(thresholdModeChanged:)
                          name : ORSIS3305ThresholdModeChanged
@@ -199,6 +203,17 @@
                          name : ORSIS3305LTThresholdOffChanged
                        object : model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(TDCLogicEnabledChanged:)
+                         name : ORSIS3305TDCMeasurementEnabledChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(ledApplicationModeChanged:)
+                         name : ORSIS3305LEDApplicationModeChanged
+                       object : model];
+    
+    
     
     //
 //    
@@ -313,10 +328,10 @@
 //                         name : ORSIS3305SampleStartIndexChanged
 //						object: model];
 //
-//    [notifyCenter addObserver : self
-//                     selector : @selector(preTriggerDelayChanged:)
-//                         name : ORSIS3305ModelPreTriggerDelayChanged
-//						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(preTriggerDelayChanged:)
+                         name : ORSIS3305ModelPreTriggerDelayChanged
+						object: model];
 //
 //    [notifyCenter addObserver : self
 //                     selector : @selector(triggerGateLengthChanged:)
@@ -420,7 +435,7 @@
                      selector : @selector(shipTimeRecordAlsoChanged:)
                          name : ORSIS3305ModelShipTimeRecordAlsoChanged
 						object: model];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(bufferWrapEnabledChanged:)
                          name : ORSIS3305ModelBufferWrapEnabledChanged
@@ -516,6 +531,13 @@
 	
 	[self runModeChanged:nil];
 	[self shipTimeRecordAlsoChanged:nil];
+    [self TDCLogicEnabledChanged:nil];
+    
+    // group settings
+    [self eventSavingMode14Changed:nil];
+    [self eventSavingMode58Changed:nil];
+    [self thresholdModeChanged:nil];
+    
     
     //channel settings
     [self channelEnabledChanged:nil];
@@ -548,6 +570,11 @@
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote
 {
 	[shipTimeRecordAlsoCB setIntValue: [model shipTimeRecordAlso]];
+}
+
+- (void) TDCLogicEnabledChanged:(NSNotification *)aNote
+{
+    [TDCLogicEnabledCB setIntValue: [model TDCMeasurementEnabled]];
 }
 
 //- (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote
@@ -687,7 +714,7 @@
     short i;
     for(i=0;i<kNumSIS3305Channels;i++){
         [[channelEnabled14Matrix cellWithTag:i] setState:[model enabled:i]];
-        [[channelEnabled58Matrix cellWithTag:i] setState:[model enabled:i]];
+        [[channelEnabled58Matrix cellWithTag:i] setState:[model enabled:(i+4)]];    // (i+4) is for split matrix
     }
 }
 
@@ -997,7 +1024,7 @@
 - (void) triggerGateLengthChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<kNumSIS3305Channels/2;i++){
+	for(i=0;i<kNumSIS3305Groups;i++){
 		[[triggerGateLengthMatrix cellWithTag:i] setIntValue:[model triggerGateLength:i]];
 	}
 }
@@ -1005,9 +1032,12 @@
 - (void) preTriggerDelayChanged:(NSNotification*)aNote
 {
 	short i;
-	for(i=0;i<kNumSIS3305Channels/2;i++){
-		[[preTriggerDelayMatrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
-	}
+	for(i=0;i<kNumSIS3305Channels;i++){
+        if(i<4)
+            [[preTriggerDelay14Matrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
+        else if(i>=4)
+            [[preTriggerDelay58Matrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
+    }
 }
 
 - (void) sampleStartIndexChanged:(NSNotification*)aNote
@@ -1132,10 +1162,12 @@
 	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
     BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
 	
+	[settingLockButton			setState: locked];
 	//[settingLockButton			setState: locked];
 
     [runModePU					setEnabled:!locked && !runInProgress];
     [pulseModeButton			setEnabled:!locked && !runInProgress];
+    [TDCLogicEnabledCB			setEnabled:!locked && !runInProgress];
 	
     [addressText				setEnabled:!locked && !runInProgress];
     [initButton					setEnabled:!lockedOrRunningMaintenance];
@@ -1149,7 +1181,8 @@
 	[energyGapTimeMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[energyPeakingTimeMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[triggerGateLengthMatrix		setEnabled:!lockedOrRunningMaintenance];
-	[preTriggerDelayMatrix			setEnabled:!lockedOrRunningMaintenance];
+    [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
+    [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
 	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
 	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
 
@@ -1677,6 +1710,12 @@
 	}
 }
 
+- (IBAction) TDCLogicEnabledAction:(id)sender
+{
+    bool value = [sender boolValue];
+    [model setTDCMeasurementEnabled:value];
+}
+
 - (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];	
@@ -1686,14 +1725,14 @@
 {
     short mode = [sender indexOfSelectedItem];
     
-    [model setEventSavingModeOf:1 toValue:mode];    // 1 is for group 1
+    [model setEventSavingModeOf:0 toValue:mode];    // 1 is for group 1
 }
 
 - (IBAction) eventSavingMode58Action:(id)sender
 {
     short mode = [sender indexOfSelectedItem];
     
-    [model setEventSavingModeOf:2 toValue:mode];    // 2 is for group 2
+    [model setEventSavingModeOf:1 toValue:mode];    // 2 is for group 2
 }
 
 - (IBAction) thresholdMode14Action:(id)sender
@@ -1767,12 +1806,12 @@
 	}
 }
 
-- (IBAction) thresholdAction:(id)sender
-{
-    if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
-		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
+//- (IBAction) thresholdAction:(id)sender
+//{
+//    if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
+//		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+//	}
+//}
 
 //- (IBAction) highThresholdAction:(id)sender
 //{
@@ -1795,11 +1834,23 @@
 	}
 }
 
-- (IBAction) preTriggerDelayAction:(id)sender
+- (IBAction) preTriggerDelay14Action:(id)sender
 {
-    if([sender intValue] != [model preTriggerDelay:[[sender selectedCell] tag]]){
-		[model setPreTriggerDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
+    int value = [sender intValue];
+    int chan = [[sender selectedCell] tag];
+    
+    if(value != [model preTriggerDelay:chan]){
+        [model setPreTriggerDelay:chan withValue:value];
+    }
+}
+- (IBAction) preTriggerDelay58Action:(id)sender
+{
+    int value = [sender intValue];
+    int chan = [[sender selectedCell] tag] + 4;     // the +4 corrects for the split matrix
+    
+    if(value != [model preTriggerDelay:chan ]){
+        [model setPreTriggerDelay:chan withValue:value];
+    }
 }
 
 - (IBAction) sampleStartIndexAction:(id)sender

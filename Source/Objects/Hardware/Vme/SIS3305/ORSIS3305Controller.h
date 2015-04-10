@@ -32,6 +32,9 @@
 	IBOutlet NSTextField*	firmwareVersionTextField;
 	IBOutlet NSMatrix*		bufferWrapEnabledMatrix;
 	IBOutlet NSButton*		shipTimeRecordAlsoCB;
+    
+    IBOutlet NSButton* 		TDCLogicEnabledCB;
+    
 //	IBOutlet NSButton*		mcaUseEnergyCalculationButton;
 //	IBOutlet NSTextField*	mcaEnergyOffsetField;
 //	IBOutlet NSTextField*	mcaEnergyMultiplierField;
@@ -68,7 +71,8 @@
 	IBOutlet NSMatrix*		internalGateEnabledMatrix;
 	IBOutlet NSMatrix*		externalGateEnabledMatrix;
 	IBOutlet NSMatrix*		triggerGateLengthMatrix;
-	IBOutlet NSMatrix*		preTriggerDelayMatrix;
+    IBOutlet NSMatrix*		preTriggerDelay14Matrix;
+    IBOutlet NSMatrix*		preTriggerDelay58Matrix;
 	IBOutlet NSMatrix*		sampleStartIndexMatrix;
 	IBOutlet NSMatrix*		lemoInEnabledMatrix;
 	IBOutlet NSMatrix*		energyGateLengthMatrix;
@@ -101,7 +105,7 @@
 	IBOutlet NSMatrix*		adc50KTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		gtMatrix;
 	IBOutlet NSMatrix*		dacOffsetMatrix;
-	IBOutlet NSMatrix*		thresholdMatrix;
+//	IBOutlet NSMatrix*		thresholdMatrix;
 //	IBOutlet NSMatrix*		highThresholdMatrix;
 	IBOutlet NSMatrix*		gateLengthMatrix;
 	IBOutlet NSMatrix*		pulseLengthMatrix;
@@ -171,10 +175,12 @@
 
 #pragma mark - Interface Management
 - (void) pulseModeChanged:(NSNotification*)aNote;
+- (void) tapDelayChanged:(NSNotification*)aNote;
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) bufferWrapEnabledChanged:(NSNotification*)aNote;
 //- (void) cfdControlChanged:(NSNotification*)aNote;
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote;
+- (void) TDCLogicEnabledChanged:(NSNotification*)aNote;
 
 - (void) channelEnabledChanged:(NSNotification*)aNote;
 - (void) ledEnabledChanged:(NSNotification*)aNote;
@@ -224,7 +230,7 @@
 - (void) inputInvertedChanged:(NSNotification*)aNote;
 - (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote;
 //- (void) gtChanged:(NSNotification*)aNote;
-- (void) thresholdChanged:(NSNotification*)aNote;
+//- (void) thresholdChanged:(NSNotification*)aNote;
 //- (void) highThresholdChanged:(NSNotification*)aNote;
 - (void) gateLengthChanged:(NSNotification*)aNote;
 - (void) pulseLengthChanged:(NSNotification*)aNote;
@@ -243,18 +249,8 @@
 - (IBAction) bufferWrapEnabledAction:(id)sender;
 - (IBAction) cfdControlAction:(id)sender;
 - (IBAction) shipTimeRecordAlsoAction:(id)sender;
-//- (IBAction) mcaUseEnergyCalculationAction:(id)sender;
-//- (IBAction) mcaEnergyOffsetAction:(id)sender;
-//- (IBAction) mcaEnergyMultiplierAction:(id)sender;
-//- (IBAction) mcaEnergyDividerAction:(id)sender;
-//- (IBAction) mcaModeAction:(id)sender;
-//- (IBAction) mcaPileupEnabledAction:(id)sender;
-//- (IBAction) mcaHistoSizeAction:(id)sender;
-//- (IBAction) mcaNofScansPresetAction:(id)sender;
-//- (IBAction) mcaAutoClearAction:(id)sender;
-//- (IBAction) mcaPrescaleFactorAction:(id)sender;
-//- (IBAction) mcaLNESetupAction:(id)sender;
-//- (IBAction) mcaNofHistoPresetAction:(id)sender;
+- (IBAction) TDCLogicEnabledAction:(id)sender;
+- (IBAction) tapDelayAction:(id)sender;
 
 - (IBAction) channelEnabledMaskAction:(id)sender;
 
@@ -277,7 +273,8 @@
 - (IBAction) energyGapTimeAction:(id)sender;
 - (IBAction) energyPeakingTimeAction:(id)sender;
 - (IBAction) triggerGateLengthAction:(id)sender;
-- (IBAction) preTriggerDelayAction:(id)sender;
+- (IBAction) preTriggerDelay14Action:(id)sender;
+- (IBAction) preTriggerDelay58Action:(id)sender;
 - (IBAction) sampleStartIndexAction:(id)sender;
 - (IBAction) sampleLengthAction:(id)sender;
 - (IBAction) dacOffsetAction:(id)sender;
@@ -301,7 +298,7 @@
 - (IBAction) triggerOutEnabledAction:(id)sender;
 - (IBAction) highEnergySuppressAction:(id)sender;
 //- (IBAction) gtAction:(id)sender;
-- (IBAction) thresholdAction:(id)sender;
+//- (IBAction) thresholdAction:(id)sender;
 
 - (IBAction) GTThresholdOn14Action:(id)sender;
 - (IBAction) GTThresholdOn58Action:(id)sender;

@@ -41,7 +41,21 @@
 	int             clockSource;
     short           eventSavingMode[kNumSIS3305Groups];
     BOOL            TDCMeasurementEnabled;
+    BOOL            ledApplicationMode;
     BOOL            ledEnable[3];
+    
+    BOOL        enableExternalLEMODirectVetoIn;
+    BOOL        enableExternalLEMOResetIn;
+    BOOL        enableExternalLEMOCountIn;
+    BOOL        invertExternalLEMODirectVetoIn;
+    BOOL        enableExternalLEMOTriggerIn;
+    BOOL        enableExternalLEMOVetoDelayLengthLogic;
+    BOOL        edgeSensitiveExternalVetoDelayLengthLogic;
+    BOOL        invertExternalVetoInDelayLengthLogic;
+    BOOL        gateModeExternalVetoInDelayLengthLogic;
+    BOOL        enableMemoryOverrunVeto;
+    BOOL        controlLEMOTriggerOut;
+    
 	
 	unsigned long   lostDataId;
 	unsigned long   dataId;
@@ -68,6 +82,8 @@
     BOOL    GTThresholdEnabled[kNumSIS3305Channels];
     short   thresholdMode[kNumSIS3305Channels];         // this is complicated, since, setting any of these three could change another...
     
+    int     tapDelay[kNumSIS3305Channels];
+    
 //	NSMutableArray*	cfdControls;
 	NSMutableArray* thresholds;
     
@@ -75,6 +91,9 @@
     int     GTThresholdOff[kNumSIS3305Channels];
     int     LTThresholdOn[kNumSIS3305Channels];
     int     LTThresholdOff[kNumSIS3305Channels];
+    
+    int     gain[kNumSIS3305Channels];
+    
     
 //	NSMutableArray* highThresholds;
     NSMutableArray* dacOffsets;
@@ -146,6 +165,51 @@
 	unsigned long	waitCount;
 	unsigned long	channelsToReadMask;
     BOOL pulseMode;
+    
+    
+    //    The SPI interface uses a particular type for communication, defined in the sis3305.h file from struck
+    struct SIS3305_ADC_SPI_Config_Struct {
+        unsigned int 	chipID[2]; 		// addr=0, read
+        unsigned int 	control[2]; 	// addr=1  write
+        unsigned int 	status[2]; 		// addr=2  read
+        unsigned int 	testMode[2]; 	// addr=5  write
+        unsigned int 	uint_spi_phase_adc[8];
+        unsigned int    spi_4chMode_gain_adc[8];	   // 4-channel Mode
+        unsigned int 	spi_4chMode_offset_adc[8];	   // 4-channel Mode
+        unsigned int 	spi_2chModeAC_gain_adc[8];	   // 2-channel Mode use inputs A,C
+        unsigned int 	spi_2chModeAC_offset_adc[8];  // 2-channel Mode use inputs A,C
+        unsigned int 	spi_2chModeBD_gain_adc[8];	   // 2-channel Mode use inputs B,D
+        unsigned int 	spi_2chModeBD_offset_adc[8];  // 2-channel Mode use inputs B,D
+        unsigned int 	spi_1chModeA_gain_adc[8];	   // 1-channel Mode use input A
+        unsigned int 	spi_1chModeA_offset_adc[8];   // 1-channel Mode use input A
+        unsigned int 	spi_1chModeB_gain_adc[8];	   // 1-channel Mode use input B
+        unsigned int 	spi_1chModeB_offset_adc[8];   // 1-channel Mode use input B
+        unsigned int 	spi_1chModeC_gain_adc[8];	   // 1-channel Mode use input C
+        unsigned int 	spi_1chModeC_offset_adc[8];   // 1-channel Mode use input C
+        unsigned int 	spi_1chModeD_gain_adc[8];	   // 1-channel Mode use input D
+        unsigned int 	spi_1chModeD_offset_adc[8];   // 1-channel Mode use input D
+    } ;
+//    struct SIS3305_ADC_SPI_Config_Struct {
+//        unsigned int 	uintChipID[2]; 		// addr=0, read
+//        unsigned int 	uintControl[2]; 	// addr=1  write
+//        unsigned int 	uintStatus[2]; 		// addr=2  read
+//        unsigned int 	uintTestMode[2]; 	// addr=5  write
+//        unsigned int 	uint_spi_phase_adc[8];
+//        unsigned int 	uint_spi_4chMode_gain_adc[8];	   // 4-channel Mode
+//        unsigned int 	uint_spi_4chMode_offset_adc[8];	   // 4-channel Mode
+//        unsigned int 	uint_spi_2chModeAC_gain_adc[8];	   // 2-channel Mode use inputs A,C
+//        unsigned int 	uint_spi_2chModeAC_offset_adc[8];  // 2-channel Mode use inputs A,C
+//        unsigned int 	uint_spi_2chModeBD_gain_adc[8];	   // 2-channel Mode use inputs B,D
+//        unsigned int 	uint_spi_2chModeBD_offset_adc[8];  // 2-channel Mode use inputs B,D
+//        unsigned int 	uint_spi_1chModeA_gain_adc[8];	   // 1-channel Mode use input A
+//        unsigned int 	uint_spi_1chModeA_offset_adc[8];   // 1-channel Mode use input A
+//        unsigned int 	uint_spi_1chModeB_gain_adc[8];	   // 1-channel Mode use input B
+//        unsigned int 	uint_spi_1chModeB_offset_adc[8];   // 1-channel Mode use input B
+//        unsigned int 	uint_spi_1chModeC_gain_adc[8];	   // 1-channel Mode use input C
+//        unsigned int 	uint_spi_1chModeC_offset_adc[8];   // 1-channel Mode use input C
+//        unsigned int 	uint_spi_1chModeD_gain_adc[8];	   // 1-channel Mode use input D
+//        unsigned int 	uint_spi_1chModeD_offset_adc[8];   // 1-channel Mode use input D
+//    } ;
 }
 
 - (id) init;
@@ -156,6 +220,9 @@
 #pragma mark ***Accessors
 - (BOOL) enabled:(short)chan;
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
+- (short) tapDelay:(short)chan;
+- (void) setTapDelay:(short)chan withValue:(short)aValue;
+
 - (BOOL) pulseMode;
 - (void) setPulseMode:(BOOL)aPulseMode;
 - (float) firmwareVersion;
@@ -199,7 +266,7 @@
 - (unsigned long) getEventConfigOffsets:(int)group;
 - (unsigned long) getEnergyGateLengthOffsets:(int)group;
 - (unsigned long) getExtendedEventConfigOffsets:(int)group;
-- (unsigned long) getEndThresholdRegOffsets:(int)group;
+- (unsigned long) getEndAddressThresholdRegOffsets:(int)group;
 - (unsigned long) getRawDataBufferConfigOffsets:(int)group;
 - (unsigned long) getEnergyTauFactorOffset:(int) channel;
 - (unsigned long) getEnergySetupGPOffset:(int)group;
@@ -235,6 +302,8 @@
 
 - (short) eventSavingMode:(short)aGroup;
 - (void) setEventSavingModeOf:(short)aGroup toValue:(short)aMode;
+- (BOOL) TDCMeasurementEnabled;
+- (void) setTDCMeasurementEnabled: (BOOL)aState;
 
 - (short) bufferWrapEnabledMask;
 - (void) setBufferWrapEnabledMask:(short)aMask;
@@ -314,6 +383,38 @@
 //- (int) threshold:(short)chan;                  // should be properly removed
 //- (void) setThreshold:(short)chan withValue:(int)aValue;    // should be properly removed
 
+// control status reg
+- (void) setLed:(short)ledNum to:(BOOL)state;
+
+- (void) setEnableExternalLEMODirectVetoIn:(BOOL)state;
+- (void) setEnableExternalLEMOResetIn:(BOOL)state;
+- (void) setEnableExternalLEMOCountIn:(BOOL)state;
+- (void) setInvertExternalLEMODirectVetoIn:(BOOL)state;
+- (void) setEnableExternalLEMOTriggerIn:(BOOL)state;
+- (void) setInvertExternalLEMODirectVetoIn:(BOOL)state;
+- (void) setEnableExternalLEMOVetoDelayLengthLogic:(BOOL)state;
+- (void) setEdgeSensitiveExternalVetoDelayLengthLogic:(BOOL)state;
+- (void) setInvertExternalVetoInDelayLengthLogic:(BOOL)state;
+- (void) setGateModeExternalVetoInDelayLengthLogic:(BOOL)state;
+- (void) setEnableMemoryOverrunVeto:(BOOL)state;
+- (void) setControlLEMOTriggerOut:(BOOL)state;
+- (BOOL) enableExternalLEMODirectVetoIn;
+- (BOOL) enableExternalLEMOResetIn;
+- (BOOL) enableExternalLEMOCountIn;
+- (BOOL) invertExternalLEMODirectVetoIn;
+- (BOOL) invertExternalLEMODirectVetoIn;
+- (BOOL) invertExternalLEMODirectVetoIn;
+- (BOOL) enableExternalLEMOVetoDelayLengthLogic;
+- (BOOL) edgeSensitiveExternalVetoDelayLengthLogic;
+- (BOOL) invertExternalVetoInDelayLengthLogic;
+- (BOOL) gateModeExternalVetoInDelayLengthLogic;
+- (BOOL) enableMemoryOverrunVeto;
+- (BOOL) controlLEMOTriggerOut;
+
+- (void) writeControlStatus;
+
+
+
 - (BOOL) LTThresholdEnabled:(short)aChan;
 - (BOOL) GTThresholdEnabled:(short)aChan;
 - (void) setLTThresholdEnabled:(short)aChan withValue:(BOOL)aValue;
@@ -359,15 +460,23 @@
 - (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax;
 - (void) initBoard;
 - (void) readModuleID:(BOOL)verbose;
+- (unsigned long) readAcquisitionControl:(BOOL)verbose;
+
 - (void) writeAcquistionRegister;
+- (void) writeClockSource:(unsigned long)aState;
+
 - (void) writeEventConfiguration;
 - (void) writeThresholds;
+- (void) readEndAddressThresholds;
 //- (void) writeHighThresholds;
 - (void) readLTThresholds:(BOOL)verbose;
 - (void) readGTThresholds:(BOOL)verbose;
 - (void) readThresholds:(BOOL)verbose;
-//- (void) readHighThresholds:(BOOL)verbose;
-- (void) setLed:(short)ledNum to:(BOOL)state;
+
+- (void) writeLedApplicationMode;
+
+- (unsigned long) getSampleStartAddress:(short)group;
+- (unsigned long) readActualSampleAddress:(short)group;
 
 
 - (void) briefReport;
@@ -379,6 +488,10 @@
 - (void) writeRawDataBufferConfiguration;
 - (void) writeEndAddressThresholds;
 - (void) writeEndAddressThreshold:(int)aGroup;
+
+- (unsigned long) readDataTransferControlRegister:(short)group;
+- (void) writeDataTransferControlRegister:(short)group withCommand:(short)command;
+
 - (void) writeEnergyGateLength;
 - (void) writeEnergyTauFactor;
 - (void) writeEnergySampleLength;
@@ -386,9 +499,23 @@
 - (void) writeEnergyNumberToSum;
 - (void) writeBufferControl;
 
-- (void) disarmSampleLogic;
-//- (void) clearTimeStamp;
+- (void) clearTimeStamp;
+- (void) writeTapDelays;
+
 - (void) writeTriggerSetups;
+
+#pragma mark -- Key Addresses
+- (void) reset;
+- (void) armSampleLogic;
+- (void) disarmSampleLogic;
+- (void) forceTrigger;
+- (void) enableSampleLogic;
+- (void) setVeto;
+- (void) clearVeto;
+- (void) ADCSynchReset;
+- (void) ADCFPGAReset;
+- (void) pulseExternalTriggerOut;
+
 
 //- (void) writeMcaLNESetupAndPrescalFactor;
 //- (void) writeMcaScanControl;
@@ -406,14 +533,16 @@
 //- (void) writeMcaArmMode;
 //- (void) writeMcaCalculationFactors;
 
+#pragma mark other
 - (void) executeCommandList:(ORCommandList*) aList;
 
-- (unsigned long) acqReg;
+//- (unsigned long) acqReg;
 - (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
 - (unsigned long) getADCBufferRegisterOffset:(int) channel;
+- (unsigned long) getADCTapDelayOffsets:(int)group;
+
 //- (void) disarmAndArmBank:(int) bank;
 //- (void) disarmAndArmNextBank;
-- (void) forceTrigger;
 - (NSString*) runSummary;
 
 #pragma mark --- Data Taker
@@ -491,13 +620,15 @@ extern NSString* ORSIS3305SampleLengthChanged;
 extern NSString* ORSIS3305DacOffsetChanged;
 extern NSString* ORSIS3305LemoInModeChanged;
 extern NSString* ORSIS3305LemoOutModeChanged;
-extern NSString* ORSIS3305AcqRegEnableMaskChanged;
+//extern NSString* ORSIS3305AcqRegEnableMaskChanged;
 
-extern NSString* ORSIS3305AcqRegChanged;
+//extern NSString* ORSIS3305AcqRegChanged;
 extern NSString* ORSIS3305EventConfigChanged;
+extern NSString* ORSIS3305TDCMeasurementEnabledChanged;
 
 extern NSString* ORSIS3305ChannelEnabledChanged;
 extern NSString* ORSIS3305ThresholdModeChanged;
+extern NSString* ORSIS3305TapDelayChanged;
 
 extern NSString* ORSIS3305LTThresholdEnabledChanged;
 extern NSString* ORSIS3305GTThresholdEnabledChanged;
@@ -530,6 +661,21 @@ extern NSString* ORSIS3305SetShipWaveformChanged;
 extern NSString* ORSIS3305SetShipSummedWaveformChanged;
 extern NSString* ORSIS3305Adc50KTriggerEnabledChanged;
 extern NSString* ORSIS3305InputInvertedChanged;
+
+// control status
+extern NSString* ORSIS3305LEDApplicationModeChanged;
+extern NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged;
+extern NSString* ORSIS3305EnableExternalLEMOResetInChanged;
+extern NSString* ORSIS3305EnableExternalLEMOCountIn;
+extern NSString* ORSIS3305InvertExternalLEMODirectVetoIn;
+extern NSString* ORSIS3305EnableExternalLEMOTriggerIn;
+extern NSString* ORSIS3305EnableExternalLEMOVetoDelayLengthLogic;
+extern NSString* ORSIS3305EdgeSensitiveExternalVetoDelayLengthLogic;
+extern NSString* ORSIS3305InvertExternalVetoInDelayLengthLogic;
+extern NSString* ORSIS3305GateModeExternalVetoInDelayLengthLogic;
+extern NSString* ORSIS3305EnableMemoryOverrunVeto;
+extern NSString* ORSIS3305EControlLEMOTriggerOut;
+
 
 extern NSString* ORSIS3305InternalTriggerEnabledChanged;
 extern NSString* ORSIS3305ExternalTriggerEnabledChanged;
