@@ -91,8 +91,8 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     [cycleStarted release];
     [measurementDate release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [missingCyclesAlarm clearAlarm];
 	[missingCyclesAlarm release];
-	[missingCyclesAlarm clearAlarm];
     [buffer release];
 	
 	int i;

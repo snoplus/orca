@@ -78,8 +78,8 @@ NSString* ORMet237Lock = @"ORMet237Lock";
     [measurementDate release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [buffer release];
+    [missingCyclesAlarm clearAlarm];
 	[missingCyclesAlarm release];
-	[missingCyclesAlarm clearAlarm];
 	
 	int i;
 	for(i=0;i<2;i++){
