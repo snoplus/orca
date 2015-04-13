@@ -129,7 +129,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [subRunStartTime release];
     [subRunEndTime release];
     [dataTypeAssigner release];
-    [dataTypeAssigner release];
     [super dealloc];
 }
 
