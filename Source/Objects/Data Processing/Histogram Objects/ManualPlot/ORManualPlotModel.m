@@ -58,7 +58,6 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [col2Title release];
     [col1Title release];
     [col0Title release];
-    [col0Title release];
 	[calibration release];
 	[data release];
  	[roiSet release];
