@@ -96,7 +96,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];	
-    [restrictedList dealloc];
+    [restrictedList release];
     [lineColor release];
     [onImage release];
     [offImage release];
