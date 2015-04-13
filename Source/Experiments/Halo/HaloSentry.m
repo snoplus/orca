@@ -64,7 +64,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [otherSystemIP release];
     [thisSystemIP release];
     [unPingableSBCs release];
-    [sentryLog release];
     [pingTask release];
     [sbcRootPwd release];
     [sentryLog release];
