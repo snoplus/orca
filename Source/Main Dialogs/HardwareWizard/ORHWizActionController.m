@@ -67,7 +67,7 @@ static NSString* valueChangeString[kNumActions] = {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [subview release];
     [paramArray release];
-    
+    [parameterValue release];
     [topLevelObjects release];
     [super dealloc];
 }
