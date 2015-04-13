@@ -19,16 +19,13 @@ NSString* CBeValue		= @"Value";
 	mHeadIndex = 0;
 	mFWrapped = NO;
 	[mKeys retain];
-	
-	// what is going on.
-	[mKeys retain];
-	
+		
     return self;
 }
 
 - ( void ) dealloc
 {
-	[mStorageArray dealloc];
+	[mStorageArray release];
 	[super dealloc];
 }
 
