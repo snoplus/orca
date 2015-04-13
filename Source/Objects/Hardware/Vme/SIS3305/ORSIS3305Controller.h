@@ -175,7 +175,7 @@
 
 #pragma mark - Interface Management
 - (void) pulseModeChanged:(NSNotification*)aNote;
-- (void) tapDelayChanged:(NSNotification*)aNote;
+//- (void) tapDelayChanged:(NSNotification*)aNote;
 - (void) firmwareVersionChanged:(NSNotification*)aNote;
 - (void) bufferWrapEnabledChanged:(NSNotification*)aNote;
 //- (void) cfdControlChanged:(NSNotification*)aNote;
@@ -183,8 +183,8 @@
 - (void) TDCLogicEnabledChanged:(NSNotification*)aNote;
 
 - (void) channelEnabledChanged:(NSNotification*)aNote;
-- (void) ledEnabledChanged:(NSNotification*)aNote;
-- (void) ledApplicationModeChanged:(NSNotification*)aNote;
+//- (void) ledEnabledChanged:(NSNotification*)aNote;
+//- (void) ledApplicationModeChanged:(NSNotification*)aNote;
 
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
@@ -250,7 +250,7 @@
 - (IBAction) cfdControlAction:(id)sender;
 - (IBAction) shipTimeRecordAlsoAction:(id)sender;
 - (IBAction) TDCLogicEnabledAction:(id)sender;
-- (IBAction) tapDelayAction:(id)sender;
+//- (IBAction) tapDelayAction:(id)sender;
 
 - (IBAction) channelEnabledMaskAction:(id)sender;
 

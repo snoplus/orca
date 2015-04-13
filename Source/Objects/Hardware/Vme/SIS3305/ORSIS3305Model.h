@@ -499,7 +499,7 @@
 - (void) writeEnergyNumberToSum;
 - (void) writeBufferControl;
 
-- (void) clearTimeStamp;
+//- (void) clearTimeStamp;
 - (void) writeTapDelays;
 
 - (void) writeTriggerSetups;

@@ -163,10 +163,10 @@
                          name : ORSIS3305ChannelEnabledChanged
                        object : model];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(tapDelayChanged:)
-                         name : ORSIS3305TapDelayChanged
-                       object : model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(tapDelayChanged:)
+//                         name : ORSIS3305TapDelayChanged
+//                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(thresholdModeChanged:)
@@ -208,10 +208,10 @@
                          name : ORSIS3305TDCMeasurementEnabledChanged
                         object: model];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(ledApplicationModeChanged:)
-                         name : ORSIS3305LEDApplicationModeChanged
-                       object : model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(ledApplicationModeChanged:)
+//                         name : ORSIS3305LEDApplicationModeChanged
+//                       object : model];
     
     
     
