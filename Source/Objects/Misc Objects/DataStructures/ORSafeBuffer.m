@@ -47,7 +47,7 @@
 
 - (void) dealloc
 {
-	[buffer dealloc];
+	[buffer release];
 	[bufferLock release];
 	[super dealloc];
 }
