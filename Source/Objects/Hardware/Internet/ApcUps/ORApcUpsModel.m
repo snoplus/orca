@@ -461,10 +461,20 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         if(i>=7){
             if([aLine rangeOfString:@"logged"].location != NSNotFound) continue;
             else {
-                aLine = [aLine stringByReplacingOccurrencesOfString:@"\t" withString:@" "];
-                int len = [aLine length];
-                if(len>6) aLine = [aLine substringToIndex:len-6];
-                [eventLog addObject:aLine];
+                NSMutableArray* parts = [[aLine componentsSeparatedByString:@"\t"] mutableCopy];
+                if([parts count]){
+                    NSString* date = [parts objectAtIndex:0];
+                    NSArray* dateParts = [date componentsSeparatedByString:@"/"];
+                    if([dateParts count]>=3){
+                        //reorder the date so it sorts correctly.
+                        NSString* newDate = [NSString stringWithFormat:@"%@/%@/%@",[dateParts objectAtIndex:2],[dateParts objectAtIndex:0],[dateParts objectAtIndex:1]];
+                        [parts replaceObjectAtIndex:0 withObject:newDate];
+                        aLine = [parts componentsJoinedByString:@" "];
+                        int len = [aLine length];
+                        if(len>6) aLine = [aLine substringToIndex:len-6];
+                        [eventLog addObject:aLine];
+                    }
+                }
             }
         }
         i++;
