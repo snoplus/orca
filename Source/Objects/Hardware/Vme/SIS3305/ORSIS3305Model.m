@@ -2574,8 +2574,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     ORCommandList* aList = [ORCommandList commandList];
 
     struct SIS3305_ADC_SPI_Config_Struct packet;
-    
-    for (int i = 0; i<2; i++) {
+    int i;
+    for (i = 0; i<2; i++) {
         data = 0x00000000;
 
         packet.chipID[i] = 1;
@@ -4290,8 +4290,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         
         [encoder encodeInt:gain[chan]                   forKey:[@"Gain"                 stringByAppendingFormat:@"%d",chan]];
     }
-    
-    for (int i=0; i<kNumSIS3305Groups; i++) {
+    int i;
+    for (i=0; i<kNumSIS3305Groups; i++) {
         [encoder encodeInt32:internalTriggerEnabled[i] forKey:[@"internalTriggerEnabled" stringByAppendingFormat:@"%d",i]];
     }
     
