@@ -1414,8 +1414,11 @@
 }
 - (IBAction) trapThresholdAction:(id)sender
 {
-	if([sender intValue] != [model trapThreshold:[[sender selectedCell] tag]]){
-		[model setTrapThreshold:[[sender selectedCell] tag] withValue:[sender floatValue]];
+    long value = [sender intValue];
+    short channel = [[sender selectedCell] tag];
+    
+	if(value != [model trapThreshold:channel]){
+		[model setTrapThreshold:channel withValue:value];
 	}
 }
 

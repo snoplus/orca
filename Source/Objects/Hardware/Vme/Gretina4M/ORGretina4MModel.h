@@ -216,7 +216,7 @@ enum Gretina4MFIFOStates {
     BOOL			easySelected[kNumGretina4MChannels];
     
     int				ledThreshold[kNumGretina4MChannels];
-    short			trapThreshold[kNumGretina4MChannels];
+    long			trapThreshold[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
     short			downSample;
     short			mrpsrt[kNumGretina4MChannels];

@@ -142,7 +142,7 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x80,  @"LED Threshold", YES, YES, YES, YES},
     {0x100, @"Window Timing", YES, YES, YES, YES},
     {0x140, @"Rising Edge Window", YES, YES, YES, YES},        
-    {0x1C0, @"TRAP Threshold", YES, YES, YES, YES},
+    {0x1C0, @"TRAP Threshold", YES, YES, YES, YES},         // undocumented.
     {0x400, @"DAC", YES, YES, NO, NO},
     {0x480, @"Slave Front bus status", YES, YES, NO, NO},          
     {0x484, @"Channel Zero time stamp LSB", YES, YES, NO, NO},     
@@ -1573,13 +1573,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
     
-    unsigned long theValue = (baselineRestoreEnabled[chan]  << 22)  | //the baselinerestorer enable was tied to the polezero enable
-                             (pzTraceEnabled[chan]          << 14)  |
-                             (poleZeroEnabled[chan]         << 13)  |
-                             ((tpol[chan] & 0x3)            << 10)  |
-                             (triggerMode[chan]             << 4)   |
-							 (presumEnabled[chan]           << 3)   |
-							 (pileUp[chan]                  << 2)   |
+    unsigned long theValue = ((baselineRestoreEnabled[chan] & 0x1 ) << 22)  | //the baselinerestorer enable was tied to the polezero enable
+                             ((pzTraceEnabled[chan]         & 0x1 ) << 14)  |
+                             ((poleZeroEnabled[chan]        & 0x1 ) << 13)  |
+                             ((tpol[chan]                   & 0x3 ) << 10)  |
+                             ((triggerMode[chan]            & 0x1 ) << 4)   |
+							 ((presumEnabled[chan]          & 0x1 ) << 3)   |
+							 ((pileUp[chan]                 & 0x1 ) << 2)   |
                              startStop;
     
     [self writeAndCheckLong:theValue
@@ -1610,7 +1610,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                        mask:0x3
                   reportKey:@"ClockSource"
               forceFullInit:forceFullInitCard];
-
 }
 
 - (void) writeClockSource
@@ -1682,7 +1681,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeLEDThreshold:(short)channel
 {
-    unsigned long theValue = (poleZeroMult[channel] << 20) | (ledThreshold[channel] & 0x1FFFF);
+    unsigned long theValue = (  (poleZeroMult[channel] & 0xFFF) << 20) |
+                                (ledThreshold[channel] & 0x1FFFF);
+    
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kLEDThreshold].offset + 4*channel
                        mask:0xfff1ffff
@@ -1690,9 +1691,16 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
               forceFullInit:forceFullInit[channel]];
 
 }
+
 - (void) writeTrapThreshold:(int)channel
 {
-    unsigned long theValue = (trapEnabled[channel]<<31) | (trapThreshold[channel] & 0xFFFFFF);
+    /* 
+        Not in the documenation, but the trap threshold is bits 23:0, at address 0x1C0.
+        This seems to work.
+     */
+    unsigned long theValue =    (trapEnabled[channel] << 31) |
+                                (trapThreshold[channel] & 0xFFFFFF);
+    
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kTrapThreshold].offset + 4*channel
                        mask:0x80ffffff
@@ -1747,7 +1755,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeDownSample
 {
-    unsigned long theValue = (downSample << 28);
+    unsigned long theValue = ((downSample & 0xF) << 28);
     [self writeAndCheckLong:theValue
               addressOffset:[self baseAddress] + register_information[kProgrammingDone].offset
                        mask:0x70000000
@@ -2268,7 +2276,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TRAP Threshold"];
-    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0xffffff lowerLimit:0 stepSize:1 units:@""];
 	[p setCanBeRamped:YES];
     [p setSetMethod:@selector(setTrapThreshold:withValue:) getMethod:@selector(trapThreshold:)];
     [a addObject:p];
@@ -2425,7 +2433,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             //the first word of the actual data record had better be the packet separator
             if(dataBuffer[2]==kGretina4MPacketSeparator){
                 short chan = dataBuffer[3] & 0xf;
-                if(chan < 10){
+                if(chan < kNumGretina4MChannels){
                     ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
                     [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
                 }
@@ -2438,20 +2446,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                 NSLogError(@"",@"Packet Sequence Error -- FIFO reset",@"GRETINA4M",[NSString stringWithFormat:@"slot %d",[self slot]],nil);
                 fifoResetCount++;
                 [self resetFIFO];
-            }
-        }
-        else {
-            int i;
-            for(i=0;i<10;i++){
-                if(enabled[i]){
-                    unsigned long val = [self readControlReg:i];
-                    BOOL bit20 = val>>20 & 0x1;
-                    if(bit20){
-                        NSLog(@"%d : 0%0x  bit 20: %d\n", i,val,bit20);
-                        [self writeControlReg:i enabled:NO];
-                        [self writeControlReg:i enabled:YES];
-                    }
-                }
             }
         }
     }
