@@ -40,8 +40,8 @@ table view controller.
     IBOutlet NSPopUpButton* logicalPopUpButton;
     IBOutlet NSPopUpButton* objPopUpButton;
     IBOutlet NSPopUpButton* selectionPopUpButton;
-    IBOutlet NSTextField* selectionTextField;
-    IBOutlet NSStepper* selectionStepper;
+    IBOutlet NSTextField*   selectionTextField;
+    IBOutlet NSStepper*     selectionStepper;
 
     int logicalTag;
     int objTag;
@@ -74,6 +74,8 @@ table view controller.
 - (void) updateWindow;
 - (void) selectionChanged:(NSNotification*)note;
 - (void) selectionValueChanged:(NSNotification*)note;
+- (void) configChanged:(NSNotification*)aNote;
+- (void) setupSelection;
 
 - (void) installSelectionArray:(NSArray*)anArray;
 - (void) enableForRow:(int)row;

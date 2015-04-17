@@ -82,14 +82,12 @@
     numberOfItems = aNumberOfItems;
 }
 
-
-- (int)maxValue
+- (int) maxValue
 {
-
     return maxValue;
 }
 
-- (void)setMaxValue:(int)aMaxValue
+- (void) setMaxValue:(int)aMaxValue
 {
     maxValue = aMaxValue;
 }
@@ -98,8 +96,13 @@
 {
     NSArray* objects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:selectionClass];
     [self setNumberOfItems:[objects count]];
-    [self setMaxValue:0];
-    if(level == kChannelLevel){
+    
+    if(level == kContainerLevel){
+        if([objects count]){
+            [self setMaxValue:[objects count]-1];
+        }
+    }
+    else if(level == kChannelLevel){
         if([objects count]){
             id <ORHWWizard> obj = [objects objectAtIndex:0];
             [self setMaxValue:[obj numberOfChannels]-1];
@@ -115,7 +118,7 @@
                 [self setMaxValue:objectTag];
             }
         }
-    }    
+    }
 }
 
 

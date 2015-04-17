@@ -158,11 +158,22 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    [notifyCenter removeObserver:self];
     
     [notifyCenter addObserver : self
                       selector: @selector(selectionChanged:)
                           name: ORSelectionControllerSelectionChangedNotification
                        object : self];
+    
+    [notifyCenter addObserver : self
+                      selector: @selector(setupSelection)
+                          name: ORGroupObjectsAdded
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                      selector: @selector(setupSelection)
+                          name: ORGroupObjectsRemoved
+                       object : nil];
     
     [notifyCenter addObserver : self
                       selector: @selector(selectionValueChanged:)
@@ -177,26 +188,43 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
     [self selectionChanged:nil];
     [self selectionValueChanged:nil];
 }
-
+    
+- (void) configChanged:(NSNotification*)aNote
+{
+    [self setupSelection];
+}
+    
 - (void) selectionChanged:(NSNotification*)aNote
 {
     if((aNote == nil || [aNote object] == self )){
-        [logicalPopUpButton selectItemAtIndex:[self logicalTag]];
-        [objPopUpButton selectItemAtIndex:[self objTag]];
-        [selectionPopUpButton selectItemAtIndex:[self selectionTag]];
-        
-        ORHWWizSelection* obj = [selectionArray objectAtIndex:objTag];
-        
-        [selectionStepper setMaxValue:[obj maxValue]];
-        [selectionStepper setMinValue:0];
-        [selectionStepper setIncrement:1];
-        
-        [selectionTextField setEnabled:selectionTag!=0];
-        [selectionStepper setEnabled:selectionTag!=0];
-        
+        [self setupSelection];
     }
 }
-
+    
+- (void) setupSelection
+{
+    [logicalPopUpButton selectItemAtIndex:[self logicalTag]];
+    [objPopUpButton selectItemAtIndex:[self objTag]];
+    [selectionPopUpButton selectItemAtIndex:[self selectionTag]];
+    
+    ORHWWizSelection* obj = [selectionArray objectAtIndex:objTag];
+    [obj scanConfiguration];
+    
+    int theMaxValue = [obj maxValue];
+    
+    [selectionStepper setMinValue:0];
+    [selectionStepper setMaxValue:theMaxValue];
+    [selectionStepper setIncrement:1];
+    
+    if([selectionTextField intValue]>theMaxValue){
+        [selectionTextField setIntValue:theMaxValue];
+    }
+    
+    [selectionTextField setEnabled:selectionTag!=0];
+    [selectionStepper setEnabled:selectionTag!=0];
+    
+}
+    
 - (void) selectionValueChanged:(NSNotification*)aNote
 {
     if((aNote == nil || [aNote object] == self )){
