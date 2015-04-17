@@ -1012,10 +1012,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self postAdcInfoProvidingValueChanged];
 }
 
-- (void) setTrapThreshold:(short)chan withValue:(int)aValue
+- (void) setTrapThreshold:(short)chan withValue:(unsigned long)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>0xFFFFFF)aValue = 0xFFFFFF;
+    if(aValue>0xFFFFFF)aValue = 0xFFFFFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setTrapThreshold:chan withValue:trapThreshold[chan]];
 	trapThreshold[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTrapThresholdChanged object:self];
@@ -1127,7 +1126,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (BOOL) pileUp:(short)chan             { return pileUp[chan];}
 - (short) triggerMode:(short)chan		{ return triggerMode[chan];}
 - (int) ledThreshold:(short)chan		{ return ledThreshold[chan]; }
-- (int) trapThreshold:(short)chan       { return trapThreshold[chan]; }
+- (unsigned long) trapThreshold:(short)chan       { return trapThreshold[chan]; }
 - (short) mrpsrt:(short)chan            { return mrpsrt[chan]; }
 - (short) ftCnt:(short)chan             { return ftCnt[chan]; }
 - (short) mrpsdv:(short)chan            { return mrpsdv[chan]; }

@@ -216,7 +216,7 @@ enum Gretina4MFIFOStates {
     BOOL			easySelected[kNumGretina4MChannels];
     
     int				ledThreshold[kNumGretina4MChannels];
-    long			trapThreshold[kNumGretina4MChannels];
+    unsigned long	trapThreshold[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
     short			downSample;
     short			mrpsrt[kNumGretina4MChannels];
@@ -395,7 +395,7 @@ enum Gretina4MFIFOStates {
 - (void) setDebug:(short)chan withValue:(BOOL)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
-- (void) setTrapThreshold:(short)chan withValue:(int)aValue;
+- (void) setTrapThreshold:(short)chan withValue:(unsigned long)aValue;
 - (void) setMrpsrt:(short)chan withValue:(short)aValue;
 - (void) setFtCnt:(short)chan withValue:(short)aValue;
 - (void) setMrpsdv:(short)chan withValue:(short)aValue;
@@ -418,7 +418,7 @@ enum Gretina4MFIFOStates {
 - (BOOL) pileUp:(short)chan;		
 - (short) triggerMode:(short)chan;
 - (int) ledThreshold:(short)chan;	
-- (int) trapThreshold:(short)chan;
+- (unsigned long) trapThreshold:(short)chan;
 - (short) mrpsrt:(short)chan;
 - (short) ftCnt:(short)chan;
 - (short) mrpsdv:(short)chan;
