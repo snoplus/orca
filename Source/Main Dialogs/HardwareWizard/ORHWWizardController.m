@@ -859,6 +859,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         
         [self makeControlStruct:nil];
         
+        e = [selectionControllers objectEnumerator];
+        while(selectionCon = [e nextObject]){
+            [selectionCon setupSelection];
+        }
     }
 }
 
