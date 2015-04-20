@@ -364,7 +364,7 @@
 		}
 		
 		[dataToShip appendBytes:&numberBins length:4];            //length of the histogram
-		[dataToShip appendBytes:histogram length:numberBins*4]; //note size in number bytes--not longs
+        [dataToShip appendData:histogram];
 		
 		//go back and fill in the total length
 		unsigned long *ptr = (unsigned long*)[dataToShip bytes];
