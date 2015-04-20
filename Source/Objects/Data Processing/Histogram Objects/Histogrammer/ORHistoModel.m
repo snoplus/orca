@@ -602,13 +602,10 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 - (void) shipTheFinalHistograms:(ORDataPacket*)aDataPacket
 {
 	NSArray* objs1d = [[self document]  collectObjectsOfClass:[OR1DHisto class]];
-	id anObj;
-	NSEnumerator* e = [objs1d objectEnumerator];
-	while(anObj = [e nextObject])[anObj setDataId:[dummy1DHisto dataId]];
+	for(id anObj in objs1d)[anObj setDataId:[dummy1DHisto dataId]];
 	
 	NSArray* objs2d = [[self document]  collectObjectsOfClass:[OR2DHisto class]];
-	e = [objs2d objectEnumerator];
-	while(anObj = [e nextObject])[anObj setDataId:[dummy2DHisto dataId]];
+	for(id anObj in objs2d)[anObj setDataId:[dummy2DHisto dataId]];
     [mLock lock];
     @try {
         [dataSet packageData:aDataPacket userInfo:nil];
