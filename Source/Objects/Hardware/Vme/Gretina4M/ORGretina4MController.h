@@ -67,6 +67,7 @@
 	IBOutlet NSMatrix*		easySelectMatrix;
 
     IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSPopUpButton* clockPhasePU;
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -179,6 +180,7 @@
 - (void) pileUpWindowChanged:(NSNotification*)aNote;
 - (void) externalWindowChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) clockPhaseChanged:(NSNotification*)aNote;
 - (void) downSampleChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
@@ -221,7 +223,8 @@
 
 #pragma mark •••Actions
 - (IBAction) forceFullInitCardAction:(id)sender;
-- (IBAction) clockSourceAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;              // is this repeated?
+- (IBAction) clockPhaseAction:(id)sender;
 - (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
 - (IBAction) diagnosticsEnableAction:(id)sender;
@@ -232,7 +235,7 @@
 - (IBAction) extTrigLengthFieldAction:(id)sender;
 - (IBAction) pileUpWindowFieldAction:(id)sender;
 - (IBAction) externalWindowFieldAction:(id)sender;
-- (IBAction) clockSourceAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;              // is this repeated?
 - (IBAction) downSampleAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;

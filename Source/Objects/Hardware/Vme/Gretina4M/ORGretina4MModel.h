@@ -230,6 +230,7 @@ enum Gretina4MFIFOStates {
     unsigned short  baselineRestoredDelay;
 
     short           clockSource;
+    short           clockPhase;
     short           externalWindow;
     short           noiseWindow;
     short           pileUpWindow;
@@ -319,7 +320,9 @@ enum Gretina4MFIFOStates {
 - (short) externalWindow;
 - (void) setExternalWindow:(short)aExternalWindow;
 - (short) clockSource;
+- (short) clockPhase;
 - (void) setClockSource:(short)aClockMux;
+- (void) setClockPhase:(short)aClockPhase;
 - (ORConnector*) spiConnector;
 - (void) setSpiConnector:(ORConnector*)aConnector;
 - (ORConnector*) linkConnector;
@@ -406,6 +409,9 @@ enum Gretina4MFIFOStates {
 - (void) setTpol:(short)chan withValue:(short)aValue;
 - (void) setPresumEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setEasySelected:(short)chan withValue:(BOOL)aValue;
+- (void) writeClockPhase;
+- (void) writeClockPhaseWithValue:(unsigned long)value;
+
 
 - (BOOL) enabled:(short)chan;
 - (BOOL) forceFullInit:(short)chan;
@@ -568,6 +574,7 @@ extern NSString* ORGretina4MModelBaselineRestoredDelayChanged;
 extern NSString* ORGretina4MModelFirmwareStatusStringChanged;
 extern NSString* ORGretina4MNoiseWindowChanged;
 extern NSString* ORGretina4MClockSourceChanged;
+extern NSString* ORGretina4MClockPhaseChanged;
 extern NSString* ORGretina4MIntegrateTimeChanged;
 extern NSString* ORGretina4MCollectionTimeChanged;
 extern NSString* ORGretina4MExtTrigLengthChanged;

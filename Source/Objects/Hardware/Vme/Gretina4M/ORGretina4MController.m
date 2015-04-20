@@ -321,6 +321,11 @@
 						object: model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(clockPhaseChanged:)
+                         name : ORGretina4MClockPhaseChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(externalWindowChanged:)
                          name : ORGretina4MExternalWindowChanged
 						object: model];
@@ -487,6 +492,8 @@
 	[self spiWriteValueChanged:nil];
 	[self downSampleChanged:nil];
 	[self clockSourceChanged:nil];
+    [self clockPhaseChanged:nil];
+    
 	[self externalWindowChanged:nil];
 	[self pileUpWindowChanged:nil];
 	[self extTrigLengthChanged:nil];
@@ -686,6 +693,11 @@
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
     [self updateClockLocked];
+}
+
+- (void) clockPhaseChanged:(NSNotification*)aNote
+{
+    [clockPhasePU selectItemAtIndex: [model clockPhase]];
 }
 
 - (void) downSampleChanged:(NSNotification*)aNote
@@ -1304,6 +1316,11 @@
 - (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) clockPhaseAction:(id)sender
+{
+    [model setClockPhase:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) downSampleAction:(id)sender

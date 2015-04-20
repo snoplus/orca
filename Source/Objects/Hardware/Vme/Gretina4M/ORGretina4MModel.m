@@ -45,6 +45,7 @@ NSString* ORGretina4MExtTrigLengthChanged       = @"ORGretina4MExtTrigLengthChan
 NSString* ORGretina4MPileUpWindowChanged        = @"ORGretina4MPileUpWindowChanged";
 NSString* ORGretina4MExternalWindowChanged      = @"ORGretina4MExternalWindowChanged";
 NSString* ORGretina4MClockSourceChanged         = @"ORGretina4MClockSourceChanged";
+NSString* ORGretina4MClockPhaseChanged         = @"ORGretina4MClockPhaseChanged";
 NSString* ORGretina4MDownSampleChanged			= @"ORGretina4MDownSampleChanged";
 NSString* ORGretina4MRegisterIndexChanged		= @"ORGretina4MRegisterIndexChanged";
 NSString* ORGretina4MRegisterWriteValueChanged	= @"ORGretina4MRegisterWriteValueChanged";
@@ -545,6 +546,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MClockSourceChanged object:self];
 }
 
+- (short) clockPhase
+{
+    return clockPhase;
+}
+
+- (void) setClockPhase:(short)aClockPhase
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockPhase:clockPhase];
+    clockPhase = aClockPhase;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MClockPhaseChanged object:self];
+
+}
+
 - (ORConnector*) spiConnector
 {
     return spiConnector;
@@ -878,6 +892,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		presumEnabled[i]    = 0x0;
 		trapThreshold[i]		= 0x10;
 	}
+    
+    clockPhase      = 0x0;
     
     noiseWindow     = 0x40;//spec default: 0x40
     externalWindow  = 0x190;//spec default: 0x190
@@ -1486,9 +1502,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     return;
 }
-- (void) setClockPhase:(unsigned long)value
+
+- (void) writeClockPhase
+{
+    [self writeClockPhaseWithValue:clockPhase];
+    return;
+}
+
+- (void) writeClockPhaseWithValue:(unsigned long)value
 {
 //    	unsigned long theValue =
+    value &= 0x3;
+    
     [[self adapter] writeLongBlock:&value
                          atAddress:[self baseAddress] + register_information[kADCConfig].offset
                         numToWrite:1
@@ -1521,6 +1546,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     //write the card level params
     [self writeClockSource];
+    [self writeClockPhase];
 	[self writeExternalWindow];
 	[self writePileUpWindow];
 	[self writeNoiseWindow];
@@ -2202,6 +2228,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Clock Phase"];
+    [p setFormat:@"##0" upperLimit:0x3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setClockPhase:) getMethod:@selector(clockPhase)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Ext Trig Length"];
@@ -2594,6 +2627,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setPileUpWindow:              [decoder decodeIntForKey:@"pileUpWindow"]];
     [self setExternalWindow:            [decoder decodeIntForKey:@"externalWindow"]];
     [self setClockSource:               [decoder decodeIntForKey:@"clockSource"]];
+    [self setClockPhase:                [decoder decodeIntForKey:@"clockPhase"]];
     [self setSpiConnector:              [decoder decodeObjectForKey:@"spiConnector"]];
     [self setLinkConnector:             [decoder decodeObjectForKey:@"linkConnector"]];
     [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
@@ -2658,6 +2692,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt:pileUpWindow                 forKey:@"pileUpWindow"];
     [encoder encodeInt:externalWindow               forKey:@"externalWindow"];
     [encoder encodeInt:clockSource                  forKey:@"clockSource"];
+    [encoder encodeInt:clockPhase                   forKey:@"clockPhase"];
     [encoder encodeObject:spiConnector				forKey:@"spiConnector"];
     [encoder encodeObject:linkConnector				forKey:@"linkConnector"];
     [encoder encodeInt:downSample					forKey:@"downSample"];
@@ -2741,6 +2776,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     [objDictionary setObject:[NSNumber numberWithInt:downSample]        forKey:@"Down Sample"];
     [objDictionary setObject:[NSNumber numberWithInt:clockSource]       forKey:@"Clock Source"];
+    [objDictionary setObject:[NSNumber numberWithInt:clockPhase]        forKey:@"Clock Phase"];
     [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier]   forKey:@"Hist E Multiplier"];
     [objDictionary setObject:[NSNumber numberWithInt:forceFullInitCard] forKey:@"forceFullInitCard"];
 
