@@ -1016,13 +1016,28 @@
 	[resetButton            setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton     setEnabled:!locked && !downloading];
 	[stopFPGALoadButton     setEnabled:!locked && downloading];
-	[downSamplePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [downSamplePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [clockSourcePU          setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [clockPhasePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
 
-    
+    [baselineRestoredDelayField setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [collectionTimeField        setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [integrateTimeField         setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [pileUpWindowField          setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [noiseWindowField           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [externalWindowField        setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [extTrigLengthField         setEnabled:!lockedOrRunningMaintenance && !downloading];
+
+    [mrpsdvMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [mrpsrtMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [prerecntMatrix          setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postrecntMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [ftCntMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+
     
     [tpolMatrix             setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
