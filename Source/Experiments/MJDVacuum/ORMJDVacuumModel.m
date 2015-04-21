@@ -1928,7 +1928,15 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         
         ORMks660BModel* baratron			= [self findBaratron];
         float			baratronPressure	= [baratron pressure];
-        if((baratronPressure >= 0.75) && (baratronPressure <= 2.0)){
+        //in Torr
+        float           kLowValue  = 0.7;
+        float           kHighValue = 0.9;
+        //in Bar
+        //float          kLowValue  = 0.9;
+        //float          kHighValue = 1.1;
+        
+        if((baratronPressure >= kLowValue) && (baratronPressure <= kHighValue)){
+            //pressure OK, remove constraints
             [self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
             [self removeOkToBiasConstraints:     kBaratronTooHighConstraint];
             [self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
@@ -1936,11 +1944,11 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         }
         else {
             //nope, not operational
-            if(baratronPressure < 0.75) {
+            if(baratronPressure < kLowValue) {
                 [self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
                 [self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
             }
-            else if(baratronPressure > 2.0)	{
+            else if(baratronPressure > kHighValue)	{
                 [self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
                 [self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
             }
