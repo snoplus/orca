@@ -436,13 +436,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     int i;
     for(i=0;i<n;i++){
         ORDetectorSegment* seg =  [group segment:i];                    //get a segment from the group
-		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
-        if(vmeCrate == aVmeCrate){
+		//int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
+       // if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             if(hvCrate<2){
                if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
             }
-        }
+       // }
     }
         
     return NO;
@@ -461,8 +461,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     int i;
     for(i=0;i<n;i++){
         ORDetectorSegment* seg =  [group segment:i];        //get a segment from the group
-		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
-        if(vmeCrate == aVmeCrate){
+		//int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
+      //  if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
             int hvCard  = [[seg objectForKey:@"kHVCard"]intValue];     //pull out the card
             if(hvCrate<2){
@@ -474,7 +474,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     [rampHVAlarm[aVmeCrate] setAcknowledged:NO];
                 }
             }
-        }
+       // }
     }
 }
 
