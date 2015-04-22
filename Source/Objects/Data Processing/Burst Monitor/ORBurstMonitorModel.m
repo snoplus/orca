@@ -392,22 +392,22 @@ unsigned long long fact(unsigned long long num)
 #pragma mark •••Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
-	//pass it on
-	[thePassThruObject processData:dataArray decoder:aDecoder];
+    //pass it on
+    [thePassThruObject processData:dataArray decoder:aDecoder];
     
     if(!theDecoder){
         theDecoder = [aDecoder retain];
     }
     NSDate* now = [NSDate date];
-	[dataArray retain];
-	//each block of data is an array of NSData objects, each potentially containing many records
-	for(id data in dataArray){
-		[data retain];
-		long totalLen = [data length]/sizeof(long);
-		if(totalLen>0){
-			unsigned long* ptr = (unsigned long*)[data bytes];
-			while(totalLen>0){
-				unsigned long dataID = ExtractDataId(ptr[0]);
+    [dataArray retain];
+    //each block of data is an array of NSData objects, each potentially containing many records
+    for(id data in dataArray){
+        [data retain];
+        long totalLen = [data length]/sizeof(long);
+        if(totalLen>0){
+            unsigned long* ptr = (unsigned long*)[data bytes];
+            while(totalLen>0){
+                unsigned long dataID = ExtractDataId(ptr[0]);
                 long recordLen       = ExtractLength(ptr[0]);
                 
                 if(recordLen > totalLen){
@@ -438,341 +438,341 @@ unsigned long long fact(unsigned long long num)
                         unsigned long microseconds = ShiftAndExtract(ptr[3], 0, 0xffffffff);
                         if(cardNum<=15){ //was break here, now just skip section to include release
                             
-                        quietSec=0;
-                        
-                        
-                        //make array of data to be buffered
-                        [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
-                        [cards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
-                        [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
-                        [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
-                        [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
-                        [words insertObject:[NSNumber numberWithLong:firstword] atIndex:0];
-                        if((energy >= minimumEnergyAllowed && cardNum <= 15) || burstForce ==1){  //Filter
-                            //make a key for looking up the correct queue for this record
-                            NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
+                            quietSec=0;
                             
-                            [queueLock lock]; //--begin critial section
-                            if(![queueMap objectForKey:aShaperKey]){
-                                if(!queueArray) queueArray = [[NSMutableArray array] retain];
-
-                                //haven't seen this one before so make a look up table and add a queue for it
-                                [queueMap   setObject:[NSNumber numberWithInt:[queueArray count]] forKey:aShaperKey];
-                                [queueArray addObject:[NSMutableArray array]];
-                            }
                             
-                            //get the right queue for this record and insert the record
-                            int     queueIndex      = [[queueMap objectForKey:aShaperKey] intValue];
-                            NSData* theShaperRecord = [NSData dataWithBytes:ptr length:recordLen*sizeof(long)]; //couldnt put humpdy together again //CBDO re the count
-                            
-                            ORBurstData* burstData = [[ORBurstData alloc] init];
-                            burstData.datePosted = now; //DAQ at LU has a different time zone than the data records do.  It might be best not to mix DAQ time and SBC time in the monitor.
-                            burstData.dataRecord = theShaperRecord;
-                            NSNumber* epochSec = [NSNumber numberWithLong:secondsSinceEpoch];
-                            NSNumber* epochMic = [NSNumber numberWithLong:microseconds];
-                            //burstData.epSec = [epochSec copy]; <--- leaks....
-                            //burstData.epMic = [epochMic copy]; <--- leaks....
-                            burstData.epSec = epochSec; //MAH 9/30/14--no need to copy or retain. the property is doing that.
-                            burstData.epMic = epochMic;
-                            
-                            //[[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
-                            //[burstData release];
-                            int addThisToQueue = 1;
-                            
-                            [queueLock unlock]; //--end critial section
-                            
-                            //NSLog(@"length of Nchans is %i", Nchans.count);
-                            //fill neutron array
-                            [Nchans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
-                            [Ncards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
-                            [Nadcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
-                            [Nsecs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
-                            [Nmics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
-                            //NSLog(@"2length of Nchans is %i", Nchans.count);
-                            
-                            if([Nchans count] >= nHit){ //There is enough data in the buffer now, start looking for bursts
-                                int countofchan = [chans count];
-                                int countofNchan = [Nchans count]; //CB this probs needs implementing
-                                double lastTime = ([[Nsecs objectAtIndex:0] longValue] + 0.000001*[[Nmics objectAtIndex:0] longValue]);
-                                double firstTime = ([[Nsecs objectAtIndex:(nHit-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(nHit-1)] longValue]);
-                                double diffTime = (lastTime - firstTime);
-                                if(diffTime < timeWindow && burstForce==0){ //burst found, start saveing everything untill it stops
-                                    burstState = 1;
-                                    novaState = 1;
-                                    novaP = 1;
+                            //make array of data to be buffered
+                            [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
+                            [cards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
+                            [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
+                            [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
+                            [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
+                            [words insertObject:[NSNumber numberWithLong:firstword] atIndex:0];
+                            if((energy >= minimumEnergyAllowed && cardNum <= 15) || burstForce ==1){  //Filter
+                                //make a key for looking up the correct queue for this record
+                                NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
+                                
+                                [queueLock lock]; //--begin critial section
+                                if(![queueMap objectForKey:aShaperKey]){
+                                    if(!queueArray) queueArray = [[NSMutableArray array] retain];
+                                    
+                                    //haven't seen this one before so make a look up table and add a queue for it
+                                    [queueMap   setObject:[NSNumber numberWithInt:[queueArray count]] forKey:aShaperKey];
+                                    [queueArray addObject:[NSMutableArray array]];
                                 }
-                                else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
-                                    if(burstState == 1){
-                                        @synchronized(self) //maybe not Bchans
-                                        {
-                                        [Bchans release];
-                                        Bchans = [chans mutableCopy]; //part of crash line
-                                        
-                                        [Bcards release];
-                                        Bcards = [cards mutableCopy];
-
-                                        [Badcs  release];
-                                        Badcs  = [adcs mutableCopy];
-
-                                        [Bsecs  release];
-                                        Bsecs  = [secs mutableCopy];
-
-                                        [Bmics  release];
-                                        Bmics  = [mics mutableCopy];
-
-                                        [Bwords release];
-                                        Bwords = [words mutableCopy];
-                                        
-                                        int iter;
-                                        NSString* bString = @"";
-                                        for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
-                                        { 
-                                            double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
-                                            //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
-                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", (countofchan - iter), countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
-                                            if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
+                                
+                                //get the right queue for this record and insert the record
+                                int     queueIndex      = [[queueMap objectForKey:aShaperKey] intValue];
+                                NSData* theShaperRecord = [NSData dataWithBytes:ptr length:recordLen*sizeof(long)]; //couldnt put humpdy together again //CBDO re the count
+                                
+                                ORBurstData* burstData = [[ORBurstData alloc] init];
+                                burstData.datePosted = now; //DAQ at LU has a different time zone than the data records do.  It might be best not to mix DAQ time and SBC time in the monitor.
+                                burstData.dataRecord = theShaperRecord;
+                                NSNumber* epochSec = [NSNumber numberWithLong:secondsSinceEpoch];
+                                NSNumber* epochMic = [NSNumber numberWithLong:microseconds];
+                                //burstData.epSec = [epochSec copy]; <--- leaks....
+                                //burstData.epMic = [epochMic copy]; <--- leaks....
+                                burstData.epSec = epochSec; //MAH 9/30/14--no need to copy or retain. the property is doing that.
+                                burstData.epMic = epochMic;
+                                
+                                //[[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
+                                //[burstData release];
+                                int addThisToQueue = 1;
+                                
+                                [queueLock unlock]; //--end critial section
+                                
+                                //NSLog(@"length of Nchans is %i", Nchans.count);
+                                //fill neutron array
+                                [Nchans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
+                                [Ncards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
+                                [Nadcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
+                                [Nsecs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
+                                [Nmics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
+                                //NSLog(@"2length of Nchans is %i", Nchans.count);
+                                
+                                if([Nchans count] >= nHit){ //There is enough data in the buffer now, start looking for bursts
+                                    int countofchan = [chans count];
+                                    int countofNchan = [Nchans count]; //CB this probs needs implementing
+                                    double lastTime = ([[Nsecs objectAtIndex:0] longValue] + 0.000001*[[Nmics objectAtIndex:0] longValue]);
+                                    double firstTime = ([[Nsecs objectAtIndex:(nHit-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(nHit-1)] longValue]);
+                                    double diffTime = (lastTime - firstTime);
+                                    if(diffTime < timeWindow && burstForce==0){ //burst found, start saveing everything untill it stops
+                                        burstState = 1;
+                                        novaState = 1;
+                                        novaP = 1;
+                                    }
+                                    else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
+                                        if(burstState == 1){
+                                            @synchronized(self) //maybe not Bchans
                                             {
-                                                bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <---"]];
-                                            }
-                                            if([[Bsecs objectAtIndex:iter] intValue] == [[Nsecs objectAtIndex:(countofNchan-1)] intValue] &&
-                                               [[Bmics objectAtIndex:iter] intValue] == [[Nmics objectAtIndex:(countofNchan-1)] intValue])
-                                            {
-                                                bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <= Burst Start"]];
-                                                numSecTillBurst = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
-                                            }
-                                            bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
-                                        }
-                                        //NSTimeInterval secTillBurst = [NSTimeIntervalSince1970 timeZoneForSecondsFromGMT:numSecTillBurst];
-                                        //Bdate = [NSDate dateWithTimeIntervalSince1970:numSecTillBurst];
-                                        //NSLog(@"Bdate is %@ \n", Bdate);
-                                            
-                                        
-                                        //Find channel likelyhood of burst 
-                                        NSMutableArray* reChans = [[Nchans mutableCopy] autorelease]; //MAH added autorelease to prevent memory leak
-                                        int j; //MAH -- declaration has to be outside the loop for XCode < 5.x
-                                        for(j=0; j<[reChans count]; j++)
-                                        {
-                                            int chanID = [[reChans objectAtIndex:j] intValue] + 10*[[Ncards objectAtIndex:j] intValue];
-                                            [reChans replaceObjectAtIndex:j withObject:[NSNumber numberWithInt:chanID]];
-                                        }
-                                        [reChans removeObjectAtIndex:(0)];
-                                        int numChan = [self channelsCheck:(reChans)];
-                                        numBurstChan = numChan;
-                                            
-                                        //Find ADC likelyhood of burst
-                                        peakN = 0;
-                                        lowN = 0;
-                                        int n;
-                                        for(n=1; n<[Nadcs count]; n++)
-                                        {
-                                            if([[Nadcs objectAtIndex:n] intValue]>400 && [[Nadcs objectAtIndex:n] intValue]<900)
-                                            {
-                                                lowN = lowN + 1;
-                                            }
-                                            else
-                                            {
-                                                if([[Nadcs objectAtIndex:n] intValue]>899 && [[Nadcs objectAtIndex:n] intValue]<1400)
+                                                [Bchans release];
+                                                Bchans = [chans mutableCopy]; //part of crash line
+                                                
+                                                [Bcards release];
+                                                Bcards = [cards mutableCopy];
+                                                
+                                                [Badcs  release];
+                                                Badcs  = [adcs mutableCopy];
+                                                
+                                                [Bsecs  release];
+                                                Bsecs  = [secs mutableCopy];
+                                                
+                                                [Bmics  release];
+                                                Bmics  = [mics mutableCopy];
+                                                
+                                                [Bwords release];
+                                                Bwords = [words mutableCopy];
+                                                
+                                                int iter;
+                                                NSString* bString = @"";
+                                                for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
                                                 {
-                                                    peakN = peakN + 1;
+                                                    double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
+                                                    //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
+                                                    bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", (countofchan - iter), countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                                    if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
+                                                    {
+                                                        bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <---"]];
+                                                    }
+                                                    if([[Bsecs objectAtIndex:iter] intValue] == [[Nsecs objectAtIndex:(countofNchan-1)] intValue] &&
+                                                       [[Bmics objectAtIndex:iter] intValue] == [[Nmics objectAtIndex:(countofNchan-1)] intValue])
+                                                    {
+                                                        bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <= Burst Start"]];
+                                                        numSecTillBurst = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
+                                                    }
+                                                    bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
                                                 }
-                                            }
+                                                //NSTimeInterval secTillBurst = [NSTimeIntervalSince1970 timeZoneForSecondsFromGMT:numSecTillBurst];
+                                                //Bdate = [NSDate dateWithTimeIntervalSince1970:numSecTillBurst];
+                                                //NSLog(@"Bdate is %@ \n", Bdate);
+                                                
+                                                
+                                                //Find channel likelyhood of burst
+                                                NSMutableArray* reChans = [[Nchans mutableCopy] autorelease]; //MAH added autorelease to prevent memory leak
+                                                int j; //MAH -- declaration has to be outside the loop for XCode < 5.x
+                                                for(j=0; j<[reChans count]; j++)
+                                                {
+                                                    int chanID = [[reChans objectAtIndex:j] intValue] + 10*[[Ncards objectAtIndex:j] intValue];
+                                                    [reChans replaceObjectAtIndex:j withObject:[NSNumber numberWithInt:chanID]];
+                                                }
+                                                [reChans removeObjectAtIndex:(0)];
+                                                int numChan = [self channelsCheck:(reChans)];
+                                                numBurstChan = numChan;
+                                                
+                                                //Find ADC likelyhood of burst
+                                                peakN = 0;
+                                                lowN = 0;
+                                                int n;
+                                                for(n=1; n<[Nadcs count]; n++)
+                                                {
+                                                    if([[Nadcs objectAtIndex:n] intValue]>400 && [[Nadcs objectAtIndex:n] intValue]<900)
+                                                    {
+                                                        lowN = lowN + 1;
+                                                    }
+                                                    else
+                                                    {
+                                                        if([[Nadcs objectAtIndex:n] intValue]>899 && [[Nadcs objectAtIndex:n] intValue]<1400)
+                                                        {
+                                                            peakN = peakN + 1;
+                                                        }
+                                                    }
+                                                }
+                                                adcP = 0;
+                                                double peakP=0.86; //mod this later possibly
+                                                double peakExpect = peakP*(peakN+lowN);
+                                                for(n=0; n<(peakN + lowN + 1); n++)
+                                                {
+                                                    double partP = ( fact(peakN + lowN)/(fact(n)*fact(peakN + lowN - n)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
+                                                    double partDisk = fabs(n-(peakP*(peakN + lowN)));
+                                                    if ((partDisk+0.01)>fabs(peakN - peakExpect))
+                                                    {
+                                                        adcP = adcP + partP;
+                                                    }
+                                                    
+                                                }
+                                                NSLog(@"adcP is %f, peak/lowN is %i, %i \n", adcP, peakN, lowN); //fixme CB remove when confident this works
+                                                
+                                                
+                                                
+                                                
+                                                //Report basic traits before veto
+                                                double startTime = ([[Nsecs objectAtIndex:(countofNchan-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(countofNchan-1)] longValue]);
+                                                double endTime = ([[Nsecs objectAtIndex:1] longValue] + 0.000001*[[Nmics objectAtIndex:1] longValue]);
+                                                int adcStart = ([[Nadcs objectAtIndex:(countofNchan-1)] intValue]);
+                                                durSec = (endTime - startTime);
+                                                NSLog(@"Burst duration is %f, start is %f, end is %f, adc %i \n", durSec, startTime, endTime, adcStart);
+                                                countsInBurst = countofNchan - 1;
+                                                
+                                                //Position of burst
+                                                int BurstLen = Nchans.count;
+                                                int m;
+                                                Xcenter = 0;
+                                                Ycenter = 0;
+                                                int Xsqr;
+                                                int Ysqr;
+                                                Xsqr = 0;
+                                                Ysqr = 0;
+                                                for(m=1;m<BurstLen; m++)
+                                                {
+                                                    int Xposn;
+                                                    int Yposn;
+                                                    Xposn = [self boreX:[[Ncards objectAtIndex:m] intValue] Channel:[[Nchans objectAtIndex:m] intValue]];
+                                                    Yposn = [self boreY:[[Ncards objectAtIndex:m] intValue] Channel:[[Nchans objectAtIndex:m] intValue]];
+                                                    [Bx insertObject:[NSNumber numberWithInt:Xposn] atIndex:0];
+                                                    [By insertObject:[NSNumber numberWithInt:Yposn] atIndex:0];
+                                                    Xcenter = Xcenter + Xposn;
+                                                    //NSLog(@"xposn is %i \n", Xposn);
+                                                    Xsqr = Xsqr + (Xposn * Xposn);
+                                                    Ycenter = Ycenter + Yposn;
+                                                    Ysqr = Ysqr + (Yposn * Yposn);
+                                                }
+                                                //NSLog(@"xcenter is %i \n", Xcenter);
+                                                Xcenter = Xcenter / (BurstLen - 1);
+                                                Ycenter = Ycenter / (BurstLen - 1);
+                                                Rcenter = sqrt((Xcenter*Xcenter) + (Ycenter*Ycenter));
+                                                if(Xcenter == 0)
+                                                {
+                                                    if(Ycenter > 0)
+                                                    {
+                                                        phi = 3.14159/2;
+                                                    }
+                                                    else
+                                                    {
+                                                        phi = 3.14159*1.5;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    phi = atan((1.0*Ycenter)/Xcenter);
+                                                }
+                                                if(Xcenter < 0)
+                                                {
+                                                    phi = phi + 3.14159;
+                                                }
+                                                Xsqr = Xsqr / (BurstLen - 1);
+                                                Ysqr = Ysqr / (BurstLen - 1);
+                                                Xrms = (Xsqr - (Xcenter * Xcenter))*(BurstLen - 1)/(BurstLen - 2);
+                                                Yrms = (Ysqr - (Ycenter * Ycenter))*(BurstLen - 1)/(BurstLen - 2);
+                                                Rrms = Xrms + Yrms;
+                                                Xrms = sqrt(Xrms);
+                                                Yrms = sqrt(Yrms);
+                                                Rrms = sqrt(Rrms);
+                                                rSqrNorm = ((BurstLen-1) * ((Xcenter/250.0) * (Xcenter/250.0)) * 0.145877) + ((BurstLen-1) * ((Ycenter/250.0) * (Ycenter/250.0)) * 0.241784);
+                                                [Bx release];
+                                                [By release];
+                                                //NSLog(@"Burst position is (%i,%i) mm from center, spread of (%i,%i) \n", Xcenter, Ycenter, Xrms, Yrms);
+                                                
+                                                addThisToQueue = 0;
+                                                
+                                                [burstString release];
+                                                burstString = [bString retain];
+                                                
+                                                //NSLog(@"precall \n");
+                                                //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //monitorqueues 2 lines
+                                                //[self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:0]; //Has no effect
+                                                //NSLog(@"postcall \n");
+                                                
+                                                //fixme //Try to start DelayedBurstEvent directly, but does not work
+                                                //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
+                                                //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //copied from monitorqueues, maybe?
+                                                //[self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1]; //does not work in this function
+                                                //NSInvocation *newvoke = [NSInvocation invocationWithMethodSignature:[self, [instanceMethodSignitureForSelector monitorQueues]];
+                                                //newvoke.target = self;
+                                                //newvoke.selector = monitorQueues;
+                                                //[newvoke setArgument:nil atIndex:2];
+                                                //[newvoke invoke];
+                                                
+                                                if(numBurstChan>=numBurstsNeeded)
+                                                {
+                                                    burstTell = 1;
+                                                }
+                                                else
+                                                {
+                                                    NSLog(@"Burst had only %i channels, needed %i \n", numBurstChan, numBurstsNeeded);
+                                                    removedSec = [[secs objectAtIndex:1] longValue];
+                                                    removedMic = [[mics objectAtIndex:1] longValue];
+                                                }
+                                                //Clean up
+                                                [chans removeAllObjects];
+                                                [cards removeAllObjects];
+                                                [adcs removeAllObjects];
+                                                [secs removeAllObjects];
+                                                [mics removeAllObjects];
+                                                [words removeAllObjects];
+                                                
+                                                [Nchans removeAllObjects];
+                                                [Ncards removeAllObjects];
+                                                [Nadcs removeAllObjects];
+                                                [Nsecs removeAllObjects];
+                                                [Nmics removeAllObjects];
+                                            }//end of synch
+                                        }//end of burststate = 1 stuff
+                                        loudSec=0;
+                                        burstForce=0;
+                                        novaState = 0;
+                                        novaP = 0;
+                                        burstState = 0;
+                                        if(Nchans.count<nHit){ // happens if a burst had too few channels and just got whiped
+                                            [burstData release]; //MAH... added to prevent memory leak on early return.
+                                            return;
                                         }
-                                        adcP = 0;
-                                        double peakP=0.86; //mod this later possibly
-                                        double peakExpect = peakP*(peakN+lowN);
-                                        for(n=0; n<(peakN + lowN + 1); n++)
+                                        removedSec = [[Nsecs objectAtIndex:(nHit-2)] longValue];
+                                        removedMic = [[Nmics objectAtIndex:(nHit-2)] longValue];
+                                        
+                                        //NSLog(@"removed time is now %f \n", removedSec+0.000001*removedMic);
+                                        [Nchans removeObjectAtIndex:nHit-1]; //remove old things from the buffer
+                                        [Ncards removeObjectAtIndex:nHit-1];
+                                        [Nadcs removeObjectAtIndex:nHit-1];
+                                        [Nsecs removeObjectAtIndex:nHit-1];
+                                        [Nmics removeObjectAtIndex:nHit-1];
+                                        int k=0;
+                                        for(k = nHit-1; k<chans.count; k++) //remove old things from the buffer (was k<countofchan, this terminates the function);
                                         {
-                                            double partP = ( fact(peakN + lowN)/(fact(n)*fact(peakN + lowN - n)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
-                                            double partDisk = fabs(n-(peakP*(peakN + lowN)));
-                                            if ((partDisk+0.01)>fabs(peakN - peakExpect))
+                                            if(([[secs objectAtIndex:k] longValue] + 0.000001*[[mics objectAtIndex:k] longValue])<(removedSec-5+0.000001*removedMic)) //CB 10 sec early
                                             {
-                                                adcP = adcP + partP;
-                                            }
-                                            
-                                        }
-                                        NSLog(@"adcP is %f, peak/lowN is %i, %i \n", adcP, peakN, lowN); //fixme CB remove when confident this works
-                                        
-                                        
-                                            
-                                            
-                                        //Report basic traits before veto
-                                        double startTime = ([[Nsecs objectAtIndex:(countofNchan-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(countofNchan-1)] longValue]);
-                                        double endTime = ([[Nsecs objectAtIndex:1] longValue] + 0.000001*[[Nmics objectAtIndex:1] longValue]);
-                                        int adcStart = ([[Nadcs objectAtIndex:(countofNchan-1)] intValue]);
-                                        durSec = (endTime - startTime);
-                                        NSLog(@"Burst duration is %f, start is %f, end is %f, adc %i \n", durSec, startTime, endTime, adcStart);
-                                        countsInBurst = countofNchan - 1;
-                                            
-                                        //Position of burst
-                                        int BurstLen = Nchans.count;
-                                        int m;
-                                        Xcenter = 0;
-                                        Ycenter = 0;
-                                        int Xsqr;
-                                        int Ysqr;
-                                        Xsqr = 0;
-                                        Ysqr = 0;
-                                        for(m=1;m<BurstLen; m++)
-                                        {
-                                            int Xposn;
-                                            int Yposn;
-                                            Xposn = [self boreX:[[Ncards objectAtIndex:m] intValue] Channel:[[Nchans objectAtIndex:m] intValue]];
-                                            Yposn = [self boreY:[[Ncards objectAtIndex:m] intValue] Channel:[[Nchans objectAtIndex:m] intValue]];
-                                            [Bx insertObject:[NSNumber numberWithInt:Xposn] atIndex:0];
-                                            [By insertObject:[NSNumber numberWithInt:Yposn] atIndex:0];
-                                            Xcenter = Xcenter + Xposn;
-                                            //NSLog(@"xposn is %i \n", Xposn);
-                                            Xsqr = Xsqr + (Xposn * Xposn);
-                                            Ycenter = Ycenter + Yposn;
-                                            Ysqr = Ysqr + (Yposn * Yposn);
-                                        }
-                                        //NSLog(@"xcenter is %i \n", Xcenter);
-                                        Xcenter = Xcenter / (BurstLen - 1);
-                                        Ycenter = Ycenter / (BurstLen - 1);
-                                        Rcenter = sqrt((Xcenter*Xcenter) + (Ycenter*Ycenter));
-                                        if(Xcenter == 0)
-                                        {
-                                            if(Ycenter > 0)
-                                            {
-                                                phi = 3.14159/2;
-                                            }
-                                            else
-                                            {
-                                                phi = 3.14159*1.5;
+                                                //NSLog(@"removeing stuff, index is %i, time is %li.%li \n", k,[[secs objectAtIndex:k] longValue],[[mics objectAtIndex:k] longValue]);
+                                                [chans removeObjectAtIndex:k];
+                                                [cards removeObjectAtIndex:k];
+                                                [adcs removeObjectAtIndex:k];
+                                                [secs removeObjectAtIndex:k];
+                                                [mics removeObjectAtIndex:k];
+                                                [words removeObjectAtIndex:k];
+                                                k=k-1;
                                             }
                                         }
-                                        else
-                                        {
-                                            phi = atan((1.0*Ycenter)/Xcenter);
-                                        }
-                                        if(Xcenter < 0)
-                                        {
-                                            phi = phi + 3.14159;
-                                        }
-                                        Xsqr = Xsqr / (BurstLen - 1);
-                                        Ysqr = Ysqr / (BurstLen - 1);
-                                        Xrms = (Xsqr - (Xcenter * Xcenter))*(BurstLen - 1)/(BurstLen - 2);
-                                        Yrms = (Ysqr - (Ycenter * Ycenter))*(BurstLen - 1)/(BurstLen - 2);
-                                        Rrms = Xrms + Yrms;
-                                        Xrms = sqrt(Xrms);
-                                        Yrms = sqrt(Yrms);
-                                        Rrms = sqrt(Rrms);
-                                        rSqrNorm = ((BurstLen-1) * ((Xcenter/250.0) * (Xcenter/250.0)) * 0.145877) + ((BurstLen-1) * ((Ycenter/250.0) * (Ycenter/250.0)) * 0.241784);
-                                        [Bx release];
-                                        [By release];
-                                        //NSLog(@"Burst position is (%i,%i) mm from center, spread of (%i,%i) \n", Xcenter, Ycenter, Xrms, Yrms);
-                                        
-                                        addThisToQueue = 0;
-                                        
-                                        [burstString release];
-                                        burstString = [bString retain];
-                                        
-                                        //NSLog(@"precall \n");
-                                        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //monitorqueues 2 lines
-                                        //[self performSelector:@selector(delayedBurstEvent) withObject:nil afterDelay:0]; //Has no effect
-                                        //NSLog(@"postcall \n");
-                                        
-                                        //fixme //Try to start DelayedBurstEvent directly, but does not work
-                                        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(monitorQueues) object:nil];
-                                        //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil]; //copied from monitorqueues, maybe?
-                                        //[self performSelector:@selector(monitorQueues) withObject:nil afterDelay:1]; //does not work in this function
-                                        //NSInvocation *newvoke = [NSInvocation invocationWithMethodSignature:[self, [instanceMethodSignitureForSelector monitorQueues]];
-                                        //newvoke.target = self;
-                                        //newvoke.selector = monitorQueues;
-                                        //[newvoke setArgument:nil atIndex:2];
-                                        //[newvoke invoke];
-                                        
-                                        if(numBurstChan>=numBurstsNeeded)
-                                        {
-                                            burstTell = 1;
-                                        }
-                                        else
-                                        {
-                                            NSLog(@"Burst had only %i channels, needed %i \n", numBurstChan, numBurstsNeeded);
-                                            removedSec = [[secs objectAtIndex:1] longValue];
-                                            removedMic = [[mics objectAtIndex:1] longValue];
-                                        }
-                                        //Clean up
-                                        [chans removeAllObjects];
-                                        [cards removeAllObjects];
-                                        [adcs removeAllObjects];
-                                        [secs removeAllObjects];
-                                        [mics removeAllObjects];
-                                        [words removeAllObjects];
-                                        
-                                        [Nchans removeAllObjects];
-                                        [Ncards removeAllObjects];
-                                        [Nadcs removeAllObjects];
-                                        [Nsecs removeAllObjects];
-                                        [Nmics removeAllObjects];
-                                        }//end of synch
-                                    }//end of burststate = 1 stuff
+                                        //NSLog(@"Nchans,chans lengths: %i,%i \n", [Nchans count], [chans count]);
+                                        NSTimeInterval removedSeconds = removedSec;
+                                        burstStart = [NSDate dateWithTimeIntervalSince1970:removedSeconds]; //Fixme hard to get consistency, so used removedSec instead
+                                    }//End of no burst found
+                                }//End of Nchans>nHit
+                                else{
                                     loudSec=0;
                                     burstForce=0;
-                                    novaState = 0;
-                                    novaP = 0;
-                                    burstState = 0;
-                                    if(Nchans.count<nHit){ // happens if a burst had too few channels and just got whiped
-                                        [burstData release]; //MAH... added to prevent memory leak on early return.
-                                        return;
-                                    }
-                                    removedSec = [[Nsecs objectAtIndex:(nHit-2)] longValue];
-                                    removedMic = [[Nmics objectAtIndex:(nHit-2)] longValue];
-
-                                    //NSLog(@"removed time is now %f \n", removedSec+0.000001*removedMic);
-                                    [Nchans removeObjectAtIndex:nHit-1]; //remove old things from the buffer
-                                    [Ncards removeObjectAtIndex:nHit-1];
-                                    [Nadcs removeObjectAtIndex:nHit-1];
-                                    [Nsecs removeObjectAtIndex:nHit-1];
-                                    [Nmics removeObjectAtIndex:nHit-1];
-                                    int k=0;
-                                    for(k = nHit-1; k<chans.count; k++) //remove old things from the buffer (was k<countofchan, this terminates the function);
+                                    NSLog(@"not full, has %i neutrons\n", [Nchans count]);
+                                    if(burstTell ==1) //Event showed up before burst was prossessed, say it for now but don't record it.
                                     {
-                                        if(([[secs objectAtIndex:k] longValue] + 0.000001*[[mics objectAtIndex:k] longValue])<(removedSec-5+0.000001*removedMic)) //CB 10 sec early
-                                        {
-                                            //NSLog(@"removeing stuff, index is %i, time is %li.%li \n", k,[[secs objectAtIndex:k] longValue],[[mics objectAtIndex:k] longValue]);
-                                            [chans removeObjectAtIndex:k];
-                                            [cards removeObjectAtIndex:k];
-                                            [adcs removeObjectAtIndex:k];
-                                            [secs removeObjectAtIndex:k];
-                                            [mics removeObjectAtIndex:k];
-                                            [words removeObjectAtIndex:k];
-                                            k=k-1;
-                                        }
+                                        double lateTime = [[secs objectAtIndex:0] longValue] + 0.000001*[[mics objectAtIndex:0] longValue];
+                                        NSLog(@"extra trip: t=%lf, adc=%i, chan=%i-%i \n", lateTime, [[adcs objectAtIndex:0] intValue], [[cards objectAtIndex:0] intValue], [[chans objectAtIndex:0] intValue]);
+                                        addThisToQueue = 0;
                                     }
-                                    //NSLog(@"Nchans,chans lengths: %i,%i \n", [Nchans count], [chans count]);
-                                    NSTimeInterval removedSeconds = removedSec;
-                                    burstStart = [NSDate dateWithTimeIntervalSince1970:removedSeconds]; //Fixme hard to get consistency, so used removedSec instead
-                                }//End of no burst found
-                            }//End of Nchans>nHit
-                            else{
-                                loudSec=0;
-                                burstForce=0;
-                                NSLog(@"not full, has %i neutrons\n", [Nchans count]);
-                                if(burstTell ==1) //Event showed up before burst was prossessed, say it for now but don't record it.
-                                {
-                                    double lateTime = [[secs objectAtIndex:0] longValue] + 0.000001*[[mics objectAtIndex:0] longValue];
-                                    NSLog(@"extra trip: t=%lf, adc=%i, chan=%i-%i \n", lateTime, [[adcs objectAtIndex:0] intValue], [[cards objectAtIndex:0] intValue], [[chans objectAtIndex:0] intValue]);
-                                    addThisToQueue = 0;
                                 }
-                            }
-                            if((addThisToQueue == 1) || (burstState + burstTell ==0)){
-                                [[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
+                                if((addThisToQueue == 1) || (burstState + burstTell ==0)){
+                                    [[queueArray objectAtIndex:queueIndex ] addObject:burstData]; //fixme dont add the last event of the burst
+                                }
                                 [burstData release];
-                            }
-                        }//end Filter
+                            }//end Filter
                         }
                     }//end of valid event with recordlen>1
                 }
                 
-				ptr += recordLen;
-				totalLen -= recordLen;
+                ptr += recordLen;
+                totalLen -= recordLen;
                 
-			}
-		}
-		[data release];
-	}
-	[dataArray release];
+            }
+        }
+        [data release];
+    }
+    [dataArray release];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
