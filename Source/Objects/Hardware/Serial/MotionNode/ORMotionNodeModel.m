@@ -118,7 +118,6 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 	[cmdQueue release];
 	[lastRequest release];
 	[inComingData release];
-	[lastRequest release];
 	[serialNumber release];
 	[localLock release];
 		
