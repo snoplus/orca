@@ -917,7 +917,7 @@
     [self mWindowChanged:nil];
     [self d3WindowChanged:nil];
     [self windowCompMinChanged:nil];
-    [self windowCompMixChanged:nil];
+    [self windowCompMaxChanged:nil];
     [self discWidthChanged:nil];
     [self baselineStartChanged:nil];
     [self baselineDelayChanged:nil];
@@ -1567,7 +1567,7 @@
 
 - (void) rawDataLengthChanged:(NSNotification*)aNote
 {
-    //waveform Offset
+    //waveform length
     [rawDataLengthField setIntValue:[model rawDataLength:0]];
 }
 
@@ -1959,7 +1959,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1974,7 +1974,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of Gretina4A FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1990,7 +1990,7 @@
     }
     @catch(NSException* localException) {
         NSLog(@"Init of Gretina4A FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2004,7 +2004,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina4A FIFO FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A FIFO Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A FIFO Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2036,7 +2036,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2064,7 +2064,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"LED Threshold Finder for Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2077,7 +2077,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }

@@ -40,98 +40,73 @@
 	[actualGretinaCards release];
     [super dealloc];
 }
-- (void) registerNotifications
-{
-	[super registerNotifications];
-	//NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-	//[nc addObserver:self selector:@selector(integrateTimeChanged:) name:ORGretina4ACardInited object:nil];
-	//[nc addObserver:self selector:@selector(histEMultiplierChanged:) name:ORGretina4AModelHistEMultiplierChanged object:nil];
-}
-
-- (void) integrateTimeChanged:(NSNotification*)aNote
-{
-	//ORGretina4AModel* theCard	= [aNote object];
-	//NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
-	//NSString* cardKey			= [self getCardKey: [theCard slot]];
-	//[self setObject:[NSNumber numberWithInt:[theCard integrateTime]] forNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil];
-}
-
-- (void) histEMultiplierChanged:(NSNotification*)aNote
-{
-	//ORGretina4AModel* theCard	= [aNote object];
-	//NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
-	//NSString* cardKey			= [self getCardKey: [theCard slot]];
-	//[self setObject:[NSNumber numberWithInt:[theCard histEMultiplier]] forNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil];
-}
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-
+    #define koffset -8192
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
 		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
 	}
 	
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	unsigned long length = ExtractLength(ptr[0]);
+    //point to ORCA location info
+    ptr++;
+    int crate           = (*ptr&0x01e00000)>>21;
+    int card            = (*ptr&0x001f0000)>>16;
+    NSString* crateKey	= [self getCrateKey: crate];
+    NSString* cardKey	= [self getCardKey: card];
     
-	ptr++; //point to location info
-    int crate = (*ptr&0x01e00000)>>21;
-    int card  = (*ptr&0x001f0000)>>16;
-    
-    int numEvents = (length-2)/1024;
-
-    ptr++; //point to first word of first data record
-    int headerSize = 14; //long words
-    int i;
-    unsigned long* dataPtr = ptr;
-    for(i=0;i<numEvents;i++){
-        if(*dataPtr == 0xAAAAAAAA){
-            unsigned long *nextRecordPtr = dataPtr+1024;
-            dataPtr++;
-            int channel	= *dataPtr & 0xF; //extract the channel
-            dataPtr += 2;                 //point to Energy low word
-            unsigned long energy = *dataPtr >> 16;
-            
-            dataPtr++;	  //point to Energy second word
-            energy += (*dataPtr & 0x000001ff) << 16;
-            
-            //energy is in 2's complement, take abs value if necessary
-            if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
-
-            NSString* crateKey	 = [self getCrateKey: crate];
-            NSString* cardKey	 = [self getCardKey: card];
+    unsigned long amountProcessed = 0;
+    do {
+        ptr++; //should be the separator
+        if(*ptr == 0xAAAAAAAA){
+            ptr++; //Geo Addr ...
+            int channel      = *ptr & 0xF;
+            int packetLength = (*ptr >> 16) & 0x7ff;
             NSString* channelKey = [self getChannelKey: channel];
+           
+            ptr++; //timestamp of descrimiator
+            ptr++; //header Length ...
+            int headerLength = (*ptr >> 26) & 0x3f;
+            int dataLength = packetLength - headerLength/2;
 
-            int histEMultiplier = [[self objectForNestedKey:crateKey,cardKey,kHistEMultiplierKey,nil] intValue];
-            if(histEMultiplier) energy *= histEMultiplier;
-
-            int integrateTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrateTimeKey,nil] intValue];
-            if(integrateTime) energy /= integrateTime; 
-            
-            [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
-            
-            dataPtr += 11; //point to the data
-
-            NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
-              
-            int dataLength = 1024 - headerSize -1;
-            [tmpData setLength:dataLength*sizeof(long)];
-            short* dPtr = (short*)[tmpData bytes];
-            int i;
-            int wordCount = 0;
-            //data is actually 2's complement. detwiler 08/26/08
-            for(i=0;i<dataLength;i++){
-                dPtr[wordCount++] =    (0x0000ffff & *dataPtr);
-                dPtr[wordCount++] =    (0xffff0000 & *dataPtr) >> 16;
-                dataPtr++;
-            }
-            [aDataSet loadWaveform:tmpData 
-                            offset:0 //bytes!
-                          unitSize:2 //unit size in bytes!
-                            sender:self  
-                          withKeys:@"Gretina4A", @"Waveforms",crateKey,cardKey,channelKey,nil];
+            ptr++; //Timestamp of previous descriminator ...
+            ptr++; //CFD sample 0
+            ptr++; //Sample baseline bits 23:0
+            ptr++; //CFD sample 2
+            ptr++; //post-rise sum (7:0) ...
+            ptr++; //Timestamp of peak detect bits 15:0 ..
+            ptr++; //Timestamp of peak detect bits 47:16..
+            ptr++; //Post-rise end samle ...
+            ptr++; //Pre-rise end sample ...
+            ptr++; //Base sample ...
         
+            long peakSample = (long)(*ptr & 0x3fff);
+            peakSample += koffset;
+            if(peakSample>=0){
+                [aDataSet histogram:peakSample numBins:0x3fff sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
+            }
+            
+            if(headerLength!=0){
+                ptr++; //point to data
+                
+                if(dataLength>0){
+                    NSData* waveformData = [NSData dataWithBytes:ptr length:dataLength*sizeof(long)];
+                    
+                    [aDataSet loadWaveform: waveformData            //pass in the whole data set
+                                    offset: 0                       // Offset in bytes (past header words)
+                                  unitSize: sizeof(short)			// unit size in bytes
+                                startIndex:	0                       // first Point Index (past the header offset!!!)
+                               scaleOffset: koffset                 // offset the value by this
+                                      mask:	0x3FFF					// when displayed all values will be masked with this value
+                               specialBits: 0x4000
+                                  bitNames: [NSArray arrayWithObjects:@"Trig",nil]
+                                    sender: self 
+                                  withKeys: @"Gretina4A", @"Waveforms",crateKey,cardKey,channelKey,nil];
+                }
+            }
             //get the actual object
             NSString* aKey = [crateKey stringByAppendingString:cardKey];
             if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
@@ -149,14 +124,13 @@
                 }
             }
             [obj bumpRateFromDecodeStage:channel];
-            
-            dataPtr = nextRecordPtr;
+            ptr += dataLength;
+
+            amountProcessed += packetLength;
         }
-        else {
-            headerSize = 0;
-  
-        }
-    }
+        else break;
+        
+    }while (amountProcessed < length);
 	 
     return length; //must return number of longs
 }

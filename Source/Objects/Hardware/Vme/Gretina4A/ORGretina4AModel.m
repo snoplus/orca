@@ -1229,7 +1229,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    return theValue;}
+    return theValue;
+}
 
 - (void) writeControlReg:(short)chan enabled:(BOOL)forceEnable
 {
@@ -1300,14 +1301,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) resetSingleFIFO
 {
-    unsigned long val = 0;
-    [[self adapter] readLongBlock:&val
-                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
-    val |= (0x1<<27);
+    unsigned long val = (0x1<<27); //all other bits are read-only.
     
     [[self adapter] writeLongBlock:&val
                          atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
@@ -1315,7 +1309,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     
-    val &= ~(0x1<<27);
+    val = 0;
     
     [[self adapter] writeLongBlock:&val
                          atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
@@ -1334,7 +1328,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    return ((val>>20) & 0x3)==0x3; //bits is high if FIFO is empty
+    return ((val>>20) & 0x3)==0x3; //both bits are high if FIFO is empty
 }
 
 - (void) readFPGAVersions
@@ -1754,10 +1748,10 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORGretina4AWaveformDecoder",             @"decoder",
+								 @"ORGretina4AWaveformDecoder",           @"decoder",
 								 [NSNumber numberWithLong:dataId],        @"dataId",
 								 [NSNumber numberWithBool:YES],           @"variable",
-								 [NSNumber numberWithLong:-1],			 @"length",
+								 [NSNumber numberWithLong:-1],			  @"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Gretina4A"];
     
@@ -1929,23 +1923,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
                 [self resetFIFO];
             }
         }
-        else {
-            /*
-            int i;
-            for(i=0;i<10;i++){
-                if(enabled[i]){
-                    unsigned long val = [self readControlReg:i];
-                    BOOL bit20 = val>>20 & 0x1;
-                    if(bit20){
-                        NSLog(@"%d : 0%0x  bit 20: %d\n", i,val,bit20);
-                        [self writeControlReg:i enabled:NO];
-                        [self writeControlReg:i enabled:YES];
-                    }
-                }
-            }
-             */
-        }
-    }
+     }
 	@catch(NSException* localException) {
         NSLogError(@"",@"Gretina4A Card Error",errorLocation,nil);
         [self incExceptionCount];
@@ -2061,7 +2039,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
      * 4: FIFO size                                         */
 
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id				= kGretina4M; //should be unique
+	configStruct->card_info[index].hw_type_id				= kGretina4A; //should be unique
 	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
 	configStruct->card_info[index].slot						= [self slot];
 	configStruct->card_info[index].crate					= [self crateNumber];
@@ -2071,6 +2049,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     configStruct->card_info[index].deviceSpecificData[1]	= [self baseAddress] + 0x1000; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[2]	= 0x0B; // fifoAM
     configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + 0x04; // fifoReset Address
+    configStruct->card_info[index].deviceSpecificData[4]	= [self rawDataWindow:0];
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -2545,11 +2524,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setFirmwareVersion:(unsigned long)aValue
 {
     if(aValue > 0xFFFF)aValue = 0xFFFF;
-    if(firmwareVersion != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFirmwareVersion:firmwareVersion];
-        firmwareVersion = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFirmwareVersionChanged object:self];
-    }
+    firmwareVersion = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFirmwareVersionChanged object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 20 ---------------
@@ -2560,11 +2536,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoEmpty0:(BOOL)aValue
 {
-    if(fifoEmpty0 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoEmpty0:fifoEmpty0];
-        fifoEmpty0 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoEmpty0Changed object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoEmpty0:fifoEmpty0];
+    fifoEmpty0 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoEmpty0Changed object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 21 ---------------
@@ -2575,11 +2549,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoEmpty1:(BOOL)aValue
 {
-    if(fifoEmpty1 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoEmpty1:fifoEmpty1];
-        fifoEmpty1 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoEmpty1Changed object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoEmpty1:fifoEmpty1];
+    fifoEmpty1 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoEmpty1Changed object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 22 ---------------
@@ -2590,11 +2562,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoAlmostEmpty:(BOOL)aValue
 {
-    if(fifoAlmostEmpty != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoAlmostEmpty:fifoAlmostEmpty];
-        fifoAlmostEmpty = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAlmostEmptyChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoAlmostEmpty:fifoAlmostEmpty];
+    fifoAlmostEmpty = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAlmostEmptyChanged object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 23 ---------------
@@ -2605,11 +2575,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoHalfFull:(BOOL)aValue
 {
-    if(fifoHalfFull != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoHalfFull:fifoHalfFull];
-        fifoHalfFull = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoHalfFullChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoHalfFull:fifoHalfFull];
+    fifoHalfFull = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoHalfFullChanged object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 24 ---------------
@@ -2620,11 +2588,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoAlmostFull:(BOOL)aValue
 {
-    if(fifoAlmostFull != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoAlmostFull:fifoAlmostFull];
-        fifoAlmostFull = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAlmostFullChanged object:self];
-    }
+    fifoAlmostFull = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAlmostFullChanged object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 25 ---------------
@@ -2635,11 +2600,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoFull0:(BOOL)aValue
 {
-    if(fifoFull0 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoFull0:fifoFull0];
-        fifoFull0 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoFull0Changed object:self];
-    }
+    fifoFull0 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoFull0Changed object:self];
 }
 
 //------------------- Address = 0x0004  Bit Field = 26 ---------------
@@ -2650,11 +2612,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoFull1:(BOOL)aValue
 {
-    if(fifoFull1 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoFull1:fifoFull1];
-        fifoFull1 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoFull1Changed object:self];
-    }
+    fifoFull1 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoFull1Changed object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 8 ---------------
@@ -2665,11 +2624,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhSuccess:(BOOL)aValue
 {
-    if(phSuccess != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhSuccess:phSuccess];
-        phSuccess = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhSuccessChanged object:self];
-    }
+    phSuccess = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhSuccessChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 9 ---------------
@@ -2680,11 +2636,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhFailure:(BOOL)aValue
 {
-    if(phFailure != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhFailure:phFailure];
-        phFailure = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhFailureChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhFailure:phFailure];
+    phFailure = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhFailureChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 10 ---------------
@@ -2695,11 +2649,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhHuntingUp:(BOOL)aValue
 {
-    if(phHuntingUp != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhHuntingUp:phHuntingUp];
-        phHuntingUp = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhHuntingUpChanged object:self];
-    }
+    phHuntingUp = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhHuntingUpChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 11 ---------------
@@ -2710,11 +2661,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhHuntingDown:(BOOL)aValue
 {
-    if(phHuntingDown != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhHuntingDown:phHuntingDown];
-        phHuntingDown = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhHuntingDownChanged object:self];
-    }
+    phHuntingDown = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhHuntingDownChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 12 ---------------
@@ -2725,11 +2673,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhChecking:(BOOL)aValue
 {
-    if(phChecking != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhChecking:phChecking];
-        phChecking = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhCheckingChanged object:self];
-    }
+    phChecking = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhCheckingChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 19..16 ---------------
@@ -2741,11 +2686,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setAcqDcmCtrlStatus:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(acqDcmCtrlStatus != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAcqDcmCtrlStatus:acqDcmCtrlStatus];
-        acqDcmCtrlStatus = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqDcmCtrlStatusChanged object:self];
-    }
+    acqDcmCtrlStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqDcmCtrlStatusChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 20 ---------------
@@ -2756,11 +2698,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAcqDcmLock:(BOOL)aValue
 {
-    if(acqDcmLock != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAcqDcmLock:acqDcmLock];
-        acqDcmLock = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqDcmLockChanged object:self];
-    }
+    acqDcmLock = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqDcmLockChanged object:self];
+    
 }
 
 //------------------- Address = 0x0020  Bit Field = 21 ---------------
@@ -2786,11 +2726,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAcqPhShiftOverflow:(BOOL)aValue
 {
-    if(acqPhShiftOverflow != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAcqPhShiftOverflow:acqPhShiftOverflow];
-        acqPhShiftOverflow = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqPhShiftOverflowChanged object:self];
-    }
+    acqPhShiftOverflow = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqPhShiftOverflowChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 23 ---------------
@@ -2801,11 +2738,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAcqDcmClockStopped:(BOOL)aValue
 {
-    if(acqDcmClockStopped != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAcqDcmClockStopped:acqDcmClockStopped];
-        acqDcmClockStopped = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqDcmClockStoppedChanged object:self];
-    }
+    acqDcmClockStopped = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcqDcmClockStoppedChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 27..24 ---------------
@@ -2817,11 +2751,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setAdcDcmCtrlStatus:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(adcDcmCtrlStatus != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAdcDcmCtrlStatus:adcDcmCtrlStatus];
-        adcDcmCtrlStatus = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmCtrlStatusChanged object:self];
-    }
+    adcDcmCtrlStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmCtrlStatusChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 28 ---------------
@@ -2832,11 +2763,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAdcDcmLock:(BOOL)aValue
 {
-    if(adcDcmLock != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAdcDcmLock:adcDcmLock];
-        adcDcmLock = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmLockChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcDcmLock:adcDcmLock];
+    adcDcmLock = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmLockChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 29 ---------------
@@ -2847,11 +2776,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAdcDcmReset:(BOOL)aValue
 {
-    if(adcDcmReset != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAdcDcmReset:adcDcmReset];
-        adcDcmReset = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmResetChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcDcmReset:adcDcmReset];
+    adcDcmReset = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmResetChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 30 ---------------
@@ -2862,11 +2789,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAdcPhShiftOverflow:(BOOL)aValue
 {
-    if(adcPhShiftOverflow != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAdcPhShiftOverflow:adcPhShiftOverflow];
-        adcPhShiftOverflow = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcPhShiftOverflowChanged object:self];
-    }
+    adcPhShiftOverflow = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcPhShiftOverflowChanged object:self];
 }
 
 //------------------- Address = 0x0020  Bit Field = 31 ---------------
@@ -2877,11 +2801,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAdcDcmClockStopped:(BOOL)aValue
 {
-    if(adcDcmClockStopped != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAdcDcmClockStopped:adcDcmClockStopped];
-        adcDcmClockStopped = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmClockStoppedChanged object:self];
-    }
+    adcDcmClockStopped = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcDcmClockStoppedChanged object:self];
 }
 
 //------------------- Address = 0x0024  Bit Field = 11..0 ---------------
@@ -2910,12 +2831,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(aValue > 0xFFFF)aValue = 0xFFFF;
     
-    if(windowCompMin != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMin:windowCompMin];
-        windowCompMin = aValue;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMinChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setWindowCompMin:windowCompMin];
+    windowCompMin = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWindowCompMinChanged object:self];
 }
 //------------------- Address = 0x032  Bit Field = 15..0 ---------------
 - (unsigned long) windowCompMax
@@ -2945,13 +2863,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(routerVetoEn[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRouterVetoEn:anIndex withValue:routerVetoEn[anIndex]];
-        routerVetoEn[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRouterVetoEn:anIndex withValue:routerVetoEn[anIndex]];
+    routerVetoEn[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARouterVetoEn0Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARouterVetoEn0Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0040  Bit Field = 3 ---------------
@@ -2965,13 +2881,10 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(preampResetDelayEn[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelayEn:anIndex withValue:preampResetDelayEn[anIndex]];
-        preampResetDelayEn[anIndex] = aValue;
-        
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelayEnChanged object:self userInfo:userInfo];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelayEn:anIndex withValue:preampResetDelayEn[anIndex]];
+    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelayEnChanged object:self userInfo:userInfo];
 }
 
 
@@ -2987,13 +2900,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x3)aValue = 0x3;
     
-    if(triggerPolarity[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTriggerPolarity:anIndex withValue:triggerPolarity[anIndex]];
-        triggerPolarity[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerPolarity:anIndex withValue:triggerPolarity[anIndex]];
+    triggerPolarity[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATriggerPolarityChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATriggerPolarityChanged object:self userInfo:userInfo];
 }
 //------------------- Address = 0x0040  Bit Field = 15 ---------------
 - (BOOL) writeFlag
@@ -3033,13 +2944,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(pileupMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPileupMode:anIndex withValue:pileupMode[anIndex]];
-        pileupMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPileupMode:anIndex withValue:pileupMode[anIndex]];
+    pileupMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupMode0Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupMode0Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0040  Bit Field = 20 ---------------
@@ -3072,14 +2981,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(eventCountMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setEventCountMode:anIndex withValue:eventCountMode[anIndex]];
-        eventCountMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventCountMode:anIndex withValue:eventCountMode[anIndex]];
+    eventCountMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventCountModeChanged object:self userInfo:userInfo];
-    }
-  
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventCountModeChanged object:self userInfo:userInfo];
 }
 //------------------- Address = 0x0040  Bit Field = 22 ---------------
 - (BOOL)  aHitCountMode:(int)anIndex
@@ -3092,14 +2998,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(aHitCountMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAHitCountMode:anIndex withValue:aHitCountMode[anIndex]];
-        aHitCountMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAHitCountMode:anIndex withValue:aHitCountMode[anIndex]];
+    aHitCountMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAHitCountModeChanged object:self userInfo:userInfo];
-    }
-    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAHitCountModeChanged object:self userInfo:userInfo];
 }
 //------------------- Address = 0x0040  Bit Field = 23 ---------------
 - (BOOL)  discCountMode:(int)anIndex
@@ -3112,14 +3015,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(discCountMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiscCountMode:anIndex withValue:discCountMode[anIndex]];
-        discCountMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiscCountMode:anIndex withValue:discCountMode[anIndex]];
+    discCountMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountModeChanged object:self userInfo:userInfo];
-    }
-    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountModeChanged object:self userInfo:userInfo];
 }
 //------------------- Address = 0x0040  Bit Field = 24..25 ---------------
 - (unsigned long) eventExtensionMode:(int)anIndex
@@ -3133,13 +3033,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x3)aValue = 0x3;
     
-    if(eventExtensionMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setEventExtensionMode:anIndex withValue:eventExtensionMode[anIndex]];
-        eventExtensionMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventExtensionMode:anIndex withValue:eventExtensionMode[anIndex]];
+    eventExtensionMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventExtensionModeChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEventExtensionModeChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0040  Bit Field = 26 ---------------
@@ -3153,13 +3051,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(pileupExtensionMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPileupExtensionMode:anIndex withValue:pileupExtensionMode[anIndex]];
-        pileupExtensionMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPileupExtensionMode:anIndex withValue:pileupExtensionMode[anIndex]];
+    pileupExtensionMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupExtensionModeChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupExtensionModeChanged object:self userInfo:userInfo];
     
 }
 
@@ -3174,13 +3070,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(counterReset[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setCounterReset:anIndex withValue:counterReset[anIndex]];
-        counterReset[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setCounterReset:anIndex withValue:counterReset[anIndex]];
+    counterReset[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACounterResetChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACounterResetChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0040  Bit Field = 30 ---------------
@@ -3194,14 +3088,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(pileupWaveformOnlyMode[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPileupWaveformOnlyMode:anIndex withValue:pileupWaveformOnlyMode[anIndex]];
-        pileupWaveformOnlyMode[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPileupWaveformOnlyMode:anIndex withValue:pileupWaveformOnlyMode[anIndex]];
+    pileupWaveformOnlyMode[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupWaveformOnlyModeChanged object:self userInfo:userInfo];
-    }
-    
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APileupWaveformOnlyModeChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0080  Bit Field = 15..0 ---------------
@@ -3216,13 +3107,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0xFFFF)aValue = 0xFFFF;
     
-    if(ledThreshold[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setLedThreshold:anIndex withValue:ledThreshold[anIndex]];
-        ledThreshold[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setLedThreshold:anIndex withValue:ledThreshold[anIndex]];
+    ledThreshold[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALedThreshold0Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALedThreshold0Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0080  Bit Field = 23..16 ---------------
@@ -3237,13 +3126,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0xFF)aValue = 0xFF;
     
-    if(preampResetDelay[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelay:anIndex withValue:preampResetDelay[anIndex]];
-        preampResetDelay[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreampResetDelay:anIndex withValue:preampResetDelay[anIndex]];
+    preampResetDelay[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelay0Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APreampResetDelay0Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x00C0  Bit Field = N/A ---------------
@@ -3258,13 +3145,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue>100)aValue = 100;
     
-    if(cFDFraction[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setCFDFraction:anIndex withValue:cFDFraction[anIndex]];
-        cFDFraction[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setCFDFraction:anIndex withValue:cFDFraction[anIndex]];
+    cFDFraction[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACFDFractionChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACFDFractionChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0100  Bit Field = 9..0 ---------------
@@ -3281,13 +3166,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x3FF)aValue = 0x3FF;
     
-    if(rawDataLength[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRawDataLength:anIndex withValue:rawDataLength[anIndex]];
-        rawDataLength[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRawDataLength:anIndex withValue:rawDataLength[anIndex]];
+    rawDataLength[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataLengthChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataLengthChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0140  Bit Field = 9..0 ---------------
@@ -3304,13 +3187,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x3FF)aValue = 0x3FF;
     
-    if(rawDataWindow[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRawDataWindow:anIndex withValue:rawDataWindow[anIndex]];
-        rawDataWindow[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRawDataWindow:anIndex withValue:rawDataWindow[anIndex]];
+    rawDataWindow[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataWindowChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataWindowChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0180  Bit Field = 6..0 ---------------
@@ -3325,13 +3206,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x7F)aValue = 0x7F;
     
-    if(dWindow[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDWindow:anIndex withValue:dWindow[anIndex]];
-        dWindow[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDWindow:anIndex withValue:dWindow[anIndex]];
+    dWindow[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADWindowChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADWindowChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x01C0  Bit Field = 6..0 ---------------
@@ -3346,13 +3225,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x7F)aValue = 0x7F;
     
-    if(kWindow[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setKWindow:anIndex withValue:kWindow[anIndex]];
-        kWindow[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setKWindow:anIndex withValue:kWindow[anIndex]];
+    kWindow[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AKWindowChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AKWindowChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0200  Bit Field = 9..0 ---------------
@@ -3367,13 +3244,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x3FF)aValue = 0x3FF;
     
-    if(mWindow[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setMWindow:anIndex withValue:mWindow[anIndex]];
-        mWindow[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setMWindow:anIndex withValue:mWindow[anIndex]];
+    mWindow[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AMWindowChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AMWindowChanged object:self userInfo:userInfo];
 }
 //------------------- Address = 0x0240  Bit Field = 6..0 ---------------
 - (unsigned long) d3Window:(int)anIndex
@@ -3387,13 +3262,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x7F)aValue = 0x7F;
     
-    if(d3Window[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setD3Window:anIndex withValue:d3Window[anIndex]];
-        d3Window[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setD3Window:anIndex withValue:d3Window[anIndex]];
+    d3Window[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AD3WindowChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AD3WindowChanged object:self userInfo:userInfo];
 }
 
 
@@ -3408,13 +3281,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(discWidth[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiscWidth:anIndex withValue:discWidth[anIndex]];
-        discWidth[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiscWidth:anIndex withValue:discWidth[anIndex]];
+    discWidth[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscWidthChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscWidthChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x02C0  Bit Field = 13..0 ---------------
@@ -3429,13 +3300,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x3FFF)aValue = 0x3FFF;
     
-    if(baselineStart[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setBaselineStart:anIndex withValue:baselineStart[anIndex]];
-        baselineStart[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setBaselineStart:anIndex withValue:baselineStart[anIndex]];
+    baselineStart[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineStartChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineStartChanged object:self userInfo:userInfo];
 }
 //------------------- Address = 0x0300  Bit Field = 3 .. 0 ---------------
 - (unsigned long) p1Window:(int)anIndex
@@ -3449,13 +3318,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 10)  return;
     if(aValue > 0x7F)aValue = 0x7F;
     
-    if(p1Window[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setP1Window:anIndex withValue:p1Window[anIndex]];
-        p1Window[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setP1Window:anIndex withValue:p1Window[anIndex]];
+    p1Window[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AP1WindowChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AP1WindowChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0400  Bit Field = 3..0 ---------------
@@ -3467,11 +3334,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setDacChannelSelect:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(dacChannelSelect != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDacChannelSelect:dacChannelSelect];
-        dacChannelSelect = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADacChannelSelectChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacChannelSelect:dacChannelSelect];
+    dacChannelSelect = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADacChannelSelectChanged object:self];
 }
 
 //------------------- Address = 0x0400  Bit Field = 7..0 ---------------
@@ -3483,11 +3348,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setDacAttenuation:(unsigned long)aValue
 {
     if(aValue > 0xFF)aValue = 0xFF;
-    if(dacAttenuation != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDacAttenuation:dacAttenuation];
-        dacAttenuation = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADacAttenuationChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacAttenuation:dacAttenuation];
+    dacAttenuation = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADacAttenuationChanged object:self];
 }
 
 //------------------- Address = 0x0404  Bit Field = N/A ---------------
@@ -3515,11 +3378,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setIlaConfig:(unsigned long)aValue
 {
-    if(ilaConfig != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setIlaConfig:ilaConfig];
-        ilaConfig = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AIlaConfigChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setIlaConfig:ilaConfig];
+    ilaConfig = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AIlaConfigChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 1 ---------------
@@ -3530,11 +3391,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhaseHunt:(BOOL)aValue
 {
-    if(phaseHunt != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseHunt:phaseHunt];
-        phaseHunt = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseHuntChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseHunt:phaseHunt];
+    phaseHunt = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseHuntChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 2 ---------------
@@ -3545,11 +3404,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setLoadbaseline:(BOOL)aValue
 {
-    if(loadbaseline != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setLoadbaseline:loadbaseline];
-        loadbaseline = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALoadbaselineChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setLoadbaseline:loadbaseline];
+    loadbaseline = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALoadbaselineChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 4 ---------------
@@ -3560,11 +3417,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhaseHuntDebug:(BOOL)aValue
 {
-    if(phaseHuntDebug != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseHuntDebug:phaseHuntDebug];
-        phaseHuntDebug = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseHuntDebugChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseHuntDebug:phaseHuntDebug];
+    phaseHuntDebug = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseHuntDebugChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 5 ---------------
@@ -3575,11 +3430,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhaseHuntProceed:(BOOL)aValue
 {
-    if(phaseHuntProceed != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseHuntProceed:phaseHuntProceed];
-        phaseHuntProceed = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseHuntProceedChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseHuntProceed:phaseHuntProceed];
+    phaseHuntProceed = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseHuntProceedChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 6 ---------------
@@ -3590,11 +3443,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhaseDec:(BOOL)aValue
 {
-    if(phaseDec != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseDec:phaseDec];
-        phaseDec = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseDecChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseDec:phaseDec];
+    phaseDec = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseDecChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 7 ---------------
@@ -3605,11 +3456,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhaseInc:(BOOL)aValue
 {
-    if(phaseInc != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseInc:phaseInc];
-        phaseInc = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseIncChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseInc:phaseInc];
+    phaseInc = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseIncChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 8 ---------------
@@ -3620,11 +3469,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setSerdesPhaseInc:(BOOL)aValue
 {
-    if(serdesPhaseInc != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSerdesPhaseInc:serdesPhaseInc];
-        serdesPhaseInc = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesPhaseIncChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setSerdesPhaseInc:serdesPhaseInc];
+    serdesPhaseInc = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesPhaseIncChanged object:self];
 }
 
 //------------------- Address = 0x040C  Bit Field = 9 ---------------
@@ -3635,11 +3482,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setSerdesPhaseDec:(BOOL)aValue
 {
-    if(serdesPhaseDec != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSerdesPhaseDec:serdesPhaseDec];
-        serdesPhaseDec = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesPhaseDecChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setSerdesPhaseDec:serdesPhaseDec];
+    serdesPhaseDec = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesPhaseDecChanged object:self];
 }
 
 //------------------- Address = 0x0410  Bit Field = N/A ---------------
@@ -3650,11 +3495,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setDiagMuxControl:(unsigned long)aValue
 {
-    if(diagMuxControl != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiagMuxControl:diagMuxControl];
-        diagMuxControl = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagMuxControlChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiagMuxControl:diagMuxControl];
+    diagMuxControl = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagMuxControlChanged object:self];
 }
 
 //------------------- Address = 0x0414  Bit Field = 9..0 ---------------
@@ -3666,11 +3509,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPeakSensitivity:(unsigned long)aValue
 {
     if(aValue > 0xFF)aValue = 0xFF;
-    if(peakSensitivity != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPeakSensitivity:peakSensitivity];
-        peakSensitivity = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APeakSensitivityChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPeakSensitivity:peakSensitivity];
+    peakSensitivity = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APeakSensitivityChanged object:self];
 }
 //------------------- Address = 0x0418  Bit Field = 13..0 ---------------
 - (unsigned long) baselineDelay
@@ -3682,12 +3523,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(aValue > 0x3FFF)aValue = 0x3FFF;
     
-    if(baselineDelay != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setBaselineDelay:baselineDelay];
-        baselineDelay = aValue;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineDelayChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setBaselineDelay:baselineDelay];
+    baselineDelay = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABaselineDelayChanged object:self];
 }
 
 //------------------- Address = 0x041C  Bit Field = 13..0 ---------------
@@ -3714,11 +3552,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setDiagChannelEventSel:(unsigned long)aValue
 {
-    if(diagChannelEventSel != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiagChannelEventSel:diagChannelEventSel];
-        diagChannelEventSel = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagChannelEventSelChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiagChannelEventSel:diagChannelEventSel];
+    diagChannelEventSel = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagChannelEventSelChanged object:self];
 }
 
 //------------------- Address = 0x0424  Bit Field = 3..0 ---------------
@@ -3730,11 +3566,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setRj45SpareIoMuxSel:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(rj45SpareIoMuxSel != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRj45SpareIoMuxSel:rj45SpareIoMuxSel];
-        rj45SpareIoMuxSel = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARj45SpareIoMuxSelChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setRj45SpareIoMuxSel:rj45SpareIoMuxSel];
+    rj45SpareIoMuxSel = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARj45SpareIoMuxSelChanged object:self];
 }
 
 //------------------- Address = 0x0424  Bit Field = 4 ---------------
@@ -3745,11 +3579,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setRj45SpareIoDir:(BOOL)aValue
 {
-    if(rj45SpareIoDir != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setRj45SpareIoDir:rj45SpareIoDir];
-        rj45SpareIoDir = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARj45SpareIoDirChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setRj45SpareIoDir:rj45SpareIoDir];
+    rj45SpareIoDir = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARj45SpareIoDirChanged object:self];
 }
 
 //------------------- Address = 0x0428  Bit Field = N/A ---------------
@@ -3760,11 +3592,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setLedStatus:(unsigned long)aValue
 {
-    if(ledStatus != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setLedStatus:ledStatus];
-        ledStatus = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALedStatusChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setLedStatus:ledStatus];
+    ledStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALedStatusChanged object:self];
 }
 
 //------------------- Address = 0x048C  Bit Field = 31..0 ---------------
@@ -3791,11 +3621,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setLiveTimestampMsb:(unsigned long)aValue
 {
     if(aValue > 0xFFFF)aValue = 0xFFFF;
-    if(liveTimestampMsb != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setLiveTimestampMsb:liveTimestampMsb];
-        liveTimestampMsb = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALiveTimestampMsbChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setLiveTimestampMsb:liveTimestampMsb];
+    liveTimestampMsb = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ALiveTimestampMsbChanged object:self];
 }
 
 
@@ -3807,11 +3635,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setDiagIsync:(BOOL)aValue
 {
-    if(diagIsync != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiagIsync:diagIsync];
-        diagIsync = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagIsyncChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiagIsync:diagIsync];
+    diagIsync = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiagIsyncChanged object:self];
 }
 
 //------------------- Address = 0x0500  Bit Field = 19 ---------------
@@ -3822,11 +3648,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setSerdesSmLostLock:(BOOL)aValue
 {
-    if(serdesSmLostLock != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSerdesSmLostLock:serdesSmLostLock];
-        serdesSmLostLock = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesSmLostLockChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setSerdesSmLostLock:serdesSmLostLock];
+    serdesSmLostLock = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesSmLostLockChanged object:self];
 }
 
 //------------------- Address = 0x0500  Bit Field = 22,23,24,25,26,27,28,29,30,31 ---------------
@@ -3839,11 +3663,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setOverflowFlagChan:(int)anIndex withValue:(BOOL)aValue
 {
     if(anIndex>=0 && anIndex<kNumGretina4AChannels){
-        if(overflowFlagChan[anIndex] != aValue){
-            [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan:anIndex withValue:anIndex];
-            overflowFlagChan[anIndex] = aValue;
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChanChanged object:self];
-        }
+        [[[self undoManager] prepareWithInvocationTarget:self] setOverflowFlagChan:anIndex withValue:anIndex];
+        overflowFlagChan[anIndex] = aValue;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverflowFlagChanChanged object:self];
     }
 }
 
@@ -3856,11 +3678,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setTriggerConfig:(unsigned long)aValue
 {
-    if(triggerConfig != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTriggerConfig:triggerConfig];
-        triggerConfig = aValue & 0x3;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATriggerConfigChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerConfig:triggerConfig];
+    triggerConfig = aValue & 0x3;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATriggerConfigChanged object:self];
 }
 
 //------------------- Address = 0x0508  Bit Field = N/A ---------------
@@ -3871,11 +3691,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPhaseErrorCount:(unsigned long)aValue
 {
-    if(phaseErrorCount != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseErrorCount:phaseErrorCount];
-        phaseErrorCount = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseErrorCountChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseErrorCount:phaseErrorCount];
+    phaseErrorCount = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseErrorCountChanged object:self];
 }
 
 //------------------- Address = 0x050C  Bit Field = 15..0 ---------------
@@ -3887,11 +3705,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPhaseStatus:(unsigned long)aValue
 {
     if(aValue > 0xFFFF)aValue = 0xFFFF;
-    if(phaseStatus != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhaseStatus:phaseStatus];
-        phaseStatus = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseStatusChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhaseStatus:phaseStatus];
+    phaseStatus = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhaseStatusChanged object:self];
 }
 
 //------------------- Address = 0x0510  Bit Field = 7..0 ---------------
@@ -3906,13 +3722,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 3)  return;
     if(aValue > 0xFF)aValue = 0xFF;
     
-    if(phase0[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhase0:anIndex withValue:phase0[anIndex]];
-        phase0[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhase0:anIndex withValue:phase0[anIndex]];
+    phase0[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhase0Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhase0Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0510  Bit Field = 15..8 ---------------
@@ -3927,13 +3741,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 3)  return;
     if(aValue > 0xFF)aValue = 0xFF;
     
-    if(phase1[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhase1:anIndex withValue:phase1[anIndex]];
-        phase1[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhase1:anIndex withValue:phase1[anIndex]];
+    phase1[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhase1Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhase1Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0510  Bit Field = 23..16 ---------------
@@ -3969,13 +3781,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(anIndex < 0 || anIndex > 3)  return;
     if(aValue > 0xFF)aValue = 0xFF;
     
-    if(phase3[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPhase3:anIndex withValue:phase3[anIndex]];
-        phase3[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setPhase3:anIndex withValue:phase3[anIndex]];
+    phase3[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhase3Changed object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhase3Changed object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x051C  Bit Field = N/A ---------------
@@ -3986,11 +3796,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setSerdesPhaseValue:(unsigned long)aValue
 {
-    if(serdesPhaseValue != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSerdesPhaseValue:serdesPhaseValue];
-        serdesPhaseValue = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesPhaseValueChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setSerdesPhaseValue:serdesPhaseValue];
+    serdesPhaseValue = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerdesPhaseValueChanged object:self];
 }
 
 //------------------- Address = 0x0600  Bit Field = 15..12  ---------------
@@ -4002,11 +3810,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPcbRevision:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(pcbRevision != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPcbRevision:pcbRevision];
-        pcbRevision = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APcbRevisionChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPcbRevision:pcbRevision];
+    pcbRevision = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APcbRevisionChanged object:self];
 }
 
 //------------------- Address = 0x0600  Bit Field = 11..8 ---------------
@@ -4018,11 +3824,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setFwType:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(fwType != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFwType:fwType];
-        fwType = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFwTypeChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFwType:fwType];
+    fwType = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFwTypeChanged object:self];
 }
 
 //------------------- Address = 0x0600  Bit Field = 7..4  ---------------
@@ -4034,11 +3838,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setMjrCodeRevision:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(mjrCodeRevision != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setMjrCodeRevision:mjrCodeRevision];
-        mjrCodeRevision = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AMjrCodeRevisionChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setMjrCodeRevision:mjrCodeRevision];
+    mjrCodeRevision = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AMjrCodeRevisionChanged object:self];
 }
 
 //------------------- Address = 0x0600  Bit Field = 3..0  ---------------
@@ -4050,11 +3852,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setMinCodeRevision:(unsigned long)aValue
 {
     if(aValue > 0xF)aValue = 0xF;
-    if(minCodeRevision != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setMinCodeRevision:minCodeRevision];
-        minCodeRevision = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AMinCodeRevisionChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setMinCodeRevision:minCodeRevision];
+    minCodeRevision = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AMinCodeRevisionChanged object:self];
 }
 
 //------------------- Address = 0x0604  Bit Field = 31..0 ---------------
@@ -4065,11 +3865,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setCodeDate:(unsigned long)aValue
 {
-    if(codeDate != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setCodeDate:codeDate];
-        codeDate = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACodeDateChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setCodeDate:codeDate];
+    codeDate = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACodeDateChanged object:self];
 }
 
 //------------------- Address = 0x0608  Bit Field = N/A ---------------
@@ -4080,11 +3878,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setTSErrCntCtrl:(unsigned long)aValue
 {
-    if(tSErrCntCtrl != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTSErrCntCtrl:tSErrCntCtrl];
-        tSErrCntCtrl = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATSErrCntCtrlChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTSErrCntCtrl:tSErrCntCtrl];
+    tSErrCntCtrl = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATSErrCntCtrlChanged object:self];
 }
 
 //------------------- Address = 0x060C  Bit Field = N/A ---------------
@@ -4095,11 +3891,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setTSErrorCount:(unsigned long)aValue
 {
-    if(tSErrorCount != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTSErrorCount:tSErrorCount];
-        tSErrorCount = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATSErrorCountChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTSErrorCount:tSErrorCount];
+    tSErrorCount = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATSErrorCountChanged object:self];
 }
 
 //------------------- Address = 0x0700  Bit Field = 31..0 ---------------
@@ -4113,13 +3907,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(droppedEventCount[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDroppedEventCount:anIndex withValue:droppedEventCount[anIndex]];
-        droppedEventCount[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDroppedEventCount:anIndex withValue:droppedEventCount[anIndex]];
+    droppedEventCount[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADroppedEventCountChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADroppedEventCountChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0740  Bit Field = 31..0 ---------------
@@ -4153,13 +3945,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(ahitCount[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAhitCount:anIndex withValue:ahitCount[anIndex]];
-        ahitCount[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setAhitCount:anIndex withValue:ahitCount[anIndex]];
+    ahitCount[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAhitCountChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAhitCountChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x07C0  Bit Field = 31..0 ---------------
@@ -4173,13 +3963,11 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     if(anIndex < 0 || anIndex > 10)  return;
     
-    if(discCount[anIndex] != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiscCount:anIndex withValue:discCount[anIndex]];
-        discCount[anIndex] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiscCount:anIndex withValue:discCount[anIndex]];
+    discCount[anIndex] = aValue;
         
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountChanged object:self userInfo:userInfo];
-    }
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountChanged object:self userInfo:userInfo];
 }
 
 //------------------- Address = 0x0800  Bit Field = 31..0 ---------------
@@ -4190,11 +3978,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAuxIoRead:(unsigned long)aValue
 {
-    if(auxIoRead != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAuxIoRead:auxIoRead];
-        auxIoRead = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAuxIoReadChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setAuxIoRead:auxIoRead];
+    auxIoRead = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAuxIoReadChanged object:self];
 }
 
 //------------------- Address = 0x0804  Bit Field = 31..0 ---------------
@@ -4205,11 +3991,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAuxIoWrite:(unsigned long)aValue
 {
-    if(auxIoWrite != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAuxIoWrite:auxIoWrite];
-        auxIoWrite = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAuxIoWriteChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setAuxIoWrite:auxIoWrite];
+    auxIoWrite = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAuxIoWriteChanged object:self];
 }
 
 //------------------- Address = 0x0808  Bit Field = 31..0 ---------------
@@ -4220,11 +4004,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAuxIoConfig:(unsigned long)aValue
 {
-    if(auxIoConfig != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAuxIoConfig:auxIoConfig];
-        auxIoConfig = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAuxIoConfigChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setAuxIoConfig:auxIoConfig];
+    auxIoConfig = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAuxIoConfigChanged object:self];
 }
 
 //------------------- Address = 0x0848  Bit Field = 2..3 ---------------
@@ -4236,12 +4018,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setSdPem:(unsigned long)aValue
 {
     if(aValue > 0x0)aValue = 0x0;
-    if(sdPem != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSdPem:sdPem];
-        sdPem = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASdPemChanged object:self];
-    }
-}
+    [[[self undoManager] prepareWithInvocationTarget:self] setSdPem:sdPem];
+    sdPem = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASdPemChanged object:self];}
 
 //------------------- Address = 0x0848  Bit Field = 9 ---------------
 - (BOOL) sdSmLostLockFlag
@@ -4251,11 +4030,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setSdSmLostLockFlag:(BOOL)aValue
 {
-    if(sdSmLostLockFlag != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSdSmLostLockFlag:sdSmLostLockFlag];
-        sdSmLostLockFlag = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASdSmLostLockFlagChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setSdSmLostLockFlag:sdSmLostLockFlag];
+    sdSmLostLockFlag = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASdSmLostLockFlagChanged object:self];
 }
 
 //------------------- Address = 0x084C  Bit Field = 31..0 ---------------
@@ -4266,11 +4043,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setAdcConfig:(unsigned long)aValue
 {
-    if(adcConfig != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAdcConfig:adcConfig];
-        adcConfig = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcConfigChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcConfig:adcConfig];
+    adcConfig = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAdcConfigChanged object:self];
 }
 
 //------------------- Address = 0x0900  Bit Field = 0 ---------------
@@ -4281,11 +4056,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setConfigMainFpga:(BOOL)aValue
 {
-    if(configMainFpga != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setConfigMainFpga:configMainFpga];
-        configMainFpga = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AConfigMainFpgaChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setConfigMainFpga:configMainFpga];
+    configMainFpga = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AConfigMainFpgaChanged object:self];
 }
 
 //------------------- Address = 0x0908  Bit Field = 0 ---------------
@@ -4296,11 +4069,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setPowerOk:(BOOL)aValue
 {
-    if(powerOk != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setPowerOk:powerOk];
-        powerOk = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APowerOkChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setPowerOk:powerOk];
+    powerOk = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APowerOkChanged object:self];
 }
 
 //------------------- Address = 0x0908  Bit Field = 1 ---------------
@@ -4311,11 +4082,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setOverVoltStat:(BOOL)aValue
 {
-    if(overVoltStat != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setOverVoltStat:overVoltStat];
-        overVoltStat = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverVoltStatChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setOverVoltStat:overVoltStat];
+    overVoltStat = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AOverVoltStatChanged object:self];
 }
 
 //------------------- Address = 0x0908  Bit Field = 2 ---------------
@@ -4326,11 +4095,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setUnderVoltStat:(BOOL)aValue
 {
-    if(underVoltStat != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setUnderVoltStat:underVoltStat];
-        underVoltStat = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AUnderVoltStatChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setUnderVoltStat:underVoltStat];
+    underVoltStat = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AUnderVoltStatChanged object:self];
 }
 
 //------------------- Address = 0x0908  Bit Field = 3 ---------------
@@ -4341,11 +4108,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setTemp0Sensor:(BOOL)aValue
 {
-    if(temp0Sensor != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTemp0Sensor:temp0Sensor];
-        temp0Sensor = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATemp0SensorChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTemp0Sensor:temp0Sensor];
+    temp0Sensor = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATemp0SensorChanged object:self];
 }
 
 //------------------- Address = 0x0908  Bit Field = 4 ---------------
@@ -4356,11 +4121,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setTemp1Sensor:(BOOL)aValue
 {
-    if(temp1Sensor != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTemp1Sensor:temp1Sensor];
-        temp1Sensor = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATemp1SensorChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTemp1Sensor:temp1Sensor];
+    temp1Sensor = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATemp1SensorChanged object:self];
 }
 
 //------------------- Address = 0x0908  Bit Field = 5 ---------------
@@ -4371,11 +4134,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setTemp2Sensor:(BOOL)aValue
 {
-    if(temp2Sensor != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setTemp2Sensor:temp2Sensor];
-        temp2Sensor = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATemp2SensorChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setTemp2Sensor:temp2Sensor];
+    temp2Sensor = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ATemp2SensorChanged object:self];
 }
 
 //------------------- Address = 0x0910  Bit Field = 0 ---------------
@@ -4386,11 +4147,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setClkSelect0:(BOOL)aValue
 {
-    if(clkSelect0 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setClkSelect0:clkSelect0];
-        clkSelect0 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AClkSelect0Changed object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setClkSelect0:clkSelect0];
+    clkSelect0 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AClkSelect0Changed object:self];
 }
 
 //------------------- Address = 0x0910  Bit Field = 1 ---------------
@@ -4401,11 +4160,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setClkSelect1:(BOOL)aValue
 {
-    if(clkSelect1 != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setClkSelect1:clkSelect1];
-        clkSelect1 = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AClkSelect1Changed object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setClkSelect1:clkSelect1];
+    clkSelect1 = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AClkSelect1Changed object:self];
 }
 
 //------------------- Address = 0x0910  Bit Field = 4 ---------------
@@ -4416,11 +4173,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFlashMode:(BOOL)aValue
 {
-    if(flashMode != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFlashMode:flashMode];
-        flashMode = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFlashModeChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFlashMode:flashMode];
+    flashMode = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFlashModeChanged object:self];
 }
 
 //------------------- Address = 0X0920  Bit Field = 15..0 ---------------
@@ -4432,11 +4187,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setSerialNum:(unsigned long)aValue
 {
     if(aValue > 0xFFFF)aValue = 0xFFFF;
-    if(serialNum != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setSerialNum:serialNum];
-        serialNum = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerialNumChanged object:self];
-    }
+    serialNum = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ASerialNumChanged object:self];
 }
 
 //------------------- Address = 0X0920  Bit Field = 23..16 ---------------
@@ -4448,11 +4200,8 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setBoardRevNum:(unsigned long)aValue
 {
     if(aValue > 0xFF)aValue = 0xFF;
-    if(boardRevNum != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setBoardRevNum:boardRevNum];
-        boardRevNum = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABoardRevNumChanged object:self];
-    }
+    boardRevNum = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ABoardRevNumChanged object:self];
 }
 
 //------------------- Address = 0X0920  Bit Field = 31..24 ---------------
@@ -4479,11 +4228,9 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setFifoAccess:(unsigned long)aValue
 {
-    if(fifoAccess != aValue){
-        [[[self undoManager] prepareWithInvocationTarget:self] setFifoAccess:fifoAccess];
-        fifoAccess = aValue;
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAccessChanged object:self];
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoAccess:fifoAccess];
+    fifoAccess = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAccessChanged object:self];
 }
 
 @end
