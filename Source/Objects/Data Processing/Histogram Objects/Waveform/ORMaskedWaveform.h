@@ -46,6 +46,7 @@
 	int numBits;
 	unsigned long firstBitMask;
 	NSArray* bitNames;
+    long scaleOffset;
 }
 
 #pragma mark ¥¥¥Accessors 
@@ -53,6 +54,8 @@
 - (NSArray*) bitNames;
 - (void) setSpecialBitMask:(unsigned long)aMask;
 - (unsigned long) specialBitMask;
+- (void) setScaleOffset:(long)aValue;
+- (long) scaleOffset;
 - (int) numBits;
 - (unsigned long) firstBitMask;
 @end

@@ -1240,13 +1240,79 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		va_end(myArgs);
 	}
 }
+- (void) loadWaveform:(NSData*)aWaveForm
+               offset:(unsigned long)anOffset
+             unitSize:(int)aUnitSize
+           startIndex:(unsigned long)aStartIndex
+                 mask:(unsigned long)aMask
+          specialBits:(unsigned long)aSpecialMask
+             bitNames:(NSArray*)bitNames
+               sender:(id)obj
+             withKeys:(NSString*)firstArg,...
+{
+    @synchronized(self){
+        va_list myArgs;
+        va_start(myArgs,firstArg);
+        
+        NSString* s             = firstArg;
+        ORDataSet* currentLevel = self;
+        ORDataSet* nextLevel    = nil;
+        [currentLevel incrementTotalCounts];
+        
+        
+        do {
+            nextLevel = [currentLevel objectForKey:s];
+            if(nextLevel){
+                if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+                currentLevel = nextLevel;
+            }
+            else {
+                nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+                [currentLevel setObject:nextLevel forKey:s];
+                currentLevel = nextLevel;
+                [nextLevel release];
+            }
+            [currentLevel incrementTotalCounts];
+            
+        } while((s = va_arg(myArgs, NSString *)));
+        
+        ORMaskedIndexedWaveformWithSpecialBits* waveform = [nextLevel data];
+        if(!waveform){
+            waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
+            [waveform setDataSet:self];
+            [waveform setMask:aMask];
+            [waveform setScaleOffset:0];
+            [waveform setSpecialBitMask:aSpecialMask];
+            [waveform setBitNames:bitNames];
+            [waveform setStartIndex:aStartIndex];
+            [waveform setDataOffset:anOffset];
+            [waveform setKey:[nextLevel key]];
+            [waveform setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+            [waveform setUnitSize:aUnitSize];
+            [nextLevel setData:waveform];
+            [waveform setWaveform:aWaveForm];
+            [waveform release];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetAdded object:self userInfo: nil];
+        }
+        
+        else {
+            [waveform setMask:aMask];
+            [waveform setSpecialBitMask:aSpecialMask];
+            [waveform setBitNames:bitNames];
+            [waveform setStartIndex:aStartIndex];
+            [waveform setWaveform:aWaveForm];
+        }
+        va_end(myArgs);
+    }
+}
 
 - (void) loadWaveform:(NSData*)aWaveForm 
 			   offset:(unsigned long)anOffset 
 			 unitSize:(int)aUnitSize 
-		   startIndex:(unsigned long)aStartIndex 
+		   startIndex:(unsigned long)aStartIndex
+          scaleOffset:(long)aScaleOffset
 				 mask:(unsigned long)aMask 
-		  specialBits:(unsigned long)aSpecialMask 
+		  specialBits:(unsigned long)aSpecialMask
 			 bitNames:(NSArray*)bitNames
 			   sender:(id)obj  
 			 withKeys:(NSString*)firstArg,...
@@ -1281,7 +1347,8 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		if(!waveform){
 			waveform = [[ORMaskedIndexedWaveformWithSpecialBits alloc] init];
 			[waveform setDataSet:self];
-			[waveform setMask:aMask];
+            [waveform setMask:aMask];
+            [waveform setScaleOffset:aScaleOffset];
 			[waveform setSpecialBitMask:aSpecialMask];
 			[waveform setBitNames:bitNames];
 			[waveform setStartIndex:aStartIndex];

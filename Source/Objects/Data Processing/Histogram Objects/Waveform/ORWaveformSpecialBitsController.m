@@ -50,7 +50,7 @@
 {
 	if([aPlot tag] == 0){
 		unsigned long aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
-		*y =  [model value:index] & aMask;
+		*y =  ([model value:index] & aMask) + [model scaleOffset];
 		*x = index;
 	}
 	else {
@@ -74,8 +74,9 @@
     NSUInteger i;
     if ([aPlot tag] == 0) {
 		unsigned long aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
+        long scaleOffset = [model scaleOffset];
         for (i=0;i<length;i++) {
-            yptr[i] = ((long)yptr[i]) & aMask;
+            yptr[i] = (((long)yptr[i]) & aMask) + scaleOffset;
         }
     } else {
 		int bit;
