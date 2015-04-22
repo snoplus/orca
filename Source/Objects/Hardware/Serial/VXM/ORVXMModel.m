@@ -69,7 +69,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 - (void) dealloc
 {
 	for(id aMotor in motors)[aMotor setOwner:nil];
-	[motors dealloc];
+	[motors release];
 	[cmdList release];
     [listFile  release];
 	[customCmd release];
