@@ -18,7 +18,6 @@ NSString* CBeValue		= @"Value";
     mTailIndex = 0;
 	mHeadIndex = 0;
 	mFWrapped = NO;
-	[mKeys retain];
 		
     return self;
 }
@@ -41,11 +40,6 @@ NSString* CBeValue		= @"Value";
 - ( long ) count
 {
 	return( [mStorageArray count] );
-}
-
-- ( NSArray *) mKeys
-{
-	return( mKeys );
 }
 
 - (void) insertHVEntry: (NSDate *) aDateOfAquistion hvValue: (NSNumber*) anHVEntry
