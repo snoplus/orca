@@ -1343,6 +1343,9 @@
 		8449CC88123E85DA009C8AA2 /* ORVHSC040nModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8449CC80123E85DA009C8AA2 /* ORVHSC040nModel.m */; };
 		8449CC89123E85DA009C8AA2 /* VHSC040n.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8449CC81123E85DA009C8AA2 /* VHSC040n.nib */; };
 		8449CC8A123E85DA009C8AA2 /* VHSC040n.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8449CC82123E85DA009C8AA2 /* VHSC040n.tif */; };
+		844AEE901ACDB10200139C57 /* ORGretina4AReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 844AEE8D1ACD9AA300139C57 /* ORGretina4AReadout.hh */; };
+		844AEE931ACDB15A00139C57 /* ORGretina4AReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 844AEE8C1ACD9AA300139C57 /* ORGretina4AReadout.cc */; };
+		844AEE941ACDB15D00139C57 /* ORGretina4AReadout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 844AEE8D1ACD9AA300139C57 /* ORGretina4AReadout.hh */; };
 		844B42BF0DE5D5680061AE80 /* ORSNORackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B70DE5D5680061AE80 /* ORSNORackController.h */; };
 		844B42C00DE5D5680061AE80 /* ORSNORackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42B80DE5D5680061AE80 /* ORSNORackController.m */; };
 		844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B90DE5D5680061AE80 /* ORSNORackModel.h */; };
@@ -3493,6 +3496,8 @@
 				84BA99070E91288800E19946 /* SNO.h in VME_Copy */,
 				84C3B29317CCD356002916F5 /* MJD.cc in VME_Copy */,
 				84C3B29417CCD358002916F5 /* MJD.h in VME_Copy */,
+				844AEE931ACDB15A00139C57 /* ORGretina4AReadout.cc in VME_Copy */,
+				844AEE941ACDB15D00139C57 /* ORGretina4AReadout.hh in VME_Copy */,
 			);
 			name = VME_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4608,6 +4613,8 @@
 		8449CC80123E85DA009C8AA2 /* ORVHSC040nModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVHSC040nModel.m; path = Source/Objects/Hardware/Vme/VHSC040n/ORVHSC040nModel.m; sourceTree = SOURCE_ROOT; };
 		8449CC81123E85DA009C8AA2 /* VHSC040n.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VHSC040n.nib; path = Source/Objects/Hardware/Vme/VHSC040n/VHSC040n.nib; sourceTree = SOURCE_ROOT; };
 		8449CC82123E85DA009C8AA2 /* VHSC040n.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VHSC040n.tif; path = Source/Objects/Hardware/Vme/VHSC040n/VHSC040n.tif; sourceTree = SOURCE_ROOT; };
+		844AEE8C1ACD9AA300139C57 /* ORGretina4AReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORGretina4AReadout.cc; sourceTree = "<group>"; };
+		844AEE8D1ACD9AA300139C57 /* ORGretina4AReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORGretina4AReadout.hh; sourceTree = "<group>"; };
 		844B42B70DE5D5680061AE80 /* ORSNORackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackController.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.h"; sourceTree = SOURCE_ROOT; };
 		844B42B80DE5D5680061AE80 /* ORSNORackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackController.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.m"; sourceTree = SOURCE_ROOT; };
 		844B42B90DE5D5680061AE80 /* ORSNORackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.h"; sourceTree = SOURCE_ROOT; };
@@ -10445,6 +10452,8 @@
 				43ADFE6310B6DBCF0044617C /* ORGretinaReadout.hh */,
 				842BC971163ED4E300393470 /* ORGretina4MReadout.cc */,
 				842BC972163ED4E300393470 /* ORGretina4MReadout.hh */,
+				844AEE8C1ACD9AA300139C57 /* ORGretina4AReadout.cc */,
+				844AEE8D1ACD9AA300139C57 /* ORGretina4AReadout.hh */,
 				43ADFE6410B6DBCF0044617C /* ORLAMData.cc */,
 				43ADFE6510B6DBCF0044617C /* ORLAMData.hh */,
 				43ADFE6610B6DBCF0044617C /* ORMTCReadout.cc */,
@@ -14045,6 +14054,7 @@
 				8434A186055B3287002D3102 /* ORAppDelegate.h in Headers */,
 				8434A187055B3287002D3102 /* ORAboutBox.h in Headers */,
 				8434A188055B3287002D3102 /* ORCatalogController.h in Headers */,
+				844AEE901ACDB10200139C57 /* ORGretina4AReadout.hh in Headers */,
 				8434A189055B3287002D3102 /* ORStatusController.h in Headers */,
 				8434A18B055B3287002D3102 /* ORDocument.h in Headers */,
 				8434A18C055B3287002D3102 /* ORDocumentController.h in Headers */,
