@@ -109,8 +109,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [localHostName release];
     [remoteHostName release];
 	[docList release];
+    [replicationAlarm clearAlarm];
     [replicationAlarm release];
-	[replicationAlarm clearAlarm];
     [customDataBases release];
 
 	[super dealloc];
