@@ -61,7 +61,7 @@
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(580,530);
-	detectorMapViewSize	 = NSMakeSize(1050,565);
+	detectorMapViewSize	 = NSMakeSize(750,730);
 	vetoMapViewSize		 = NSMakeSize(460,565);
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
     [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
