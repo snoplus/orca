@@ -28,6 +28,8 @@
 #import "ORDecoder.h"
 
 NSString* ORHWWizCountsChangedNotification  = @"ORHWWizCountsChangedNotification";
+NSString* ORHWWizardExecutionStarted        = @"ORHWWizardExecutionStarted";
+NSString* ORHWWizardExecutionFinished       = @"ORHWWizardExecutionFinished";
 NSString* ORHWWizardLock					= @"ORHWWizardLock";
 
 #define kRestoreFailed @"Restore Failed"
@@ -1579,6 +1581,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				id target = [wizObject target];
 				ORHWWizParam* paramObj = [[actionController paramArray] objectAtIndex:parameterSelection];
 				
+                
 				SEL methodSel = [paramObj setMethodSelector];
 				int numberOfSettableArguments = 0;
 				if(methodSel) numberOfSettableArguments = [[target methodSignatureForSelector:methodSel] numberOfArguments]-2;
@@ -1587,7 +1590,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 					NSLog(@"HW Wizard selection <%@> can not be executed while running. It was skipped.\n",[paramObj name]);
 					continue;
 				}
-				
+                NSDictionary* wizardInfo = [NSDictionary dictionaryWithObjectsAndKeys:[paramObj name],@"ActionName",NSStringFromSelector(methodSel),@"ActionSelector", nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizardExecutionStarted object:target userInfo:wizardInfo];
+                
 				if(numberOfSettableArguments <= 1){
 					if([paramObj useValue] || [paramObj oncePerCard]){
 						//no channels to deal with, just do the action
@@ -1643,6 +1648,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 						}
 					}
 				}
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizardExecutionFinished object:target userInfo:wizardInfo];
 			}
 		}
 	}
