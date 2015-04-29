@@ -2387,7 +2387,8 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
                       startptr=foundPos+strlen("usleep ");
                       //printf("   startptr:   >%s<  \n",startptr);//DEBUG
                       numUSec = strtoul((const char *)startptr,&endptr,0);
-                      printf("   numUSec is %u, startptr: %p, endptr %p  \n",numUSec,startptr,endptr);//DEBUG
+                      //printf("   numUSec is %u, startptr: %p, endptr %p  \n",numUSec,startptr,endptr);//DEBUG
+                      printf("   ---> calling usleep(%u)  \n",numUSec);//DEBUG
                       usleep(numUSec);
                       //tests
                       //tests

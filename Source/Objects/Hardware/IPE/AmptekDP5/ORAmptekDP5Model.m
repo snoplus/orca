@@ -656,6 +656,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 -(void) dealloc
 {
+    [lastRequest release];
     [textCommand release];
     [crateUDPCommand release];
     [crateUDPCommandIP release];
@@ -762,6 +763,27 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (NSString*) lastRequest
+{
+    return lastRequest;
+}
+
+- (void) setLastRequest:(NSString*)aLastRequest
+{
+    //the code wizard version
+    #if 0
+    [lastRequest autorelease];
+    lastRequest = [aLastRequest copy];    
+    #endif    
+    
+    //new version from e.g. ORPacFPModel.m (which one to use?)
+    #if 1
+	[aLastRequest retain];
+	[lastRequest release];
+	lastRequest = aLastRequest;    
+    #endif    
+}
 
 - (int) isPollingSpectrum
 {
@@ -2099,6 +2121,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         //show status
         if(hasStatus){
             uint32_t var32=0;
+            uint16_t var16=0; var16=0;
             uint8_t var8=0;
             NSLog(@"STATUS:    (statusOffset: %i)\n",statusOffset);
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kFastCountOffset])) );
@@ -2198,6 +2221,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
   
 	
     
+    
+    
+    //TODO: FIXIT for Amptek, we do not need a listening socket, see comment in startListeningServerSocket -tb-
     //[self setIsListeningOnServerSocket: 1];//TODO: rename -tb-
     [self startListeningServerSocket];//TODO: rename -tb-
 	
