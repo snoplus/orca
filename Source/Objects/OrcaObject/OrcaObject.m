@@ -303,6 +303,13 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     return [NSMutableArray arrayWithObject:self];
 }
 
+- (int) stationNumber
+{
+    //some objects use stationNumber. they can override for special situations.
+    //hardware wizard uses this instead of a slot or tag number.
+    return tag;
+}
+
 - (int) tag
 {
     return tag;
