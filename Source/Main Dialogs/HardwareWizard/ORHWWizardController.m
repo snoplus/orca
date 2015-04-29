@@ -563,7 +563,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) addActionController:(id) obj atIndex:(int) index
 {
-    if (index != 0 && index < [actionControllers count]-1) [[self actionControllers] insertObject: obj atIndex: (index + 1)];
+    if (index < [actionControllers count]-1) [[self actionControllers] insertObject: obj atIndex: (index + 1)];
     else	    [[self actionControllers] addObject: obj];
     [actionViewController reloadTableView];
     [self adjustActionSize:1];
@@ -583,7 +583,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) addSelectionController:(id) obj atIndex:(int) index
 {
-    if (index != 0 && index < [selectionControllers count]-1) [[self selectionControllers] insertObject: obj atIndex: (index + 1)];
+    if (index < [selectionControllers count]-1) [[self selectionControllers] insertObject: obj atIndex: (index + 1)];
     else	    [[self selectionControllers] addObject: obj];
     [selectionViewController reloadTableView];
     [self adjustSelectionSize:1];
@@ -1067,7 +1067,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         NSEnumerator* e = [containers objectEnumerator];
         id containerObj;
         while( containerObj = [e nextObject]){
-            int containerTag = [containerObj tag] + [containerObj tagBase];
+            int containerTag = [containerObj stationNumber];
             [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
 			//set up this container's objects
             NSArray* objectList = [containerObj collectObjectsOfClass:objectClass]; 
@@ -1152,7 +1152,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     OrcaObject<ORHWWizard>* obj;
     NSEnumerator* e = [objectList objectEnumerator];
     while(obj = [e nextObject]){
-        [currentContainer replaceObjectAtIndex:[obj tag] + [obj tagBase] withObject:[ORHWWizObj hwWizObject:obj]];
+        [currentContainer replaceObjectAtIndex:[obj stationNumber] withObject:[ORHWWizObj hwWizObject:obj]];
     }
 }
 
@@ -1281,7 +1281,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 								break;
 								
                             case kObjectLevel:
-                                index = [[wizObject target] tag] + [[wizObject target] tagBase];
+                                index = [[wizObject target] stationNumber];
                                 indexValid = true;
 								break;
 								
