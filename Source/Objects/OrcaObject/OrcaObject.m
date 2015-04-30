@@ -307,7 +307,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 {
     //some objects use stationNumber. they can override for special situations.
     //hardware wizard uses this instead of a slot or tag number.
-    return tag;
+    return [self tag] + [self tagBase];
 }
 
 - (int) tag
