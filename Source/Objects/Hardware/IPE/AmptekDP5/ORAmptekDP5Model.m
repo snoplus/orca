@@ -2151,6 +2151,15 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         //ship the packet 
         uint32_t data[8400];
         uint32_t location = [self uniqueIdNumber];
+        uint32_t infoFlags = 0;
+        uint32_t acqtime = 0;
+        uint32_t realtime = 0;
+        if(hasStatus){
+            infoFlags = infoFlags | 0x1;
+            acqtime = *( (uint32_t*) (&(dp5Packet[statusOffset + kAccTimeOffset])) );
+            realtime = *( (uint32_t*) (&(dp5Packet[statusOffset + kRealtimeOffset])) );
+        }
+        
         int lengthBytes = 8*4 + currentDP5PacketLen; // 8 words header * 4 byte (each is uint32_t) + packet ...
         if(lengthBytes%4)     NSLog(@"ERROR in %@::%@!  lengthBytes %i not multiple of 4! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,lengthBytes);//TODO: DEBUG -tb-
 
@@ -2159,13 +2168,13 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 			time(&ut_time);
 
 			data[0] = spectrumEventId | (length32); 
-			data[1] = location;
+			data[1] = location;    //called "deviceID" in the ROOT file
 			data[2] = ut_time;	   //sec
 			data[3] = 0;	       //subsec
 			data[4] = specLength;  //spectrum length
-			data[5] = 0;	
-			data[6] = 0;	
-			data[7] = 0;	
+			data[5] = hasStatus;   //additional info
+			data[6] = acqtime;	
+			data[7] = realtime;	
             
             void *destination = (void*) &(data[8]);
             memcpy(destination, dp5Packet, currentDP5PacketLen);

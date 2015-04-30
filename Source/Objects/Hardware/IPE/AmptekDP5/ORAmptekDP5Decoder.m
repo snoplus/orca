@@ -47,13 +47,14 @@
  ^^^^ ^^^^ ^^^^ ^^-----------------------data id
  -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
  
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx location = unique ID number (if multiple AmpTek DP5 boards present)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx location = unique ID number (if multiple AmpTek DP5 boards present)  ---> deviceID in ROOT file
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spectrum length (=MCAC) in 3-byte-words
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+ ------------------- ^^^^ ^^^^ ^^^^ ^^^^-spectrum length (=MCAC) in 3-byte-words (max. 8192)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx info flags (bit0=hasStatus)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx acquisition time (refer to  page 14,58 of the "DP5 Programmer Guide" Rev A6)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx realtime (dito)
 
  followed by original UDP packet data (max. ~  25000 bytes, ~6150 32-bit- words)
  UDP packet is: 8 byte header/checksum + 3 * x * 256 byte + 64 byte status => multiple of 4 => can be saved as uint_32
