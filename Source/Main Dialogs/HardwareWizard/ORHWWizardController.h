@@ -191,8 +191,8 @@ extern NSString* ORHWWizardLock;
 
 extern NSString* ORHWWizGroupActionStarted;
 extern NSString* ORHWWizGroupActionFinished;
-extern NSString* ORHWWizSelectorExectutionStarted;
-extern NSString* ORHWWizSelectorExectutionFinished;
+extern NSString* ORHWWizSelectorActionStarted;
+extern NSString* ORHWWizSelectorActionFinished;
 extern NSString* ORHWWizActionFinalNotification;
 
 @interface ORHWWizObj : NSObject
