@@ -28,8 +28,13 @@
 #import "ORDecoder.h"
 
 NSString* ORHWWizCountsChangedNotification  = @"ORHWWizCountsChangedNotification";
-NSString* ORHWWizardExecutionStarted        = @"ORHWWizardExecutionStarted";
-NSString* ORHWWizardExecutionFinished       = @"ORHWWizardExecutionFinished";
+
+NSString* ORHWWizGroupActionStarted         = @"ORHWWizGroupActionStarted";
+NSString* ORHWWizGroupActionFinished        = @"ORHWWizGroupActionFinished";
+NSString* ORHWWizSelectorActionStarted      = @"ORHWWizSelectorActionStarted";
+NSString* ORHWWizSelectorActionFinished     = @"ORHWWizSelectorActionFinished";
+
+NSString* ORHWWizActionFinalNotification    = @"ORHWWizActionFinalNotification";
 NSString* ORHWWizardLock					= @"ORHWWizardLock";
 
 #define kRestoreFailed @"Restore Failed"
@@ -227,6 +232,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
     return objectTag;
 }
+
 - (void)setObjectTag:(int)anObjectTag
 {
     objectTag = anObjectTag;
@@ -1369,19 +1375,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) executeControlStruct
 {
-    
     [hwUndoManager startNewUndoGroup];
     
-    NSEnumerator* actionEnum = [actionControllers objectEnumerator];
-    id actionController;
-    while(actionController = [actionEnum nextObject]){
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionStarted object: self];
+    
+    for(id actionController in actionControllers){
         [self _executeActionController:actionController];
 	}
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizGroupActionFinished object: self];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizActionFinalNotification object: self];
+    
     if(useMark){
         [hwUndoManager setMark];
         [self marksChanged];
-    }
-    if(useMark){
         NSLog(@"Hardware Wizard executed with return mark = %d\n",[hwUndoManager numberOfMarks]-1);
     }
     else NSLog(@"Hardware Wizard executed.\n");
@@ -1591,7 +1599,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 					continue;
 				}
                 NSDictionary* wizardInfo = [NSDictionary dictionaryWithObjectsAndKeys:[paramObj name],@"ActionName",NSStringFromSelector(methodSel),@"ActionSelector", nil];
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizardExecutionStarted object:target userInfo:wizardInfo];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizSelectorActionStarted object:target userInfo:wizardInfo];
                 
 				if(numberOfSettableArguments <= 1){
 					if([paramObj useValue] || [paramObj oncePerCard]){
@@ -1648,7 +1656,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 						}
 					}
 				}
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizardExecutionFinished object:target userInfo:wizardInfo];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORHWWizSelectorActionFinished object:target userInfo:wizardInfo];
 			}
 		}
 	}
