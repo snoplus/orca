@@ -14,7 +14,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     uint32_t fifoAddress      = GetDeviceSpecificData()[1];
     uint32_t fifoAddressMod   = GetDeviceSpecificData()[2];
     uint32_t fifoResetAddress = GetDeviceSpecificData()[3];
-    uint32_t eventLength      = GetDeviceSpecificData()[4];
+    uint32_t eventLength      = GetDeviceSpecificData()[4]/2;
     uint32_t dataId           = GetHardwareMask()[0];
     uint32_t slot             = GetSlot(); 
     uint32_t crate            = GetCrate(); 
@@ -42,7 +42,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     
     if(amountToRead != 0){
         
-        LogMessage("Gretina4A Fifo state: 0x%x",fifoState);
+        //LogMessage("Gretina4A Fifo state: 0x%x",fifoState);
         ensureDataCanHold(amountToRead+2);
      
         int32_t savedIndex = dataIndex;
@@ -65,17 +65,23 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
             uint32_t dataLength = 0;
             uint32_t n = 0;
             while(data[eventStartIndex] == kGretinaPacketSeparator){
-
                 eventStartIndex += eventLength+1;
+                
+                //LogMessage("len: %d",eventLength);
+               // LogMessage("-1: 0x%x",data[eventStartIndex-1]);
+                //LogMessage("0: 0x%x",data[eventStartIndex]);
+                //LogMessage("+1: 0x%x",data[eventStartIndex+1]);
+
                 dataLength += eventLength;
                 n++;
                 //LogMessage("Length: %u %u %u",n, dataLength,amountToRead);
                 if(dataLength>amountToRead)break; //sanity check
             }
+            //LogMessage("n: %d",n);
 
             if(dataLength>0){
                 data[savedIndex] |= (dataLength+2); //put the total length + ORCA header into the first word
-                dataIndex += dataLength;
+                dataIndex += dataLength+1; //the next data word is one past this set
             }
             else {
                 //oops... really bad -- the buffer read is out of sequence
