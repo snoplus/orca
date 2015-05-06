@@ -24,6 +24,7 @@
 	IBOutlet NSPopUpButton* modelTypePU;
 	IBOutlet NSTextField*   totalCycleZTimeField;
 	IBOutlet NSTextField*   percentZeroOffField;
+    IBOutlet NSButton*      useHWResetCB;
 	IBOutlet NSButton*      cycleZeroSuppressionCB;
 	IBOutlet NSButton*      defaultsButton;
 	IBOutlet NSTextField*   slideConstantField;
@@ -44,6 +45,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) useHWResetChanged:(NSNotification*)aNote;
 - (void) totalCycleZTimeChanged:(NSNotification*)aNote;
 - (void) percentZeroOffChanged:(NSNotification*)aNote;
 - (void) cycleZeroSuppressionChanged:(NSNotification*)aNote;
@@ -62,6 +64,7 @@
 
 
 #pragma mark ***Actions
+- (IBAction) useHWResetAction:(id)sender;
 - (IBAction) totalCycleZTimeAction:(id)sender;
 - (IBAction) percentZeroOffAction:(id)sender;
 - (IBAction) cycleZeroSuppressionAction:(id)sender;
