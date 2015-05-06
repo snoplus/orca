@@ -1087,6 +1087,7 @@ nil];
         
         [self recordEvent:@"RunStarted" document:doc];
     }
+    [self updateRunInfo];
 }
 
 - (void) runStopped:(NSNotification*)aNote
@@ -1112,6 +1113,7 @@ nil];
 
         [self recordEvent:@"RunStopped" document:doc];
     }
+    [self updateRunInfo];
 }
 
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote

@@ -1952,6 +1952,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (NSDictionary*) fullRunInfo
 {
+    NSArray* rtNames = [self runTypeNames];
+    if([rtNames count]==0){
+        rtNames = [NSArray array];
+    }
 	return [NSDictionary dictionaryWithObjectsAndKeys:
 							 [NSNumber numberWithUnsignedLong:[self runNumber]],		@"run",
 							 [NSNumber numberWithUnsignedLong:[self subRunNumber]],		@"subrun",
@@ -1966,7 +1970,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithBool:[self timedRun]],					@"timedRun",
 							 [NSNumber numberWithUnsignedLong:[self timeLimit]],		@"timeLimit",
                              [NSNumber numberWithUnsignedLong:[self runType]],          @"runType",
-                             runTypeNames,                                              @"runTypeNames",
+                             rtNames,                                                   @"runTypeNames",
                              [[self startTime] stdDescription],                         @"startTime",
                              [[self subRunStartTime] stdDescription],                   @"subRunStartTime",
 
