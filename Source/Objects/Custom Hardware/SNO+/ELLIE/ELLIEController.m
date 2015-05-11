@@ -324,6 +324,26 @@
             //do nothing
         }
     }
+    //check the number of shots value
+    else if([note object] == tellieNumofShots){
+        int currentNumberOfShots = [[note object] intValue];
+        int minimumNumOfShots = 1;
+        int maxiumumNumOfShots = 16000;
+        
+        
+        if(currentNumberOfShots > maxiumumNumOfShots){
+            NSLog(@"Tellie: Number of shots cannot be greater than %i\n",maxiumumNumOfShots);
+            [[note object] setIntValue:maxiumumNumOfShots];
+        }
+        else if (currentNumberOfShots < minimumNumOfShots){
+            NSLog(@"Tellie: Number of shots cannot be less than %i\n",minimumNumOfShots);
+            [[note object] setIntValue:minimumNumOfShots];
+        }
+        else{
+            //do nothing 
+        }
+    }
+    
     //check any other delegate accidentally assigned to the file's owner 
     else{
         //do nothing
@@ -350,6 +370,7 @@
 {
     [tellieTriggerDelayTf setBackgroundColor:aColor];
     [tellieChannelTf setBackgroundColor:aColor];
+    [tellieNumofShots setBackgroundColor:aColor];
     [tellieFibreDelayTf setBackgroundColor:aColor];
     [telliePulseWidthTf setBackgroundColor:aColor];
     [telliePulseHeightTf setBackgroundColor:aColor];
@@ -364,6 +385,8 @@
     backgroundColorSet *= [[telliePulseWidthTf backgroundColor] isEqualTo:aColor];
     backgroundColorSet *= [[telliePulseHeightTf backgroundColor] isEqualTo:aColor];
     backgroundColorSet *= [[telliePulseRateTf backgroundColor] isEqualTo:aColor];
+    backgroundColorSet *= [[tellieNumofShots backgroundColor] isEqualTo:aColor];
+    backgroundColorSet *= [[tellieChannelTf backgroundColor] isEqualTo:aColor];
     return backgroundColorSet;
 }
 
@@ -375,6 +398,8 @@
     [telliePulseWidthTf.window makeFirstResponder:nil];
     [telliePulseHeightTf.window makeFirstResponder:nil];
     [telliePulseRateTf.window makeFirstResponder:nil];
+    [tellieChannelTf.window makeFirstResponder:nil];
+    [tellieNumofShots.window makeFirstResponder:nil];
 
     //check the settings are validated and have been set
     if([self areTellieValuesCorrectlySet:[NSColor orangeColor]]){
@@ -414,6 +439,9 @@
     [telliePulseWidthTf.window makeFirstResponder:nil];
     [telliePulseHeightTf.window makeFirstResponder:nil];
     [telliePulseRateTf.window makeFirstResponder:nil];
+    [tellieChannelTf.window makeFirstResponder:nil];
+    [tellieNumofShots.window makeFirstResponder:nil];
+    
     
     NSMutableDictionary *fireTellieCommands = [[NSMutableDictionary alloc] initWithCapacity:10];
     [fireTellieCommands setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
@@ -422,6 +450,7 @@
     [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
     [fireTellieCommands setObject:[NSNumber numberWithFloat:[tellieFibreDelayTf floatValue]] forKey:@"fibre_delay"];
     [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieTriggerDelayTf intValue]] forKey:@"trigger_delay"];
+    [fireTellieCommands setObject:[NSNumber numberWithInt:[tellieNumofShots intValue]] forKey:@"number_of_shots"];
     
     //check the settings are validated and have been set 
     if([self areTellieValuesCorrectlySet:[NSColor greenColor]]){
@@ -437,8 +466,13 @@
             [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseHeightTf intValue]] forKey:@"pulse_height"];
             [tellieSettings setObject:[NSNumber numberWithInt:[telliePulseWidthTf intValue]] forKey:@"pulse_width"];
             [tellieSettings setObject:[NSNumber numberWithInt:[tellieChannelTf intValue]] forKey:@"channel"];
+            [tellieSettings setObject:[NSNumber numberWithInt:[tellieNumofShots intValue]] forKey:@"number_of_shots"];
             [model setTellieSubRunSettings:tellieSettings];
-            [model fireTellieFibre:fireTellieCommands];
+            
+            tellieThread = [[NSThread alloc] initWithTarget:model selector:@selector(fireTellieFibre:) object:fireTellieCommands];
+            [tellieThread start];
+            
+            //[model fireTellieFibre:fireTellieCommands];
         }
         else{
             NSLog(@"Tellie: Please start a Tellie run, before firing fibres\n");
