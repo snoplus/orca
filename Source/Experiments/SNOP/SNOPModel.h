@@ -31,6 +31,7 @@
 @required
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 @end
 
 #define kUseTubeView	0
@@ -55,6 +56,7 @@
     NSString* _debugDBUserName;
     NSString* _debugDBPassword;
     NSString* _debugDBName;
+    NSString* _smellieRunNameLabel;
     unsigned int _debugDBPort;
     NSString* _debugDBIPAddress;
     NSMutableArray* _debugDBConnectionHistory;
@@ -88,7 +90,13 @@
     NSDictionary* _configDocument;
     NSDictionary* _mtcConfigDoc;
     NSMutableDictionary* _runTypeDocumentPhysics;
+    NSMutableDictionary* smellieRunHeaderDocList;
+    
+    bool _smellieDBReadInProgress;
+    bool _smellieDocUploaded;
 }
+
+@property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -102,6 +110,7 @@
 @property (nonatomic,copy) NSString* debugDBUserName;
 @property (nonatomic,copy) NSString* debugDBPassword;
 @property (nonatomic,copy) NSString* debugDBName;
+@property (nonatomic,copy) NSString* smellieRunNameLabel;
 @property (nonatomic,assign) unsigned int debugDBPort;
 @property (nonatomic,copy) NSString* debugDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
@@ -111,10 +120,14 @@
 @property (nonatomic,assign) unsigned long epedDataId;
 @property (nonatomic,assign) unsigned long rhdrDataId;
 
+@property (nonatomic,assign) bool smellieDBReadInProgress;
+@property (nonatomic,assign) bool smellieDocUploaded;
+
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
 
+- (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
 - (id) orcaDBConnectionHistoryItem:(unsigned int)index;
@@ -171,6 +184,11 @@
 #pragma mark ¥¥¥SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+
+//smellie functions -------
+- (void) getSmellieRunListInfo;
+- (NSMutableDictionary*)smellieTestFct;
 
 @end
 

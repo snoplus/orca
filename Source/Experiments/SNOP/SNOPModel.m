@@ -37,12 +37,13 @@
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
 #import "ORCaen1720Model.h"
+#import "ELLIEModel.h"
+#import "SNOP_Run_Constants.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
-
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -64,6 +65,7 @@ NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChan
 
 @synthesize
 orcaDBUserName = _orcaDBUserName,
+smellieRunNameLabel = _smellieRunNameLabel,
 orcaDBPassword = _orcaDBPassword,
 orcaDBName = _orcaDBName,
 orcaDBPort = _orcaDBPort,
@@ -80,14 +82,30 @@ debugDBPingTask = _debugDBPingTask,
 epedDataId = _epedDataId,
 rhdrDataId = _rhdrDataId,
 runDocument = _runDocument,
+smellieDBReadInProgress = _smellieDBReadInProgress,
+smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
 mtcConfigDoc = _mtcConfigDoc;
+
+@synthesize smellieRunHeaderDocList;
+int runType = kRunUndefined;
+
 
 #pragma mark ¥¥¥Initialization
 
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"SNOP"]];
+}
+
+- (int) getRunType
+{
+    return runType;
+}
+
+- (void) setRunType:(int)aRunType
+{
+    runType = aRunType;
 }
 
 - (void) makeMainController
@@ -118,6 +136,16 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     [super sleep];
     //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
+}
+
+
+- (void) initSmellieRunDocsDic
+{
+    [self setSmellieDBReadInProgress:NO];
+    
+    if(!self.smellieRunHeaderDocList) {
+        self.smellieRunHeaderDocList = nil;//[[NSMutableDictionary alloc] init];
+    }
 }
 
 - (void) initOrcaDBConnectionHistory
@@ -512,6 +540,16 @@ mtcConfigDoc = _mtcConfigDoc;
             self.runDocument = runDoc;
             //[aResult prettyPrint:@"CouchDB Ack Doc:"];
         }
+        
+        //This is called when smellie run header is queried from CouchDB
+        else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"])
+        {
+            //NSLog(@"here\n");
+            //NSLog(@"Object: %@\n",aResult);
+            //NSLog(@"result1: %@\n",[aResult objectForKey:@"rows"]);
+            //NSLog(@"result2: %@\n",[[aResult objectForKey:@"rows"] objectAtIndexedSubscript:0]);
+            [self parseSmellieRunHeaderDoc:aResult];
+        }
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];
@@ -650,12 +688,16 @@ mtcConfigDoc = _mtcConfigDoc;
 	return viewType;
 }
 
+//undefined run type
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
+    [self initSmellieRunDocsDic];
+    //zero is the undefined run type otherwise specified
+    [self setRunType:kRunUndefined];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -774,6 +816,22 @@ mtcConfigDoc = _mtcConfigDoc;
     return [[result retain] autorelease];
 }
 
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+ {
+ 
+     ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
+                                         port:self.orcaDBPort
+                                     username:self.orcaDBUserName
+                                          pwd:self.orcaDBPassword
+                                     database:entryDB
+                                     delegate:self];
+ 
+     if (aCouchDelegate)
+         [result setDelegate:aCouchDelegate];
+ 
+     return [[result retain] autorelease];
+ }
+
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate
 {
     return nil;
@@ -797,6 +855,72 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //unsigned int* pt_step_crate = pt_step[0];
     
+}
+
+- (void) getSmellieRunListInfo
+{
+    //Collect a series of objects from the ORMTCModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    
+    //Initialise the MTCModal
+    ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
+    
+    //NSMutableDictionary *state = [[NSMutableDictionary alloc] initWithDictionary:[anELLIEModel pullEllieCustomRunFromDB:@"smellie"]];
+    
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
+    
+    [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
+    
+    [self setSmellieDBReadInProgress:YES];
+    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+    
+}
+
+//complete this after the smellie documents have been recieved 
+-(void)smellieDocumentsRecieved
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
+    if (![self smellieDBReadInProgress]) { //killed already
+        return;
+    }
+    
+    [self setSmellieDBReadInProgress:NO];
+    
+}
+
+-(void) parseSmellieRunHeaderDoc:(id)aResult
+{
+    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
+    
+    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
+    
+    for(i=0;i<cnt;i++){
+        NSMutableDictionary* smellieRunHeaderDocIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
+        NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
+        [tmp setObject:smellieRunHeaderDocIterator forKey:keyForSmellieDocs];
+    }
+
+    [self setSmellieRunHeaderDocList:tmp];
+    [tmp release];
+    
+    [self setSmellieDocUploaded:YES];
+}
+
+/*-(void)setSmellieRunNameLabel:(NSString*)aRunNameLabel
+{
+    [self setSmellieRunNameLabel:aRunNameLabel];
+}*/
+
+
+- (NSMutableDictionary*)smellieTestFct
+{
+    if([self smellieDocUploaded] == YES){
+        return smellieRunHeaderDocList;
+    }
+    else{
+        NSLog(@"Document no loaded yet\n");
+        return nil;
+    }
 }
 
 @end
@@ -872,7 +996,7 @@ mtcConfigDoc = _mtcConfigDoc;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
-    [runDocDict setObject:@"physics" forKey:@"run_type"];
+    [runDocDict setObject:[self getRunType] forKey:@"run_type"];
     [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
     [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
@@ -1212,7 +1336,6 @@ mtcConfigDoc = _mtcConfigDoc;
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [[self orcaDbRef:self] addDocument:mtcDocDict tag:kMtcRunDocumentAdded];
     }
-
     
     //FILL information from the Caen
     NSMutableDictionary* caenArray = [NSMutableDictionary dictionaryWithCapacity:100];
@@ -1241,7 +1364,6 @@ mtcConfigDoc = _mtcConfigDoc;
         [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen threshold:l]] forKey:[NSString stringWithFormat:@"thres_ch_%d",l]];
         [caenArray setObject:[NSNumber numberWithUnsignedShort:[theCaen overUnderThreshold:l]] forKey:[NSString stringWithFormat:@"over_thres_ch_%d",l]];
     }
-
     
     //FILL THE DATA FROM EACH FRONT END CARD HERE !!!!!
     

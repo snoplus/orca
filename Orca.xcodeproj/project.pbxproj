@@ -6402,6 +6402,7 @@
 		DB9CA3D5190ECF6000063A70 /* ResistorDBViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResistorDBViewController.m; sourceTree = "<group>"; };
 		DB9CA3DA190ED05000063A70 /* ResistorDBWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ResistorDBWindow.xib; sourceTree = "<group>"; };
 		DBEC755418EB9E9B0077D493 /* ellie.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ellie.gif; sourceTree = "<group>"; };
+		DBF0BE51198C32F5004CA310 /* SNOP_Run_Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SNOP_Run_Constants.h; sourceTree = "<group>"; };
 		EF37879112DFFF81003C814E /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
 		EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSNOCrateReadout.cc; sourceTree = "<group>"; };
 		EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSNOCrateReadout.hh; sourceTree = "<group>"; };
@@ -13165,6 +13166,7 @@
 				EFB39FCB130BA1C5001220AC /* SNOPDetectorView.m */,
 				EFB39FCC130BA1C5001220AC /* SNOPModel.h */,
 				EFB39FCD130BA1C5001220AC /* SNOPModel.m */,
+				DBF0BE51198C32F5004CA310 /* SNOP_Run_Constants.h */,
 			);
 			path = SNOP;
 			sourceTree = "<group>";
