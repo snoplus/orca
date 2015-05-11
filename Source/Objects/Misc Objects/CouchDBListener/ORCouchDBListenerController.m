@@ -23,6 +23,7 @@
 #import "ORCouchDBListenerModel.h"
 #import "ORCouchDB.h"
 #import "NSNotifications+Extensions.h"
+#import <YAJL/NSObject+YAJL.h>
 
 @implementation ORCouchDBListenerController
 
@@ -77,6 +78,11 @@
                          name : ORCouchDBListenerModelStatusLogChanged
                        object : nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(statusLogChanged:)
+                         name : ORCouchDBListenerModelStatusLogAppended
+                       object : nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(heartbeatChanged:)
                          name : ORCouchDBListenerModelHeartbeatChanged
@@ -150,7 +156,13 @@
 
 - (void) statusLogChanged:(NSNotification *)aNote
 {
-    [statusLog setString:[model statusLog]];
+    if ([[aNote name] isEqualToString:ORCouchDBListenerModelStatusLogAppended]) {
+        NSAttributedString* attr = [[NSAttributedString alloc] initWithString:[aNote object]];
+        [[statusLog textStorage] appendAttributedString:attr];
+        [statusLog scrollRangeToVisible:NSMakeRange([[statusLog string] length], 0)];
+    } else {
+        [statusLog setString:[model statusLog]];
+    }
 }
 
 - (void) hostChanged:(NSNotification *)aNote
@@ -328,24 +340,7 @@
     NSString* val=[NSString stringWithString:[cmdValueField stringValue]];
     NSString* info=[NSString stringWithString:[cmdInfoField stringValue]];
     
-    if ([[model cmdDict] objectForKey:label]){
-        [model log:@"Error: key already in use"];
-    }
-    else{
-        [model addCommand];
-        NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[model commandCount]-1];
-        [cmdTable selectRowIndexes:indexSet byExtendingSelection:NO];
-        
-        id cmd = [model commandAtIndex:[indexSet firstIndex]-1];
-        
-        [cmd setValue:label forKey:@"Label"];
-        [cmd setValue:obj forKey:@"Object"];
-        [cmd setValue:sel forKey:@"Selector"];
-        [cmd setValue:val forKey:@"Value"];
-        [cmd setValue:info forKey:@"Info"];
-        
-        [self commandsChanged:nil];
-    }
+    [model addCommand:obj label:label selector:sel info:info value:val];
 }
 - (IBAction) cmdObjectSelected:(id)sender
 {
@@ -366,8 +361,18 @@
 - (IBAction) testExecute:(id)sender
 {
     NSString* key=[[model commandAtIndex:[cmdTable selectedRow]] objectForKey:@"Label"];
-    if([model executeCommand:key value:nil]){
+    id returnVal = [NSNull null];
+    if([model executeCommand:key arguments:nil returnVal:&returnVal]){
         [model log:[NSString stringWithFormat:@"successfully executed command with label '%@'", key]];
+
+        @try {
+            // See if we can parse it.
+            NSString* resultString = [returnVal yajl_JSONString];
+            [model log:[NSString stringWithFormat:@"   received and parsed result: '%@'",resultString]];
+        }
+        @catch (NSException *exception) {
+            [model log:[NSString stringWithFormat:@"   CANNOT parse result to JSON: '%@'",returnVal]];
+        }
     }
     else{
         [model log:[NSString stringWithFormat:@"execution of command '%@' failed", key]];

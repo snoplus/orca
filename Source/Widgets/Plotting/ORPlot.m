@@ -23,6 +23,8 @@
 #import "ORAxis.h"
 #import "ORPlotAttributeStrings.h"
 
+#define kMaximumPlotPoints 10000
+
 @implementation ORPlot
 - (id) initWithTag:(int)aTag andDataSource:(id)aDataSource
 {
@@ -234,25 +236,74 @@
 	float x,y;
 	
 	//draw the data 
-	int minX = MAX(0,roundToLong([mXScale minLimit]));
-	int maxX = MIN(roundToLong([mXScale maxLimit]+1),numPoints);
+
 	double xValue,yValue;
-	[dataSource plotter:self index:minX x:&xValue y:&yValue];
-	x  = [mXScale getPixAbs:minX];
-	y  = [mYScale getPixAbs:yValue];
-	
-	NSBezierPath* theDataPath = [NSBezierPath bezierPath];
-	[theDataPath moveToPoint:NSMakePoint(x,y)];
-	float maxXValue = [mXScale maxValue];
 	long ix;
-	for (ix=minX+1; ix<maxX;++ix) {	
-		[dataSource plotter:self index:ix x:&xValue y:&yValue];
-		if(xValue<maxXValue){
+    
+	float maxXValue = [mXScale maxValue];
+    NSUInteger minX = (NSUInteger)[mXScale minValue];
+    NSUInteger maxX = (NSUInteger) maxXValue;
+    NSBezierPath* theDataPath = [NSBezierPath bezierPath];
+    
+    // We limit the total number of plotted points by using a stride    
+    NSUInteger totalLength = maxX - minX;
+    NSUInteger stride = (NSUInteger)((double)totalLength)/kMaximumPlotPoints;
+    if (stride == 0) stride = 1;
+    
+    if (![dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
+        [dataSource plotter:self index:minX x:&xValue y:&yValue];
+        x  = [mXScale getPixAbs:minX];
+        y  = [mYScale getPixAbs:yValue];
+        [theDataPath moveToPoint:NSMakePoint(x,y)];
+        
+        for (ix=minX+stride; ix<maxX;ix+=stride) {
+            [dataSource plotter:self index:ix x:&xValue y:&yValue];
+            if(xValue>=maxXValue) break;
             x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx];
             y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
             [theDataPath lineToPoint:NSMakePoint(x,y)];
         }
-	}
+    } else {
+        // We can use the fast mechanism which avoids calling obj-c functions in type loops.
+        NSMutableData* xValues = [NSMutableData data];
+        NSMutableData* yValues = [NSMutableData data];
+
+        totalLength = [dataSource plotter:self
+                               indexRange:NSMakeRange(minX,totalLength)
+                                   stride:stride
+                                        x:xValues
+                                        y:yValues];
+        
+        double* xptr = (double*) [xValues bytes];
+        double* yptr = (double*) [yValues bytes];
+        NSData* allXValues = [mXScale getManyPixAbsFast:xptr
+                                                  count:totalLength
+                                                    log:NO
+                                                integer:YES
+                                                 minPad:aMinPadx];
+        NSData* allYValues = [mYScale getManyPixAbsFast:yptr
+                                                  count:totalLength
+                                                    log:aLog
+                                                integer:aInt
+                                                 minPad:aMinPad];
+        
+        NSMutableData* allPts = [NSMutableData dataWithCapacity:totalLength*sizeof(NSPoint)];
+        
+        float* ypts = (float*) [allYValues bytes];
+        float* xpts = (float*) [allXValues bytes];
+        NSPoint* ptArray = (NSPoint*)[allPts bytes];
+
+        NSUInteger j = 0;
+        for (ix=0;ix<totalLength;ix++){
+            if (xptr[ix] >= maxXValue) break;
+            ptArray[j] = NSMakePoint(xpts[ix],ypts[ix]);
+            j += 1;
+        }
+        if (j>1) [theDataPath moveToPoint:ptArray[0]];
+        for (ix=1; ix<j; ix+=1) {
+            [theDataPath lineToPoint:ptArray[ix]];
+        }
+    }
 
 	if([self useConstantColor] || [plotView topPlot] == self)	[[self lineColor] set];
 	else [[[self lineColor] highlightWithLevel:.5]set];
@@ -403,10 +454,26 @@
 - (void) getyMin:(double*)aYMin yMax:(double*)aYMax;
 {
 	int n  = [dataSource numberPointsInPlot:self];
-	if(n!=0){
-		double minY = 9E9;
-		double maxY = -9E9;
-
+    *aYMin = 0;
+    *aYMax = 0;
+	if(n==0) return;
+    double minY = 9E9;
+    double maxY = -9E9;
+    if ([dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
+        NSMutableData* xVals = [NSMutableData data];
+        NSMutableData* yVals = [NSMutableData data];
+        [dataSource plotter:self
+                 indexRange:NSMakeRange(0,n)
+                     stride:1
+                          x:xVals
+                          y:yVals];
+        NSUInteger i, total = [yVals length]/sizeof(*aYMax);
+        double* ptr = (double*)[yVals bytes];
+        for(i=0;i<total;i++) {
+			maxY = MAX(maxY,ptr[i]);
+			minY = MIN(minY,ptr[i]);
+        }
+    } else {
 		int i;
 		for (i=0; i<n; ++i) {
 			double xValue,yValue;
@@ -414,29 +481,23 @@
 			maxY = MAX(maxY,yValue);
 			minY = MIN(minY,yValue);
 		}
-		*aYMin = minY;
-		*aYMax = maxY;
-	}
-	else {
-		*aYMin = 0;
-		*aYMax = 0;
-	}
+    }
+    *aYMin = minY;
+    *aYMax = maxY;
 }
 
 - (void) getxMin:(double*)aXMin xMax:(double*)aXMax;
 {
 	int n  = [dataSource numberPointsInPlot:self];
+    *aXMax = 0;
+    *aXMin = 0;
 	if(n!=0){
-		double minX = 9E9;
-		double maxX = -9E9;
 		int i;
-		BOOL gotOne = NO;
 		for (i=0; i<n; ++i) {
 			double xValue,yValue;
 			[dataSource plotter:self index:i x:&xValue y:&yValue];
 			if(yValue!=0){
-				minX = xValue;
-				gotOne = YES;
+				*aXMin = xValue;
 				break;
 			}
 		}
@@ -445,23 +506,10 @@
 			double xValue,yValue;
 			[dataSource plotter:self index:i x:&xValue y:&yValue];
 			if(yValue!=0){
-				maxX = xValue;
-				gotOne = YES;
+				*aXMax = xValue;
 				break;
 			}
 		}
-		if(gotOne){
-			*aXMin = minX;
-			*aXMax = maxX;
-		}
-		else {
-			*aXMin = 0;
-			*aXMax = 0;
-		}
-	}
-	else {
-		*aXMin = 0;
-		*aXMax = 0;
 	}
 }
 

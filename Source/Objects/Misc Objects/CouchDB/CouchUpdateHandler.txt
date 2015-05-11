@@ -5,7 +5,7 @@ function(doc, req) {
     for (k in _ref) {
         doc[k] = _ref[k];
     }
-    if(!_ref.timestamp){
+    if(_ref['timestamp'] == undefined){
        var dt = new Date();
 
         var year = dt.getFullYear();
@@ -25,7 +25,7 @@ function(doc, req) {
 
         doc.timestamp = year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
     }
-    if(!_ref.time){
+    if(_ref['time'] == undefined){
         var milliseconds = (new Date).getTime();
         doc.time = (milliseconds/1000).toFixed(0);;
     }

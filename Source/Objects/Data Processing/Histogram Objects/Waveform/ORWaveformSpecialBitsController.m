@@ -66,4 +66,30 @@
 		}
 	}
 }
+- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y
+{
+    NSUInteger length = [model plotter:aPlot indexRange:aRange stride:stride x:x y:y];
+    if (length == 0) return length;
+    double* yptr = (double*)[y bytes];
+    NSUInteger i;
+    if ([aPlot tag] == 0) {
+		unsigned long aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
+        for (i=0;i<length;i++) {
+            yptr[i] = ((long)yptr[i]) & aMask;
+        }
+    } else {
+		int bit;
+		for(bit=0;bit<[model numBits];bit++){
+			if([aPlot tag] == bit+1){
+				unsigned long aMask =  [model firstBitMask];
+                for (i=0;i<length;i++) {
+                    yptr[i] = (((long)yptr[i]) & (aMask << bit)) != 0;
+                }
+				break;
+			}
+		}
+    }
+    return length;
+}
+
 @end

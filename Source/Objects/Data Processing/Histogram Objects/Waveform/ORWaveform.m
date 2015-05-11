@@ -93,42 +93,48 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 
 -(long) value:(unsigned long)aChan callerLockedMe:(BOOL)callerLockedMe
 {
+    double tempVal = 0;
+    [self manyValues:NSMakeRange(aChan,1) to:&tempVal stride:1 callerLockedMe:callerLockedMe];
+    return (long)tempVal;
+}
+
+-(NSUInteger) manyValues:(NSRange)overRange to:(double*)output stride:(NSUInteger)stride callerLockedMe:(BOOL)callerLockedMe
+{
+
+#define FORLOOP(atype)              \
+NSUInteger maxLength = (([waveform length] - dataOffset)/unitSize - overRange.location); \
+NSUInteger maxRange =  (overRange.length >= maxLength) ?  maxLength : overRange.length;   \
+const atype* cptr = (const atype*)[waveform bytes];         \
+if (cptr != 0) {                                            \
+    cptr += dataOffset;                                     \
+    NSUInteger j;                                           \
+    for (j=0;j<maxRange;j+=stride) {                        \
+        output[i] = cptr[j + overRange.location];           \
+        i+=1;                                               \
+    }                                                       \
+}
+
+    
+#define MANYVALUERANGE(atype)    \
+    case sizeof(atype):  {       \
+        if (useUnsignedValues) { \
+            FORLOOP(unsigned atype) \
+        } else {                 \
+            FORLOOP(atype)     \
+        }                        \
+        break;                   \
+    }
+
     if(!callerLockedMe) [dataSetLock lock];
-
-    long theValue = 0;
-	const char* cptr = (const char*)[waveform bytes];
-	if(cptr){
-		cptr += dataOffset;
-			
-		if( aChan < ([waveform length] - dataOffset)/unitSize){
-			switch(unitSize){
-				case 1:
-					if(useUnsignedValues) theValue =  (unsigned long)((unsigned char*)cptr)[aChan];
-					else				  theValue =  (long)cptr[aChan];
-				break;
-
-				case 2:
-					{
-						const short* sptr = (const short*)cptr;
-						if(useUnsignedValues) theValue =  (unsigned long)((unsigned short*)sptr)[aChan];
-						else				  theValue =  (long)sptr[aChan];
-					}
-				break;
-
-				case 4:
-					{
-						const long* lptr = (const long*)cptr;
-						if(useUnsignedValues) theValue =  (unsigned long)((unsigned long*)lptr)[aChan];
-						else				  theValue =  lptr[aChan];
-					}
-				break;
-			}
-		}
-		else theValue =  0;
-	}
-
+    NSUInteger i=0;
+    switch(unitSize){
+        MANYVALUERANGE(char)
+        MANYVALUERANGE(short)
+        MANYVALUERANGE(long)
+        default: break;
+    }
 	if(!callerLockedMe) [dataSetLock unlock];
-	return theValue;
+    return i;
 }
 
 - (double) getTrapezoidValue:(unsigned int)channel rampTime:(unsigned int)ramp gapTime:(unsigned int)gap
@@ -260,6 +266,22 @@ static NSString *ORWaveformUnitSize 	= @"Waveform Data Unit Size";
 {
 	return [self numberBins];
 }
+
+- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y
+{
+    [x setLength:aRange.length*sizeof(double)];
+    [y setLength:aRange.length*sizeof(double)];
+    NSUInteger numCopied = [self manyValues:aRange to:(double *)[y bytes] stride:stride callerLockedMe:NO];
+    NSUInteger i;
+    double *ptr = (double*)[x bytes];
+    for(i=0;i<numCopied;i++) {
+        ptr[i] = i*stride+aRange.location;
+    }
+    [x setLength:numCopied*sizeof(double)];
+    [y setLength:numCopied*sizeof(double)];
+    return numCopied;
+}
+
 
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y
 {

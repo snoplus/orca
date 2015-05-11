@@ -80,7 +80,10 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		regionColor = aColor;
         
         //also store as rbg string for couchdb records
-        float red,green,blue,alpha;
+        float red   = 0;
+        float green = 0;
+        float blue  = 0;
+        float alpha = 0;
         NSColor* convertedColor = [aColor colorUsingColorSpaceName:NSDeviceRGBColorSpace];
         [convertedColor getRed:&red green:&green blue:&blue alpha:&alpha];
         self.rgbString = [NSString stringWithFormat:@"#%02x%02x%02x",(int)(red*255),(int)(green*255),(int)(blue*255)];

@@ -216,34 +216,6 @@
 }
 
 #pragma mark ***CouchDB Checks
-- (BOOL) couchDBRunning
-{
-	BOOL couchDBRunning = NO;
-	@try {
-		NSTask* task = [[[NSTask alloc] init] autorelease];
-		[task setLaunchPath: @"/bin/ps"];
-		[task setArguments: [NSArray arrayWithObjects:@"-ef",nil]];
-		
-		NSPipe* pipe = [NSPipe pipe];
-		[task setStandardOutput: pipe];
-		
-		NSFileHandle* file = [pipe fileHandleForReading];
-		
-		[task launch];
-		NSData* data = [file readDataToEndOfFile];		
-		[task waitUntilExit];
-		
-
-		NSString* result = [[[NSString alloc] initWithData:data encoding: NSUTF8StringEncoding] autorelease];
-		if([result rangeOfString:@"couchdb"].location != NSNotFound &&
-		   [result rangeOfString:@"erlang"].location != NSNotFound) {
-			couchDBRunning = YES;
-		}
-	}
-	@catch (NSException* e) {
-	}
-	return couchDBRunning;
-}
 
 @end
 
@@ -324,7 +296,24 @@
                 [request setAllHTTPHeaderFields:[NSDictionary dictionaryWithObject:@"application/json" forKey:@"Content-Type"]];
             }
         }
-        if(aBody)[request setHTTPBody:[[aBody yajl_JSONString] dataUsingEncoding:NSASCIIStringEncoding]];
+        if(aBody){
+            NSData* adat=nil;
+            @try {
+                adat = [[aBody yajl_JSONString]
+                        dataUsingEncoding:NSASCIIStringEncoding];
+            }
+            @catch (NSException *exc) {
+                NSLogColor([NSColor redColor],
+                           @"ORCouchDB JSON parse failure (%@), trying to continue"
+                           " by ignoring unknown types during the parse.\n",exc);
+                adat = [[aBody yajl_JSONStringWithOptions:YAJLGenOptionsIgnoreUnknownTypes
+                                                     indentString:@""]
+                                dataUsingEncoding:NSASCIIStringEncoding];
+            }
+            @finally {
+                if (adat) [request setHTTPBody:adat];
+            }
+        }
         [self _updateAuthentication:request];
         NSData *data = [[[NSURLConnection sendSynchronousRequest:request returningResponse:&response error:nil] retain] autorelease];
         

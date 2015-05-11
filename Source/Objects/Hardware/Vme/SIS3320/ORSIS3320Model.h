@@ -78,7 +78,6 @@
  	unsigned char   gtMask;
  	unsigned char   triggerOutMask;
  	unsigned char   extendedTriggerMask;
-    BOOL			multiEvent;
 	
 	NSMutableArray* dacValues;
 	NSMutableArray* preTriggerDelays;
