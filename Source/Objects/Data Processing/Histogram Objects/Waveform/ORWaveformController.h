@@ -21,12 +21,11 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
-#import "ORPlot.h"
 @class OR1dRoiController;
 @class OR1dFitController;
 @class ORFFTController;
 
-@interface ORWaveformController : ORDataController<ORFastPlotDataSourceMethods> {
+@interface ORWaveformController : ORDataController {
 	IBOutlet NSView*		roiView;
 	IBOutlet NSView*		fitView;
 	IBOutlet NSView*		fftView;
@@ -54,6 +53,5 @@
 - (BOOL) plotterShouldShowRoi:(id)aPlot;
 - (int) numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y;
-- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot;
 @end

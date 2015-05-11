@@ -19,11 +19,10 @@
 //-------------------------------------------------------------
 
 #import "ORDataSetModel.h"
-#import "ORPlot.h"
 
 @class ORWaveformController;
 
-@interface ORWaveform : ORDataSetModel<ORFastPlotDataSourceMethods>  {
+@interface ORWaveform : ORDataSetModel  {
     NSData*				waveform;
     unsigned long		dataOffset;
 	int					unitSize;
@@ -56,7 +55,6 @@
 - (NSMutableArray*) rois;
 - (int) numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
-- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
 
 //subclasses will override these
 - (unsigned long) mask;

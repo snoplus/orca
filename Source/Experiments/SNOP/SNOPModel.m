@@ -36,12 +36,12 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
+#import "ELLIEModel.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
-
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -78,7 +78,11 @@ debugDBPingTask = _debugDBPingTask,
 epedDataId = _epedDataId,
 rhdrDataId = _rhdrDataId,
 runDocument = _runDocument,
+smellieDBReadInProgress = _smellieDBReadInProgress,
+smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument;
+
+@synthesize smellieRunHeaderDocList;
 
 #pragma mark ¥¥¥Initialization
 
@@ -115,6 +119,15 @@ configDocument  = _configDocument;
 {
     [super sleep];
     //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
+}
+
+- (void) initSmellieRunDocsDic
+{
+    [self setSmellieDBReadInProgress:NO];
+    
+    if(!self.smellieRunHeaderDocList) {
+        self.smellieRunHeaderDocList = nil;//[[NSMutableDictionary alloc] init];
+    }
 }
 
 - (void) initOrcaDBConnectionHistory
@@ -507,6 +520,17 @@ configDocument  = _configDocument;
             self.runDocument = runDoc;
             //[aResult prettyPrint:@"CouchDB Ack Doc:"];
         }
+        
+        //This is called when smellie run header is queried from CouchDB
+        else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"])
+        {
+            //NSLog(@"here\n");
+            //NSLog(@"Object: %@\n",aResult);
+            //NSLog(@"result1: %@\n",[aResult objectForKey:@"rows"]);
+            //NSLog(@"result2: %@\n",[[aResult objectForKey:@"rows"] objectAtIndexedSubscript:0]);
+            [self parseSmellieRunHeaderDoc:aResult];
+        }
+        
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];
@@ -646,6 +670,7 @@ configDocument  = _configDocument;
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
+    [self initSmellieRunDocsDic];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -764,6 +789,22 @@ configDocument  = _configDocument;
     return [[result retain] autorelease];
 }
 
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+ {
+ 
+     ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
+                                         port:self.orcaDBPort
+                                     username:self.orcaDBUserName
+                                          pwd:self.orcaDBPassword
+                                     database:entryDB
+                                     delegate:self];
+ 
+     if (aCouchDelegate)
+         [result setDelegate:aCouchDelegate];
+ 
+     return [[result retain] autorelease];
+ }
+
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate
 {
     return nil;
@@ -787,6 +828,66 @@ configDocument  = _configDocument;
     
     //unsigned int* pt_step_crate = pt_step[0];
     
+}
+
+- (void) getSmellieRunListInfo
+{
+    //Collect a series of objects from the ORMTCModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    
+    //Initialise the MTCModal
+    ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
+    
+    //NSMutableDictionary *state = [[NSMutableDictionary alloc] initWithDictionary:[anELLIEModel pullEllieCustomRunFromDB:@"smellie"]];
+    
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
+    
+    [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
+    
+    [self setSmellieDBReadInProgress:YES];
+    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+    
+}
+
+//complete this after the smellie documents have been recieved 
+-(void)smellieDocumentsRecieved
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
+    if (![self smellieDBReadInProgress]) { //killed already
+        return;
+    }
+    
+    [self setSmellieDBReadInProgress:NO];
+    
+}
+
+-(void) parseSmellieRunHeaderDoc:(id)aResult
+{
+    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
+    
+    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
+    
+    for(i=0;i<cnt;i++){
+        NSMutableDictionary* smellieRunHeaderDocIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
+        NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
+        [tmp setObject:smellieRunHeaderDocIterator forKey:keyForSmellieDocs];
+    }
+
+    [self setSmellieRunHeaderDocList:tmp];
+    [tmp release];
+    
+    [self setSmellieDocUploaded:YES];
+}
+
+- (NSMutableDictionary*)smellieTestFct
+{
+    if([self smellieDocUploaded] == YES){
+        return smellieRunHeaderDocList;
+    }
+    else{
+        NSLog(@"Document no loaded yet\n");
+        return nil;
+    }
 }
 
 @end
@@ -836,12 +937,8 @@ configDocument  = _configDocument;
     [runDocDict setObject:@"" forKey:@"run_stop"];
 
     self.runDocument = runDocDict;
-    
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
-    }
-    
+    [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
+
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
     while ([timeout timeIntervalSinceNow] > 0 && ![self.runDocument objectForKey:@"_id"]) {
@@ -856,15 +953,10 @@ configDocument  = _configDocument;
         [runStartString setString:[self stringDateFromDate:runStart]];
     }
     [runDocDict setObject:@"in progress" forKey:@"run_status"];
-        
 
     //self.runDocument = runDocDict;
-    
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
-    }
-    
+    [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
+
     //Collect a series of objects from the ORMTCModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
@@ -1196,16 +1288,6 @@ configDocument  = _configDocument;
         
     }//end of looping through all the Fec32 Cards
     
-    //fetching the svn version used for this DAQ build 
-    NSFileManager* fm = [NSFileManager defaultManager];
-    NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
-    NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
-    if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
-    if([svnVersion hasSuffix:@"\n"]){
-        [svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
-    }
-    
-    
     //Fill the configuration document with information
     [configDocDict setObject:@"configuration" forKey:@"doc_type"];
     [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
@@ -1214,8 +1296,6 @@ configDocument  = _configDocument;
      NSNumber * runNumberForConfig = [NSNumber numberWithUnsignedLong:[rc runNumber]];
     [configDocDict setObject:runNumberForConfig forKey:@"run_number"];
     
-    [configDocDict setObject:svnVersion forKey:@"daq_version_build"];
-    
     [configDocDict setObject:mtcArray forKey:@"mtc_info"];
     
     //this works but I'm not sure we need to see everything right now???
@@ -1223,11 +1303,7 @@ configDocument  = _configDocument;
     
     //add the configuration document
     self.configDocument = configDocDict;
-    
-    //check to see if this is an offline run 
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
-    }
+    [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
     //NSLog(@"Adding configuation file \n");
     
     //wait for main thread to receive acknowledgement from couchdb
@@ -1306,12 +1382,9 @@ configDocument  = _configDocument;
     //end of run xl3 logs
     //ellie
 
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] updateDocument:runDocDict
-                                   documentId:[runDocDict objectForKey:@"_id"]
-                                          tag:kOrcaRunDocumentUpdated];
-    }
+    [[self orcaDbRef:self] updateDocument:runDocDict
+                               documentId:[runDocDict objectForKey:@"_id"]
+                                      tag:kOrcaRunDocumentUpdated];
     
     [runDocPool release];
 }

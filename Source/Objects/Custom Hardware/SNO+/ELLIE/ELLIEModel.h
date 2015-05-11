@@ -9,12 +9,53 @@
 #import <Foundation/Foundation.h>
 #import <ELLIEController.h>
 
-@interface ELLIEModel :  OrcaObject
+@class ORCouchDB;
+
+@interface ELLIEModel :  OrcaObject{
+    NSMutableDictionary* smellieRunSettings;
+    NSTask* exampleTask;
+    NSMutableDictionary* smellieRunHeaderDocList;
+}
+
+@property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
+@property (nonatomic,retain) NSTask* exampleTask;
+@property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 
 -(void) setUpImage;
 -(void) makeMainController;
 -(void) wakeUp;
 -(void) sleep;
--(void)dealloc;
+-(void) dealloc;
+-(void) registerNotificationObservers;
+- (ORCouchDB*) generalDBRef:(NSString*)aCouchDb;
+
+//This is called by ORCouchDB.h class as a returning delegate
+- (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
+
+/*This function calls a python script: 
+    pythonScriptFilePath - this is the python script file path
+    withCmdLineArgs - these are the arguments for the python script*/
+-(NSString*)callPythonScript:(NSString*)pythonScriptFilePath withCmdLineArgs:(NSArray*)commandLineArgs;
+
+//starts a SMELLIE run with given parameters and submits the smellie run file to the database
+-(void) startSmellieRun:(NSDictionary*)smellieSettings;
+-(void) stopSmellieRun;
+-(void) smellieDBpush:(NSMutableDictionary*)dbDic;
+-(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings;
+
+//SMELLIE Control Functions
+-(void)setSmellieSafeStates;
+-(void)setLaserSwitch:(NSString*)laserSwitchChannel;
+-(void)setFibreSwitch:(NSString*)fibreSwitchChannel;
+-(void)setLaserIntensity:(NSString*)laserIntensity;
+-(void)setLaserSoftLockOn;
+-(void)setLaserSoftLockOff;
+-(void)setSmellieMasterMode:(NSString*)triggerFrequency withNumOfPulses:(NSString*)numOfPulses;
+-(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2;
+
 
 @end
+
+extern NSString* ELLIEAllLasersChanged;
+extern NSString* ELLIEAllFibresChanged;
+extern NSString* smellieRunDocsPresent;

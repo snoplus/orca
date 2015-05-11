@@ -844,8 +844,8 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
         if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
         if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
         if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
-        id aKey = [segmentGroup groupName];
-        if(aKey && aDictionary)[values setObject:aDictionary forKey:aKey];
+        
+        [values setObject:aDictionary forKey:[segmentGroup groupName]];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];

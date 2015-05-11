@@ -53,7 +53,6 @@ static NSString* valueChangeString[kNumActions] = {
 #endif
             [self release];
             self = nil;
-            return self;
         }
         [topLevelObjects retain];
         [self setParameterValue:[NSNumber numberWithInt:0]];
