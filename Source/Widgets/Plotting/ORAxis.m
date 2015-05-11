@@ -568,7 +568,32 @@ enum {
 	
 }
 
+- (NSData*) getManyPixAbsFast:(double*)arr count:(NSUInteger)length log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad;
+{
+    NSMutableData* retData = [NSMutableData dataWithCapacity:sizeof(float)*length];
+    float	t;
+    float*  datptr = (float*) [retData bytes];
 
+    if (aLog) {
+        NSUInteger i;
+        for(i=0;i<length;i++) {
+            float val = arr[i];
+            if (aInt) val += 1;
+            else val /= aMinPad;
+            if (val < kMinArgumentForLog) val = kMinArgumentForLog;
+            t = log(val) * fscl;			// get pixel position
+            datptr[i] = (t>0) ? t+0.5 : t-0.5;
+        }
+    }
+    else {
+        NSUInteger i;
+        for(i=0;i<length;i++) {
+            t = (arr[i]-aMinPad) * fscl;
+            datptr[i] = (t>0) ? t+0.5 : t-0.5;
+        }
+    }
+    return retData;
+}
 
 /* getPixAbs - convert from an absolute scale value to an absolute pixel position */
 - (float) getPixAbs:(double) val

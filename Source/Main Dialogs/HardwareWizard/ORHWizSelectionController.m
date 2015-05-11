@@ -44,6 +44,7 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
 
             [self release];
             self = nil;
+            return self;
         }
         [topLevelObjects retain];
     }

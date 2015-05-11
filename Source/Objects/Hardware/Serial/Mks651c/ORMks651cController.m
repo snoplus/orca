@@ -696,7 +696,7 @@
 
 	int i;
 	for(i=0;i<5;i++){
-		[setPointTypePU[5] setEnabled:!locked];
+		[setPointTypePU[i] setEnabled:!locked];
 	}
 	
     NSString* s = @"";

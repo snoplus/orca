@@ -35,8 +35,8 @@
 }
 
 + (ORArchive*) sharedArchive;
-+ (NSString*) binPath;
-+ (BOOL) deploymentVersion;
+- (NSString*) binPath;
+- (BOOL) deploymentVersion;
 - (NSOperationQueue*) queue;
 - (void) registerNotificationObservers;
 - (void) securityStateChanged:(NSNotification*)aNote;

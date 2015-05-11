@@ -941,7 +941,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     
     //TODO: PMTIC information
     //TODO: Cable information
-    //TODO: Not Operational (Need to query Noel's PMT DB??
+    //TODO: Not Operational (Need to query Noel's PMT DB??)
     return output;
 }
 

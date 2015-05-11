@@ -59,7 +59,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 {
     if([self aWake])return;
     [super wakeUp];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:5];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:17];
 }
 
 - (void) sleep
@@ -215,7 +215,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
 	if(![self isBusy])[self getStatus];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:30];
+	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:37];
     [self postCouchDBRecord];
 }
 
@@ -345,7 +345,6 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 				}
 			}
 		}
-		[self disconnect];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	}
 }
@@ -355,6 +354,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
     if(inNetSocket == socket){
 		
 		[self setIsConnected:NO];
+        [socket setDelegate:nil];
 		[socket autorelease];
 		socket = nil;
 		[self setPendingCmd:nil];
@@ -416,17 +416,17 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 - (void) sendCmd
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
-	[socket write:bytes length:[pendingCmd length]];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+    if([pendingCmd length]){
+        const char* bytes = [pendingCmd cStringUsingEncoding:NSASCIIStringEncoding];
+        [socket write:bytes length:[pendingCmd length]];
+    }
+    [self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+
 }
-		 
+
 - (void) timeout
 {
-	if([self isConnected]){
-		[self disconnect];
-	}
-	else [self setPendingCmd:nil];
+    [self setPendingCmd:nil];
 }
 		 
 - (void) setPendingCmd:(NSString*)aCmd

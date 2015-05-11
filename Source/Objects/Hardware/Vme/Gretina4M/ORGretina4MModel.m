@@ -1392,12 +1392,64 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
 	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
+
+	if (mainVersion > kCurrentFirmwareVersion){
+		NSLog(@"Main FPGA version is higher than expected: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
+	}
     
-	if (mainVersion != kCurrentFirmwareVersion){
+	if (mainVersion < kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
 		return NO;
 	}
     else return YES;
+}
+
+- (void) clockManagerReset
+{
+//    The reset sequence suggested by Thorsten
+//    "the reset sequence for the clock managers in the FPGA and the DAQ part of the FPGA.
+//    All the write go into register ox848
+//    0x1C01
+//    0x1801
+//    0x1001
+//    0x0001
+//    We wait about 100ms between each write."
+
+	unsigned long theValues[] = {0x1C01, 0x1801, 0x1001, 0x001};
+    for (int i=0; i<4; i++) {
+        [[self adapter] writeLongBlock:&theValues[i]
+                             atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        [ORTimer delay:0.1];
+    }
+    return;
+}
+- (void) setClockPhase:(unsigned long)value
+{
+//    	unsigned long theValue =
+    [[self adapter] writeLongBlock:&value
+                         atAddress:[self baseAddress] + register_information[kADCConfig].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    [ORTimer delay:0.1];
+
+    return;
+	
+}
+
+- (unsigned long) readClockPhase
+{
+    unsigned long theValue = 0 ;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_information[kADCConfig].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    return theValue;
 }
 
 - (void) initBoard
@@ -1427,9 +1479,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             [self writeRisingEdgeWindow:i];
         }
     }
-    //[ORTimer delay:.1];
     //enable channels
     [self resetFIFO];
+    [ORTimer delay:.1];
+    [self resetFIFO];
+    [ORTimer delay:.1];
 
     for(i=0;i<kNumGretina4MChannels;i++){
         if([self enabled:i]){

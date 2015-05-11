@@ -31,7 +31,6 @@
 @required
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
-- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 @end
 
 #define kUseTubeView	0
@@ -86,14 +85,9 @@
     
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
+    NSDictionary* _mtcConfigDoc;
     NSMutableDictionary* _runTypeDocumentPhysics;
-    NSMutableDictionary* smellieRunHeaderDocList;
-    
-    bool _smellieDBReadInProgress;
-    bool _smellieDocUploaded;
 }
-
-@property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -116,13 +110,10 @@
 @property (nonatomic,assign) unsigned long epedDataId;
 @property (nonatomic,assign) unsigned long rhdrDataId;
 
-@property (nonatomic,assign) bool smellieDBReadInProgress;
-@property (nonatomic,assign) bool smellieDocUploaded;
-
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
+@property (copy) NSDictionary* mtcConfigDoc;
 
-- (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
 - (id) orcaDBConnectionHistoryItem:(unsigned int)index;
@@ -179,11 +170,6 @@
 #pragma mark ¥¥¥SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
-- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
-
-//smellie functions -------
-- (void) getSmellieRunListInfo;
-- (NSMutableDictionary*)smellieTestFct;
 
 @end
 

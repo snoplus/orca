@@ -59,7 +59,6 @@
 - (NSOperation*) changesFeedMode:(NSString*)mode heartbeat:(NSUInteger)heartbeat tag:(NSString*)aTag filter:(NSString*)filter;
 
 #pragma mark ***CouchDB Checks
-- (BOOL) couchDBRunning;
 
 @property (assign)	id					delegate;
 @property (retain)	NSOperationQueue*	queue;

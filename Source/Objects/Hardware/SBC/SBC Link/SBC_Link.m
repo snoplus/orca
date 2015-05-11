@@ -1838,7 +1838,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	//get the host info
 	struct sockaddr_in target_address;					// connector's address information 
 	struct hostent* he=gethostbyname([IPNumber cStringUsingEncoding:NSASCIIStringEncoding]);
-	if(!he) [NSException raise:@"HostByName Failed" format:@"Couldn't couldn't get hostname for %@",IPNumber];
+	if(!he) [NSException raise:@"HostByName Failed" format:@"Couldn't get hostname for %@",IPNumber];
 	
 	target_address.sin_family = AF_INET;				// host byte order 
 	target_address.sin_port = htons(aPort);				// short, network byte order 
@@ -1846,7 +1846,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	memset(&(target_address.sin_zero), '\0', 8);		// zero the rest of the struct 
 	
     int sck = socket(AF_INET, SOCK_STREAM, 0);
-	if(sck == kError)[NSException raise:@"Socket Failed" format:@"Couldn't couldn't get a socket for %@ Port %d",IPNumber,aPort];
+	if(sck == kError)[NSException raise:@"Socket Failed" format:@"Couldn't get a socket for %@ Port %d",IPNumber,aPort];
 	
 	int oflag = fcntl(sck, F_GETFL);
 	fcntl(sck, F_SETFL, oflag | O_NONBLOCK);

@@ -22,7 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
 
-#define kApcPollTime            60*10
+#define kApcPollTime            60*3
 #define kApcUpsPort             23
 #define kNumApcUpsAdcChannels    7
 
@@ -49,9 +49,12 @@
     float lowLimit[kNumApcUpsAdcChannels];
     float hiLimit[kNumApcUpsAdcChannels];
 
+    unsigned int pollTime;
 }
 
 #pragma mark ***Accessors
+- (unsigned int) pollTime;
+- (void) setPollTime:(unsigned int)aPollTime;
 - (NSMutableSet*) eventLog;
 - (void) setEventLog:(NSMutableSet*)aEventLog;
 - (NSString*) ipAddress;

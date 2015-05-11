@@ -27,4 +27,5 @@
 
 #pragma mark ¥¥¥Data Source
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y;
+- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
 @end
