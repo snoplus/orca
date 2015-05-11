@@ -168,6 +168,8 @@
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 
+-(void) eStopPoll;
+
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
@@ -217,4 +219,3 @@
 extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
-extern NSString* SNOPRunTypeChangedNotification;

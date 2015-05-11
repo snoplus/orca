@@ -153,11 +153,6 @@ smellieRunFile;
                          name: ORRunStatusChangedNotification
                        object: theRunControl];
     
-    [notifyCenter addObserver:self
-                     selector:@selector(runTypeChanged:)
-                         name:SNOPRunTypeChangedNotification
-                       object:self];
-    
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
                      selector:@selector(runTypesChanged:)
@@ -248,14 +243,6 @@ smellieRunFile;
     [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
 }
 
--(void) runTypeChanged:(NSNotification*)aNote
-{
-    [lastRunType setIntValue:[[model runTypeMask] intValue]]; //update the old run types
-    //[currentRunType setIntValue:[aNote intValue]]; //update the current Run Type
-    
-}
-
-
 - (IBAction) startRunAction:(id)sender
 {
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -280,9 +267,8 @@ smellieRunFile;
             //[model setRunType:kRunStandardPhysicsRun];
         }
     }
-    else if ([[sender title] isEqualToString:@"Start Run"]){
+    else if ([[sender title] isEqualToString:@"Start Maint. Run"]){
         //[model setRunType:kRunMaintainence];
-        NSLog(@"Starting a run from SNOP");
     }
     else{
         NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
@@ -429,6 +415,16 @@ smellieRunFile;
     if([theRunControl waitRequestersCount]==0)s = @"Between Sub Runs..";
     else s = @"'TweenSubRuns (Waiting)";
     return s;
+}
+
+
+
+- (void) runTypeChanged:(NSNotification*)aNotification
+{
+    //TODO: Call the database and fetch the run_type for this run 
+    //TODO: Set the run type for the current run
+    //TODO: Set the run type for the next run 
+    
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -912,6 +908,11 @@ smellieRunFile;
     
     //[theELLIEModel release];
     
+}
+
+-(IBAction)eStop:(id)sender
+{
+    [model eStopPoll];
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender
