@@ -99,6 +99,10 @@
     IBOutlet NSButton *startTellieRunButton;
     IBOutlet NSButton *stopTellieRunButton;
     NSTextField *automaticallyChangeTellieTriggerInput;
+    
+    IBOutlet NSTextField * tellieNumofShots;
+    
+    NSThread *tellieThread;
 }
 
 

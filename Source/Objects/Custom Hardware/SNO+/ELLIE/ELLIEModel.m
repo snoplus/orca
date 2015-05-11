@@ -172,22 +172,51 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
     
     //wait a small amount of time to establish sub run info 
-    [NSThread sleepForTimeInterval:0.5f];
+    //[NSThread sleepForTimeInterval:0.5f];
     
     //TODO:Add this back in 
     //Post to the Database what is about to happen
-    NSString *responseFromTellie = [[NSString alloc] init];
-    NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n 10",@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
+    __block NSString * responseFromTellie = [[NSString alloc] init];
+    NSArray * nullCommandArguments = @[@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[[fireCommands objectForKey:@"number_of_shots"] stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
     
-    //TODO: Only post if there is a good reason.
-    [self updateTellieDocument:fireCommands];
+    //NSArray * tellieCommandLineArguments = @[@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py",@"-c",[[fireCommands objectForKey:@"channel"] stringValue],@"-n",[[fireCommands objectForKey:@"number_of_shots"] stringValue],@"-d",[[fireCommands objectForKey:@"pulse_rate"] stringValue],@"-t",[[fireCommands objectForKey:@"trigger_delay"] stringValue],@"-w",[[fireCommands objectForKey:@"pulse_width"] stringValue],@"-z",[[fireCommands objectForKey:@"pulse_height"] stringValue],@"-x",[[fireCommands objectForKey:@"fibre_delay"] stringValue]];
     
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
-    NSLog(@"Response from Tellie: %@\n",responseFromTellie);
-    
+    //responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
 
+    //responseFromTellie = [self performSelector:@selector(callPythonScript:withCmdLineArgs:) onThread:[NSThread currentThread] withObject:tellieCommandLineArguments waitUntilDone:YES];
+    
+    double numberOfShots = [[fireCommands objectForKey:@"number_of_shots"] doubleValue];
+    double timeBetweenShotsInMicroSeconds = [[fireCommands objectForKey:@"pulse_rate"] doubleValue]/(1000);
+    double timeToSleep = 1.0*numberOfShots*timeBetweenShotsInMicroSeconds;
+    
+    
+    //hold the fire command on this thread
+    dispatch_sync(dispatch_get_current_queue(), ^{
+        responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_fire_script.py" withCmdLineArgs:nullCommandArguments];
+        NSLog(@"Response from Tellie Fire command: %@\n",responseFromTellie);
+    });
+
+    NSLog(@"in here");
+    [NSThread sleepForTimeInterval:timeToSleep];
+    
+    //[NSThread sleepForTimeInterval:1.0];
+    __block NSString * responseFromPoll = [[NSString alloc] init];
+    dispatch_sync(dispatch_get_current_queue(), ^{
+        responseFromPoll = [self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
+        NSLog(@"Response from Tellie Fire command: %@\n",responseFromPoll);
+    });
+    
+    @try {
+        [fireCommands setObject:[NSNumber numberWithInt:[responseFromPoll intValue]] forKey:@"pin_readout"];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Unable to add pin readout due to error %@",exception);
+    }
+    
+    [self updateTellieDocument:fireCommands];
 
 }
+
 
 -(void) stopTellieFibre:(NSArray*)fireCommands
 {
@@ -254,8 +283,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2], nil]];
     }
     
-    else if ([commandLineArgs count] == 13){ //this is the case for the fire tellie commands
-        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],[commandLineArgs objectAtIndex:3],[commandLineArgs objectAtIndex:4],[commandLineArgs objectAtIndex:5],[commandLineArgs objectAtIndex:6],[commandLineArgs objectAtIndex:7],[commandLineArgs objectAtIndex:8],[commandLineArgs objectAtIndex:9],[commandLineArgs objectAtIndex:10],[commandLineArgs objectAtIndex:11],[commandLineArgs objectAtIndex:12], nil]];
+    else if ([commandLineArgs count] == 14){ //this is the case for the fire tellie commands
+        [task setArguments: [NSArray arrayWithObjects:pythonScriptFilePath,[commandLineArgs objectAtIndex:0],[commandLineArgs objectAtIndex:1],[commandLineArgs objectAtIndex:2],[commandLineArgs objectAtIndex:3],[commandLineArgs objectAtIndex:4],[commandLineArgs objectAtIndex:5],[commandLineArgs objectAtIndex:6],[commandLineArgs objectAtIndex:7],[commandLineArgs objectAtIndex:8],[commandLineArgs objectAtIndex:9],[commandLineArgs objectAtIndex:10],[commandLineArgs objectAtIndex:11],[commandLineArgs objectAtIndex:12],[commandLineArgs objectAtIndex:13], nil]];
     }
     else if ([commandLineArgs count] == 0){  //this is for the tellie poll script
         [task setArguments:[NSArray arrayWithObjects:pythonScriptFilePath, nil]];
@@ -449,12 +478,20 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* subRunDocDict = [[self.tellieSubRunSettings mutableCopy] autorelease];
     
     [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-        
+    @try{
+        [subRunDocDict setObject:[NSNumber numberWithInt:[[subRunDoc objectForKey:@"pin_readout"] intValue]] forKey:@"pin_readout"];
+    }
+    @catch (NSException *e) {
+        NSLog(@"Error in pin readout %@",e);
+    }
     NSMutableArray * subRunInfo = [[NSMutableArray alloc] initWithCapacity:10];
     subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
+
     
     [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
+    
+
     
     self.tellieRunDoc = runDocDict;
     
