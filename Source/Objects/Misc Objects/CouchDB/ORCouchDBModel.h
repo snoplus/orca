@@ -76,6 +76,7 @@
 - (void) setUsingUpdateHandler:(BOOL)aState;
 - (BOOL) replicationRunning;
 - (void) setReplicationRunning:(BOOL)aState;
+- (BOOL) couchRunning;
 - (BOOL) keepHistory;
 - (void) setKeepHistory:(BOOL)aKeepHistory;
 - (BOOL) stealthMode;

@@ -20,7 +20,6 @@
 
 #import "OrcaObject.h"
 @class ORAlarm;
-@class ORFileMoverOp;
 
 @interface ORRaidMonitorModel : OrcaObject
 {
@@ -40,7 +39,6 @@
 	ORAlarm*            badDiskAlarm;
     NSDateFormatter*    dateFormatter;
     NSDateFormatter*    dateConvertFormatter;
-    ORFileMoverOp*      fileMover;
 }
 
 #pragma mark ***Initialization
@@ -67,8 +65,6 @@
 #pragma mark ***scp action
 - (void) getStatus;
 - (void) fileGetterIsDone;
-- (void) shutdown;
-- (void) fileMoverIsDone;
 @end
 
 extern NSString* ORRaidMonitorModelResultDictionaryChanged;

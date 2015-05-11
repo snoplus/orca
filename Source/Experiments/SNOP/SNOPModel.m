@@ -36,18 +36,17 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
+#import "ELLIEModel.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 
-
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
 #define kOrcaConfigDocumentAdded @"kOrcaConfigDocumentAdded"
 #define kOrcaConfigDocumentUpdated @"kOrcaConfigDocumentUpdated"
-#define kMtcRunDocumentAdded @"kMtcRunDocumentAdded"
 
 #define kMorcaCompactDB         @"kMorcaCompactDB"
 
@@ -79,8 +78,11 @@ debugDBPingTask = _debugDBPingTask,
 epedDataId = _epedDataId,
 rhdrDataId = _rhdrDataId,
 runDocument = _runDocument,
-configDocument  = _configDocument,
-mtcConfigDoc = _mtcConfigDoc;
+smellieDBReadInProgress = _smellieDBReadInProgress,
+smellieDocUploaded = _smellieDocUploaded,
+configDocument  = _configDocument;
+
+@synthesize smellieRunHeaderDocList;
 
 #pragma mark ¥¥¥Initialization
 
@@ -117,6 +119,15 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     [super sleep];
     //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(morcaUpdateDB) object:nil];
+}
+
+- (void) initSmellieRunDocsDic
+{
+    [self setSmellieDBReadInProgress:NO];
+    
+    if(!self.smellieRunHeaderDocList) {
+        self.smellieRunHeaderDocList = nil;//[[NSMutableDictionary alloc] init];
+    }
 }
 
 - (void) initOrcaDBConnectionHistory
@@ -211,8 +222,6 @@ mtcConfigDoc = _mtcConfigDoc;
     self.runDocument = nil;
     //intialise the configuation document
     self.configDocument = nil;
-    //initilise the run document
-    self.mtcConfigDoc = nil;
     
     [NSThread detachNewThreadSelector:@selector(_runDocumentWorker) toTarget:self withObject:nil];
 
@@ -511,14 +520,19 @@ mtcConfigDoc = _mtcConfigDoc;
             self.runDocument = runDoc;
             //[aResult prettyPrint:@"CouchDB Ack Doc:"];
         }
+        
+        //This is called when smellie run header is queried from CouchDB
+        else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"])
+        {
+            //NSLog(@"here\n");
+            //NSLog(@"Object: %@\n",aResult);
+            //NSLog(@"result1: %@\n",[aResult objectForKey:@"rows"]);
+            //NSLog(@"result2: %@\n",[[aResult objectForKey:@"rows"] objectAtIndexedSubscript:0]);
+            [self parseSmellieRunHeaderDoc:aResult];
+        }
         else if ([aTag isEqualToString:kOrcaRunDocumentUpdated]) {
             //there was error
             //[aResult prettyPrint:@"couchdb update doc:"];
-        }
-        else if([aTag isEqualToString:kMtcRunDocumentAdded]){
-            NSMutableDictionary* mtcConfigDoc = [[[self mtcConfigDoc] mutableCopy] autorelease];
-            [mtcConfigDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
-            self.mtcConfigDoc = mtcConfigDoc;
         }
         //Look for the configuration document tag
         else if ([aTag isEqualToString:kOrcaConfigDocumentAdded]) {
@@ -655,6 +669,7 @@ mtcConfigDoc = _mtcConfigDoc;
     [[self undoManager] disableUndoRegistration];
 	[self initOrcaDBConnectionHistory];
 	[self initDebugDBConnectionHistory];
+    [self initSmellieRunDocsDic];
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
@@ -773,6 +788,22 @@ mtcConfigDoc = _mtcConfigDoc;
     return [[result retain] autorelease];
 }
 
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
+ {
+ 
+     ORCouchDB* result = [ORCouchDB couchHost:self.orcaDBIPAddress
+                                         port:self.orcaDBPort
+                                     username:self.orcaDBUserName
+                                          pwd:self.orcaDBPassword
+                                     database:entryDB
+                                     delegate:self];
+ 
+     if (aCouchDelegate)
+         [result setDelegate:aCouchDelegate];
+ 
+     return [[result retain] autorelease];
+ }
+
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate
 {
     return nil;
@@ -798,6 +829,66 @@ mtcConfigDoc = _mtcConfigDoc;
     
 }
 
+- (void) getSmellieRunListInfo
+{
+    //Collect a series of objects from the ORMTCModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    
+    //Initialise the MTCModal
+    ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
+    
+    //NSMutableDictionary *state = [[NSMutableDictionary alloc] initWithDictionary:[anELLIEModel pullEllieCustomRunFromDB:@"smellie"]];
+    
+    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
+    
+    [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
+    
+    [self setSmellieDBReadInProgress:YES];
+    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+    
+}
+
+//complete this after the smellie documents have been recieved 
+-(void)smellieDocumentsRecieved
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(smellieDocumentsRecieved) object:nil];
+    if (![self smellieDBReadInProgress]) { //killed already
+        return;
+    }
+    
+    [self setSmellieDBReadInProgress:NO];
+    
+}
+
+-(void) parseSmellieRunHeaderDoc:(id)aResult
+{
+    unsigned int i,cnt = [[aResult objectForKey:@"rows"] count];
+    
+    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] init];
+    
+    for(i=0;i<cnt;i++){
+        NSMutableDictionary* smellieRunHeaderDocIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
+        NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
+        [tmp setObject:smellieRunHeaderDocIterator forKey:keyForSmellieDocs];
+    }
+
+    [self setSmellieRunHeaderDocList:tmp];
+    [tmp release];
+    
+    [self setSmellieDocUploaded:YES];
+}
+
+- (NSMutableDictionary*)smellieTestFct
+{
+    if([self smellieDocUploaded] == YES){
+        return smellieRunHeaderDocList;
+    }
+    else{
+        NSLog(@"Document no loaded yet\n");
+        return nil;
+    }
+}
+
 @end
 
 @implementation SNOPModel (private)
@@ -806,42 +897,6 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
     [snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
-    snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    NSDate* strDate;
-    if (!aDate)
-        strDate = [NSDate date];
-    else
-        strDate = aDate;
-    NSString* result = [snotDateFormatter stringFromDate:strDate];
-    [snotDateFormatter release];
-    strDate = nil;
-    return [[result retain] autorelease];
-}
-
-//iso formatted string from date
-- (NSString*) stringUnixFromDate:(NSDate*)aDate
-{
-    //NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
-    //[snotDateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SS'Z'"];
-    //snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    NSDate* strDate;
-    if (!aDate)
-        strDate = [NSDate date];
-    else
-        strDate = aDate;
-    //strDate.date.timeIntervalSince1970
-    NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
-    //[snotDateFormatter release];
-    strDate = nil;
-    return [[result retain] autorelease];
-}
-
-
-//rfc2822 formatted string from date
-- (NSString*) rfc2822StringDateFromDate:(NSDate*)aDate
-{
-    NSDateFormatter* snotDateFormatter = [[NSDateFormatter alloc] init];
-    [snotDateFormatter setDateFormat:@"EEE, dd MMM yyyy HH:mm:ss Z"];
     snotDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
     NSDate* strDate;
     if (!aDate)
@@ -871,25 +926,18 @@ mtcConfigDoc = _mtcConfigDoc;
     NSNumber* runNumber = [NSNumber numberWithUnsignedInt:run_number];
 
     [runDocDict setObject:@"run" forKey:@"doc_type"];
-    [runDocDict setObject:@"physics" forKey:@"run_type"];
-    [runDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_start"];
-    [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_start"];
-    [runDocDict setObject:runNumber forKey:@"run"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
+    [runDocDict setObject:runNumber forKey:@"run_number"];
     [runDocDict setObject:@"starting" forKey:@"run_status"];
     
     //[runDocDict setObject:runStartString forKey:@"run_start"];
-    [runDocDict setObject:@"" forKey:@"time_stamp_end"];
-    [runDocDict setObject:@"" forKey:@"sudbury_time_end"];
-    //[runDocDict setObject:@"" forKey:@"run_stop"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_start"];
+
+    [runDocDict setObject:@"" forKey:@"run_stop"];
 
     self.runDocument = runDocDict;
-    
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
-    }
-    
+    [[self orcaDbRef:self] addDocument:runDocDict tag:kOrcaRunDocumentAdded];
+
     //wait for main thread to receive acknowledgement from couchdb
     NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
     while ([timeout timeIntervalSinceNow] > 0 && ![self.runDocument objectForKey:@"_id"]) {
@@ -897,21 +945,17 @@ mtcConfigDoc = _mtcConfigDoc;
     }
     
     //if failed emit alarm and give up
+    
     runDocDict = [[[self runDocument] mutableCopy] autorelease];
     if (rc) {
         NSDate* runStart = [[[rc startTime] copy] autorelease];
         [runStartString setString:[self stringDateFromDate:runStart]];
     }
     [runDocDict setObject:@"in progress" forKey:@"run_status"];
-        
 
     //self.runDocument = runDocDict;
-    
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
-    }
-    
+    [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
+
     //Collect a series of objects from the ORMTCModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
 
@@ -1118,12 +1162,8 @@ mtcConfigDoc = _mtcConfigDoc;
         
     int i;
 	int maskValue = [aMTCcard dbIntByIndex: kGtMask];
-    //NSString * triggerOn = @"On";
-    //NSString * triggerOff = @"Off";
-    
-    NSNumber *triggerOn = [NSNumber numberWithInt:1];
-    NSNumber *triggerOff = [NSNumber numberWithInt:0];
-    
+    NSString * triggerOn = @"On";
+    NSString * triggerOff = @"Off";
     
     //add each mask to the main gtMask mutableArray §
 	for(i=0;i<26;i++){
@@ -1182,35 +1222,20 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //Fill an array with mtc information 
     NSMutableDictionary * mtcArray = [NSMutableDictionary dictionaryWithCapacity:20];
-    [mtcArray setObject:mtcCoarseDelay forKey:@"coarse_delay"];
-    [mtcArray setObject:mtcFineDelay forKey:@"fine_delay"];
-    [mtcArray setObject:mtcPedWidth forKey:@"ped_width"];
-    [mtcArray setObject:mtcGTWordMask forKey:@"gt_word_mask"];
-    [mtcArray setObject:mtcPedestalWidth forKey:@"pedestal_width"];
-    [mtcArray setObject:mtcNhit100LoPrescale forKey:@"nhit100_lo_prescale"];
-    [mtcArray setObject:mtcPulserPeriod forKey:@"pulsar_period"];
-    [mtcArray setObject:mtcLow10MhzClock forKey:@"low_10Mhz_clock"];
-    [mtcArray setObject:mtcFineSlope forKey:@"fine_slope"];
-    [mtcArray setObject:mtcMinDelayOffset forKey:@"min_delay_offset"];
+    [mtcArray setObject:mtcCoarseDelay forKey:@"mtc_coarse_delay"];
+    [mtcArray setObject:mtcFineDelay forKey:@"mtc_fine_delay"];
+    [mtcArray setObject:mtcPedWidth forKey:@"mtc_ped_width"];
+    [mtcArray setObject:mtcGTWordMask forKey:@"mtc_gt_word_mask"];
+    [mtcArray setObject:mtcPedestalWidth forKey:@"mtc_pedestal_width"];
+    [mtcArray setObject:mtcNhit100LoPrescale forKey:@"mtc_nhit100_lo_prescale"];
+    [mtcArray setObject:mtcPulserPeriod forKey:@"mtc_pulsar_period"];
+    [mtcArray setObject:mtcLow10MhzClock forKey:@"mtc_low_10Mhz_clock"];
+    [mtcArray setObject:mtcFineSlope forKey:@"mtc_fine_slope"];
+    [mtcArray setObject:mtcMinDelayOffset forKey:@"mtc_min_delay_offset"];
     [mtcArray setObject:nhitMtcaArray forKey:@"mtca_nhit_matrix"];
     [mtcArray setObject:esumArray forKey:@"mtca_esum_matrix"];
     [mtcArray setObject:triggerMask forKey:@"trigger_masks"];
     
-    
-    //make an MTC document
-    NSMutableDictionary* mtcDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
-    
-    [mtcDocDict setObject:@"mtc" forKey:@"doc_type"];
-    [mtcDocDict setObject:[NSNumber numberWithUnsignedInt:0] forKey:@"version"];
-    [mtcDocDict setObject:runNumber forKey:@"run"];
-    [mtcDocDict setObject:mtcArray forKey:@"mtc_info"];
-    
-    self.mtcConfigDoc = mtcDocDict;
-    
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] addDocument:mtcDocDict tag:kMtcRunDocumentAdded];
-    }
     
     //FILL THE DATA FROM EACH FRONT END CARD HERE !!!!!
     
@@ -1262,16 +1287,6 @@ mtcConfigDoc = _mtcConfigDoc;
         
     }//end of looping through all the Fec32 Cards
     
-    //fetching the svn version used for this DAQ build 
-    NSFileManager* fm = [NSFileManager defaultManager];
-    NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
-    NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
-    if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
-    if([svnVersion hasSuffix:@"\n"]){
-        [svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
-    }
-    
-    
     //Fill the configuration document with information
     [configDocDict setObject:@"configuration" forKey:@"doc_type"];
     [configDocDict setObject:[self stringDateFromDate:nil] forKey:@"time_stamp"];
@@ -1280,8 +1295,6 @@ mtcConfigDoc = _mtcConfigDoc;
      NSNumber * runNumberForConfig = [NSNumber numberWithUnsignedLong:[rc runNumber]];
     [configDocDict setObject:runNumberForConfig forKey:@"run_number"];
     
-    [configDocDict setObject:svnVersion forKey:@"daq_version_build"];
-    
     [configDocDict setObject:mtcArray forKey:@"mtc_info"];
     
     //this works but I'm not sure we need to see everything right now???
@@ -1289,11 +1302,7 @@ mtcConfigDoc = _mtcConfigDoc;
     
     //add the configuration document
     self.configDocument = configDocDict;
-    
-    //check to see if this is an offline run 
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
-    }
+    [[self orcaDbRef:self] addDocument:configDocDict tag:kOrcaConfigDocumentAdded];
     //NSLog(@"Adding configuation file \n");
     
     //wait for main thread to receive acknowledgement from couchdb
@@ -1365,21 +1374,16 @@ mtcConfigDoc = _mtcConfigDoc;
     NSMutableDictionary* runDocDict = [[runDoc mutableCopy] autorelease];
 
     [runDocDict setObject:@"done" forKey:@"run_status"];
-    //[runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_stop"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"time_stamp_end"];
-    [runDocDict setObject:[self rfc2822StringDateFromDate:nil] forKey:@"sudbury_time_end"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"run_stop"];
 
     //after run stats
     //alarm logs
     //end of run xl3 logs
     //ellie
 
-    //check to see if run is offline or not
-    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        [[self orcaDbRef:self] updateDocument:runDocDict
-                                   documentId:[runDocDict objectForKey:@"_id"]
-                                          tag:kOrcaRunDocumentUpdated];
-    }
+    [[self orcaDbRef:self] updateDocument:runDocDict
+                               documentId:[runDocDict objectForKey:@"_id"]
+                                      tag:kOrcaRunDocumentUpdated];
     
     [runDocPool release];
 }

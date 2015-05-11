@@ -26,13 +26,17 @@
 #import "ORAxis.h"
 #import "ORDetectorSegment.h"
 #import "ORXL3Model.h"
+#import "ELLIEModel.h"
+#import "ORCouchDB.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
 @implementation SNOPController
 
 @synthesize
-runStopImg = _runStopImg;
+runStopImg = _runStopImg,
+smellieRunFileList,
+smellieRunFile;
 
 #pragma mark ¥¥¥Initialization
 -(id)init
@@ -51,15 +55,22 @@ runStopImg = _runStopImg;
 -(void) awakeFromNib
 {
 	detectorSize		= NSMakeSize(620,595);
-	detailsSize		= NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(450,480);
-	hvMasterSize		= NSMakeSize(620,595);
+	//detailsSize		= NSMakeSize(450,589);
+    detailsSize		= NSMakeSize(620,595);
+	//focalPlaneSize		= NSMakeSize(450,589);
+	focalPlaneSize		= NSMakeSize(620,595);
+    //couchDBSize		= NSMakeSize(450,480);
+	couchDBSize		= NSMakeSize(620,595);
+    hvMasterSize		= NSMakeSize(620,595);
 	runsSize		= NSMakeSize(620,595);
 	
 	blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
 	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    
+    //pull the information from the SMELLIE DB
+    [model getSmellieRunListInfo];
+    
     
 	[super awakeFromNib];
 }
@@ -75,7 +86,7 @@ runStopImg = _runStopImg;
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
                          name : ORSNOPModelViewTypeChanged
-			object: model];
+                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(dbOrcaDBIPChanged:)
@@ -95,6 +106,11 @@ runStopImg = _runStopImg;
     [notifyCenter addObserver : self
                      selector : @selector(hvStatusChanged:)
                          name : ORXL3ModelHVNominalVoltageChanged
+                        object: nil];
+    
+    [notifyCenter addObserver :self
+                     selector : @selector(stopSmellieRunAction:)
+                         name : ORELLIERunFinished
                         object: nil];
 }
 
@@ -416,6 +432,217 @@ runStopImg = _runStopImg;
     }
     
     return nil;
+}
+
+//smellie functions ----------------------------------------------
+
+//this fetches the smellie run file information 
+- (IBAction) callSmellieSettings:(id)sender
+{
+    //remove any old smellie file values 
+    self.smellieRunFileList = nil;
+    NSMutableDictionary *tmp = [[NSMutableDictionary alloc] initWithDictionary:[model smellieTestFct]];
+    
+    //remove all the old items 
+    [smellieRunFileNameField removeAllItems];
+    
+    //Fill lthe combo box with information 
+    for(id key in tmp){
+        id loopValue = [tmp objectForKey:key];
+        [smellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+    }
+
+    [smellieRunFileNameField setEnabled:YES];
+    [smellieLoadRunFile setEnabled:YES];
+
+    self.smellieRunFileList = tmp;
+    [tmp release];
+
+}
+
+-(IBAction)loadSmellieRunAction:(id)sender
+{
+    if([smellieRunFileNameField objectValueOfSelectedItem]!= nil)
+    {
+        //Loop through all the smellie files in the run list 
+        for(id key in self.smellieRunFileList){
+            
+            id loopValue = [self.smellieRunFileList objectForKey:key];
+            
+            NSString *string1 = [loopValue objectForKey:@"run_name"];
+            NSString *string2 = [smellieRunFileNameField objectValueOfSelectedItem];
+            
+            if( [string1 isEqualToString:string2]){
+                self.smellieRunFile = loopValue;
+                
+                [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
+                [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
+                [loadedSmellieOperationModeLabel setStringValue:[smellieRunFile objectForKey:@"operation_mode"]];
+                [loadedSmellieMaxIntensityLaser setStringValue:[smellieRunFile objectForKey:@"max_laser_intensity"]];
+                [loadedSmellieMinIntensityLaser setStringValue:[smellieRunFile objectForKey:@"min_laser_intensity"]];
+                
+                //counters of fibres and Lasers
+                int fibreCounter=  0;
+                int laserCounter = 0;
+                
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS007"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS107"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS207"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS025"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS125"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS225"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS037"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS137"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS237"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS055"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS155"] intValue];
+                fibreCounter = fibreCounter + [[self.smellieRunFile objectForKey:@"FS255"] intValue];
+                
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue];
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue];
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue];
+                laserCounter = laserCounter + [[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue];
+                
+                [loadedSmellieFibresLabel setStringValue:[NSString stringWithFormat:@"%i",fibreCounter]];
+                
+                //Concatenate the laser string
+                NSMutableString * smellieLaserString = [[NSMutableString alloc] init];
+                
+                //see if the 375nm laser is on 
+                if([[self.smellieRunFile objectForKey:@"375nm_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" 375nm "];
+                }
+                
+                //see if the 405nm laser is on
+                if([[self.smellieRunFile objectForKey:@"405nm_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" 405nm "];
+                }
+                
+                //see if the 440nm laser is on
+                if([[self.smellieRunFile objectForKey:@"440nm_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" 440nm "];
+                }
+                
+                //see if the 500nm laser is on
+                if([[self.smellieRunFile objectForKey:@"500nm_laser_on"] intValue] == 1){
+                    [smellieLaserString appendString:@" 500nm "];
+                }
+                
+                //Calculate the approximate time of the run
+                float triggerFrequency = [[smellieRunFile objectForKey:@"trigger_frequency"] floatValue];
+                float numberTriggersPerLoop = [[smellieRunFile objectForKey:@"triggers_per_loop"] floatValue];
+                float timePerLaserPerFibrePerIntensity = (1.0/triggerFrequency)*numberTriggersPerLoop + 13.0;
+                float numberOfIntensities = [[smellieRunFile objectForKey:@"num_intensity_steps"] floatValue];
+                float timePerLaserPerFibre = timePerLaserPerFibrePerIntensity*numberOfIntensities;
+                float timePerLaser = timePerLaserPerFibre*(1.0*fibreCounter);
+                
+                //final approx time plus the laser switchover time
+                float totalTime = timePerLaser*(1.0*laserCounter) + (30*laserCounter);
+                
+                //return total approx time in minutes
+                totalTime = totalTime/60.0; 
+                
+                [loadedSmellieApproxTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",totalTime]];
+                [loadedSmellieLasersLabel setStringValue:smellieLaserString];
+                
+                //unlock the control buttons
+                [smellieCheckInterlock setEnabled:YES];
+                [smellieLaserString release];
+                
+            }
+        }
+    }
+    else{
+        [smellieCheckInterlock setEnabled:NO];
+        NSLog(@"Main SNO+ Control:Please choose a Smellie Run File from selection\n");
+    }
+}
+
+- (IBAction) checkSmellieInterlockAction:(id)sender
+{
+    //Check interlock with them model here
+    [smellieStartRunButton setEnabled:YES];
+    [smellieStopRunButton setEnabled:YES];
+    [smellieEmergencyStop setEnabled:YES];
+}
+
+- (IBAction) startSmellieRunAction:(id)sender
+{
+    [smellieLoadRunFile setEnabled:NO];
+    [smellieRunFileNameField setEnabled:NO];
+    [smellieStopRunButton setEnabled:YES];
+    [smellieStartRunButton setEnabled:NO];
+    [smellieCheckInterlock setEnabled:NO];
+    
+    //start different sub runs as the laser runs through
+    //communicate with smellie model
+    
+    //Collect a series of objects from the ELLIEModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    
+    //get the ELLIE Model object
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    
+    //Method for completing this without a new thread 
+    //[theELLIEModel startSmellieRun:smellieRunFile];
+    
+    smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
+    [smellieThread start];
+    
+    
+    //[NSThread detachNewThreadSelector:@selector(startSmellieRun:) toTarget:theELLIEModel withObject:smellieRunFile];
+    
+    //[theELLIEModel release];
+    
+}
+
+- (IBAction) stopSmellieRunAction:(id)sender
+{
+    [smellieLoadRunFile setEnabled:YES];
+    [smellieRunFileNameField setEnabled:YES];
+    [smellieStartRunButton setEnabled:YES];
+    [smellieStopRunButton setEnabled:NO];
+    [smellieCheckInterlock setEnabled:YES];
+   
+    //Collect a series of objects from the ELLIEModel
+    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    
+    //get the ELLIE Model object
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+    
+    /*[NSThread detachNewThreadSelector:@selector(startSmellieRun:)
+                             toTarget:theELLIEModel
+                           withObject:[smellieRunFile autorelease]];*/
+    
+    /*[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startSmellieRun:) object:smellieRunFile];*/
+    //cancel the smellie thread
+    [smellieThread cancel];
+    [smellieThread release];
+    smellieThread = nil;
+    
+    //Method for completing this without a new thread
+    [theELLIEModel stopSmellieRun];
+    
+    
+    //[theELLIEModel release];
+    
+    //wait for the current loop to finish
+    //move straight to a maintainence run
+    //communicate with smellie model
+    //TODO:Make a note in the datastream that this happened
+}
+
+- (IBAction) emergencySmellieStopAction:(id)sender
+{
+    [smellieLoadRunFile setEnabled:YES];
+    [smellieRunFileNameField setEnabled:YES];
+    [smellieStartRunButton setEnabled:NO];
+    [smellieStopRunButton setEnabled:NO];
+    [smellieCheckInterlock setEnabled:NO];
+    //turn the interlock off
+    //(if a smellie run is currently operating) start a maintainence run
+    //reset the smellie laser system
+    //TODO:Make a note in the datastream that this happened 
 }
 
 

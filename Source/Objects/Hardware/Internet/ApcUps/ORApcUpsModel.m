@@ -100,22 +100,6 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 
 #pragma mark ***Accessors
 
-- (unsigned int) pollTime
-{
-    if(pollTime==0)pollTime = kApcPollTime;
-    else if(pollTime==20)pollTime = 20;
-
-    return pollTime;
-}
-
-- (void) setPollTime:(unsigned int)aPollTime
-{
-    pollTime = aPollTime;
-    if(aPollTime==0)aPollTime = kApcPollTime;
-    else if(aPollTime==20)aPollTime = 20;
-    [self pollHardware];
-}
-
 - (NSMutableSet*) eventLog
 {
     return eventLog;
@@ -213,8 +197,8 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 {
     if([ipAddress length]!=0 && [password length]!=0 && [username length]!=0){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollHardware) object:nil];
-        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:[self pollTime]];
-        [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:[self pollTime]]];
+        [self performSelector:@selector(pollHardware) withObject:nil afterDelay:kApcPollTime];
+        [self setNextPollScheduled:[NSDate dateWithTimeIntervalSinceNow:kApcPollTime]];
         [self setLastTimePolled:[NSDate date]];
         
         [self getEvents];
@@ -357,7 +341,7 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
         for(i=0;i<8;i++){
             if(timeRate[i] == nil){
                 timeRate[i] = [[ORTimeRate alloc] init];
-                [timeRate[i] setSampleTime: [self pollTime]];
+                [timeRate[i] setSampleTime: kApcPollTime];
             }
             [timeRate[i] addDataToTimeAverage:[self valueForChannel:i]];
         }
@@ -643,8 +627,6 @@ NSString* ORApcUpsLowLimitChanged		= @"ORApcUpsLowLimitChanged";
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    
-    pollTime = kApcPollTime;
     
     [[self undoManager] disableUndoRegistration];
     [self setEventLog: [decoder decodeObjectForKey:@"eventLog"]];

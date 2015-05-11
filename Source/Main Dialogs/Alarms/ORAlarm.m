@@ -233,9 +233,8 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 	return [NSDictionary dictionaryWithObjectsAndKeys:
             [timePosted descriptionWithCalendarFormat:nil timeZone:nil locale:nil],	@"timePosted",
 							[NSNumber numberWithUnsignedLong:[self severity]],@"severity",
-							[self name],	   @"name",
-                            [self helpString], @"help",
-                            [NSNumber numberWithInt:[self acknowledged]], @"acknowledged",
+							[self name],		  @"name",
+							[self helpString], @"help",
 							nil];
 }
 

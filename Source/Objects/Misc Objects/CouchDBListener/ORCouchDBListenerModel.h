@@ -24,7 +24,7 @@
 @interface ORCouchDBListenerModel : OrcaObject {
     
     //Message Section
-    NSMutableString* statusLogString;
+    NSString* statusLogString;
     
     //CouchDB Configuration
     NSString* hostName;
@@ -50,6 +50,7 @@
     NSMutableArray* cmdTableArray;
     BOOL commonMethodsOnly;
     NSMutableDictionary* cmdDict;
+    NSString* lastRev;
     
     NSString* updatePath;
     
@@ -67,7 +68,6 @@
 //Message Section
 - (NSString*) statusLog;
 - (void) setStatusLog:(NSString*)log;
-- (void) appendStatusLog:(NSString *)log;
 - (void) log:(NSString*)message;
 
 //CouchDb Config
@@ -104,12 +104,12 @@
 
 #pragma mark ***Command Section
 - (void) updateObjectList;
-- (BOOL) executeCommand:(NSString*)key arguments:(NSArray*)val returnVal:(id*)retVal;
+- (BOOL) executeCommand:(NSString*)key value:(NSString*)val;
 - (void) setCommands:(NSMutableArray*)anArray;
 - (void) setDefaults;
 - (NSDictionary*) commandAtIndex:(int)index;
 - (NSUInteger) commandCount;
-- (void) addCommand:(NSString*)obj label:(NSString*)lab selector:(NSString*)sel info:(NSString*)info value:(NSString*)val;
+- (void) addCommand;
 - (void) removeCommand:(int)index;
 //DB Interaction
 
@@ -127,7 +127,6 @@ extern NSString* ORCouchDBListenerModelListeningChanged;
 extern NSString* ORCouchDBListenerModelObjectListChanged;
 extern NSString* ORCouchDBListenerModelCommandsChanged;
 extern NSString* ORCouchDBListenerModelStatusLogChanged;
-extern NSString* ORCouchDBListenerModelStatusLogAppended;
 extern NSString* ORCouchDBListenerModelHostChanged;
 extern NSString* ORCouchDBListenerModelPortChanged;
 extern NSString* ORCouchDBListenerModelDatabaseChanged;

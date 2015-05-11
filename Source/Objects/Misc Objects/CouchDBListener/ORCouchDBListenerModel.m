@@ -52,7 +52,6 @@ NSString* ORCouchDBListenerModelPasswordChanged            = @"ORCouchDBListener
 NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerModelListeningStatusChanged";
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
-NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerModelStatusLogAppended";
 
 @interface ORCouchDBListenerModel (private)
 - (void) _uploadCmdDesignDocument;
@@ -62,7 +61,6 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
 - (void) _processCmdDocument:(NSDictionary*) doc;
 - (void) _uploadAllSections;
 - (BOOL) checkSyntax:(NSString*) key;
-- (id) _convertInvocationReturn:(NSInvocation*)inv;
 - (ORCouchDB*) statusDBRef:(NSString*)db_name;
 - (ORCouchDB*) statusDBRef;
 @end
@@ -139,17 +137,15 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
     } else {
         
         NSString* message;
-        id returnVal = [NSNull null];
         NSString* key=[doc valueForKey:@"execute"];
-        id val=[doc valueForKey:@"arguments"];
+        NSString* val=[NSString stringWithFormat:@"%@",[doc valueForKey:@"arguments"]];
         
         NSDictionary* cmd=[cmdDict objectForKey:key];
-        BOOL ok = NO;
+        
         if(cmd){
             if ([self checkSyntax:key]){
-                if([self executeCommand:key arguments:val returnVal:&returnVal]){
+                if([self executeCommand:key value:val]){
                     message=[NSString stringWithFormat:@"executed command with label '%@'",key];
-                    ok = YES;
                 }
                 else {
                     message=@"failure while trying to execute";
@@ -164,11 +160,9 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         }
         [self log:message];
         NSMutableDictionary* returnDic = [NSMutableDictionary dictionaryWithDictionary:doc];
-        NSMutableDictionary* response = [NSMutableDictionary dictionaryWithObjectsAndKeys:message,@"content",
-                                         [[NSDate date] description],@"timestamp",returnVal,@"return",
-                                         nil];
-        if (ok) [response setObject:[NSNumber numberWithBool:ok] forKey:@"ok"];
-        [returnDic setObject:response forKey:@"response"];
+        [returnDic setObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                              message,@"content",
+                              [[NSDate date] description],@"timestamp",nil] forKey:@"response"];
         [[self statusDBRef] updateDocument:returnDic
                                 documentId:[returnDic objectForKey:@"_id"]
                                        tag:nil];
@@ -223,41 +217,6 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
 	return syntaxOK;
 }
 
-- (id) _convertInvocationReturn:(NSInvocation*)inv
-{
-    const char* the_type = [[inv methodSignature] methodReturnType];
-    if (strcmp(@encode(void),the_type) == 0) return [NSNull null];
-
-    NSUInteger returnLength = [[inv methodSignature] methodReturnLength];
-    NSMutableData* buffer = [NSMutableData dataWithCapacity:returnLength];
-    void* data = (void*)[buffer bytes];
-    [inv getReturnValue:data];
-
-    // Now deal with the type
-    // If it's just an object, return it.  Maybe it works...
-    if (strcmp(@encode(id),the_type) == 0) return *((id*) data);
-
-    // now handle C scalar types.  We don't bother with anything more complicated.
-#define HANDLE_NUMBER_TYPE(capAType, atype)        \
-if (strcmp(@encode(atype), the_type) == 0)     \
-{ return [NSNumber numberWith ## capAType:*((atype*) data)]; }
-
-    HANDLE_NUMBER_TYPE(Bool, BOOL)
-    HANDLE_NUMBER_TYPE(Double, double)
-    HANDLE_NUMBER_TYPE(Float, float)
-    HANDLE_NUMBER_TYPE(Char, char)
-    HANDLE_NUMBER_TYPE(Int, int)
-    HANDLE_NUMBER_TYPE(Long, long)
-    HANDLE_NUMBER_TYPE(LongLong, long long)
-    HANDLE_NUMBER_TYPE(Short, short)
-    HANDLE_NUMBER_TYPE(UnsignedChar, unsigned char)
-    HANDLE_NUMBER_TYPE(UnsignedInt, unsigned int)
-    HANDLE_NUMBER_TYPE(UnsignedLong, unsigned long)
-    HANDLE_NUMBER_TYPE(UnsignedLongLong, unsigned long long)
-    HANDLE_NUMBER_TYPE(UnsignedShort, unsigned short)
-    return [NSNull null];
-}
-
 @end
 
 @implementation ORCouchDBListenerModel
@@ -280,7 +239,6 @@ if (strcmp(@encode(atype), the_type) == 0)     \
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [statusLogString release];
     [databaseName release];
     [userName release];
     [password release];
@@ -334,32 +292,22 @@ if (strcmp(@encode(atype), the_type) == 0)     \
 #pragma mark ***Accessors
 - (NSString*) statusLog
 {
-    if (!statusLogString) return @"";
     return statusLogString;
 }
 
 - (void) setStatusLog:(NSString *)log
 {
-    @synchronized(self) {
-        [statusLogString release];
-        statusLogString = [[NSMutableString stringWithString:log] retain];
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelStatusLogChanged object:self];
-    }
-}
-
-- (void) appendStatusLog:(NSString *)log
-{
     @synchronized(self){
-        if (!statusLogString) statusLogString = [[NSMutableString string] retain];
-        [statusLogString appendString:log];
-        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelStatusLogAppended object:log];
+        [statusLogString release];
+        statusLogString=[log retain];
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelStatusLogChanged object:self];
     }
 }
 
 - (void) log:(NSString *)message
 {
     if(message){
-        [self appendStatusLog:[NSString stringWithFormat:@"%@: %@\n", [NSDate date], message]];
+        [self setStatusLog:[[NSString stringWithFormat:@"%@: %@\n", [NSDate date], message] stringByAppendingString:statusLogString]];
     }
 }
 
@@ -597,11 +545,10 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     
 }
 
-- (BOOL) executeCommand:(NSString*) key arguments:(NSArray*)val returnVal:(id*)aReturn
+- (BOOL) executeCommand:(NSString*) key value:(NSString*)val
 {
     [self _createCmdDict];
     BOOL goodToGo = NO;
-    *aReturn = [NSNull null];
 	id aCommand = [cmdDict objectForKey:key];
     if(aCommand){
 		NSString* objID = [aCommand objectForKey:@"Object"];
@@ -609,63 +556,37 @@ if (strcmp(@encode(atype), the_type) == 0)     \
 		if(obj){
 			@try {
 				NSMutableString* setterString	= [[[aCommand objectForKey:@"Selector"] mutableCopy] autorelease];
-                
-                NSArray* theValue = (val) ? val : [[aCommand objectForKey:@"Value"] yajl_JSON];
-                if (theValue && ![theValue isKindOfClass:[NSArray class]]) {
-                    [NSException raise:@"Invalid arguments"
-                                format:@"Arguments must be an array (e.g. [1, 2.3]) of arguments"];
+                NSDecimalNumber* theValue;
+                if (val){
+                    theValue = [NSDecimalNumber decimalNumberWithString:val];
+                }
+				else {
+                    theValue   = [NSDecimalNumber decimalNumberWithString:[aCommand objectForKey:@"Value"]];
                 }
 				SEL theSetterSelector			= [NSInvocation makeSelectorFromString:setterString];
 				
 				//do the setter
 				NSMethodSignature*	theSignature	= [obj methodSignatureForSelector:theSetterSelector];
 				NSInvocation*		theInvocation	= [NSInvocation invocationWithMethodSignature:theSignature];
+				NSArray*			selectorItems	= [NSInvocation argumentsListFromSelector:setterString];
 				
 				[theInvocation setSelector:theSetterSelector];
 				int n = [theSignature numberOfArguments];
 				int i;
-                if ((n-2) != [theValue count]) {
-                    [NSException raise:@"ORCouchDBListenerInvalidArguments"
-                                format:@"Invalid argument number: (%i) seen, (%i) needed",[theValue count],(n-2)];
-                }
-				for(i=2;i<n;i++){
-                    id o = [theValue objectAtIndex:i-2];
-                    const char* the_type = [theSignature getArgumentTypeAtIndex:i];
-                    if (strcmp(@encode(id), the_type)==0) {
-                        // It's expects an object, just try to pass it in.
-                        [theInvocation setArgument:&o atIndex:i];
-                    } else {
-                        // Try to deal with numbers
-                        if (![o isKindOfClass:[NSNumber class]]) {
-                            [NSException raise:@"ORCouchDBListenerInvalidArguments"
-                                        format:@"Can only handle NSNumber type, seen (%@)",[o class]];
-                        }
-#define HANDLE_NUMBER_ARG(capAType, atype)        \
-if (strcmp(@encode(atype), the_type) == 0)         \
-{ atype tmp = [o capAType ## Value]; [theInvocation setArgument:&tmp atIndex:i]; continue; }
-                      
-                        HANDLE_NUMBER_ARG(bool, BOOL)
-                        HANDLE_NUMBER_ARG(double, double)
-                        HANDLE_NUMBER_ARG(float, float)
-                        HANDLE_NUMBER_ARG(int, int)
-                        HANDLE_NUMBER_ARG(double, double)
-                        HANDLE_NUMBER_ARG(long, long)
-                        HANDLE_NUMBER_ARG(longLong, long long)
-                        HANDLE_NUMBER_ARG(short, short)
-                        HANDLE_NUMBER_ARG(unsignedChar, unsigned char)
-                        HANDLE_NUMBER_ARG(unsignedInt, unsigned int)
-                        HANDLE_NUMBER_ARG(unsignedLong, unsigned long)
-                        HANDLE_NUMBER_ARG(unsignedLongLong, unsigned long)
-                        HANDLE_NUMBER_ARG(unsignedShort, unsigned short)
-                        [NSException raise:@"ORCouchDBListenerInvalidArguments"
-                                    format:@"Found invalid requested number type as argument(%s)?!",the_type];
-                    }
+				int count=0;
+				for(i=1;i<n;i+=2){
+					if(i<[selectorItems count]){
+						id theArg = [selectorItems objectAtIndex:i];
+						if([theArg isEqualToString:@"$1"]){
+							theArg = theValue;
+						}
+						[theInvocation setArgument:count++ to:theArg];
+					}
 				}
 				[theInvocation setTarget:obj];
 				[theInvocation performSelectorOnMainThread:@selector(invoke)
                                                 withObject:nil
                                              waitUntilDone:YES];
-                *aReturn = [self _convertInvocationReturn:theInvocation];
                 goodToGo = YES;
 			}
 			@catch(NSException* localException){
@@ -688,6 +609,7 @@ if (strcmp(@encode(atype), the_type) == 0)         \
 - (void) setDefaults
 {
     [self setCommands:[NSMutableArray array]];
+	[self addCommand];
 }
 
 - (NSDictionary*) commandAtIndex:(int)index
@@ -703,33 +625,16 @@ if (strcmp(@encode(atype), the_type) == 0)         \
 	return [cmdTableArray count];
 }
 
-- (void) addCommand:(NSString*)obj label:(NSString*)lab selector:(NSString*)sel info:(NSString*)info value:(NSString*)val
+- (void) addCommand
 {
-    @try {
-        if ([[self cmdDict] objectForKey:lab]){
-            [NSException raise:@"ORCouchDBListerCommand"
-                        format:@"Key (%@) already in use",lab];
-        }
-        
-        NSMutableDictionary* adic = [NSMutableDictionary dictionaryWithObjectsAndKeys:obj,@"Object",
-                                     lab,@"Label",sel,@"Selector",info,@"Info",nil];
-        if(val && [val length] > 0) {
-            NSString* new_str = [val stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            if ([new_str characterAtIndex:0] != '[' && [new_str characterAtIndex:[new_str length]-1] != ']') {
-                new_str = [NSString stringWithFormat:@"[%@]",new_str];
-            }
-            if (![[new_str yajl_JSON] isKindOfClass:[NSArray class]]) {
-                [NSException raise:@"ORCouchDBListerCommand"
-                            format:@"Value must be parsable array/list: (e.g. [ 1, 23.4 ] )"];
-            }
-            [adic setObject:new_str forKey:@"Value"];
-        }
-        [cmdTableArray addObject:adic];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBListenerModelCommandsChanged object:self];
-    } @catch (NSException* exc) {
-        [self log:[NSString stringWithFormat:@"Can't add command, exception: %@",[exc reason]]];
-    }
+	[cmdTableArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+						 @"",@"Object",
+						 @"",@"Label",
+						 @"",@"Selector",
+						 @"",@"Info",
+						 nil]];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBListenerModelCommandsChanged object:self];
     
 }
 

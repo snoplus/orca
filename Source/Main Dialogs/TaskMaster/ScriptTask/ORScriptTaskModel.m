@@ -186,11 +186,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 		ORMailer* mailer = [ORMailer mailer];
 		[mailer setTo:receipients];
 		[mailer setSubject:subject];
-        
-        NSArray* parts = [theContent componentsSeparatedByString:@"\\n"];
-        NSString* escapedString = [parts componentsJoinedByString:@"\n"];
-
-		NSAttributedString* s = [[NSAttributedString alloc] initWithString:escapedString];
+		NSAttributedString* s = [[NSAttributedString alloc] initWithString:theContent];
 		[mailer setBody:s];
 		[mailer send:self];
 		[s release];

@@ -175,11 +175,7 @@
 	*y =  [model value:index];
 	*x = index;
 }
-- (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y
-{
-    return [model plotter:aPlot indexRange:aRange stride:stride x:x y:y];
-}
-                          
+
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot
 {
 	return [model rois];

@@ -53,11 +53,13 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 - (id) init
 {
     if(self = [super init]){
+        
 #if !defined(MAC_OS_X_VERSION_10_9)
         [NSBundle loadNibNamed:@"SmartFolder" owner:self];
 #else
         [[NSBundle mainBundle] loadNibNamed:@"SmartFolder" owner:self topLevelObjects:&topLevelObjects];
 #endif
+        [topLevelObjects retain];
     }
     
     [self setDirectoryName:@"~"];
@@ -72,6 +74,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [view removeFromSuperview];
+    [view release];
     [remoteHost release];
     [remotePath release];
     [remoteUserName release];
@@ -79,6 +82,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     [directoryName release];
     [fileQueue cancelAllOperations];
     [fileQueue release];
+    [topLevelObjects release];
     [super dealloc];
 }
 
