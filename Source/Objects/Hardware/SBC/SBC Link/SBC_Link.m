@@ -30,6 +30,7 @@
 #import "ORCommandList.h"
 #import "NSNotifications+Extensions.h"
 #import "NSFileManager+Extensions.h"
+#import "SNOCmds.h"
 
 #import <netdb.h>
 #import <sys/types.h>
@@ -1089,6 +1090,40 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
     return pingedSuccessfully;
 }
 
+-(BOOL) eStopPoll
+{
+    //SBC_Link* sbcLink = [self sbcLink];
+    long hvStatus = 0;
+    if( self != nil )
+    {
+        NSLog(@"Made SBC Link.\n");
+        SBC_Packet aPacket;
+        aPacket.cmdHeader.destination = kSNO;
+        aPacket.cmdHeader.cmdID = kSNOReadHVStop;
+        aPacket.cmdHeader.numberBytesinPayload = 1 * sizeof( long );
+        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
+        payloadPtr[0] = 0;
+        @try
+        {
+            [self send: &aPacket receive: &aPacket];
+            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
+            hvStatus = responsePtr[0];
+            NSLog(@"hv_status %ld",hvStatus);
+            /*if( errorCode )
+             {
+             @throw [NSException exceptionWithName:@"Reset All Camera error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
+             }*/
+        }
+        @catch( NSException* e )
+        {
+            NSLog( @"SBC failed pol hv\n" );
+            NSLog( @"Error: %@ with reason: %@\n", [e name], [e reason] );
+            //@throw e;
+        }
+    }
+    return (BOOL)hvStatus;
+}
+
 - (void) toggleCrate
 {
 	if([self isConnected]){
@@ -1108,6 +1143,8 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 			startCrateState = kTryToConnect;
 		}
 		[self performSelector:@selector(startCrateProcess) withObject:self afterDelay:0];
+
+        
 	}
 }
 
@@ -1790,7 +1827,6 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
 			//[self getRunInfoBlock];
 			[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
-			
 		}
 		@catch (NSException* localException) {
 			if(socketfd){

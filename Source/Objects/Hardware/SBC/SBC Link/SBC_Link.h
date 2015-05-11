@@ -141,6 +141,7 @@ typedef enum eSBC_ThrottleConsts{
 	long			sbcCodeVersion;
     NSDate*         lastRateUpdate;
 	unsigned long	sbcPollingRate;
+
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;

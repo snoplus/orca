@@ -153,11 +153,6 @@ smellieRunFile;
                          name: ORRunStatusChangedNotification
                        object: theRunControl];
     
-    [notifyCenter addObserver:self
-                     selector:@selector(runTypeChanged:)
-                         name:SNOPRunTypeChangedNotification
-                       object:self];
-    
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
                      selector:@selector(runTypesChanged:)
@@ -178,6 +173,7 @@ smellieRunFile;
     [self fetchRunMaskSettings];
     //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
+    [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
 }
 
 -(void) fetchRunMaskSettings
@@ -248,14 +244,6 @@ smellieRunFile;
     [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
 }
 
--(void) runTypeChanged:(NSNotification*)aNote
-{
-    [lastRunType setIntValue:[[model runTypeMask] intValue]]; //update the old run types
-    //[currentRunType setIntValue:[aNote intValue]]; //update the current Run Type
-    
-}
-
-
 - (IBAction) startRunAction:(id)sender
 {
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -280,9 +268,8 @@ smellieRunFile;
             //[model setRunType:kRunStandardPhysicsRun];
         }
     }
-    else if ([[sender title] isEqualToString:@"Start Run"]){
+    else if ([[sender title] isEqualToString:@"Start Maint. Run"]){
         //[model setRunType:kRunMaintainence];
-        NSLog(@"Starting a run from SNOP");
     }
     else{
         NSLog(@"SNOP_CONTROL:Run isn't correctly defined. Please check NSButton titles");
@@ -429,6 +416,16 @@ smellieRunFile;
     if([theRunControl waitRequestersCount]==0)s = @"Between Sub Runs..";
     else s = @"'TweenSubRuns (Waiting)";
     return s;
+}
+
+
+
+- (void) runTypeChanged:(NSNotification*)aNotification
+{
+    //TODO: Call the database and fetch the run_type for this run 
+    //TODO: Set the run type for the current run
+    //TODO: Set the run type for the next run 
+    
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -901,8 +898,8 @@ smellieRunFile;
     //[theELLIEModel startSmellieRun:smellieRunFile];
     
     //if([model isRunTypeMaskedIn:@"Smellie"]){
-    smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
-    [smellieThread start];
+        smellieThread = [[NSThread alloc] initWithTarget:theELLIEModel selector:@selector(startSmellieRun:) object:smellieRunFile];
+        [smellieThread start];
     //}
     //else{
     //    NSLog(@"Smellie Run Type is not masked in. Please mask this in and try again \n");
@@ -912,6 +909,27 @@ smellieRunFile;
     
     //[theELLIEModel release];
     
+}
+
+- (IBAction) enmergencyStopToggle:(id)sender
+{
+    /*if([emergyencyStopEnabled state] == 1){
+        [model setIsEmergencyStopEnabled:true];
+    }
+    else{
+        [model setIsEmergencyStopEnabled:false];
+    }*/
+    [model setIsEmergencyStopEnabled:(bool)[sender state]];
+}
+
+-(IBAction)eStop:(id)sender
+{
+    //if([eStopPollingThread isCancelled])
+    //eStopPollingThread = [[NSThread alloc] initWithTarget:model selector:@selector(eStopPolling) object:nil];
+    //[eStopPollingThread start]
+    //[model startEStopThread];
+    //[model eStopPoll];
+    [model eStopPolling];
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender

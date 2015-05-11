@@ -97,6 +97,10 @@
     bool _smellieDocUploaded;
     NSMutableDictionary * snopRunTypeMask;
     NSNumber * runTypeMask;
+    
+    NSThread * eStopThread;
+    
+    bool isEmergencyStopEnabled;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -127,6 +131,7 @@
 
 @property (nonatomic,assign) bool smellieDBReadInProgress;
 @property (nonatomic,assign) bool smellieDocUploaded;
+@property (nonatomic,assign) bool isEmergencyStopEnabled;
 
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
@@ -168,6 +173,9 @@
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 
+-(BOOL) eStopPoll;
+-(void) eStopPolling;
+
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
@@ -199,7 +207,7 @@
 - (void) getSmellieRunListInfo;
 - (NSMutableDictionary*)smellieTestFct;
 -(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
-
+-(void) testerHv;
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
@@ -217,4 +225,3 @@
 extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
-extern NSString* SNOPRunTypeChangedNotification;
