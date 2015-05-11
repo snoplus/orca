@@ -8,7 +8,7 @@
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
@@ -39,13 +39,12 @@
 #import "ORCaen1720Model.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
-#import "SBC_Link.h"
-#import "SNOCmds.h"
 
 NSString* ORSNOPModelViewTypeChanged	= @"ORSNOPModelViewTypeChanged";
 static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
+NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -109,6 +108,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) setSnopRunTypeMask:(NSMutableDictionary*)aSnopRunTypeMask
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:SNOPRunTypeChangedNotification object:self];
     snopRunTypeMask = aSnopRunTypeMask;
 }
 
@@ -695,51 +695,7 @@ mtcConfigDoc = _mtcConfigDoc;
 	return @"SNOPDetectorLock";
 }
 
-- (id) sbcLink
-{
-    NSArray* theSBCs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORVmecpuModel")];
-    NSLog(@"Found %d SBCs.\n", theSBCs.count);
-    for(id anSBC in theSBCs)
-    {
-        return [anSBC sbcLink];
-    }
-    return nil;
-}
-
--(void) eStopPoll
-{
-    SBC_Link* sbcLink = [self sbcLink];
-    if( sbcLink != nil )
-    {
-        NSLog(@"Made SBC Link.\n");
-        long hvStatus = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOReadHVStop;
-        aPacket.cmdHeader.numberBytesinPayload = 1 * sizeof( long );
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = 0;
-        @try
-        {
-            [sbcLink send: &aPacket receive: &aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            hvStatus = responsePtr[0];
-            NSLog(@"hv_status %ld",hvStatus);
-            /*if( errorCode )
-            {
-                @throw [NSException exceptionWithName:@"Reset All Camera error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }*/
-        }
-        @catch( NSException* e )
-        {
-            NSLog( @"SBC failed pol hv\n" );
-            NSLog( @"Error: %@ with reason: %@\n", [e name], [e reason] );
-            //@throw e;
-        }
-    }
-}
-
-- (NSString*) experimentDetailsLock
+- (NSString*) experimentDetailsLock	
 {
 	return @"SNOPDetailsLock";
 }
@@ -827,7 +783,6 @@ mtcConfigDoc = _mtcConfigDoc;
 	}
 	return @"";
 }
-
 
 #pragma mark ¥¥¥DataTaker
 - (void) setDataIds:(id)assigner
