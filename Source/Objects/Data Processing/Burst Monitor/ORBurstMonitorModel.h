@@ -103,7 +103,7 @@
     unsigned short       burstCount;
     NSString*            burstString;
 }
-
+//unsigned long long facto(unsigned long long num); recusive one does not work any more
 
 - (id)   init;
 - (void) dealloc;

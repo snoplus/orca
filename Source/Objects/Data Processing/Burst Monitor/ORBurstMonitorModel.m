@@ -380,12 +380,19 @@ NSDate* burstStart = NULL;
         return ([self diffprob:co Channels:(ch - 1) Expect:ex Found:fd]);
     }
 }
-unsigned long long fact(unsigned long long num)
+unsigned long long facto(unsigned long long num)
 {
     if (num == 0) {
         return 1;
-    } else {
-        return (num * fact(num - 1));
+    }
+    else {
+        int factorial = 1;
+        int k;
+        for(k = 1; k<num+1; k++)
+        {
+            factorial = factorial*k;
+        }
+        return factorial;
     }
 }
 
@@ -582,7 +589,12 @@ unsigned long long fact(unsigned long long num)
                                                 double peakExpect = peakP*(peakN+lowN);
                                                 for(n=0; n<(peakN + lowN + 1); n++)
                                                 {
-                                                    double partP = ( fact(peakN + lowN)/(fact(n)*fact(peakN + lowN - n)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
+                                                    //unsigned long long nfac = facto(n);
+                                                    //unsigned long long neutfac = facto(peakN+lowN);
+                                                    //unsigned long long allfac = facto(peakN+lowN-n);
+                                                    int nummy = peakN+lowN-n;
+                                                    //NSLog(@"n!, (peak+low-n)!, nummy!, denom is %i, %i, %i, %i \n", facto(n), facto(peakN + lowN - n), facto(nummy), (facto(n)*facto(peakN + lowN - n)));
+                                                    double partP = ( facto(peakN + lowN)/(facto(n)*facto(nummy)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
                                                     double partDisk = fabs(n-(peakP*(peakN + lowN)));
                                                     if ((partDisk+0.01)>fabs(peakN - peakExpect))
                                                     {
@@ -1061,6 +1073,34 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
     //calc chan prob
     double exChan =999.999;
+    if(durSec<100) //Send a cping somewhere if the burst is good enough
+    {
+        NSTask* Cping;
+        Cping =[[NSTask alloc] init];
+        NSPipe* pipe;
+        pipe = [NSPipe pipe];
+        [Cping setStandardOutput: pipe];
+        NSFileHandle* pingfile;
+        pingfile =[pipe fileHandleForReading];
+        if(0) //Send to local machine
+        {
+            [Cping setLaunchPath: @"/usr/bin/printf"];
+            [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
+        }
+        else{ //Send to halo shift
+            [Cping setLaunchPath: @"/usr/bin/ssh"];  //@"/usr/bin/ssh"
+            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.225", @"cd snews/coinccode/ ; ./cping all 0 0 0 9", nil]];
+            //[Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.225", @"cd snews/coinccode/ ; mkdir AAASNEWSPINGTEST", nil]];
+        }  // -c successfully made directories in home
+        [Cping launch]; //Send the ping!
+        //system("ssh halo@142.51.71.225 'cd snews/coinccode/ && ./cping all 0 0 0 3'"); freezes orca for about 30 seconds but works
+        
+        //NSData* pingdata;
+        //pingdata = [pingfile readDataToEndOfFile]; //dont do this, it freezes orca
+        //NSString* pingstring;
+        //pingstring =[[NSString alloc] initWithData:pingdata encoding:NSUTF8StringEncoding];
+        //NSLog(@"pingstring is %@ \n", pingstring);
+    }
     if(countsInBurst < 20)
     {
         exChan = 64.0*(1.0-exp(-(countsInBurst/64.0)));
