@@ -548,7 +548,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 #pragma mark -- Channel settings
 
 - (BOOL) enabled:(short)chan{
-    return enabled[chan];
+//    return enabled[chan];
+    bool state = GTThresholdEnabled[chan] || LTThresholdEnabled[chan];
+    return state;
+    
 }
 
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue
@@ -610,7 +613,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         NSLog(@"That wasn't supposed to happen...");
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdEnabledChanged object:self];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ChannelEnabledChanged object:self];
+
+    
+    //    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
 
 }
 
@@ -728,19 +734,19 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     thresholdMode[chan] = aValue;
     switch (aValue) {
-        case 0:
+        case 0:     // DISABLED
             [self setGTThresholdEnabled:chan withValue:NO];
             [self setLTThresholdEnabled:chan withValue:NO];
             break;
-        case 1:
+        case 1:     // GT ENABLED
             [self setGTThresholdEnabled:chan withValue:YES];
             [self setLTThresholdEnabled:chan withValue:NO];
             break;
-        case 2:
+        case 2:     // LT ENABLED
             [self setGTThresholdEnabled:chan withValue:NO];
             [self setLTThresholdEnabled:chan withValue:YES];
             break;
-        case 3:
+        case 3:     // BOTH ENABLED
             [self setGTThresholdEnabled:chan withValue:YES];
             [self setLTThresholdEnabled:chan withValue:YES];
             break;
@@ -750,8 +756,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             NSLog(@"Threshold mode was somehow set to %d, please report this error!",aValue);
             break;
     }
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
-
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ChannelEnabledChanged object:self];
+    
     //ORAdcInfoProviding protocol requirement ?
     //[self postAdcInfoProvidingValueChanged];
     

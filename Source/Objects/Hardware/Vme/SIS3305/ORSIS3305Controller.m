@@ -172,7 +172,7 @@
                      selector : @selector(thresholdModeChanged:)
                          name : ORSIS3305ThresholdModeChanged
                        object : model];
-
+    
     [notifyCenter addObserver : self
                      selector : @selector(thresholdModeChanged:)
                          name : ORSIS3305LTThresholdEnabledChanged
@@ -712,9 +712,13 @@
 - (void) channelEnabledChanged:(NSNotification*)aNote
 {
     short i;
+    short state = 0;
     for(i=0;i<kNumSIS3305Channels;i++){
-        [[channelEnabled14Matrix cellWithTag:i] setState:[model enabled:i]];
-        [[channelEnabled58Matrix cellWithTag:i] setState:[model enabled:(i+4)]];    // (i+4) is for split matrix
+        state = [model enabled:i];
+        [[channelEnabled14Matrix cellWithTag:i] setState:state];
+        
+        state = [model enabled:(i+4)];
+        [[channelEnabled58Matrix cellWithTag:i] setState:state];    // (i+4) is for split matrix
     }
 }
 
@@ -1400,7 +1404,9 @@
 
 - (IBAction) channelEnabledMaskAction:(id)sender
 {
-    [model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+    // This method does nothing, since I rewrote the [model enabled:chan] to just return the OR of GT || LT
+    
+ //   [model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
  //   - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
 
 }
