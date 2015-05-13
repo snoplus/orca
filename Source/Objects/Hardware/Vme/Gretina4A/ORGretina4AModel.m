@@ -63,18 +63,6 @@ NSString* ORGretina4ARegisterLock                       = @"ORGretina4ARegisterL
 NSString* ORGretina4ALockChanged                        = @"ORGretina4ALockChanged";
 
 NSString* ORGretina4AFirmwareVersionChanged             = @"ORGretina4AFirmwareVersionChanged";
-NSString* ORGretina4AFifoEmpty0Changed                  = @"ORGretina4AFifoEmpty0Changed";
-NSString* ORGretina4AFifoEmpty1Changed                  = @"ORGretina4AFifoEmpty1Changed";
-NSString* ORGretina4AFifoAlmostEmptyChanged             = @"ORGretina4AFifoAlmostEmptyChanged";
-NSString* ORGretina4AFifoHalfFullChanged                = @"ORGretina4AFifoHalfFullChanged";
-NSString* ORGretina4AFifoAlmostFullChanged              = @"ORGretina4AFifoAlmostFullChanged";
-NSString* ORGretina4AFifoFull0Changed                   = @"ORGretina4AFifoFull0Changed";
-NSString* ORGretina4AFifoFull1Changed                   = @"ORGretina4AFifoFull1Changed";
-NSString* ORGretina4APhSuccessChanged                   = @"ORGretina4APhSuccessChanged";
-NSString* ORGretina4APhFailureChanged                   = @"ORGretina4APhFailureChanged";
-NSString* ORGretina4APhHuntingUpChanged                 = @"ORGretina4APhHuntingUpChanged";
-NSString* ORGretina4APhHuntingDownChanged               = @"ORGretina4APhHuntingDownChanged";
-NSString* ORGretina4APhCheckingChanged                  = @"ORGretina4APhCheckingChanged";
 NSString* ORGretina4AAcqDcmCtrlStatusChanged            = @"ORGretina4AAcqDcmCtrlStatusChanged";
 NSString* ORGretina4AAcqDcmLockChanged                  = @"ORGretina4AAcqDcmLockChanged";
 NSString* ORGretina4AAcqDcmResetChanged                 = @"ORGretina4AAcqDcmResetChanged";
@@ -313,7 +301,36 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"Gretina4ACard"]];	
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so that each crate can have its own version for drawing into.
+    //---------------------------------------------------------------------------------------------------
+    NSImage* aCachedImage = [NSImage imageNamed:@"Gretina4ACard"];
+    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    [i lockFocus];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    int chan;
+    float y=73;
+    float dy=3;
+    NSColor* enabledColor  = [NSColor colorWithCalibratedRed:0.4 green:0.7 blue:0.4 alpha:1];
+    NSColor* disabledColor = [NSColor clearColor];
+    for(chan=0;chan<kNumGretina4AChannels;chan+=2){
+        if(enabled[chan])  [enabledColor  set];
+        else			  [disabledColor set];
+        [[NSBezierPath bezierPathWithRect:NSMakeRect(5,y,4,dy)] fill];
+        
+        if(enabled[chan+1])[enabledColor  set];
+        else			  [disabledColor set];
+        [[NSBezierPath bezierPathWithRect:NSMakeRect(9,y,4,dy)] fill];
+        y -= dy;
+    }
+    [i unlockFocus];
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:OROrcaObjectImageChanged
+     object:self];
 }
 
 - (void) makeMainController
@@ -372,7 +389,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSRect aFrame = [aConnector localFrame];
     if(aConnector == spiConnector){
         float x =  17 + [self slot] * 16*.62 ;
-        float y =  75;
+        float y =  78;
         aFrame.origin = NSMakePoint(x,y);
         [aConnector setLocalFrame:aFrame];
     }
@@ -1102,6 +1119,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
     enabled[chan] = aValue;
+    [self setUpImage];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEnabledChanged object:self userInfo:userInfo];
 }
@@ -2080,18 +2098,6 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
     [self setFirmwareVersion:   [decoder decodeInt32ForKey:@"firmwareVersion"]];
-    [self setFifoEmpty0:        [decoder decodeBoolForKey: @"fifoEmpty"]];
-    [self setFifoEmpty1:        [decoder decodeBoolForKey: @"fifoEmpty1"]];
-    [self setFifoAlmostEmpty:   [decoder decodeBoolForKey: @"fifoAlmostEmpty"]];
-    [self setFifoHalfFull:      [decoder decodeBoolForKey: @"fifoHalfFull"]];
-    [self setFifoAlmostFull:    [decoder decodeBoolForKey: @"fifoAlmostFull"]];
-    [self setFifoFull0:         [decoder decodeBoolForKey: @"fifoFull"]];
-    [self setFifoFull1:         [decoder decodeBoolForKey: @"fifoFull1"]];
-    [self setPhSuccess:         [decoder decodeBoolForKey: @"phSuccess"]];
-    [self setPhFailure:         [decoder decodeBoolForKey: @"phFailure"]];
-    [self setPhHuntingUp:       [decoder decodeBoolForKey: @"phHuntingUp"]];
-    [self setPhHuntingDown:     [decoder decodeBoolForKey: @"phHuntingDown"]];
-    [self setPhChecking:        [decoder decodeBoolForKey: @"phChecking"]];
     [self setAcqDcmCtrlStatus:  [decoder decodeInt32ForKey:@"acqDcmCtrlStatus"]];
     [self setAcqDcmLock:        [decoder decodeBoolForKey: @"acqDcmLock"]];
     [self setAcqDcmReset:       [decoder decodeBoolForKey: @"acqDcmReset"]];
@@ -2228,18 +2234,6 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
     
     [encoder encodeInt32:firmwareVersion            forKey:@"firmwareVersion"];
-    [encoder encodeBool:fifoEmpty0                  forKey:@"fifoEmpty0"];
-    [encoder encodeBool:fifoEmpty1                  forKey:@"fifoEmpty1"];
-    [encoder encodeBool:fifoAlmostEmpty             forKey:@"fifoAlmostEmpty"];
-    [encoder encodeBool:fifoHalfFull                forKey:@"fifoHalfFull"];
-    [encoder encodeBool:fifoAlmostFull              forKey:@"fifoAlmostFull"];
-    [encoder encodeBool:fifoFull0                   forKey:@"fifoFull0"];
-    [encoder encodeBool:fifoFull1                   forKey:@"fifoFull1"];
-    [encoder encodeBool:phSuccess                   forKey:@"phSuccess"];
-    [encoder encodeBool:phFailure                   forKey:@"phFailure"];
-    [encoder encodeBool:phHuntingUp                 forKey:@"phHuntingUp"];
-    [encoder encodeBool:phHuntingDown               forKey:@"phHuntingDown"];
-    [encoder encodeBool:phChecking                  forKey:@"phChecking"];
     [encoder encodeInt32:acqDcmCtrlStatus           forKey:@"acqDcmCtrlStatus"];
     [encoder encodeBool:acqDcmLock                  forKey:@"acqDcmLock"];
     [encoder encodeBool:acqDcmReset                 forKey:@"acqDcmReset"];
@@ -2528,154 +2522,6 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFirmwareVersionChanged object:self];
 }
 
-//------------------- Address = 0x0004  Bit Field = 20 ---------------
-- (BOOL) fifoEmpty0
-{
-    return fifoEmpty0;
-}
-
-- (void) setFifoEmpty0:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFifoEmpty0:fifoEmpty0];
-    fifoEmpty0 = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoEmpty0Changed object:self];
-}
-
-//------------------- Address = 0x0004  Bit Field = 21 ---------------
-- (BOOL) fifoEmpty1
-{
-    return fifoEmpty1;
-}
-
-- (void) setFifoEmpty1:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFifoEmpty1:fifoEmpty1];
-    fifoEmpty1 = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoEmpty1Changed object:self];
-}
-
-//------------------- Address = 0x0004  Bit Field = 22 ---------------
-- (BOOL) fifoAlmostEmpty
-{
-    return fifoAlmostEmpty;
-}
-
-- (void) setFifoAlmostEmpty:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFifoAlmostEmpty:fifoAlmostEmpty];
-    fifoAlmostEmpty = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAlmostEmptyChanged object:self];
-}
-
-//------------------- Address = 0x0004  Bit Field = 23 ---------------
-- (BOOL) fifoHalfFull
-{
-    return fifoHalfFull;
-}
-
-- (void) setFifoHalfFull:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFifoHalfFull:fifoHalfFull];
-    fifoHalfFull = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoHalfFullChanged object:self];
-}
-
-//------------------- Address = 0x0004  Bit Field = 24 ---------------
-- (BOOL) fifoAlmostFull
-{
-    return fifoAlmostFull;
-}
-
-- (void) setFifoAlmostFull:(BOOL)aValue
-{
-    fifoAlmostFull = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoAlmostFullChanged object:self];
-}
-
-//------------------- Address = 0x0004  Bit Field = 25 ---------------
-- (BOOL) fifoFull0
-{
-    return fifoFull0;
-}
-
-- (void) setFifoFull0:(BOOL)aValue
-{
-    fifoFull0 = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoFull0Changed object:self];
-}
-
-//------------------- Address = 0x0004  Bit Field = 26 ---------------
-- (BOOL) fifoFull1
-{
-    return fifoFull1;
-}
-
-- (void) setFifoFull1:(BOOL)aValue
-{
-    fifoFull1 = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AFifoFull1Changed object:self];
-}
-
-//------------------- Address = 0x0020  Bit Field = 8 ---------------
-- (BOOL) phSuccess
-{
-    return phSuccess;
-}
-
-- (void) setPhSuccess:(BOOL)aValue
-{
-    phSuccess = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhSuccessChanged object:self];
-}
-
-//------------------- Address = 0x0020  Bit Field = 9 ---------------
-- (BOOL) phFailure
-{
-    return phFailure;
-}
-
-- (void) setPhFailure:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPhFailure:phFailure];
-    phFailure = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhFailureChanged object:self];
-}
-
-//------------------- Address = 0x0020  Bit Field = 10 ---------------
-- (BOOL) phHuntingUp
-{
-    return phHuntingUp;
-}
-
-- (void) setPhHuntingUp:(BOOL)aValue
-{
-    phHuntingUp = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhHuntingUpChanged object:self];
-}
-
-//------------------- Address = 0x0020  Bit Field = 11 ---------------
-- (BOOL) phHuntingDown
-{
-    return phHuntingDown;
-}
-
-- (void) setPhHuntingDown:(BOOL)aValue
-{
-    phHuntingDown = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhHuntingDownChanged object:self];
-}
-
-//------------------- Address = 0x0020  Bit Field = 12 ---------------
-- (BOOL) phChecking
-{
-    return phChecking;
-}
-
-- (void) setPhChecking:(BOOL)aValue
-{
-    phChecking = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4APhCheckingChanged object:self];
-}
 
 //------------------- Address = 0x0020  Bit Field = 19..16 ---------------
 - (unsigned long) acqDcmCtrlStatus
@@ -4521,7 +4367,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
         [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
 
-    fpgaFileMover = [[[ORFileMoverOp alloc] init] autorelease];
+    fpgaFileMover = [[ORFileMoverOp alloc] init];
     
     [fpgaFileMover setDelegate:self];
     
