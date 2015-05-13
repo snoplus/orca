@@ -249,7 +249,36 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"Gretina4MCard"]];	
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so that each crate can have its own version for drawing into.
+    //---------------------------------------------------------------------------------------------------
+    NSImage* aCachedImage = [NSImage imageNamed:@"Gretina4MCard"];
+    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    [i lockFocus];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    int chan;
+    float y=73;
+    float dy=3;
+    NSColor* enabledColor  = [NSColor colorWithCalibratedRed:0.4 green:0.7 blue:0.4 alpha:1];
+    NSColor* disabledColor = [NSColor clearColor];
+    for(chan=0;chan<kNumGretina4MChannels;chan+=2){
+        if(enabled[chan])  [enabledColor  set];
+        else			  [disabledColor set];
+        [[NSBezierPath bezierPathWithRect:NSMakeRect(5,y,4,dy)] fill];
+        
+        if(enabled[chan+1])[enabledColor  set];
+        else			  [disabledColor set];
+        [[NSBezierPath bezierPathWithRect:NSMakeRect(9,y,4,dy)] fill];
+        y -= dy;
+    }
+    [i unlockFocus];
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:OROrcaObjectImageChanged
+     object:self];
 }
 
 - (void) makeMainController
@@ -308,7 +337,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSRect aFrame = [aConnector localFrame];
     if(aConnector == spiConnector){
         float x =  17 + [self slot] * 16*.62 ;
-        float y =  75;
+        float y =  78;
         aFrame.origin = NSMakePoint(x,y);
         [aConnector setLocalFrame:aFrame];
     }
@@ -936,6 +965,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
 	enabled[chan] = aValue;
+    [self setUpImage];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MEnabledChanged object:self userInfo:userInfo];
 }
@@ -3238,7 +3268,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
 
-    fpgaFileMover = [[[ORFileMoverOp alloc] init] autorelease];
+    fpgaFileMover = [[ORFileMoverOp alloc] init];
     
     [fpgaFileMover setDelegate:self];
     
