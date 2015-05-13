@@ -2250,7 +2250,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
     
-    fpgaFileMover = [[[ORFileMoverOp alloc] init] autorelease];
+    fpgaFileMover = [[ORFileMoverOp alloc] init];
     
     [fpgaFileMover setDelegate:self];
     
