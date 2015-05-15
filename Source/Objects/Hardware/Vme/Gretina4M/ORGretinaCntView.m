@@ -264,9 +264,9 @@
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     if(optionKeyDown){
         
-        float newPreRisingEdgeBugX;
-        float newRisingEdgeBugX;
-        float newPostRisingEdgeBugX;
+        float newPreRisingEdgeBugX = 0.0;
+        float newRisingEdgeBugX = 0.0;
+        float newPostRisingEdgeBugX = 0.0;
         
         if(movingPreRisingEdge){
             newPreRisingEdgeBugX   = localPoint.x;
@@ -315,9 +315,9 @@
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     if(optionKeyDown){
         
-        float newPreRisingEdgeBugX;
-        float newRisingEdgeBugX;
-        float newPostRisingEdgeBugX;
+        float newPreRisingEdgeBugX  = 0.0;
+        float newRisingEdgeBugX     = 0.0;
+        float newPostRisingEdgeBugX = 0.0;
         
         if(movingPreRisingEdge){
             newPreRisingEdgeBugX   = localPoint.x;

@@ -388,7 +388,7 @@ enum Gretina4FIFOStates {
 - (BOOL) isLocked;
 - (BOOL) locked;
 - (void) setLocked:(BOOL)aState;
-- (NSString*) initSerDesStateName;
+- (NSString*) serDesStateName;
 
 //conversion methods
 - (float) poleZeroTauConverted:(short)chan;

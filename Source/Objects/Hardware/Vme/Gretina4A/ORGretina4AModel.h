@@ -486,7 +486,7 @@ enum Gretina4AFIFOStates {
 - (short)           initState;
 - (void)            setInitState:(short)aState;
 - (void)            stepSerDesInit;
-- (NSString*)       initSerDesStateName;
+- (NSString*)       serDesStateName;
 
 #pragma mark •••HW Wizard
 - (int)         numberOfChannels;

@@ -1420,7 +1420,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MLockChanged object: self];
 }
 
-- (NSString*) initSerDesStateName
+- (NSString*) serDesStateName
 {
     switch(initializationState){    
         case kSerDesIdle:           return @"Idle";

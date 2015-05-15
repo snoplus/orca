@@ -1175,7 +1175,7 @@
 
 - (void) initSerDesStateChanged:(NSNotification*) aNote
 {
-    [initSerDesStateField setStringValue:[model initSerDesStateName]];
+    [initSerDesStateField setStringValue:[model serDesStateName]];
 }
 
 - (void) forceFullCardInitChanged:(NSNotification*)aNote

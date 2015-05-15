@@ -1226,7 +1226,7 @@ static struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4LockChanged object: self];
 }
 
-- (NSString*) initSerDesStateName
+- (NSString*) serDesStateName
 {
     switch(initializationState){
         case kSerDesIdle:           return @"Idle";
