@@ -40,7 +40,8 @@
 - (void) documentLockChanged:(NSNotification*)aNotification;
 - (void) powerFailed:(NSNotification*)aNotification;
 - (void) powerRestored:(NSNotification*)aNotification;
-- (void) crateNumberChanged:(NSNotification*)aNote;
+- (void) crateNumberChanged:(NSNotification*)aNotification;
+- (void) updateView:(NSNotification*)aNotification;
 
 #pragma mark •••Interface Management
 - (void) showLabelsChanged:(NSNotification*)aNote;
