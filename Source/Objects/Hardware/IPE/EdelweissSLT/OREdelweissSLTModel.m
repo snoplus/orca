@@ -3789,8 +3789,8 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
                         M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     }
                     int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
-                    int     i, j, j_swapit, toffset;
-                    int64_t K,t;
+                    int     i, j, j_swapit, toffset = 0;
+                    int64_t K,t = 0;
                     //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
                     for(i=0; i<kMaxNumADCChan/*720*/; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;
                     uint16_t *P;

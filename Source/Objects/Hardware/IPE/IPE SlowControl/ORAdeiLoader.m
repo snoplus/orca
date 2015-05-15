@@ -188,7 +188,7 @@
 
 - (void) loadPath:(NSString*)aPath recursive:(BOOL)aFlag
 {
-	NSArray* components;
+	NSArray* components = nil;
 	int count = 0;
 	recursive = aFlag;
 	//db paths are of the form '/server/database/group/item'
