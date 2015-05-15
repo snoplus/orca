@@ -1222,8 +1222,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         }
         
         /* setup hardware parameters for searches independent of container and object level */
-        int     count, shift;
-        unsigned long mask1;
+        int     count, shift = 0;
+        unsigned long mask1 = 0;
         switch (selectionLevel) {
             case kChannelLevel:
                 count = kMaxChannels;
@@ -1279,7 +1279,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                 while(wizObject = [objectEnum nextObject]){
                     if([wizObject respondsToSelector:@selector(target)]){
                         
-                        short	index, indexValid;
+                        short	index = 0, indexValid;
                         
                         /* set index for search keys that change with container and object number */
                         switch (selectionLevel) {

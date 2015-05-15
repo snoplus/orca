@@ -837,7 +837,7 @@
 {
     
     
-    NSEnumerator* e;
+    NSEnumerator* e = nil;
     BOOL ok = YES;
     if([type isEqualToString:ORGroupPasteBoardItem])e = [savedObjects objectEnumerator];
     else if([type isEqualToString:ORGroupDragBoardItem])e = [draggedObjects objectEnumerator];
