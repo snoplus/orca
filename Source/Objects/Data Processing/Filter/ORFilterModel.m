@@ -337,7 +337,7 @@ int filterGraph(nodeType*);
 	if(aDecoder != currentDecoder){
 		[currentDecoder release];
 		currentDecoder = [aDecoder retain];
-        [currentDecoder setSkipRateCounts:YES];
+        //[currentDecoder setSkipRateCounts:YES];
 		if(usePlugin && firstTime){
 			[symbolTable release];
 			symbolTable = [[ORFilterSymbolTable alloc] init];
