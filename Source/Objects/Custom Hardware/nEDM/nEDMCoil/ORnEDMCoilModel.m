@@ -565,7 +565,6 @@ for (id obj in listOfADCs) [obj x];               \
 - (void) _setActiveChannelMatrix:(NSMutableArray*)anArray
 {
     [ActiveChannelMap release];
-    [anArray retain];
     if ([[anArray objectAtIndex:0] isKindOfClass:[NSArray class]]){
         ActiveChannelMap = nil;
         [[NSNotificationCenter defaultCenter]
@@ -573,6 +572,7 @@ for (id obj in listOfADCs) [obj x];               \
         return;
     }
 
+    [anArray retain];
     ActiveChannelMap = anArray;
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORnEDMCoilSensitivityMapChanged object: self];
