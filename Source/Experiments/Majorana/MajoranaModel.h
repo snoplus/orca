@@ -68,6 +68,7 @@
 - (id) mjdInterlocks:(int)index;
 - (void) hvInfoRequest:(NSNotification*)aNote;
 - (void) setDetectorStringPositions;
+- (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;

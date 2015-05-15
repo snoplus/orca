@@ -32,6 +32,7 @@
 #import "ORAlarm.h"
 #import "ORTimeRate.h"
 #import "ORMJDInterlocks.h"
+#import "ORVME64CrateModel.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged        = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged        = @"MajoranaModelIgnorePanicOnAChanged";
@@ -359,6 +360,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 		NSString* crateName  = [aGroup segment:index objectForKey:@"kVME"];
 		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
 		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
+        
+        
+        
 		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
 			ORDataSet* aDataSet = nil;
 			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
@@ -366,18 +370,44 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 			if([objs count]){
 				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 				if([arrayOfHistos count]){
-					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Gretina", @"Energy",
+                    
+                    NSString* cardObjectName = [self objectNameForCrate:crateName andCard:cardName];
+                    //have to get the class name of the card in question. First look for the crate
+ 
+                    
+                    if(cardObjectName){
+                    
+                        id histoObj = [arrayOfHistos objectAtIndex:0];
+                        aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:cardObjectName, @"Energy",
 															[NSString stringWithFormat:@"Crate %2d",[crateName intValue]],
 															[NSString stringWithFormat:@"Card %2d",[cardName intValue]],
 															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
 															nil]];
 					
-					[aDataSet doDoubleClick:nil];
+                        [aDataSet doDoubleClick:nil];
+                    }
 				}
 			}
 		}
 	}
+}
+
+- (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName
+{
+    NSArray* crates = [[self document] collectObjectsOfClass:NSClassFromString(@"ORVme64CrateModel")];
+    for(ORVme64CrateModel* aCrate in crates){
+        if([aCrate crateNumber] == [aCrateName intValue]){
+            //OK, got the crate. Get the card
+            NSArray* cards = [aCrate orcaObjects];
+            for(id aCard in cards){
+                if([aCard slot] == [aCardName intValue]){
+                    NSString* cardObjectName  = [[aCard className] stringByReplacingOccurrencesOfString:@"OR" withString:@""];
+                    return [cardObjectName stringByReplacingOccurrencesOfString:@"Model" withString:@""];
+                }
+            }
+        }
+    }
+    return nil;
 }
 
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index

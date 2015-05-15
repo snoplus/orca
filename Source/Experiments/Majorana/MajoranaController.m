@@ -620,13 +620,19 @@
         else if([[aTableColumn identifier] isEqualToString:@"hiThreshold"]){
             return [[model segmentGroup:0] segment:rowIndex*2+1 objectForKey:@"threshold"];
         }
+        else if([[aTableColumn identifier] isEqualToString:@"kDetectorNumber"]){
+            return [NSNumber numberWithInt:rowIndex];
+        }
         else {
             return [[model segmentGroup:0] segment:rowIndex*2 objectForKey:[aTableColumn identifier]];
         }
     }
     else if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
-        if([[aTableColumn identifier] isEqualToString:@"kSegmentNumber"]){
+        if([[aTableColumn identifier] isEqualToString:@"kPanelNumber"]){
             return [NSNumber numberWithInt:rowIndex];
+        }
+        else if([[aTableColumn identifier] isEqualToString:@"threshold"]){
+            return [[model segmentGroup:0] segment:rowIndex objectForKey:@"threshold"];
         }
 		else return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
@@ -723,7 +729,8 @@
         else if([[aTableColumn identifier] isEqualToString:@"hiThreshold"]){
             aSegment = [[model segmentGroup:0] segment:rowIndex*2+1];
  			[aSegment setThreshold:anObject];
-       }
+        }
+
   	}
     
     else if(aTableView == secondaryTableView){
