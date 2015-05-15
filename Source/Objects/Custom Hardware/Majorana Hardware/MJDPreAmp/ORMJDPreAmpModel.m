@@ -1261,7 +1261,7 @@ struct {
     if(anIndex != 5 && anIndex!=6 && anIndex!= 13 && anIndex!= 14)return;
     float aValue = [self adc:anIndex];
     BOOL postAlarm = NO;
-    NSString* alarmName;
+    NSString* alarmName = nil;
     switch(anIndex){
         case 5:
 	  if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
