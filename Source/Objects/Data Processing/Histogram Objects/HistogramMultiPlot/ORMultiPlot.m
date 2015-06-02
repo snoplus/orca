@@ -34,7 +34,8 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 - (id) init 
 {
     self = [super init];
-    return self;    
+    [self registerNotificationObservers];
+    return self;
 }
 
 - (void) dealloc
@@ -50,9 +51,10 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 -(void)registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    
+    [notifyCenter removeObserver:self];
+   
     [notifyCenter addObserver: self
-                     selector: @selector(reCache:)
+                     selector: @selector(dataSetRemoved:)
                          name: ORDataSetRemoved
                        object: nil];
     
@@ -80,16 +82,35 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void) dataSetRemoved:(NSNotification*)aNote
+{
+    for(id anItem in dataSetItems){
+       if([[anItem name] isEqualToString:[[aNote object] shortName] ]){
+           //datasets can be removed by user, but they can return in the next run.
+           //we remove the dataset, from the cached list, but keep it in the overall list
+           //so that is will return at next run.
+           [anItem retain];
+           NSUInteger index = [dataSetItems indexOfObject:anItem];
+           [self removeDataSet:anItem];
+           [self reCache:nil];
+           [dataSetItems insertObject:anItem atIndex:index];
+           [anItem release];
+           break;
+        }
+    }
+    
+
+}
+
 - (void) reCache:(NSNotification*)aNote
 {
    	@synchronized(self){  
-	 
 		[cachedDataSets release];
 		cachedDataSets = [[NSMutableArray array] retain];
 		int n = [dataSetItems count];
 		int i;
 		for(i=0;i<n;i++){
-			id obj = [dataSource dataSetWithName:[[dataSetItems objectAtIndex:i]name]];
+			ORDataSet* obj = [dataSource dataSetWithName:[[dataSetItems objectAtIndex:i]name]];
 			if(obj)[cachedDataSets addObject:obj];
 		}
 		[[NSNotificationCenter defaultCenter]
@@ -124,8 +145,6 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
     
     id anItem = [ORMultiPlotDataItem dataItem:aName guardian:self];
     
-    [[[self undoManager] prepareWithInvocationTarget:self] removeDataSetName:anItem];
-    
     [dataSetItems addObject:anItem];
     [self reCache:nil];
     
@@ -134,24 +153,9 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
                               object: self ];
 }
 
-- (void) removeDataSetName:(id)aDataSetItem
+- (void) removeDataSet:(id)aDataSetItem
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] unRemoveDataSetName:aDataSetItem];
     [dataSetItems removeObject:aDataSetItem];
-    
-    [self reCache:nil];
-    
-    [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORMultiPlotDataSetItemsChangedNotification
-                              object: self ];
-}
-
-- (void) unRemoveDataSetName:(id)aDataSetItem
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] removeDataSetName:aDataSetItem];
-    [dataSetItems addObject:aDataSetItem];
-    
-    [self reCache:nil];
     
     [[NSNotificationCenter defaultCenter]
 				postNotificationName:ORMultiPlotDataSetItemsChangedNotification
@@ -191,7 +195,7 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 }
 
 #pragma mark ¥¥¥Data Management
--(void)clear
+- (void) clear
 {
     [cachedDataSets makeObjectsPerformSelector:@selector(clear)];
 }
@@ -267,7 +271,7 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
     [[self undoManager] enableUndoRegistration];
     
     [self registerNotificationObservers];
-    
+    [self reCache:nil];
     return self;
 }
 
@@ -350,7 +354,7 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 
 - (void) removeSelf
 {
-    [guardian removeDataSetName:self];
+    [guardian removeDataSet:self];
 }
 
 - (NSString*) description
