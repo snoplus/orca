@@ -61,11 +61,21 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 {
 	@synchronized(self){  
 		
-		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORDataSetRemoved
-		 object:self
-		 userInfo: nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetRemoved
+                                                            object:self
+                                                          userInfo: nil];
 		
+        if(data!=nil){
+            NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+            [userInfo setObject:[NSArray arrayWithObject:data] forKey: ORGroupObjectList];
+            
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORGroupObjectsRemoved
+                                                                object:self
+                                                              userInfo: userInfo];
+  
+        }
+        
 		[realDictionary release];
 		realDictionary = nil;
 		
@@ -75,7 +85,6 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 		[sortedArray release];
 		sortedArray = nil;
 	}
-//	[dataSetLock release];
     [super dealloc];
 }
 
