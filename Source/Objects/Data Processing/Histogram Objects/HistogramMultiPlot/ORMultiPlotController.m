@@ -63,7 +63,8 @@
 	
 	[plotView setBackgroundColor:[NSColor colorWithCalibratedRed:230/255. green:1 blue:253/255. alpha:1]];
     [[plotView yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
-	[self setUpPlots];
+
+    [self setUpPlots];
 	
 	roiController = [[OR1dRoiController panel] retain];
 	[roiView addSubview:[roiController view]];
@@ -88,7 +89,7 @@
                      selector : @selector(modelRecached:)
                          name : ORMultiPlotReCachedNotification
                         object: model];
-
+        
     [notifyCenter addObserver : self
                      selector : @selector(plotNameChanged:)
                          name : ORMultiPlotNameChangedNotification
@@ -116,7 +117,7 @@
 - (void) setLegend
 {
 	int i;
-    for(i=0;i<[model count];i++){
+    for(i=0;i<[model cachedCount];i++){
         if(model && plotView){
             NSString* s = [NSString stringWithFormat:@"%@%@",i==[[plotView topPlot] tag]?@"+ ":@"  ",[model objectAtIndex:i]];
 			[(ORPlot*)[plotView plotWithTag:i] setName:s];
@@ -127,10 +128,15 @@
 
 - (void) plotNameChanged:(NSNotification*)aNote
 {
-	if(![model plotName])[model setPlotName:@"MultiPlot"];
-	[plotNameField setStringValue:[model plotName]];
+    if(![model plotName]){
+        [model setPlotName:@"MultiPlot"];
+        [[self window] setTitle:@"MultiPlot"];
+    }
+    else {
+        [plotNameField setStringValue:[model plotName]];
+        [[self window] setTitle:[model plotName]];
+    }
 	[plotNameField resignFirstResponder];
-	[[self window] setTitle:[model plotName]];
 }
 
 - (void) modelRemoved:(NSNotification*)aNote
@@ -142,7 +148,7 @@
 
 - (void) modelRecached:(NSNotification*)aNote
 {
-    if([aNote object] == model){
+    if(([aNote object] == model) || ![aNote object]){
         [[NSNotificationCenter defaultCenter] removeObserver:self];
 		[self setUpPlots];
         [self registerNotificationObservers];
@@ -197,7 +203,7 @@
 
 - (void) plotOrderDidChange:(id)aPlotView
 {
-	id topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
+	ORPlotWithROI* topRoi = [[aPlotView topPlot] roi];
 	[roiController setModel:topRoi];
 	[fitController setModel:[topRoi fit]];
 	[self setLegend];
@@ -214,10 +220,8 @@
 
 - (void) plotter:(id)aPlot index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int tag = [aPlot tag];
-	id aDataSet = [model cachedObjectAtIndex:tag];
 	*xValue = (double)i;
-	*yValue =  [aDataSet value:i];
+	*yValue =  [[model cachedObjectAtIndex:[aPlot tag]] value:i];
 }
 
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot
