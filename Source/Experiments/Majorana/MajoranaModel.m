@@ -821,10 +821,12 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         int j;
         for(j=0;j<5;j++){
             NSString* detectorNum = [self stringMap:i objectForKey:[NSString stringWithFormat:@"kDet%d",j+1]];
+            NSString* stringName  = [self stringMap:i objectForKey:@"kStringName"];
             if([detectorNum rangeOfString:@"-"].location == NSNotFound && [detectorNum length]!=0){
                 int detIndex = [detectorNum intValue];
                 [segmentGroup setSegment:detIndex*2 object:[NSNumber numberWithInt:i] forKey:@"kStringNum"];
                 [segmentGroup setSegment:detIndex*2 object:[NSNumber numberWithInt:j] forKey:@"kPosition"];
+                [segmentGroup setSegment:detIndex*2 object:stringName                 forKey:@"kStringName"];
             }
         }
     }
