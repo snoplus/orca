@@ -475,7 +475,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) logSystemResponse
 {
 	if(connectionProtocol == kHPPulserUseIP){
-		if(verbose)[self writeToGPIBDevice:@"SYST:ERR?"];
+		if([self verbose])[self writeToGPIBDevice:@"SYST:ERR?"];
 	}
 	else [super logSystemResponse];
 }
