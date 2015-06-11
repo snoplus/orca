@@ -23,6 +23,7 @@
 #define kSLTv4    1
 #define kFLTv4    2
 
+#define kKatrinV4SLT    1   //TODO: !!!!!!!!!!!!
 
 #define kReadWaveForms	0x1 << 0
 

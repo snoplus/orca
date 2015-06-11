@@ -22,4 +22,5 @@
 }
 - (NSInteger) tag;
 - (void) setTag:(NSInteger)aValue;
+- (void) drawString:(NSString*)aString atPoint:(NSPoint)aPoint;
 @end

@@ -791,7 +791,7 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Read SIS3350 board temperature failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3350 Temperature read FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3350 Temperature read FAILED", @"OK", nil, nil,
                         localException);
 	}
 	
@@ -890,7 +890,7 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS3350 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3350 Probe FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3350 Probe FAILED", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -902,7 +902,7 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Read for Report of SIS3350 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3350 Report FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3350 Report FAILED", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -985,7 +985,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset and Init of SIS3350 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3350 Reset and Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3350 Reset and Init", @"OK", nil, nil,
                         localException);
     }
 }

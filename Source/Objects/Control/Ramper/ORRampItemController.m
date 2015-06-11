@@ -27,9 +27,11 @@
 #import "ORHWWizard.h"
 #import "ORCompositePlotView.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORRamperController (private)
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
+#endif
 
 @implementation ORRampItemController
 - (id) initWithNib:(NSString*)aNibName
@@ -380,7 +382,22 @@
 
 - (IBAction) panic:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Panic!"];
+    [alert setInformativeText:@"REALLY Panic this parameter to zero?\nIs this really what you want?"];
+    [alert addButtonWithTitle:@"Yes, Do Panic"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[owner window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model panic];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"Panic!",@"Cancel",@"YES/Do Panic",nil,[owner window],self,@selector(sheetDidEnd:returnCode:contextInfo:),nil,nil, @"REALLY Panic this parameter to zero?\nIs this really what you want?");
+#endif
 }
 
 - (IBAction) targetSelectionAction:(id)sender
@@ -440,6 +457,7 @@
 }
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORRampItemController (private)
 - (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
@@ -448,3 +466,4 @@
 	}
 }
 @end
+#endif

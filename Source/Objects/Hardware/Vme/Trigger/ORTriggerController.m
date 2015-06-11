@@ -544,7 +544,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board ID FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -567,7 +567,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board Status FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -581,7 +581,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -595,7 +595,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board Event 1 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Event 1 FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReset of Trigger Board Event 1 FAILED", @"OK", nil, nil,
                         localException);
     }
 }
@@ -609,7 +609,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board Event 2 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Event 2 FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReset of Trigger Board Event 2 FAILED", @"OK", nil, nil,
                         localException);
     }
 }
@@ -624,7 +624,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"Reset of Trigger Board Clock FAILED.\n");
- NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Clock FAILED", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nReset of Trigger Board Clock FAILED", @"OK", nil, nil,
  localException);
  }
  }
@@ -639,7 +639,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower GTID: 0x%04x\n",[model gtidLower]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower GTID: 0x%04x", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower GTID: 0x%04x", @"OK", nil, nil,
 						localException,[model gtidLower]);
     }
 }
@@ -654,7 +654,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Upper GTID: 0x%04x\n",[model gtidUpper]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper GTID: 0x%04x", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper GTID: 0x%04x", @"OK", nil, nil,
 						localException,[model gtidUpper]);
     }	
 }
@@ -667,7 +667,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower GTID 1: %d\n",[model gtidLower]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 1\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 1\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -680,7 +680,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to read Trigger Upper GTID 1\n");
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper GTID 1", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper GTID 1", @"OK", nil, nil,
 						localException);
     }
 }
@@ -694,7 +694,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower GTID 2: %d\n",[model gtidLower]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 2\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 2\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -707,7 +707,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to read Trigger Upper GTID 2\n");
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper GTID 2", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper GTID 2", @"OK", nil, nil,
 						localException);
     }
 }
@@ -736,7 +736,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to load Trigger Lower VME Clock: 0x%04x\n",[model vmeClkLower]);
- NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower VME clock: 0x%04x", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower VME clock: 0x%04x", @"OK", nil, nil,
  localException,[model vmeClkLower]);
  }
  
@@ -752,7 +752,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to load Trigger Middle VME Clock: 0x%04x\n",[model vmeClkMiddle]);
- NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Middle VME clock: 0x%04x", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Middle VME clock: 0x%04x", @"OK", nil, nil,
  localException,[model vmeClkMiddle]);
  }
  }
@@ -767,7 +767,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to load Trigger Upper VME Clock: 0x%04x\n",[model vmeClkUpper]);
- NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper VME clock: 0x%04x", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper VME clock: 0x%04x", @"OK", nil, nil,
  localException,[model vmeClkUpper]);
  }
  }
@@ -780,7 +780,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to read Trigger Lower VME clock\n");
- NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower VME clock: 0x%0x", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower VME clock: 0x%0x", @"OK", nil, nil,
  localException);
  }
  }
@@ -792,7 +792,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to read Trigger Middle VME clock\n");
- NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Middle VME clock: 0x%0x", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Middle VME clock: 0x%0x", @"OK", nil, nil,
  localException);
  }
  }
@@ -805,7 +805,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to read Trigger Upper VME clock\n");
- NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper VME clock: 0x%0x", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper VME clock: 0x%0x", @"OK", nil, nil,
  localException);
  }
  }
@@ -852,7 +852,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to send soft GT to trigger card.\n");
-		NSRunAlertPanel([localException name], @"%@\nSoft GT FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSoft GT FAILED\n", @"OK", nil, nil,
 						localException);
     }	
 }
@@ -866,7 +866,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to GT sync clear trigger card.\n");
-		NSRunAlertPanel([localException name], @"%@\nGT Sync Clear FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nGT Sync Clear FAILED\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -880,7 +880,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to sync clear trigger card.\n");
-		NSRunAlertPanel([localException name], @"%@\nSync Clear FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSync Clear FAILED\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -894,7 +894,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to latch trigger card GTID 1.\n");
-		NSRunAlertPanel([localException name], @"%@\nGTID 1 Latch FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nGTID 1 Latch FAILED\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -908,7 +908,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to latch trigger card GTID 2.\n");
-		NSRunAlertPanel([localException name], @"%@\nGTID 2 Latch FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nGTID 2 Latch FAILED\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -922,7 +922,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"FAILED to sync clear 24 trigger card.\n");
-		NSRunAlertPanel([localException name], @"%@\nSync Clear 24 FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSync Clear 24 FAILED\n", @"OK", nil, nil,
 						localException);
     }
 }
@@ -937,7 +937,7 @@
  }
  @catch(NSException* localException) {
  NSLog(@"FAILED to latch clock on trigger card.\n");
- NSRunAlertPanel([localException name], @"%@\nLatch Clock FAILED\n", @"OK", nil, nil,
+ ORRunAlertPanel([localException name], @"%@\nLatch Clock FAILED\n", @"OK", nil, nil,
  localException);
  }
  
@@ -979,7 +979,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Test Poll sequence FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nTest Poll FAILED\n", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nTest Poll FAILED\n", @"OK", nil, nil,
 						localException);
     }
 	
@@ -1026,7 +1026,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to %@ Clock.\n",enable?@"enable":@"disable");
-        NSRunAlertPanel([localException name], @"%@\nFAILED to %@ Clock.\n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFAILED to %@ Clock.\n", @"OK", nil, nil,
 						localException,enable?@"enable":@"disable");
     }
 }
@@ -1040,7 +1040,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to %@ trigger multiboard output.\n",enable?@"enable":@"disable");
-        NSRunAlertPanel([localException name], @"%@\nFAILED to %@ multiboard output.\n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFAILED to %@ multiboard output.\n", @"OK", nil, nil,
 						localException,enable?@"enable":@"disable");
     }
 }
@@ -1054,7 +1054,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"FAILED to %@ trigger Busy.\n",enable?@"enable":@"disable");
-        NSRunAlertPanel([localException name], @"%@\nFAILED to %@ Busy.\n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFAILED to %@ Busy.\n", @"OK", nil, nil,
 						localException,enable?@"enable":@"disable");
     }
 }

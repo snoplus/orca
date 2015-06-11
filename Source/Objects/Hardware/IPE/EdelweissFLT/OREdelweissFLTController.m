@@ -540,9 +540,49 @@
                          name : OREdelweissFLTModelChargeFICFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(hitrateLimitHeatChanged:)
+                         name : OREdelweissFLTModelHitrateLimitHeatChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hitrateLimitIonChanged:)
+                         name : OREdelweissFLTModelHitrateLimitIonChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatSWTriggerDelayChanged:)
+                         name : OREdelweissFLTModelRepeatSWTriggerDelayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(saveIonChanFilterOutputRecordsChanged:)
+                         name : OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote
+{
+	//unused [saveIonChanFilterOutputRecordsCB setObjectValue: [model saveIonChanFilterOutputRecords]];
+}
+
+- (void) repeatSWTriggerDelayChanged:(NSNotification*)aNote
+{
+	[repeatSWTriggerDelayTextField setDoubleValue: [model repeatSWTriggerDelay]];
+}
+
+- (void) hitrateLimitIonChanged:(NSNotification*)aNote
+{
+	[hitrateLimitIonTextField setIntValue: [model hitrateLimitIon]];
+}
+
+- (void) hitrateLimitHeatChanged:(NSNotification*)aNote
+{
+	[hitrateLimitHeatTextField setIntValue: [model hitrateLimitHeat]];
+}
 
 - (void) chargeFICFileChanged:(NSNotification*)aNote
 {
@@ -579,25 +619,83 @@
 - (void) ficCardTriggerCmdChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardTriggerCmdTextField setIntValue: [model ficCardTriggerCmdForFiber:fiber]];
+    uint32_t val = [model ficCardTriggerCmdForFiber:fiber];
+	[ficCardTriggerCmdTextField setIntValue: val];
+    //sub elements
+	[ficCardTriggerCmdDelayTextField setIntValue: val & 0xfff];
+    int i;
+    for(i=0;i<4; i++){
+        [[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:i] setIntValue: (val & (0x1<<(12+i)))];
+    }
 }
 
 - (void) ficCardADC23CtrlRegChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardADC23CtrlRegTextField setIntValue: [model ficCardADC23CtrlRegForFiber:fiber]];
+    uint32_t reg = [model ficCardADC23CtrlRegForFiber:fiber];
+	[ficCardADC23CtrlRegTextField setIntValue: reg];
+    
+    uint32_t val = 0;
+    //PUs
+    val = (reg >> kEWFlt_FICADC0Ctrl_Mode_Shift) & kEWFlt_FICADC0Ctrl_Mode_Mask;
+    [ficCardADC2CtrlRegPU selectItemAtIndex: val];
+    val = (reg >> kEWFlt_FICADC1Ctrl_Mode_Shift) & kEWFlt_FICADC1Ctrl_Mode_Mask;
+    [ficCardADC3CtrlRegPU selectItemAtIndex: val];
+    //CB matrix
+    int i;
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << i)) val=1; else val=0;
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:2 column:i] setIntValue: val];
+    }
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << (8+i))) val=1; else val=0;
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:3 column:i] setIntValue: val];
+    }
+    
 }
 
 - (void) ficCardADC01CtrlRegChanged:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardADC01CtrlRegTextField setIntValue: [model ficCardADC01CtrlRegForFiber:fiber]];
+    uint32_t reg = [model ficCardADC01CtrlRegForFiber:fiber];
+	[ficCardADC01CtrlRegTextField setIntValue: reg];
+    
+    uint32_t val = 0;
+    //PUs
+    val = (reg >> kEWFlt_FICADC0Ctrl_Mode_Shift) & kEWFlt_FICADC0Ctrl_Mode_Mask;
+    [ficCardADC0CtrlRegPU selectItemAtIndex: val];
+    val = (reg >> kEWFlt_FICADC1Ctrl_Mode_Shift) & kEWFlt_FICADC1Ctrl_Mode_Mask;
+    [ficCardADC1CtrlRegPU selectItemAtIndex: val];
+    //CB matrix
+    int i;
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << i)) val=1; else val=0;
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: row: %i   col: %i  val: %i (reg: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), 0, i, val , reg);//TODO : DEBUG testing ...-tb-
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:0 column:i] setIntValue: val];
+    }
+    for(i=0; i<5; i++){
+        if(reg & (0x1 << (8+i))) val=1; else val=0;
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: row: %i   col: %i  val: %i (reg: 0x%08x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), 1, i+8, val , reg);//TODO : DEBUG testing ...-tb-
+        [[ficCardADC0123CtrlRegMatrix cellAtRow:1 column:i] setIntValue: val];
+    }
+    
 }
 
 - (void) ficCardCtrlReg2Changed:(NSNotification*)aNote
 {
     int fiber = [model fiberSelectForBBAccess];
-	[ficCardCtrlReg2TextField setIntValue: [model ficCardCtrlReg2ForFiber:fiber]];
+    int reg2 = [model ficCardCtrlReg2ForFiber:fiber];
+	[ficCardCtrlReg2TextField setIntValue: reg2];
+    char reg2ch = [model ficCardCtrlReg2ForFiber:fiber];
+	[ficCardCtrlReg2AddrOffsTextField setIntValue: reg2ch];
+	[ficCardCtrlReg2AddrOffsetSlider setIntValue: reg2ch];
+    
+	[ficCardCtrlReg2GapCB setIntValue: ((reg2 >> kEWFlt_FICCtrl2_gap_Shift) & kEWFlt_FICCtrl2_gap_Mask)];
+	[ficCardCtrlReg2SyncResCB setIntValue: ((reg2 >> kEWFlt_FICCtrl2_SyncRes_Shift) & kEWFlt_FICCtrl2_SyncRes_Mask)];
+    int i;
+    for(i=0;i<6; i++){
+        [[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:i] setIntValue: (reg2 & (0x1<<(kEWFlt_FICCtrl2_SendCh_Shift+i)))];
+    }
 }
 
 - (void) ficCardCtrlReg1Changed:(NSNotification*)aNote
@@ -1475,6 +1573,10 @@
 	[self ficCardTriggerCmdChanged:nil];
 	[self progressOfChargeFICChanged:nil];
 	[self chargeFICFileChanged:nil];
+	[self hitrateLimitHeatChanged:nil];
+	[self hitrateLimitIonChanged:nil];
+	[self repeatSWTriggerDelayChanged:nil];
+	[self saveIonChanFilterOutputRecordsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1758,7 +1860,8 @@
 {
 
 	[hitRateLengthTextField setIntValue:[model hitRateLength]];
-	[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
+	//[hitRateLengthPU selectItemWithTag:[model hitRateLength]];
+	[hitRateLengthPU selectItemAtIndex:[model hitRateLength]];
 }
 
 - (void) hitRateEnabledMaskChanged:(NSNotification*)aNote
@@ -1775,6 +1878,7 @@
 - (void) hitRateChanged:(NSNotification*)aNote
 {
 	int chan;
+    //hitrate text fields
 	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 		id theCell = [rateTextFields cellWithTag:chan];
 		if([model hitRateOverFlow:chan]){
@@ -1788,9 +1892,18 @@
 			[theCell setFloatValue: [model hitRate:chan]];
 		}
 	}
+    
 	[rate0 setNeedsDisplay:YES];
 	[totalHitRateField setFloatValue:[model hitRateTotal]];
 	[totalRate setNeedsDisplay:YES];
+    
+    //hitrate regulation ON/OFF checkboxes
+	for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
+		id theCell = [rateRegulationCBs  cellAtRow:chan column:0];
+        [theCell setIntValue: [model hitRateRegulationIsOn: chan]];
+        //DEBUG OUTPUT: 	NSLog(@"%@::%@:   [model hitRateRegulationIsOn: is %i  chan %i]  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), [model hitRateRegulationIsOn: chan],chan);//TODO: DEBUG testing ...-tb-
+    }
+    
 }
 
 - (void) totalRateChanged:(NSNotification*)aNote
@@ -1846,6 +1959,26 @@
 }
 
 #pragma mark •••Actions
+
+- (void) saveIonChanFilterOutputRecordsCBAction:(id)sender
+{
+	//unused [model setSaveIonChanFilterOutputRecords:[sender objectValue]];	
+}
+
+- (void) repeatSWTriggerDelayTextFieldAction:(id)sender
+{
+	[model setRepeatSWTriggerDelay:[sender doubleValue]];	
+}
+
+- (void) hitrateLimitIonTextFieldAction:(id)sender
+{
+	[model setHitrateLimitIon:[sender intValue]];	
+}
+
+- (void) hitrateLimitHeatTextFieldAction:(id)sender
+{
+	[model setHitrateLimitHeat:[sender intValue]];	
+}
 - (void) selectChargeFICFileButtonAction:(id) sender
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -1859,7 +1992,6 @@
     if(fullPath)	startingDir = [[model chargeFICFile] stringByDeletingLastPathComponent];
     else			startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -1867,28 +1999,7 @@
             NSLog(@"FIC FPGA config file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
        }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(selectChargeFICFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) selectChargeFICFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setChargeBBFile:[[sheet filenames] objectAtIndex:0]];
-		NSLog(@"BB FPGA config file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-#endif
-
-
 
 - (void) chargeFICFileTextFieldAction:(id)sender
 {
@@ -1940,11 +2051,157 @@
 	[model setFicCardADC01CtrlReg:[sender intValue] forFiber:fiber];	
 }
 
+- (void) ficCardADC0CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC0Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC0Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC01CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC01CtrlReg:reg forFiber:fiber];	
+}
+
+- (void) ficCardADC1CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC1Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC1Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC01CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC01CtrlReg:reg forFiber:fiber];	
+}
+
+
+
+- (void) ficCardADC2CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC0Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC0Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC23CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC23CtrlReg:reg forFiber:fiber];	
+}
+
+- (void) ficCardADC3CtrlRegPUAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    
+    uint32_t mask  = kEWFlt_FICADC1Ctrl_Mode_Mask;
+    uint32_t shift = kEWFlt_FICADC1Ctrl_Mode_Shift;
+    
+    int val = [sender indexOfSelectedItem] & mask;
+    uint32_t negmask = ~(mask << shift);
+    uint32_t reg = [model ficCardADC23CtrlRegForFiber:fiber];
+    reg = (reg & negmask) | (val << shift);
+
+	[model setFicCardADC23CtrlReg:reg forFiber:fiber];	
+}
+
+
+
+
+- (void) ficCardADC0123CtrlRegMatrixAction:(id)sender
+{
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@:  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //DEBUG OUTPUT:                 NSLog(@"%@::%@: row: %i   col: %i  val: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), [sender selectedRow], [sender selectedColumn], [[sender selectedCell] intValue]);//TODO : DEBUG testing ...-tb-
+
+    // ficCardADC0123CtrlRegMatrix
+
+    int fiber = [model fiberSelectForBBAccess];
+    int row = [sender selectedRow];
+    int col = [sender selectedColumn];
+    int val = [[sender selectedCell] intValue] & 0x1;
+    uint32_t shift = col;
+    uint32_t reg = 0;
+    uint32_t negmask = 0;
+    
+        //DEBUG OUTPUT:    NSLog(@"%@::%@: row: %i   col: %i  val: %i \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), row, col, val);//TODO : DEBUG testing ...-tb-
+    
+    if(row<2){//ADC 0 or 1
+        reg = [model ficCardADC01CtrlRegForFiber:fiber];
+        if(row==1) shift += 8;//ADC 1
+        negmask = ~(0x1 << shift);
+        reg = (reg & negmask) | (val << shift);
+        [model setFicCardADC01CtrlReg: reg forFiber:fiber];
+    }else{//ADC 2 or 3
+        reg = [model ficCardADC23CtrlRegForFiber:fiber];
+        if(row==3) shift += 8;//ADC 3
+        negmask = ~(0x1 << shift);
+        reg = (reg & negmask) | (val << shift);
+        [model setFicCardADC23CtrlReg: reg forFiber:fiber];
+    }
+
+
+}
+
+
+
+
+
 - (void) ficCardCtrlReg2TextFieldAction:(id)sender
 {
     int fiber = [model fiberSelectForBBAccess];
 	[model setFicCardCtrlReg2:[sender intValue] forFiber:fiber];	
 }
+
+- (void) ficCardCtrlReg2AddrOffsTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardCtrlReg2AddrOffs:[sender intValue] forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2GapCBAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t mask = ~(kEWFlt_FICCtrl2_gap_Mask << kEWFlt_FICCtrl2_gap_Shift);
+    uint32_t reg = [model ficCardCtrlReg2ForFiber:fiber];
+    reg = (reg & mask) | (([sender intValue] & kEWFlt_FICCtrl2_gap_Mask) << kEWFlt_FICCtrl2_gap_Shift);
+	[model setFicCardCtrlReg2:reg forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2SyncResCBAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t mask = ~(kEWFlt_FICCtrl2_SyncRes_Mask << kEWFlt_FICCtrl2_SyncRes_Shift);
+    uint32_t reg = [model ficCardCtrlReg2ForFiber:fiber];
+    reg = (reg & mask) | (([sender intValue] & kEWFlt_FICCtrl2_SyncRes_Mask) << kEWFlt_FICCtrl2_SyncRes_Shift);
+	[model setFicCardCtrlReg2:reg forFiber:fiber];	
+}
+
+- (void) ficCardCtrlReg2SendChMatrixAction:(id)sender
+{
+    uint32_t val   = [[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:0] intValue]  |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:1] intValue] <<1) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:2] intValue] <<2) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:3] intValue] <<3) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:4] intValue] <<4) |
+                    ([[ficCardCtrlReg2SendChMatrix cellAtRow:0 column:5] intValue] <<5) ;
+
+
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t mask = ~(kEWFlt_FICCtrl2_SendCh_Mask << kEWFlt_FICCtrl2_SendCh_Shift);
+    uint32_t reg = [model ficCardCtrlReg2ForFiber:fiber];
+    reg = (reg & mask) | ((val & kEWFlt_FICCtrl2_SendCh_Mask) << kEWFlt_FICCtrl2_SendCh_Shift);
+	[model setFicCardCtrlReg2:reg forFiber:fiber];	
+}
+
+
 
 - (void) ficCardCtrlReg1TextFieldAction:(id)sender
 {
@@ -1959,6 +2216,8 @@
     reg = reg | ([sender intValue] & 0xfff);
 	[model setFicCardCtrlReg1:reg forFiber:fiber];	
 }
+
+
 
 - (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender
 {
@@ -1975,11 +2234,47 @@
 }
 
 
+
+
+
+- (IBAction) ficCardTriggerCmdDelayTextFieldAction:(id)sender
+{
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t reg = [model ficCardTriggerCmdForFiber: fiber] & 0xf000;
+    reg = reg | ([sender intValue] & 0xfff);
+	[model setFicCardTriggerCmd:reg forFiber:fiber];	
+}
+
+- (IBAction) ficCardTriggerCmdChanMaskMatrixAction:(id)sender
+{
+    uint32_t mask = [[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:0] intValue]  |
+                    ([[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:1] intValue] <<1) |
+                    ([[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:2] intValue] <<2) |
+                    ([[ficCardTriggerCmdChanMaskMatrix cellAtRow:0 column:3] intValue] <<3) ;
+    mask = mask << 12;
+    //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION! mask: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),mask);//TODO: DEBUG testing ...-tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+    uint32_t reg = ([model ficCardTriggerCmdForFiber: fiber] & 0xfff) | mask;
+	[model setFicCardTriggerCmd:reg forFiber:fiber];	
+}
+
+
+
+
+
+
+
+
 - (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender
 {
     [self endEditing];
 	//debug     
     NSLog(@"Called %@::%@ intValue %i  floatValue %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue],[sender floatValue]);//TODO: DEBUG -tb-
+
+    int fiber = [model fiberSelectForBBAccess];
+	[model setFicCardCtrlReg2AddrOffs:[sender intValue] forFiber:fiber];	
+
 }
 
 
@@ -2075,7 +2370,6 @@
     if(fullPath)	startingDir = [[model chargeBBFileForFiber:fiber] stringByDeletingLastPathComponent];
     else			startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -2083,28 +2377,7 @@
             NSLog(@"BB FPGA config file set to: %@\n",[[[[openPanel URL] path] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
        }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(selectChargeBBFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        int fiber = [model fiberSelectForBBAccess];
-        [model setChargeBBFile:[[sheet filenames] objectAtIndex:0]  forFiber:fiber];
-		NSLog(@"BB FPGA config file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
-    }
-}
-#endif
-
 
 - (void) chargeBBFileForFiberTextFieldAction:(id)sender
 {
@@ -2331,7 +2604,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2618,7 +2891,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2652,7 +2925,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2666,7 +2939,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2698,7 +2971,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2716,7 +2989,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
         return;
 	}
@@ -2758,7 +3031,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2784,7 +3057,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2801,7 +3074,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 
@@ -2881,7 +3154,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2896,7 +3169,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2917,7 +3190,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2965,7 +3238,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -2978,7 +3251,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3026,7 +3299,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3039,7 +3312,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAccess to FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3056,7 +3329,8 @@
 //DEBUG OUTPUT: 	NSLog(@"%@::%@: UNDER CONSTRUCTION!   \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
     //TODO: use try...catch -tb-
-    [model writeTriggerParameters];
+    [model writeTriggerParametersVerbose];
+    //[model writeTriggerParameters];
 }
 
 - (IBAction) dumpTriggerParametersButtonAction:(id)sender
@@ -3255,7 +3529,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3270,7 +3544,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3282,7 +3556,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3298,7 +3572,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception '%@'-'%@' in %@::%@ ; FLT (%d) \n",[localException name],[localException reason],NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3333,7 +3607,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Threshold Finder for IPE V4 FLT Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -3371,7 +3645,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT post trigger time\n");
-		NSRunAlertPanel([localException name], @"%@\nSet post trigger time of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet post trigger time of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -3383,7 +3657,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT behavior\n");
-		NSRunAlertPanel([localException name], @"%@\nSetting Behaviour of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSetting Behaviour of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -3395,7 +3669,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT analog offset\n");
-		NSRunAlertPanel([localException name], @"%@\nSet analog offset FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet analog offset FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -3407,7 +3681,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT interrupt mask\n");
-		NSRunAlertPanel([localException name], @"%@\nSet of interrupt mask of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet of interrupt mask of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -3430,7 +3704,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT default Values\n");
-		NSRunAlertPanel([localException name], @"%@\nSet Defaults for FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet Defaults for FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -3455,7 +3729,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3468,7 +3742,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3520,7 +3794,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3533,7 +3807,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception initBoard FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3546,7 +3820,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception readAll FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nReading of FLT%d configuration failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nReading of FLT%d configuration failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3568,7 +3842,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Version\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3582,7 +3856,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Test\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3595,7 +3869,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT reset\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3607,10 +3881,12 @@
 
 - (IBAction) hitRateLengthAction: (id) sender
 {
+ 	//DEBUG     NSLog(@"%@::%@ index: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG testing ...-tb-
 	if([sender indexOfSelectedItem] != [model hitRateLength]){
         [self endEditing];
 		[[self undoManager] setActionName: @"Set Hit Rate Period"]; 
-		[model setHitRateLength:[[sender selectedItem] tag]];
+		//[model setHitRateLength:[[sender selectedItem] tag]];
+		[model setHitRateLength:[sender indexOfSelectedItem]];
 	}
 }
 
@@ -3653,7 +3929,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3703,7 +3979,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3726,7 +4002,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLTv4 reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nFLTv4%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLTv4%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -3741,7 +4017,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception running FLT test code\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }

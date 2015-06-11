@@ -58,6 +58,7 @@
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runEnded:(NSNotification*)aNote;
 - (void) aboutToQuit:(NSNotification*)aNote;
@@ -139,6 +140,7 @@
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
+- (void) postCouchDBRecord:(NSDictionary*)aRecord;
 
 #pragma mark ***Data ID
 - (unsigned long) dataId;

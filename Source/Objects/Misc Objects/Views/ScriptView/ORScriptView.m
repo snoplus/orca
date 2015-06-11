@@ -447,7 +447,7 @@
 	if( range.length == 0 || recolorTimer )	{    // don't recolor partially if a full recolorization is pending.
 		return;
 	}
-	[[[NSApp delegate] undoManager] disableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
 	@try {
 		syntaxColoringBusy = YES;
 		[progress startAnimation:nil];
@@ -524,7 +524,7 @@
 		[progress stopAnimation:nil];
 		//[localException raise];
 	}
-	[[[NSApp delegate] undoManager] enableUndoRegistration];
+	[[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
 

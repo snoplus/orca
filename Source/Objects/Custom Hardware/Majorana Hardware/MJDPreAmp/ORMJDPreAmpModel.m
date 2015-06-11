@@ -25,7 +25,8 @@
 #import "ORAlarm.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORMJDPreAmpModelUseSBCChanged = @"ORMJDPreAmpModelUseSBCChanged";
+NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
+NSString* ORMJDPreAmpModelUseSBCChanged     = @"ORMJDPreAmpModelUseSBCChanged";
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
@@ -48,6 +49,7 @@ NSString* ORMJDBaselineVoltageArrayChanged  = @"ORMJDBaselineVoltageArrayChanged
 NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
 NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
 NSString* ORMJDPreAmpModelDetectorNameChanged		= @"ORMJDPreAmpModelDetectorNameChanged";
+NSString* ORMJDPreAmpModelConnectionChanged		= @"ORMJDPreAmpModelConnectionChanged";
 
 
 #pragma mark ¥¥¥Local Strings
@@ -118,6 +120,7 @@ struct {
 - (void) updateTrends;
 - (void) calculateLeakageCurrentForAdc:(int) aChan;
 - (void) postCouchDBRecord;
+- (void) clearAllAlarms;
 @end
 
 #pragma mark ¥¥¥Implementation
@@ -205,12 +208,37 @@ struct {
 
 - (void) makeConnectors
 {
-    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(2,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width/2- kConnectorSize/2,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
 	[aConnector setConnectorType: 'SPII' ];
 	[aConnector addRestrictedConnectionType: 'SPIO' ]; 
 	[aConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
     [[self connectors] setObject:aConnector forKey:MJDPreAmpInputConnector];
     [aConnector release];
+}
+
+- (void) connectionChanged
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelConnectionChanged object:self];
+    id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
+    if(connectedObj){
+        connected = YES;
+    }
+    else {
+        connected = NO;
+        [self clearAllAlarms];
+    }
+}
+
+- (NSString*) connectedObjectName
+{
+    NSString* name = @"";
+    ORConnector* inputConnector = [[self connectors] objectForKey:MJDPreAmpInputConnector];
+    ORConnector* otherObjConnector = [inputConnector connector];
+    OrcaObject* digitizerObj = [otherObjConnector objectLink];
+    name = [digitizerObj fullID];
+    name = [name stringByReplacingOccurrencesOfString:@"OR" withString:@""];
+    name = [name stringByReplacingOccurrencesOfString:@"Model" withString:@""];
+    return name;
 }
 
 - (void) setUpImage
@@ -224,6 +252,20 @@ struct {
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (int) boardRev
+{
+    return boardRev;
+}
+
+- (void) setBoardRev:(int)aBoardRev
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBoardRev:boardRev];
+    
+    boardRev = aBoardRev;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelBoardRevChanged object:self];
+}
 
 - (BOOL) useSBC
 {
@@ -324,6 +366,7 @@ struct {
 	}
 	else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
+        [self clearAllAlarms];
 	}
 }
 
@@ -735,7 +778,7 @@ struct {
     if(!rangesHaveBeenSet)[self writeAdcRanges];
     unsigned long rawAdcValue[16];
     int chan;
-	if([self controllerIsSBC] && useSBC ){
+    if([self controllerIsSBC] && useSBC ){
         //if an SBC is available we pass the request to read the adcs
         //to it.
         int chip;
@@ -753,10 +796,10 @@ struct {
                 int adcIndex = chan + (chip*8);
                 if(adcEnabledMask & (0x1<<adcIndex)){
                     unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
-												(chan<<10)         |             //set chan
-												(0x1 << 4)             |             //use internal voltage reference for conversion
-												(mjdPreAmpTable[adcIndex].conversionType << 5)   |
-												(mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
+                    (chan<<10)         |             //set chan
+                    (0x1 << 4)             |             //use internal voltage reference for conversion
+                    (mjdPreAmpTable[adcIndex].conversionType << 5)   |
+                    (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
                     p->adc[chan] = (mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8));
                 }
                 else p->adc[chan] = 0;
@@ -774,63 +817,161 @@ struct {
                 
             }
         }
-
+        
     }
     else {
         for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
             if(adcEnabledMask & (0x1<<chan)){
-                unsigned long controlWord = (kControlReg << 13)    |            //sel the chan set
-											((chan%8)<<10)         |            //set chan
-											(mjdPreAmpTable[chan].conversionType << 5)   |
-											(0x1 << 4)             |            //use internal voltage reference for conversion
-											(mjdPreAmpTable[chan].mode << 8);    //set mode, other bits are zero
                 
                 //-------------------------------------------------------
                 //don't like the following where we have to read four times, but seems we have no choice
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 //-------------------------------------------------------
+                
+                unsigned long controlWord;
+                if( (chan%8)==0 ){
+                
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // one latency here (will show up at power cycling the chips)
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |(((chan%8)+1)<<10)                             //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
+                if( ((chan%8)>0) && ((chan%8)<5) ){
+                 
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |(((chan%8)+1)<<10)                             //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];                    
+                }
+                if( (chan%8)==5 ){
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |(((chan%8)+1)<<10)                             //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // one latency here
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
+                if( (chan%8)==6 ){
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // one write enough
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
+                if( (chan%8)==7 ){
+                    
+                    controlWord = (kControlReg << 13)               //sel the chan set
+                    |((chan%8)<<10)                                 //set chan
+                    |(mjdPreAmpTable[chan].conversionType << 5)
+                    |(0x1 << 4)                                     //use internal voltage reference for conversion
+                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+                    
+                    // catch up previous writes
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                }
             }
         }
-
+        
     }
-	for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-		if(adcEnabledMask & (0x1<<chan)){
-			//int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
+
+    for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+        if(adcEnabledMask & (0x1<<chan)){
+            //int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
             //if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
             long adcValue;
             if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
-			   if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
-			   else                          adcValue = rawAdcValue[chan] & 0x1FFF;
-			}
-			else {
-				adcValue = rawAdcValue[chan] & 0x1FFF;
-			}
+                if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
+                else                          adcValue = rawAdcValue[chan] & 0x1FFF;
+            }
+            else {
+                adcValue = rawAdcValue[chan] & 0x1FFF;
+            }
             
-			float convertedValue = (-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
+            float convertedValue = (-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
 			
-			if(verbose)NSLog(@"%d: %d %d %d %.2f (%.2f)\n",chan,adcValue,mjdPreAmpTable[chan].adcOffset,-adcValue+mjdPreAmpTable[chan].adcOffset,(-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept,convertedValue);
+            if(verbose)NSLog(@"[%d], raw: %d, converted:%.2f\n",chan,adcValue,convertedValue);
             
-			[self setAdc:chan value:convertedValue];
-            [self checkAdcIsWithinLimits:chan];
             
+            if(boardRev == 0){  //Orginal Board Rev 1
+                [self setAdc:chan value:convertedValue];
+            }
+            else {
+                //this is a Rev 2 board.
+                //----------------------------------------------------------
+                // Fix for controller rev2 + mother board rev2 configuration
+                // Ground and signal connector pins swapped on board
+                // --> Order of channels 0-4 inverted on ribbon cable - niko
+                if( (chan%8) < 5 ){
+                    int swapChan;
+                    if( chan < 5 )
+                        swapChan = 4 - chan;
+                    else swapChan = 20 - chan;
+                    
+                    [self setAdc:swapChan value:convertedValue];
+                }
+                else [self setAdc:chan value:convertedValue];
+                //----------------------------------------------------------
+            }
+            [self checkAdcIsWithinLimits:chan];	
             if(mjdPreAmpTable[chan].calculateLeakageCurrent){
                 [self calculateLeakageCurrentForAdc:chan];
-             }
-        
-		}
-		else [self setAdc:chan value:0.0];
-	}
+            }
+        }
+        else [self setAdc:chan value:0.0];
+    }
     
     [self checkTempIsWithinLimits];
-
-	//get the time(UT!) for the data record.
-	time_t	ut_Time;
-	time(&ut_Time);
-	timeMeasured = ut_Time;
+    
+    //get the time(UT!) for the data record.
+    time_t	ut_Time;
+    time(&ut_Time);
+    timeMeasured = ut_Time;
 }
          
 - (BOOL) controllerIsSBC
@@ -857,12 +998,12 @@ struct {
 - (void) pollValues
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollValues) object:nil];
-        
-	[self readAllAdcs];
-    [self updateTrends];
-    [self postCouchDBRecord];
-
-	if(shipValues)[self shipRecords];
+    if(connected){
+        [self readAllAdcs];
+        [self updateTrends];
+        [self postCouchDBRecord];
+        if(shipValues)[self shipRecords];
+    }
 	if(pollTime)[self performSelector:@selector(pollValues) withObject:nil afterDelay:pollTime];
 }
 
@@ -932,7 +1073,8 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setUseSBC:[decoder decodeBoolForKey:@"useSBC"]];
+    [self setBoardRev:      [decoder decodeIntForKey:@"boardRev"]];
+    [self setUseSBC:        [decoder decodeBoolForKey:@"useSBC"]];
     [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
@@ -966,7 +1108,8 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeBool:useSBC forKey:@"useSBC"];
+	[encoder encodeInt:boardRev         forKey:@"boardRev"];
+	[encoder encodeBool:useSBC          forKey:@"useSBC"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];
@@ -996,6 +1139,7 @@ struct {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
     [objDictionary setObject:[NSNumber numberWithInt:[self uniqueIdNumber]] forKey:@"preampID"];
+    [objDictionary setObject:[NSNumber numberWithInt:[self boardRev]] forKey:@"boardRev"];
     
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
@@ -1046,7 +1190,7 @@ struct {
 			unsigned long asLong;
 		} theData;
 		
-		int index = 5;
+		int index = 4;
 		int i;
 		for(i=0;i<kMJDPreAmpDacChannels;i++){
 			theData.asFloat = [self adc:i];
@@ -1063,7 +1207,9 @@ struct {
 #pragma mark ¥¥¥Alarms
 - (void) checkTempIsWithinLimits
 {
-    float maxAllowedTemperature = 500; //temporarily set high because the temp readout isn't working right
+    if(!connected)return;
+    
+    float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
     int aChip;
     float aTemperature;
     for(aChip=0;aChip<2;aChip++){
@@ -1071,8 +1217,8 @@ struct {
         else            aTemperature = [self adc:15];
         if(aTemperature >= maxAllowedTemperature){
  			if(!temperatureAlarm[aChip]){
-				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Preamp %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
-                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Preamp %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
+				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Controller %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
+                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Controller %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
 				[temperatureAlarm[aChip] setSticky:YES];
                 [temperatureAlarm[aChip] postAlarm];
 			}
@@ -1087,13 +1233,16 @@ struct {
 
 - (void) checkLeakageCurrentIsWithinLimits:(int)aChan
 {
-    float maxAllowedLeakageCurrent = 50;//pA    
-    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %lu Channel %d Leakage Current",[self uniqueIdNumber], aChan];
+    if(!connected)return;
+
+    float maxAllowedLeakageCurrent = 50;//pA
+    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %d of Controller %lu: Leakage Current Alarm",aChan,[self uniqueIdNumber]];
     float aLeakageCurrent = [self leakageCurrent:aChan];
+    
     if(aLeakageCurrent >= maxAllowedLeakageCurrent){
         if(!leakageCurrentAlarm[aChan]){
             leakageCurrentAlarm[aChan] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %lu Channel %d leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber], aChan]];
+            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %d of Controller %lu: leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",aChan,[self uniqueIdNumber]]];
             [leakageCurrentAlarm[aChan] setSticky:YES];
         }
         [leakageCurrentAlarm[aChan] postAlarm];
@@ -1107,35 +1256,37 @@ struct {
 
 - (void) checkAdcIsWithinLimits:(int)anIndex
 {
+    if(!connected)return;
+
     if(anIndex != 5 && anIndex!=6 && anIndex!= 13 && anIndex!= 14)return;
     float aValue = [self adc:anIndex];
     BOOL postAlarm = NO;
     NSString* alarmName;
     switch(anIndex){
         case 5:
-            if(fabs(aValue - 12) >= 1.0){
-                alarmName  = [NSString stringWithFormat:@"Preamp %lu +12V Supply",[self uniqueIdNumber]];
+	  if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
+                alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 6:
-            if(fabs(aValue + 12) >= 1.0){
-                alarmName = [NSString stringWithFormat:@"Preamp %lu -12V Supply",[self uniqueIdNumber]];
+            if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
+                alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 13:
-            if(fabs(aValue - 24) >= 1.0){
-                alarmName = [NSString stringWithFormat:@"Preamp %lu +24V Supply",[self uniqueIdNumber]];
+            if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
+                alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
             
         case 14:
-            if(fabs(aValue + 24) >= 1.0){
-                alarmName = [NSString stringWithFormat:@"Preamp %lu -24V Supply",[self uniqueIdNumber]];
+            if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
+                alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
         break;
@@ -1144,7 +1295,7 @@ struct {
     if(postAlarm){
         if(!adcAlarm[anIndex]){
             adcAlarm[anIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Preamp %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
+            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Controller %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
             [adcAlarm[anIndex] setSticky:YES];
             [adcAlarm[anIndex] postAlarm];
         }
@@ -1160,6 +1311,23 @@ struct {
 
 #pragma mark ¥¥¥Private Implementation
 @implementation ORMJDPreAmpModel (private)
+
+- (void) clearAllAlarms
+{
+    int i;
+    for(i=0;i<2;i++){
+        [temperatureAlarm[i] clearAlarm];
+        [temperatureAlarm[i] release];
+        temperatureAlarm[i] = nil;
+    }
+    for(i=0;i<kMJDPreAmpAdcChannels;i++){
+        [adcAlarm[i] clearAlarm];
+        [adcAlarm[i] release];
+        adcAlarm[i] = nil;
+        [self setAdc:i value:0];
+    }
+}
+
 - (void) updateTrends
 {
     int chan;
@@ -1182,12 +1350,15 @@ struct {
     float nanoToPico = 1000.;
     
     int currentChan = mjdPreAmpTable[adcChan].leakageCurrentIndex;
-    if(currentChan>0){
+    if(currentChan>=0){
         if([self feedBackResistor:adcChan] != 0){
             //leakage current is (first stage output voltage - baseline voltage)/feedback resistance
             float leakageCurrent = -nanoToPico*([self adc:adcChan] - [self baselineVoltage:adcChan])/ [self feedBackResistor:adcChan];//in picoamps
             [self setLeakageCurrent:currentChan value:leakageCurrent];
+            //[self setLeakageCurrent:adcChan value:leakageCurrent];
             [self checkLeakageCurrentIsWithinLimits:currentChan];
+            
+            //NSLog(@"leakage adc channel %d, preamp %d = %f pA\n",adcChan,mjdPreAmpTable[adcChan].leakageCurrentIndex,leakageCurrent);
         }
         else  [self setLeakageCurrent:currentChan value:0];
     }
@@ -1207,7 +1378,7 @@ struct {
  
  
         
-        //just ten detectors per premap
+        //just ten detectors per preamp
         int i;
         for(i=0;i<10;i++){
             int detectorAdcChannel = detectorToAdc[i];

@@ -1,4 +1,4 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
 \viewkind0
@@ -63,6 +63,12 @@ for(<exp>;<exp>;<exp>) \{\
 	<statements>\
 \}\
 \
+for looping over arrays  or dictionaries you can optionally use the  obj-c format:\
+\
+for(<var> in <array>)\{\
+	<statements>\
+\}\
+\
 do \{\
 	<statements>\
 \} while(<exp>);\
@@ -111,6 +117,25 @@ unless(<condition>) \{\
 \b Conditional\
 
 \b0 var = <expression>?<stmt>:<stmt>\
+\
+
+\b Exception Handling\
+
+\b0 try \{\
+	<statements>\
+\}\
+catch (<var>)  \{\
+	<statements>      //<var> is the exception\
+\}\
+finally \{			//this block is optional\
+	<statements>	//and will execute whether \
+\}				//or not an exception happens
+\b \
+
+\b0 \
+throw(<exception>);    //throw an exception\
+\
+var = nsexception(<name>,<reason>,<userInfo>); //make an exception for throwing\
 \
 
 \b User Confirmation\
@@ -183,10 +208,14 @@ rangelen(<range structure>)
 
 \b0 Strings can be formed as either  'C' strings or ObjC string objects.\
 b = "a String";  	//or\
-b = @"a String";
+b = @"a String";\
+\
+Strings can now be concatenated with '+'
 \b \
 
-\b0 \
+\b0 a = "Hello" + " " + "World";\
+\
+\
 
 \b Output
 \b0 \
@@ -205,7 +234,6 @@ Note the 'display' is a
 \b0 sci(<var>,<exp>); //returns <valr> formated to x.xxExx using <exp> as the precisition\
 fixed(<var>,<exp>); //returns <valr> formated to x.xx using <exp> as the precisition\
 \
-\
 
 \b LogFiles\
 
@@ -221,7 +249,8 @@ to start a new empty file with the same name, you must manually delete the old f
 \b0 \
 waituntil (<true>)		       //returns true always\
 waituntil (<true>,<timeout>) //returns false if timed-out, true otherwise.\
-sleep(<# seconds>);\
+sleep(<# seconds>);	       //# seconds can be a float value\
+yield(<# seconds>);	       //# seconds is rounded to int value (1 second granularity)\
 hex(<var>)		                
 \i //convert to hex string
 \i0 \
@@ -232,10 +261,22 @@ strcat(<var,var,...>)	      //concatenate values into string for printing or an 
 postalarm(<alarmName>, <alarmSeverity> [,<alarmHelp>]);  //the help string is optional\
 clearalarm(<alarmName>);\
 nsdictionary()                     
-\i //makes an NSDictionary
+\i //makes an empty NSDictionary
+\i0 \
+nsdictionary(<key>,<value>, ...)     
+\i //makes a NSDictionary with those keys and values\
+@\{
+\i0 <key>:<value>, ...\}        
+\i //makes a NSDictionary with those keys and values
 \i0 \
 nsarray()                            
 \i //makes an NSArray\
+
+\i0 nsarray(<var>,<var>,...)    
+\i //makes an NSArray and inits it with the <var> list\
+@[
+\i0 <var>,<var>,...]             
+\i //makes an NSArray and inits it with the <var> list\
 
 \i0 nsdatecomponents()
 \i          //returns the date from system\

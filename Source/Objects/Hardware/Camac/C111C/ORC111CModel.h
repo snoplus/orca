@@ -33,7 +33,7 @@
 {
     NSString*		ipAddress;
     BOOL			isConnected;
-    NSCalendarDate*	timeConnected;
+    NSDate*         timeConnected;
 	int				crate_id;
 	CRATE_INFO		cr_info;
     short			stationToTest;
@@ -55,8 +55,8 @@
 - (void) setTrackTransactions:(BOOL)aTrackTranactions;
 - (char) stationToTest;
 - (void) setStationToTest:(char)aStationToTest;
-- (NSCalendarDate*) timeConnected;
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
+- (NSDate*) timeConnected;
+- (void) setTimeConnected:(NSDate*)newTimeConnected;
 - (BOOL) isConnected;
 - (void) setIsConnected:(BOOL)aFlag;
 - (NSString*) ipAddress;

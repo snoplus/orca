@@ -54,9 +54,8 @@
 	int theChan  = (dataPtr[1] >> 28) & 0x1;
 	int thePower  = (dataPtr[1] >> 16) & 0x1;
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-	theString = [theString stringByAppendingFormat:@"%@\n",date];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+	theString = [theString stringByAppendingFormat:@"%@\n",[date stdDescription]];
 	union {
 		float asFloat;
 		unsigned long asLong;

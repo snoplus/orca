@@ -21,12 +21,7 @@
 #import "OrcaObjectController.h"
 #import "ORXYCom564Model.h"
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORXYCom564Controller : OrcaObjectController <NSTableViewDataSource>
-#else
-@interface ORXYCom564Controller : OrcaObjectController
-#endif
-
 {
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSView*        winView;

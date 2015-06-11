@@ -52,8 +52,11 @@
 
 - (void) main 
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
 	if(![[NSFileManager defaultManager] fileExistsAtPath:filePath]){
 		NSLog(@"<%@> does not exist.\n",filePath);
+        [thePool release];
 		return;
 	}
     @try {
@@ -112,6 +115,9 @@
     @catch (NSException* e){
         NSLog(@"Replay halted abnormally\n");
         NSLog(@"%@\n",e);
+    }
+    @finally {
+        [thePool release];
     }
 }
 

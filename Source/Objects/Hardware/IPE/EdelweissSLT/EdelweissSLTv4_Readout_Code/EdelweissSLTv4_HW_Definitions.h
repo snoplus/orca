@@ -30,6 +30,9 @@
 #define kSLTRev20131212_5WordsPerEvent	0x41950242
 //FLT events in SLT Event FIFO consists now of 5 instead of 4 words
 //+ new driver necessary (kit_ipe_slt)
+#define kSLTRev20140710_TimerWithSubsec	0x41970018
+//the 48 bit SLT time register now counts in 100 kHz sub units (was rounded to seconds up to now)
+
 
 #define kReadWaveForms	0x1 << 0
 
@@ -84,9 +87,10 @@ enum daqMode {
 #endif
 	
 //flags in the runFlagsMask, sent to PrPMC by ORIpeV4FLTModel::load_HW_Config_Structure
-#define kFirstTimeFlag              0x10000
-#define kTakeEventDataFlag          0x20000
-#define kShipSumHistogramFlag		0x40000
+#define kFirstTimeFlag                          0x10000
+#define kTakeEventDataFlag                      0x20000
+//KATRIN #define kShipSumHistogramFlag		0x40000
+#define kSaveIonChanFilterOutputRecordsFlag		0x40000
 
 typedef struct { // -tb- 2008-02-27
 	int32_t readoutSec;

@@ -437,7 +437,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     channelConfigMask = aChannelConfigMask;
 	
-	//can't get the packed form to work so just make sure that bit is cleared.
+	//can't get the d form to work so just make sure that bit is cleared.
 	channelConfigMask &= ~(1L<<11);
 
 	//we do the sequential memory access only

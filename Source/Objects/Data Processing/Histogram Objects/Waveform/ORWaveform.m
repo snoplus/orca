@@ -106,7 +106,7 @@ NSUInteger maxLength = (([waveform length] - dataOffset)/unitSize - overRange.lo
 NSUInteger maxRange =  (overRange.length >= maxLength) ?  maxLength : overRange.length;   \
 const atype* cptr = (const atype*)[waveform bytes];         \
 if (cptr != 0) {                                            \
-    cptr += dataOffset;                                     \
+    cptr += dataOffset/sizeof(atype);                       \
     NSUInteger j;                                           \
     for (j=0;j<maxRange;j+=stride) {                        \
         output[i] = cptr[j + overRange.location];           \

@@ -31,13 +31,6 @@
 
 @interface ORDGF4cController (private)
 - (void) doUpdate;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) firmWareSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) dspCodeSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveSetSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) loadSetSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) mergeSetSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 @end
 
 
@@ -717,22 +710,12 @@
             startDir = NSHomeDirectory();
         }
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setFirmWarePath:[[openPanel URL]path]];
         }
     }];
-#else 		
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(firmWareSelectionDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
 }
 
 
@@ -751,23 +734,12 @@
             startDir = NSHomeDirectory();
         }
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setDSPCodePath:[[openPanel URL]path]];
         }
     }];
-#else 		
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"bin"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(dspCodeSelectionDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-	
-#endif
 }
 
 - (IBAction) loadSetAction:(id) sender
@@ -785,22 +757,13 @@
             startDir = NSHomeDirectory();
         }
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model loadSetFromPath:[[openPanel URL]path]]; 
         }
     }];
-#else 		
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"plist"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadSetSelectionDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];    
-#endif
+
 }
 
 - (IBAction) saveSetAction:(id) sender
@@ -816,22 +779,13 @@
             startDir = NSHomeDirectory();
         }
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model saveSetToPath:[[savePanel URL]path]]; 
         }
     }];
-#else 	    
-    [savePanel beginSheetForDirectory:startDir
-                                 file:@"saveSet.plist"
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveSetSelectionDidEnd:returnCode:contextInfo:)
-                          contextInfo:nil];
-    
-#endif
+
 }
 
 - (IBAction) mergeSetAction:(id) sender
@@ -849,22 +803,13 @@
             startDir = NSHomeDirectory();
         }
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model createNewVarList:[[openPanel URL]path]]; 
         }
     }];
-#else 	    	
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:[NSArray arrayWithObject:@"var"]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(mergeSetSelectionDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];    
-#endif
+
 }
 
 - (IBAction) runTypeAction:(id) sender
@@ -1172,44 +1117,6 @@
 @end
 
 @implementation ORDGF4cController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-
-- (void)firmWareSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setFirmWarePath:[[sheet filenames] objectAtIndex:0]];
-    }
-}
-
-- (void)dspCodeSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setDSPCodePath:[[sheet filenames] objectAtIndex:0]];
-    }
-}
-
-- (void)saveSetSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model saveSetToPath:[[sheet filenames] objectAtIndex:0]]; 
-    }
-}
-
-- (void)loadSetSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model loadSetFromPath:[[sheet filenames] objectAtIndex:0]]; 
-    }
-}
-
-- (void)mergeSetSelectionDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model createNewVarList:[[sheet filenames] objectAtIndex:0]]; 
-    }
-}
-#endif
-
 - (void) doUpdate
 {
     scheduledToUpdate = NO;

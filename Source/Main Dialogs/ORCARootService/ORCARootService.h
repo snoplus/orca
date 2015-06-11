@@ -36,7 +36,7 @@
     NSString*		name;
     NetSocket*		socket;
 	BOOL			isConnected;
-    NSCalendarDate*	timeConnected;
+    NSDate*         timeConnected;
     unsigned long	amountInBuffer;
     unsigned long	totalSent;
 	unsigned long	dataId;
@@ -74,8 +74,8 @@
 - (void) setName:(NSString*)newName;
 - (unsigned long) totalSent;
 - (void) setTotalSent:(unsigned long)aTotalSent;
-- (NSCalendarDate*) timeConnected;
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
+- (NSDate*) timeConnected;
+- (void) setTimeConnected:(NSDate*)newTimeConnected;
 - (unsigned long) amountInBuffer; 
 - (void) setAmountInBuffer:(unsigned long)anAmountInBuffer; 
 - (void) writeData:(NSData*)inData;

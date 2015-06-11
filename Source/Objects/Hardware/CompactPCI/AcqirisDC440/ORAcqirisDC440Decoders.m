@@ -104,7 +104,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx --number shorts in waveform
 		if(!actualAcqirisDC440)actualAcqirisDC440 = [[NSMutableDictionary alloc] init];
 		ORAcqirisDC440Model* obj = [actualAcqirisDC440 objectForKey:acqirisKey];
 		if(!obj){
-			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORAcqirisDC440Model")];
+			NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORAcqirisDC440Model")];
 			NSEnumerator* e = [listOfCards objectEnumerator];
 			ORAcqirisDC440Model* aCard;
 			while(aCard = [e nextObject]){

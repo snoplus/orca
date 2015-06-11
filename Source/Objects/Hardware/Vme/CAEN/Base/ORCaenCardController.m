@@ -433,7 +433,7 @@
 		[model read];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -453,7 +453,7 @@
 		[model write];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -475,7 +475,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read of %@ thresholds FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Reading Thresholds", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Reading Thresholds", @"OK", nil, nil,
                         localException);
     }
 	
@@ -497,7 +497,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Write of %@ thresholds FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
                         localException);
     }
 }
@@ -531,8 +531,8 @@
     
 	// Populate the register popup
     for (i = 0; i < [model getNumberRegisters]; i++) {
-        [registerAddressPopUp insertItemWithTitle:[model 
-												   getRegisterName:i] 
+        [registerAddressPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d %@",i,[model
+												   getRegisterName:i]]
 										  atIndex:i];
     }
     

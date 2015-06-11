@@ -627,7 +627,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -640,7 +640,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -687,7 +687,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -700,7 +700,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception intitBoard FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -722,7 +722,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Version\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -734,7 +734,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Test\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -747,7 +747,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT reset\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -799,7 +799,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -815,6 +815,20 @@
 
 - (IBAction) calibrateAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Threshold Calibration"];
+    [alert setInformativeText:@"Really run threshold calibration? This will change ALL thresholds on this card."];
+    [alert addButtonWithTitle:@"Yes/Do Calibrate"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model autoCalibrate];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Threshold Calibration",
                       @"Cancel",
                       @"Yes/Do Calibrate",
@@ -823,16 +837,18 @@
                       @selector(calibrationSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really run threshold calibration? This will change ALL thresholds on this card.");
+#endif
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
 		[model autoCalibrate];
     }    
 }
-
+#endif
 #pragma mark ¥¥¥Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {

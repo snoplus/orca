@@ -33,6 +33,8 @@ NSString* ORAdcModelMinChangeChanged	= @"ORAdcModelMinChangeChanged";
 NSString* ORAdcModelOKConnection		= @"ORAdcModelOKConnection";
 NSString* ORAdcModelLowConnection		= @"ORAdcModelLowConnection";
 NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
+NSString* ORAdcModelOutOfRangeLow       = @"ORAdcModelOutOfRangeLow";
+NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 
 @interface ORAdcModel (private)
 - (NSImage*) composeIcon;
@@ -46,6 +48,8 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 
 @implementation ORAdcModel
 
+@synthesize lastValue;
+
 - (void) dealloc
 {
     [highText release];
@@ -57,6 +61,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 	[alarmGradient release];
 	[resetDate release];
 	[lowDate release];
+    [lastValue release];
 
 	[super dealloc];
 }
@@ -281,7 +286,13 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 			if(trackMaxMin)[self checkMaxMinValues];
 		}
 		BOOL newState = !(valueTooLow || valueTooHigh);
-		
+		if(valueTooLow){
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAdcModelOutOfRangeLow object:self userInfo:nil waitUntilDone:YES];
+        }
+		if(valueTooHigh){
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAdcModelOutOfRangeHi object:self userInfo:nil waitUntilDone:YES];
+        }
+        
 		if((newState == [self state]) && updateNeeded){
 			//if the state will not post an update, then do it here.
 			[self postStateChange];
@@ -314,7 +325,15 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
             isValid = [hwObject dataForChannelValid:[self bit]];
         }
         if(isValid){
-            s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],[self iconValue]];
+            NSString* currentValue = [self iconValue];
+            s =  [NSString stringWithFormat:@"%@: %@ ", [self iconLabel],currentValue];
+            if([lastValue length]){
+                if([lastValue isEqualToString:currentValue]){
+                    s = [s stringByAppendingString:@"(Unchanged!) "];
+                }
+            }
+            self.lastValue = currentValue;
+            
             NSString* theFormat = @"%.1f";
             if([displayFormat length] != 0)									theFormat = displayFormat;
             if([theFormat rangeOfString:@"%@"].location !=NSNotFound)		theFormat = @"%.1f";
@@ -332,7 +351,7 @@ NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
                 NSString* lowestValueString  =  [NSString stringWithFormat:theFormat,lowestValue];
                 
                 s =  [s stringByAppendingFormat:@" [Lowest %@ at %@]  [Highest %@ at %@] ",
-                      lowestValueString, [lowDate descriptionWithCalendarFormat:nil timeZone:nil locale:nil], highestValueString, [highDate descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+                      lowestValueString, [lowDate stdDescription], highestValueString, [highDate stdDescription]];
             }
         }
         else s =  [NSString stringWithFormat:@"%@: Data Unavailable ", [self iconLabel]];

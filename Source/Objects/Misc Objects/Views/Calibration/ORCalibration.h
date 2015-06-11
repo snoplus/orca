@@ -34,7 +34,8 @@
 	IBOutlet NSTextField*	labelField;
 	IBOutlet NSTextField*	nameField;
 	IBOutlet NSButton*		cancelButton;
-	IBOutlet NSButton*		applyButton;
+    IBOutlet NSButton*		applyButton;
+    IBOutlet NSButton*		removeButton;
 	IBOutlet NSButton*		addPtButton;
 	IBOutlet NSButton*		removePtButton;
 	id                      model;
@@ -54,6 +55,7 @@
 - (IBAction) selectionAction:(id)sender;
 - (IBAction) deleteAction:(id)sender;
 - (IBAction) apply:(id)sender;
+- (IBAction) remove:(id)sender;
 - (IBAction) done:(id)sender;
 - (IBAction) cancel:(id)sender;
 - (IBAction) addPtAction:(id)sender;
@@ -62,7 +64,7 @@
 
 @interface ORCalibration : NSObject 
 {
-	NSMutableArray*		calibrationArray;
+	NSMutableArray*	calibrationArray;
 	double			slope;
 	double			intercept;
 	NSString*		units;
@@ -73,7 +75,7 @@
 	NSString*		calibrationName;
 }
 
-- (id) init;
+- (BOOL) isValidCalibration;
 - (NSMutableArray*)calibrationArray;
 - (double) slope;
 - (double) intercept;

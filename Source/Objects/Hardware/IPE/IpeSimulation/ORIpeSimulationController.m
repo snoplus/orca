@@ -27,14 +27,6 @@
 #import "ORAdeiLoader.h"
 #import "ORCompositePlotView.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORIpeSimulationController (private) 
-- (void) openExecutableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORIpeSimulationController
 
 #pragma mark ***Initialization
@@ -480,7 +472,6 @@
     [openPanel setPrompt:@"Choose"];
 	[openPanel setTitle: @"Open Executable File"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString* filename = [[openPanel URL]path];
@@ -489,15 +480,6 @@
             [executableFileNameTextField setStringValue: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
         }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:NSHomeDirectory()
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openExecutableFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 
@@ -517,7 +499,6 @@
     [openPanel setPrompt:@"Choose"];   
     [openPanel setTitle: @"Open Config File"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString *filename = [[openPanel URL]path];
@@ -527,15 +508,6 @@
             [configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
         }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:NSHomeDirectory()
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(openConfigFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) saveConfigFileAction:(id)sender
@@ -569,7 +541,6 @@
 	[savePanel setAllowsOtherFileTypes: YES];
 	[savePanel setCanSelectHiddenExtension: YES];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             NSString *filename = [[savePanel URL]path];
@@ -584,16 +555,6 @@
             
         }
     }];
-#else 	
-    [savePanel beginSheetForDirectory:NSHomeDirectory()
-                                 file:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveConfigFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:nil];
-#endif
-
-	
 }
 
 - (void) showDebugOutputAction:(id)sender
@@ -808,17 +769,28 @@
         if(![model channelExists: i]) [newChannelNumberPopup addItemWithTitle:[NSString stringWithFormat:@"%i",i]];
     }
     
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [[self window] beginSheet:editChannelNumberView completionHandler:(^(NSModalResponse returnCode){
+        
+    })];
+#else
 	[[NSApplication sharedApplication] beginSheet:editChannelNumberView
 								   modalForWindow:[self window]
 									modalDelegate:self
 								   didEndSelector:NULL
 									  contextInfo:NULL];
+#endif
 }
 
 - (IBAction) cancelEditChannelNumberAction:(id)sender
 {
 	[editChannelNumberView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:editChannelNumberView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [[[NSApplication sharedApplication]keyWindow]  endSheet:editChannelNumberView];
+#else
+    [[NSApplication sharedApplication]  endSheet:editChannelNumberView];
+#endif
+
 }
 
 - (IBAction) newChannelNumberAction:(id)sender
@@ -1189,53 +1161,4 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 
 @end
 
-@implementation ORIpeSimulationController (private)  
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)openExecutableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString *filename = [sheet filename];
-		[model setExecutableFileName: filename];	
-        NSLog( @"Setting the filename to: %@\n",[model executableFileName]);
-		[executableFileNameTextField setStringValue: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
-    }
-}
-- (void)openConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
-{
-    if (returnCode == NSFileHandlingPanelOKButton)  //NSOKButton) NSFileWrapper
-    {
-        NSString *filename = [sheet filename];
-        
-		//  !this does not work as URLs start with "file://localhost" ... see comment above: APPLE needs to provide more convesion functions -tb-
-		
-        NSLog( @"Setting the filename to: %@\n",[model configFileName]);
-		[configFileTextView setString: [NSString stringWithContentsOfFile: [model configFileName] encoding: NSASCIIStringEncoding error: NULL]];
-    }
-}
-
-- (void)saveConfigFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo	
-{
-    if (returnCode == NSFileHandlingPanelOKButton) {
-        NSString *filename = [sheet filename];
-        NSLog( @"You selected the filename: %@\n",filename);
-        NSLog( @"You selected [op nameFieldStringValue]: %@\n",[sheet nameFieldLabel]);
-        NSLog( @"You selected [op directoryURL]: %@\n",[sheet URL]);
-        //if (![textData writeToFile:[sp filename] atomically:YES])
-		BOOL saveOK;  
-		saveOK = [[configFileTextView string] writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding error: NULL];
-		if (saveOK) {
-			[model setConfigFileName: filename];	
-			NSLog( @"Save file: %@\n",filename);
-		}
-        else{
-			NSLog( @"ERROR: Could not save file: %@\n",filename);
-		}
-        
-    }
-
-}
-
-#endif
-
-@end
 

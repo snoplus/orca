@@ -27,7 +27,6 @@
 @interface OR1DHistoController : ORDataController {
 	IBOutlet NSView*		roiView;
 	IBOutlet NSView*		fitView;
-	IBOutlet NSButton*		fitButton;
 	id						calibrationPanel;				
     OR1dRoiController*		roiController;
 	OR1dFitController*		fitController;

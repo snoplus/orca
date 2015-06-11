@@ -36,6 +36,7 @@ NSString* ORLakeShore210ModelHighLimitChanged           = @"ORLakeShore210ModelH
 NSString* ORLakeShore210ModelHighAlarmChanged           = @"ORLakeShore210ModelHighAlarmChanged";
 NSString* ORLakeShore210ModelLowLimitChanged            = @"ORLakeShore210ModelLowLimitChanged";
 NSString* ORLakeShore210ModelLowAlarmChanged            = @"ORLakeShore210ModelLowAlarmChanged";
+
 NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 @interface ORLakeShore210Model (private)
@@ -45,6 +46,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (void) processOneCommandFromQueue;
 - (void) process_xrdg_response:(NSString*)theResponse args:(NSArray*)cmdArgs;
 - (void) pollTemps;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORLakeShore210Model
@@ -169,6 +171,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 #pragma mark ***Accessors
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDVacuumModel")] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORMJDPumpCartModel")];
+}
+
 - (ORTimeRate*)timeRate:(int)index
 {
 	return timeRates[index];
@@ -217,7 +226,6 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	}
 }
 
-
 - (float) temp:(int)index
 {
 	if(index>=0 && index<8)return temp[index];
@@ -242,7 +250,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210TempChanged 
 															object:self 
-														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
+														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
 
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
 		[timeRates[index] addDataToTimeAverage:aValue];
@@ -542,7 +550,8 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	int i;
 	for(i=0;i<[t count];i++){
 		[self setTemp:i value:[[t objectAtIndex:i] floatValue]];
-	}	
+	}
+    [self setIsValid:YES];
 	if(shipTemperatures) [self shipTemps];
 }
 
@@ -550,8 +559,26 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollTemps) object:nil];
 	[self readTemps];
-	
+	[self postCouchDBRecord];
 	[self performSelector:@selector(pollTemps) withObject:nil afterDelay:pollTime];
+}
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:temp[0]],
+                             [NSNumber numberWithInt:temp[1]],
+                             [NSNumber numberWithInt:temp[2]],
+                             [NSNumber numberWithInt:temp[3]],
+                             [NSNumber numberWithInt:temp[4]],
+                             [NSNumber numberWithInt:temp[5]],
+                             [NSNumber numberWithInt:temp[6]],
+                             [NSNumber numberWithInt:temp[7]],
+                             nil], @"temperatures",
+                            [NSNumber numberWithInt:    unitsType],    @"unitType",
+                            [NSNumber numberWithInt:    pollTime],     @"pollTime",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
 @end

@@ -32,14 +32,6 @@
 #import "ORCompositePlotView.h"
 #import "ORValueBarGroupView.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORGretina4Controller (private)
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-						 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo;
-@end
-#endif
-
 @implementation ORGretina4Controller
 
 -(id)init
@@ -59,7 +51,7 @@
 {
     settingSize     = NSMakeSize(830,510);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,287);
+    registerTabSize	= NSMakeSize(400,330);
 	firmwareTabSize = NSMakeSize(340,187);
     
     blankView = [[NSView alloc] init];
@@ -92,12 +84,16 @@
 	[registerIndexPU setAutoenablesItems:NO];
 	int i;
 	for (i=0;i<kNumberOfGretina4Registers;i++) {
-		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i], [model registerNameAt:i]];
+        
+		[registerIndexPU insertItemWithTitle:s	atIndex:i];
 		[[registerIndexPU itemAtIndex:i] setEnabled:![model displayRegisterOnMainPage:i] && ![model displayFPGARegisterOnMainPage:i]];
 	}
 	// And now the FPGA registers
 	for (i=0;i<kNumberOfFPGARegisters;i++) {
-		[registerIndexPU insertItemWithTitle:[model fpgaRegisterNameAt:i]	atIndex:(i+kNumberOfGretina4Registers)];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model fpgaRegisterOffsetAt:i], [model fpgaRegisterNameAt:i]];
+        
+		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4Registers)];
 	}
 	
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4%d.selectedtab",[model slot]];
@@ -342,7 +338,22 @@
                          name : ORGretina4ModelFirmwareStatusStringChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(clockSourceChanged:)
+                         name : ORGretina4ClockSourceChanged
+						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(initSerDesStateChanged:)
+                         name : ORGretina4ModelInitStateChanged
+						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORGretina4LockChanged
+						object: model];
+
+
 	[self registerRates];
 }
 
@@ -413,9 +424,36 @@
 	[self histEMultiplierChanged:nil];
     
 	[self firmwareStatusStringChanged:nil];
+	[self clockSourceChanged:nil];
+	[self initSerDesStateChanged:nil];
+    [self lockChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) lockChanged:(NSNotification*) aNote
+{
+    [lockStateField setStringValue:[model locked]?@"Yes":@"No"];
+    [self updateClockLocked];
+}
+
+- (void) updateClockLocked
+{
+    if([model clockSource] == 1) [clockLockedField setStringValue:@""];
+    else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
+}
+
+- (void) initSerDesStateChanged:(NSNotification*) aNote
+{
+    [initSerDesStateField setStringValue:[model initSerDesStateName]];
+}
+
+- (void) clockSourceChanged:(NSNotification*)aNote
+{
+	[clockSourcePU selectItemAtIndex: [model clockSource]];
+    [self updateClockLocked];
+    
+}
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote
 {
 	[firmwareStatusStringField setStringValue: [model firmwareStatusString]];
@@ -869,18 +907,22 @@
 }
 
 #pragma mark ¥¥¥Actions
-- (void) downSampleAction:(id)sender
+- (IBAction) downSampleAction:(id)sender
 {
 	if([sender indexOfSelectedItem] != [model downSample]){
 		[model setDownSample:[sender indexOfSelectedItem]];
 	}
 }
 
-- (void) histEMultiplierAction:(id)sender
+- (IBAction) histEMultiplierAction:(id)sender
 {
 	[model setHistEMultiplier:[sender intValue]];
 }
 
+- (IBAction) clockSourceAction:(id)sender
+{
+	[model setClockSource:[sender indexOfSelectedItem]];
+}
 - (IBAction) registerIndexPUAction:(id)sender
 {
 	unsigned int index = [sender indexOfSelectedItem];
@@ -1077,7 +1119,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Gretina4 Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4 Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1092,7 +1134,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of Gretina4 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4 Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1105,7 +1147,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina4 FIFO FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 FIFO Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4 FIFO Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1143,7 +1185,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4 Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 
@@ -1171,7 +1213,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"LED Threshold Finder for Gretina4 Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1211,7 +1253,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4 Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1253,22 +1295,12 @@
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Select FPGA Binary File"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setFpgaFilePath:[[openPanel URL]path]];
             [model startDownLoadingMainFPGA];
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory:NSHomeDirectory()
-								 file:nil
-								types:nil //[NSArray arrayWithObjects:@"bin",nil]
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
 }
 
 - (IBAction) stopLoadingMainFPGAAction:(id)sender
@@ -1295,17 +1327,3 @@
 	*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];
 }
 @end
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORGretina4Controller (private)
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-						 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo
-{
-    if(returnCode){
-		[model setFpgaFilePath:[sheet filename]];
-		[model startDownLoadingMainFPGA];
-    }
-}
-@end
-#endif

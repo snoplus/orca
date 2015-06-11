@@ -33,7 +33,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 {
     NSString* aString = getNextString(aFile);
     //get the object represented by the string
-    id obj = [[[NSApp delegate] document] findObjectWithFullID:aString];
+    id obj = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:aString];
     if(obj) {
         ORReadOutObject* anItem = [[ORReadOutObject alloc] initWithObject:obj];
         [anItem setOwner:anOwner];
@@ -206,7 +206,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 
 - (NSUndoManager *)undoManager
 {
-    return [[[NSApp delegate]document] undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document] undoManager];
 }
 
 - (BOOL) containsObject:(id) anObj
@@ -316,6 +316,9 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 - (void) moveObject:(id)anObj toIndex:(unsigned)index
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] moveObject:anObj toIndex:[children indexOfObject:anObj]];
+    if(index > [children count]-1){
+        index = [children count]-1;
+    }
 	[children moveObject:anObj toIndex:index];
     [[NSNotificationCenter defaultCenter]
 					postNotificationName:NSReadOutListChangedNotification
@@ -336,12 +339,11 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 
 - (void) insertObject:(id)anObj atIndex:(unsigned)index
 {
-	[[[self undoManager] prepareWithInvocationTarget:self] removeObject:anObj];
-	[children insertObject:anObj atIndex:index];
-    [[NSNotificationCenter defaultCenter]
-					postNotificationName:NSReadOutListChangedNotification
-                                  object:self];
-    
+        [[[self undoManager] prepareWithInvocationTarget:self] removeObject:anObj];
+        [children insertObject:anObj atIndex:index];
+        [[NSNotificationCenter defaultCenter]
+                        postNotificationName:NSReadOutListChangedNotification
+                                      object:self];
 }
 
 - (void) addObjectsFromArray:(NSArray*)anArray

@@ -24,6 +24,8 @@
 @interface ORApcUpsController : OrcaObjectController 
 {
     IBOutlet NSTableView*   powerTableView;
+	IBOutlet NSTextField*   maintenanceModeField;
+	IBOutlet NSButton*      maintenanceModeButton;
 	IBOutlet NSTextView*    eventLogTextView;
     IBOutlet NSTableView*   loadTableView;
     IBOutlet NSTableView*   batteryTableView;
@@ -41,9 +43,12 @@
 	IBOutlet ORTimedTextField*	timedOutField;
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 	IBOutlet ORCompositeTimeLineView*   plotter1;
+    
+	IBOutlet ORGroupView*   subComponentsView;
 }
 
 #pragma mark ***Interface Management
+- (void) maintenanceModeChanged:(NSNotification*)aNote;
 - (void) eventLogChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
@@ -58,8 +63,10 @@
 - (void) timedOut:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+-(void) groupChanged:(NSNotification*)note;
 
 #pragma mark •••Actions
+- (IBAction) maintenanceModeAction:(id)sender;
 - (IBAction) clearEventLogAction:(id)sender;
 - (IBAction) ipAddressAction:(id)sender;
 - (IBAction) usernameAction:(id)sender;
@@ -67,7 +74,11 @@
 - (IBAction) connectAction:(id)sender;
 - (IBAction) dialogLockAction:(id)sender;
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) maintenanceModeActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
+
 
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter;

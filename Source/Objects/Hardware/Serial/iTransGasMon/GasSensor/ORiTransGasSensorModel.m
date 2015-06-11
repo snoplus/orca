@@ -82,7 +82,7 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 
 - (NSUndoManager *)undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 #pragma mark ***Accessors

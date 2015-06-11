@@ -105,16 +105,16 @@
 
 - (void) makeFileHeader
 {
-    [self setFileHeader:[[[NSApp delegate] document] fillInHeaderInfo:[NSMutableDictionary dictionary]]];
+    [self setFileHeader:[[(ORAppDelegate*)[NSApp delegate] document] fillInHeaderInfo:[NSMutableDictionary dictionary]]];
     NSMutableDictionary* docDict = [fileHeader objectForKey:@"Document Info"];
     if(!docDict){
         docDict = [NSMutableDictionary dictionary];
         [fileHeader setObject:docDict forKey:@"Document Info"];
     }
     [docDict setObject:[NSNumber numberWithInt:kDataVersion] forKey:@"dataVersion"];
-    [docDict setObject:[[NSApp delegate] ethernetHardwareAddress] forKey:@"macAddress"];
+    [docDict setObject:[(ORAppDelegate*)[NSApp delegate] ethernetHardwareAddress] forKey:@"macAddress"];
 	//tell objects to add any additional data descriptions into the data description header.
-    NSArray* objectList = [NSArray arrayWithArray:[[[NSApp delegate] document]collectObjectsRespondingTo:@selector(appendDataDescription:userInfo:)]];
+    NSArray* objectList = [NSArray arrayWithArray:[[(ORAppDelegate*)[NSApp delegate] document]collectObjectsRespondingTo:@selector(appendDataDescription:userInfo:)]];
     NSEnumerator* e = [objectList objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
@@ -124,7 +124,7 @@
 
 - (void) updateHeader
 {
-	[[[NSApp delegate] document] fillInHeaderInfo:[self fileHeader]];
+	[[(ORAppDelegate*)[NSApp delegate] document] fillInHeaderInfo:[self fileHeader]];
 }
 
 - (void) addDataDescriptionItem:(NSDictionary*) dataDictionary forKey:(NSString*)aKey

@@ -50,9 +50,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	
 	NSString* s = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.rootservice.ServiceHostName"];
 	hostNameIndex = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.rootservice.HostNameIndex"];
-	connectionHistory = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.rootservice.ServiceHistory"];
-	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
+	NSArray* theHistory = [[NSUserDefaults standardUserDefaults] arrayForKey: @"orca.rootservice.ServiceHistory"];
 
+	if(!theHistory)connectionHistory = [[NSMutableArray alloc] init];
+    else {
+        connectionHistory = [[NSMutableArray alloc] initWithArray:theHistory];
+    }
 	if(s){
 		if(![connectionHistory containsObject:s])[connectionHistory addObject:s];
 	}
@@ -95,7 +98,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 #pragma mark ¥¥¥Accessors
 - (NSUndoManager *)undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 
@@ -122,7 +125,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     hostName = [aName copy];    	
 
 	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
-	if(![connectionHistory containsObject:hostName]){
+	if(![connectionHistory containsObject:hostName] && [hostName length]!=0){
 		[connectionHistory addObject:hostName];
 	}
 	if(aName)hostNameIndex = [connectionHistory indexOfObject:aName];
@@ -165,7 +168,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
                           object: self 
 						  userInfo:userInfo];
 
-	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+	[self setTimeConnected:isConnected?[NSDate date]:nil];
 }
 
 - (void) clearHistory
@@ -173,7 +176,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	[connectionHistory release];
 	connectionHistory = nil;
 
-	[self setHostName:kORCARootServiceHost];
+	[self setHostName:hostName];
 	
 }
 
@@ -237,12 +240,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     totalSent = aTotalSent;
 }
 
-- (NSCalendarDate*) timeConnected
+- (NSDate*) timeConnected
 {
 	return timeConnected;
 }
 
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected
+- (void) setTimeConnected:(NSDate*)newTimeConnected
 {
 	[timeConnected autorelease];
 	timeConnected=[newTimeConnected retain];	

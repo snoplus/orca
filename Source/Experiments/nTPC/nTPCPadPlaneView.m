@@ -193,7 +193,7 @@
 			for(k=0;k<100;k++){
 				NSPoint p = pixel[i][j][k];
 				if(p.x==-999 && p.y==-999)break;
-				if(abs(localPoint.x-p.x)<=2 && abs(localPoint.y-p.y)<=2){
+				if(fabsf(localPoint.x-p.x)<=2 && fabsf(localPoint.y-p.y)<=2){
 					selectedSet  = i;
 					selectedPath = j;
 					foundOne = YES;

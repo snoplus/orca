@@ -48,8 +48,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (id) init
 {
-	self = [super init];
-	
+	self = [super init];	
 	return self;
 }
 
@@ -85,7 +84,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (void) searchForDevices
 {
-	NSArray* allDevices = [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(USBDevice)];
+	NSArray* allDevices = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:@protocol(USBDevice)];
 	devices = [NSMutableArray arrayWithArray:allDevices];
 	[devices retain];
 	[devices makeObjectsPerformSelector:@selector(registerWithUSB:) withObject:self];

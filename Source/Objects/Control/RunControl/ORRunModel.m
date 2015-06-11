@@ -60,6 +60,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 @interface ORRunModel (private)
 - (void) startRun:(BOOL)doInit;
+- (void) waitOnObjects:(NSNumber*)doInitBool;
+- (void) continueWithRunStart:(NSNumber*)doInitBool;
 - (void) startRunStage0:(NSNumber*)doInitBool;
 - (void) startRunStage1:(NSNumber*)doInitBool;
 - (void) startRunStage2:(NSNumber*)doInitBool;
@@ -97,6 +99,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) dealloc
 {
     [objectsRequestingStateChangeWait release];
+    [objectsRequestingRunStartAbort release];
     [shutDownScriptState release];
     [startScriptState release];
     [shutDownScript release];
@@ -122,7 +125,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
     [runStoppedByVetoAlarm clearAlarm];
 	[runStoppedByVetoAlarm release];
-	
+    
+    [subRunStartTime release];
+    [subRunEndTime release];
+    [dataTypeAssigner release];
     [super dealloc];
 }
 
@@ -433,12 +439,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return [startTime description];
 }
 
-- (NSCalendarDate*)startTime
+- (NSDate*)startTime
 {
     return startTime;
 }
 
-- (void) setStartTime:(NSCalendarDate*)aDate
+- (void) setStartTime:(NSDate*)aDate
 {
     [aDate retain];
     [startTime release];
@@ -449,12 +455,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 object: self];
 }
 
-- (NSCalendarDate*)subRunStartTime
+- (NSDate*)subRunStartTime
 {
     return subRunStartTime;
 }
 
-- (void) setSubRunStartTime:(NSCalendarDate*)aDate
+- (void) setSubRunStartTime:(NSDate*)aDate
 {
     [aDate retain];
     [subRunStartTime release];
@@ -464,12 +470,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 postNotificationName:ORRunStartTimeChangedNotification
 	 object: self];
 }
-- (NSCalendarDate*)subRunEndTime
+- (NSDate*)subRunEndTime
 {
     return subRunEndTime;
 }
 
-- (void) setSubRunEndTime:(NSCalendarDate*)aDate
+- (void) setSubRunEndTime:(NSDate*)aDate
 {
     [aDate retain];
     [subRunEndTime release];
@@ -933,7 +939,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) prepareForNewSubRunStage2
 {
     [self setRunningState:eRunBetweenSubRuns];
-    [self setSubRunEndTime:[NSCalendarDate date]];
+    [self setSubRunEndTime:[NSDate date]];
     [self setElapsedBetweenSubRunTime:0];
     //ship between sub run record
     //get the time(UT!)
@@ -991,7 +997,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     [self setSubRunNumber:[self subRunNumber]+1];
     [self setRunningState:eRunInProgress];
-    [self setSubRunStartTime:[NSCalendarDate date]];
+    [self setSubRunStartTime:[NSDate date]];
     [self setElapsedSubRunTime:0];
     //ship new sub run record
     //get the time(UT!)
@@ -1030,6 +1036,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) startRun:(BOOL)doInit
 {
+    //make sure to clear out any left overs
+    [objectsRequestingRunStartAbort release];
+    objectsRequestingRunStartAbort = nil;
+
 	skipShutDownScript = NO;
     _forceRestart      = NO;
     if([self isRunning]){
@@ -1037,7 +1047,47 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         NSLogColor([NSColor redColor],@"Start a run while one is already in progress.\n");
         return;
     }
+    //first call to see if any object needs to stop the run or do something to cause the run start process to wait
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunInitializationNotification
+                                                        object: self
+                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
 
+    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
+    
+    [dataTypeAssigner assignDataIds];
+
+    //------
+    //at this stage, some object may need extra time. If so they will post a wait request
+    [self waitOnObjects:[NSNumber numberWithBool:doInit]];
+}
+
+- (void) waitOnObjects:(NSNumber*)doInitBool
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitOnObjects:) object:doInitBool];
+    if([objectsRequestingStateChangeWait count]==0){
+        [self continueWithRunStart:doInitBool];
+    }
+    else {
+        [self performSelector:@selector(waitOnObjects:) withObject:doInitBool afterDelay:.01];
+    }
+}
+
+- (void) continueWithRunStart:(NSNumber*)doInitBool
+{
+    if([objectsRequestingRunStartAbort count]){
+        NSLog(@"Run was not started because one or more objects requested a run start abort\n");
+        NSLog(@"%@\n",objectsRequestingRunStartAbort);
+        
+        [objectsRequestingRunStartAbort release];
+        objectsRequestingRunStartAbort = nil;
+
+        [self setRunningState:eRunStopped];
+        return;
+    }
+    
+    BOOL doInit = [doInitBool boolValue];
+
+    
 	//movedfrom startRunStage1 06/29/05 MAH to test remote run stuff
 	[self getCurrentRunNumber];
 	
@@ -1047,13 +1097,18 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
 	[self setRunningState:eRunStarting];
     
+    [self performSelector:@selector(startRunStage0:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
+}
+
+- (void) startRunStage0:(NSNumber*)doInitBool
+{
     if(selectedRunTypeScript){
         savedRunType = runType; //run type scripts can changed the run type, but we need to change it back then at the end
         savedSelectedRunTypeScript = selectedRunTypeScript;
         NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
         for (ORRunScriptModel* aScript in theScripts){
             if([aScript selectionIndex] == selectedRunTypeScript){
-                [aScript setSelectorOK:@selector(startRunStage0:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
+                [aScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
                 if(![aScript runScript]){
                     [self runAbortFromScript];
                 }
@@ -1061,31 +1116,27 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             }
         }
     }
-	else [self performSelector:@selector(startRunStage0:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
-}
-
-- (void) startRunStage0:(NSNumber*)doInitBool
-{
-	if(startScript){
-		[startScript setSelectorOK:@selector(startRunStage1:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
-		[self setStartScriptState:@"Running"];
-		if(![startScript runScript]){
-			[self runAbortFromScript];
-		}
-	}
-	else [self performSelector:@selector(startRunStage1:) withObject:doInitBool afterDelay:0];
-}
+    else [self performSelector:@selector(startRunStage1:) withObject:doInitBool afterDelay:0];
+ }
 
 - (void) startRunStage1:(NSNumber*)doInitBool
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
-                                                    object: self
-                                                  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
-    [self startRunStage2:doInitBool];
+    if(startScript){
+        [startScript setSelectorOK:@selector(startRunStage2:) bad:@selector(runAbortFromScript) withObject:doInitBool target:self];
+        [self setStartScriptState:@"Running"];
+        if(![startScript runScript]){
+            [self runAbortFromScript];
+        }
+    }
+    else [self performSelector:@selector(startRunStage2:) withObject:doInitBool afterDelay:0];
+ 
 }
 
 - (void) startRunStage2:(NSNumber*)doInitBool
 {
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
+                                                        object: self
+                                                      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startRunStage2:) object:doInitBool];
     if([objectsRequestingStateChangeWait count]==0)[self startRunStage3:doInitBool];
     else {
@@ -1107,7 +1158,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                 
         [self runStarted:doInit];
         
-        //start the thread
+        //start the threaddo
         if(dataTakingThreadRunning){
             NSLogColor([NSColor redColor],@"*****runthread still exists\n");
         }
@@ -1120,8 +1171,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[readoutThread setStackSize:4*1024*1024];
 		[readoutThread start];
 		 
-        [self setStartTime:[NSCalendarDate date]];
-		[self setSubRunStartTime:[NSCalendarDate date]];
+        [self setStartTime:[NSDate date]];
+		[self setSubRunStartTime:[NSDate date]];
 		[self setElapsedRunTime:0];
         [self setElapsedSubRunTime:0];
         
@@ -1151,7 +1202,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		[runFailedAlarm setAcknowledged:NO];
 		[runFailedAlarm postAlarm];
         
-        NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@\n",[localException name]);
+        //NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@\n",[localException name]);
+        NSLogColor([NSColor redColor],@"Run Not Started because of exception: %@, reason: %@\n",[localException name],[localException reason]);//please show more info -tb-
         
     }
 }
@@ -1256,10 +1308,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		////NSLog(@"Stop Run message received and ignored because no run in progress.\n");
 		//return;
 		//}
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
+		@try {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStopNotification
 															object: self
 														  userInfo: nil];
+        }
+        @catch(NSException* e){
+            NSLog(@"Exception thrown and caught broadcasting the RunAboutToStop Notification. Apparently a HW error. %@\n",e);
+        }
 		
 		[self setRunningState:eRunStopping];
 		
@@ -1327,9 +1383,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		
         NSDictionary* statusInfo = [NSDictionary
 									dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:eRunStopped],ORRunStatusValue,
-                                    [NSNumber numberWithLong:runNumber],kRunNumber,
-                                    [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+                                    [NSNumber numberWithUnsignedLong:runNumber],kRunNumber,
+                                    [NSNumber numberWithUnsignedLong:subRunNumber],kSubRunNumber,
                                     [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                                    [NSNumber numberWithFloat:elapsedRunTime],  kElapsedTime,
 									@"Not Running",ORRunStatusString,
 									dataPacket,@"DataPacket",nil];
         
@@ -1492,19 +1549,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) runStarted:(BOOL)doInit
 {
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    
-    [self setDataTypeAssigner:[[[ORDataTypeAssigner alloc] init]autorelease]];
-    
-    [dataTypeAssigner assignDataIds];
-	
     [heartBeatTimer invalidate];
     [heartBeatTimer release];
     heartBeatTimer = nil;
     
     ignoreRepeat = NO;
-    id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
     
     [self setDataPacket:[[[ORDataPacket alloc] init]autorelease]];
     [[self dataPacket] setRunNumber:[self runNumber]];
@@ -1538,8 +1587,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStartNotification
                                                         object: self
                                                       userInfo: runInfo];
-    
+
     //tell them to start up
+    id nextObject = [self objectConnectedTo:ORRunModelRunControlConnection];
     [nextObject runTaskStarted:runInfo];
     [nextObject setInvolvedInCurrentRun:YES];
 	
@@ -1591,10 +1641,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     lastRunNumberShipped	= data[2];
 	
     [self sendHeartBeat:nil];
-	[NSThread setThreadPriority:.7];
+	[NSThread setThreadPriority:1];
 	
 	[self setRunPaused:NO];
-	
 }
 
 
@@ -1605,12 +1654,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
 	[NSThread setThreadPriority:1];
-	//alloc a large block to force the memory system to clean house
-	char* p = malloc(1024*1024*50);
-	if(p){
-		*p=1; //use it so the compile doesn't optimize it away.
-		free(p);
-	}
 
 	dataTakingThreadRunning = YES;
     [self clearExceptionCount];
@@ -1708,11 +1751,35 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 						 name:ORAddRunStateChangeWait 
 					   object:nil];
 
+    [notifyCenter addObserver:self
+					 selector:@selector(addRunStartupAbort:)
+						 name:ORAddRunStartupAbort
+					   object:nil];
+
+    
     [notifyCenter addObserver:self 
 					 selector:@selector(releaseRunStateChangeWait:) 
 						 name:ORReleaseRunStateChangeWait 
 					   object:nil];
 
+}
+
+- (void) addRunStartupAbort:(NSNotification*)aNote
+{
+    @synchronized (self){
+        if(!objectsRequestingRunStartAbort)objectsRequestingRunStartAbort = [[NSMutableArray array]retain];
+        id obj = [aNote object];
+        NSString* requester;
+        if([obj respondsToSelector:@selector(fullID)]) requester = [obj fullID];
+        else requester = [obj className];
+        if(requester){
+            NSString* reason = [[aNote userInfo] objectForKey:@"Reason"];
+            if([reason length]==0)reason = @"No Reason Given";
+            NSString* details = [[aNote userInfo] objectForKey:@"Details"];
+            if([details length]==0)details = @"No Details Given";
+            [objectsRequestingRunStartAbort addObject:[NSDictionary dictionaryWithObjectsAndKeys:requester,@"Requester",reason,@"Reason",details,@"Details", nil]];
+        }
+    }
 }
 
 - (void) addRunStateChangeWait:(NSNotification*)aNote
@@ -1889,8 +1956,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithUnsignedLong:[self runNumber]],		@"run",
 							 [NSNumber numberWithUnsignedLong:[self subRunNumber]],		@"subrun",
 							 [NSNumber numberWithUnsignedLong:[self runningState]],		@"state",
-							 [[self startTime] description],							@"startTime",
-							 [[self subRunStartTime]description],						@"subRunStartTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedRunTime]],	@"elapsedTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedSubRunTime]],@"elapsedSubRunTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedBetweenSubRunTime]],@"elapsedBetweenSubRunTime",
@@ -1900,7 +1965,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithBool:[self offlineRun]],				@"offlineRun",
 							 [NSNumber numberWithBool:[self timedRun]],					@"timedRun",
 							 [NSNumber numberWithUnsignedLong:[self timeLimit]],		@"timeLimit",
-							 nil];	
+                             [NSNumber numberWithUnsignedLong:[self runType]],          @"runType",
+                             runTypeNames,                                              @"runTypeNames",
+                             [[self startTime] stdDescription],                         @"startTime",
+                             [[self subRunStartTime] stdDescription],                   @"subRunStartTime",
+
+							 nil];
 }
 
 #pragma mark ¥¥¥Archival

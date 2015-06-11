@@ -111,6 +111,8 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
                          name : @"MPodPowerRestoredNotification"
                        object : nil];
     
+    [self slowPoll];
+
 }
 
 - (id) controllerCard
@@ -239,46 +241,60 @@ NSString* ORMPodCrateConstraintsChanged				= @"ORMPodCrateConstraintsChanged";
 - (void) postCouchDBRecord
 {
     NSMutableDictionary* theSupplies  = [NSMutableDictionary dictionary];
-    NSMutableDictionary* systemParams = [NSMutableDictionary dictionary];
+    NSDictionary* systemParams = nil;
+    NSMutableDictionary* theModules = [NSMutableDictionary dictionary];
     
     int numChannelsWithVoltage = 0;
     int numChannelsRamping     = 0;
-    for(id anObj in [self orcaObjects]){
-        if([anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
-            ORiSegHVCard* anHVCard = (ORiSegHVCard*)anObj;
-            NSMutableArray* theChannels = [NSMutableArray array];
-            int i;
-            for(i=0;i<[anHVCard numberOfChannels];i++){
-                NSMutableDictionary* params = [[anHVCard rdParams:i]mutableCopy];
-                if(params){
-					[params setObject:[NSNumber numberWithInt:[anHVCard target:i]]     forKey:@"target"];
-					[params setObject:[NSNumber numberWithFloat:[anHVCard maxCurrent:i]] forKey:@"maxCurrent"];
-                    [params setObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
-                    [theChannels addObject:params];
+    @synchronized(adapter){
+        for(id anObj in [self orcaObjects]){
+            if([anObj isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+                ORiSegHVCard* anHVCard = (ORiSegHVCard*)anObj;
+                NSMutableArray* theChannels = [NSMutableArray array];
+                int i;
+                for(i=0;i<[anHVCard numberOfChannels];i++){
+                    NSMutableDictionary* params = [[anHVCard rdParams:i]mutableCopy];
+                    if(params){
+                        [params setObject:[NSNumber numberWithInt:[anHVCard target:i]]     forKey:@"target"];
+                        [params setObject:[NSNumber numberWithFloat:[anHVCard maxCurrent:i]] forKey:@"maxCurrent"];
+                        [params setObject:[NSNumber numberWithInt:i] forKey:@"Channel"];
+                        [theChannels addObject:params];
+                    }
+                    [params release];
                 }
-                [params release];
-            }
-            numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
-            numChannelsRamping     += [anHVCard numberChannelsRamping];
-            if(theChannels)[theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
-        }
-        else if([anObj isKindOfClass:NSClassFromString(@"ORMPodCModel")]){
-            ORMPodCModel* aControllerCard = (ORMPodCModel*)anObj;
-            if([aControllerCard systemParams])systemParams = [aControllerCard systemParams];
-        }
-    }
-    
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            systemParams, @"system",
-                            theSupplies,  @"supplies",
-                            [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
-                            [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
-                            nil];
+                
+                NSDictionary* modParams = [anHVCard modParams];
+                if(modParams){
+                    [theModules setObject:modParams forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1] ];
+                }
+                
+                numChannelsWithVoltage += [anHVCard numberChannelsWithNonZeroVoltage];
+                numChannelsRamping     += [anHVCard numberChannelsRamping];
+                if(theChannels){
+                    [theSupplies setObject:theChannels forKey:[NSString stringWithFormat:@"%d",[anHVCard slot]-1]];
+                }
 
-    
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+            }
+            else if(anObj == adapter){
+                [systemParams release]; //make sure there is only one.
+                systemParams = [[[adapter parameterDictionary] objectForKey:@"0"] copy];
+                if(!systemParams)systemParams = [[NSDictionary dictionary] retain];
+            }
+        }
+        
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                                systemParams, @"system",
+                                theSupplies,  @"supplies",
+                                theModules, @"modules",
+                                [NSNumber numberWithInt:numChannelsWithVoltage],@"NumberChannelsOn",
+                                [NSNumber numberWithInt:numChannelsRamping],@"NumberChannelsRamping",
+                                nil];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+    [systemParams release];
 }
+
 @end
 
 @implementation ORMPodCrate (OROrderedObjHolding)

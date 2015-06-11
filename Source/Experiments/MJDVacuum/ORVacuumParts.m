@@ -601,7 +601,7 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumDynamicLabel
-@synthesize channel,component,isValid;
+@synthesize channel,component,isValid,value;
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag component:(int)aComponent channel:(int)aChannel label:(NSString*)aLabel bounds:(NSRect)aRect
 {
 	self = [super initWithDelegate:aDelegate regionTag:aRegionTag label:aLabel bounds:aRect];
@@ -613,6 +613,11 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 - (NSString*) displayString
 {
 	return @"?";
+}
+- (BOOL) valueHigherThan:(double)aValue
+{
+    if(!self.isValid) return YES; //assume worst case
+    else return self.value > aValue;
 }
 
 - (void) draw 
@@ -667,7 +672,6 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @implementation ORVacuumValueLabel
-@synthesize value;
 
 - (void) setValue:(double)aValue
 {
@@ -675,11 +679,6 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 		value = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
 	}
-}
-- (BOOL) valueHigherThan:(double)aValue
-{
-	if(!self.isValid) return YES; //assume worst case
-	else return self.value > aValue;
 }
 
 - (NSString*) displayString
@@ -689,6 +688,93 @@ NSString* ORVacuumConstraintChanged = @"ORVacuumConstraintChanged";
 }
 
 @end
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@implementation ORVacuumTempGroup
+
+- (NSString*) displayTemp:(int)chan
+{
+    if(self.isValid)return [NSString stringWithFormat:@"%d: %.2f",chan,[self temp:chan]];
+    else return @"?";
+}
+
+- (double) temp:(int)chan
+{
+    if(chan>=0 && chan<8)return temp[chan];
+    else return 0;
+}
+
+- (void) setTemp:(int)chan value:(double)aValue
+{
+    if(fabs(aValue-temp[chan]) > 0.1){
+        temp[chan] = aValue;
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
+    }
+}
+
+- (void) draw
+{
+    [[NSColor blackColor] set];
+    [NSBezierPath strokeRect:bounds];
+    [gradient drawInRect:bounds angle:90.];
+    
+    if([label length]){
+        
+        NSAttributedString* s1 = [[[NSAttributedString alloc] initWithString:label
+                                                                  attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                              [NSColor blackColor],NSForegroundColorAttributeName,
+                                                                              [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+                                                                              nil]] autorelease];
+        NSSize size1 = [s1 size];
+        float x_pos = (bounds.size.width - size1.width)/2;
+        float y_pos = bounds.size.height-size1.height;
+        [s1 drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos)];
+        
+        
+        int i;
+        for(i=0;i<8;i++){
+            NSString* s = [self displayTemp:i];
+            if([s length] == 0)s = @"?";
+            NSAttributedString* s2 = [[[NSAttributedString alloc] initWithString:s
+                                                                      attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                                  [NSColor blackColor],NSForegroundColorAttributeName,
+                                                                                  [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+                                                                                  nil]] autorelease];
+            
+            NSSize size2 = [s2 size];
+            y_pos = (bounds.size.height - size2.height);
+            [s2 drawAtPoint:NSMakePoint(bounds.origin.x + x_pos, bounds.origin.y + y_pos-size2.height-(size2.height*i))];
+        }
+        
+    }
+    
+    [[NSColor blackColor] set];
+}
+
+@end
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@implementation ORTemperatureValueLabel
+
+- (void) setValue:(double)aValue
+{
+    if(fabs(aValue-value) > .1){
+        value = aValue;
+        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORVacuumPartChanged object:dataSource];
+    }
+}
+
+
+- (NSString*) displayString
+{
+    if(self.isValid) return [NSString stringWithFormat:@"%.1f",[self value]];
+    else return @"?";
+}
+
+@end
+
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------

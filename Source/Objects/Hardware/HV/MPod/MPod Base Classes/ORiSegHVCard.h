@@ -23,6 +23,7 @@
 #import "ORHWWizard.h"
 
 @class ORTimeRate;
+@class ORAlarm;
 
 #define kPositivePolarity 1
 #define kNegativePolarity 0
@@ -55,6 +56,21 @@ enum {
 	outputEmergencyOffMask				= (0x1<<14)
 };
 
+enum{
+    moduleEventPowerFail                = (0x1<<0),
+    
+    moduleEventLiveInsertion            = (0x1<<2),
+
+	moduleEventService                  = (0x1<<4),
+	moduleHardwareLimitVoltageNotGood   = (0x1<<5),
+    moduleEventInputError               = (0x1<<6),
+    
+    moduleEventSafetyLoopNotGood        = (0x1<<10),
+    
+    moduleEventSupplyNotGood            = (0x1<<13),
+    moduleEventTemperatureNotGood       = (0x1<<14)
+};
+
 #define kiSegHVCardProblemMask (outputFailureMaxTerminalVoltageMask | outputFailureMaxCurrentMask | outputFailureMaxTemperatureMask | outputFailureMaxPowerMask | outputFailureTimeoutMask | outputCurrentLimitedMask)
 
 @interface ORiSegHVCard : ORMPodCard <ORHWWizard>
@@ -65,7 +81,8 @@ enum {
     short			hwGoal[16];		//value to send to hw
     short			target[16];		//input by user
     float			riseRate;
-	NSMutableDictionary* rdParams[16];
+	NSDictionary*	rdParams[16];
+    NSDictionary*   modParams;
     int				selectedChannel;
     float			maxCurrent[16];
     int             maxVoltage[16];
@@ -74,8 +91,7 @@ enum {
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
     NSMutableDictionary* hvConstraints;
-	int				commonParamQueryCount;
-	int				channelUpdateQueryCount;
+    ORAlarm* safetyLoopNotGoodAlarm;
 }
 
 #pragma mark ***Initialization
@@ -128,12 +144,16 @@ enum {
 - (BOOL)	channelIsRamping:(short)chan;
 - (unsigned long) failureEvents:(short)channel;
 - (unsigned long) failureEvents;
+- (unsigned long) moduleFailureEvents;
 - (BOOL) channelInBounds:(short)aChan;
 - (BOOL) isOn:(short)aChannel;
 - (BOOL) hvOnAnyChannel;
-- (NSMutableDictionary*) rdParams:(int)i;
+- (void) setRdParamsFrom:(NSDictionary*)aDictionary;
+- (NSDictionary*) rdParams:(int)i;
+- (NSDictionary*) modParams;
 - (BOOL) constraintsInPlace;
 - (void) requestMaxValues:(int)aChannel;
+- (NSString*) getModuleString;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
@@ -143,13 +163,8 @@ enum {
 - (NSDictionary*) dataRecordDescription;
 
 #pragma mark ***Polling
-- (void) updateAllValues;
-- (NSArray*) channelUpdateList;
-- (NSArray*) commonChannelUpdateList;
 - (NSArray*) addChannelNumbersToParams:(NSArray*)someChannelParams;
 - (NSArray*) addChannel:(int)i toParams:(NSArray*)someChannelParams;
-- (void) processReadResponseArray:(NSArray*)response;
-- (void) processSyncResponseArray:(NSArray*)response;
 - (void) processWriteResponseArray:(NSArray*)response;
 
 #pragma mark ¥¥¥Hardware Access
@@ -179,6 +194,7 @@ enum {
 - (void) stopAllRamping;
 - (void) rampAllToZero;
 - (void) panicAll;
+- (void) clearModule;
 
 #pragma mark ¥¥¥Trends
 - (ORTimeRate*) voltageHistory:(short)index;
@@ -212,6 +228,7 @@ enum {
 
 @interface NSObject (ORiSegHVCard)
 - (BOOL) power;
+- (void) pollHardware;
 @end
 
 extern NSString* ORiSegHVCardShipRecordsChanged;

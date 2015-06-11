@@ -895,25 +895,42 @@
             if([[model cemConstraints] count] && [model constraintsDisabled]){
                 s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
             }
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            [alert setMessageText:s];
+            [alert setInformativeText:@"Really turn ON Detector?"];
+            [alert addButtonWithTitle:@"YES/Turn On Detector"];
+            [alert addButtonWithTitle:@"Cancel"];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            
+            [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+                if (result == NSAlertFirstButtonReturn){
+                    [model sendDetectorParameters];
+                }
+            }];
+#else
             NSBeginAlertSheet(s,
                               @"YES/Turn On Detector",
                               @"Cancel",
                               nil,[self window],
                               self,
-                              @selector(turnOnIonizerDidFinish:returnCode:contextInfo:),
+                              @selector(turnDetectorOnDidFinish:returnCode:contextInfo:),
                               nil,
                               nil,
                               @"Really turn ON Detector?");
+#endif
         }
 	}
 
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnDetectorOnDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model sendDetectorParameters];
 }
+#endif
 
 - (IBAction) toggleIonizerAction:(id)sender		
 { 
@@ -927,6 +944,20 @@
             if([[model filamentConstraints] count] && [model constraintsDisabled]){
                 s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
             }
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            [alert setMessageText:s];
+            [alert setInformativeText:@"Really turn ON Ionizer?"];
+            [alert addButtonWithTitle:@"YES/Turn On Ionizer"];
+            [alert addButtonWithTitle:@"Cancel"];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            
+            [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+                if (result == NSAlertFirstButtonReturn){
+                    [model sendIonizerParameters];
+                }
+            }];
+#else
             NSBeginAlertSheet(s,
                               @"YES/Turn On Ionizer",
                               @"Cancel",
@@ -936,14 +967,17 @@
                               nil,
                               nil,
                               @"Really turn ON Ionizer?");
+#endif
         }
 	}
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOnIonizerDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model sendIonizerParameters];
 }
+#endif
 
 - (IBAction) lockAction:(id) sender						
 { 
@@ -972,6 +1006,20 @@
 - (IBAction) syncDialogAction:(id)sender
 { 
 	[self endEditing];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Sync Dialog"];
+    [alert setInformativeText:@"Really transfer the actual HW values to the input fields of this dialog?"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes/Do It"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertSecondButtonReturn){
+            [model syncWithHW];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Sync Dialog",
 					  @"YES/Do it",
 					  @"Cancel",
@@ -981,15 +1029,18 @@
 					  nil,
 					  nil,
 					  @"Really transfer the actual HW values to the input fields of this dialog?");
+#endif
 	
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model syncWithHW]; 
 	}
 }
+#endif
 
 - (IBAction) startMeasurementAction:(id)sender
 { 
@@ -1140,7 +1191,7 @@
 - (IBAction) listFilamentConstraintsAction:(id)sender
 {
   	if([[model filamentConstraints]count]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model filamentConstraintReport]);
         
     }
@@ -1148,7 +1199,7 @@
 - (IBAction) listCemConstraintsAction:(id)sender
 {
    	if([[model cemConstraints]count]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model cemConstraintReport]);
         
     }

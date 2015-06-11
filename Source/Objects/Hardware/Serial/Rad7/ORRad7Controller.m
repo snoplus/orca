@@ -25,11 +25,13 @@
 #import "ORTimeAxis.h"
 #import "ORSerialPortController.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORRad7Controller (private)
 - (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) loadDialogFromHWPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) eraseAllDataPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
+#endif
 
 @implementation ORRad7Controller
 
@@ -44,6 +46,7 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [blankView release];
 	[super dealloc];
 }
 
@@ -188,12 +191,7 @@
                      selector : @selector(rUnitsChanged:)
                          name : ORRad7ModelRUnitsChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(operationStateChanged:)
-                         name : ORRad7ModelOperationStateChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(statusChanged:)
                          name : ORRad7ModelStatusChanged
@@ -265,11 +263,18 @@
                          name : ORRad7ModelHumidityMaxLimitChanged
 						object: model];
 	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(statusStringChanged:)
+                         name : ORRad7ModelStatusStringChanged
+                        object: model];
+
+    
 	[serialPortController registerNotificationObservers];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(firmwareLoadingChanged:)
-                         name : ORRad7ModelFirmwareLoadingChanged
+                     selector : @selector(radLinkLoadingChanged:)
+                         name : ORRad7ModelRadLinkLoadingChanged
 						object: model];
 
 }
@@ -291,7 +296,6 @@
 	[self tUnitsChanged:nil];
 	[self rUnitsChanged:nil];
 	[self statusChanged:nil];
-	[self operationStateChanged:nil];
 	[self runStateChanged:nil];
 	[self updatePlot:nil];
 	[self runToPrintChanged:nil];
@@ -303,14 +307,15 @@
 	[self humidityAlarmChanged:nil];
 	[self pumpCurrentAlarmChanged:nil];
 	[self pumpCurrentMaxLimitChanged:nil];
-	[self humidityMaxLimitChanged:nil];
+    [self humidityMaxLimitChanged:nil];
+    [self statusStringChanged:nil];
 	[serialPortController updateWindow];
-	[self firmwareLoadingChanged:nil];
+	[self radLinkLoadingChanged:nil];
 }
 
-- (void) firmwareLoadingChanged:(NSNotification*)aNote
+- (void) radLinkLoadingChanged:(NSNotification*)aNote
 {
-	[firmwareLoadingField setStringValue: [model firmwareLoading]?@"Busy":@""];
+	[radLinkLoadingField setStringValue: [model radLinkLoading]?@"Busy":@""];
 	[self updateButtons];
 }
 
@@ -419,9 +424,9 @@
 }
 
 
-- (void) operationStateChanged:(NSNotification*)aNote
+- (void) statusStringChanged:(NSNotification *)aNote
 {
-	[operationStateField setStringValue: [model operationStateString]];
+	[statusStateField setStringValue: [model statusString]];
 	[self updateButtons];
 }
 
@@ -529,21 +534,20 @@
 - (void) updateButtons
 {
     BOOL locked = [gSecurity isLocked:ORRad7Lock];
-	BOOL firmwareLoading = [model firmwareLoading];
+	BOOL radLinkLoading = [model radLinkLoading];
     [lockButton setState: locked];
 	
-	[serialPortController updateButtons:locked && !firmwareLoading];
+	[serialPortController updateButtons:locked && !radLinkLoading];
 	
-    [pollTimePopup setEnabled:!locked && !firmwareLoading];
-	[pollNowButton setEnabled:!firmwareLoading];
-    [deleteHistoryButton setEnabled:!locked && !firmwareLoading];
-    [radLinkButton setEnabled:!locked && !firmwareLoading];
+    [pollTimePopup setEnabled:!locked && !radLinkLoading];
+	[pollNowButton setEnabled:!radLinkLoading];
+    [deleteHistoryButton setEnabled:!locked && !radLinkLoading];
+    [radLinkButton setEnabled:!locked && !radLinkLoading];
 	
-	//int opState = [model operationState];
 	int runState = [model runState];
 	//BOOL idle = (opState==kRad7Idle);
 	BOOL counting = runState == kRad7RunStateCounting;
-	if(!locked && !firmwareLoading){
+	if(!locked && !radLinkLoading){
 		if(runState== kRad7RunStateUnKnown){
 			[startTestButton	setEnabled:	 NO];
 			[stopTestButton		setEnabled:  NO];
@@ -596,24 +600,24 @@
 	
 	//[initHWButton		setEnabled:  !counting && idle && !locked];
 	
-	[rUnitsPU setEnabled:	!counting && !locked && !firmwareLoading];
-	[tUnitsPU setEnabled:	!counting && !locked && !firmwareLoading];
-	[formatPU setEnabled:	!counting && !locked && !firmwareLoading];
-	[tonePU setEnabled:		!counting && !locked && !firmwareLoading];
-	[protocolPU setEnabled:	!counting && !locked && !firmwareLoading];
+	[rUnitsPU setEnabled:	!counting && !locked && !radLinkLoading];
+	[tUnitsPU setEnabled:	!counting && !locked && !radLinkLoading];
+	[formatPU setEnabled:	!counting && !locked && !radLinkLoading];
+	[tonePU setEnabled:		!counting && !locked && !radLinkLoading];
+	[protocolPU setEnabled:	!counting && !locked && !radLinkLoading];
 	
-	[saveUserProtocolButton setEnabled:([(ORRad7Model*)model protocol] == kRad7ProtocolNone) && !firmwareLoading ];
+	[saveUserProtocolButton setEnabled:([(ORRad7Model*)model protocol] == kRad7ProtocolNone) && !radLinkLoading ];
 	
-	[alarmLimitTextField setEnabled:!locked && !firmwareLoading];
-	[maxRadonTextField setEnabled:	!locked && !firmwareLoading];
+	[alarmLimitTextField setEnabled:!locked && !radLinkLoading];
+	[maxRadonTextField setEnabled:	!locked && !radLinkLoading];
 	
 	
 	if([(ORRad7Model*)model protocol] == kRad7ProtocolUser || [(ORRad7Model*)model protocol] == kRad7ProtocolNone){
-		[pumpModePU setEnabled:	!counting && !locked && !firmwareLoading];
-		[thoronPU setEnabled:	!counting && !locked && !firmwareLoading];
-		[modePU setEnabled:		!counting && !locked && !firmwareLoading];
-		[recycleTextField setEnabled: !counting && !locked && !firmwareLoading];
-		[cycleTimeTextField setEnabled: !counting && !locked && !firmwareLoading];
+		[pumpModePU setEnabled:	!counting && !locked && !radLinkLoading];
+		[thoronPU setEnabled:	!counting && !locked && !radLinkLoading];
+		[modePU setEnabled:		!counting && !locked && !radLinkLoading];
+		[recycleTextField setEnabled: !counting && !locked && !radLinkLoading];
+		[cycleTimeTextField setEnabled: !counting && !locked && !radLinkLoading];
 		
 	}
 	else {
@@ -843,7 +847,21 @@
 - (IBAction) updateSettingsAction:(id)sender
 {
 	
-	NSBeginAlertSheet(@"Load Dialog With Hardware Settings",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Load Dialog With Hardware Settings"];
+    [alert setInformativeText:@"Really replace the settings in the dialog with the current HW settings?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model loadDialogFromHardware];
+       }
+    }];
+#else
+    NSBeginAlertSheet(@"Load Dialog With Hardware Settings",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -853,13 +871,28 @@
 					  nil,
 					  nil,
 					  @"Really replace the settings in the dialog with the current HW settings?");
+#endif
 	
 }
 
 - (IBAction) eraseAllDataAction:(id)sender
 {
 	
-	NSBeginAlertSheet(@"Erase All Data",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Erase All Data"];
+    [alert setInformativeText:@"Really erase ALL data?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model dataErase];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Erase All Data",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -869,6 +902,7 @@
 					  nil,
 					  nil,
 					  @"Really erase ALL data?");
+#endif
 	
 }
 
@@ -887,7 +921,7 @@
 			modalDelegate:self didEndSelector:NULL contextInfo:nil];
 	}	
 	else {
-		[self doRadLinkLoad:self];
+        [self getRadLinkFile];
 	}
 }
 
@@ -906,12 +940,12 @@
 
 - (IBAction) doRadLinkLoad:(id)sender
 {
-	[radLinkLoadPanel orderOut:nil];
+    [radLinkLoadPanel orderOut:nil];
     [NSApp endSheet:radLinkLoadPanel];
-	[self getFirmwareFile];
+    [self getRadLinkFile];
 }
 
-- (void) getFirmwareFile
+- (void) getRadLinkFile
 {
 	int index = [radLinkSelectionMatrix selectedRow];
 
@@ -923,41 +957,17 @@
 	else		[openPanel setPrompt:@"Choose File That Removes RadLink"];
     NSString* startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
-			[model loadFirmwareFile:[[openPanel URL]path] index:index];
+			[model loadRadLinkFile:[[openPanel URL]path] index:index];
         }
     }];
-#else 
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(getFirmwareFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)getFirmwareFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model loadFirmwareFile:[[sheet filenames] objectAtIndex:0] index:[radLinkSelectionMatrix selectedRow]];
-    }
-}
-#endif
 
 - (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
-}
-
-- (IBAction) initAction:(id)sender
-{
-	[model initHardware];
 }
 
 - (IBAction) getStatusAction:(id)sender
@@ -982,7 +992,21 @@
 
 - (IBAction) saveUserSettings:(id)sender;
 {
-	NSBeginAlertSheet(@"Save Settings As New User Protocol",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Save Settings As New User Protocol"];
+    [alert setInformativeText:@"Really make the current settings the new user protocol?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model saveUser];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Save Settings As New User Protocol",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -992,13 +1016,13 @@
 					  nil,
 					  nil,
 					  @"Really make the current settings the new user protocol?");
+#endif
 }
 
-- (IBAction) dumpUserValuesAction:(id)sender
+- (IBAction) sendControlC:(id)sender
 {
-	[model dumpUserValues];
+    [model stopOpsAndInterrupt];
 }
-
 - (IBAction) printRunAction:(id)sender
 {
 	[self endEditing];
@@ -1033,6 +1057,8 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+
 @implementation ORRad7Controller (private)
 
 - (void) saveUserSettingPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
@@ -1051,4 +1077,4 @@
 }
 
 @end
-
+#endif

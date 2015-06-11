@@ -325,7 +325,7 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (IBAction) openHelp:(NSToolbarItem*)item 
 {
-	[[[NSApp delegate] helpCenter] showHelpCenter:nil];
+	[[(ORAppDelegate*)[NSApp delegate] helpCenter] showHelpCenter:nil];
 }
 
 - (IBAction) openPreferences:(NSToolbarItem*)item 
@@ -345,12 +345,12 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (IBAction) openTaskMaster:(NSToolbarItem*)item 
 {
-    [[NSApp  delegate] showTaskMaster:self];
+    [(ORAppDelegate*)[NSApp delegate] showTaskMaster:self];
 }
 
 - (IBAction) openORCARootService:(NSToolbarItem*)item 
 {
-    [[NSApp  delegate] showORCARootServiceController:self];
+    [(ORAppDelegate*)[NSApp delegate] showORCARootServiceController:self];
 }
 
 - (IBAction) hardwareFinder:(NSToolbarItem*)item
@@ -365,7 +365,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     NSView*     borderView   = [[[self window] contentView] superview];
     NSData*     pdfData		 = [borderView dataWithPDFInsideRect: cRect];
     NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
-	[tempImage setScalesWhenResized:YES];
 	
 	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSSize imageSize = [tempImage size];

@@ -63,12 +63,14 @@
     IBOutlet NSButton*      rampAllToZeroButton;
     IBOutlet NSButton*      panicAllButton;
     IBOutlet NSButton*      clearAllPanicButton;
+    
+    //module status
+    IBOutlet NSTextField*   moduleStatusField;
+    IBOutlet NSButton*      moduleClearButton;
 	
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
 	IBOutlet ORTimedTextField*    timeoutField;
-    
-	BOOL scheduledForUpdate;
 }
 
 #pragma mark •••Interface Management
@@ -89,7 +91,6 @@
 - (void) powerRestored:(NSNotification*)aNote;
 - (void) updateHistoryPlots:(NSNotification*)aNote;
 - (void) outputStatusChanged:(NSNotification*)aNote;
-- (void) deferedReadParamsUpdate:(NSNotification*)aNote;
 - (void) maxVoltageChanged:(NSNotification*)aNote;
 - (void) chanNameChanged:(NSNotification*)aNote;
 
@@ -119,6 +120,7 @@
 - (IBAction) panicAllAction:(id)sender;
 - (IBAction) clearAllPanicAction:(id)sender;
 - (IBAction) loadAllAction:(id)sender;
+- (IBAction) cleadModuleAction:(id)sender;
 
 #pragma mark •••Table Data Source Methods
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView;

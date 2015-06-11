@@ -359,7 +359,7 @@ NSString* ORHVSupplyVoltageAdcSlopeChangedNotification  = @"ORHVSupplyVoltageAdc
             startHighCurrentTime = [[NSDate date] retain];
         }
         else {
-            if(abs([startHighCurrentTime timeIntervalSinceNow]) > kMaxCurrentTime){
+            if(fabs([startHighCurrentTime timeIntervalSinceNow]) > kMaxCurrentTime){
                 [startHighCurrentTime release];
                 startHighCurrentTime = nil;
                 wasHigh = NO;
@@ -389,14 +389,14 @@ NSString* ORHVSupplyVoltageAdcSlopeChangedNotification  = @"ORHVSupplyVoltageAdc
 
 - (BOOL) checkAdcDacMismatch:(id)checker pollingTime:(int)pollingTime
 {
-    float diff = fabs([self adcVoltage] - [self dacValue]);
+    float diff = abs([self adcVoltage] - [self dacValue]);
     if([self dacValue]>50 && diff>(.20*[self dacValue])){
         if(!wasMismatched){
             wasMismatched = YES;
             startMisMatchTime = [[NSDate date] retain];
         }
         else {
-            if(abs([startMisMatchTime timeIntervalSinceNow]) > kMaxMismatchTime){
+            if(fabs([startMisMatchTime timeIntervalSinceNow]) > kMaxMismatchTime){
                 [startMisMatchTime release];
                 startMisMatchTime = nil;
                 wasMismatched = NO;

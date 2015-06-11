@@ -21,15 +21,17 @@
 
 #pragma mark •••Imported Files
 #import "ORAdcProcessing.h"
+#import "OROrderedObjHolding.h"
 
 #define kApcPollTime            60*3
 #define kApcUpsPort             23
-#define kNumApcUpsAdcChannels    7
+#define kNumApcUpsAdcChannels    9
 
 @class ORAlarm;
 @class ORTimeRate;
+@class NetSocket;
 
-@interface ORApcUpsModel : OrcaObject <ORAdcProcessing>
+@interface ORApcUpsModel : ORGroup <OROrderedObjHolding,ORAdcProcessing>
 {
     NSString*   ipAddress;
     NSString*   password;
@@ -43,16 +45,29 @@
     ORTimeRate*          timeRate[8];
     BOOL                 dataValid;
     ORAlarm*             dataInValidAlarm;
+    ORAlarm*             powerOutAlarm;
     NSOperationQueue*    fileQueue;
     NSMutableSet*        eventLog;
-    
-    float lowLimit[kNumApcUpsAdcChannels];
-    float hiLimit[kNumApcUpsAdcChannels];
-
-    unsigned int pollTime;
+    NSArray*             sortedEventLog;
+    float                lastBatteryValue;
+    float                lowLimit[kNumApcUpsAdcChannels];
+    float                hiLimit[kNumApcUpsAdcChannels];
+    NetSocket*           socket;
+    NSMutableString*     inputBuffer;
+    BOOL                 isConnected;
+    NSSpeechSynthesizer* sayIt;
+    int                  sayItCount;
+    unsigned int         pollTime;
+    BOOL                 maintenanceMode;
 }
 
 #pragma mark ***Accessors
+- (BOOL) maintenanceMode;
+- (void) setMaintenanceMode:(BOOL)aMaintenanceMode;
+- (void) cancelMaintenanceMode;
+
+- (NetSocket*) socket;
+- (void) setSocket:(NetSocket*)aSocket;
 - (unsigned int) pollTime;
 - (void) setPollTime:(unsigned int)aPollTime;
 - (NSMutableSet*) eventLog;
@@ -62,6 +77,8 @@
 - (ORTimeRate*)timeRate:(int)aChannel;
 - (void) setDataValid:(BOOL)aState;
 - (void) clearEventLog;
+- (void) sortEventLog;
+- (NSArray*) sortedEventLog;
 
 #pragma mark ***Utilities
 - (void) pollHardware;
@@ -75,14 +92,24 @@
 
 - (id) valueForKeyInValueDictionary:(NSString*)aKey;
 - (NSString*) valueForPowerPhase:(int)aPhaseIndex powerTableIndex:(int)aRowIndex;
-- (NSString*) valueForLoadPhase:(int)aLoadIndex loadTableIndex:(int)aRowIndex;
+- (NSString*) valueForLoadPhase:(int)aPhaseIndex loadTableIndex:(int)aRowIndex;
 - (NSString*) valueForBattery:(int)aLoadIndex batteryTableIndex:(int)aRowIndex;
+- (float) inputVoltageOnPhase:(int)aPhase;
+- (float) batteryCapacity;
+- (BOOL) powerIsOut;
 
 - (void) checkAlarms;
 - (BOOL) isConnected;
 - (void) setUpQueue;
 - (void) getEvents;
-- (void) getData;
+- (void) connect;
+- (void) disconnect;
+- (void) setIsConnected:(BOOL)aFlag;
+- (void)  startShutdownScript;
+- (void)  startPowerOutSpeech;
+- (void)  continuePowerOutSpeech;
+- (void)  stopPowerOutSpeech;
+- (id)   remoteSocket;
 
 #pragma mark •••Process Limits
 - (float) lowLimit:(int)i;
@@ -108,6 +135,18 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark •••OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (NSString*) nameForSlot:(int)aSlot;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
+
 @property (retain) NSMutableDictionary* valueDictionary;
 @property (assign,nonatomic) BOOL dataValid;
 @property (retain,nonatomic) NSString* username;
@@ -116,6 +155,7 @@
 @property (retain,nonatomic) NSDate* nextPollScheduled;
 @end
 
+extern NSString* ORApcUpsModelMaintenanceModeChanged;
 extern NSString* ORApcUpsModelEventLogChanged;
 extern NSString* ORApcUpsIsConnectedChanged;
 extern NSString* ORApcUpsIpAddressChanged;

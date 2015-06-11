@@ -40,6 +40,7 @@
 	BOOL delayTermination;
 }
 
+- (BOOL)   inDebugger;
 - (MemoryWatcher*) memoryWatcher;
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher;
 - (ORAlarmCollection*) alarmCollection;
@@ -53,6 +54,7 @@
 - (BOOL) configLoadedOK;
 - (void) delayTermination;
 - (void) delayedTermination;
+- (void) restart:(id)sender withConfig:(NSString*)aConfig;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

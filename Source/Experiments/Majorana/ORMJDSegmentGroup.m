@@ -153,7 +153,6 @@
         if(!headerDone){
             NSString* paramHeader = [loGainSeg paramHeader];
             paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kChannel" withString:@"kChanLo,kChanHi"];
-//            paramHeader = [paramHeader stringByReplacingOccurrencesOfString:@"kPreAmpChan" withString:@"kPreAmpLo,kPreAmpHi"];
             
             [theContents appendString:paramHeader];
             headerDone = YES;

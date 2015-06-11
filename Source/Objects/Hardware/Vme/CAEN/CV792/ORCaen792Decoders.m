@@ -60,7 +60,7 @@
             if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
             ORCaen792Model* obj = [actualCards objectForKey:aKey];
             if(!obj){
-                NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen792Model")];
+                NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen792Model")];
                 NSEnumerator* e = [listOfCards objectEnumerator];
                 ORCaen792Model* aCard;
                 while(aCard = [e nextObject]){

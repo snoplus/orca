@@ -25,9 +25,11 @@
 #import "ORAxis.h"
 #import "ORCARootServiceDefs.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORDataController (private)
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 title]]; }
 
@@ -335,7 +337,23 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 - (IBAction)clear:(NSToolbarItem*)item 
 {
-    NSBeginAlertSheet(@"Clear Counts",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+     NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+     [alert setMessageText:@"Clear Counts"];
+     [alert setInformativeText:@"Really Clear them? You will not be able to undo this."];
+     [alert addButtonWithTitle:@"Yes/Clear Counts"];
+     [alert addButtonWithTitle:@"Cancel"];
+     [alert setAlertStyle:NSWarningAlertStyle];
+     
+     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model clear];
+            [plotView setNeedsDisplay:YES];
+            [rawDataTable reloadData];
+        }
+    }];
+#else
+     NSBeginAlertSheet(@"Clear Counts",
                       @"Cancel",
                       @"Yes/Clear It",
                       nil,[self window],
@@ -343,6 +361,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
                       @selector(_clearSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really Clear them? You will not be able to undo this.");
+#endif
 }
 
 - (IBAction)doAnalysis:(NSToolbarItem*)item
@@ -504,6 +523,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 }
 
 @end
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORDataController (private)
 
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
@@ -515,7 +535,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
     }
 }
 @end
-
+#endif
 @implementation NSObject (ORDataController_Cat)
 - (int) numberBins
 {

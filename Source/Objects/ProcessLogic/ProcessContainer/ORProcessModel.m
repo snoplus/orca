@@ -25,6 +25,7 @@
 #import "ORProcessCenter.h"
 #import "ORMailer.h"
 #import "ORCouchDBModel.h"
+#import "ORAdcModel.h"
 
 NSString* ORProcessModelMasterProcessChanged = @"ORProcessModelMasterProcessChanged";
 NSString* ORProcessModelSendOnStopChanged			= @"ORProcessModelSendOnStopChanged";
@@ -49,6 +50,8 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 @implementation ORProcessModel
 
+@synthesize lastReportContent,lastReportTime;
+
 #pragma mark ¥¥¥initialization
 - (id) init
 {
@@ -69,6 +72,8 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[shortName release];
 	[testModeAlarm clearAlarm];
     [testModeAlarm release];
+    [lastReportContent release];
+    [lastReportTime release];
 	[super dealloc];
 }
 
@@ -109,6 +114,30 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                      selector: @selector(runNow:)
                          name: ORForceProcessPollNotification
                        object: nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(outOfRangeLowChanged:)
+                         name: ORAdcModelOutOfRangeLow
+                       object: nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(outOfRangeHiChanged:)
+                         name: ORAdcModelOutOfRangeHi
+                       object: nil];
+}
+
+- (void) outOfRangeLowChanged:(NSNotification*)aNote
+{
+    if([[aNote object] guardian]==self){
+        outOfRangeLowCount++;
+    }
+}
+
+- (void) outOfRangeHiChanged:(NSNotification*)aNote
+{
+    if([[aNote object] guardian]==self){
+        outOfRangeHiCount++;
+    }
 }
 
 #pragma mark ***Accessors
@@ -131,7 +160,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         NSLog(@"Process '%@' is now at 'Master' status\n",[self shortName]);
     }
     if(masterProcess && updateImageForMasterChange){
-        NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+        NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
         for(id aProcess in processes){
             if(aProcess == self) continue;
             if([aProcess masterProcess]) {
@@ -488,7 +517,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
            
             NSSize theIconSize = [[self image] size];
             NSSize textSize = [n size];
-            float x = theIconSize.width/2 - textSize.width/2;
+            float x = theIconSize.width/2 - textSize.width/2 + 30;
             [n drawInRect:NSMakeRect(x,[i size].height-18,textSize.width,textSize.height)];
 
 
@@ -500,6 +529,22 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 									 attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
 			
 			[n drawInRect:NSMakeRect([i size].width-[n size].width-10,[i size].height-18,[i size].width-20,16)];
+			[n release];
+		}
+		if(outOfRangeLowCount && processRunning){
+			NSAttributedString* n = [[NSAttributedString alloc]
+									 initWithString:[NSString stringWithFormat:@"%d Lo",outOfRangeLowCount]
+									 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName,[NSColor redColor],NSForegroundColorAttributeName,nil] ];
+			
+            [n drawInRect:NSMakeRect(80,[i size].height-18,[i size].width-20,16)];
+			[n release];
+		}
+		if(outOfRangeHiCount && processRunning){
+			NSAttributedString* n = [[NSAttributedString alloc]
+									 initWithString:[NSString stringWithFormat:@"%d Hi",outOfRangeHiCount]
+									 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName,[NSColor redColor],NSForegroundColorAttributeName,nil] ];
+			
+            [n drawInRect:NSMakeRect(120,[i size].height-18,[i size].width-20,16)];
 			[n release];
 		}
 
@@ -709,6 +754,9 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 - (void) startProcessCycle
 {
+    outOfRangeHiCount=0;
+    outOfRangeLowCount=0;
+    
 	if(processRunning){
 		if(!sampleGateOpen){
 			NSDate* now = [NSDate date];
@@ -734,7 +782,16 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 			}
 		}
 		sampleGateOpen = NO;
-		
+        
+		if(lastOutOfRangeLowCount!=outOfRangeLowCount || lastOutOfRangeHiCount!=outOfRangeHiCount){
+            if(lastOutOfRangeLowCount!=outOfRangeLowCount){
+                lastOutOfRangeLowCount=outOfRangeLowCount;
+            }
+            if(lastOutOfRangeHiCount!=outOfRangeHiCount){
+                lastOutOfRangeHiCount=outOfRangeHiCount;
+            }
+            [self setUpImage];
+        }
         @synchronized(self){
             if(keepHistory && [historyFile length]){
                 NSString* header = @"# SampleTime";
@@ -785,8 +842,13 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                 }
             }
         }
-
 	}
+    else {
+        lastOutOfRangeLowCount=0;
+        lastOutOfRangeHiCount=0;
+        outOfRangeLowCount=0;
+        outOfRangeHiCount=0;
+    }
 }
 
 - (void) checkForAchival
@@ -798,9 +860,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 		NSDate* creationDate = [attrib objectForKey:NSFileCreationDate];
 		NSTimeInterval fileAge = fabs([creationDate timeIntervalSinceNow]);	
         if(fileAge >= 60*60*24*7){
-			NSDate* now = [NSCalendarDate date];
-			NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S" allowNaturalLanguage:NO] autorelease];
-			
+			NSDate* now = [NSDate date];
 			NSFileManager* fm = [NSFileManager defaultManager];
 			NSString* folderPath = [[fullPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"History"];
 			if(![fm fileExistsAtPath: folderPath]){
@@ -808,7 +868,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 			}
 			
 			NSString* newPath = [folderPath stringByAppendingPathComponent:[fullPath lastPathComponent]];
-			newPath = [newPath stringByAppendingFormat:@"_%@",[dateFormatter stringFromDate:now]];
+            newPath = [newPath stringByAppendingFormat:@"_%@",[now descriptionFromTemplate:@"yy_MM_dd_HH_mm_ss"]];
 			[fm moveItemAtPath:fullPath toPath:newPath error:nil];
 			writeHeader = YES;
             [self incrementProcessRunNumber];
@@ -892,7 +952,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 				s= [s stringByAppendingString:@"\n"];
 			}
 			if(adcCount){
-				NSArray* couchObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
+				NSArray* couchObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")];
 				if([couchObjs count]){
 					ORCouchDBModel* couchObj = [couchObjs objectAtIndex:0];
 					if(![couchObj replicationRunning]){
@@ -996,7 +1056,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeatShutOffWarning) object:nil];
     
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
     //check if there is another process that is the Master. If so it will handle this.
     if(![self masterProcess]){
         for(id aProcess in processes){
@@ -1025,7 +1085,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendHeartbeat) object:nil];
 	if([self heartbeatSeconds]==0)return;
 	
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
     BOOL skipReport = NO;
     //check if there is another process that is the Master. If so it will do a heartbeat report.
     if(![self masterProcess]){
@@ -1043,29 +1103,43 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	
     if(!skipReport){
         NSString* theContent = @"";
+        NSDate* theCurrentTime = [NSDate date];
         theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-        theContent = [theContent stringByAppendingFormat:@"This heartbeat message was generated automatically by the Process at:\n"];
-        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+        theContent = [theContent stringByAppendingFormat:@"This report was generated automatically by a process at:\n"];
+        theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",theCurrentTime];
         theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
         theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
-                      [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
-        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];	
-        theContent = [theContent stringByAppendingFormat:@"%@\n",[self report]];
+                      nextHeartbeat, [nextHeartbeat utcDescription]];
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+        NSString* currentReport = [self report];
+
+        theContent = [theContent stringByAppendingFormat:@"%@\n",currentReport];
         
-        NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+        NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
         if([self masterProcess]){
             for(id aProcess in processes){
                 if(aProcess == self) continue;
                 theContent = [theContent stringByAppendingFormat:@"%@\n",[aProcess report]];
             }
         }
+        
+        if([lastReportContent length] && (lastReportTime!=nil)){
+            //append last report for comparision
+            theContent = [theContent stringByAppendingString:@"\n"];
+            theContent = [theContent stringByAppendingString:@"=====================================================\n"];
+            theContent = [theContent stringByAppendingFormat:@"Last report sent %@ (Local ORCA Time)\n",lastReportTime];
+            theContent = [theContent stringByAppendingString:@"Last report is appended for comparison.\n"];
+            theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+            theContent = [theContent stringByAppendingFormat:@"%@\n",lastReportContent];
+        }
+        self.lastReportContent = currentReport;
+        self.lastReportTime    = theCurrentTime;
 
-        theContent = [theContent stringByAppendingString:@"\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
         theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
         for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
-        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
+        theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 
-     
         NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
         [self sendMail:userInfo];
     }
@@ -1087,7 +1161,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (void) sendStartStopNotice:(BOOL)state
 {
     
-    NSArray* processes = [[[NSApp delegate] document] collectObjectsOfClass:[self class]];
+    NSArray* processes = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[self class]];
     ORProcessModel* emailSource = self;
     if(![self masterProcess]){
         for(id aProcess in processes){
@@ -1148,11 +1222,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	if([self heartbeatSeconds]){
 		[nextHeartbeat release];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
-#else
-		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
-#endif
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORProcessModelNextHeartBeatChanged object:self];
 	

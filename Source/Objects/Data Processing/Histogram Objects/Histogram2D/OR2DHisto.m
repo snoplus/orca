@@ -156,7 +156,7 @@
 		[dataSetLock lock];
 		unsigned long theSize = numberBinsPerSide*numberBinsPerSide;
 		[dataToShip appendBytes:&theSize length:4];            //length of the histogram
-		[dataToShip appendBytes:histogram length:theSize*4]; //note size in number bytes--not longs
+        [dataToShip appendData:histogram];
 		[dataSetLock unlock];
 		
 		//go back and fill in the total length

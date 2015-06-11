@@ -140,8 +140,8 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	@"portWasOpen"]];
 	NSString* aName = [decoder decodeObjectForKey:@"portName"];
     [self performSelector:@selector(setPortName:) withObject:aName afterDelay:3];
-	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
+    [[self undoManager] enableUndoRegistration];
 	
 	return self;
 }

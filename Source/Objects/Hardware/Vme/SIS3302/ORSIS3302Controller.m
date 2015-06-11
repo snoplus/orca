@@ -1462,7 +1462,7 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -1650,7 +1650,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset and Init of SIS3302 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3302 Reset and Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3302 Reset and Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1691,7 +1691,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"SIS3302 Report FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3302 Report FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3302 Report FAILED", @"OK", nil, nil,
                         localException);
     }
 
@@ -1707,7 +1707,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"SIS3302 Reg Dump FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3302 Reg Dump FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3302 Reg Dump FAILED", @"OK", nil, nil,
                         localException);
     }
 	if(ok)[model regDump];

@@ -654,7 +654,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		[model read];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -666,7 +666,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		[model write];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -713,7 +713,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		[model report];
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -725,7 +725,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		NSLog(@"Caen 1721 Card %d thresholds loaded\n",[model slot]);
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nThreshold loading failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nThreshold loading failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -737,7 +737,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		NSLog(@"Caen 1721 Card %d inited\n",[model slot]);
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -807,7 +807,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		[model readFrontPanelControl];
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@\nGet Front Panel Failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nGet Front Panel Failed", @"OK", nil, nil,
 				localException);
 	}
 }
@@ -818,7 +818,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		[model writeFrontPanelControl];
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@\nSet Front Panel Failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet Front Panel Failed", @"OK", nil, nil,
 				localException);
 	}
 }
@@ -834,7 +834,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 		[model generateSoftwareTrigger];
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nSoftware Trigger Failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSoftware Trigger Failed", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -868,11 +868,10 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
 
 - (IBAction) isFixedSizeAction:(id)sender
 {
-	
 	//incompatible with overlapping triggers, gate acq, and zero length encoding
 	//trigger overlap || sync-in gate
 	if (([model channelConfigMask] & 0x2UL) || ([model acquisitionMode] == 2)) {
-		NSRunCriticalAlertPanel(@"You will loose data! Fixed Event Size is not compatible with Trigger Overlap and Sync-In Gate acq mode",
+		ORRunAlertPanel(@"You will loose data! Fixed Event Size is not compatible with Trigger Overlap and Sync-In Gate acq mode",
 					@"Fixed event size doesn't poll the card to get the next event size, and doesn't flush CAEN buffer on memory full. It's faster and fits better heavy bursts. Disable trigger overlap and sync-in gate.",
 					@"OK", nil, nil);
 		[model setIsFixedSize:NO];
@@ -927,7 +926,7 @@ int chanConfigToMaskBit1721[kNumChanConfigBits] = {1,3,6};
               fw&0xff);
 	}
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
                         localException);
 	}
 

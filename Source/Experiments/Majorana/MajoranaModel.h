@@ -34,21 +34,25 @@
 #define kVacBComponent			1
 
 @class ORRemoteSocketModel;
-@class OROpSequence;
 @class ORAlarm;
+@class ORMJDInterlocks;
 
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
 	int             viewType;
     int             pollTime;
-    OROpSequence*   scriptModel[2];
+    NSDate*         lastConstraintCheck;
     NSMutableArray* stringMap;
     ORAlarm*        rampHVAlarm[2];
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
+    
+    ORMJDInterlocks* mjdInterlocks[2];
 }
 
 #pragma mark ¥¥¥Accessors
+- (NSDate*) lastConstraintCheck;
+- (void) setLastConstraintCheck:(NSDate*)aDate;
 - (BOOL) ignorePanicOnB;
 - (void) setIgnorePanicOnB:(BOOL)aIgnorePanicOnB;
 - (BOOL) ignorePanicOnA;
@@ -61,10 +65,9 @@
 - (BOOL) anyHvOnVMECrate:(int)aVMECrate;
 - (void) setVmeCrateHVConstraint:(int)aCrate state:(BOOL)aState;
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
-- (id) scriptModel:(int)index;
-- (NSArray*) scriptSteps:(int)index;
+- (id) mjdInterlocks:(int)index;
 - (void) hvInfoRequest:(NSNotification*)aNote;
-- (void) updateAllowedToRunStates;
+- (void) setDetectorStringPositions;
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
@@ -72,6 +75,7 @@
 - (id)   stringMap:(int)i objectForKey:(id)aKey;
 - (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey;
 - (NSString*) mapFileAsString;
+- (BOOL) validateDetector:(int)aDetectorIndex;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;
@@ -103,4 +107,4 @@ extern NSString* MajoranaModelIgnorePanicOnAChanged;
 extern NSString* ORMajoranaModelViewTypeChanged;
 extern NSString* ORMajoranaModelPollTimeChanged;
 extern NSString* ORMJDAuxTablesChanged;
-
+extern NSString* ORMajoranaModelLastConstraintCheckChanged;

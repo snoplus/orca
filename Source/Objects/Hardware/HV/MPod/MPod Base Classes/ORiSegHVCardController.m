@@ -28,6 +28,7 @@
 #import "ORTimedTextField.h"
 #import "ORMPodCrate.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORiSegHVCardController (private)
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _panicAllRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
@@ -36,6 +37,7 @@
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _allRampToZeroSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 @end
+#endif
 
 @implementation ORiSegHVCardController
 - (void) dealloc
@@ -48,9 +50,9 @@
 {	
 	[super awakeFromNib];
 	
-	[[currentPlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
+	[[currentPlotter yAxis] setRngLimitsLow:-5000 withHigh:5000 withMinRng:10];
 	[[voltagePlotter yAxis] setRngLimitsLow:0 withHigh:10000 withMinRng:10];
-	[[currentPlotter yAxis] setLabel:@"Current (µA)"];
+	[[currentPlotter yAxis] setLabel:@"Current (pA)"];
 	[[voltagePlotter yAxis] setLabel:@"Voltage (V)"];
 	ORTimeLinePlot* aPlot;
 	
@@ -301,15 +303,6 @@
 
 - (void) channelReadParamsChanged:(NSNotification*)aNote
 {
-	if(!scheduledForUpdate){
-		scheduledForUpdate = YES;
-		[NSObject cancelPreviousPerformRequestsWithTarget:self];
-		[self performSelector:@selector(deferedReadParamsUpdate:) withObject:aNote afterDelay:1];
-	}
-}
-- (void) deferedReadParamsUpdate:(NSNotification*)aNote
-{
-	scheduledForUpdate = NO;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[hvTableView reloadData];
 	[self updateButtons];
@@ -320,12 +313,13 @@
 	[channelCountField setIntValue:numberOnChannels];
 	[self outputStatusChanged:aNote];
 	int events = [model failureEvents:selectedChannel];
+    int moduleEvents = [model moduleFailureEvents];
 	int state  = [model channel:selectedChannel readParamAsInt:@"outputSwitch"];
 	[temperatureField setIntValue:[model channel:0 readParamAsInt:@"outputMeasurementTemperature"]];
 
 	NSString* eventString = @"";
 	
-	if(!events && (state != kiSegHVCardOutputSetEmergencyOff))eventString = @"No Events";
+	if(!events && (state != kiSegHVCardOutputSetEmergencyOff) && !moduleEvents)eventString = @"No Events";
 	else {
 		if(state == kiSegHVCardOutputSetEmergencyOff)	eventString = [eventString stringByAppendingString:@"Panicked\n"];
 		if(events & outputFailureMinSenseVoltageMask)	eventString = [eventString stringByAppendingString:@"Min Voltage\n"];
@@ -337,6 +331,15 @@
 		if(events & outputFailureTimeoutMask)			eventString = [eventString stringByAppendingString:@"Timeout\n"];
 		if(events & outputCurrentLimitedMask)			eventString = [eventString stringByAppendingString:@"Current Limit\n"];
 		if(events & outputEmergencyOffMask)				eventString = [eventString stringByAppendingString:@"Emergency Off\n"];
+        if(moduleEvents & moduleEventPowerFail)         eventString = [eventString stringByAppendingString:@"Module Power Failure\n"];
+        if(moduleEvents & moduleEventLiveInsertion)     eventString = [eventString stringByAppendingString:@"Module Live Insertion\n"];
+        if(moduleEvents & moduleEventService)           eventString = [eventString stringByAppendingString:@"Module Requires Service\n"];
+        if(moduleEvents &
+           moduleHardwareLimitVoltageNotGood)           eventString = [eventString stringByAppendingString:@"Module Hard Limit Voltage Not Good\n"];
+        if(moduleEvents & moduleEventInputError)        eventString = [eventString stringByAppendingString:@"Module Input Error\n"];
+        if(moduleEvents & moduleEventSafetyLoopNotGood) eventString = [eventString stringByAppendingString:@"Module Safety Loop Not Good\n"];
+        if(moduleEvents & moduleEventSupplyNotGood)     eventString = [eventString stringByAppendingString:@"Module Power Supply Not Good\n"];
+        if(moduleEvents & moduleEventTemperatureNotGood)eventString = [eventString stringByAppendingString:@"Module Temperature Not Good\n"];
 	}
 	[eventField setStringValue:eventString];
 }
@@ -401,7 +404,7 @@
 			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];
 
 		}
-		else if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff)){
+		else if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff) || [model moduleFailureEvents]){
 			//channel is off
 			[powerOnButton setEnabled:NO];
 			[powerOffButton setEnabled:NO];
@@ -431,10 +434,11 @@
 			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];
 		}
 		
-		if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff)){
+		if([model failureEvents:selectedChannel] || (state == kiSegHVCardOutputSetEmergencyOff) || [model moduleFailureEvents]){
 			[clearPanicButton setEnabled:YES];
 		}
 		else {
+            //set up the clear events button
 			[clearPanicButton setEnabled:NO];
 		}
 		
@@ -616,6 +620,7 @@
 	[self endEditing];
 	int selectedChannel = [model selectedChannel];
 	[model loadValues:selectedChannel];
+
 }
 
 #pragma mark •••Data Source Methods
@@ -678,11 +683,13 @@
 - (IBAction) powerOnAction:(id)sender
 {
 	[model turnChannelOn:[model selectedChannel]];
+	[[model adapter] pollHardware];
 }
 
 - (IBAction) powerOffAction:(id)sender
 {
 	[model turnChannelOff:[model selectedChannel]];
+	[[model adapter] pollHardware];
 }
 
 - (IBAction) stopRampAction:(id)sender
@@ -699,6 +706,21 @@
 {
 	[self endEditing];
 	int chan = [model selectedChannel];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:[NSString stringWithFormat:@"HV Panic Channel %d",chan]];
+    [alert setInformativeText:[NSString stringWithFormat:@"Really Panic Channel %d High Voltage OFF?",chan]];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model panic:chan];
+            NSLog(@"Panicked MPod (%lu), Card %d Channel %d\n",[[model guardian]uniqueIdNumber],[model slot], chan);
+        }
+    }];
+#else
     NSBeginAlertSheet([NSString stringWithFormat:@"HV Panic Channel %d",chan],
 					  @"YES/Do it NOW",
 					  @"Cancel",
@@ -709,12 +731,14 @@
 					  nil,
 					  nil,
 					  @"%@",[NSString stringWithFormat:@"Really Panic Channel %d High Voltage OFF?",chan]);
+#endif
 }
 
 - (IBAction) clearPanicAction:(id)sender
 {
 	[model clearPanicChannel:[model selectedChannel]];
 	[model clearEventsChannel:[model selectedChannel]];
+    [model clearModule];
 }
 
 #pragma mark •••Actions for All
@@ -736,6 +760,20 @@
 			  [model numberOfChannels]-numberOffChannels,
 			  [model numberOfChannels]-numberOffChannels>1?@"s are":@" is"];
 	}
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert setInformativeText:s2];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model turnAllChannelsOn];
+       }
+    }];
+#else
     NSBeginAlertSheet(s1,
 					  @"YES/Do it NOW",
 					  @"Cancel",
@@ -746,6 +784,7 @@
 					  nil,
 					  nil,
 					  @"%@",s2);
+#endif
 }
 
 - (IBAction) powerAllOffAction:(id)sender
@@ -766,7 +805,21 @@
 			  [model numberOfChannels]-numberOnChannels,
 			  [model numberOfChannels]-numberOnChannels>1?@"s are":@" is"];
 	}
-	NSBeginAlertSheet(s1,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert setInformativeText:s2];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model turnAllChannelsOff];
+        }
+    }];
+#else
+    NSBeginAlertSheet(s1,
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -776,6 +829,8 @@
 					  nil,
 					  nil,
 					  @"%@",s2);
+#endif
+
 }
 
 - (IBAction) stopAllRampAction:(id)sender
@@ -785,7 +840,21 @@
 
 - (IBAction) rampAllToZeroAction:(id)sender
 {	
-	NSBeginAlertSheet(@"Ramp All Channels to Zero",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Ramp All Channels to Zero"];
+    [alert setInformativeText:@"Really Ramp ALL Channels to Zero?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model rampAllToZero];
+       }
+    }];
+#else
+    NSBeginAlertSheet(@"Ramp All Channels to Zero",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -795,6 +864,7 @@
 					  nil,
 					  nil,
 					  @"Really Ramp ALL Channels to Zero?");
+#endif
 	
 }
 - (IBAction) loadAllAction:(id)sender
@@ -803,9 +873,29 @@
 	[model loadAllValues];
 }
 
+- (IBAction) cleadModuleAction:(id)sender
+{
+    [model clearModule];
+}
+
 - (IBAction) panicAllAction:(id)sender
 {
 	[self endEditing];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"HV Panic ALL Channels"];
+    [alert setInformativeText:@"Really Panic ALL Channels High Voltage OFF?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model panicAll];
+            NSLog(@"Panicked All Channels MPod (%lu), Card %d\n",[[model guardian]uniqueIdNumber],[model slot]);
+       }
+    }];
+#else
     NSBeginAlertSheet(@"HV Panic ALL Channels",
 					  @"YES/Do it NOW",
 					  @"Cancel",
@@ -816,6 +906,7 @@
 					  nil,
 					  nil,
 					  @"Really Panic ALL Channels High Voltage OFF?");
+#endif
 }
 
 - (IBAction) clearAllPanicAction:(id)sender
@@ -826,7 +917,21 @@
 
 - (IBAction) syncAction:(id)sender
 {
-	NSBeginAlertSheet(@"Sync targets to Readback Voltages",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Sync targets to Readback Voltages"];
+    [alert setInformativeText:@"This will set the target voltages to the actual hw voltages. The actual hw voltages will not change until you 'load' the values.\n\nReally sync these values?\n\n"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model syncDialog];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Sync targets to Readback Voltages",
 					  @"YES/Do it NOW",
 					  @"Cancel",
 					  nil,
@@ -836,12 +941,13 @@
 					  nil,
 					  nil,
 					  @"This will set the target voltages to the actual hw voltages. The actual hw voltages will not change until you 'load' the values.\n\nReally sync these values?\n\n");
+#endif
 }
 
 - (IBAction) listConstraintsAction:(id)sender
 {
 	if([model constraintsInPlace]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model constraintReport]);
         
     }
@@ -875,6 +981,7 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORiSegHVCardController (private)
 
 - (void) _allRampToZeroSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
@@ -922,3 +1029,4 @@
 }
 
 @end
+#endif

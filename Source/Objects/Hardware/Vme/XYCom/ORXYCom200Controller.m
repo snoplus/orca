@@ -223,7 +223,7 @@
 		[model initBoard];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Init failed: %@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"Init failed: %@", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -234,7 +234,7 @@
 		[model report];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Report failed: %@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"Report failed: %@", @"OK", nil, nil,
                         localException);
     }
 }
@@ -280,7 +280,7 @@
 		[model read];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -292,7 +292,7 @@
 		[model write];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
     }
 }
@@ -304,7 +304,7 @@
 		[model initSqWave:chipIndex];	
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Init Square Wave failed: %@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"Init Square Wave failed: %@", @"OK", nil, nil,
                         localException);
     }	
 }

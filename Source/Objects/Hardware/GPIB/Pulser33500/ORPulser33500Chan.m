@@ -239,7 +239,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (NSUndoManager*) undoManager
 {
-	return [[NSApp delegate] undoManager];
+	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 #pragma mark ***HW Access

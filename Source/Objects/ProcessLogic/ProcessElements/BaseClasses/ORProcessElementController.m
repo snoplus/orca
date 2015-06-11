@@ -53,7 +53,7 @@
 {    
     [super setModel:aModel];
     [[self window] setTitle:[NSString stringWithFormat:@"%@-%lu",[model className],[model processID]]];
-    [self updateWindow];
+    if(model)[self updateWindow];
 }
 
 - (void) commentChanged:(NSNotification*)aNote

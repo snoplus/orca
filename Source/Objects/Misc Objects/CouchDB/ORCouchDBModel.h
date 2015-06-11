@@ -99,8 +99,7 @@
 - (NSDictionary*) dBHistoryInfo;
 - (NSDictionary*) dBInfo;
 - (void) checkReplication;
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment;
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp;
+- (void) recordEvent:(NSString*)eventName document:aDocument;
 - (void) checkDataBaseExists:(ORCouchDB*)aDataBase;
 
 #pragma mark ***DB Access
@@ -113,17 +112,16 @@
 - (ORCouchDB*) remoteDBRef;
 - (ORCouchDB*) remoteHistoryDBRef;
 - (ORCouchDB*) remoteHistoryDBRef:(NSString*)aDatabaseName;
-- (void) createDatabase;
+- (void) createDatabases;
 - (void) createDatabase:(ORCouchDB*)aDBRef;
+- (void) deleteDatabases;
+- (void) deleteDatabase:(ORCouchDB*)aDBRef;
 - (void) addUpdateHandler;
 - (void) addUpdateHandler:(ORCouchDB*)aDBRef;
-
+- (void) startReplication;
 - (void) createHistoryDatabase:(ORCouchDB*)aDBRef;
 - (void) createHistoryDatabase;
 - (void) createRemoteDataBases;
-- (void) startReplication;
-- (void) replicate:(BOOL)continuously;
-- (void) deleteDatabase;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 //test functions
 - (void) databaseInfo:(BOOL)toStatusWindow;
@@ -133,6 +131,8 @@
 - (void) compactDatabase;
 - (void) updateDatabaseStats;
 - (void) updateRunInfo;
+- (void) replicate:(BOOL)continuously;
+- (void) replicate:(BOOL)continuously restart:(BOOL)aRestart;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

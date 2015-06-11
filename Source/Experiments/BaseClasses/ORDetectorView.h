@@ -46,6 +46,8 @@
 - (void) showSelectedDialog;
 - (int) selectedSet;
 - (int) selectedPath;
+- (NSColor*) outlineColor:(int)aSet;
+- (NSColor*) selectedColor:(int)aSet;
 
 //subclass reponsiblity
 - (void) upArrow;

@@ -62,8 +62,6 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [dateFormatter release];
     [badDiskAlarm release];
     [dateConvertFormatter release];
-    [fileQueue cancelAllOperations];
-    [fileQueue release];
     [super dealloc];
 }
 

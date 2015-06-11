@@ -235,7 +235,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
- 		NSRunAlertPanel( [ localException name ], 	// Name of panel
+ 		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -259,7 +259,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
- 		NSRunAlertPanel( [ localException name ], 	// Name of panel
+ 		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -274,7 +274,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -291,7 +291,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -308,7 +308,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -325,7 +325,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -341,7 +341,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -357,7 +357,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -373,7 +373,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -389,7 +389,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -405,7 +405,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -421,7 +421,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -437,7 +437,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
+        ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",				// Okay button
 						nil,				// alternate button

@@ -71,15 +71,14 @@
 	int channel = ShiftAndExtract(dataPtr[1],16,0xfff);
 	theString   = [theString stringByAppendingFormat:@"Unit %d Chan %d\n",ident,channel];
 			
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
 	
 	union {
 		float asFloat;
 		unsigned long asLong;
 	}theData;
 	theData.asLong = dataPtr[3];
-	theString = [theString stringByAppendingFormat:@"Gas Reading %d: %.2E %@\n",channel,theData.asFloat,date];
+	theString = [theString stringByAppendingFormat:@"Gas Reading %d: %.2E %@\n",channel,theData.asFloat,[date stdDescription]];
 	
 	return theString;
 }

@@ -22,11 +22,7 @@
     NSSize existingSize;
 	NSImageRep* imageRep;
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 	imageRep = [existingImage bestRepresentationForRect:NSMakeRect(0,0,[self size].width,[self size].height) context:nil hints:nil];
-#else
-	imageRep = [existingImage bestRepresentationForDevice: nil];
-#endif
 	
     existingSize.width = [imageRep pixelsWide];
     existingSize.height = [imageRep pixelsHigh];
@@ -44,11 +40,8 @@
     [rotateTF concat];
 
     NSRect r1 = NSMakeRect(0, 0, newSize.height, newSize.width);
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 	imageRep = [existingImage bestRepresentationForRect:NSMakeRect(0,0,[self size].width,[self size].height) context:nil hints:nil];
-#else
-	imageRep = [existingImage bestRepresentationForDevice: nil];
-#endif
+
     [imageRep drawInRect: r1];
 
     [rotatedImage unlockFocus];

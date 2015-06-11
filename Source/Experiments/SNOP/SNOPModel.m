@@ -338,11 +338,19 @@ mtcConfigDoc = _mtcConfigDoc;
 	if([runObjects count]){
 		ORRunModel* rc = [runObjects objectAtIndex:0];
         _rhdrStruct.runNumber = [rc runNumber];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific            
+        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
+        NSDateComponents *cmpStartTime = [gregorian components:
+                                                 (NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay |
+                                                  NSCalendarUnitHour | NSCalendarUnitMinute |NSCalendarUnitSecond)
+                                                      fromDate:[NSDate date]];
+#else
         NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
         NSDateComponents *cmpStartTime = [gregorian components:
-                                                 (NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit |
-                                                  NSHourCalendarUnit | NSMinuteCalendarUnit |NSSecondCalendarUnit)
+                                          (NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit |
+                                           NSHourCalendarUnit | NSMinuteCalendarUnit |NSSecondCalendarUnit)
                                                       fromDate:[NSDate date]];
+#endif
         _rhdrStruct.date = [cmpStartTime day] + [cmpStartTime month] * 100 + [cmpStartTime year] * 10000;
         _rhdrStruct.time = [cmpStartTime second] * 100 + [cmpStartTime minute] * 10000 + [cmpStartTime hour] * 1000000;
 	}
@@ -969,7 +977,7 @@ mtcConfigDoc = _mtcConfigDoc;
 
 - (void) zeroPedestalMasks
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")]
      makeObjectsPerformSelector:@selector(zeroPedestalMasks)];
 }
 
@@ -1171,7 +1179,8 @@ mtcConfigDoc = _mtcConfigDoc;
         [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
     }
     
-
+    //Collect a series of objects from the ORMTCModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     
     NSMutableDictionary* configDocDict = [NSMutableDictionary dictionaryWithCapacity:1000];
     
@@ -1361,7 +1370,7 @@ mtcConfigDoc = _mtcConfigDoc;
     NSMutableArray * pedCrateMask = [NSMutableArray arrayWithCapacity:100];
     
     //Collect a series of objects from the ORMTCController
-    /*NSArray*  controllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCController")];
+    /*NSArray*  controllerObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCController")];
     
     //Initialise the MTCModal
     ORMTCController* aMTCController = [controllerObjs objectAtIndex:0];
@@ -1658,7 +1667,7 @@ mtcConfigDoc = _mtcConfigDoc;
     }
     
     //Loop over all the FEC cards
-    NSArray * fec32ControllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    NSArray * fec32ControllerObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
     
     //Count all Fec32 Cards on the DAQ
     //int numberFec32Cards = 2; //PLACE THIS IN LATER: [fec32ControllerObjs count];

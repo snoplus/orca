@@ -228,7 +228,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to download user code.\n");
-		NSRunAlertPanel([localException name], @"%@\nCould not download.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nCould not download.", @"OK", nil, nil,
 						localException);
 	}
 }
@@ -240,7 +240,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to start user code.\n");
-		NSRunAlertPanel([localException name], @"%@\nCould not start user code.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nCould not start user code.", @"OK", nil, nil,
 						localException);
 	}
 }
@@ -252,7 +252,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to stop user code.\n");
-		NSRunAlertPanel([localException name], @"%@\nCould not stop user code.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nCould not stop user code.", @"OK", nil, nil,
 						localException);
 	}
 }
@@ -307,7 +307,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Could not dump memory from eCPU.\n");
-		NSRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
 						localException);
 	}
 }
@@ -319,7 +319,7 @@
     }
 	@catch(NSException* localException) {
 		NSLog(@"Could not dump memory from eCPU.\n");
-		NSRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
 						localException);
     }
 	
@@ -332,33 +332,14 @@
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             NSString* filename = [[[openPanel URL]path ]stringByAbbreviatingWithTildeInPath];
             [model setFileName:filename];
        }
     }];
-#else	
-	[openPanel beginSheetForDirectory:NSHomeDirectory()
-								 file:nil
-								types:nil
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
 }
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode){
-		NSString* filename = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		[model setFileName:filename];
-	}
-}
-#endif
 #pragma mark ¥¥¥Queue DataSource
 
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue

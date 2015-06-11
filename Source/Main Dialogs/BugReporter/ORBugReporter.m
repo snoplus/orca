@@ -40,8 +40,8 @@
 	CFBundleGetLocalInfoDictionary( localInfoBundle );
 	NSString* bugMan = [infoDictionary objectForKey:@"ReportBugsTo"];
 
-	[[mailForm cellWithTag:0] setStringValue:bugMan];
-	[[mailForm cellWithTag:2] setStringValue:@"Orca Bug"];
+    [toField setStringValue:bugMan];
+	[subjectField setStringValue:@"Orca Bug"];
 	
 	[categoryMatrix selectCellWithTag:3];
 	[bodyField setString:@""];
@@ -56,7 +56,7 @@
 //this method is needed so the global menu commands will be passes on correctly.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 #pragma mark •••Actions
@@ -111,8 +111,8 @@
 	}
 	if(!foundOne) s = [s stringByAppendingFormat:@"Machine : %@\n",[[NSHost currentHost] names]];
 	
-	s = [s stringByAppendingFormat:@"Submitted by : %@\n",[[infoForm cellWithTag:0] stringValue]];
-	s = [s stringByAppendingFormat:@"Institution : %@\n",[[infoForm cellWithTag:1] stringValue]];
+	s = [s stringByAppendingFormat:@"Submitted by : %@\n",[submitField stringValue]];
+	s = [s stringByAppendingFormat:@"Institution : %@\n",[institutionField stringValue]];
 	
 	[bodyField setString:s];
 	
@@ -122,9 +122,9 @@
 	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 	
 	ORMailer* mailer = [ORMailer mailer];
-	[mailer setTo:		[[mailForm cellWithTag:0] stringValue]];
-	[mailer setCc:		[[mailForm cellWithTag:1] stringValue]];
-	[mailer setSubject:	[[mailForm cellWithTag:2] stringValue]];
+	[mailer setTo:		[toField stringValue]];
+	[mailer setCc:		[ccField stringValue]];
+	[mailer setSubject:	[subjectField stringValue]];
 	[mailer setBody:	theContent];
 	[theContent release];
 	
@@ -254,7 +254,7 @@
     NSMutableArray* allEMails = [NSMutableArray array];
     [self putAlarmEMailsIntoArray:allEMails];
         
-    NSArray* allProcesses = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
+    NSArray* allProcesses = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")];
     for(id aProcess in allProcesses){
         [self putProcess:aProcess eMailsIntoArray:allEMails];
     }

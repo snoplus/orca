@@ -29,6 +29,7 @@
 	
     //BB commands
     IBOutlet   NSTextField* eventFifoStatusRegTextField;
+	IBOutlet   NSButton* saveIonChanFilterOutputRecordsCB;
 	IBOutlet   NSButton* resetEventCounterAtRunStartCB;
 	IBOutlet   NSTextField* statusHighRegTextField;
 	IBOutlet   NSTextField* statusLowRegTextField;
@@ -82,6 +83,8 @@
 		//(P) command sender (client)
 	    IBOutlet   NSTextField* crateUDPDataIPTextField;
 	    IBOutlet   NSTextField* crateUDPDataPortTextField;
+	      IBOutlet   NSPopUpButton* fifoForUDPDataPortPU;
+	      IBOutlet   NSButton* useStandardUDPDataPortsCB;
 		IBOutlet NSButton*		openDataCommandSocketButton;
 		IBOutlet NSButton*		closeDataCommandSocketButton;
 	    IBOutlet NSProgressIndicator*   openDataCommandSocketIndicator;
@@ -171,6 +174,9 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote;
+- (void) fifoForUDPDataPortChanged:(NSNotification*)aNote;
+- (void) useStandardUDPDataPortsChanged:(NSNotification*)aNote;
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote;
 - (void) lowLevelRegInHexChanged:(NSNotification*)aNote;
 - (void) statusHighRegChanged:(NSNotification*)aNote;
@@ -234,6 +240,9 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) saveIonChanFilterOutputRecordsCBAction:(id)sender;
+- (IBAction) fifoForUDPDataPortPUAction:(id)sender;
+- (IBAction) useStandardUDPDataPortsCBAction:(id)sender;
 - (IBAction) resetEventCounterAtRunStartCBAction:(id)sender;
 - (IBAction) lowLevelRegInHexPUAction:(id)sender;
 - (IBAction) statusHighRegTextFieldAction:(id)sender;
@@ -343,6 +352,7 @@
 - (IBAction) sendCommandScript:(id)sender;
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-
+#endif
 @end

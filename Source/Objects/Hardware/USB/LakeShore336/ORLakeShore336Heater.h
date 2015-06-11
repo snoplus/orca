@@ -57,7 +57,7 @@
 - (NSString*) pidSetupString;
 - (NSString*) outputSetupString;
 
-@property (assign,nonatomic) NSString*      label;
+@property (copy,nonatomic)   NSString*      label;
 @property (assign,nonatomic) int            channel;
 @property (assign,nonatomic) float          output;
 @property (assign,nonatomic) int            resistance;

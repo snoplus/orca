@@ -90,7 +90,7 @@
 		if(!actualShapers)actualShapers = [[NSMutableDictionary alloc] init];
 		ORShaperModel* obj = [actualShapers objectForKey:shaperKey];
 		if(!obj){
-			NSArray* listOfShapers = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
+			NSArray* listOfShapers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
 			for(ORShaperModel* aShaper in listOfShapers){
 				if([aShaper crateNumber] == crate && [aShaper slot] == card){
 					[actualShapers setObject:aShaper forKey:shaperKey];

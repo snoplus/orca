@@ -53,6 +53,7 @@ smellieRunFile;
     return self;
 }
 
+<<<<<<< HEAD
 -(void)windowDidLoad
 {
     
@@ -77,6 +78,13 @@ smellieRunFile;
     self.snopRunTypeMaskDic = temp;
 }
 
+=======
+- (void) dealloc
+{
+    [blankView release];
+    [super dealloc];
+}
+>>>>>>> 9cd190b44fb0833c26f974bd2faff603cb61c9da
 
 - (NSString*) defaultPrimaryMapFilePath
 {
@@ -633,9 +641,9 @@ smellieRunFile;
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 /*
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
         [model hvPanicDown];
     }
@@ -687,7 +695,7 @@ smellieRunFile;
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 - (IBAction)hvMasterStatus:(id)sender

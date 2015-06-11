@@ -37,10 +37,14 @@
 
 - (void)dealloc
 {
-    [invocation release];
-    invocation = nil;
-	[outputStringErrorPattern release];
-    outputStringErrorPattern=nil;
+    [invocation                 release];
+	[outputStringErrorPattern   release];
+	[outputStateKey             release];
+    
+    outputStateKey              = nil;
+    invocation                  = nil;
+    outputStringErrorPattern    = nil;
+    
 	[super dealloc];
 }
 

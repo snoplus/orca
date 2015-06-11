@@ -37,22 +37,22 @@ typedef enum
 
 @interface OROpSeqStep : NSOperation
 {
-	OROpSequenceQueue*  currentQueue;
-	OROpSeqStep*        concurrentStep;
-	NSTextStorage*      outputStringStorage;
-	NSTextStorage*      errorStringStorage;
-	NSInteger           errorCount;
-	NSInteger           numAllowedErrors;
-	NSString*           title;
-	NSString*           errorTitle;
-	NSString*           successTitle;
-	NSMutableDictionary*  skipConditions;
-	NSMutableDictionary*  requirements;
-	NSMutableDictionary*  andConditions;
-	NSMutableDictionary*  orConditions;
-    OROpSequence*       persistantStorageObj;
-    NSString*           persistantAccessKey;
-    BOOL                forceError;
+	OROpSequenceQueue*      currentQueue;
+	OROpSeqStep*            concurrentStep;
+	NSTextStorage*          outputStringStorage;
+	NSTextStorage*          errorStringStorage;
+	NSInteger               errorCount;
+	NSInteger               numAllowedErrors;
+	NSString*               title;
+	NSString*               errorTitle;
+	NSString*               successTitle;
+	NSMutableDictionary*    skipConditions;
+	NSMutableDictionary*    requirements;
+	NSMutableDictionary*    andConditions;
+	NSMutableDictionary*    orConditions;
+    OROpSequence*           persistantStorageObj;
+    NSString*               persistantAccessKey;
+    BOOL                    forceError;
 }
 
 @property (nonatomic, copy) NSString*       title;

@@ -39,6 +39,7 @@
 - (int)  numberBins;
 - (long) value:(unsigned long)channel;
 - (long) value:(unsigned long)channel callerLockedMe:(BOOL)callerLockedMe;
+-(NSUInteger) manyValues:(NSRange)overRange to:(double*)output stride:(NSUInteger)stride callerLockedMe:(BOOL)callerLockedMe;
 - (void) setWaveform:(NSData*)aWaveform;
 - (BOOL) useUnsignedValues;
 - (void) setUseUnsignedValues:(BOOL)aState;

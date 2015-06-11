@@ -52,7 +52,11 @@
                      selector : @selector(remotePortChanged:)
                          name : ORRSRemotePortChanged
                        object : model];
-	
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(connectionChanged:)
+                         name : ORRSRemoteConnectedChanged
+                       object : model];
 }
 
 - (void) updateWindow
@@ -61,12 +65,18 @@
 	[self remoteHostNameChanged:nil];
 	[self remotePortChanged:nil];
     [self remoteSocketLockChanged:nil];
+    [self connectionChanged:nil];
 }
+
+- (void) connectionChanged:(NSNotification*)aNote
+{
+    [connectedField setStringValue:[model isConnected]?@"Connected":@""];
+}
+
 
 - (void) remoteHostNameChanged:(NSNotification*)aNote
 {
 	[remoteHostField setStringValue:[model remoteHost]];
-	[remoteHostNameField setStringValue:[model remoteHostName]];
 }
 
 - (void) remotePortChanged:(NSNotification*)aNote

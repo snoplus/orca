@@ -42,6 +42,8 @@
     IBOutlet NSButton* cmdCommonMethodsOnly;
     IBOutlet NSButton* cmdObjectUpdateButton;
     IBOutlet NSButton* cmdTestExecuteButton;
+    IBOutlet NSButton* cmdListenOnStart;
+    IBOutlet NSButton* cmdSaveHeartbeatsWhileListening;
     IBOutlet NSTextField* cmdValueField;
     IBOutlet NSTextField* updateDesignDocField;
     IBOutlet NSTextField* updateNameField;
@@ -66,6 +68,8 @@
 - (void) passwordChanged:(NSNotification*)aNote;
 - (void) heartbeatChanged:(NSNotification*)aNote;
 - (void) updatePathChanged:(NSNotification*)aNote;
+- (void) listenOnStartChanged:(NSNotification*)aNote;
+- (void) saveHeartbeatsWhileListeningChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (void) updateDisplays;
@@ -88,6 +92,8 @@
 - (IBAction) testExecute:(id)sender;
 - (IBAction) clearStatusLog:(id)sender;
 - (IBAction) updatePathAction:(id)sender;
+- (IBAction) listenOnStartAction:(id)sender;
+- (IBAction) saveHeartbeatsWhileListeningAction:(id)sender;
 
 
 

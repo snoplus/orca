@@ -426,7 +426,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
 
 - (void) postCouchDBRecord
 {
-    if(abs(lastTimePosted-timeMeasured) > 10){
+    if((lastTimePosted-timeMeasured) > 10){
         lastTimePosted = timeMeasured;
         NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                                 [NSNumber numberWithFloat:    temperature], @"temperature",

@@ -221,8 +221,7 @@ static NSString* kCardKey[8] = {
 	
 	theData.asLong = dataPtr[2];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
 	
 	theString = [theString stringByAppendingFormat:@"%.2E %@\n",theData.asFloat,date];
 	

@@ -553,7 +553,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -572,7 +572,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -584,7 +584,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Read No Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Read No Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -596,7 +596,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Read And clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Read And clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -608,7 +608,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear Scalers of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -623,7 +623,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear Overflow of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Clear Overflow", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Clear Overflow", @"OK", nil, nil,
                         localException);
     }
 }
@@ -636,7 +636,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Start Counting of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Start", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Start", @"OK", nil, nil,
                         localException);
     }
 	
@@ -649,7 +649,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Stop Counting of SIS3800 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3800 Stop", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3800 Stop", @"OK", nil, nil,
                         localException);
     }
 	

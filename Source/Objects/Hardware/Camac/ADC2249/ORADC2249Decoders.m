@@ -106,7 +106,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     NSString* card  = [NSString stringWithFormat:@"Station  = %lu\n", (ptr[0]&0x001f0000)>>16];
     NSString* chan  = [NSString stringWithFormat:@"Chan     = %lu\n", (ptr[0]&0x0000f000)>>12];
     NSString* adc   = [NSString stringWithFormat:@"ADC      = 0x%lx\n",ptr[0]&0x00000fff];
-	NSCalendarDate* theTime = nil;
+	NSDate* theTime = nil;
 	
 	if(length ==4){
 		union {
@@ -116,9 +116,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		theTimeRef.asLongs[1] = ptr[1];
 		theTimeRef.asLongs[0] = ptr[2];
 		
-		theTime   = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
+		theTime   = [NSDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
 		NSString* inSec = [NSString stringWithFormat:@"\n(%.3f secs)\n",theTimeRef.asTimeInterval];
-		return [NSString stringWithFormat:@"%@%@%@%@%@\nTimeStamp:\n%@%@\n",title,crate,card,chan,adc,[theTime descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S:%F"],inSec];               
+		return [NSString stringWithFormat:@"%@%@%@%@%@\nTimeStamp:\n%@%@\n",title,crate,card,chan,adc,[theTime descriptionFromTemplate:@"MM/dd/yy HH:mm:SSS"],inSec];
 		
 	}
     

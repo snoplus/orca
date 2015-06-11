@@ -27,6 +27,7 @@
 #define kRunMode		@"kRunMode"
 #define kRunNumber		@"kRunNumber"
 #define kSubRunNumber	@"kSubRunNumber"
+#define kElapsedTime	@"kElapsedTime"
 #define kFilePrefix		@"kFilePrefix"
 #define kFileSuffix		@"kFileSuffix"
 

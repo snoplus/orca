@@ -74,6 +74,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
         [transferQueue release];
         transferQueue = nil;
     }
+    [dataTimer release];
+    [mainTimer release];
 	
     [queueFullAlarm clearAlarm];
     [queueFullAlarm release];
@@ -81,7 +83,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [dataTakers release];
 	[theDecoder release];
     [recordsPending release];
-    
+    [lastFile release];
     [super dealloc];
 }
 
@@ -268,8 +270,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	enableTimer = aState;
 	if(enableTimer){
 		[self clearTimeHistogram];
-		dataTimer = [[ORTimer alloc]init];
-		mainTimer = [[ORTimer alloc]init];
+		if(!dataTimer)dataTimer = [[ORTimer alloc]init];
+		if(!mainTimer)mainTimer = [[ORTimer alloc]init];
 		[dataTimer start];
 		[mainTimer start];
 	}
@@ -298,8 +300,8 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
 	if(enableTimer){
 		[timerLock lock];	//start critical section
-		dataTimer = [[ORTimer alloc]init];
-		mainTimer = [[ORTimer alloc]init];
+		if(!dataTimer) dataTimer = [[ORTimer alloc]init];
+		if(!mainTimer) mainTimer = [[ORTimer alloc]init];
 		[dataTimer start];
 		[mainTimer start];
 		[timerLock unlock];	//end critical section
@@ -350,11 +352,9 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	[theDecoder release];
 	theDecoder = [[ORDecoder alloc] initWithHeader:[aDataPacket fileHeader]];
 		
-	if(transferQueue){
-        [transferQueue release];
-        transferQueue = nil;
+	if(!transferQueue){
+        transferQueue       = [[ORSafeQueue alloc] init];
     }
-    transferQueue       = [[ORSafeQueue alloc] init];
     
     //cache the next object
     nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
@@ -529,6 +529,10 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 		}
 	}	
 	if([transferQueue count]==0)NSLog(@"Processing queue clear\n");
+    else {
+        NSLog(@"Processing queue NOT clear -- Forcing a flush\n");
+        [transferQueue removeAllObjects];
+    }
 	
 	//wait for the processing thread to exit.
 	NSLog(@"Waiting on processing thread\n");
@@ -665,7 +669,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 - (void) sendDataFromQueue
 {
 	NSAutoreleasePool *threadPool = [[NSAutoreleasePool allocWithZone:nil] init];
-	[NSThread setThreadPriority:.8];
+	[NSThread setThreadPriority:1];
     id theNextObject =  [self objectConnectedTo: ORDataTaskDataOut];
 	BOOL flushMessagePrintedOnce = NO;
     BOOL timeToQuit              = NO;

@@ -34,7 +34,9 @@
 	int i;
 	for(i=0;i<kNumCV830Channels;i++){
 		[[enabledMaskMatrix cellAtRow:i column:0] setTag:i];
+		[[scalerValueMatrix cellAtRow:i column:0] setTag:i];
 		[[channelLabelMatrix cellAtRow:i column:0] setIntValue:i];
+		[[scalerValueMatrix cellAtRow:i column:0] setIntValue:0];
 	}
 	
 	[super awakeFromNib];	
@@ -97,11 +99,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(dataFormatChanged:)
-                         name : ORCV830ModelDataFormatChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(clearMebChanged:)
                          name : ORCV830ModelClearMebChanged
 						object: model];
@@ -111,9 +108,19 @@
                          name : ORCV830ModelAutoResetChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(count0OffsetChanged:)
+                         name : ORCV830ModelCount0OffsetChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) count0OffsetChanged:(NSNotification*)aNote
+{
+	[count0OffsetField setIntValue: [model count0Offset]];
+}
 
 - (void) autoResetChanged:(NSNotification*)aNote
 {
@@ -123,11 +130,6 @@
 - (void) clearMebChanged:(NSNotification*)aNote
 {
 	[clearMebCB setIntValue: [model clearMeb]];
-}
-
-- (void) dataFormatChanged:(NSNotification*)aNote
-{
-	[dataFormatCB setIntValue: [model dataFormat]];
 }
 
 - (void) testModeChanged:(NSNotification*)aNote
@@ -164,9 +166,9 @@
 	[self dwellTimeChanged:nil];
 	[self acqModeChanged:nil];
 	[self testModeChanged:nil];
-	[self dataFormatChanged:nil];
 	[self clearMebChanged:nil];
 	[self autoResetChanged:nil];
+	[self count0OffsetChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -212,7 +214,6 @@
     [shipRecordsButton setEnabled:!lockedOrRunningMaintenance];
 	[autoResetCB setEnabled:!lockedOrRunningMaintenance];
 	[clearMebCB setEnabled:!lockedOrRunningMaintenance];
-	[dataFormatCB setEnabled:!lockedOrRunningMaintenance];
 	[testModeCB setEnabled:!lockedOrRunningMaintenance];
 	[acqModePU setEnabled:!lockedOrRunningMaintenance];
 	[dwellTimeField setEnabled:!lockedOrRunningMaintenance && [model acqMode]==2];
@@ -251,45 +252,45 @@
 	if(aNotification==nil){
 		int i;
 		for(i=0;i<kNumCV830Channels;i++){
-			[[scalerValueMatrix cellAtRow:i column:0] setIntValue:[model scalerValue:i]];
+			[[scalerValueMatrix cellAtRow:i column:0] setDoubleValue:[model scalerValue:i]];
 		}
 	}
 	else {
 		int index = [[[aNotification userInfo]objectForKey:@"Channel"] intValue];
 		if(index>=0 && index < kNumCV830Channels){
-			[[scalerValueMatrix cellAtRow:index column:0] setIntValue:[model scalerValue:index]];
+			[[scalerValueMatrix cellAtRow:index column:0] setDoubleValue:[model scalerValue:index]];
 		}
 	}
 }
 
 #pragma mark •••Actions
 
-- (void) autoResetAction:(id)sender
+- (void) count0OffsetAction:(id)sender
+{
+	[model setCount0Offset:[sender intValue]];	
+}
+
+- (IBAction) autoResetAction:(id)sender
 {
 	[model setAutoReset:[sender intValue]];	
 }
 
-- (void) clearMebAction:(id)sender
+- (IBAction) clearMebAction:(id)sender
 {
 	[model setClearMeb:[sender intValue]];	
 }
 
-- (void) dataFormatAction:(id)sender
-{
-	[model setDataFormat:[sender intValue]];	
-}
-
-- (void) testModeAction:(id)sender
+- (IBAction) testModeAction:(id)sender
 {
 	[model setTestMode:[sender intValue]];	
 }
 
-- (void) acqModeAction:(id)sender
+- (IBAction) acqModeAction:(id)sender
 {
 	[model setAcqMode:[sender indexOfSelectedItem]];	
 }
 
-- (void) dwellTimeAction:(id)sender
+- (IBAction) dwellTimeAction:(id)sender
 {
 	[model setDwellTime:[sender intValue]];	
 }
@@ -299,7 +300,7 @@
 	[model initBoard];
 }
 
-- (void) enabledMaskAction:(id)sender
+- (IBAction) enabledMaskAction:(id)sender
 {
 	int i;
 	unsigned long aMask = 0;
@@ -328,7 +329,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Software trigger of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Software Trigger", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Software Trigger", @"OK", nil, nil,
                         localException);
     }
 }
@@ -341,7 +342,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Software clear of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Software Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Software Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -354,7 +355,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Software reset of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Software Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Software Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -373,7 +374,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Read Scalers", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Read Scalers", @"OK", nil, nil,
                         localException);
     }
 }
@@ -385,7 +386,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Status of CV830 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV830 Read Status", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV830 Read Status", @"OK", nil, nil,
                         localException);
     }
 }
@@ -407,7 +408,7 @@
     
     short	i;
     for (i = 0; i < [model getNumberRegisters]; i++) {
-        [registerAddressPopUp insertItemWithTitle:[model getRegisterName:i] atIndex:i];
+        [registerAddressPopUp insertItemWithTitle:[NSString stringWithFormat:@"%2d %@",i,[model getRegisterName:i]] atIndex:i];
     }
     
 }

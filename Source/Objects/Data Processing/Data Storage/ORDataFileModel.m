@@ -87,14 +87,16 @@ static const int currentVersion = 1;           // Current version
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[diskFullAlarm clearAlarm];
     [diskFullAlarm release];
+	[diskFillingAlarm clearAlarm];
+    [diskFillingAlarm release];
     [filePointer release];
     [fileName release];
-    [statusFileName release];
     [dataFolder release];
     [statusFolder release];
     [configFolder release];
     [md5Queue cancelAllOperations];
     [md5Queue release];
+    [openFilePath release];
     [super dealloc];
 }
 
@@ -587,7 +589,7 @@ static const int currentVersion = 1;           // Current version
     int statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
     if(runMode == kNormalRun){
 	    //start a copy of the Status File
-	    statusFileName = [[NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]] retain];
+	    NSString* statusFileName = [NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]];
         
         [statusFolder ensureExists:[statusFolder finalDirectoryName]];
         NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
@@ -692,7 +694,21 @@ static const int currentVersion = 1;           // Current version
 			long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
 			long long totalSpace = [[diskInfo objectForKey:NSFileSystemSize] longLongValue]; 
 			percentFull = 100 - 100*freeSpace/(double)totalSpace;
-									
+            
+			if(freeSpace < (long long)kScaryDiskSpace * 1024 * 1024 * 1024){
+                if(!diskFillingAlarm){
+					diskFillingAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Data disk getting full"] severity:kHardwareAlarm];
+					[diskFillingAlarm setSticky:YES];
+                    [diskFullAlarm postAlarm];
+					[diskFillingAlarm setHelpString:[NSString stringWithFormat:@"The data disk is filling. You can acknowledge this alarm, but it will not be cleared until more disk space is available."]];
+				}
+            }
+            else {
+                [diskFillingAlarm clearAlarm];
+                [diskFillingAlarm release];
+                diskFillingAlarm = nil;
+            }
+            
 			if(freeSpace < (long long)kMinDiskSpace * 1024 * 1024 * 1024){
 				if(!diskFullAlarm){
 					diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
@@ -925,7 +941,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	else s = [NSString stringWithFormat:@"Run%@%d",fileSuffix,runNumber];
 	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];
 	if(useDatedFileNames){
-		NSCalendarDate* theDate = [NSCalendarDate date];
+		NSDate* theDate = [NSDate date];
 		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
 	}
 	return s;
@@ -949,6 +965,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 - (void) main
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
 	@try {
 		if(filePath && ![self isCancelled]){
 			NSTask* task = [[NSTask alloc] init];
@@ -983,5 +1001,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	}
 	@catch(NSException* e){
 	}
+    @finally {
+        [thePool release];
+    }
 }
 @end

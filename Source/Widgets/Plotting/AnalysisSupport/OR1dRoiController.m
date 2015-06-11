@@ -119,7 +119,7 @@
 {
 	if(model){
 		[roiMinField setFloatValue: [model minChannel]];
-		[roiWidthField setFloatValue:fabs([model maxChannel]-[model minChannel])];
+		[roiWidthField setFloatValue:labs([model maxChannel]-[model minChannel])];
 	}
 	else {
 		[roiMinField setStringValue:@"---"];	
@@ -132,7 +132,7 @@
 {
 	if(model){
 		[roiMaxField setFloatValue: [model maxChannel]];
-		[roiWidthField setFloatValue:fabs([model maxChannel]-[model minChannel])];
+		[roiWidthField setFloatValue:labs([model maxChannel]-[model minChannel])];
 	}
 	else {          
 		[roiMaxField setStringValue:@"---"];	

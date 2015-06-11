@@ -29,7 +29,7 @@ typedef struct HPPulserCustomWaveformStruct {
 	NSString*       storageName;
 	bool			tryToStore;
     bool            builtInFunction;
-} HPPulserCustomWaveformStruct; 
+} HPPulserCustomWaveformStruct;
 
 #define kCalibrationWidth 	7.8  //can't set exactly to 8 because of a bug in the HP pulser
 #define kCalibrationVoltage 	750
@@ -62,6 +62,7 @@ typedef struct HPPulserCustomWaveformStruct {
 	int				savedTriggerSource;
     BOOL			lockGUI;
     BOOL			negativePulse;
+    BOOL            verbose;
 	
 	enum {
                 kBuiltInSine,
@@ -138,6 +139,8 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) updateLoadProgress;
 
 #pragma mark •••Accessors
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerbose;
 - (BOOL) negativePulse;
 - (void) setNegativePulse:(BOOL)aNegativePulse;
 - (BOOL) lockGUI;
@@ -249,6 +252,7 @@ typedef struct HPPulserCustomWaveformStruct {
 
 @end
 
+extern NSString* ORHPPulserModelVerboseChanged;
 extern NSString* ORHPPulserModelNegativePulseChanged;
 extern NSString* ORHPPulserModelLockGUIChanged;
 extern NSString* ORHPPulserVoltageChangedNotification;

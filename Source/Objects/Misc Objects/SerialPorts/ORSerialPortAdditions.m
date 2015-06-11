@@ -21,7 +21,7 @@
 //  Modified from ORSerialPortList.h by Andreas Mayer
 
 #import "ORSerialPortAdditions.h"
-
+#import "NSDate+Extensions.h"
 
 @implementation ORSerialPort (ORSerialPortAdditions)
 

@@ -24,9 +24,11 @@
 #import "StopLightView.h"
 #import "ORSerialPortController.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORTM700Controller (private)
 - (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORTM700Controller
 
@@ -390,7 +392,21 @@
         if([[model pumpOffConstraints] count] && [model constraintsDisabled]){
             s = [s stringByAppendingString:@" WARNING--Constraints in place but are diabled."];
         }
-		NSBeginAlertSheet(s,
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:s];
+        [alert setInformativeText:@"Is this really what you want?"];
+        [alert addButtonWithTitle:@"YES, Turn it OFF"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertFirstButtonReturn){
+                [model turnStationOff];
+            }
+        }];
+#else
+        NSBeginAlertSheet(s,
                       @"Cancel",
                       @"Yes, Turn it OFF",
                       nil,[self window],
@@ -398,6 +414,7 @@
                       @selector(_turnOffSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 	}
 }
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
@@ -451,7 +468,7 @@
 - (IBAction) listConstraintsAction:(id)sender
 {
 	if([[model pumpOffConstraints]count]){
-        NSRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
+        ORRunAlertPanel(@"The following constraints are in place", @"%@", @"OK", nil, nil,
                         [model pumpOffConstraintReport]);
         
     }
@@ -460,6 +477,7 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORTM700Controller (private)
 - (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
@@ -467,6 +485,6 @@
 		[model turnStationOff];
     }    
 }
-
 @end
+#endif
 

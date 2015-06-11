@@ -25,6 +25,7 @@
 #import "ORCompositePlotView.h"
 #import "ORTimeAxis.h"
 #import "ORTimeRate.h"
+#import "ORVmeCard.h"
 
 @implementation ORMJDPreAmpController
 
@@ -94,32 +95,35 @@
  		[[feedBackResistorMatrix cellAtRow:chan column:0] setTag:chan];
 	}
     
-    [[baselinePlot0 yAxis] setRngLow:0.0 withHigh:300.];
-    [[baselinePlot0 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
-    [[baselinePlot1 yAxis] setRngLow:0.0 withHigh:300.];
-    [[baselinePlot1 yAxis] setRngLimitsLow:-15. withHigh:0. withMinRng:4]; // rail of preamp at -12V - niko
+    [[baselinePlot0 xAxis] setRngLow:0.0 withHigh:10000];
+    [[baselinePlot0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[baselinePlot0 yAxis] setRngLow:-15.0 withHigh:15.];
+    [[baselinePlot0 yAxis] setRngLimitsLow:-15. withHigh:10. withMinRng:4]; // rail of preamp at -12V - niko
+    
+    [[baselinePlot1 xAxis] setRngLow:0.0 withHigh:10000];
+    [[baselinePlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[baselinePlot1 yAxis] setRngLow:-15. withHigh:15.];
+    [[baselinePlot1 yAxis] setRngLimitsLow:-15. withHigh:15. withMinRng:4]; // rail of preamp at -12V - niko
+    
+    [[temperaturePlot xAxis] setRngLow:0.0 withHigh:10000];
+    [[temperaturePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[temperaturePlot yAxis] setRngLow:0.0 withHigh:300.];
     [[temperaturePlot yAxis] setRngLimitsLow:0.0 withHigh:60 withMinRng:4]; // up to 60 degrees on chip - niko
-    [[voltagePlot yAxis] setRngLow:0.0 withHigh:300.];
+    
+    [[voltagePlot xAxis] setRngLow:0.0 withHigh:10000];
+    [[voltagePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+    [[voltagePlot yAxis] setRngLow:-30. withHigh:30.];
     [[voltagePlot yAxis] setRngLimitsLow:-30. withHigh:30. withMinRng:4]; // up to +/-24V - niko
+    
+    [[leakageCurrentPlot0 xAxis] setRngLow:0.0 withHigh:10000];
+    [[leakageCurrentPlot0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[leakageCurrentPlot0 yAxis] setRngLow:0.0 withHigh:300.];
     [[leakageCurrentPlot0 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
+    
+    [[leakageCurrentPlot1 xAxis] setRngLow:0.0 withHigh:10000];
+    [[leakageCurrentPlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[leakageCurrentPlot1 yAxis] setRngLow:0.0 withHigh:300.];
     [[leakageCurrentPlot1 yAxis] setRngLimitsLow:-50 withHigh:150 withMinRng:4]; // up to 150 pA leakage current - niko
-
-   
-    [[baselinePlot0 xAxis] setRngLow:0.0 withHigh:10000];
-	[[baselinePlot0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[baselinePlot1 xAxis] setRngLow:0.0 withHigh:10000];
-	[[baselinePlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[temperaturePlot xAxis] setRngLow:0.0 withHigh:10000];
-	[[temperaturePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[voltagePlot xAxis] setRngLow:0.0 withHigh:10000];
-	[[voltagePlot xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[leakageCurrentPlot0 xAxis] setRngLow:0.0 withHigh:10000];
-	[[leakageCurrentPlot0 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-    [[leakageCurrentPlot1 xAxis] setRngLow:0.0 withHigh:10000];
-	[[leakageCurrentPlot1 xAxis] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     
 	NSColor* color[5] = {
 		[NSColor redColor],
@@ -129,7 +133,7 @@
 		[NSColor blackColor],
 	};
     
-    //first the plots for the adc values
+    //baselines
 	int i;
 	for(i=0;i<5;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
@@ -139,7 +143,7 @@
 		[(ORTimeAxis*)[baselinePlot0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
-
+    //baselines
 	for(i=8;i<13;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[baselinePlot1 addPlot: aPlot];
@@ -148,7 +152,7 @@
 		[(ORTimeAxis*)[baselinePlot1 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
-    
+    //temps
 	for(i=0;i<2;i++){
         int tag[2] = {7,15};
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag[i] andDataSource:self];
@@ -158,6 +162,7 @@
 		[(ORTimeAxis*)[temperaturePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
+    //hw voltages
 	for(i=0;i<4;i++){
         int tag[4] = {5,6,13,14};
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:tag[i] andDataSource:self];
@@ -169,7 +174,7 @@
 	}
     
     
-    //the plots for the computed values
+    //leakage currents
     for(i=0;i<5;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[leakageCurrentPlot0 addPlot: aPlot];
@@ -178,6 +183,7 @@
 		[(ORTimeAxis*)[leakageCurrentPlot0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 		[aPlot release];
 	}
+    //leakage currents
     for(i=5;i<10;i++){
 		ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:i andDataSource:self];
 		[leakageCurrentPlot1 addPlot: aPlot];
@@ -206,8 +212,13 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"PreAmp %lu",[model uniqueIdNumber]]];
+    [self setWindowTitle];
     [self settingsLockChanged:nil];
+}
+
+- (void) setWindowTitle
+{
+    [[self window] setTitle:[NSString stringWithFormat:@"Preamp %lu (Rev %d) -> %@",[model uniqueIdNumber],[model boardRev]+1,[model connectedObjectName]]];
 }
 
 #pragma mark ¥¥¥Notifications
@@ -352,6 +363,21 @@
                          name : ORMJDPreAmpModelUseSBCChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(boardRevChanged:)
+                         name : ORMJDPreAmpModelBoardRevChanged
+						object: model];
+ 
+    [notifyCenter addObserver : self
+                     selector : @selector(setWindowTitle)
+                         name : ORMJDPreAmpModelConnectionChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(setWindowTitle)
+                         name : ORVmeCardSlotChangedNotification
+                        object: nil];
+   
 }
 
 - (void) updateWindow
@@ -373,13 +399,20 @@
 	[self pollTimeChanged:nil];
 	[self adcEnabledMaskChanged:nil];
 	[self updateTimePlot:nil];
-	[self baselineVoltageArrayChanged:nil];
-	[self feedbackResistorArrayChanged:nil];
+	[self baselineVoltageChanged:nil];
+	[self feedbackResistorChanged:nil];
 	[self detectorNameChanged:nil];
 	[self useSBCChanged:nil];
+	[self boardRevChanged:nil];
+    [self adcChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) boardRevChanged:(NSNotification*)aNote
+{
+	[boardRevPU selectItemAtIndex: [model boardRev]];
+    [self setWindowTitle];
+ }
 
 - (void) useSBCChanged:(NSNotification*)aNote
 {
@@ -449,10 +482,10 @@
     if(aNote == nil || [key isEqualToString:@"XAttributes3"])[self setPlot:voltagePlot xAttributes:attrib];
 	if(aNote == nil || [key isEqualToString:@"YAttributes3"])[self setPlot:voltagePlot yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes4"])[self setPlot:voltagePlot xAttributes:attrib];
+    if(aNote == nil || [key isEqualToString:@"XAttributes4"])[self setPlot:leakageCurrentPlot0 xAttributes:attrib];
 	if(aNote == nil || [key isEqualToString:@"YAttributes4"])[self setPlot:leakageCurrentPlot0 yAttributes:attrib];
     
-    if(aNote == nil || [key isEqualToString:@"XAttributes5"])[self setPlot:leakageCurrentPlot0 xAttributes:attrib];
+    if(aNote == nil || [key isEqualToString:@"XAttributes5"])[self setPlot:leakageCurrentPlot1 xAttributes:attrib];
 	if(aNote == nil || [key isEqualToString:@"YAttributes5"])[self setPlot:leakageCurrentPlot1 yAttributes:attrib];
 }
 
@@ -550,10 +583,20 @@
 
 - (void) feedbackResistorChanged:(NSNotification*)aNote
 {
- 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-    if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
-    else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
-	else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+    int chan;
+    if(!aNote){
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+            else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+            else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        if(chan>=5 && chan<=7)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+        else if(chan>=13)[[feedBackResistorMatrix cellWithTag:chan] setStringValue:@""];
+        else [[feedBackResistorMatrix cellWithTag:chan] setFloatValue: [model feedBackResistor:chan]];
+    }
 }
 
 - (void) baselineVoltageArrayChanged:(NSNotification*)aNote
@@ -568,11 +611,20 @@
 
 - (void) baselineVoltageChanged:(NSNotification*)aNote
 {
- 	int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-    if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
-    else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
-	else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
-   
+    int chan;
+    if(!aNote){
+        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+            if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+            else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+            else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
+        }
+    }
+    else {
+        chan= [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        if(chan>=5 && chan<=7)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+        else if(chan>=13)[[baselineVoltageMatrix cellWithTag:chan] setStringValue:@""];
+        else [[baselineVoltageMatrix cellWithTag:chan] setFloatValue: [model baselineVoltage:chan]];
+   }
 }
 
 - (void) loopForeverChanged:(NSNotification*)aNote
@@ -696,6 +748,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) boardRevAction:(id)sender
+{
+	[model setBoardRev:[sender indexOfSelectedItem]];
+}
 
 - (void) useSBCAction:(id)sender
 {

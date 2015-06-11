@@ -317,7 +317,7 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 - (id) hardwareCard
 {

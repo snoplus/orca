@@ -1393,7 +1393,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 					if(channelMask==0)continue;
 					
 					if(triggerEventDir & (0x80000000 >> (group*2)))		++waveFormCount[(group*2)];
-					if(triggerEventDir & (0x80000000 >> (group*2)+1))	++waveFormCount[(group*2)+1];
+					if(triggerEventDir & (0x80000000 >> ((group*2)+1)))	++waveFormCount[(group*2)+1];
 					
 					
 					//only read the channels that have trigger info

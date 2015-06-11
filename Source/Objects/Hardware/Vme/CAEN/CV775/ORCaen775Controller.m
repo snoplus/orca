@@ -196,7 +196,7 @@
 		[model initBoard];
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@\nInit of %@ failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nInit of %@ failed", @"OK", nil, nil,
                         localException,[model identifier]);
 
 	}

@@ -148,10 +148,7 @@
 			case kOpSeqQueueRunning:
 			case kOpSeqQueueFinished:
                 {
-                    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
-                    NSString* dateString           = [dateFormatter stringFromDate:[NSDate date]];
-                    [dateFormatter release];
-                    [progressLabel setStringValue:[NSString stringWithFormat:@"Done @ %@",dateString]];
+                    [progressLabel setStringValue:[NSString stringWithFormat:@"Done @ %@",[[NSDate date] descriptionFromTemplate:@"HH:mm:ss"]]];
                 }
 				break;
 			case kOpSeqQueueFailed:

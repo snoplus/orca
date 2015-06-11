@@ -63,12 +63,12 @@ NSString* ORObjectProxyNumberChanged	= @"ORObjectProxyNumberChanged";
 
 - (NSArray*) validObjects
 {
-    return [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString([self proxyName])];
+    return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString([self proxyName])];
 }
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (BOOL) classInList:(NSArray*)anArray

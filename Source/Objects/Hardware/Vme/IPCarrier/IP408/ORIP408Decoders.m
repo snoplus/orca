@@ -72,10 +72,9 @@ static NSString* kIPSlotKey[4] = {
 	NSString* ipSlotKey		= [NSString stringWithFormat:@"IP    = %@\n",[self getSlotKey:*ptr&0x0000000f]];
 
 	ptr++;
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:*ptr];
 
-	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,ipSlotKey,date];
+    NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,ipSlotKey,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z\n"]];
 	ptr++;  s = [s stringByAppendingFormat:@"WriteMask : 0x%08lX\n",*ptr];
 	ptr++;  s = [s stringByAppendingFormat:@"ReadMask  : 0x%08lX\n",*ptr];
 	ptr++;  s = [s stringByAppendingFormat:@"WriteValue: 0x%08lX\n",*ptr];

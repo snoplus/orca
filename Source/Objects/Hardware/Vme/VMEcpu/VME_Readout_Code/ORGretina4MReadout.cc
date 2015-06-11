@@ -1,5 +1,6 @@
 #include "ORGretina4MReadout.hh"
 #include <errno.h>
+#include <stdio.h>
 #include <iostream>
 using namespace std;
 bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
@@ -70,7 +71,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
             else {
                 //oops... really bad -- the buffer read is out of sequence
                 dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-               // LogBusError("Fifo Rst: Gretina4 0x%04x %s",fifoResetAddress,strerror(errno));
+                LogBusError("Fifo Rst: Gretina4 slot %d",slot);
                 clearFifo(fifoResetAddress);
             }
         }

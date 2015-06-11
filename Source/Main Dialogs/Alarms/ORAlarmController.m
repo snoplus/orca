@@ -56,7 +56,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 #pragma mark •••Notifications
@@ -119,7 +119,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (ORAlarmCollection*) alarmCollection
 {
-    return [[NSApp delegate] alarmCollection];
+    return [(ORAppDelegate*)[NSApp delegate] alarmCollection];
 }
 
 #pragma mark •••Delegate Methods
@@ -214,12 +214,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction)delete:(id)sender

@@ -44,19 +44,18 @@
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[xAxis release];
-	[yAxis release];
-	[legend release];
-	[plotView release];
-	[titleField release];
+    self.delegate   = nil;
+	self.xAxis      = nil;
+	self.yAxis      = nil;
+	self.legend     = nil;
+	self.plotView   = nil;
+	self.titleField = nil;
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
 	[self setUpViews];
-	[plotView setDelegate:delegate];
-	[plotView setViewForPDF:self];
 	[xAxis awakeFromNib];
 	[yAxis awakeFromNib];
 	[legend awakeFromNib];
@@ -137,9 +136,16 @@
 	
 	ORPlotView* aPlotView = [[ORPlotView alloc] initWithFrame:NSMakeRect(52,52,width-x,height-y)];
 	[aPlotView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-	[self addSubview:aPlotView];
-	self.plotView = aPlotView;
+    
+    [aPlotView setDelegate:delegate];
+    [aPlotView setViewForPDF:self];
+    
+    [self addSubview:aPlotView];
+
+    self.plotView = aPlotView;
+    
 	[aPlotView release];
+
 }
 
 - (void) makeLegend

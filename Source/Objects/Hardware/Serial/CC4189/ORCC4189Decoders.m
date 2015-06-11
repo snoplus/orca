@@ -97,10 +97,9 @@ static NSString* kCCUnit[8] = {
 	theData.asLong = dataPtr[3];
 	float humidity = theData.asFloat;
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[3]];
 	
-	theString = [theString stringByAppendingFormat:@"%.2f %.2f %@\n",temp,humidity,date];
+	theString = [theString stringByAppendingFormat:@"%.2f %.2f %@\n",temp,humidity,[date stdDescription]];
 	
 	return theString;
 }

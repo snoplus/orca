@@ -108,7 +108,6 @@
         case 1: [self setImage:[NSImage imageNamed:onImageName]]; break;
         default: [self setImage:[NSImage imageNamed:unKnownImageName]]; break;
     }
-    [image setScalesWhenResized:YES];
     [image setSize:[self bounds].size];
     [self setNeedsDisplay:YES];
 }

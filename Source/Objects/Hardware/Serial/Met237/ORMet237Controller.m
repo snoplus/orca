@@ -259,7 +259,7 @@
 - (void) cycleStartedChanged:(NSNotification*)aNote
 {
 	
-	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
 	NSString* dateString = [dateFormatter stringFromDate:[model cycleStarted]];
 	
 	[dateFormatter release];

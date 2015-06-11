@@ -18,8 +18,11 @@
 //-------------------------------------------------------------
 @interface ORBugReporter : NSWindowController
 {
-	IBOutlet NSForm* mailForm;
-	IBOutlet NSForm* infoForm;
+    IBOutlet NSTextField* toField;
+    IBOutlet NSTextField* subjectField;
+    IBOutlet NSTextField* ccField;
+    IBOutlet NSTextField* submitField;
+    IBOutlet NSTextField* institutionField;
 	IBOutlet NSTextView* bodyField;
 	IBOutlet NSMatrix* categoryMatrix;
     IBOutlet NSButton* startDebugging;

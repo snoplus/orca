@@ -58,11 +58,16 @@
     BOOL            rangesHaveBeenSet;
     NSDate*         lastDataBaseUpdate;
     BOOL            useSBC;
+    int             boardRev;
+    BOOL            connected;
 }
 
 - (void) setUpArrays;
+- (NSString*) connectedObjectName;
 
 #pragma mark ¥¥¥Accessors
+- (int)  boardRev;
+- (void) setBoardRev:(int)aBoardRev;
 - (BOOL) useSBC;
 - (void) setUseSBC:(BOOL)aUseSBC;
 - (NSString*) detectorName:(int)i;
@@ -149,6 +154,7 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelBoardRevChanged;
 extern NSString* ORMJDPreAmpModelUseSBCChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;
@@ -172,6 +178,7 @@ extern NSString* ORMJDBaselineVoltageArrayChanged;
 extern NSString* ORMJDFeedBackResistorChanged;
 extern NSString* ORMJDBaselineVoltageChanged;
 extern NSString* ORMJDPreAmpModelDetectorNameChanged;
+extern NSString* ORMJDPreAmpModelConnectionChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;

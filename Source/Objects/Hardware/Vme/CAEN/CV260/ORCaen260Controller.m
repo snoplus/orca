@@ -272,7 +272,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Set Inhibit of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Set Inhibit", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen260 Set Inhibit", @"OK", nil, nil,
                         localException);
     }
 }
@@ -286,7 +286,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset Inhibit of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 reset Inhibit", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen260 reset Inhibit", @"OK", nil, nil,
                         localException);
     }
 }
@@ -300,7 +300,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear Scalers of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Clear Scalers", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen260 Clear Scalers", @"OK", nil, nil,
                         localException);
     }
 }
@@ -314,7 +314,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Read Scalers", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen260 Read Scalers", @"OK", nil, nil,
                         localException);
     }
 }
@@ -328,7 +328,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Inc Scalers of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Inc Scalers", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Caen260 Inc Scalers", @"OK", nil, nil,
                         localException);
     }
 }

@@ -43,19 +43,22 @@
 #import "ORWindowSaveSet.h"
 #import "ORArchive.h"
 #import "ORVXI11HardwareFinderController.h"
-
+#import "NSApplication+Extensions.h"
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
 
 #import <sys/sysctl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-NSString* kCrashLogDir  = @"~/Library/Logs/CrashReporter";
-NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
+NSString* kCrashLogDir               = @"~/Library/Logs/CrashReporter";
+NSString* kLastCrashLog              = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 NSString* OROrcaAboutToQuitNotice    = @"OROrcaAboutToQuitNotice";
 NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
-#define kORSplashScreenDelay 1
-#define kHeartbeatPeriod 30
+#define kORSplashScreenDelay    1
+#define kHeartbeatPeriod        30 //seconds
+#define kLogSnapShotPeriod      15 //minutes
 
 @implementation ORAppDelegate
 
@@ -109,23 +112,10 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	NSUserDefaults *standardDefaults = [NSUserDefaults standardUserDefaults];
 	NSString* noKill				 = [standardDefaults stringForKey:@"startup"];
 	if(![noKill isEqualToString:@"NoKill"]){
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         NSString* bundleID = [[NSRunningApplication currentApplication] bundleIdentifier];
 		NSArray* launchedApps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
         if([launchedApps count]>1)[NSApp terminate:self];
-#else
-		NSString* myName = [[NSProcessInfo processInfo] processName];
-		int myPid        = [[NSProcessInfo processInfo] processIdentifier];
-		NSArray* launchedApps = [[NSWorkspace sharedWorkspace] launchedApplications];
-		for(id anApp in launchedApps){
-			NSString* otherProcessName = [anApp objectForKey:@"NSApplicationName"];
-			int otherProcessPid = [[anApp objectForKey:@"NSApplicationProcessIdentifier"] intValue];
-			
-			if([otherProcessName isEqualToString:myName] && otherProcessPid != myPid){
-				[NSApp terminate:self];
-			}
-		}
-#endif
+
 	}
  
 	return self;
@@ -148,6 +138,25 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
     [self registerNotificationObservers];
     [self setAlarmCollection:[[[ORAlarmCollection alloc] init] autorelease]];
     [self setMemoryWatcher:[[[MemoryWatcher alloc] init] autorelease]];
+}
+
+- (BOOL) inDebugger
+{
+    int                 mib[4];
+    struct kinfo_proc   info;
+    
+    info.kp_proc.p_flag = 0;
+    
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PID;
+    mib[3] = getpid();
+    
+    size_t size = sizeof(info);
+    int err = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
+    //In debugger if the P_TRACED flag is set.
+    if(err == 0) return ((info.kp_proc.p_flag & P_TRACED) != 0);
+    else         return NO; //just return NO on error
 }
 
 - (ORHelpCenter*) helpCenter
@@ -222,7 +231,17 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 }
 
 - (void) applicationWillTerminate:(NSNotification *)aNotification
+
 {
+
+	[queue cancelAllOperations];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
+        NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"];
+        unsigned long now = (unsigned long)[[NSDate date] timeIntervalSince1970];
+        NSString* contents = [NSString stringWithFormat:@"Quit:%lu",now];
+        [contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+    }
+
 	[[ORProcessCenter sharedProcessCenter] stopAll:nil];
 	[ORTimer delay:0.3];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -340,17 +359,14 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
 - (IBAction) terminate:(id)sender
 {
-	BOOL okToQuit = YES;
-	int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
+    BOOL cancel = NO;
+    int runningProcessCount = [[ORProcessCenter sharedProcessCenter] numberRunningProcesses];
 	if(runningProcessCount>0){
-		NSString* s = [NSString stringWithFormat:@"Quitting will stop %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];		
-		int choice = NSRunAlertPanel(s,@"Is this really what you want?",@"Cancel",@"Stop Processes and Quit",nil);
-		if(choice == NSAlertAlternateReturn){
-			okToQuit = YES;
-		}
-		else okToQuit = NO;
+        NSString* s = [NSString stringWithFormat:@"Quitting will stop %d Running Process%@!",runningProcessCount,runningProcessCount>1?@"es":@""];
+        cancel = ORRunAlertPanel(s, @"Is this really what you want?", @"Cancel", @"Stop Processes and Quit",nil);
+
 	}
-	if(okToQuit){
+	if(!cancel){
         delayTermination = NO;
 		[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
 		[ORTimer delay:1];
@@ -393,7 +409,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 - (void) setDocument:(id)aDocument
 {
 	if(aDocument && document){
-		NSRunAlertPanel(@"Experiment Already Open",@"Only one experiment can be active at a time.",nil,nil,nil,nil);
+		ORRunAlertPanel(@"Experiment Already Open",@"Only one experiment can be active at a time.",nil,nil,nil);
 		[NSException raise:@"Document already open" format:@""];
 	}
 	document = aDocument;
@@ -403,14 +419,26 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 {
 	return configLoadedOK;
 }
+
+- (void) restart:(id)sender withConfig:(NSString*)aConfig
+{
+    if([aConfig length] == 0){
+        aConfig = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
+    }
+    NSMutableArray* arguments = nil;
+    if([aConfig length]!=0)arguments = [NSMutableArray arrayWithObjects:@"--forceLoad",aConfig,nil];
+    [NSApp relaunch:sender arguments:arguments];
+}
+
 #pragma mark ¥¥¥Notification Methods
 -(void)applicationDidFinishLaunching:(NSNotification*)aNotification
 {
 	[self showStatusLog:self];
-
+    
+    bool debugging = [self inDebugger];
     NSLog(@"-------------------------------------------------\n");
-    NSLog(@"   Orca (v%@) Has Started                    \n",fullVersion());
-    NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag]; 
+    NSLog(@"   Orca (v%@) started %@                   \n",fullVersion(),debugging?@"in debugger":@"");
+    NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag];
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
 		NSLog(@"   (After crash or hard debugger stop)           \n");
     }
@@ -425,6 +453,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 
     NSLog(@"Running MacOS %@ %@\n", version,updateNotice);
     NSLog(@"Mac Address: %@\n",[self ethernetHardwareAddress]);
+    NSLog(@"Machine Name: %@\n",computerName());
 	NSString* theAppPath = appPath();
 	if(theAppPath)	NSLog(@"Launch Path: %@\n",theAppPath);
 
@@ -439,25 +468,29 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
    
     NSError* fileOpenError = nil;
 	configLoadedOK = NO;
+    
 	@try {
 		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
 			
-			NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"config"];
+			NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"forceLoad"]; //this is from relaunch argument
+            BOOL relaunched = [lastFile length]!=0;
 			if(![lastFile length])lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
 			
 			if([lastFile length]){
 				NSLog(@"Trying to open: %@\n",lastFile);
+                if(relaunched)NSLog(@"This is an auto-relaunch using [%@]\n",NSApplicationRelaunchDaemon);
 				NSURL* asURL = [NSURL fileURLWithPath:lastFile];
 				if(![[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:asURL display:YES error:&fileOpenError]){
 					[self closeSplashWindow];
 					NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
 					NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
-					NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
+					ORRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
 				}
 				else {
 					NSLog(@"Opened Configuration: %@\n",lastFile);
 				}
 			}
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"forceLoad"];
 			if([[[NSUserDefaults standardUserDefaults] objectForKey: OROrcaSecurityEnabled] boolValue]){
 				NSLog(@"Orca global security is enabled.\n");
 			}
@@ -496,8 +529,8 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		[self closeSplashWindow];
 		NSLogColor([NSColor redColor],@"Number of processors: %d\n",count);
 		if([[NSUserDefaults standardUserDefaults] objectForKey:@"IgnoreSingleCPUWarning"] == nil){
-			int result = NSRunInformationalAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",nil,@"OK/Don't remind me",nil);
-			if(result == -1){
+			BOOL cancel = ORRunAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",@"OK/Don't remind me",nil,nil);
+			if(!cancel){
 				[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"IgnoreSingleCPUWarning"];    
 				[[NSUserDefaults standardUserDefaults] synchronize];
 			}
@@ -593,7 +626,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 						[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
 						ORMailer* mailer = [ORMailer mailer];
 						[mailer setTo:finalAddressList];
-						[mailer setSubject:@"ORCA Crash Log"];
+						[mailer setSubject:[NSString stringWithFormat:@"ORCA Crash Log for: %@",computerName()]];
 						[mailer setBody:crashLog];
 						[mailer send:self];
 						[crashLog release];
@@ -682,15 +715,16 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	@try {
 		if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
 			NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"]; 
-			unsigned long now = (unsigned long)[NSDate timeIntervalSinceReferenceDate];
+			unsigned long now = (unsigned long)[[NSDate date]timeIntervalSince1970];
 			NSString* contents = [NSString stringWithFormat:@"Time:%lu\nNext:%lu",now,now+kHeartbeatPeriod];
 			[contents writeToFile:finalPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-		}
-		//if(heartbeatCount%30 == 0){
+        }
+
+		if(heartbeatCount%(kLogSnapShotPeriod*60/kHeartbeatPeriod) == 0){
 			if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefPostLogEnabled] intValue]){
-				[[ORStatusController sharedStatusController] doPeriodicSnapShotToPath:[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath]];
+                [[ORStatusController sharedStatusController] performSelectorOnMainThread:@selector(doSnapShot) withObject:nil waitUntilDone:YES];
 			}
-		//}
+		}
 	}
 	@catch(NSException* e){
 	}

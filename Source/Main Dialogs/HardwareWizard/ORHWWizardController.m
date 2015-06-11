@@ -33,19 +33,17 @@ NSString* ORHWWizardLock					= @"ORHWWizardLock";
 #define kRestoreFailed @"Restore Failed"
 
 @interface ORHWWizardController (private)
-- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _delayedExecute;
 - (void) _delayedRestoreAllFileRequest;
 - (void) _executeActionController:(id) actionController;
 - (void) _executeController:(id)actionController container:(id)container;
 - (void) _restoreAll;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _askForFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) _restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 #endif
 @end
 
@@ -305,7 +303,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (NSUndoManager *)undoManager
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 - (void) registerNotificationObservers
@@ -413,7 +411,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) statusTextChanged:(NSNotification*)aNotification
 {
-    if([[[NSApp delegate] document] statusText])[statusTextField setStringValue:[[[NSApp delegate] document] statusText]];		
+    if([[(ORAppDelegate*)[NSApp delegate] document] statusText])[statusTextField setStringValue:[[(ORAppDelegate*)[NSApp delegate] document] statusText]];		
 }
 
 - (void) actionChanged:(NSNotification*)aNotification
@@ -639,6 +637,22 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	    [[self window] endEditingFor:nil];		
     }
     
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:[NSString stringWithFormat:@"Hardware Wizard About to Run!\nThe return point will be marked: %d",[hwUndoManager numberOfMarks]]];
+    [alert setInformativeText:@"Really Execute This HardwareWizard Set?"];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            [self setUseMark:YES];
+            [self makeControlStruct:nil];
+            [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
+            [self setUseMark:NO];
+        }      }];
+#else
     NSBeginAlertSheet([NSString stringWithFormat:@"Hardware Wizard About to Run!\nThe return point will be marked: %d",[hwUndoManager numberOfMarks]],
                       @"Yes",
                       @"Cancel",
@@ -647,6 +661,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       @selector(_doItWithMarkSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really Execute This HardwareWizard Set?");
+#endif
 }
 
 - (IBAction) doIt:(id) sender
@@ -654,6 +669,22 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     if(![[self window] makeFirstResponder:[self window]]){
 	    [[self window] endEditingFor:nil];		
     }
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Hardware Wizard About to Run!"];
+    [alert setInformativeText:@"Really Execute This HardwareWizard Set?"];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [self setUseMark:NO];
+            [self makeControlStruct:nil];
+            [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
+         }
+    }];
+#else
     NSBeginAlertSheet(@"Hardware Wizard About to Run!",
                       @"Yes",
                       @"Cancel",
@@ -662,6 +693,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       @selector(_doItSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really Execute This HardwareWizard Set?");
+#endif
     
 }
 
@@ -684,7 +716,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Restore"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[openPanel URL]path]];
@@ -692,15 +723,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             [self executeControlStruct];   
         }
     }];
-#else	
-    [openPanel beginSheetForDirectory:nil
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_askForFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 
@@ -717,6 +739,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	    [[self window] endEditingFor:nil];		
     }
     
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clearing ALL return points!"];
+    [alert setInformativeText:@"Really Clear them? You will not be able to undo to the mark points."];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [hwUndoManager clearMarks];
+            [self marksChanged];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"Clearing ALL return points!",
                       @"Yes",
                       @"Cancel",
@@ -725,6 +762,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       @selector(_clearMarksSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really Clear them? You will not be able to undo to the mark points.");
+#endif
 }
 
 
@@ -734,6 +772,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	    [[self window] endEditingFor:nil];		
     }
     
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clearing Hardware Wizard Undo/Redo Stack!"];
+    [alert setInformativeText:@"Really clear them? You will not be able to undo."];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [self clearUndoStacks];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"Clearing Hardware Wizard Undo/Redo Stack!",
                       @"Yes",
                       @"Cancel",
@@ -742,6 +794,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       @selector(_clearUndoSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really clear them? You will not be able to undo.");
+#endif
 }
 
 - (void) clearUndoStacks
@@ -778,12 +831,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction) selectObject:(id) sender
@@ -806,6 +859,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         
         [self makeControlStruct:nil];
         
+        e = [selectionControllers objectEnumerator];
+        while(selectionCon = [e nextObject]){
+            [selectionCon setupSelection];
+        }
     }
 }
 
@@ -910,7 +967,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (NSArray*) scanForObjects
 {
-    return [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORHWWizard)];
+    return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:@protocol(ORHWWizard)];
 }
 
 - (void) installObjects:(NSArray*) theObjects
@@ -996,7 +1053,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     
     //set up the container level
     //fill with nil objects at start, will fill in below.
-    NSArray* containers = [[[NSApp delegate] document] collectObjectsOfClass:containerClass]; 
+    NSArray* containers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:containerClass]; 
     [self setControlArray:[NSMutableArray array]];
     for(i=0;i<MAX([containerSelection maxValue],[containers count]);i++){
         [controlArray addObject:[NSNull null]];
@@ -1021,7 +1078,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         int containerTag = 0;
         [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
 		//set up this container's objects
-        NSArray* objectList = [[[NSApp delegate] document] collectObjectsOfClass:objectClass]; 
+        NSArray* objectList = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:objectClass]; 
         [self addObjectList:objectList atIndex:containerTag];
         
     }
@@ -1467,6 +1524,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (IBAction) restoreAllAction:(id) sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Hardware Wizard Restore ALL!"];
+    [alert setInformativeText:@"Really Restore ALL Parameters?\n(A run file will be requested, with one more chance to cancel.)"];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [self performSelector:@selector(_delayedRestoreAllFileRequest) withObject:nil afterDelay:.1];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Hardware Wizard Restore ALL!",
                       @"Yes",
                       @"Cancel",
@@ -1475,7 +1546,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                       @selector(_restoreAllSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really Restore ALL Parameters?\n(A run file will be requested, with one more chance to cancel.)");
-	
+#endif
 }
 
 @end
@@ -1518,7 +1589,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				}
 				
 				if(numberOfSettableArguments <= 1){
-					if([paramObj useValue]){
+					if([paramObj useValue] || [paramObj oncePerCard]){
 						//no channels to deal with, just do the action
 						unsigned long chanMask = [wizObject wizMask];
 						if(chanMask & 0xffffffff){									
@@ -1582,23 +1653,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	if([self needToRestore])[self askForFileAndExecute];
 	else [self executeControlStruct];
 }
-
-- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertDefaultReturn){
-        [self setUseMark:NO];
-        [self makeControlStruct:nil];
-        [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
-    }    
-}
-
-- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertDefaultReturn){
-        [self performSelector:@selector(_delayedRestoreAllFileRequest) withObject:nil afterDelay:.1];
-    }    
-}
-
+     
 - (void) _delayedRestoreAllFileRequest
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -1607,7 +1662,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Restore All"];
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[openPanel URL]path]];
@@ -1615,16 +1669,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             [self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
         }
     }];
-#else	
-    [openPanel beginSheetForDirectory:nil
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_restoreAllFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-    
 }
 - (void) _restoreAll
 {
@@ -1664,6 +1708,22 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertDefaultReturn){
+        [self performSelector:@selector(_delayedRestoreAllFileRequest) withObject:nil afterDelay:.1];
+    }    
+}
+     
+- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertDefaultReturn){
+        [self setUseMark:NO];
+        [self makeControlStruct:nil];
+        [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
+    }    
+}
 - (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
@@ -1688,25 +1748,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         [self clearUndoStacks];
     }    
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)_askForFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];
-		[self setFileHeader:[ORDecoder readHeader:theFile]];
-        [self executeControlStruct];   
-    }
-}
-- (void)_restoreAllFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSFileHandle* theFile = [NSFileHandle fileHandleForReadingAtPath:[[sheet filenames] objectAtIndex:0]];\
-		[self setFileHeader:[ORDecoder readHeader:theFile]];
-		[self performSelector:@selector(_restoreAll) withObject:nil afterDelay:.1];
-    }
-}
-
 #endif
 @end
 

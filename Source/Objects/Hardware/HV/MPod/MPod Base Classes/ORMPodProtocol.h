@@ -20,9 +20,6 @@
 
 @protocol ORMPodProtocol <NSObject>
 
-- (void) getValue:(NSString*)cmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
-- (void) getValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo;

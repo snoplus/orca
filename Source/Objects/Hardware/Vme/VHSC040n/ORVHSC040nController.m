@@ -23,7 +23,9 @@
 
 @interface ORVHSC040nController (private)
 - (void) panicToZero:(unsigned short)aChannel;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 @end
 
 @implementation ORVHSC040nController
@@ -509,7 +511,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"HV power toggle of VHSC040n FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed HV power toggle of VHSC040n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed HV power toggle of VHSC040n", @"OK", nil, nil,
                         localException);
     }
 	
@@ -533,7 +535,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Module Info Read of VHSC040n FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Module Info Read of VHSC040n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Module Info Read of VHSC040n", @"OK", nil, nil,
                         localException);
     }
 }
@@ -545,7 +547,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Do Clear of VHSC040n FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Do Clear of VHSC040n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Do Clear of VHSC040n", @"OK", nil, nil,
                         localException);
     }
 }
@@ -602,7 +604,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Hardware access of VHSC040n FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed HW Access of VHSC040n", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed HW Access of VHSC040n", @"OK", nil, nil,
                         localException);
     }
 }
@@ -629,9 +631,31 @@
 {
 	[self endEditing];
 	//******contextInfo is released when the sheet closes.
-	NSNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
 	NSString* n = [NSString stringWithFormat:@"%d",aChannel];
 	NSString* s = [NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":n];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s];
+    [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
+    [alert addButtonWithTitle:@"Yes/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            @try {
+                int i;
+                for(i=0;i<kNumVHSC040nChannels;i++){
+                    if(aChannel == 0xFFFF || aChannel == i)[model panicToZero:i];
+                }
+            }
+            @catch(NSException* e){
+                NSLog(@"vhs040n Panic failed because of exception\n");
+            }
+        }
+    }];
+#else
+    NSNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
     NSBeginAlertSheet(s,
 					  @"YES/Do it NOW",
 					  @"Cancel",
@@ -642,8 +666,10 @@
 					  nil,
 					  contextInfo,
 					  @"Really Panic Selected High Voltage OFF?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
 	NSDecimalNumber* theChannelNumber = (NSDecimalNumber*)info;
@@ -661,4 +687,5 @@
 	}
 	[theChannelNumber release];
 }
+#endif
 @end

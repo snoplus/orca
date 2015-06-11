@@ -45,10 +45,9 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 };
 
 @interface OREdelweissSLTController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 - (void) do:(SEL)aSelector name:(NSString*)aName;
 @end
 
@@ -341,9 +340,42 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : OREdelweissSLTModelResetEventCounterAtRunStartChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useStandardUDPDataPortsChanged:)
+                         name : OREdelweissSLTModelUseStandardUDPDataPortsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fifoForUDPDataPortChanged:)
+                         name : OREdelweissSLTModelFifoForUDPDataPortChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(saveIonChanFilterOutputRecordsChanged:)
+                         name : OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged
+						object: model];
+
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote
+{
+	[saveIonChanFilterOutputRecordsCB setIntValue: [model saveIonChanFilterOutputRecords]];
+}
+
+- (void) fifoForUDPDataPortChanged:(NSNotification*)aNote
+{
+	[fifoForUDPDataPortPU selectItemAtIndex: [model fifoForUDPDataPort]];
+}
+
+- (void) useStandardUDPDataPortsChanged:(NSNotification*)aNote
+{
+	[useStandardUDPDataPortsCB setIntValue: [model useStandardUDPDataPorts]];
+    //[fifoForUDPDataPortPU setEnabled: [model useStandardUDPDataPorts]];
+    [crateUDPDataPortTextField setEnabled: ![model useStandardUDPDataPorts]];
+    [crateUDPDataReplyPortTextField setEnabled: ![model useStandardUDPDataPorts]];
+}
 
 - (void) resetEventCounterAtRunStartChanged:(NSNotification*)aNote
 {
@@ -494,7 +526,7 @@ return;
 {
 	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
 	int i;
-	for(i=0;i<19;i++){
+	for(i=0;i<20;i++){
 		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
 	}    
 
@@ -735,6 +767,9 @@ return;
 	[self statusHighRegChanged:nil];
 	[self lowLevelRegInHexChanged:nil];
 	[self resetEventCounterAtRunStartChanged:nil];
+	[self useStandardUDPDataPortsChanged:nil];
+	[self fifoForUDPDataPortChanged:nil];
+	[self saveIonChanFilterOutputRecordsChanged:nil];
 }
 
 
@@ -883,6 +918,21 @@ return;
 }
 
 #pragma mark ***Actions
+
+- (void) saveIonChanFilterOutputRecordsCBAction:(id)sender
+{
+	[model setSaveIonChanFilterOutputRecords:[sender intValue]];	
+}
+
+- (void) fifoForUDPDataPortPUAction:(id)sender
+{
+	[model setFifoForUDPDataPort:[sender indexOfSelectedItem]];	
+}
+
+- (void) useStandardUDPDataPortsCBAction:(id)sender
+{
+	[model setUseStandardUDPDataPorts:[sender intValue]];	
+}
 
 - (void) resetEventCounterAtRunStartCBAction:(id)sender
 {
@@ -1300,7 +1350,7 @@ return;
 		}
 		@catch(NSException* localException) {
 			NSLog(@"Exception doing SLT dump trigger RAM page\n");
-			NSRunAlertPanel([localException name], @"%@\nSLT%d dump trigger RAM failed", @"OK", nil, nil,
+			ORRunAlertPanel([localException name], @"%@\nSLT%d dump trigger RAM failed", @"OK", nil, nil,
 							localException,[model stationNumber]);
 		}
 	}
@@ -1359,7 +1409,7 @@ return;
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception SLT init\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d InitBoard failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d InitBoard failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1390,7 +1440,7 @@ return;
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT status\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 	
@@ -1437,18 +1487,20 @@ return;
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    value = [model readReg:index forFifo: fifoIndex ];
-		    NSLog(@"FLTv4 reg: %@  for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index], fifoIndex, value, value);
+		    //NSLog(@"FLTv4 reg: %@  for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index], fifoIndex, value, value);
+            NSLog(@"FLTv4 reg: %@ (regIdx %i) for fifo# %i has value: 0x%x (%i)\n",[model getRegisterName:index],index, fifoIndex, value, value);
 		    //NSLog(@"  (addr: 0x%08x = 0x%08x ... 0x%08x)  \n", ([model getAddress:index]|(fifoIndex << 14)), [model getAddress:index],  (fifoIndex << 14));
         }
 		else {
 		    value = [model readReg:index ];
-		    NSLog(@"SLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
+		    //NSLog(@"SLTv4 reg: %@ has value: 0x%x (%i)\n",[model getRegisterName:index],value, value);
+            NSLog(@"SLTv4 reg: %@ (regIdx %i) has value: 0x%x (%i)\n",[model getRegisterName:index],index,value, value);
         }
 	}
 	@catch(NSException* localException) {
         //localException is generated by "- (void) throwError:(int)anError address:(unsigned long)anAddress" in SBC_Link.m -tb-
 		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed (B)", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed (B)", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1463,16 +1515,18 @@ return;
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    [model writeReg:index forFifo: fifoIndex  value:val];
-    		NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ fifo# %i\n", val, val, [model getRegisterName:index], fifoIndex);
+    		//NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ fifo# %i\n", val, val, [model getRegisterName:index], fifoIndex);
+            NSLog(@"wrote 0x%x (%i) to SLTv4 reg: %@ (idx:%i) fifo# %i\n", val, val, [model getRegisterName:index], index, fifoIndex);
         }
 		else {
 		    [model writeReg:index value:val];
-		    NSLog(@"wrote 0x%x to SLT reg: %@ \n",val,[model getRegisterName:index]);
+		    //NSLog(@"wrote 0x%x to SLT reg: %@ \n",val,[model getRegisterName:index]);
+            NSLog(@"wrote 0x%x to SLT reg: %@  (idx:%i)\n",val,[model getRegisterName:index],index);
         }
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing SLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1499,7 +1553,7 @@ return;
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading SLT HW Model Version\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1538,6 +1592,30 @@ return;
 - (IBAction) sendSimulationConfigScriptON:(id)sender
 {
 	//[self killCrateAction: nil];//TODO: this seems not to be modal ??? -tb- 2010-04-27
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"This will KILL the crate process before compiling and starting simulation mode. "
+     "There may be other ORCAs connected to the crate. You need to do a 'Force reload' before."];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Yes, Kill Crate"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [[model sbcLink] killCrate]; //XCode says "No '-killCrate' method found!" but it is found during runtime!! -tb- How to get rid of this warning?
+            BOOL rememberState = [[model sbcLink] forceReload];
+            if(rememberState) [[model sbcLink] setForceReload: NO];
+            [model sendSimulationConfigScriptON];
+            //[self connectionAction: nil];
+            //[self toggleCrateAction: nil];
+            //[[model sbcLink] startCrate]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            //   [[model sbcLink] startCrateProcess]; //If "Force reload" is checked the readout code will be loaded again and overwrite the simulation mode! -tb-
+            [[model sbcLink] startCrate];
+            if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"This will KILL the crate process before compiling and starting simulation mode. "
 						"There may be other ORCAs connected to the crate. You need to do a 'Force reload' before.",
                       @"Cancel",
@@ -1547,8 +1625,10 @@ return;
                       @selector(_SLTv4killCrateAndStartSimDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 //NSLog(@"This is my _killCrateDidEnd: -tb-\n");
@@ -1566,7 +1646,7 @@ return;
 		if(rememberState !=[[model sbcLink] forceReload]) [[model sbcLink] setForceReload: rememberState];
 	}
 }
-
+#endif
 
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender
 {
@@ -1591,7 +1671,7 @@ return;
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception loading SLT pulser values\n");
-        NSRunAlertPanel([localException name], @"%@\nSLT%d load pulser failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d load pulser failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1611,7 +1691,6 @@ return;
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Load Pattern File"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -1619,15 +1698,6 @@ return;
             [model setPatternFilePath:fileName];
         }
     }];
-#else 	
-    [openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadPatternPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) loadPatternFile:(id)sender
@@ -1637,6 +1707,24 @@ return;
 
 - (IBAction) calibrateAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Threshold Calibration"];
+    [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
+    [alert addButtonWithTitle:@"Yes/Do Calibrate"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            @try {
+                [model autoCalibrate];
+            }
+            @catch(NSException* localException) {
+            }
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Threshold Calibration",
                       @"Cancel",
                       @"Yes/Do Calibrate",
@@ -1645,22 +1733,14 @@ return;
                       @selector(calibrationSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards.");
+#endif
 }
 
 
 @end
 
 @implementation OREdelweissSLTController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
--(void)loadPatternPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[sheet filenames] objectAtIndex:0];
-        [model setPatternFilePath:fileName];
-    }
-}
-#endif
-
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
@@ -1671,7 +1751,7 @@ return;
 		}
     }    
 }
-
+#endif
 - (void) do:(SEL)aSelector name:(NSString*)aName
 {
 	@try { 
@@ -1680,7 +1760,7 @@ return;
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception doing EDELWEISS SLT %@\n",aName);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d %@ failed", @"OK", nil, nil,
                         localException,[model stationNumber],aName);
 	}
 }

@@ -331,7 +331,7 @@ struct {
 					}
 				}
 			}
-			[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+			[self setLastRead:[[NSDate date] stdDescription]];
 			
 		}
 		else NSLog(@"nothing enabled\n");
@@ -474,7 +474,7 @@ struct {
 {
 	@synchronized(self){
 		[self _setUpPolling];
-		[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+		[self setLastRead:[[NSDate date] description]];
 	}
 }
 

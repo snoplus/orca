@@ -90,7 +90,7 @@ static NcdDetector *ncdInstance = nil;
 #pragma mark ¥¥¥Accessors
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 // ----------------------------------------------------------
@@ -246,8 +246,8 @@ static NcdDetector *ncdInstance = nil;
 
 - (void) configurationChanged
 {
-    [self setShaperCards:[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")]];
-    [self setMuxBoxes:[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")]];
+    [self setShaperCards:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")]];
+    [self setMuxBoxes:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")]];
 }
 
 - (void) collectTotalShaperRate

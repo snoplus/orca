@@ -33,14 +33,6 @@
 #import "ORValueBarGroupView.h"
 #import "ORGretinaCntView.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORGretina4MController (private)
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-						 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo;
-@end
-#endif
-
 @implementation ORGretina4MController
 
 -(id)init
@@ -58,9 +50,9 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(940,460);
+    settingSize     = NSMakeSize(950,460);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(400,287);
+    registerTabSize	= NSMakeSize(400,490);
 	firmwareTabSize = NSMakeSize(340,187);
 	definitionsTabSize = NSMakeSize(1200,350);
     blankView = [[NSView alloc] init];
@@ -78,6 +70,7 @@
         [[easySelectMatrix cellAtRow:i column:0] setTag:i];
         [[trapEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroEnabledMatrix cellAtRow:i column:0] setTag:i];
+        [[baselineRestoreEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[poleZeroTauMatrix cellAtRow:i column:0] setTag:i];
         [[pzTraceEnabledMatrix cellAtRow:i column:0] setTag:i];
         [[pileUpMatrix cellAtRow:i column:0] setTag:i];
@@ -94,12 +87,16 @@
         [[postrecntMatrix cellAtRow:i column:0] setTag:i];
     }
 	for (i=0;i<kNumberOfGretina4MRegisters;i++) {
-		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i], [model registerNameAt:i]];
+        
+		[registerIndexPU insertItemWithTitle:s	atIndex:i];
 		[[registerIndexPU itemAtIndex:i] setEnabled:![model displayRegisterOnMainPage:i] && ![model displayFPGARegisterOnMainPage:i]];
 	}
 	// And now the FPGA registers
 	for (i=0;i<kNumberOfFPGARegisters;i++) {
-		[registerIndexPU insertItemWithTitle:[model fpgaRegisterNameAt:i]	atIndex:(i+kNumberOfGretina4MRegisters)];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model fpgaRegisterOffsetAt:i], [model fpgaRegisterNameAt:i]];
+
+		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4MRegisters)];
 	}
 
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4M%d.selectedtab",[model slot]];
@@ -197,6 +194,17 @@
                        object : model];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(forceFullInitChanged:)
+                         name : ORGretina4MForceFullInitChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(forceFullInitCardChanged:)
+                         name : ORGretina4MForceFullInitCardChanged
+                       object : model];
+
+    
+    [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
                          name : ORGretina4MEnabledChanged
                        object : model];
@@ -215,7 +223,12 @@
                      selector : @selector(poleZeroEnabledChanged:)
                          name : ORGretina4MPoleZeroEnabledChanged
                        object : model];
-	
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(baselineRestoreEnabledChanged:)
+                         name: ORGretina4MBaselineRestoreEnabledChanged
+                       object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(poleZeroTauChanged:)
                          name : ORGretina4MPoleZeroMultChanged
@@ -302,11 +315,15 @@
                          name : ORGretina4MDownSampleChanged
 						object: model];
 
-	[self registerRates];
     [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORGretina4MClockSourceChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(clockPhaseChanged:)
+                         name : ORGretina4MClockPhaseChanged
+                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(externalWindowChanged:)
@@ -398,7 +415,17 @@
                          name : ORGretina4MModelHistEMultiplierChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(initSerDesStateChanged:)
+                         name : ORGretina4MModelInitStateChanged
+						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORGretina4MLockChanged
+						object: model];
+    
+   	[self registerRates];
 
 }
 
@@ -427,10 +454,13 @@
     [super updateWindow];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self enabledChanged:nil];
+    [self forceFullInitCardChanged:nil];
+    [self forceFullInitChanged:nil];
+    [self enabledChanged:nil];
 	[self easySelectChanged:nil];
 	[self trapEnabledChanged:nil];
 	[self poleZeroEnabledChanged:nil];
+	[self baselineRestoreEnabledChanged:nil];
 	[self poleZeroTauChanged:nil];
 	[self pzTraceEnabledChanged:nil];
 	[self presumEnabledChanged:nil];
@@ -462,6 +492,8 @@
 	[self spiWriteValueChanged:nil];
 	[self downSampleChanged:nil];
 	[self clockSourceChanged:nil];
+    [self clockPhaseChanged:nil];
+    
 	[self externalWindowChanged:nil];
 	[self pileUpWindowChanged:nil];
 	[self extTrigLengthChanged:nil];
@@ -480,9 +512,28 @@
     [self diagnosticsEnabledChanged:nil];
     
 	[self histEMultiplierChanged:nil];
+    [self initSerDesStateChanged:nil];
+    [self lockChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) lockChanged:(NSNotification*) aNote
+{
+    [lockStateField setStringValue:[model locked]?@"Yes":@"No"];
+    [self updateClockLocked];
+}
+
+- (void) updateClockLocked
+{
+    if([model clockSource] == 1) [clockLockedField setStringValue:@""];
+    else [clockLockedField setStringValue:[model locked]?@"":@"NOT Locked"];
+}
+
+- (void) initSerDesStateChanged:(NSNotification*) aNote
+{
+    [initSerDesStateField setStringValue:[model initSerDesStateName]];
+}
+
 - (void) histEMultiplierChanged:(NSNotification*)aNote
 {
 	[histEMultiplierField setIntValue: [model histEMultiplier]];
@@ -494,7 +545,7 @@
 
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote
 {
-	[baselineRestoredDelayField setIntValue: [model baselineRestoredDelay]];
+	[baselineRestoredDelayField setFloatValue: [model BLRDelayConverted]];
 }
 
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote
@@ -641,6 +692,12 @@
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
+    [self updateClockLocked];
+}
+
+- (void) clockPhaseChanged:(NSNotification*)aNote
+{
+    [clockPhasePU selectItemAtIndex: [model clockPhase]];
 }
 
 - (void) downSampleChanged:(NSNotification*)aNote
@@ -701,6 +758,26 @@
     }
 }
 
+- (void) forceFullInitCardChanged:(NSNotification*)aNote
+{
+    [forceFullInitCardButton setIntValue:[model forceFullInitCard]];
+}
+
+
+- (void) forceFullInitChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[forceFullInitMatrix cellWithTag:i] setState:[model forceFullInit:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[forceFullInitMatrix cellWithTag:chan] setState:[model forceFullInit:chan]];
+    }
+}
+
 - (void) easySelectChanged:(NSNotification*)aNote
 {
     short i;
@@ -739,7 +816,22 @@
         [[poleZeroEnabledMatrix cellWithTag:chan] setState:[model poleZeroEnabled:chan]];
     }
 }
+
+- (void) baselineRestoreEnabledChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [[baselineRestoreEnabledMatrix cellWithTag:i] setState:[model baselineRestoreEnabled:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[baselineRestoreEnabledMatrix cellWithTag:chan] setState:[model baselineRestoreEnabled:chan]];
+    }
     
+    [self settingsLockChanged:nil];
+}
 
 - (void) poleZeroTauChanged:(NSNotification*)aNote
 {
@@ -866,15 +958,16 @@
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
 {
-    ORRate* theRateObj = [aNote object];		
+    ORRate* theRateObj = [aNote object];
     [[rateTextFields cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
     [rate0 setNeedsDisplay:YES];
+    
 }
 
-- (void) totalRateChanged:(NSNotification*)aNotification
+- (void) totalRateChanged:(NSNotification*)aNote
 {
-	ORRateGroup* theRateObj = [aNotification object];
-	if(aNotification == nil || [model waveFormRateGroup] == theRateObj){
+	ORRateGroup* theRateObj = [aNote object];
+	if(aNote == nil || [model waveFormRateGroup] == theRateObj){
 		
 		[totalRateText setFloatValue: [theRateObj totalRate]];
 		[totalRate setNeedsDisplay:YES];
@@ -906,12 +999,14 @@
     	
     [settingLockButton      setState: locked];
     [initButton             setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [fullInitButton         setEnabled:!lockedOrRunningMaintenance && !downloading];
     [initButton1            setEnabled:!lockedOrRunningMaintenance && !downloading];
     [clearFIFOButton        setEnabled:!locked && !runInProgress && !downloading];
 	[noiseFloorButton       setEnabled:!locked && !runInProgress && !downloading];
 	[statusButton           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[probeButton            setEnabled:!locked && !runInProgress && !downloading];
 	[poleZeroEnabledMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [baselineRestoreEnabledMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[poleZeroTauMatrix      setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pzTraceEnabledMatrix   setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
@@ -921,9 +1016,29 @@
 	[resetButton            setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[loadMainFPGAButton     setEnabled:!locked && !downloading];
 	[stopFPGALoadButton     setEnabled:!locked && downloading];
-	[downSamplePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [downSamplePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [clockSourcePU          setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [clockPhasePU           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[pileUpMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
 	[dumpAllRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[snapShotRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[compareRegistersButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+
+    [baselineRestoredDelayField setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [collectionTimeField        setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [integrateTimeField         setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [pileUpWindowField          setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [noiseWindowField           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [externalWindowField        setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [extTrigLengthField         setEnabled:!lockedOrRunningMaintenance && !downloading];
+
+    [mrpsdvMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [mrpsrtMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [prerecntMatrix          setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postrecntMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [ftCntMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+
+    
     [tpolMatrix             setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
     
@@ -954,10 +1069,20 @@
         for(i=0;i<kNumGretina4MChannels;i++){
             BOOL usingTrap      = [model trapEnabled:i];
             BOOL presumEnabled  = [model presumEnabled:i];
-            [[ledThresholdMatrix cellAtRow:i column:0] setEnabled:!usingTrap];
-            [[trapThresholdMatrix cellAtRow:i column:0] setEnabled:usingTrap];
+            BOOL baselineRestoreEnabled = [model baselineRestoreEnabled:i];
+            
+            [[ledThresholdMatrix cellWithTag:i] setEnabled:!usingTrap];
+            [[trapThresholdMatrix cellWithTag:i] setEnabled:usingTrap];
+            //            [[chpsrtMatrix cellWithTag:i] setEnabled:presumEnabled];
+            //            [[chpsdvMatrix cellWithTag:i] setEnabled:presumEnabled];
             [[chpsrtMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
             [[chpsdvMatrix cellAtRow:i column:0] setEnabled:presumEnabled];
+            
+            // The following lines force BLR to be enabled for PZ to be enabled.
+            [[poleZeroEnabledMatrix  cellWithTag:i] setEnabled:baselineRestoreEnabled];
+            if (!baselineRestoreEnabled) {
+                [model setPoleZeroEnabled:i withValue:NO];
+            }
         }
     }
 }
@@ -981,14 +1106,14 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M Card (Slot %d)",[model slot]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M (Crate %d Slot %d)",[model crateNumber],[model slot]]];
     [dataWindowView initBugs];
     [dataWindowView setNeedsDisplay:YES];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M Card (Slot %d)",[model slot]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Gretina4M (Crate %d Slot %d)",[model crateNumber],[model slot]]];
 }
 
 - (void) integrationChanged:(NSNotification*)aNotification
@@ -1129,7 +1254,7 @@
 
 - (IBAction) baselineRestoredDelayAction:(id)sender
 {
-	[model setBaselineRestoredDelay:[sender intValue]];
+	[model setBLRDelayConverted:[sender floatValue]];
 }
 
 - (IBAction) noiseWindowAction:(id)sender
@@ -1208,6 +1333,11 @@
 	[model setClockSource:[sender indexOfSelectedItem]];
 }
 
+- (IBAction) clockPhaseAction:(id)sender
+{
+    [model setClockPhase:[sender indexOfSelectedItem]];
+}
+
 - (IBAction) downSampleAction:(id)sender
 {
 	if([sender indexOfSelectedItem] != [model downSample]){
@@ -1220,6 +1350,13 @@
 	unsigned int index = [sender indexOfSelectedItem];
 	[model setRegisterIndex:index];
 	[self setRegisterDisplay:index];
+}
+
+- (IBAction) forceFullInitAction:(id)sender;
+{
+    if([sender intValue] != [model forceFullInit:[[sender selectedCell] tag]]){
+        [model setForceFullInit:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
 }
 
 - (IBAction) enabledAction:(id)sender
@@ -1264,6 +1401,12 @@
 		[model setPoleZeroEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
+- (IBAction) baselineRestoreEnabledAction:(id)sender
+{
+	if([sender intValue] != [model baselineRestoreEnabled:[[sender selectedCell] tag]]){
+		[model setBaselineRestoreEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
 - (IBAction) poleZeroTauAction:(id)sender
 {
 	if([sender intValue] != [model poleZeroTauConverted:[[sender selectedCell] tag]]){
@@ -1303,8 +1446,11 @@
 }
 - (IBAction) trapThresholdAction:(id)sender
 {
-	if([sender intValue] != [model trapThreshold:[[sender selectedCell] tag]]){
-		[model setTrapThreshold:[[sender selectedCell] tag] withValue:[sender floatValue]];
+    long value = [sender intValue];
+    short channel = [[sender selectedCell] tag];
+    
+	if(value != [model trapThreshold:channel]){
+		[model setTrapThreshold:channel withValue:value];
 	}
 }
 
@@ -1391,7 +1537,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1406,10 +1552,27 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of Gretina4M FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
                         localException);
     }
 }
+
+- (IBAction) fullInitBoardAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model clearOldUserValues];
+        [model initBoard];		//initialize and load hardware, but don't enable channels
+        NSLog(@"Initialized Gretina4M (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    }
+    @catch(NSException* localException) {
+        NSLog(@"Init of Gretina4M FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M Init", @"OK", nil, nil,
+                        localException);
+    }
+}
+
 
 - (IBAction) clearFIFO:(id)sender
 {
@@ -1419,7 +1582,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina4M FIFO FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4M FIFO Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4M FIFO Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1451,7 +1614,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1479,7 +1642,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"LED Threshold Finder for Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1543,7 +1706,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4M Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1590,22 +1753,13 @@
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Select FPGA Binary File"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setFpgaFilePath:[[openPanel URL]path]];
             [model startDownLoadingMainFPGA];
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory:NSHomeDirectory()
-								 file:nil
-								types:nil //[NSArray arrayWithObjects:@"bin",nil]
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
+
 }
 
 - (IBAction) stopLoadingMainFPGAAction:(id)sender
@@ -1615,6 +1769,22 @@
 - (IBAction) dumpAllRegisters:(id)sender
 {
     [model dumpAllRegisters];
+}
+
+- (IBAction) snapShotRegistersAction:(id)sender
+{
+    [model snapShotRegisters];
+
+}
+
+- (IBAction) compareToSnapShotAction:(id)sender
+{
+    [model compareToSnapShot];
+}
+
+- (IBAction) forceFullInitCardAction:(id)sender
+{
+    [model setForceFullInitCard:[sender intValue]];
 }
 
 #pragma mark •••Data Source
@@ -1637,16 +1807,3 @@
 }
 @end
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORGretina4MController (private)
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-						 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo
-{
-    if(returnCode){
-		[model setFpgaFilePath:[sheet filename]];
-		[model startDownLoadingMainFPGA];
-    }
-}
-@end
-#endif

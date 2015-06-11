@@ -26,6 +26,7 @@
 #import "ORHV4032Supply.h"
 #import "ORTimedTextField.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORHV4032Controller (private)
 - (void) _openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) _startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -33,6 +34,7 @@
 - (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORHV4032Controller
 - (id) init
@@ -458,7 +460,24 @@
     [model pollHardware];
 	
     if(![model checkActualVsSetValues]){
-		NSBeginAlertSheet(@"High Voltage Set Value != Actual Value",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"High Voltage Set Value != Actual Value"];
+        [alert setInformativeText:@"You can not Ramp HV until this problem is resolved.\nWhat would like to do?"];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"Set DACs = ADC's"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertSecondButtonReturn){
+                [model resolveActualVsSetValueProblem];
+                [model initializeStates];
+                [model startRamping];
+                [self updateButtons];
+            }
+        }];
+#else
+        NSBeginAlertSheet(@"High Voltage Set Value != Actual Value",
 						  @"Cancel",
 						  @"Set DACs = ADC's",
 						  nil,[self window],
@@ -467,6 +486,7 @@
 						  nil,
 						  nil,
 						  @"You can not Ramp HV until this problem is resolved.\nWhat would like to do?");
+#endif
     }
     else {
 		[model initializeStates];
@@ -476,6 +496,7 @@
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void)_startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
@@ -486,7 +507,7 @@
     }
 	
 }
-
+#endif
 
 - (IBAction) stopRampAction:(id)sender
 {
@@ -505,6 +526,22 @@
 - (IBAction) panicAction:(id)sender
 {
     [self endEditing];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"HV Panic"];
+    [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
+    [alert addButtonWithTitle:@"Yes, Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model setStates:kHV4032Panic onlyControlled:YES];
+            [model startRamping];
+            [self updateButtons];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"HV Panic",
 					  @"YES/Do it NOW",
 					  @"Canel",
@@ -515,9 +552,10 @@
 					  nil,
 					  @"Really Panic Selected High Voltage OFF?");
 	
-	
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
@@ -525,13 +563,28 @@
 		[model startRamping];
 		[self updateButtons];
     }
-	
 }
-
+#endif
 - (IBAction) panicSystemAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"HV Panic",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"HV Panic"];
+    [alert setInformativeText:@"Really Panic ALL High Voltage OFF?"];
+    [alert addButtonWithTitle:@"Yes, Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model setStates:kHV4032Panic onlyControlled:NO];
+            [model startRamping];
+            [self updateButtons];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"HV Panic",
 					  @"YES/Do it NOW",
 					  @"Canel",
 					  nil,[self window],
@@ -540,8 +593,10 @@
 					  nil,
 					  nil,
 					  @"Really Panic ALL High Voltage OFF?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
@@ -550,11 +605,26 @@
 		[self updateButtons];
     }
 }
-
+#endif
 - (IBAction) syncAction:(id)sender;
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Sync DACs to ADCs",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Sync DACs to ADCs"];
+    [alert setInformativeText:@"Really move ADC values into DAC fields?"];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model forceDacToAdc];
+            [self updateButtons];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Sync DACs to ADCs",
 					  @"YES",
 					  @"Canel",
 					  nil,[self window],
@@ -563,8 +633,10 @@
 					  nil,
 					  nil,
 					  @"Really move ADC values into DAC fields?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
@@ -572,6 +644,7 @@
 		[self updateButtons];
     }
 }
+#endif
 
 - (IBAction) setPollingAction:(id)sender
 {

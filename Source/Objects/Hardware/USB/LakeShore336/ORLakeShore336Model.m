@@ -47,6 +47,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 - (void) processOneCommandFromQueue;
 - (void) process_response:(NSString*)theResponse;
 - (void) mainThreadSocketWrite:(NSString*)aCommand;
+- (void) postCouchDBRecord;
 @end
 
 @implementation ORLakeShore336Model
@@ -306,8 +307,10 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollTime == 0)return;
 	[self queryAll];
+    [self postCouchDBRecord];
 	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
 }
+
 
 - (void) queryAll
 {
@@ -982,6 +985,22 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 @end
 
 @implementation ORLakeShore336Model (private)
+- (void) postCouchDBRecord
+{
+    if([inputs count]>=4){
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSArray arrayWithObjects:
+                                 [NSNumber numberWithInt:[[inputs objectAtIndex:0]temperature]],
+                                 [NSNumber numberWithInt:[[inputs objectAtIndex:1]temperature]],
+                                 [NSNumber numberWithInt:[[inputs objectAtIndex:2]temperature]],
+                                 [NSNumber numberWithInt:[[inputs objectAtIndex:3]temperature]],
+                                  nil], @"temperatures",
+                                [NSNumber numberWithInt:    pollTime],     @"pollTime",
+                                nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+}
+
 - (void) processOneCommandFromQueue
 {
  	@synchronized(self){

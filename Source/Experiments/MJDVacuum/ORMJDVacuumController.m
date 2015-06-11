@@ -442,6 +442,20 @@
 - (IBAction) overRideAction:(id)sender
 {
     if(![model disableConstraints]){
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"REALLY disable constraints?"];
+        [alert setInformativeText:@"This is a dangerous operation. If you are NOT an expert -- CANCEL this operation.\n\nIf you continue, constraints will be disabled for 60 seconds."];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"Yes/Disable Constraints!"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertSecondButtonReturn){
+                [model disableConstraintsFor60Seconds];
+            }
+        }];
+#else
         NSBeginCriticalAlertSheet(@"REALLY disable constraints?",
                           @"Cancel",
                           @"Yes/Disable Constraints!",
@@ -450,18 +464,21 @@
                           @selector(toggleSheetDidEnd:returnCode:contextInfo:),
                           nil,
                           nil,@"This is a dangerous operation. If you are NOT an expert -- CANCEL this operation.\n\nIf you continue, constraints will be disabled for 60 seconds.");
+#endif
     }
     else {
         [model enableConstraints];
     }
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [model disableConstraintsFor60Seconds];
     }
 }
+#endif
 
 - (IBAction) reportConstraints:(id)sender
 {

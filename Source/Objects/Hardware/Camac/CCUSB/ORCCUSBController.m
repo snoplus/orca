@@ -12,13 +12,6 @@
 #import "ORCCUSBModel.h"
 #import "ORUSBInterface.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORCCUSBController (private)
-- (void)_readStackFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void)_saveStackFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORCCUSBController
 
 #pragma mark ¥¥¥Initialization
@@ -779,7 +772,7 @@
         NSLog(@"CC32 Test FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"CC32 Test"];
         else {
-            NSRunAlertPanel([localException name], @"%@\nStatus=%d\n%@", @"OK", nil, nil,
+            ORRunAlertPanel([localException name], @"%@\nStatus=%d\n%@", @"OK", nil, nil,
                             [localException name],statusCC32,@"Failed Test of CC32");
         }
 	}
@@ -818,7 +811,6 @@
     if([model lastStackFilePath]) startingDir = [[model lastStackFilePath] stringByDeletingLastPathComponent];
     else						  startingDir = NSHomeDirectory();
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -827,15 +819,7 @@
             [model setCustomStack:[[[theContents componentsSeparatedByString:@"\n"] mutableCopy] autorelease]];
         }
     }];
-#else 
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_readStackFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif	
+
 }
 
 - (IBAction) saveStackAction:(id)sender
@@ -856,7 +840,6 @@
         defaultFile = @"CCUSBStack";
         
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -866,14 +849,7 @@
             [theContents writeToFile:[[savePanel URL]path] atomically:YES encoding:NSASCIIStringEncoding error:nil];
         }
     }];
-#else 
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_saveStackFilePanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
+
 }
 
 
@@ -936,27 +912,4 @@
 
 
 @end
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORCCUSBController (private)
-- (void)_readStackFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setLastStackFilePath:[[sheet filenames] objectAtIndex:0]];
-		NSString* theContents = [NSString stringWithContentsOfFile:[model lastStackFilePath] encoding:NSASCIIStringEncoding error:nil];
-		[model setCustomStack:[[[theContents componentsSeparatedByString:@"\n"] mutableCopy] autorelease]];
-    }
-}
-
-- (void)_saveStackFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[model setLastStackFilePath:[sheet filename]];
-		NSString* theContents = [[model customStack] componentsJoinedByString:@"\n"];
-		[theContents writeToFile:[sheet filename] atomically:YES encoding:NSASCIIStringEncoding error:nil];
-		
-    }
-}
-@end
-#endif
 

@@ -1064,9 +1064,16 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     // perform the run loop
     // This ends whenever the socket changes
     @try{
-        while( socket == currentSocket &&
-              [rl runMode:NSDefaultRunLoopMode
-               beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]);
+        while( socket == currentSocket ) {
+            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+            if (![rl runMode:NSDefaultRunLoopMode
+             beforeDate:[NSDate dateWithTimeIntervalSinceNow:1.0]]) {
+               [pool drain];
+               break;
+            }
+            [pool drain];
+        }
+
     } @catch (NSException* e) {
         [self _setSocket:nil];
         [self _setIsConnected:NO];
@@ -1181,13 +1188,13 @@ SYNC_MODEL_VARS(Set ## var, Get ## var ## Set)
                 if ([ipAddress isEqualToString:[dev ipAddress]]) return;
                 
                 // Otherwise we need to ask for confirmation
-                if (NSRunAlertPanel(@"IP Address changed",
+                if (ORRunAlertPanel(@"IP Address changed",
                                     @"%@",
                                     @"OK",
                                     @"Cancel",
                                     nil,
                                     [NSString stringWithFormat:@"The IP (%@) of %@,%@ has changed to %@.  Do you wish to allow this?",
-                                                          [self ipAddress],[self objectName],[self serialNumber],[dev ipAddress]]) == NSAlertDefaultReturn) {
+                                                          [self ipAddress],[self objectName],[self serialNumber],[dev ipAddress]])) {
                     [self setIpAddress:[dev ipAddress]];
                 }
                 break;

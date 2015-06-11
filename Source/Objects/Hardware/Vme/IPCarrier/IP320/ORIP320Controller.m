@@ -26,13 +26,6 @@
 #import "ORTimeMultiPlot.h"
 #import "ORDataSet.h"
 
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORIP320Controller (private)
-- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORIP320Controller
 
 #pragma mark ¥¥¥Initialization
@@ -45,6 +38,7 @@
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [blankView release];
     [super dealloc];
 }
 
@@ -498,7 +492,6 @@
         defaultFile = @"OrcaScript";
     }
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -506,15 +499,6 @@
             [model setLogFile:[[[savePanel URL]path] stringByAbbreviatingWithTildeInPath]];
        }
     }];
-#else	
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(selectLogFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-	
-#endif
 }
 
 - (IBAction) logToFileAction:(id)sender
@@ -539,7 +523,7 @@
         [model readAllAdcChannels];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of All Channels Failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of All Channels Failed", @"OK", nil, nil,
                         localException);
     }
 }
@@ -693,14 +677,3 @@
 
 @end
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-
-@implementation ORIP320Controller (private)
-- (void)selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model setLogFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
-    }
-}
-@end
-#endif

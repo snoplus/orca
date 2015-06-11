@@ -96,8 +96,7 @@ static NSString* kLakeShoreTempUnit[3] = {
 	for(i=0;i<8;i++){
 		theData.asLong = dataPtr[index];
 		
-		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
-		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+		NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		
 		theString = [theString stringByAppendingFormat:@"%d: %.2f %@\n",i,theData.asFloat,date];
 		index+=2;

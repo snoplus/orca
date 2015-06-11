@@ -227,7 +227,7 @@
     [super prepare];
     lastTime = [[NSDate date] retain];
     currentStep = 1;
-    NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
         @try {
             thePDSModel = [objects objectAtIndex:0];
@@ -261,7 +261,7 @@
 		if(!numOfValues)[self setNumOfValues:1];
     }
     
-    objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
+    objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         thePulserModel = [objects objectAtIndex:0];
         pulserMemento = [[thePulserModel memento] retain];  //save the old values

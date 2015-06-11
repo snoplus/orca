@@ -30,7 +30,6 @@
 - (NSString*) cardSlotChangedNotification;
 - (Class)	guardianClass;
 - (id)		adapter;
-- (void)	processReadResponseArray:(NSArray*)reponse;
 - (void)	processSystemResponseArray:(NSArray*)reponse;
 - (void)	processSyncResponseArray:(NSArray*)response;
 - (void)	processWriteResponseArray:(NSArray*)response;

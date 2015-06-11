@@ -238,10 +238,8 @@
 - (void) setUpLights
 {
 	onLight = [[ORDotImage bigDotWithColor:[NSColor redColor]] retain];
-	[onLight setScalesWhenResized:YES];
 	[onLight setSize:NSMakeSize(20,20)];
 	offLight = [[ORDotImage bigDotWithColor:[NSColor lightGrayColor]] retain];
-	[offLight setScalesWhenResized:YES];
 	[offLight setSize:NSMakeSize(20,20)];
 }
 
@@ -275,10 +273,8 @@
 - (void) setUpLights
 {
 	onLight = [[ORDotImage vRectWithColor:[NSColor redColor]] retain];
-	[onLight setScalesWhenResized:YES];
 	[onLight setSize:NSMakeSize(5,17)];
 	offLight = [[ORDotImage vRectWithColor:[NSColor lightGrayColor]] retain];
-	[offLight setScalesWhenResized:YES];
 	[offLight setSize:NSMakeSize(5,17)];
 }
 

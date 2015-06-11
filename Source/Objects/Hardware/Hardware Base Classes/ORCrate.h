@@ -21,7 +21,6 @@
 #import "OROrderedObjHolding.h"
 
 @interface ORCrate : ORGroup <OROrderedObjHolding>  {
-	NSMutableDictionary* cardRates;
     unsigned int	crateNumber;
     BOOL			powerOff;
 	id				adapter;
@@ -40,8 +39,6 @@
 - (id) adapter;
 - (void) setAdapter:(id)anAdapter;
 - (id) controllerCard;
-- (NSDictionary*) cardRates;
-- (void) setCardRates:(NSMutableDictionary*)newCardRates;
 - (void) doNoPowerAlert:(NSException*)exception action:(NSString*)message;
 - (unsigned long) requestGTID;
 - (NSString*) adapterArchiveKey;

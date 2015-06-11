@@ -1186,7 +1186,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of SIS3320 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3320 Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3320 Reset", @"OK", nil, nil,
                         localException);
     }  
 }
@@ -1201,7 +1201,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Trigger of SIS3320 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3320 Trigger", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3320 Trigger", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1216,7 +1216,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear Timestamp of SIS3320 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3320 Clear Timestamp", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3320 Clear Timestamp", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1232,7 +1232,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of SIS3320 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3320 Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3320 Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1244,7 +1244,7 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS3320 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3320 Probe FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3320 Probe FAILED", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -1256,7 +1256,7 @@
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Read for Report of SIS3320 board ID failed\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3320 Report FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3320 Report FAILED", @"OK", nil, nil,
                         localException);
 	}
 }
@@ -1271,7 +1271,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"SIS3320 Reg Dump FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nSIS3320 Reg Dump FAILED", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSIS3320 Reg Dump FAILED", @"OK", nil, nil,
                         localException);
     }
 	if(ok)[model regDump];

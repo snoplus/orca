@@ -91,6 +91,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 #define kEmptyEnable    0x1000
 #define kSlideSubEnable 0x2000 //used
 #define kAllTrg         0x4000 //used
+#define kSoftReset      0x0080
 
 @interface ORCaen792Model (private)
 - (void) startCyclingZeroSuppression;
@@ -186,7 +187,10 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [[[self undoManager] prepareWithInvocationTarget:self] setCycleZeroSuppression:cycleZeroSuppression];
     
     cycleZeroSuppression = aCycleZeroSuppression;
-
+    
+    if(!cycleZeroSuppression)[self stopCyclingZeroSuppression];
+    else if([gOrcaGlobals runInProgress])[self startCyclingZeroSuppression];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelCycleZeroSuppressionChanged object:self];
 }
 
@@ -315,11 +319,12 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
     onlineMask = anOnlineMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelOnlineMaskChanged object:self];
+    [self postAdcInfoProvidingValueChanged];
 }
 
 - (BOOL)onlineMaskBit:(int)bit
 {
-	return onlineMask&(1<<bit);
+	return (onlineMask&(1<<bit))!=0;
 }
 
 - (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
@@ -357,6 +362,11 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 }
 
 #pragma mark ***Register - General routines
+- (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
+{
+    [super setThreshold:aChnl threshold:aValue];
+    [self postAdcInfoProvidingValueChanged];
+}
 - (short) getNumberRegisters
 {
     return kNumRegisters;
@@ -486,6 +496,18 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
                      usingAddSpace:0x01];
 }
 
+- (void) writeOneShotReset
+{
+    unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kSingleShotReset].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
+}
+
+
 - (void) writeSlideConstReg
 {
     unsigned short aValue = slideConstant;
@@ -530,11 +552,27 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (void) initBoard
 {
+    [self doSoftClear];
     [self writeThresholds];
     [self writeIPed];
     [self writeBit2Register];
     [self writeSlideConstReg];
 }
+
+- (void) doSoftClear
+{
+    // Clear unit
+    [self write:kBitSet1   sendValue:kSoftReset];   // set Soft Reset bit,
+    [self write:kBitClear1 sendValue:kSoftReset];   // Clear "Soft Reset" bit of status reg.
+}
+
+- (void) clearData
+{
+    // Clear unit
+    [self write:kBitSet2   sendValue:kClearData];		// set Clear data bit,
+    [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
+}
+
 #pragma mark ***DataTaker
 - (void) setDataIds:(id)assigner
 {
@@ -554,23 +592,15 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     dataIdN = DataId;
 }
 
-
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
-    // Clear unit
-    [self write:kBitSet2 sendValue:kClearData];		// Clear data,
-    [self write:kBitClear2 sendValue:kClearData];       // Clear "Clear data" bit of status reg.
-
     // Set options
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 
-    // Set thresholds in unit
     [self initBoard];
     
-    [self write:kEventCounterReset sendValue:0x0000];	// Clear event counter
-   
     if(cycleZeroSuppression){
         [self startCyclingZeroSuppression];
     }
@@ -678,6 +708,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [self stopCyclingZeroSuppression];
 	[qdcRateGroup stop];
 	isRunning = NO;
+    [self clearData];
 
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }
@@ -735,10 +766,11 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 	configStruct->card_info[index].crate 	 = [self crateNumber];
 	configStruct->card_info[index].add_mod 	 = [self addressModifier];
 	configStruct->card_info[index].base_add  = [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0] = reg[kStatusRegister1].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[1] = reg[kOutputBuffer].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[2] = reg[kStatusRegister2].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[3] = [self getDataBufferSize]/sizeof(long);
+	configStruct->card_info[index].deviceSpecificData[0] = modelType;
+	configStruct->card_info[index].deviceSpecificData[1] = [self baseAddress]+reg[kStatusRegister1].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[2] = [self baseAddress]+reg[kStatusRegister2].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[3] = [self baseAddress]+reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[4] = [self getDataBufferSize]/sizeof(long);
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;
@@ -924,7 +956,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (void) stopCyclingZeroSuppression
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startCyclingZeroSuppression) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doCycle) object:nil];
     
 }
 @end

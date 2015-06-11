@@ -459,7 +459,7 @@
 
 - (void) _showWarningPanel:(NSString *)astr
 {
-    NSRunAlertPanel([NSString stringWithFormat:@"HW Error Seen in %@ (%@, %@)",[model objectName],
+    ORRunAlertPanel([NSString stringWithFormat:@"HW Error Seen in %@ (%@, %@)",[model objectName],
                      [model ipAddress],[model serialNumber]],
                     @"%@",
                     @"OK",nil,nil,astr);

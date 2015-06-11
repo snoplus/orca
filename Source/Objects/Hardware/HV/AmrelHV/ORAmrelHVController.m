@@ -25,9 +25,11 @@
 @interface ORAmrelHVController (private)
 - (void) populatePortListPopup;
 - (void) panicToZero:(unsigned short)aChannel;
-- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) syncDialog;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
+#endif
 @end
 
 @implementation ORAmrelHVController
@@ -594,7 +596,27 @@
 {
 	[self endEditing];
 	//******contextInfo is released when the sheet closes.
-	NSNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:[NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":aChannel==0?@"Channel 0":@"Channel 1"]];
+    [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
+    [alert addButtonWithTitle:@"YES/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            @try {
+                if(aChannel == 0xFFFF || aChannel == 0)[model panicToZero:0];
+                if(aChannel == 0xFFFF || aChannel == 1)[model panicToZero:1];
+            }
+            @catch(NSException* e){
+                NSLog(@"vhW224L Panic failed because of exception\n");
+            }
+        }
+    }];
+#else
+    NSNumber* contextInfo =  [[NSDecimalNumber numberWithInt:aChannel] retain];
     NSBeginAlertSheet([NSString stringWithFormat:@"HV Panic %@",aChannel==0xffff?@"(All Channels)":aChannel==0?@"Channel 0":@"Channel 1"],
 					  @"YES/Do it NOW",
 					  @"Canel",
@@ -605,8 +627,10 @@
 					  nil,
 					  contextInfo,
 					  @"Really Panic Selected High Voltage OFF?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
 	NSDecimalNumber* theChannelNumber = (NSDecimalNumber*)info;
@@ -622,10 +646,24 @@
 	}
 	[theChannelNumber release];
 }
-
+#endif
 - (void) syncDialog
 {
 	[self endEditing];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Sync Dialog to Hardware"];
+    [alert setInformativeText:@"This will make Target Voltage == Actual Voltage\nAnd sync the rest of the values also."];
+    [alert addButtonWithTitle:@"YES/Do it"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model syncDialog];
+       }
+    }];
+#else
     NSBeginAlertSheet([NSString stringWithFormat:@"Sync Dialog to Hardware"],
 					  @"YES/Do it",
 					  @"Cancel",
@@ -636,15 +674,17 @@
 					  nil,
 					  nil,
 					  @"This will make Target Voltage == Actual Voltage\nAnd sync the rest of the values also.");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model syncDialog];
 	}
 }
-
+#endif
 @end
 
 

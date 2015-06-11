@@ -114,9 +114,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
 	
 	NSString* energy        = [NSString stringWithFormat:@"Energy     = %lu\n",ePtr->energy];
 
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
-	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
-	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
+	NSDate* theDate = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
+	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionFromTemplate:@"MM/dd/yy"]];
+	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionFromTemplate:@"HH:mm:ss"]];
 
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n", ePtr->sec];
 	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %lu\n", ePtr->subSec];
@@ -302,9 +302,9 @@ followed by waveform data (n x 1024 16-bit words)
 	
 	NSString* energy		= [NSString stringWithFormat:@"Energy     = %lu\n",ePtr->energy];
 
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
-	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
-	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
+	NSDate* theDate = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
+	NSString* eventDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionFromTemplate:@"MM/dd/yy"]];
+	NSString* eventTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionFromTemplate:@"HH:mm:ss"]];
 
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n", ePtr->sec];
 	NSString* subSec    	= [NSString stringWithFormat:@"Subseconds = %lu\n", ePtr->subSec];
@@ -418,9 +418,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitrate
 	
 	NSString* hitrate        = [NSString stringWithFormat:@"Hitrate     = %lu\n",ePtr->hitrate];
 
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
-	NSString* sampleDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
-	NSString* sampleTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
+	NSDate* theDate = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
+	NSString* sampleDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionFromTemplate:@"MM/dd/yy"]];
+	NSString* sampleTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionFromTemplate:@"HH:mm:ss"]];
 
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %lu\n", ePtr->sec];
 		

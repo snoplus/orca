@@ -73,11 +73,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 15
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
     NSString* mask  = [NSString stringWithFormat:@"Mask  = 0x%lx\n",(*ptr)&0xffff];
 	ptr++; //point to time
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:*ptr];
 	ptr++; //first data word	
 	int i;
-	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,date];
+	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,[date descriptionFromTemplate:@"MM/dd/yy H:mm:ss z\n"]];
 	for(i=0;i<kNumCaen260Channels;i++){
 		s = [s stringByAppendingFormat:@"%d:%lu\n",i,*ptr];
 		ptr++;

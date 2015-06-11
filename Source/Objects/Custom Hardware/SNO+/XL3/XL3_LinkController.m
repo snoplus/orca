@@ -43,6 +43,7 @@ static NSDictionary* xl3Ops;
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [blankView release];
 	[super dealloc];
 }
 
@@ -623,7 +624,7 @@ static NSDictionary* xl3Ops;
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
     if (!owl_crate_master) { //cache owl master
-        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (id xl3 in xl3s) {
             if ([xl3 crateNumber] == 16) owl_crate_master = xl3;
         }
@@ -1269,13 +1270,27 @@ static NSDictionary* xl3Ops;
 
     if (sup == 0 && [model hvASwitch]) {
         if ([model hvAVoltageDACSetValue] > 30) {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            [alert setMessageText:@"Not turning OFF"];
+            [alert setInformativeText:@"Voltage too high. Ramp down first."];
+            [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+#else
             NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
+#endif
             return;
         }
     }
     else if (sup == 1 && [model hvBSwitch]) {
         if ([model hvBVoltageDACSetValue] > 30) {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            [alert setMessageText:@"Not turning OFF"];
+            [alert setInformativeText:@"Voltage too high. Ramp down first."];
+            [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+#else
             NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
+#endif
             return;
         }
     }
@@ -1318,8 +1333,15 @@ static NSDictionary* xl3Ops;
     }
     if ((sup == 0 && nextTargetValue + 20 < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue + 20 < [model hvBVoltageDACSetValue])) {
         [self hvTargetValueChanged:nil];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"HV target NOT changed."];
+        [alert setInformativeText:@"Can not set target value lower than the current HV. Ramp down first."];
+        [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+#else
         NSBeginAlertSheet (@"HV target NOT changed.",@"OK",nil,nil,[self window],self,nil,nil,nil,
                            @"Can not set target value lower than the current HV. Ramp down first.");
+#endif
         return;
     }
     if (sup == 0) {
@@ -1454,13 +1476,13 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     /*
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
         [model hvPanicDown];
     }
      */
 
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 
     //[model hvMasterPanicDown];
     NSLog(@"Detector wide panic down started\n");
@@ -1476,7 +1498,7 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvMasterTriggerOnAction:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 //connection

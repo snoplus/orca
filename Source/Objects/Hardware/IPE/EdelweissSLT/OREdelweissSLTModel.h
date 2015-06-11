@@ -175,6 +175,8 @@
 	
 	//UDP Data Packet tab
     int crateUDPDataPort;
+        int useStandardUDPDataPorts;
+        int fifoForUDPDataPort;
     NSString* crateUDPDataIP;
     int crateUDPDataReplyPort;
 		    //reply connection (server/listener)
@@ -220,6 +222,7 @@
     OREdelweissFLTModel *fltChargingFIC;
     
     int resetEventCounterAtRunStart;
+    BOOL saveIonChanFilterOutputRecords;
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -237,6 +240,12 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (BOOL) saveIonChanFilterOutputRecords;
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords;
+- (int) fifoForUDPDataPort;
+- (void) setFifoForUDPDataPort:(int)aFifoForUDPDataPort;
+- (int) useStandardUDPDataPorts;
+- (void) setUseStandardUDPDataPorts:(int)aUseStandardUDPDataPorts;
 - (int) resetEventCounterAtRunStart;
 - (void) setResetEventCounterAtRunStart:(int)aResetEventCounterAtRunStart;
 - (int) lowLevelRegInHex;
@@ -524,6 +533,9 @@
 
 @end
 
+extern NSString* OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged;
+extern NSString* OREdelweissSLTModelFifoForUDPDataPortChanged;
+extern NSString* OREdelweissSLTModelUseStandardUDPDataPortsChanged;
 extern NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged;
 extern NSString* OREdelweissSLTModelLowLevelRegInHexChanged;
 extern NSString* OREdelweissSLTModelStatusRegHighChanged;

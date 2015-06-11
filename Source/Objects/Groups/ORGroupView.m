@@ -209,18 +209,18 @@
 			//origins must be 0,0 so we have to do a bit of adjustment here
 			if(x<0){
 				box.origin.x = 0;
-				box.size.width += fabs(x) * scaleFactor;
+				box.size.width += abs(x) * scaleFactor;
 			}
 			if(y<0){
 				box.origin.y = 0;
-				box.size.height += fabs(y) * scaleFactor;
+				box.size.height += abs(y) * scaleFactor;
 			}
 			NSEnumerator* e = [[group orcaObjects] objectEnumerator];
 			OrcaObject* obj;
 			while(obj = [e nextObject]){
 				NSRect aFrame = [obj frame];
-				if(x<0)aFrame.origin.x += fabs(x);
-				if(y<0)aFrame.origin.y += fabs(y);
+				if(x<0)aFrame.origin.x += abs(x);
+				if(y<0)aFrame.origin.y += abs(y);
 				[obj setFrame:aFrame];
 			}
 			
@@ -278,8 +278,8 @@
     OrcaObject* obj;
     while(obj = [e nextObject]){
         NSRect aFrame = [obj frame];
-        aFrame.origin.x -= fabs(x);
-        aFrame.origin.y -= fabs(y);
+        aFrame.origin.x -= abs(x);
+        aFrame.origin.y -= abs(y);
         [obj setFrame:aFrame];
     }
     
@@ -470,7 +470,6 @@
 	[openPanel setCanCreateDirectories:NO];
 	[openPanel setPrompt:@"Choose Image"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 //10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -480,16 +479,6 @@
             }
         }
     }];
-
-#else
-	[openPanel beginSheetForDirectory:startDir
-                                 file:nil
-                                types:[NSArray arrayWithObjects:@"pdf",@"tif",@"tiff",@"gif",@"png",@"jpeg",@"jpg",nil]
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 //-------------------------------------------------------------------------------
@@ -588,7 +577,7 @@
     else if ([menuItem action] == @selector(bringToFront:))		return changesAllowed & (selectedCount>0);
     else if ([menuItem action] == @selector(sendToBack:))		return changesAllowed & (selectedCount>0);
     else if ([menuItem action] == @selector(alignBottom:))		return changesAllowed & (selectedCount>0);
-	else return  [[NSApp delegate] validateMenuItem:menuItem];
+	else return  [(ORAppDelegate*)[NSApp delegate] validateMenuItem:menuItem];
 }
 
 - (void) clearSelections:(BOOL)shiftKeyDown
@@ -778,7 +767,7 @@
 			BOOL okToPaste = YES;
             OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
 			if([anObject solitaryObject]){
-				NSArray* existingObjects = [[[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
+				NSArray* existingObjects = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
 				if([existingObjects count]){
 					okToPaste = NO;
 					NSBeep();
@@ -1214,7 +1203,7 @@
                 NSPoint		newPoint  = NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y);
                 BOOL okToDrop = YES;
                 if([anObject solitaryObject]){
-                    NSArray* existingObjects = [[[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
+                    NSArray* existingObjects = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
                     if([existingObjects count]){
                         okToDrop = NO;
                         NSBeep();
@@ -1271,17 +1260,6 @@
     }
     return result;
 }
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* path = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-		if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
-			[group setBackgroundImagePath:path];
-		}
-	}
-}
-#endif
 @end
 
 

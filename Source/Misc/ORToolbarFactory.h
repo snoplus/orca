@@ -70,12 +70,7 @@
 */
 
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORToolbarFactory : NSObject <NSToolbarDelegate>
-#else																						// pre-10.6 fallback
-@interface ORToolbarFactory : NSObject
-#endif
-
 {
 	IBOutlet NSWindow*		owner;				// Window to put the toolbar on.
 	NSDictionary*			toolbarItems;		// List of possible items in the toolbar.

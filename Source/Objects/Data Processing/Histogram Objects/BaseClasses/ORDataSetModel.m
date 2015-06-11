@@ -91,9 +91,16 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 - (void) setCalibration:(id)aCalibration
 {
-	[aCalibration retain];
-	[calibration release];
-	calibration  = aCalibration;
+    if([aCalibration isValidCalibration]){
+        [aCalibration retain];
+        [calibration release];
+        calibration  = aCalibration;
+    }
+    else {
+        [calibration release];
+        calibration = nil;
+    }
+        
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetCalibrationChanged object:self];
 }
 

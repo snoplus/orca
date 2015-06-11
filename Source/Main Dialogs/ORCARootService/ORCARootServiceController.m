@@ -162,12 +162,12 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 
@@ -235,8 +235,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 - (void) hostNameChanged:(NSNotification*)aNotification
 {
 	NSUInteger index = [[self orcaRootService] hostNameIndex];
+    [hostComboBox reloadData];
 	if(index!=NSNotFound)[hostComboBox selectItemAtIndex: index];
-	[hostComboBox reloadData];
 }
 
 - (void) connectedChanged:(NSNotification*)aNotification
@@ -252,8 +252,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 - (void) timeConnectedChanged:(NSNotification*)aNotification
 {
 	if([[self orcaRootService] isConnected]){
-		[timeField setStringValue: [NSString stringWithFormat:@"At: %@",[[[self orcaRootService] timeConnected] descriptionWithCalendarFormat:@"%H:%M:%S %m/%d"]]];
-	}
+        NSDate* timeConnected = [[self orcaRootService] timeConnected];
+        [timeField setStringValue: [NSString stringWithFormat:@"At: %@",[timeConnected stdDescription]]];
+
+    }
 	else {
 		[timeField setStringValue: @""];
 	}

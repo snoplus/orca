@@ -109,9 +109,9 @@
 {
     
     self = [super init];
-    [[[NSApp delegate] undoManager] disableUndoRegistration];
+    [[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
     [self setDestination:[decoder decodeObjectForKey:@"destination"]];    
-    [[[NSApp delegate] undoManager] enableUndoRegistration];
+    [[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
     
     return self;
 }

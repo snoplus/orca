@@ -57,6 +57,16 @@ typedef struct  {
 	float x1,y1,x2,y2;
 }  VacuumLineStruct;
 
+typedef struct  {
+    int type;
+    int regionTag;
+    int component;
+    int channel;
+    NSString* label;
+    float x1,y1,x2,y2;
+}  TempGroup;
+
+
 #define kNA		 -1
 #define kUpToAir -2
 
@@ -73,6 +83,8 @@ typedef struct  {
 #define kVacLine		9
 #define kGVControl		10
 #define kVacStatusItem	11
+#define kVacTempItem    12
+#define kVacTempGroup   13
 
 #define kGVImpossible				0
 #define kGVOpen					    1
@@ -173,24 +185,40 @@ typedef struct  {
 	BOOL isValid;
 	int component;
 	int channel;
+    double value;
 }
 - (id) initWithDelegate:(id)aDelegate regionTag:(int)aRegionTag component:(int)aComponent channel:(int)aChannel label:(NSString*)label bounds:(NSRect)aRect;
 - (NSString*) displayString;
+- (BOOL) valueHigherThan:(double)aValue;
 @property (nonatomic,assign) int channel;
 @property (nonatomic,assign) int component;
 @property (nonatomic,assign) BOOL isValid;
+@property (nonatomic,assign) double value;
 @end
 
 //----------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------
 @interface ORVacuumValueLabel : ORVacuumDynamicLabel
 {
-	double value;
 }
+@end
 
-- (BOOL) valueHigherThan:(double)aValue;
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@interface ORVacuumTempGroup : ORVacuumDynamicLabel
+{
+    double temp[8];
+}
+- (NSString*) displayTemp:(int)chan;
+- (double) temp:(int)chan;
+- (void)   setTemp:(int)chan value:(double)aValue;
+@end
 
-@property (nonatomic,assign) double value;
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+@interface ORTemperatureValueLabel : ORVacuumDynamicLabel
+{
+}
 @end
 
 //----------------------------------------------------------------------------------------------------

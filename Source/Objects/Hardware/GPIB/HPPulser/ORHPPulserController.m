@@ -26,11 +26,11 @@
 #import "ORCompositePlotView.h"
 
 @interface ORHPPulserController (private)
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) systemTest;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 #endif
+- (void) systemTest;
+
 @end
 
 @implementation ORHPPulserController
@@ -213,6 +213,11 @@
                          name : ORHPPulserModelNegativePulseChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseChanged:)
+                         name : ORHPPulserModelVerboseChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -235,6 +240,12 @@
     [self randomCountChanged:nil];
     [self triggerModeChanged:nil];
     [self negativePulseChanged:nil];
+	[self verboseChanged:nil];
+}
+
+- (void) verboseChanged:(NSNotification*)aNote
+{
+	[verboseCB setIntValue:[model verbose]];
 }
 
 - (void) negativePulseChanged:(NSNotification*)aNote
@@ -244,6 +255,12 @@
 
 
 #pragma mark •••Actions
+
+- (IBAction) verboseAction:(id)sender;
+{
+	[model setVerbose:[sender intValue]];
+}
+
 - (IBAction) negativePulseAction:(id)sender
 {
 	if([[sender selectedCell] tag] != [model negativePulse]){
@@ -270,7 +287,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
- 		NSRunAlertPanel( [ localException name ], 	// Name of panel
+ 		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -282,6 +299,32 @@
 
 - (IBAction) clearMemory:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clear Pulser Non-Volatile Memory"];
+    [alert setInformativeText:@"Really Clear the Non-Volatile Memory in Pulser?"];
+    [alert addButtonWithTitle:@"YES/Do it NOW"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            @try {
+                [model emptyVolatileMemory];
+            }
+            @catch(NSException* localException) {
+                NSLog( [ localException reason ] );
+                ORRunAlertPanel( [ localException name ], 	// Name of panel
+                                @"%@",	// Reason for error
+                                @"OK",	// Okay button
+                                nil,	// alternate button
+                                nil,    // other button
+                                [localException reason ]);
+            }
+        }
+
+    }];
+#else
     NSBeginAlertSheet(@"Clear Pulser Non-Volatile Memory",
                       @"YES/Do it NOW",
                       @"Canel",
@@ -291,7 +334,7 @@
                       nil,
                       nil,
                       @"Really Clear the Non-Volatile Memory in Pulser?");
-    
+#endif
     
 }
 
@@ -303,7 +346,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
- 		NSRunAlertPanel( [ localException name ], 	// Name of panel
+ 		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -320,7 +363,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -344,7 +387,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -363,7 +406,6 @@
         [openPanel setAllowsMultipleSelection:NO];
         [openPanel setPrompt:@"Download"];
         
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         [openPanel setDirectoryURL:[NSURL URLWithString:NSHomeDirectory()]];
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton) {
@@ -373,15 +415,6 @@
                 NSLog(@"Downloading Waveform: %@\n",fileName);
            }
         }];
-#else	
-        [openPanel beginSheetForDirectory:NSHomeDirectory()
-                                     file:nil
-                                    types:nil
-                           modalForWindow:[self window]
-                            modalDelegate:self
-                           didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
-                              contextInfo:NULL];
-#endif
     }
     else {
 		[self downloadWaveform];
@@ -412,7 +445,7 @@
 		[progress setIndeterminate:NO];
 		[progress setDoubleValue:0];
 		NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -432,7 +465,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -449,7 +482,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button
@@ -802,19 +835,7 @@
 @end
 
 @implementation ORHPPulserController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [model setFileName:fileName];
-        [self performSelector:@selector(downloadWaveform) withObject:self afterDelay:0.1];
-		NSLog(@"Downloading Waveform: %@\n",fileName);
-		
-    }
-}
-#endif
-
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
@@ -823,7 +844,7 @@
 		}
 		@catch(NSException* localException) {
 			NSLog( [ localException reason ] );
-            NSRunAlertPanel( [ localException name ], 	// Name of panel
+            ORRunAlertPanel( [ localException name ], 	// Name of panel
                             @"%@",	// Reason for error
                             @"OK",	// Okay button
                             nil,	// alternate button
@@ -832,6 +853,7 @@
 		}
     }
 }
+#endif
 - (void) systemTest
 {
 	@try {
@@ -839,7 +861,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
-		NSRunAlertPanel( [ localException name ], 	// Name of panel
+		ORRunAlertPanel( [ localException name ], 	// Name of panel
 						@"%@",	// Reason for error
 						@"OK",	// Okay button
 						nil,	// alternate button

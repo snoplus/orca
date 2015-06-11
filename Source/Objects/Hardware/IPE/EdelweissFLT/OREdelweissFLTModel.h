@@ -26,6 +26,9 @@
 #import "OREdelweissFLTDefs.h"
 #import "ORAdcInfoProviding.h"
 
+#import "ipe4structure.h"
+
+
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Forward Definitions
 @class ORDataPacket;
@@ -72,7 +75,8 @@
 	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
 	unsigned long	hitRateId;
 	unsigned long	histogramId;
-	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (hitrate period, 8 bit, 0..255 seconds)
+	unsigned short	hitRateLength;		//!< Sampling time of the hitrate measurement (hitrate period, 8 bit, 2**hitRateLength seconds)
+	uint32_t		hitRateReg[kNumEWFLTHeatIonChannels];	//!< Actual value of the trigger rate/hitrate  register
 	float			hitRate[kNumEWFLTHeatIonChannels];	//!< Actual value of the trigger rate measurement
 	BOOL			hitRateOverFlow[kNumEWFLTHeatIonChannels];	//!< Overflow of hardware trigger rate register
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
@@ -140,9 +144,12 @@
     int totalTriggerNRegister;
     uint32_t controlRegister;
     int repeatSWTriggerMode;
+    double repeatSWTriggerDelay;
     int swTriggerIsRepeating;
     int32_t fiberOutMask;
     int fiberSelectForBBStatusBits;
+    int testVariable;
+    unsigned long CFPGAVersion;
     
     
     uint32_t statusBitsBB[kNumEWFLTFibers][kNumBBStatusBufferLength32];//default: [6][30]
@@ -188,6 +195,9 @@
     uint32_t ficCardADC01CtrlReg[kNumEWFLTFibers];
     uint32_t ficCardADC23CtrlReg[kNumEWFLTFibers];
     uint32_t ficCardTriggerCmd[kNumEWFLTFibers];
+    int hitrateLimitHeat;
+    int hitrateLimitIon;
+    BOOL saveIonChanFilterOutputRecords;//unused
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Initialization
@@ -197,7 +207,20 @@
 - (void) makeMainController;
 - (short) getNumberRegisters;
 
+#pragma mark •••Notifications
+- (void) registerNotificationObservers;
+//- (void) runIsAboutToStop:(NSNotification*)aNote;
+- (void) runIsAboutToStart:(NSNotification*)aNote;
+- (void) runIsAboutToChangeState:(NSNotification*)aNote;
+- (BOOL) preRunChecks;
+
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (BOOL) saveIonChanFilterOutputRecords;
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords;
+- (int) hitrateLimitIon;
+- (void) setHitrateLimitIon:(int)aHitrateLimitIon;
+- (int) hitrateLimitHeat;
+- (void) setHitrateLimitHeat:(int)aHitrateLimitHeat;
 - (NSString*) chargeFICFile;
 - (void) setChargeFICFile:(NSString*)aChargeFICFile;
 - (int) progressOfChargeFIC;
@@ -210,6 +233,7 @@
 - (void) setFicCardADC01CtrlReg:(uint32_t)aFicCardADC01CtrlReg forFiber:(int)aFiber;
 - (uint32_t) ficCardCtrlReg2ForFiber:(int)aFiber;
 - (void) setFicCardCtrlReg2:(uint32_t)aFicCardCtrlReg2 forFiber:(int)aFiber;
+- (void) setFicCardCtrlReg2AddrOffs:(uint32_t)aOffset  forFiber:(int)aFiber;
 - (uint32_t) ficCardCtrlReg1ForFiber:(int)aFiber;
 - (void) setFicCardCtrlReg1:(uint32_t)aFicCardCtrlReg1 forFiber:(int)aFiber;
 - (int) pollBBStatusIntervall;
@@ -323,6 +347,8 @@
 - (void) setSwTriggerIsRepeating:(int)aSwTriggerIsRepeating;
 - (int) repeatSWTriggerMode;
 - (void) setRepeatSWTriggerMode:(int)aRepeatSWTriggerMode;
+- (double) repeatSWTriggerDelay;
+- (void) setRepeatSWTriggerDelay:(double)aRepeatSWTriggerDelay;
 - (uint32_t) controlRegister;
 - (void) setControlRegister:(uint32_t)aControlRegister;
 - (int) statusLatency;//obsolete 2014 -tb-
@@ -432,7 +458,9 @@
 - (void) setGains:(NSMutableArray*)aGains;
 
 - (void) readTriggerParameters;
+- (void) writeTriggerParametersVerbose;
 - (void) writeTriggerParameters;
+- (void) writeTriggerParametersDisableAll;
 - (void) dumpTriggerParameters;
 - (void) setTriggerPar:(unsigned short)chan  withValue:(uint32_t) val;
 - (uint32_t) triggerPar:(unsigned short)chan;
@@ -464,6 +492,7 @@
 - (float) rate:(int)aChan;
 
 - (BOOL) hitRateOverFlow:(unsigned short)aChan;
+- (BOOL) hitRateRegulationIsOn:(unsigned short)aChan;
 - (float) hitRateTotal;
 
 - (ORTimeRate*) totalRate;
@@ -634,6 +663,10 @@
 				  n:(int) n;
 @end
 
+extern NSString* OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged;
+extern NSString* OREdelweissFLTModelRepeatSWTriggerDelayChanged;
+extern NSString* OREdelweissFLTModelHitrateLimitIonChanged;
+extern NSString* OREdelweissFLTModelHitrateLimitHeatChanged;
 extern NSString* OREdelweissFLTModelChargeFICFileChanged;
 extern NSString* OREdelweissFLTModelProgressOfChargeFICChanged;
 extern NSString* OREdelweissFLTModelFicCardTriggerCmdChanged;

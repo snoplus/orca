@@ -36,11 +36,6 @@
 
 
 @interface ORPlotPublisher (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) _loadDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) _saveAsDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 - (void) dumpAndStore;
 - (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) storeNewAttributes;
@@ -123,13 +118,21 @@
 - (IBAction) publish:(id)sender
 {	
 	[[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
+#else
     [NSApp endSheet:[self window] returnCode:NSOKButton];
+#endif
 }
 
 - (IBAction) cancel:(id)sender
 {
     [[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+   [NSApp endSheet:[self window] returnCode:NSModalResponseCancel];
+#else
     [NSApp endSheet:[self window] returnCode:NSCancelButton];
+#endif
 }
 
 - (IBAction) labelingOptionsAction: (id) sender
@@ -191,7 +194,6 @@
 
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save Settings"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:startingFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -203,15 +205,6 @@
             [newAttributes writeToFile:[[savePanel URL]path] atomically:NO];
         }
     }];
-    
-#else 	
-    [savePanel beginSheetForDirectory:startingDir
-								 file:startingFile
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(_saveAsDidEnd:returnCode:contextInfo:)
-						  contextInfo:nil];
-#endif
 }
 
 - (IBAction) loadSetAction:(id) sender
@@ -223,7 +216,6 @@
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setPrompt:@"Choose"];
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -234,49 +226,15 @@
             [saveSetField setStringValue:[[[openPanel URL] path]stringByAbbreviatingWithTildeInPath]];
         }
     }];
-#else 	
-	NSString* startingFile = [startingPath lastPathComponent];
-	if(!startingFile)startingFile = @"PublisherSettings";
-    [openPanel beginSheetForDirectory:startingDir
-								 file:startingFile
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(_loadDidEnd:returnCode:contextInfo:)
-						  contextInfo:nil];
-#endif
 }
 
 @end
 
 @implementation ORPlotPublisher (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _loadDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode == NSOKButton){
-		[newAttributes release];
-		newAttributes = nil;
-		newAttributes = [[NSMutableDictionary dictionaryWithContentsOfFile:[sheet filename]] retain];
-		[self loadNewAttributes];
-		[saveSetField setStringValue:[[sheet filename] stringByAbbreviatingWithTildeInPath]];
-	}
-}
-- (void) _saveAsDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-	if(returnCode == NSOKButton){
-		[[NSUserDefaults standardUserDefaults] setObject:[sheet filename] forKey:kPlotPublisherDefaultFile];
-		[[NSUserDefaults standardUserDefaults] synchronize];
-		[saveSetField setStringValue:[[sheet filename] stringByAbbreviatingWithTildeInPath]];
-		[self storeNewAttributes];
-		[newAttributes writeToFile:[sheet filename] atomically:NO];
-	}
-}
-#endif
-
 - (void) dumpAndStore
 {
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save"];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -286,21 +244,15 @@
 			[self finish];
        }
     }];
-    
-#else 	
-
-    [savePanel beginSheetForDirectory:NSHomeDirectory()
-								 file:@"Plot.pdf"
-					   modalForWindow:[compositePlotView window]
-						modalDelegate:self
-					   didEndSelector:@selector(_saveFileDidEnd:returnCode:contextInfo:)
-						  contextInfo:nil];
-#endif
 }
 
 - (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	if(returnCode == NSOKButton){
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
+    if(returnCode == NSOKButton){
+#endif
 		[self dumpAndStore];
 	}
 	else [self finish];
@@ -310,19 +262,6 @@
 		[[compositePlotView plot:i] restoreColor];
 	}
 }
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) _saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* savePath = [sheet filename];
-		NSData* pdfData = [compositePlotView plotAsPDFData];
-		[pdfData writeToFile:[savePath stringByExpandingTildeInPath] atomically:NO];
-    }
-	[self finish];
-}
-#endif
-
 - (void) finish
 {
 	[(ORPlotView*)[compositePlotView plotView] setAttributes: oldAttributes];

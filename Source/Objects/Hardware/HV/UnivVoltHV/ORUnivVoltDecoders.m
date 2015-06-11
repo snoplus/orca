@@ -66,9 +66,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	NSString* deviceId  = [NSString stringWithFormat:@"device%2lu",*ptr&0x0000000f];
 
 	ptr++;
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z"];
-
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:*ptr];
 	NSString* valueString = @"";
 	int n = length - 3;
 	int i;
@@ -76,7 +74,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		ptr++;
 		valueString   = [valueString stringByAppendingFormat:@"Value(%02lu) = %0.6f\n",(*ptr&0x00f00000)>>20, (12. * (*ptr&0x000fffff))/1048576.];
     }
-    return [NSString stringWithFormat:@"%@%@%@%@",title,deviceId,date,valueString];               
+    return [NSString stringWithFormat:@"%@%@%@%@",title,deviceId,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z\n"],valueString];
 }
 
 

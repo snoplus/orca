@@ -78,10 +78,8 @@ static NSString* kMotionNodeTraceType[3] = {
 	NSString* traceType = kMotionNodeTraceType[type];
 	
     ptr++; //point at trace time
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-		
-    return [NSString stringWithFormat:@"%@\nMotionNode (%d)\ntype: %@\nTime: %@",title,device,traceType,date];               
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)*ptr];		
+    return [NSString stringWithFormat:@"%@\nMotionNode (%d)\ntype: %@\nTime: %@",title,device,traceType,[date stdDescription]];
 }
 
 

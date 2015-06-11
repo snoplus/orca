@@ -179,7 +179,7 @@
 			if(!actualSIS3302Cards)actualSIS3302Cards = [[NSMutableDictionary alloc] init];
 			ORSIS3302Model* obj = [actualSIS3302Cards objectForKey:aKey];
 			if(!obj){
-				NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3302Model")];
+				NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3302Model")];
 				NSEnumerator* e = [listOfCards objectEnumerator];
 				ORSIS3302Model* aCard;
 				while(aCard = [e nextObject]){
@@ -597,7 +597,7 @@
 			if(!actualSIS3302Cards)actualSIS3302Cards = [[NSMutableDictionary alloc] init];
 			ORSIS3302Model* obj = [actualSIS3302Cards objectForKey:aKey];
 			if(!obj){
-				NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3302Model")];
+				NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3302Model")];
 				NSEnumerator* e = [listOfCards objectEnumerator];
 				ORSIS3302Model* aCard;
 				while(aCard = [e nextObject]){

@@ -184,16 +184,16 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	 postNotificationName:ORC111CConnectionChanged 
 	 object: self];
 	
-	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+	[self setTimeConnected:isConnected?[NSDate date]:nil];
 	
 }
 
-- (NSCalendarDate*) timeConnected
+- (NSDate*) timeConnected
 {
 	return timeConnected;
 }
 
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected
+- (void) setTimeConnected:(NSDate*)newTimeConnected
 {
 	[timeConnected autorelease];
 	timeConnected=[newTimeConnected retain];	

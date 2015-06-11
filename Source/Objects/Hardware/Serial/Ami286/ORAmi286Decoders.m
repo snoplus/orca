@@ -108,10 +108,9 @@ static NSString* kBocTicUnit[4] = {
 	for(i=0;i<4;i++){
 		theData.asLong = dataPtr[index];
 		int fillState =  ShiftAndExtract(dataPtr[1],16+(i*4),0xf);
-		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
-		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+		NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		
-		theString = [theString stringByAppendingFormat:@"Level %d: %.2E %@\n",i,theData.asFloat,date];
+		theString = [theString stringByAppendingFormat:@"Level %d: %.2E %@\n",i,theData.asFloat,[date stdDescription]];
 		theString = [theString stringByAppendingFormat:@"State: %@\n",[self fillStatusName:fillState]];
 		index+=2;
 	}

@@ -45,7 +45,7 @@ long roundToLong(double x);
 	BOOL	saveRng;
 	double  mGrabValue;
 	BOOL	mDragInProgress;
-	BOOL	mMarkerDragInProgress;
+    NSNumber* markerBeingDragged;
 	BOOL    firstDrag;
 	
 	//cache some variables that are heavily used in tight loops.
@@ -62,6 +62,7 @@ long roundToLong(double x);
 - (void) drawGridInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor;
 - (void) drawMarker:(float)val axisPosition:(int)axisPosition;
 - (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor;
+- (void) drawMark:(NSNumber*)markerNumber inFrame:(NSRect)aFram usingColor:(NSColor*)aColor;
 - (void) drawTitle;
 
 - (void) dealloc;
@@ -194,7 +195,8 @@ extern NSString* ORAxisMinSave;
 extern NSString* ORAxisMaxSave;
 extern NSString* ORAxisLabel;
 extern NSString* ORAxisTempLabel;
-extern NSString* ORAxisMarker;
+extern NSString* ORAxisMarker;  //old, single marker
+extern NSString* ORAxisMarkers; //new, mulitple markers
 
 extern NSString* ORAxisAllowShifts;
 extern NSString* ORAxisAllowNegative;

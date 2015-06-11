@@ -132,8 +132,7 @@
 		[NSBezierPath setDefaultLineWidth:.75];
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x,0) toPoint:NSMakePoint(x,height)];
 		
-		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)([[NSDate date] timeIntervalSince1970]-secondsInPast)];
-		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+		NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)([[NSDate date] timeIntervalSince1970]-secondsInPast)];
 		NSString* cursorPositionString = [NSString stringWithFormat:@"%@",date];
 		NSAttributedString* s = [[NSAttributedString alloc] initWithString:cursorPositionString attributes:attrsDictionary];
 		NSSize labelSize = [s size];

@@ -652,7 +652,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -671,7 +671,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -683,7 +683,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Read No Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Read No Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -695,7 +695,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read Scalers of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Read And clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Read And clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -707,7 +707,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear Scalers of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -719,7 +719,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear Overflow of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Clear Overflow", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Clear Overflow", @"OK", nil, nil,
                         localException);
     }
 }
@@ -732,7 +732,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Start Counting of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Start", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Start", @"OK", nil, nil,
                         localException);
     }
 	
@@ -745,7 +745,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Stop Counting of SIS3820 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed SIS3820 Stop", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed SIS3820 Stop", @"OK", nil, nil,
                         localException);
     }
 	

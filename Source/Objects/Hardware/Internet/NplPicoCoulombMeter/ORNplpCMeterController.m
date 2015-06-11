@@ -28,6 +28,11 @@
     self = [ super initWithWindowNibName: @"NplpCMeter" ];
     return self;
 }
+- (void) dealloc
+{
+    [blankView release];
+    [super dealloc];
+}
 - (void) awakeFromNib
 {
 	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];

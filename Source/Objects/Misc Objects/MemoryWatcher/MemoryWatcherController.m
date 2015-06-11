@@ -168,6 +168,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 	int theTag = [aPlot tag];
 	if(theTag < kNumWatchedValues) *yValue =  [watcher timeRate:theTag value:i];
 	else *yValue = 0;
+    *xValue = i;
 }
 
 @end

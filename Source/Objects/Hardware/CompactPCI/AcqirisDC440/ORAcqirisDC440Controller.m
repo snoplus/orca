@@ -548,6 +548,20 @@
 
 - (IBAction) loadDialogAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Replace these dialog values with values read from hardware!"];
+    [alert setInformativeText:@"Really replace all values? This can not be undone!"];
+    [alert addButtonWithTitle:@"Yes"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model loadDialog];
+         }
+    }];
+#else
     NSBeginAlertSheet(@"Replace these dialog values with values read from hardware!",
                       @"Yes",
                       @"Cancel",
@@ -556,6 +570,7 @@
                       @selector(_doItSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really replace all values? This can not be undone!");
+#endif
 	
 }
 
@@ -579,9 +594,9 @@
 	*yValue =  [model buffer:i set:set];
 	*xValue = i;
 }
-
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORAcqirisDC440Controller (private)
 - (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
@@ -589,7 +604,6 @@
 		[model loadDialog];
 	}
 }
-
-
 @end
+#endif
 

@@ -507,9 +507,7 @@ NSString* UVkWrite = @"W";
 	float pollTimeSecs = kMinutesToSecs * [mPollTimeMins floatValue];
 	NSDate *now = [NSDate date];	
 
-	NSString* lastPollTime = [now descriptionWithCalendarFormat: @"%H:%M:%S"
-	                                                   timeZone: nil   
-													     locale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
+	NSString* lastPollTime = [now descriptionFromTemplate: @"HH:mm:ss"];
 	NSString* lastPollTimeMsg = [NSString stringWithFormat: @"%@", lastPollTime];
 	
 	NSLog( @"ORUnivVoltModel - Last Poll Time ORUnivVoltModel: %@\n", lastPollTimeMsg );
@@ -1304,7 +1302,7 @@ NSString* UVkWrite = @"W";
 		NSNumber* HVLimit = [NSNumber numberWithFloat: 2300.0];
 		
 		int statusInt = 1;
-		float difference = abs( measuredHVFloat - [demandHV floatValue] );  
+		float difference = fabsf( measuredHVFloat - [demandHV floatValue] );  
 		if (  difference > [mvdZ floatValue])
 			statusInt = eHVUTripForHVError;
 		NSNumber* status = [NSNumber numberWithInt: statusInt];

@@ -28,9 +28,11 @@
 #import "ORTimeRate.h"
 #import "ORSerialPortController.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORVarianTPSController (private)
 - (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORVarianTPSController
 
@@ -317,6 +319,20 @@
 
 - (IBAction) turnOffAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Turning Off Pumping Station!"];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Yes, Turn it OFF"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertSecondButtonReturn){
+            [model turnStationOff];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Turning Off Pumping Station!",
                       @"Cancel",
                       @"Yes, Turn it OFF",
@@ -325,6 +341,7 @@
                       @selector(_turnOffSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 }
 
 
@@ -360,6 +377,7 @@
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORVarianTPSController (private)
 - (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
@@ -367,6 +385,6 @@
 		[model turnStationOff];
     }    
 }
-
 @end
+#endif
 

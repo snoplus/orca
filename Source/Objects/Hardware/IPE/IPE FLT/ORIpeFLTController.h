@@ -147,8 +147,9 @@
 - (IBAction) readThresholdsGains:(id)sender;
 - (IBAction) writeThresholdsGains:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) calibrationSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-
+#endif
 #pragma mark ¥¥¥Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;

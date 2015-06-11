@@ -260,7 +260,7 @@
 	}
 	@catch(NSException* e){
         NSLog(@"Init of %@ FAILED.\n",[self className]);
-        NSRunAlertPanel([e name], @"%@\nInit Failed", @"OK", nil, nil, e);	
+        ORRunAlertPanel([e name], @"%@\nInit Failed", @"OK", nil, nil, e);
 	}
 }
 
@@ -276,7 +276,7 @@
 	}
 	@catch(NSException* e){
         NSLog(@"Probe of %@ FAILED.\n",[self className]);
-        NSRunAlertPanel([e name], @"%@\nProbe Failed", @"OK", nil, nil, e);	
+        ORRunAlertPanel([e name], @"%@\nProbe Failed", @"OK", nil, nil, e);	
 	}
 }
 

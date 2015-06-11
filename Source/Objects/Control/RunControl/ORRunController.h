@@ -123,8 +123,6 @@
 - (IBAction) prepareForSubRunAction:(id)sender;
 - (IBAction) forceClearWaitsAction:(id)sender;
 - (IBAction) chooseDir:(id)sender;
-- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) deferredRunNumberChange;
 - (void) deferredChooseDir;
 

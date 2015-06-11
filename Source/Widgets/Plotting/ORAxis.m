@@ -53,7 +53,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kYNumberRightEdge	    (-kLongTickLength - 3)	// y-label dx (right edge)
 #define	kYNumberCenter		    0						// y-label dy (center)
 #define	kXAxisRoomLeft		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2)		// room needed left of x axis
-#define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2+8)		// room needed right of x axis
+#define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2+13)		// room needed right of x axis
 #define	kYAxisRoomAbove		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room above y axis
 #define	kYAxisRoomBelow		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room below y axis
 #define	kXNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].width * 7/3)      // optimal x scale label sep
@@ -105,6 +105,7 @@ NSString* ORAxisAllowNegative		= @"ORAxisAllowNegative";
 NSString* ORAxisFont				= @"ORAxisFont";
 NSString* ORAxisLabel				= @"ORAxisLabel";
 NSString* ORAxisMarker				= @"kMarker";
+NSString* ORAxisMarkers				= @"kMarkers";
 NSString* ORAxisTempLabel			= @"ORAxisTempLabel";
 
 
@@ -225,6 +226,7 @@ enum {
 {
     return YES;
 }
+
 - (NSColor*) color
 {
 	NSData* theColorData = [attributes objectForKey:ORAxisColor];
@@ -733,15 +735,12 @@ enum {
 {
 	if([self isXAxis]){
 		//there may be a calibration in place, it might have units
-		id theCalibration = [self calibration];
+		ORCalibration* theCalibration = [self calibration];
 		if([theCalibration useCalibration]){
-			NSString* calibrationUnits = [theCalibration units];
-			if([calibrationUnits length])return calibrationUnits;
-			else return @"";
+			return [theCalibration units];
 		}
-		else return @"";
 	}
-	else return @"";
+    return @"";
 }
 
 - (NSString*) label
@@ -749,15 +748,13 @@ enum {
 	NSString* label = [attributes objectForKey:ORAxisLabel];
 	if([self isXAxis]){
 		//there may be a calibration in place
-		id theCalibration = [self calibration];
+		ORCalibration* theCalibration = [self calibration];
 		if([theCalibration useCalibration]){
-			NSString* calibrationLabel = [theCalibration label];
-			if([calibrationLabel length]) return calibrationLabel;
-			else return @"";
+			return [theCalibration label];
 		}
 	}
-	if(!label)return @"";
-	else return label;
+    if([label length]==0)return @"";
+    else return label;
 }
 
 - (long) axisMinLimit
@@ -889,38 +886,39 @@ enum {
 	NSEventType modifierKeys = [theEvent modifierFlags];
     NSPoint mouseLoc         = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	
-	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
+	NSMutableArray* markers = [attributes objectForKey:ORAxisMarkers];
 
-	if(markerNumber){
-	
-		float markerPixel = [self getPixAbs:[markerNumber floatValue]];
-		float checkValue;
-		
-		if([self isXAxis])	checkValue = mouseLoc.x-lowOffset;
-		else				checkValue = mouseLoc.y-lowOffset;
-		
-		if(checkValue <= (markerPixel+20) && checkValue>=(markerPixel-20)){
-			if(modifierKeys & NSCommandKeyMask){
-				[attributes removeObjectForKey:ORAxisMarker];
-				[[self window] resetCursorRects];
-				[viewToScale setNeedsDisplay:YES];
-				[self setNeedsDisplay:YES];
-				return;
-			}
-			else {
-				mMarkerDragInProgress = YES;
-				[[NSCursor closedHandCursor] push];
-			}
-		}		
+	if(markers){
+        for(id markerNumber in markers){
+            float markerPixel = [self getPixAbs:[markerNumber floatValue]];
+            float checkValue;
+            
+            if([self isXAxis])	checkValue = mouseLoc.x-lowOffset;
+            else				checkValue = mouseLoc.y-lowOffset;
+            
+            if(checkValue <= (markerPixel+5) && checkValue>=(markerPixel-5)){
+                if(modifierKeys & NSCommandKeyMask){
+                    [markers removeObject:markerNumber];
+                    if([markers count] == 0){
+                        [attributes removeObjectForKey:ORAxisMarkers];
+                    }
+                    [[self window] resetCursorRects];
+                    [viewToScale setNeedsDisplay:YES];
+                    [self setNeedsDisplay:YES];
+                    return;
+                }
+                else {
+                    [markerBeingDragged release];
+                    markerBeingDragged = [markerNumber retain];
+                    [markers removeObject:markerBeingDragged];
+                    [[NSCursor closedHandCursor] push];
+                }
+                break;
+            }
+        }
 	}
-	if(!mMarkerDragInProgress){
+	if(!markerBeingDragged){
 		firstDrag = YES;   
-		
-
-	//	if ([theEvent clickCount] == 2){
-	//		[ORAxisPreferences sharedAxisPreferenceController:self];
-	//		return;
-	//	}
 
 		if(modifierKeys & NSCommandKeyMask)  [self markClick:mouseLoc];
 		else {
@@ -958,7 +956,7 @@ enum {
     if(mDragInProgress){
         [self drag:mouseLoc];
     }
-	else if(mMarkerDragInProgress){
+	else if(markerBeingDragged){
 		[self markClick:mouseLoc];
 	}
 }
@@ -967,19 +965,16 @@ enum {
 {
     if(mDragInProgress){
         [self rangingDonePostChange];
-       /* NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-        if(NSPointInRect(mouseLoc,[self bounds])){
-            if([theEvent modifierFlags] & NSControlKeyMask){
-                if([self isXAxis])[[NSCursor resizeLeftRightCursor]set];
-                else[[NSCursor resizeUpDownCursor]set];
-            }
-            else [[NSCursor openHandCursor]set];
-        }
-        else [[NSCursor arrowCursor]set];
-		*/
     }
 	mDragInProgress = NO;
-	mMarkerDragInProgress = NO;
+    
+    if(markerBeingDragged){
+        NSMutableArray* markers = [attributes objectForKey:ORAxisMarkers];
+        [markers addObject:markerBeingDragged];
+
+        [markerBeingDragged release];
+        markerBeingDragged = nil;
+    }
 	
 	[[self window] resetCursorRects];
 	[self clearPin];
@@ -1003,15 +998,21 @@ enum {
 	if(markValue <= [self minValue])	 markValue = [self minValue];
 	else if(markValue >=[self maxValue]) markValue = [self maxValue];
 	
-	[attributes setObject:[NSNumber numberWithFloat:markValue] forKey:ORAxisMarker];
-	[viewToScale setNeedsDisplay:YES];
+    NSMutableArray* markers = [attributes objectForKey:ORAxisMarkers];
+    if(markerBeingDragged){
+        [markerBeingDragged release];
+        markerBeingDragged = [[NSNumber numberWithFloat:markValue]retain];
+    }
+    else {
+        if(!markers){
+            [attributes setObject:[NSMutableArray array] forKey:ORAxisMarkers];
+        }
+        [markers addObject:[NSNumber numberWithFloat:markValue]];
+    }
+    
+    [viewToScale setNeedsDisplay:YES];
 	[self setNeedsDisplay:YES];
 }
-
-//- (NSUndoManager*) undoManager
-//{
-//    return [[[self window] windowController] undoManager];
-//}
 
 - (double) optimalLabelSeparation
 {
@@ -1180,51 +1181,58 @@ enum {
 {
 	NSAssert([NSThread mainThread],@"ORAxis drawing from non-gui thread");
 
-	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
-	if(markerNumber){
-		float oldLineWidth = [NSBezierPath defaultLineWidth];
-		[NSBezierPath setDefaultLineWidth:.5];
-		[aColor set];
-		float val = [markerNumber floatValue];
-		val = [self getPixAbs:val];
-		
-		NSString* label;
-		float markerValue;
-		if([self isXAxis] && [[self calibration] useCalibration]){
-			markerValue = [[self calibration] convertedValueForChannel:[markerNumber floatValue]];
-			label = [NSString stringWithFormat:@"%.3f",markerValue];
-		}
-		else {
-			markerValue = [markerNumber floatValue];
-			NSString* format = @"%.0f";
-			double scaleRange = fabs([self maxValue] - [self minValue]);
-			if(scaleRange<.5)format = @"%.3f";
-			else if(scaleRange<5)format = @"%.2f";
-			else if(scaleRange<50)format = @"%.1f";
-			label = [NSString stringWithFormat:format,markerValue];
-		}
-		if([self isXAxis]){
-			[NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
-									toPoint:NSMakePoint(val,aFrame.size.height-1)];
-			
-			int labelWidth = [label sizeWithAttributes:[self labelAttributes]].width;
-			float x;
-			if(val + labelWidth > aFrame.size.width)x = val - labelWidth-3;
-			else x = val+3;
-			[label drawAtPoint:NSMakePoint(x,3) withAttributes:[self labelAttributes]];
-		}
-		else {
-			[NSBezierPath strokeLineFromPoint:NSMakePoint(0,val) 
-								  toPoint:NSMakePoint(aFrame.size.width-1,val)];
-			int labelHeight = [label sizeWithAttributes:[self labelAttributes]].height;
-			float y;
-			if(val + labelHeight > aFrame.size.height)y = val - labelHeight;
-			else y = val;
-			[label drawAtPoint:NSMakePoint(3,y) withAttributes:[self labelAttributes]];
-		}
+	NSArray* markers = [attributes objectForKey:ORAxisMarkers];
+    for(id markerNumber in markers){
+        [self drawMark:markerNumber inFrame:aFrame usingColor:aColor];
+    }
+    [self drawMark:markerBeingDragged inFrame:aFrame usingColor:aColor];
+}
+- (void) drawMark:(NSNumber*)markerNumber inFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
+{
+    if(!markerNumber)return;
+    float oldLineWidth = [NSBezierPath defaultLineWidth];
+    [NSBezierPath setDefaultLineWidth:.5];
+    [aColor set];
+    float val = [markerNumber floatValue];
+    val = [self getPixAbs:val];
+    
+    NSString* label;
+    float markerValue;
+    if([self isXAxis] && [[self calibration] useCalibration]){
+        markerValue = [[self calibration] convertedValueForChannel:[markerNumber floatValue]];
+        label = [NSString stringWithFormat:@"%.3f",markerValue];
+    }
+    else {
+        markerValue = [markerNumber floatValue];
+        NSString* format = @"%.0f";
+        double scaleRange = fabs([self maxValue] - [self minValue]);
+        if(scaleRange<.5)format = @"%.3f";
+        else if(scaleRange<5)format = @"%.2f";
+        else if(scaleRange<50)format = @"%.1f";
+        label = [NSString stringWithFormat:format,markerValue];
+    }
+    if([self isXAxis]){
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
+                                toPoint:NSMakePoint(val,aFrame.size.height-1)];
+        
+        int labelWidth = [label sizeWithAttributes:[self labelAttributes]].width;
+        float x;
+        if(val + labelWidth > aFrame.size.width)x = val - labelWidth-3;
+        else x = val+3;
+        [label drawAtPoint:NSMakePoint(x,3) withAttributes:[self labelAttributes]];
+    }
+    else {
+        [NSBezierPath strokeLineFromPoint:NSMakePoint(0,val) 
+                              toPoint:NSMakePoint(aFrame.size.width-1,val)];
+        int labelHeight = [label sizeWithAttributes:[self labelAttributes]].height;
+        float y;
+        if(val + labelHeight > aFrame.size.height)y = val - labelHeight;
+        else y = val;
+        [label drawAtPoint:NSMakePoint(3,y) withAttributes:[self labelAttributes]];
+    }
 
-		[NSBezierPath setDefaultLineWidth:oldLineWidth];
-	}
+    [NSBezierPath setDefaultLineWidth:oldLineWidth];
+	
 }
 
 - (void) drawGridInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
@@ -1255,7 +1263,7 @@ enum {
 - (void) resetCursorRects
 {
     NSRect aRect = NSMakeRect(0,0,[self frame].size.width,[self frame].size.height);
-	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
+	NSArray* markers = [attributes objectForKey:ORAxisMarkers];
 	NSRect lowRect;
 	NSRect highRect;
 	NSRect markerRect;
@@ -1272,42 +1280,44 @@ enum {
 	}
 	NSSize cursorSize = [cursorImage size];
 	cursor = [[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(cursorSize.width/2,cursorSize.height/2)];
-	float markerPixel = [self getPixAbs:[markerNumber floatValue]]+lowOffset;
-	if([self isXAxis]){
-		lowRect    = NSMakeRect(0,0,markerPixel-cursorSize.width/2,[self frame].size.height);
-		markerRect = NSMakeRect(markerPixel-cursorSize.width/2,0,cursorSize.width,[self frame].size.height);
-		highRect   = NSMakeRect(markerPixel+cursorSize.width/2,0,[self frame].size.width-markerPixel-cursorSize.width/2,[self frame].size.height);
-	}
-	else {
-		lowRect    = NSMakeRect(0,0,[self frame].size.width,markerPixel-cursorSize.height/2);
-		markerRect = NSMakeRect(0,markerPixel-cursorSize.height/2,[self frame].size.width,cursorSize.height);
-		highRect   = NSMakeRect(0,markerPixel+cursorSize.height/2,[self frame].size.height-markerPixel-cursorSize.height/2,[self frame].size.width);
-	}
-	
-	
-    if([[NSApp currentEvent] modifierFlags] & NSControlKeyMask){
-		if([self isXAxis])[self addCursorRect:aRect cursor:[NSCursor resizeLeftRightCursor]];
-		else [self addCursorRect:aRect cursor:[NSCursor resizeUpDownCursor]];
-	}
-    else if([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask){
-		if(markerNumber){
-			[self addCursorRect:lowRect cursor:cursor];
-			[self addCursorRect:markerRect cursor:[NSCursor disappearingItemCursor]];
-			[self addCursorRect:highRect cursor:cursor];
-		}
-		else {
-			[self addCursorRect:aRect cursor:cursor];
-		}
-	}
-	else {
-		if(markerNumber){
-			[self addCursorRect:lowRect cursor:[NSCursor openHandCursor]];
-			if([self isXAxis])	[self addCursorRect:markerRect cursor:[NSCursor resizeLeftRightCursor]];
-			else				[self addCursorRect:markerRect cursor:[NSCursor resizeUpDownCursor]];
-			[self addCursorRect:highRect cursor:[NSCursor openHandCursor]];
-		}
-		else [self addCursorRect:aRect cursor:[NSCursor openHandCursor]];
-    } 
+    for(id markerNumber in markers){
+        float markerPixel = [self getPixAbs:[markerNumber floatValue]]+lowOffset;
+        if([self isXAxis]){
+            lowRect    = NSMakeRect(0,0,markerPixel-cursorSize.width/2,[self frame].size.height);
+            markerRect = NSMakeRect(markerPixel-cursorSize.width/2,0,cursorSize.width,[self frame].size.height);
+            highRect   = NSMakeRect(markerPixel+cursorSize.width/2,0,[self frame].size.width-markerPixel-cursorSize.width/2,[self frame].size.height);
+        }
+        else {
+            lowRect    = NSMakeRect(0,0,[self frame].size.width,markerPixel-cursorSize.height/2);
+            markerRect = NSMakeRect(0,markerPixel-cursorSize.height/2,[self frame].size.width,cursorSize.height);
+            highRect   = NSMakeRect(0,markerPixel+cursorSize.height/2,[self frame].size.height-markerPixel-cursorSize.height/2,[self frame].size.width);
+        }
+        
+        
+        if([[NSApp currentEvent] modifierFlags] & NSControlKeyMask){
+            if([self isXAxis])[self addCursorRect:aRect cursor:[NSCursor resizeLeftRightCursor]];
+            else [self addCursorRect:aRect cursor:[NSCursor resizeUpDownCursor]];
+        }
+        else if([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask){
+            if(markerNumber){
+                [self addCursorRect:lowRect cursor:cursor];
+                [self addCursorRect:markerRect cursor:[NSCursor disappearingItemCursor]];
+                [self addCursorRect:highRect cursor:cursor];
+            }
+            else {
+                [self addCursorRect:aRect cursor:cursor];
+            }
+        }
+        else {
+            if(markerNumber){
+                [self addCursorRect:lowRect cursor:[NSCursor openHandCursor]];
+                if([self isXAxis])	[self addCursorRect:markerRect cursor:[NSCursor resizeLeftRightCursor]];
+                else				[self addCursorRect:markerRect cursor:[NSCursor resizeUpDownCursor]];
+                [self addCursorRect:highRect cursor:[NSCursor openHandCursor]];
+            }
+            else [self addCursorRect:aRect cursor:[NSCursor openHandCursor]];
+        }
+    }
 	[cursor release];
    
 }
@@ -1358,7 +1368,7 @@ enum {
 	BOOL isOpposite = [self oppositePosition];
 	if([self isXAxis]){
 		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
-		float xc = [self frame].size.width/2;
+		float xc = [self frame].size.width/2 - kXAxisRoomLeft;
 		if(isOpposite) [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,[self frame].size.height - labelSize.height) withAttributes:labelAttributes];
 		else	       [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,0) withAttributes:labelAttributes];
 	}
@@ -1665,11 +1675,13 @@ enum {
 		longTicEndY   = lowOffset;
 	}    
 
-	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
-	if(markerNumber){	
+	NSArray* markers = [attributes objectForKey:ORAxisMarkers];
+    for(id markerNumber in markers){
 		[self drawMarker:[markerNumber floatValue] axisPosition:axisPosition];
 	}
-
+    if(markerBeingDragged){
+        [self drawMarker:[markerBeingDragged floatValue] axisPosition:axisPosition];
+    }
 	[theAxis moveToPoint:NSMakePoint(axisStartX,axisStartY)];// draw axis line
 	[theAxis lineToPoint:NSMakePoint(axisEndX,axisEndY)];
 
@@ -1934,10 +1946,13 @@ enum {
 	}    
 
 	
-	NSNumber* markerNumber = [attributes objectForKey:ORAxisMarker];
-	if(markerNumber){	
+	NSArray* markers = [attributes objectForKey:ORAxisMarkers];
+	for(id markerNumber in markers){
 		[self drawMarker:[markerNumber floatValue] axisPosition:axisPosition];
 	}
+    if(markerBeingDragged){
+        [self drawMarker:[markerBeingDragged floatValue] axisPosition:axisPosition];
+    }
 
 	[theAxis moveToPoint:NSMakePoint(axisStartX,axisStartY)];						// draw axis line
 	[theAxis lineToPoint:NSMakePoint(axisEndX,axisEndY)];

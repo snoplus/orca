@@ -63,9 +63,8 @@ Followed by the rest of the channel values
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCrateKey:crate]];
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCardKey:card]];
 
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[4]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-	theString = [theString stringByAppendingFormat:@"%@\n",date];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[4]];
+	theString = [theString stringByAppendingFormat:@"%@\n",[date stdDescription]];
 	union {
 		float asFloat;
 		unsigned long asLong;

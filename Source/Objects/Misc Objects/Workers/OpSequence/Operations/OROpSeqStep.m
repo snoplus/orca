@@ -110,7 +110,9 @@
 //
 - (void) main
 {
-	self.currentQueue = [NSOperationQueue currentQueue];
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
+	self.currentQueue = (OROpSequenceQueue*)[NSOperationQueue currentQueue];
     
 	if(![self checkSkipConditions] && [self checkConditions]){
         [self runStep];
@@ -123,31 +125,37 @@
 	//	[[NSOperationQueue currentQueue] cancelAllOperations];
 	//}
 	self.currentQueue = nil;
+    [thePool release];
 }
 
 - (void)dealloc
 {
+	[title               release];
+	[errorTitle          release];
+    [successTitle        release];
 	[outputStringStorage release];
-	[errorStringStorage release];
-	[concurrentStep release];
-	[currentQueue release];
-	[title release];
-    [requirements release];
+	[errorStringStorage  release];
+    [currentQueue        release];
+	[concurrentStep      release];
+    [requirements        release];
+    [skipConditions      release];
+    [andConditions       release];
+    [orConditions        release];
     [persistantAccessKey release];
-    [skipConditions release];
-    [andConditions release];
-    [orConditions release];
-
-    outputStringStorage     = nil;
-	errorStringStorage      = nil;
-	concurrentStep          = nil;
-	currentQueue            = nil;
-	title                   = nil;
-    requirements            = nil;
-    persistantAccessKey     = nil;
-    skipConditions           = nil;
-    andConditions           = nil;
-    orConditions            = nil;
+    
+    title               = nil;
+	errorTitle          = nil;
+    successTitle        = nil;
+	outputStringStorage = nil;
+	errorStringStorage  = nil;
+    currentQueue        = nil;
+	concurrentStep      = nil;
+    requirements        = nil;
+    skipConditions      = nil;
+    andConditions       = nil;
+    orConditions        = nil;
+    persistantStorageObj= nil;
+    persistantAccessKey = nil;
     
 	[super dealloc];
 }
@@ -183,7 +191,7 @@
             }
             else s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
             
-            if(self.errorString && ec>=ac || forceError) s = self.errorTitle;
+            if((self.errorString && ec>=ac) || forceError) s = self.errorTitle;
         }
         return s;
     }
