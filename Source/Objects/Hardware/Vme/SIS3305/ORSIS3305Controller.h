@@ -67,7 +67,6 @@
     
 	IBOutlet NSMatrix*		internalTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		externalTriggerEnabledMatrix;
-	IBOutlet NSMatrix*		extendedThresholdEnabledMatrix;
 	IBOutlet NSMatrix*		internalGateEnabledMatrix;
 	IBOutlet NSMatrix*		externalGateEnabledMatrix;
 	IBOutlet NSMatrix*		triggerGateLengthMatrix;
@@ -75,7 +74,6 @@
     IBOutlet NSMatrix*		preTriggerDelay58Matrix;
 	IBOutlet NSMatrix*		sampleStartIndexMatrix;
 	IBOutlet NSMatrix*		lemoInEnabledMatrix;
-	IBOutlet NSMatrix*		energyGateLengthMatrix;
 	IBOutlet NSPopUpButton* runModePU;
 	IBOutlet NSTextField*	energySampleStartIndex3Field;
 	IBOutlet NSTextField*	energySampleStartIndex2Field;
@@ -101,8 +99,6 @@
 
 	IBOutlet NSMatrix*		inputInvertedMatrix;
 	IBOutlet NSMatrix*		triggerOutEnabledMatrix;
-	IBOutlet NSMatrix*		highEnergySuppressMatrix;
-	IBOutlet NSMatrix*		adc50KTriggerEnabledMatrix;
 	IBOutlet NSMatrix*		gtMatrix;
 	IBOutlet NSMatrix*		dacOffsetMatrix;
 //	IBOutlet NSMatrix*		thresholdMatrix;
@@ -189,21 +185,12 @@
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
-- (void) extendedThresholdEnabledChanged:(NSNotification*)aNote;
 - (void) internalGateEnabledChanged:(NSNotification*)aNote;
 - (void) externalGateEnabledChanged:(NSNotification*)aNote;
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote;
-- (void) energyGateLengthChanged:(NSNotification*)aNote;
 - (void) runModeChanged:(NSNotification*)aNote;
-- (void) energyTauFactorChanged:(NSNotification*)aNote;
-- (void) energySampleStartIndex3Changed:(NSNotification*)aNote;
-- (void) energySampleStartIndex2Changed:(NSNotification*)aNote;
-- (void) energySampleStartIndex1Changed:(NSNotification*)aNote;
-- (void) energyNumberToSumChanged:(NSNotification*)aNote;
-- (void) energyGapTimeChanged:(NSNotification*)aNote;
-- (void) energyPeakingTimeChanged:(NSNotification*)aNote;
-- (void) energySetShipWaveformChanged:(NSNotification*)aNote;
-- (void) energySetShipSummedWaveformChanged:(NSNotification*)aNote;
+
+
 - (void) triggerGateLengthChanged:(NSNotification*)aNote;
 - (void) preTriggerDelayChanged:(NSNotification*)aNote;
 - (void) sampleStartIndexChanged:(NSNotification*)aNote;
@@ -211,7 +198,6 @@
 - (void) dacOffsetChanged:(NSNotification*)aNote;
 - (void) lemoInModeChanged:(NSNotification*)aNote;
 - (void) lemoOutModeChanged:(NSNotification*)aNote;
-- (void) extendedThresholdEnabledChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
 - (void) eventSavingMode14Changed:(NSNotification*)aNote;
@@ -226,12 +212,8 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) triggerOutEnabledChanged:(NSNotification*)aNote;
-- (void) highEnergySuppressChanged:(NSNotification*)aNote;
 - (void) inputInvertedChanged:(NSNotification*)aNote;
-- (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote;
-//- (void) gtChanged:(NSNotification*)aNote;
-//- (void) thresholdChanged:(NSNotification*)aNote;
-//- (void) highThresholdChanged:(NSNotification*)aNote;
+
 - (void) gateLengthChanged:(NSNotification*)aNote;
 - (void) pulseLengthChanged:(NSNotification*)aNote;
 - (void) sumGChanged:(NSNotification*)aNote;
@@ -257,21 +239,12 @@
 - (IBAction) internalExternalTriggersOredAction:(id)sender;
 - (IBAction) internalTriggerEnabledMaskAction:(id)sender;
 - (IBAction) externalTriggerEnabledMaskAction:(id)sender;
-- (IBAction) extendedThresholdEnabledMaskAction:(id)sender;
 - (IBAction) internalGateEnabledMaskAction:(id)sender;
 - (IBAction) externalGateEnabledMaskAction:(id)sender;
 - (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
-- (IBAction) energySampleStartIndex3Action:(id)sender;
-- (IBAction) energyTauFactorAction:(id)sender;
-- (IBAction) energySampleStartIndex2Action:(id)sender;
-- (IBAction) energySampleStartIndex1Action:(id)sender;
-- (IBAction) energyNumberToSumAction:(id)sender;
-- (IBAction) energyShipWaveformAction:(id)sender;
-- (IBAction) energyShipSummedWaveformAction:(id)sender;
-- (IBAction) energyGapTimeAction:(id)sender;
-- (IBAction) energyPeakingTimeAction:(id)sender;
+
 - (IBAction) triggerGateLengthAction:(id)sender;
 - (IBAction) preTriggerDelay14Action:(id)sender;
 - (IBAction) preTriggerDelay58Action:(id)sender;
@@ -293,10 +266,8 @@
 - (IBAction) triggerDecimationAction:(id)sender;
 - (IBAction) energyDecimationAction:(id)sender;
 
-- (IBAction) adc50KTriggerEnabledAction:(id)sender;
 - (IBAction) inputInvertedAction:(id)sender;
 - (IBAction) triggerOutEnabledAction:(id)sender;
-- (IBAction) highEnergySuppressAction:(id)sender;
 //- (IBAction) gtAction:(id)sender;
 //- (IBAction) thresholdAction:(id)sender;
 

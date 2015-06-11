@@ -214,50 +214,7 @@
 //                       object : model];
     
     
-    
-    //
-//    
-//    [notifyCenter addObserver : self
-//                     selector : @selector(integrationChanged:)
-//                         name : ORRateGroupIntegrationChangedNotification
-//                       object : nil];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(triggerOutEnabledChanged:)
-//                         name : ORSIS3305TriggerOutEnabledChanged
-//                       object : model];
-//
-//	[notifyCenter addObserver : self
-//                     selector : @selector(highEnergySuppressChanged:)
-//                         name : ORSIS3305HighEnergySuppressChanged
-//                       object : model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(inputInvertedChanged:)
-//                         name : ORSIS3305InputInvertedChanged
-//                       object : model];
-//	
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(adc50KTriggerEnabledChanged:)
-//                         name : ORSIS3305Adc50KTriggerEnabledChanged
-//                       object : model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(gtChanged:)
-//                         name : ORSIS3305GtChanged
-//                       object : model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(thresholdChanged:)
-//                         name : ORSIS3305ThresholdChanged
-//                       object : model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(highThresholdChanged:)
-//                         name : ORSIS3305HighThresholdChanged
-//                       object : model];	
-//    
+
 	[notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3305ClockSourceChanged
@@ -482,11 +439,7 @@
     [self settingsLockChanged:nil];
 	[self inputInvertedChanged:nil];
 	[self triggerOutEnabledChanged:nil];
-	[self highEnergySuppressChanged:nil];
-	[self adc50KTriggerEnabledChanged:nil];
-//	[self gtChanged:nil];
-//	[self thresholdChanged:nil];
-//	[self highThresholdChanged:nil];
+
 	[self gateLengthChanged:nil];
 	[self pulseLengthChanged:nil];
 	[self sumGChanged:nil];
@@ -509,19 +462,9 @@
 	[self sampleStartIndexChanged:nil];
 	[self preTriggerDelayChanged:nil];
 	[self triggerGateLengthChanged:nil];
-	[self energyPeakingTimeChanged:nil];
-	[self energyGapTimeChanged:nil];
-	[self energySampleStartIndex1Changed:nil];
-	[self energySampleStartIndex2Changed:nil];
-	[self energyNumberToSumChanged:nil];
-	[self energyTauFactorChanged:nil];
-	[self energySampleStartIndex3Changed:nil];
-	[self energySetShipWaveformChanged:nil];
-	[self energySetShipSummedWaveformChanged:nil];
-	[self energyGateLengthChanged:nil];
-	[self lemoInEnabledMaskChanged:nil];
+
+    [self lemoInEnabledMaskChanged:nil];
 	[self internalExternalTriggersOredChanged:nil];
-	[self extendedThresholdEnabledChanged:nil];
 	
 	[self internalTriggerEnabledChanged:nil];
 	[self externalTriggerEnabledChanged:nil];
@@ -738,13 +681,7 @@
 	}
 }
 
-- (void) extendedThresholdEnabledChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[extendedThresholdEnabledMatrix cellWithTag:i] setState:[model extendedThresholdEnabled:i]];
-	}
-}
+
 
 - (void) internalGateEnabledChanged:(NSNotification*)aNote
 {
@@ -761,29 +698,6 @@
 		[[externalGateEnabledMatrix cellWithTag:i] setState:[model externalGateEnabled:i]];
 	}
 }
-- (void) energyTauFactorChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[energyTauFactorMatrix cellWithTag:i] setIntValue:[model energyTauFactor:i]];
-	}
-}
-
-- (void) energyGapTimeChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<4;i++){
-		[[energyGapTimeMatrix cellWithTag:i] setIntValue:[model energyGapTime:i]];
-	}
-}
-
-- (void) energyPeakingTimeChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<4;i++){
-		[[energyPeakingTimeMatrix cellWithTag:i] setIntValue:[model energyPeakingTime:i]];
-	}
-}
 
 - (void) runModeChanged:(NSNotification*)aNote
 {
@@ -794,63 +708,6 @@
 	[self settingsLockChanged:nil];
 }
 
-- (void) energySampleStartIndex3Changed:(NSNotification*)aNote
-{
-	[energySampleStartIndex3Field setIntValue: [model energySampleStartIndex3]];
-}
-
-- (void) energySampleStartIndex2Changed:(NSNotification*)aNote
-{
-	[energySampleStartIndex2Field setIntValue: [model energySampleStartIndex2]];
-}
-
-- (void) energySampleStartIndex1Changed:(NSNotification*)aNote
-{
-	[energySampleStartIndex1Field setIntValue: [model energySampleStartIndex1]];
-}
-
-- (void) energyNumberToSumChanged:(NSNotification *)aNote
-{
-	[energyNumberToSumField setIntValue: [model energyNumberToSum]];
-}
-
-
-- (void) energySetShipWaveformChanged:(NSNotification*)aNote
-{
-	if ([energyShipWaveformButton state] != [model shipEnergyWaveform]) {
-		[energyShipWaveformButton setState:[model shipEnergyWaveform]];
-	}
-	if ([model shipEnergyWaveform]) {
-		[energySampleStartIndex3Field setEnabled:YES];
-		[energySampleStartIndex2Field setEnabled:YES];
-		[energySampleStartIndex1Field setEnabled:YES];
-	} else {
-		[energySampleStartIndex3Field setEnabled:NO];
-		[energySampleStartIndex2Field setEnabled:NO];
-		[energySampleStartIndex1Field setEnabled:NO];
-	}
-	[self settingsLockChanged:nil];
-	[runSummaryField setStringValue: [model runSummary]];
-}
-
-- (void) energySetShipSummedWaveformChanged:(NSNotification *)aNote
-{
-	if ([energyShipSummedWaveformButton state] != [model shipSummedWaveform]) {
-		[energyShipSummedWaveformButton setState:[model shipSummedWaveform]];
-	}
-	if ([model shipSummedWaveform]) {
-		[energySampleStartIndex3Field setEnabled:NO];
-		[energySampleStartIndex2Field setEnabled:NO];
-		[energySampleStartIndex1Field setEnabled:YES];
-	} else {
-		[energySampleStartIndex3Field setEnabled:NO];
-		[energySampleStartIndex2Field setEnabled:NO];
-		[energySampleStartIndex1Field setEnabled:NO];
-	}
-	[self settingsLockChanged:nil];
-	[energyBufferAssignmentField setStringValue: [model energyBufferAssignment]];
-	[runSummaryField setStringValue: [model runSummary]];
-}
 
 - (void) lemoInModeChanged:(NSNotification*)aNote
 {
@@ -905,21 +762,7 @@
 		[[triggerOutEnabledMatrix cellWithTag:i] setState:[model triggerOutEnabled:i]];
 	}
 }
-- (void) highEnergySuppressChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[highEnergySuppressMatrix cellWithTag:i] setState:[model highEnergySuppress:i]];
-	}
-	[self settingsLockChanged:nil];
-}
-- (void) adc50KTriggerEnabledChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[adc50KTriggerEnabledMatrix cellWithTag:i] setState:[model adc50KTriggerEnabled:i]];
-	}
-}
+
 
 - (void) bufferWrapEnabledChanged:(NSNotification*)aNote
 {
@@ -1017,13 +860,6 @@
 	[runSummaryField setStringValue: [model runSummary]];
 }
 
-- (void) energyGateLengthChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels/2;i++){
-		[[energyGateLengthMatrix cellWithTag:i] setIntValue:[model energyGateLength:i]];
-	}
-}
 
 - (void) triggerGateLengthChanged:(NSNotification*)aNote
 {
@@ -1164,7 +1000,7 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3305SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3305SettingsLock];
 	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
-    BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
+//    BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
 	
 	[settingLockButton			setState: locked];
 	//[settingLockButton			setState: locked];
@@ -1222,7 +1058,6 @@
 	[triggerOutEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
 	
 	//mca specific
-	[adc50KTriggerEnabledMatrix setEnabled:!lockedOrRunningMaintenance && mcaMode];
 //	[mcaModePU					setEnabled:!lockedOrRunningMaintenance && mcaMode];
 //    [mcaHistoSizePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
 //    [mcaLNESourcePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
@@ -1623,10 +1458,6 @@
 	[model setExternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) extendedThresholdEnabledMaskAction:(id)sender
-{
-	[model setExtendedThresholdEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
 
 - (IBAction) internalExternalTriggersOredAction:(id)sender
 {
@@ -1641,26 +1472,6 @@
 - (IBAction) runModeAction:(id)sender
 {
 	[model setRunMode:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) energySampleStartIndex3Action:(id)sender
-{
-	[model setEnergySampleStartIndex3:[sender intValue]];	
-}
-
-- (IBAction) energySampleStartIndex2Action:(id)sender
-{
-	[model setEnergySampleStartIndex2:[sender intValue]];	
-}
-
-- (IBAction) energySampleStartIndex1Action:(id)sender
-{
-	[model setEnergySampleStartIndex1:[sender intValue]];	
-}
-
-- (IBAction) energyNumberToSumAction:(id)sender
-{
-	[model setEnergyNumberToSum:[sender intValue]];
 }
 
 - (IBAction) energyShipWaveformAction:(id)sender
@@ -1762,20 +1573,12 @@
 	[model setTriggerOutEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) highEnergySuppressAction:(id)sender
-{
-	[model setHighEnergySuppress:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
 
 - (IBAction) inputInvertedAction:(id)sender
 {
 	[model setInputInverted:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) adc50KTriggerEnabledAction:(id)sender
-{
-	[model setAdc50KTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
 
 - (IBAction) LTThresoldEnabledAction:(id)sender
 {
@@ -1912,26 +1715,6 @@
 {
     if([sender intValue] != [model internalTriggerDelay:[[sender selectedCell] tag]]){
 		[model setInternalTriggerDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
-- (IBAction) energyTauFactorAction:(id)sender
-{
-    if([sender intValue] != [model energyTauFactor:[[sender selectedCell] tag]]){
-		[model setEnergyTauFactor:[[sender selectedCell] tag] withValue:[sender intValue]];	
-	}
-}
-
-- (IBAction) energyGapTimeAction:(id)sender
-{
-    if([sender intValue] != [model energyGapTime:[[sender selectedCell] tag]]){
-		[model setEnergyGapTime:[[sender selectedCell] tag] withValue:[sender intValue]];	
-	}
-}
-
-- (IBAction) energyPeakingTimeAction:(id)sender
-{
-    if([sender intValue] != [model energyPeakingTime:[[sender selectedCell] tag]]){
-		[model setEnergyPeakingTime:[[sender selectedCell] tag] withValue:[sender intValue]];	
 	}
 }
 
