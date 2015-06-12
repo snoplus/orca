@@ -237,6 +237,10 @@
     NSString* s = [[[[ORGlobal sharedGlobal] runModeString] copy] autorelease];
     if([s length] == 0)s = @"Not Running";
     s = [s stringByReplacingOccurrencesOfString:@"." withString:@""];
+    NSRange maskRange = [s rangeOfString:@"Mask"];
+    if(maskRange.location != NSNotFound){
+        s = [s substringToIndex:maskRange.location];
+    }
     [localRunInProgressField setStringValue:s];
 }
 

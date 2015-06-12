@@ -1306,13 +1306,12 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     if([someObjects count]){
         [[self undoManager] disableUndoRegistration];
 
-        NSArray* dataTasks = [[[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")]retain];
+        NSArray* dataTasks = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")];
         for(id aDataTask in dataTasks){
             for(id anObj in someObjects){
                 [aDataTask removeObject:anObj];
             }
         }
-        [dataTasks release];
         [self postListModAlarm];
         sbcSocketDropCount = 0;
         [[self undoManager] enableUndoRegistration];
