@@ -48,6 +48,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
 {
     self = [super init];
     [self registerNotificationObservers];
+    unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
+
     return self;
 }
 
@@ -866,8 +868,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
   
         case ePingCrates:
-            [unPingableSBCs release];
-            unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
+            [unPingableSBCs removeAllObjects];
             for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
             [self setNextState:eWaitForPing stepTime:.2];
             loopTime = 0;
@@ -985,8 +986,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     switch (state){
         case eStarting:
             restartCount++;
-            [unPingableSBCs release];
-            unPingableSBCs= nil;
             [self setNextState:eKillCrates stepTime:.1];
             break;
             
@@ -1002,8 +1001,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             break;
   
         case ePingCrates:
-            [unPingableSBCs release];
-            unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
+            [unPingableSBCs removeAllObjects];
             [self appendToSentryLog:@"Pinging Crates"];
             for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
             [self setNextState:eWaitForPing stepTime:.2];
