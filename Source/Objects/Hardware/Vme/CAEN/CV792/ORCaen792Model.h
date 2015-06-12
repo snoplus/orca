@@ -69,7 +69,7 @@ enum {
 #define kADCOutputBufferSize 0x07FF + 0x0004
 #define kModel792  0
 #define kModel792N 1
-
+ 
 
 // Class definition
 @interface ORCaen792Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
@@ -90,10 +90,13 @@ enum {
     int             percentZeroOff;
     int             totalCycleZTime;
     BOOL            isRunning;
+    BOOL            useHWReset;
     
 }
 
 #pragma mark ***Accessors
+- (BOOL)            useHWReset;
+- (void)            setUseHWReset:(BOOL)aValue;
 - (int)             totalCycleZTime;
 - (void)            setTotalCycleZTime:(int)aTotalCycleZTime;
 - (int)             percentZeroOff;
@@ -145,6 +148,9 @@ enum {
 - (void)            startRates;
 - (void)            clearEventCounts;
 - (unsigned long)   getCounter:(int)counterTag forGroup:(int)groupTag;
+- (void)            clearData;
+- (void)            writeOneShotReset;
+- (void)            doSoftClear;
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) 		getRegisterName: (short) anIndex;
@@ -161,12 +167,14 @@ enum {
 - (void) clearEventCounts;
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan;
 - (unsigned short) gainForDisplay:(unsigned short) aChan;
+- (void) postAdcInfoProvidingValueChanged;
 
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORCaen792ModelUseHWResetChanged;
 extern NSString* ORCaen792ModelTotalCycleZTimeChanged;
 extern NSString* ORCaen792ModelPercentZeroOffChanged;
 extern NSString* ORCaen792ModelCycleZeroSuppressionChanged;

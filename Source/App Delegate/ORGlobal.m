@@ -46,6 +46,7 @@ NSString* ORQueueRecordForShippingNotification  = @"ORQueueRecordForShippingNoti
 
 
 NSString* ORNeedMoreTimeToStopRun			= @"Extend Time to stop run";
+NSString* ORRunInitializationNotification   = @"Time to do inits";
 NSString* ORRunAboutToStartNotification     = @"Run is about to start";
 NSString* ORRunStartedNotification          = @"Run started";
 NSString* ORRunBetweenSubRunsNotification   = @"Between sub runs";
@@ -62,6 +63,7 @@ NSString* ORRequestRunHalt					= @"ORRequestRunHalt";
 NSString* ORAddRunStateChangeWait           = @"ORAddRunStateChangeWait";
 NSString* ORReleaseRunStateChangeWait       = @"ORReleaseRunStateChangeWait";
 NSString* ORRunAboutToChangeState           = @"ORRunAboutToChangeState";
+NSString* ORAddRunStartupAbort              = @"ORAddRunStartupAbort";
 
 NSString* ORRunTypeMask			    = @"ORRunTypeMask";
 NSString* ORRunStatusValue		    = @"Run Status Value";
@@ -254,7 +256,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) setRunInProgress:(BOOL)state
 {
     runInProgress = state;
-	[[[NSApp delegate] document] setStatusText:[self runModeString]];
+	[[(ORAppDelegate*)[NSApp delegate] document] setStatusText:[self runModeString]];
 }
 
 - (BOOL) testInProgress
@@ -265,7 +267,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) setTestInProgress:(BOOL)state
 {
     testInProgress = state;
-	[[[NSApp delegate] document] setStatusText:testInProgress?@"Testing":@""];
+	[[(ORAppDelegate*)[NSApp delegate] document] setStatusText:testInProgress?@"Testing":@""];
 }
 
 - (unsigned long)runType {
@@ -279,7 +281,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) addRunVeto:(NSString*)vetoName comment:(NSString*)aComment

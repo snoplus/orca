@@ -533,5 +533,32 @@ kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices)
 	
     return kernResult;
 }
+        
+BOOL ORRunAlertPanel(NSString* mainMessage, NSString* msg, NSString* defaultButtonTitle, NSString* alternateButtonTitle,NSString* otherButtonTitle, ...)
+{
+    
+    va_list ap;
+    va_start(ap, otherButtonTitle);
+    BOOL result;
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 //    10.10-specific
 
-
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    if(mainMessage)[alert setMessageText:mainMessage];
+    [alert setInformativeText:[NSString stringWithFormat:msg parameters:ap]];
+    if(defaultButtonTitle)  [alert addButtonWithTitle:defaultButtonTitle];
+    if(alternateButtonTitle)[alert addButtonWithTitle:alternateButtonTitle];
+    if(otherButtonTitle)    [alert addButtonWithTitle:otherButtonTitle];
+    int choice = [alert runModal];
+    if(choice == NSAlertFirstButtonReturn)  result = YES;
+    else                                    result = NO;
+#else
+    NSString* s = [NSString stringWithFormat:msg parameters:ap];
+    int choice = NSRunAlertPanel(mainMessage,@"%@",defaultButtonTitle,alternateButtonTitle,otherButtonTitle,s);
+    if(choice == NSAlertDefaultReturn) result = YES;
+    else                               result = NO;
+#endif
+ 
+     va_end(ap);
+    return result;
+}
+        

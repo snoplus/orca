@@ -21,6 +21,7 @@
 #import "ORMJDVacuumView.h"
 #import "ORTPG256AModel.h"
 #import "ORMJDPumpCartModel.h"
+#import "ORLakeShore210Model.h"
 
 @interface ORMJDTestCryostat (private)
 - (void) _makeParts;
@@ -33,7 +34,7 @@
 - (void) resetVisitationFlag;
 
 - (double) valueForRegion:(int)aRegion;
-- (ORVacuumValueLabel*) regionValueObj:(int)aRegion;
+- (ORVacuumDynamicLabel*) regionValueObj:(int)aRegion;
 - (BOOL) valueValidForRegion:(int)aRegion;
 - (BOOL) region:(int)aRegion valueHigherThan:(double)aValue;
 
@@ -69,13 +70,46 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 	ORTPG256AModel* pressureGauge = [aNote object];
 	int chan = [[[aNote userInfo] objectForKey:@"Channel"]intValue];
 	int componentTag = [pressureGauge tag];
-	ORVacuumValueLabel*  aLabel = [self regionValueObj:kRegionNegPump]; 
+	ORVacuumDynamicLabel*  aLabel = [self regionValueObj:kRegionNegPump];
 	if([aLabel channel ] == chan && [aLabel component] == componentTag){
 		[aLabel setIsValid:[pressureGauge isValid]]; 
 		[aLabel setValue:[pressureGauge pressure:[aLabel channel]]]; 
 	}
 }
 
+- (void) temperatureGaugeChanged:(NSNotification*)aNote
+{
+    ORLakeShore210Model* tempGauge = [aNote object];
+    int componentTag = [tempGauge tag];
+    int chan         = [[[aNote userInfo] objectForKey:@"Channel"]intValue];
+    //get the right region/channel etc...
+    //cryo 1,3,..     cryo 2,4,..
+    //chan0->TempA  chan4->TempA
+    //chan1->TempB  chan5->TempB
+    //chan2->TempC  chan6->TempC
+    //chan3->TempD  chan7->TempD
+    
+    int componentOffset[7]={0,0,1,1,2,2,3}; //by stc
+    int channelOffset[7]  ={0,4,0,4,0,4,0}; //by stc
+    
+    int tagIndex = [self tag];
+    
+    if(tagIndex<7 && chan<8){
+        
+        ORVacuumDynamicLabel*  aLabel = [self regionValueObj:kRegionTempA+chan%4];
+    
+        //each cryostat needs a different temp gauge component based on its cryostat #
+        int labelChannel   = [aLabel channel]   + channelOffset[tagIndex];
+        int labelComponent = [aLabel component] + componentOffset[tagIndex];
+        
+        if(labelComponent == componentTag){
+            if(labelChannel == chan){
+                [aLabel setIsValid:[tempGauge isValid]];
+                [aLabel setValue:[tempGauge temp:chan]];
+            }
+        }
+    }
+}
 
 #pragma mark ***Accessors
 - (int) connectionStatus
@@ -249,9 +283,9 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 #define kNumVacPipes		6
 	VacuumPipeStruct vacPipeList[kNumVacPipes] = {
 		//region 0 pipes
-		{ kVacBox,	  kRegionCryostat, 60,			  100,			140,				180 },
+		{ kVacBox,	  kRegionCryostat, 70,			   100,			130,				180 },
 		{ kVacVPipe,  kRegionCryostat, 100,				50,			100,				100 }, 
-		{ kVacHPipe,  kRegionCryostat, 65,				75,			100-kPipeRadius,	75 }, 
+		{ kVacHPipe,  kRegionCryostat, 100+kPipeRadius,				75,			135+kPipeRadius,	75 },
 		
 		//region 1 pipes
 		{ kVacVPipe,  kRegionNegPump, 100,				0,			100,				50 }, 
@@ -265,11 +299,17 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 		{kVacStaticLabel, kRegionNegPump,			@"NEG\nPump",	135,  15,	195, 45},
 	};	
 	
-#define kNumStatusItems	1
+#define kNumStatusItems	5
 	VacuumDynamicLabelStruct dynamicLabelItems[kNumStatusItems] = {
 		//type,	region, component, channel
-		{kVacPressureItem, kRegionNegPump,	2, 3,  @"PKR G1",	5, 60,	65, 90}, //The component, channel are first one. The actual values are offset using the stand number.
-	};	
+        {kVacPressureItem, kRegionNegPump,	2, 3,  @"PKR G1",	135, 60,	195,   90}, //The component, channel are first ones. The actual values are offset using the stand number.
+        {kVacTempItem,     kRegionTempA,    4, 0,  @"Temp A",	10,  130,	 60,  160}, //The component, channel are first ones. The actual component and channel will be computed by the object
+        {kVacTempItem,     kRegionTempB,    4, 1,  @"Temp B",	10,   90,	 60,  120}, //The component, channel are first ones.
+        {kVacTempItem,     kRegionTempC,    4, 2,  @"Temp C",	10,   50,	 60,   80}, //The component, channel are first ones.
+        {kVacTempItem,     kRegionTempD,    4, 3,  @"Temp D",	10,   10,	 60,   40}, //The component, channel are first ones.
+
+    
+    };
 		
 #define kNumVacGVs			3
 	VacuumGVStruct gvList[kNumVacGVs] = {
@@ -344,18 +384,25 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 
 - (void)  makeDynamicLabels:(VacuumDynamicLabelStruct*)labelItems num:(int)numItems
 {
-	//the pressure gauge has six channels. Our pump stands start at the first pressure gauge, channel 3 and are offset from there
-	int i = 0;
-	int channel		= labelItems[i].channel + [self tag];
-	int component	= labelItems[i].component;
-	if(channel>5){
-		channel   = [self tag]-3;
-		component+=1;
-	}
-	NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
-	if(labelItems[i].type == kVacPressureItem){
-		[[[ORVacuumValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:component channel:channel label:labelItems[i].label bounds:theBounds] autorelease];			
-	}
+    int i;
+    for(i=0;i<numItems;i++){
+        int component	= labelItems[i].component;
+        if(labelItems[i].type == kVacPressureItem){
+            int channel		= labelItems[i].channel + [self tag];
+            //the pressure gauge has six channels. Our pump stands start at the first pressure gauge, channel 3 and are offset from there
+            if(channel>5){
+                channel   = [self tag]-3;
+                component+=1;
+            }
+            NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
+            [[[ORVacuumValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:component channel:channel label:labelItems[i].label bounds:theBounds] autorelease];
+        }
+        else if(labelItems[i].type == kVacTempItem){
+            int channel		= labelItems[i].channel;
+            NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
+            [[[ORTemperatureValueLabel alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:component channel:channel label:labelItems[i].label bounds:theBounds] autorelease];
+        }
+    }
 }
 
 - (void) colorRegions
@@ -470,6 +517,10 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 		[[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
 		[valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
 	}
+    else if([aPart isKindOfClass:NSClassFromString(@"ORTemperatureValueLabel")]){
+        [[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
+        [valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
+    }
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumStatusLabel")]){
 		[[partDictionary objectForKey:@"StatusLabels"] addObject:aPart];
 		[statusDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
@@ -494,7 +545,7 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
 	return [[self regionValueObj:aRegion] value];
 }
 
-- (ORVacuumValueLabel*) regionValueObj:(int)aRegion
+- (ORVacuumDynamicLabel*) regionValueObj:(int)aRegion
 {
 	return [valueDictionary objectForKey:[NSNumber numberWithInt:aRegion]];
 }

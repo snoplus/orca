@@ -33,11 +33,7 @@ extern NSString* ORObjArrayPtrPBType;
 @class ORGroup;
 @class ORConnection;
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface OrcaObject:NSObject <NSCoding,NSCopying,NSMenuDelegate> 
-#else																						// pre-10.6 fallback
-@interface OrcaObject:NSObject <NSCoding,NSCopying> 
-#endif
+@interface OrcaObject:NSObject <NSCoding,NSCopying,NSMenuDelegate>
 {
 	@protected
         id			guardian;
@@ -104,6 +100,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void)		setSkipConnectionDraw:(BOOL)state;
 - (NSMutableArray*) 	children;
 - (NSMutableArray*) 	familyList;
+- (int)         stationNumber;
 - (int)			tag;
 - (void)		setTag:(int)aTag;
 - (int)         tagBase;

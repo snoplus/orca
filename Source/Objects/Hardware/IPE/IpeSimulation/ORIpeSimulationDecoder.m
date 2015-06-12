@@ -91,8 +91,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 	theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];
 	// -tb- theString = [theString stringByAppendingFormat:@"Value: %.4E\n",theData.asFloat];
 	NSTimeInterval seconds = ptr[3] + ptr[4]/1000.;
-	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSince1970:seconds];
-	theString = [theString stringByAppendingFormat:@"Date: %@\n",theDate];
+	NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:seconds];
+	theString = [theString stringByAppendingFormat:@"Date: %@\n",[theDate stdDescription]];
 	return theString;
 }
 @end

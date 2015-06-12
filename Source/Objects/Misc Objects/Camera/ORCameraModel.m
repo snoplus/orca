@@ -546,11 +546,10 @@ NSString* ORCameraModelMovieChanged				= @"ORCameraModelMovieChanged";
 
 - (void) saveMovieToHistory
 {		
-	NSDate* now = [NSCalendarDate date];
-	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%Y_%m_%d_%H_%M_%S.mov" allowNaturalLanguage:NO];
-	NSString* fileName = [dateFormatter stringFromDate:now];
+	NSDate* now = [NSDate date];
+
+	NSString* fileName = [now descriptionFromTemplate:@"Y_M_d_H_m_s.mov"];
 	NSString* path = [historyFolder stringByAppendingPathComponent:fileName];
-	[dateFormatter release];
 	[movie writeToFile: [path stringByExpandingTildeInPath]
 		withAttributes: [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:QTMovieFlatten] 
 				 error: nil];

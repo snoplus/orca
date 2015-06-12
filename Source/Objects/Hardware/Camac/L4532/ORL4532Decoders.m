@@ -84,9 +84,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		theTimeRef.asLongs[1] = *ptr;
 		ptr++;
 		theTimeRef.asLongs[0] = *ptr;
-		NSCalendarDate* theTime   = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
+		NSDate* theTime   = [NSDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
 		timeString = [NSString string];
-		timeString = [timeString stringByAppendingFormat:@"timeStamp  = %@\n",[theTime descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S:%F"]];
+		timeString = [timeString stringByAppendingFormat:@"timeStamp  = %@\n",[theTime descriptionFromTemplate:@"MM/dd/yy HH:mm:SSS"]];
 		timeString = [timeString stringByAppendingFormat:@"(in secs)  = %.3f\n\n",theTimeRef.asTimeInterval];
 
 	}

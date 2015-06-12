@@ -40,6 +40,7 @@
         int				scaleFactor;
 		SEL				afterSaveSelector;
 		id				afterSaveTarget;
+        NSMutableDictionary* customRunParameters;
 }
 
 #pragma mark ¥¥¥Initializations
@@ -58,6 +59,7 @@
 - (void) setOrcaControllers:(NSMutableArray*)newOrcaControllers;
 - (BOOL) documentCanBeChanged;
 
+- (NSArray*) collectObjectsWithClassName:(NSString*)aClassName;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
@@ -66,6 +68,7 @@
 - (void) assignUniqueIDNumber:(id)anObject;
 - (void) resetAlreadyVisitedInChainSearch;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) addCustomRunParameters:(id)anObject forKey:(NSString*)aKey;
 
 #pragma mark ¥¥¥Orca Dialog Management
 - (void)    duplicateDialog:(id)dialog;

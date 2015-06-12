@@ -54,16 +54,20 @@ typedef enum  {
 
 + (id) itemAtLevel:(eSelectionLevel)aLevel name:(NSString*)aName className:(NSString*)aClassName;
 
-- (NSString *)name;
-- (void)setName:(NSString *)aName;
+- (NSString*) name;
+- (void)  setName:(NSString *)aName;
 - (eSelectionLevel)level;
-- (void)setLevel:(eSelectionLevel)aLevel;
+- (void)  setLevel:(eSelectionLevel)aLevel;
 - (Class) selectionClass;
-- (void) setSelectionClass:(Class)aClass;
-- (int) numberOfItems;
-- (void) setNumberOfItems:(int)aNumberOfItems;
-- (int)maxValue;
-- (void)setMaxValue:(int)aMaxValue;
-- (void) scanConfiguration;
+- (void)  setSelectionClass:(Class)aClass;
+- (int)   numberOfItems;
+- (void)  setNumberOfItems:(int)aNumberOfItems;
+- (int)   maxValue;
+- (void)  setMaxValue:(int)aMaxValue;
+- (void)  scanConfiguration;
 
+@end
+
+@interface NSObject (WizSelection)
+- (int) minSlot;
 @end

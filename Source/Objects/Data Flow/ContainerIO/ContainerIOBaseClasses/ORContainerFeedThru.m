@@ -470,7 +470,7 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 			if(![aConnector connector] && ![aRemoteConnector connector])count++;
         }
         if(count==0 ){
-            NSRunAlertPanel(@"Connector Conflict!",@"You must disconnect something.",nil,nil,nil);
+            ORRunAlertPanel(@"Connector Conflict!",@"You must disconnect something.",nil,nil,nil);
             return NO;
         }
     }

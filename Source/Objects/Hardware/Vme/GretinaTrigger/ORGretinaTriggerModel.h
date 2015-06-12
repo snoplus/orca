@@ -21,6 +21,10 @@
 
 #pragma mark ***Imported Files
 #import "ORVmeIOCard.h"
+#import "SBC_Link.h"
+
+@class ORFileMoverOp;
+@class ORAlarm;
 
 #pragma mark •••Register Definitions
 enum {
@@ -34,6 +38,7 @@ enum {
     kAuxIOData,
     kAuxInputSelect,
     kAuxTriggerWidth,
+    
     kSerdesTPower,
     kSerdesRPower,
     kSerdesLocalLe,
@@ -44,6 +49,7 @@ enum {
     kMiscCtl2,
     kGenericTestFifo,
     kDiagPinCrl,
+   
     kTrigMask,
     kTrigDistMask,
     kSerdesMultThresh,
@@ -54,6 +60,7 @@ enum {
     kRawEthreshHi,
     kIsomerThresh1,
     kIsomerThresh2,
+
     kIsomerTimeWindow,
     kFifoRawEsumThresh,
     kFifoTwEsumThresh,
@@ -64,6 +71,7 @@ enum {
     kCCPattern5,
     kCCPattern6,
     kCCPattern7,
+    
     kCCPattern8,
     kMon1FifoSel,
     kMon2FifoSel,
@@ -74,6 +82,7 @@ enum {
     kMon7FifoSel,
     kMon8FifoSel,
     kChanFifoCrl,
+    
     kDigMiscBits,
     kDigDiscBitSrc,
     kDenBits,
@@ -84,6 +93,7 @@ enum {
     kFifoResets,
     kAsyncCmdFifo,
     kAuxCmdFifo,
+    
     kDebugCmdFifo,
     kMask,
     kFastStrbThresh,
@@ -94,6 +104,7 @@ enum {
     kChanFifoStat,
     kTimeStampA,
     kTimeStampB,
+    
     kTimeStampC,
     kMSMState,
     kChanPipeStatus,
@@ -104,6 +115,7 @@ enum {
     kDiagnosticC,
     kDiagnosticD,
     kDiagnosticE,
+    
     kDiagnosticF,
     kDiagnosticG,
     kDiagnosticH,
@@ -114,6 +126,7 @@ enum {
     kMon1Fifo,
     kMon2Fifo,
     kMon3Fifo,
+    
     kMon4Fifo,
     kMon5Fifo,
     kMon6Fifo,
@@ -124,6 +137,7 @@ enum {
     kChan3Fifo,
     kChan4Fifo,
     kChan5Fifo,
+    
     kChan6Fifo,
     kChan7Fifo,
     kChan8Fifo,
@@ -134,23 +148,141 @@ enum {
     kRouterBMultiplicity,
     kRouterCMultiplicity,
     kRouterDMultiplicity,
+    
     kNumberOfGretinaTriggerRegisters	//must be last
 };
 
-#define kResetLinkInitMachBit (0x1<<2)
-#define kLinkInitStateMask    (0x0f00)
+enum {
+	kTriggerMainFPGAControl,			//[0] Main Digitizer FPGA configuration register
+	kTriggerMainFPGAStatus,             //[1] Main Digitizer FPGA status register
+	kTriggerVoltageAndTemperature,		//[2] Voltage and Temperature Status
+	kTriggerVMEGPControl,				//[3] General Purpose VME Control Settings
+	kTriggerVMETimeoutValue,			//[4] VME Timeout Value Register
+	kTriggerVMEFPGAVersionStatus,		//[5] VME Version/Status
+	kTriggerVMEFPGASandbox1,			//[6] VME FPGA Sandbox Register Block
+	kTriggerVMEFPGASandbox2,			//[7] VME FPGA Sandbox Register Block
+	kTriggerVMEFPGASandbox3,			//[8] VME FPGA Sandbox Register Block
+	kTriggerVMEFPGASandbox4,			//[9] VME FPGA Sandbox Register Block
+	kTriggerFlashAddress,				//[10] Flash Address
+	kTriggerFlashDataWithAddrIncr,		//[11] Flash Data with Auto-increment address
+	kTriggerFlashData,					//[12] Flash Data
+	kTriggerFlashCommandRegister,		//[13] Flash Command Register
+	kTriggerNumberOfFPGARegisters
+};
+
+//do NOT change this list without changing the GretinaTriggerStateInfo array in the .m file
+//Master States
+enum {
+    kMasterIdle,
+    kMasterSetup,
+    kWaitOnRouterSetup,
+    kSetInputLinkMask,
+    kSetMasterTRPower,
+    kSetMasterPreEmphCtrl,
+    kReleaseLinkInit,
+    kCheckMiscStatus,
+    kStartRouterTRPowerUp,
+    kWaitOnRouterTRPowerUp,
+    kReadLinkLock,
+    kVerifyLinkState,
+    kSetClockSource,
+    kWaitOnSetClockSource,
+    kCheckWaitAckState,
+    kMasterSetClearAckBit,
+    kVerifyAckMode,
+    kSendNormalData,
+    kRunRouterDataCheck,
+    kWaitOnRouterDataCheck,
+    kFinalCheck,
+    kReleaseImpSync,
+    kFinalReset,
+    kMasterError,
+    kNumMasterTriggerStates //must be last
+};
+
+//do NOT change this list without changing the GretinaTriggerStateInfo array in the .m file
+//Router States
+enum {
+    kRouterIdle,
+    kRouterSetup,
+    kDigitizerSetup,
+    kDigitizerSetupWait,
+    kSetRouterTRPower,
+    SetLLinkDenRenSync,
+    kSetRouterPreEmphCtrl,
+    KSetRouterClockSource,
+    kRouterDataChecking,
+    kMaskUnusedRouterChans,
+    kSetTRPowerBits,
+    kReleaseLintInitReset,
+    kRunDigitizerInit,
+    kWaitOnDigitizerInit,
+    kRouterSetClearAckBit,
+    kRouterError,
+    kNumRouterTriggerStates //must be last
+};
+
+
+#define kResetLinkInitMachBit       (0x1<<2)
+#define kPowerOnLSerDes             (0x1<<8)
+#define kClockSourceSelectBit       (0x1<<15)
+#define kLinkInitStateMask          (0x0F00)
+#define kSerdesPowerOnAll           (0x7FF)
+#define kLinkLruCrlMask             (0x700)
+#define kLvdsPreEmphasisPowerOnL    (0x1<<2)
+#define kAllLockBit                 (0x1<<14)
+#define kStringentLockBit           (0x1<<4)
+#define linkInitAckBit              (0x1<<1)
+#define kWaitAcknowledgeStateMask   (0x0F00)
+#define kAcknowledgedStateMask      (0x0F00)
 
 @interface ORGretinaTriggerModel : ORVmeIOCard
 {
   @private
+	NSThread*		fpgaProgrammingThread;
 	ORConnector*    linkConnector[11]; //we won't draw these connectors so we have to keep references to them
 	BOOL            isMaster;
-    unsigned long   registerWriteValue;
+    unsigned short  regWriteValue;
     int             registerIndex;
-    unsigned long   inputLinkMask;
-    unsigned long   serdesTPowerMask;
-    unsigned long   serdesRPowerMask;
-    unsigned long   lvdsPreemphasisCtlMask;
+    unsigned short  inputLinkMask;
+    unsigned short  serdesTPowerMask;
+    unsigned short  serdesRPowerMask;
+    unsigned short  lvdsPreemphasisCtlMask;
+    unsigned short  miscCtl1Reg;
+    unsigned short  miscStatReg;
+    unsigned short  linkLruCrlReg;
+    unsigned short  linkLockedReg;
+    BOOL            clockUsingLLink;
+    NSString*       mainFPGADownLoadState;
+    NSString*       fpgaFilePath;
+	BOOL            stopDownLoadingMainFPGA;
+	BOOL            downLoadMainFPGAInProgress;
+    int             fpgaDownProgress;
+	NSLock*         progressLock;
+    NSString*       firmwareStatusString;
+    BOOL            verbose;
+    BOOL            locked;
+    unsigned long   dataId;
+    BOOL            doNotLock;
+    unsigned short  numTimesToRetry;
+    ORAlarm*        noClockAlarm;
+    unsigned short  timeStampA;
+    unsigned short  timeStampB;
+    unsigned short  timeStampC;
+    
+    //------------------internal use only
+    int             tryNumber;
+    ORFileMoverOp*  fpgaFileMover;
+    NSOperationQueue*	fileQueue;
+    BOOL            initializationRunning;
+    short           initializationState;
+    unsigned short  connectedRouterMask;
+    unsigned short  connectedDigitizerMask;
+    NSMutableArray* stateStatus;
+    NSString*       errorString;
+    int             digitizerCount;
+    int             digitizerLockCount;
+    BOOL            linkWasLost;
 }
 
 - (id) init;
@@ -160,16 +292,62 @@ enum {
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
+- (void) registerNotificationObservers;
+- (void) runInitialization:(NSNotification*)aNote;
+- (void) startPollingLock:(NSNotification*)aNote;
+- (void) endPollingLock:(NSNotification*)aNote;
+- (void) pollLock;
 
 #pragma mark ***Accessors
-- (unsigned long) inputLinkMask;
-- (void) setInputLinkMask:(unsigned long)aMask;
-- (unsigned long) serdesTPowerMask;
-- (void) setSerdesTPowerMask:(unsigned long)aMask;
-- (unsigned long) serdesRPowerMask;
-- (void) setSerdesRPowerMask:(unsigned long)aMask;
-- (unsigned long) lvdsPreemphasisCtlMask;
-- (void) setLvdsPreemphasisCtlMask:(unsigned long)aMask;
+- (unsigned long long) timeStamp;
+- (int) tryNumber;
+- (unsigned short) numTimesToRetry;
+- (void) setNumTimesToRetry:(unsigned short)aNumTimesToRetry;
+- (BOOL) doNotLock;
+- (void) setDoNotLock:(BOOL)aDoNotLock;
+- (BOOL) locked;
+- (void) setLocked:(BOOL)aState;
+- (int) digitizerCount;
+- (int) digitizerLockCount;
+- (void) setErrorString:(NSString*)aString;
+- (NSString*) errorString;
+- (BOOL) verbose;
+- (void) setVerbose:(BOOL)aVerbose;
+- (short) initState;
+- (void) setInitState:(short)aState;
+- (NSString*) initialStateName;
+- (void) setupStateArray;
+- (NSString*) stateName:(int)anIndex;
+- (unsigned short) inputLinkMask;
+- (void) setInputLinkMask:(unsigned short)aMask;
+- (unsigned short) serdesTPowerMask;
+- (void) setSerdesTPowerMask:(unsigned short)aMask;
+- (unsigned short) serdesRPowerMask;
+- (void) setSerdesRPowerMask:(unsigned short)aMask;
+- (unsigned short) lvdsPreemphasisCtlMask;
+- (void) setLvdsPreemphasisCtlMask:(unsigned short)aMask;
+- (unsigned short)miscCtl1Reg;
+- (void) setMiscCtl1Reg:(unsigned short)aValue;
+- (unsigned short)miscStatReg;
+- (void) setMiscStatReg:(unsigned short)aValue;
+- (unsigned short)linkLruCrlReg;
+- (void) setLinkLruCrlReg:(unsigned short)aValue;
+- (unsigned short)linkLockedReg;
+- (void) setLinkLockedReg:(unsigned short)aValue;
+- (BOOL)clockUsingLLink;
+- (void) setClockUsingLLink:(BOOL)aValue;
+
+- (BOOL) downLoadMainFPGAInProgress;
+- (void) setDownLoadMainFPGAInProgress:(BOOL)aState;
+- (short) fpgaDownProgress;
+- (NSString*) mainFPGADownLoadState;
+- (void) setMainFPGADownLoadState:(NSString*)aMainFPGADownLoadState;
+- (NSString*) fpgaFilePath;
+- (void) setFpgaFilePath:(NSString*)aFpgaFilePath;
+- (NSString*) firmwareStatusString;
+- (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
+- (void) startDownLoadingMainFPGA;
+- (void) stopDownLoadingMainFPGA;
 
 - (ORConnector*) linkConnector:(int)index;
 - (void) setLink:(int)index connector:(ORConnector*)aConnector;
@@ -178,24 +356,58 @@ enum {
 - (void) setIsMaster:(BOOL)aIsMaster;
 - (int) registerIndex;
 - (void) setRegisterIndex:(int)aRegisterIndex;
-- (unsigned long) registerWriteValue;
-- (void) setRegisterWriteValue:(unsigned long)aWriteValue;
+- (unsigned short) regWriteValue;
+- (void) setRegWriteValue:(unsigned short)aWriteValue;
+- (void) setupStateArray;
+- (NSString*) stateStatus:(int)aStateIndex;
+- (int) initializationState;
 
 #pragma mark •••set up routines
-- (void) initAsOneMasterOneRouter;
-- (void) slaveToMaster;
-- (unsigned long)findRouters;
+- (void) initClockDistribution;
+- (void) initClockDistribution:(BOOL)force;
+- (BOOL) checkSystemLock;
+- (BOOL) isLocked;
+- (unsigned short)findRouterMask;
+- (unsigned short)findDigitizerMask;
+- (void) readDisplayRegs;
+- (BOOL) isRouterLocked;
+- (void) resetScaler;
+
+- (void) stepMaster;
+- (void) stepRouter;
+- (void) setRoutersToIdle;
+- (BOOL) allRoutersIdle;
+- (BOOL) allGretinaCardsIdle;
+
+- (void) setToInternalClock;
 
 // Register access
+- (void) dumpFpgaRegisters;
+- (void) dumpRegisters;
+- (void) testSandBoxRegisters;
+- (void) testSandBoxRegister:(int)anOffset;
 - (NSString*) registerNameAt:(unsigned int)index;
-- (unsigned long) readRegister:(unsigned int)index;
-- (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
+- (unsigned long) registerOffsetAt:(unsigned int)index;
+- (unsigned short) readRegister:(unsigned int)index;
+- (void) writeRegister:(unsigned int)index withValue:(unsigned short)value;
 - (BOOL) canReadRegister:(unsigned int)index;
 - (BOOL) canWriteRegister:(unsigned int)index;
 
 #pragma mark •••Hardware Access
-- (unsigned long) readCodeRevision;
-- (unsigned long) readCodeDate;
+- (unsigned short) readCodeRevision;
+- (unsigned short) readCodeDate;
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned short)aValue;
+- (unsigned short) readFromAddress:(unsigned long)anAddress;
+- (void) readTimeStamps;
+
+#pragma mark •••Data Records
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+- (void) shipDataRecord;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -203,6 +415,10 @@ enum {
 
 @end
 
+extern NSString* ORGretinaTriggerTimeStampChanged;
+extern NSString* ORGretinaTriggerModelNumTimesToRetryChanged;
+extern NSString* ORGretinaTriggerModelDoNotLockChanged;
+extern NSString* ORGretinaTriggerModelVerboseChanged;
 extern NSString* ORGretinaTriggerModelInputLinkMaskChanged;
 extern NSString* ORGretinaTriggerSerdesTPowerMaskChanged;
 extern NSString* ORGretinaTriggerSerdesRPowerMaskChanged;
@@ -212,3 +428,18 @@ extern NSString* ORGretinaTriggerRegisterLock;
 extern NSString* ORGretinaTriggerRegisterIndexChanged;
 extern NSString* ORGretinaTriggerRegisterWriteValueChanged;
 extern NSString* ORGretinaTriggerModelIsMasterChanged;
+extern NSString* ORGretinaTriggerMainFPGADownLoadInProgressChanged;
+extern NSString* ORGretinaTriggerFPGADownLoadStateChanged;
+extern NSString* ORGretinaTriggerFpgaFilePathChanged;
+extern NSString* ORGretinaTriggerMainFPGADownLoadInProgressChanged;
+extern NSString* ORGretinaTriggerFirmwareStatusStringChanged;
+extern NSString* ORGretinaTriggerMainFPGADownLoadStateChanged;
+extern NSString* ORGretinaTriggerFpgaDownProgressChanged;
+extern NSString* ORGretinaTriggerMiscCtl1RegChanged;
+extern NSString* ORGretinaTriggerMiscStatRegChanged;
+extern NSString* ORGretinaTriggerLinkLruCrlRegChanged;
+extern NSString* ORGretinaTriggerLinkLockedRegChanged;
+extern NSString* ORGretinaTriggerClockUsingLLinkChanged;
+extern NSString* ORGretinaTriggerModelInitStateChanged;
+extern NSString* ORGretinaTriggerLockChanged;
+

@@ -452,4 +452,58 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNMPQueue);
 }
 @end
 
+//--------------------------------------------------
+// ORSNMPShellOp
+// An easier way to use SNMP by just executing shell
+// scripts and having the result go back to the delegate
+//--------------------------------------------------
+@implementation ORSNMPShellOp
+- (id) initWithCmd:(NSString*)aCmd arguments:(NSArray*)theArgs delegate:(id)aDelegate tag:(int)aTag
+{
+	self = [super init];
+    tag         = aTag;
+	delegate    = aDelegate;
+	command     = [aCmd copy];
+    arguments   = [theArgs retain];
+    return self;
+}
+
+- (void) dealloc
+{
+	[command release];
+	[arguments release];
+	[super dealloc];
+}
+
+- (void) main
+{
+	@try {
+		if(command && ![self isCancelled]){
+			NSTask* task = [[NSTask alloc] init];
+			[task setLaunchPath: command];
+			[task setArguments: arguments];
+			
+			NSPipe* pipe = [NSPipe pipe];
+			[task setStandardOutput: pipe];
+			
+			NSFileHandle* file = [pipe fileHandleForReading];
+			[task launch];
+            
+			NSData* data = [file readDataToEndOfFile];
+			if(data){
+				NSString* result = [[[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding] autorelease];
+				if([result length]){
+                    if([delegate respondsToSelector:@selector(setSNMP:result:)]){
+                        [delegate setSNMP:tag result:result];
+                    }
+                }
+			}
+			[task release];
+        }
+	}
+	@catch(NSException* e){
+	}
+}
+
+@end
 

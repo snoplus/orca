@@ -70,6 +70,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	[scriptName release];
 	[inputValues release];
 	[scriptRunner release];
+    [temporaryStore release];
+    [persistantStore release];
     [super dealloc];
 }
 
@@ -118,7 +120,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+
+    
 	[notifyCenter addObserver : self
 					 selector : @selector(runStarted:)
 						 name : ORRunStartedNotification
@@ -158,7 +166,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     if(autoRunAtQuit && ![scriptRunner running]){
 		runPeriodically = NO; //disable for the final run
         [self runScript];
-        [[NSApp delegate] delayTermination];
+        [(ORAppDelegate*)[NSApp delegate] delayTermination];
     }
 }
 
@@ -168,6 +176,19 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	if(autoStartWithDocument){
 		[self runScript];
 	}
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+    if(autoStartWithRun && ![scriptRunner running]){
+        [self parseScript];
+        if(!parsedOK){
+            NSString* reason = [NSString stringWithFormat:@"Script <%@> has errors",[self scriptName]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                                                                object:self
+                                                              userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+        }
+    }
 }
 
 - (void) runStarted:(NSNotification*)aNote
@@ -191,7 +212,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		return [[self scriptRunner] debugging]?@"Debugging":@"Running";
 	}
 	else if(nextPeriodicRun!=nil){
-		NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO] autorelease];
+		NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        [dateFormatter setDateFormat:@"HH:mm:ss"];
 		NSString* nextTime = [dateFormatter stringFromDate:nextPeriodicRun];
 		return [NSString stringWithFormat:@"Idle until %@",nextTime];
 	}
@@ -549,6 +571,14 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	return [self runScriptWithMessage:@""];
 }
 
+- (void) postCouchDBRecord:(NSDictionary*)aRecord
+{
+    NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:aRecord];
+    [values setObject:scriptName forKey:@"scriptName"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
+
 - (BOOL) runScriptWithMessage:(NSString*) startMessage
 {
 	parsedOK = YES;
@@ -802,7 +832,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState
 {
-    if([gOrcaGlobals runInProgress]){
+    if([gOrcaGlobals runRunning]){
 		
 		//get the time(UT!)
 		time_t	ut_time;
@@ -828,8 +858,11 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 			id plist = nil;
 			//this just wrapps the data in a top level dictionary to make it easy for orca root decoders
 			someData = [NSDictionary dictionaryWithObject:someData	forKey:@"DataRecord"];
-			plist = [NSPropertyListSerialization dataFromPropertyList:someData
-															   format:NSPropertyListXMLFormat_v1_0 errorDescription:nil];
+
+            plist = [NSPropertyListSerialization dataWithPropertyList:someData
+                                                               format:NSPropertyListXMLFormat_v1_0
+                                                              options:NSPropertyListImmutable
+                                                                error:nil];
 			
 			
 			if([plist length]){
@@ -860,6 +893,18 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		}
 	}
 }
+- (id)   temporaryObjectWithKey:(id)aKey
+{
+    return [temporaryStore objectForKey:aKey];
+}
+
+- (void) setTemporaryObject:(id)anObj forKey:(id)aKey
+{
+    if(!temporaryStore){
+        temporaryStore = [[NSMutableDictionary dictionary] retain];
+    }
+    [temporaryStore setObject:anObj forKey:aKey];
+}
 
 - (id)   storedObjectWithKey:(id)aKey
 {
@@ -886,7 +931,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
-    persistantStore = 	[[decoder decodeObjectForKey:@"persistantStore"] retain];
+    persistantStore             = 	[[decoder decodeObjectForKey:@"persistantStore"] retain];
     [self setPeriodicRunInterval:	[decoder decodeIntForKey:@"periodicRunInterval"]];
     [self setRunPeriodically:		[decoder decodeBoolForKey:@"runPeriodically"]];
     [self setAutoRunAtQuit:			[decoder decodeBoolForKey:@"autoRunAtQuit"]];
@@ -967,10 +1012,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	
     NSString* state = [NSString stringWithFormat:@"%@,%d %@\n",typeString,theObjID,ptr[3]?@"Started":@"Stopped"];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
-
-    return [NSString stringWithFormat:@"%@%@%@",title,state,date];               
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:ptr[2]];
+    return [NSString stringWithFormat:@"%@%@%@\n",title,state,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss %z"]];
 }
 
 @end
@@ -1021,15 +1064,14 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	NSPropertyListFormat format;
 	NSData *plistXML = [NSData dataWithBytes:&ptr[5] length:ptr[4]];
 	id result = [NSPropertyListSerialization
-						  propertyListFromData:plistXML
-						  mutabilityOption:NSPropertyListMutableContainersAndLeaves
-						  format:&format errorDescription:nil];
+                        propertyListWithData:plistXML
+                        options:NSPropertyListMutableContainersAndLeaves
+                        format:&format
+                        error:nil];
 	
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
-	
-    return [NSString stringWithFormat:@"%@%@%@Data:%@",title,date,idString,result];               
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:ptr[2]];	
+    return [NSString stringWithFormat:@"%@%@%@Data:%@",title,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z\n"],idString,result];
 }
 @end
 

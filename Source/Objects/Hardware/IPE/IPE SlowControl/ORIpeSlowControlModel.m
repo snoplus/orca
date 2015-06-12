@@ -91,6 +91,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 {
     //FZK-internal: [self setAdeiServiceUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
     [self setIPNumber: @"fuzzy.fzk.de/adei"];
+    currentQueueErrorIndex=1;
 	if(!requestCache)   requestCache = [[NSMutableDictionary dictionary] retain];
 	if(!pollingLookUp)  pollingLookUp = [[NSMutableArray array] retain];
 	return self;
@@ -1262,7 +1263,8 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 }
 
 //Just send the request string, don't wait for response.
-- (void) sendRequestString:(NSString*)requestString
+//extended to store a queueErrorIndex -tb- 2014-04-04
+- (void) sendRequestString:(NSString*)requestString withQueueErrorIndex:(int) aIndex;
 {
 	//NSLog(@"%@::%@: requestString:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),requestString);//TODO: debug output -tb-
 
@@ -1274,12 +1276,18 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
         }
     ORAdeiLoader* aLoader = [ORAdeiLoader loaderWithAdeiType:kRequestStringType delegate:self didFinishSelector:@selector(handleSilentItemResult:path:)];
     [aLoader setShowDebugOutput: showDebugOutput];//TODO: timeout debugging -tb-
+    [aLoader setQueueErrorIndex:aIndex];
     [aLoader sendRequestString:requestString];
 	[self setPendingRequest:anItemKey];
     [self setTotalRequestCount:totalRequestCount+1];
 
 }
 
+//extended to store a queueErrorIndex -tb- 2014-08-04 - see above
+- (void) sendRequestString:(NSString*)requestString
+{
+    [self sendRequestString:requestString withQueueErrorIndex:-1];
+}
 
 /*
 NSStringEncoding
@@ -1788,13 +1796,18 @@ enum {
 
 
 
-- (void) sendSetpointRequestQueue
+- (int) sendSetpointRequestQueue
 {
 	#ifdef SHOW_REQUEST_LIST_DEBUG_OUTPUT
 	NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
 	NSLog(@"The queue: %@\n",setpointRequestsQueue);
 	#endif
 	
+    int newCurrentQueueErrorIndex = ([self currentQueueErrorIndex] + 1) % kMaxQueueErrorEntries;
+    if(newCurrentQueueErrorIndex==0) newCurrentQueueErrorIndex = 1;
+    [self setCurrentQueueErrorIndex: newCurrentQueueErrorIndex];
+    [self setCurrentQueueError: -1];
+    
 	//sort the list/queue according to url and path -> build a tree
 	NSMutableDictionary *requestTree = [NSMutableDictionary dictionary];
 	id objx;
@@ -1836,11 +1849,14 @@ enum {
 	for(i=0; i<count; i++){
 		NSMutableString *requestString = [requestStringList objectAtIndex:i];
 		//NSLog(@"Request %i is: %@\n",i,requestString);
-		[self sendRequestString:requestString];
+		//[self sendRequestString:requestString]; //added error handlich for queues 2014-04 -tb-
+		[self sendRequestString:requestString withQueueErrorIndex:newCurrentQueueErrorIndex];
 	}
 	
 	
 	[self clearSetpointRequestQueue];	
+    
+    return newCurrentQueueErrorIndex;
 }
 
 
@@ -1859,6 +1875,56 @@ enum {
 	//NSLog(@"%@::%@  count is %i\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),[setpointRequestsQueue count]);//DEBUG OUTPUT -tb-  
 
 }
+
+//count from 1 to kMaxQueueErrorEntries-1 (index 0 is reserved)
+- (int) currentQueueErrorIndex
+{
+    return currentQueueErrorIndex;
+}
+
+- (void) setCurrentQueueErrorIndex:(int)anIndex
+{
+    if(anIndex<0) anIndex=0;
+    if(anIndex>=kMaxQueueErrorEntries) anIndex=kMaxQueueErrorEntries;
+    currentQueueErrorIndex=anIndex;
+}
+
+- (int) queueErrorForIndex:(int)anIndex
+{
+    if(anIndex<0) return 0;
+    if(anIndex>=kMaxQueueErrorEntries) return 0;
+    return queueError[anIndex];
+}
+
+
+//aError: -1: still pending; 0 got a reply without error; 1 = reply with error
+- (void) setQueueError:(int)aError forIndex:(int)anIndex
+{
+    if(anIndex<0) return ;
+    if(anIndex>=kMaxQueueErrorEntries) return ;
+    queueError[anIndex] = aError;
+}
+
+- (void) setCurrentQueueError:(int)aError
+{
+    int anIndex = [self currentQueueErrorIndex];
+    [self setQueueError:aError forIndex: anIndex];
+}
+
+- (int) currentQueueError
+{
+    int anIndex = [self currentQueueErrorIndex];
+    return [self queueErrorForIndex: anIndex];
+}
+
+- (void) incCurrentQueueError
+{
+    int aError = [self currentQueueError];
+    aError++;
+    [self setCurrentQueueError:aError ];
+}
+
+
 
 
 
@@ -2110,6 +2176,31 @@ enum {
 		NSMutableDictionary* dictionary = [result objectAtIndex:0];
 		NSString* itemKey = [self itemKey:[dictionary objectForKey:@"URL"] path:[dictionary objectForKey:@"Path"]];
 		//NSLog(@"handleSilentItemResult: ... itemKey is %@ \n",itemKey);//DEBUG OUTPUT -tb-
+        int queueErrorIndex = -23;
+        
+        //ERROR handling for queues
+        NSNumber * num= [dictionary objectForKey:@"queueErrorIndex"] ;
+        if(num){
+            queueErrorIndex=[num intValue];
+		    //DEBUG NSLog(@"handleSilentItemResult: ... queueErrorIndex is %i \n",queueErrorIndex);//DEBUG OUTPUT -tb-
+            if([self showDebugOutput])
+		        //DEBUG 
+                NSLog(@"handleSilentItemResult: ... result is %@ \n",result);//DEBUG OUTPUT -tb-
+            NSString* errorObj  = [dictionary objectForKey:@"Error"];
+            NSString* resultObj  = [dictionary objectForKey:@"Result"];
+            int isError = 0;
+            int tmp=[resultObj caseInsensitiveCompare:@"Error"];//note: caseInsensitiveCompare: returns a 'NSComparisonResult' which may be -1, 0 or 1 ({NSOrderedAscending = -1, NSOrderedSame, NSOrderedDescending})-tb-
+            //DEBUG  NSLog(@"%@::%@   result is >>>%@<<< comparison is:(%i) ((NSOrderedAscending is %i))\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),result,tmp,NSOrderedAscending);//DEBUG OUTPUT -tb-
+            if(tmp!=NSOrderedDescending){//== @"Error"  found 
+                isError=1;
+                if([self showDebugOutput])
+		            NSLog(@"handleSilentItemResult: ... ERROR with string: %@ \n",errorObj);//DEBUG OUTPUT -tb-
+                [self setQueueError:1 forIndex: queueErrorIndex];
+            }
+            if([self queueErrorForIndex:queueErrorIndex] == -1) [self setQueueError:0 forIndex: queueErrorIndex];
+        }
+
+
         //if(!itemKey) continue; //avoid (null) item key; this may happen if there was a alarm message in the received xml structure (contains no path/url) -tb-
         
         //housekeeping
@@ -2210,7 +2301,7 @@ enum {
 
 - (NSTimeInterval) timeFromADEIDate:(NSString*)aDate
 {
-	NSCalendarDate *theDate = [NSCalendarDate dateWithString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
+	NSDate *theDate = [NSDate dateFromString:aDate calendarFormat:@"%d-%b-%y %H:%M:%S.%F"];
 	return [theDate timeIntervalSince1970];
 }
 

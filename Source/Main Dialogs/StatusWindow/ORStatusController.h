@@ -22,11 +22,7 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataSet;
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 @interface ORStatusController : NSWindowController <NSOutlineViewDataSource>
-#else																						// pre-10.6 fallback
-@interface ORStatusController : NSWindowController
-#endif
 {
 	IBOutlet NSTabView*     tabView;
     IBOutlet NSTextView*    statusView;  
@@ -48,7 +44,7 @@
 	BOOL					logBookDirty;
 	NSString*				logBookFile;
 	NSDate*					lastSnapShot;
-
+    unsigned  long long     alarmLogSize;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -66,7 +62,9 @@
 - (NSString*) alarmLogContents;
 - (void) populateFilterPopup;
 - (void) loadAlarmHistory;
+- (void) doSnapShot;
 - (void) doPeriodicSnapShotToPath:(NSString*) aPath;
+- (void) mailSent:(NSString*)address;
 
 #pragma mark ¥¥¥Updating
 - (void) updateErrorDisplay;

@@ -45,6 +45,7 @@ NSString* ORGretina4MExtTrigLengthChanged       = @"ORGretina4MExtTrigLengthChan
 NSString* ORGretina4MPileUpWindowChanged        = @"ORGretina4MPileUpWindowChanged";
 NSString* ORGretina4MExternalWindowChanged      = @"ORGretina4MExternalWindowChanged";
 NSString* ORGretina4MClockSourceChanged         = @"ORGretina4MClockSourceChanged";
+NSString* ORGretina4MClockPhaseChanged         = @"ORGretina4MClockPhaseChanged";
 NSString* ORGretina4MDownSampleChanged			= @"ORGretina4MDownSampleChanged";
 NSString* ORGretina4MRegisterIndexChanged		= @"ORGretina4MRegisterIndexChanged";
 NSString* ORGretina4MRegisterWriteValueChanged	= @"ORGretina4MRegisterWriteValueChanged";
@@ -60,10 +61,13 @@ NSString* ORGretina4MNoiseFloorChanged			= @"ORGretina4MNoiseFloorChanged";
 NSString* ORGretina4MFIFOCheckChanged           = @"ORGretina4MFIFOCheckChanged";
 
 NSString* ORGretina4MTrapEnabledChanged         = @"ORGretina4MTrapEnabledChanged";
+
+NSString* ORGretina4MForceFullInitChanged       = @"ORGretina4MForceFullInitChanged";
 NSString* ORGretina4MEnabledChanged             = @"ORGretina4MEnabledChanged";
 NSString* ORGretina4MPoleZeroEnabledChanged     = @"ORGretina4MPoleZeroEnabledChanged";
 NSString* ORGretina4MPoleZeroMultChanged        = @"ORGretina4MPoleZeroMultChanged";
 NSString* ORGretina4MPZTraceEnabledChanged      = @"ORGretina4MPZTraceEnabledChanged";
+NSString* ORGretina4MBaselineRestoreEnabledChanged = @"ORGretina4MBaselineRestoreEnabledChanged";
 NSString* ORGretina4MDebugChanged               = @"ORGretina4MDebugChanged";
 NSString* ORGretina4MPileUpChanged              = @"ORGretina4MPileUpChanged";
 NSString* ORGretina4MTriggerModeChanged         = @"ORGretina4MTriggerModeChanged";
@@ -85,6 +89,11 @@ NSString* ORGretina4MPresumEnabledChanged       = @"ORGretina4MPresumEnabledChan
 NSString* ORGretina4ModelTrapThresholdChanged	= @"ORGretina4ModelTrapThresholdChanged";
 NSString* ORGretina4MEasySelectedChanged        = @"ORGretina4MEasySelectedChanged";
 NSString* ORGretina4MModelHistEMultiplierChanged= @"ORGretina4MModelHistEMultiplierChanged";
+NSString* ORGretina4MModelInitStateChanged      = @"ORGretina4MModelInitStateChanged";
+NSString* ORGretina4MForceFullInitCardChanged   = @"ORGretina4MForceFullInitCardChanged";
+
+NSString* ORGretina4MLockChanged                = @"ORGretina4MLockChanged";
+
 
 @interface ORGretina4MModel (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -134,7 +143,7 @@ static Gretina4MRegisterInformation register_information[kNumberOfGretina4MRegis
     {0x80,  @"LED Threshold", YES, YES, YES, YES},
     {0x100, @"Window Timing", YES, YES, YES, YES},
     {0x140, @"Rising Edge Window", YES, YES, YES, YES},        
-    {0x1C0, @"TRAP Threshold", YES, YES, YES, YES},
+    {0x1C0, @"TRAP Threshold", YES, YES, YES, YES},         // undocumented.
     {0x400, @"DAC", YES, YES, NO, NO},
     {0x480, @"Slave Front bus status", YES, YES, NO, NO},          
     {0x484, @"Channel Zero time stamp LSB", YES, YES, NO, NO},     
@@ -222,6 +231,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) dealloc 
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [firmwareStatusString release];
     [spiConnector release];
     [linkConnector release];
@@ -233,13 +244,41 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[progressLock release];
     [fileQueue cancelAllOperations];
     [fileQueue release];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"Gretina4MCard"]];	
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so that each crate can have its own version for drawing into.
+    //---------------------------------------------------------------------------------------------------
+    NSImage* aCachedImage = [NSImage imageNamed:@"Gretina4MCard"];
+    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    [i lockFocus];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    int chan;
+    float y=73;
+    float dy=3;
+    NSColor* enabledColor  = [NSColor colorWithCalibratedRed:0.4 green:0.7 blue:0.4 alpha:1];
+    NSColor* disabledColor = [NSColor clearColor];
+    for(chan=0;chan<kNumGretina4MChannels;chan+=2){
+        if(enabled[chan])  [enabledColor  set];
+        else			  [disabledColor set];
+        [[NSBezierPath bezierPathWithRect:NSMakeRect(5,y,4,dy)] fill];
+        
+        if(enabled[chan+1])[enabledColor  set];
+        else			  [disabledColor set];
+        [[NSBezierPath bezierPathWithRect:NSMakeRect(9,y,4,dy)] fill];
+        y -= dy;
+    }
+    [i unlockFocus];
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:OROrcaObjectImageChanged
+     object:self];
 }
 
 - (void) makeMainController
@@ -282,17 +321,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[linkConnector setOffColor:[NSColor colorWithCalibratedRed:1 green:1 blue:.3 alpha:1.]];
 }
 
-- (void) registerNotificationObservers
-{
-    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    [notifyCenter removeObserver:self];
-    [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
-                       object : nil];
-
-}
-
 - (void) setSlot:(int)aSlot
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self slot]];
@@ -309,7 +337,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSRect aFrame = [aConnector localFrame];
     if(aConnector == spiConnector){
         float x =  17 + [self slot] * 16*.62 ;
-        float y =  75;
+        float y =  78;
         aFrame.origin = NSMakePoint(x,y);
         [aConnector setLocalFrame:aFrame];
     }
@@ -321,6 +349,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
+- (void) disconnect
+{
+    [spiConnector disconnect];
+    [linkConnector disconnect];
+    [super disconnect];
+}
 
 - (void) setGuardian:(id)aGuardian
 {
@@ -357,6 +391,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 #pragma mark ***Accessors
+- (BOOL) forceFullInitCard
+{
+    return forceFullInitCard;
+}
+
+- (void) setForceFullInitCard:(BOOL)aForceFullInitCard
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setForceFullInitCard:forceFullInitCard];
+    forceFullInitCard = aForceFullInitCard;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MForceFullInitCardChanged object:self];
+}
+
 - (short) histEMultiplier
 {
     return histEMultiplier;
@@ -376,8 +422,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return baselineRestoredDelay;
 }
 
-- (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay
+- (void) setBaselineRestoredDelay:(long)aBaselineRestoredDelay
 {
+    if (aBaselineRestoredDelay < 0) {
+        aBaselineRestoredDelay = 0;
+    }
+    
+    if(aBaselineRestoredDelay > 0xFFFF)
+        aBaselineRestoredDelay = 0xFFFF;
+
     [[[self undoManager] prepareWithInvocationTarget:self] setBaselineRestoredDelay:baselineRestoredDelay];
     
     baselineRestoredDelay = aBaselineRestoredDelay;
@@ -418,7 +471,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setNoiseWindow:(short)aNoiseWindow
 {
-    if(aNoiseWindow>0x7f)aNoiseWindow = 0x7f;
+    if(aNoiseWindow>0x7f) aNoiseWindow = 0x7f;
+    else if(aNoiseWindow<0) aNoiseWindow = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setNoiseWindow:noiseWindow];
     
     noiseWindow = aNoiseWindow;
@@ -433,7 +487,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setIntegrateTime:(short)aIntegrateTime
 {
-    if(aIntegrateTime>0x3ff)aIntegrateTime = 0x3ff;
+    if(aIntegrateTime>0x3ff)
+        aIntegrateTime = 0x3ff;
+    else if(aIntegrateTime<0)
+        aIntegrateTime = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setIntegrateTime:integrateTime];
     
     integrateTime = aIntegrateTime;
@@ -448,7 +505,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setCollectionTime:(short)aCollectionTime
 {
-    if(aCollectionTime>0x3ff)aCollectionTime = 0x3ff;
+    if(aCollectionTime>0x3ff)
+        aCollectionTime = 0x3ff;
+    else if(aCollectionTime<0)
+        aCollectionTime = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setCollectionTime:collectionTime];
     
     collectionTime = aCollectionTime;
@@ -464,6 +524,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setExtTrigLength:(short)aExtTrigLength
 {
     if(aExtTrigLength>0x7ff)aExtTrigLength = 0x7ff;
+    else if(aExtTrigLength<0) aExtTrigLength = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setExtTrigLength:extTrigLength];
     
     extTrigLength = aExtTrigLength;
@@ -479,7 +540,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setPileUpWindow:(short)aPileUpWindow
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPileUpWindow:pileUpWindow];
-    
+//  This should be masked, but I don't know the max value. -SJM
+    if (pileUpWindow<0) {pileUpWindow=0;}
     pileUpWindow = aPileUpWindow;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MPileUpWindowChanged object:self];
@@ -493,6 +555,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setExternalWindow:(short)aExternalWindow
 {
     if(aExternalWindow>0x7ff) aExternalWindow = 0x7ff;
+    else if(aExternalWindow<0) aExternalWindow = 0;
     [[[self undoManager] prepareWithInvocationTarget:self] setExternalWindow:externalWindow];
     
     externalWindow = aExternalWindow;
@@ -510,6 +573,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
     clockSource = aClockSource;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MClockSourceChanged object:self];
+}
+
+- (short) clockPhase
+{
+    return clockPhase;
+}
+
+- (void) setClockPhase:(short)aClockPhase
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockPhase:clockPhase];
+    clockPhase = aClockPhase;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MClockPhaseChanged object:self];
+
 }
 
 - (ORConnector*) spiConnector
@@ -543,7 +619,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return registerIndex;
 }
 
-- (void) setRegisterIndex:(short)aRegisterIndex
+- (void) setRegisterIndex:(int)aRegisterIndex
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRegisterIndex:registerIndex];
     registerIndex = aRegisterIndex;
@@ -570,7 +646,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) setSPIWriteValue:(unsigned long)aWriteValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:spiWriteValue];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSPIWriteValue:spiWriteValue];
     spiWriteValue = aWriteValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MSPIWriteValueChanged object:self];
 }
@@ -581,10 +657,22 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	return register_information[index].name;
 }
 
+- (unsigned short) registerOffsetAt:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4MRegisters) return 0;
+	return register_information[index].offset;
+}
+
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index
 {
 	if (index >= kNumberOfFPGARegisters) return @"";
 	return fpga_register_information[index].name;
+}
+
+- (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return 0;
+	return fpga_register_information[index].offset;
 }
 
 - (unsigned long) readRegister:(unsigned int)index
@@ -818,6 +906,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		pileUp[i]			= NO;
 		poleZeroEnabled[i]	= NO;
 		poleZeroMult[i]	    = 0x600;
+        baselineRestoreEnabled[i]= NO;
 		pzTraceEnabled[i]	= NO;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x1FFFF;//spec default: maximum (0x1FFFF)
@@ -832,6 +921,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		presumEnabled[i]    = 0x0;
 		trapThreshold[i]		= 0x10;
 	}
+    
+    clockPhase      = 0x0;
     
     noiseWindow     = 0x40;//spec default: 0x40
     externalWindow  = 0x190;//spec default: 0x190
@@ -874,9 +965,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
 	enabled[chan] = aValue;
+    [self setUpImage];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MEnabledChanged object:self userInfo:userInfo];
 }
+
+- (void) setForceFullInit:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setForceFullInit:chan withValue:forceFullInit[chan]];
+    forceFullInit[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MForceFullInitChanged object:self userInfo:userInfo];
+}
+
 
 - (void) setTrapEnabled:(short)chan withValue:(BOOL)aValue
 {
@@ -911,7 +1012,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MPZTraceEnabledChanged object:self userInfo:userInfo];
 }
 
-- (void) setDebug:(short)chan withValue:(BOOL)aValue	
+- (void) setBaselineRestoreEnabled:(short)chan withValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBaselineRestoreEnabled:chan withValue:baselineRestoreEnabled[chan]];
+	baselineRestoreEnabled[chan] = aValue;
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MBaselineRestoreEnabledChanged object:self userInfo:userInfo];
+}
+
+- (void) setDebug:(short)chan withValue:(BOOL)aValue
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setDebug:chan withValue:debug[chan]];
 	debug[chan] = aValue;
@@ -949,10 +1058,9 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self postAdcInfoProvidingValueChanged];
 }
 
-- (void) setTrapThreshold:(short)chan withValue:(int)aValue
+- (void) setTrapThreshold:(short)chan withValue:(unsigned long)aValue
 {
-	if(aValue<0)aValue=0;
-	else if(aValue>0xFFFFFF)aValue = 0xFFFFFF;
+    if(aValue>0xFFFFFF)aValue = 0xFFFFFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setTrapThreshold:chan withValue:trapThreshold[chan]];
 	trapThreshold[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTrapThresholdChanged object:self];
@@ -1053,16 +1161,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
+- (BOOL) forceFullInit:(short)chan		{ return forceFullInit[chan]; }
 - (BOOL) enabled:(short)chan			{ return enabled[chan]; }
 - (BOOL) trapEnabled:(short)chan        { return trapEnabled[chan]; }
 - (BOOL) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
 - (short) poleZeroMult:(short)chan      { return poleZeroMult[chan]; }
+- (BOOL) baselineRestoreEnabled:(short)chan	{ return baselineRestoreEnabled[chan]; }
 - (BOOL) pzTraceEnabled:(short)chan     { return pzTraceEnabled[chan]; }
 - (BOOL) debug:(short)chan              { return debug[chan]; }
 - (BOOL) pileUp:(short)chan             { return pileUp[chan];}
 - (short) triggerMode:(short)chan		{ return triggerMode[chan];}
 - (int) ledThreshold:(short)chan		{ return ledThreshold[chan]; }
-- (int) trapThreshold:(short)chan       { return trapThreshold[chan]; }
+- (unsigned long) trapThreshold:(short)chan       { return trapThreshold[chan]; }
 - (short) mrpsrt:(short)chan            { return mrpsrt[chan]; }
 - (short) ftCnt:(short)chan             { return ftCnt[chan]; }
 - (short) mrpsdv:(short)chan            { return mrpsdv[chan]; }
@@ -1079,6 +1189,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (float) noiseWindowConverted      { return noiseWindow    * 640./(float)0x40; }		//convert to ¬¨¬µs
 - (float) externalWindowConverted	{ return externalWindow * 4/(float)0x190;   }		//convert to ¬¨¬µs
 - (float) pileUpWindowConverted     { return pileUpWindow * 10/(float)0x400;  }		//convert to ¬¨¬µs
+- (float) BLRDelayConverted         { return baselineRestoredDelay * 10/(float)0x400;  }		//convert to ¬¨¬µs
 - (float) extTrigLengthConverted    { return extTrigLength  * 4/(float)0x190;   }		//convert to ¬¨¬µs
 - (float) collectionTimeConverted   { return collectionTime * 4.5/(float)0x1C2; }		//convert to ¬¨¬µs
 - (float) integrateTimeConverted    { return integrateTime  * 4.5/(float)0x1C2; }		//convert to ¬¨¬µs
@@ -1092,6 +1203,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 - (void) setNoiseWindowConverted:(float)aValue      { [self setNoiseWindow:     aValue*0x40/640.]; } //ns -> raw
 - (void) setExternalWindowConverted:(float)aValue   { [self setExternalWindow:  aValue*0x190/4.0]; } //us -> raw
 - (void) setPileUpWindowConverted:(float)aValue     { [self setPileUpWindow:    aValue*0x400/10.0];  } //us -> raw
+- (void) setBLRDelayConverted:(float)aValue         { [self setBaselineRestoredDelay:aValue*0x400/10.0];} //us -> raw
 - (void) setExtTrigLengthConverted:(float)aValue    { [self setExtTrigLength:   aValue*0x190/4.0];  } //us -> raw
 - (void) setCollectionTimeConverted:(float)aValue   { [self setCollectionTime:  aValue*0x1C2/4.5]; } //us -> raw
 - (void) setIntegrateTimeConverted:(float)aValue    { [self setIntegrateTime:   aValue*0x1C2/4.5];  } //us -> raw
@@ -1180,37 +1292,27 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     NSLog(@"Gretina: 0x%0x   HV1: 0x%0x   HV2: 0x%0x\n",theValue1,theValue2,theValue3);
 }
 
+
 - (void) resetClock
 {
-    //this routine is temporary to see if we can reset the clock via software
-    [self writeRegister:kAuxIOConfig withValue:0x1001];
-    [self writeRegister:kAuxIOConfig withValue:0x1000];
-
-}
-
-- (void) resetDCM
-{
-    //Start Slave clock
-	//turn off SerDes driver
-	unsigned long theValue = 0x11;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	//reset DCM clock while keeping SerDes driver off
+    
 	// To reset the DCM, assert bit 9 of this register. 
-	theValue = 0x211;
+	unsigned long theValue;
+    [[self adapter] readLongBlock:&theValue
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+    theValue ^= (0x1<<9);
+
 	[[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
                         withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
-	//sleep(1); //wait for 1 second:
-	
-	theValue = 0x11;
+	sleep(1);
+    theValue ^= (0x1<<9);
 	[[self adapter] writeLongBlock:&theValue
 						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
@@ -1218,29 +1320,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 }
 
-- (void) resetAndHoldClock
-{
-	//reset DCM clock while keeping SerDes driver off
-	// To reset the DCM, assert bit 9 of this register.
-	unsigned long theValue = 0x211;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-}
-- (void) releaseClock
-{
-	//reset DCM clock while keeping SerDes driver off
-	// To reset the DCM, assert bit 9 of this register.
-	unsigned long theValue = 0x11;
-	[[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-}
 - (void) resetBoard
 {
     /* First disable all channels. This does not affect the model state,
@@ -1249,57 +1328,113 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];
     }
-	
-    /* Then reset the DCM clock. (This will also reset the serdes.) */
-    //[self resetDCM];  change by Jing: DCM is reset in initSerDes;
     
-    /* Finally, initialize the serdes. */
-    [self initSerDes];
+    [self resetFIFO];
+    [self resetMainFPGA];
+    [ORTimer delay:6];  // 6 second delay during board reset    
 }
 
-/*
-- (void) initSerDes
+- (short) initState {return initializationState;}
+- (void) setInitState:(short)aState
 {
-    unsigned long theValue = 0;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-    if ((theValue & 0x7) == 0x7) return;
-    theValue = 0x22;
-    // First we set to loop back mode so the SD can lock. 
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-    NSDate* startDate = [NSDate date];
-    while(1) {
-        // Wait for the SD and DCM to lock 
-        [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                            numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		
-        if ((theValue & 0x7) == 0x7) break;
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 2) {
-			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
-			return;
-		}
-    }
-    theValue = 0x02;
-    [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];    
+    initializationState = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MModelInitStateChanged object:self];
 }
-*/
 
+- (void) stepSerDesInit
+{
+    int i;
+    switch(initializationState){
+        case kSerDesSetup:
+            [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
+            [self writeRegister:kSDConfig           withValue: 0x00001231]; //T/R SerDes off, reset clock manager, reset clocks
+            [self setInitState:kSerDesIdle];
+            break;
+        
+        case kSetDigitizerClkSrc:
+            [[self undoManager] disableUndoRegistration];
+            [self setClockSource:0];                                //set to external clock (gui only!!!)
+            [[self undoManager] enableUndoRegistration];
+            [self writeFPGARegister:kVMEGPControl   withValue:0x00 ]; //set to external clock (in HW)
+            [self setInitState:kFlushFifo];
+            
+            break;
+            
+        case kFlushFifo:
+            for(i=0;i<kNumGretina4MChannels;i++){
+                [self writeControlReg:i enabled:NO];
+            }
+            
+            [self resetFIFO];
+            [self setInitState:kReleaseClkManager];
+            break;
+            
+        case kReleaseClkManager:
+            //SERDES still disabled, release clk manager, clocks still held at reset
+            [self writeRegister:kSDConfig           withValue: 0x00000211];
+            [self setInitState:kPowerUpRTPower];
+            break;
+            
+        case kPowerUpRTPower:
+            //SERDES enabled, clocks still held at reset
+            [self writeRegister:kSDConfig           withValue: 0x00000200];
+            [self setInitState:kSetMasterLogic];
+            break;
+            
+        case kSetMasterLogic:
+            [self writeRegister:kMasterLogicStatus  withValue: 0x00000051]; //power up value
+            [self setInitState:kSetSDSyncBit];
+            break;
+            
+        case kSetSDSyncBit:
+            [self writeRegister:kSDConfig           withValue: 0x00000000]; //release the clocks
+            [self writeRegister:kSDConfig           withValue: 0x00000020]; //set sd syn
+
+            [self setInitState:kSerDesIdle];
+            break;
+            
+        case kSerDesError:
+            break;
+    }
+    if(initializationState!= kSerDesError && initializationState!= kSerDesIdle){
+       [self performSelector:@selector(stepSerDesInit) withObject:nil afterDelay:.01];
+    }
+}
+
+- (BOOL) isLocked
+{
+    BOOL lockedBitSet   = ([self readRegister:kMasterLogicStatus] & kSDLockBit)==kSDLockBit;
+    //BOOL lostLockBitSet = ([self readRegister:kSDLostLockBit] & kSDLostLockBit)==kSDLostLockBit;
+    [self setLocked: lockedBitSet]; //& !lostLockBitSet];
+    return [self locked];
+}
+
+- (BOOL) locked
+{
+    return locked;
+}
+
+- (void) setLocked:(BOOL)aState
+{
+    locked = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MLockChanged object: self];
+}
+
+- (NSString*) serDesStateName
+{
+    switch(initializationState){    
+        case kSerDesIdle:           return @"Idle";
+        case kSerDesSetup:          return @"Reset to power up state";
+        case kSetDigitizerClkSrc:   return @"Set the Clk Source";
+        case kFlushFifo:            return @"Flush FIFO";
+ 
+        case kPowerUpRTPower:       return @"Power up T/R Power";
+        case kSetMasterLogic:       return @"Write Master Logic = 0x20051";
+        case kSetSDSyncBit:         return @"Write SD Sync Bit";
+        case kSerDesError:          return @"Error";
+        default:                    return @"?";
+    }
+}
 
 - (void) resetMainFPGA
 {
@@ -1338,42 +1473,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					 usingAddSpace:0x01];
 }
 
-- (void) initSerDes
-{
-	//first set clock source
-	//I can't find the variable for clock source, so I set it 0 temporarily
-	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
-	[self setClockSource:0x01];
-	
-	//main FPGA reset cycle
-	[self resetMainFPGA];
-	
-	//wait for 10 seconds
-	sleep(10);
-	
-	/*
-	unsigned long theValue = 0;
-	NSDate* startDate = [NSDate date];
-    while(1) {
-        // Wait for the SD and DCM to lock 
-        [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
-                            numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-		
-        if ((theValue & 0x7) == 0x7) break;
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 10) {
-			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
-			return;
-		}
-    }
-	*/
-	 
-	//reset DCM
-	[self resetDCM];
-	
-}
+
 
 - (BOOL) checkFirmwareVersion
 {
@@ -1391,11 +1491,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					usingAddSpace:0x01];
 	//mainVersion = (mainVersion & 0xFFFF0000) >> 16;
 	mainVersion = (mainVersion & 0xFFFFF000) >> 12;
-	if(verbose)NSLog(@"Main FGPA version: 0x%x \n", mainVersion);
-
-	if (mainVersion > kCurrentFirmwareVersion){
-		NSLog(@"Main FPGA version is higher than expected: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
-	}
+	if(verbose)NSLog(@"Main FPGA version: 0x%x \n", mainVersion);
     
 	if (mainVersion < kCurrentFirmwareVersion){
 		NSLog(@"Main FPGA version does not match: 0x%x is required but 0x%x is loaded.\n", kCurrentFirmwareVersion,mainVersion);
@@ -1415,9 +1511,19 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //    0x0001
 //    We wait about 100ms between each write."
 
-	unsigned long theValues[] = {0x1C01, 0x1801, 0x1001, 0x001};
-    for (int i=0; i<4; i++) {
-        [[self adapter] writeLongBlock:&theValues[i]
+	unsigned long theValues[] = {0x0000, 0x1000, 0x1800, 0x1C00};
+    unsigned long aValue;
+    [[self adapter] readLongBlock:&aValue
+                         atAddress:[self baseAddress] + register_information[kSDConfig].offset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
+    int i;
+    for (i=0; i<4; i++) {
+        aValue &= 0xFF; 
+        aValue |= theValues[i];
+        [[self adapter] writeLongBlock:&aValue
                              atAddress:[self baseAddress] + register_information[kSDConfig].offset
                             numToWrite:1
                             withAddMod:[self addressModifier]
@@ -1426,9 +1532,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     return;
 }
-- (void) setClockPhase:(unsigned long)value
+
+- (void) writeClockPhase
+{
+    [self writeClockPhaseWithValue:clockPhase];
+    return;
+}
+
+- (void) writeClockPhaseWithValue:(unsigned long)value
 {
 //    	unsigned long theValue =
+    value &= 0x3;
+    
     [[self adapter] writeLongBlock:&value
                          atAddress:[self baseAddress] + register_information[kADCConfig].offset
                         numToWrite:1
@@ -1453,8 +1568,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 - (void) initBoard
-{
-    //disable all channels
+{       //disable all channels
     int i;
     for(i=0;i<kNumGretina4MChannels;i++){
         [self writeControlReg:i enabled:NO];
@@ -1462,6 +1576,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     //write the card level params
     [self writeClockSource];
+    [self writeClockPhase];
 	[self writeExternalWindow];
 	[self writePileUpWindow];
 	[self writeNoiseWindow];
@@ -1481,16 +1596,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
     //enable channels
     [self resetFIFO];
-    [ORTimer delay:.1];
-    [self resetFIFO];
-    [ORTimer delay:.1];
 
     for(i=0;i<kNumGretina4MChannels;i++){
         if([self enabled:i]){
             [self writeControlReg:i enabled:YES];
         }
     }
-	
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MCardInited object:self];
 }
 
@@ -1516,19 +1628,20 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
     
-    unsigned long theValue = (poleZeroEnabled[chan]         << 22)  | //the baselinerestorer enable is tied to the polezero enable
-                             (pzTraceEnabled[chan]          << 14)  |
-                             (poleZeroEnabled[chan]         << 13)  |
-                             ((tpol[chan] & 0x3)            << 10)  |
-                             (triggerMode[chan]             << 4)   |
-							 (presumEnabled[chan]           << 3)   |
-							 (pileUp[chan]                  << 2)   |
+    unsigned long theValue = ((baselineRestoreEnabled[chan] & 0x1 ) << 22)  | //the baselinerestorer enable was tied to the polezero enable
+                             ((pzTraceEnabled[chan]         & 0x1 ) << 14)  |
+                             ((poleZeroEnabled[chan]        & 0x1 ) << 13)  |
+                             ((tpol[chan]                   & 0x3 ) << 10)  |
+                             ((triggerMode[chan]            & 0x1 ) << 4)   |
+							 ((presumEnabled[chan]          & 0x1 ) << 3)   |
+							 ((pileUp[chan]                 & 0x1 ) << 2)   |
                              startStop;
     
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kControlStatus].offset + 4*chan
                        mask:0x00406C1D
-                  reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]];
+                  reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]
+              forceFullInit:forceFullInit[chan]];
 }
     
      
@@ -1546,12 +1659,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 //new code version 1 (Jing Qian)
 - (void) writeClockSource: (unsigned long) clocksource
 {
-	//clock select.  0 = SerDes, 1 = ref, 2 = SerDes, 3 = Ext
+    if(clocksource == 0)return; ////temp..... Clock source might be set by the Trigger Card init code.
     [self writeAndCheckLong:clocksource
               addressOffset:fpga_register_information[kVMEGPControl].offset
                        mask:0x3
-                  reportKey:@"ClockSource"];
-
+                  reportKey:@"ClockSource"
+              forceFullInit:forceFullInitCard];
 }
 
 - (void) writeClockSource
@@ -1562,12 +1675,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeNoiseWindow
 {
-    unsigned long theValue = noiseWindow;
-    [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_information[kNoiseWindow].offset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeAndCheckLong:noiseWindow
+              addressOffset:register_information[kNoiseWindow].offset
+                       mask:0x7f
+                  reportKey:@"NoiseWindow"
+              forceFullInit:forceFullInitCard];
+
 }
 
 - (void) writeExternalWindow
@@ -1575,7 +1688,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:externalWindow
               addressOffset:register_information[kExternalWindow].offset
                        mask:0x7ff
-                  reportKey:@"ExternalWindow"];
+                  reportKey:@"ExternalWindow"
+              forceFullInit:forceFullInitCard];
 }
 
 - (void) writePileUpWindow
@@ -1584,25 +1698,28 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
  
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kPileupWindow].offset
-                       mask:0x07ff07ff
-                  reportKey:@"PileupWindow"];
-
+                       mask:0xffffffff
+                  reportKey:@"PileupWindow"
+              forceFullInit:forceFullInitCard];
 }
+
 - (void) writeExtTrigLength
 {
     [self writeAndCheckLong:extTrigLength
               addressOffset:register_information[kExtTrigSlidingLength].offset
                        mask:0x7ff
-                  reportKey:@"ExtTrigLength"];
-
+                  reportKey:@"ExtTrigLength"
+              forceFullInit:forceFullInitCard];
 }
 
 - (void) writeCollectionTime
 {
     [self writeAndCheckLong:collectionTime
               addressOffset:register_information[kCollectionTime].offset
-                       mask:0x1ff
-                  reportKey:@"CollectionTime"];
+                       mask:0x3ff
+                  reportKey:@"CollectionTime"
+              forceFullInit:forceFullInitCard];
+
 }
 
 
@@ -1610,27 +1727,40 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     [self writeAndCheckLong:integrateTime
               addressOffset:register_information[kIntegrateTime].offset
-                       mask:0x1ff
-                  reportKey:@"IntegrationTime"];
+                       mask:0x3ff
+                  reportKey:@"IntegrationTime"
+              forceFullInit:forceFullInitCard];
+
 
 }
 
 - (void) writeLEDThreshold:(short)channel
 {
-    unsigned long theValue = (poleZeroMult[channel] << 20) | (ledThreshold[channel] & 0x1FFFF);
+    unsigned long theValue = (  (poleZeroMult[channel] & 0xFFF) << 20) |
+                                (ledThreshold[channel] & 0x1FFFF);
+    
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kLEDThreshold].offset + 4*channel
                        mask:0xfff1ffff
-                  reportKey:[NSString stringWithFormat:@"LEDThreshold_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"LEDThreshold_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 
 }
+
 - (void) writeTrapThreshold:(int)channel
 {
-    unsigned long theValue = (trapEnabled[channel]<<31) | (trapThreshold[channel] & 0xFFFFFF);
+    /* 
+        Not in the documenation, but the trap threshold is bits 23:0, at address 0x1C0.
+        This seems to work.
+     */
+    unsigned long theValue =    (trapEnabled[channel] << 31) |
+                                (trapThreshold[channel] & 0xFFFFFF);
+    
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kTrapThreshold].offset + 4*channel
                        mask:0x80ffffff
-                  reportKey:[NSString stringWithFormat:@"TrapThreshold_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"TrapThreshold_%d",channel]
+              forceFullInit:forceFullInit[channel]];
     
 }
 
@@ -1645,7 +1775,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kWindowTiming].offset + 4*channel
                        mask:0x07ffffff
-                  reportKey:[NSString stringWithFormat:@"WindowTiming_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"WindowTiming_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 }
 
 - (void) writeRisingEdgeWindow:(short)channel
@@ -1655,7 +1786,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self writeAndCheckLong:theValue
               addressOffset:register_information[kRisingEdgeWindow].offset + 4*channel
                        mask:0x007ff7ff
-                  reportKey:[NSString stringWithFormat:@"RisingEdgeWindow_%d",channel]];
+                  reportKey:[NSString stringWithFormat:@"RisingEdgeWindow_%d",channel]
+              forceFullInit:forceFullInit[channel]];
 
 }
 
@@ -1669,7 +1801,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    if((theValue & kGretina4MFIFOEmpty)!=0)		return kEmpty;
+    if((theValue & kGretina4MFIFOEmpty)!=0)             return kEmpty;
     else if((theValue & kGretina4MFIFOAllFull)!=0)		return kFull;
     else if((theValue & kGretina4MFIFOAlmostFull)!=0)	return kAlmostFull;
     else if((theValue & kGretina4MFIFOAlmostEmpty)!=0)	return kAlmostEmpty;
@@ -1678,13 +1810,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) writeDownSample
 {
-    unsigned long theValue = (downSample << 28);
-    [[self adapter] writeLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
-                        numToWrite:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-}
+    unsigned long theValue = ((downSample & 0xF) << 28);
+    [self writeAndCheckLong:theValue
+              addressOffset:[self baseAddress] + register_information[kProgrammingDone].offset
+                       mask:0x70000000
+                  reportKey:@"downSample"
+              forceFullInit:forceFullInitCard];
+ }
 
 - (short) readExternalWindow
 {
@@ -1769,6 +1901,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (void) resetFIFO
 {
+
+    [self resetSingleFIFO];
+    [self resetSingleFIFO];
+
+    if(![self fifoIsEmpty]){
+        NSLogColor([NSColor redColor], @"%@ Fifo NOT reset properly\n",[self fullID]);
+    }
+    
+}
+
+- (void) resetSingleFIFO
+{
     unsigned long val = 0;
     [[self adapter] readLongBlock:&val
                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
@@ -1779,11 +1923,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     val |= (0x1<<27);
     
     [[self adapter] writeLongBlock:&val
-                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
+                         atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
                         numToWrite:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-  
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
     val &= ~(0x1<<27);
     
     [[self adapter] writeLongBlock:&val
@@ -1791,7 +1935,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-
+    
 }
 
 - (BOOL) fifoIsEmpty
@@ -2070,7 +2214,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return dataDictionary;
 }
 
-
 #pragma mark •••HW Wizard
 -(BOOL) hasParmetersToRamp
 {
@@ -2113,6 +2256,13 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:0x2 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
+    [p setActionMask:kAction_Set_Mask];
+    [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Clock Phase"];
+    [p setFormat:@"##0" upperLimit:0x3 lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setClockPhase:) getMethod:@selector(clockPhase)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
     
@@ -2158,7 +2308,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setEnabled:withValue:) getMethod:@selector(enabled:)];
     [a addObject:p];
- 
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Force Full Iit"];
+    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
+    [p setSetMethod:@selector(setForceFullInit:withValue:) getMethod:@selector(forceFullInit:)];
+    [a addObject:p];
+
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trap Enabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -2181,7 +2338,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TRAP Threshold"];
-    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0xffffff lowerLimit:0 stepSize:1 units:@""];
 	[p setCanBeRamped:YES];
     [p setSetMethod:@selector(setTrapThreshold:withValue:) getMethod:@selector(trapThreshold:)];
     [a addObject:p];
@@ -2256,6 +2413,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
+    [p setOncePerCard:YES];
     [p setName:@"Init"];
     [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
@@ -2268,8 +2426,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
     NSMutableArray* a = [NSMutableArray array];
     [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORVmeCrateModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORGretina4M"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORGretina4M"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card" className:@"ORGretina4MModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel" className:@"ORGretina4MModel"]];
     return a;
 }
 
@@ -2315,12 +2473,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
-- (void) runAboutToStart:(NSNotification*)aNote
-{
-    //temporary until the trigger card is ready
-    [self resetClock];
-}
-
 //**************************************************************************************
 // Function:	TakeData
 // Description: Read data from a card
@@ -2343,7 +2495,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
             //the first word of the actual data record had better be the packet separator
             if(dataBuffer[2]==kGretina4MPacketSeparator){
                 short chan = dataBuffer[3] & 0xf;
-                if(chan < 10){
+                if(chan < kNumGretina4MChannels){
                     ++waveFormCount[dataBuffer[3] & 0x7];  //grab the channel and inc the count
                     [aDataPacket addLongsToFrameBuffer:dataBuffer length:kG4MDataPacketSize];
                 }
@@ -2356,20 +2508,6 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
                 NSLogError(@"",@"Packet Sequence Error -- FIFO reset",@"GRETINA4M",[NSString stringWithFormat:@"slot %d",[self slot]],nil);
                 fifoResetCount++;
                 [self resetFIFO];
-            }
-        }
-        else {
-            int i;
-            for(i=0;i<10;i++){
-                if(enabled[i]){
-                    unsigned long val = [self readControlReg:i];
-                    BOOL bit20 = val>>20 & 0x1;
-                    if(bit20){
-                        NSLog(@"%d : 0%0x  bit 20: %d\n", i,val,bit20);
-                        [self writeControlReg:i enabled:NO];
-                        [self writeControlReg:i enabled:YES];
-                    }
-                }
             }
         }
     }
@@ -2403,6 +2541,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     for(i=0;i<kNumGretina4MChannels;i++){					
 		waveFormCount[i] = 0;
     }
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkFifoAlarm) object:nil];
 }
 
 - (void) checkFifoAlarm
@@ -2518,6 +2657,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setPileUpWindow:              [decoder decodeIntForKey:@"pileUpWindow"]];
     [self setExternalWindow:            [decoder decodeIntForKey:@"externalWindow"]];
     [self setClockSource:               [decoder decodeIntForKey:@"clockSource"]];
+    [self setClockPhase:                [decoder decodeIntForKey:@"clockPhase"]];
     [self setSpiConnector:              [decoder decodeObjectForKey:@"spiConnector"]];
     [self setLinkConnector:             [decoder decodeObjectForKey:@"linkConnector"]];
     [self setDownSample:				[decoder decodeIntForKey:@"downSample"]];
@@ -2528,6 +2668,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setNoiseFloorIntegrationTime:	[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
     [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
     [self setHistEMultiplier:			[decoder decodeIntForKey:@"histEMultiplier"]];
+    [self setForceFullInitCard:			[decoder decodeBoolForKey:@"forceFullInitCard"]];
 
     
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
@@ -2541,12 +2682,14 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
-		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
+        [self setForceFullInit:i withValue:[decoder decodeIntForKey:[@"forceFullInit"	    stringByAppendingFormat:@"%d",i]]];
+        [self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	    stringByAppendingFormat:@"%d",i]]];
 		[self setTrapEnabled:i	withValue:[decoder decodeIntForKey:[@"trapEnabled"	stringByAppendingFormat:@"%d",i]]];
 		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	    stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroEnabled:i withValue:[decoder decodeIntForKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPoleZeroMultiplier:i withValue:[decoder decodeIntForKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]]];
+		[self setBaselineRestoreEnabled:i withValue:[decoder decodeIntForKey:[@"baselineRestoreEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setPZTraceEnabled:i withValue:[decoder decodeIntForKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]]];
 		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
@@ -2559,12 +2702,10 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self setPrerecnt:i     withValue:[decoder decodeIntForKey:[@"prerecnt"     stringByAppendingFormat:@"%d",i]]];
 		[self setPostrecnt:i    withValue:[decoder decodeIntForKey:[@"postrecnt"    stringByAppendingFormat:@"%d",i]]];
 		[self setTpol:i         withValue:[decoder decodeIntForKey:[@"tpol"         stringByAppendingFormat:@"%d",i]]];
-		[self setPresumEnabled:i withValue:[decoder decodeIntForKey:[@"PresumEnabled"         stringByAppendingFormat:@"%d",i]]];
+		[self setPresumEnabled:i withValue:[decoder decodeIntForKey:[@"presumEnabled"         stringByAppendingFormat:@"%d",i]]];
         [self setEasySelected:i		withValue:[decoder decodeIntForKey:[@"easySelected"	    stringByAppendingFormat:@"%d",i]]];
 	}
     
-    [self registerNotificationObservers];
-
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -2581,6 +2722,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt:pileUpWindow                 forKey:@"pileUpWindow"];
     [encoder encodeInt:externalWindow               forKey:@"externalWindow"];
     [encoder encodeInt:clockSource                  forKey:@"clockSource"];
+    [encoder encodeInt:clockPhase                   forKey:@"clockPhase"];
     [encoder encodeObject:spiConnector				forKey:@"spiConnector"];
     [encoder encodeObject:linkConnector				forKey:@"linkConnector"];
     [encoder encodeInt:downSample					forKey:@"downSample"];
@@ -2592,15 +2734,18 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];
     [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
     [encoder encodeInt:histEMultiplier              forKey:@"histEMultiplier"];
+    [encoder encodeBool:forceFullInitCard           forKey:@"forceFullInitCard"];
     
 	int i;
  	for(i=0;i<kNumGretina4MChannels;i++){
-		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:forceFullInit[i]	forKey:[@"forceFullInit"		stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:trapEnabled[i]	forKey:[@"trapEnabled"  stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:debug[i]			forKey:[@"debug"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroEnabled[i] forKey:[@"poleZeroEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:poleZeroMult[i]  forKey:[@"poleZeroMult" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:baselineRestoreEnabled[i] forKey:[@"baselineRestoreEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:pzTraceEnabled[i] forKey:[@"pzTraceEnabled" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:ledThreshold[i]	forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
@@ -2629,49 +2774,66 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [objDictionary setObject:[NSNumber numberWithInt:collectionTime] forKey:@"Collection Time"];
     [objDictionary setObject:[NSNumber numberWithInt:integrateTime] forKey:@"Integration Time"];
     
-	[self addCurrentState:objDictionary cArray:(short*)enabled forKey:@"Enabled"];
-	[self addCurrentState:objDictionary cArray:(short*)trapEnabled forKey:@"Trap Enabled"];
-	[self addCurrentState:objDictionary cArray:(short*)debug forKey:@"Debug Mode"];
-	[self addCurrentState:objDictionary cArray:(short*)pileUp forKey:@"Pile Up"];
-	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
-	[self addCurrentState:objDictionary cArray:(short*)poleZeroEnabled forKey:@"Pole Zero Enabled"];
-	[self addCurrentState:objDictionary cArray:poleZeroMult forKey:@"Pole Zero Multiplier"];
-	[self addCurrentState:objDictionary cArray:(short*)pzTraceEnabled forKey:@"PZ Trace Enabled"];
-	[self addCurrentState:objDictionary cArray:mrpsrt forKey:@"Mrpsrt"];
-	[self addCurrentState:objDictionary cArray:ftCnt forKey:@"FtCnt"];
-	[self addCurrentState:objDictionary cArray:mrpsdv forKey:@"Mrpsdv"];
-	[self addCurrentState:objDictionary cArray:chpsrt forKey:@"Chpsrt"];
-	[self addCurrentState:objDictionary cArray:chpsdv forKey:@"Chpsdv"];
-	[self addCurrentState:objDictionary cArray:prerecnt forKey:@"Prerecnt"];
-	[self addCurrentState:objDictionary cArray:postrecnt forKey:@"Postrecnt"];
-	[self addCurrentState:objDictionary cArray:tpol forKey:@"TPol"];
-	[self addCurrentState:objDictionary cArray:(short*)presumEnabled forKey:@"PreSum Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)enabled       forKey:@"Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)forceFullInit forKey:@"forceFullInit"];
+	[self addCurrentState:objDictionary boolArray:(BOOL*)trapEnabled   forKey:@"Trap Enabled"];
+	[self addCurrentState:objDictionary boolArray:(BOOL*)debug         forKey:@"Debug Mode"];
+	[self addCurrentState:objDictionary boolArray:(BOOL*)pileUp        forKey:@"Pile Up"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)poleZeroEnabled forKey:@"Pole Zero Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)pzTraceEnabled forKey:@"PZ Trace Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)presumEnabled forKey:@"PreSum Enabled"];
+    [self addCurrentState:objDictionary boolArray:(BOOL*)baselineRestoreEnabled forKey:@"Baseline Restore Enabled"];
+
+	[self addCurrentState:objDictionary shortArray:triggerMode          forKey:@"Trigger Mode"];
+	[self addCurrentState:objDictionary shortArray:poleZeroMult         forKey:@"Pole Zero Multiplier"];
+	[self addCurrentState:objDictionary shortArray:mrpsrt               forKey:@"Mrpsrt"];
+	[self addCurrentState:objDictionary shortArray:ftCnt                forKey:@"FtCnt"];
+	[self addCurrentState:objDictionary shortArray:mrpsdv               forKey:@"Mrpsdv"];
+	[self addCurrentState:objDictionary shortArray:chpsrt               forKey:@"Chpsrt"];
+	[self addCurrentState:objDictionary shortArray:chpsdv               forKey:@"Chpsdv"];
+	[self addCurrentState:objDictionary shortArray:prerecnt             forKey:@"Prerecnt"];
+	[self addCurrentState:objDictionary shortArray:postrecnt            forKey:@"Postrecnt"];
+	[self addCurrentState:objDictionary shortArray:tpol                 forKey:@"TPol"];
 
     NSMutableArray* ar = [NSMutableArray array];
     int i;
-	for(i=0;i<kNumGretina4MChannels;i++){
-		[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
-	}
+	for(i=0;i<kNumGretina4MChannels;i++)[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
     [objDictionary setObject:ar forKey:@"LED Threshold"];
+    
+    [ar removeAllObjects];
+    for(i=0;i<kNumGretina4MChannels;i++)[ar addObject:[NSNumber numberWithLong:trapThreshold[i]]];
     [objDictionary setObject:ar forKey:@"TRAP Threshold"];
+    
     [objDictionary setObject:[NSNumber numberWithInt:downSample]        forKey:@"Down Sample"];
     [objDictionary setObject:[NSNumber numberWithInt:clockSource]       forKey:@"Clock Source"];
+    [objDictionary setObject:[NSNumber numberWithInt:clockPhase]        forKey:@"Clock Phase"];
     [objDictionary setObject:[NSNumber numberWithInt:histEMultiplier]   forKey:@"Hist E Multiplier"];
+    [objDictionary setObject:[NSNumber numberWithInt:forceFullInitCard] forKey:@"forceFullInitCard"];
 
 	
     return objDictionary;
 }
 
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey
+- (void) addCurrentState:(NSMutableDictionary*)dictionary shortArray:(short*)anArray forKey:(NSString*)aKey
 {
 	NSMutableArray* ar = [NSMutableArray array];
 	int i;
 	for(i=0;i<kNumGretina4MChannels;i++){
-		[ar addObject:[NSNumber numberWithShort:*anArray]];
-		anArray++;
+		[ar addObject:[NSNumber numberWithShort:anArray[i]]];
 	}
 	[dictionary setObject:ar forKey:aKey];
 }
+
+- (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray forKey:(NSString*)aKey
+{
+    NSMutableArray* ar = [NSMutableArray array];
+    int i;
+    for(i=0;i<kNumGretina4MChannels;i++){
+        [ar addObject:[NSNumber numberWithBool:anArray[i]]];
+    }
+    [dictionary setObject:ar forKey:aKey];
+}
+
 
 - (NSArray*) autoTests 
 {
@@ -2712,22 +2874,64 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     return readBack;
 }
 
+- (void) snapShotRegisters
+{
+    int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        snapShot[i] = [self readRegister:i];
+    }
+    
+    for(i=0;i<kNumberOfFPGARegisters;i++){        
+        fpgaSnapShot[i] = [self readFPGARegister:i];
+    }
+}
+
+- (void) compareToSnapShot
+{
+    NSLog(@"------------------------------------------------\n");
+    NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"offset   snapshot        newest\n");
+
+    int i;
+    for(i=0;i<kNumberOfGretina4MRegisters;i++){
+        unsigned long theValue = [self readRegister:i];
+        if(snapShot[i] != theValue){
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",register_information[i].offset,snapShot[i],theValue,register_information[i].name);
+ 
+        }
+    }
+    
+    for(i=0;i<kNumberOfFPGARegisters;i++){
+        unsigned long theValue = [self readFPGARegister:i];
+        if(fpgaSnapShot[i] != theValue){
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x != 0x%08x %@\n",register_information[i].offset,fpgaSnapShot[i],theValue,register_information[i].name);
+            
+        }
+    }
+    NSLog(@"------------------------------------------------\n");
+
+}
+
+
 - (void) dumpAllRegisters
 {
     NSLog(@"------------------------------------------------\n");
     NSLog(@"Register Values for Channel #1\n");
     int i;
     for(i=0;i<kNumberOfGretina4MRegisters;i++){
-        unsigned long theValue = 0;
-        [[self adapter] readLongBlock:&theValue
-							atAddress:[self baseAddress] + register_information[i].offset
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-       NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",register_information[i].offset,theValue,register_information[i].name);
+        unsigned long theValue = [self readRegister:i];
+        NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",register_information[i].offset,theValue,register_information[i].name);
+        snapShot[i] = theValue;
 
     }
     NSLog(@"------------------------------------------------\n");
+
+    for(i=0;i<kNumberOfFPGARegisters;i++){
+        unsigned long theValue = [self readFPGARegister:i];
+          NSLogFont([NSFont fontWithName:@"Monaco" size:10.0],@"0x%04x 0x%08x %@\n",fpga_register_information[i].offset,theValue,fpga_register_information[i].name);
+        
+        fpgaSnapShot[i] = theValue;
+    }
+
 }
 
 #pragma mark •••AdcProviding Protocol
@@ -3064,7 +3268,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         [fileQueue addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
 
-    fpgaFileMover = [[[ORFileMoverOp alloc] init] autorelease];
+    fpgaFileMover = [[ORFileMoverOp alloc] init];
     
     [fpgaFileMover setDelegate:self];
     

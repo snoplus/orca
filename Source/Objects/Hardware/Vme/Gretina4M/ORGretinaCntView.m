@@ -210,7 +210,7 @@
 
 - (void) setValues:(short)channel final:(BOOL)finalValues
 {
-	if(!finalValues)[[[NSApp delegate] undoManager] disableUndoRegistration];
+	if(!finalValues)[[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
     
     int ftCnt = 2048 - (postRisingEdgeBugX-b.origin.x)*2048/b.size.width;
     [[dataSource model] setFtCnt:channel withValue:ftCnt];
@@ -222,7 +222,7 @@
     [[dataSource model] setPrerecnt:channel withValue:preCnt];
 
     
-	if(!finalValues)[[[NSApp delegate] undoManager] enableUndoRegistration];
+	if(!finalValues)[[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
 #pragma mark ¥¥¥Archival
@@ -264,9 +264,9 @@
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     if(optionKeyDown){
         
-        float newPreRisingEdgeBugX;
-        float newRisingEdgeBugX;
-        float newPostRisingEdgeBugX;
+        float newPreRisingEdgeBugX = 0.0;
+        float newRisingEdgeBugX = 0.0;
+        float newPostRisingEdgeBugX = 0.0;
         
         if(movingPreRisingEdge){
             newPreRisingEdgeBugX   = localPoint.x;
@@ -315,9 +315,9 @@
 	NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
     if(optionKeyDown){
         
-        float newPreRisingEdgeBugX;
-        float newRisingEdgeBugX;
-        float newPostRisingEdgeBugX;
+        float newPreRisingEdgeBugX  = 0.0;
+        float newRisingEdgeBugX     = 0.0;
+        float newPostRisingEdgeBugX = 0.0;
         
         if(movingPreRisingEdge){
             newPreRisingEdgeBugX   = localPoint.x;

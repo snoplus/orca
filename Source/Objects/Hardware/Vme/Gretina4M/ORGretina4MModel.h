@@ -70,6 +70,20 @@
 #define kSPIClock	    0x4
 #define kSPIChipSelect	0x8
 #define kSPIRead        0x10
+#define kSDLockBit      (0x1<<17)
+#define kSDLostLockBit  (0x1<<24)
+
+enum {
+    kSerDesIdle,
+    kSerDesSetup,
+    kSetDigitizerClkSrc,
+    kFlushFifo,
+    kReleaseClkManager,
+    kPowerUpRTPower,
+    kSetMasterLogic,
+    kSetSDSyncBit,
+    kSerDesError,
+};
 
 #pragma mark •••Register Definitions
 enum {
@@ -188,16 +202,21 @@ enum Gretina4MFIFOStates {
 	unsigned long   dataId;
 	unsigned long   dataBuffer[kG4MDataPacketSize];
 
+    BOOL            forceFullInitCard;
     BOOL			enabled[kNumGretina4MChannels];
+    BOOL			forceFullInit[kNumGretina4MChannels];
     BOOL			trapEnabled[kNumGretina4MChannels];
     BOOL			debug[kNumGretina4MChannels];
     BOOL			pileUp[kNumGretina4MChannels];
     BOOL            poleZeroEnabled[kNumGretina4MChannels];
+    BOOL            baselineRestoreEnabled[kNumGretina4MChannels];
     BOOL			pzTraceEnabled[kNumGretina4MChannels];
     BOOL			presumEnabled[kNumGretina4MChannels];
     short			triggerMode[kNumGretina4MChannels];
+    BOOL			easySelected[kNumGretina4MChannels];
+    
     int				ledThreshold[kNumGretina4MChannels];
-    short			trapThreshold[kNumGretina4MChannels];
+    unsigned long	trapThreshold[kNumGretina4MChannels];
     short           poleZeroMult[kNumGretina4MChannels];
     short			downSample;
     short			mrpsrt[kNumGretina4MChannels];
@@ -208,10 +227,10 @@ enum Gretina4MFIFOStates {
     short			prerecnt[kNumGretina4MChannels];
     short			postrecnt[kNumGretina4MChannels];
     short			tpol[kNumGretina4MChannels];
-    BOOL			easySelected[kNumGretina4MChannels];
     unsigned short  baselineRestoredDelay;
 
     short           clockSource;
+    short           clockPhase;
     short           externalWindow;
     short           noiseWindow;
     short           pileUpWindow;
@@ -262,9 +281,13 @@ enum Gretina4MFIFOStates {
 	unsigned long 	waveFormCount[kNumGretina4MChannels];
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
+    BOOL            locked;
     
     //------------------internal use only
     NSOperationQueue*	fileQueue;
+    int                 initializationState;
+    unsigned long       snapShot[kNumberOfGretina4MRegisters];
+    unsigned long       fpgaSnapShot[kNumberOfFPGARegisters];
 }
 
 - (id) init;
@@ -274,14 +297,16 @@ enum Gretina4MFIFOStates {
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
-- (void) registerNotificationObservers;
-- (void) runAboutToStart:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL) forceFullInitCard;
+- (void) setForceFullInitCard:(BOOL)aForceFullInitCard;
+- (short) initState;
+- (void) setInitState:(short)aState;
 - (short) histEMultiplier;
 - (void) setHistEMultiplier:(short)aHistEMultiplier;
 - (unsigned short) baselineRestoredDelay;
-- (void) setBaselineRestoredDelay:(unsigned short)aBaselineRestoredDelay;
+- (void) setBaselineRestoredDelay:(long)aBaselineRestoredDelay;
 - (NSString*) firmwareStatusString;
 - (void) setFirmwareStatusString:(NSString*)aFirmwareStatusString;
 - (short) integrateTime;
@@ -295,7 +320,9 @@ enum Gretina4MFIFOStates {
 - (short) externalWindow;
 - (void) setExternalWindow:(short)aExternalWindow;
 - (short) clockSource;
+- (short) clockPhase;
 - (void) setClockSource:(short)aClockMux;
+- (void) setClockPhase:(short)aClockPhase;
 - (ORConnector*) spiConnector;
 - (void) setSpiConnector:(ORConnector*)aConnector;
 - (ORConnector*) linkConnector;
@@ -303,7 +330,7 @@ enum Gretina4MFIFOStates {
 - (short) downSample;
 - (void) setDownSample:(short)aDownSample;
 - (short) registerIndex;
-- (void) setRegisterIndex:(short)aRegisterIndex;
+- (void) setRegisterIndex:(int)aRegisterIndex;
 - (unsigned long) registerWriteValue;
 - (void) setRegisterWriteValue:(unsigned long)aWriteValue;
 - (unsigned long) spiWriteValue;
@@ -326,7 +353,9 @@ enum Gretina4MFIFOStates {
 
 // Register access
 - (NSString*) registerNameAt:(unsigned int)index;
+- (unsigned short) registerOffsetAt:(unsigned int)index;
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index;
+- (unsigned short) fpgaRegisterOffsetAt:(unsigned int)index;
 - (unsigned long) readRegister:(unsigned int)index;
 - (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
 - (BOOL) canReadRegister:(unsigned int)index;
@@ -357,17 +386,19 @@ enum Gretina4MFIFOStates {
 - (void) setNoiseWindow:(short)aNoiseWindow;
 - (short) noiseWindow;
 
+- (void) setForceFullInit:(short)chan withValue:(BOOL)aValue;
 - (void) setTriggerMode:(short)chan withValue:(short)aValue;
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
 - (void) setEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setTrapEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setPoleZeroEnabled:(short)chan withValue:(BOOL)aValue;
-- (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;		
+- (void) setBaselineRestoreEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setPoleZeroMultiplier:(short)chan withValue:(short)aValue;
 - (void) setPZTraceEnabled:(short)chan withValue:(BOOL)aValue;		
 - (void) setDebug:(short)chan withValue:(BOOL)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
 - (void) setThreshold:(short)chan withValue:(int)aValue;
-- (void) setTrapThreshold:(short)chan withValue:(int)aValue;
+- (void) setTrapThreshold:(short)chan withValue:(unsigned long)aValue;
 - (void) setMrpsrt:(short)chan withValue:(short)aValue;
 - (void) setFtCnt:(short)chan withValue:(short)aValue;
 - (void) setMrpsdv:(short)chan withValue:(short)aValue;
@@ -378,17 +409,22 @@ enum Gretina4MFIFOStates {
 - (void) setTpol:(short)chan withValue:(short)aValue;
 - (void) setPresumEnabled:(short)chan withValue:(BOOL)aValue;
 - (void) setEasySelected:(short)chan withValue:(BOOL)aValue;
+- (void) writeClockPhase;
+- (void) writeClockPhaseWithValue:(unsigned long)value;
+
 
 - (BOOL) enabled:(short)chan;
+- (BOOL) forceFullInit:(short)chan;
 - (BOOL) trapEnabled:(short)chan;
 - (BOOL) poleZeroEnabled:(short)chan;
+- (BOOL) baselineRestoreEnabled:(short)chan;
 - (short) poleZeroMult:(short)chan;
 - (BOOL) pzTraceEnabled:(short)chan;
 - (BOOL) debug:(short)chan;		
 - (BOOL) pileUp:(short)chan;		
 - (short) triggerMode:(short)chan;
 - (int) ledThreshold:(short)chan;	
-- (int) trapThreshold:(short)chan;
+- (unsigned long) trapThreshold:(short)chan;
 - (short) mrpsrt:(short)chan;
 - (short) ftCnt:(short)chan;
 - (short) mrpsdv:(short)chan;
@@ -408,6 +444,7 @@ enum Gretina4MFIFOStates {
 - (void) setNoiseWindowConverted:(float)aValue;
 - (void) setExternalWindowConverted:(float)aValue;
 - (void) setPileUpWindowConverted:(float)aValue;
+- (void) setBLRDelayConverted:(float)aValue;
 - (void) setExtTrigLengthConverted:(float)aValue;
 - (void) setCollectionTimeConverted:(float)aValue;
 - (void) setIntegrateTimeConverted:(float)aValue;
@@ -415,11 +452,14 @@ enum Gretina4MFIFOStates {
 - (float) noiseWindowConverted;
 - (float) externalWindowConverted;
 - (float) pileUpWindowConverted;
+- (float) BLRDelayConverted;
 - (float) extTrigLengthConverted;
 - (float) collectionTimeConverted;
 - (float) integrateTimeConverted;
 
 - (void) dumpAllRegisters;
+- (void) snapShotRegisters;
+- (void) compareToSnapShot;
 
 #pragma mark •••Hardware Access
 - (short) readBoardID;
@@ -427,11 +467,11 @@ enum Gretina4MFIFOStates {
 - (BOOL) checkFirmwareVersion:(BOOL)verbose;
 - (void) readFPGAVersions;
 - (void) resetBoard;
-- (void) resetDCM;
+- (void) resetClock;
 - (void) resetMainFPGA;
 - (void) resetFIFO;
+- (void) resetSingleFIFO;
 - (void) initBoard;
-- (void) initSerDes;
 - (unsigned long) readControlReg:(short)channel;
 - (void) writeControlReg:(short)channel enabled:(BOOL)enabled;
 - (void) writeClockSource: (unsigned long) clocksource;
@@ -497,7 +537,8 @@ enum Gretina4MFIFOStates {
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary shortArray:(short*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray forKey:(NSString*)aKey;
 
 #pragma mark •••AutoTesting
 - (NSArray*) autoTests;
@@ -512,6 +553,14 @@ enum Gretina4MFIFOStates {
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan;
 - (unsigned short) gainForDisplay:(unsigned short) aChan;
 
+- (BOOL) isLocked;
+- (BOOL) locked;
+- (void) setLocked:(BOOL)aState;
+
+#pragma mark •••Internal Use only
+- (void) stepSerDesInit;
+- (NSString*) serDesStateName;
+
 @end
 
 @interface NSObject (Gretina4M)
@@ -525,6 +574,7 @@ extern NSString* ORGretina4MModelBaselineRestoredDelayChanged;
 extern NSString* ORGretina4MModelFirmwareStatusStringChanged;
 extern NSString* ORGretina4MNoiseWindowChanged;
 extern NSString* ORGretina4MClockSourceChanged;
+extern NSString* ORGretina4MClockPhaseChanged;
 extern NSString* ORGretina4MIntegrateTimeChanged;
 extern NSString* ORGretina4MCollectionTimeChanged;
 extern NSString* ORGretina4MExtTrigLengthChanged;
@@ -542,11 +592,14 @@ extern NSString* ORGretina4MFpgaFilePathChanged;
 extern NSString* ORGretina4MNoiseFloorIntegrationTimeChanged;
 extern NSString* ORGretina4MNoiseFloorOffsetChanged;
 
+extern NSString* ORGretina4MForceFullInitCardChanged;
+extern NSString* ORGretina4MForceFullInitChanged;
 extern NSString* ORGretina4MEnabledChanged;
 extern NSString* ORGretina4MTrapEnabledChanged;
 extern NSString* ORGretina4MDebugChanged;
 extern NSString* ORGretina4MPileUpChanged;
 extern NSString* ORGretina4MPoleZeroEnabledChanged;
+extern NSString* ORGretina4MBaselineRestoreEnabledChanged;
 extern NSString* ORGretina4MPoleZeroMultChanged;
 extern NSString* ORGretina4MPZTraceEnabledChanged;
 extern NSString* ORGretina4MTriggerModeChanged;
@@ -572,4 +625,6 @@ extern NSString* ORGretina4MTpolChanged;
 extern NSString* ORGretina4MPresumEnabledChanged;
 extern NSString* ORGretina4MEasySelectedChanged;
 extern NSString* ORGretina4MModelHistEMultiplierChanged;
-
+extern NSString* ORGretina4MModelInitStateChanged;
+extern NSString* ORGretina4MForceFullInitCardChanged;
+extern NSString* ORGretina4MLockChanged;

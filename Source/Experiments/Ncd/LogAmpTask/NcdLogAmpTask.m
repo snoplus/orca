@@ -91,14 +91,14 @@
         [stepTask setStartIsDelayed:NO];
     }       
     startedStepTask = NO;
-    NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
         thePDSModel = [objects objectAtIndex:0];
         pdsMemento = [[thePDSModel memento] retain];  //save the old values
         [thePDSModel setDisableForPulser:YES];
     }
 	
-    objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
+    objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         thePulserModel = [objects objectAtIndex:0];
         pulserMemento = [[thePulserModel memento] retain];

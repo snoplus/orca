@@ -202,8 +202,24 @@
     NSString* name = [model outletName:chan];
     if([name length]!=0)s1 = [s1 stringByAppendingFormat:@"\n\n(Description: %@)",name];
     
-    NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:chan],@"chan", nil] retain]; //release in confirmDidFinish()
     
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Turn %@ #%d",state?@"OFF":@"ON",chan]];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        int state = [model outletStatus:chan];
+        if(result == NSAlertSecondButtonReturn){
+            if(state)[model turnOffOutlet:chan];
+            else     [model turnOnOutlet:chan];
+        }
+
+    }];
+#else
+    NSDictionary* context = [[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:chan],@"chan", nil] retain]; //release in confirmDidFinish()
     NSBeginAlertSheet(s1,
                       [NSString stringWithFormat:@"YES/Turn %@ #%d",state?@"OFF":@"ON",chan],
 					  @"Cancel",
@@ -213,9 +229,11 @@
 					  nil,
 					  context, 
 					  @"");
+#endif
 }
-    
 
+
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     int chan  = [[userInfo objectForKey:@"chan"] intValue];
@@ -226,7 +244,7 @@
     }
     [userInfo release];
 }
-
+#endif
 
 
 - (IBAction) pollNowButtonAction:(id)sender
@@ -256,10 +274,8 @@
     self = [super initWithFrame:frame];
     if (self) {
 		onLight = [[ORDotImage bigDotWithColor:[NSColor greenColor]] retain];
-		[onLight setScalesWhenResized:YES];
 		[onLight setSize:NSMakeSize(15,15)];
 		offLight = [[ORDotImage bigDotWithColor:[NSColor redColor]] retain];
-		 [offLight setScalesWhenResized:YES];
 		 [offLight setSize:NSMakeSize(15,15)];
    }
     return self;

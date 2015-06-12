@@ -9,9 +9,11 @@ void comment();
 void singleLineComment();
 void grabString();
 void yyreset_state();
+char escapedCharacterInString(char c);
 long num_lines = 1;
 extern NSMutableArray* nodeList;
 extern NSMutableArray* functionList;
+static NSDictionary* map_dict = nil;
 %}
 
 D			[0-9]
@@ -78,6 +80,7 @@ E			[Ee][+-]?{D}+
 "do"			return DO;
 "while"         return WHILE;
 "for"			return FOR;
+"in"			return IN;
 "if"            return IF;
 "unless"        return UNLESS;
 "switch"        return SWITCH;
@@ -94,6 +97,7 @@ E			[Ee][+-]?{D}+
 "continue"		return CONTINUE;
 "return"		return RETURN;
 "sleep"			return SLEEP;
+"yield"			return YIELD;
 "waituntil"		return WAITUNTIL;
 "waitUntil"		return WAITUNTIL;
 "hex"			return HEX;
@@ -112,6 +116,7 @@ E			[Ee][+-]?{D}+
 "nsdictionary"	return NSDICTIONARY;
 "nsdatecomponents"  return NSDATECOMPONENTS;
 "nsarray"		return NSARRAY;
+"nsexception"	return MAKEEXCEPTION;
 "time"			return TIME;
 "sci"			return SCI;
 "fixed"			return FIXED;
@@ -126,6 +131,10 @@ E			[Ee][+-]?{D}+
 "show"              return SHOW;
 "seedRandom"        return SEEDRANDOM;
 "random"            return RANDOM;
+"try"               return TRY;
+"catch"             return CATCH;
+"finally"           return FINALLY;
+"throw"             return THROW;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);
@@ -162,10 +171,21 @@ void grabString()
 {
 	int i=0;
 	char c;
-	while ((c = input()) != '"'){
+    bool slash_seen = false;
+	while ((c = input()) != '"' || slash_seen) {
+        if (slash_seen) {
+            // If we saw a slash last time, get the correct escaped character.
+            c = escapedCharacterInString(c);
+            slash_seen = false;
+        } else {
+            // Check if the current character is a slash
+            slash_seen = (c == '\\');
+            // If we saw an escape slash, cycle to the next output.
+            if (slash_seen) continue;
+        }
 		OrcaScriptlval.cString[i++] = c;
-		if(i>1022){
-			NSLog(@"<line %d> String too long. Truncated to length 1024\n",num_lines);
+		if(i>sizeof(OrcaScriptlval)-2){
+			NSLog(@"<line %d> String too long. Truncated to length %d\n",num_lines,sizeof(OrcaScriptlval));
 			break;
 		}
 	}
@@ -207,4 +227,45 @@ void yyreset_state()
 	[functionList release];
 	functionList = nil;
 	BEGIN(INITIAL);
+}
+
+char escapedCharacterInString(char c)
+{
+    if (!map_dict) {
+        /*
+        map_dict = [@{
+            @"a" : @"\a",
+            @"b" : @"\b",
+            @"f" : @"\f",
+            @"n" : @"\n",
+            @"r" : @"\r",
+            @"t" : @"\t",
+            @"v" : @"\v",
+            @"\\" : @"\\",
+            @"\"" : @"\"",
+            @"\'" : @"\'",
+            @"\\" : @"\\",
+            @"\?" : @"\?"
+        } retain];
+*/
+        map_dict = [[NSDictionary dictionaryWithObjectsAndKeys:
+        @"\a", @"a",
+        @"\b", @"b",
+        @"\f" , @"f",
+        @"\n" , @"n",
+        @"\r" , @"r",
+        @"\t" , @"t",
+        @"\v" , @"v",
+        @"\\" , @"\\",
+        @"\"" , @"\"",
+        @"\'" , @"\'",
+        @"\\" , @"\\",
+        @"\?" , @"\?",
+        nil
+        ] retain];
+    }
+    NSString* temp_str = [map_dict objectForKey:[NSString stringWithFormat:@"%c",c]];
+    if (!temp_str) return c;
+    return [temp_str characterAtIndex:0];
+
 }

@@ -55,9 +55,8 @@
 	int ident = dataPtr[1] & 0xfff;
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-	theString = [theString stringByAppendingFormat:@"%@\n",date];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+    theString = [theString stringByAppendingFormat:@"%@\n",date];
 	union {
 		float asFloat;
 		unsigned long asLong;

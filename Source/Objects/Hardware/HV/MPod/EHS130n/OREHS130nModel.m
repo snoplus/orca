@@ -63,36 +63,6 @@ NSString*  OREHS130nSettingsLock = @"OREHS130nSettingsLock";
     return 16;
 }
 
-- (NSArray*) channelUpdateList
-{
-	NSArray* channelReadParams = [NSArray arrayWithObjects:
-		@"outputStatus",
-		@"outputSwitch",
-		@"outputMeasurementSenseVoltage",	
-		@"outputMeasurementCurrent",	
-		//@"outputVoltage",
-		//@"outputCurrent",
-		nil];
-	NSArray* cmds = [self addChannelNumbersToParams:channelReadParams];
-	return cmds;
-}
-
-- (NSArray*) commonChannelUpdateList
-{
-	NSArray* cmds = nil;
-	if(commonParamQueryCount==0){
-		NSArray* channelReadParams = [NSArray arrayWithObjects:
-									  //@"outputVoltageRiseRate",
-									  @"outputMeasurementTemperature",	
-									  nil];
-		cmds = [self addChannel:0 toParams:channelReadParams];
-	}
-	commonParamQueryCount++;
-	if(commonParamQueryCount>60)commonParamQueryCount = 0;
-
-	return cmds;
-}
-
 - (NSArray*) wizardSelections
 {
     NSMutableArray* a = [NSMutableArray array];

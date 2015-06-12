@@ -23,7 +23,6 @@
 
 @class ORColorScale;
 @class ORSegmentGroup;
-@class OROpSequenceController;
 
 @interface MajoranaController : ORExperimentController {
  
@@ -51,9 +50,13 @@
     //items in the  subComponet tab view
     IBOutlet ORGroupView*   subComponentsView;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet OROpSequenceController* seqController0;
-    IBOutlet OROpSequenceController* seqController1;
 
+    IBOutlet NSTextField*   lastTimeCheckedField;
+    IBOutlet NSTableView*   module1InterlockTable;
+    IBOutlet NSTableView*   module2InterlockTable;
+    IBOutlet NSTextField*   ignore1Field;
+    IBOutlet NSTextField*   ignore2Field;
+    
 	NSView *blankView;
     NSSize detectorSize;
     NSSize subComponentViewSize;
@@ -65,6 +68,7 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) updateLastConstraintCheck:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote;
 - (void) secondaryMapFileChanged:(NSNotification*)aNote;
@@ -77,7 +81,9 @@
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote;
 - (void) setDetectorTitle;
 - (void) viewTypeChanged:(NSNotification*)aNote;
-
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 #pragma mark ***Actions
 - (IBAction) ignorePanicOnBAction:(id)sender;
 - (IBAction) ignorePanicOnAAction:(id)sender;
@@ -88,6 +94,8 @@
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) autoscaleSecondayColorScale:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) resetInterLocksOnModule0:(id)sender;
+- (IBAction) resetInterLocksOnModule1:(id)sender;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 

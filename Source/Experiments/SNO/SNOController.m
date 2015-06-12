@@ -43,6 +43,7 @@
 
 - (void) dealloc
 {
+    [blankView release];
     [super dealloc];
 }
 
@@ -188,9 +189,9 @@
 //Run control action
 - (void) findRunControl
 {
-	runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRunModel,1"];
+	runControl = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORRunModel,1"];
 	if(!runControl){
-        runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
+        runControl = [[(ORAppDelegate*)[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
 	}
 	[self updateRunInfo:nil];
     [self getRunTypes];

@@ -421,11 +421,10 @@
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"time"]){
 				unsigned long theTime = [model timeMeasured:rowIndex];
-				NSCalendarDate* theDate;
+				NSDate* theDate;
 				if(theTime){
-					theDate = [NSCalendarDate dateWithTimeIntervalSince1970:theTime];
-					[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-					return theDate;
+					theDate = [NSDate dateWithTimeIntervalSince1970:theTime];
+					return [theDate description];
 				}
 				else return @"--";
 			}

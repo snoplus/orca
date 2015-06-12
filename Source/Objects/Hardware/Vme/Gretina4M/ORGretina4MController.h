@@ -39,13 +39,18 @@
 	IBOutlet   NSTextField* extTrigLengthField;
 	IBOutlet   NSTextField* pileUpWindowField;
 	IBOutlet   NSTextField* externalWindowField;
+	IBOutlet   NSTextField* clockLockedField;
 
     //basic ops page
-	IBOutlet NSMatrix*		enabledMatrix;
+    IBOutlet NSMatrix*		enabledMatrix;
+    IBOutlet NSMatrix*		forceFullInitMatrix;
+    IBOutlet NSButton*      forceFullInitCardButton;
+    
 	IBOutlet NSMatrix*		trapEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroTauMatrix;
 	IBOutlet NSMatrix*		pzTraceEnabledMatrix;
+    IBOutlet NSMatrix*      baselineRestoreEnabledMatrix;
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		presumEnabledMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
@@ -62,9 +67,11 @@
 	IBOutlet NSMatrix*		easySelectMatrix;
 
     IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSPopUpButton* clockPhasePU;
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
+    IBOutlet NSButton*      fullInitButton;
     IBOutlet NSButton*      initButton1;
     IBOutlet NSButton*      resetButton;
     IBOutlet NSButton*      clearFIFOButton;
@@ -105,10 +112,15 @@
 	IBOutlet NSTextField*	spiWriteValueField;
 	IBOutlet NSButton*		writeSPIButton;
 	IBOutlet NSButton*		dumpAllRegistersButton;
+	IBOutlet NSButton*		snapShotRegistersButton;
+	IBOutlet NSButton*		compareRegistersButton;
 	
     IBOutlet NSButton*		diagnosticsEnabledCB;
     IBOutlet NSButton*		diagnosticsReportButton;
     IBOutlet NSButton*		diagnosticsClearButton;
+    
+    IBOutlet NSTextField*	initSerDesStateField;
+    IBOutlet NSTextField*   lockStateField;
     
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
@@ -146,6 +158,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) updateClockLocked;
 - (void) histEMultiplierChanged:(NSNotification*)aNote;
 - (void) baselineRestoredDelayChanged:(NSNotification*)aNote;
 - (void) firmwareStatusStringChanged:(NSNotification*)aNote;
@@ -157,6 +170,8 @@
 - (void) chsrtChanged:(NSNotification*)aNote;
 - (void) prerecntChanged:(NSNotification*)aNote;
 - (void) postrecntChanged:(NSNotification*)aNote;
+- (void) forceFullInitChanged:(NSNotification*)aNote;
+- (void) forceFullInitCardChanged:(NSNotification*)aNote;
 
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) integrateTimeChanged:(NSNotification*)aNote;
@@ -165,6 +180,7 @@
 - (void) pileUpWindowChanged:(NSNotification*)aNote;
 - (void) externalWindowChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) clockPhaseChanged:(NSNotification*)aNote;
 - (void) downSampleChanged:(NSNotification*)aNote;
 - (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
@@ -182,6 +198,7 @@
 - (void) enabledChanged:(NSNotification*)aNote;
 - (void) trapEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroEnabledChanged:(NSNotification*)aNote;
+- (void) baselineRestoreEnabledChanged:(NSNotification*)aNote;
 - (void) poleZeroTauChanged:(NSNotification*)aNote;
 - (void) pzTraceEnabledChanged:(NSNotification*)aNote;
 - (void) presumEnabledChanged:(NSNotification*)aNote;
@@ -202,8 +219,12 @@
 - (void) spiWriteValueChanged:(NSNotification*)aNote;
 
 - (void) setRegisterDisplay:(unsigned int)index;
+- (void) initSerDesStateChanged:(NSNotification*) aNote;
 
 #pragma mark •••Actions
+- (IBAction) forceFullInitCardAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;              // is this repeated?
+- (IBAction) clockPhaseAction:(id)sender;
 - (IBAction) diagnosticsClearAction:(id)sender;
 - (IBAction) diagnosticsReportAction:(id)sender;
 - (IBAction) diagnosticsEnableAction:(id)sender;
@@ -214,13 +235,14 @@
 - (IBAction) extTrigLengthFieldAction:(id)sender;
 - (IBAction) pileUpWindowFieldAction:(id)sender;
 - (IBAction) externalWindowFieldAction:(id)sender;
-- (IBAction) clockSourceAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;              // is this repeated?
 - (IBAction) downSampleAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) readStatus:(id)sender;
 - (IBAction) resetBoard:(id)sender;
 - (IBAction) initBoardAction:(id)sender;
+- (IBAction) fullInitBoardAction:(id)sender;
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) findNoiseFloors:(id)sender;
@@ -240,7 +262,9 @@
 
 
 - (IBAction) enabledAction:(id)sender;
+- (IBAction) forceFullInitAction:(id)sender;
 - (IBAction) trapEnabledAction:(id)sender;
+- (IBAction) baselineRestoreEnabledAction:(id)sender;
 - (IBAction) poleZeroEnabledAction:(id)sender;
 - (IBAction) poleZeroTauAction:(id)sender;
 - (IBAction) pzTraceEnabledAction:(id)sender;
@@ -267,6 +291,8 @@
 - (IBAction) selectAllInEasySet:(id)sender;
 - (IBAction) selectNoneInEasySet:(id)sender;
 - (IBAction) histEMultiplierAction:(id)sender;
+- (IBAction) snapShotRegistersAction:(id)sender;
+- (IBAction) compareToSnapShotAction:(id)sender;
 
 
 #pragma mark •••Data Source

@@ -58,7 +58,6 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [col2Title release];
     [col1Title release];
     [col0Title release];
-    [col0Title release];
 	[calibration release];
 	[data release];
  	[roiSet release];
@@ -133,7 +132,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 {
   int nBins = [data count];
   if(nBins == 0) {
-    NSLogColor([NSColor redColor],@"Must call setHistogramBins before filling!");
+    NSLogColor([NSColor redColor],@"Must call setHistogramBins before filling!\n");
     return;
   }
   float xLow = [[self dataAtRow:0 column:0] floatValue];

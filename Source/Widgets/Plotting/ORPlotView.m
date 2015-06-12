@@ -29,7 +29,6 @@
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        [self setDelegate:nil];
 		[self setDefaults];
     }
     return self;
@@ -37,6 +36,7 @@
 
 - (void) dealloc
 {
+    delegate = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [plotArray release];
     [attributes release];
@@ -322,7 +322,7 @@
 	[[self xScale] drawMarkInFrame:[self bounds] usingColor:[NSColor blackColor]];
 	[[self yScale] drawMarkInFrame:[self bounds] usingColor:[NSColor blackColor]];
 		
-    if ( [self delegate] && [[self delegate] respondsToSelector:@selector(plotViewDidDraw:)] ) {
+    if ([[self delegate] respondsToSelector:@selector(plotViewDidDraw:)] ) {
         [[self delegate] plotViewDidDraw:self];
 	}
 	
@@ -520,7 +520,7 @@
 				float newXMax = [xScale getValAbs:MAX(currentDragXValue,startDragXValue)];
 				float newYMin = [yScale getValAbs:MIN(currentDragYValue,startDragYValue)];
 				float newYMax = [yScale getValAbs:MAX(currentDragYValue,startDragYValue)];
-				NSUndoManager* undoManager = [[NSApp delegate] undoManager];
+				NSUndoManager* undoManager = [(ORAppDelegate*)[NSApp delegate] undoManager];
 				[undoManager beginUndoGrouping];
 				[xScale	setRngLow:newXMin withHigh:newXMax];
 				[yScale	setRngLow:newYMin withHigh:newYMax];
@@ -610,6 +610,56 @@
 	else {
 		NSBeep();
 		NSLog(@"Sorry.. can't copy data from that plot\n");
+	}
+}
+
+- (IBAction) writeToFile:(id)sender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save Plot CSV Data As"];
+    [savePanel setCanCreateDirectories:YES];
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
+    [savePanel setNameFieldLabel:@"File Name:"];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [self savePlotDataAs:[[savePanel URL]path]];
+        }
+    }];
+}
+
+- (void) savePlotDataAs:(NSString*)aPath
+{
+	NSMutableString* string = [NSMutableString string];
+  	int maxPoints = 0;
+	BOOL allPlotsValid = YES;
+	for(id aPlot in plotArray){
+		if([aPlot respondsToSelector:@selector(numberPoints)]){
+			maxPoints = MAX(maxPoints,[aPlot numberPoints]);
+		}
+		if(![aPlot respondsToSelector:@selector(valueAsStringAtPoint:)]){
+			allPlotsValid = NO;
+			break;
+		}
+	}
+	if(allPlotsValid){
+		//make a string with the data
+		int i;
+		for(i=0;i<maxPoints;i++){
+			[string appendFormat:@"%d",i];
+			for(id aPlot in plotArray){
+				NSString* theValueAsString = [aPlot valueAsStringAtPoint:i];
+				[string appendFormat:@",%@",theValueAsString];
+			}
+			[string appendFormat:@"\n"];
+		}
+		
+		if([string length]){
+            [string writeToFile:aPath atomically:NO encoding:NSASCIIStringEncoding error:nil];
+		}
+	}
+	else {
+		NSBeep();
+		NSLog(@"Sorry.. can't write data from that plot\n");
 	}
 }
 

@@ -38,6 +38,7 @@
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
+- (void) openPortIfNeeded;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

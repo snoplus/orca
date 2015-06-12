@@ -25,9 +25,11 @@
 #import "ORCompositePlotView.h"
 #import "ORTimeSeriesPlot.h"
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ObjWithHistoryController (private)
 - (void) _deleteHistorySheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ObjWithHistoryController
 
@@ -144,6 +146,20 @@
 
 - (IBAction) deleteHistory:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clear History"];
+    [alert setInformativeText:@"Really clear history? You will not be able to undo this."];
+    [alert addButtonWithTitle:@"YES/Clear History"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model deleteHistory];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"Clear History",
                       @"Cancel",
                       @"Yes/Clear History",
@@ -152,10 +168,12 @@
                       @selector(_deleteHistorySheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Really clear history? You will not be able to undo this.");
+#endif
 }
 
 @end
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ObjWithHistoryController (private)
 - (void) _deleteHistorySheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
@@ -164,3 +182,4 @@
     }
 }
 @end
+#endif

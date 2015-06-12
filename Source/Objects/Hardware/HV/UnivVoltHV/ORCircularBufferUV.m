@@ -18,17 +18,13 @@ NSString* CBeValue		= @"Value";
     mTailIndex = 0;
 	mHeadIndex = 0;
 	mFWrapped = NO;
-	[mKeys retain];
-	
-	// what is going on.
-	[mKeys retain];
-	
+		
     return self;
 }
 
 - ( void ) dealloc
 {
-	[mStorageArray dealloc];
+	[mStorageArray release];
 	[super dealloc];
 }
 
@@ -46,16 +42,11 @@ NSString* CBeValue		= @"Value";
 	return( [mStorageArray count] );
 }
 
-- ( NSArray *) mKeys
-{
-	return( mKeys );
-}
-
 - (void) insertHVEntry: (NSDate *) aDateOfAquistion hvValue: (NSNumber*) anHVEntry
 {
 	@try
 	{
-		NSLog( @"Date: %@, HV Value: %@\n", aDateOfAquistion, anHVEntry );
+		NSLog( @"Date: %@, HV Value: %@\n", [aDateOfAquistion stdDescription], anHVEntry );
 //	NSNumber* numObj = [NSNumber numberWithFloat: anHVEntry];
 //	NSLog( @"Number: %@\n", numObj );
 		NSArray* tmpTimePoint = [NSArray arrayWithObjects: aDateOfAquistion, anHVEntry, nil];

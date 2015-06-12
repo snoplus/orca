@@ -132,7 +132,7 @@
 			[[model crate]  doNoPowerAlert:localException action:[NSString stringWithFormat:@"Init"]];
 		}
 		else {
-			NSRunAlertPanel([localException name], @"%@\n", @"OK", nil, nil,
+			ORRunAlertPanel([localException name], @"%@\n", @"OK", nil, nil,
 							[localException name]);
 		}
     }
@@ -191,7 +191,7 @@
         [[model crate]  doNoPowerAlert:anException action:[NSString stringWithFormat:@"%@ (F%d)",name,i]];
     }
     else {
-        NSRunAlertPanel([anException name], @"%@\n%@ (F%d)", @"OK", nil, nil,
+        ORRunAlertPanel([anException name], @"%@\n%@ (F%d)", @"OK", nil, nil,
                         [anException name],name,i);
     }
 }

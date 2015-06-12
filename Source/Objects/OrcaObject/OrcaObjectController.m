@@ -46,10 +46,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (void) awakeFromNib
 {
-	//   commented out this registerNotification because the registerNotification 
-	//   that is done in 'setMode' is sufficifient
-	//   [self registerNotificationObservers];
-     [self updateWindow];	
+    [super awakeFromNib];
 }
 
 - (void) close
@@ -198,12 +195,12 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 - (NSArray*) collectObjectsOfClass:(Class)aClass
 {
-	return [[[NSApp delegate] document] collectObjectsOfClass:aClass];
+	return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:aClass];
 }
 
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol
 {
-	return [[[NSApp delegate] document] collectObjectsConformingTo:aProtocol];
+	return [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsConformingTo:aProtocol];
 }
 
 - (IBAction) printDocument:(id)sender
@@ -213,7 +210,6 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     NSView*     borderView   = [[[self window] contentView] superview];
     NSData*     pdfData		 = [borderView dataWithPDFInsideRect: cRect];
     NSImage*    tempImage = [[NSImage alloc] initWithData: pdfData];
-	[tempImage setScalesWhenResized:YES];
 	
 	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSSize imageSize = [tempImage size];
@@ -250,7 +246,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) incModelSortedBy:(SEL)aSelector
 {
 	[self endEditing];
-	NSMutableArray* allModels = [[[[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
+	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
 	int index = [allModels indexOfObject:model] + 1;
 	if(index>[allModels count]-1) index = 0;
@@ -261,7 +257,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) decModelSortedBy:(SEL)aSelector
 {
 	[self endEditing];
-	NSMutableArray* allModels = [[[[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
+	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
 	int index = [allModels indexOfObject:model] - 1;
 	if(index<0) index = [allModels count]-1;
@@ -389,13 +385,13 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender
 {
-	[[[NSApp delegate] document] duplicateDialog:self];
+	[[(ORAppDelegate*)[NSApp delegate] document] duplicateDialog:self];
 }
 
 
 - (IBAction) incDialog:(id)sender
 {
-	NSArray* models = [self collectObjectsOfClass:[model class]];
+	NSArray* models = [[model guardian] collectObjectsOfClass:[model class]];
 	if([models count]>1){
 		NSEnumerator* e = [models objectEnumerator];
 		id obj;
@@ -411,7 +407,7 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 
 - (IBAction) decDialog:(id)sender
 {
-	NSArray* models = [self collectObjectsOfClass:[model class]];
+	NSArray* models = [[model guardian] collectObjectsOfClass:[model class]];
 	if([models count]>1){
 		NSEnumerator* e = [models reverseObjectEnumerator];
 		id obj;

@@ -35,9 +35,9 @@
     @private
         unsigned long 	runNumber;
 
-        NSCalendarDate* startTime;
-		NSCalendarDate* subRunStartTime;
-		NSCalendarDate* subRunEndTime;
+        NSDate* startTime;
+		NSDate* subRunStartTime;
+		NSDate* subRunEndTime;
         NSTimer* 		timer;
         NSTimer* 		heartBeatTimer;
 
@@ -95,6 +95,7 @@
 		NSThread* readoutThread;
     
         NSMutableArray* objectsRequestingStateChangeWait;
+        NSMutableArray* objectsRequestingRunStartAbort;
         int selectedRunTypeScript;
         int savedSelectedRunTypeScript;
 }
@@ -132,13 +133,13 @@
 - (unsigned long)   runNumber;
 - (void)	    setRunNumber:(unsigned long)aRunNumber;
 - (NSString*) startTimeAsString;
-- (NSCalendarDate*) subRunStartTime;
-- (void)	setSubRunStartTime:(NSCalendarDate*) aDate;
-- (NSCalendarDate*) subRunEndTime;
-- (void)	setSubRunEndTime:(NSCalendarDate*) aDate;
+- (NSDate*) subRunStartTime;
+- (void)	setSubRunStartTime:(NSDate*) aDate;
+- (NSDate*) subRunEndTime;
+- (void)	setSubRunEndTime:(NSDate*) aDate;
 - (NSString*) elapsedTimeString:(NSTimeInterval) aTimeInterval;
-- (NSCalendarDate*) startTime;
-- (void)	setStartTime:(NSCalendarDate*) aDate;
+- (NSDate*) startTime;
+- (void)	setStartTime:(NSDate*) aDate;
 - (NSTimeInterval)  elapsedRunTime;
 - (void)	setElapsedRunTime:(NSTimeInterval) aValue;
 - (NSTimeInterval)  elapsedSubRunTime;
@@ -208,6 +209,7 @@
 - (void) incrementTime:(NSTimer*)aTimer;
 - (void) sendHeartBeat:(NSTimer*)aTimer;
 
+- (void) addRunStartupAbort:(NSNotification*)aNote;
 - (void) addRunStateChangeWait:(NSNotification*)aNote;
 - (void) releaseRunStateChangeWait:(NSNotification*)aNote;
 - (void) needMoreTimeToStopRun:(NSNotification*)aNotification;

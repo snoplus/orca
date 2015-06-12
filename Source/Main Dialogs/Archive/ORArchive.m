@@ -88,7 +88,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 {
     if (object == queue && [keyPath isEqual:@"operations"]) {
         if ([[queue operations] count] == 0) {
-			[self performSelectorOnMainThread:@selector(resetStatusTimer) withObject:nil waitUntilDone:YES];
+			[self performSelectorOnMainThread:@selector(resetStatusTimer) withObject:nil waitUntilDone:NO];
         }
 		[self performSelectorOnMainThread:@selector(lockChanged:) withObject:nil waitUntilDone:NO];
 
@@ -134,7 +134,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 - (void) securityStateChanged:(NSNotification*)aNote
@@ -159,6 +159,42 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) updateWithSvn:(id)sender
 {
+    
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Full Update and Restart"];
+    [alert setInformativeText:@"Really do an Archive, SVN Update, Clean Build, and Restart?\n\nThis can take awhile."];
+    [alert addButtonWithTitle:@"Yes/Do It"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [self doTheSvnUpdate];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Full Update and Restart",
+                      @"Cancel",
+                      @"Yes/Do it",
+                      nil,[self window],
+                      self,
+                      @selector(_toggleSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Really do an Archive, SVN Update, Clean Build, and Restart?\n\nThis can take awhile.");
+#endif
+}
+
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) _toggleSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [self doTheSvnUpdate];
+    }
+}
+#endif
+- (void) doTheSvnUpdate
+{
 	[operationStatusField setTimeOut:1000];
 
 	NSFileManager* fm = [NSFileManager defaultManager];
@@ -173,27 +209,18 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 		[openPanel setAllowsMultipleSelection:NO];
 		[openPanel setPrompt:@"Choose ORCA Location"];
 
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
         [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
             if (result == NSFileHandlingPanelOKButton){
                 [self performSelector:@selector(deferedSvnUpdate:) withObject:[[openPanel URL] path] afterDelay:0];
             }
         }];
-#else 	
-		[openPanel beginSheetForDirectory: [@"~" stringByExpandingTildeInPath]
-									 file: nil
-									types: nil
-						   modalForWindow: [self window]
-							modalDelegate: self
-						   didEndSelector: @selector(updateWithSvnPanelDidEnd:returnCode:contextInfo:)
-							  contextInfo: NULL];
-#endif
+
 	}
 }
 
 - (void) deferedSvnUpdate:(NSString *)anUpdatePath
 {
-	[[[NSApp delegate] document] saveDocument:self];
+	[[(ORAppDelegate*)[NSApp delegate] document] saveDocument:self];
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 	}
@@ -209,11 +236,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	ORBuildOrcaOp* aBuildOp = [[ORBuildOrcaOp alloc] initAtPath:anUpdatePath delegate:self];
 	[queue addOperation:aBuildOp];
 	[aBuildOp release];
-	NSString* aPath;
     
-	if([[ORArchive sharedArchive] deploymentVersion])aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Deployment/Orca.app/Contents/MacOS/Orca"];
-    else aPath = [anUpdatePath stringByAppendingPathComponent:@"build/Development/Orca.app/Contents/MacOS/Orca"];
-	[self restart:aPath];
+    [self restart:launchPath()];
 }
 
 - (IBAction) lockAction:(id)sender
@@ -223,12 +247,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction) archiveThisOrca:(id)sender
@@ -253,22 +277,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Choose"];
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.7-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:[kOldBinaryPath stringByExpandingTildeInPath]]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [self performSelector:@selector(deferedStartOldOrca:) withObject:[[openPanel URL] path] afterDelay:0];
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory: [kOldBinaryPath stringByExpandingTildeInPath]
-								 file: nil
-								types: nil
-					   modalForWindow: [self window]
-						modalDelegate: self
-					   didEndSelector: @selector(startOldOrcaPanelDidEnd:returnCode:contextInfo:)
-						  contextInfo: NULL];
-#endif
+
 }
 
 - (void) updateStatus:(NSString*)aString
@@ -278,7 +293,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) deferedStartOldOrca:(NSString*)anOldOrcaPath
 {
-	[[[NSApp delegate] document] saveDocument:self];
+	[[(ORAppDelegate*)[NSApp delegate] document] saveDocument:self];
 	if([self checkOldBinariesFolder]){
 		[self archiveCurrentBinary];
 		[self unArchiveBinary:anOldOrcaPath];
@@ -364,20 +379,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 	[self restart:binPath config:nil];
 }
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific 
-- (void) updateWithSvnPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self performSelector:@selector(deferedSvnUpdate:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
-    }
-}
-- (void) startOldOrcaPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self performSelector:@selector(deferedStartOldOrca:) withObject:[[sheet filenames] objectAtIndex:0] afterDelay:0];
-    }
-}
-#endif
 
 @end
 
@@ -448,7 +449,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 
 - (void) main
 {
-	if(![[NSApp delegate] configLoadedOK]){
+	if(![(ORAppDelegate*)[NSApp delegate] configLoadedOK]){
 		NSLog(@"You currently do not have a valid config. It was NOT archived.\n");
 		return;
 	}
@@ -463,7 +464,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				NSLogColor([NSColor redColor], @"%@\n",error);
 			}
 		}
-		NSString* currentConfigPath = [[[[NSApp delegate] document] fileURL] path];
+		NSString* currentConfigPath = [[[(ORAppDelegate*)[NSApp delegate] document] fileURL] path];
 		if([fm copyItemAtPath:currentConfigPath toPath:archivePath error:&error]){
 			NSLog(@"Copied %@ to %@\n", currentConfigPath,archivePath);
 		}
@@ -556,29 +557,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Archive);
 				newLocation = nil;
 			}
 		}
-		
-
-   
-		NSTask* task = [[NSTask alloc] init];
-        NSLog(@"Restarting: %@\n",binPath);
-		[task setCurrentDirectoryPath:[[binPath stringByExpandingTildeInPath] stringByDeletingLastPathComponent]];
-		[task setLaunchPath: binPath];
-    
-		NSArray* arguments = [NSArray arrayWithObjects: @"-startup",@"Kill", nil];
-		if(configFile){
-			arguments = [arguments arrayByAddingObjectsFromArray:[NSArray arrayWithObjects: @"-config",newLocation, nil]];
-		}
-        
-		[task setArguments: arguments];
-		
-		[delegate updateStatus:@"Relaunching"];
-		[task launch];
-		[task release];
-		[NSApp terminate:self];
+        //euthanize self and restart. Use main thread
+        [(ORAppDelegate*)[NSApp delegate] restart:self withConfig:configFile];
 	}
 	@catch(NSException* e){
 	}
 }
+
 @end
 
 @interface NSObject (ORUpdateCenter)

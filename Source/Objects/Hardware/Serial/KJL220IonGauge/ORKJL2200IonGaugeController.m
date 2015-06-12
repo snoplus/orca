@@ -340,11 +340,10 @@
 		[smallPressureField setStringValue:@"OFF"];
 	}
 	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
+	NSDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
+		theDate = [NSDate dateWithTimeIntervalSince1970:t];
+        [timeField setObjectValue:[theDate description]];
 	}
 	else [timeField setObjectValue:@"--"];
 }

@@ -158,7 +158,7 @@
 	}
 	@catch (NSException* localException){
         NSLog(@"Reset of CV785 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed CV785 Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed CV785 Reset", @"OK", nil, nil,
                         localException);
 	}
 }

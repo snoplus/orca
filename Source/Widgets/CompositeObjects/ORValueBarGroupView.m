@@ -52,6 +52,10 @@
 {
 	return YES;
 }
+- (NSArray*) valueBars
+{
+    return valueBars;
+}
 
 - (void) setNumber:(int)n height:(float)aHeight spacing:(float)aSpacing
 {	

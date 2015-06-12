@@ -38,6 +38,7 @@
 #define kDesignUploadDone   @"kDesignUploadDone"
 
 #define kCouchDBPort 5984
+#define kCouchDBSubmitHeartbeatsPeriod 10
 
 NSString* ORCouchDBListenerModelDatabaseListChanged    = @"ORCouchDBListenerModelDatabaseListChanged";
 NSString* ORCouchDBListenerModelListeningChanged       = @"ORCouchDBListenerModelListeningChanged";
@@ -53,6 +54,8 @@ NSString* ORCouchDBListenerModelListeningStatusChanged = @"ORCouchDBListenerMode
 NSString* ORCouchDBListenerModelHeartbeatChanged       = @"ORCouchDBListenerModelHeartbeatChanged";
 NSString* ORCouchDBListenerModelUpdatePathChanged      = @"ORCouchDBListenerModelUpdatePathChanged";
 NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerModelStatusLogAppended";
+NSString* ORCouchDBListenerModelListenOnStartChanged   = @"ORCouchDBListenerModelListenOnStartChanged";
+NSString* ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged = @"ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged";
 
 @interface ORCouchDBListenerModel (private)
 - (void) _uploadCmdDesignDocument;
@@ -63,6 +66,7 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
 - (void) _uploadAllSections;
 - (BOOL) checkSyntax:(NSString*) key;
 - (id) _convertInvocationReturn:(NSInvocation*)inv;
+- (void) _saveHeartbeat;
 - (ORCouchDB*) statusDBRef:(NSString*)db_name;
 - (ORCouchDB*) statusDBRef;
 @end
@@ -165,13 +169,13 @@ NSString* ORCouchDBListenerModelStatusLogAppended      = @"ORCouchDBListenerMode
         [self log:message];
         NSMutableDictionary* returnDic = [NSMutableDictionary dictionaryWithDictionary:doc];
         NSMutableDictionary* response = [NSMutableDictionary dictionaryWithObjectsAndKeys:message,@"content",
-                                         [[NSDate date] description],@"timestamp",returnVal,@"return",
+                                         [[NSDate date] stdDescription],@"timestamp",returnVal,@"return",
                                          nil];
         if (ok) [response setObject:[NSNumber numberWithBool:ok] forKey:@"ok"];
         [returnDic setObject:response forKey:@"response"];
-        [[self statusDBRef] updateDocument:returnDic
-                                documentId:[returnDic objectForKey:@"_id"]
-                                       tag:nil];
+        [[self statusDBRef:updatePath] addDocument:returnDic
+                                        documentId:[returnDic objectForKey:@"_id"]
+                                               tag:nil];
     }
 }
 
@@ -256,6 +260,17 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     HANDLE_NUMBER_TYPE(UnsignedLongLong, unsigned long long)
     HANDLE_NUMBER_TYPE(UnsignedShort, unsigned short)
     return [NSNull null];
+}
+
+- (void) _saveHeartbeat
+{
+    if (![self isListening] || !saveHeartbeatsWhileListening) return;
+    [[self statusDBRef:updatePath] addDocument:[NSDictionary dictionaryWithObjectsAndKeys:@"heartbeat",@"type",nil]
+                                           tag:@""];
+
+    [self performSelector:@selector(_saveHeartbeat)
+               withObject:self
+               afterDelay:kCouchDBSubmitHeartbeatsPeriod];
 }
 
 @end
@@ -472,11 +487,36 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelHeartbeatChanged object:self];
 }
 
+- (void) setSaveHeartbeatsWhileListening:(BOOL)save
+{
+    if (saveHeartbeatsWhileListening == save) return;
+    saveHeartbeatsWhileListening = save;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged
+                                                                        object:self];
+}
+
+- (BOOL) saveHeartbeatsWhileListening
+{
+    return saveHeartbeatsWhileListening;
+}
+
 
 //Command Section
 - (void) setCommonMethods:(BOOL)only
 {
     commonMethodsOnly=only;
+}
+
+- (BOOL) listenOnStart
+{
+    return listenOnStart;
+}
+- (void) setListenOnStart:(BOOL)alist
+{
+    if (alist == listenOnStart) return;
+    listenOnStart = alist;
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListenOnStartChanged
+                                                                        object:self];
 }
 
 - (NSArray*) objectList
@@ -527,6 +567,9 @@ if (strcmp(@encode(atype), the_type) == 0)     \
                                                         tag:kChangesfeed
                                                      filter:@"orcacommand/execute_commands"] retain];
     [runningChangesfeed addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
+    if (saveHeartbeatsWhileListening) {
+        [self performSelectorOnMainThread:@selector(_saveHeartbeat) withObject:self waitUntilDone:NO];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORCouchDBListenerModelListeningChanged object:self];
 }
 
@@ -791,8 +834,13 @@ if (strcmp(@encode(atype), the_type) == 0)         \
     [self setUserName:[decoder decodeObjectForKey:@"userName"]];
     [self setPassword:[decoder decodeObjectForKey:@"password"]];
     [self setUpdatePath:[decoder decodeObjectForKey:@"updatePath"]];
+    [self setListenOnStart:[decoder decodeBoolForKey:@"listenOnStart"]];
+    [self setSaveHeartbeatsWhileListening:[decoder decodeBoolForKey:@"saveHeartbeatsWhileListening"]];
     if(!cmdTableArray){
         [self setDefaults];
+    }
+    if (listenOnStart) {
+        [self performSelector:@selector(startStopSession) withObject:self afterDelay:0.5];
     }
    return self;
 }
@@ -810,6 +858,8 @@ if (strcmp(@encode(atype), the_type) == 0)         \
     [encoder encodeObject:userName forKey:@"userName"];
     [encoder encodeObject:password forKey:@"password"];
     [encoder encodeObject:updatePath forKey:@"updatePath"];
+    [encoder encodeBool:listenOnStart forKey:@"listenOnStart"];
+    [encoder encodeBool:saveHeartbeatsWhileListening forKey:@"saveHeartbeatsWhileListening"];
 }
 
 @end

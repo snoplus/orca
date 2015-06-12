@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
+#include <sys/time.h> //for gettimeofday
 
 
 #if 0 //TODO: remove, moved to ipe4structure.h -tb-
@@ -337,6 +337,8 @@ public:
     int sendtoUDPClients(int flag, const void *buffer, size_t length);
 
     int initUDPServerSocket(void);
+    int myUDPServerSocket(void);
+    int isConnectedUDPServerSocket(void);
     int recvfromServer(unsigned char *readBuffer, int maxSizeOfReadbuffer);
     void endUDPServerSocket(void);
     static void initAllUDPServerSockets(void);
@@ -348,6 +350,7 @@ public:
 		readfifo=0;  //set to 1 to activate readout
 		numfifo=0;   //my index
 	    //show_debug_info=0;
+        isWaitingToClearAfterDelay=0;// ... 0 = not waiting
 		
 		write2file=0;  // 0 = don't write to file; 1 = write file
 		write2file_len_sec=5;
@@ -356,6 +359,7 @@ public:
 		
         AddrLength = 0;
 		
+        MY_UDP_SERVER_SOCKET = -1;
 		MY_UDP_SERVER_IP = INADDR_ANY;
 		strcpy(MY_UDP_SERVER_IP_ADDR, "0.0.0.0");
 	    NB_CLIENT_UDP=0;		
@@ -461,7 +465,12 @@ public:
 	//int simulation_send_dummy_udp;
 	//int run_main_readout_loop; is global!
 	//int show_debug_info;
-	
+    
+    //handle dely between FIFO disable and FIFO clear (reset pointers mres, pres) command
+    int isWaitingToClearAfterDelay;//need to wait 1 sec between FIFO disable and FIFO clear (WARNING: otherwise shuffling may occur 2014-11) -tb-
+	struct timeval timeOfDisableFIFOcmd;
+    
+    
 	int write2file;  // 0 = don't write to file; 1 = write file
 	int write2file_len_sec;
 	int write2file_format;
@@ -511,8 +520,23 @@ public:
 	/*--------------------------------------------------------------------
 	 vars and functions for FIFO buffer
 	 --------------------------------------------------------------------*/
-    static void startFIFO(unsigned int i){
-        if(i<FIFOREADER::availableNumFIFO){ 
+    static int isConnectedUDPServerSocketForFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            return FIFOREADER::FifoReader[i].isConnectedUDPServerSocket();
+        }
+        return 0;
+    }
+    
+    static int initUDPServerSocketForFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            return FIFOREADER::FifoReader[i].initUDPServerSocket();
+        }
+        return 0;
+    }
+    
+    
+    static void startFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
             if(FIFOREADER::FifoReader[i].readfifo){
                 //FIFO i is already running
                 printf("WARNING:   FIFO %i already running!\n",i);
@@ -528,11 +552,18 @@ public:
         }
     }
     
-    static void stopFIFO(unsigned int i){
-        if(i<FIFOREADER::availableNumFIFO){ 
+    static int isRunningFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            return FifoReader[i].readfifo;
+        }
+        return 0;
+    }
+    
+    static void stopFIFO(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
             if(!FIFOREADER::FifoReader[i].readfifo){
                 //FIFO i is not running
-                printf("WARNING:   FIFO %i is not running!\n",i);
+                printf("WARNING:  FIFOREADER::stopFIFO: FIFO %i is not running!\n",i);
             }
             else
             {
@@ -544,6 +575,37 @@ public:
         }
     }
     
+    static void markFIFOforClearAfterDelay(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            FifoReader[i].isWaitingToClearAfterDelay = 1;
+            gettimeofday(&FifoReader[i].timeOfDisableFIFOcmd,NULL);
+        }
+    }
+
+    static void unmarkFIFOforClearAfterDelay(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO){ 
+            FifoReader[i].isWaitingToClearAfterDelay = 0;
+            gettimeofday(&FifoReader[i].timeOfDisableFIFOcmd,NULL);
+        }
+    }
+
+    static int isMarkedToClearAfterDelay(int i){
+        if(i>=0 && i<FIFOREADER::availableNumFIFO)
+            return FifoReader[i].isWaitingToClearAfterDelay;
+        return 0;
+    }
+
+    static int64_t usecElapsedDelaySinceMarkToClear(int i){
+        if(!  (i>=0 && i<FIFOREADER::availableNumFIFO))  return 0;
+        int64_t timeDiff=0;
+        struct timeval now;
+        gettimeofday(&now,NULL);
+        timeDiff = (now.tv_usec - FifoReader[i].timeOfDisableFIFOcmd.tv_usec) + (now.tv_sec - FifoReader[i].timeOfDisableFIFOcmd.tv_sec)*1000000;
+        
+        return timeDiff;
+    }
+
+
     static void resetAllSynchronizingAndPackaging(){
         int i=0;
         for(i=0; i<FIFOREADER::availableNumFIFO; i++) 
@@ -730,11 +792,19 @@ public:
 	    initVars();
 	}
     uint32_t PixbusEnable;
+    int      sltTimerSetting;
+    int      utcTimeOffset;
+    int      utcTimeCorrection100kHz;
     uint32_t numHWFifos;
 	void initVars(){
 		//
 		PixbusEnable=0x0;
         numHWFifos=0;
+        
+        sltTimerSetting=-1;
+        utcTimeOffset=0;
+        utcTimeCorrection100kHz=0;
+        
     }
     
     static void initSLTSETTINGS(){

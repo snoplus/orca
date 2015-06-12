@@ -12,12 +12,16 @@
 // VERSION_IPE4_HW is 1934 which means IPE4  (1=I, 9=P, 3=E, 4=4)
 // VERSION_IPE4_SW is the version of the readout software (this file)
 #define VERSION_IPE4_HW      1934200
-#define VERSION_IPE4_SW           10
+#define VERSION_IPE4_SW           11
 #define VERSION_IPE4READOUT (VERSION_IPE4_HW + VERSION_IPE4_SW)
 
 /* History:
 
 -----SOFTWARE VERSION:
+version 11:2014 July
+           read out full FLT when a single channel triggered
+           better timing (SLT timer now readable)
+ 
 version 10:2014 January
            added variable UDP packet size
            until 2013 December:
@@ -181,7 +185,7 @@ int kbhit(void)
 #include <Pbus/Pbus.h>
 #include <akutil/semaphore.h>
 
-#pragma warning TODO remove -lkatrinhw4 in Makefile
+//TODO: #pragma warning TODO remove -lkatrinhw4 in Makefile
 //#include "hw4/baseregister.h"
 //#include "Pbus/pbusimp.h"
 //#include "katrinhw4/subrackkatrin.h"
@@ -399,8 +403,8 @@ int runPreRunChecks()
 #endif
 
     int retval=0;
-    printf("    sizeof(UDPStructIPECrateStatus) is %i\n",sizeof(UDPStructIPECrateStatus));
-    printf("    sizeof(UDPStructIPECrateStatus2) is %i\n",sizeof(UDPStructIPECrateStatus2));
+    printf("    sizeof(UDPStructIPECrateStatus) is %lu\n",sizeof(UDPStructIPECrateStatus));
+    printf("    sizeof(UDPStructIPECrateStatus2) is %lu\n",sizeof(UDPStructIPECrateStatus2));
     if(  (sizeof(UDPStructIPECrateStatus) == SIZEOF_UDPStructIPECrateStatus)   &&   (sizeof(UDPStructIPECrateStatus) == sizeof(UDPStructIPECrateStatus2)) ){
         printf("    OK!\n");
     }
@@ -410,19 +414,19 @@ int runPreRunChecks()
         retval++;
     }
     
-    printf("    sizeof(TypeIpeCrateStatusBlock) is %i\n",sizeof(TypeIpeCrateStatusBlock));
+    printf("    sizeof(TypeIpeCrateStatusBlock) is %lu\n",sizeof(TypeIpeCrateStatusBlock));
     printf("    ---> expected sizeof(TypeIpeCrateStatusBlock) is %i\n",  15*4);
-    printf("    sizeof(TypeBBStatusBlock) is %i\n",sizeof(TypeBBStatusBlock));
+    printf("    sizeof(TypeBBStatusBlock) is %lu\n",sizeof(TypeBBStatusBlock));
     printf("    ---> expected sizeof(TypeBBStatusBlock) is %i\n",  4+4+4+2*_nb_mots_status_bbv2+2 );
     TypeBBStatusBlock bb;
-    printf("Offset of size_bytes: %i\n",(char*)&bb.size_bytes - (char*)&bb);
-    printf("Offset of type: %i\n",(char*)&bb.type - (char*)&bb);
-    printf("Offset of crateIndex: %i\n",(char*)&bb.crateIndex - (char*)&bb);
-    printf("Offset of fltIndex: %i\n",(char*)&bb.fltIndex - (char*)&bb);
-    printf("Offset of fiberIndex: %i\n",(char*)&bb.fiberIndex - (char*)&bb);
-    printf("Offset of spare: %i\n",(char*)&bb.spare - (char*)&bb);
-    printf("Offset of bb_status: %i\n",(char*)&bb.bb_status - (char*)&bb);
-    printf("Offset of spare_for_alignment: %i\n",(char*)&bb.spare_for_alignment - (char*)&bb);
+    printf("Offset of size_bytes: %li\n",(char*)&bb.size_bytes - (char*)&bb);
+    printf("Offset of type: %li\n",(char*)&bb.type - (char*)&bb);
+    printf("Offset of crateIndex: %li\n",(char*)&bb.crateIndex - (char*)&bb);
+    printf("Offset of fltIndex: %li\n",(char*)&bb.fltIndex - (char*)&bb);
+    printf("Offset of fiberIndex: %li\n",(char*)&bb.fiberIndex - (char*)&bb);
+    printf("Offset of spare: %li\n",(char*)&bb.spare - (char*)&bb);
+    printf("Offset of bb_status: %li\n",(char*)&bb.bb_status - (char*)&bb);
+    printf("Offset of spare_for_alignment: %li\n",(char*)&bb.spare_for_alignment - (char*)&bb);
     
     
     return retval;
@@ -479,14 +483,14 @@ void InitSLTPbus(void)
 	{
 		//if(presentFLTMap & bit[fifo])
 		{
-		    pbus->write(BBcsrReg(fifo),0x8);
-	        printf("  Reset FIFO %i - writing BBcsrReg ... reading: 0x%08x\n",fifo,pbus->read(BBcsrReg(fifo)));
+		    pbus->write(BBcsrReg(fifo),0x8+0x4);//disable+reset FIFO
+	        printf("  Reset FIFO %i - writing BBcsrReg ... reading: 0x%08lx\n",fifo,pbus->read(BBcsrReg(fifo)));
 		}
     }
     usleep(20);
 	//set mask
 	pbus->write(SLTInterruptMaskReg,0xffff);//reset SLT
-	printf("  Interrupt  mask 0x%08x  (wrote 0xffff) ... \n",pbus->read(SLTInterruptMaskReg));
+	printf("  Interrupt  mask 0x%08lx  (wrote 0xffff) ... \n",pbus->read(SLTInterruptMaskReg));
 	
 
      //find FLTs
@@ -775,7 +779,7 @@ int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr,
     //exit(1);
   }
     fprintf(stderr, "    sendtoGlobalClient3: UDP Client: IP: %s, port: %i\n",receiverIPAddr,port);
-    ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",buffer); //DEBUG
+    ((char*)buffer)[length]=0;    fprintf(stderr, "    sendtoGlobalClient3: %s\n",(char*)buffer); //DEBUG
 	
 	retval = sendto(GLOBAL_UDP_CLIENT_SOCKET, buffer, length, 0 /*flags*/, (struct sockaddr *)&GLOBAL_sockaddrin_to, GLOBAL_sockaddrin_to_len);
     return retval;
@@ -1132,6 +1136,12 @@ int FIFOREADER::initUDPServerSocket(void)
 {
     int status, retval=0;
 
+	if (MY_UDP_SERVER_SOCKET!=-1){
+        fprintf(stderr, "WARNING: FIFOREADER::initUDPServerSocket: socket for FIFO %i already exists! \n",numfifo);
+        //TODO: close it or leave it?endUDPServerSocket();
+    }
+//test: fls(32);
+
 	MY_UDP_SERVER_SOCKET = socket ( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
 	if (MY_UDP_SERVER_SOCKET==-1){
         fprintf(stderr, "FIFOREADER::initUDPServerSocket: socket(...) failed\n");
@@ -1168,8 +1178,21 @@ printf("    inet_aton(MY_UDP_SERVER_IP_ADDR %s, &servaddr.sin_addr ... 0x%08x );
    }
 
 
-    return retval;
+    return retval;//TODO: is always 0!!!
 }
+
+
+
+int FIFOREADER::myUDPServerSocket(void)
+{
+    return MY_UDP_SERVER_SOCKET;
+}
+
+int FIFOREADER::isConnectedUDPServerSocket(void)
+{
+    return (MY_UDP_SERVER_SOCKET >0);
+}
+
 
 
 void FIFOREADER::initAllUDPServerSockets(void)
@@ -1475,7 +1498,7 @@ int sendChargeBBStatus(uint32_t prog_status,int numFifo)
                 crateStatusBlock.size_bytes = sizeof(crateStatusBlock);            // 
                 crateStatusBlock.version = VERSION_IPE4READOUT;        // _may_ be useful in some particular cases (version of C code/firmware/hardware?)
                 //SLT register:
-                uint32_t OperaStatus1 =  0;//pbus->read(OperaStatusReg1);
+                //uint32_t OperaStatus1 =  0;//pbus->read(OperaStatusReg1);
                 crateStatusBlock.SLTTimeLow    =  0;//pbus->read(SLTTimeLowReg);       // the according SLT register
                 crateStatusBlock.SLTTimeHigh   =  0;//pbus->read(SLTTimeHighReg);       // the according SLT register
                 crateStatusBlock.OperaStatus1  = 0;//OperaStatus1;     // contains d0, previously in cew: registre_x, =20  
@@ -2178,7 +2201,7 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
               startptr=&buffer[4];
 	          address = strtoul((const char *)&buffer[4],&endptr,0);
               if(address==0){printf("handleKCommand:1 This is not a valid KW command!\n"); return; }
-        printf("handleKCommand: buffer %p startptr %p endptr %p diff %i  next char: %c\n",buffer,startptr,endptr,endptr-startptr,*endptr);
+        printf("handleKCommand: buffer %p startptr %p endptr %p diff %li  next char: %c\n",buffer,startptr,endptr,endptr-startptr,*endptr);
               // accept other deliminiter than '_' if(*endptr!='_'){printf("handleKCommand:2 This is not a valid KW command!\n"); return; }
 	          //value   = strtoul((const char *)&buffer[15],0,0);
               startptr=endptr+1;
@@ -2263,7 +2286,7 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
 	          else 
 	          if(  (foundPos=strstr(buffer,"chargeBBFile"))  ){
 	              printf("handleKCommand: KWC >%s< command 9!\n",foundPos);//DEBUG
-                  if(len >= sizeof("KWC_chargeBBFile_"))//filename must be at least one character
+                  if(len >= (int)sizeof("KWC_chargeBBFile_"))//filename must be at least one character
                       //2014-01-27 use version without horloge command ... chargeBBWithFileOLD( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                       chargeBBWithFile( foundPos + sizeof("chargeBBFile") , fromFifo);//sizeof("chargeBBFile") counts the ending \0, but I anyway need to skip one '_'
                   else
@@ -2278,7 +2301,7 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
                   //    KWC_sendBBCmd_0xAA_0xBB_0xCC_0xCC_0x01_9_FLT_1_FIBER_2
                   // real example (sets ref and adc1...4 to ON):
                   //    KWC_sendBBCmd_0xF0_0x1d_0x00_0x1f_FLT_1_FIBER_2
-                  if(len >= sizeof("KWC_sendBBCmd_")){//filename must be at least one character
+                  if(len >= (int)sizeof("KWC_sendBBCmd_")){//filename must be at least one character
                       unsigned char cmdbuf[256];
                       int lencmdbuf=0;
                       int flt=-1;
@@ -2300,17 +2323,27 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
               else
 	          if(  (foundPos=strstr(buffer,"startFIFO"))  ){
 	              printf("handleKCommand: KWC >%s< command 11!\n",foundPos);//DEBUG
-                  if(len > strlen("KWC_startFIFO_")){//must have at least one character as argument
-                      printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=15)!\n",buffer,strlen(buffer));//DEBUG
+                  if(len > (int)strlen("KWC_startFIFO_")){//must have at least one character as argument
+                      printf("   msg: KWC >%s< command - length OK (strlen:%lu should be >=15)!\n",buffer,strlen(buffer));//DEBUG
                       char *startptr, *endptr;
-                      unsigned long value=0;
+                      unsigned long numFIFO=0;
                       startptr=foundPos+strlen("startFIFO ");
-                      printf("   startptr:   >%s<  \n",startptr);//DEBUG
-                      value = strtoul((const char *)startptr,&endptr,0);
-                      printf("   value is %u, startptr: %p, endptr %p  \n",value,startptr,endptr);//DEBUG
-                      FIFOREADER::startFIFO(value);
-                      pbus->write(BBcsrReg(value),0xc);//c=0x8+0x4=mres+pres
-
+                      //printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      numFIFO = strtoul((const char *)startptr,&endptr,0);
+                      //printf("   numFIFO is %u, startptr: %p, endptr %p  \n",numFIFO,startptr,endptr);//DEBUG
+                      
+                      if(FIFOREADER::isRunningFIFO(numFIFO)){
+                          printf("   WARNING: FIFO %lu is already running! Cmd 'startFIFO' ignored!\n",numFIFO);//DEBUG
+                      }else{
+                          if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
+                              printf("    WARNING: FIFO %lu is still stopping and clearing! Cmd 'startFIFO' ignored!\n",numFIFO);//DEBUG
+                          }else{
+                              if(! FIFOREADER::isConnectedUDPServerSocketForFIFO(numFIFO)) FIFOREADER::initUDPServerSocketForFIFO(numFIFO);
+                              FIFOREADER::startFIFO(numFIFO);
+                              pbus->write(BBcsrReg(numFIFO),0x2);//enable FIFO
+                              printf("   Message: FIFO %lu started\n",numFIFO);//DEBUG
+                          }
+                      }
                   }
                   else
                       printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
@@ -2318,15 +2351,61 @@ void parse_sendBBCmd_string(char *buffer, unsigned char* cmdbuf, int* lencmdbuf,
 	          else 
 	          if(  (foundPos=strstr(buffer,"stopFIFO"))  ){
 	              printf("handleKCommand: KWC >%s< command 12!\n",foundPos);//DEBUG
-                  if(len > strlen("KWC_stopFIFO_")){//must have at least one character as argument
-                      printf("   messg: KWC >%s< command - length OK (strlen:%i should be >=14)!\n",buffer,strlen(buffer));//DEBUG
+                  if(len > int(strlen("KWC_stopFIFO_"))){//must have at least one character as argument
+                      printf("   msg: KWC >%s< command - length OK (strlen:%lu should be >=14)!\n",buffer,strlen(buffer));//DEBUG
                       char *startptr, *endptr;
-                      unsigned long value=0;
+                      unsigned long numFIFO=0;
                       startptr=foundPos+strlen("stopFIFO ");
-                      printf("   startptr:   >%s<  \n",startptr);//DEBUG
-                      value = strtoul((const char *)startptr,&endptr,0);
-                      printf("   value is %u, startptr: %p, endptr %p  \n",value,startptr,endptr);//DEBUG
-                      FIFOREADER::stopFIFO(value);
+                      //printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      numFIFO = strtoul((const char *)startptr,&endptr,0);
+                      //printf("   numFIFO is %u, startptr: %p, endptr %p  \n",numFIFO,startptr,endptr);//DEBUG
+                      //tests
+                      //tests
+                      if(! FIFOREADER::isRunningFIFO(numFIFO)){
+                          printf("   WARNING: 'stopFIFO': FIFO %lu is not running!\n",numFIFO);
+                          if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
+                              printf("   WARNING: 'stopFIFO': FIFO %lu is still stopping!\n",numFIFO);
+                          }
+                      }
+                      FIFOREADER::stopFIFO(numFIFO);
+                      //disable and clear the FIFO; wait 1 sec. after disable to clear (WARNING: otherwise shuffling may occur 2014-11) -tb-
+                      pbus->write(BBcsrReg(numFIFO),0x0);//disable this FIFO
+                      //clear is delayed by 1 sec
+                      //pbus->write(BBcsrReg(numFIFO),0xc);//clear FIFO (c=0x8+0x4=mres+pres)
+                      FIFOREADER::markFIFOforClearAfterDelay(numFIFO);
+                  }
+                  else
+                      printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
+              }
+	          else 
+	          if(  (foundPos=strstr(buffer,"usleep"))  ){
+	              printf("handleKCommand: KWC >%s< command 13!\n",foundPos);//DEBUG
+                  if(len > int(strlen("KWC_usleep_"))){//must have at least one character as argument
+                      printf("   msg: KWC >%s< command - length OK (strlen:%lu should be >=12)!\n",buffer,strlen(buffer));//DEBUG
+                      char *startptr, *endptr;
+                      unsigned long numUSec=0;
+                      startptr=foundPos+strlen("usleep ");
+                      //printf("   startptr:   >%s<  \n",startptr);//DEBUG
+                      numUSec = strtoul((const char *)startptr,&endptr,0);
+                      //printf("   numUSec is %u, startptr: %p, endptr %p  \n",numUSec,startptr,endptr);//DEBUG
+                      printf("   ---> calling usleep(%u)  \n",numUSec);//DEBUG
+                      usleep(numUSec);
+                      //tests
+                      //tests
+                      #if 0
+                      if(! FIFOREADER::isRunningFIFO(numFIFO)){
+                          printf("   WARNING: 'stopFIFO': FIFO %lu is not running!\n",numFIFO);
+                          if(FIFOREADER::isMarkedToClearAfterDelay(numFIFO)){
+                              printf("   WARNING: 'stopFIFO': FIFO %lu is still stopping!\n",numFIFO);
+                          }
+                      }
+                      FIFOREADER::stopFIFO(numFIFO);
+                      //disable and clear the FIFO; wait 1 sec. after disable to clear (WARNING: otherwise shuffling may occur 2014-11) -tb-
+                      pbus->write(BBcsrReg(numFIFO),0x0);//disable this FIFO
+                      //clear is delayed by 1 sec
+                      //pbus->write(BBcsrReg(numFIFO),0xc);//clear FIFO (c=0x8+0x4=mres+pres)
+                      FIFOREADER::markFIFOforClearAfterDelay(numFIFO);
+                      #endif
                   }
                   else
                       printf("   ERROR: KWC >%s< command without parameter!\n",buffer);//DEBUG
@@ -2789,6 +2868,15 @@ int parseConfigFileLine(char *line, int flags)
 			  wasFound = searchHex32InString(mystring,"PixbusEnable:",&slt.PixbusEnable);
 			  if(wasFound) printf("PixbusEnable: 0x%x\n",slt.PixbusEnable);
 			  
+			  wasFound = searchIntInString(mystring,"sltTimerSetting:",&slt.sltTimerSetting);
+			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.sltTimerSetting);
+			  
+			  wasFound = searchIntInString(mystring,"utcTimeOffset:",&slt.utcTimeOffset);
+			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.utcTimeOffset);
+			  
+			  wasFound = searchIntInString(mystring,"utcTimeCorrection100kHz:",&slt.utcTimeCorrection100kHz);
+			  if(wasFound) printf("UTCTimeOffset: %i\n",slt.utcTimeCorrection100kHz);
+			  
 			  
 			  
     #if 0// now per FIFO (see below)
@@ -3189,7 +3277,7 @@ int runSpikeFinderOnUDPPacket(char *buffer, size_t length)
 	            if(val>400 && val<1001) countSpikesVal[1]++;
 	            if(val>1000) countSpikesVal[2]++;
 	            if(use_spike_finder>=2){//verbose output
-	                printf("SPIKE:pnr.%3i(dlast:%3i),chan:%i,val1:0x%x (%li),  val2:0x%x (%li)  , diff:%i   ,   index1:%i    index2:%i\n",data[-2],data[-2]-pnr,iadc,(unsigned int)val1,val1,(unsigned int)val2,val2,(int)val,i+iadc,i+iadc+Nb_mots16_lecture);
+	                printf("SPIKE:pnr.%3i(dlast:%3i),chan:%i,val1:0x%x (%i),  val2:0x%x (%i)  , diff:%i   ,   index1:%i    index2:%i\n",data[-2],data[-2]-pnr,iadc,(unsigned int)val1,val1,(unsigned int)val2,val2,(int)val,i+iadc,i+iadc+Nb_mots16_lecture);
 	                pnr=data[-2];
 	            }
 	        }
@@ -3255,7 +3343,7 @@ int FIFOREADER::openBinaryFile(int utc, int write2file_len_sec)
 int FIFOREADER::writeToAsciiFile(const char *buf, size_t n, int udpdataSec)
 {
 	int retval=0;
-	int col;
+	uint32_t col;
 	unsigned int printval=0;
 	
 	
@@ -3386,7 +3474,7 @@ void FIFOREADER::scanFIFObuffer(void)
 {
 	int32_t		temp_status_bbv2_1[_nb_mots_status_bbv2 + 10];	//_nb_mots_status_bbv2 = 57 -tb-
 	int16_t	*	temp_status_bbv2_1_16=(int16_t	*)temp_status_bbv2_1;
-
+	
 
 
 
@@ -3398,7 +3486,7 @@ void FIFOREADER::scanFIFObuffer(void)
 
 
 
-    if( (FIFObuf32avail < udpDataPacketPayloadSize32() /*360*/) ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
+    if( ((int)FIFObuf32avail < udpDataPacketPayloadSize32() /*360*/) ) return;// we need at most 360 words to build a standard UDP packet; only the last before header word may be shorter
     
     //TODO: if globalHeaderWordCounter==0 don't send UDP packets: we are maybe in the middle of FIFO -tb-
 	
@@ -3406,7 +3494,7 @@ void FIFOREADER::scanFIFObuffer(void)
     
     int udpPacketLen   = 0;
     int headerWordFoundFlag = 0;
-    uint32_t i;
+    int32_t i;
     int32_t val;
     
     //1. start building a UDP packet in array udpdata32/udpdata ;    we have usually 360 words in FIFO: 
@@ -3424,7 +3512,7 @@ void FIFOREADER::scanFIFObuffer(void)
     
 #if 1
     if(flagToSendDataAndResetBuffer){
-        if(FIFObuf32avail<=udpDataPacketPayloadSize32()/*360*/){//we have the last 'maybe not full' UDP packet (before the magic pattern)
+        if((int)FIFObuf32avail<=udpDataPacketPayloadSize32()/*360*/){//we have the last 'maybe not full' UDP packet (before the magic pattern)
             numWord32=FIFObuf32avail;//in all other cases FIFObuf32avail is >360
             //if(flagToSendDataAndResetBuffer)
             
@@ -3452,21 +3540,26 @@ void FIFOREADER::scanFIFObuffer(void)
                 waitingForSynchroWord = 0;
                 synchroWordPosHint=0;
                 //if(show_debug_info>2) 
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                 printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
             }else{
                 if(synchroWordBufferPosHint>=-64 && synchroWordBufferPosHint<=64){//is near the expected position
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                     printf("scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position  \n",synchroWordBufferPosHint);//TODO: DEBUG output -tb-
                 }
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                     printf("  !!!scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position (i=%i, to numWord32=%i) \n",synchroWordBufferPosHint,i,numWord32);//TODO: DEBUG output -tb-
                 //in all other cases the pattern 0x00003117 is assumed to be ADC data
                 if(   (0x00080c00 == (FIFObuf32[popIndexFIFObuf32+1] & 0x000f0f00))   ||   synchroWordBufferPosHint==8192){
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                     printf("WARNING: is 0x00080cXX or 8192 shift: MOST PROBABLY A synch word - scanFIFObuffer: WARNING: found synchro word shifted by %i from expected position (i=%i, to numWord32=%i) \n",synchroWordBufferPosHint,i,numWord32);//TODO: DEBUG output -tb-
                   headerWordFoundFlag=1 ;  
                   waitingForSynchroWord = 0;
                   synchroWordPosHint=0;
                 //if(show_debug_info>2) 
+/*TODO: for DEBUGGING - remove this line after 2014-07 -tb- */ if(show_debug_info>=1)
                 printf("scanFIFObuffer: found header word at i= %i (popIndexFIFObuf32 %i)\n",i, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 //printf("scanFIFObuffer: found header word: synchroWordBufferPosHint %i    (popIndexFIFObuf32 %i)\n",synchroWordBufferPosHint, popIndexFIFObuf32);//TODO: DEBUG output -tb-
                 break;//stop for-loop: keep headerWord in buffer and proceed to step 2.a)
@@ -3551,29 +3644,48 @@ void FIFOREADER::scanFIFObuffer(void)
         headerWordFoundFlag=0;
         //move FIFObuf content to index 0 --> header word at index 0
         if(show_debug_info>1) printf("scanFIFObuffer: Move FIFO by %i indices down\n",popIndexFIFObuf32);
-        for(i=0; i<FIFObuf32avail; i++) FIFObuf32[i] = FIFObuf32[popIndexFIFObuf32+i];//TODO: memcpy might be faster? -tb-
+        for(i=0; i<(int)FIFObuf32avail; i++) FIFObuf32[i] = FIFObuf32[popIndexFIFObuf32+i];//TODO: memcpy might be faster? -tb-
         popIndexFIFObuf32 = 0;
         pushIndexFIFObuf32 = FIFObuf32avail;
         
         //DEBUGKRAM
-        if(show_debug_info>=1){
+        if(show_debug_info>=1 || show_debug_info == -1){
             if(FIFObuf32avail >= 4){
                 printf("   SynchroWord: ");
                 int i;
                 for(i=0; i<4; i++){
                     printf("0x%08x, ",FIFObuf32[i]);
                 }
+                
+                
+        #if 1 //TODO: this was for the TS debugging - REMOVE IT -tb-
+        if(show_debug_info == -1){
+            uint32_t pd_fort=0, pd_faible=0;
+            pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
+            pd_faible = FIFObuf32[2] & 0x3fffffff;  // 30 bit
+            uint64_t sltTime = 0,sltTimeSubSec;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) ;
+                printf("     - time  %lu ",sltTime);
+            sltTimeSubSec = (((uint64_t)pd_fort << 30) | pd_faible) % 100000 - SLTSETTINGS::SLT->utcTimeCorrection100kHz;
+            /* error check */
+            if(sltTimeSubSec != 0) printf("    scanFIFObuffer: *** WARNING *** *** WARNING *** - time from TimeStamp pattern not OK: %lu (subSecs are %lu) \n",   sltTime, sltTimeSubSec);
+        }
+        #endif
+                
+                
+                
                 printf("\n");
             }
         }
+
         
         //DEBUG: show spike finder results
         if(use_spike_finder ){
         int k;
-        printf("------->Spike finder: %li (",countSpikes);
-        for(k=0; k<Nb_mots_lecture *2;k++) printf("%li,",countSpikesChan[k]);
-        printf("), sec. %li    <------\n",secCountSpikes);
-        if(use_spike_finder>=2) printf("Spikebit - 256er:%li , 512er:%li, larger:%li \n",countSpikesVal[0], countSpikesVal[1],countSpikesVal[2]);
+        printf("------->Spike finder: %i (",countSpikes);
+        for(k=0; k<Nb_mots_lecture *2;k++) printf("%i,",countSpikesChan[k]);
+        printf("), sec. %i    <------\n",secCountSpikes);
+        if(use_spike_finder>=2) printf("Spikebit - 256er:%i , 512er:%i, larger:%i \n",countSpikesVal[0], countSpikesVal[1],countSpikesVal[2]);
         secCountSpikes++;
         }
 
@@ -3615,16 +3727,37 @@ void FIFOREADER::scanFIFObuffer(void)
                         setUdpDataPacketSize(max_udp_size_config);
                     }
                 }
-                printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
+                
+                if(show_debug_info>=1 )
+                    printf("Using UDP Packet size: %i payload size:%i (words:%i)\n",udpDataPacketSize(),udpDataPacketPayloadSize(),udpDataPacketPayloadSize32());
+
             }
             #endif
             
-            
+            {
+                //show PC time
+                struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
+                gettimeofday(&currenttime,NULL);
+                uint32_t currentSec = currenttime.tv_sec;  
+                uint32_t currentSubSec = currenttime.tv_usec;  
+
+	            //following lines by Bernhard to get the localtime in the ipe4reader output
+	            struct tm *Zeit;
+	            long Jetzt;
+	            time(&Jetzt);
+	            Zeit = localtime(&Jetzt);
+	            //end modification by Bernhard*/
+
+                printf("PC-Time (CEST?): %d:%02d:%02d  (UTC:%li, gtodUTC:%u,%u)\n",Zeit->tm_hour, Zeit->tm_min, Zeit->tm_sec,Jetzt,currentSec,currentSubSec); //by Bernhard to see the time in the ipe4reader output
+            }
+
+
+
 		    //TODO: move "send code" to this location???? -tb-
 		
 
             //print num of sent bytes
-			//if(show_debug_info) 
+			//if(show_debug_info >= 1) 
 			printf("scanFIFObuffer: numfifo %i: read bytes: %i\n", numfifo, udpdataByteCounter);
 
             //prepare next UDP packet header
@@ -3634,9 +3767,46 @@ void FIFOREADER::scanFIFObuffer(void)
             uint32_t pd_fort=0, pd_faible=0;
             pd_fort   = FIFObuf32[3] & 0x3ffff ;    // 18 bits
             pd_faible = FIFObuf32[2] & 0x3fffffff;  // 30 bit
-            udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;
+#if 0
+//TODO: original code without correction, see correction in ipe4tbtool, setSLTtimerWithUTC TEMPORARY FIX -tb- 2014-07-18
+            uint64_t sltTime = 0;  
+            uint64_t sltTimeSubSec = 0;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) ;
+            sltTimeSubSec = (((uint64_t)pd_fort << 30) | pd_faible) % 100000 ;
+            /* error check */
+            if(sltTimeSubSec != 0) printf("    scanFIFObuffer: *** WARNING *** *** WARNING *** - time from TimeStamp pattern not multiple of 100000: %lli (subSecs are %lli) \n",   sltTime, sltTimeSubSec);
+            sltTime = sltTime / 100000;
+            udpdataSec = sltTime;
             globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
-            if(show_debug_info) printf("scanFIFObuffer: HEADER word # %u, t= %i\n", globalHeaderWordCounter,udpdataSec);
+            if(show_debug_info >= 1) printf("scanFIFObuffer: HEADER word # %u, t= %i (%lli)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+#endif
+
+//code with TEMPORARY CORRECTION -tb- 2014-07-18
+//we assume, subsecs are not 0 but 1 -> correction by software -tb-
+            uint64_t sltTime = 0;  
+            sltTime = (((uint64_t)pd_fort << 30) | pd_faible) /100000 ;//   .../100000 removes the .........1 -tb-
+            {
+                //make correction for timestamp pattern in data stream:
+                //    the SLT timer registers have a exactly 1 second larger timestamp (subseconds are OK)
+                //    the reason is unknown, maybe it is in the Opera "black box" 
+                //    we (Denis, Bernhard, Till) decided to make this correction in software 
+                //    in order to be consistent, we recompute pd_fort, pd_faible
+                // -tb- 2014-07-17
+                //sltTime = sltTime + 1;
+                uint64_t sltTimeCorr = sltTime * 100000;
+                pd_fort   = (sltTimeCorr >> 30) &  0x3ffff;     // 18 bits
+                pd_faible =  sltTimeCorr        &  0x3fffffff;  // 30 bit
+            }
+            //udpdataSec = 	(     (((pd_fort%125)<<25) + (pd_faible>>5)) /125       +     ((pd_fort/125)<<25)     )     /25;//THIS FORMULA IS WRONG -tb- 2014-07
+            udpdataSec = sltTime;
+            globalHeaderWordCounter++; //TODO: for testing/debugging -tb-
+            if(show_debug_info >= 1) printf("scanFIFObuffer: HEADER word # %u, t= %i (%li)\n", globalHeaderWordCounter,udpdataSec,sltTime);
+            //crosscheck of correction - 
+            if(show_debug_info >= 1) printf("   pd_faible is:  %i 0x%08x   pd_fort is:  %i 0x%08x   \n", pd_faible,pd_faible, pd_fort,pd_fort);
+
+
+
+
 //TODO: remove it, for DEBUGGING -tb-
 //udpdataSec= globalHeaderWordCounter;
             //now 'remove' header from FIFObuff32
@@ -3738,7 +3908,7 @@ void FIFOREADER::scanFIFObuffer(void)
 								//printf("Status bits fiber %i read from FLT %i with ID %i:\n",fiber,idx,numFLT);
 								int i;
 								uint32_t status;
-								uint16_t *status16 = (uint16_t *)(&status);
+								//uint16_t *status16 = (uint16_t *)(&status);
 								int numChan =fiber;
 								for(i=0; i<32; i++){
 									status = pbus->read(FLTBBStatusReg(numFLT, numChan)+i);
@@ -3881,7 +4051,7 @@ void FIFOREADER::scanFIFObuffer(void)
 								//printf("Status bits fiber %i read from FLT %i with ID %i:\n",fiber,idx,numFLT);
 								int i;
 								uint32_t status;
-								uint16_t *status16 = (uint16_t *)(&status);
+								//uint16_t *status16 = (uint16_t *)(&status);
 								int numChan =fiber;
 								for(i=0; i<32; i++){
 									status = pbus->read(FLTBBStatusReg(numFLT, numChan)+i);
@@ -3918,7 +4088,7 @@ void FIFOREADER::scanFIFObuffer(void)
 					//write UDP status packet to file
 					//TODO: now I maybe send several status packets - move to for-fiber-loop above -tb-
 					if(write2file && write2file_format == ascii){
-						if(  globalHeaderWordCounter>0 && globalHeaderWordCounter < write2file_len_sec){
+						if(  globalHeaderWordCounter>0 && (int)globalHeaderWordCounter < write2file_len_sec){
 							if(pFile == NULL) openAsciiFile(udpdataSec,write2file_len_sec);//open file
 							writeToAsciiFile((char*)(&Trame_status_udp),sizeof(Trame_status_udp),udpdataSec);
 						}else
@@ -3973,7 +4143,8 @@ void FIFOREADER::scanFIFObuffer(void)
  *--------------------------------------------------------------------*/ //-tb-
 void FIFOREADER::readFIFOtoFIFObuffer(void)
 {
-    uint32_t FIFOavail=0, FIFOMode=0, FIFOStatus=0, FIFOStatusTSPtr=0;
+    uint32_t FIFOavail=0;
+    int32_t  FIFOMode=0, FIFOStatus=0, FIFOStatusTSPtr=0;
 //    uint32_t currentBlockSize=FIFOBlockSize;//block size to be read from SLT FIFO; try to read as large blocks as possible (FIFOBlockSize*8192)
 
     // check FIFO size
@@ -4039,7 +4210,7 @@ void FIFOREADER::readFIFOtoFIFObuffer(void)
 
         //keep counter up to date
         if(synchroWordPosHint >0){
-            if( (synchroWordPosHint  ) <= FIFOBlockSize  ){
+            if( (synchroWordPosHint  ) <= (int32_t)FIFOBlockSize  ){
                 //in the next block there will be the synchro word
                 waitingForSynchroWord=1;//set a flag
                 synchroWordBufferPosHint= FIFObuf32avail + synchroWordPosHint -1;//compute expected pos in FIFO buffer
@@ -4102,7 +4273,7 @@ if(1){ //DEBUG search explicitly for header ...
             }else{
                 fwrite( &FIFObuf32[pushIndexFIFObuf32-FIFOBlockSize], sizeof(uint32_t), FIFOBlockSize, pFile);
             }
-            if(globalHeaderWordCounter > write2file_len_sec) run_main_readout_loop = 0; //TODO: set flag to finish main loop - leave it? -tb-
+            if((int)globalHeaderWordCounter > write2file_len_sec) run_main_readout_loop = 0; //TODO: set flag to finish main loop - leave it? -tb-
         }
 
     }
@@ -4179,6 +4350,69 @@ void RunSomeHardwareTests()
     pbus->write(SLTCommandReg,0x2);//this is the SltRes flag
     usleep(1);
     
+    //4.
+    //set SLT time register to UTC -tb- 2014-07
+    if(version > 0x41970000){
+        printf("   This SLT FPGA version supports writable timer registers! (ver: 0x%08x)\n", version);
+        #if 1
+        uint64_t retval=0, utcTime=0 , utcTimeOffset=SLTSETTINGS::SLT->utcTimeOffset;
+        retval++;//keep compiler quiet (want it for debugging ...) -tb-
+        uint64_t utcTimeCorrection100kHz = SLTSETTINGS::SLT->utcTimeCorrection100kHz;
+        uint32_t flags=0;
+        if(SLTSETTINGS::SLT->sltTimerSetting != -2){
+            flags=kSetSLTtimerWithUTCFlag_Verbose | kSetSLTtimerWithUTCFlag_ReadBack;
+            if(SLTSETTINGS::SLT->sltTimerSetting >= 0){
+                flags |= kSetSLTtimerWithUTCFlag_Value;
+                utcTime = SLTSETTINGS::SLT->sltTimerSetting;
+            }
+            //if SLTSETTINGS::SLT->sltTimerSetting == -1, use UTC from crate PC (the default)
+            retval = setSLTtimerWithUTC( flags,  utcTime, utcTimeOffset, utcTimeCorrection100kHz);
+        }
+        #else
+        //moved to function "setSLTtimerWithUTC":
+        struct timeval currenttime;//    struct timezone tz; is obsolete ... -tb-
+        uint32_t currentSec = 0;  
+        gettimeofday(&currenttime,NULL);
+        currentSec = currenttime.tv_sec;  
+
+        uint32_t sltTimeLo = 0;  
+        uint32_t sltTimeHi = 0;  
+        uint64_t sltTime = 0;  
+        int64_t timeDiff = 0;  
+        sltTimeLo = pbus->read(SLTTimeLowReg);
+        sltTimeHi = pbus->read(SLTTimeHighReg);
+        sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+        printf("Set SLT timer: UTC:%i  (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",currentSec,sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+        timeDiff=currentSec-sltTime;
+        if((timeDiff < -1) || (timeDiff >1)){
+            printf("    Set SLT timer: timeDiff:  %lli - set timer!\n", timeDiff);
+            sltTime = ((uint64_t)currentSec) * 100000LL;
+            sltTimeLo =  sltTime        & 0xffffffff;
+            sltTimeHi = (sltTime >> 32) & 0xffffffff;
+            pbus->write(SLTTimeLowReg, sltTimeLo);
+            pbus->write(SLTTimeHighReg, sltTimeHi);
+            sleep(1);
+            sltTimeLo = pbus->read(SLTTimeLowReg);
+            sltTimeHi = pbus->read(SLTTimeHighReg);
+            sltTime = (((uint64_t)sltTimeHi << 32) | sltTimeLo) /100000 ;
+            printf("    Set SLT timer: read back (current value  (hi: 0x%08x  lo:  0x%08x ): 0x%016llx, %lli)\n",sltTimeHi,sltTimeLo,sltTime,sltTime); //by Bernhard to see the time in the ipe4reader output
+
+            #if 0
+            pbus->write(SLTTimeLowReg, 0);
+            pbus->write(SLTTimeHighReg, 0);
+            sleep(1);
+            #endif
+
+
+        }else{
+            printf("   timeDiff:  %lli - OK!\n", timeDiff);
+        }
+        #endif
+        
+    }else{
+            printf("   This SLT FPGA version does not support writable timer registers! (ver: 0x%08x)\n", version);
+    }
+    
 }
 
  /*--------------------------------------------------------------------
@@ -4194,7 +4428,6 @@ void RunSomeHardwareTests()
 uint32_t InitFLTs()
 {
     uint32_t retval = 0;
-    int i;
     //begin-----INIT FLT SETTINGS---------------------------------------
 	int fltID;
 
@@ -4250,13 +4483,13 @@ uint32_t InitFLTs()
 
         pbus->write(FLTFiberSet_1Reg(fltID),FLT.fiberSet1); 
         pbus->write(FLTFiberSet_2Reg(fltID),FLT.fiberSet2);  
-        printf("------FLTFiberSet_1Reg: 0x%08x\n",pbus->read(FLTFiberSet_1Reg(fltID)));
-        printf("------FLTFiberSet_2Reg: 0x%08x\n",pbus->read(FLTFiberSet_2Reg(fltID)));
+        printf("------FLTFiberSet_1Reg: 0x%08lx\n",pbus->read(FLTFiberSet_1Reg(fltID)));
+        printf("------FLTFiberSet_2Reg: 0x%08lx\n",pbus->read(FLTFiberSet_2Reg(fltID)));
         
         pbus->write(FLTTriggerMask_1Reg(fltID),FLT.triggerMask1); 
         pbus->write(FLTTriggerMask_2Reg(fltID),FLT.triggerMask2);  
-        printf("------FLTTriggerMask_1Reg: 0x%08x\n",pbus->read(FLTTriggerMask_1Reg(fltID)));
-        printf("------FLTTriggerMask_2Reg: 0x%08x\n",pbus->read(FLTTriggerMask_2Reg(fltID)));
+        printf("------FLTTriggerMask_1Reg: 0x%08lx\n",pbus->read(FLTTriggerMask_1Reg(fltID)));
+        printf("------FLTTriggerMask_2Reg: 0x%08lx\n",pbus->read(FLTTriggerMask_2Reg(fltID)));
         
 	}
 	
@@ -4274,10 +4507,9 @@ uint32_t InitFLTs()
 //TODO: testFLTs - remove it? -tb-
 void testFLTs()
 {
-    int i;
 //FLT tests ----  FLT tests ----  FLT tests ----  FLT tests ----  FLT tests ----  
-    int numFLT=4;//<----------------------numFLT
     #if 0
+    int numFLT=4;//<----------------------numFLT
     uint32_t  reg=0;
 	reg =  pbus->read(SLTVersionReg);
     printf("------val: 0x%08x\n",reg);
@@ -4338,6 +4570,7 @@ void testFLTs()
  /*--------------------------------------------------------------------
  *    function:     StopSLTFIFO
  *--------------------------------------------------------------------*/ //-tb-
+ //currently never used (called when "stopRunLoop" which is obsolete 2014-11 -tb-)
 void StopSLTFIFO()
 {
 	printf("StopSLTFIFO.\n");
@@ -4362,9 +4595,10 @@ void StopSLTFIFO()
 			//SLT csr register
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
-			//now enable BB
-			printf("Send 'prt reset' flags.\n");
-			pbus->write(BBcsrReg(i), (0x08 + 0x04));
+			//now disable+reset  FIFO
+			printf("Send 'ptr reset' flags.\n");
+			pbus->write(BBcsrReg(i), 0);//stop
+			pbus->write(BBcsrReg(i), (0x08 + 0x04));//clear
 			BB0csr =  pbus->read(BBcsrReg(i));
 			printf("    BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
         }
@@ -4405,7 +4639,7 @@ void InitHardwareFIFOs(int warmStart)
 			printf("FIFOMode(%i): 0x%08x (length %u)\n",i,FIFOMode, FIFOMode & 0x00ffffff);
 		}
 	
-	//SLT control register
+	//SLT control register - set Offline
 	SLTControl =  pbus->read(SLTControlReg);
 	printf("SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
 	//switch to OffLine (test mode)
@@ -4416,12 +4650,18 @@ void InitHardwareFIFOs(int warmStart)
 	}
 	SLTControl =  pbus->read(SLTControlReg);
 	printf("SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
+
+	//SLT control register - set Online - MUST DO before accessing the BBxcsr register -> otherwise: shuffling 2014-11 -tb-
+	printf("SLT Control: set 'OnLine' to 1.\n");
+	SLTControl =  pbus->read(SLTControlReg);
+	pbus->write(SLTControlReg, SLTControl | 0x4000);//set Online flag
+			
 	
     if(!warmStart){
     	//reset Pixbus Enable mask
-	    printf("SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    printf("SLTPixbusEnableReg: 0x%08lx \n",pbus->read(SLTPixbusEnableReg));
 	    pbus->write(SLTPixbusEnableReg,0x0);
-	    printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    printf("After reset: SLTPixbusEnableReg: 0x%08lx \n",pbus->read(SLTPixbusEnableReg));
     }
 	
 	//reset FIFO (pointers), read FIFO length
@@ -4434,7 +4674,9 @@ void InitHardwareFIFOs(int warmStart)
 			printf("Reset FIFO:\n");
 			printf("BBcsrReg(%i): 0x%08x (BBEn: %i)\n",i,BB0csr, (BB0csr & 0x2)>>1);
 			//pbus->write(BBcsrReg(numfifo) ,BB0csr | 0x4 | 0x8);
-			pbus->write(BBcsrReg(i) ,  (0x08 + 0x04));  //reset flags
+			pbus->write(BBcsrReg(i) ,  0);  //stop FIFO
+			usleep(10);
+			pbus->write(BBcsrReg(i) ,  (0x08 + 0x04));  //clear FIFO  -  firmware changed 2014-11, probably this command is enough -tb-
 			usleep(10);
 			//read FIFO length
 			//test pbus->write(FIFOAddr(numfifo), 13);
@@ -4450,13 +4692,11 @@ void InitHardwareFIFOs(int warmStart)
     printf("INIT HARDWARE (SLT REGISTERS)\n");
     printf("-----------------------------\n");
     
-	printf("SLT Control: set 'OnLine' to 1.\n");
-	pbus->write(SLTControlReg, 0x4000);
-			
 	//SLT control register
 	SLTControl =  pbus->read(SLTControlReg);
 	printf("SLTControl: 0x%08x (OnLine: %i)\n",SLTControl, (SLTControl & 0x4000)>>14);
 			
+    //enable FIFOs
 	for(i=0;i<FIFOREADER::availableNumFIFO;i++)
 	//for(i=0;i<FIFOREADER::maxNumFIFO;i++)
 	    if(FIFOREADER::FifoReader[i].readfifo){
@@ -4478,9 +4718,9 @@ void InitHardwareFIFOs(int warmStart)
 		
     if(0 /*I did it above*/ && !warmStart){
     	//reset Pixbus Enable mask
-	    printf("SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    printf("SLTPixbusEnableReg: 0x%08lx \n",pbus->read(SLTPixbusEnableReg));
 	    pbus->write(SLTPixbusEnableReg,0x0);
-	    printf("After reset: SLTPixbusEnableReg: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    printf("After reset: SLTPixbusEnableReg: 0x%08lx \n",pbus->read(SLTPixbusEnableReg));
 	}
 	
     if( !warmStart){
@@ -4489,7 +4729,7 @@ void InitHardwareFIFOs(int warmStart)
 	    //SLTPixbusEnable=pbus->read(SLTPixbusEnableReg);
 	    SLTPixbusEnable = slt.PixbusEnable;
 	    pbus->write(SLTPixbusEnableReg,SLTPixbusEnable);
-	    printf("Set SLTPixbusEnableReg to: 0x%08x \n",pbus->read(SLTPixbusEnableReg));
+	    printf("Set SLTPixbusEnableReg to: 0x%08lx \n",pbus->read(SLTPixbusEnableReg));
     }
 
     //end-----INIT HARDWARE (SLT REGISTERS)---------------------------------------
@@ -4632,7 +4872,7 @@ int32_t main(int32_t argc, char *argv[])
     }
     //check sizeof long 
       //TODO: move to preRunChecks -tb-
-    printf("Must be equal:  sizeof(unsigned long) is %i, sizeof(uint32_t) is %i\n", sizeof(unsigned long), sizeof(uint32_t));
+    printf("Must be equal:  sizeof(unsigned long) is %li, sizeof(uint32_t) is %li\n", sizeof(unsigned long), sizeof(uint32_t));
     if(sizeof(unsigned long) != sizeof(uint32_t)){
         printf("WARNING: sizeof(unsigned long) not equal to sizeof(uint32_t), this software should work correctly, but fdhwlib needs redesign ... \n");
         //exit(666);
@@ -4806,11 +5046,11 @@ int32_t main(int32_t argc, char *argv[])
 	
     
     //prepare simulation mode (we can simulate BB21 and BB2 mode)
-	int num_udp1444_packets = 0;//BB2: 0x341 = 833; BB21: 0x22b = 555
+	//int num_udp1444_packets = 0;//BB2: 0x341 = 833; BB21: 0x22b = 555
     #if 1
 	//this is BB21 mode:
 	//read status byte block
-	num_udp1444_packets = 0x22b;//0x341 = 833; BB21: 0x22b = 555
+	//num_udp1444_packets = 0x22b;//0x341 = 833; BB21: 0x22b = 555
 	buf_status284_len = readFileToBuf("bb21-udp284.txt",buf_status284,buflen);
 		//printf ("Total number of bytes: buf_status284_len %i\n", buf_status284_len);
 	//read adc date byte block
@@ -4878,25 +5118,24 @@ int32_t main(int32_t argc, char *argv[])
     InitHardwareFIFOs();
 
     //SLT registers
-	uint32_t FIFO0Status;
-	uint32_t FIFOMode;
-    uint32_t SLTControl;
-    uint32_t BB0csr;
+	//uint32_t FIFO0Status;
+	//uint32_t FIFOMode;
+    //uint32_t SLTControl;
+    //uint32_t BB0csr;
     uint32_t OperaStatus0;
     uint32_t OperaStatus1;
 
 
 	// vars
-    uint32_t val=0, rval=0;
-    int num_diff=0;
-    num_diff=0;
+    //uint32_t val=0, rval=0;
+    //int num_diff=0;
 
 	//talk with hardware
 
 
 	//Legacy Opera  status  
 	//--------------------
-	FIFOREADER *fr = FIFOREADER::FifoReader;
+	//FIFOREADER *fr = FIFOREADER::FifoReader;
 	#if 1 //we init the Trame_status_udp with prev. recorded UDP status packet in buf_status284 (of len buf_status284_len)
         //TODO: fake Opera status
 	for(iFifo=0; iFifo<FIFOREADER::maxNumFIFO; iFifo++){//here we can use FIFOREADER::maxNumFIFO instead of FIFOREADER::availableNumFIFO -tb-
@@ -5057,10 +5296,12 @@ int32_t main(int32_t argc, char *argv[])
 			    //check FIFObuf
 			   if(show_debug_info>1) printf("main: FIFObuf32avail(%i): %i\n",iFifo, FifoReader[iFifo].FIFObuf32avail);//DEBUG output -tb-
 			   
-			   if(currDiffTime!=0.0)printf("Average datarate FIFO %i: %9.3g KB/sec; ",FifoReader[iFifo].numfifo, (FifoReader[iFifo].FIFObuf32counter*0.004)/currDiffTime);
-			   printf("current rate: %9.3g KB/sec; ", ((FifoReader[iFifo].FIFObuf32counter-FifoReader[iFifo].FIFObuf32counterlast)*0.004)/elapsedTime);//elapsedTime is larger 0.0
-			   printf(" (%lli word32s in %g seconds) ",FifoReader[iFifo].FIFObuf32counter,currDiffTime);
-			   printf("\n");
+               if(show_debug_info >= 1){
+			       if(currDiffTime!=0.0)printf("Average datarate FIFO %i: %9.3g KB/sec; ",FifoReader[iFifo].numfifo, (FifoReader[iFifo].FIFObuf32counter*0.004)/currDiffTime);
+			       printf("current rate: %9.3g KB/sec; ", ((FifoReader[iFifo].FIFObuf32counter-FifoReader[iFifo].FIFObuf32counterlast)*0.004)/elapsedTime);//elapsedTime is larger 0.0
+			       printf(" (%li word32s in %g seconds) ",FifoReader[iFifo].FIFObuf32counter,currDiffTime);
+			       printf("\n");
+               }
                FifoReader[iFifo].FIFObuf32counterlast = FifoReader[iFifo].FIFObuf32counter;
 			}
 			
@@ -5125,8 +5366,24 @@ int32_t main(int32_t argc, char *argv[])
             }
         }
 
+        //check, whether there are FIFOs, which were disabled and still wait for enabling (new 2014-11) -tb-
+        //----------------------
+        const int64_t usecDelayBtwDisableAndClearFIFO=0;//after SLT FW update not necessary any more 2014-11-07 -tb- 1000000LL;
+	    for(iFifo=0; iFifo<FIFOREADER::availableNumFIFO; iFifo++){
+            if(FIFOREADER::isMarkedToClearAfterDelay(iFifo)){
+                int64_t timeDiff= FIFOREADER::usecElapsedDelaySinceMarkToClear(iFifo);
+                //TODO: DEBUG                 fprintf(stderr,"   timeDIff is %li\n", timeDiff );
+                if(timeDiff > usecDelayBtwDisableAndClearFIFO){
+                    pbus->write(BBcsrReg(iFifo),0xc);//clear FIFO (c=0x8+0x4=mres+pres)
+                    FIFOREADER::unmarkFIFOforClearAfterDelay(iFifo);
+                }
+            }
+        }
+        
+        
 
         //check for requests to change the state (from K command)
+        //    (after switching to multiple FIFOs in 2013, this all is more or less useless [as it would effect ALL FIFOs]) -tb-
         //-----------------------
         if(goToState != frUNDEF){
             //DEBUG fprintf(stderr,"-------------requested state change!!!---- -- (%i , FIFOREADER::State %i)\n", goToState ,FIFOREADER::State);

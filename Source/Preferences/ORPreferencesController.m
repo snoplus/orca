@@ -34,9 +34,6 @@
 - (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _shakeIt;
 - (void) _setPassWordButtonText;
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-- (void) _selectHeartbeatPathDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 @end;
 
 @implementation ORPreferencesController
@@ -229,7 +226,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 - (IBAction)closePassWordPanel:(id)sender
 {
     [passWordPanel orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+#else
     [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
 }
 
 - (IBAction) changePassWordAction:(id)sender
@@ -254,13 +255,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 - (IBAction) closeChangePassWordPanel:(id)sender
 {
         [changePassWordPanel orderOut:self];
-        [NSApp endSheet:changePassWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:changePassWordPanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+#else
+    [NSApp endSheet:changePassWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
 }
 
 - (IBAction) closeSetPassWordPanel:(id)sender
 {
     [setPassWordPanel orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+   [NSApp endSheet:setPassWordPanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+#else
     [NSApp endSheet:setPassWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
 }
 
 - (IBAction) enableBugReportSendAction:(id)sender
@@ -372,7 +381,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 	[openPanel setPrompt:@"Choose Heartbeat Location"];
 	NSString* startPath = [[NSUserDefaults standardUserDefaults] objectForKey: ORPrefHeartBeatPath];
 	if(![startPath length])startPath = [@"~" stringByExpandingTildeInPath];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startPath]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -383,35 +391,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
             [[NSNotificationCenter defaultCenter]postNotificationName:ORPrefHeartBeatPathChanged object:nil];
         }
     }];
-
-#else
-	[openPanel beginSheetForDirectory: startPath
-								 file: nil
-								types: nil
-					   modalForWindow: [self window]
-						modalDelegate: self
-					   didEndSelector: @selector(_selectHeartbeatPathDidEnd:returnCode:contextInfo:)
-						  contextInfo: NULL];
-#endif
-	
 }
 
 @end
 
 @implementation ORPreferencesController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre-10.6-specific
-- (void) _selectHeartbeatPathDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		NSString* path = [[sheet filenames] objectAtIndex:0];
-		[[NSUserDefaults standardUserDefaults] setObject:path forKey:ORPrefHeartBeatPath];
-		[heartbeatPathField setStringValue:[path stringByAbbreviatingWithTildeInPath]];
-
-		[[NSNotificationCenter defaultCenter]postNotificationName:ORPrefHeartBeatPathChanged object:nil];
-    }
-}
-#endif
-
 - (void)  _openSetNewPassWordPanel     
 {
     [setPassWordField setStringValue:@""];
@@ -435,7 +419,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
     if(returnCode == NSOKButton){
+#endif
     
         if([[passWordField stringValue] isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword]]){
             [self setLockState:NO];
@@ -458,7 +446,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 
 - (void) _changePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else 
     if(returnCode == NSOKButton){
+#endif
         if([[oldPassWordField stringValue] isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword]]){
             if([[newPassWordField stringValue] length] == 0){ 
                 NSBeep();
@@ -484,8 +476,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 
 - (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {   
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
     if(returnCode == NSOKButton){
-        if([[setPassWordField stringValue] length] == 0){ 
+#endif
+        if([[setPassWordField stringValue] length] == 0){
             if(!disallowStateChange)[self setLockState:YES];
             NSBeep();
             NSLog(@"Orca passwords cannot have zero length.\n");

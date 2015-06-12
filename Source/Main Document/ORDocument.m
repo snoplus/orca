@@ -8,7 +8,7 @@
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020.
 //The University has certain rights in the program pursuant to 
 //the contract and the program should not be copied or distributed 
 //outside your organization.  The DOE and the University of 
@@ -52,7 +52,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     if(self =[super init]){
 		[ORStatusController sharedStatusController];
         
-        [[NSApp delegate] setDocument:self];
+        [(ORAppDelegate*)[NSApp delegate] setDocument:self];
         [self setGroup:[[[ORGroup alloc] init] autorelease]];
         
        	[self setOrcaControllers:[NSMutableArray array]];
@@ -71,6 +71,8 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         
         
         [ORCommandCenter sharedCommandCenter];
+       // [[ORUSB sharedUSB] searchForDevices];
+
     }
     return self;
 }
@@ -78,7 +80,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (id) initForURL:(NSURL *)url withContentsOfURL:(NSURL *)contentsURL ofType:(NSString *)typeName error:(NSError **)outError
 {
     @try {
-        if([[NSApp delegate] document]){
+        if([(ORAppDelegate*)[NSApp delegate] document]){
             NSLogColor([NSColor redColor],@"Did not open [%@]. Only one experiment can be open at a time\n",[[url path] stringByAbbreviatingWithTildeInPath]);
             return nil;
         }
@@ -95,7 +97,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (id) initWithContentsOfURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError **)outError
 {
     @try {
-        if([[NSApp delegate] document]){
+        if([(ORAppDelegate*)[NSApp delegate] document]){
             NSLogColor([NSColor redColor],@"Did not open [%@]. Only one experiment can be open at a time\n",[[url path] stringByAbbreviatingWithTildeInPath]);
             return nil;
         }
@@ -122,11 +124,12 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
     [group sleep];
     [group release];
-	
+    [customRunParameters release];
+
     [[self undoManager] removeAllActions];
 	RestoreApplicationDockTileImage();
     
-	[[NSApp delegate] setDocument:nil];
+	[(ORAppDelegate*)[NSApp delegate] setDocument:nil];
     //[self setDbConnection:nil];
     [super dealloc];
 }
@@ -210,9 +213,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         unsigned long anId = 1;
         do {
             BOOL idAlreadyUsed = NO;
-            NSEnumerator* e = [objects objectEnumerator];
-            id anObj;
-            while(anObj = [e nextObject]){
+            for(id anObj in objects){
                 if(anObj == objToGetID)continue;
                 if([anObj uniqueIdNumber] == anId){
                     anId++;
@@ -249,6 +250,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (void) resetAlreadyVisitedInChainSearch
 {
 	[[self group] resetAlreadyVisitedInChainSearch];
+}
+
+- (NSArray*) collectObjectsWithClassName:(NSString*)aClassName
+{
+    return [self collectObjectsOfClass:NSClassFromString(aClassName)];
 }
 
 
@@ -292,7 +298,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	
     [docDict setObject:[svnVersion length]?svnVersion:@"0"   forKey:@"svnModVersion"];
 
-    [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
+    [docDict setObject:[NSString stringWithFormat:@"%@",[[NSDate date] stdDescription]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
 		
 	//setup and add Objects to object info list
@@ -305,9 +311,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	NSMutableArray* serial			= [NSMutableArray array];
 	NSMutableArray* auxHw			= [NSMutableArray array];
 	NSMutableDictionary* exp		= [NSMutableDictionary dictionary];
-	NSEnumerator* e					= [allObjects objectEnumerator];
-	id anObj;
-	while(anObj = [e nextObject]){
+	for(id anObj in allObjects){
 		if([anObj isKindOfClass:NSClassFromString(@"ORCrate")]){
 			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
 				[anObj addObjectInfoToArray:crates];
@@ -375,7 +379,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	if([exp count]){
 		[objectInfoDictionary setObject:exp forKey:@"Experiments"];
 	}
-	
+    if(customRunParameters){
+        [objectInfoDictionary setObject:customRunParameters forKey:@"Custom"];
+        [customRunParameters release];
+        customRunParameters = nil;
+    }
 	//add the Object Info into the dictionary from our argument list.
 	if([objectInfoDictionary count]){
 		[dictionary setObject:objectInfoDictionary forKey:@"ObjectInfo"];
@@ -386,6 +394,12 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
 	return [group addParametersToDictionary:dictionary];
+}
+
+- (void) addCustomRunParameters:(id)anObject forKey:(NSString*)aKey
+{
+    if(!customRunParameters)customRunParameters = [[NSMutableDictionary dictionary] retain];
+    [customRunParameters setObject:anObject forKey:aKey];
 }
 
 #pragma mark ¥¥¥Archival
@@ -511,9 +525,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[[self group] wakeUp];
 		
 
-	NSEnumerator* e = [orcaControllers objectEnumerator];
-		id controller;
-		while(controller = [e nextObject]){
+		for(id controller in orcaControllers){
 			@try {
 				[[controller window] orderFront:controller];
 			}
@@ -527,7 +539,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		 object:self];
 		
 		@try {
-			[[ORUSB sharedUSB] awakeAfterDocumentLoaded];
+			//[[ORUSB sharedUSB] awakeAfterDocumentLoaded];
 			[group awakeAfterDocumentLoaded];
 		}
 		@catch(NSException* localException) {
@@ -546,9 +558,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (NSArray*) controllersToSave
 {
 	NSMutableArray* controllersToSave = [NSMutableArray array];
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller model] != [[ORCommandCenter sharedCommandCenter] scriptIDEModel]){
             [controllersToSave addObject:controller];
         }
@@ -558,10 +568,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) checkControllers
 {
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
     NSMutableArray* badObjs = [NSMutableArray array];
-    while(controller = [e nextObject]){
+    for (id controller in orcaControllers){
         if(![controller isKindOfClass:[OrcaObjectController class]]){
             [badObjs addObject:controller];
         }
@@ -634,11 +642,9 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         else shareDialogs = YES;
     }
     
-    id controller = nil;
     
     //if a dialog already exists then use it no matter what.
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller model] == aModel){
             [controller showWindow:self];
 			[[controller window] makeFirstResponder:[controller window]];
@@ -649,8 +655,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     //ok, the dialog doesn't exist yet....
     if(shareDialogs == YES){
         //try to share one
-        NSEnumerator* e = [orcaControllers objectEnumerator];
-        while(controller = [e nextObject]){
+        for(id controller in orcaControllers){
             if([controller class] == NSClassFromString(aClassName)){
                 [controller setModel:aModel];
                 [controller showWindow:self];
@@ -661,7 +666,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     }
     
     //if we get here then we'll have to make one.
-    controller = [[NSClassFromString(aClassName) alloc] init];
+    id controller = [[NSClassFromString(aClassName) alloc] init];
     if([controller isKindOfClass:[OrcaObjectController class]]){
         
         [controller setModel:aModel];
@@ -698,23 +703,15 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void)objectsRemoved:(NSNotification*)aNote
 {
-    
     NSArray* list = [[aNote userInfo] objectForKey:ORGroupObjectList];
-    NSEnumerator* objsToRemoveEnumerator = [list objectEnumerator];
-    id anObj;
-    while(anObj = [objsToRemoveEnumerator nextObject]){
+    for(id anObj in list){
         NSArray* totalList = [anObj familyList];    
-        NSEnumerator* e = [totalList objectEnumerator];
-        id objToBeRemoved;
-		id controllersToRemove;
-        while(objToBeRemoved = [e nextObject]){
-            controllersToRemove = [self findControllersWithModel:objToBeRemoved];
+        for(id objToBeRemoved in totalList){
+            id controllersToRemove = [self findControllersWithModel:objToBeRemoved];
             [orcaControllers removeObjectsInArray:controllersToRemove];
 			//tricky, we also have to worry about objects that have subobjects that have dialogs
 			id subObjectsToBeRemoved = [objToBeRemoved subObjectsThatMayHaveDialogs];
-			NSEnumerator* e1 = [subObjectsToBeRemoved objectEnumerator];
-			id subObjectToBeRemoved;
-			while(subObjectToBeRemoved = [e1 nextObject]){
+			for(id subObjectToBeRemoved in subObjectsToBeRemoved){
 				controllersToRemove = [self findControllersWithModel:subObjectToBeRemoved];
 	            [orcaControllers removeObjectsInArray:controllersToRemove];
 			}
@@ -726,9 +723,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (NSArray*) findControllersWithModel:(id)obj
 { 
     NSMutableArray* list = [NSMutableArray array];
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller model] == obj){
             [list addObject:controller];
         }
@@ -739,9 +734,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (void)windowClosing:(NSNotification*)aNote
 {
     
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller window] == [aNote object]){
             //[controller retain];
 			@try {
@@ -766,11 +759,11 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		return YES;
 	}
     else if([[ORGlobal sharedGlobal] runInProgress]){
-        NSRunAlertPanel(@"Run In Progess", @"Experiment can NOT be closed.", nil, nil,nil);
+        ORRunAlertPanel(@"Run In Progess", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;
     }
     else if([self isDocumentEdited]){
-        NSRunAlertPanel(@"Document Unsaved", @"Experiment can NOT be closed.", nil, nil,nil);
+        ORRunAlertPanel(@"Document Unsaved", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;
     }
 	else {
@@ -785,8 +778,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 			s = @"Closing main window will close this experiment!";
 			buttonString = @"Close Experiment";
 		}
-        int choice = NSRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
-        if(choice == NSAlertAlternateReturn){
+        BOOL cancel = ORRunAlertPanel(s,@"Is this really what you want?",@"Cancel",buttonString,nil);
+        if(!cancel){
             //[[self undoManager] removeAllActions];
             [[NSNotificationCenter defaultCenter]
 			 postNotificationName:ORDocumentClosedNotification

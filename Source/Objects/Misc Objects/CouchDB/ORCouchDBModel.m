@@ -48,22 +48,23 @@ NSString* ORCouchDBLock							= @"ORCouchDBLock";
 NSString* ORCouchDBLocalHostNameChanged         = @"ORCouchDBLocalHostNameChanged";
 NSString* ORCouchDBModelUsingUpdateHandleChanged = @"ORCouchDBModelUsingUpdateHandleChanged";
 
-#define kCreateDB		 @"kCreateDB"
-#define kReplicateDB	 @"kReplicateDB"
-#define kCreateRemoteDB  @"kCreateRemoteDB"
-#define kDeleteDB		 @"kDeleteDB"
-#define kListDB			 @"kListDB"
-#define kRemoteInfo		 @"kRemoteInfo"
-#define kRemoteInfoVerbose @"kRemoteInfoVerbose"
-#define kDocument		 @"kDocument"
-#define kInfoDB			 @"kInfoDB"
-#define kDocumentAdded	 @"kDocumentAdded"
-#define kDocumentUpdated @"kDocumentUpdated"
-#define kDocumentDeleted @"kDocumentDeleted"
-#define kCompactDB		 @"kCompactDB"
-#define kInfoInternalDB  @"kInfoInternalDB"
-#define kAttachmentAdded @"kAttachmentAdded"
-#define kInfoHistoryDB   @"kInfoHistoryDB"
+#define kCreateDB           @"kCreateDB"
+#define kReplicateDB        @"kReplicateDB"
+#define kRestartReplicateDB @"kRestartReplicateDB"
+#define kCreateRemoteDB     @"kCreateRemoteDB"
+#define kDeleteDB           @"kDeleteDB"
+#define kListDB             @"kListDB"
+#define kRemoteInfo         @"kRemoteInfo"
+#define kRemoteInfoVerbose  @"kRemoteInfoVerbose"
+#define kDocument           @"kDocument"
+#define kInfoDB             @"kInfoDB"
+#define kDocumentAdded      @"kDocumentAdded"
+#define kDocumentUpdated    @"kDocumentUpdated"
+#define kDocumentDeleted    @"kDocumentDeleted"
+#define kCompactDB          @"kCompactDB"
+#define kInfoInternalDB     @"kInfoInternalDB"
+#define kAttachmentAdded    @"kAttachmentAdded"
+#define kInfoHistoryDB      @"kInfoHistoryDB"
 #define kAddUpdateHandler @"kAddUpdateHandler"
 
 #define kCouchDBPort 5984
@@ -108,8 +109,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [localHostName release];
     [remoteHostName release];
 	[docList release];
+    [replicationAlarm clearAlarm];
     [replicationAlarm release];
-	[replicationAlarm clearAlarm];
     [customDataBases release];
 
 	[super dealloc];
@@ -118,9 +119,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) wakeUp
 {
     if(![self aWake]){
-        [self createDatabase];
+        [self createDatabases];
         [self _startAllPeriodicOperations];
         [self registerNotificationObservers];
+        statusUpdateScheduled = NO;
+
     }
     [super wakeUp];
 }
@@ -130,7 +133,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     [self _cancelAllPeriodicOperations];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self deleteDatabase];
+	//[self deleteDatabases];
 	[super sleep];
 }
 
@@ -170,7 +173,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [notifyCenter addObserver : self
                      selector : @selector(applicationIsTerminating:)
                          name : @"ORAppTerminating"
-                       object : [NSApp delegate]];
+                       object : (ORAppDelegate*)[NSApp delegate]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
@@ -246,7 +249,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) applicationIsTerminating:(NSNotification*)aNote
 {
-	[self deleteDatabase];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+	//[self deleteDatabases];
+    //int i;
+    //for(i=0;i<15;i++){
+    //    if([ORCouchDBQueue operationCount]==0)break;
+    //    [NSThread sleepForTimeInterval:1];
+    //}
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -255,7 +264,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[self alarmsChanged:nil];
 	[self statusLogChanged:nil];
 	[self updateExperiment];
-    [self recordEvent:@"Restart" symbol:@"O" comment:@"ORCA restarted"];
+    NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                         @"ORCA restarted",                                     @"comment",
+                         @"O",                                                  @"Symbol",
+                         nil];
+
+    [self recordEvent:@"Restart" document:doc];
 }
 
 #pragma mark ***Accessors
@@ -309,11 +323,11 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if(stealthMode){
         if([ORCouchDBQueue operationCount]) [ORCouchDBQueue cancelAllOperations];
         [self _cancelAllPeriodicOperations];
-        [self deleteDatabase];
+        //[self deleteDatabases];
     }
     else {
-        [self createDatabase];
-        [self _startAllPeriodicOperations];
+        [self createDatabases];
+       // [self _startAllPeriodicOperations];
     }
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelStealthModeChanged object:self];
 }
@@ -471,15 +485,33 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	else return [ORCouchDB couchHost:remoteHostName port:portNumber username:userName pwd:password database:aDatabaseName delegate:self];
 }
 
-- (void) createDatabase
+- (void) createDatabases
 {
-    [self createDatabase:[self statusDBRef]];
-    [self addUpdateHandler:[self statusDBRef]];
+    [self createDatabase:   [self statusDBRef]];
+    [self addUpdateHandler: [self statusDBRef]];
+    if([remoteHostName length]){
+        [self createDatabase:    [self remoteDBRef]];
+        [self performSelector:@selector(startReplication) withObject:nil afterDelay:4];
+    }
+    [self _startAllPeriodicOperations];
+
 }
 
 - (void) createDatabase:(ORCouchDB*)aDBRef;
 {
 	[aDBRef createDatabase:kCreateDB views:nil];
+}
+
+- (void) deleteDatabases
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self deleteDatabase:[self statusDBRef]];
+    [self deleteDatabase:[self remoteDBRef]];
+}
+
+- (void) deleteDatabase:(ORCouchDB*)aDBRef;
+{
+    [aDBRef deleteDatabase:kDeleteDB];
 }
 
 - (void) addUpdateHandler
@@ -554,21 +586,38 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	[[self remoteDBRef]         createDatabase:kCreateRemoteDB views:nil];
     for(id aKey in [customDataBases allKeys]){
         [[self remoteHistoryDBRef:aKey]  createDatabase:kCreateRemoteDB views:nil];
-    }}
-
-- (void) replicate:(BOOL)continuously
-{			
-	[[self remoteHistoryDBRef]  replicateLocalDatabase:kReplicateDB continous:continuously];
-	[[self remoteDBRef]         replicateLocalDatabase:kReplicateDB continous:continuously];
-    for(id aKey in [customDataBases allKeys]){
-        [[self remoteHistoryDBRef:aKey]  replicateLocalDatabase:kReplicateDB continous:YES];
     }
 }
 
-
-- (void) deleteDatabase
+- (void) startReplication
 {
-	[[self statusDBRef] deleteDatabase:kDeleteDB];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startReplication) object:nil];
+   
+    [self replicate:YES restart:replicationRunning];
+    
+	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
+    [self performSelector:@selector(startReplication) withObject:nil afterDelay:3600];
+}
+
+- (void) replicate:(BOOL)continuously
+{
+    [self replicate:continuously restart:NO];
+}
+
+- (void)replicate:(BOOL)continuously restart:(BOOL)aRestart
+{
+    NSString* tag;
+    
+    if(!aRestart) tag = kReplicateDB;
+    else         tag = kRestartReplicateDB;
+    
+	[[self remoteHistoryDBRef]  replicateLocalDatabase:tag continous:continuously];
+	[[self remoteDBRef]         replicateLocalDatabase:tag continous:continuously];
+    for(id aKey in [customDataBases allKeys]){
+        [[self remoteHistoryDBRef:aKey]  replicateLocalDatabase:tag continous:YES];
+    }
 }
 
 - (void) updateProcesses
@@ -652,14 +701,30 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                 }
             }
             
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+            
+            NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+            [dateFormatter setTimeZone:gmt];
+            NSString *lastTimeStamp = [dateFormatter stringFromDate:[NSDate date]];
+            NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+            unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+            [dateFormatter release];
+            
+            
+            if(![lastTimeStamp length]) lastTimeStamp = @"0";
+            
             NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        @"machineinfo",@"_id",
-                                        @"machineinfo",@"type",
-                                         [NSNumber numberWithLong:[[[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
-                                         computerName(),@"name",
-                                         macAddress(),@"hw_address",
-                                         thisHostAdress,@"ip_address",
-                                         fullVersion(),@"version",nil];
+                                                    @"machineinfo", @"_id",
+                                                    @"machineinfo", @"type",
+                                                    [NSNumber numberWithLong:[[(ORAppDelegate*)(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+                                                    computerName(), @"name",
+                                                    macAddress(),   @"hw_address",
+                                                    thisHostAdress, @"ip_address",
+                                                    fullVersion(),  @"version",
+                                                    lastTimeStamp,  @"timestamp",
+                                                    [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+nil];
             
             NSFileManager* fm = [NSFileManager defaultManager];
             
@@ -742,8 +807,10 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 	}
 }
 
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment
+- (void) recordEvent:(NSString*)eventName document:aDocument
 {
+    if (stealthMode) return;
+    
     NSDate* localDate = [NSDate date];
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -756,38 +823,31 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
     [dateFormatter release];
     
-    [self recordEvent:eventName symbol:aSymbol comment:aComment timeString:lastTimeStamp timeStamp:secondsSince1970];
-}
-
-- (void) recordEvent:(NSString*)eventName symbol:(NSString*)aSymbol comment:(NSString*)aComment timeString:aDateString timeStamp:(unsigned long)aTimeStamp
-{
-    if([aSymbol length]>=1) aSymbol = [aSymbol substringWithRange:NSMakeRange(0,1)];
-    else aSymbol = @"G";
+    NSMutableDictionary* eventInfo = [NSMutableDictionary dictionaryWithDictionary:aDocument];
+    [eventInfo setObject:eventName forKey:@"name"];
+    [eventInfo setObject:@"Events" forKey:@"title"];
+    [eventInfo setObject:lastTimeStamp forKey:@"timestamp"];
+    [eventInfo setObject:[NSNumber numberWithUnsignedLong: secondsSince1970] forKey:@"time"];
+ 
     
-    NSMutableDictionary* eventInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        eventName,          @"name",
-                                        @"Events",			@"title",
-                                        aSymbol,            @"symbol",
-                                        aComment,           @"comment",
-                                        aDateString,		@"timestamp",
-                                        [NSNumber numberWithUnsignedLong: aTimeStamp],		@"time",
-                                        nil];
+    id aDataBaseRef = [self historyDBRef];
+    [self checkDataBaseExists:aDataBaseRef];
 
-    [[self historyDBRef] addDocument:eventInfo tag:kDocumentAdded];
+    
+    [aDataBaseRef addDocument:eventInfo tag:kDocumentAdded];
 	
-	[[self historyDBRef] updateEventCatalog:eventInfo documentId:@"eventCatalog" tag:kDocumentAdded];
+	[aDataBaseRef updateEventCatalog:eventInfo documentId:@"eventCatalog" tag:kDocumentAdded];
 
 }
 
 - (void) updateDatabaseStats
 {
-	if(!stealthMode){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-        [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
-        if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
-        [self getRemoteInfo:NO];
-		[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
-	}
+    if (stealthMode) return;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+    [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
+    if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
+    [self getRemoteInfo:NO];
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
 }
 
 - (void) setDBInfo:(NSDictionary*)someInfo
@@ -845,6 +905,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 					[aResult prettyPrint:@"CouchDB Info:"];
 				}
 				else if([aTag isEqualToString:kDocumentAdded]){
+					//ignore
+				}
+				else if([aTag isEqualToString:kRestartReplicateDB]){
 					//ignore
 				}
 				else if([aTag isEqualToString:kCreateDB]){
@@ -964,20 +1027,12 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 }
 
-- (void) startReplication
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-    
-	[self replicate:YES];
-    
-	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
-}
-
 - (void) periodicCompact
 {
+    if (stealthMode) return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(periodicCompact) object:nil];
 	[self compactDatabase];
-	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:600];
+	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 }
 
 - (void) compactDatabase
@@ -1020,8 +1075,19 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         NSString* comment;
         if(subRunNumberLocal==0) comment = [NSString stringWithFormat:@"Run %lu Started",runNumberLocal];
         else                     comment = [NSString stringWithFormat:@"Run %lu.%lu Started",runNumberLocal,subRunNumberLocal];
-        [self recordEvent:@"RunStarted" symbol:@"S" comment:comment];
+        
+        NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithUnsignedLong:runNumberLocal]   , @"RunNumber",
+                             [NSNumber numberWithUnsignedLong:subRunNumberLocal], @"SubRunNumber",
+                             comment,@"comment",
+                             @"S",@"Symbol",
+                             nil];
+        
+        
+        
+        [self recordEvent:@"RunStarted" document:doc];
     }
+    [self updateRunInfo];
 }
 
 - (void) runStopped:(NSNotification*)aNote
@@ -1030,11 +1096,24 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     if([[info objectForKey:@"kRunMode"] intValue]==0){
         unsigned long runNumberLocal     = [[info objectForKey:@"kRunNumber"] unsignedLongValue];
         unsigned long subRunNumberLocal  = [[info objectForKey:@"kSubRunNumber"]unsignedLongValue];
+        float elapsedTimeLocal   = [[info objectForKey:@"kElapsedTime"]floatValue];
         NSString* comment;
         if(subRunNumberLocal==0) comment = [NSString stringWithFormat:@"Run %lu Stopped",runNumberLocal];
         else                     comment = [NSString stringWithFormat:@"Run %lu.%lu Stopped",runNumberLocal,subRunNumberLocal];
-        [self recordEvent:@"RunStopped" symbol:@"E" comment:comment];
+        
+        
+        NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithUnsignedLong:runNumberLocal]   , @"RunNumber",
+                             [NSNumber numberWithUnsignedLong:subRunNumberLocal], @"SubRunNumber",
+                             [NSNumber numberWithFloat:elapsedTimeLocal],         @"ElapsedTime",
+                             
+                             comment,@"comment",
+                             @"E",@"Symbol",
+                             nil];
+
+        [self recordEvent:@"RunStopped" document:doc];
     }
+    [self updateRunInfo];
 }
 
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote
@@ -1265,7 +1344,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		if(!statusUpdateScheduled){
-			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:60];
+			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:120];
 			statusUpdateScheduled = YES;
 		}
 	}
@@ -1382,7 +1461,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
             }
         }
 		
-		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:10];
+		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:30];
 	}
 }
 
@@ -1395,9 +1474,9 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
     [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
     [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
-    [self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:3];
-    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
-    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60];
+    [self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:4];
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:5];
+    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 }
 
 #pragma mark ***Archival

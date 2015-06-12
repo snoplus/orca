@@ -48,7 +48,7 @@
     float		    lowFillPoint[4];
     unsigned long	timeMeasured[4];
     int				alarmStatus[4];
-    NSCalendarDate*	lastChange[4];
+    NSDate*         lastChange[4];
     NSTimer*		expiredTimer[4];
     unsigned char	enabledMask;
     BOOL			unitsSet;

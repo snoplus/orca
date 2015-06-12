@@ -178,7 +178,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
 - (void)processIsStopping
 {
 	[self _setUpPolling];
-	[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+	[self setLastRead:[[NSDate date] stdDescription]];
 }
 
 - (void) startProcessCycle
@@ -229,7 +229,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     @try { 
         [self readInputRegister:NO];    
-		[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+		[self setLastRead:[[NSDate date] description]];
     }
 	@catch(NSException* localException) { 
         //catch this here to prevent it from falling thru, but nothing to do.

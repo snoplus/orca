@@ -28,21 +28,11 @@
 #import "OR1DHistoPlot.h"
 
 @interface ORMCA927Controller (private)
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) openPanelForFPGADidEnd:(NSOpenPanel*)sheet
-					 returnCode:(int)returnCode
-					contextInfo:(void*)contextInfo;
-
-- (void) saveFileDidEnd:(NSSavePanel *)sheet 
-			 returnCode:(int)returnCode 
-			contextInfo:(void  *)contextInfo;
-#endif
-
-- (void) clearSpectaSheetDidEnd:(id)sheet 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) clearSpectaSheetDidEnd:(id)sheet
 				  returnCode:(int)returnCode 
 				 contextInfo:(id)userInfo;
-
+#endif
 - (void) populateInterfacePopup:(ORUSB*)usb;
 
 @end
@@ -563,7 +553,37 @@
 - (IBAction) clearSpectrumAction:(id)sender;
 {
 	
-	NSBeginAlertSheet(@"Clearing all spectra!",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clearing all spectra!"];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Yes, Clear All"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            @try {
+                [model clearSpectrum:0];
+                [model clearSpectrum:1];
+                [model clearZDT:0];
+                [model clearZDT:1];
+                [model readSpectrum:0];
+                [model readSpectrum:1];
+                [model readZDT:0];
+                [model readZDT:1];
+                [plotter setNeedsDisplay:YES];
+            }
+            @catch (NSException* localException){
+                [self displayFPGAError];
+                NSLogColor([NSColor redColor],@"MCA927 failed to clear spectrum\n");
+                NSLogColor([NSColor redColor],@"%@\n",localException);
+            }
+ 
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Clearing all spectra!",
                       @"Cancel",
                       @"Yes, Clear All",
                       nil,[self window],
@@ -571,6 +591,7 @@
                       @selector(clearSpectaSheetDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 }
 
 - (IBAction) writeSpectrumAction:(id)sender;
@@ -591,7 +612,6 @@
         startingDir = NSHomeDirectory();
         defaultFile = @"Untitled";
     }
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldLabel:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -600,16 +620,6 @@
             [model writeSpectrum:i toFile:[[savePanel URL]path]];
         }
     }];
-    
-#else 		
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-	
-#endif
 }
 
 - (IBAction) readSpectrumAction:(id)sender
@@ -827,22 +837,12 @@
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setPrompt:@"Select FPGA Binary File"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startPath]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model setFpgaFilePath:[[openPanel URL]path]]; 
         }
     }];
-#else 	
-	[openPanel beginSheetForDirectory:startPath?startPath:startPath
-								 file:nil
-								types:nil //[NSArray arrayWithObjects:@"bin",nil]
-					   modalForWindow:[self window]
-						modalDelegate:self
-					   didEndSelector:@selector(openPanelForFPGADidEnd:returnCode:contextInfo:)
-						  contextInfo:NULL];
-#endif
 }
 
 
@@ -912,25 +912,7 @@
 @end
 
 @implementation ORMCA927Controller (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void) openPanelForFPGADidEnd:(NSOpenPanel*)sheet
-					 returnCode:(int)returnCode
-						contextInfo:(void*)contextInfo
-{
-    if(returnCode){
-		[model setFpgaFilePath:[sheet filename]];
-    }
-}
-
-- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void*)contextInfo
-{
-    if(returnCode){
-		int i = [model selectedChannel];
-		[model writeSpectrum:i toFile:[sheet filename]];
-    }
-}
-#endif
-
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) clearSpectaSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
@@ -953,6 +935,7 @@
 		}
 	}
 }
+#endif
 
 - (void) populateInterfacePopup:(ORUSB*)usb
 {

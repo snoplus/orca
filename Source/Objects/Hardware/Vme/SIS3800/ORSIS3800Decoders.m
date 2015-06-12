@@ -82,13 +82,11 @@
 	s = [s stringByAppendingFormat:@"Card  = %lu\n",ShiftAndExtract(ptr[1],16,0x1f)];
 	s = [s stringByAppendingString:(ptr[1]&0x1)?@"SIS3820\n":@"SIS3800\n"];
 
-	NSCalendarDate* date;	 
-	date= [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	NSDate* date;
+	date= [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[2]];
 	s = [s stringByAppendingFormat:@"This Read: %@\n",date];
 	
-	date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[3]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[3]];
 	s = [s stringByAppendingFormat:@"Last Read: %@\n",date];
 		 
 	s = [s stringByAppendingFormat:@"Enabled  Mask: 0x%08lx\n",ptr[4]];

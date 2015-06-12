@@ -66,9 +66,7 @@
     NSString* card			= [NSString stringWithFormat:@"Card  = %lu\n",(*ptr&0x001f0000)>>16];
 
 	ptr++;
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
-
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:*ptr];
 
 	NSString* adcString = @"";
 	int n = length - 3;
@@ -78,7 +76,7 @@
 		adcString   = [adcString stringByAppendingFormat:@"ADC(%02lu) = 0x%lx\n",(*ptr>>16)&0x000000ff, *ptr&0x00000fff];
     }
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,date,adcString];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,[date descriptionFromTemplate:@"MM/dd/yy HH:mm:ss z\n"],adcString];
 }
 
 

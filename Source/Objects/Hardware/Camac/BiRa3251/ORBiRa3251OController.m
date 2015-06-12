@@ -111,7 +111,7 @@
         [[model crate]  doNoPowerAlert:anException action:[NSString stringWithFormat:@"%@",name]];
     }
     else {
-        NSRunAlertPanel([anException name], @"%@\n%@", @"OK", nil, nil,
+        ORRunAlertPanel([anException name], @"%@\n%@", @"OK", nil, nil,
                         [anException name],name);
     }
 }

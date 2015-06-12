@@ -116,6 +116,16 @@
                      selector : @selector(updatePathChanged:)
                          name : ORCouchDBListenerModelUpdatePathChanged
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(listenOnStartChanged:)
+                         name : ORCouchDBListenerModelListenOnStartChanged
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(saveHeartbeatsWhileListeningChanged:)
+                         name : ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged
+                       object : nil];
 }
 
 - (void) updateWindow
@@ -157,7 +167,7 @@
 - (void) statusLogChanged:(NSNotification *)aNote
 {
     if ([[aNote name] isEqualToString:ORCouchDBListenerModelStatusLogAppended]) {
-        NSAttributedString* attr = [[NSAttributedString alloc] initWithString:[aNote object]];
+        NSAttributedString* attr = [[[NSAttributedString alloc] initWithString:[aNote object]]autorelease];
         [[statusLog textStorage] appendAttributedString:attr];
         [statusLog scrollRangeToVisible:NSMakeRange([[statusLog string] length], 0)];
     } else {
@@ -203,6 +213,15 @@
     }
 }
 
+- (void) listenOnStartChanged:(NSNotification*)aNote
+{
+    [cmdListenOnStart setState:[model listenOnStart]];
+}
+
+- (void) saveHeartbeatsWhileListeningChanged:(NSNotification *)aNote
+{
+    [cmdSaveHeartbeatsWhileListening setState:[model saveHeartbeatsWhileListening]];
+}
 
 #pragma mark •••Actions
 - (void) updateDisplays
@@ -223,6 +242,8 @@
     [self statusLogChanged:nil];
     [self databaseChanged:nil];
     [self updatePathChanged:nil];
+    [self listenOnStartChanged:nil];
+    [self saveHeartbeatsWhileListeningChanged:nil];
     
 }
 
@@ -246,6 +267,7 @@
     [cmdObjectUpdateButton setEnabled:NO];
     [cmdValueField setEnabled:NO];
     [cmdTestExecuteButton setEnabled:NO];
+    [cmdSaveHeartbeatsWhileListening setEnabled:NO];
 
 }
 
@@ -268,6 +290,7 @@
     [cmdInfoField setEnabled:YES];
     [cmdObjectUpdateButton setEnabled:YES];
     [cmdTestExecuteButton setEnabled:YES];
+    [cmdSaveHeartbeatsWhileListening setEnabled:YES];
 }
 
 - (IBAction) heartbeatSet:(id)sender
@@ -310,6 +333,11 @@
 - (IBAction) listDB:(id)sender
 {
     [model listDatabases];
+}
+
+- (IBAction) listenOnStartAction:(id)sender
+{
+    [model setListenOnStart:[sender state]];
 }
 
 - (IBAction) cmdRemoveAction:(id)sender
@@ -392,6 +420,11 @@
     } else if ([updatename length] != 0 && [designdoc length] != 0) {
         [model setUpdatePath:[NSString stringWithFormat:@"_design/%@/_update/%@",designdoc,updatename]];
     }
+}
+
+- (IBAction) saveHeartbeatsWhileListeningAction:(id)sender
+{
+    [model setSaveHeartbeatsWhileListening:[sender state]];
 }
 
 #pragma mark •••DataSource

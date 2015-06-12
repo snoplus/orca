@@ -636,7 +636,8 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
         [fm createFileAtPath:filePath contents:nil attributes:nil];
     }
     
- 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:S"];
 	NSString* dateString = [dateFormatter stringFromDate:dateOfMaxRadValue];
     [dateFormatter release];
 
@@ -660,7 +661,8 @@ NSString* ORNMon5085IsLogChanged                  = @"ORNMon5085IsLogChanged";
         [fm createFileAtPath:filePath contents:nil attributes:nil];
     }
     NSDate* now = [NSDate date];
- 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"%H:%M:%S" allowNaturalLanguage:NO];
+ 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"HH:mm:S"];
 	NSString* dateString = [dateFormatter stringFromDate:now];
     [dateFormatter release];
     

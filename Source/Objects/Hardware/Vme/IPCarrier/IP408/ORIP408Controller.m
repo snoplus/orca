@@ -36,26 +36,6 @@
     return self;
 }
 
-
-- (void) awakeFromNib
-{
-	[logicView setGroup:model];
-    [super awakeFromNib];
-}
-
-- (ORTriggerLogicView *)logicView
-{
-    return logicView;
-}
-
-
-- (void) setModel:(OrcaObject*)aModel
-{
-    [super setModel:aModel];
-    [logicView setGroup:(ORGroup*)model];
-}
-
-
 #pragma mark ¥¥¥Notifications
 -(void)registerNotificationObservers
 {
@@ -99,7 +79,6 @@
     [self readMaskChanged:nil];
     [self readValueChanged:nil];
     [self slotChanged:nil];
-    [logicView setNeedsDisplay:YES];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -163,7 +142,7 @@
         [model setReadValue:value];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
     }
 }
@@ -175,7 +154,7 @@
         [model setOutputWithMask:[model writeMask] value:[model writeValue]];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
     }
 }

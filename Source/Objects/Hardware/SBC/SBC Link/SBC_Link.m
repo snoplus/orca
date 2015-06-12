@@ -32,11 +32,15 @@
 #import "NSFileManager+Extensions.h"
 #import "SNOCmds.h"
 
+#import "libkern/OSAtomic.h" //necessary for 10.6 (needed for OSQueueHead, OSAtomicDequeue, etc.) -tb-
+
 #import <netdb.h>
 #import <sys/types.h>
 #import <sys/socket.h>
 #import <sys/select.h>
 #import <sys/errno.h>
+
+#import <objc/runtime.h>
 
 #define kNoSelectionError	 0
 #define kSelectionTimeout	 0
@@ -89,12 +93,41 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
     NSMutableData* data;
 }
 
++ (id) allocWithZone:(struct _NSZone *)zone;
 - (void) dealloc;
+- (void) releaseAndCache;
 - (SBC_Packet*) sbcPacket;
 
 @end
 
+static OSQueueHead gSBCPacketWrapperHead = OS_ATOMIC_QUEUE_INIT;
+static id GetSBCPacketFromCache()
+{
+    return OSAtomicDequeue(&gSBCPacketWrapperHead, offsetof(struct objc_object,isa));
+}
+
+static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
+{
+    OSAtomicEnqueue(&gSBCPacketWrapperHead, sbc, offsetof(struct objc_object,isa));
+}
+
 @implementation SBCPacketWrapper
++ (id) allocWithZone:(struct _NSZone *)zone
+{
+    id obj = GetSBCPacketFromCache();
+    if (obj) {
+        *(Class *)obj = self;
+    } else {
+        obj = [super allocWithZone:zone];
+    }
+    return obj;
+}
+
+-(void) releaseAndCache
+{
+    AddSBCPacketWrapperToCache(self);
+}
+
 - (void) dealloc
 {
     [data release];
@@ -284,7 +317,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 
 - (NSUndoManager*) undoManager
 {
-	return [[NSApp delegate] undoManager];
+	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (NSString*) sbcLockName
@@ -579,15 +612,15 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
         [connectionDroppedAlarm release];
         connectionDroppedAlarm = nil;
     }
-	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+	[self setTimeConnected:isConnected?[NSDate date]:nil];
 }
 
-- (NSCalendarDate*) timeConnected
+- (NSDate*) timeConnected
 {
 	return timeConnected;
 }
 
-- (void) setTimeConnected:(NSCalendarDate*)newTimeConnected
+- (void) setTimeConnected:(NSDate*)newTimeConnected
 {
 	[timeConnected autorelease];
 	timeConnected=[newTimeConnected retain];	
@@ -654,7 +687,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 
 - (void) setByteRateSent:(float)aRate
 {    
-	byteRateSent = aRate/(float)kSBCRateIntegrationTime;
+	byteRateSent = aRate;
 }
 
 - (float)byteRateSent
@@ -664,7 +697,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 
 - (void) setByteRateReceived:(float)aRate
 {    
-	byteRateReceived = aRate/(float)kSBCRateIntegrationTime;
+	byteRateReceived = aRate;
 }
 
 - (float)byteRateReceived
@@ -787,6 +820,8 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	
 	exitCBTest    = YES;
 	cbTestRunning = NO;
+    
+    [self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
 
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -888,7 +923,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	[self send:aPacket receive:aPacket];
 	
 	memcpy(&runInfo,aPacket->payload,sizeof(SBC_info_struct));
-	[pw release];
+	[pw releaseAndCache];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
@@ -1338,7 +1373,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	} @finally {
-        [pw release];
+        [pw releaseAndCache];
     }
 	
 }
@@ -1368,7 +1403,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	} @finally {
-        [pw release];
+        [pw releaseAndCache];
     }
 }
 
@@ -1407,7 +1442,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[socketLock unlock]; //end critical section
 		[localException raise];
 	} @finally {
-        [pw release];
+        [pw releaseAndCache];
     }
 }
 
@@ -1452,7 +1487,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[localException raise];
 	}
 	@finally {
-		[pw release];
+		[pw releaseAndCache];
 	}
 }
 
@@ -1538,7 +1573,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[localException raise];
 	}
 	@finally {
-		[pw release];
+        [pw releaseAndCache];
 	}
 
 }
@@ -1609,7 +1644,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[localException raise];
 	}
 	@finally {
-		[pw release];
+		[pw releaseAndCache];
 	}
 }
 
@@ -1729,7 +1764,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		if(numLongs>0){
 			[aDataPacket addLongsToFrameBuffer:rp length:numLongs];
 		}
-		[pw release];
+		[pw releaseAndCache];
 	}
 }
 
@@ -1787,7 +1822,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	memcpy(aPacket->payload,aConfig,sizeof(SBC_crate_config));
 	
 	[self write:socketfd buffer:aPacket];	
-	[pw release];
+	[pw releaseAndCache];
 }
 
 #pragma mark ***DataSource
@@ -1821,7 +1856,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 			irqfd = [self connectToPort:portNumber+1];
 			
 			[self setIsConnected: YES];
-			[self setTimeConnected:[NSCalendarDate date]];
+			[self setTimeConnected:[NSDate date]];
 			[self setReloading:NO];
 			
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
@@ -1970,7 +2005,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		totalRecordsChecked = 0;
 		totalErrors = 0;
 		startBlockSize = 1000;
-		endBlockSize   = 300000;
+		endBlockSize   = 1000000;
 		productionSpeedValueValid = NO;
 		productionSpeed = 0;
 		doingProductionTest = NO;
@@ -2071,7 +2106,8 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	else if(anError == EBUSY)	details = @"Device Busy";
 	else if(anError == ENOMEM)	details = @"Out of Memory";
 	else details = [NSString stringWithFormat:@"%d",anError];
-	[NSException raise: @"SBC access Error" format:@"%@:%@\nAddress: 0x%08lx",baseString,details,anAddress];
+	//[NSException raise: @"SBC access Error" format:@"%@:%@\nAddress: 0x%08lx",baseString,details,anAddress];
+	[NSException raise: @"SBC access Error" format:@"%@:ErrorCode:%@\nAddress: 0x%08lx ",baseString,details,anAddress];//give more info -tb-
 }
 
 - (void) fillInScript:(NSString*)theScript
@@ -2263,7 +2299,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	
 	irqThreadRunning = NO;
 	[lamsToAck release];
-	[pw release];
+	[pw releaseAndCache];
 	
 	lamsToAck    = nil;
 }
@@ -2645,7 +2681,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		cbTestRunning = NO;
 		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCBTest object:self];
 	}
-	[pw release];
+	[pw releaseAndCache];
 }
 
 - (void) monitorJobFor:(id)aDelegate statusSelector:(SEL)aSelector
@@ -2680,7 +2716,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 	@catch(NSException* localException) {
 	}
 	@finally {
-		[pw release];
+		[pw releaseAndCache];
 	}
 }
 
@@ -2721,7 +2757,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[localException raise];
 	}
 	@finally {
-		[pw release];
+		[pw releaseAndCache];
 	}
 }
 
@@ -2761,7 +2797,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 		[localException raise];
 	}
 	@finally {
-		[pw release];
+		[pw releaseAndCache];
 	}
 }
 @end

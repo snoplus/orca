@@ -354,6 +354,7 @@
   
   
 #define kResponseTimeHistogramSize 15000
+#define kMaxQueueErrorEntries 100
 
 @interface ORIpeSlowControlModel : OrcaObject <ORAdcProcessing>
 {
@@ -388,6 +389,10 @@
     NSString* manualPath;
     int manualType;
     int rePostStillPendingRequests;
+    
+    int queueError[kMaxQueueErrorEntries];
+    int currentQueueErrorIndex;
+    
 }
 
 #pragma mark ***Initialization
@@ -405,6 +410,8 @@
 - (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Accessors
+- (void) setCurrentQueueErrorIndex:(int)anIndex;
+- (id) pendingRequest:(id)aKey forIndex:(int)anIndex;
 - (int) rePostStillPendingRequests;
 - (void) setRePostStillPendingRequests:(int)aRePostStillPendingRequests;
 - (int) manualType;
@@ -528,8 +535,18 @@
 - (void) fillRequest:(NSDictionary*)unusedobj intoTree:(NSMutableDictionary*)requestTree accordingTo:(NSArray*)pathThroughTree level:(int)level;//don't call in scripts, helper for sendSetpointRequestQueue
 - (void) traverseTree:(NSMutableDictionary*)theTree level:(int)level requestString:(NSMutableString*)aString requestStringList:(NSMutableArray*)requestStringList;//don't call in scripts, helper for sendSetpointRequestQueue
 
-- (void) sendSetpointRequestQueue;
+- (int) sendSetpointRequestQueue;
 - (void) clearSetpointRequestQueue;
+
+- (int) currentQueueErrorIndex;
+- (void) setCurrentQueueErrorIndex:(int)anIndex;
+- (int) queueErrorForIndex:(int)anIndex;
+- (void) setQueueError:(int)aError forIndex:(int)anIndex;
+- (void) setCurrentQueueError:(int)aError;
+- (int) currentQueueError;
+- (void) incCurrentQueueError;
+
+
 
 
 - (void) postRequestForChan:(int)aChan;
@@ -548,6 +565,7 @@
 - (void) postControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
 - (void) sendControlSetpoint:(NSString*)aUrl path:(NSString*)aPath value:(double)aValue;
 - (void) sendRequestString:(NSString*)requestString;
+- (void) sendRequestString:(NSString*)requestString withQueueErrorIndex:(int) aIndex;
 - (BOOL) requestIsPending:(NSString*)aUrl path:(NSString*)aPath;
 - (BOOL) requestIsPending:(NSString*)itemKey;
 - (double) valueForUrl:(NSString*)aUrl path:(NSString*)aPath;

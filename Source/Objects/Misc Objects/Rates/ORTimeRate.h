@@ -44,6 +44,7 @@
 - (unsigned) count;
 - (double)valueAtIndex:(unsigned)index;
 - (NSTimeInterval)timeSampledAtIndex:(unsigned)index;
+- (NSArray*) ratesAsArray;
 
 
 - (void) addDataToTimeAverage:(float)aValue;

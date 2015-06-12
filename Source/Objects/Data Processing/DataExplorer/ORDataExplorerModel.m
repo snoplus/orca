@@ -330,10 +330,10 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     [self setMultiCatalog:	[decoder decodeBoolForKey:		@"ORDataExplorerModelMultiCatalog"]];
 	[self setFileToExplore:	[decoder decodeObjectForKey:	@"ORDataExplorerFileName"]];
     [self setDataSet:		[decoder decodeObjectForKey:	@"ORDataExplorerDataSet"]];
-	[[self undoManager] enableUndoRegistration];
     
     if(!dataSet)[self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease]];
-    
+    [[self undoManager] enableUndoRegistration];
+
     
     return self;
 }

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>DefaultItems</key>
 	<array>
 		<string>LogLin</string>
 		<string>Clear</string>
-        <string>NSToolbarPrintItem</string>
+		<string>NSToolbarPrintItem</string>
+		<string>SaveToFolder</string>
 		<string>NSToolbarFlexibleSpaceItem</string>
 		<string>NSToolbarCustomizeToolbarItem</string>
 	</array>
@@ -47,7 +48,16 @@
 			<string>AutoScale</string>
 			<key>ToolTip</key>
 			<string>Auto Scale the Plot</string>
-        </dict>
+		</dict>
+		<key>SaveToFolder</key>
+		<dict>
+			<key>Action</key>
+			<string>writeToFile:</string>
+			<key>Label</key>
+			<string>Save CSV</string>
+			<key>ToolTip</key>
+			<string>Save as CSV File</string>
+		</dict>
 		<key>NSToolbarPrintItem</key>
 		<dict/>
 	</dict>

@@ -17,7 +17,6 @@
 
 @interface ORCircularBufferUV : NSObject {
 	NSMutableArray*		mStorageArray;
-	NSArray*			mKeys;
 	long				mSize;
 	long				mHeadIndex;
 	long				mTailIndex;
@@ -30,7 +29,6 @@
 - (long) count;
 - (void) insertHVEntry: (NSDate *) aDateOfAquistion hvValue: (NSNumber*) anHVEntry;
 - (NSDictionary *) HVEntry: (long) anOffset;
-- (NSArray *) mKeys;
 
 @end
 

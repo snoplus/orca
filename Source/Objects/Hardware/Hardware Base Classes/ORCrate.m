@@ -35,7 +35,6 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[cardRates release];
     [cratePowerAlarm clearAlarm];
     [cratePowerAlarm release];
 	[super dealloc];
@@ -124,22 +123,10 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	return [self objectConnectedTo:[self crateAdapterConnectorKey]];
 }
 
-- (NSDictionary*) cardRates
-{
-	return cardRates;
-}
-- (void) setCardRates:(NSMutableDictionary*)newCardRates
-{
-	[cardRates autorelease];
-	cardRates=[newCardRates retain];
-}
-
-
-
 - (void) doNoPowerAlert:(NSException*)exception action:(NSString*)message
 {
     NSLogColor([NSColor redColor],@"****** Check Crate Power and Cable ******\n");
-    NSRunAlertPanel([exception name], @"%@\nFailed: <%@>", @"OK", nil, nil,exception,message);
+    ORRunAlertPanel([exception name], @"%@\nFailed: <%@>", @"OK", nil, nil,exception,message);
 }
 
 #pragma mark ¥¥¥Notifications

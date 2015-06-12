@@ -67,7 +67,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AutoTester);
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 - (BOOL) repeat
@@ -233,7 +233,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AutoTester);
 #pragma mark •••Data Source Methods
 
 #define GET_CHILDREN NSArray* children; \
-if(!item) children = [[[[[NSApp delegate] document] group] orcaObjects] sortedArrayUsingSelector:@selector(sortCompare:)]; \
+if(!item) children = [[[[(ORAppDelegate*)[NSApp delegate] document] group] orcaObjects] sortedArrayUsingSelector:@selector(sortCompare:)]; \
 else if([item respondsToSelector:@selector(orcaObjects)])children = [[item orcaObjects]sortedArrayUsingSelector:@selector(sortCompare:)]; \
 else children = nil;\
 

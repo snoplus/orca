@@ -34,6 +34,7 @@
 }
 - (void) awakeFromNib
 {
+	[subComponentsView setGroup:model];
  	[super awakeFromNib];
     int i;
     
@@ -49,7 +50,7 @@
 		[NSColor brownColor]
 	};
     int tag = 0;
-    for(i=0;i<2;i++){
+    for(i=0;i<3;i++){
         ORTimeLinePlot* aPlot= [[ORTimeLinePlot alloc] initWithTag:tag andDataSource:self];
         [aPlot setLineColor:theColors[i]];
         [aPlot setName:[model nameForChannel:tag]];
@@ -164,6 +165,31 @@
                          name : ORApcUpsModelEventLogChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(maintenanceModeChanged:)
+                         name : ORApcUpsModelMaintenanceModeChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsAdded
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : ORGroupSelectionChanged
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(groupChanged:)
+                         name : OROrcaObjectMoved
+                       object : nil];
+
 }
 
 
@@ -182,11 +208,26 @@
 	[self updateTimePlot:nil];
     [self refreshProcessTable:nil];
 	[self eventLogChanged:nil];
+	[self maintenanceModeChanged:nil];
+}
+
+-(void) groupChanged:(NSNotification*)note
+{
+	if(note == nil || [note object] == model || [[note object] guardian] == model){
+		[subComponentsView setNeedsDisplay:YES];
+	}
+}
+
+- (void) maintenanceModeChanged:(NSNotification*)aNote
+{
+    BOOL inMaintenanceMode = [model maintenanceMode];
+    [maintenanceModeButton setTitle:inMaintenanceMode?@"End Maintenance":@"Start Maintenance"];
+	[maintenanceModeField setStringValue: inMaintenanceMode?@"Maintence Mode":@""];
 }
 
 - (void) eventLogChanged:(NSNotification*)aNote
 {
-    NSSet* events = [model eventLog];
+    NSArray* events = [model sortedEventLog];
     NSMutableString* eventLog = [NSMutableString stringWithString:@""];
     for (NSString *anEvent in events) {
         [eventLog appendFormat:@"%@\n",anEvent];
@@ -242,7 +283,7 @@
 - (void) updateTimePlot:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<8;i++){
+    for(i=0;i<3;i++){
         if(!aNote || [aNote object] == [model timeRate:i]){
             [plotter0 setNeedsDisplay:YES];
             break;
@@ -293,7 +334,7 @@
 
 - (void) refreshTables:(NSNotification*)aNote
 {
-    NSString* name = [[model valueDictionary] objectForKey:@"Name"];
+    NSString* name = [[model valueDictionary] objectForKey:@"NAME"];
     if([name length]!=0)[[self window] setTitle:[NSString stringWithFormat:@"UPS : %@",name]];
     [powerTableView reloadData];
     [loadTableView reloadData];
@@ -312,7 +353,12 @@
 - (void) pollingTimesChanged:(NSNotification*)aNote
 {
     [lastPolledField setObjectValue:[model lastTimePolled]];
-    [nextPollField setObjectValue:[model nextPollScheduled]];
+    if(![model maintenanceMode]){
+        [nextPollField setObjectValue:[model nextPollScheduled]];
+    }
+    else {
+        [nextPollField setStringValue:@"---"];
+    }
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
@@ -326,8 +372,63 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) maintenanceModeAction:(id)sender
+{
+    if(![model maintenanceMode]){
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"Really Start Maintenance Mode."];
+        [alert setInformativeText:@"This will stop polling the UPS and allow unfetered access via the web interface. It will disable all power out alarms. It will automatically revert to normal operations in 30 minutes."];
+        [alert addButtonWithTitle:@"Cancel"];
+        [alert addButtonWithTitle:@"Yes, Go to Maintenance"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+            if (result == NSAlertSecondButtonReturn){
+                [model setMaintenanceMode:YES];
+             }
+        }];
+#else
+        NSBeginAlertSheet(@"Really Start Maintenance Mode.",
+                          @"Cancel",
+                          @"Yes, Go to Maintenance",
+                          nil,[self window],
+                          self,
+                          @selector(maintenanceModeActionDidEnd:returnCode:contextInfo:),
+                          nil,
+                          nil,@"This will stop polling the UPS and allow unfetered access via the web interface. It will disable all power out alarms. It will automatically revert to normal operations in 30 minutes.");
+#endif
+    }
+    else {
+        [model setMaintenanceMode:NO];
+    }
+}
+    
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) maintenanceModeActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){
+        [model setMaintenanceMode:YES];
+    }
+}
+#endif
 - (IBAction) clearEventLogAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Clear the Event Log."];
+    [alert setInformativeText:@"This will clear the persistant history event log kept by ORCA and refresh with only the latest events recorded by the UPS. Is that really what you want to do?"];
+    [alert addButtonWithTitle:@"Yes, Event Log"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model clearEventLog];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Clear the Event Log.",
                       @"Cancel",
                       @"Yes, Clear Event Log",
@@ -336,14 +437,17 @@
                       @selector(clearEventActionDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"This will clear the persistant history event log kept by ORCA and refresh with only the latest events recorded by the UPS. Is that really what you want to do?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) clearEventActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
 		[model clearEventLog];
 	}
 }
+#endif
 - (IBAction) ipAddressAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	
@@ -374,12 +478,14 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
     if(aTableView == powerTableView){
-        if([[aTableColumn identifier] isEqualToString:@"Name"]) return [model nameAtIndexInPowerTable:rowIndex];
+        if([[aTableColumn identifier] isEqualToString:@"Name"]){
+            return [model nameAtIndexInPowerTable:rowIndex];
+        }
         else {
             if([model dataValid]){
                 if(rowIndex==4){
                     //special case, just one value in the first column
-                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"Freq"];
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"INPUT FREQUENCY"];
                     else return @"";
                 }
                 else return [model valueForPowerPhase:[[aTableColumn identifier] intValue] powerTableIndex:rowIndex];
@@ -392,10 +498,14 @@
         else {
             if([model dataValid]){
                 if(rowIndex==2){
-                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"TupsC"];
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"INTERNAL TEMPERATURE"];
                     else return @"";
-              }
-            else return [model valueForLoadPhase:[[aTableColumn identifier] intValue] loadTableIndex:rowIndex];
+                }
+                else if(rowIndex==3){
+                    if([[aTableColumn identifier] isEqualToString:@"1"]) return [model valueForKeyInValueDictionary:@"OUTPUT FREQUENCY"];
+                    else return @"";
+                }
+                else return [model valueForLoadPhase:[[aTableColumn identifier] intValue] loadTableIndex:rowIndex];
             }
             else return @"?";
         }
@@ -435,10 +545,10 @@
         return 5;
     }
     else if(aTableView == loadTableView){
-        return 3;
+        return 4;
     }
     else if(aTableView == batteryTableView){
-        return 3;
+        return 4;
     }
     else if(aTableView == processTableView){
         return kNumApcUpsAdcChannels;

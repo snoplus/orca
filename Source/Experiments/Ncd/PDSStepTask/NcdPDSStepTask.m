@@ -383,7 +383,7 @@
         if(done)break;
     }
     //load the mask to hardware...
-    NSArray* thePDSObjs = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* thePDSObjs = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([thePDSObjs count]){
         ORPulserDistribModel* aPulserModel = [thePDSObjs objectAtIndex:0];
         [aPulserModel loadHardware:workingArray];
@@ -412,7 +412,7 @@
 
 - (void) setEnabledStates
 {
-    NSArray* thePDSObjs = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* thePDSObjs = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if(ignorePDS){
         [self setEnabledinMatrix: patternMatrix0 usingMask:0xffffffff];
         [self setEnabledinMatrix: patternMatrix1 usingMask:0xffffffff];
@@ -440,7 +440,7 @@
 {
     [super stopTask];
     if(reloadPDS){
-        NSArray* thePDSObjs = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+        NSArray* thePDSObjs = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
         if([thePDSObjs count]){
             ORPulserDistribModel* aPulserModel = [thePDSObjs objectAtIndex:0];
             [aPulserModel loadHardware:[aPulserModel patternArray]];
@@ -509,7 +509,7 @@ static NSString* NcdPDSStepTaskTime  = @"NcdPDSStepTaskTime";
     [super prepare];
     workingChannelIndex = 0;
     lastTime = [[NSDate date] retain];
-    NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
         thePDSModel = [objects objectAtIndex:0];
         //tbd.. put in a locking mechanism for running tasks

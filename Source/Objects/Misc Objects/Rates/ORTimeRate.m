@@ -132,6 +132,22 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
     return theValue;
 }
 
+- (NSArray*) ratesAsArray
+{
+    NSMutableArray* theList = [NSMutableArray arrayWithCapacity:4096];
+    int n = [self count];
+    int i;
+    for(i=0;i<n;i++){
+        int index = n-i-1;
+        NSString* aValue;
+		if(n==0) aValue = @"0";
+		else     aValue = [NSString stringWithFormat:@"%.4f",[self valueAtIndex:index]];
+		NSString* t = [NSString stringWithFormat:@"%.0f",[self timeSampledAtIndex:index]];
+        [theList addObject: [NSArray arrayWithObjects:t,aValue,nil]];
+    }
+    return theList;
+}
+
 #pragma mark •••Archival
 static NSString *ORTimeRate_SampleTime 	= @"ORTimeRate_SampleTime";
 

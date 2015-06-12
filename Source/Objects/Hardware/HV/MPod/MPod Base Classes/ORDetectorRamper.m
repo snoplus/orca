@@ -89,7 +89,7 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (NSUndoManager*) undoManager
 {
-    return [[NSApp delegate] undoManager];
+    return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) setStepWait:(short)aValue
@@ -157,12 +157,12 @@ NSString* ORDetectorRamperRunningChanged				= @"ORDetectorRamperRunningChanged";
 
 - (BOOL) atIntermediateGoal
 {
-	return abs([delegate voltage:channel] - [delegate hwGoal:channel]) < kTolerance;
+	return fabsf([delegate voltage:channel] - [delegate hwGoal:channel]) < kTolerance;
 }
 
 - (BOOL) atTarget
 {
-	return abs([delegate voltage:channel] - target) < kTolerance;
+	return fabsf([delegate voltage:channel] - target) < kTolerance;
 }
 
 - (int) stepSize

@@ -22,6 +22,11 @@
 		<string>default</string>
 		<string>unless</string>
 		<string>array</string>
+		<string>try</string>
+		<string>catch</string>
+		<string>finally</string>
+		<string>throw</string>
+		<string>in</string>
 	</array>
 	<key>Identifiers2</key>
 	<array>
@@ -31,6 +36,7 @@
 		<string>waituntil</string>
 		<string>waitUntil</string>
 		<string>sleep</string>
+		<string>yield</string>
 		<string>print</string>
 		<string>printfile</string>
 		<string>display</string>
@@ -43,6 +49,7 @@
 		<string>strcat</string>
 		<string>nsdictionary</string>
 		<string>nsarray</string>
+		<string>nsexception</string>
 		<string>point</string>
 		<string>rect</string>
 		<string>pointx</string>

@@ -267,7 +267,7 @@
 - (void) makeObjects:(templateObjs*)objsToMake withConnections:(templateConnections*)connectionsToMake
 {
 	NSMutableArray* theObjects = [NSMutableArray array];
-	ORGroup* theGroup = [[[NSApp delegate] document]group];
+	ORGroup* theGroup = [[(ORAppDelegate*)[NSApp delegate] document]group];
 	int i=0;
 	while(objsToMake[i].name != nil){
 		OrcaObject* obj;

@@ -33,13 +33,13 @@
 	IBOutlet NSMatrix*		viewTypeMatrix;
 	IBOutlet NSTextField*	millimetersPerVoltTextField;
     IBOutlet NSPopUpButton* interfaceObjPUy;
-	IBOutlet NSForm*		channelMatrix;
+	IBOutlet NSMatrix*		channelMatrix;
 	IBOutlet ORCompositePlotView*    xyPlot;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      getPositionButton;
     IBOutlet NSTextField*   xPositionField;
     IBOutlet NSTextField*   yPositionField;
-    IBOutlet NSForm*		cmdMatrix;
+    IBOutlet NSMatrix*		cmdMatrix;
     IBOutlet NSMatrix*      absMatrix;
     IBOutlet NSButton*      goButton;
     IBOutlet NSButton*      stopButton;

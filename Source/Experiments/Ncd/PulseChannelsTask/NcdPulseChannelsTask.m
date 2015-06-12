@@ -275,7 +275,7 @@ enum {
     [[self undoManager] disableUndoRegistration];
     
 	
-    NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
+    NSArray* objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
         thePDSModel = [objects objectAtIndex:0];
         pdsMemento = [[thePDSModel memento] retain];  //save the old values
@@ -296,7 +296,7 @@ enum {
 		
     }
 	
-    objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
+    objects = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         thePulserModel = [objects objectAtIndex:0];
         pulserMemento = [[thePulserModel memento] retain];  //save the old values
@@ -323,7 +323,7 @@ enum {
 		lastTime = [[NSDate date] retain];
 		onlineTubes       = [[NSMutableArray array] retain];
 		NSArray* allTubes = [[[delegate detector] tubes] retain];
-		NSArray* shaperCards = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
+		NSArray* shaperCards = [[(ORAppDelegate*)[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
 		NSEnumerator* e = [allTubes objectEnumerator];
 		id tube;
 		while(tube = [e nextObject]){

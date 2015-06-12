@@ -188,7 +188,7 @@
 
 - (void) loadPath:(NSString*)aPath recursive:(BOOL)aFlag
 {
-	NSArray* components;
+	NSArray* components = nil;
 	int count = 0;
 	recursive = aFlag;
 	//db paths are of the form '/server/database/group/item'
@@ -249,6 +249,18 @@
 
 - (BOOL) showDebugOutput
 {   return showDebugOutput; }
+
+- (int) queueErrorIndex
+{
+    return queueErrorIndex;
+}
+
+- (void) setQueueErrorIndex:(int)anIndex
+{
+    queueErrorIndex=anIndex;
+}
+
+
 
 
 #pragma mark ***Delegate Methods
@@ -346,6 +358,7 @@
 	else if(dataFormat == kmsgFormat){
 		if(!resultArray)resultArray = [[NSMutableArray array] retain];//resultArray will be shipped to delegate
 		NSMutableDictionary* dictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys: host, @"URL", path, @"Path", nil];
+    	[dictionary setObject:[NSNumber numberWithInt:queueErrorIndex]		forKey:@"queueErrorIndex"];
 		[resultArray addObject: dictionary];
         
         [self parseXMLData:receivedData];

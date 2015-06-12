@@ -208,8 +208,8 @@ enum {
 - (void) taskCompleted: (NSNotification*)aNote
 {
     if([aNote object] == vmTask){
-        
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(launchTask) object:nil];
+        [self setVmTask:nil];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(launchTask) object:nil];
         [self performSelector:@selector(launchTask) withObject:nil afterDelay:taskInterval];
     }
 }

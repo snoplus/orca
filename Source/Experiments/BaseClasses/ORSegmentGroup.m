@@ -77,8 +77,13 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [colorAxisAttributes release];
 	[segments release];
 	[mapEntries release];
+	[groupName release];
+	[adcClassName release];
+	[mapFile release];
+	[totalRate release];
 	[super dealloc];
 }
 - (void) setCrateIndex:(int)aValue;
@@ -96,7 +101,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 }
 - (NSUndoManager*) undoManager
 {
-	return [[NSApp delegate] undoManager];
+	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
 - (void) showDialogForSegment:(int)aSegment
@@ -141,13 +146,13 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) registerForRates
 {
-	NSArray* adcObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
+	NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
 	[segments makeObjectsPerformSelector:@selector(registerForRates:) withObject:adcObjects];
 }
 
 - (void) configurationChanged:(NSNotification*)aNote
 {
-	NSArray* adcObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
+	NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
 	[segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
 	[self registerForRates];
 	
@@ -177,6 +182,11 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 - (id) segment:(int)index objectForKey:(id)aKey
 {
 	return [[segments objectAtIndex:index] objectForKey:aKey];
+}
+
+- (void) setSegment:(int)index object:(id)anObject forKey:(id)aKey
+{
+    [[segments objectAtIndex:index] setObject:anObject forKey:aKey];
 }
 
 - (ORDetectorSegment*) segment:(int)index
@@ -280,7 +290,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) setColorAxisAttributes:(NSDictionary*)newColorAxisAttributes
 {
-	[colorAxisAttributes release];
+	[colorAxisAttributes autorelease];
     colorAxisAttributes = [newColorAxisAttributes copy];
 }
 

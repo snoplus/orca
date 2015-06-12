@@ -31,6 +31,7 @@
     
         //FLT settings
         IBOutlet NSButton*		settingLockButton;
+	IBOutlet   NSButton* saveIonChanFilterOutputRecordsCB;//unused
 	IBOutlet   NSProgressIndicator* progressOfChargeBBIndicator;
 	IBOutlet   NSTextField* progressOfChargeBBTextField;
 	IBOutlet   NSTextField* chargeBBFileForFiberTextField;
@@ -54,6 +55,20 @@
 	IBOutlet   NSTextField* ficCardCtrlReg1BlockLenTextField;
 	IBOutlet   NSMatrix*    ficCardCtrlReg1ChanEnableMatrix;
 	IBOutlet   NSSlider*    ficCardCtrlReg2AddrOffsetSlider;
+	IBOutlet   NSTextField* ficCardCtrlReg2AddrOffsTextField;
+	IBOutlet   NSButton*    ficCardCtrlReg2GapCB;
+	IBOutlet   NSButton*    ficCardCtrlReg2SyncResCB;
+	IBOutlet   NSMatrix*    ficCardCtrlReg2SendChMatrix;
+	IBOutlet   NSMatrix*    ficCardADC0123CtrlRegMatrix;
+    IBOutlet   NSPopUpButton* ficCardADC0CtrlRegPU;
+    IBOutlet   NSPopUpButton* ficCardADC1CtrlRegPU;
+    IBOutlet   NSPopUpButton* ficCardADC2CtrlRegPU;
+    IBOutlet   NSPopUpButton* ficCardADC3CtrlRegPU;
+    
+	//IBOutlet   NSTextField* ficCardCtrlReg1BlockLenTextField;
+	//IBOutlet   NSMatrix*    ficCardCtrlReg1ChanEnableMatrix;
+	IBOutlet   NSTextField* ficCardTriggerCmdDelayTextField;
+	IBOutlet   NSMatrix*    ficCardTriggerCmdChanMaskMatrix;
     
     //Trigger Tab
 	IBOutlet   NSTextField* heatChannelsTextField;
@@ -66,6 +81,9 @@
 	IBOutlet   NSMatrix*    gapMatrix;
 	IBOutlet   NSMatrix*    downSamplingMatrix;
 	IBOutlet   NSMatrix*    shapingLengthMatrix;
+		//hirate settings
+	    IBOutlet   NSTextField* hitrateLimitIonTextField;
+	    IBOutlet   NSTextField* hitrateLimitHeatTextField;
 		IBOutlet NSMatrix*		hitRateEnableMatrix;
 		IBOutlet NSPopUpButton*	hitRateLengthPU;
 		IBOutlet NSTextField*	hitRateLengthTextField;
@@ -124,6 +142,7 @@
 //	IBOutlet   No Outlet* swTriggerIsRepeatingNo Outlet;
 		
 	IBOutlet   NSTextField* repeatSWTriggerModeTextField;
+	IBOutlet   NSTextField* repeatSWTriggerDelayTextField;
 		
 		IBOutlet NSPopUpButton*	repeatSWTriggerModePU;
 		IBOutlet NSProgressIndicator*	swTriggerProgress;
@@ -178,6 +197,7 @@
 	
 		//rate page
 		IBOutlet NSMatrix*		rateTextFields;
+		IBOutlet NSMatrix*		rateRegulationCBs;
 		
 		IBOutlet ORValueBarGroupView*		rate0;
 		IBOutlet ORValueBarGroupView*		totalRate;
@@ -236,6 +256,10 @@
 - (void) updateButtons;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+- (void) saveIonChanFilterOutputRecordsChanged:(NSNotification*)aNote;
+- (void) repeatSWTriggerDelayChanged:(NSNotification*)aNote;
+- (void) hitrateLimitIonChanged:(NSNotification*)aNote;
+- (void) hitrateLimitHeatChanged:(NSNotification*)aNote;
 - (void) chargeFICFileChanged:(NSNotification*)aNote;
 - (void) progressOfChargeFICChanged:(NSNotification*)aNote;
 //FIC card
@@ -338,6 +362,10 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (IBAction) saveIonChanFilterOutputRecordsCBAction:(id)sender;
+- (IBAction) repeatSWTriggerDelayTextFieldAction:(id)sender;
+- (IBAction) hitrateLimitIonTextFieldAction:(id)sender;
+- (IBAction) hitrateLimitHeatTextFieldAction:(id)sender;
 - (IBAction) chargeFICFileTextFieldAction:(id)sender;
 //- (IBAction) progressOfChargeFICIndicatorAction:(id)sender;
 - (IBAction) selectChargeFICFileButtonAction:(id) sender;
@@ -348,18 +376,35 @@
 - (IBAction) ficCardTriggerCmdTextFieldAction:(id)sender;
 - (IBAction) ficCardADC23CtrlRegTextFieldAction:(id)sender;
 - (IBAction) ficCardADC01CtrlRegTextFieldAction:(id)sender;
-- (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
 - (IBAction) ficCardCtrlReg1TextFieldAction:(id)sender;
-//FIC subelements
-- (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
-- (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
-- (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender;
 //FIC buttons
 - (IBAction) sendFICCtrl1RegButtonAction:(id)sender;
 - (IBAction) sendFICCtrl2RegButtonAction:(id)sender;
 - (IBAction) sendFICADC01CtrlRegButtonAction:(id)sender;
 - (IBAction) sendFICADC23CtrlRegButtonAction:(id)sender;
 - (IBAction) sendFICTriggerCmdButtonAction:(id)sender;
+
+//FIC subelements
+- (IBAction) ficCardCtrlReg1BlockLenTextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg1ChanEnableMatrixAction:(id)sender;
+
+- (IBAction) ficCardTriggerCmdDelayTextFieldAction:(id)sender;
+- (IBAction) ficCardTriggerCmdChanMaskMatrixAction:(id)sender;
+
+- (IBAction) ficCardCtrlReg2AddrOffsetSliderAction:(id)sender;
+- (IBAction) ficCardCtrlReg2TextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg2AddrOffsTextFieldAction:(id)sender;
+- (IBAction) ficCardCtrlReg2GapCBAction:(id)sender;
+- (IBAction) ficCardCtrlReg2SyncResCBAction:(id)sender;
+- (IBAction) ficCardCtrlReg2SendChMatrixAction:(id)sender;
+
+- (IBAction) ficCardADC0CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC1CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC2CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC3CtrlRegPUAction:(id)sender;
+- (IBAction) ficCardADC0123CtrlRegMatrixAction:(id)sender;
+
+
 
 - (IBAction) pollBBStatusIntervallPUAction:(id)sender;
 - (IBAction) devTabButtonAction:(id) sender;
@@ -551,10 +596,6 @@
 - (IBAction) noiseFloorOffsetAction:(id)sender;
 
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // pre 10.6-specific
-- (void) selectChargeBBFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
 	
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter;

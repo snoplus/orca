@@ -386,11 +386,9 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				  unitSize: sizeof(short)					// unit size in bytes
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFF							// when displayed all values will be masked with this value
-			   specialBits:0x0000	
-				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"UDP-Raw",crateKey,stationKey,fiberKey,channelKey,nil];
-}else if((eventFlags4bit == 0x2)){//FLT event
+}else if(eventFlags4bit == 0x2){//FLT event
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
@@ -407,8 +405,6 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				  unitSize: sizeof(short)					// unit size in bytes
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFF							// when displayed all values will be masked with this value
-			   specialBits:0x0000	
-				  bitNames: [NSArray arrayWithObjects:nil]
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"UDP-ADC-Channels",crateKey,stationKey,totalChannelKey,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
@@ -459,7 +455,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		OREdelweissFLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
 			for(OREdelweissFLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -505,7 +501,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     NSString* secStr    = 0;//[NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = 0;//[NSString stringWithFormat:@"SubSec     = %d\n", subsec];
     NSString* energyStr = 0;//[NSString stringWithFormat:@"NumFIFO     = %d\n", numfifo];
-    if((eventFlags4bit == 0x2)){//FLT event
+    if(eventFlags4bit == 0x2){//FLT event
         secStr    = [NSString stringWithFormat:@"Time 0..31 = 0x%08x\n", sec];
         subsecStr = [NSString stringWithFormat:@"Time32..47 = 0x%08x\n", subsec];
         energyStr = [NSString stringWithFormat:@"Energy     = 0x%08x\n", energy];
@@ -563,9 +559,9 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
  --------------------^^^^ ^^^^-----------OR FLT trigger channel (0...29, including fast channels; or 0...41 including filter debug output)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo0: timestamp lo (bit [31:0])    
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo1: FLT# (8bit) , 8 bit reserved, timestamp hi 16 bit (bit [47:32]) and FLT#
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo2: channel map (for FLT event record)
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo3: energy
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo4: pageN + triggerAddress
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo2: (TR(3 bit)+)    channel map (for FLT event record) (18 bit)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo3: (U (6 bit)+)    energy (24 bit)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx EventFifo4: pageN (4 bit) +  triggerAddress (12 bit)
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventFlags
                  ^^^ ^^^^ ^^^^-----------traceStart16 (first trace value in short array, 11 bit, 0..2047)
                                  ^-------append flag is in this record (append to previous record)
@@ -600,18 +596,20 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 	unsigned long length	= ExtractLength(ptr[0]);
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0xf);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
-	unsigned char fiber		= ShiftAndExtract(ptr[1],12,0xf);
-	unsigned int totalChan		= ShiftAndExtract(ptr[4],0,0xffff);
-	unsigned char chan		= ShiftAndExtract(ptr[1],8,0xf);
-	unsigned int trigChan	= ShiftAndExtract(ptr[1],8,0xff);
+	//unsigned char fiber		= ShiftAndExtract(ptr[1],12,0xf);
+	//unsigned int totalChan		= ShiftAndExtract(ptr[4],0,0xffff);//channel map
+	//unsigned char chan		= ShiftAndExtract(ptr[1],8,0xf);
+	unsigned int trigChan	= ShiftAndExtract(ptr[1],8,0xff);      //channel 0..41
 	NSString* crateKey		= [self getCrateKey: crate];
 	NSString* stationKey	= [self getStationKey: card];	
-	NSString* fiberKey	    = [NSString stringWithFormat:@"Fiber %2d",fiber];	
-	NSString* channelKey	= [self getChannelKey: chan];	
+	//NSString* fiberKey	    = [NSString stringWithFormat:@"Fiber %2d",fiber];
+	//NSString* channelKey	= [self getChannelKey: chan];
 	NSString* trigChannelKey	= [self getChannelKey: trigChan];	
-	NSString* totalChannelKey	= [self getChannelKey: totalChan];	
+	//NSString* totalChannelKey	= [self getChannelKey: totalChan];
 	//unsigned long startIndex= ShiftAndExtract(ptr[7],8,0x7ff);
-	unsigned long startIndex= ShiftAndExtract(ptr[6],0,0xfff);
+	unsigned long startIndex  = 0;
+	unsigned long triggerAddr = ShiftAndExtract(ptr[6],0,0xfff);
+   // uint32_t eventFifo4       = ptr[6]; //f4
 
 	//channel by channel histograms
 	//unsigned long energy = ptr[6];
@@ -670,16 +668,59 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 //TODO: no offset -tb-
 //startIndex=traceStart16;
 //2013-12-16: from now on I save the shifted trace -tb- startIndex+=1023;
-startIndex=0;
 
-//TODO: what is the best value for the 'mask'? 0xFFFF is appropriate for shorts ... -tb-
 
     uint32_t eventFlags4bit     = eventFlags & 0xf;
     
     
+
+    // waveforms
+    //----------------------------------------
+    if(trigChan<18 || trigChan>29){//slow channel or filter output
+        startIndex=0;
+	    [aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0  // 0xFFFF // when displayed all values will be masked with this value //only necessary if some bits need to be masked out -tb-
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
+				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
+    }else{//fast channel
+        if(eventFlags4bit==0x2){
+            startIndex= (-triggerAddr-1023)%2048;//revert offset from SLTv4Readout -tb-
+        }else{
+            startIndex= 0;//for e.g. version 0x4
+        }
+
+		[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0  // 0xFFFF // when displayed all values will be masked with this value //only necessary if some bits need to be masked out -tb-
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
+    }
+    //DEBUG 	   NSLog(@"%@::%@ plot FIC channel %i, flags: %i, triggerAddr:%i, startIndex:%i, eventFifo4:0x%08x\n", NSStringFromClass([self class]),NSStringFromSelector(_cmd),trigChan, eventFlags4bit,triggerAddr,startIndex,eventFifo4);//TODO: DEBUG testing ...-tb-
+
+    
+    #if 0 //old call  -  the specialBits waveform seems to be buggy (in plots, "Unsigned" check has no effect ...) -tb-
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0xFFFF							// when displayed all values will be masked with this value
+			   specialBits:0x0000	
+				  bitNames: [NSArray arrayWithObjects:nil]
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
+				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
+    #endif
+
+
+#if 0 //TODO: remove it -tb-
+//TODO: what is the best value for the 'mask'? 0xFFFF is appropriate for shorts ... -tb-
 eventFlags4bit=0x2;//TODO: fake FLT event -tb- remove it ...
-
-
 if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
@@ -691,6 +732,18 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"UDP-Raw",crateKey,stationKey,fiberKey,channelKey,nil];
 }else if((eventFlags4bit == 0x2)){//FLT event
+    if(1 || trigChan<30){
+	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
+					offset: 9*sizeof(long)					// Offset in bytes (past header words)
+				  unitSize: sizeof(short)					// unit size in bytes
+				startIndex:	startIndex					// first Point Index (past the header offset!!!)
+					  mask:	0  // 0xFFFF // when displayed all values will be masked with this value //only necessary if some bits need to be masked out -tb-
+					sender: self 
+				  withKeys: @"IPE-SLT-EW", @"FLT-Eventxxxxx",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
+				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
+    }else{
+    }
+    #if 0 //old call  -  the specialBits waveform seems to be buggy (in plots, "Unsigned" check has no effect ...) -tb-
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
 				  unitSize: sizeof(short)					// unit size in bytes
@@ -701,6 +754,8 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"FLT-Event",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
+    #endif
+
 }else{
 	[aDataSet loadWaveform: waveFormdata					//pass in the whole data set
 					offset: 9*sizeof(long)					// Offset in bytes (past header words)
@@ -713,9 +768,12 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				  withKeys: @"IPE-SLT-EW", @"UDP-ADC-Channels",crateKey,stationKey,totalChannelKey,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];
 }
+#endif
 
 
 
+    // energy histogram(s)
+    //----------------------------------------
     if(eventFlags4bit == 0x2){//FLT event
         uint32_t energy         = ptr[6] & 0x00ffffff;
         uint32_t shapingLength  = ptr[8] & 0x000000ff;
@@ -759,7 +817,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 		if(!actualFlts)actualFlts = [[NSMutableDictionary alloc] init];
 		OREdelweissFLTModel* obj = [actualFlts objectForKey:fltKey];
 		if(!obj){
-			NSArray* listOfFlts = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
+			NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OREdelweissFLTModel")];
 			for(OREdelweissFLTModel* aFlt in listOfFlts){
 				if(/*[aFlt crateNumber] == crate &&*/ [aFlt stationNumber] == card){
 					[actualFlts setObject:aFlt forKey:fltKey];
@@ -784,15 +842,15 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 	//unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
 	//unsigned char chan		= ShiftAndExtract(ptr[1],8,0xff);
 	unsigned int trigChan	= ShiftAndExtract(ptr[1],8,0xff);
-    uint32_t sec            = ptr[2];
-    uint32_t subsec         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
-    uint32_t timelo         = ptr[2];
+    uint32_t sec            = ptr[2]; //f0   
+    uint32_t subsec         = ptr[3]; //f1   // ShiftAndExtract(ptr[1],0,0xffffffff);
+    uint32_t timelo         = ptr[2]; 
     uint64_t timehi         = ptr[3]; // ShiftAndExtract(ptr[1],0,0xffffffff);
     uint64_t timestamp=timelo | ((timehi & 0xffff)<<32);
-    uint32_t chmap          = ptr[4];
-    uint32_t energy         = ptr[5] & 0x00ffffff;
+    uint32_t chmap          = ptr[4]; //f2   
+    uint32_t energy         = ptr[5] & 0x00ffffff;  //f3   
   //  uint32_t eventID        = ptr[6];
-    uint32_t eventFifo4       = ptr[6];
+    uint32_t eventFifo4       = ptr[6]; //f4   
 //    uint32_t numfifo        = ptr[6];
     uint32_t eventFlags     = ptr[7];
     uint32_t spareWord      = ptr[8];
@@ -814,7 +872,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
     NSString* secStr    = 0;//[NSString stringWithFormat:@"Sec        = %d\n", sec];
     NSString* subsecStr = 0;//[NSString stringWithFormat:@"SubSec     = %d\n", subsec];
     NSString* energyStr = 0;//[NSString stringWithFormat:@"NumFIFO     = %d\n", numfifo];
-    if((eventFlags4bit == 0x2)){//FLT event
+    if(eventFlags4bit == 0x2){//FLT event
     }
         secStr    = [NSString stringWithFormat:@"Time 0..31 = 0x%08x\n", sec];
         subsecStr = [NSString stringWithFormat:@"Time32..47 = 0x%08x\n", subsec];

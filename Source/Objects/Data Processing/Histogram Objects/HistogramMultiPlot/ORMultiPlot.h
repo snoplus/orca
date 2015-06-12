@@ -48,8 +48,7 @@
 #pragma mark ¥¥¥Data Management
 - (void) invalidateDataSource;
 - (void) clear;
-- (void) removeDataSetName:(id)aDataSetItem;
-- (void) unRemoveDataSetName:(id)aDataSetItem;
+- (void) removeDataSet:(id)aDataSetItem;
 - (void) addDataSetName:(NSString*)aName;
 - (void) reCache:(NSNotification*)aNote;
 - (ORMultiPlotDataItem*) dataItemWithName:(NSString*)aName;

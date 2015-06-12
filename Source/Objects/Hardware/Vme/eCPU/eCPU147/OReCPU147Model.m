@@ -379,7 +379,7 @@ const struct {
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to stop user code.\n");
-		NSRunAlertPanel([localException name], @"%@\nCould not stop user code in eCPU.", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nCould not stop user code in eCPU.", @"OK", nil, nil,
                         localException);
 	}
 }

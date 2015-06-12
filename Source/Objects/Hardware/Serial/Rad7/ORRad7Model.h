@@ -74,6 +74,7 @@
 #define kRad7StartingRun	  4
 #define kRad7StoppingRun	  5
 #define kRad7DumpingSettings  6
+#define kRad7Delay            7
 
 #define kRad7RunStateUnKnown  0
 #define kRad7RunStateCounting 1 
@@ -104,21 +105,25 @@
 @class ORRad7DataPt;
 @class ORSafeQueue;
 
+enum {
+    kRad7QueueIdle,
+    kRad7SendCntrlC,
+    kRad7WaitForCarrot,
+    kRad7WaitForResponse,
+    kRad7FinishedWithCmd,
+    kNumberRad7CommandStates //must be last
+};
+
 @interface ORRad7Model : ObjWithHistoryModel <ORAdcProcessing>
 {
 @private
 	NSString*       portName;
 	BOOL            portWasOpen;
 	ORSerialPort*   serialPort;
-	NSString*		lastRequest;
 	ORSafeQueue* cmdQueue;
 	unsigned long	timeMeasured;
 	int				pollTime;
 	NSMutableString* buffer;
-	unsigned int    currentRequest;
-	unsigned int    waitTime;
-	unsigned int    expectedCount;
-	unsigned int    requestCount;
 	int				protocol;
 	int				cycleTime;
 	int				recycle;
@@ -129,7 +134,6 @@
 	int				formatSetting;
 	int				rUnits;
 	int				tUnits;
-	int				operationState;
 	NSMutableDictionary*   statusDictionary;
 	int				runState;
 	int				dataRecordCount;
@@ -151,7 +155,17 @@
 	float			humidityMaxLimit;
 	BOOL            dataValid;  
 	int				okCount;
-    BOOL			firmwareLoading;
+    BOOL			radLinkLoading;
+    BOOL			unLoading;
+    int             commandState;
+    BOOL            gotResponse;
+    BOOL            gotCarrot;
+    BOOL            poweringUp;
+    BOOL            rebooting;
+    BOOL            gettingData;
+    BOOL            gettingReview;
+    int             radLinkSize;
+    NSString*       statusString;
 }
 
 #pragma mark ***Initialization
@@ -161,8 +175,12 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark ***Accessors
-- (BOOL) firmwareLoading;
-- (void) setFirmwareLoading:(BOOL)aFirmwareLoading;
+- (NSString*)statusString;
+- (void) setStatusString:(NSString*)aString;
+- (int) commandState;
+- (void) setCommandState:(int)aState;
+- (BOOL) radLinkLoading;
+- (void) setRadLinkLoading:(BOOL)aRadLinkLoading;
 - (float) humidityMaxLimit;
 - (void) setHumidityMaxLimit:(float)aHumidityMaxLimit;
 - (float) pumpCurrentMaxLimit;
@@ -189,9 +207,6 @@
 - (void) setDataPointArray:(NSMutableArray*)aDataPt;
 - (int) runState;
 - (void) setRunState:(int)aRunState;
-- (int) operationState;
-- (void) setOperationState:(int)aOperationState;
-- (NSString*) operationStateString;
 - (int) tUnits;
 - (void) setTUnits:(int)aUnits;
 - (int) rUnits;
@@ -221,8 +236,6 @@
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aRequest;
 - (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
 - (NSDictionary*) statusDictionary;
@@ -238,7 +251,6 @@
 - (int) convertProtocolStringToIndex:(NSString*)aProtocol;
 
 #pragma mark ***Data
-- (void) dumpUserValues;
 - (void) saveUser;
 - (void) pollHardware;
 - (void) dataErase;
@@ -249,7 +261,6 @@
 
 #pragma mark ***Commands
 - (void) addCmdToQueue:(NSString*)aCmd;
-- (void) readData;
 - (void) loadDialogFromHardware;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -260,7 +271,8 @@
 - (void) printRun;
 - (void) printDataInProgress;
 - (void) printRun:(int) runNumber;
-- (void) loadFirmwareFile:(NSString*)filePath index:(int)type;
+- (void) loadRadLinkFile:(NSString*)filePath index:(int)type;
+- (void) stopOpsAndInterrupt;
 
 #pragma mark •••Adc Processing Protocol
 - (void)processIsStarting;
@@ -276,7 +288,7 @@
 - (BOOL) dataForChannelValid:(int)aChannel;
 @end
 
-extern NSString* ORRad7ModelFirmwareLoadingChanged;
+extern NSString* ORRad7ModelRadLinkLoadingChanged;
 extern NSString* ORRad7ModelHumidityMaxLimitChanged;
 extern NSString* ORRad7ModelPumpCurrentMaxLimitChanged;
 extern NSString* ORRad7ModelPumpCurrentAlarmChanged;
@@ -289,7 +301,6 @@ extern NSString* ORRad7ModelDeleteDataOnStartChanged;
 extern NSString* ORRad7ModelRunToPrintChanged;
 extern NSString* ORRad7ModelDataPointArrayChanged;
 extern NSString* ORRad7ModelRunStateChanged;
-extern NSString* ORRad7ModelOperationStateChanged;
 extern NSString* ORRad7ModelTUnitsChanged;
 extern NSString* ORRad7ModelRUnitsChanged;
 extern NSString* ORRad7ModelFormatChanged;
@@ -307,6 +318,8 @@ extern NSString* ORRad7ModelPortNameChanged;
 extern NSString* ORRad7ModelPortStateChanged;
 extern NSString* ORRad7ModelStatusChanged;
 extern NSString* ORRad7ModelUpdatePlot;
+extern NSString* ORRad7ModelCommandStateChanged;
+extern NSString* ORRad7ModelStatusStringChanged;
 
 @interface ORRad7DataPt : NSObject
 {

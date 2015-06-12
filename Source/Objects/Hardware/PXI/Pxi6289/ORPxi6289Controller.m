@@ -425,7 +425,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset and Init of Pxi6289 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Pxi6289 Reset and Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Pxi6289 Reset and Init", @"OK", nil, nil,
                         localException);
     }
 }

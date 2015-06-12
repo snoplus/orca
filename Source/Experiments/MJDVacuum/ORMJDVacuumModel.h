@@ -42,8 +42,9 @@
 #define kRegionDiaphramPump	7
 #define kRegionBelowTurbo	8
 #define kRegionLakeShore	9
+#define kLakeShoreTemps     10
 
-#define kNumberRegions	    10
+#define kNumberRegions	    11
 //-----------------------------------
 //component tag numbers
 #define kTurboComponent			0

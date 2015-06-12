@@ -822,11 +822,11 @@ NSString* ORMks660BLock = @"ORMks660BLock";
 				return YES;
 			}
 			if(index==1){
-				if(fabs(highHysteresis - theValue) == 0)return YES;
+				if(abs(highHysteresis - theValue) == 0)return YES;
 				else NSLogColor([NSColor redColor], @"MKS660B (%d) HighHysteresis ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],highHysteresis,theValue);
 			}
 			else {
-				if(fabs(lowHysteresis - theValue) == 0)return YES;
+				if(abs(lowHysteresis - theValue) == 0)return YES;
 				else NSLogColor([NSColor redColor], @"MKS660B (%d) LowHysteresis ReadBack mismatch (%d != %d)\n",[self uniqueIdNumber],lowHysteresis,theValue);
 			}
 		}

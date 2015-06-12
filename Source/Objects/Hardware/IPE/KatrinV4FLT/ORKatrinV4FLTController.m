@@ -394,9 +394,29 @@
                          name : ORKatrinV4FLTModelUseSLTtimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useBipolarEnergyChanged:)
+                         name : ORKatrinV4FLTModelUseBipolarEnergyChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(bipolarEnergyThreshTestChanged:)
+                         name : ORKatrinV4FLTModelBipolarEnergyThreshTestChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) bipolarEnergyThreshTestChanged:(NSNotification*)aNote
+{
+	[bipolarEnergyThreshTestTextField setIntValue: [model bipolarEnergyThreshTest]];
+}
+
+- (void) useBipolarEnergyChanged:(NSNotification*)aNote
+{
+	[useBipolarEnergyCB setIntValue: [model useBipolarEnergy]];
+}
 
 - (void) useSLTtimeChanged:(NSNotification*)aNote
 {
@@ -669,6 +689,8 @@
 	[self useDmaBlockReadChanged:nil];
 	[self boxcarLengthChanged:nil];
 	[self useSLTtimeChanged:nil];
+	[self useBipolarEnergyChanged:nil];
+	[self bipolarEnergyThreshTestChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1060,6 +1082,16 @@
 
 #pragma mark •••Actions
 
+- (void) bipolarEnergyThreshTestTextFieldAction:(id)sender
+{
+	[model setBipolarEnergyThreshTest:[sender intValue]];	
+}
+
+- (void) useBipolarEnergyCBAction:(id)sender
+{
+	[model setUseBipolarEnergy:[sender intValue]];	
+}
+
 - (void) useSLTtimePUAction:(id)sender
 {
 	//DEBUG -tb-    	NSLog(@"Called %@::%@! selected %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG -tb-
@@ -1169,7 +1201,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Threshold Finder for IPE V4 FLT Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1241,7 +1273,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT clock\n");
-		NSRunAlertPanel([localException name], @"%@\nSetClock of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSetClock of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -1254,7 +1286,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT post trigger time\n");
-		NSRunAlertPanel([localException name], @"%@\nSet post trigger time of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet post trigger time of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -1266,7 +1298,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT behavior\n");
-		NSRunAlertPanel([localException name], @"%@\nSetting Behaviour of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSetting Behaviour of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -1278,7 +1310,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT analog offset\n");
-		NSRunAlertPanel([localException name], @"%@\nSet analog offset FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet analog offset FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -1290,7 +1322,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT interrupt mask\n");
-		NSRunAlertPanel([localException name], @"%@\nSet of interrupt mask of FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet of interrupt mask of FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -1313,7 +1345,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception setting FLT default Values\n");
-		NSRunAlertPanel([localException name], @"%@\nSet Defaults for FLT%d failed", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nSet Defaults for FLT%d failed", @"OK", nil, nil,
 						localException,[model stationNumber]);
 	}
 }
@@ -1334,7 +1366,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1347,7 +1379,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT gains and thresholds\n");
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1395,7 +1427,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1408,7 +1440,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception intitBoard FLT (%d) status\n",[model stationNumber]);
-        NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1432,7 +1464,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Version\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1444,7 +1476,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Test\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1457,7 +1489,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT reset\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1498,7 +1530,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1513,7 +1545,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1560,7 +1592,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1583,7 +1615,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLTv4 reg: %@\n",[model getRegisterName:index]);
-        NSRunAlertPanel([localException name], @"%@\nFLTv4%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLTv4%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }
@@ -1595,7 +1627,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Exception running FLT test code\n");
-        NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	}
 }

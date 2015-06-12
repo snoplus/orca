@@ -326,11 +326,10 @@
 	NSString* theValue = [NSString stringWithFormat:format,[model pressure]];
 	[pressureField setStringValue:theValue];
 	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
+	NSDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[timeField setObjectValue:theDate];
+		theDate = [NSDate dateWithTimeIntervalSince1970:t];
+		[timeField setObjectValue:[theDate description]];
 	}
 	else [timeField setObjectValue:@"--"];
 }
@@ -455,7 +454,21 @@
 - (IBAction) loadDialogFromHW:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Transfer HW Settings To Dialog",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Transfer HW Settings To Dialog"];
+    [alert setInformativeText:@"This will read the values that are in the hardware unit and put those values into the dialog.\n\nReally do this?"];
+    [alert addButtonWithTitle:@"Yes/Do It"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model readAndLoad];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Transfer HW Settings To Dialog",
 					  @"YES/Do it",
 					  @"Cancel",
 					  nil,[self window],
@@ -464,15 +477,17 @@
 					  nil,
 					  nil,
 					  @"This will read the values that are in the hardware unit and put those values into the dialog.\n\nReally do this?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) loadDialogDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model readAndLoad];
     }
 }
-
+#endif
 - (IBAction) pollNowAction:(id)sender
 {
 	[model pollHardware];	
@@ -531,7 +546,21 @@
 - (IBAction) zeroAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Display Zero",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Display Zero"];
+    [alert setInformativeText:@"This will zero the display.\n\nReally do this?"];
+    [alert addButtonWithTitle:@"YES/Do it"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model writeZeroDisplay];
+       }
+    }];
+#else
+    NSBeginAlertSheet(@"Display Zero",
 					  @"YES/Do it",
 					  @"Cancel",
 					  nil,[self window],
@@ -540,19 +569,36 @@
 					  nil,
 					  nil,
 					  @"This will zero the display.\n\nReally do this?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) zeroDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model writeZeroDisplay];
     }
 }
+#endif
 
 - (IBAction) fullScaleAction:(id)sender
 {
     [self endEditing];
-	NSBeginAlertSheet(@"Set Full Scale",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Set Full Scale"];
+    [alert setInformativeText:@"This will make the current value the full scale value.\n\nReally do this?"];
+    [alert addButtonWithTitle:@"YES/Do it"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [model writeFullScale];
+        }
+    }];
+#else
+    NSBeginAlertSheet(@"Set Full Scale",
 					  @"YES/Do it",
 					  @"Cancel",
 					  nil,[self window],
@@ -561,8 +607,10 @@
 					  nil,
 					  nil,
 					  @"This will make the current value the full scale value.\n\nReally do this?");
+#endif
 }
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) fullScaleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
@@ -571,6 +619,7 @@
 		[model writeFullScale]; //have to write it twice with a delay
     }
 }
+#endif
 
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter

@@ -246,10 +246,10 @@
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];
     
     // We limit the total number of plotted points by using a stride    
-    NSUInteger totalLength = maxX - minX;
+    NSUInteger totalLength = MIN(maxX - minX,numPoints);
     NSUInteger stride = (NSUInteger)((double)totalLength)/kMaximumPlotPoints;
     if (stride == 0) stride = 1;
-    
+    maxX = MIN(maxX, stride*numPoints + minX);
     if (![dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
         [dataSource plotter:self index:minX x:&xValue y:&yValue];
         x  = [mXScale getPixAbs:minX];
@@ -457,6 +457,8 @@
     *aYMin = 0;
     *aYMax = 0;
 	if(n==0) return;
+    //aahhh, but the dataset may be empty....
+    //added a check below
     double minY = 9E9;
     double maxY = -9E9;
     if ([dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
@@ -468,6 +470,9 @@
                           x:xVals
                           y:yVals];
         NSUInteger i, total = [yVals length]/sizeof(*aYMax);
+        
+        if(total==0)return; //data set was empty. prevents major hang in the axis setup
+        
         double* ptr = (double*)[yVals bytes];
         for(i=0;i<total;i++) {
 			maxY = MAX(maxY,ptr[i]);
@@ -482,6 +487,7 @@
 			minY = MIN(minY,yValue);
 		}
     }
+    
     *aYMin = minY;
     *aYMax = maxY;
 }

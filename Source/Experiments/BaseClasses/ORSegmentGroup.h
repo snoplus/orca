@@ -60,6 +60,7 @@
 - (int) numSegments;
 - (ORDetectorSegment*) segment:(int)index;
 - (id) segment:(int)index objectForKey:(id)aKey;
+- (void) setSegment:(int)index object:(id)anObject forKey:(id)aKey;
 - (NSString*) groupName;
 - (void) setGroupName:(NSString*)aName;
 - (int) thresholdHistogram:(int) index;

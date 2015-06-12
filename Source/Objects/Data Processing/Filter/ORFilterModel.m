@@ -337,7 +337,7 @@ int filterGraph(nodeType*);
 	if(aDecoder != currentDecoder){
 		[currentDecoder release];
 		currentDecoder = [aDecoder retain];
-        [currentDecoder setSkipRateCounts:YES];
+        //[currentDecoder setSkipRateCounts:YES];
 		if(usePlugin && firstTime){
 			[symbolTable release];
 			symbolTable = [[ORFilterSymbolTable alloc] init];
@@ -790,7 +790,7 @@ int filterGraph(nodeType*);
 {  
 	// yacc has a number of global variables so it is NOT thread safe
 	// Acquire the lock to ensure one parse processing at a time
-	@synchronized([NSApp delegate]){
+	@synchronized((ORAppDelegate*)[NSApp delegate]){
 		parsedOK = NO;
 		@try { 
 			

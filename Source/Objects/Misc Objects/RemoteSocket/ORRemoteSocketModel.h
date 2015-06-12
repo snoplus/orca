@@ -19,25 +19,13 @@
 
 #pragma mark ***Imported Files
 
-@class SimpleCocoaConnection;
-//return values of connect message
-enum SCCInit {
-    SCCInitOK = 1,
-    SCCInitError_Connected = 2,
-	SCCInitError_Host = 4,
-	SCCInitError_Port = 8,
-	SCCInitError_NoConnection = 32,
-	SCCInitError_Timeout = 64,
-	SCCInitError_NoSocket = 128,
-	SCCInitError_Unknown = 256
-};
-typedef enum SCCInit SCCInit;
+@class NetSocket;
 
 #define SCCDefaultConnectionTimeout 30
 @interface ORRemoteSocketModel : OrcaObject
 {
 @private
-	SimpleCocoaConnection*	c;
+    NetSocket*              socket;
 	NSString*				remoteHost;
 	int						remotePort;
 	BOOL					isConnected;
@@ -54,7 +42,6 @@ typedef enum SCCInit SCCInit;
 - (BOOL)		isConnected;
 
 - (NSString*)	remoteHost;
-- (NSString*)	remoteHostName;
 - (void)		setRemoteHost:(NSString*)newHost;
 - (int)			remotePort;
 - (void)		setRemotePort:(int)newPort;
@@ -63,15 +50,20 @@ typedef enum SCCInit SCCInit;
 - (NSStringEncoding) defaultStringEncoding;
 - (void)		setDefaultStringEncoding:(NSStringEncoding)encoding;
 - (void)		removeResponseForKey:(NSString*)aKey;
+- (void)        processMessage:(NSString*)message;
+- (NetSocket*)  socket;
+- (void)        setSocket:(NetSocket*)aSocket;
 
 #pragma mark ***Socket Methods
-- (SCCInit) connect;
+- (void)    connect;
 - (void)	disconnect;
 - (BOOL)	sendData:(NSData*)data;
 - (BOOL)	sendString:(NSString*)string;
 - (BOOL)	sendString:(NSString*)string withEncoding:(NSStringEncoding)encoding;
 - (id)		responseForKey:(NSString*)aKey;
 - (BOOL)	responseExistsForKey:(NSString*)aKey;
+
+#pragma mark ***Delegate Methods
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -81,19 +73,4 @@ typedef enum SCCInit SCCInit;
 extern NSString* ORRSRemotePortChanged;
 extern NSString* ORRSRemoteHostChanged;
 extern NSString* ORRemoteSocketLock;
-
-@interface SimpleCocoaConnection : NSObject {
-@private
-	NSFileHandle* fileHandle;	//Socket for the connection
-    id connectionDelegate;		//always the client
-    NSString* remoteAddress;	//server/remote IP address
-	int remotePort;				//server/remote port
-}
-
-- (id)	initWithFileHandle:(NSFileHandle*)fh delegate:(id)initDelegate;
-- (NSFileHandle*) fileHandle;
-- (NSString*)	  remoteAddress;
-- (int)			  remotePort;
-- (void) dataReceivedNotification:(NSNotification*)notification;
-
-@end
+extern NSString* ORRSRemoteConnectedChanged;

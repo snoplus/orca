@@ -55,7 +55,7 @@
 //this method is needed so the global menu commands will be passed on correctly.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 - (void) registerNotificationObservers
@@ -80,7 +80,7 @@
 
 - (id) document
 {
-	return [[NSApp delegate] document];
+	return [(ORAppDelegate*)[NSApp delegate] document];
 }
 
 #pragma mark •••Actions

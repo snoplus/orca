@@ -71,14 +71,13 @@
 		unsigned long asLong;
 	}theData;
 	
-    NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[4]];
-    [date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+    NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[4]];
 		
     theData.asLong = dataPtr[2];
-    theString = [theString stringByAppendingFormat:@"First Stage Temp: %.1f %@\n",theData.asFloat,date];
+    theString = [theString stringByAppendingFormat:@"First Stage Temp: %.1f %@\n",theData.asFloat,[date stdDescription]];
 	
 	theData.asLong = dataPtr[3];
-	theString = [theString stringByAppendingFormat:@"Second Stage Temp: %.1f %@\n",theData.asFloat,date];
+	theString = [theString stringByAppendingFormat:@"Second Stage Temp: %.1f %@\n",theData.asFloat,[date stdDescription]];
 	return theString;
 }
 @end

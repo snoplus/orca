@@ -142,7 +142,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
 		ORCMC203Model* obj = [actualCards objectForKey:cmc203Key];
 		if(!obj){
-			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCMC203Model")];
+			NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCMC203Model")];
 			NSEnumerator* e = [listOfCards objectEnumerator];
 			ORCMC203Model* aCard;
 			while(aCard = [e nextObject]){

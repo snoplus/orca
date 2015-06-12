@@ -111,7 +111,7 @@
     
     NSString* title= @"L2301 Hist Record\n\n";
     
-    NSCalendarDate* theTime = nil;
+    NSDate* theTime = nil;
 	
     if(hasTiming){
         ptr -= (nBins+2);
@@ -122,9 +122,9 @@
     	theTimeRef.asLongs[1] = ptr[1];
     	theTimeRef.asLongs[0] = ptr[2];
     	
-    	theTime   = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
+    	theTime   = [NSDate dateWithTimeIntervalSinceReferenceDate:theTimeRef.asTimeInterval];
     	NSString* inSec = [NSString stringWithFormat:@"\n(%.3f secs)\n",theTimeRef.asTimeInterval];
-    	return [NSString stringWithFormat:@"%@%@%@%@%@\nTimeStamp:\n%@%@\n",title,crate,card,nBinsStr,countsStr,[theTime descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S:%F"],inSec];               
+    	return [NSString stringWithFormat:@"%@%@%@%@%@\nTimeStamp:\n%@%@\n",title,crate,card,nBinsStr,countsStr,[theTime descriptionFromTemplate:@"MM/dd/yy HH:mm:SSS"],inSec];
     	
     }
 	

@@ -183,8 +183,8 @@
 		else if ([theObject isKindOfClass:[NSNumber class]]) {
 			result = [NSString stringWithFormat:@"%@", theObject];
 		}
-		else if ([theObject isKindOfClass:[NSCalendarDate class]]) {
-			result = [NSString stringWithFormat:@"'%@'", [(NSCalendarDate *)theObject descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S"]];
+		else if ([theObject isKindOfClass:[NSDate class]]) {
+			result = [NSString stringWithFormat:@"'%@'", [(NSDate *)theObject descriptionFromTemplate:@"yy-MM-dd HH:mm:ss"]];
 		}
 		else if ((nil == theObject) || ([theObject isKindOfClass:[NSNull class]])) {
 			result = @"NULL";

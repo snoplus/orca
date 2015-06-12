@@ -67,6 +67,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) clearReasons;
 - (void) changeTimerExpired: (NSTimer*) aTimer;
 - (void) pollLevels;
+- (void) postCouchDBRecord;
+- (void) clearAlarms:(int)aChan;
 @end
 
 @implementation ORAmi286Model
@@ -312,7 +314,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (void) setEmailEnabled:(BOOL)aEmailEnabled
 {
-    [[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setEmailEnabled:emailEnabled];
+    [[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setEmailEnabled:emailEnabled];
     emailEnabled = aEmailEnabled;
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduleStatusSend) object:nil];
@@ -374,6 +376,13 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     
     enabledMask = anEnabledMask;
 	
+    int i;
+    for(i=0;i<4;i++){
+        if((enabledMask & (0x1<<i)) == 0){
+            [self clearAlarms:i];
+        }
+    }
+    
 	[[self undoManager] disableUndoRegistration];
 	[self setEmailEnabled:emailEnabled];
 	[[self undoManager] enableUndoRegistration];
@@ -439,7 +448,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		if(fillStatus[index]!=aValue){
 			[self setLastChange:index];
 			if(sendOnValveChange){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Fill State Changed to %@ at %@\n",index,[self fillStatusName:aValue], time]];
 				[self scheduleStatusSend];
 			}
@@ -467,7 +476,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	if(index>=0 && index<4){
 		
 		[lastChange[index] release];
-		lastChange[index] = [[NSCalendarDate date] retain];
+		lastChange[index] = [[NSDate date] retain];
 		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORAmi286LastChange
@@ -500,7 +509,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 			[hiAlarm[index] postAlarm];
 			if(sendOnAlarm){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Hi Alarm posted at %@\n",index,time]];
 				[self scheduleStatusSend];
 			}
@@ -517,7 +526,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			}
 			[lowAlarm[index] postAlarm];
 			if(sendOnAlarm){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Low Alarm posted at %@\n",index,time]];
 				[self scheduleStatusSend];
 			}
@@ -529,12 +538,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		}
 		if(alarmStatus[index] & (1<<6)){
 			if(!expiredAlarm[index]){
-				expiredAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Expired" severity:kRangeAlarm];
+				expiredAlarm[index] = [[ORAlarm alloc] initWithName:@"Ami 286 Expired" severity:kInformationAlarm]; //more alarms will be tripped if the level drop. so this alarm is just for information.
 				[expiredAlarm[index] setSticky:YES];
 			}
 			[expiredAlarm[index] postAlarm];
 			if(sendOnAlarm){
-				NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+				NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 				[self addReason:[NSString stringWithFormat:@"Chan %d. Expired Alarm posted at %@\n",index,time]];
 				[self scheduleStatusSend];
 			}
@@ -770,15 +779,19 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
-		[serialPort setSpeed:9600];
-		[serialPort setParityOdd];
-		[serialPort setStopBits2:1];
-		[serialPort setDataBits:7];
         [serialPort open];
+		[serialPort setSpeed:9600];
+		[serialPort setParityNone];
+		[serialPort setStopBits2:0];
+		[serialPort setDataBits:8];
+        [serialPort commitChanges];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
-	
+    
+    [self setLastRequest:nil];
+    [cmdQueue removeAllObjects];
+
 	[[self undoManager] disableUndoRegistration];
 	[self setEmailEnabled:emailEnabled];
 	[[self undoManager] enableUndoRegistration];
@@ -906,8 +919,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:STATUS:ALARM:CONDITION?",i+1]];
 			if(i<2)[self addCmdToQueue:[NSString stringWithFormat:@"CH%d:FILL:STATE?",i+1]];
 		}
+        else {
+            [self clearAlarms:i];
+        }
 	}
 	[self addCmdToQueue:@"++ShipRecords"];
+    [self postCouchDBRecord];
 }
 
 - (void) loadAlarmsToHardware
@@ -1108,6 +1125,22 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 @end
 
 @implementation ORAmi286Model (private)
+
+- (void) clearAlarms:(int)aChan
+{
+    [hiAlarm[aChan] clearAlarm];
+    [hiAlarm[aChan] release];
+    hiAlarm[aChan] = nil;
+    
+    [lowAlarm[aChan] clearAlarm];
+    [lowAlarm[aChan] release];
+    lowAlarm[aChan] = nil;
+    
+    [expiredAlarm[aChan] clearAlarm];
+    [expiredAlarm[aChan] release];
+    expiredAlarm[aChan] = nil;
+}
+
 - (void) runStarted:(NSNotification*)aNote
 {
 }
@@ -1121,7 +1154,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     isValid = NO;
 	NSLogError(@"command timeout",@"AMI 286",nil);
 	[self setLastRequest:nil];
-	[self processOneCommandFromQueue];	 //do the next command in the queue
+    [cmdQueue removeAllObjects];
 }
 
 - (void) processOneCommandFromQueue
@@ -1200,7 +1233,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	int i;
 	for(i=0;i<4;i++){
 		if(enabledMask & (1<<i)) {
-			NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+			NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %ld minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
 			[self scheduleStatusSend];
 		}
@@ -1231,7 +1264,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[eMailLock lock];
 	if(!eMailReasons){
 		eMailReasons = [[NSMutableArray array] retain];
-		NSString* time = [[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"];
+		NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
 		[eMailReasons addObject:[NSString stringWithFormat:@"EMailed originally triggered at %@\n",time]];
 	}
 	[eMailReasons addObject:aReason];
@@ -1277,7 +1310,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			stat = "N/A";
 			fillStat = "N/A";
 		}
-		content = [content stringByAppendingFormat:@"%2d: %5.1f %10s %7s       %@\n",i,level[i],stat,fillStat,[lastChange[i] descriptionWithCalendarFormat:@"%m/%d %I:%M %p"]];
+		content = [content stringByAppendingFormat:@"%2d: %5.1f %10s %7s       %@\n",i,level[i],stat,fillStat,[lastChange[i] descriptionFromTemplate:@"MM/dd HH:mm:ss"]];
 	}
 	
 	if([eMailReasons count]){
@@ -1289,7 +1322,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		eMailReasons = nil;
 	}
 	
-	@synchronized([NSApp delegate]){
+	@synchronized((ORAppDelegate*)[NSApp delegate]){
 		if(content){
 			NSFont*       labelFont  = [NSFont fontWithName:@"Monaco" size:12];
 			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys: labelFont,NSFontAttributeName,nil];
@@ -1316,4 +1349,72 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	
 	[self performSelector:@selector(pollLevels) withObject:nil afterDelay:pollTime];
 }
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithFloat:level[0]],
+                             [NSNumber numberWithFloat:level[1]],
+                             [NSNumber numberWithFloat:level[2]],
+                             [NSNumber numberWithFloat:level[3]],
+                             nil], @"level",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:fillStatus[0]],
+                             [NSNumber numberWithInt:fillStatus[1]],
+                             [NSNumber numberWithInt:fillStatus[2]],
+                             [NSNumber numberWithInt:fillStatus[3]],
+                             nil], @"fillStatus",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:fillState[0]],
+                             [NSNumber numberWithInt:fillState[1]],
+                             [NSNumber numberWithInt:fillState[2]],
+                             [NSNumber numberWithInt:fillState[3]],
+                             nil], @"fillState",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:hiAlarmLevel[0]],
+                             [NSNumber numberWithInt:hiAlarmLevel[1]],
+                             [NSNumber numberWithInt:hiAlarmLevel[2]],
+                             [NSNumber numberWithInt:hiAlarmLevel[3]],
+                             nil], @"hiAlarmLevel",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:lowAlarmLevel[0]],
+                             [NSNumber numberWithInt:lowAlarmLevel[1]],
+                             [NSNumber numberWithInt:lowAlarmLevel[2]],
+                             [NSNumber numberWithInt:lowAlarmLevel[3]],
+                             nil], @"lowAlarmLevel",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:hiFillPoint[0]],
+                             [NSNumber numberWithInt:hiFillPoint[1]],
+                             [NSNumber numberWithInt:hiFillPoint[2]],
+                             [NSNumber numberWithInt:hiFillPoint[3]],
+                             nil], @"hiFillPoint",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:lowFillPoint[0]],
+                             [NSNumber numberWithInt:lowFillPoint[1]],
+                             [NSNumber numberWithInt:lowFillPoint[2]],
+                             [NSNumber numberWithInt:lowFillPoint[3]],
+                             nil], @"lowFillPoint",
+                            
+                            [NSArray arrayWithObjects:
+                             [NSNumber numberWithInt:alarmStatus[0]],
+                             [NSNumber numberWithInt:alarmStatus[1]],
+                             [NSNumber numberWithInt:alarmStatus[2]],
+                             [NSNumber numberWithInt:alarmStatus[3]],
+                             nil], @"alarmStatus",
+                            
+                            [NSNumber numberWithBool:   isValid],               @"isValid",
+                            [NSNumber numberWithInt:    enabledMask],           @"enabledMask",
+                            [NSNumber numberWithBool:   [serialPort isOpen]],   @"portOpen",
+                            
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+}
+
+
 @end

@@ -209,6 +209,12 @@
     return [[NSDecimalNumber decimalNumberWithString:self] unsignedLongValue];
 }
 
++ (NSString*) stringWithFormat:(NSString*)a parameters:(va_list)valist;
+{
+    return [[[NSString alloc] initWithFormat:a arguments:valist] autorelease];
+
+}
+
 @end
 
 @implementation NSMutableString (NSStringWithExtensions)

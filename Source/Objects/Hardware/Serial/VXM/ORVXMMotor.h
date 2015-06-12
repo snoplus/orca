@@ -41,6 +41,7 @@
 		BOOL			absoluteMotion;
         int             motorType;
         NSString*       axis;
+        BOOL            sentMotorType;
 }
 
 #pragma mark ***Accessors
@@ -68,6 +69,9 @@
 - (void) setTargetPosition:(int)aPosition;
 - (NSString*) axis;
 - (void) setAxis:(NSString*)aString;
+- (BOOL) sentMotorType;
+- (void) setSentMotorType:(BOOL)aState;
+
 @end
 
 extern NSString* ORVXMMotorAbsMotionChanged;

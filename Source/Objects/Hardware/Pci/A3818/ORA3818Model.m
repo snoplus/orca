@@ -195,7 +195,7 @@ NSString* ORA3818Lock										= @"ORA3818Lock";
 		@catch(NSException* localException) {
             NSLogColor([NSColor redColor],@"*** Unable to send %@ reset ***\n",deviceName);
             NSLogColor([NSColor redColor],@"*** Check VME bus power and/or cables ***\n");
-            if(okToShowResetWarning) NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+            if(okToShowResetWarning) ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 													 localException);
         }
     }
@@ -962,9 +962,9 @@ typedef struct a3818_comm {
             size_t inbufSize = 64;
 
             /*kern_return_t result = */IOConnectCallMethod(  dataPort,   // connection
-                                         kA3818GetPCIConfig,		// selector
+                                         kA3818VmeIOCtrl,		// selector
                                          NULL,                      // input values
-                                         NULL,							// number of scalar input values
+                                         0,							// number of scalar input values
                                          outbuf,						// Pointer to input struct
                                          count,							// Size of input struct
                                          NULL,						// output scalar array
@@ -972,7 +972,8 @@ typedef struct a3818_comm {
                                          inbuf,                     // pointer to struct output
                                          &inbufSize                 // pointer to size of struct output
                                          );
-
+            int i;
+            for(i=0;i<32;i++)NSLog(@"%d: %d\n",i,inbuf[i]);
             
 			//????if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             

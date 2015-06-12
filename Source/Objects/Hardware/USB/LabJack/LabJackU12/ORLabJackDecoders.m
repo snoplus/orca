@@ -115,8 +115,7 @@ static NSString* kLabJackUnit[8] = {
 	theString = [theString stringByAppendingFormat:@"I/O Out = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
 	theString = [theString stringByAppendingFormat:@"I/O In  = 0x%08lx\n",dataPtr[index++] & 0x000fffff];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index]];
 	theString = [theString stringByAppendingFormat:@"%@\n",date];
 	
 	return theString;

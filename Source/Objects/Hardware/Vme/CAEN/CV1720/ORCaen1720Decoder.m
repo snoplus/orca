@@ -129,7 +129,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
                 if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
                 ORCaen1720Model* obj = [actualCards objectForKey:aKey];
                 if(!obj){
-                    NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen1720Model")];
+                    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen1720Model")];
                     NSEnumerator* e = [listOfCards objectEnumerator];
                     ORCaen1720Model* aCard;
                     while(aCard = [e nextObject]){

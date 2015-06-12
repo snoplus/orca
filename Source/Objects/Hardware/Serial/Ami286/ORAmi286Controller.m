@@ -352,11 +352,10 @@
 	[[level1Matrix cellWithTag:index] setStringValue:levelAsString];
 	
 	unsigned long t = [model timeMeasured:index];
-	NSCalendarDate* theDate;
+	NSDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-		[[timeMatrix cellWithTag:index] setObjectValue:theDate];
+		theDate = [NSDate dateWithTimeIntervalSince1970:t];
+		[[timeMatrix cellWithTag:index] setObjectValue:[theDate stdDescription]];
 	}
 	else [[timeMatrix cellWithTag:index] setObjectValue:@"--"];
 }

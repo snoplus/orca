@@ -33,14 +33,12 @@
 #import "ORQueueView.h"
 
 @interface SBC_LinkController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-#endif
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
-
 
 @implementation SBC_LinkController
 
@@ -68,11 +66,11 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-    [[plotter xAxis] setRngLimitsLow:0 withHigh:300 withMinRng:300];
+    [[plotter xAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:1000];
     [[plotter yAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
 	
 	[[histogram xAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
-    [[histogram yAxis] setRngLimitsLow:0 withHigh:100 withMinRng:10];
+    [[histogram yAxis] setRngLimitsLow:0 withHigh:1000 withMinRng:10];
 
     [plotter setUseGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
@@ -94,13 +92,15 @@
 	[aPlot1 release];
 	
 	[payloadSizeSlider setMinValue:0];
-	[payloadSizeSlider setMaxValue:300];
+	[payloadSizeSlider setMaxValue:1000];
 	[ipNumberComboBox reloadData];
 	[self setDriverInfo];
 	if([[model driverScriptName] length] == 0){
 		[downloadDriverButton setEnabled:NO];
 	}
-	[bytesReceivedRateAxis setLabel:@"KBytes/Second"];
+    [bytesReceivedRateAxis setLabel:@"KBytes/Second"];
+    [bytesReceivedRateAxis setLog:YES];
+    [bytesReceivedRateAxis setRngLimitsLow:0 withHigh:100000 withMinRng:1000];
 	[queView setBarColor:[NSColor redColor]];
 }
 
@@ -638,7 +638,7 @@
             else {
                 theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %-9u Polling     : %u Hz\n",theRunInfo.readCycles/10000,theRunInfo.pollingRate]];
             }
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %u\n",theRunInfo.lostByteCount]];
 			
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9lu Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9lu Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
@@ -774,7 +774,6 @@
 	[openPanel setCanCreateDirectories:NO];
 	[openPanel setPrompt:@"Choose"];
     
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startPath?startPath:NSHomeDirectory()]];
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -783,16 +782,6 @@
             [[model sbcLink] setFilePath:path];
         }
     }];
-    
-#else 	    
-	[openPanel beginSheetForDirectory:startPath?startPath:NSHomeDirectory()
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 - (IBAction) loadModeAction:(id)sender
@@ -807,6 +796,20 @@
 
 - (IBAction) killCrateAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"This will KILL the crate process. There may be other ORCAs connected to the crate."];
+    [alert setInformativeText:@"Is this really what you want?"];
+    [alert addButtonWithTitle:@"Yes,  Kill Crate"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if (result == NSAlertFirstButtonReturn){
+            [[model sbcLink] killCrate];
+       }
+    }];
+#else
     NSBeginAlertSheet(@"This will KILL the crate process. There may be other ORCAs connected to the crate.",
                       @"Cancel",
                       @"Yes, Kill Crate",
@@ -815,6 +818,7 @@
                       @selector(_killCrateDidEnd:returnCode:contextInfo:),
                       nil,
                       nil,@"Is this really what you want?");
+#endif
 }
 
 - (IBAction) downloadDriverAction:(id)sender
@@ -854,13 +858,23 @@
 - (IBAction) closePassWordPanel:(id)sender
 {
     [passWordPanel orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+
+#else
     [NSApp endSheet:passWordPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
 }
 
 - (IBAction) closeDriverInstallPanel:(id)sender
 {
     [driverInstallPanel orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:driverInstallPanel returnCode:([sender tag] == 1) ? NSModalResponseOK : NSModalResponseCancel];
+#else
     [NSApp endSheet:driverInstallPanel returnCode:([sender tag] == 1) ? NSOKButton : NSCancelButton];
+#endif
+
 }
 
 - (IBAction) verboseAction:(id)sender
@@ -992,7 +1006,7 @@
 		}
 	}
 	@catch (NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
     }
 }
@@ -1061,7 +1075,7 @@
 		}
 	}
 	@catch (NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08lX", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAddress: 0x%08lX", @"OK", nil, nil,
                         localException,address);
     }
 }
@@ -1191,36 +1205,35 @@
 @end
 
 @implementation SBC_LinkController (private)
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        NSString* path = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
-        [[model sbcLink] setFilePath:path];
-    }
-}
-#endif
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
 		[[model sbcLink] killCrate];
 	}
 }
-
+#endif
 - (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
     if(returnCode == NSOKButton){
-		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[[rebootMatrix selectedCell]tag]];  
+#endif
+		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[[rebootMatrix selectedCell]tag]];
 	}
 }
 
 - (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    if(returnCode == NSModalResponseOK){
+#else
     if(returnCode == NSOKButton){
-		[[model sbcLink] installDriver:[driverPassWordField stringValue]];  
+#endif
+		[[model sbcLink] installDriver:[driverPassWordField stringValue]];
 	}
 }
-
 @end
 
 @implementation OrcaObject (SBC_Link)

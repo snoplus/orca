@@ -39,7 +39,7 @@
 - (void) assignDataIds
 {
 	
-    NSMutableArray* classList = [[[[NSApp delegate] document] collectObjectsRespondingTo:@selector(setDataIds:)] mutableCopy];
+    NSMutableArray* classList = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsRespondingTo:@selector(setDataIds:)] mutableCopy];
     
     while([classList count]){
         int i;

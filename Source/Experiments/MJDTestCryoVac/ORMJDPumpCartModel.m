@@ -26,6 +26,7 @@
 #import "ORRGA300Model.h"
 #import "ORTM700Model.h"
 #import "ORTPG256AModel.h"
+#import "ORLakeShore210Model.h"
 #import "ORMJDTestCryostat.h"
 
 @interface ORMJDPumpCartModel (private)
@@ -48,11 +49,13 @@
 - (BOOL) valueValidForRegion:(int)aRegion;
 - (BOOL) region:(int)aRegion valueHigherThan:(double)aValue;
 
-- (ORRGA300Model*)     findRGA;
-- (ORTM700Model*)      findTurboPump;
-- (ORTPG256AModel*)    findPressureGauge:(int)aSlot;
+- (ORRGA300Model*)          findRGA;
+- (ORTM700Model*)           findTurboPump;
+- (ORTPG256AModel*)         findPressureGauge:(int)aSlot;
+- (ORLakeShore210Model*)    findTemperatureGauge:(int)aSlot;
 - (id) findObject:(NSString*)aClassName;
 - (id) findObject:(NSString*)aClassName inSlot:(int)aSlot;
+- (void)postCouchRecord;
 
 @end
 
@@ -162,9 +165,58 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 							 name : ORSerialPortWithQueueModelIsValidChanged
 						   object : rga];
 	}
-		
-	
+    
+    ORLakeShore210Model* temperatureGauge1 = [self findTemperatureGauge:4];
+    ORLakeShore210Model* temperatureGauge2 = [self findTemperatureGauge:5];
+    ORLakeShore210Model* temperatureGauge3 = [self findTemperatureGauge:6];
+    ORLakeShore210Model* temperatureGauge4 = [self findTemperatureGauge:7];
+    if(temperatureGauge1){
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORLakeShore210TempChanged
+                           object : temperatureGauge1];
+        
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORSerialPortWithQueueModelIsValidChanged
+                           object : temperatureGauge1];
+    }
+    
+    if(temperatureGauge2){
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORLakeShore210TempChanged
+                           object : temperatureGauge2];
+        
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORSerialPortWithQueueModelIsValidChanged
+                           object : temperatureGauge2];
+    }
+    if(temperatureGauge3){
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORLakeShore210TempChanged
+                           object : temperatureGauge3];
+        
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORSerialPortWithQueueModelIsValidChanged
+                           object : temperatureGauge3];
+    }
+    if(temperatureGauge4){
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORLakeShore210TempChanged
+                           object : temperatureGauge4];
+        
+        [notifyCenter addObserver : self
+                         selector : @selector(temperatureGaugeChanged:)
+                             name : ORSerialPortWithQueueModelIsValidChanged
+                           object : temperatureGauge4];
+    }
 }
+
 - (BOOL) detectorsBiased		{ return NO; }
 
 - (void) turboChanged:(NSNotification*)aNote
@@ -192,6 +244,13 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 	for(id aCryostat in testCryostats){
 		[aCryostat pressureGaugeChanged:aNote];
 	}
+}
+
+- (void) temperatureGaugeChanged:(NSNotification*)aNote
+{
+    for(id aCryostat in testCryostats){
+        [aCryostat temperatureGaugeChanged:aNote];
+    }
 }
 
 - (void) rgaChanged:(NSNotification*)aNote
@@ -363,7 +422,10 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
     leftSideConnection = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelLeftSideConnectionChanged object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelConnectionChanged object:self];
-	
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+    }
 }
 
 - (int) rightSideConnection
@@ -379,12 +441,17 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 	rightSideConnection = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelRightSideConnectionChanged object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPumpCartModelConnectionChanged object:self];
+    
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+    }
 }
 
 
 #pragma mark •••CardHolding Protocol
-- (int) maxNumberOfObjects	{ return 4;  }	
-- (int) objWidth			{ return 80; }	
+- (int) maxNumberOfObjects	{ return 8;  }
+- (int) objWidth			{ return 60; }
 - (int) groupSeparation		{ return 0;  }	
 - (NSString*) nameForSlot:(int)aSlot	
 { 
@@ -393,19 +460,21 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 
 - (NSRange) legalSlotsForObj:(id)anObj
 {
-	if([anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])			return NSMakeRange(0,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])		return NSMakeRange(1,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")]) return NSMakeRange(2,1);
-	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])		return NSMakeRange(3,1);
+	if([anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])                return NSMakeRange(0,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])          return NSMakeRange(1,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])         return NSMakeRange(2,1);
+    else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])         return NSMakeRange(3,1);
+    else if([anObj isKindOfClass:NSClassFromString(@"ORLakeShore210Model")])	return NSMakeRange(4,4);
 	else return NSMakeRange(0,0);
 }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
 { 
-	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])		return NO;
-	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])	return NO;
-	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	return NO;
-	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	return NO;
+	if(aSlot == 0      && [anObj isKindOfClass:NSClassFromString(@"ORTM700Model")])         return NO;
+	else if(aSlot == 1 && [anObj isKindOfClass:NSClassFromString(@"ORRGA300Model")])        return NO;
+	else if(aSlot == 2 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])       return NO;
+    else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])       return NO;
+    else if(aSlot >= 4 && [anObj isKindOfClass:NSClassFromString(@"ORLakeShore210Model")])	return NO;
     else return YES;
 }
 
@@ -469,9 +538,10 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 
 
 @implementation ORMJDPumpCartModel (private)
-- (ORRGA300Model*)      findRGA				{ return [self findObject:@"ORRGA300Model"];      }
-- (ORTM700Model*)       findTurboPump		{ return [self findObject:@"ORTM700Model"];       }
-- (ORTPG256AModel*)     findPressureGauge:(int)aSlot   { return [self findObject:@"ORTPG256AModel" inSlot:aSlot];     }
+- (ORRGA300Model*)      findRGA                         { return [self findObject:@"ORRGA300Model"];      }
+- (ORTM700Model*)       findTurboPump                   { return [self findObject:@"ORTM700Model"];       }
+- (ORTPG256AModel*)     findPressureGauge:(int)aSlot    { return [self findObject:@"ORTPG256AModel"      inSlot:aSlot];     }
+- (ORLakeShore210Model*)findTemperatureGauge:(int)aSlot { return [self findObject:@"ORLakeShore210Model" inSlot:aSlot];     }
 
 - (id) findObject:(NSString*)aClassName
 {
@@ -726,7 +796,57 @@ NSString* ORMJDPumpCartModelConnectionChanged			 = @"ORMJDPumpCartModelConnectio
 			}
 		}
 	}
+    if(!couchPostScheduled){
+        couchPostScheduled = YES;
+        [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+    }
 }
+
+- (void)postCouchRecord
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postCouchRecord) object:nil];
+    
+    couchPostScheduled = NO;
+
+    if([[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]>0){
+
+        NSMutableDictionary* values = [NSMutableDictionary dictionary];
+        NSMutableArray* regionColors = [NSMutableArray array];
+        int i;
+        for(i=0;i<kNumberPriorityRegions;i++){
+            NSArray* pipes = [self pipesForRegion:i];
+            for(id aPipe in pipes){
+                [regionColors addObject:[aPipe rgbString]];
+            }
+        }
+        
+        NSMutableArray* gvStates = [NSMutableArray array];
+        for(ORVacuumGateValve* aGateValve in [self gateValves]){
+            [gvStates addObject:[NSArray arrayWithObjects:
+                                 [NSNumber numberWithInt:[aGateValve state]],
+                                 [NSNumber numberWithInt:[aGateValve constraintCount]],
+                                 nil]];
+        }
+        
+        NSMutableArray* valueLabels = [NSMutableArray array];
+        for(ORVacuumStatusLabel* aLabel in [self statusLabels]){
+            [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
+        }
+        for(ORVacuumDynamicLabel* aLabel in [self valueLabels]){
+            [valueLabels addObject:[NSArray arrayWithObjects:[aLabel label],[aLabel displayString],nil]];
+        }
+        
+        [values setObject: valueLabels          forKey:@"DynamicLabels"];
+        [values setObject: regionColors         forKey:@"RegionColors"];
+        [values setObject: gvStates             forKey:@"GateValves"];
+        [values setObject: [NSNumber numberWithInt:leftSideConnection]                   forKey:@"LeftSideConnection"];
+        [values setObject: [NSNumber numberWithInt:rightSideConnection]                    forKey:@"RightSideConnection"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+    }
+    [self performSelector:@selector(postCouchRecord) withObject:nil afterDelay:10];
+}
+
 
 - (void) resetVisitationFlag
 {

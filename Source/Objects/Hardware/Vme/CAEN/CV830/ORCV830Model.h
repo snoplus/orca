@@ -109,20 +109,24 @@ enum {
 		NSTimeInterval	pollingState;
 		BOOL			shipRecords;
 		time_t			lastReadTime;
-		BOOL			isRunning;
 		BOOL			scheduledForUpdate;
 		unsigned long	dwellTime;
 		short			acqMode;
 		BOOL			testMode;
-		BOOL			dataFormat;
 		BOOL			clearMeb;
 		BOOL			autoReset;
 		unsigned long	polledDataId;
 		unsigned long	dataRecord[38];
 		ORReadOutList*	readOutGroup;
+        BOOL            remoteInit;
+        long            count0Offset;
+   
 		//some cached variabled
 		NSArray* dataTakers;	//cache of data takers.
 		unsigned long numEnabledChannels;
+        unsigned long    lastChan0Count;
+        unsigned long    chan0RollOverCount;
+    
 }
 
 #pragma mark •••Initialization
@@ -132,12 +136,12 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (long) count0Offset;
+- (void) setCount0Offset:(long)aCount0Offset;
 - (BOOL) autoReset;
 - (void) setAutoReset:(BOOL)aAutoReset;
 - (BOOL) clearMeb;
 - (void) setClearMeb:(BOOL)aClearMeb;
-- (BOOL) dataFormat;
-- (void) setDataFormat:(BOOL)aDataFormat;
 - (BOOL) testMode;
 - (void) setTestMode:(BOOL)aTestMode;
 - (short) acqMode;
@@ -156,6 +160,7 @@ enum {
 - (void) runAboutToStop:(NSNotification*)aNote;
 
 #pragma mark •••Hardware Access
+- (void) remoteInitBoard;
 - (void) initBoard;
 - (void) readStatus;
 - (void) readScalers;
@@ -167,6 +172,7 @@ enum {
 - (void) writeDwellTime;
 - (unsigned short) getNumEvents;
 - (unsigned short) numEnabledChannels;
+- (unsigned short) readControlReg;
 
 #pragma mark •••Data Header
 - (unsigned long) polledDataId;
@@ -198,9 +204,9 @@ enum {
 @end
 
 #pragma mark •••External String Definitions
+extern NSString* ORCV830ModelCount0OffsetChanged;
 extern NSString* ORCV830ModelAutoResetChanged;
 extern NSString* ORCV830ModelClearMebChanged;
-extern NSString* ORCV830ModelDataFormatChanged;
 extern NSString* ORCV830ModelTestModeChanged;
 extern NSString* ORCV830ModelAcqModeChanged;
 extern NSString* ORCV830ModelDwellTimeChanged;

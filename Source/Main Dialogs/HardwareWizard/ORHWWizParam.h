@@ -49,6 +49,7 @@ typedef enum  {
     float     lowerLimit;
     float     stepSize;
     BOOL      useValue;
+    BOOL      oncePerCard;
     SEL setMethodSelector;
     SEL getMethodSelector;
     NSFormatter* formatter;
@@ -80,6 +81,8 @@ typedef enum  {
 - (void) setStepSize:(float)aStepSize;
 - (BOOL)useValue;
 - (void)setUseValue:(BOOL)flag;
+- (BOOL)oncePerCard;
+- (void)setOncePerCard:(BOOL)flag;
 - (void) setFormat:(NSString*)aFormat upperLimit:(float)anUpperLimit lowerLimit:(float)aLowerLimit stepSize:(float)step units:(NSString*)units;
 - (SEL)setMethodSelector;
 - (void)setSetMethodSelector:(SEL)anInitMethodSelector;

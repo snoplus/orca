@@ -302,7 +302,7 @@
 		[model initBoard];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Init failed: %@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"Init failed: %@", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -314,7 +314,7 @@
 		[model resetBoard];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Reset failed: %@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"Reset failed: %@", @"OK", nil, nil,
                         localException);
     }	
 }
@@ -325,7 +325,7 @@
 		[model report];
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"Report failed: %@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"Report failed: %@", @"OK", nil, nil,
                         localException);
     }
 }
@@ -401,7 +401,7 @@
         
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[registerAddressPopUp indexOfSelectedItem]]);
     }
 }
@@ -414,7 +414,7 @@
         [model write:val atRegisterIndex:[registerAddressPopUp indexOfSelectedItem]];    
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[registerAddressPopUp indexOfSelectedItem]]);
     }
 }

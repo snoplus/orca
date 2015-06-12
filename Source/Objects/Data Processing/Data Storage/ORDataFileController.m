@@ -30,9 +30,11 @@ enum {
     kConfig
 };
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORDataFileController (private)
 - (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
+#endif
 
 @implementation ORDataFileController
 
@@ -127,6 +129,22 @@ enum {
 
 - (IBAction) stopSendingAction:(id)sender
 {
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:@"Stop Sending Files?"];
+    [alert setInformativeText:@"You can always send them later."];
+    [alert addButtonWithTitle:@"Stop"];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            [[model dataFolder] stopTheQueue];
+            [[model statusFolder] stopTheQueue];
+            [[model configFolder] stopTheQueue];
+        }
+    }];
+#else
     NSBeginAlertSheet(@"Stop Sending Files?",
                       @"Stop",
                       @"Cancel",
@@ -136,7 +154,9 @@ enum {
                       nil,
                       nil,
                       @"You can always send them later.");
+#endif
 }
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
@@ -145,6 +165,7 @@ enum {
 		[[model configFolder] stopTheQueue];
     }
 }
+#endif
 
 
 #pragma mark ¥¥¥Interface Management

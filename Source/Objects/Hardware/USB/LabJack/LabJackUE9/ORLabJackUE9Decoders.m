@@ -108,8 +108,7 @@ static NSString* kLabJackUE9Unit[8] = {
 	}theAdcValue;
 	theString = [theString stringByAppendingFormat:@"HW ID = %lu\n",dataPtr[1] & 0x0000ffff];
 	
-	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
+	NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
 	theString = [theString stringByAppendingFormat:@"%@\n",date];
 	
 	int i;

@@ -20,8 +20,8 @@
 
 @interface ORRemoteSocketController : OrcaObjectController 
 {	
-	IBOutlet NSTextField* remoteHostNameField;
-	IBOutlet NSTextField* remoteHostField;
+    IBOutlet NSTextField* connectedField;
+    IBOutlet NSTextField* remoteHostField;
 	IBOutlet NSTextField* remotePortField;
     IBOutlet NSButton*    remoteSocketLockButton;
 }
@@ -30,6 +30,7 @@
 - (void) remoteHostNameChanged:(NSNotification*)aNote;
 - (void) remotePortChanged:(NSNotification*)aNote;
 - (void) remoteSocketLockChanged:(NSNotification*)aNote;
+- (void) connectionChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) remoteHostNameAction:(id)sender;

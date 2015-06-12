@@ -50,7 +50,7 @@
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-@property (assign,nonatomic) NSString*      label;
+@property (copy,nonatomic) NSString*      label;
 @property (assign,nonatomic) int            channel;
 @property (assign,nonatomic) float          temperature;
 @property (assign,nonatomic) BOOL           autoRange;

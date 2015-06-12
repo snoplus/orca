@@ -50,7 +50,12 @@
                      selector : @selector(modelTypeChanged:)
                          name : ORCaen792ModelModelTypeChanged
 						object: model];
-
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(useHWResetChanged:)
+                         name : ORCaen792ModelUseHWResetChanged
+                       object : model];
+  
 	[notifyCenter addObserver : self
 					 selector : @selector(onlineMaskChanged:)
 						 name : ORCaen792ModelOnlineMaskChanged
@@ -130,7 +135,8 @@
 {
     [super updateWindow];
 	[self modelTypeChanged:nil];
-	[self onlineMaskChanged:nil];
+    [self useHWResetChanged:nil];
+    [self onlineMaskChanged:nil];
 	[self iPedChanged:nil];
 	[self overflowSuppressEnableChanged:nil];
 	[self zeroSuppressEnableChanged:nil];
@@ -141,6 +147,11 @@
 	[self cycleZeroSuppressionChanged:nil];
 	[self percentZeroOffChanged:nil];
 	[self totalCycleZTimeChanged:nil];
+}
+
+- (void) useHWResetChanged:(NSNotification*)aNote
+{
+    [useHWResetCB setIntValue: [model useHWReset]];
 }
 
 - (void) slideConstantChanged:(NSNotification*)aNote
@@ -233,7 +244,8 @@
     [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
     [thresholdReadButton setEnabled:!lockedOrRunningMaintenance];
 	
-	[slideConstantField           setEnabled: !lockedOrRunningMaintenance && ![model slidingScaleEnable]];
+    [useHWResetCB                 setEnabled: !lockedOrRunningMaintenance];
+    [slideConstantField           setEnabled: !lockedOrRunningMaintenance && ![model slidingScaleEnable]];
 	[slidingScaleEnableMatrix     setEnabled: !lockedOrRunningMaintenance];
 	[eventCounterIncMatrix        setEnabled: !lockedOrRunningMaintenance];
 	[overflowSuppressEnableMatrix setEnabled: !lockedOrRunningMaintenance];
@@ -279,6 +291,12 @@
 {
 	[model setSlideConstant:[sender intValue]];
 }
+
+- (IBAction) useHWResetAction:(id)sender
+{
+    [model setUseHWReset:[sender intValue]];
+}
+
 
 - (IBAction) slidingScaleEnableAction:(id)sender
 {

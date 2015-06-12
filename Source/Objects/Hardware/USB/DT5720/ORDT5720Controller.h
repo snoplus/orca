@@ -1,5 +1,5 @@
 //
-//  ORHPDT5720Controller.h
+//  ORDT5720Controller.h
 //  Orca
 //
 //  Created by Mark Howe on Wed Mar 12,2014.
@@ -21,14 +21,48 @@
 
 @class ORValueBarGroupView;
 @class ORCompositeTimeLineView;
+@class ORSafeCircularBuffer;
+@class ORQueueView;
 
 @interface ORDT5720Controller : OrcaObjectController 
 {
-	IBOutlet NSPopUpButton* serialNumberPopup;
-	IBOutlet NSButton*		lockButton;
     IBOutlet NSTabView* 	tabView;
-    IBOutlet NSStepper* 	addressStepper;
-    IBOutlet NSTextField* 	addressTextField;
+	IBOutlet NSPopUpButton* serialNumberPopup;
+    IBOutlet NSMatrix*		enabledMaskMatrix;
+    
+    IBOutlet NSMatrix*      logicTypeMatrix;
+    IBOutlet NSMatrix*		zsThresholdMatrix;
+    IBOutlet NSMatrix*		numOverUnderZsThresholdMatrix;
+    IBOutlet NSMatrix*		nLbkMatrix;
+    IBOutlet NSMatrix*		nLfwdMatrix;
+    IBOutlet NSMatrix*		thresholdMatrix;
+    IBOutlet NSMatrix*		numOverUnderThresholdMatrix;
+    IBOutlet NSMatrix*		dacMatrix;
+    IBOutlet NSPopUpButton* zsAlgorithmPU;
+    IBOutlet NSButton*      packedCB;
+
+    IBOutlet NSMatrix*      trigOnUnderThresholdMatrix;
+    IBOutlet NSButton*      testPatternEnabledButton;
+    IBOutlet NSButton*      trigOverlapEnabledButton;
+    IBOutlet NSPopUpButton* eventSizePopUp;
+    IBOutlet NSTextField*	eventSizeTextField;
+
+    IBOutlet NSTextField*	postTriggerSettingTextField;
+    IBOutlet NSMatrix*		triggerSourceEnableMaskMatrix;
+    IBOutlet NSMatrix*		triggerOutMatrix;
+    IBOutlet NSTextField*	coincidenceLevelTextField;
+
+    IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSMatrix*		countAllTriggersMatrix;
+
+	IBOutlet NSMatrix*      ttlEnabledMatrix;
+	IBOutlet NSMatrix*      gpoEnabledMatrix;
+	IBOutlet NSButton*      fpSoftwareTrigEnabledButton;
+	IBOutlet NSButton*      fpExternalTrigEnabledButton;
+	IBOutlet NSButton*      externalTrigEnabledButton;
+	IBOutlet NSButton*      softwareTrigEnabledButton;
+	IBOutlet NSMatrix*      gpiRunModeMatrix;
+ 
     IBOutlet NSStepper* 	writeValueStepper;
     IBOutlet NSTextField* 	writeValueTextField;
     IBOutlet NSPopUpButton*	registerAddressPopUp;
@@ -45,44 +79,10 @@
     IBOutlet NSTextField*	registerReadWriteTextField;
     
     
-    IBOutlet NSMatrix*		thresholdMatrix;
     IBOutlet NSButton*		softwareTriggerButton;
-	IBOutlet NSMatrix*		enabledMaskMatrix;
-	IBOutlet NSMatrix*		chanTriggerMatrix;
-	IBOutlet NSMatrix*		otherTriggerMatrix;
-	IBOutlet NSMatrix*		chanTriggerOutMatrix;
-	IBOutlet NSMatrix*		otherTriggerOutMatrix;
-	IBOutlet NSMatrix*		fpIOModeMatrix;
-	IBOutlet NSMatrix*		fpIOPatternLatchMatrix;
-	IBOutlet NSMatrix*		fpIOTrgInMatrix;
-	IBOutlet NSMatrix*		fpIOTrgOutMatrix;
-	IBOutlet NSMatrix*		fpIOTrgOutModeMatrix;
-	IBOutlet NSMatrix*		fpIOLVDS0Matrix;
-	IBOutlet NSMatrix*		fpIOLVDS1Matrix;
-	IBOutlet NSMatrix*		fpIOLVDS2Matrix;
-	IBOutlet NSMatrix*		fpIOLVDS3Matrix;
-	IBOutlet NSButton*		fpIOGetButton;
-	IBOutlet NSButton*		fpIOSetButton;
-	IBOutlet NSTextField*	postTriggerSettingTextField;
-	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
-	IBOutlet NSTextField*	coincidenceLevelTextField;
-    IBOutlet NSMatrix*		dacMatrix;
-	IBOutlet NSMatrix*		acquisitionModeMatrix;
-	IBOutlet NSMatrix*		countAllTriggersMatrix;
-	IBOutlet NSTextField*	customSizeTextField;
-	IBOutlet NSButton*	customSizeButton;
-	IBOutlet NSButton*	fixedSizeButton;
-	IBOutlet NSMatrix*		channelConfigMaskMatrix;
-    IBOutlet NSMatrix*		overUnderMatrix;
-	IBOutlet NSPopUpButton* eventSizePopUp;
-	IBOutlet NSTextField*	eventSizeTextField;
-    IBOutlet NSTextField*	slotField;
-    IBOutlet NSTextField*	slot1Field;
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
-    IBOutlet NSButton*		loadThresholdsButton;
-    IBOutlet NSButton *continousRunsButton;
 	
 	//rates page
 	IBOutlet NSMatrix*      rateTextFields;
@@ -91,23 +91,22 @@
     IBOutlet NSTextField*   totalRateText;
     IBOutlet NSMatrix*      enabled2MaskMatrix;
     
-    IBOutlet ORValueBarGroupView*    rate0;
-    IBOutlet ORValueBarGroupView*    totalRate;
-    IBOutlet NSButton*      rateLogCB;
-    IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORCompositeTimeLineView*    timeRatePlot;
-    IBOutlet NSButton*      timeRateLogCB;
-    IBOutlet NSTextField*   bufferStateField;
-    
-	
+    IBOutlet ORValueBarGroupView*     rate0;
+    IBOutlet ORValueBarGroupView*     totalRate;
+    IBOutlet NSButton*                rateLogCB;
+    IBOutlet NSButton*                totalRateLogCB;
+    IBOutlet ORCompositeTimeLineView* timeRatePlot;
+    IBOutlet NSButton*                timeRateLogCB;
+    IBOutlet NSTextField*             bufferStateField;
+    IBOutlet NSTextField*             transferRateField;
     IBOutlet NSButton*		basicLockButton;
-    IBOutlet NSButton*		settingsLockButton;
-	IBOutlet NSTextField*   settingsLockDocField;
+    IBOutlet NSButton*		lowLevelLockButton;
+    IBOutlet ORQueueView*   queView;
     
     
     NSView *blankView;
+    NSSize lowLevelSize;
     NSSize basicSize;
-    NSSize settingsSize;
     NSSize monitoringSize;
 }
 
@@ -117,88 +116,107 @@
 - (void) awakeFromNib;
 - (void) updateWindow;
 
-#pragma mark ***Interface Management
-- (void) interfacesChanged:(NSNotification*)aNote;
-- (void) serialNumberChanged:(NSNotification*)aNote;
-- (void) lockChanged:(NSNotification*)aNote;
-
-#pragma mark •••Actions
-- (IBAction) settingLockAction:(id) sender;
-- (IBAction) serialNumberAction:(id)sender;
-
-- (void) validateInterfacePopup;
-#pragma mark ***Initialization
-- (id)		init;
-
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) registerRates;
+- (void) updateWindow;
+- (void) validateInterfacePopup;
 
 #pragma mark ***Interface Management
+- (void) logicTypeChanged:(NSNotification*)aNote;
+- (void) zsThresholdChanged: (NSNotification*) aNote;
+- (void) numOverUnderZsThresholdChanged: (NSNotification*) aNote;
+- (void) nlbkChanged:(NSNotification*) aNote;
+- (void) nlfwdChanged:(NSNotification*) aNote;
+- (void) thresholdChanged: (NSNotification*) aNote;
+- (void) numOverUnderThresholdChanged: (NSNotification*) aNote;
+- (void) dacChanged: (NSNotification*) aNote;
+- (void) zsAlgorithmChanged:(NSNotification*)aNote;
+- (void) packedChanged:(NSNotification*)aNote;
+- (void) trigOnUnderThresholdChanged:(NSNotification*)aNote;
+- (void) testPatternEnabledChanged:(NSNotification*)aNote;
+- (void) trigOverlapEnabledChanged:(NSNotification*)aNote;
 - (void) eventSizeChanged:(NSNotification*)aNote;
-- (void) updateWindow;
+- (void) clockSourceChanged:(NSNotification*)aNote;
+- (void) countAllTriggersChanged:(NSNotification*)aNote;
+- (void) gpiRunModeChanged:(NSNotification*)aNote;
+- (void) softwareTrigEnabledChanged:(NSNotification*)aNote;
+- (void) externalTrigEnabledChanged:(NSNotification*)aNote;
+- (void) coincidenceLevelChanged:(NSNotification*)aNote;
+- (void) triggerSourceEnableMaskChanged:(NSNotification*)aNote;
+- (void) fpExternalTrigEnabledChanged:(NSNotification*)aNote;
+- (void) fpSoftwareTrigEnabledChanged:(NSNotification*)aNote;
+- (void) postTriggerSettingChanged:(NSNotification*)aNote;
+- (void) triggerOutMaskChanged:(NSNotification*)aNote;
+- (void) gpoEnabledChanged:(NSNotification*)aNote;
+- (void) ttlEnabledChanged:(NSNotification*)aNote;
+- (void) enabledMaskChanged:(NSNotification*)aNote;
+
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
+- (void) interfacesChanged:(NSNotification*)aNote;
+- (void) serialNumberChanged:(NSNotification*)aNote;
+
 - (void) writeValueChanged: (NSNotification*) aNote;
 - (void) selectedRegIndexChanged: (NSNotification*) aNote;
 - (void) selectedRegChannelChanged:(NSNotification*) aNote;
-- (void) enabledMaskChanged:(NSNotification*)aNote;
-- (void) postTriggerSettingChanged:(NSNotification*)aNote;
-- (void) triggerSourceMaskChanged:(NSNotification*)aNote;
-- (void) triggerOutMaskChanged:(NSNotification*)aNote;
-- (void) fpIOControlChanged:(NSNotification*)aNote;
-- (void) coincidenceLevelChanged:(NSNotification*)aNote;
-- (void) basicLockChanged:(NSNotification*)aNote;
-- (void) acquisitionModeChanged:(NSNotification*)aNote;
-- (void) countAllTriggersChanged:(NSNotification*)aNote;
-- (void) customSizeChanged:(NSNotification*)aNote;
-- (void) isCustomSizeChanged:(NSNotification*)aNote;
-- (void) isFixedSizeChanged:(NSNotification*)aNote;
-- (void) channelConfigMaskChanged:(NSNotification*)aNote;
-- (void) dacChanged: (NSNotification*) aNote;
-- (void) overUnderChanged: (NSNotification*) aNote;
-- (void) basicLockChanged:(NSNotification*)aNote;
-- (void) settingsLockChanged:(NSNotification*)aNote;
-- (void) thresholdChanged: (NSNotification*) aNote;
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
-- (void) continousRunsChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNote;
 
-- (void) setBufferStateLabel;
+- (void) rateGroupChanged:(NSNotification*)aNote;
+- (void) basicLockChanged:(NSNotification*)aNote;
+- (void) lowLevelLockChanged:(NSNotification*)aNote;
+
+- (void) setStatusStrings;
 
 #pragma mark •••Actions
+- (IBAction) serialNumberAction:(id)sender;
+- (IBAction) logicTypeAction:(id)sender;
+- (IBAction) zsThresholdAction: (id) sender;
+- (IBAction) numOverUnderZsThresholdAction: (id) sender;
+- (IBAction) nLbkAction: (id) sender;
+- (IBAction) nLfwdAction: (id) sender;
+- (IBAction) thresholdAction: (id) sender;
+- (IBAction) numOverUnderThresholdAction: (id) sender;
+- (IBAction) dacAction: (id) sender;
+- (IBAction) zsAlgorithmAction:(id)sender;
+- (IBAction) packedAction:(id)sender;
+- (IBAction) trigOnUnderThresholdAction:(id)sender;
+- (IBAction) testPatternEnabledAction:(id)sender;
+- (IBAction) trigOverlapEnabledAction:(id)sender;
 - (IBAction) eventSizeAction:(id)sender;
-- (IBAction) integrationAction:(id)sender;
-- (IBAction) writeValueAction: (id) aSender;
-- (IBAction) selectRegisterAction: (id) aSender;
-- (IBAction) selectChannelAction: (id) aSender;
-
-- (IBAction) basicRead: (id) sender;
-- (IBAction) basicWrite: (id) sender;
-- (IBAction) basicLockAction:(id)sender;
-- (IBAction) settingsLockAction:(id)sender;
-
-- (IBAction) report: (id) sender;
-- (IBAction) initBoard: (id) sender;
-- (IBAction) loadThresholds: (id) sender;
-- (IBAction) enabledMaskAction:(id)sender;
-- (IBAction) postTriggerSettingTextFieldAction:(id)sender;
-- (IBAction) triggerSourceMaskAction:(id)sender;
-- (IBAction) triggerOutMaskAction:(id)sender;
-- (IBAction) fpIOControlAction:(id)sender;
-- (IBAction) fpIOGetAction:(id)sender;
-- (IBAction) fpIOSetAction:(id)sender;
-- (IBAction) coincidenceLevelTextFieldAction:(id)sender;
-- (IBAction) generateTriggerAction:(id)sender;
-- (IBAction) acquisitionModeAction:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
-- (IBAction) customSizeAction:(id)sender;
-- (IBAction) isCustomSizeAction:(id)sender;
-- (IBAction) isFixedSizeAction:(id)sender;
-- (IBAction) channelConfigMaskAction:(id)sender;
-- (IBAction) dacAction: (id) aSender;
-- (IBAction) thresholdAction: (id) aSender;
-- (IBAction) overUnderAction: (id) aSender;
-- (IBAction)countinuousRunsAction:(id)sender;
+- (IBAction) gpiRunModeAction:(id)sender;
+- (IBAction) externalTrigEnabledAction:(id)sender;
+- (IBAction) softwareTrigEnabledAction:(id)sender;
+- (IBAction) softwareTrigEnabledAction:(id)sender;
+- (IBAction) externalTrigEnabledAction:(id)sender;
+- (IBAction) coincidenceLevelAction:(id)sender;
+- (IBAction) triggerSourceEnableMaskAction:(id)sender;
+- (IBAction) fpExternalTrigEnabledAction:(id)sender;
+- (IBAction) fpSoftwareTrigEnabledAction:(id)sender;
+- (IBAction) triggerOutMaskAction:(id)sender;
+- (IBAction) postTriggerSettingAction:(id)sender;
+- (IBAction) ttlEnabledAction:(id)sender;
+- (IBAction) gpoEnabledAction:(id)sender;
+- (IBAction) enabledMaskAction:(id)sender;
+
+- (IBAction) writeValueAction: (id) sender;
+- (IBAction) selectRegisterAction: (id) sender;
+- (IBAction) selectChannelAction: (id) sender;
+- (IBAction) basicReadAction: (id) sender;
+- (IBAction) basicWriteAction: (id) sender;
+
+- (IBAction) lowLevelLockAction:(id) sender;
+- (IBAction) basicLockAction:(id)sender;
+
+- (IBAction) reportAction: (id) sender;
+- (IBAction) initBoardAction: (id) sender;
+- (IBAction) generateTriggerAction:(id)sender;
+- (IBAction) integrationAction:(id)sender;
 
 #pragma mark •••Misc Helpers
 - (void)    populatePullDown;
@@ -209,6 +227,8 @@
 - (double) getBarValue:(int)tag;
 - (int) numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
+- (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 
 @end
 

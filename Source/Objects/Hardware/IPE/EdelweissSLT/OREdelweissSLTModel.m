@@ -148,8 +148,8 @@ static IpeRegisterNamesStruct regV4[kEWSltV4NumRegs] = {
 {@"OperaStatusReg1",	0xB00010,		1,			kIpeRegReadable | kIpeRegWriteable },
 {@"OperaStatusReg2",	0xB00014,		1,			kIpeRegReadable | kIpeRegWriteable },
 
-{@"TimeLow",			0xB00018,		1,			kIpeRegReadable },
-{@"TimeHigh",			0xB0001C,		1,			kIpeRegReadable },
+{@"TimeLow",			0xB00018,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"TimeHigh",			0xB0001C,		1,			kIpeRegReadable | kIpeRegWriteable },
 
 {@"EventFIFO",			0xB80000,  		1, 			kIpeRegReadable },
 {@"EventFIFOStatus",	0xB80004,  		1, 			kIpeRegReadable },
@@ -316,6 +316,9 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 	    }
         
 #if 0
+        
+        int counterData1444Packet=counterDataPacket;
+
 	    if(retval == 1444 && counterData1444Packet==0){
 	        NSLog(@"     receiveFromDataReplyServerThreadFunction: Got UDP data packet from %s!  \n",  inet_ntoa(dataReplyThreadData->sockaddr_data_from.sin_addr));//TODO: DEBUG -tb-
 			int i;
@@ -544,6 +547,9 @@ void* receiveFromDataReplyServerThreadFunction (void* p)
 
 #pragma mark ***External Strings
 
+NSString* OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged = @"OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged";
+NSString* OREdelweissSLTModelFifoForUDPDataPortChanged = @"OREdelweissSLTModelFifoForUDPDataPortChanged";
+NSString* OREdelweissSLTModelUseStandardUDPDataPortsChanged = @"OREdelweissSLTModelUseStandardUDPDataPortsChanged";
 NSString* OREdelweissSLTModelResetEventCounterAtRunStartChanged = @"OREdelweissSLTModelResetEventCounterAtRunStartChanged";
 NSString* OREdelweissSLTModelLowLevelRegInHexChanged = @"OREdelweissSLTModelLowLevelRegInHexChanged";
 NSString* OREdelweissSLTModelStatusRegHighChanged = @"OREdelweissSLTModelStatusRegHighChanged";
@@ -632,9 +638,9 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 	crateUDPCommandPort = 9940;
 	crateUDPCommandIP = @"localhost";
 	crateUDPReplyPort = 9940;
-    crateUDPDataPort = 994;
+    crateUDPDataPort = 9941;
     crateUDPDataIP = @"192.168.1.100";
-    crateUDPDataReplyPort = 12345;
+    crateUDPDataReplyPort = 9941;
 	
     return self;
 }
@@ -733,6 +739,55 @@ NSString* OREdelweissSLTV4cpuLock							= @"OREdelweissSLTV4cpuLock";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) saveIonChanFilterOutputRecords
+{
+    return saveIonChanFilterOutputRecords;
+}
+
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSaveIonChanFilterOutputRecords:saveIonChanFilterOutputRecords];
+    
+    saveIonChanFilterOutputRecords = aSaveIonChanFilterOutputRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelSaveIonChanFilterOutputRecordsChanged object:self];
+}
+
+- (int) fifoForUDPDataPort
+{
+    return fifoForUDPDataPort;
+}
+
+- (void) setFifoForUDPDataPort:(int)aFifoForUDPDataPort
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFifoForUDPDataPort:fifoForUDPDataPort];
+    fifoForUDPDataPort = aFifoForUDPDataPort;
+    if(fifoForUDPDataPort==0) fifoForUDPDataPort=0;
+    if(fifoForUDPDataPort>5) fifoForUDPDataPort=5;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelFifoForUDPDataPortChanged object:self];
+    if(useStandardUDPDataPorts){
+        [self setCrateUDPDataPort: 9941 + fifoForUDPDataPort];
+        [self setCrateUDPDataReplyPort: 9941 + fifoForUDPDataPort];
+    }
+}
+
+- (int) useStandardUDPDataPorts
+{
+    return useStandardUDPDataPorts;
+}
+
+- (void) setUseStandardUDPDataPorts:(int)aUseStandardUDPDataPorts
+{
+    int oldState=useStandardUDPDataPorts;
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseStandardUDPDataPorts:useStandardUDPDataPorts];
+    useStandardUDPDataPorts = aUseStandardUDPDataPorts;
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissSLTModelUseStandardUDPDataPortsChanged object:self];
+    if(oldState==0 && useStandardUDPDataPorts){
+        [self setCrateUDPDataPort: 9941 + fifoForUDPDataPort];
+        [self setCrateUDPDataReplyPort: 9941 + fifoForUDPDataPort];
+    }
+}
 
 - (int) resetEventCounterAtRunStart
 {
@@ -3236,6 +3291,9 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setSaveIonChanFilterOutputRecords:[decoder decodeBoolForKey:@"saveIonChanFilterOutputRecords"]];
+	[self setFifoForUDPDataPort:[decoder decodeIntForKey:@"fifoForUDPDataPort"]];
+	[self setUseStandardUDPDataPorts:[decoder decodeIntForKey:@"useStandardUDPDataPorts"]];
 	[self setResetEventCounterAtRunStart:[decoder decodeIntForKey:@"resetEventCounterAtRunStart"]];
 	[self setLowLevelRegInHex:[decoder decodeIntForKey:@"lowLevelRegInHex"]];
 	[self setTakeADCChannelData:[decoder decodeIntForKey:@"takeADCChannelData"]];
@@ -3309,6 +3367,9 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:saveIonChanFilterOutputRecords forKey:@"saveIonChanFilterOutputRecords"];
+	[encoder encodeInt:fifoForUDPDataPort forKey:@"fifoForUDPDataPort"];
+	[encoder encodeInt:useStandardUDPDataPorts forKey:@"useStandardUDPDataPorts"];
 	[encoder encodeInt:resetEventCounterAtRunStart forKey:@"resetEventCounterAtRunStart"];
 	[encoder encodeInt:lowLevelRegInHex forKey:@"lowLevelRegInHex"];
 	[encoder encodeInt:takeADCChannelData forKey:@"takeADCChannelData"];
@@ -3493,13 +3554,17 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         //event mode
         if(takeEventData){
 		    //[self initBoard];		
+            //init FLTs is done by RunControl, if they are in TaskManager ...
         }
         //UDP data stream mode
         if(takeUDPstreamData){
             //'re-init' stream loop
-            [self sendUDPDataCommandString: @"KWC_stopStreamLoop"];	
+            //---- deprecated --- [self sendUDPDataCommandString: @"KWC_stopStreamLoop"];	
+            [self sendUDPDataCommandString: [NSString stringWithFormat: @"KWC_stopFIFO %i",fifoForUDPDataPort]];	
             usleep(10000);//need to wait for a recvfrom() cycle ...
-            [self sendUDPDataCommandString: @"KWC_startStreamLoop"];	
+            sleep(1);
+            //---- deprecated --- [self sendUDPDataCommandString: @"KWC_startStreamLoop"];	
+            [self sendUDPDataCommandString: [NSString stringWithFormat: @"KWC_startFIFO %i",fifoForUDPDataPort]];	
             usleep(10000);
             [self loopCommandRequestUDPData];
             //[self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];
@@ -3724,8 +3789,8 @@ if(NA==0) NA=6;//TODO: dirty workaround, if 0 channels are transmitted -tb-
                         M=(MaxUDPPacketSizeBytes-4) / 2;//max. number of shorts (1444-4)/2=720
                     }
                     int numfifo=dataReplyThreadData.numfifo[*rdIndex];//TODO: take from crate status packet -tb-
-                    int     i, j, j_swapit, toffset;
-                    int64_t K,t;
+                    int     i, j, j_swapit, toffset = 0;
+                    int64_t K,t = 0;
                     //for(i=0; i<NA; i++) adcTraceBufCount[*rdIndex][i]=0;
                     for(i=0; i<kMaxNumADCChan/*720*/; i++) dataReplyThreadData.adcTraceBufCount[*rdIndex][i]=0;
                     uint16_t *P;
@@ -4228,6 +4293,7 @@ if((len % 4) != 0){
 	unsigned long runFlagsMask = 0;
 	runFlagsMask |= kFirstTimeFlag;          //bit 16 = "first time" flag
     if(takeEventData)  runFlagsMask |= kTakeEventDataFlag;
+    if(saveIonChanFilterOutputRecords)  runFlagsMask |= kSaveIonChanFilterOutputRecordsFlag;
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
     
     //for handling of different firmware versions

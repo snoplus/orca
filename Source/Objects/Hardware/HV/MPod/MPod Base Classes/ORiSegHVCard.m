@@ -27,6 +27,7 @@
 #import "ORHWWizSelection.h"
 #import "ORSNMP.h"
 #import "ORMPodCrate.h"
+#import "ORAlarm.h"
 
 NSString* ORiSegHVCardShipRecordsChanged		= @"ORiSegHVCardShipRecordsChanged";
 NSString* ORiSegHVCardMaxCurrentChanged         = @"ORiSegHVCardMaxCurrentChanged";
@@ -62,8 +63,13 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	for(i=0;i<[self numberOfChannels];i++){
 		[voltageHistory[i] release];
 		[currentHistory[i] release];
+        [rdParams[i] release];
+        [chanName[i] release];
 	}
     [hvConstraints release];
+    [safetyLoopNotGoodAlarm clearAlarm];
+    [safetyLoopNotGoodAlarm release];
+    [modParams release];
     
     [super dealloc];
 }
@@ -146,7 +152,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	[[NSNotificationCenter defaultCenter]
      postNotificationName:ORiSegHVCardExceptionCountChanged
      object:self];
-    
 }
 
 - (void)incExceptionCount
@@ -157,7 +162,89 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
      postNotificationName:ORiSegHVCardExceptionCountChanged
      object:self];
 }
-- (NSMutableDictionary*) rdParams:(int)i
+
+
+- (void) setRdParamsFrom:(NSDictionary*)aDictionary
+{
+    @try {
+        int numChannels = [self numberOfChannels];
+        int i;
+        for(i=0;i<numChannels;i++){
+            id oldOnOffState	= [[[[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
+
+            NSString* aChannelKey = [NSString stringWithFormat:@"u%d",[self slotChannelValue:i]];
+            id params = [aDictionary objectForKey:aChannelKey];
+            [rdParams[i] release];
+            rdParams[i] = [params retain];
+
+            id currentOnOffState	 = [[rdParams[i] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
+            int oldState	 = [oldOnOffState intValue];
+            int currentState = [currentOnOffState intValue];
+            
+            if(oldOnOffState && currentOnOffState && (oldState != currentState)){
+                NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], i,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
+            }
+            
+            
+            if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
+            if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
+            [voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
+            [currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]*1000000];
+            
+        }
+
+        NSString* moduleID = [self getModuleString];
+        id params = [aDictionary objectForKey:moduleID];
+        id currentEventStatus = [params objectForKey:@"moduleEventStatus"];
+        NSString* newModuleStatus = (NSString*)[currentEventStatus objectForKey:@"Names"];
+        
+        [modParams release];
+        modParams = [[aDictionary objectForKey:moduleID] retain];
+
+        int moduleEvents = [self moduleFailureEvents];
+        
+        if(moduleEvents & moduleEventSafetyLoopNotGood){
+            if(!safetyLoopNotGoodAlarm){
+                NSString* s = [NSString stringWithFormat:@"%@ Safety Loop Not Good", [self fullID] ];
+                safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: kHardwareAlarm];
+                [safetyLoopNotGoodAlarm setSticky: YES];
+                [safetyLoopNotGoodAlarm setHelpString:@"No current is going into the SL connector on the HV card. Apply current to SL input and clear events to clear alarm."];
+            
+                [safetyLoopNotGoodAlarm postAlarm];
+                NSLog(@"MPod Module Status Events: %@\n", newModuleStatus);
+            }
+        }
+        else if( safetyLoopNotGoodAlarm ){
+            [safetyLoopNotGoodAlarm clearAlarm];
+            [safetyLoopNotGoodAlarm release];
+            safetyLoopNotGoodAlarm = nil;
+        }
+        
+        
+        if(shipRecords) [self shipDataRecords];
+        
+        if([[self adapter] respondsToSelector:@selector(power)]){
+            if(![[self adapter] power]){
+                int i;
+                for(i=0;i<[self numberOfChannels];i++){
+                    [rdParams[i] release];
+                    rdParams[i] = nil;
+                }
+            }
+        }
+	}
+    @catch(NSException* e){
+        
+    }
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
+	
+}
+- (NSDictionary*) modParams
+{
+    return modParams;
+}
+
+- (NSDictionary*) rdParams:(int)i
 {
     if(i>=0 && i<[self numberOfChannels]){
         return rdParams[i];
@@ -216,60 +303,55 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     }
 }
 
+- (NSString*) getModuleString
+{
+	return [NSString stringWithFormat:@"ma%i", ([self slot]-1) ];
+}
+
 - (int) channel:(short)i readParamAsInt:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
-	}
-	else return 0;
+    if([self channelInBounds:i]){
+        return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] intValue];
+    }
+    
+    return 0;
 }
 
 - (float) channel:(short)i readParamAsFloat:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
-	}
-	else return 0;
+    if([self channelInBounds:i]){
+           return [[[rdParams[i] objectForKey:name] objectForKey:@"Value"] floatValue];
+    }
+    return 0;
 }
 
 - (id) channel:(short)i readParamAsValue:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
-	}
-	else return nil;
+    if([self channelInBounds:i]){
+        return  [[rdParams[i] objectForKey:name] objectForKey:@"Value"];
+    }
+    return 0;
 }
 
 - (id) channel:(short)i readParamAsObject:(NSString*)name
 {
-	if([self channelInBounds:i]){
-		return [rdParams[i] objectForKey:name];
-	}
-	else return @"";
-}
-
-
-- (NSArray*) channelUpdateList
-{
-	return nil; //subclasses should override
-}
-
-- (NSArray*) commonChannelUpdateList
-{
-	return nil; //subclasses should override
+    if([self channelInBounds:i]){
+            return [rdParams[i] objectForKey:name];
+    }
+    else return 0;
 }
 
 - (void) syncDialog
-{
-	NSArray* syncParams = [NSArray arrayWithObjects:
-						   @"outputMeasurementSenseVoltage",
-						   @"outputCurrent",
-						   nil];
-    
-	syncParams = [self addChannelNumbersToParams:syncParams];
-	syncParams = [syncParams arrayByAddingObjectsFromArray:[self commonChannelUpdateList]];
-	
-	[[self adapter] getValues:syncParams target:self selector:@selector(processSyncResponseArray:)];
+{	
+	int i;
+	for(i=0;i<[self numberOfChannels];i++){
+		
+		float readBackVoltage = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
+		int theTarget = fabs(readBackVoltage)+ 0.5;
+		[self setTarget:i withValue:theTarget];
+
+		//if([name isEqualToString:@"outputCurrent"])	[self setMaxCurrent:theChannel withValue:[[anEntry objectForKey:@"Value"] floatValue]*1000000.];
+	}
 }
 
 - (NSArray*) addChannelNumbersToParams:(NSArray*)someChannelParams
@@ -298,90 +380,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	return convertedArray;
 }
 
-- (void) updateAllValues
-{
-	NSArray* updateRequests = [self channelUpdateList];
-	updateRequests = [updateRequests arrayByAddingObjectsFromArray:[self commonChannelUpdateList]];
-	[[self adapter] getValues: updateRequests  target:self selector:@selector(processReadResponseArray:)];
-	if(shipRecords) [self shipDataRecords];
-}
-
-- (void) processReadResponseArray:(NSArray*)response
-{
-	
-	[super processReadResponseArray:response];
-	
-	for(id anEntry in response){
-		NSString* anError = [anEntry objectForKey:@"Error"];
-		if([anError length]){
-			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
-				//time out so flush the queue
-				[[ORSNMPQueue queue] cancelAllOperations];
-				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
-				break;
-			}
-		}
-		else {
-			//make sure the slot matches: if not then ignore this Entry
-			int theSlot = [[anEntry objectForKey:@"Slot"] intValue];
-			if(theSlot == [self slot]){
-				if([anEntry objectForKey:@"Channel"]){
-					int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-					NSString* name = [anEntry objectForKey:@"Name"];
-					if([self channelInBounds:theChannel]){
-						if(!rdParams[theChannel])rdParams[theChannel] = [[NSMutableDictionary dictionary] retain];
-						id oldOnOffState = nil;
-						id currentOnOffState   = nil;
-						if(name){
-							BOOL checkForStateChange = [name isEqualToString:@"outputSwitch"];
-							
-							//get the orginal state
-							if(checkForStateChange) oldOnOffState	= [[[[rdParams[theChannel] objectForKey:@"outputSwitch"] objectForKey:@"Value"] copy] autorelease];
-							
-							[rdParams[theChannel] setObject:anEntry forKey:name];
-							
-							if(checkForStateChange){
-								//get the new state
-								currentOnOffState	 = [[rdParams[theChannel] objectForKey:@"outputSwitch"] objectForKey:@"Value"];
-								if(oldOnOffState!=nil && currentOnOffState!=nil){
-									int oldState	 = [oldOnOffState intValue];
-									int currentState = [currentOnOffState intValue];
-									
-									if(oldState != currentState){
-										NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], theChannel,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
-									}
-								}
-							}
-                        }
-					}
-				}
-			}
-		}
-	}
-	
-    
-	if([[self adapter] respondsToSelector:@selector(power)]){
-		if(![[self adapter] power]){
-			int i;
-			for(i=0;i<[self numberOfChannels];i++){
-				[rdParams[i] removeAllObjects];
-			}
-		}
-	}
-	
-	int i;
-	for(i=0;i<[self numberOfChannels];i++){
-		if(voltageHistory[i] == nil) voltageHistory[i] = [[ORTimeRate alloc] init];
-		if(currentHistory[i] == nil) currentHistory[i] = [[ORTimeRate alloc] init];
-		[voltageHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"]];
-		[currentHistory[i] addDataToTimeAverage:[self channel:i readParamAsFloat:@"outputMeasurementCurrent"]];
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardChannelReadParamsChanged object:self];
-	
-    
-}
-
 - (void) processWriteResponseArray:(NSArray*)response
 {
 	[super processWriteResponseArray:response];
@@ -395,8 +393,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
 				break;
 			}
-		}
-		else {
 		}
 	}
 }
@@ -529,6 +525,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     
 	[self setHwGoal:channel withValue:0];
 	[self writeVoltage:channel];
+	
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
     NSLog(@"Turned ON MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
@@ -614,6 +611,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 {
 	int i;
 	for(i=0;i<[self numberOfChannels];i++)[self turnChannelOn:i];
+	[[self adapter] pollHardware];
 }
 
 - (void) turnAllChannelsOff
@@ -622,6 +620,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	for(i=0;i<[self numberOfChannels];i++){
 		[self turnChannelOff:i];
 	}
+	[[self adapter] pollHardware];
+
 }
 
 - (void) panicAllChannels
@@ -660,6 +660,13 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	for(i=0;i<[self numberOfChannels];i++)[self panic:i];
 }
 
+- (void) clearModule
+{
+	NSString* clearCmd =[NSString stringWithFormat:@"moduleDoClear.%@ i %d",[self getModuleString] ,1];
+	[[self adapter] writeValue:clearCmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
+	NSLog(@"Clear Module Events, Card %d \n",[self slot]);
+}
+
 - (unsigned long) failureEvents:(short)channel
 {
 	int events = [self channel:selectedChannel readParamAsInt:@"outputStatus"];
@@ -679,6 +686,16 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 		failEvents |= [self failureEvents:i];
 	}
 	return failEvents;
+}
+- (unsigned long) moduleFailureEvents
+{
+    id oldModuleEventStatus = [[[modParams objectForKey:@"moduleEventStatus"] copy] autorelease];
+    int events = [[oldModuleEventStatus objectForKey:@"Value"] intValue];
+    events &= ( moduleEventPowerFail    |   moduleEventLiveInsertion            |
+                moduleEventService      |   moduleHardwareLimitVoltageNotGood   |
+                moduleEventInputError   |   moduleEventSafetyLoopNotGood        |
+                moduleEventSupplyNotGood|   moduleEventTemperatureNotGood       );
+    return events;
 }
 
 - (NSString*) channelState:(short)channel
@@ -704,34 +721,6 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	}
 }
 
-- (void) processSyncResponseArray:(NSArray*)response
-{
-	[super processSyncResponseArray:response];
-	for(id anEntry in response){
-		NSString* anError = [anEntry objectForKey:@"Error"];
-		if([anError length]){
-			if([anError rangeOfString:@"Timeout"].location != NSNotFound){
-				//time out so flush the queue
-				[[ORSNMPQueue queue] cancelAllOperations];
-				NSLogError(@"TimeOut",[NSString stringWithFormat:@"MPod Crate %d\n",[self crateNumber]],[NSString stringWithFormat:@"HV Card %d\n",[self slot]],nil);
-				[[NSNotificationCenter defaultCenter] postNotificationName:@"Timeout" object:self];
-				break;
-			}
-		}
-		else {
-			int theChannel = [[anEntry objectForKey:@"Channel"] intValue];
-			if(theChannel>=0 && theChannel<[self numberOfChannels]){
-				NSString* name = [anEntry objectForKey:@"Name"];
-				if([name isEqualToString:@"outputMeasurementSenseVoltage"]){
-					int theTarget = fabs([[anEntry objectForKey:@"Value"] floatValue])+ 0.5;
-					
-					[self setTarget:theChannel withValue:theTarget];
-				}
-				if([name isEqualToString:@"outputCurrent"])	[self setMaxCurrent:theChannel withValue:[[anEntry objectForKey:@"Value"] floatValue]*1000000.];
-			}
-		}
-	}
-}
 
 - (float) riseRate{ return riseRate; }
 - (void) setRiseRate:(float)aValue
@@ -1096,7 +1085,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Ramp Rate"];
-    [p setFormat:@"##0" upperLimit:500 lowerLimit:2 stepSize:1 units:[NSString stringWithFormat:@"%cV",[self polarity]?'+':'-']];
+    [p setFormat:@"##0" upperLimit:500 lowerLimit:2 stepSize:1 units:[NSString stringWithFormat:@"%cV/s",[self polarity]?'+':'-']];
     [p setSetMethod:@selector(setRiseRate:) getMethod:@selector(riseRate)];
 	[p setInitMethodSelector:@selector(loadAllValues)];
     [a addObject:p];

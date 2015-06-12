@@ -59,8 +59,10 @@
 - (IBAction) clearHistoryAction:(id)sender;
 - (IBAction) outletNameAction:(id)sender;
 - (IBAction) turnOnOffAction:(id)sender;
-- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (IBAction) pollNowButtonAction:(id)sender;
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+- (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+#endif
 @end
 
 

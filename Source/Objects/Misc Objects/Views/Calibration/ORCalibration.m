@@ -46,7 +46,12 @@
 - (void) awakeFromNib
 {
 	[self populateSelectionPU];
-	[self loadUI:[model calibration]];
+    if(![model calibration]){
+        ORCalibration* aCalibration = [[ORCalibration alloc]init];
+        [model setCalibration:aCalibration];
+        [aCalibration release];
+    }
+    [self loadUI:[model calibration]];
 }
 
 - (void) loadUI:(ORCalibration*) aCalibration
@@ -246,14 +251,33 @@
 {	
 	[self calibrate];
 	[[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
+#else
     [NSApp endSheet:[self window] returnCode:NSOKButton];
-
+#endif
 }
 
 - (IBAction) cancel:(id)sender
 {
     [[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseCancel];
+#else 
     [NSApp endSheet:[self window] returnCode:NSCancelButton];
+#endif
+}
+
+- (IBAction) remove:(id)sender
+{
+    [model setCalibration:nil];
+    [self calibrate];
+    [[self window] orderOut:self];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+    [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
+#else
+    [NSApp endSheet:[self window] returnCode:NSOKButton];
+#endif
 }
 
 #pragma mark •••Table Data Source
@@ -281,12 +305,6 @@
 @end
 
 @implementation ORCalibration
-- (id) init
-{
-	self = [super init];
-	[self calibrate];	
-	return self;
-}
 
 - (void)dealloc
 {
@@ -303,6 +321,11 @@
 	return calibrationArray;
 }
 
+- (BOOL) isValidCalibration
+{
+    return [[NSMutableArray arrayWithArray:calibrationArray] count]>0;
+}
+
 - (void) calibrate
 {
 	double SUMx = 0;
@@ -310,9 +333,17 @@
 	double SUMxy= 0;
 	double SUMxx= 0;
 	calibrationValid = NO;
-	int n = [calibrationArray count];
+    
+    NSMutableArray* dataArray = [NSMutableArray arrayWithArray:calibrationArray];
+
+	int n = [dataArray count];
+    
 	if(n!=0){
-		for(id pt in calibrationArray){
+        if(n==1){
+            [dataArray insertObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:0],@"Channel",[NSNumber numberWithDouble:0],@"Energy", nil] atIndex:0];
+            n = [dataArray count];
+        }
+		for(id pt in dataArray){
 			double x = [[pt objectForKey:@"Channel"] doubleValue];
 			double y = [[pt objectForKey:@"Energy"] doubleValue];
 			SUMx = SUMx + x;
@@ -325,7 +356,13 @@
 			intercept = ( SUMy - slope*SUMx ) / n;
 			calibrationValid = YES;
 		}
+        else {
+            NSLog(@"Invalid Calibration: sum of the x values is zero\n");   
+        }
 	}
+    else {
+        NSLog(@"Invalid Calibration: you must enter at least one set of values\n");
+    }
 }
 
 
@@ -367,7 +404,7 @@
 
 - (void) setUnits:(NSString*)unitString
 {
-	if(!unitString) unitString = @"";
+	if([unitString length]==0) unitString = @"";
 	[units autorelease];
 	units = [unitString copy];
 }
@@ -375,27 +412,27 @@
 
 - (NSString*) label
 {
-	if(!label)return @"Energy";
+	if([label length]==0)return @"Energy";
 	else return label;
 }
 
 - (void) setLabel:(NSString*)aString
 {
-	if(!aString) label = @"Energy";
+	if([aString length]==0) label = @"Energy";
 	[label autorelease];
 	label = [aString copy];
 }
 
 - (void) setCalibrationName:(NSString*)nameString
 {
-	if(!nameString) nameString = @"";
+    if([nameString length]==0) nameString = @"";
 	[calibrationName autorelease];
 	calibrationName = [nameString copy];
 }
 
 - (NSString*) calibrationName
 {
-    if(!calibrationName) return @"";
+    if([calibrationName length]==0) return @"";
 	else return calibrationName;
 }
 

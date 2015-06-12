@@ -189,10 +189,8 @@
 {
 	[currentField setFloatValue:[model current]];
 	unsigned long t = [model timeMeasured];
-	NSCalendarDate* theDate;
 	if(t){
-		theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-		[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
+		NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:t];
 		[timeField setObjectValue:theDate];
 	}
 	else [timeField setObjectValue:@"--"];

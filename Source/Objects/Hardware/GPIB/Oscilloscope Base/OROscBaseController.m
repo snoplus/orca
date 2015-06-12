@@ -985,14 +985,14 @@
         }
         else
         {
-            NSRunAlertPanel( @"GPIB Connection Fault", 
+            ORRunAlertPanel( @"GPIB Connection Fault", 
 							@"Must first establish connection to GPIB device.", 
 							@"OK", nil, nil );
         }
 	}
 	@catch(NSException* localException) {
 		NSLog( @"Loading of oscilloscope parameters FAILED.\n" );
-		NSRunAlertPanel( [ localException name ], @"Failed to load oscilloscope parameters.",
+		ORRunAlertPanel( [ localException name ], @"Failed to load oscilloscope parameters.",
 						@"OK", nil, nil );
 	}
 }
@@ -1017,7 +1017,7 @@
         }
         else
         {
-            NSRunAlertPanel( @"GPIB Connection Fault", 
+            ORRunAlertPanel( @"GPIB Connection Fault",
 							@"Must first establish connection to GPIB device.", 
 							@"OK", nil, nil );
         }
@@ -1025,7 +1025,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog( @"Setting of oscilloscope parameters FAILED.\n" );
-		NSRunAlertPanel( [ localException name ], @"Failed to set oscilloscope parameters.",
+		ORRunAlertPanel( [ localException name ], @"Failed to set oscilloscope parameters.",
 						@"OK", nil, nil );
 	}
 }

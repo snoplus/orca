@@ -387,7 +387,7 @@ struct {
 				
 				[self _checkAlarm:chan];
 			}
-			[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+			[self setLastRead:[[NSDate date] stdDescription]];
 			
 		}
 		else NSLog(@"nothing enabled\n");
@@ -519,7 +519,7 @@ struct {
 - (void)processIsStopping
 {
 	[self _setUpPolling];
-	[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+	[self setLastRead:[[NSDate date] description]];
 }
 
 - (void) startProcessCycle

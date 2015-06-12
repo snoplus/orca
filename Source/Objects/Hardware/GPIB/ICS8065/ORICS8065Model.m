@@ -98,7 +98,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     [notifyCenter addObserver : self
                      selector : @selector(applicationIsTerminating:)
                          name : @"ORAppTerminating"
-                       object : [NSApp delegate]];
+                       object : (ORAppDelegate*)[NSApp delegate]];
 }	
 
 - (void) applicationIsTerminating:(NSNotification*)aNote

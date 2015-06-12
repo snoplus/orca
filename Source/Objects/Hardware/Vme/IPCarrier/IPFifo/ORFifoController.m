@@ -82,7 +82,7 @@
 		[model resetFifo];
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
 	}
 	
@@ -97,7 +97,7 @@
 		[model readFifo:FIFO_CSR_REGISTER atPtr:&sdata];
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@\nStatus Reg: %d", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@\nStatus Reg: %d", @"OK", nil, nil,
 						localException,sdata);
 	}
 	NSLog(@"Fifo Status: %d\n",sdata);
@@ -112,7 +112,7 @@
 		[model blockLoadUnloadTest];
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
 		NSLog(@"*** FIFO Block Load/Unload Test Failed ***\n");
 	}
@@ -149,7 +149,7 @@
 		
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
 		NSLog(@"*** FIFO Block Read/Write Test Failed ***\n");
 	}
@@ -184,7 +184,7 @@
 		
 	}
 	@catch(NSException* localException) {
-		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+		ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 						localException);
 		NSLog(@"*** FIFO Block Read/Write Test Failed ***\n");
 	}

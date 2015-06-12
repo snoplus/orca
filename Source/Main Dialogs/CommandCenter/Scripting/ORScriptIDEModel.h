@@ -48,7 +48,8 @@
     BOOL					runPeriodically;
     int						periodicRunInterval;
     NSDate*					nextPeriodicRun;
-	NSMutableDictionary*    persistantStore;
+    NSMutableDictionary*    persistantStore;
+    NSMutableDictionary*    temporaryStore;
 }
 
 #pragma mark ***Initialization
@@ -58,12 +59,15 @@
 
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runEnded:(NSNotification*)aNote;
 - (void) aboutToQuit:(NSNotification*)aNote;
 - (void) finalQuitNotice:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (id)   temporaryObjectWithKey:(id)aKey;
+- (void) setTemporaryObject:(id)anObj forKey:(id)aKey;
 - (id)   storedObjectWithKey:(id)aKey;
 - (void) setStoredObject:(id)anObj forKey:(id)aKey;
 - (void) clearStoredObjects;
@@ -139,6 +143,7 @@
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
+- (void) postCouchDBRecord:(NSDictionary*)aRecord;
 
 #pragma mark ***Data ID
 - (unsigned long) dataId;

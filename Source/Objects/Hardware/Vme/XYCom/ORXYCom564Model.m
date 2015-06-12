@@ -393,13 +393,17 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (uint16_t) getAdcValueAtChannel:(int)chan
 {
     if (chan >= [self getNumberOfChannels]) return 0;
-    return ((uint16_t*)[chanADCVals bytes])[chan];
+    uint16_t raw;
+    [self getAdcValues:&raw range:NSMakeRange(chan, 1)];
+    return raw;
 }
 
 - (uint16_t) getAdcAverageValueAtChannel:(int)chan
 {
     if (chan >= [self getNumberOfChannels]) return 0;
-    return ((uint16_t*)[chanADCAverageVals bytes])[chan];
+    uint16_t raw;
+    [self getAdcAverageValues:&raw range:NSMakeRange(chan, 1)];
+    return raw;
 }
 
 - (EXyCom564ReadoutMode) readoutMode
@@ -564,12 +568,50 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     return [NSString stringWithFormat:@"XVME-564,%d,%d",[self crateNumber],[self slot]];
 }
 
+- (void) convertedValues:(double*)ptr range:(NSRange)aRange
+{
+    uint16_t temp[aRange.length];
+    if (averageValueNumber != 1) {
+        [self getAdcAverageValues:temp range:aRange];
+    } else {
+        [self getAdcValues:temp range:aRange];
+    }
+    NSUInteger i;
+    for (i=0;i<aRange.length;i++) {
+        ptr[i] = [self _interpretADCValue:temp[i]];
+    }
+}
+
+- (void) getAdcValues:(uint16_t*)ptr range:(NSRange)range
+{
+    if (range.location + range.length > [self getNumberOfChannels]) return;
+    NSUInteger i;
+    @synchronized(self) {
+        uint16_t* byte_ptr = (uint16_t*)[chanADCVals bytes];
+        for (i=0;i<range.length;i++) {
+            ptr[i] = byte_ptr[range.location + i];
+        }
+    }
+}
+
+- (void) getAdcAverageValues:(uint16_t*)ptr range:(NSRange)range
+{
+    if (range.location + range.length > [self getNumberOfChannels]) return;
+    NSUInteger i;
+    @synchronized(self) {
+        uint16_t* byte_ptr = (uint16_t*)[chanADCAverageVals bytes];
+        for (i=0;i<range.length;i++) {
+            ptr[i] = byte_ptr[range.location + i];
+        }
+    }
+    
+}
+
 - (double) convertedValue:(int)channel
 {
-    uint16_t raw = (averageValueNumber != 1) ?
-                    [self getAdcAverageValueAtChannel:channel] :
-                    [self getAdcValueAtChannel:channel];
-    return [self _interpretADCValue:raw];
+    double raw;
+    [self convertedValues:&raw range:NSMakeRange(channel, 1)];
+    return raw;
 }
 
 - (double) maxValueForChan:(int)channel
@@ -714,10 +756,11 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
     int numChans = [self getNumberOfChannels];
     uint32_t* averageValPtr = (uint32_t*)[chanADCAverageValsCache bytes];
+    uint16_t* inputPtr = (uint16_t*)[vals bytes];
     int i;
     @synchronized(self) {
         for (i=0;i<numChans;i++) {
-            averageValPtr[i] += ((uint16_t*)[vals bytes])[i];
+            averageValPtr[i] += inputPtr[i];
         }
         currentAverageState++;
         if (currentAverageState == averageValueNumber) {
@@ -735,9 +778,10 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 - (void) _setAverageADCValues:(uint32_t *)array withLength:(int)length
 {
     assert([chanADCAverageVals length] == length*sizeof(uint16_t));
+    uint16_t* valPtr = (uint16_t*)[chanADCAverageVals bytes];
     int i;
     for (i=0;i<length;i++) {
-        ((uint16_t*)[chanADCAverageVals bytes])[i] = array[i];
+        valPtr[i] = array[i];
     }
 }
 
@@ -824,7 +868,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 
     // perform the run loop
     int tryTime = 0;
-    NSDate* start = [[[NSDate alloc] init] retain];
+    NSDate* start = [[NSDate alloc] init];
     @try{
         [self initBoard];
         while(!pollStopRequested){
@@ -832,7 +876,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
             [self _pollAllChannels];
 	        tryTime += 1;
             if (tryTime == 1000) {
-                NSDate* tmp = [[[NSDate alloc] init] retain];
+                NSDate* tmp = [[NSDate alloc] init];
                 [self _setPollingSpeed:[tmp timeIntervalSinceDate:start]/1000];
                 [start release];
                 start = tmp;

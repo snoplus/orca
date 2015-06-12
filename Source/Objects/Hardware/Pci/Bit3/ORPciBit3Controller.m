@@ -433,7 +433,7 @@
 	@catch(NSException* localException) {
         NSLog(@"*** Unable To Send VME SYSRESET ***\n");
         NSLog(@"*** Check VME Bus Power and Cables ***\n");
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
     
@@ -448,7 +448,7 @@
         NSLog(@"%@ Reset\n",[model objectName]);
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
 }
@@ -680,7 +680,7 @@
         
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
     }
     
@@ -741,7 +741,7 @@
 		
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08lX", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAddress: 0x%08lX", @"OK", nil, nil,
                         localException,address);
     }
 }
@@ -804,7 +804,7 @@
 		
     }
 	@catch(NSException* localException) {
-        NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
     }
 }

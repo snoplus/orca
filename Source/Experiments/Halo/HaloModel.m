@@ -105,6 +105,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kClock",         @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",           @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHvCrate",       @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHvSlot",        @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHvChan",        @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmp",        @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPulserCard",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
@@ -122,6 +123,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kClock",         @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",           @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHvCrate",       @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHvSlot",        @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHvChan",        @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmp",        @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPulserCard",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
@@ -403,10 +405,10 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	NSString* theContent = @"";
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 	theContent = [theContent stringByAppendingFormat:@"This report was generated automatically by HALO at:\n"];
-	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date]descriptionWithCalendarFormat:nil timeZone:nil locale:nil]];
+	theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[[NSDate date] stdDescription] ];
 	theContent = [theContent stringByAppendingFormat:@"Unless changed in ORCA, it will be repeated at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n%@ (UTC)\n",
-                  [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:nil locale:nil], [nextHeartbeat descriptionWithCalendarFormat:nil timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"] locale:nil]];
+                  nextHeartbeat, [nextHeartbeat utcDescription]];
 	theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     NSString* haloReport = [haloSentry report];
     if([haloReport length] == 0)haloReport = @"Halo report was empty of content";
@@ -435,20 +437,21 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 	NSString* finalString = @"";
 	NSArray* parts = [aString componentsSeparatedByString:@"\n"                                                          ];
 	finalString = [ finalString stringByAppendingString:@"\n-----------------------\n"                                   ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment"    parts:parts]       ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Bore"       parts:parts]          ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" NCD"        parts:parts]           ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Clock"      parts:parts]         ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Segment"    parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Bore"       parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" NCD"        parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Clock"      parts:parts]    ];
 	finalString = [ finalString stringByAppendingString:@"-----------------------\n"                                     ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot"   parts:parts]      ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel"    parts:parts]       ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" VME"        parts:parts]       ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold"  parts:parts]     ];
-	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain"       parts:parts]          ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" CardSlot"   parts:parts]    ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Channel"    parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" VME"        parts:parts]    ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Threshold"  parts:parts]    ];
+	finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" Gain"       parts:parts]    ];
 	finalString = [ finalString stringByAppendingString:@"-----------------------\n"                                     ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvCrate"    parts:parts]       ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvChan"     parts:parts]        ];
-    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreAmp"     parts:parts]        ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvCrate"    parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvSlot"     parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" HvChan"     parts:parts]    ];
+    finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PreAmp"     parts:parts]    ];
     finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PulserCard" parts:parts]    ];
     finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:@" PulserChan" parts:parts]    ];
 	return finalString;
@@ -480,11 +483,8 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
 {
 	if([self heartbeatSeconds]){
 		[nextHeartbeat release];
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
 		nextHeartbeat = [[[NSDate date] dateByAddingTimeInterval:[self heartbeatSeconds]] retain];
-#else
-		nextHeartbeat = [[[NSDate date] addTimeInterval:[self heartbeatSeconds]] retain];
-#endif
+
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:HaloModelNextHeartBeatChanged object:self];
 	

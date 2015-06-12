@@ -496,7 +496,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Read of %@ thresholds FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Reading Thresholds", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Reading Thresholds", @"OK", nil, nil,
                         localException);
     }
 }
@@ -509,7 +509,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of %@  FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -527,7 +527,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Write of %@ thresholds FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
                         localException);
     }
 }
@@ -539,7 +539,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Software trigger of %@  FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Software Trigger", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Software Trigger", @"OK", nil, nil,
                         localException);
     }
 }
@@ -552,7 +552,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset data buffer of %@  FAILED.\n",[model identifier]);
-        NSRunAlertPanel([localException name], @"%@\nFailed data buffer reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed data buffer reset", @"OK", nil, nil,
                         localException);
     }
 }

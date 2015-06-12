@@ -142,8 +142,9 @@
 - (IBAction) dumpNewDataAction:(id)sender;
 - (IBAction) clearAllAction:(id)sender;
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) clearDataSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-
+#endif
 
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter;

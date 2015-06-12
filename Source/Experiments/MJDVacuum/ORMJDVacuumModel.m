@@ -27,6 +27,7 @@
 #import "ORTM700Model.h"
 #import "ORTPG256AModel.h"
 #import "ORCP8CryopumpModel.h"
+#import "ORLakeShore210Model.h"
 #import "ORLakeShore336Model.h"
 #import "ORLakeShore336Input.h"
 #import "ORAlarm.h"
@@ -40,6 +41,7 @@
 - (void) makeGateValves:(VacuumGVStruct*)pipeList num:(int)numItems;
 - (void) makeStaticLabels:(VacuumStaticLabelStruct*)labelItems num:(int)numItems;
 - (void) makeDynamicLabels:(VacuumDynamicLabelStruct*)labelItems num:(int)numItems;
+- (void) makeTempGroups:(TempGroup*)labelItems num:(int)numItems;
 - (void) colorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) recursizelyColorRegionsConnectedTo:(int)aRegion withColor:(NSColor*)aColor;
 - (void) resetVisitationFlag;
@@ -62,13 +64,12 @@
 - (void) postCouchRecord;
 - (void) resetHvTimer;
 
-- (ORLakeShore336Model*)findLakeShore;
+- (id)                  findLakeShore;
 - (ORMks660BModel*)     findBaratron;
 - (ORRGA300Model*)      findRGA;
 - (ORTM700Model*)       findTurboPump;
 - (ORTPG256AModel*)     findPressureGauge;
 - (ORCP8CryopumpModel*) findCryoPump;
-- (ORLakeShore336Model*)findLakeShore;
 - (id)                  findObject:(NSString*)aClassName;
 @end
 
@@ -139,12 +140,14 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	[super addObjects:someObjects];
 	[self checkAllConstraints];
+    [self registerNotificationObservers];
 }
 
 - (void) removeObjects:(NSArray*)someObjects
 {
 	[super removeObjects:someObjects];
 	[self checkAllConstraints];
+    [self registerNotificationObservers];
 }
 
 - (void) registerNotificationObservers
@@ -153,7 +156,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	//we need to know about a specific set of events in order to handle the constraints
 	ORMks660BModel*       baratron  = [self findBaratron];
-    ORLakeShore336Model*  lakeShore = [self findLakeShore];
+    id                    lakeShore = [self findLakeShore];
+    
     //should have just one or the other..... baratron or lakeshore not both
 	if(baratron){
 		[notifyCenter addObserver : self
@@ -168,15 +172,29 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	}
 
 	if(lakeShore){
-		[notifyCenter addObserver : self
-						 selector : @selector(lakeShoreChanged:)
-							 name : ORLakeShore336InputTemperatureChanged
-						   object : nil];
-        
-		[notifyCenter addObserver : self
-						 selector : @selector(lakeShoreChanged:)
-							 name : ORLakeShore336IsValidChanged
-						   object : lakeShore];
+        if([lakeShore isKindOfClass:NSClassFromString(@"ORLakeShore336Model")]){
+            [notifyCenter addObserver : self
+                             selector : @selector(lakeShoreChanged:)
+                                 name : ORLakeShore336InputTemperatureChanged
+                               object : nil];
+            
+            [notifyCenter addObserver : self
+                             selector : @selector(lakeShoreChanged:)
+                                 name : ORLakeShore336IsValidChanged
+                               object : lakeShore];
+        }
+        else {
+            [notifyCenter addObserver : self
+                             selector : @selector(lakeShoreChanged:)
+                                 name : ORLakeShore210TempChanged
+                               object : nil];
+            
+            [notifyCenter addObserver : self
+                             selector : @selector(lakeShoreChanged:)
+                                 name : ORSerialPortWithQueueModelIsValidChanged
+                               object : lakeShore];
+           
+        }
 	}
 
     
@@ -270,22 +288,36 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (void) baratronChanged:(NSNotification*)aNote
 {
-    if([self coolerMode] == kThermosyphon){
+    //if([self coolerMode] == kThermosyphon){ //changed to always display value
         ORMks660BModel* baratron         = [aNote object];
         ORVacuumValueLabel* aRegionlabel = [self regionValueObj:kRegionBaratron];
         [aRegionlabel setValue:  [baratron pressure]];
         [aRegionlabel setIsValid:[baratron isValid]];
-    }
+    //}
 }
 
 - (void) lakeShoreChanged:(NSNotification*)aNote
 {
-    if([self coolerMode] == kPulseTube){
-        ORLakeShore336Model* lakeShore = [self findLakeShore];
-        if([aNote object] == [lakeShore input:0]){ //make sure the value is coming from input A
+    id lakeShore = [self findLakeShore];
+    if([lakeShore isKindOfClass:NSClassFromString(@"ORLakeShore336Model")]){
+        if([aNote object] == [(ORLakeShore336Model*)lakeShore input:0]){ //make sure the value is coming from input A
             ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
-            [aRegionlabel setValue:  [lakeShore convertedValue:0]];
-            [aRegionlabel setIsValid:[lakeShore isValid]];
+            [aRegionlabel setValue:  [(ORLakeShore336Model*)lakeShore convertedValue:0]];
+            [aRegionlabel setIsValid:[(ORLakeShore336Model*)lakeShore isValid]];
+        }
+    }
+    else {
+        if([aNote object] == (ORLakeShore210Model*)lakeShore){
+            ORVacuumValueLabel* aRegionlabel    = [self regionValueObj:kRegionLakeShore];
+            [aRegionlabel setValue:  [(ORLakeShore210Model*)lakeShore convertedValue:7]];
+            [aRegionlabel setIsValid:[(ORLakeShore210Model*)lakeShore isValid]];
+
+            ORVacuumTempGroup* aTempGroup    = (ORVacuumTempGroup*)[self regionValueObj:kLakeShoreTemps];
+            int i;
+            for(i=0;i<8;i++){
+                [aTempGroup setTemp:i  value:[(ORLakeShore210Model*)lakeShore convertedValue:i]];
+                [aTempGroup setIsValid:[(ORLakeShore210Model*)lakeShore isValid]];
+            }
         }
     }
 }
@@ -409,6 +441,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 - (BOOL)    shouldUnbiasDetector	{ return [continuedBiasConstraints count] != 0; }
 - (BOOL)    okToBiasDetector		{ return [okToBiasConstraints count] == 0; }
+//- (BOOL)    shouldUnbiasDetector	{ return NO; }
+//- (BOOL)    okToBiasDetector		{ return YES; }
 - (BOOL)    detectorsBiased         { return detectorsBiased;       }
 
 //-------------------------------------------------------------------
@@ -679,6 +713,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	else if([anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])		return NSMakeRange(3,1);
 	else if([anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])		return NSMakeRange(4,1);
 	else if([anObj isKindOfClass:NSClassFromString(@"ORLakeShore336Model")])return NSMakeRange(5,1);
+	else if([anObj isKindOfClass:NSClassFromString(@"ORLakeShore210Model")])return NSMakeRange(5,1);
     else return NSMakeRange(0,0);
 }
 
@@ -690,6 +725,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	else if(aSlot == 3 && [anObj isKindOfClass:NSClassFromString(@"ORTPG256AModel")])	  return NO;
 	else if(aSlot == 4 && [anObj isKindOfClass:NSClassFromString(@"ORMks660BModel")])     return NO;
 	else if(aSlot == 5 && [anObj isKindOfClass:NSClassFromString(@"ORLakeShore336Model")])return NO;
+	else if(aSlot == 5 && [anObj isKindOfClass:NSClassFromString(@"ORLakeShore210Model")])return NO;
     else return YES;
 }
 
@@ -742,7 +778,8 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		case kRegionNegPump:		return @"Neg Pump";
 		case kRegionDiaphramPump:	return @"Diaphram Pump";
 		case kRegionBelowTurbo:		return @"Below Turbo";
-		case kRegionLakeShore:		return @"LakeShore";
+        case kRegionLakeShore:		return @"LakeShore";
+        case kLakeShoreTemps:		return @"LakeShoreTemps";
 		default: return nil;
 	}
 }
@@ -913,7 +950,17 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 
 
 @implementation ORMJDVacuumModel (private)
-- (ORLakeShore336Model*)findLakeShore  	    { return [self findObject:@"ORLakeShore336Model"];}
+- (id)findLakeShore
+{
+    id lakeShore336 = [self findObject:@"ORLakeShore336Model"];
+    if(lakeShore336)return lakeShore336;
+    
+    id lakeShore210 = [self findObject:@"ORLakeShore210Model"];
+    if(lakeShore210)return lakeShore210;
+    
+    return nil;
+ 
+}
 - (ORMks660BModel*)     findBaratron		{ return [self findObject:@"ORMks660BModel"];     }
 - (ORRGA300Model*)      findRGA				{ return [self findObject:@"ORRGA300Model"];      }
 - (ORTM700Model*)       findTurboPump		{ return [self findObject:@"ORTM700Model"];       }
@@ -1068,7 +1115,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{kVacPressureItem, kRegionBaratron,		4, 0,  @"Baratron",	330, 510,	390, 540},
 		{kVacPressureItem, kRegionDiaphramPump,	3, 3,  @"Assumed",	370, 100,	430, 130},
 		{kVacPressureItem, kRegionDryN2,		99, 99,@"Assumed",	370, 50,	430, 80},
-		{kVacPressureItem, kRegionLakeShore,    9, 0,  @"LakeShore",405, 510,	465, 540},
+        {kVacPressureItem, kRegionLakeShore,    9, 0,  @"LakeShore",405, 510,	465, 540}
 	};
 	
 #define kNumVacLines 10
@@ -1109,12 +1156,18 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		{kVacHGateV, 16,	@"Turbo",		k1BitReadBack,				50, 260,	kRegionAboveTurbo,	kRegionBelowTurbo,		kControlNone},	//this is a virtual valve-- really the turbo on/off
 		{kVacVGateV, 17,	@"PRV",			kManualOnlyShowClosed,		230, 350,	kRegionRGA,			kUpToAir,				kControlNone},	//PRV
 	};
-	
+    
+    #define kNumTempGroups 1
+    TempGroup temperatureGroup[kNumTempGroups] = {
+        {kVacTempGroup, kLakeShoreTemps,    9, 0,  @"Temps (K)",130, 250,	190, 380},
+    };
+    
 	[self makeLines:vacLines					num:kNumVacLines];
 	[self makePipes:vacPipeList					num:kNumVacPipes];
 	[self makeGateValves:gvList					num:kNumVacGVs];
 	[self makeStaticLabels:staticLabelItems		num:kNumStaticLabelItems];
 	[self makeDynamicLabels:dynamicLabelItems	num:kNumStatusItems];
+    [self makeTempGroups:temperatureGroup       num:kNumTempGroups];
 }
 
 - (void) makePipes:( VacuumPipeStruct*)pipeList num:(int)numItems
@@ -1191,6 +1244,15 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	ORVacuumValueLabel* aLabel = [self regionValueObj:kRegionDryN2];
 	[aLabel setIsValid:YES];
 	[aLabel setValue:1.0E3];
+}
+
+- (void)  makeTempGroups:(TempGroup*)labelItems num:(int)numItems
+{
+    int i;
+    for(i=0;i<numItems;i++){
+        NSRect theBounds = NSMakeRect(labelItems[i].x1,labelItems[i].y1,labelItems[i].x2-labelItems[i].x1,labelItems[i].y2-labelItems[i].y1);
+        [[[ORVacuumTempGroup alloc] initWithDelegate:self regionTag:labelItems[i].regionTag component:labelItems[i].component channel:labelItems[i].channel label:labelItems[i].label bounds:theBounds] autorelease];
+    }
 }
 
 - (void) makeLines:( VacuumLineStruct*)lineItems num:(int)numItems
@@ -1340,7 +1402,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 		[partDictionary setObject:[NSMutableArray array] forKey:@"GateValves"];		
 		[partDictionary setObject:[NSMutableArray array] forKey:@"ValueLabels"];		
 		[partDictionary setObject:[NSMutableArray array] forKey:@"StatusLabels"];		
-		[partDictionary setObject:[NSMutableArray array] forKey:@"StaticLabels"];		
+        [partDictionary setObject:[NSMutableArray array] forKey:@"StaticLabels"];
 	}
 	if(!valueDictionary){
 		valueDictionary = [[NSMutableDictionary dictionary] retain];
@@ -1359,10 +1421,14 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumGateValve")]){
 		[[partDictionary objectForKey:@"GateValves"] addObject:aPart];
 	}
-	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumValueLabel")]){
-		[[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
-		[valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
-	}
+    else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumValueLabel")]){
+        [[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
+        [valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
+    }
+    else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumTempGroup")]){
+        [[partDictionary objectForKey:@"ValueLabels"] addObject:aPart];
+        [valueDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
+    }
 	else if([aPart isKindOfClass:NSClassFromString(@"ORVacuumStatusLabel")]){
 		[[partDictionary objectForKey:@"StatusLabels"] addObject:aPart];
 		[statusDictionary setObject:aPart forKey:[NSNumber numberWithInt:[aPart regionTag]]];
@@ -1437,6 +1503,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 {
 	return [valueDictionary objectForKey:[NSNumber numberWithInt:aRegion]];
 }
+
 - (id) component:(int)aComponentTag
 {
 	for(OrcaObject* anObj in [self orcaObjects]){
@@ -1848,7 +1915,7 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
 	
 	//---------------------------------------------------------------------------
 	//PKR G3>1E-5: Should unbias, PKR G3>1E-6: Forbid biasing
-	//baratron must be >1000Torr  and <2500Torr if baratron is used
+	//baratron must be >.75  and <2.0Bar if baratron is used
     //LakeShore A must be >100K is baratron is NOT used
 	//Note: the bias info can only get back to the DAQ via the DAQ system script
 	double			cyrostatPress		= [self valueForRegion:kRegionCryostat];
@@ -1861,7 +1928,15 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         
         ORMks660BModel* baratron			= [self findBaratron];
         float			baratronPressure	= [baratron pressure];
-        if((baratronPressure >= 1000) && (baratronPressure <= 2500)){
+        //in Torr
+        float           kLowValue  = 0.7;
+        float           kHighValue = 0.9;
+        //in Bar
+        //float          kLowValue  = 0.9;
+        //float          kHighValue = 1.1;
+        
+        if((baratronPressure >= kLowValue) && (baratronPressure <= kHighValue)){
+            //pressure OK, remove constraints
             [self removeContinuedBiasConstraints:kBaratronTooHighConstraint];
             [self removeOkToBiasConstraints:     kBaratronTooHighConstraint];
             [self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
@@ -1869,11 +1944,11 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         }
         else {
             //nope, not operational
-            if(baratronPressure < 1000) {
+            if(baratronPressure < kLowValue) {
                 [self addContinuedBiasConstraints:kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
                 [self addOkToBiasConstraints:     kBaratronTooLowConstraint  reason:kBaratronTooLowReason];
             }
-            else if(baratronPressure > 2500)	{
+            else if(baratronPressure > kHighValue)	{
                 [self addContinuedBiasConstraints:kBaratronTooHighConstraint reason:kBaratronTooHighReason];
                 [self addOkToBiasConstraints:     kBaratronTooHighConstraint reason:kBaratronTooHighReason];
             }
@@ -1886,9 +1961,18 @@ NSString* ORMJDVacuumModelCoolerModeChanged             = @"ORMJDVacuumModelCool
         [self removeContinuedBiasConstraints:kBaratronTooLowConstraint];
         [self removeOkToBiasConstraints:     kBaratronTooLowConstraint];
 
-        ORLakeShore336Model* lakeShore			= [self findLakeShore];
-        float lakeShoreTemp	= [lakeShore convertedValue:0];
-        if((lakeShoreTemp <=100) && [lakeShore isValid]){ //cold enough?
+        id lakeShore			= [self findLakeShore];
+        float lakeShoreTemp;
+        BOOL  isValid;
+        if([lakeShore isKindOfClass:NSClassFromString(@"ORLakeShore336Model")]){
+            lakeShoreTemp = [(ORLakeShore336Model*)lakeShore convertedValue:0];
+            isValid = [(ORLakeShore336Model*)lakeShore isValid];
+        }
+        else {
+            lakeShoreTemp = [(ORLakeShore210Model*)lakeShore convertedValue:7];
+            isValid = [(ORLakeShore210Model*)lakeShore isValid];
+       }
+        if((lakeShoreTemp <=100) && isValid){ //cold enough?
             [self removeContinuedBiasConstraints:kLakeShoreHighConstraint];
             [self removeOkToBiasConstraints:kLakeShoreHighConstraint];
          }

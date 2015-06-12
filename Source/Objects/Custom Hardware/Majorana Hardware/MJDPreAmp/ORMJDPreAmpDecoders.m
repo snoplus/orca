@@ -92,9 +92,8 @@ static NSString* kMJDPreAmpUnit[21] = {
 		unsigned long asLong;
 	}theData;
 		
-	NSCalendarDate* date1 = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
-	[date1 setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
-    theString = [theString stringByAppendingFormat:@"TimeStamp: %@\n",date1];
+	NSDate* date1 = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+    theString = [theString stringByAppendingFormat:@"TimeStamp: %@\n",[date1 stdDescription]];
 
 	unsigned long enabledMask = dataPtr[3];
 	int index = 4;

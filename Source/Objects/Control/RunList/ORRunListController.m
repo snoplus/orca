@@ -24,13 +24,6 @@
 #import "TimedWorker.h"
 #import "ORRunModel.h"
 
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@interface ORRunListController (private)
-- (void) loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-@end
-#endif
-
 @implementation ORRunListController
 - (id) init
 {
@@ -326,24 +319,12 @@
 	NSString* fullPath = [[model lastFile] stringByExpandingTildeInPath];
     if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
     else		 startingDir = NSHomeDirectory();
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
             [model restoreFromFile:[[[openPanel URL] path]stringByAbbreviatingWithTildeInPath]];
        }
     }];
-    
-#else 		
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
-    
 }
 
 - (IBAction) saveFileAction:(id) sender
@@ -365,7 +346,6 @@
         defaultFile = @"Untitled";
     }
 	
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
     [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [savePanel setNameFieldStringValue:defaultFile];
     [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
@@ -374,15 +354,6 @@
             [model saveToFile:[[savePanel URL]path]];
        }
     }];
-    
-#else 		
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-#endif
 }
 
 
@@ -414,23 +385,4 @@
 	else return 0;
 }
 @end
-
-#if !defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6 // 10.6-specific
-@implementation ORRunListController (private)
-- (void)loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [model restoreFromFile:[[[sheet filenames] objectAtIndex:0]stringByAbbreviatingWithTildeInPath]];
-    }
-}
-
-- (void)saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-		[self endEditing];
-        [model saveToFile:[sheet filename]];
-    }
-}
-@end
-#endif
 

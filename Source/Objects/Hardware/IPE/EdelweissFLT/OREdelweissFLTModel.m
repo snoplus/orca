@@ -39,6 +39,10 @@
 
 //#import "ipe4tbtools.cpp"
 
+NSString* OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged = @"OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged";
+NSString* OREdelweissFLTModelRepeatSWTriggerDelayChanged = @"OREdelweissFLTModelRepeatSWTriggerDelayChanged";
+NSString* OREdelweissFLTModelHitrateLimitIonChanged = @"OREdelweissFLTModelHitrateLimitIonChanged";
+NSString* OREdelweissFLTModelHitrateLimitHeatChanged = @"OREdelweissFLTModelHitrateLimitHeatChanged";
 NSString* OREdelweissFLTModelChargeFICFileChanged = @"OREdelweissFLTModelChargeFICFileChanged";
 NSString* OREdelweissFLTModelProgressOfChargeFICChanged = @"OREdelweissFLTModelProgressOfChargeFICChanged";
 NSString* OREdelweissFLTModelFicCardTriggerCmdChanged = @"OREdelweissFLTModelFicCardTriggerCmdChanged";
@@ -282,6 +286,20 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 		[self setStatusBitsBBData: [NSMutableData dataWithLength: 4 * kNumEWFLTFibers * kNumBBStatusBufferLength32]];
 	}
 
+    int i;
+	if(!thresholds){
+		[self setThresholds: [NSMutableArray array]];
+		for(i=0;i<kNumEWFLTHeatIonChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
+	}
+	if(!triggerParameter){
+		[self setTriggerParameter: [NSMutableArray array]];
+		for(i=0;i<kNumEWFLTHeatIonChannels;i++) [triggerParameter addObject:[NSNumber numberWithInt:0]];
+	}
+    
+    repeatSWTriggerDelay = 1.0;//default
+
+    [self registerNotificationObservers];
+
     return self;
 }
 
@@ -289,7 +307,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 {	
     [chargeFICFile release];
     [chargeBBFileForFiber[0] release];//sorry, this is awfuel, but it was a quick hack -tb-
-    [chargeBBFileForFiber[1] release];
+    [chargeBBFileForFiber[1] release]; 
     [chargeBBFileForFiber[2] release];
     [chargeBBFileForFiber[3] release];
     [chargeBBFileForFiber[4] release];
@@ -304,6 +322,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[triggerParameter release];
 	[gains release];
 	[totalRate release];
+   	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
 	[super dealloc];
 }
 
@@ -346,7 +366,198 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (ORTimeRate*) totalRate   { return totalRate; }
 - (short) getNumberRegisters{ return kFLTV4NumRegs; }
 
+
+
+
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers
+{
+
+    return; //currently unused -tb-
+    
+    
+    
+    
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+	
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+ 	[notifyCenter removeObserver:self]; //guard against a double register
+   
+    //[super registerNotificationObservers]; ORIpeV4FLTModel does not implement it ... -tb-
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToStart:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
+					   
+	#if 0
+    [notifyCenter addObserver : self
+                     selector : @selector(XXXXsettingsLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToStop:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToChangeState:)
+                         name : ORRunAboutToChangeState
+                       object : nil];
+	#endif
+					   
+}
+
+#if 0
+//#define SHOW_RUN_NOTIFICATIONS_AND_CALLS 1
+- (void) runIsAboutToStop:(NSNotification*)aNote
+{
+    #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
+        //DEBUG
+                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    #endif
+    //NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
+    //reset the 'sync with subruns' facility (should not be necessary without 'sending  eRunStarting twice' bug)
+	runControlState = eRunStopping;
+	syncWithRunControlCounterFlag = 0;
+}
+#endif
+
+
+
+- (void) runIsAboutToStart:(NSNotification*)aNote
+{
+         //DEBUG
+                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+    
+        //a test:
+        testVariable = 25;
+    
+    if(![self isPartOfRun]) return;
+        //read FPGA firmware version and status register for ... addParametersToDictionary:(NSMutableDictionary*) ...
+        //this is called ater runTaskStarted:..., so these values will go into the Orca run file -tb-
+        unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	    [self setStatusRegister:status];
+    
+        CFPGAVersion = [self readVersion];
+
+}
+
+
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote
+{
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+
+         //DEBUG
+                 NSLog(@"%@::%@ Called runIsAboutToChangeState --- FLT #%i [self isPartOfRun] %i<----------------state:%i---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],[self isPartOfRun],state);//DEBUG -tb-
+                
+    
+    //is FLT  in data taker list of data task manager?
+    if(![self isPartOfRun]) return;
+    
+
+    if(1 || state==eRunStarting){
+        //DEBUG
+        NSLog(@"%@::%@ FLT#%i: run is starting, read back statusReg and FPGA version\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],hitRateEnabledMask);//DEBUG -tb-
+	    //TODO: [self addRunWaitWithReason:@"FLTv4: wait for next hitrate event."];
+        //a test:
+        testVariable = 24;
+    
+        //read FPGA firmware version and status register for ... addParametersToDictionary:(NSMutableDictionary*) ...
+        //this is called ater runTaskStarted:..., so these values will go into the Orca run file -tb-
+        unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	    [self setStatusRegister:status];
+    
+        CFPGAVersion = [self readVersion];       }
+
+	//we need to care about the following cases:
+	// 1. no run active, system going to start run:
+    //    (old state: eRunStopping/0  , new state: eRunStarting)
+	// 2. run active, system going to change state:
+	//    possible cases:
+    //    old state: eRunStarting        , new state: eRunStopping ->stop run
+    //    old state: eRunBetweenSubRuns  , new state: eRunStopping ->stop run (from 'between subruns')
+    //    old state: eRunStarting        , new state: eRunBetweenSubRuns ->stop subrun, stay 'between subruns'
+    //    old state: eRunBetweenSubRuns  , new state: eRunStarting ->start new subrun (from 'between subruns')
+
+
+
+	/*
+	id rc =  [aNote object];
+    NSLog(@"Calling object %@\n",NSStringFromClass([rc class]));//DEBUG -tb-
+	switch (state) {
+		case eRunStarting://=2
+            NSLog(@"   Notification: go to  %@\n",@"eRunStarting");//DEBUG -tb-
+			break;
+		case eRunBetweenSubRuns://=4
+            NSLog(@"   Notification: go to  %@\n",@"eRunBetweenSubRuns");//DEBUG -tb-
+			break;
+		case eRunStopping://=3
+            NSLog(@"   Notification: go to  %@\n",@"eRunStopping");//DEBUG -tb-
+			break;
+		default:
+			break;
+	}
+	*/
+
+}
+
+- (BOOL) preRunChecks;
+{
+         //DEBUG                 NSLog(@"%@::%@   --- FLT #%i<---------N\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
+                 return true;
+}
+
+
+
+
+
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (BOOL) saveIonChanFilterOutputRecords
+{
+    return saveIonChanFilterOutputRecords;
+}
+
+- (void) setSaveIonChanFilterOutputRecords:(BOOL)aSaveIonChanFilterOutputRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSaveIonChanFilterOutputRecords:saveIonChanFilterOutputRecords];
+    
+    saveIonChanFilterOutputRecords = aSaveIonChanFilterOutputRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelSaveIonChanFilterOutputRecordsChanged object:self];
+}
+
+- (int) hitrateLimitIon
+{
+    return hitrateLimitIon;
+}
+
+- (void) setHitrateLimitIon:(int)aHitrateLimitIon
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitrateLimitIon:hitrateLimitIon];
+    
+    hitrateLimitIon = aHitrateLimitIon;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitrateLimitIonChanged object:self];
+}
+
+- (int) hitrateLimitHeat
+{
+    return hitrateLimitHeat;
+}
+
+- (void) setHitrateLimitHeat:(int)aHitrateLimitHeat
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHitrateLimitHeat:hitrateLimitHeat];
+    
+    hitrateLimitHeat = aHitrateLimitHeat;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitrateLimitHeatChanged object:self];
+}
 
 - (NSString*) chargeFICFile
 {
@@ -430,6 +641,15 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     ficCardCtrlReg2[aFiber] = aFicCardCtrlReg2;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardCtrlReg2Changed object:self];
+}
+
+- (void) setFicCardCtrlReg2AddrOffs:(uint32_t)aOffset forFiber:(int)aFiber
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setFicCardCtrlReg2:ficCardCtrlReg2[aFiber] forFiber:aFiber];
+    uint32_t aFicCardCtrlReg2 = ficCardCtrlReg2[aFiber];
+    aFicCardCtrlReg2 = (aFicCardCtrlReg2 & 0xff00) |  (aOffset & 0x00ff);
+    [self setFicCardCtrlReg2: aFicCardCtrlReg2 forFiber: aFiber];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelFicCardCtrlReg2Changed object:self];
 }
 
 - (uint32_t) ficCardCtrlReg1ForFiber:(int)aFiber
@@ -1654,6 +1874,32 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRepeatSWTriggerModeChanged object:self];
 }
 
+
+- (double) repeatSWTriggerDelay
+{
+    return repeatSWTriggerDelay;
+}
+
+- (void) setRepeatSWTriggerDelay:(double)aRepeatSWTriggerDelay
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRepeatSWTriggerDelay:repeatSWTriggerDelay];
+    
+    repeatSWTriggerDelay = aRepeatSWTriggerDelay;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelRepeatSWTriggerDelayChanged object:self];
+}
+
+
+
+
+
+
+
+
+
+
+
+
 - (uint32_t) controlRegister
 {
     return controlRegister;
@@ -2103,7 +2349,8 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:2047];//min 6 was found 'experimental' for KATRIN -tb-
+    //postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:2047];//min 6 was found 'experimental' for KATRIN -tb-
+    postTriggerTime = aPostTriggerTime & 0xffff;
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -2155,8 +2402,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (unsigned short) hitRateLength { return hitRateLength; }
 - (void) setHitRateLength:(unsigned short)aHitRateLength
 {	
+ 	//DEBUG   -tb-   NSLog(@"%@::%@ aHitRateLength: %i   old: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aHitRateLength,hitRateLength);//TODO: DEBUG testing ...-tb-
+
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateLength:hitRateLength];
-    hitRateLength = [self restrictIntValue:aHitRateLength min:1 max:256]; //0->1sec, 1->2, 2->3 .... sec
+    hitRateLength = [self restrictIntValue:aHitRateLength min:0 max:8]; //new 2014-11: 0->1sec, 1->2, 2->4, 3->8 .... sec etc   //before 2014-11: 0->1sec, 1->2, 2->3 .... sec
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateLengthChanged object:self];
 }
@@ -2237,7 +2486,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [self readThresholds];
 }
 
-- (void) writeTriggerParameters
+- (void) writeTriggerParametersVerbose
 {
         NSLog(@"WRITE TriggerParameters\n");
         NSLog(@"----------------------------\n");
@@ -2245,6 +2494,30 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     for(i=0;i<kNumEWFLTHeatIonChannels;i++){
         NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
         [self writeTriggerPar:i value:triggerPar[i]];
+    }    
+
+    //TODO: make own action -tb-
+    [self writeThresholds];
+}
+
+- (void) writeTriggerParameters
+{
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        //NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
+        [self writeTriggerPar:i value:triggerPar[i]];
+    }    
+
+    //TODO: make own action -tb-
+    [self writeThresholds];
+}
+
+- (void) writeTriggerParametersDisableAll
+{
+    int i;
+    for(i=0;i<kNumEWFLTHeatIonChannels;i++){
+        //NSLog(@"TriggerParameter[%i]: 0x%08x\n",i,triggerPar[i]);
+        [self writeTriggerPar:i value: (triggerPar[i] & 0xffff7fff)];//set ENABLE flag to zero
     }    
 
     //TODO: make own action -tb-
@@ -2549,6 +2822,10 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	else return NO;
 }
 
+- (BOOL) hitRateRegulationIsOn:(unsigned short)aChan
+{    return (hitRateReg[aChan] & 0x10000)!=0;}
+
+
 - (unsigned short) selectedChannelValue { return selectedChannelValue; }
 - (void) setSelectedChannelValue:(unsigned short) aValue
 {
@@ -2803,11 +3080,22 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	return control;
 }
 
+
+//TODO: we write the hitrate regulation limits, too; currently we have only one "Write" button in the GUI ...; make a button in the future! -tb- 2014-11
 - (void) writeRunControl
 {
-	unsigned long aValue = ((hitRateLength-1) & 0xf) << 16 ;
+ 	//DEBUG     NSLog(@"%@::%@ \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+
+    //  never used: uint32_t highestBit = fls(hitRateLengthSec); if(highestBit) highestBit --;
+	//  never used:  unsigned long aValue = ((highestBit) & 0xf) << 16 ;
+	//unsigned long aValue = ((hitRateLength-1) & 0xf) << 16 ; //before 2014-11
+	unsigned long aValue = ((hitRateLength) & 0xff) << 16 ;
 	aValue |= 0x80000000;//activate flag
-	[self writeReg:kFLTV4RunControlReg value:aValue];					
+	[self writeReg:kFLTV4RunControlReg value:aValue];	
+    
+                    //TODO: write the	ThreshAdjust reg (hitrate regulation limits) , too	
+    aValue =  ((hitrateLimitIon & 0xff) << 16)  | (hitrateLimitHeat & 0xff) ;
+	[self writeReg:kFLTV4ThreshAdjustReg value:aValue];					
 }
 
 - (void) writeControl
@@ -2916,9 +3204,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 - (void) writePostTriggerTimeAndIonToHeatDelay
 {
 	unsigned long aValue =	((postTriggerTime & 0xffff)<<16) | (ionToHeatDelay & 0xffff);
-//DEBUG OUTPUT:
- 	NSLog(@"%@::%@:   kFLTV4Ion2HeatDelayReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
-    //DEBUG OUTPUT: 	NSLog(@"%@::%@:   selectFiberTrig: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),selectFiberTrig);//TODO: DEBUG testing ...-tb-
+//DEBUG OUTPUT: 	NSLog(@"%@::%@:   kFLTV4Ion2HeatDelayReg: 0x%08x \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aValue);//TODO: DEBUG testing ...-tb-
 	
 	[self writeReg: kFLTV4Ion2HeatDelayReg value:aValue];
 }
@@ -3578,17 +3864,16 @@ for(chan=0; chan<6;chan++)
 - (void) readHitRates
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+    
+    int hitRateLengthSec = 0x1 << hitRateLength;
 
-        //DEBUG OUTPUT:                 NSLog(@"%@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+        //DEBUG OUTPUT:                         NSLog(@"%@::%@: UNDER CONSTRUCTION! hitRateLength: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),hitRateLength);//TODO : DEBUG testing ...-tb-
 	
-//TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
-//TODO: readHitRates UNDER CONSTRUCTION -tb- 2012-07-19
 	@try {
 		
 		BOOL oneChanged = NO;
 		float newTotal = 0;
 		int chan;
-        int hitRateLengthSec = hitRateLength;
 		float freq = 1.0/((double)hitRateLengthSec);
 				
 //		unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
@@ -3610,16 +3895,17 @@ for(chan=0; chan<6;chan++)
 		int dataIndex = 0;
 		for(chan=0;chan<kNumEWFLTHeatIonChannels;chan++){
 			if(hitRateEnabledMask & (1L<<chan)){
-				unsigned long aValue = [aList longValueForCmd:dataIndex];
-				BOOL overflow = (aValue >> 31) & 0x1;
-				aValue = aValue & 0x7fffffff;
-				if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
+                hitRateReg[chan] = [aList longValueForCmd:dataIndex];
+				unsigned long aValue = hitRateReg[chan];
+				BOOL overflow = (aValue == 0xffff);//(aValue >> 31) & 0x1;
+				aValue = aValue & 0xffff;
+				if((aValue *freq) != hitRate[chan] || overflow != hitRateOverFlow[chan]){
 					if (hitRateLengthSec!=0)	hitRate[chan] = aValue * freq;
 					//if (hitRateLengthSec!=0)	hitRate[chan] = aValue; 
 					else					    hitRate[chan] = 0;
-        //DEBUG OUTPUT:                 NSLog(@"%@::%@: HR  for chan %i was 0x%08x (%i)  -> %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,aValue,aValue,hitRate[chan]);//TODO : DEBUG testing ...-tb-
+                    //DEBUG OUTPUT:                 NSLog(@"%@::%@: HR  for chan %i was 0x%08x (%i)  -> %f\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,aValue,aValue,hitRate[chan]);//TODO : DEBUG testing ...-tb-
 					
-					if(hitRateOverFlow[chan])hitRate[chan] = 0;
+					if(hitRateOverFlow[chan]) hitRate[chan] = 0;
 					hitRateOverFlow[chan] = overflow;
 					
 					oneChanged = YES;
@@ -3629,7 +3915,10 @@ for(chan=0; chan<6;chan++)
 				}
 //				data[dataIndex + 5] = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue;// the hitrate may have more than 16 bit in the future -tb-
 				dataIndex++;
-			}
+			}else{
+                hitRateReg[chan] = 0;
+            }
+            //DEBUG OUTPUT:      NSLog(@"%@::%@: chan %i   hitRateReg[chan]: 0x%x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),chan,hitRateReg[chan]);//TODO : DEBUG testing ...-tb-
 		}
 #if 0
 		
@@ -3650,7 +3939,7 @@ for(chan=0; chan<6;chan++)
 		
 		[self setHitRateTotal:newTotal];
 		
-		if(oneChanged){
+		if(1 || oneChanged){//TODO: need to store the hitrate regulation bit and OR together in "oneCHanged" -tb- 2014-11
 		    [[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];
 		}
 	}
@@ -3659,7 +3948,7 @@ for(chan=0; chan<6;chan++)
 	
 
 
-	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay: hitRateLengthSec];
 }
 
 
@@ -3714,6 +4003,10 @@ for(chan=0; chan<6;chan++)
     
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
+    //[self setSaveIonChanFilterOutputRecords:[decoder decodeBoolForKey:@"saveIonChanFilterOutputRecords"]];
+    [self setRepeatSWTriggerDelay:[decoder decodeDoubleForKey:@"repeatSWTriggerDelay"]];
+    [self setHitrateLimitIon:[decoder decodeIntForKey:@"hitrateLimitIon"]];
+    [self setHitrateLimitHeat:[decoder decodeIntForKey:@"hitrateLimitHeat"]];
     [self setChargeFICFile:[decoder decodeObjectForKey:@"chargeFICFile"]];
         [self setFicCardTriggerCmd:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]] forFiber:i];
         [self setFicCardADC23CtrlReg:[decoder decodeIntForKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]] forFiber:i]; 
@@ -3778,8 +4071,6 @@ for(chan=0; chan<6;chan++)
     [self setFilterLength:		[decoder decodeIntForKey:@"filterLength"]-2];//to be backward compatible with old Orca config files -tb-
     [self setGapLength:			[decoder decodeIntForKey:@"gapLength"]];
     [self setPostTriggerTime:	[decoder decodeInt32ForKey:@"postTriggerTime"]];
-    [self setFifoBehaviour:		[decoder decodeIntForKey:@"fifoBehaviour"]];
-    [self setAnalogOffset:		[decoder decodeIntForKey:@"analogOffset"]];
     [self setInterruptMask:		[decoder decodeInt32ForKey:@"interruptMask"]];
     [self setHitRateLength:		[decoder decodeIntForKey:@"OREdelweissFLTModelHitRateLength"]];
     [self setHitRateEnabledMask:[decoder decodeIntForKey:@"hitRateEnabledMask"]];
@@ -3792,6 +4083,11 @@ for(chan=0; chan<6;chan++)
     [self setWriteValue:		[decoder decodeIntForKey:@"writeValue"]];
     [self setSelectedRegIndex:  [decoder decodeIntForKey:@"selectedRegIndex"]];
     [self setSelectedChannelValue:  [decoder decodeIntForKey:@"selectedChannelValue"]];
+    /* unused
+    //TODO: remove from call definition -tb-
+    [self setFifoBehaviour:		[decoder decodeIntForKey:@"fifoBehaviour"]];
+    [self setAnalogOffset:		[decoder decodeIntForKey:@"analogOffset"]];
+    */
 	
 	//int i;
 	if(!thresholds){
@@ -3832,7 +4128,8 @@ for(chan=0; chan<6;chan++)
 	}
 	
     [[self undoManager] enableUndoRegistration];
-	
+    [self registerNotificationObservers];
+
     return self;
 }
 
@@ -3840,9 +4137,14 @@ for(chan=0; chan<6;chan++)
 {
     [super encodeWithCoder:encoder];
 	
+        [encoder encodeDouble:repeatSWTriggerDelay forKey:@"repeatSWTriggerDelay"];
+        [encoder encodeInt:hitrateLimitIon forKey:@"hitrateLimitIon"];
+        [encoder encodeInt:hitrateLimitHeat forKey:@"hitrateLimitHeat"];
+        [encoder encodeObject:chargeFICFile forKey:@"chargeFICFile"];
+        //[encoder encodeBool:saveIonChanFilterOutputRecords forKey:@"saveIonChanFilterOutputRecords"];
+        
     int i;
     for(i=0; i<kNumEWFLTFibers; i++){
-        [encoder encodeObject:chargeFICFile forKey:@"chargeFICFile"];
         [encoder encodeInt:ficCardTriggerCmd[i] forKey: [NSString stringWithFormat: @"ficCardTriggerCmd%i",i]];
         [encoder encodeInt:ficCardADC23CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC23CtrlReg%i",i]];
         [encoder encodeInt:ficCardADC01CtrlReg[i] forKey: [NSString stringWithFormat: @"ficCardADC01CtrlReg%i",i]]; 
@@ -3912,8 +4214,6 @@ for(chan=0; chan<6;chan++)
     [encoder encodeInt:(filterLength+2)			forKey:@"filterLength"];//to be backward compatible with old Orca config files (this is the register value)-tb-
     [encoder encodeInt:gapLength			forKey:@"gapLength"];
     [encoder encodeInt32:postTriggerTime	forKey:@"postTriggerTime"];
-    [encoder encodeInt:fifoBehaviour		forKey:@"fifoBehaviour"];
-    [encoder encodeInt:analogOffset			forKey:@"analogOffset"];
     [encoder encodeInt32:interruptMask		forKey:@"interruptMask"];
     [encoder encodeInt:hitRateLength		forKey:@"OREdelweissFLTModelHitRateLength"];
     [encoder encodeInt:hitRateEnabledMask	forKey:@"hitRateEnabledMask"];
@@ -3928,6 +4228,11 @@ for(chan=0; chan<6;chan++)
     [encoder encodeInt:writeValue           forKey:@"writeValue"];	
     [encoder encodeInt:selectedRegIndex  	forKey:@"selectedRegIndex"];	
     [encoder encodeInt:selectedChannelValue	forKey:@"selectedChannelValue"];	
+    
+    /*
+    [encoder encodeInt:fifoBehaviour		forKey:@"fifoBehaviour"];
+    [encoder encodeInt:analogOffset			forKey:@"analogOffset"];
+    */
 }
 
 #pragma mark *** Data Taking
@@ -4015,36 +4320,59 @@ for(chan=0; chan<6;chan++)
 }
 
 
-
+//this goes into the Orca run file XML header
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
-    //TODO:  addParametersToDictionary  -  add missing parameters -tb- 2013-06
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+
+
+    [objDictionary setObject:[NSNumber numberWithLong:controlRegister]		forKey:@"controlRegister"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:fiberDelays]		forKey:@"fiberDelays"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:streamMask]		forKey:@"streamMask"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:fiberOutMask]		forKey:@"fiberOutMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:testVariable]		forKey:@"testVariable"];
+
     [objDictionary setObject:thresholds										forKey:@"thresholds"];
+    
     int i;
 	for(i=0;i<kNumEWFLTHeatIonChannels;i++)    [triggerParameter replaceObjectAtIndex:i withObject:[NSNumber numberWithUnsignedInt:triggerPar[i]]];
     [objDictionary setObject:triggerParameter								forKey:@"triggerParameter"];
-    [objDictionary setObject:gains											forKey:@"gains"];
-    [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
     [objDictionary setObject:[NSNumber numberWithLong:postTriggerTime]		forKey:@"postTriggerTime"];
+    if(sizeof(uint64_t) < sizeof(long long)) NSLog(@"%@::%@: ERROR - WARNING - sizeof(uint64_t) < sizeof(long long) - cannot store: ionTriggerMask, heatTriggerMask without information loss! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO : DEBUG testing ...-tb-
+    //else NSLog(@"%@::%@:  sizeof(uint64_t)(%i) >= sizeof(long long) (%i) -  store: ionTriggerMask, heatTriggerMask - OK! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),sizeof(uint64_t),sizeof(long long));//TODO : DEBUG testing ...-tb-
+    //usually both are 8 ... -tb-
+
+    [objDictionary setObject:[NSNumber numberWithLongLong:ionTriggerMask]		forKey:@"ionTriggerMask"];
+    [objDictionary setObject:[NSNumber numberWithLongLong:heatTriggerMask]		forKey:@"heatTriggerMask"];
     [objDictionary setObject:[NSNumber numberWithLong:ionToHeatDelay]		forKey:@"ionToHeatDelay"];
-    [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
-    [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask]	forKey:@"hitRateEnabledMask"];
+    
+    //if([self isPartOfRun]){ // ... is not yet set at this point ... -tb-
+        unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	    [self setStatusRegister:status];
+    
+        CFPGAVersion = [self readVersion];
+        
+        [objDictionary setObject:[NSNumber numberWithLong:statusRegister]		forKey:@"statusRegister"];
+        [objDictionary setObject:[NSNumber numberWithLong:CFPGAVersion]		forKey:@"CFPGAVersion"];
+    //}
+    
+    //obsolete values -tb- 2014
+    /*
+    [objDictionary setObject:gains											forKey:@"gains"];
+    [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
+    
+    
+    [objDictionary setObject:[NSNumber numberWithLong:fifoBehaviour]		forKey:@"fifoBehaviour"];
+    [objDictionary setObject:[NSNumber numberWithLong:analogOffset]			forKey:@"analogOffset"];
     //TODO: obsolete for EW -tb- [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
     //TODO: obsolete for EW -tb- [objDictionary setObject:[NSNumber numberWithLong:filterLength+2]			forKey:@"filterLength"];//this is the fpga register value -tb-
+    */
 	return objDictionary;
 }
 
@@ -4084,7 +4412,7 @@ for(chan=0; chan<6;chan++)
 	//now: sw trigg.
     [self writeCommandSoftwareTrigger];
 
-	if([self swTriggerIsRepeating])[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+	if([self swTriggerIsRepeating] && [self repeatSWTriggerMode])[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:repeatSWTriggerDelay];
 
 }
 
@@ -4095,7 +4423,23 @@ for(chan=0; chan<6;chan++)
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
+        //DEBUG
+                 NSLog(@"%@::%@ Called runTaskStarted -  UNDER CONSTRUCTION --- FLT #%i<-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber]);//DEBUG -tb-
 
+
+#if 0
+    //moved to runIsAboutToChangeState
+    //a test:
+    testVariable = 23;
+    
+    //read FPGA firmware version and status register for ... addParametersToDictionary:(NSMutableDictionary*) ...
+    //this is called ater runTaskStarted:..., so these values will go into the Orca run file -tb-
+    unsigned long status = [self readReg: kFLTV4StatusReg ]; //[self readStatus] would call both, but calls a NSLog..., too, which I do not want here -tb-
+	[self setStatusRegister:status];
+    
+    CFPGAVersion = [self readVersion];   
+#endif
+    
     [self setIsPartOfRun: YES];
 
 	firstTime = YES;
@@ -4120,6 +4464,8 @@ for(chan=0; chan<6;chan++)
 	}
 #endif	
 
+    [self initTrigger];//TODO: 
+
     if([[userInfo objectForKey:@"doinit"]intValue]){
 //TODO: remove the obsolete commands -tb-    
 	//[self setLedOff:NO];
@@ -4132,7 +4478,7 @@ for(chan=0; chan<6;chan++)
 	if(ratesEnabled){//TODO: disabled ... -tb-
 		[self performSelector:@selector(readHitRates) 
 				   withObject:nil
-				   afterDelay: [self hitRateLength]];		//start reading out the rates
+				   afterDelay:  (0x1 << hitRateLength)];		//start reading out the rates
 	}
 		
 	if(runMode == kIpeFltV4_MonitoringDaqMode ){ ///obsolete ... kIpeFltV4_Histogram_DaqMode){
@@ -4147,7 +4493,8 @@ for(chan=0; chan<6;chan++)
 	if([self repeatSWTriggerMode] == 1){
 	    NSLog(@"Start SW Trigger\n");//TODO: debug output -tb-
 		[self setSwTriggerIsRepeating: 1];  //-> call writeCommandSoftwareTrigger frequently
-	    [self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+	    //[self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:1];
+	    [self performSelector:@selector(fireRepeatedSoftwareTriggerInRun) withObject:nil afterDelay:repeatSWTriggerDelay];
 	}
 
 }
@@ -4184,6 +4531,7 @@ for(chan=0; chan<6;chan++)
 	}
 	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fireRepeatedSoftwareTriggerInRun) object:nil];
 
+    [self writeTriggerParametersDisableAll];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:OREdelweissFLTModelHitRateChanged object:self];
     
@@ -4313,7 +4661,7 @@ for(chan=0; chan<6;chan++)
 
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Hit Rate Length"];
-    [p setFormat:@"##0" upperLimit:4095 lowerLimit:255 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:8 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setHitRateLength:) getMethod:@selector(hitRateLength)];
     [a addObject:p];			
 
@@ -4473,6 +4821,16 @@ for(chan=0; chan<6;chan++)
 
 - (void) printStatusReg
 {
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    //TODO:   needs redesign, some parts remaining from KATRIN  -tb- 2014-07
+    
+    
 	unsigned long status = [self readStatus];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"FLT %d status Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTV4StatusReg],status);

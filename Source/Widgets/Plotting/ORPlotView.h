@@ -146,5 +146,7 @@
 - (IBAction) zoomXYIn:(id)sender;
 - (IBAction) zoomXYOut:(id)sender;
 - (IBAction) autoScale:(id)sender; 
+- (IBAction) writeToFile:(id)sender;
+- (void) savePlotDataAs:(NSString*)aPath;
 
 @end

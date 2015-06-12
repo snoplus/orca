@@ -159,6 +159,12 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self setUpImage];
 }
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+	return [super acceptsGuardian:aGuardian] ||
+    [aGuardian isMemberOfClass:NSClassFromString(@"ORApcUpsModel")];
+}
+
 #pragma mark ***Script Methods
 - (id) nextScriptConnector
 {
@@ -182,7 +188,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
 - (void) sendMailTo:(NSString*)receipients cc:(NSString*)cc subject:(NSString*)subject content:(NSString*)theContent
 {
-	@synchronized([NSApp delegate]){
+	@synchronized((ORAppDelegate*)[NSApp delegate]){
 		ORMailer* mailer = [ORMailer mailer];
 		[mailer setTo:receipients];
 		[mailer setSubject:subject];

@@ -53,6 +53,8 @@
 
 - (void) main 
 {
+    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
+
 	NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
 	if([currentDecoder legalDataFile:fh]){
 		dataToProcess = [[NSMutableData dataWithCapacity:kAmountToRead] retain];
@@ -80,6 +82,7 @@
 		}		
 	}
 	else NSLog(@"%@ doesn't appear to be a legal ORCA file\n");
+    [thePool release];
 }
 
 - (void) processData

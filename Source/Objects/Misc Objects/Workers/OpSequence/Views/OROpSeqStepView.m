@@ -51,6 +51,11 @@
 		[imageView setHidden:NO];
 		[errorLabel setHidden:NO];
 	}
+    else if(newState == kSeqStepCancelled){
+		[imageView setImage:[NSImage imageNamed:@"dashMark"]];
+		[imageView setHidden:NO];
+		[errorLabel setHidden:YES];
+    }
 	else { // cancelled and pending
 		[imageView setHidden:YES];
 		[errorLabel setHidden:YES];

@@ -38,7 +38,7 @@ typedef enum {
 
 
 @interface ORAlarm : NSObject {
-	NSCalendarDate* timePosted;
+	NSDate*         timePosted;
 	NSString*		name;
 	int				severity;
 	NSString*		helpString;
@@ -62,7 +62,7 @@ typedef enum {
 
 - (NSString*) timePosted;
 - (NSString*) timePostedUTC;
-- (void) setTimePosted:(NSCalendarDate*)aDate;
+- (void) setTimePosted:(NSDate*)aDate;
 - (NSTimeInterval) timeSincePosted;
 - (NSString*) name;
 - (void) setName:(NSString*)aName;

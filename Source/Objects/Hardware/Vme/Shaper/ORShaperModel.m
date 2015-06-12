@@ -167,7 +167,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
     
     [adcRateGroup quit];
     [scalerRateGroup quit];
-	
+	[thresholdAdcs release];
     [thresholds release];
     [gains release];
     [adcRateGroup release];

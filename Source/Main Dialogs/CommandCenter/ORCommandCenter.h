@@ -89,7 +89,6 @@
 - (void) handleLocalCommand:(NSString*)aCommandString;
 - (void) addCommandToHistory:(NSString*)aCommandString;
 - (id) executeSimpleCommand:(NSString*)aCommandString;
-- (NSCalendarDate*) currentTime;
 
 #pragma mark •••Delegate Methods
 - (void) netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket;

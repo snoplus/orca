@@ -57,8 +57,8 @@
 	[super awakeFromNib];
     pciSize     = NSMakeSize(217,355);
     serialSize	= NSMakeSize(365,355);
-    usbSize	= NSMakeSize(365,355);
-    blankView = [[NSView alloc] init];
+    usbSize     = NSMakeSize(305,395);
+    blankView   = [[NSView alloc] init];
 
 	[groupView setGroup:model];
     [serialPortView reloadData];
@@ -182,7 +182,8 @@
 							   object : thePort];
 			
 			if([thePort isOpen]){
-				[sendCmdButton setEnabled:YES];
+                [sendCmdButton      setEnabled:YES];
+                [sendCntrlCButton   setEnabled:YES];
 				[clearDisplayButton setEnabled:YES];
 				
 				[openPortButton setTitle:@"Close"];
@@ -195,7 +196,8 @@
 			else {
 				[outputView setString:@""];
 
-				[sendCmdButton setEnabled:NO];
+				[sendCmdButton      setEnabled:NO];
+                [sendCntrlCButton   setEnabled:NO];
 				[clearDisplayButton setEnabled:NO];
 				
 				[openPortButton setTitle:@"Open"];
@@ -206,7 +208,8 @@
 			}
 		}
 		else {
-			[sendCmdButton setEnabled:NO];
+			[sendCmdButton      setEnabled:NO];
+            [sendCntrlCButton   setEnabled:NO];
 			[clearDisplayButton setEnabled:NO];
 			[selectedPortNameField setStringValue:@"---"];
 			[openPortButton setEnabled:NO];
@@ -395,6 +398,16 @@
 				}
                 [thePort writeString:theCmd];
             }
+        }
+    }
+}
+- (IBAction) sendCntrlCAction:(id)sender
+{
+    int index = [serialPortView selectedRow];
+    if(index >= 0){
+        ORSerialPort* thePort = [model serialPort:index];
+        if([thePort isOpen]){
+            [thePort writeString:[NSString stringWithFormat:@"%c",0x03]]; //0x03 is control-C
         }
     }
 }

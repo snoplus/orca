@@ -59,9 +59,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 	[processView setAutosaveTableColumns:YES];
 	[processView setAutosaveName:@"ORProcessCenterOutlineView"];   
 	
-    [[[[NSApp delegate]document] undoManager] disableUndoRegistration];
+    [[[(ORAppDelegate*)[NSApp delegate]document] undoManager] disableUndoRegistration];
 	[self setProcessMode:0];
-    [[[[NSApp delegate]document] undoManager] enableUndoRegistration];
+    [[[(ORAppDelegate*)[NSApp delegate]document] undoManager] enableUndoRegistration];
 	
     [processView setDoubleAction:@selector(doubleClick:)];
 	[self findObjects];
@@ -70,13 +70,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 - (void) findObjects
 {
     [processorList release];
-    processorList = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] mutableCopy];
+    processorList = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] mutableCopy];
     [processView reloadData];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[[NSApp delegate]document]  undoManager];
+    return [[(ORAppDelegate*)[NSApp delegate]document]  undoManager];
 }
 
 #pragma mark ¥¥¥Notifications
@@ -164,7 +164,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 #pragma mark ¥¥¥Accessors
 - (void) setProcessMode:(int)aMode
 {
-    [[[[[NSApp delegate]document] undoManager] prepareWithInvocationTarget:self] setProcessMode:processMode];
+    [[[[(ORAppDelegate*)[NSApp delegate]document] undoManager] prepareWithInvocationTarget:self] setProcessMode:processMode];
     
 	processMode = aMode;
 	
@@ -206,12 +206,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (IBAction) saveDocument:(id)sender
 {
-    [[[NSApp delegate]document] saveDocument:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocument:sender];
 }
 
 - (IBAction) saveDocumentAs:(id)sender
 {
-    [[[NSApp delegate]document] saveDocumentAs:sender];
+    [[(ORAppDelegate*)[NSApp delegate]document] saveDocumentAs:sender];
 }
 
 - (IBAction) startAll:(id)sender

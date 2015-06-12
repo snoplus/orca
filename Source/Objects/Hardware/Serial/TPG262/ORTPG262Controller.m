@@ -229,11 +229,10 @@
 		[[pressureMatrix cellWithTag:index] setStringValue:pressureAsString];
 		[[pressure1Matrix cellWithTag:index] setStringValue:pressureAsString];
 		unsigned long t = [model timeMeasured:index];
-		NSCalendarDate* theDate;
+		NSDate* theDate;
 		if(t){
-			theDate = [NSCalendarDate dateWithTimeIntervalSince1970:t];
-			[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
-			[[timeMatrix cellWithTag:index] setObjectValue:theDate];
+			theDate = [NSDate dateWithTimeIntervalSince1970:t];
+			[[timeMatrix cellWithTag:index] setObjectValue:[theDate description]];
 		}
 	}
 	else if(state == kTPG262MeasurementUnderRange){

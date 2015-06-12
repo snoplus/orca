@@ -162,7 +162,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (id)document;
 {
-    return [[NSApp delegate]document];
+    return [(ORAppDelegate*)[NSApp delegate]document];
 }
 
 - (void) wakeUp {aWake = YES;}
@@ -301,6 +301,13 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 - (NSMutableArray*) familyList
 {
     return [NSMutableArray arrayWithObject:self];
+}
+
+- (int) stationNumber
+{
+    //some objects use stationNumber. they can override for special situations.
+    //hardware wizard uses this instead of a slot or tag number.
+    return [self tag] + [self tagBase];
 }
 
 - (int) tag
@@ -541,7 +548,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) openHelp:(id)sender
 {
-	[[[NSApp delegate] helpCenter] showHelpCenterPage:[self helpURL]];
+	[[(ORAppDelegate*)[NSApp delegate] helpCenter] showHelpCenterPage:[self helpURL]];
 }
 
 - (void) doDoubleClick:(id)sender
@@ -989,32 +996,32 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 
 - (int) second 
 {
-	return [[NSCalendarDate date] secondOfMinute];
+	return [[NSDate date] secondOfMinute];
 }
 
 - (int) minute 
 {
-	return [[NSCalendarDate date] minuteOfHour];
+	return [[NSDate date] minuteOfHour];
 }
 
 - (int) hour 
 {
-	return [[NSCalendarDate date] hourOfDay];
+	return [[NSDate date] hourOfDay];
 }
 
 - (int) day 
 {
-	return [[NSCalendarDate date] dayOfMonth];
+	return [[NSDate date] dayOfMonth];
 }
 
 - (int) month 
 {
-	return [[NSCalendarDate date] monthOfYear];
+	return [[NSDate date] monthOfYear];
 }
 
-- (int)year 
+- (int) year
 {
-	return [[NSCalendarDate date] yearOfCommonEra];
+	return [[NSDate date] yearOfCommonEra];
 }
 
 @end

@@ -64,6 +64,7 @@
 
 #pragma mark ***Notificatons
 - (void) pressureGaugeChanged:(NSNotification*)aNote;
+- (void) temperatureGaugeChanged:(NSNotification*)aNote;
 
 
 @end

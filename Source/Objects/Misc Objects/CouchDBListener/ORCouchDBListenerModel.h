@@ -50,6 +50,8 @@
     NSMutableArray* cmdTableArray;
     BOOL commonMethodsOnly;
     NSMutableDictionary* cmdDict;
+    BOOL listenOnStart;
+    BOOL saveHeartbeatsWhileListening;
     
     NSString* updatePath;
     
@@ -87,6 +89,8 @@
 - (NSString*) updatePath;
 - (BOOL) isListening;
 - (void) setHeartbeat:(NSUInteger)beat;
+- (void) setSaveHeartbeatsWhileListening:(BOOL)save;
+- (BOOL) saveHeartbeatsWhileListening;
 
 
 //Command Section
@@ -95,6 +99,8 @@
 - (NSArray*) getMethodListForObjectID:(NSString*)objID;
 - (BOOL) commonMethodsOnly;
 - (NSDictionary*) cmdDict;
+- (BOOL) listenOnStart;
+- (void) setListenOnStart:(BOOL)alist;
 
 #pragma mark ***DB Access
 - (void) startStopSession;
@@ -136,3 +142,5 @@ extern NSString* ORCouchDBListenerModelPasswordChanged;
 extern NSString* ORCouchDBListenerModelListeningStatusChanged;
 extern NSString* ORCouchDBListenerModelHeartbeatChanged;
 extern NSString* ORCouchDBListenerModelUpdatePathChanged;
+extern NSString* ORCouchDBListenerModelListenOnStartChanged;
+extern NSString* ORCouchDBListenerModelSaveHeartbeatsWhileListeningChanged;

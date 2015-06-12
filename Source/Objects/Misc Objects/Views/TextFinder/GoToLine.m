@@ -101,9 +101,13 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 {
 	if( [sender tag] != 1 ) { // jump & close or cancel
 		[dialogueView orderOut:self];
-		[[NSApplication sharedApplication]  endSheet:dialogueView];
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        [[[NSApplication sharedApplication] keyWindow] endSheet:dialogueView];
+#else
+        [[NSApplication sharedApplication]  endSheet:dialogueView];
+#endif
 	}
-	
+
 	if( [sender tag] == -1 ) return;
 
 	[self showLine:[lineNumberField intValue]];
@@ -143,22 +147,27 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 	
 	
 	// Show in textView
-	if( granularity == -1 ){
-		
-		[layoutManager lineFragmentRectForGlyphAtIndex:
-			[layoutManager glyphRangeForCharacterRange:NSMakeRange(charIndex,1)
-								  actualCharacterRange:NULL].location effectiveRange:&lineRange];
-		
-		
-		// Now lineRange is glyph range of the line
-		// Convert lineRange(glyph range) --> lineRange(char range)	
-		lineRange = [layoutManager characterRangeForGlyphRange: lineRange
-											  actualGlyphRange:NULL];
-		[textView setSelectedRange:lineRange];
-	}
-	else {
-		[textView setSelectedRange: [textView selectionRangeForProposedRange:NSMakeRange(charIndex,1) granularity:granularity]];
-	}
+    switch(granularity){
+        case NSSelectByCharacter:
+        case NSSelectByWord:
+        case NSSelectByParagraph:
+            [textView setSelectedRange: [textView selectionRangeForProposedRange:NSMakeRange(charIndex,1) granularity:granularity]];
+            break;
+        default:
+            [layoutManager lineFragmentRectForGlyphAtIndex:
+             [layoutManager glyphRangeForCharacterRange:NSMakeRange(charIndex,1)
+                                   actualCharacterRange:NULL].location effectiveRange:&lineRange];
+            
+            
+            // Now lineRange is glyph range of the line
+            // Convert lineRange(glyph range) --> lineRange(char range)
+            lineRange = [layoutManager characterRangeForGlyphRange: lineRange
+                                                  actualGlyphRange:NULL];
+            [textView setSelectedRange:lineRange];
+
+            break;
+
+    }
 	
 	[textView scrollRangeToVisible: [textView selectedRange]];
 	return YES;

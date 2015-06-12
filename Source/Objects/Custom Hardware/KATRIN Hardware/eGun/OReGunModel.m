@@ -71,8 +71,8 @@ NSString* OReGunLock = @"OReGunLock";
     [stateString release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[x220Object dealloc];
-	[y220Object dealloc];
+	[x220Object release];
+	[y220Object release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }

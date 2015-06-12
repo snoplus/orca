@@ -124,7 +124,7 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 		@catch(NSException* localException) {
             NSLogColor([NSColor redColor],@"*** Unable to send PXI8336 reset ***\n");
             NSLogColor([NSColor redColor],@"*** Check PXI bus power and/or cables ***\n");
-            if(okToShowResetWarning) NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+            if(okToShowResetWarning) ORRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
 													 localException);
         }
     }

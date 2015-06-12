@@ -25,9 +25,9 @@
 
 #pragma mark ¥¥¥Initialization
 
-+ (id) mailCenter
++ (id) mailCenterWithDelegate:(id)aDelegate
 {
-	ORMailCenter* mailCenter = [[[ORMailCenter alloc] init] autorelease];
+	ORMailCenter* mailCenter = [[[ORMailCenter alloc] initWithDelegate:aDelegate] autorelease];
 
 	[[NSNotificationCenter defaultCenter] addObserver:mailCenter selector:@selector(windowWillClose:) name:NSWindowWillCloseNotification object:nil];
 	return mailCenter;
@@ -35,11 +35,12 @@
 
 #pragma mark ***Accessors
 
-- (id)init
+- (id)initWithDelegate:aDelegate
 {
     self = [super initWithWindowNibName:@"MailCenter"];
 	[self retain];
 	selfRetained = YES;
+    delegate = aDelegate;
     return self;
 }
 
@@ -67,7 +68,7 @@
 //this method is needed so the global menu commands will be passes on correctly.
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
 {
-    return [[NSApp delegate]  undoManager];
+    return [(ORAppDelegate*)[NSApp delegate]  undoManager];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -89,14 +90,28 @@
 		[[self window] endEditingFor:nil];		
 	}
 	
-	NSString* address = [[mailForm cellWithTag:0] stringValue];
-	NSString* subject = [[mailForm cellWithTag:2] stringValue];
+	NSString* address = [toField stringValue];
+	NSString* subject = [subjectField stringValue];
 	if([address length]!=0 && [address rangeOfString:@"@"].location != NSNotFound){
 		if([subject length]!=0){
 			[self sendit];
 		}
 		else {
-			NSBeginAlertSheet(@"ORCA Mail",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            [alert setMessageText:@"ORCA Mail"];
+            [alert setInformativeText:@"No Subject..."];
+            [alert addButtonWithTitle:@"Send Anyway"];
+            [alert addButtonWithTitle:@"Cancel"];
+            [alert setAlertStyle:NSWarningAlertStyle];
+            
+            [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+                if (result == NSAlertFirstButtonReturn){
+                    [self sendit];
+                }
+            }];
+#else
+            NSBeginAlertSheet(@"ORCA Mail",
 							  @"Cancel",
 							  @"Send Anyway",
 							  nil,
@@ -104,11 +119,21 @@
 							  self,
 							  @selector(noSubjectSheetDidEnd:returnCode:contextInfo:),
 							  nil,
-							  nil,@"No Subject...");	
+							  nil,@"No Subject...");
+#endif
 		}
 	}
 	else {
-		NSBeginAlertSheet(@"ORCA Mail",
+#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
+        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        [alert setMessageText:@"ORCA Mail"];
+        [alert setInformativeText:@"No Destination Address Given"];
+        [alert addButtonWithTitle:@"OK"];
+        [alert setAlertStyle:NSWarningAlertStyle];
+        
+        [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+#else
+        NSBeginAlertSheet(@"ORCA Mail",
 						  @"OK",
 						  nil,
 						  nil,
@@ -117,10 +142,11 @@
 						  @selector(noAddressSheetDidEnd:returnCode:contextInfo:),
 						  nil,
 						  nil,@"No Destination Address Given");
+#endif
 	}
 	
 	
-} 
+}
 	
 - (void) sendit
 {
@@ -132,15 +158,16 @@
 	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 	
 	ORMailer* mailer = [ORMailer mailer];
-	[mailer setTo:[[mailForm cellWithTag:0] stringValue]];
-	[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
-	[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
+	[mailer setTo:[toField stringValue]];
+	[mailer setCc:[ccField stringValue]];
+	[mailer setSubject:[subjectField stringValue]];
 	[mailer setBody:theContent];
-	[mailer send:self];
+	[mailer send:delegate];
 	[theContent release];
 }
 
 
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
 	
@@ -152,5 +179,5 @@
 		[self sendit];
 	}
 }
-
+#endif
 @end

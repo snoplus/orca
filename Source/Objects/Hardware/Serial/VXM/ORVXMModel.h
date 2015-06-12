@@ -51,7 +51,8 @@
     NSString*		customCmd;
     BOOL			waiting;
     BOOL			useCmdQueue;
-    BOOL			queryInProgress;
+    BOOL			finalQueryInProgress;
+    BOOL            doneFirstAction;
 }
 
 #pragma mark ***Initialization
