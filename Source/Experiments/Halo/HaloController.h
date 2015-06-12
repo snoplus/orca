@@ -39,7 +39,7 @@
     IBOutlet NSTextField*	connectedField;
     IBOutlet NSTextField*	remoteRunInProgressField;
     IBOutlet NSTextField*	localRunInProgressField;
-    IBOutlet NSTextField*	sbcPasswordField;
+    IBOutlet NSSecureTextField*	sbcPasswordField;
     IBOutlet NSPopUpButton*	viewTypePU;
     IBOutlet NSButton*      sentryLockButton;
     IBOutlet NSButton*      secondaryMapLockButton;
