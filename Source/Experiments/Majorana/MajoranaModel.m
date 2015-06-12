@@ -32,6 +32,7 @@
 #import "ORAlarm.h"
 #import "ORTimeRate.h"
 #import "ORMJDInterlocks.h"
+#import "ORVME64CrateModel.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged        = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged        = @"MajoranaModelIgnorePanicOnAChanged";
@@ -262,20 +263,19 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     
     NSMutableArray* mapEntries = [NSMutableArray array];
     if(groupIndex == 0){
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber", @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmpChan",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCrate",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCard",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVChan",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kMaxVoltage",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorName",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",  @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kStringNum",     @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPosition",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-    }
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",     @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",               @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kCardSlot",          @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",           @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmpChan",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCrate",           @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVCard",            @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kHVChan",            @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kMaxVoltage",        @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorName",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kDetectorType",      @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreAmpDigitizer",   @"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+     }
     else if(groupIndex == 1){
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber", @"key", [NSNumber numberWithInt:0], @"sortType", nil]];
         [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kVME",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
@@ -324,8 +324,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
     NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
     NSArray* stringMapEntries = [[self mapFileAsString] componentsSeparatedByString:@"\n"];
-    [aDictionary setObject:stringMapEntries       forKey: @"geometry"];
-    [values setObject:aDictionary forKey:@"Strings"];
+    [aDictionary setObject:stringMapEntries forKey: @"geometry"];
+    [values setObject:aDictionary           forKey:@"Strings"];
     
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
@@ -360,6 +360,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 		NSString* crateName  = [aGroup segment:index objectForKey:@"kVME"];
 		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
 		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
+        
+        
+        
 		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
 			ORDataSet* aDataSet = nil;
 			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
@@ -367,18 +370,44 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 			if([objs count]){
 				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
 				if([arrayOfHistos count]){
-					id histoObj = [arrayOfHistos objectAtIndex:0];
-					aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Gretina", @"Energy",
+                    
+                    NSString* cardObjectName = [self objectNameForCrate:crateName andCard:cardName];
+                    //have to get the class name of the card in question. First look for the crate
+ 
+                    
+                    if(cardObjectName){
+                    
+                        id histoObj = [arrayOfHistos objectAtIndex:0];
+                        aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:cardObjectName, @"Energy",
 															[NSString stringWithFormat:@"Crate %2d",[crateName intValue]],
 															[NSString stringWithFormat:@"Card %2d",[cardName intValue]],
 															[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
 															nil]];
 					
-					[aDataSet doDoubleClick:nil];
+                        [aDataSet doDoubleClick:nil];
+                    }
 				}
 			}
 		}
 	}
+}
+
+- (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName
+{
+    NSArray* crates = [[self document] collectObjectsOfClass:NSClassFromString(@"ORVme64CrateModel")];
+    for(ORVme64CrateModel* aCrate in crates){
+        if([aCrate crateNumber] == [aCrateName intValue]){
+            //OK, got the crate. Get the card
+            NSArray* cards = [aCrate orcaObjects];
+            for(id aCard in cards){
+                if([aCard slot] == [aCardName intValue]){
+                    NSString* cardObjectName  = [[aCard className] stringByReplacingOccurrencesOfString:@"OR" withString:@""];
+                    return [cardObjectName stringByReplacingOccurrencesOfString:@"Model" withString:@""];
+                }
+            }
+        }
+    }
+    return nil;
 }
 
 - (NSString*) dataSetNameGroup:(int)aGroup segment:(int)index
@@ -570,19 +599,18 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
         
         finalString = [finalString stringByAppendingFormat: @"%@\n",[parts objectAtIndex:0]];
-        finalString = [finalString stringByAppendingFormat: @"%@%@\n",[self getPartStartingWith: @" DetectorName"   parts:parts],detType];
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" VME"       parts:parts]];
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" CardSlot"  parts:parts]];
-        finalString = [finalString stringByAppendingFormat: @"%@ (%@)\n",[self getPartStartingWith: @" Channel"   parts:parts],gainType];
+        finalString = [finalString stringByAppendingFormat: @"%@%@\n",[self getPartStartingWith:    @" DetectorName"   parts:parts],detType];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" VME"       parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" CardSlot"  parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@ (%@)\n\n",[self getPartStartingWith: @" Channel"   parts:parts],gainType];
         
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" PreAmpChan"   parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" PreAmpDigitizer"   parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" PreAmpChan"   parts:parts]];
 
-        finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith: @" HVCrate"  parts:parts]];
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" HVCard"   parts:parts]];
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" HVChan"   parts:parts]];
-
-        
-        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith: @" Threshold" parts:parts]];
+        finalString = [ finalString stringByAppendingFormat:@"%@\n",[self getPartStartingWith:      @" HVCrate"  parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" HVCard"   parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" HVChan"   parts:parts]];
+        finalString = [finalString stringByAppendingFormat: @"%@\n",[self getPartStartingWith:      @" Threshold" parts:parts]];
         
         return finalString;
     }
@@ -787,18 +815,18 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     int i;
     for(i = 0; i<numSegments; i++){
         [segmentGroup setSegment:i object:@"-" forKey:@"kStringName"];
-        [segmentGroup setSegment:i object:[NSNumber numberWithInt:999] forKey:@"kStringNum"];
-        [segmentGroup setSegment:i object:[NSNumber numberWithInt:999] forKey:@"kPosition"];
     }
     
     for(i=0;i<14;i++){
         int j;
         for(j=0;j<5;j++){
             NSString* detectorNum = [self stringMap:i objectForKey:[NSString stringWithFormat:@"kDet%d",j+1]];
+            NSString* stringName  = [self stringMap:i objectForKey:@"kStringName"];
             if([detectorNum rangeOfString:@"-"].location == NSNotFound && [detectorNum length]!=0){
                 int detIndex = [detectorNum intValue];
                 [segmentGroup setSegment:detIndex*2 object:[NSNumber numberWithInt:i] forKey:@"kStringNum"];
                 [segmentGroup setSegment:detIndex*2 object:[NSNumber numberWithInt:j] forKey:@"kPosition"];
+                [segmentGroup setSegment:detIndex*2 object:stringName                 forKey:@"kStringName"];
             }
         }
     }

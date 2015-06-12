@@ -441,7 +441,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
 		//Establish crate areas
 		NSRect crateRect = NSMakeRect(xc,yc,segSize*16,segSize*32);
 		
-		float xOffset, yOffset;
+		float xOffset = 0.0, yOffset = 0.0;
 		for(crate=0;crate<kMaxSNOCrates-1;++crate){
 			if (crate<10) {
 				xOffset=-5.5*segSize*16+crate*segSize*17.5;
@@ -999,7 +999,7 @@ NSString* plotButtonDisabled                 = @"plotButtonDisabled";
     selectedVoltage = -1;
 	
     NSPoint localPoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
-	NSBezierPath *aPath;
+	NSBezierPath *aPath = nil;
 	
     int crate,card,pmt,iVoltage;
     if (parameterToDisplay != kFECVoltagesDisplay && parameterToDisplay != kXL3VoltagesDisplay){

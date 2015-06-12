@@ -84,27 +84,32 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
     
     if(![aPortName isEqualToString:portName]){
         [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
+        portName = [aPortName copy];
     }
-
+    
+    [self openPortIfNeeded];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortNameChanged object:self];
+}
+
+- (void) openPortIfNeeded
+{
+    BOOL valid = NO;
+    NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+    ORSerialPort *aPort;
+    while (aPort = [enumerator nextObject]) {
+        if([portName isEqualToString:[aPort name]]){
+            [self setSerialPort:aPort];
+            if(portWasOpen){
+                [self openPort:YES];
+            }
+            valid = YES;
+            break;
+        }
+    }
+    if(!valid){
+        [self setSerialPort:nil];
+    }
 }
 
 - (ORSerialPort*) serialPort
@@ -138,11 +143,11 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	@"portWasOpen"]];
-	NSString* aName = [decoder decodeObjectForKey:@"portName"];
-    [self performSelector:@selector(setPortName:) withObject:aName afterDelay:3];
+    [self setPortName:      [decoder decodeObjectForKey:@"portName"]];
     [self registerNotificationObservers];
     [[self undoManager] enableUndoRegistration];
 	
+    
 	return self;
 }
 

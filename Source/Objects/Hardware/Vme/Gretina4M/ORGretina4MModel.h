@@ -559,7 +559,7 @@ enum Gretina4MFIFOStates {
 
 #pragma mark •••Internal Use only
 - (void) stepSerDesInit;
-- (NSString*) initSerDesStateName;
+- (NSString*) serDesStateName;
 
 @end
 

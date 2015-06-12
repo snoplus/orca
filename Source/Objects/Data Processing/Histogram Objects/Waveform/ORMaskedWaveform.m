@@ -113,6 +113,16 @@
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) setScaleOffset:(long)aValue
+{
+    scaleOffset = aValue;
+}
+
+- (long) scaleOffset
+{
+    return scaleOffset;
+}
+
 - (void) setBitNames:(NSArray*)someNames
 {
 	[someNames retain];
@@ -124,6 +134,7 @@
 {
 	return bitNames;
 }
+
 - (void) setSpecialBitMask:(unsigned long)aMask
 {
 	specialBitMask=aMask;
@@ -137,6 +148,7 @@
 		}
 	}
 }
+
 - (unsigned long) specialBitMask
 {
 	return specialBitMask;
@@ -154,8 +166,8 @@
 
 -(long) value:(unsigned long)aChan
 {
-	aChan = (aChan + startIndex)%[self numberBins];;
-	return [self unMaskedValue:aChan];
+	aChan = (aChan + startIndex)%[self numberBins];
+    return [self unMaskedValue:aChan];
 }
 
 - (id)initWithCoder:(NSCoder*)decoder
@@ -163,6 +175,7 @@
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
     [self setSpecialBitMask:[decoder decodeInt32ForKey:@"specialBitMask"]];
+    [self setScaleOffset:   [decoder decodeInt32ForKey:@"scaleOffset"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -172,6 +185,7 @@
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt32:specialBitMask forKey:@"specialBitMask"];
+    [encoder encodeInt32:scaleOffset    forKey:@"scaleOffset"];
 }
 
 @end

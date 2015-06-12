@@ -56,7 +56,13 @@
     BOOL        enableMemoryOverrunVeto;
     BOOL        controlLEMOTriggerOut;
     
+    // temp and temp supervisor
+    BOOL   temperatureSupervisorEnable;
+    unsigned long   tempThreshRaw;
+    float           tempThreshConverted;
 	
+    unsigned long   ringbufferPreDelay[kNumSIS3305Channels];    // ringbuffer pretrigger delays
+    
 	unsigned long   lostDataId;
 	unsigned long   dataId;
 	unsigned long   mcaId;
@@ -66,13 +72,11 @@
     BOOL            globalTriggerEnabled[kNumSIS3305Groups];
 	short			internalTriggerEnabledMask; 
 	short			externalTriggerEnabledMask;
-	short			extendedThresholdEnabledMask;
 	short			internalGateEnabledMask;
 	short			externalGateEnabledMask;
 	short			inputInvertedMask;
 	short			triggerOutEnabledMask;
 	short			highEnergySuppressMask;
-	short			adc50KTriggerEnabledMask;
 //    short			ltMask;
 //    short			gtMask;
 	bool			waitingForSomeChannels;
@@ -108,7 +112,6 @@
     NSMutableArray* triggerGateLengths;
 	NSMutableArray*	triggerDecimations;
     NSMutableArray* energyGateLengths;
-	NSMutableArray* energyPeakingTimes;
     NSMutableArray* energyGapTimes;
     NSMutableArray* energyTauFactors;
 	NSMutableArray* energyDecimations;
@@ -240,42 +243,14 @@
 - (void) setRunMode:(int)aRunMode;
 - (unsigned long) endAddressThreshold:(short)aGroup; 
 - (void) setEndAddressThreshold:(short)aGroup withValue:(unsigned long)aValue;
-- (int) energyTauFactor:(short)aChannel;
-- (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue;
-- (int)  energySampleStartIndex3;
-- (void) setEnergySampleStartIndex3:(int)aEnergySampleStartIndex3;
-- (int)  energySampleStartIndex2;
-- (void) setEnergySampleStartIndex2:(int)aEnergySampleStartIndex2;
-- (int)  energySampleStartIndex1;
-- (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1;
-- (int)	 energyNumberToSum;
-- (void) setEnergyNumberToSum:(int)aNumberToSum;
-- (int)  energySampleLength;
-- (void) setEnergySampleLength:(int)aEnergySampleLength;
-- (int) energyGapTime:(short)aGroup;
-- (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue;
-- (int) energyPeakingTime:(short)aGroup;
-- (void) setEnergyPeakingTime:(short)aGroup withValue:(int)aValue;
+
+
 - (unsigned long) getGTThresholdRegOffsets:(int) channel;
 - (unsigned long) getLTThresholdRegOffsets:(int) channel;
-- (unsigned long) getExtendedThresholdRegOffsets:(int) channel;
-- (unsigned long) getTriggerSetupRegOffsets:(int) channel; 
-- (unsigned long) getTriggerExtSetupRegOffsets:(int)channel;
-- (unsigned long) getSampleAddress:(int)channel;
-- (unsigned long) getAdcMemory:(int)channel;
-- (unsigned long) getEventConfigOffsets:(int)group;
-- (unsigned long) getEnergyGateLengthOffsets:(int)group;
-- (unsigned long) getExtendedEventConfigOffsets:(int)group;
-- (unsigned long) getEndAddressThresholdRegOffsets:(int)group;
-- (unsigned long) getRawDataBufferConfigOffsets:(int)group;
-- (unsigned long) getEnergyTauFactorOffset:(int) channel;
-- (unsigned long) getEnergySetupGPOffset:(int)group;
-- (unsigned long) getPreTriggerDelayTriggerGateLengthOffset:(int) aGroup; 
-- (unsigned long) getBufferControlOffset:(int) aGroup; 
-- (unsigned long) getPreviousBankSampleRegister:(int)channel;
 
-- (int) energyGateLength:(short)aGroup;
-- (void) setEnergyGateLength:(short)aGroup withValue:(int)aEnergyGateLength;
+- (unsigned long) getEndAddressThresholdRegOffsets:(int)group;
+
+
 
 - (unsigned short) sampleLength:(short)group;
 - (void) setSampleLength:(short)group withValue:(int)aValue;
@@ -320,11 +295,6 @@
 - (BOOL) externalTriggerEnabled:(short)chan;
 - (void) setExternalTriggerEnabled:(short)chan withValue:(BOOL)aValue;
 
-- (short) extendedThresholdEnabledMask;
-- (void) setExtendedThresholdEnabledMask:(short)aMask;
-- (BOOL) extendedThresholdEnabled:(short)chan;
-- (void) setExtendedThresholdEnabled:(short)chan withValue:(BOOL)aValue;
-
 - (short) internalGateEnabledMask;
 - (void) setInternalGateEnabledMask:(short)aMask;
 - (BOOL) internalGateEnabled:(short)chan;
@@ -344,16 +314,6 @@
 - (void) setTriggerOutEnabledMask:(short)aMask;
 - (BOOL) triggerOutEnabled:(short)chan;
 - (void) setTriggerOutEnabled:(short)chan withValue:(BOOL)aValue;
-
-- (short) highEnergySuppressMask;
-- (void) setHighEnergySuppressMask:(short)aMask;
-- (BOOL) highEnergySuppress:(short)chan;
-- (void) setHighEnergySuppress:(short)chan withValue:(BOOL)aValue;
-
-- (short) adc50KTriggerEnabledMask;
-- (void) setAdc50KTriggerEnabledMask:(short)aMask;
-- (BOOL) adc50KTriggerEnabled:(short)chan;
-- (void) setAdc50KTriggerEnabled:(short)chan withValue:(BOOL)aValue;
 
 - (BOOL) shipEnergyWaveform;
 - (void) setShipEnergyWaveform:(BOOL)aState;
@@ -411,7 +371,6 @@
 - (BOOL) enableMemoryOverrunVeto;
 - (BOOL) controlLEMOTriggerOut;
 
-- (void) writeControlStatus;
 
 
 
@@ -454,55 +413,72 @@
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
 - (void) calculateSampleValues;
-- (void) calculateEnergyGateLength;
+
+
+
+
+
+
+
+
 
 #pragma mark - Hardware Access
-- (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax;
-- (void) initBoard;
-- (void) readModuleID:(BOOL)verbose;
-- (unsigned long) readAcquisitionControl:(BOOL)verbose;
+- (void) writeControlStatus;
 
-- (void) writeAcquistionRegister;
-- (void) writeClockSource:(unsigned long)aState;
-
-- (void) writeEventConfiguration;
-- (void) writeThresholds;
-- (void) readEndAddressThresholds;
-//- (void) writeHighThresholds;
-- (void) readLTThresholds:(BOOL)verbose;
-- (void) readGTThresholds:(BOOL)verbose;
-- (void) readThresholds:(BOOL)verbose;
-
+- (void) writeLed:(short)ledNum to:(BOOL)state;
 - (void) writeLedApplicationMode;
 
-- (unsigned long) getSampleStartAddress:(short)group;
-- (unsigned long) readActualSampleAddress:(short)group;
+- (void) readModuleID:(BOOL)verbose;
+- (unsigned long) readInterruptControl:(BOOL)verbose;
+- (void) writeInterruptControl:(unsigned long)value;
 
+// acquisition control methods
+- (unsigned long) readAcquisitionControl:(BOOL)verbose;
+- (void) writeAcquistionControl;
+- (void) writeClockSource:(unsigned long)aState;
 
-- (void) briefReport;
-- (void) regDump;
-//- (void) resetSamplingLogic;
-//- (void) writePageRegister:(int) aPage;
-- (void) writePreTriggerDelayAndTriggerGateDelay;
-- (void) writeEnergyGP;
-- (void) writeRawDataBufferConfiguration;
-- (void) writeEndAddressThresholds;
-- (void) writeEndAddressThreshold:(int)aGroup;
+- (unsigned long) readVetoLength:(BOOL)verbose;
+- (void) writeVetoLength:(unsigned long)timeInNS;
+- (unsigned long) readVetoDelay:(BOOL)verbose;
+- (void) writeVetoDelay:(unsigned long)timeInNS;
+
+- (unsigned long) EEPROMControlwithCommand:(short)command andAddress:(short)addr andData:(unsigned int)data;
+- (unsigned long) onewireControlwithCommand:(short)command andData:(unsigned int)data;
+
+- (unsigned long) readBroadcastSetup:(bool)verbose;
+- (unsigned long) readLEMOTriggerOutSelect;
+- (void) writeLEMOTriggerOutSelect:(unsigned long)value;
+- (unsigned long) readExternalTriggerCounter;
+
+#pragma mark --- TDC Regs
+
+- (unsigned long) readTDCWrite:(BOOL)verbose;
+- (void) writeTDCWriteWithData:(unsigned long)data atAddress:(unsigned short)addr;
+- (unsigned long) readTDCRead:(BOOL)verbose;
+- (void) writeTDCReadatAddress:(unsigned short)addr;
+- (unsigned long) readTDCStartStopEnable:(BOOL)verbose;
+- (void) writeTDCStartStopEnable:(unsigned long)value;
+- (void) writeXilinxJTAGTestWithTDI:(char)tdi andTMS:(char)tms;
+- (unsigned long) readXilinxJTAGDataIn;
+
+#pragma mark -- Other regs
+
+- (unsigned long) readTemperature:(BOOL)verbose;
+- (void) writeTemperatureThreshold:(unsigned long)thresh;
+
+- (unsigned long) readADCSerialInterface:(BOOL)verbose;
+- (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr viaSPI:(char)spiOn;
+- (void) writeADCSerialInterface;
 
 - (unsigned long) readDataTransferControlRegister:(short)group;
 - (void) writeDataTransferControlRegister:(short)group withCommand:(short)command;
 
-- (void) writeEnergyGateLength;
-- (void) writeEnergyTauFactor;
-- (void) writeEnergySampleLength;
-- (void) writeEnergySampleStartIndexes;
-- (void) writeEnergyNumberToSum;
-- (void) writeBufferControl;
+- (unsigned long) readDataTransferStatusRegister:(short)group;
 
-//- (void) clearTimeStamp;
-- (void) writeTapDelays;
-
-- (void) writeTriggerSetups;
+- (unsigned long) readAuroraProtocolStatus;
+- (void) writeAuroraProtocolStatus:(unsigned long)value;
+- (unsigned long) readAuroraDataStatus;
+- (void) writeAuroraDataStatus:(unsigned long)value;
 
 #pragma mark -- Key Addresses
 - (void) reset;
@@ -516,29 +492,83 @@
 - (void) ADCFPGAReset;
 - (void) pulseExternalTriggerOut;
 
+- (unsigned long) getEventConfigOffsets:(int)group;
+- (unsigned long) readEventConfigurationOfGroup:(short)group;
+- (void) writeEventConfiguration;
 
-//- (void) writeMcaLNESetupAndPrescalFactor;
-//- (void) writeMcaScanControl;
-//- (void) writeMcaNofHistoPreset;
-//- (void) writeMcaLNEPulse;
-//- (void) writeMcaArm;
-//- (void) writeMcaScanEnable;
-//- (void) writeMcaScanDisable;
-//- (void) writeMcaMultiScanStartReset;
-//- (void) writeMcaMultiScanArmScanArm;
-//- (void) writeMcaMultiScanArmScanEnable;
-//- (void) writeMcaMultiScanDisable;
-//- (void) writeHistogramParams;
-//- (void) writeMcaMultiScanNofScansPreset;
-//- (void) writeMcaArmMode;
-//- (void) writeMcaCalculationFactors;
+- (unsigned long) readSampleStartAddressOfGroup:(short)group;
+- (void) writeSampleStartAddressOfGroup:(short)group toValue:(unsigned long)value;
+
+- (unsigned long) readSampleLength:(short) group;
+
+- (unsigned long) readActualSampleAddress:(short)group;
+- (void) writeSampleLengthOfGroup:(short)group toValue:(unsigned long)value;
+- (unsigned long) readSamplePretriggerLengthOfGroup:(short)group;
+- (void) writeSamplePretriggerLengthOfGroup:(short)group toValue:(unsigned long)value;
+- (unsigned long) readRingbufferPretriggerDelayOnChannel:(short)chan;
+- (void) writeRingbufferPretriggerDelayOnChannel:(short)chan toValue:(unsigned long)value;
+
+- (unsigned long) readMaxNumOfEventsInGroup:(short)group;
+- (void) writeMaxNumOfEventsInGroup:(short)group toValue:(unsigned int)maxValue;
+
+- (unsigned long) getEndAddressThresholdRegOffsets:(int)group;
+- (unsigned long) readEndAddressThresholdOfGroup:(short)group;
+- (void) writeEndAddressThresholds;
+- (void) writeEndAddressThresholdOfGroup:(int)aGroup;
+- (void) writeEndAddressThresholdOfGroup:(short)group toValue:(unsigned long)value;
+
+
+- (unsigned long) readLTThresholdOnChannel:(short)chan;
+- (void) readLTThresholds:(BOOL)verbose;
+- (unsigned long) readGTThresholdOnChannel:(short)chan;
+- (void) readGTThresholds:(BOOL)verbose;
+- (void) readThresholds:(BOOL)verbose;
+- (void) writeThresholds;
+- (void) writeLTThresholds;
+- (void) writeGTThresholds;
+
+- (unsigned long) getSamplingStatusAddressForGroup:(short)group;
+- (unsigned long) readSamplingStatusForGroup:(short)group;
+- (unsigned long) readActualSampleAddress:(short)group;
+
+
+
+
+
+
+
+
+- (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax;
+- (void) initBoard;
+
+
+
+
+
+
+
+
+- (unsigned long) readEndAddressThresholdOfGroup:(short)group;
+
+
+
+
+//- (unsigned long) getSampleStartAddress:(short)group;
+
+- (void) briefReport;
+- (void) regDump;
+//- (void) resetSamplingLogic;
+//- (void) writePageRegister:(int) aPage;
+
+
+//- (void) clearTimeStamp;
+- (void) writeTapDelays;
+
 
 #pragma mark other
 - (void) executeCommandList:(ORCommandList*) aList;
 
 //- (unsigned long) acqReg;
-- (unsigned long) getPreviousBankSampleRegisterOffset:(int) channel;
-- (unsigned long) getADCBufferRegisterOffset:(int) channel;
 - (unsigned long) getADCTapDelayOffsets:(int)group;
 
 //- (void) disarmAndArmBank:(int) bank;
@@ -564,7 +594,6 @@
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) isEvent;
-- (void) setUpPageReg;
 
 #pragma mark --- HW Wizard
 - (int) numberOfChannels;
@@ -606,13 +635,11 @@ extern NSString* ORSIS3305ModelEnergyGateLengthChanged;
 extern NSString* ORSIS3305ModelRunModeChanged;
 extern NSString* ORSIS3305ModelEndAddressThresholdChanged;
 extern NSString* ORSIS3305ModelEnergySampleStartIndex3Changed;
-extern NSString* ORSIS3305ModelEnergyTauFactorChanged;
 extern NSString* ORSIS3305ModelEnergySampleStartIndex2Changed;
 extern NSString* ORSIS3305ModelEnergySampleStartIndex1Changed;
 extern NSString* ORSIS3305ModelEnergyNumberToSumChanged;
 extern NSString* ORSIS3305ModelEnergySampleLengthChanged;
 extern NSString* ORSIS3305ModelEnergyGapTimeChanged;
-extern NSString* ORSIS3305ModelEnergyPeakingTimeChanged;
 extern NSString* ORSIS3305ModelTriggerGateLengthChanged;
 extern NSString* ORSIS3305ModelPreTriggerDelayChanged;
 extern NSString* ORSIS3305SampleStartIndexChanged;
@@ -659,7 +686,6 @@ extern NSString* ORSIS3305TriggerDecimationChanged;
 extern NSString* ORSIS3305EnergyDecimationChanged;
 extern NSString* ORSIS3305SetShipWaveformChanged;
 extern NSString* ORSIS3305SetShipSummedWaveformChanged;
-extern NSString* ORSIS3305Adc50KTriggerEnabledChanged;
 extern NSString* ORSIS3305InputInvertedChanged;
 
 // control status
@@ -679,7 +705,6 @@ extern NSString* ORSIS3305EControlLEMOTriggerOut;
 
 extern NSString* ORSIS3305InternalTriggerEnabledChanged;
 extern NSString* ORSIS3305ExternalTriggerEnabledChanged;
-extern NSString* ORSIS3305ExtendedThresholdEnabledChanged;
 extern NSString* ORSIS3305InternalGateEnabledChanged;
 extern NSString* ORSIS3305ExternalGateEnabledChanged;
 extern NSString* ORSIS3305McaStatusChanged;

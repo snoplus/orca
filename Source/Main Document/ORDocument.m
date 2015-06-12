@@ -213,9 +213,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
         unsigned long anId = 1;
         do {
             BOOL idAlreadyUsed = NO;
-            NSEnumerator* e = [objects objectEnumerator];
-            id anObj;
-            while(anObj = [e nextObject]){
+            for(id anObj in objects){
                 if(anObj == objToGetID)continue;
                 if([anObj uniqueIdNumber] == anId){
                     anId++;
@@ -313,9 +311,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	NSMutableArray* serial			= [NSMutableArray array];
 	NSMutableArray* auxHw			= [NSMutableArray array];
 	NSMutableDictionary* exp		= [NSMutableDictionary dictionary];
-	NSEnumerator* e					= [allObjects objectEnumerator];
-	id anObj;
-	while(anObj = [e nextObject]){
+	for(id anObj in allObjects){
 		if([anObj isKindOfClass:NSClassFromString(@"ORCrate")]){
 			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
 				[anObj addObjectInfoToArray:crates];
@@ -529,9 +525,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[[self group] wakeUp];
 		
 
-	NSEnumerator* e = [orcaControllers objectEnumerator];
-		id controller;
-		while(controller = [e nextObject]){
+		for(id controller in orcaControllers){
 			@try {
 				[[controller window] orderFront:controller];
 			}
@@ -564,9 +558,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (NSArray*) controllersToSave
 {
 	NSMutableArray* controllersToSave = [NSMutableArray array];
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller model] != [[ORCommandCenter sharedCommandCenter] scriptIDEModel]){
             [controllersToSave addObject:controller];
         }
@@ -576,10 +568,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void) checkControllers
 {
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
     NSMutableArray* badObjs = [NSMutableArray array];
-    while(controller = [e nextObject]){
+    for (id controller in orcaControllers){
         if(![controller isKindOfClass:[OrcaObjectController class]]){
             [badObjs addObject:controller];
         }
@@ -652,11 +642,9 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         else shareDialogs = YES;
     }
     
-    id controller = nil;
     
     //if a dialog already exists then use it no matter what.
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller model] == aModel){
             [controller showWindow:self];
 			[[controller window] makeFirstResponder:[controller window]];
@@ -667,8 +655,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     //ok, the dialog doesn't exist yet....
     if(shareDialogs == YES){
         //try to share one
-        NSEnumerator* e = [orcaControllers objectEnumerator];
-        while(controller = [e nextObject]){
+        for(id controller in orcaControllers){
             if([controller class] == NSClassFromString(aClassName)){
                 [controller setModel:aModel];
                 [controller showWindow:self];
@@ -679,7 +666,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     }
     
     //if we get here then we'll have to make one.
-    controller = [[NSClassFromString(aClassName) alloc] init];
+    id controller = [[NSClassFromString(aClassName) alloc] init];
     if([controller isKindOfClass:[OrcaObjectController class]]){
         
         [controller setModel:aModel];
@@ -716,23 +703,15 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void)objectsRemoved:(NSNotification*)aNote
 {
-    
     NSArray* list = [[aNote userInfo] objectForKey:ORGroupObjectList];
-    NSEnumerator* objsToRemoveEnumerator = [list objectEnumerator];
-    id anObj;
-    while(anObj = [objsToRemoveEnumerator nextObject]){
+    for(id anObj in list){
         NSArray* totalList = [anObj familyList];    
-        NSEnumerator* e = [totalList objectEnumerator];
-        id objToBeRemoved;
-		id controllersToRemove;
-        while(objToBeRemoved = [e nextObject]){
-            controllersToRemove = [self findControllersWithModel:objToBeRemoved];
+        for(id objToBeRemoved in totalList){
+            id controllersToRemove = [self findControllersWithModel:objToBeRemoved];
             [orcaControllers removeObjectsInArray:controllersToRemove];
 			//tricky, we also have to worry about objects that have subobjects that have dialogs
 			id subObjectsToBeRemoved = [objToBeRemoved subObjectsThatMayHaveDialogs];
-			NSEnumerator* e1 = [subObjectsToBeRemoved objectEnumerator];
-			id subObjectToBeRemoved;
-			while(subObjectToBeRemoved = [e1 nextObject]){
+			for(id subObjectToBeRemoved in subObjectsToBeRemoved){
 				controllersToRemove = [self findControllersWithModel:subObjectToBeRemoved];
 	            [orcaControllers removeObjectsInArray:controllersToRemove];
 			}
@@ -744,9 +723,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (NSArray*) findControllersWithModel:(id)obj
 { 
     NSMutableArray* list = [NSMutableArray array];
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller model] == obj){
             [list addObject:controller];
         }
@@ -757,9 +734,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (void)windowClosing:(NSNotification*)aNote
 {
     
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
+    for(id controller in orcaControllers){
         if([controller window] == [aNote object]){
             //[controller retain];
 			@try {

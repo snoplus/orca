@@ -1179,9 +1179,6 @@ mtcConfigDoc = _mtcConfigDoc;
         [[self orcaDbRef:self] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kOrcaRunDocumentUpdated];
     }
     
-    //Collect a series of objects from the ORMTCModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    
     NSMutableDictionary* configDocDict = [NSMutableDictionary dictionaryWithCapacity:1000];
     
     //Pulling all the MTC Values

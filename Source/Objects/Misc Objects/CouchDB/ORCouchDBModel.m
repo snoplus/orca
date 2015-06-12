@@ -109,8 +109,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [localHostName release];
     [remoteHostName release];
 	[docList release];
+    [replicationAlarm clearAlarm];
     [replicationAlarm release];
-	[replicationAlarm clearAlarm];
     [customDataBases release];
 
 	[super dealloc];
@@ -1087,6 +1087,7 @@ nil];
         
         [self recordEvent:@"RunStarted" document:doc];
     }
+    [self updateRunInfo];
 }
 
 - (void) runStopped:(NSNotification*)aNote
@@ -1112,6 +1113,7 @@ nil];
 
         [self recordEvent:@"RunStopped" document:doc];
     }
+    [self updateRunInfo];
 }
 
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote

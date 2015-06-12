@@ -2,7 +2,7 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">13F34</string>
+		<string key="IBDocument.SystemVersion">13F1077</string>
 		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
 		<string key="IBDocument.AppKitVersion">1265.21</string>
 		<string key="IBDocument.HIToolboxVersion">698.00</string>
@@ -2211,7 +2211,6 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<string key="NSFrame">{{743, 14}, {24, 79}}</string>
 																<reference key="NSSuperview" ref="432615114"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<int key="NSNumRows">4</int>
@@ -2293,7 +2292,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<int key="NSNumCols">1</int>
 																<array class="NSMutableArray" key="NSCells">
 																	<object class="NSButtonCell" id="101586038">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -2349,7 +2348,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<int key="NSPeriodicInterval">25</int>
 																	</object>
 																	<object class="NSButtonCell" id="591488576">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -2364,7 +2363,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<int key="NSPeriodicInterval">25</int>
 																	</object>
 																	<object class="NSButtonCell" id="225145828">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -2379,7 +2378,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<int key="NSPeriodicInterval">25</int>
 																	</object>
 																	<object class="NSButtonCell" id="219793233">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -4183,7 +4182,6 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<string key="NSFrame">{{719, 97}, {48, 26}}</string>
 																<reference key="NSSuperview" ref="203595572"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSTextFieldCell" key="NSCell" id="750339745">
 																	<int key="NSCellFlags">67108864</int>
@@ -4283,7 +4281,6 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<string key="NSFrame">{{732, 14}, {24, 79}}</string>
 																<reference key="NSSuperview" ref="203595572"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView"/>
 																<bool key="NSEnabled">YES</bool>
 																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																<int key="NSNumRows">4</int>
@@ -4365,7 +4362,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<int key="NSNumCols">1</int>
 																<array class="NSMutableArray" key="NSCells">
 																	<object class="NSButtonCell" id="790414005">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -4421,7 +4418,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<int key="NSPeriodicInterval">25</int>
 																	</object>
 																	<object class="NSButtonCell" id="33405655">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -4436,7 +4433,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<int key="NSPeriodicInterval">25</int>
 																	</object>
 																	<object class="NSButtonCell" id="464528339">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -4451,7 +4448,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																		<int key="NSPeriodicInterval">25</int>
 																	</object>
 																	<object class="NSButtonCell" id="227175896">
-																		<int key="NSCellFlags">67108864</int>
+																		<int key="NSCellFlags">603979776</int>
 																		<int key="NSCellFlags2">131072</int>
 																		<string key="NSContents"/>
 																		<reference key="NSSupport" ref="26"/>
@@ -4655,23 +4652,23 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<nil key="NSMenuItem"/>
+																	<object class="NSMenuItem" key="NSMenuItem" id="852196044">
+																		<reference key="NSMenu" ref="522350773"/>
+																		<string key="NSTitle">Mode 0: Save 4-Ch in 1 data block (asynch/internal trig 1x5 Gsps OR Synch. Global Trigger)</string>
+																		<string key="NSKeyEquiv"/>
+																		<int key="NSMnemonicLoc">2147483647</int>
+																		<int key="NSState">1</int>
+																		<reference key="NSOnImage" ref="127590575"/>
+																		<reference key="NSMixedImage" ref="519015157"/>
+																		<string key="NSAction">_popUpItemAction:</string>
+																		<int key="NSTag">4</int>
+																		<reference key="NSTarget" ref="921230949"/>
+																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
 																	<object class="NSMenu" key="NSMenu" id="522350773">
 																		<string key="NSTitle">OtherViews</string>
 																		<array class="NSMutableArray" key="NSMenuItems">
-																			<object class="NSMenuItem" id="852196044">
-																				<reference key="NSMenu" ref="522350773"/>
-																				<string key="NSTitle">Mode 0: Save 4-Ch in 1 data block (asynch/internal trig 1x5 Gsps OR Synch. Global Trigger)</string>
-																				<string key="NSKeyEquiv"/>
-																				<int key="NSMnemonicLoc">2147483647</int>
-																				<int key="NSState">1</int>
-																				<reference key="NSOnImage" ref="127590575"/>
-																				<reference key="NSMixedImage" ref="519015157"/>
-																				<string key="NSAction">_popUpItemAction:</string>
-																				<int key="NSTag">4</int>
-																				<reference key="NSTarget" ref="921230949"/>
-																			</object>
+																			<reference ref="852196044"/>
 																			<object class="NSMenuItem" id="731602755">
 																				<reference key="NSMenu" ref="522350773"/>
 																				<string key="NSTitle">Mode 1: Save 2-Ch in 1 data block (asynch/internal trig 2x2.5 Gsps)</string>
@@ -13692,6 +13689,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<bool key="NSDrawsBackground">YES</bool>
+							<reference key="NSDelegate"/>
 							<array class="NSMutableArray" key="NSSubviews">
 								<reference ref="189780115"/>
 							</array>
@@ -23068,10 +23066,12 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<string key="relais1PUAction:">id</string>
 						<string key="relais2PUAction:">id</string>
 						<string key="relaisStatesBBMatrixAction:">id</string>
+						<string key="repeatSWTriggerDelayTextFieldAction:">id</string>
 						<string key="repeatSWTriggerModePUAction:">id</string>
 						<string key="repeatSWTriggerModeTextFieldAction:">id</string>
 						<string key="reportButtonAction:">id</string>
 						<string key="resetAction:">id</string>
+						<string key="saveIonChanFilterOutputRecordsCBAction:">id</string>
 						<string key="selectChannelAction:">id</string>
 						<string key="selectChargeBBFileForFiberAction:">id</string>
 						<string key="selectChargeFICFileButtonAction:">id</string>
@@ -23599,6 +23599,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 							<string key="name">relaisStatesBBMatrixAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="repeatSWTriggerDelayTextFieldAction:">
+							<string key="name">repeatSWTriggerDelayTextFieldAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="repeatSWTriggerModePUAction:">
 							<string key="name">repeatSWTriggerModePUAction:</string>
 							<string key="candidateClassName">id</string>
@@ -23613,6 +23617,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						</object>
 						<object class="IBActionInfo" key="resetAction:">
 							<string key="name">resetAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveIonChanFilterOutputRecordsCBAction:">
+							<string key="name">saveIonChanFilterOutputRecordsCBAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="selectChannelAction:">
@@ -23994,10 +24002,12 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<string key="relais1PU">NSPopUpButton</string>
 						<string key="relais2PU">NSPopUpButton</string>
 						<string key="relaisStatesBBMatrix">NSMatrix</string>
+						<string key="repeatSWTriggerDelayTextField">NSTextField</string>
 						<string key="repeatSWTriggerModePU">NSPopUpButton</string>
 						<string key="repeatSWTriggerModeTextField">NSTextField</string>
 						<string key="reportButton">NSButton</string>
 						<string key="resetButton">NSButton</string>
+						<string key="saveIonChanFilterOutputRecordsCB">NSButton</string>
 						<string key="selectFiberTrigPU">NSPopUpButton</string>
 						<string key="setWriteToBBSegControl">NSSegmentedControl</string>
 						<string key="settingLockButton">NSButton</string>
@@ -24511,6 +24521,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 							<string key="name">relaisStatesBBMatrix</string>
 							<string key="candidateClassName">NSMatrix</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="repeatSWTriggerDelayTextField">
+							<string key="name">repeatSWTriggerDelayTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="repeatSWTriggerModePU">
 							<string key="name">repeatSWTriggerModePU</string>
 							<string key="candidateClassName">NSPopUpButton</string>
@@ -24525,6 +24539,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="resetButton">
 							<string key="name">resetButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="saveIonChanFilterOutputRecordsCB">
+							<string key="name">saveIonChanFilterOutputRecordsCB</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="selectFiberTrigPU">
@@ -25363,7 +25381,6 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<string key="settingLockAction:">id</string>
 						<string key="shipTimeRecordAlsoAction:">id</string>
 						<string key="sumGAction:">id</string>
-						<string key="tapDelayAction:">id</string>
 						<string key="triggerDecimationAction:">id</string>
 						<string key="triggerGateLengthAction:">id</string>
 						<string key="triggerOutEnabledAction:">id</string>
@@ -25599,10 +25616,6 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						</object>
 						<object class="IBActionInfo" key="sumGAction:">
 							<string key="name">sumGAction:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="tapDelayAction:">
-							<string key="name">tapDelayAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="triggerDecimationAction:">

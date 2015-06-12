@@ -22,10 +22,10 @@
 #import "ORDataSetModel.h"
 #import "ORDataController.h"
 #import "ORCalibration.h"
+#import "ORGroup.h"
 
 NSString* ORDataSetModelPausedChanged		= @"ORDataSetModelPausedChanged";
 NSString* ORDataSetModelRefreshModeChanged	= @"ORDataSetModelRefreshModeChanged";
-NSString* ORDataSetModelRemoved				= @"ORDataSetModelRemoved";
 NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
@@ -41,16 +41,10 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORDataSetModelRemoved
-	 object:self
-	 userInfo: nil];
-	
-    
 	[dataSetLock release];
     [key release];
     [fullName release];
-    [shortName release];	
+    [shortName release];
     [dataSet release];
     [calibration release];
     [super dealloc];

@@ -112,11 +112,6 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
                        object : self];
     
     [notifyCenter addObserver : self
-                     selector : @selector(dataSetRemoved:)
-                         name : ORDataSetModelRemoved
-                       object : model];
-    
-    [notifyCenter addObserver : self
                      selector : @selector(dataSetChanged:)
                          name : ORDataSetDataChanged
                        object : model];
@@ -166,13 +161,10 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 						 name : ORRunStatusChangedNotification
 					   object : nil];
 
-    
     [notifyCenter addObserver : self
 					 selector : @selector(windowDidResize:)
 						 name : NSWindowDidResizeNotification
 					   object : nil];
-    
-
 }
 
 - (void) updateWindow

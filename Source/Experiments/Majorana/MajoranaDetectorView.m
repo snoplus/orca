@@ -262,8 +262,9 @@
         int detectorIndex = i*2;
         ORDetectorSegment* aSegment = [aGroup segment:detectorIndex];
         
-        int position  = [[aSegment objectForKey:@"kPosition"]intValue];
-        int stringNum = [[aSegment objectForKey:@"kStringNum"]intValue];
+        int position         = [[aSegment objectForKey:@"kPosition"]intValue];
+        int stringNum        = [[aSegment objectForKey:@"kStringNum"]intValue];
+        NSString* stringName = [aSegment objectForKey:@"kStringName"];
         
         if(position> numDetectors/2|| stringNum>numDetectors/2){
             //this detector is not part of a string so draw offscreen
@@ -288,7 +289,12 @@
                 y = yOffset[stringNum][position];
 
                 [stringLabel[stringNum] autorelease];
-                stringLabel[stringNum] = [[NSString stringWithFormat:@"Str%d,%d",stringNum/7+1,stringNum%7 + 1] retain];
+                if([stringName length]==0 || [stringName hasPrefix:@"-"]){
+                    stringLabel[stringNum] = [[NSString stringWithFormat:@"Str%d,%d",stringNum/7+1,stringNum%7 + 1] retain];
+                }
+                else {
+                    stringLabel[stringNum] = [[NSString stringWithString:stringName] retain];
+                }
             }
             else {
                 x = -100;

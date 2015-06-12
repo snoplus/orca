@@ -97,9 +97,20 @@
     [notifyCenter addObserver : self
                      selector : @selector(crateNumberChanged:)
                          name : ORCrateModelCrateNumberChanged
-						object: model];
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateView:)
+                         name : OROrcaObjectImageChanged
+                        object: model];
 
 
+}
+- (void) updateView:(NSNotification*)aNotification
+{
+    if([aNotification object] == model){
+        [groupView setNeedsDisplay:YES];
+    }
 }
 
 - (void) isNowKeyWindow:(NSNotification*)aNotification

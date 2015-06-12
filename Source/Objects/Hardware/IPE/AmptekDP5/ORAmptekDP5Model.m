@@ -656,6 +656,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 -(void) dealloc
 {
+    [lastRequest release];
     [textCommand release];
     [crateUDPCommand release];
     [crateUDPCommandIP release];
@@ -762,6 +763,27 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (NSString*) lastRequest
+{
+    return lastRequest;
+}
+
+- (void) setLastRequest:(NSString*)aLastRequest
+{
+    //the code wizard version
+    #if 0
+    [lastRequest autorelease];
+    lastRequest = [aLastRequest copy];    
+    #endif    
+    
+    //new version from e.g. ORPacFPModel.m (which one to use?)
+    #if 1
+	[aLastRequest retain];
+	[lastRequest release];
+	lastRequest = aLastRequest;    
+    #endif    
+}
 
 - (int) isPollingSpectrum
 {
@@ -2099,6 +2121,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         //show status
         if(hasStatus){
             uint32_t var32=0;
+            uint16_t var16=0; var16=0;
             uint8_t var8=0;
             NSLog(@"STATUS:    (statusOffset: %i)\n",statusOffset);
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kFastCountOffset])) );
@@ -2128,6 +2151,15 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         //ship the packet 
         uint32_t data[8400];
         uint32_t location = [self uniqueIdNumber];
+        uint32_t infoFlags = 0;
+        uint32_t acqtime = 0;
+        uint32_t realtime = 0;
+        if(hasStatus){
+            infoFlags = infoFlags | 0x1;
+            acqtime = *( (uint32_t*) (&(dp5Packet[statusOffset + kAccTimeOffset])) );
+            realtime = *( (uint32_t*) (&(dp5Packet[statusOffset + kRealtimeOffset])) );
+        }
+        
         int lengthBytes = 8*4 + currentDP5PacketLen; // 8 words header * 4 byte (each is uint32_t) + packet ...
         if(lengthBytes%4)     NSLog(@"ERROR in %@::%@!  lengthBytes %i not multiple of 4! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,lengthBytes);//TODO: DEBUG -tb-
 
@@ -2136,13 +2168,13 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 			time(&ut_time);
 
 			data[0] = spectrumEventId | (length32); 
-			data[1] = location;
+			data[1] = location;    //called "deviceID" in the ROOT file
 			data[2] = ut_time;	   //sec
 			data[3] = 0;	       //subsec
 			data[4] = specLength;  //spectrum length
-			data[5] = 0;	
-			data[6] = 0;	
-			data[7] = 0;	
+			data[5] = hasStatus;   //additional info
+			data[6] = acqtime;	
+			data[7] = realtime;	
             
             void *destination = (void*) &(data[8]);
             memcpy(destination, dp5Packet, currentDP5PacketLen);
@@ -2198,6 +2230,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
   
 	
     
+    
+    
+    //TODO: FIXIT for Amptek, we do not need a listening socket, see comment in startListeningServerSocket -tb-
     //[self setIsListeningOnServerSocket: 1];//TODO: rename -tb-
     [self startListeningServerSocket];//TODO: rename -tb-
 	

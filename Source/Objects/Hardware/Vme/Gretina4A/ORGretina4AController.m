@@ -266,66 +266,6 @@
                         object: model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(fifoEmptyChanged:)
-                         name : ORGretina4AFifoEmpty0Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fifoEmpty1Changed:)
-                         name : ORGretina4AFifoEmpty1Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fifoAlmostEmptyChanged:)
-                         name : ORGretina4AFifoAlmostEmptyChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fifoHalfFullChanged:)
-                         name : ORGretina4AFifoHalfFullChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fifoAlmostFullChanged:)
-                         name : ORGretina4AFifoAlmostFullChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fifoFullChanged:)
-                         name : ORGretina4AFifoFull0Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(fifoFull1Changed:)
-                         name : ORGretina4AFifoFull1Changed
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(phSuccessChanged:)
-                         name : ORGretina4APhSuccessChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(phFailureChanged:)
-                         name : ORGretina4APhFailureChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(phHuntingUpChanged:)
-                         name : ORGretina4APhHuntingUpChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(phHuntingDownChanged:)
-                         name : ORGretina4APhHuntingDownChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(phCheckingChanged:)
-                         name : ORGretina4APhCheckingChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
                      selector : @selector(acqDcmCtrlStatusChanged:)
                          name : ORGretina4AAcqDcmCtrlStatusChanged
                         object: model];
@@ -868,18 +808,6 @@
     [self forceFullInitChanged:nil];
     [self forceFullCardInitChanged:nil];
     [self firmwareVersionChanged:nil];
-    [self fifoEmptyChanged:nil];
-    [self fifoEmpty1Changed:nil];
-    [self fifoAlmostEmptyChanged:nil];
-    [self fifoHalfFullChanged:nil];
-    [self fifoAlmostFullChanged:nil];
-    [self fifoFullChanged:nil];
-    [self fifoFull1Changed:nil];
-    [self phSuccessChanged:nil];
-    [self phFailureChanged:nil];
-    [self phHuntingUpChanged:nil];
-    [self phHuntingDownChanged:nil];
-    [self phCheckingChanged:nil];
     [self acqDcmCtrlStatusChanged:nil];
     [self acqDcmLockChanged:nil];
     [self acqDcmResetChanged:nil];
@@ -917,7 +845,7 @@
     [self mWindowChanged:nil];
     [self d3WindowChanged:nil];
     [self windowCompMinChanged:nil];
-    [self windowCompMixChanged:nil];
+    [self windowCompMaxChanged:nil];
     [self discWidthChanged:nil];
     [self baselineStartChanged:nil];
     [self baselineDelayChanged:nil];
@@ -1247,7 +1175,7 @@
 
 - (void) initSerDesStateChanged:(NSNotification*) aNote
 {
-    [initSerDesStateField setStringValue:[model initSerDesStateName]];
+    [initSerDesStateField setStringValue:[model serDesStateName]];
 }
 
 - (void) forceFullCardInitChanged:(NSNotification*)aNote
@@ -1288,42 +1216,7 @@
 - (void) firmwareVersionChanged:(NSNotification*)aNote
 {
 }
-- (void) fifoEmptyChanged:(NSNotification*)aNote
-{
-}
-- (void) fifoEmpty1Changed:(NSNotification*)aNote
-{
-}
-- (void) fifoAlmostEmptyChanged:(NSNotification*)aNote
-{
-}
-- (void) fifoHalfFullChanged:(NSNotification*)aNote
-{
-}
-- (void) fifoAlmostFullChanged:(NSNotification*)aNote
-{
-}
-- (void) fifoFullChanged:(NSNotification*)aNote
-{
-}
-- (void) fifoFull1Changed:(NSNotification*)aNote
-{
-}
-- (void) phSuccessChanged:(NSNotification*)aNote
-{
-}
-- (void) phFailureChanged:(NSNotification*)aNote
-{
-}
-- (void) phHuntingUpChanged:(NSNotification*)aNote
-{
-}
-- (void) phHuntingDownChanged:(NSNotification*)aNote
-{
-}
-- (void) phCheckingChanged:(NSNotification*)aNote
-{
-}
+
 - (void) acqDcmCtrlStatusChanged:(NSNotification*)aNote
 {
 }
@@ -1567,7 +1460,7 @@
 
 - (void) rawDataLengthChanged:(NSNotification*)aNote
 {
-    //waveform Offset
+    //waveform length
     [rawDataLengthField setIntValue:[model rawDataLength:0]];
 }
 
@@ -1580,18 +1473,22 @@
 {
     [dWindowField setIntValue:[model dWindow:0]];
 }
+
 - (void) kWindowChanged:(NSNotification*)aNote
 {
     [kWindowField setIntValue:[model kWindow:0]];
 }
+
 - (void) mWindowChanged:(NSNotification*)aNote
 {
     [mWindowField setIntValue:[model mWindow:0]];
 }
+
 - (void) d3WindowChanged:(NSNotification*)aNote
 {
     [d3WindowField setIntValue:[model d3Window:0]];
 }
+
 - (void) discWidthChanged:(NSNotification*)aNote
 {
     [discWidthField setIntValue:[model discWidth:0]];
@@ -1959,7 +1856,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Reset of Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A Reset", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A Reset", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1974,7 +1871,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Init of Gretina4A FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -1990,7 +1887,7 @@
     }
     @catch(NSException* localException) {
         NSLog(@"Init of Gretina4A FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A Init", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2004,7 +1901,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina4A FIFO FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4A FIFO Clear", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Gretina4A FIFO Clear", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2036,7 +1933,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2064,7 +1961,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"LED Threshold Finder for Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2077,7 +1974,7 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"Probe Gretina4A Board FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
+        ORRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
     }
 }
@@ -2196,14 +2093,17 @@
 {
     [model setPileupWaveformOnlyMode:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
+
 - (IBAction) decimationFactorAction:(id)sender
 {
     [model setDecimationFactor:[sender indexOfSelectedItem]];
 }
+
 - (IBAction) writeFlagAction:(id)sender
 {
     [model setWriteFlag:[sender intValue]];
 }
+
 - (IBAction) pileupModeAction:(id)sender
 {
     [model setPileupMode:[[sender selectedCell] tag] withValue:[sender intValue]];
@@ -2268,11 +2168,11 @@
 {
     [model setBaselineStart:0 withValue:[sender intValue]];
 }
+
 - (IBAction) baselineDelayAction:(id)sender
 {
     [model setBaselineDelay:[sender intValue]];
 }
-
 
 - (IBAction) p1WindowAction:(id)sender
 {
@@ -2288,10 +2188,12 @@
 {
     [model setTriggerConfig:[sender indexOfSelectedItem]];
 }
+
 - (IBAction) windowCompMinAction:(id)sender
 {
     [model setWindowCompMin:[sender intValue]];
 }
+
 - (IBAction) windowCompMaxAction:(id)sender
 {
     [model setWindowCompMax:[sender intValue]];

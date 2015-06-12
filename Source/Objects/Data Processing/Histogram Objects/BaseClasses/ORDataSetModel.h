@@ -85,7 +85,6 @@
 
 extern NSString* ORDataSetModelPausedChanged;
 extern NSString* ORDataSetModelRefreshModeChanged;
-extern NSString* ORDataSetModelRemoved;
 extern NSString* ORDataSetDataChanged;
 extern NSString* ORDataSetCalibrationChanged;
 

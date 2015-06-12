@@ -90,10 +90,13 @@ enum {
     int             percentZeroOff;
     int             totalCycleZTime;
     BOOL            isRunning;
+    BOOL            useHWReset;
     
 }
 
 #pragma mark ***Accessors
+- (BOOL)            useHWReset;
+- (void)            setUseHWReset:(BOOL)aValue;
 - (int)             totalCycleZTime;
 - (void)            setTotalCycleZTime:(int)aTotalCycleZTime;
 - (int)             percentZeroOff;
@@ -171,6 +174,7 @@ enum {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORCaen792ModelUseHWResetChanged;
 extern NSString* ORCaen792ModelTotalCycleZTimeChanged;
 extern NSString* ORCaen792ModelPercentZeroOffChanged;
 extern NSString* ORCaen792ModelCycleZeroSuppressionChanged;

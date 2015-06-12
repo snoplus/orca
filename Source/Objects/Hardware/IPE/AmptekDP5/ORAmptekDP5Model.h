@@ -277,6 +277,7 @@
     int isPollingSpectrum;
     struct timeval lastRequestTime;//    struct timezone tz; is obsolete ... -tb-
     
+    NSString* lastRequest;
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Initialization
@@ -294,6 +295,8 @@
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (NSString*) lastRequest;
+- (void) setLastRequest:(NSString*)aLastRequest;
 - (int) isPollingSpectrum;
 - (void) setIsPollingSpectrum:(int)aIsPollingSpectrum;
 - (void) requestSpectrumTimedWorker;

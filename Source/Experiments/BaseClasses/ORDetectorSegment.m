@@ -455,15 +455,15 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
 
 - (id) description
 {		
-	NSString* string = [NSString stringWithFormat:@"       Segment: %d\n",[self segmentNumber]];
+	NSString* string = [NSString stringWithFormat:@"         Segment: %d\n",[self segmentNumber]];
 	NSString* theModel = [(NSObject*)hardwareCard className];
 	if([theModel hasPrefix:@"OR"]) theModel   = [theModel substringFromIndex:2];
 	if([theModel hasSuffix:@"Model"])theModel = [theModel substringToIndex:[theModel length]-[@"Model"length]];
-	string = [string stringByAppendingFormat:     @"     Adc Class: %@\n",theModel];
-	string = [string stringByAppendingFormat:     @"     Threshold: %lu\n",[self threshold]];
+	string = [string stringByAppendingFormat:     @"       Adc Class: %@\n",theModel];
+	string = [string stringByAppendingFormat:     @"       Threshold: %lu\n",[self threshold]];
 	for(id aKey in params){
 		const char *theKeyAsCString = [[aKey substringFromIndex:1] cStringUsingEncoding:NSASCIIStringEncoding];
-		NSString* p = [NSString stringWithFormat:   @"%15s: %@\n",theKeyAsCString,[params objectForKey:aKey]];
+		NSString* p = [NSString stringWithFormat:   @"%17s: %@\n",theKeyAsCString,[params objectForKey:aKey]];
 		string = [string stringByAppendingString:[p substringFromIndex:1]];
 	}
 	//string = [string stringByAppendingFormat:   @"Slot     : %d\n",[self cardSlot]];

@@ -220,17 +220,13 @@ NSString* ORVXMMotorTypeChanged         = @"ORVXMMotorTypeChanged";
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super init];
-	[[owner undoManager] disableUndoRegistration];
-	[self setAbsoluteMotion:[decoder decodeBoolForKey: @"absoluteMotion"]];	
+	[self setAbsoluteMotion:[decoder decodeBoolForKey: @"absoluteMotion"]];
 	[self setMotorEnabled:	[decoder decodeBoolForKey: @"motorEnabled"]];	
 	[self setConversion:	[decoder decodeFloatForKey:@"conversion"]];
 	[self setFullScale:		[decoder decodeIntForKey:  @"fullScaleInt"]];
 	[self setMotorSpeed:	[decoder decodeIntForKey:  @"motorSpeedInt"]];
 	[self setTargetPosition:[decoder decodeIntForKey:  @"targetPosition"]];
 	[self setMotorType:     [decoder decodeIntForKey:  @"motorType"]];
-	
-	[[owner undoManager] enableUndoRegistration];
-		
 	return self;
 }
 

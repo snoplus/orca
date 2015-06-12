@@ -70,6 +70,8 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	[scriptName release];
 	[inputValues release];
 	[scriptRunner release];
+    [temporaryStore release];
+    [persistantStore release];
     [super dealloc];
 }
 
@@ -891,6 +893,18 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		}
 	}
 }
+- (id)   temporaryObjectWithKey:(id)aKey
+{
+    return [temporaryStore objectForKey:aKey];
+}
+
+- (void) setTemporaryObject:(id)anObj forKey:(id)aKey
+{
+    if(!temporaryStore){
+        temporaryStore = [[NSMutableDictionary dictionary] retain];
+    }
+    [temporaryStore setObject:anObj forKey:aKey];
+}
 
 - (id)   storedObjectWithKey:(id)aKey
 {
@@ -917,7 +931,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     
     [[self undoManager] disableUndoRegistration];
 	
-    persistantStore = 	[[decoder decodeObjectForKey:@"persistantStore"] retain];
+    persistantStore             = 	[[decoder decodeObjectForKey:@"persistantStore"] retain];
     [self setPeriodicRunInterval:	[decoder decodeIntForKey:@"periodicRunInterval"]];
     [self setRunPeriodically:		[decoder decodeBoolForKey:@"runPeriodically"]];
     [self setAutoRunAtQuit:			[decoder decodeBoolForKey:@"autoRunAtQuit"]];

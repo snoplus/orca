@@ -64,6 +64,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Thresholds",         false,	false, 	false,	0x1080,		kReadWrite,	kD16},
 };
 
+NSString* ORCaen792ModelUseHWResetChanged             = @"ORCaen792ModelUseHWResetChanged";
 NSString* ORCaen792ModelTotalCycleZTimeChanged        = @"ORCaen792ModelTotalCycleZTimeChanged";
 NSString* ORCaen792ModelPercentZeroOffChanged         = @"ORCaen792ModelPercentZeroOffChanged";
 NSString* ORCaen792ModelCycleZeroSuppressionChanged   = @"ORCaen792ModelCycleZeroSuppressionChanged";
@@ -208,6 +209,19 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     slideConstant = aSlideConstant;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelSlideConstantChanged object:self];
+}
+- (BOOL) useHWReset
+{
+    return useHWReset;
+}
+
+- (void) setUseHWReset:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseHWReset:useHWReset];
+    
+    useHWReset = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelUseHWResetChanged object:self];
 }
 
 - (BOOL) slidingScaleEnable
@@ -552,7 +566,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 
 - (void) initBoard
 {
-    [self doSoftClear];
+    if(!useHWReset)[self doSoftClear];
     [self writeThresholds];
     [self writeIPed];
     [self writeBit2Register];
@@ -807,6 +821,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
+    [self setUseHWReset:            [aDecoder decodeBoolForKey: @"useHWReset"]];
     [self setTotalCycleZTime:       [aDecoder decodeIntForKey:  @"totalCycleZTime"]];
     [self setPercentZeroOff:        [aDecoder decodeIntForKey:  @"percentZeroOff"]];
     [self setCycleZeroSuppression:  [aDecoder decodeBoolForKey: @"cycleZeroSuppression"]];
@@ -837,6 +852,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+    [anEncoder encodeBool:useHWReset              forKey:@"useHWReset"];
 	[anEncoder encodeInt:totalCycleZTime          forKey:@"totalCycleZTime"];
 	[anEncoder encodeInt:percentZeroOff           forKey:@"percentZeroOff"];
 	[anEncoder encodeBool:cycleZeroSuppression    forKey:@"cycleZeroSuppression"];
@@ -920,6 +936,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 
+    [objDictionary setObject:[NSNumber numberWithBool:useHWReset]             forKey:@"useHWReset"];
     [objDictionary setObject:[NSNumber numberWithInt:slideConstant]           forKey:@"slideConstant"];
     [objDictionary setObject:[NSNumber numberWithBool:slidingScaleEnable]     forKey:@"slidingScaleEnable"];
     [objDictionary setObject:[NSNumber numberWithBool:overflowSuppressEnable] forKey:@"overflowSuppressEnable"];

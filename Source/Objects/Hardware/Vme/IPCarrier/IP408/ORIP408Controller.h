@@ -23,11 +23,9 @@
 #import "ORIP408Model.h"
 #import "ORContainerController.h"
 
-@class ORTriggerLogicView;
 
 @interface ORIP408Controller : ORContainerController  {
 	@private
-    IBOutlet ORTriggerLogicView* logicView;
 	IBOutlet NSTextField* writeMaskDecimalField;
 	IBOutlet NSTextField* writeMaskHexField;
 	IBOutlet NSMatrix* 	  writeMaskBitMatrix;

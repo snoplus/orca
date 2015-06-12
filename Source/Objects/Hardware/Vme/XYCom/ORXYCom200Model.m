@@ -233,7 +233,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 		NSLog(@"PI/T #%d\n",i+1);
 		//the general control reg
 		[self read:kGeneralControl returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Mode    : %@\n", (aValue>>6) & 0x3);
+		NSLogFont(monoSpacedFont,@"Mode    : %d\n", (aValue>>6) & 0x3);
 		NSLogFont(monoSpacedFont,@"H12     : %@\n", ((aValue>>4) & 0x1)?@"Enabled":@"Disabled");
 		NSLogFont(monoSpacedFont,@"H34     : %@\n", ((aValue>>5) & 0x1)?@"Enabled":@"Disabled");
 		NSLogFont(monoSpacedFont,@"H1 Sense: %@\n", ((aValue>>0) & 0x1)?@"Active High":@"Active Low");

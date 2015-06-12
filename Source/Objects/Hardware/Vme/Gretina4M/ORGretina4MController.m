@@ -531,7 +531,7 @@
 
 - (void) initSerDesStateChanged:(NSNotification*) aNote
 {
-    [initSerDesStateField setStringValue:[model initSerDesStateName]];
+    [initSerDesStateField setStringValue:[model serDesStateName]];
 }
 
 - (void) histEMultiplierChanged:(NSNotification*)aNote
@@ -1032,14 +1032,16 @@
     [externalWindowField        setEnabled:!lockedOrRunningMaintenance && !downloading];
     [extTrigLengthField         setEnabled:!lockedOrRunningMaintenance && !downloading];
 
-    [mrpsdvMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [mrpsrtMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [prerecntMatrix          setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [postrecntMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
-    [ftCntMatrix           setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [mrpsdvMatrix       setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [mrpsrtMatrix       setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [prerecntMatrix     setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [postrecntMatrix    setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [ftCntMatrix        setEnabled:!lockedOrRunningMaintenance && !downloading];
 
+    [forceFullInitMatrix        setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [forceFullInitCardButton    setEnabled:!lockedOrRunningMaintenance && !downloading];
     
-    [tpolMatrix             setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [tpolMatrix         setEnabled:!lockedOrRunningMaintenance && !downloading];
     [triggerModeMatrix  setEnabled:!lockedOrRunningMaintenance && !downloading];
     
     [easySetButton      setEnabled:!lockedOrRunningMaintenance && !downloading];

@@ -53,7 +53,6 @@ smellieRunFile;
     return self;
 }
 
-<<<<<<< HEAD
 -(void)windowDidLoad
 {
     
@@ -78,13 +77,11 @@ smellieRunFile;
     self.snopRunTypeMaskDic = temp;
 }
 
-=======
 - (void) dealloc
 {
     [blankView release];
     [super dealloc];
 }
->>>>>>> 9cd190b44fb0833c26f974bd2faff603cb61c9da
 
 - (NSString*) defaultPrimaryMapFilePath
 {
