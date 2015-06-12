@@ -393,7 +393,7 @@
     [startButton         setEnabled:!locked];
     [startButton         setTitle:   sentryRunning?@"Stop":@"Start"];
     [toggleButton        setEnabled:!locked & aRunIsInProgress];
-    [sbcPasswordField    setEnabled:!locked & !aRunIsInProgress];
+    [sbcPasswordField    setEnabled:!locked & aRunIsInProgress];
     [updateShapersButton setEnabled:!locked & !localRunInProgress];
 }
 
