@@ -23,6 +23,7 @@
 #import "OROrderedObjHolding.h"
 #import "Sno_Monitor_Adcs.h"
 #import "ORXL3Model.h"
+#import "ORHWWizard.h"
 #import "ORDataTaker.h"
 
 @class ORFecDaughterCardModel;
@@ -177,7 +178,7 @@ typedef struct Fec32CmosShiftReg{
 	unsigned short	cmos_shift_item[7];
 } aFec32CmosShiftReg;
 
-@interface ORFec32Model :  ORSNOCard <ORDataTaker,OROrderedObjHolding>
+@interface ORFec32Model :  ORSNOCard <ORDataTaker,OROrderedObjHolding, ORHWWizard>
 {
 	unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
 	unsigned char	vRes;		//VRES for bipolar chip
@@ -207,12 +208,21 @@ typedef struct Fec32CmosShiftReg{
 	eFecMonitorState  adcVoltageStatusOfCard;
 	eFecMonitorState  adcVoltageStatus[kNumFecMonitorAdcs];
     int variableDisplay;
+
+    // variables used during Hardware Wizard actions
+    unsigned long   startSeqDisabledMask;
+    unsigned long   startPedEnabledMask;
+    unsigned long   startTrigger20nsDisabledMask;
+    unsigned long   startTrigger100nsDisabledMask;
+    unsigned long   startOnlineMask;
+    BOOL            cardChangedFlag;
 }
 
 - (void) setUpImage;
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (int)             stationNumber;
 - (unsigned long)	cmosReadDisabledMask;
 - (void)			setCmosReadDisabledMask:(unsigned long)aCmosReadDisabledMask;
 - (BOOL)			cmosReadDisabled:(short)aChannel;
@@ -228,21 +238,40 @@ typedef struct Fec32CmosShiftReg{
 - (void)			setVariableDisplay:(int)aVariableDisplay;
 - (unsigned long)	pedEnabledMask;
 - (void)			setPedEnabledMask:(unsigned long) aMask;
+- (void)            setPed:(short)chan enabled:(short)state;
+- (BOOL)            pedEnabled:(short)chan;
 - (unsigned long)	onlineMask;
 - (void)			setOnlineMask:(unsigned long) aMask;
+- (void)			setOnlineMaskNoInit:(unsigned long) aMask;
+- (BOOL)            getOnline:(short)chan;
+- (void)            setOnline:(short)chan enabled:(short)state;
 - (unsigned long)	seqDisabledMask;
 - (void)			setSeqDisabledMask:(unsigned long) aMask;
+- (void)			setSeq:(short)chan enabled:(short)state;
 - (BOOL)			seqDisabled:(short)chan;
+- (BOOL)			seqEnabled:(short)chan;
 - (BOOL)			trigger20nsDisabled:(short)chan;
 - (BOOL)			trigger100nsDisabled:(short)chan;
+- (BOOL)			trigger20nsEnabled:(short)chan;
+- (BOOL)			trigger100nsEnabled:(short)chan;
+- (BOOL)			trigger20ns100nsEnabled:(short)chan;
 - (void)			setTrigger20ns:(short) chan disabled:(short)state;
 - (void)			setTrigger100ns:(short) chan disabled:(short)state;
+- (void)            setTrigger20ns:(short)chan enabled:(short)state;
+- (void)            setTrigger100ns:(short)chan enabled:(short)state;
+- (void)            setTrigger20ns100ns:(short)chan enabled:(short)state;
 - (unsigned long)	trigger20nsDisabledMask;
 - (void)			setTrigger20nsDisabledMask:(unsigned long) aMask;
 - (unsigned long)	trigger100nsDisabledMask;
 - (void)			setTrigger100nsDisabledMask:(unsigned long) aMask;
 - (BOOL)			qllEnabled;
 - (void)			setQllEnabled:(BOOL) aState;
+- (short)           getVth:(short)chan;
+- (void)            setVth:(short)chan withValue:(short)aValue;
+- (void)            setVthToEcal:(short)chan;
+- (void)            setVthToMax:(short)chan;
+- (short)           getVThAboveZero:(short)chan;
+- (void)            setVThAboveZero:(short)chan withValue:(unsigned char)aValue;
 
 - (int)				globalCardNumber;
 - (NSComparisonResult) globalCardNumberCompare:(id)aCard;
@@ -257,13 +286,19 @@ typedef struct Fec32CmosShiftReg{
 - (float)			hVRef;
 - (void)			setHVRef:(float)aValue;
 - (BOOL)			pmtOnline:(unsigned short)index;
-- (float)			adcVoltage:(int)index; 
+- (float)			adcVoltage:(int)index;
 - (void)			setAdcVoltage:(int)index withValue:(float)aValue;
 - (eFecMonitorState)adcVoltageStatus:(int)index;
 - (void)			setAdcVoltageStatus:(int)index withValue:(eFecMonitorState)aState;
 - (eFecMonitorState)adcVoltageStatusOfCard;
 - (void)			setAdcVoltageStatusOfCard:(eFecMonitorState)aState;
 
+
+#pragma mark •••Notifications
+- (void) registerNotificationObservers;
+- (void) hwWizardActionBegin:(NSNotification*)aNote;
+- (void) hwWizardActionEnd:(NSNotification*)aNote;
+- (void) hwWizardActionFinal:(NSNotification*)aNote;
 
 #pragma mark Converted Data Methods
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
