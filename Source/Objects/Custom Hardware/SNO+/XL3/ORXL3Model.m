@@ -108,6 +108,8 @@ extern NSString* ORSNOPRequestHVStatus;
 @synthesize
 xl3MegaBundleDataId = _xl3MegaBundleDataId,
 pmtBaseCurrentDataId = _pmtBaseCurrentDataId,
+relayHighMask = relayHighMask,
+relayLowMask = relayLowMask,
 cmosRateDataId = _cmosRateDataId,
 xl3FifoDataId = _xl3FifoDataId,
 xl3HvDataId = _xl3HvDataId,
@@ -1312,6 +1314,8 @@ void SwapLongBlock(void* p, int32_t n)
     [self setIsPollingXl3WithRun:   [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3WithRun"]];
     [self setIsPollingVerbose:      [decoder decodeBoolForKey:@"ORXL3ModelIsPollingVerbose"]];
     [self setRelayMask:[decoder decodeInt64ForKey:@"ORXL3ModelRelayMask"]];
+    [self setRelayLowMask:[decoder decodeInt32ForKey:@"ORXL3ModelRelayLowMask"]];
+    [self setRelayHighMask:[decoder decodeInt32ForKey:@"ORXL3ModelRelayHighMask"]];
     [self setHvAVoltageDACSetValue:[decoder decodeIntForKey:@"ORXL3ModelHvAVoltageDACSetValue"]];
     [self setHvBVoltageDACSetValue:[decoder decodeIntForKey:@"ORXL3ModelHvBVoltageDACSetValue"]];
     [self setHvAVoltageTargetValue:[decoder decodeIntForKey:@"ORXL3ModelhvAVoltageTargetValue"]];
@@ -1393,6 +1397,8 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:_hvNominalVoltageA forKey:@"ORXL3ModelHvNominalVoltageA"];
     [encoder encodeInt:_hvNominalVoltageB forKey:@"ORXL3ModelHvNominalVoltageB"];
     [encoder encodeInt64:relayMask forKey:@"ORXL3ModelRelayMask"];
+    [encoder encodeInt32:relayLowMask forKey:@"ORXL3ModelRelayLowMask"];
+    [encoder encodeInt32:relayHighMask forKey:@"ORXL3ModelRelayHighMask"];
     [encoder encodeInt:_hvACMOSRateLimit forKey:@"ORXL3ModelhvACMOSRateLimit"];
     [encoder encodeInt:_hvBCMOSRateLimit forKey:@"ORXL3ModelhvBCMOSRateLimit"];
     [encoder encodeInt:_hvACMOSRateIgnore forKey:@"ORXL3ModelhvACMOSRateIgnore"];

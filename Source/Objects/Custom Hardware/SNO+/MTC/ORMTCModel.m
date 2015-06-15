@@ -34,6 +34,7 @@
 #import "ORSelectorSequence.h"
 #import "ORRunModel.h"
 #import "ORCaen1720Model.h"
+#import "ORRunController.h"
 
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
@@ -1485,7 +1486,7 @@ resetFifoOnStart = _resetFifoOnStart;
 	//set the 10MHz counter to a time based on the number of seconds since 1/1/1996 (GMT)
 	//static unsigned long theSecondsToSubtract = 0;
     
-    double theTicks10MHz = [[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
+    double theTicks10MHz = [[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
 	
     theTicks10MHz /= 100.E-9;
     unsigned long theLowerBits  = (unsigned long) fmod(theTicks10MHz,4294967296.0);
@@ -1581,7 +1582,8 @@ resetFifoOnStart = _resetFifoOnStart;
 	static unsigned long theSecondsToAdd = 0;
 	
  	if( theSecondsToAdd == 0 ) {
-		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
+		NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"GMT"];
+		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:timeZone]];
  	}
 	
     return theSecondsToAdd + (unsigned long)[self get10MHzSeconds];
@@ -1939,14 +1941,25 @@ resetFifoOnStart = _resetFifoOnStart;
 	//Fire Pedestal pulses at a pecified period in ms, with a specifed 
 	//GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
-	@try {
-		[self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
-		[self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
-	}
-	@catch(NSException* e) {
-		NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
+    
+    //get the run controller
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel* runControl;
+    runControl = [objs objectAtIndex:0];
+    //access the run control and only allow this to happen if a run is going
+    if([runControl isRunning]){
+            @try {
+                [self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
+                [self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
+            }
+            @catch(NSException* e) {
+                NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+                NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+            }
+    }
+    else{
+        NSLog(@"MTC failed to fire pedestals because there is no run going!\n");
+    }
 }
 
 - (void) basicMTCPedestalGTrigSetup

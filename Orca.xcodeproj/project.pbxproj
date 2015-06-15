@@ -317,6 +317,18 @@
 		5B5A40551A79385C00543633 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */; };
 		5B5A40561A79385C00543633 /* SIS3305.nib in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404D1A79385C00543633 /* SIS3305.nib */; };
 		5B5A40571A79385C00543633 /* SIS3305Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404E1A79385C00543633 /* SIS3305Card.gif */; };
+		6B40D6471B2B79170000F7C1 /* CameraPic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6411B2B79170000F7C1 /* CameraPic.jpg */; };
+		6B40D6481B2B79170000F7C1 /* SNOPCamera.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */; };
+		6B40D6491B2B79170000F7C1 /* SNOPCameraController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B40D6431B2B79170000F7C1 /* SNOPCameraController.h */; };
+		6B40D64A1B2B79170000F7C1 /* SNOPCameraController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B40D6441B2B79170000F7C1 /* SNOPCameraController.m */; };
+		6B40D64B1B2B79170000F7C1 /* SNOPCameraModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B40D6451B2B79170000F7C1 /* SNOPCameraModel.h */; };
+		6B40D64C1B2B79170000F7C1 /* SNOPCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B40D6461B2B79170000F7C1 /* SNOPCameraModel.m */; };
+		6B40D6611B2B79960000F7C1 /* resistor.png in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D65B1B2B79960000F7C1 /* resistor.png */; };
+		6B40D6621B2B79960000F7C1 /* ResistorDBModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B40D65C1B2B79960000F7C1 /* ResistorDBModel.h */; };
+		6B40D6631B2B79960000F7C1 /* ResistorDBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B40D65D1B2B79960000F7C1 /* ResistorDBModel.m */; };
+		6B40D6641B2B79960000F7C1 /* ResistorDBViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B40D65E1B2B79960000F7C1 /* ResistorDBViewController.h */; };
+		6B40D6651B2B79960000F7C1 /* ResistorDBViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B40D65F1B2B79960000F7C1 /* ResistorDBViewController.m */; };
+		6B40D6661B2B79960000F7C1 /* ResistorDBWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6601B2B79960000F7C1 /* ResistorDBWindow.xib */; };
 		8400D08D09AD40CE000C1DA4 /* ORcPCICard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */; };
 		8400D67A09AF96C5000C1DA4 /* ORTaskSequence.h in Headers */ = {isa = PBXBuildFile; fileRef = 8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */; };
 		8400D67B09AF96C6000C1DA4 /* ORTaskSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */; };
@@ -3830,6 +3842,18 @@
 		5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		5B5A404D1A79385C00543633 /* SIS3305.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3305.nib; sourceTree = "<group>"; };
 		5B5A404E1A79385C00543633 /* SIS3305Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3305Card.gif; sourceTree = "<group>"; };
+		6B40D6411B2B79170000F7C1 /* CameraPic.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = CameraPic.jpg; sourceTree = "<group>"; };
+		6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOPCamera.xib; sourceTree = "<group>"; };
+		6B40D6431B2B79170000F7C1 /* SNOPCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPCameraController.h; sourceTree = "<group>"; };
+		6B40D6441B2B79170000F7C1 /* SNOPCameraController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPCameraController.m; sourceTree = "<group>"; };
+		6B40D6451B2B79170000F7C1 /* SNOPCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPCameraModel.h; sourceTree = "<group>"; };
+		6B40D6461B2B79170000F7C1 /* SNOPCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPCameraModel.m; sourceTree = "<group>"; };
+		6B40D65B1B2B79960000F7C1 /* resistor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = resistor.png; sourceTree = "<group>"; };
+		6B40D65C1B2B79960000F7C1 /* ResistorDBModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResistorDBModel.h; sourceTree = "<group>"; };
+		6B40D65D1B2B79960000F7C1 /* ResistorDBModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResistorDBModel.m; sourceTree = "<group>"; };
+		6B40D65E1B2B79960000F7C1 /* ResistorDBViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResistorDBViewController.h; sourceTree = "<group>"; };
+		6B40D65F1B2B79960000F7C1 /* ResistorDBViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResistorDBViewController.m; sourceTree = "<group>"; };
+		6B40D6601B2B79960000F7C1 /* ResistorDBWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ResistorDBWindow.xib; sourceTree = "<group>"; };
 		8400D08C09AD40CE000C1DA4 /* ORcPCICard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICard.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICard.h"; sourceTree = SOURCE_ROOT; };
 		8400D67809AF96C5000C1DA4 /* ORTaskSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTaskSequence.h; sourceTree = "<group>"; };
 		8400D67909AF96C5000C1DA4 /* ORTaskSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTaskSequence.m; sourceTree = "<group>"; };
@@ -7242,6 +7266,32 @@
 				5B5A404E1A79385C00543633 /* SIS3305Card.gif */,
 			);
 			path = SIS3305;
+			sourceTree = "<group>";
+		};
+		6B40D6401B2B79170000F7C1 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				6B40D6411B2B79170000F7C1 /* CameraPic.jpg */,
+				6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */,
+				6B40D6431B2B79170000F7C1 /* SNOPCameraController.h */,
+				6B40D6441B2B79170000F7C1 /* SNOPCameraController.m */,
+				6B40D6451B2B79170000F7C1 /* SNOPCameraModel.h */,
+				6B40D6461B2B79170000F7C1 /* SNOPCameraModel.m */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		6B40D65A1B2B79960000F7C1 /* ResistorDB */ = {
+			isa = PBXGroup;
+			children = (
+				6B40D65B1B2B79960000F7C1 /* resistor.png */,
+				6B40D65C1B2B79960000F7C1 /* ResistorDBModel.h */,
+				6B40D65D1B2B79960000F7C1 /* ResistorDBModel.m */,
+				6B40D65E1B2B79960000F7C1 /* ResistorDBViewController.h */,
+				6B40D65F1B2B79960000F7C1 /* ResistorDBViewController.m */,
+				6B40D6601B2B79960000F7C1 /* ResistorDBWindow.xib */,
+			);
+			path = ResistorDB;
 			sourceTree = "<group>";
 		};
 		8402796907397B8700972B07 /* Bit3 Adaptor */ = {
@@ -10802,6 +10852,8 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				6B40D65A1B2B79960000F7C1 /* ResistorDB */,
+				6B40D6401B2B79170000F7C1 /* Camera */,
 				DBEC755318EB9E9B0077D493 /* ELLIE */,
 				8499FF8E0DC9090400E82DB4 /* SNO Base Classes */,
 				8499FE820DC8E9B700E82DB4 /* SNOCrate */,
@@ -14930,6 +14982,7 @@
 				845B140A1227E7DC0022F207 /* ORPxi6289Model.h in Headers */,
 				EFCE3ADF123DD9A2009AEBA8 /* ORXL3Decoders.h in Headers */,
 				8449CC83123E85DA009C8AA2 /* ORVHSC040nController.h in Headers */,
+				6B40D6621B2B79960000F7C1 /* ResistorDBModel.h in Headers */,
 				8449CC85123E85DA009C8AA2 /* ORVHSC040nDecoders.h in Headers */,
 				8449CC87123E85DA009C8AA2 /* ORVHSC040nModel.h in Headers */,
 				84E9F6A0123FE4D600116607 /* ORNHQ226LController.h in Headers */,
@@ -14968,6 +15021,7 @@
 				EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */,
 				EFB39FD4130BA1C5001220AC /* SNOPModel.h in Headers */,
 				84052A2E13106B65007607A4 /* ORCouchDBController.h in Headers */,
+				6B40D6491B2B79170000F7C1 /* SNOPCameraController.h in Headers */,
 				84052A3013106B65007607A4 /* ORCouchDBModel.h in Headers */,
 				8494C0251316CEBA00151E7B /* ORBootBarController.h in Headers */,
 				8494C0271316CEBA00151E7B /* ORBootBarModel.h in Headers */,
@@ -14990,6 +15044,7 @@
 				84E9C353194F42140028B7E2 /* ORPacFPDecoders.h in Headers */,
 				8459A8D6137C1FEC0029C5B6 /* ORComparatorModel.h in Headers */,
 				8483D2E4139EAB8B000C8901 /* ORCV812Controller.h in Headers */,
+				6B40D64B1B2B79170000F7C1 /* SNOPCameraModel.h in Headers */,
 				8483D2E6139EAB8B000C8901 /* ORCV812Model.h in Headers */,
 				8483D3BA139FAAB8000C8901 /* ORCV895Controller.h in Headers */,
 				8483D3BC139FAAB8000C8901 /* ORCV895Model.h in Headers */,
@@ -15076,6 +15131,7 @@
 				8415EB63152DF0970092C975 /* ORAdcProcessorController.h in Headers */,
 				8415EB65152DF0970092C975 /* ORAdcProcessorModel.h in Headers */,
 				8491303315334EAA00597004 /* ORBitProcessorController.h in Headers */,
+				6B40D6641B2B79960000F7C1 /* ResistorDBViewController.h in Headers */,
 				8491303515334EAA00597004 /* ORBitProcessorModel.h in Headers */,
 				8491303715334EAA00597004 /* ORTwoBitProcessorController.h in Headers */,
 				8491303915334EAA00597004 /* ORTwoBitProcessorModel.h in Headers */,
@@ -15458,6 +15514,7 @@
 				84EC3461079D973300188ED3 /* No617DriverHelp.plist in Resources */,
 				84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */,
 				84B5197C191D285A003A580B /* BurstMonitor.nib in Resources */,
+				6B40D6661B2B79960000F7C1 /* ResistorDBWindow.xib in Resources */,
 				8446CE1F07B847B8006CD9C4 /* AD413A.nib in Resources */,
 				8446CE2007B847B8006CD9C4 /* AD413ACard.gif in Resources */,
 				843A54D807BBE7A500534C27 /* 4ChanTriggerCard.gif in Resources */,
@@ -15583,6 +15640,7 @@
 				84C1355D0997F5CD006F2901 /* cPCICrate.gif in Resources */,
 				84C1355E0997F5CD006F2901 /* cPCICrate.nib in Resources */,
 				84C1355F0997F5CD006F2901 /* cPCICrateSmall.gif in Resources */,
+				6B40D6471B2B79170000F7C1 /* CameraPic.jpg in Resources */,
 				848E3BCB09DB0B3E0003F7A2 /* MailCenter.nib in Resources */,
 				844D8CC80A069CA200E83C57 /* MCarrier.gif in Resources */,
 				844D93050A0A79AA00E83C57 /* Pulser33220Icon.tif in Resources */,
@@ -15637,6 +15695,7 @@
 				849DA7000BF276AC00044320 /* RawPlot.gif in Resources */,
 				849DA70E0BF4DB3000044320 /* edu.washington.npl.orca.PlotTimeSeries.plist in Resources */,
 				849DA7130BF4DB3000044320 /* PlotTimeSeries.nib in Resources */,
+				6B40D6611B2B79960000F7C1 /* resistor.png in Resources */,
 				84A4E8290C187A3E00CBC222 /* IP220.gif in Resources */,
 				84A4E82A0C187A3E00CBC222 /* IP220.nib in Resources */,
 				84A4E89C0C287CA900CBC222 /* USBtoGPIB.gif in Resources */,
@@ -16117,6 +16176,7 @@
 				8458EA3A15DBCFF6005C43A9 /* MPodCrate.nib in Resources */,
 				8458EA3B15DBCFF6005C43A9 /* MPodCrate.tif in Resources */,
 				8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */,
+				6B40D6481B2B79170000F7C1 /* SNOPCamera.xib in Resources */,
 				2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */,
 				2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */,
 				84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */,
@@ -16716,6 +16776,7 @@
 				9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */,
 				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
 				9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */,
+				6B40D6631B2B79960000F7C1 /* ResistorDBModel.m in Sources */,
 				84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */,
 				84AB8BB70D2314A500EC39F2 /* ORCmdHistory.m in Sources */,
 				84AB8BC10D2314CD00EC39F2 /* crate_lib.m in Sources */,
@@ -16864,6 +16925,7 @@
 				84B28E360F4C7FD400E2B056 /* ORLDA102Controller.m in Sources */,
 				84B28E380F4C7FD400E2B056 /* ORLDA102Model.m in Sources */,
 				84B28E550F4C835500E2B056 /* ORUnivVoltController.m in Sources */,
+				6B40D6651B2B79960000F7C1 /* ResistorDBViewController.m in Sources */,
 				84B28E570F4C835500E2B056 /* ORUnivVoltDecoders.m in Sources */,
 				84B28E590F4C835500E2B056 /* ORUnivVoltModel.m in Sources */,
 				84B28E5F0F4C835500E2B056 /* ORUnivVoltHVCrateController.m in Sources */,
@@ -17118,6 +17180,7 @@
 				CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */,
 				CE6CCDDE146732D90099238D /* vxi11_clnt.c in Sources */,
 				CE6CCDE1146732D90099238D /* vxi11_xdr.c in Sources */,
+				6B40D64C1B2B79170000F7C1 /* SNOPCameraModel.m in Sources */,
 				CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */,
 				848E59181472B34400A70AB4 /* ORTTCPX400DPController.m in Sources */,
 				848E591A1472B34400A70AB4 /* ORTTCPX400DPModel.m in Sources */,
@@ -17139,6 +17202,7 @@
 				8402B5B614C708A1007999C1 /* ORMJDPreAmpController.m in Sources */,
 				8402B5B814C708A1007999C1 /* ORMJDPreAmpModel.m in Sources */,
 				848F6CAB14C75F690093E502 /* ORSIS3150Controller.m in Sources */,
+				6B40D64A1B2B79170000F7C1 /* SNOPCameraController.m in Sources */,
 				848F6CAD14C75F690093E502 /* ORSIS3150Model.m in Sources */,
 				8407398314CDD91F00BAD105 /* ORMet637Controller.m in Sources */,
 				84F16AF418900D530074B787 /* ORXTR6Controller.m in Sources */,

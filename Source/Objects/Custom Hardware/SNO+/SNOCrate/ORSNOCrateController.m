@@ -144,9 +144,7 @@
 		[model initCrate:YES phase:0];
 	}
 	@catch (NSException* localException) {
-        ORRunAlertPanel([localException name], @"%@\nCrate AutoInit Failed", @"OK", nil, nil,
-                        localException);
-
+		NSBeginAlertSheet(@"Crate AutoInit Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
 		NSLog(@"AutoInit of Crate (%d) failed.\n",[model crateNumber]);
 	}
 }
@@ -158,8 +156,7 @@
 		[model initCrate:YES phase:0];
 	}
 	@catch (NSException* localException) {
-        ORRunAlertPanel([localException name], @"%@\nCrate Init Xilinx Failed", @"OK", nil, nil,
-                        localException);
+		NSBeginAlertSheet(@"Crate Init Xilinx Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
 		NSLog(@"Init Xilinx of Crate (%d) failed.\n",[model crateNumber]);
 	}
 }
@@ -171,8 +168,7 @@
 		[model initCrate:NO phase:0];
 	}
 	@catch (NSException* localException) {
-        ORRunAlertPanel([localException name], @"%@\nrate Init No Xilinx Failed", @"OK", nil, nil,
-                        localException);
+		NSBeginAlertSheet(@"Crate Init No Xilinx Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
 		NSLog(@"Init No Xilinx of Crate (%d) failed.\n",[model crateNumber]);
 	}
 }

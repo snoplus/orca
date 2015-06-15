@@ -37,6 +37,8 @@
 #define kSNOMtcTellReadout      0x0b
 
 #define kSNOMtcTellReadoutHardEnd 0x01
+#define kSNOCameraResetAll       0x0c // 0000_1100 in binary
+#define kSNOReadHVStop          0x0d //0000_1101 in binary 
 
 typedef struct {
 	int32_t baseAddress;

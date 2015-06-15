@@ -81,8 +81,8 @@ mtcModel = _mtcModel;
 - (id) init
 {
 	self = [super init];
-    [self setBaseDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0
-             timeZone:@"GMT"]];
+    [self setBaseDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0
+             timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
 
     [self setMtcDateFormatter:[[[NSDateFormatter alloc] init] autorelease]];
     [[self mtcDateFormatter] setDateFormat:@"yyyy'-'MM'-'dd' 'HH':'mm':'ss"];
@@ -107,7 +107,7 @@ mtcModel = _mtcModel;
     
     if([self isGetRatesFromDecodeStage]){
         if (![self mtcModel]) {
-            NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+            NSArray* mtcs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
             if (mtcs && [mtcs count] > 0) {
                 [self setMtcModel:[mtcs objectAtIndex:0]];
             }

@@ -64,7 +64,9 @@ void processSNOCommand(SBC_Packet* aPacket)
 		case kSNOMtcatResetMtcat: mtcatResetMtcat(aPacket); break;
 		case kSNOMtcatResetAll:mtcatResetAll(aPacket); break;
 		case kSNOMtcatLoadCrateMask: mtcatLoadCrateMask(aPacket); break;
+        case kSNOReadHVStop: hvEStopPoll(aPacket); break;
         case kSNOMtcTellReadout: mtcTellReadout(aPacket); break;
+        case kSNOCameraResetAll: cameraResetAll( aPacket ); break;
 	}
 }
 
@@ -1313,6 +1315,50 @@ exit:
     writeBuffer(aPacket);
 }
 
+void hvEStopPoll(SBC_Packet* aPacket)
+{
+    uint32_t* p = (uint32_t*) aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    //unsigned int crate_mask = p[0];
+    //unsigned char mtcat_id = p[1];
+    int32_t responseFromHv = 0;
+    
+    char* dl_err;
+    void* hdl = NULL;
+    //int (*load_crate_mask) (unsigned int, unsigned char);
+    int (*hv_stop_ok)( );
+    
+    //printf("load crate mask 0x%08x to mtca+ %d\n", crate_mask, mtcat_id);
+    
+    hdl = dlopen("libmtcat_lj.so", RTLD_LAZY);
+    if (hdl == NULL) {
+        responseFromHv = 300;
+        LogError("libmtcat_lj.so not found\n");
+        goto exit;
+    }
+    
+    dlerror();
+    
+    hv_stop_ok = ( int(*)() )dlsym(hdl, "hv_stop_ok");
+    if ((dl_err = dlerror()) != NULL) {
+        LogError("%s, %d\n", dl_err, stderr);
+        responseFromHv = 100;
+        goto early_exit;
+    }
+    
+    responseFromHv = hv_stop_ok();
+    //printf("done with error_code: %d\n", error_code);
+    
+early_exit:
+    dlclose(hdl);
+    
+exit:
+    p[0] = responseFromHv;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    writeBuffer(aPacket);
+}
+
 void mtcTellReadout(SBC_Packet* aPacket)
 {
     uint32_t* p = (uint32_t*) aPacket->payload;
@@ -1335,4 +1381,55 @@ void mtcTellReadout(SBC_Packet* aPacket)
     p[0] = error_code;
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
     writeBuffer(aPacket);
+}
+
+void cameraResetAll( SBC_Packet* aPacket )
+{
+    uint32_t* p = (uint32_t*)aPacket->payload; // a stream of bits
+    
+    if( needToSwap )
+        SwapLongBlock( p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t) );
+    
+    int32_t error_code = 0;
+    
+    char* dl_err;
+    void* hdl = NULL;
+    int( *reset_all )( );
+    
+    hdl = dlopen( "libmtcat_lj.so", RTLD_LAZY );
+    
+    if( hdl == NULL )
+    {
+        error_code = 1;
+        
+        LogError( "libmtcat_lj.so not found\n" );
+        
+        goto exit;
+    }
+    
+    dlerror( );
+    
+    reset_all = ( int(*)() )dlsym( hdl, "turn_camera_on" );
+    
+    if( (dl_err = dlerror()) != NULL )
+    {
+        LogError( "%s, %d\n", dl_err, stderr );
+        
+        error_code = 2;
+        
+        goto early_exit;
+    }
+    
+    error_code = reset_all( );
+    
+early_exit:
+    dlclose( hdl );
+    
+exit:
+    p[0] = error_code;
+    
+    if( needToSwap )
+        SwapLongBlock( p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t) );
+    
+    writeBuffer( aPacket );
 }

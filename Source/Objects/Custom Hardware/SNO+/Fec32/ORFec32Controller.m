@@ -528,9 +528,7 @@
 		[model autoInit];
 	}
 	@catch (NSException* localException) {
-        ORRunAlertPanel([localException name], @"%@\nFec32 AutoInit Failed", @"OK", nil, nil,
-                        localException);
-
+		NSBeginAlertSheet(@"Fec32 AutoInit Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
 		NSLog(@"AutoInit of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
 	}
 }
@@ -543,8 +541,7 @@
 				[model readVoltages];
 			}
 			@catch (NSException* localException) {
-                ORRunAlertPanel([localException name], @"%@\nFec32 Voltage Read Failed", @"OK", nil, nil,
-                                localException);
+				NSBeginAlertSheet(@"Fec32 Voltage Read Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
 				NSLog(@"Read Voltages of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
 			}
 		break;
@@ -563,9 +560,8 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Scan of Fec32 FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nFec32 Scan Failed", @"OK", nil, nil,
-                        localException);
-    }
+		NSBeginAlertSheet(@"Fec32 Scan Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
+	}
 }
 
 - (IBAction) probeAction:(id)sender
@@ -575,8 +571,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Probe of Fec32 FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nFec32 Probe Failed", @"OK", nil, nil,
-                        localException);
+		NSBeginAlertSheet(@"Fec32 Probe Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
 	}
 }
 

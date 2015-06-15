@@ -41,7 +41,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNOCableDB);
 {
 	if(!aPath)aPath = @"";
 
-    [[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setCableDBFilePath:cableDBFilePath];
+    [[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setCableDBFilePath:cableDBFilePath];
 	
 	[cableDBFilePath autorelease];
 	cableDBFilePath = [aPath copy];
@@ -90,7 +90,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNOCableDB);
 		NSCharacterSet* letterSet = [whiteSpace invertedSet];
 		NSString* cableID;
 		NSString* pmtID;
-		NSString* pcID = nil;
+		NSString* pcID;
 		NSString* chanInfo;
 		float x,y,z;
 		for(panel=0;panel<num_panels;panel++){

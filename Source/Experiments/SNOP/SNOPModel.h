@@ -31,12 +31,14 @@
 @required
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 @end
 
 #define kUseTubeView	0
 #define kUseCrateView	1
 #define kUsePSUPView	2
 #define kNumTubes	20 //XL3s
+#define kNumOfCrates 19 //number of Crates in SNO+
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
@@ -54,6 +56,7 @@
     NSString* _debugDBUserName;
     NSString* _debugDBPassword;
     NSString* _debugDBName;
+    NSString* _smellieRunNameLabel;
     unsigned int _debugDBPort;
     NSString* _debugDBIPAddress;
     NSMutableArray* _debugDBConnectionHistory;
@@ -70,6 +73,7 @@
         unsigned long pedestalWidth;
         unsigned long calType; // pattern ID (1 to 4) + 10 * (1 ped, 2 tslope, 3 qslope)
         unsigned long stepNumber;
+        unsigned long nTSlopePoints;
     } _epedStruct;
     
     struct {
@@ -85,8 +89,24 @@
     
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
+    NSDictionary* _mtcConfigDoc;
     NSMutableDictionary* _runTypeDocumentPhysics;
+    NSMutableDictionary* smellieRunHeaderDocList;
+    
+    bool _smellieDBReadInProgress;
+    bool _smellieDocUploaded;
+    NSMutableDictionary * snopRunTypeMask;
+    NSNumber * runTypeMask;
+    
+    NSThread * eStopThread;
+    
+    bool isEmergencyStopEnabled;
+    bool isEStopPolling;
 }
+
+@property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
+@property (nonatomic,retain) NSMutableDictionary* snopRunTypeMask;
+@property (nonatomic,retain) NSNumber* runTypeMask;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -100,6 +120,7 @@
 @property (nonatomic,copy) NSString* debugDBUserName;
 @property (nonatomic,copy) NSString* debugDBPassword;
 @property (nonatomic,copy) NSString* debugDBName;
+@property (nonatomic,copy) NSString* smellieRunNameLabel;
 @property (nonatomic,assign) unsigned int debugDBPort;
 @property (nonatomic,copy) NSString* debugDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
@@ -109,9 +130,16 @@
 @property (nonatomic,assign) unsigned long epedDataId;
 @property (nonatomic,assign) unsigned long rhdrDataId;
 
+@property (nonatomic,assign) bool smellieDBReadInProgress;
+@property (nonatomic,assign) bool smellieDocUploaded;
+@property (nonatomic,assign) bool isEmergencyStopEnabled;
+@property (nonatomic,assign) bool isEStopPolling;
+
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
+@property (copy) NSDictionary* mtcConfigDoc;
 
+- (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;
 - (id) orcaDBConnectionHistoryItem:(unsigned int)index;
@@ -147,6 +175,9 @@
 - (void) updateRHDRSruct;
 - (void) shipRHDRRecord;
 
+-(BOOL) eStopPoll;
+-(void) eStopPolling;
+
 #pragma mark ¥¥¥Accessors
 - (void) setViewType:(int)aViewType;
 - (int) viewType;
@@ -168,7 +199,17 @@
 #pragma mark ¥¥¥SnotDbDelegate
 - (ORCouchDB*) orcaDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
+- (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
+//run type definition functions
+- (void) setSnopRunTypeMask:(NSMutableDictionary*)aRunType;
+- (NSMutableDictionary*) getSnopRunTypeMask;
+
+//smellie functions -------
+- (void) getSmellieRunListInfo;
+- (NSMutableDictionary*)smellieTestFct;
+-(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
+-(void) testerHv;
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
@@ -186,3 +227,4 @@
 extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
+extern NSString* SNOPRunTypeChangedNotification;

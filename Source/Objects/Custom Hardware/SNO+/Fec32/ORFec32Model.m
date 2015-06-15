@@ -923,10 +923,9 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     NSNumber * crateNumberObj = [NSNumber numberWithInt:[self crateNumber]];
     [output setObject:crateNumberObj forKey:@"crate_number"];
     
-    //Global Card Number
-    NSNumber * globalCardNumberObj = [NSNumber numberWithInt:[self globalCardNumber]];
-                                      
-    [output setObject:globalCardNumberObj forKey:@"mother_board_global_card_id"];
+    //Slot Number 
+    NSNumber *slotNumber = [NSNumber numberWithInt:[self slot]];
+    [output setObject:slotNumber forKey:@"slot"];
     
     //sequencer value for DQXX
     NSNumber * sequencerValue = [NSNumber numberWithFloat:[self seqDisabledMask]];
@@ -941,7 +940,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     
     //TODO: PMTIC information
     //TODO: Cable information
-    //TODO: Not Operational (Need to query Noel's PMT DB??
+    //TODO: Not Operational (Need to query Noel's PMT DB??)
     return output;
 }
 
@@ -1445,7 +1444,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 		short channel_index;
 		for(channel_index = 0; channel_index < 16; channel_index++){
 			if ( cmosShiftRegisterValue[channel_index].cmos_shift_item[cmosRegItem] & (1UL << bit_mask) ) {
-				writeValue |= (1UL << (channel_index + 2));
+				writeValue |= (1UL << channel_index + 2);
 			}
 		}
 		
@@ -1474,7 +1473,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 		short channel_index;
 		for(channel_index = 0; channel_index < 16; channel_index++){
 			if ( cmosShiftRegisterValue[channel_index].cmos_shift_item[cmosRegItem] & (1UL << bit_mask) ) {
-				writeValue |= (1UL << (channel_index + 2));
+				writeValue |= (1UL << channel_index + 2);
 			}
 		}
 		
@@ -1666,7 +1665,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 			for (j = 8; j >= 1; j--){					// 8 bits of data per channel
 				writeValue = 0UL;
 				for (k = 2; k<= 18; k++){				// 17 octal DACs
-					if ( (1UL << (j-1) ) & dacValues[numChannels - i][k-2] ) {
+					if ( (1UL << j-1 ) & dacValues[numChannels - i][k-2] ) {
 						writeValue |= 1UL << k;
 					}
 				}
@@ -1871,7 +1870,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 			for (j = 8; j >= 1; j--){					// 8 bits of data per channel
 				writeValue = 0UL;
 				for (k = 2; k<= 18; k++){				// 17 octal DACs
-					if ( (1UL << (j-1) ) & dacValues[numChannels - i][k-2] ) {
+					if ( (1UL << j-1 ) & dacValues[numChannels - i][k-2] ) {
 						writeValue |= 1UL << k;
 					}
 				}

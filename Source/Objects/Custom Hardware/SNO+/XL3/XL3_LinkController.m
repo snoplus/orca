@@ -43,7 +43,6 @@ static NSDictionary* xl3Ops;
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    [blankView release];
 	[super dealloc];
 }
 
@@ -604,6 +603,8 @@ static NSDictionary* xl3Ops;
 
     [hvRelayMaskLowField setIntValue:relayMask & 0xffffffff];
     [hvRelayMaskHighField setIntValue:relayMask >> 32];
+    
+    [self splitRelayMask:relayMask];
 
     unsigned char slot;
     unsigned char pmtic;
@@ -622,7 +623,7 @@ static NSDictionary* xl3Ops;
 - (void) hvStatusChanged:(NSNotification*)aNote
 {
     if (!owl_crate_master) { //cache owl master
-        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         for (id xl3 in xl3s) {
             if ([xl3 crateNumber] == 16) owl_crate_master = xl3;
         }
@@ -1189,12 +1190,25 @@ static NSDictionary* xl3Ops;
 {
     [model setIsPollingXl3:false];
 }
+
+//split the relayMask into a low and high parts for posting to couchdb
+-(void)splitRelayMask:(unsigned long long)aHvRelayMask
+{
+    //split the hvRelayMask into two parts
+    uint32_t highMask = (uint32_t)((aHvRelayMask & 0xFFFFFFFF00000000ULL) >> 32);
+    uint32_t lowMask = (uint32_t)(aHvRelayMask & 0xFFFFFFFF);
+    [model setRelayHighMask:highMask];
+    [model setRelayLowMask:lowMask];
+}
+
+
 //hv
 - (IBAction)hvRelayMaskHighAction:(id)sender
 {
     [[sender window] makeFirstResponder:tabView];
     unsigned long long newRelayMask = [model relayMask] & 0xFFFFFFFFULL;
     newRelayMask |= ((unsigned long long)[sender intValue]) << 32;
+    [self splitRelayMask:newRelayMask];
     [model setRelayMask:newRelayMask];
 }
 
@@ -1203,6 +1217,7 @@ static NSDictionary* xl3Ops;
     [[sender window] makeFirstResponder:tabView];
     unsigned long long newRelayMask = [model relayMask] & (0xFFFFFFFFULL << 32);
     newRelayMask |= [sender intValue] & 0xFFFFFFFF;
+    [self splitRelayMask:newRelayMask];
     [model setRelayMask:newRelayMask];    
 }
 
@@ -1217,6 +1232,10 @@ static NSDictionary* xl3Ops;
             newRelayMask |= ([[sender cellAtRow:pmtic column:15-slot] intValue]?1ULL:0ULL) << (slot*4 + pmtic);
         }
     }
+    
+    //split the hvRelayMask into two parts
+    [self splitRelayMask:newRelayMask];
+    
     [model setRelayMask:newRelayMask];
 }
 
@@ -1250,27 +1269,13 @@ static NSDictionary* xl3Ops;
 
     if (sup == 0 && [model hvASwitch]) {
         if ([model hvAVoltageDACSetValue] > 30) {
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-            [alert setMessageText:@"Not turning OFF"];
-            [alert setInformativeText:@"Voltage too high. Ramp down first."];
-            [alert beginSheetModalForWindow:[self window] completionHandler:nil];
-#else
             NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
-#endif
             return;
         }
     }
     else if (sup == 1 && [model hvBSwitch]) {
         if ([model hvBVoltageDACSetValue] > 30) {
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-            [alert setMessageText:@"Not turning OFF"];
-            [alert setInformativeText:@"Voltage too high. Ramp down first."];
-            [alert beginSheetModalForWindow:[self window] completionHandler:nil];
-#else
             NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
-#endif
             return;
         }
     }
@@ -1313,15 +1318,8 @@ static NSDictionary* xl3Ops;
     }
     if ((sup == 0 && nextTargetValue + 20 < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue + 20 < [model hvBVoltageDACSetValue])) {
         [self hvTargetValueChanged:nil];
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-        [alert setMessageText:@"HV target NOT changed."];
-        [alert setInformativeText:@"Can not set target value lower than the current HV. Ramp down first."];
-        [alert beginSheetModalForWindow:[self window] completionHandler:nil];
-#else
         NSBeginAlertSheet (@"HV target NOT changed.",@"OK",nil,nil,[self window],self,nil,nil,nil,
                            @"Can not set target value lower than the current HV. Ramp down first.");
-#endif
         return;
     }
     if (sup == 0) {
@@ -1456,13 +1454,13 @@ static NSDictionary* xl3Ops;
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     /*
-    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
         [model hvPanicDown];
     }
      */
 
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 
     //[model hvMasterPanicDown];
     NSLog(@"Detector wide panic down started\n");
@@ -1470,12 +1468,15 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvMasterTriggerOffAction:(id)sender
 {
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+    //NSLog(@"Stop all polling of XL3s");
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
+    
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
 - (IBAction)hvMasterTriggerOnAction:(id)sender
 {
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 //connection

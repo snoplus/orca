@@ -27,7 +27,7 @@
 @interface SNOPController : ORExperimentController {
 	IBOutlet NSTextField* detectorTitle;
 	IBOutlet NSPopUpButton*	viewTypePU;
-
+    
 	NSView *blankView;
 	NSSize detectorSize;
 	NSSize detailsSize;
@@ -40,10 +40,75 @@
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
+    //Run Types Information
+    IBOutlet NSMatrix*  globalRunTypesMatrix;
+    
+    //Xl3 Mode
+    IBOutlet NSMatrix * globalxl3Mode;
+    
+    //Run information
+    IBOutlet NSTextField* currentRunNumber;
+    IBOutlet NSTextField* currentRunType;
+    IBOutlet NSTextField* currentStatus;
+    IBOutlet NSTextField* lastRunNumber;
+    IBOutlet NSTextField* lastRunType;
+
+    IBOutlet NSTextField *n100Hi;
+    IBOutlet NSTextField *n100med;
+    IBOutlet NSTextField *n20hi;
+    IBOutlet NSTextField *esumhi;
+    IBOutlet NSTextField *owln;
+    IBOutlet NSTextField *n100Lo;
+    
+    //smellie buttons ---------
+    IBOutlet NSComboBox *smellieRunFileNameField;
+    IBOutlet NSTextField *loadedSmellieRunNameLabel;
+    IBOutlet NSTextField *loadedSmellieTriggerFrequencyLabel;
+    IBOutlet NSTextField *loadedSmellieApproxTimeLabel;
+    IBOutlet NSTextField *loadedSmellieLasersLabel;
+    IBOutlet NSTextField *loadedSmellieFibresLabel;
+    IBOutlet NSTextField *loadedSmellieOperationModeLabel;
+    IBOutlet NSTextField *loadedSmellieMaxIntensityLaser;
+    IBOutlet NSTextField *loadedSmellieMinIntensityLaser;
+    
+    IBOutlet NSButton *smellieLoadRunFile;
+    IBOutlet NSButton *smellieCheckInterlock;
+    IBOutlet NSButton *smellieStartRunButton;
+    IBOutlet NSButton *smellieStopRunButton;
+    IBOutlet NSButton *smellieEmergencyStop;
+    IBOutlet NSButton *smellieBuildCustomRun;
+    IBOutlet NSButton *smellieChangeConfiguration;
+    
+    IBOutlet NSButton *tellieEnabled;
+    
+    IBOutlet NSButton *startPhysicsRunButton;
+    IBOutlet NSButton *startMaintainenceRunButton;
+    IBOutlet NSButton *newPhysicsRunButton;
+    IBOutlet NSButton *newMaintainenceRunButton;
+    
+    //eStop buttons
+    IBOutlet NSButton *emergyencyStopEnabled;
+    IBOutlet NSButton *eStopButton;
+    
+    IBOutlet NSTextField *pollingStatus;
+    
+    
     NSImage* _runStopImg;
+    NSMutableDictionary *smellieRunFileList;
+    NSDictionary *smellieRunFile;
+    NSThread *smellieThread;
+    NSNumber * runTypeMask;
+    NSThread *eStopPollingThread;
+    
+    NSMutableDictionary *snopRunTypeMaskDic; 
+    
 }
 
 @property (nonatomic,retain) NSImage* runStopImg;
+@property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
+@property (nonatomic,retain) NSMutableDictionary *snopRunTypeMaskDic;
+@property (nonatomic,retain) NSDictionary *smellieRunFile;
+@property (nonatomic,retain) NSNumber *runTypeMask;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -56,6 +121,8 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;
+
+- (IBAction) eStop:(id)sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;
@@ -74,10 +141,25 @@
 - (IBAction) hvMasterTriggersON:(id)sender;
 - (IBAction) hvMasterStatus:(id)sender;
 
+//smellie functions -------------------
+- (IBAction) loadSmellieRunAction:(id)sender;
+- (IBAction) callSmellieSettings:(id)sender;
+- (IBAction) startSmellieRunAction:(id)sender;
+- (IBAction) stopSmellieRunAction:(id)sender;
+- (IBAction) emergencySmellieStopAction:(id)sender;
+
+//eStop functions
+- (IBAction) enmergencyStopToggle:(id)sender;
+
+//xl3 mode sttaus
+- (IBAction)updatexl3Mode:(id)sender;
+
 #pragma mark ¥¥¥Details Interface Management
 - (void) setDetectorTitle;
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
+-(void) windowDidLoad;
+-(void) fetchRunMaskSettings;
 
 @end
 @interface ORDetectorView (SNO)
