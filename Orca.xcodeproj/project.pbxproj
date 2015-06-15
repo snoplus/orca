@@ -317,6 +317,14 @@
 		5B5A40551A79385C00543633 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */; };
 		5B5A40561A79385C00543633 /* SIS3305.nib in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404D1A79385C00543633 /* SIS3305.nib */; };
 		5B5A40571A79385C00543633 /* SIS3305Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404E1A79385C00543633 /* SIS3305Card.gif */; };
+		6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E071B2F4241002E2DD7 /* SNOP.xib */; };
+		6B325E0A1B2F42C8002E2DD7 /* SNOCrate.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */; };
+		6B325E0C1B2F42D8002E2DD7 /* SNORack.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */; };
+		6B325E0E1B2F4306002E2DD7 /* XL1.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0D1B2F4306002E2DD7 /* XL1.xib */; };
+		6B325E101B2F431C002E2DD7 /* XL3_Link.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */; };
+		6B325E121B2F4334002E2DD7 /* MTC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E111B2F4334002E2DD7 /* MTC.xib */; };
+		6B325E141B2F4344002E2DD7 /* Fec32.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E131B2F4344002E2DD7 /* Fec32.xib */; };
+		6B325E161B2F435A002E2DD7 /* FecDaughterCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E151B2F435A002E2DD7 /* FecDaughterCard.xib */; };
 		6B40D6471B2B79170000F7C1 /* CameraPic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6411B2B79170000F7C1 /* CameraPic.jpg */; };
 		6B40D6481B2B79170000F7C1 /* SNOPCamera.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */; };
 		6B40D6491B2B79170000F7C1 /* SNOPCameraController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B40D6431B2B79170000F7C1 /* SNOPCameraController.h */; };
@@ -1363,7 +1371,6 @@
 		844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B90DE5D5680061AE80 /* ORSNORackModel.h */; };
 		844B42C20DE5D5680061AE80 /* ORSNORackModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42BA0DE5D5680061AE80 /* ORSNORackModel.m */; };
 		844B42C50DE5D5680061AE80 /* SNORack.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844B42BD0DE5D5680061AE80 /* SNORack.gif */; };
-		844B42C60DE5D5680061AE80 /* SNORack.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844B42BE0DE5D5680061AE80 /* SNORack.nib */; };
 		844B9BED132E527700FEDA6B /* Caen1724.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844B9BE5132E527700FEDA6B /* Caen1724.nib */; };
 		844B9BEE132E527700FEDA6B /* Caen1724Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844B9BE6132E527700FEDA6B /* Caen1724Card.gif */; };
 		844B9BEF132E527700FEDA6B /* ORCaen1724Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B9BE7132E527700FEDA6B /* ORCaen1724Controller.h */; };
@@ -1940,7 +1947,6 @@
 		849191800725B43500F454F1 /* ORToolbarFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491917E0725B43500F454F1 /* ORToolbarFactory.h */; };
 		849191C70725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */; };
 		849194460725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849194450725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist */; };
-		8491E6C60EB9DFD30084BAD6 /* XL1.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8491E6C50EB9DFD30084BAD6 /* XL1.nib */; };
 		8491E6CA0EB9E1900084BAD6 /* ORXL1Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491E6C80EB9E1900084BAD6 /* ORXL1Controller.h */; };
 		8491E6CB0EB9E1900084BAD6 /* ORXL1Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491E6C90EB9E1900084BAD6 /* ORXL1Controller.m */; };
 		8491F4760EC0CDEF0084BAD6 /* ORPmtImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491F4740EC0CDEF0084BAD6 /* ORPmtImage.h */; };
@@ -2055,7 +2061,6 @@
 		8498069D09A6584200086E71 /* ORSocketThreadedClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 8498069B09A6584200086E71 /* ORSocketThreadedClient.h */; };
 		8498069E09A6584200086E71 /* ORSocketThreadedClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8498069C09A6584200086E71 /* ORSocketThreadedClient.m */; };
 		849901930DC91C5A00E82DB4 /* SNOCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849901920DC91C5A00E82DB4 /* SNOCrate.gif */; };
-		849928170DCB997C00E82DB4 /* MTC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499280F0DCB997C00E82DB4 /* MTC.nib */; };
 		849928180DCB997C00E82DB4 /* MTCCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849928100DCB997C00E82DB4 /* MTCCard.gif */; };
 		849928190DCB997C00E82DB4 /* ORMTCController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928110DCB997C00E82DB4 /* ORMTCController.h */; };
 		8499281A0DCB997C00E82DB4 /* ORMTCController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928120DCB997C00E82DB4 /* ORMTCController.m */; };
@@ -2120,7 +2125,6 @@
 		8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */; };
 		8499FE900DC8E9B700E82DB4 /* ORSNOCrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FE870DC8E9B700E82DB4 /* ORSNOCrateModel.h */; };
 		8499FE910DC8E9B700E82DB4 /* ORSNOCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE880DC8E9B700E82DB4 /* ORSNOCrateModel.m */; };
-		8499FE940DC8E9B700E82DB4 /* SNOCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499FE8B0DC8E9B700E82DB4 /* SNOCrate.nib */; };
 		8499FF910DC9090400E82DB4 /* ORSNOCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FF8F0DC9090400E82DB4 /* ORSNOCard.h */; };
 		8499FF920DC9090400E82DB4 /* ORSNOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FF900DC9090400E82DB4 /* ORSNOCard.m */; };
 		8499FFDD0DC90F5800E82DB4 /* ORXL1Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FFDA0DC90F5800E82DB4 /* ORXL1Model.h */; };
@@ -2676,14 +2680,12 @@
 		84CD6BFB1A1E34D90089026F /* ORGretina4AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CD6BF01A1E34D90089026F /* ORGretina4AModel.h */; };
 		84CD6BFC1A1E34D90089026F /* ORGretina4AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CD6BF11A1E34D90089026F /* ORGretina4AModel.m */; };
 		84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3630EA4EB2E0060076A /* Fec32.gif */; };
-		84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3640EA4EB2E0060076A /* Fec32.nib */; };
 		84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3650EA4EB2E0060076A /* Fec32Card.gif */; };
 		84CEA36F0EA4EB2E0060076A /* ORFec32Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */; };
 		84CEA3700EA4EB2E0060076A /* ORFec32Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA3670EA4EB2E0060076A /* ORFec32Controller.m */; };
 		84CEA3710EA4EB2E0060076A /* ORFec32Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA3680EA4EB2E0060076A /* ORFec32Model.h */; };
 		84CEA3720EA4EB2E0060076A /* ORFec32Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA3690EA4EB2E0060076A /* ORFec32Model.m */; };
 		84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA6E10EA623A50060076A /* FecDaughterCard.gif */; };
-		84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA6E20EA623A50060076A /* FecDaughterCard.nib */; };
 		84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA6E30EA623A50060076A /* ORFecDaughterCardController.h */; };
 		84CEA6EA0EA623A50060076A /* ORFecDaughterCardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */; };
 		84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */; };
@@ -3250,9 +3252,7 @@
 		EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = EFAC073011E9A6CB00336793 /* XL3_Link.m */; };
 		EFAC073F11E9A9DB00336793 /* XL3_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */; };
 		EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFAC073E11E9A9DB00336793 /* XL3_LinkController.m */; };
-		EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = EFAC074211E9ADB500336793 /* XL3_Link.nib */; };
 		EFB39FCE130BA1C5001220AC /* SNOP.gif in Resources */ = {isa = PBXBuildFile; fileRef = EFB39FC6130BA1C5001220AC /* SNOP.gif */; };
-		EFB39FCF130BA1C5001220AC /* SNOP.nib in Resources */ = {isa = PBXBuildFile; fileRef = EFB39FC7130BA1C5001220AC /* SNOP.nib */; };
 		EFB39FD0130BA1C5001220AC /* SNOPController.h in Headers */ = {isa = PBXBuildFile; fileRef = EFB39FC8130BA1C5001220AC /* SNOPController.h */; };
 		EFB39FD1130BA1C5001220AC /* SNOPController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB39FC9130BA1C5001220AC /* SNOPController.m */; };
 		EFB39FD2130BA1C5001220AC /* SNOPDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */; };
@@ -3842,6 +3842,14 @@
 		5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		5B5A404D1A79385C00543633 /* SIS3305.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3305.nib; sourceTree = "<group>"; };
 		5B5A404E1A79385C00543633 /* SIS3305Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3305Card.gif; sourceTree = "<group>"; };
+		6B325E071B2F4241002E2DD7 /* SNOP.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOP.xib; sourceTree = "<group>"; };
+		6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOCrate.xib; sourceTree = "<group>"; };
+		6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNORack.xib; sourceTree = "<group>"; };
+		6B325E0D1B2F4306002E2DD7 /* XL1.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = XL1.xib; sourceTree = "<group>"; };
+		6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = XL3_Link.xib; sourceTree = "<group>"; };
+		6B325E111B2F4334002E2DD7 /* MTC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MTC.xib; sourceTree = "<group>"; };
+		6B325E131B2F4344002E2DD7 /* Fec32.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Fec32.xib; sourceTree = "<group>"; };
+		6B325E151B2F435A002E2DD7 /* FecDaughterCard.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FecDaughterCard.xib; sourceTree = "<group>"; };
 		6B40D6411B2B79170000F7C1 /* CameraPic.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = CameraPic.jpg; sourceTree = "<group>"; };
 		6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOPCamera.xib; sourceTree = "<group>"; };
 		6B40D6431B2B79170000F7C1 /* SNOPCameraController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPCameraController.h; sourceTree = "<group>"; };
@@ -4644,7 +4652,6 @@
 		844B42B90DE5D5680061AE80 /* ORSNORackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.h"; sourceTree = SOURCE_ROOT; };
 		844B42BA0DE5D5680061AE80 /* ORSNORackModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackModel.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.m"; sourceTree = SOURCE_ROOT; };
 		844B42BD0DE5D5680061AE80 /* SNORack.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SNORack.gif; path = "Source/Objects/Custom Hardware/SNO+/SNORack/SNORack.gif"; sourceTree = SOURCE_ROOT; };
-		844B42BE0DE5D5680061AE80 /* SNORack.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SNORack.nib; path = "Source/Objects/Custom Hardware/SNO+/SNORack/SNORack.nib"; sourceTree = SOURCE_ROOT; };
 		844B9BE5132E527700FEDA6B /* Caen1724.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen1724.nib; path = Source/Objects/Hardware/Vme/CAEN/CV1724/Caen1724.nib; sourceTree = SOURCE_ROOT; };
 		844B9BE6132E527700FEDA6B /* Caen1724Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Caen1724Card.gif; path = Source/Objects/Hardware/Vme/CAEN/CV1724/Caen1724Card.gif; sourceTree = SOURCE_ROOT; };
 		844B9BE7132E527700FEDA6B /* ORCaen1724Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1724Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV1724/ORCaen1724Controller.h; sourceTree = SOURCE_ROOT; };
@@ -5251,7 +5258,6 @@
 		8491917E0725B43500F454F1 /* ORToolbarFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORToolbarFactory.h; path = Source/Misc/ORToolbarFactory.h; sourceTree = SOURCE_ROOT; };
 		849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Document.plist; path = "Source/Main Document/edu.washington.npl.orca.Document.plist"; sourceTree = SOURCE_ROOT; };
 		849194450725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.Waveform.plist; path = "Source/Objects/Data Processing/Histogram Objects/Waveform/edu.washington.npl.orca.Waveform.plist"; sourceTree = SOURCE_ROOT; };
-		8491E6C50EB9DFD30084BAD6 /* XL1.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XL1.nib; path = "Source/Objects/Custom Hardware/SNO+/XL1/XL1.nib"; sourceTree = SOURCE_ROOT; };
 		8491E6C80EB9E1900084BAD6 /* ORXL1Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL1Controller.h; sourceTree = "<group>"; };
 		8491E6C90EB9E1900084BAD6 /* ORXL1Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL1Controller.m; sourceTree = "<group>"; };
 		8491F4740EC0CDEF0084BAD6 /* ORPmtImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPmtImage.h; path = "Source/Objects/Misc Objects/Views/pmtImage/ORPmtImage.h"; sourceTree = SOURCE_ROOT; };
@@ -5373,7 +5379,6 @@
 		8499148804BB3E05005F64B1 /* ORDispatcherController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherController.m; sourceTree = "<group>"; };
 		8499148B04BB3E05005F64B1 /* ORDispatcherModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDispatcherModel.h; sourceTree = "<group>"; };
 		8499148C04BB3E05005F64B1 /* ORDispatcherModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherModel.m; sourceTree = "<group>"; };
-		8499280F0DCB997C00E82DB4 /* MTC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MTC.nib; path = "Source/Objects/Custom Hardware/SNO+/MTC/MTC.nib"; sourceTree = SOURCE_ROOT; };
 		849928100DCB997C00E82DB4 /* MTCCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MTCCard.gif; path = "Source/Objects/Custom Hardware/SNO+/MTC/MTCCard.gif"; sourceTree = SOURCE_ROOT; };
 		849928110DCB997C00E82DB4 /* ORMTCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCController.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCController.h"; sourceTree = SOURCE_ROOT; };
 		849928120DCB997C00E82DB4 /* ORMTCController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCController.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCController.m"; sourceTree = SOURCE_ROOT; };
@@ -5437,7 +5442,6 @@
 		8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateController.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.m"; sourceTree = SOURCE_ROOT; };
 		8499FE870DC8E9B700E82DB4 /* ORSNOCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCrateModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateModel.h"; sourceTree = SOURCE_ROOT; };
 		8499FE880DC8E9B700E82DB4 /* ORSNOCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateModel.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateModel.m"; sourceTree = SOURCE_ROOT; };
-		8499FE8B0DC8E9B700E82DB4 /* SNOCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SNOCrate.nib; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/SNOCrate.nib"; sourceTree = SOURCE_ROOT; };
 		8499FF8F0DC9090400E82DB4 /* ORSNOCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCard.h; path = "Source/Objects/Custom Hardware/SNO+/SNO Base Classes/ORSNOCard.h"; sourceTree = SOURCE_ROOT; };
 		8499FF900DC9090400E82DB4 /* ORSNOCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCard.m; path = "Source/Objects/Custom Hardware/SNO+/SNO Base Classes/ORSNOCard.m"; sourceTree = SOURCE_ROOT; };
 		8499FFDA0DC90F5800E82DB4 /* ORXL1Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXL1Model.h; path = "Source/Objects/Custom Hardware/SNO+/XL1/ORXL1Model.h"; sourceTree = SOURCE_ROOT; };
@@ -6071,14 +6075,12 @@
 		84CDDA5404717389005F64B1 /* ORTek754DData.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTek754DData.h; path = "Source/Objects/Hardware/GPIB/Oscilloscope T754D/ORTek754DData.h"; sourceTree = SOURCE_ROOT; };
 		84CDDA5504717389005F64B1 /* ORTek754DData.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTek754DData.m; path = "Source/Objects/Hardware/GPIB/Oscilloscope T754D/ORTek754DData.m"; sourceTree = SOURCE_ROOT; };
 		84CEA3630EA4EB2E0060076A /* Fec32.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Fec32.gif; path = "Source/Objects/Custom Hardware/SNO+/Fec32/Fec32.gif"; sourceTree = SOURCE_ROOT; };
-		84CEA3640EA4EB2E0060076A /* Fec32.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Fec32.nib; path = "Source/Objects/Custom Hardware/SNO+/Fec32/Fec32.nib"; sourceTree = SOURCE_ROOT; };
 		84CEA3650EA4EB2E0060076A /* Fec32Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Fec32Card.gif; path = "Source/Objects/Custom Hardware/SNO+/Fec32/Fec32Card.gif"; sourceTree = SOURCE_ROOT; };
 		84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFec32Controller.h; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Controller.h"; sourceTree = SOURCE_ROOT; };
 		84CEA3670EA4EB2E0060076A /* ORFec32Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFec32Controller.m; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Controller.m"; sourceTree = SOURCE_ROOT; };
 		84CEA3680EA4EB2E0060076A /* ORFec32Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFec32Model.h; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Model.h"; sourceTree = SOURCE_ROOT; };
 		84CEA3690EA4EB2E0060076A /* ORFec32Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFec32Model.m; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Model.m"; sourceTree = SOURCE_ROOT; };
 		84CEA6E10EA623A50060076A /* FecDaughterCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = FecDaughterCard.gif; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/FecDaughterCard.gif"; sourceTree = SOURCE_ROOT; };
-		84CEA6E20EA623A50060076A /* FecDaughterCard.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = FecDaughterCard.nib; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/FecDaughterCard.nib"; sourceTree = SOURCE_ROOT; };
 		84CEA6E30EA623A50060076A /* ORFecDaughterCardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFecDaughterCardController.h; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardController.h"; sourceTree = SOURCE_ROOT; };
 		84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFecDaughterCardController.m; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardController.m"; sourceTree = SOURCE_ROOT; };
 		84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFecDaughterCardModel.h; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardModel.h"; sourceTree = SOURCE_ROOT; };
@@ -6687,9 +6689,7 @@
 		EFAC073011E9A6CB00336793 /* XL3_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XL3_Link.m; sourceTree = "<group>"; };
 		EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XL3_LinkController.h; sourceTree = "<group>"; };
 		EFAC073E11E9A9DB00336793 /* XL3_LinkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XL3_LinkController.m; sourceTree = "<group>"; };
-		EFAC074211E9ADB500336793 /* XL3_Link.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = XL3_Link.nib; sourceTree = "<group>"; };
 		EFB39FC6130BA1C5001220AC /* SNOP.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SNOP.gif; sourceTree = "<group>"; };
-		EFB39FC7130BA1C5001220AC /* SNOP.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SNOP.nib; sourceTree = "<group>"; };
 		EFB39FC8130BA1C5001220AC /* SNOPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPController.h; sourceTree = "<group>"; };
 		EFB39FC9130BA1C5001220AC /* SNOPController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SNOPController.m; sourceTree = "<group>"; };
 		EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOPDetectorView.h; sourceTree = "<group>"; };
@@ -9187,12 +9187,12 @@
 		844B42B60DE5D5680061AE80 /* SNORack */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */,
 				844B42B70DE5D5680061AE80 /* ORSNORackController.h */,
 				844B42B80DE5D5680061AE80 /* ORSNORackController.m */,
 				844B42B90DE5D5680061AE80 /* ORSNORackModel.h */,
 				844B42BA0DE5D5680061AE80 /* ORSNORackModel.m */,
 				844B42BD0DE5D5680061AE80 /* SNORack.gif */,
-				844B42BE0DE5D5680061AE80 /* SNORack.nib */,
 			);
 			name = SNORack;
 			path = "Source/Objects/Custom Hardware/SNO+/SNORack";
@@ -10731,7 +10731,7 @@
 		8499280E0DCB997C00E82DB4 /* MTC */ = {
 			isa = PBXGroup;
 			children = (
-				8499280F0DCB997C00E82DB4 /* MTC.nib */,
+				6B325E111B2F4334002E2DD7 /* MTC.xib */,
 				849928100DCB997C00E82DB4 /* MTCCard.gif */,
 				849928110DCB997C00E82DB4 /* ORMTCController.h */,
 				849928120DCB997C00E82DB4 /* ORMTCController.m */,
@@ -10872,6 +10872,7 @@
 		8499FE820DC8E9B700E82DB4 /* SNOCrate */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */,
 				EFCC4544117FD45E008DC12C /* ORSNOCrateDecoders.h */,
 				EFCC4545117FD45E008DC12C /* ORSNOCrateDecoders.m */,
 				849901920DC91C5A00E82DB4 /* SNOCrate.gif */,
@@ -10880,7 +10881,6 @@
 				8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */,
 				8499FE870DC8E9B700E82DB4 /* ORSNOCrateModel.h */,
 				8499FE880DC8E9B700E82DB4 /* ORSNOCrateModel.m */,
-				8499FE8B0DC8E9B700E82DB4 /* SNOCrate.nib */,
 			);
 			name = SNOCrate;
 			path = "Source/Objects/Custom Hardware/SNO+/SNOCrate";
@@ -10904,12 +10904,12 @@
 		8499FFD90DC90F5800E82DB4 /* XL1 */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E0D1B2F4306002E2DD7 /* XL1.xib */,
 				8499FFDA0DC90F5800E82DB4 /* ORXL1Model.h */,
 				8499FFDB0DC90F5800E82DB4 /* ORXL1Model.m */,
 				8491E6C80EB9E1900084BAD6 /* ORXL1Controller.h */,
 				8491E6C90EB9E1900084BAD6 /* ORXL1Controller.m */,
 				8499FFDC0DC90F5800E82DB4 /* XL1Card.gif */,
-				8491E6C50EB9DFD30084BAD6 /* XL1.nib */,
 			);
 			name = XL1;
 			path = "Source/Objects/Custom Hardware/SNO+/XL1";
@@ -12431,8 +12431,8 @@
 		84CEA3620EA4EB2E0060076A /* Fec32 */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E131B2F4344002E2DD7 /* Fec32.xib */,
 				84CEA3630EA4EB2E0060076A /* Fec32.gif */,
-				84CEA3640EA4EB2E0060076A /* Fec32.nib */,
 				84CEA3650EA4EB2E0060076A /* Fec32Card.gif */,
 				84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */,
 				84CEA3670EA4EB2E0060076A /* ORFec32Controller.m */,
@@ -12447,8 +12447,8 @@
 		84CEA6E00EA623A50060076A /* FecDaughterCard */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E151B2F435A002E2DD7 /* FecDaughterCard.xib */,
 				84CEA6E10EA623A50060076A /* FecDaughterCard.gif */,
-				84CEA6E20EA623A50060076A /* FecDaughterCard.nib */,
 				84CEA6E30EA623A50060076A /* ORFecDaughterCardController.h */,
 				84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */,
 				84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */,
@@ -13610,6 +13610,7 @@
 		EF7722B111E813120064A1CF /* XL3 */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */,
 				EFCE3ADD123DD9A2009AEBA8 /* ORXL3Decoders.h */,
 				EFCE3ADE123DD9A2009AEBA8 /* ORXL3Decoders.m */,
 				EF7722B211E813120064A1CF /* ORXL3Model.h */,
@@ -13620,7 +13621,6 @@
 				EFAC073D11E9A9DB00336793 /* XL3_LinkController.h */,
 				EFAC073E11E9A9DB00336793 /* XL3_LinkController.m */,
 				EF7722B411E813120064A1CF /* XL3Card.gif */,
-				EFAC074211E9ADB500336793 /* XL3_Link.nib */,
 			);
 			path = XL3;
 			sourceTree = "<group>";
@@ -13628,8 +13628,8 @@
 		EFB39FC5130BA1C5001220AC /* SNOP */ = {
 			isa = PBXGroup;
 			children = (
+				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
-				EFB39FC7130BA1C5001220AC /* SNOP.nib */,
 				EFB39FC8130BA1C5001220AC /* SNOPController.h */,
 				EFB39FC9130BA1C5001220AC /* SNOPController.m */,
 				EFB39FCA130BA1C5001220AC /* SNOPDetectorView.h */,
@@ -15435,6 +15435,7 @@
 				84CF3B2405E6B60700C5C320 /* Appearance.tif in Resources */,
 				84CF3B2605E6B85800C5C320 /* Startup.tif in Resources */,
 				844E5CD706236ACD0051849B /* CommandCenter.gif in Resources */,
+				6B325E141B2F4344002E2DD7 /* Fec32.xib in Resources */,
 				844E5CD806236ACD0051849B /* TaskMaster.gif in Resources */,
 				848463B80625D76A00128299 /* SmartFolder.nib in Resources */,
 				84FFCAA60636D5B10069432F /* C792.gif in Resources */,
@@ -15485,6 +15486,7 @@
 				841DA0E20781F0740099BBF6 /* TwoDHisto.nib in Resources */,
 				841DA0F00781F09B0099BBF6 /* edu.washington.npl.orca.OneDHisto.plist in Resources */,
 				841DA0F10781F09B0099BBF6 /* OneDHisto.nib in Resources */,
+				6B325E161B2F435A002E2DD7 /* FecDaughterCard.xib in Resources */,
 				841DA5FD07820BB70099BBF6 /* CamacCrate.gif in Resources */,
 				841DA5FE07820BB70099BBF6 /* CamacCrate.nib in Resources */,
 				841DA665078211E70099BBF6 /* CC32Card.gif in Resources */,
@@ -15569,6 +15571,7 @@
 				849DE73508F6F1FA0052AFC6 /* MacFront.gif in Resources */,
 				84B0CFBE08FC60BC00EBE23C /* Container.nib in Resources */,
 				84B0CFBF08FC60BC00EBE23C /* Container.tif in Resources */,
+				6B325E101B2F431C002E2DD7 /* XL3_Link.xib in Resources */,
 				84B0CFEE08FC6C9B00EBE23C /* OfflineRunAlarmHelp in Resources */,
 				84B0CFF208FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist in Resources */,
 				8435625708FDB287002864C7 /* ContainerInput.nib in Resources */,
@@ -15653,7 +15656,9 @@
 				84A16C560A7EB7CF005BC151 /* JADCLCard.gif in Resources */,
 				8472AD6E0A82BD8E0069A069 /* BiRa3251O.nib in Resources */,
 				8472AD6F0A82BD8F0069A069 /* BiRa3251OCard.gif in Resources */,
+				6B325E0E1B2F4306002E2DD7 /* XL1.xib in Resources */,
 				842DAEBB0A82CA8400C942A2 /* BiRa2351I.nib in Resources */,
+				6B325E121B2F4334002E2DD7 /* MTC.xib in Resources */,
 				842DAEBC0A82CA8400C942A2 /* BiRa2351ICard.gif in Resources */,
 				2A69BE030AAF7F8A00FEFDBB /* NoVmeCratePowerHelp.plist in Resources */,
 				2A69BE110AAF7FB500FEFDBB /* NoCamacCratePowerHelp.plist in Resources */,
@@ -15714,6 +15719,7 @@
 				84F46F3E0CA44255007EFADA /* IpeCrate.tif in Resources */,
 				84F46F450CA44255007EFADA /* IpeFLT.nib in Resources */,
 				84F46F460CA44255007EFADA /* IpeFLTCard.gif in Resources */,
+				6B325E0A1B2F42C8002E2DD7 /* SNOCrate.xib in Resources */,
 				84F46F4E0CA44255007EFADA /* IpeSLT.nib in Resources */,
 				84F46F4F0CA44255007EFADA /* IpeSLTCard.gif in Resources */,
 				84F46F560CA44255007EFADA /* KatrinFLT.nib in Resources */,
@@ -15767,11 +15773,9 @@
 				84BC16550DA14F3600D3935C /* Caen1720.nib in Resources */,
 				84BC165C0DA1527300D3935C /* Caen1720Card.gif in Resources */,
 				8499FE8D0DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist in Resources */,
-				8499FE940DC8E9B700E82DB4 /* SNOCrate.nib in Resources */,
 				8499FFDF0DC90F5800E82DB4 /* XL1Card.gif in Resources */,
 				8499FFE60DC9102700E82DB4 /* XL2Card.gif in Resources */,
 				849901930DC91C5A00E82DB4 /* SNOCrate.gif in Resources */,
-				849928170DCB997C00E82DB4 /* MTC.nib in Resources */,
 				849928180DCB997C00E82DB4 /* MTCCard.gif in Resources */,
 				84992CB40DD21F3800E82DB4 /* HP3458a.nib in Resources */,
 				84992CB50DD21F3800E82DB4 /* HP3458a.tif in Resources */,
@@ -15780,7 +15784,6 @@
 				848D8B2A0DE23D2400D44B81 /* C1190.gif in Resources */,
 				848D8B2B0DE23D2400D44B81 /* Caen1190.nib in Resources */,
 				844B42C50DE5D5680061AE80 /* SNORack.gif in Resources */,
-				844B42C60DE5D5680061AE80 /* SNORack.nib in Resources */,
 				8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */,
 				8407F0EB0DEF6700000F1441 /* C862.gif in Resources */,
 				84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */,
@@ -15798,12 +15801,9 @@
 				84BAA2A90E92A81A00E19946 /* SIS3300.nib in Resources */,
 				84BAA2AA0E92A81A00E19946 /* SIS3300Card.gif in Resources */,
 				84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */,
-				84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */,
 				84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */,
 				84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */,
-				84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */,
 				840463CA183515FF00F69B23 /* GretinaTrigger.gif in Resources */,
-				8491E6C60EB9DFD30084BAD6 /* XL1.nib in Resources */,
 				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
 				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
 				84F16AF818900D530074B787 /* XTR6Icon.tif in Resources */,
@@ -15884,6 +15884,7 @@
 				849F0A8C18D0973A00FF3F36 /* DT5720.nib in Resources */,
 				8409825D0F84EA5900036BE8 /* ORTek220.nib in Resources */,
 				84B5197D191D285A003A580B /* BurstMonitor.tif in Resources */,
+				6B325E0C1B2F42D8002E2DD7 /* SNORack.xib in Resources */,
 				840982680F84EC4700036BE8 /* Tek220.tif in Resources */,
 				844484D10F8FB2B60013E933 /* ZupRampItem.nib in Resources */,
 				84098F5C0F964F0100036BE8 /* PDcu.nib in Resources */,
@@ -16005,7 +16006,6 @@
 				84E9C357194F42140028B7E2 /* PacFP.nib in Resources */,
 				840795EF11DA59AB00A91442 /* edu.washington.npl.orca.Prespectrometer.plist in Resources */,
 				EF7722B711E813120064A1CF /* XL3Card.gif in Resources */,
-				EFAC074311E9ADB500336793 /* XL3_Link.nib in Resources */,
 				84B11665121ED85100BC8464 /* noHeartbeat.png in Resources */,
 				840F5AC41222C03800D49A75 /* Camera.nib in Resources */,
 				840F5AE81222C4CA00D49A75 /* Camera.png in Resources */,
@@ -16050,7 +16050,6 @@
 				84258D8D12FDAA0E00A15D82 /* Heartbeat.tif in Resources */,
 				842FCCBE19784AAA00B89723 /* EDSF130p.nib in Resources */,
 				EFB39FCE130BA1C5001220AC /* SNOP.gif in Resources */,
-				EFB39FCF130BA1C5001220AC /* SNOP.nib in Resources */,
 				84052A2C13106B65007607A4 /* CouchDB.nib in Resources */,
 				84052A2D13106B65007607A4 /* CouchDB.tif in Resources */,
 				8494C0231316CEBA00151E7B /* BootBar.nib in Resources */,
@@ -16204,6 +16203,7 @@
 				84CED3941732FB9E000A84C2 /* LakeShore336.tif in Resources */,
 				849978741746C7C100BFEE3E /* PollingTimeStamp.gif in Resources */,
 				84D29FDE1843EAC800D320DB /* check.png in Resources */,
+				6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */,
 				8499788B174BA11400BFEE3E /* EHS130n.nib in Resources */,
 				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
 				84BF74BE17590CB000AF1F56 /* 3DScanPlatform.nib in Resources */,
