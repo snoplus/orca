@@ -171,6 +171,7 @@
 - (void)        setNextRunWillQuickStart:(BOOL)state;
 - (int)		runningState;
 - (void)	setRunningState:(int)aRunningState;
+- (void) letRunStart;
 - (void)	setForceRestart:(BOOL)aState;
 - (BOOL)	quickStart;
 - (void)	setQuickStart:(BOOL)flag;

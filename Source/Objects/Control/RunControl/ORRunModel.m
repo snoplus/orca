@@ -765,6 +765,21 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStatusChangedNotification object: self userInfo: userInfo];
 }
 
+- (void) letRunStart
+{
+    //this should only be called from a runscript if they want to continue running while the run is in progress
+    if(selectedRunTypeScript){
+        NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
+        for (ORRunScriptModel* aScript in theScripts){
+            if([aScript selectionIndex] == selectedRunTypeScript){
+                [aScript runOKSelectorNow]; //force the script to make it look like it finished OK
+                break;
+            }
+        }
+    }
+    
+}
+
 //not private, but don't call
 - (void) setForceRestart:(BOOL)aState
 {
@@ -1117,7 +1132,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         }
     }
     else [self performSelector:@selector(startRunStage1:) withObject:doInitBool afterDelay:0];
- }
+}
 
 - (void) startRunStage1:(NSNumber*)doInitBool
 {

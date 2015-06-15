@@ -39,6 +39,7 @@
 - (void) setSelectionIndex:(int)anIndex;
 
 #pragma mark ***Scripting
+- (void) runOKSelectorNow;
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
 - (void) setSelectorOK:(SEL)aSelectorOK bad:(SEL)aSelectorBAD withObject:(id)anObject target:(id)aTarget;
 

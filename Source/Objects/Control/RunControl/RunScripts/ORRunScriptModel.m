@@ -95,6 +95,17 @@ NSString* ORRunScriptSlotChangedNotification = @"ORRunScriptSlotChangedNotificat
 	[self setUpImage];
 }
 
+- (void) runOKSelectorNow
+{
+    if(selectorOK)[target performSelector:selectorOK withObject:anArg];
+    selectorOK  = nil;
+    selectorBAD = nil;
+    [anArg release];
+    anArg = nil;
+    [target release];
+    target = nil;
+}
+
 - (void) setSelectorOK:(SEL)aSelectorOK bad:(SEL)aSelectorBAD withObject:(id)anObject target:(id)aTarget
 {
 	selectorOK	= aSelectorOK;
