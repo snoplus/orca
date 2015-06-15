@@ -23,6 +23,7 @@
 #import "OROrderedObjHolding.h"
 #import "Sno_Monitor_Adcs.h"
 #import "ORXL3Model.h"
+#import "ORDataTaker.h"
 
 @class ORFecDaughterCardModel;
 @class ORCommandList;
@@ -176,7 +177,7 @@ typedef struct Fec32CmosShiftReg{
 	unsigned short	cmos_shift_item[7];
 } aFec32CmosShiftReg;
 
-@interface ORFec32Model :  ORSNOCard <OROrderedObjHolding>
+@interface ORFec32Model :  ORSNOCard <ORDataTaker,OROrderedObjHolding>
 {
 	unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
 	unsigned char	vRes;		//VRES for bipolar chip
@@ -324,6 +325,15 @@ typedef struct Fec32CmosShiftReg{
 - (NSString*) nameForSlot:(int)aSlot;
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
+
+- (void) initBoard;
+
+#pragma mark DataTaker Methods
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) reset;
+
 @end
 
 
