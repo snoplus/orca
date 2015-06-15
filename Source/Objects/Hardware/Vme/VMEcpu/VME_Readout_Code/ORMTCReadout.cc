@@ -107,8 +107,8 @@ bool ORMTCReadout::Start() {
 
     hv_stop_ok = (int (*)())dlsym(hdl, "hv_stop_ok");
     
-    LogError("ORMTCReadout::hello...\n");
-    LogError("ORMTCReadout::hv_stop_ok: %i\n",hv_stop_ok);
+   // LogError("ORMTCReadout::hello...\n");
+   // LogError("ORMTCReadout::hv_stop_ok: %i\n",hv_stop_ok);
     
     if ((dl_err = dlerror()) != NULL) {
         hv_stop_ok = NULL;
@@ -282,8 +282,8 @@ bool ORMTCReadout::UpdateStatus() {
     if (hv_stop_ok) err = hv_stop_ok();
     data[dataIndex++] = (long)err;
     
-    LogError("hello...\n");
-    LogError("%i\n",err);
+    //LogError("hello...\n");
+    //LogError("%i\n",err);
 
     return true;
 }
