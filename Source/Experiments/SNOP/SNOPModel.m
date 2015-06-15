@@ -986,18 +986,22 @@ mtcConfigDoc = _mtcConfigDoc;
 {
     //Collect a series of objects from the ORMTCModel
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    
-    //Initialise the MTCModal
-    ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
-    
-    //NSMutableDictionary *state = [[NSMutableDictionary alloc] initWithDictionary:[anELLIEModel pullEllieCustomRunFromDB:@"smellie"]];
-    
-    NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
-    
-    [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
-    
-    [self setSmellieDBReadInProgress:YES];
-    [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+    if([objs count]){
+        //Initialise the MTCModal
+        ELLIEModel* anELLIEModel = [objs objectAtIndex:0];
+        
+        //NSMutableDictionary *state = [[NSMutableDictionary alloc] initWithDictionary:[anELLIEModel pullEllieCustomRunFromDB:@"smellie"]];
+        
+        NSString *requestString = [NSString stringWithFormat:@"_design/smellieMainQuery/_view/pullEllieRunHeaders"];
+        
+        [[anELLIEModel generalDBRef:@"smellie"] getDocumentId:requestString tag:@"kSmellieRunHeaderRetrieved"];
+        
+        [self setSmellieDBReadInProgress:YES];
+        [self performSelector:@selector(smellieDocumentsRecieved) withObject:nil afterDelay:10.0];
+    }
+    else {
+        NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
+    }
     
 }
 

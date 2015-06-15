@@ -212,32 +212,37 @@ smellieRunFile;
 -(void)fetchNhitSettings
 {
     NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* theMtcModel = [objs objectAtIndex:0];
-    int col,row;
-    for(col=0;col<4;col++){
-		for(row=0;row<6;row++){
-			int index = kNHit100HiThreshold + row + (col * 6);
-            int mtcaIndex = kESumLowThreshold + row + (col * 4);
-            if((col == 0) && (row==0)){
-                [n100Hi setIntValue:[theMtcModel dbFloatByIndex: index]];
-                [esumhi setIntValue:[theMtcModel dbFloatByIndex:mtcaIndex]];
-            }
-            else if((col == 0) && (row==1)){
-                [n100med setIntValue:[theMtcModel dbFloatByIndex: index]];
-            }
-            else if((col == 0) && (row==3)){
-                [n20hi setIntValue:[theMtcModel dbFloatByIndex: index]];
-            }
-            else if((col == 0) && (row==5)){
-                [owln setIntValue:[theMtcModel dbFloatByIndex: index]];
-            }
-            else if((col == 0) && (row==2)){
-                [n100Lo setIntValue:[theMtcModel dbFloatByIndex: index]]; 
-            }
-            else{
-                //do nothing
+    if([objs count]){
+        ORMTCModel* theMtcModel = [objs objectAtIndex:0];
+        int col,row;
+        for(col=0;col<4;col++){
+            for(row=0;row<6;row++){
+                int index = kNHit100HiThreshold + row + (col * 6);
+                int mtcaIndex = kESumLowThreshold + row + (col * 4);
+                if((col == 0) && (row==0)){
+                    [n100Hi setIntValue:[theMtcModel dbFloatByIndex: index]];
+                    [esumhi setIntValue:[theMtcModel dbFloatByIndex:mtcaIndex]];
+                }
+                else if((col == 0) && (row==1)){
+                    [n100med setIntValue:[theMtcModel dbFloatByIndex: index]];
+                }
+                else if((col == 0) && (row==3)){
+                    [n20hi setIntValue:[theMtcModel dbFloatByIndex: index]];
+                }
+                else if((col == 0) && (row==5)){
+                    [owln setIntValue:[theMtcModel dbFloatByIndex: index]];
+                }
+                else if((col == 0) && (row==2)){
+                    [n100Lo setIntValue:[theMtcModel dbFloatByIndex: index]]; 
+                }
+                else{
+                    //do nothing
+                }
             }
         }
+    }
+    else {
+        NSLogColor([NSColor redColor],@"Must have an MTC in the configuration\n");
     }
 }
 
