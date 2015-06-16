@@ -1539,45 +1539,6 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     return count;    
 }
 
-- (void) initBoard
-{
-    
-}
-
-#pragma mark DataTaker Methods
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    //do any pre-run checks here.
-    
-    //--------------------------------------------------------------------------
-    // first add our description to the data description
-    
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORFec32Model"];
-    
-    //--------------------------------------------------------------------------
-    controller = [[self adapter] controllerCard]; //cache the controller for alittle bit more speed.
-    
-    [self clearExceptionCount];
-    
-    [self initBoard];
-    if([[userInfo objectForKey:@"doinit"]intValue]){
-
-    }
-}
-
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    
-}
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    
-}
-- (void) reset
-{
-    //just a stub, not used in SNO+
-}
-
 #pragma mark •••HWWizard
 - (int) numberOfChannels
 {
