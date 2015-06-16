@@ -440,13 +440,13 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     else      onlineMask &= ~(1<<chan);
 }
 
-
+// all of these Vth get/set routines deal with the daughtercard ecal+corr thresholds
 - (short) getVth:(short)chan
 {
     short dcNum = chan/8;
     if (dcNum<4 && dcPresent[dcNum]) {
         short dcChan = chan - dcNum*8;
-        return [dc[dcNum] vt:dcChan];
+        return [dc[dcNum] vt_ecal:dcChan] + [dc[dcNum] vt_corr:dcChan];
     } else {
         return -1;
     }
@@ -456,7 +456,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     short dcNum = chan/8;
     if (dcNum<4 && dcPresent[dcNum]) {
         short dcChan = chan - dcNum*8;
-        [dc[dcNum] setVt:dcChan withValue:aValue];
+        [dc[dcNum] setVt_corr:dcChan withValue:(aValue - [dc[dcNum] vt_ecal:dcChan])];
         cardChangedFlag = true;
     }
 }
@@ -475,7 +475,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     short dcNum = chan/8;
     if (dcNum<4 && dcPresent[dcNum]) {
         short dcChan = chan - dcNum*8;
-        [dc[dcNum] setVt:dcChan withValue:[dc[dcNum] vt_ecal:dcChan]];
+        [dc[dcNum] setVt_corr:dcChan withValue:0];
         cardChangedFlag = true;
     }
 }
@@ -484,7 +484,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     short dcNum = chan/8;
     if (dcNum<4 && dcPresent[dcNum]) {
         short dcChan = chan - dcNum*8;
-        [dc[dcNum] setVt:dcChan withValue:255];
+        [dc[dcNum] setVt_corr:dcChan withValue:(255 - [dc[dcNum] vt_ecal:dcChan])];
         cardChangedFlag = true;
     }
 }
@@ -493,7 +493,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     short dcNum = chan/8;
     if (dcNum<4 && dcPresent[dcNum]) {
         short dcChan = chan - dcNum*8;
-        return [dc[dcNum] vt:dcChan] - [dc[dcNum] vt_zero:dcChan];
+        return [dc[dcNum] vt_ecal:dcChan] + [dc[dcNum] vt_corr:dcChan] - [dc[dcNum] vt_zero:dcChan];
     } else {
         return -1;
     }
@@ -503,12 +503,8 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     short dcNum = chan/8;
     if (dcNum<4 && dcPresent[dcNum]) {
         short dcChan = chan - dcNum*8;
-        short val = aValue + [dc[dcNum] vt_zero:dcChan];
-        if (val > 255) val = 255;
-        if (val >= 0) {
-            [dc[dcNum] setVt:dcChan withValue:val];
-            cardChangedFlag = true;
-        }
+        [dc[dcNum] setVt_corr:dcChan withValue:([dc[dcNum] vt_zero:dcChan] + aValue - [dc[dcNum] vt_ecal:dcChan])];
+        cardChangedFlag = true;
     }
 }
 
