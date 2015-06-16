@@ -90,7 +90,7 @@ static NSImage *pmtImage, *colorMaskImage, *topImage;
 	
 	NSImage* newImage =     [self rotateIndividualImage: anImage angle:angle];
 	[self lockFocus];
-    [newImage drawAtPoint:NSZeroPoint fromRect:[newImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [newImage drawInRect:NSMakeRect (0,0,80,80) fromRect:[newImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	[self unlockFocus];
 	
 }
