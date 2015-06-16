@@ -254,7 +254,14 @@
 
 - (void) setModel:(OrcaObject*)aModel
 {
+    [[aModel undoManager] disableUndoRegistration];
+    if(model!=nil)[(ORFec32Model*)aModel setVariableDisplay:[model variableDisplay]];
+    [[aModel undoManager] enableUndoRegistration];
+
     [super setModel:aModel];
+    
+
+
     [groupView setGroup:(ORGroup*)model];
 	[fecNumberField setIntValue:[model stationNumber]];
 	[crateNumberField setIntValue:[[model guardian] crateNumber]];
