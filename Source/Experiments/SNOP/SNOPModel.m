@@ -1247,21 +1247,13 @@ mtcConfigDoc = _mtcConfigDoc;
 		}
         
         //Do I need to release the memory for the temporary Array?
-        //This will reveal itself during my analysis for the new Array  
-        if(col == 0){
-            [nhitMtcaArray setObject:tempArray forKey:@"threshold_value"];
-        }
-        else if(col == 1){
-            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_adc"];
-        }
-        else if(col == 2){
-            [nhitMtcaArray setObject:tempArray forKey:@"mv_per_nhit"];
-        }
-        else if(col == 3){
-            [nhitMtcaArray setObject:tempArray forKey:@"dc_offset"];
-        }
-        else{
-            NSLog(@"OrcaDB::Cannot write the Mtca Nhit DAC values to the OrcaDB");
+        //This will reveal itself during my analysis for the new Array
+        switch(col){
+            case 0: [nhitMtcaArray setObject:tempArray forKey:@"threshold_value"];  break;
+            case 1: [nhitMtcaArray setObject:tempArray forKey:@"mv_per_adc"];       break;
+            case 2: [nhitMtcaArray setObject:tempArray forKey:@"mv_per_nhit"];      break;
+            case 3: [nhitMtcaArray setObject:tempArray forKey:@"dc_offset"];        break;
+            default:  NSLog(@"OrcaDB::Cannot write the Mtca Nhit DAC values to the OrcaDB"); break;
         }
 	}
     
@@ -1299,21 +1291,12 @@ mtcConfigDoc = _mtcConfigDoc;
              else displayValue = [aMTCcard dbFloatByIndex: index];
              
              NSNumber * valueToDisplay = [NSNumber numberWithFloat:displayValue];
-             
-             if(row ==0) {
-                 [tempArray setObject:valueToDisplay forKey:@"esum_hi"];
-             }
-             else if(row == 1){
-                 [tempArray setObject:valueToDisplay forKey:@"esum_lo"];
-             }
-             else if(row == 2){
-                 [tempArray setObject:valueToDisplay forKey:@"owle_hi"];
-             }
-             else if(row == 3){
-                 [tempArray setObject:valueToDisplay forKey:@"owle_lo"];
-             }
-             else{
-                 NSLog(@"OrcaDB::Cannot write the Mtca Esum DAC values to the OrcaDB");
+             switch (row){
+                 case 0: [tempArray setObject:valueToDisplay forKey:@"esum_hi"]; break;
+                 case 1: [tempArray setObject:valueToDisplay forKey:@"esum_lo"]; break;
+                 case 2: [tempArray setObject:valueToDisplay forKey:@"owle_hi"]; break;
+                 case 3: [tempArray setObject:valueToDisplay forKey:@"owle_lo"]; break;
+                 default: NSLog(@"OrcaDB::Cannot write the Mtca Esum DAC values to the OrcaDB"); break;
              }
              
          }
