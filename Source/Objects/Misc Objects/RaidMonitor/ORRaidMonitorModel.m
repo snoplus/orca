@@ -221,14 +221,11 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
      
 - (void) fileMoverIsDone
 {
-    BOOL transferOK;
     if ([[fileMover task] terminationStatus] == 0) {
         NSLog(@"Transferred file: %@ to %@:~/shutmedown.tempfile\n",[fileMover fileName],[fileMover remoteHost]);
-        transferOK = YES;
     }
     else {
         NSLogColor([NSColor redColor], @"Failed to transfer file to %@\n",[fileMover remoteHost]);
-        transferOK = YES;
     }
     
     [fileMover release];
