@@ -1451,7 +1451,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1241">
-                                            <rect key="frame" x="1" y="4" width="53" height="220"/>
+                                            <rect key="frame" x="13" y="4" width="53" height="220"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="53" height="11"/>
@@ -1566,7 +1566,7 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1265">
-                                            <rect key="frame" x="62" y="4" width="38" height="220"/>
+                                            <rect key="frame" x="74" y="4" width="38" height="220"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="38" height="11"/>
@@ -1681,7 +1681,7 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1311">
-                                            <rect key="frame" x="95" y="4" width="28" height="220"/>
+                                            <rect key="frame" x="107" y="4" width="28" height="220"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="28" height="11"/>
@@ -1804,7 +1804,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="1394">
-                                            <rect key="frame" x="32" y="6" width="28" height="198"/>
+                                            <rect key="frame" x="37" y="6" width="28" height="198"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="28" height="12"/>
@@ -1903,89 +1903,89 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="28" height="12"/>
-                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1976">
+                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1976">
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <cells>
                                                 <column>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" title="Label" id="1977">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="right" title="Label" id="1977">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1982">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1982">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1987">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1987">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1991">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1991">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1990">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1990">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1983">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1983">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1989">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1989">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1978">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1978">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1981">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1981">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1986">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1986">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1985">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1985">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1979">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1979">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1980">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1980">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1988">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1988">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1992">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1992">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1984">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1984">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1994,7 +1994,7 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="1459">
-                                            <rect key="frame" x="116" y="6" width="28" height="198"/>
+                                            <rect key="frame" x="121" y="6" width="28" height="198"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="28" height="12"/>
@@ -2093,89 +2093,89 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="28" height="12"/>
-                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1995">
+                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1995">
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <cells>
                                                 <column>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" title="Label" id="1996">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="right" title="Label" id="1996">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2001">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2001">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2006">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2006">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2010">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2010">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2009">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2009">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2002">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2002">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2008">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2008">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1997">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1997">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2000">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2000">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2005">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2005">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2004">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2004">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1998">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1998">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="1999">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1999">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2007">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2007">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2011">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2011">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="2003">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="2003">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2779,93 +2779,93 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1811">
-                                            <rect key="frame" x="5" y="11" width="20" height="192"/>
+                                            <rect key="frame" x="4" y="11" width="20" height="192"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="12"/>
-                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="1952">
+                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1952">
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <cells>
                                                 <column>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="left" title="Label" id="1867">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="right" title="0" id="1867">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1870">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1870">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1881">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1881">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1882">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1882">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1874">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1874">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1871">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1871">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1875">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1875">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1876">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1876">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1877">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1877">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1879">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1879">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1869">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1869">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1872">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1872">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1878">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1878">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1873">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1873">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1880">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1880">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1868">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1868">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -2874,7 +2874,7 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1812">
-                                            <rect key="frame" x="26" y="11" width="53" height="192"/>
+                                            <rect key="frame" x="22" y="11" width="53" height="192"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="53" height="12"/>
@@ -2969,93 +2969,93 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1814">
-                                            <rect key="frame" x="90" y="11" width="20" height="192"/>
+                                            <rect key="frame" x="89" y="11" width="20" height="192"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="12"/>
-                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1955">
+                                            <textFieldCell key="prototype" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1955">
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <cells>
                                                 <column>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="left" title="Label" id="1816">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="right" title="0" id="1816">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1817">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1817">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1820">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1820">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1831">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1831">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1818">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1818">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1821">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1821">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1819">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1819">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1829">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1829">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1826">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1826">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1824">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1824">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1823">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1823">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1825">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1825">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1827">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1827">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1828">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1828">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1822">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1822">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="1830">
+                                                    <textFieldCell controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="1830">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3064,7 +3064,7 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="1813">
-                                            <rect key="frame" x="111" y="11" width="53" height="192"/>
+                                            <rect key="frame" x="107" y="11" width="53" height="192"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="53" height="12"/>
