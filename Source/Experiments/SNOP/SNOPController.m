@@ -107,7 +107,7 @@ smellieRunFile;
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     
     [super registerNotificationObservers];
@@ -198,7 +198,7 @@ smellieRunFile;
 -(IBAction)setTellie:(id)sender
 {
     //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
     NSArray * setSafeStates = @[@"0",@"0",@"0"]; //30 is the flag for setting smellie to its safe states
     [theELLIEModel callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_orca_script.py" withCmdLineArgs:setSafeStates];
@@ -211,7 +211,7 @@ smellieRunFile;
 
 -(void)fetchNhitSettings
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     if([objs count]){
         ORMTCModel* theMtcModel = [objs objectAtIndex:0];
         int col,row;
@@ -248,7 +248,7 @@ smellieRunFile;
 
 - (void) runNumberChanged:(NSNotification*)aNotification
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [currentRunNumber setIntValue:[theRunControl runNumber]];
     [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
@@ -264,7 +264,7 @@ smellieRunFile;
 
 - (IBAction) startRunAction:(id)sender
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
 	if([[theRunControl document] isDocumentEdited]){
 		[[theRunControl document] afterSaveDo:@selector(startRun) withTarget:self];
@@ -298,7 +298,7 @@ smellieRunFile;
     
 }
 - (IBAction)newRunAction:(id)sender {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [theRunControl setForceRestart:YES];
     [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
@@ -363,7 +363,7 @@ smellieRunFile;
 
 
 - (IBAction)stopRunAction:(id)sender {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
     [currentStatus setStringValue:[self getStoppingString]];
@@ -374,14 +374,14 @@ smellieRunFile;
 
 - (void) startRun
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
 	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification{
     
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     if([theRunControl runningState] == eRunInProgress){
 		if(![theRunControl runPaused])[currentStatus setStringValue:[[ORGlobal sharedGlobal] runModeString]];
@@ -401,7 +401,7 @@ smellieRunFile;
 
 - (NSString*) getStartingString
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     NSString* s;
     if([theRunControl waitRequestersCount]==0)s = @"Starting...";
@@ -411,7 +411,7 @@ smellieRunFile;
 
 - (NSString*) getRestartingString
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     NSString* s;
     if([theRunControl waitRequestersCount]==0)s = @"Restart...";
@@ -420,7 +420,7 @@ smellieRunFile;
 }
 - (NSString*) getStoppingString
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     NSString* s;
     if([theRunControl waitRequestersCount]==0)s = @"Stopping...";
@@ -429,7 +429,7 @@ smellieRunFile;
 }
 - (NSString*) getBetweenSubrunsString
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     NSString* s;
     if([theRunControl waitRequestersCount]==0)s = @"Between Sub Runs..";
@@ -458,7 +458,7 @@ smellieRunFile;
 {
     if (!aNote) {
         //collect all instances of xl3 objects in Orca
-        NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         
         // bit wise mask of xl3s
         unsigned long xl3Mask = 0x7ffff;
@@ -638,7 +638,7 @@ smellieRunFile;
 - (IBAction)hvMasterPanicAction:(id)sender
 {
     
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
 /*
     NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
@@ -651,7 +651,7 @@ smellieRunFile;
 - (IBAction)updatexl3Mode:(id)sender{
     
     int i =0;
-    NSArray* xl3s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+    NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     for (id xl3 in xl3s) {
         ORXL3Model * anXl3 = xl3;
         //[xl3 xl3Mode];
@@ -685,14 +685,14 @@ smellieRunFile;
 
 - (IBAction)hvMasterTriggersOFF:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
     
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
 }
 
 - (IBAction)hvMasterTriggersON:(id)sender
 {
-    [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersON)];
 }
 
 - (IBAction)hvMasterStatus:(id)sender
@@ -935,7 +935,7 @@ smellieRunFile;
     //communicate with smellie model
     
     //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     
     //get the ELLIE Model object
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
@@ -999,7 +999,7 @@ smellieRunFile;
     //[model setRunType:kRunUndefined];
    
     //Collect a series of objects from the ELLIEModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     
     //get the ELLIE Model object
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
