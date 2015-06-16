@@ -83,7 +83,7 @@
         NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
         int group;
         for(group=0;group<[theCard numberOfChannels]/2;group++){
-            [theValues addObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]]];
+            [theValues addObject:[NSNumber numberWithInt:[theCard peakingTime:group]]];
         }
         [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
     }
@@ -531,7 +531,7 @@
     NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
 	int group;
 	for(group=0;group<[theCard numberOfChannels]/2;group++){
-        [theValues addObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]]];
+        [theValues addObject:[NSNumber numberWithInt:[theCard peakingTime:group]]];
 	}
     [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
 }

@@ -4554,7 +4554,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	
 	[self disarmSampleLogic];
     [waveFormRateGroup stop];
-    [self setLed:1 to:NO];
+    //[self setLed:1 to:NO];
 	
 	int group;
 	for(group=0;group<kNumSIS3305Groups;group++){

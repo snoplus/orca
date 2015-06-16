@@ -1850,7 +1850,9 @@ void SwapLongBlock(void* p, int32_t n)
                                          @"initCrateDone:", @"callback",
                                          argDict, @"initArgs",
                                          nil];
-                
+                timer = [[ORTimer alloc]init];
+                [timer start];
+
                 [NSThread detachNewThreadSelector:@selector(sendCommandWithDict:) toTarget:self withObject:arggDict];
                 
                 //[[self xl3Link] sendCommand:CRATE_INIT_ID withPayload:&payload expectResponse:YES];
@@ -4452,7 +4454,6 @@ void SwapLongBlock(void* p, int32_t n)
     //separate thread detached from initCrateWithDict
     NSAutoreleasePool* initPool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* resp = [[NSMutableDictionary alloc] init];
-    
     /*
     NSDictionary* argDict = [NSDictionary dictionaryWithObjectsAndKeys:
                              [NSNumber numberWithInt:CRATE_INIT_ID], @"cmdId",
@@ -4469,6 +4470,7 @@ void SwapLongBlock(void* p, int32_t n)
         [[self xl3Link] sendCommand:[[argDict objectForKey:@"cmdId"] intValue]
                         withPayload:&payload
                         expectResponse:[[argDict objectForKey:@"response"] boolValue]];
+        
     }
     @catch (NSException* e) {
         NSLog(@"%@ init crate failed; error: %@ reason: %@\n",[[self xl3Link] crateName], [e name], [e reason]);
@@ -4565,6 +4567,9 @@ void SwapLongBlock(void* p, int32_t n)
         [self setXl3InitInProgress:NO];
 
     }//synchronized
+    NSLog(@"%@ Init time = %f seconds\n",[[self xl3Link] crateName],[timer secondsSinceStart]);
+    [timer stop];
+    [timer release];
 }
 
 - (void) _setPedestalInParallelWorker

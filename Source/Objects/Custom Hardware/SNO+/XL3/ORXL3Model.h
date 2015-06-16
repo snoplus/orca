@@ -95,6 +95,7 @@ enum {
     BOOL            isPollingForced;
     NSString*       pollStatus;
     NSThread*       pollThread;
+    ORTimer*        timer;
     
     unsigned long long  relayMask;
     uint32_t relayLowMask;

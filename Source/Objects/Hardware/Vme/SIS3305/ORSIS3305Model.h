@@ -344,7 +344,7 @@
 //- (void) setThreshold:(short)chan withValue:(int)aValue;    // should be properly removed
 
 // control status reg
-- (void) setLed:(short)ledNum to:(BOOL)state;
+//- (void) setLed:(short)ledNum to:(BOOL)state;
 
 - (void) setEnableExternalLEMODirectVetoIn:(BOOL)state;
 - (void) setEnableExternalLEMOResetIn:(BOOL)state;

@@ -117,7 +117,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
     //add run control object
-    NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
     
     
@@ -144,7 +144,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) stopTellieRun
 {    
     //add run control object
-    NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
     
     if([runControl isRunning]){
@@ -165,7 +165,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) fireTellieFibre:(NSMutableDictionary*)fireCommands
 {
     //add run control object
-    NSArray*  runControlObjsArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [runControlObjsArray objectAtIndex:0];
     
     //start a new subrun
@@ -271,7 +271,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 - (ORCouchDB*) generalDBRef:(NSString*)aCouchDb
 {
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
@@ -361,7 +361,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
@@ -404,10 +404,10 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
@@ -440,7 +440,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
     
 
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
@@ -472,7 +472,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
     ORCouchDB* result = [ORCouchDB couchHost:aSnotModel.orcaDBIPAddress
@@ -530,7 +530,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
@@ -703,7 +703,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)testFunction
 {
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
@@ -714,7 +714,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(NSNumber*) fetchRecentVersion
 {
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
@@ -747,7 +747,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     //NSDictionary* currentConfig;
     
@@ -941,14 +941,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     
     //get the MTC Object (but only use in Slave Mode)
-    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray*  objsMTC = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     [theMTCModel stopMTCPedestalsFixedRate]; //stop any pedestals that are currently running
     
 
     
     //get the run controller
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     //Save the current settings of the detector
@@ -1167,12 +1167,12 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //Even though this is stopping in Orca it can still contine on SNODROP!
     //Need a stop run command here
     //TODO: add a try and except statement here
-    NSArray*  objsMTC = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray*  objsMTC = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* theMTCModel = [objsMTC objectAtIndex:0];
     
     
     //removed this to stop splurgingb
-    NSArray*  objs3 = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
     //Set the Mtcd for back to original settings

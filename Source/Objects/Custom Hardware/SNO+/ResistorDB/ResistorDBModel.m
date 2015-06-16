@@ -93,7 +93,7 @@ endRunNumber = _endRunNumber;
     
     
     //Loop over all the FEC cards
-    NSArray * fec32ControllerObjs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
+    NSArray * fec32ControllerObjs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORFec32Model")];
     
     //Count all Fec32 Cards on the DAQ
     int numberFec32Cards = [fec32ControllerObjs count];
@@ -182,7 +182,7 @@ endRunNumber = _endRunNumber;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 {
     //Loop over all the FEC cards
-    NSArray * snopControllerArray = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray * snopControllerArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel * snopModel = [snopControllerArray objectAtIndex:0];
     
     

@@ -440,7 +440,7 @@
     //int runType = [aSnopModel getRunType];
     
     //collect ORRunModel objects
-    NSArray*  runModelObjects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray*  runModelObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* aRunModel = [runModelObjects objectAtIndex:0];
     
 
@@ -906,7 +906,7 @@
 
 -(void) fetchCurrentTellieSubRunFile
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
     NSURL *url = [NSURL URLWithString:urlString];
@@ -938,7 +938,7 @@
 {
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
@@ -972,7 +972,7 @@
 
 -(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
 {
-    NSArray*  objs = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     //NSDictionary* currentConfig;
     

@@ -41,7 +41,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNOCableDB);
 {
 	if(!aPath)aPath = @"";
 
-    [[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setCableDBFilePath:cableDBFilePath];
+    [[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setCableDBFilePath:cableDBFilePath];
 	
 	[cableDBFilePath autorelease];
 	cableDBFilePath = [aPath copy];
@@ -88,10 +88,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SNOCableDB);
 		short panel;
 		NSCharacterSet* whiteSpace  = [NSCharacterSet whitespaceCharacterSet];
 		NSCharacterSet* letterSet = [whiteSpace invertedSet];
-		NSString* cableID;
-		NSString* pmtID;
-		NSString* pcID;
-		NSString* chanInfo;
+		NSString* cableID   = nil;
+		NSString* pmtID     = nil;
+		NSString* pcID      = nil;
+		NSString* chanInfo  = nil;
 		float x,y,z;
 		for(panel=0;panel<num_panels;panel++){
 			//get the number of pmts in this panel

@@ -203,7 +203,7 @@
 
 - (void) plotOrderDidChange:(id)aPlotView
 {
-	ORPlotWithROI* topRoi = [[aPlotView topPlot] roi];
+	ORPlotWithROI* topRoi = [(ORPlotWithROI*)[aPlotView topPlot] roi];
 	[roiController setModel:topRoi];
 	[fitController setModel:[topRoi fit]];
 	[self setLegend];
