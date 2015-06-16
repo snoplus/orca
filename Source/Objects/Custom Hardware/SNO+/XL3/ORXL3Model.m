@@ -1170,6 +1170,11 @@ void SwapLongBlock(void* p, int32_t n)
     [self setFecVltDataId:[anotherObj fecVltDataId]];
 }
 
+- (void) initBoard
+{
+    //unused -- here to satisfy the datataker protocol
+}
+
 - (NSDictionary*) dataRecordDescription
 {
 	NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
@@ -1234,7 +1239,11 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXL3Model"];	
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXL3Model"];
+    
+    if([[userInfo objectForKey:@"doinit"]intValue]){
+        [self initCrateRegistersOnly];
+    }
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -2296,7 +2305,6 @@ void SwapLongBlock(void* p, int32_t n)
 	[self setXl3OpsRunning:NO forKey:@"compositeSetPedestal"];
 }
 
-//used by OrcaScript for ECA
 - (void) setPedestalInParallel
 {
     if (![[self xl3Link] isConnected]) {
@@ -4564,6 +4572,7 @@ void SwapLongBlock(void* p, int32_t n)
     NSAutoreleasePool* pedPool = [[NSAutoreleasePool alloc] init];
 
     if (![[self xl3Link] isConnected]) {
+        [pedPool release];
         return;
     }
 
