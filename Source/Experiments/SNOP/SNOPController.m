@@ -65,13 +65,8 @@ smellieRunFile;
     NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithCapacity:20];
     int i;
     for(i=0;i<31;i++){
-        NSButtonCell * test = [[NSButtonCell alloc] init];
-        test = [globalRunTypesMatrix cellAtRow:i column:0];
-        NSString * keyString = [[NSString alloc] init];
-        keyString = [test title];
-        //this works
-        [temp setObject:[NSString stringWithFormat:@"empty"] forKey:keyString];
-
+        NSButtonCell* test = [globalRunTypesMatrix cellAtRow:i column:0];
+        [temp setObject:[NSString stringWithFormat:@"empty"] forKey:[test title]];
     }
     
     self.snopRunTypeMaskDic = temp;
@@ -335,19 +330,15 @@ smellieRunFile;
     //only goes up to 31 because there is some strange problem with objective c recasting implictly an unsigned long as a long
     for(i=0;i<31;i++){
         if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
-            NSButtonCell * test = [[NSButtonCell alloc] init];
-            test = [globalRunTypesMatrix cellAtRow:i column:0];
-            NSString * keyString = [[NSString alloc] init];
-            keyString = [test title];
-            [snopRunTypeMaskDic setObject:[NSNumber numberWithInt:[[globalRunTypesMatrix cellAtRow:i column:0] intValue]] forKey:keyString];
+            NSButtonCell* test = [globalRunTypesMatrix cellAtRow:i column:0];
+            [snopRunTypeMaskDic setObject:[NSNumber numberWithInt:[[globalRunTypesMatrix cellAtRow:i column:0] intValue]] forKey:[test title]];
             //set the actual bit mask
             maskValue |= (0x1UL << i);
         }
     }
     
     //self.runTypeMask = nil;
-    NSNumber * maskValueForStore = [[NSNumber alloc] init];
-    maskValueForStore = [NSNumber numberWithUnsignedLong:maskValue];
+    NSNumber* maskValueForStore = [NSNumber numberWithUnsignedLong:maskValue];
     self.runTypeMask = maskValueForStore;
     
     [model setRunTypeMask:maskValueForStore];
@@ -655,11 +646,11 @@ smellieRunFile;
     for (id xl3 in xl3s) {
         ORXL3Model * anXl3 = xl3;
         //[xl3 xl3Mode];
-        NSString *xl3ModeDescription = [NSString stringWithFormat:@"--"];
-        if([anXl3 xl3Mode] == 1) xl3ModeDescription = [NSString stringWithFormat:@"init"];
-        else if ([anXl3 xl3Mode] == 2) xl3ModeDescription = [NSString stringWithFormat:@"normal"];
-        else if ([anXl3 xl3Mode] == 3) xl3ModeDescription = [NSString stringWithFormat:@"CGT"];
-        else xl3ModeDescription = [NSString stringWithFormat:@"unknown"];
+        NSString *xl3ModeDescription;
+        if([anXl3 xl3Mode] == 1)        xl3ModeDescription = [NSString stringWithFormat:@"init"];
+        else if ([anXl3 xl3Mode] == 2)  xl3ModeDescription = [NSString stringWithFormat:@"normal"];
+        else if ([anXl3 xl3Mode] == 3)  xl3ModeDescription = [NSString stringWithFormat:@"CGT"];
+        else                            xl3ModeDescription = [NSString stringWithFormat:@"unknown"];
         
         if([anXl3 crateNumber] == 16){
             i++;
