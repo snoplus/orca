@@ -1418,6 +1418,9 @@ static NSDictionary* xl3Ops;
 
 - (IBAction)hvRampDownAction:(id)sender
 {
+    if ([model isTriggerON]) {
+        [model hvTriggersOFF];
+    }
     if ([hvPowerSupplyMatrix selectedColumn] == 0) {
         [model setHvANextStepValue:0];
     }

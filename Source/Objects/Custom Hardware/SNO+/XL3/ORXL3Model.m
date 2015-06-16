@@ -1365,6 +1365,10 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
     }
     
+    //hack to start the HV monitoring automiatically on init
+    [self setHVSwitch:YES forPowerSupply:0];
+    [self setHVSwitch:YES forPowerSupply:1];
+    
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	return self;
@@ -3594,10 +3598,13 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) hvPanicDown
 {
+    [self setIsPollingXl3:NO];	
+    if ([self isTriggerON]) {
+        [self hvTriggersOFF];
+    }
     [self setHvPanicFlag:YES];
     [self setHvANextStepValue:0];
     [self setHvBNextStepValue:0];
-    [self setIsPollingXl3:NO];
     NSLog(@"%@ panic down started, hit HV ON to recover\n", [[self xl3Link] crateName]);
 }
 
