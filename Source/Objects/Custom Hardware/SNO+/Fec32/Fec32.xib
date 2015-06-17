@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
@@ -60,15 +60,15 @@
         <window title="Fec32" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="32" y="87" width="747" height="691"/>
+            <rect key="contentRect" x="32" y="87" width="695" height="670"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="747" height="691"/>
+                <rect key="frame" x="0.0" y="5" width="695" height="670"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView drawsBackground="NO" controlSize="small" id="181">
-                        <rect key="frame" x="-7" y="144" width="469" height="542"/>
+                        <rect key="frame" x="13" y="123" width="469" height="542"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <tabViewItems>
                             <tabViewItem label="Config/Rates" identifier="1" id="182">
@@ -142,7 +142,7 @@
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="890">
                                             <rect key="frame" x="150" y="430" width="286" height="20"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="20"/>
                                             <size key="intercellSpacing" width="18" height="0.0"/>
@@ -337,7 +337,7 @@
                                         </customView>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="934">
                                             <rect key="frame" x="150" y="449" width="286" height="20"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="20"/>
                                             <size key="intercellSpacing" width="18" height="0.0"/>
@@ -445,7 +445,7 @@
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="946">
                                             <rect key="frame" x="82" y="261" width="20" height="181"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="20" height="20"/>
                                             <size key="intercellSpacing" width="0.0" height="3"/>
@@ -1295,7 +1295,7 @@
                         </connections>
                     </button>
                     <box title="Location" borderType="line" id="367">
-                        <rect key="frame" x="320" y="96" width="214" height="55"/>
+                        <rect key="frame" x="264" y="70" width="214" height="55"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <view key="contentView">
                             <rect key="frame" x="1" y="1" width="212" height="39"/>
@@ -1365,9 +1365,9 @@
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <button verticalHuggingPriority="750" id="1013">
-                        <rect key="frame" x="95" y="99" width="62" height="32"/>
+                        <rect key="frame" x="115" y="96" width="62" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Probe" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1915">
+                        <buttonCell key="cell" type="push" title="Probe" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" transparent="YES" imageScaling="proportionallyDown" inset="2" id="1915">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
@@ -1376,9 +1376,9 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="1100">
-                        <rect key="frame" x="29" y="99" width="62" height="32"/>
+                        <rect key="frame" x="49" y="96" width="62" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Scan" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1916">
+                        <buttonCell key="cell" type="push" title="Scan" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" transparent="YES" imageScaling="proportionallyDown" inset="2" id="1916">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
@@ -1387,9 +1387,9 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="1138">
-                        <rect key="frame" x="26" y="68" width="69" height="32"/>
+                        <rect key="frame" x="46" y="65" width="69" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="AutoInit" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1917">
+                        <buttonCell key="cell" type="push" title="AutoInit" bezelStyle="rounded" alignment="center" controlSize="small" enabled="NO" borderStyle="border" transparent="YES" imageScaling="proportionallyDown" inset="2" id="1917">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
@@ -1398,7 +1398,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="1142">
-                        <rect key="frame" x="506" y="370" width="102" height="32"/>
+                        <rect key="frame" x="526" y="349" width="102" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Read Voltages" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1918">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1409,7 +1409,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="1805">
-                        <rect key="frame" x="497" y="305" width="120" height="32"/>
+                        <rect key="frame" x="517" y="284" width="120" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Read CMOS Rates" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1921">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1420,7 +1420,7 @@
                         </connections>
                     </button>
                     <popUpButton verticalHuggingPriority="750" id="1381">
-                        <rect key="frame" x="475" y="627" width="183" height="22"/>
+                        <rect key="frame" x="495" y="606" width="183" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="push" title="Voltages" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1384" id="1919">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1441,7 +1441,7 @@
                         </connections>
                     </popUpButton>
                     <tabView type="noTabsBezelBorder" id="1387">
-                        <rect key="frame" x="474" y="396" width="185" height="234"/>
+                        <rect key="frame" x="494" y="375" width="185" height="234"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
@@ -3168,6 +3168,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="61"/>
             </connections>
+            <point key="canvasLocation" x="113.5" y="136"/>
         </window>
         <customObject id="27" customClass="OHexFormatter"/>
     </objects>
