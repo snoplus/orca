@@ -1419,8 +1419,6 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:_hvBCMOSRateIgnore       forKey:@"ORXL3ModelhvBCMOSRateIgnore"];
     [encoder encodeInt:xl3Mode                  forKey:@"Xl3Mode"];
     
-    [self setXl3Mode:[decoder decodeIntForKey:@""]];
-
     unsigned short i;
     for (i=0; i<12; i++) {
         [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]];
