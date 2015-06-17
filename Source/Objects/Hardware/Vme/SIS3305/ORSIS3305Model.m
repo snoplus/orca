@@ -72,13 +72,13 @@ NSString* ORSIS3305LemoOutModeChanged			= @"ORSIS3305LemoOutModeChanged";
 NSString* ORSIS3305AcquisitionControlRegChanged = @"ORSIS3305AcquisitionControlRegChanged";
 NSString* ORSIS3305EventConfigChanged			= @"ORSIS3305EventConfigChanged";
 NSString* ORSIS3305InputInvertedChanged			= @"ORSIS3305InputInvertedChanged";
-NSString* ORSIS3305InternalTriggerEnabledChanged = @"ORSIS3305InternalTriggerEnabledChanged";
+
 NSString* ORSIS3305ExternalTriggerEnabledChanged = @"ORSIS3305ExternalTriggerEnabledChanged";
 NSString* ORSIS3305InternalGateEnabledChanged	= @"ORSIS3305InternalGateEnabledChanged";
 NSString* ORSIS3305ExternalGateEnabledChanged	= @"ORSIS3305ExternalGateEnabledChanged";
 
+// acquisition reg
 NSString* ORSIS3305ClockSourceChanged			= @"ORSIS3305ClockSourceChanged";
-NSString* ORSIS3305EventSavingModeChanged		= @"ORSIS3305EventSavingModeChanged";
 NSString* ORSIS3305ChannelEnabledChanged		= @"ORSIS3305ChannelEnabledChanged";
 
 NSString* ORSIS3305RateGroupChangedNotification	= @"ORSIS3305RateGroupChangedNotification";
@@ -102,6 +102,23 @@ NSString* ORSIS3305GTThresholdEnabledChanged    = @"ORSIS3305GTThresholdEnabledC
 
 // control status
 NSString* ORSIS3305LEDApplicationModeChanged    = @"ORSIS3305LEDApplicationModeChanged";
+
+
+// event config
+NSString* ORSIS3305EventSavingModeChanged                           = @"ORSIS3305EventSavingModeChanged";
+NSString* ORSIS3305ADCGateModeEnabledChanged                        = @"ORSIS3305ADCGateModeEnabledChanged";
+NSString* ORSIS3305GlobalTriggerEnabledChanged                      = @"ORSIS3305GlobalTriggerEnabledChanged";
+NSString* ORSIS3305InternalTriggerEnabledChanged                    = @"ORSIS3305InternalTriggerEnabledChanged";
+NSString* ORSIS3305StartEventSamplingWithExtTrigEnabledChanged      = @"ORSIS3305StartEventSamplingWithExtTrigEnabledChanged";
+NSString* ORSIS3305ClearTimestampWhenSamplingEnabledEnabledChanged  = @"ORSIS3305ClearTimestampWhenSamplingEnabledEnabledChanged";
+NSString* ORSIS3305GrayCodeEnabledChanged                           = @"ORSIS3305GrayCodeEnabledChanged";
+NSString* ORSIS3305ClearTimestampDisabledChanged                    = @"ORSIS3305ClearTimestampDisabledChanged";
+NSString* ORSIS3305DirectMemoryHeaderDisabledChanged                = @"ORSIS3305DirectMemoryHeaderDisabledChanged";
+NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged        = @"ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged";
+
+
+
+
 NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged    = @"ORSIS3305EnableExternalLEMODirectVetoInChanged";
 NSString* ORSIS3305EnableExternalLEMOResetInChanged         = @"ORSIS3305EnableExternalLEMOResetInChanged";
 NSString* ORSIS3305EnableExternalLEMOCountIn                = @"ORSIS3305EnableExternalLEMOCountIn";
@@ -119,15 +136,18 @@ NSString* ORSIS3305SampleDone					= @"ORSIS3305SampleDone";
 NSString* ORSIS3305IDChanged					= @"ORSIS3305IDChanged";
 NSString* ORSIS3305GateLengthChanged			= @"ORSIS3305GateLengthChanged";
 NSString* ORSIS3305PulseLengthChanged			= @"ORSIS3305PulseLengthChanged";
-NSString* ORSIS3305SumGChanged					= @"ORSIS3305SumGChanged";
-NSString* ORSIS3305PeakingTimeChanged			= @"ORSIS3305PeakingTimeChanged";
 NSString* ORSIS3305InternalTriggerDelayChanged	= @"ORSIS3305InternalTriggerDelayChanged";
 NSString* ORSIS3305TriggerDecimationChanged		= @"ORSIS3305TriggerDecimationChanged";
 NSString* ORSIS3305EnergyDecimationChanged		= @"ORSIS3305EnergyDecimationChanged";
+NSString* ORSIS3305LEDEnabledChanged            = @"ORSIS3305LEDEnabledChanged";
 NSString* ORSIS3305SetShipWaveformChanged		= @"ORSIS3305SetShipWaveformChanged";
 NSString* ORSIS3305SetShipSummedWaveformChanged	= @"ORSIS3305SetShipSummedWaveformChanged";
 NSString* ORSIS3305McaStatusChanged				= @"ORSIS3305McaStatusChanged";
 NSString* ORSIS3305CardInited					= @"ORSIS3305CardInited";
+
+NSString* ORSIS3305ModelRegisterIndexChanged    = @"ORSIS3305ModelRegisterIndexChanged";
+NSString* ORSIS3305ModelRegisterWriteValueChanged = @"ORSIS3305ModelRegisterWriteValueChanged";
+
 
 @interface ORSIS3305Model (private)
 //- (void) writeDacOffsets;
@@ -143,136 +163,137 @@ NSString* ORSIS3305CardInited					= @"ORSIS3305CardInited";
 typedef struct {
 	unsigned long offset;
 	NSString* name;
+    BOOL canRead;
+    BOOL canWrite;
 } SIS3305GammaRegisterInformation;
 
-#define kNumSIS3305ReadRegs 92
 
 static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs] = {
-	{0x00000,  @"Control/Status"},
-	{0x00004,  @"Module Id. and Firmware Revision"},
-	{0x00008,  @"Interrupt configuration"},
-	{0x0000C,  @"Interrupt control"},
+	{0x00000,  @"Control/Status", YES, YES},
+    {0x00004,  @"Module Id. and Firmware Revision", YES, NO},
+	{0x00008,  @"Interrupt configuration", YES, YES},
+	{0x0000C,  @"Interrupt control", YES, YES},
     
-    {0x00010,  @"Acquisition control/status"},
-    {0x00014,  @"Veto Length"},
-    {0x00018,  @"Veto Delay"},
+    {0x00010,  @"Acquisition control/status", YES, YES},
+    {0x00014,  @"Veto Length", YES, YES},
+    {0x00018,  @"Veto Delay", YES, YES},
     
-    {0x00020,  @"TDC Test Register"},
-    {0x00014,  @"TDC Test Register"},
-    {0x00028,  @"EEPROM 93C56 Control"},
-    {0x0002C,  @"EEPROM DS2430 Onewire Control"},
+    {0x00020,  @"TDC Test Register", YES, YES},
+    {0x00014,  @"TDC Test Register", YES, YES},
+    {0x00028,  @"EEPROM 93C56 Control", YES, YES},
+    {0x0002C,  @"EEPROM DS2430 Onewire Control", YES, YES},
     
-	{0x00030,  @"Broadcast Setup register"},
-    {0x00040,  @"LEMO Trigger Out Select"},
-    {0x0004C,  @"External Trigger In Counter"},
-    {0x00050,  @"TDC Write Cmd / TDC Status"},
-    {0x00054,  @"TDC Read Cmd / TDC Read Value"},
-    {0x00058,  @"TDC Start/Stop Enable"},
-    {0x0005C,  @"TDC FSM Reg4 Value"},
-    {0x00060,  @"XILINX JTAG_TEST/JTAG_DATA_IN"},
-    {0x00070,  @"Temperature and Temperature Supervisor"},
-    {0x00074,  @"ADC Serial Interface (SPI)"},
+	{0x00030,  @"Broadcast Setup register", YES, YES},
+    {0x00040,  @"LEMO Trigger Out Select", YES, YES},
+    {0x0004C,  @"External Trigger In Counter", YES, NO},
+    {0x00050,  @"TDC Write Cmd / TDC Status", YES, YES},
+    {0x00054,  @"TDC Read Cmd / TDC Read Value", YES, YES},
+    {0x00058,  @"TDC Start/Stop Enable", YES, YES},
+    {0x0005C,  @"TDC FSM Reg4 Value" , YES, YES},
+    {0x00060,  @"XILINX JTAG_TEST/JTAG_DATA_IN", YES, YES},
+    {0x00070,  @"Temperature and Temperature Supervisor", YES, YES},
+    {0x00074,  @"ADC Serial Interface (SPI)", NO, YES},
 
-    {0x000C0,  @"ADC1 ch1-ch4 FPGA Data Transfer Control"},
-    {0x000C4,  @"ADC2 ch5-ch8 FPGA Data Transfer Control"},
-    {0x000C8,  @"ADC1 ch1-ch4 FPGA Data Transfer Status"},
-    {0x000CC,  @"ADC2 ch5-ch8 FPGA Data Transfer Status"},
+    {0x000C0,  @"ADC1 ch1-ch4 FPGA Data Transfer Control", YES, YES},
+    {0x000C4,  @"ADC2 ch5-ch8 FPGA Data Transfer Control", YES, YES},
+    {0x000C8,  @"ADC1 ch1-ch4 FPGA Data Transfer Status", YES, NO},
+    {0x000CC,  @"ADC2 ch5-ch8 FPGA Data Transfer Status", YES, NO},
 
-    {0x000D0,  @"Aurora Protocol Status"},
-    {0x000D4,  @"Aurora Data Status"},
-    {0x000D8,  @"Aurora Data Pending Request Counter Status"},
+    {0x000D0,  @"Aurora Protocol Status", YES, NO},
+    {0x000D4,  @"Aurora Data Status", YES, NO},
+    {0x000D8,  @"Aurora Data Pending Request Counter Status", YES, NO},
     
     
     // Key address registers
-    {0x00400,  @"General Reset"},
-    {0x00410,  @"Arm Sample Logic"},
-    {0x00414,  @"Disarm/Disable Sample Logic"},
-    {0x00418,  @"Trigger"},
-    {0x0041C,  @"Enable Sample Logic"},
+    {0x00400,  @"General Reset", YES, YES},
+    {0x00410,  @"Arm Sample Logic", YES, YES},
+    {0x00414,  @"Disarm/Disable Sample Logic", YES, YES},
+    {0x00418,  @"Trigger", YES, YES},
+    {0x0041C,  @"Enable Sample Logic", YES, YES},
 
-    {0x00420,  @"Set Veto"},
-    {0x00424,  @"Clear Veto"},
+    {0x00420,  @"Set Veto", YES, YES},
+    {0x00424,  @"Clear Veto", YES, YES},
 
-    {0x00430,  @"ADC Clock Synchronization"},
-    {0x00434,  @"Rest ADC-FPGA-Logic"},
+    {0x00430,  @"ADC Clock Synchronization", YES, YES},
+    {0x00434,  @"Reset ADC-FPGA-Logic", YES, YES},
 
-    {0x0043C,  @"Trigger Out pulse"},
+    {0x0043C,  @"Trigger Out pulse", YES, YES},
 
     
 	//group 1
-	{0x02000,  @"Event configuration (ADC1 ch1-ch4)"},
-	{0x02004,  @"Sample Memory Start Address (ADC1 ch1-ch4)"},
-	{0x02008,  @"Sample/Extended Block Length (ADC1 ch1-ch4)"},
-	{0x0200C,  @"Direct Memory Pretrigger Block Length register (ADC1 ch1-ch4)"},
+	{0x02000,  @"Event configuration (ADC1 ch1-ch4)", YES, YES},
+	{0x02004,  @"Sample Memory Start Address (ADC1 ch1-ch4)", YES, YES},
+	{0x02008,  @"Sample/Extended Block Length (ADC1 ch1-ch4)", YES, YES},
+	{0x0200C,  @"Direct Memory Pretrigger Block Length register (ADC1 ch1-ch4)", YES, YES},
     
-	{0x02010,  @"Ringbuffer Pretrigger Delay (ADC1 ch1-ch2)"},
-	{0x02014,  @"Ringbuffer Pretrigger Delay (ADC1 ch3-ch4)"},
-	{0x02018,  @"Direct Memory Max N of Events (ADC1 ch1-ch4)"},
-	{0x0201C,  @"End Address Threshold"},
+	{0x02010,  @"Ringbuffer Pretrigger Delay (ADC1 ch1-ch2)", YES, YES},
+	{0x02014,  @"Ringbuffer Pretrigger Delay (ADC1 ch3-ch4)", YES, YES},
+	{0x02018,  @"Direct Memory Max N of Events (ADC1 ch1-ch4)", YES, YES},
+	{0x0201C,  @"End Address Threshold", YES, YES},
     
-	{0x02020,  @"Trigger/Gate GT Threshold (ADC1 ch1)"},
-	{0x02024,  @"Trigger/Gate LT Threshold (ADC1 ch1)"},
-	{0x02028,  @"Trigger/Gate GT Threshold (ADC1 ch2)"},
-	{0x0202C,  @"Trigger/Gate LT Threshold (ADC1 ch2)"},
-	{0x02030,  @"Trigger/Gate GT Threshold (ADC1 ch3)"},
-	{0x02034,  @"Trigger/Gate LT Threshold (ADC1 ch3)"},
-	{0x02038,  @"Trigger/Gate GT Threshold (ADC1 ch4)"},
-	{0x0203C,  @"Trigger/Gate LT Threshold (ADC1 ch4)"},
+	{0x02020,  @"Trigger/Gate GT Threshold (ADC1 ch1)", YES, YES},
+	{0x02024,  @"Trigger/Gate LT Threshold (ADC1 ch1)", YES, YES},
+	{0x02028,  @"Trigger/Gate GT Threshold (ADC1 ch2)", YES, YES},
+	{0x0202C,  @"Trigger/Gate LT Threshold (ADC1 ch2)", YES, YES},
+	{0x02030,  @"Trigger/Gate GT Threshold (ADC1 ch3)", YES, YES},
+	{0x02034,  @"Trigger/Gate LT Threshold (ADC1 ch3)", YES, YES},
+	{0x02038,  @"Trigger/Gate GT Threshold (ADC1 ch4)", YES, YES},
+	{0x0203C,  @"Trigger/Gate LT Threshold (ADC1 ch4)", YES, YES},
 
-    {0x02040,  @"Sampling Status (ADC1 ch1-ch4)"},
-	{0x02044,  @"Actual Sample Address (ADC1 ch1-ch4)"},
-	{0x02048,  @"Direct Memory Event Counter (ADC1 ch1-ch4)"},
-	{0x0204C,  @"Direct Memory Actual Event Start Address (ADC1 ch1-ch4)"},
+    {0x02040,  @"Sampling Status (ADC1 ch1-ch4)", YES, NO},
+	{0x02044,  @"Actual Sample Address (ADC1 ch1-ch4)", YES, NO},
+	{0x02048,  @"Direct Memory Event Counter (ADC1 ch1-ch4)", YES, NO},
+	{0x0204C,  @"Direct Memory Actual Event Start Address (ADC1 ch1-ch4)", YES, NO},
     
-	{0x02050,  @"Actual Sample Value (ADC1 ch1-ch2)"},
-	{0x02054,  @"Actual Sample Value (ADC1 ch3-ch4)"},
+	{0x02050,  @"Actual Sample Value (ADC1 ch1-ch2)", YES, NO},
+	{0x02054,  @"Actual Sample Value (ADC1 ch3-ch4)", YES, NO},
     
-	{0x02058,  @"Aurora Protocol/Data Status (ADC1)"},
-	{0x0205C,  @"Internal Status (ADC1)"},
+	{0x02058,  @"Aurora Protocol/Data Status (ADC1)", YES, NO},
+	{0x0205C,  @"Internal Status (ADC1)", YES, NO},
     
-	{0x02060,  @"Aurora Protocol TX Live counter (ADC1)"},
+	{0x02060,  @"Aurora Protocol TX Live counter (ADC1)", YES, NO},
     
-	{0x02070,  @"Individual Channel Select/Set Veto (ADC1 ch1-ch4)"},
+	{0x02070,  @"Individual Channel Select/Set Veto (ADC1 ch1-ch4)", YES, YES},
  
-    {0x02400,  @"Input Tap Delay (ADC1 ch1-ch4)"},
+    {0x02400,  @"Input Tap Delay (ADC1 ch1-ch4)", YES, YES},
 	
     
 	//group 2
-	{0x03000,  @"Event configuration (ADC2 ch5-ch8)"},
-    {0x03004,  @"Sample Memory Start Address (ADC2 ch5-ch8)"},
-    {0x03008,  @"Sample/Extended Block Length (ADC2 ch5-ch8)"},
-    {0x0300C,  @"Direct Memory Pretrigger Block Length register (ADC2 ch5-ch8)"},
+	{0x03000,  @"Event configuration (ADC2 ch5-ch8)", YES, YES},
+    {0x03004,  @"Sample Memory Start Address (ADC2 ch5-ch8)", YES, YES},
+    {0x03008,  @"Sample/Extended Block Length (ADC2 ch5-ch8)", YES, YES},
+    {0x0300C,  @"Direct Memory Pretrigger Block Length register (ADC2 ch5-ch8)", YES, YES},
     
-    {0x03010,  @"Ringbuffer Pretrigger Delay (ADC2 ch5-ch6)"},
-    {0x03014,  @"Ringbuffer Pretrigger Delay (ADC2 ch7-ch8)"},
-    {0x03018,  @"Direct Memory Max N of Events (ADC2 ch5-ch8)"},
-    {0x0301C,  @"End Address Threshold"},
+    {0x03010,  @"Ringbuffer Pretrigger Delay (ADC2 ch5-ch6)", YES, YES},
+    {0x03014,  @"Ringbuffer Pretrigger Delay (ADC2 ch7-ch8)", YES, YES},
+    {0x03018,  @"Direct Memory Max N of Events (ADC2 ch5-ch8)", YES, YES},
+    {0x0301C,  @"End Address Threshold", YES, YES},
     
-    {0x03020,  @"Trigger/Gate GT Threshold (ADC2 ch5)"},
-    {0x03024,  @"Trigger/Gate LT Threshold (ADC2 ch5)"},
-    {0x03028,  @"Trigger/Gate GT Threshold (ADC2 ch6)"},
-    {0x0302C,  @"Trigger/Gate LT Threshold (ADC2 ch6)"},
-    {0x03030,  @"Trigger/Gate GT Threshold (ADC2 ch7)"},
-    {0x03034,  @"Trigger/Gate LT Threshold (ADC2 ch7)"},
-    {0x03038,  @"Trigger/Gate GT Threshold (ADC2 ch8)"},
-    {0x0303C,  @"Trigger/Gate LT Threshold (ADC2 ch8)"},
+    {0x03020,  @"Trigger/Gate GT Threshold (ADC2 ch5)", YES, YES},
+    {0x03024,  @"Trigger/Gate LT Threshold (ADC2 ch5)", YES, YES},
+    {0x03028,  @"Trigger/Gate GT Threshold (ADC2 ch6)", YES, YES},
+    {0x0302C,  @"Trigger/Gate LT Threshold (ADC2 ch6)", YES, YES},
+    {0x03030,  @"Trigger/Gate GT Threshold (ADC2 ch7)", YES, YES},
+    {0x03034,  @"Trigger/Gate LT Threshold (ADC2 ch7)", YES, YES},
+    {0x03038,  @"Trigger/Gate GT Threshold (ADC2 ch8)", YES, YES},
+    {0x0303C,  @"Trigger/Gate LT Threshold (ADC2 ch8)", YES, YES},
     
-    {0x03040,  @"Sampling Status (ADC2 ch5-ch8)"},
-    {0x03044,  @"Next Sample Address (ADC2 ch5-ch8)"},
-    {0x03048,  @"Direct Memory Event Counter (ADC2 ch5-ch8)"},
-    {0x0304C,  @"Direct Memory Actual Event Start Address (ADC2 ch5-ch8)"},
+    {0x03040,  @"Sampling Status (ADC2 ch5-ch8)", YES, NO},
+    {0x03044,  @"Next Sample Address (ADC2 ch5-ch8)", YES, NO},
+    {0x03048,  @"Direct Memory Event Counter (ADC2 ch5-ch8)",YES, NO},
+    {0x0304C,  @"Direct Memory Actual Event Start Address (ADC2 ch5-ch8)", YES, NO},
     
-    {0x03050,  @"Actual Sample Value (ADC2 ch5-ch6)"},
-    {0x03054,  @"Actual Sample Value (ADC2 ch7-ch8)"},
+    {0x03050,  @"Actual Sample Value (ADC2 ch5-ch6)", YES, NO},
+    {0x03054,  @"Actual Sample Value (ADC2 ch7-ch8)", YES, NO},
     
-    {0x03058,  @"Aurora Protocol/Data Status (ADC2)"},
-    {0x0305C,  @"Internal Status (ADC2)"},
+    {0x03058,  @"Aurora Protocol/Data Status (ADC2)", YES, NO},
+    {0x0305C,  @"Internal Status (ADC2)", YES, NO},
     
-    {0x03060,  @"Aurora Protocol TX Live counter (ADC2)"},
+    {0x03060,  @"Aurora Protocol TX Live counter (ADC2)", YES, NO},
     
-    {0x03070,  @"Individual Channel Select/Set Veto (ADC2 ch5-ch8)"},
+    {0x03070,  @"Individual Channel Select/Set Veto (ADC2 ch5-ch8)", YES, YES},
     
-    {0x03400,  @"Input Tap Delay (ADC2 ch5-ch8)"},
+    {0x03400,  @"Input Tap Delay (ADC2 ch5-ch8)", YES, YES},
     
 };
 
@@ -295,7 +316,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	
 	[gateLengths release];
 	[pulseLengths release];
-	[peakingTimes release];
     
     [internalTriggerDelays release];
 	[endAddressThresholds release];
@@ -304,15 +324,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	
 //	[cfdControls release];
     [dacOffsets release];
-	[sumGs release];
 	[sampleLengths release];
     [sampleStartIndexes release];
-    [preTriggerDelays release];
     [triggerGateLengths release];
-	[triggerDecimations release];
-    [energyGapTimes release];
-    [energyTauFactors release];
-	[energyDecimations release];
+
 	
 	[waveFormRateGroup release];
     [super dealloc];
@@ -354,19 +369,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ClockSourceChanged object:self];
 }
 
-- (short) eventSavingMode:(short)aGroup
-{
-    return eventSavingMode[aGroup];
-}
-
-- (void) setEventSavingModeOf:(short)aGroup toValue:(short)aMode
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEventSavingModeOf:aGroup toValue:aMode];
-    eventSavingMode[aGroup] = [self limitIntValue:aMode min:0 max:3];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EventSavingModeChanged object:self];
-}
-
 
 - (BOOL) TDCMeasurementEnabled {
     return TDCMeasurementEnabled;
@@ -374,7 +376,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) setTDCMeasurementEnabled: (BOOL)aState {
     
-    [[[self undoManager] prepareWithInvocationTarget:self] setPulseMode:TDCMeasurementEnabled];
+    [[[self undoManager] prepareWithInvocationTarget:self] setTDCMeasurementEnabled:TDCMeasurementEnabled];
     
     TDCMeasurementEnabled = aState;
     
@@ -410,8 +412,212 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelShipTimeRecordAlsoChanged object:self];
 }
 
+#pragma mark -- register r/w accessors
+- (short) registerIndex
+{
+    return registerIndex;
+}
+
+- (void) setRegisterIndex:(int)aRegisterIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterIndex:registerIndex];
+    registerIndex = aRegisterIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelRegisterIndexChanged object:self];
+}
+
+- (unsigned long) registerWriteValue
+{
+    return registerWriteValue;
+}
+
+- (void) setRegisterWriteValue:(unsigned long)aWriteValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:registerWriteValue];
+    registerWriteValue = aWriteValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelRegisterWriteValueChanged object:self];
+}
+
+- (NSString*) registerNameAt:(unsigned int)index
+{
+    if (index >= kNumSIS3305ReadRegs) return @"";
+    return register_information[index].name;
+}
+
+- (unsigned short) registerOffsetAt:(unsigned int)index
+{
+    if (index >= kNumSIS3305ReadRegs) return 0;
+    return register_information[index].offset;
+}
+
+
+#pragma mark -- Event config Accessors
+
+// **********
+// Event saving mode bits
+// bit 2:0 of event config
+// **********
+- (short) eventSavingMode:(short)aGroup{    return eventSavingMode[aGroup]; }
+
+- (void) setEventSavingModeOf:(short)aGroup toValue:(short)aMode
+{
+    // event saving mode gives 3 bits which are eventually written to the event config reg
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventSavingModeOf:aGroup toValue:[self eventSavingMode:aGroup]];
+    
+    eventSavingMode[aGroup] = [self limitIntValue:aMode min:0 max:7];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EventSavingModeChanged object:self];
+}
+
+// **********
+// bit 3 of event config unused
+// **********
+
+
+// **********
+// ADC Gate mode bit
+// bit 4 of event config
+// **********
+- (BOOL) ADCGateModeEnabled:(unsigned short)group
+{
+    return ADCGateModeEnabled[group];
+}
+
+- (void) setADCGateModeEnabled:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setADCGateModeEnabled:group toValue:[self ADCGateModeEnabled:group]];
+    
+    ADCGateModeEnabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ADCGateModeEnabledChanged object:self];
+}
+
+
+
+// **********
+// Global trigger enable bit
+// bit 5 of event config
+// **********
+- (BOOL) globalTriggerEnabledOnGroup:(unsigned short)group
+{
+    return globalTriggerEnabled[group];
+}
+
+- (void) setGlobalTriggerEnabledOnGroup:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setGlobalTriggerEnabledOnGroup:group toValue:[self globalTriggerEnabledOnGroup:group]];
+    
+    globalTriggerEnabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GlobalTriggerEnabledChanged object:self];
+}
+
+
+// **********
+// Internal trigger enabled bit
+// bit 6 of event config
+// **********
+- (BOOL) internalTriggerEnabled:(short)group { return internalTriggerEnabled[group]; }
+
+- (void) setInternalTriggerEnabled:(short)group toValue:(BOOL)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerEnabled:group toValue:internalTriggerEnabled[group]];
+    internalTriggerEnabled[group] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305InternalTriggerEnabledChanged object:self];
+}
+
+// **********
+// bit 7 of event config unused
+// **********
+
+// **********
+// Start sampling after first external trigger
+// bit 8 of event config
+// **********
+- (BOOL) startEventSamplingWithExtTrigEnabled:(unsigned short)group {return startEventSamplingWithExtTrigEnabled[group]; }
+
+- (void) setStartEventSamplingWithExtTrigEnabled:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStartEventSamplingWithExtTrigEnabled:group toValue:startEventSamplingWithExtTrigEnabled[group]];
+    startEventSamplingWithExtTrigEnabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305StartEventSamplingWithExtTrigEnabledChanged object:self];
+}
+
+
+// **********
+// Clear timestamp when sampling enabled
+// bit 9 of event config
+// **********
+- (BOOL) clearTimestampWhenSamplingEnabledEnabled:(unsigned short)group {return clearTimestampWhenSamplingEnabledEnabled[group]; }
+
+- (void) setClearTimestampWhenSamplingEnabledEnabled:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClearTimestampWhenSamplingEnabledEnabled:group toValue:clearTimestampWhenSamplingEnabledEnabled[group]];
+    clearTimestampWhenSamplingEnabledEnabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ClearTimestampWhenSamplingEnabledEnabledChanged object:self];
+}
+
+
+// **********
+// Disable timestamp clear
+// bit 10 of event config
+// **********
+- (BOOL) clearTimestampDisabled:(unsigned short)group {return clearTimestampDisabled[group];}
+
+- (void) setClearTimestampDisabled:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClearTimestampDisabled:group toValue:clearTimestampDisabled[group]];
+    clearTimestampDisabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ClearTimestampDisabledChanged object:self];
+}
+
+
+// **********
+// Enable Gray code
+// bit 12 of event config
+// **********
+- (BOOL) grayCodeEnabled:(unsigned short)group {return grayCodeEnabled[group];}
+
+- (void) setGrayCodeEnabled:(unsigned short)group toValue:(BOOL) value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setGrayCodeEnabled:group toValue:grayCodeEnabled[group]];
+    grayCodeEnabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GrayCodeEnabledChanged object:self];
+    
+}
+
+
+// **********
+// Disable direct memory header
+// bit 16 of event config
+// **********
+- (BOOL) directMemoryHeaderDisabled:(unsigned short)group {return directMemoryHeaderDisabled[group];}
+
+- (void) setDirectMemoryHeaderDisabled:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDirectMemoryHeaderDisabled:group toValue:directMemoryHeaderDisabled[group]];
+    directMemoryHeaderDisabled[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305DirectMemoryHeaderDisabledChanged object:self];
+}
+
+
+// **********
+// "Enable Direct Memory Stop Arm for Trigger adter PreTriggerDelay" bit
+// forces you to wait the length of the pretrig delay time before arming the sample logic in wrap mode
+// bit 18 of event config
+// **********
+
+- (BOOL) waitPreTrigTimeBeforeDirectMemTrig:(unsigned short)group {return waitPreTrigTimeBeforeDirectMemTrig[group];}
+
+- (void) setWaitPreTrigTimeBeforeDirectMemTrig:(unsigned short)group toValue:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWaitPreTrigTimeBeforeDirectMemTrig:group toValue:waitPreTrigTimeBeforeDirectMemTrig[group]];
+    waitPreTrigTimeBeforeDirectMemTrig[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged object:self];
+}
+
+
+
+
 // Control status reg things
-#pragma mark --- Control Status Reg settings
+#pragma mark --- Control Status Reg Accessors
 
 
 - (void) setLedApplicationMode:(BOOL)mode
@@ -514,28 +720,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 
 #pragma mark -- Group settings
-/*
- Internal trigger enabling
- 
- The internal trigger enable mask is 8-bits, each representing a channel
- 
- */
-//- (short) internalTriggerEnabledMask { return internalTriggerEnabledMask; }
-/*
- Internal trigger enabling
- 
- The internal trigger enable mask is 8-bits, each representing a channel
- 
- 
- */
 
-- (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setInternalTriggerEnabled:chan withValue:internalTriggerEnabled[chan]];
-    internalTriggerEnabled[chan] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305InternalTriggerEnabledChanged object:self];
-}
-- (BOOL) internalTriggerEnabled:(short)chan { return internalTriggerEnabled[chan]; }
+
 
 - (short) externalTriggerEnabledMask { return externalTriggerEnabledMask; }
 
@@ -872,7 +1058,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     aValue = [self limitIntValue:aValue min:4 max:0xfffc];
     aValue = (aValue/4)*4;
     [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [self calculateSampleValues];
+//    [self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SampleLengthChanged object:self];
 }
 
@@ -901,28 +1087,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setPulseLength:aChan withValue:[self pulseLength:aChan]];
     [pulseLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305PulseLengthChanged object:self];
-}
-
-- (short) sumG:(short)aChan { return [[sumGs objectAtIndex:aChan] shortValue]; }
-- (void) setSumG:(short)aChan withValue:(short)aValue
-{
-    short temp = [self peakingTime:aChan];
-    aValue = [self limitIntValue:aValue min:0 max:0x3ff];
-    [[[self undoManager] prepareWithInvocationTarget:self] setSumG:aChan withValue:[self sumG:aChan]];
-    if (aValue < temp) aValue = temp;
-    [sumGs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SumGChanged object:self];
-}
-
-- (short) peakingTime:(short)aChan { return [[peakingTimes objectAtIndex:aChan] shortValue]; }
-- (void) setPeakingTime:(short)aChan withValue:(short)aValue
-{
-    short temp = [self sumG:aChan];
-    aValue = [self limitIntValue:aValue min:0 max:0x3ff];
-    [[[self undoManager] prepareWithInvocationTarget:self] setPeakingTime:aChan withValue:[self peakingTime:aChan]];
-    if (temp < aValue) [self setSumG:aChan withValue:aValue];
-    [peakingTimes replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305PeakingTimeChanged object:self];
 }
 
 
@@ -1013,94 +1177,47 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelRunModeChanged object:self];
-	[self calculateSampleValues];
+//	[self calculateSampleValues];
 }
-
-- (int) energySampleStartIndex3 {
-    return energySampleStartIndex3;
-}
-
-- (void) setEnergySampleStartIndex3:(int)aEnergySampleStartIndex3
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex3:energySampleStartIndex3];
-    energySampleStartIndex3 = aEnergySampleStartIndex3;
-	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex3Changed object:self];
-}
-
-- (int) energySampleStartIndex2 {
-    return energySampleStartIndex2;
-}
-
-- (void) setEnergySampleStartIndex2:(int)aEnergySampleStartIndex2
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex2:energySampleStartIndex2];
-    energySampleStartIndex2 = aEnergySampleStartIndex2;
-	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex2Changed object:self];
-}
-
-- (int) energySampleStartIndex1 {
-    return energySampleStartIndex1;
-}
-
-- (void) setEnergySampleStartIndex1:(int)aEnergySampleStartIndex1
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleStartIndex1:energySampleStartIndex1];
-    energySampleStartIndex1 = aEnergySampleStartIndex1;
-	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex1Changed object:self];
-}
-
-- (int) energyNumberToSum {
-    return energyNumberToSum;
-}
-
-- (void) setEnergyNumberToSum:(int)aNumberToSum
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyNumberToSum:energyNumberToSum];
-    energyNumberToSum = [self limitIntValue:aNumberToSum min:4 max:256];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyNumberToSumChanged object:self];
-}	
-
-- (int) energySampleLength {
-    return energySampleLength;
-}
-
-- (void) setEnergySampleLength:(int)aEnergySampleLength
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
-    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:kSIS3305MaxEnergyWaveform];
-	[self calculateSampleValues];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleLengthChanged object:self];
-}
-
-- (int) energyTauFactor:(short)aChannel 
-{ 
-	if(aChannel>=kNumSIS3305Channels)return 0;
-	return [[energyTauFactors objectAtIndex:aChannel] intValue];
-}
-- (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue
-{
-	if(aChannel>=kNumSIS3305Channels)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:aChannel withValue:[self energyTauFactor:aChannel]];
-    int energyTauFactor = [self limitIntValue:aValue min:0 max:0x3f];
-	[energyTauFactors replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:energyTauFactor]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyTauFactorChanged object:self];
-}
-- (int) energyGapTime:(short)aGroup 
-{ 
-	if(aGroup>=kNumSIS3305Groups)return 0;
-	return [[energyGapTimes objectAtIndex:aGroup] intValue]; 
-}
-- (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue
-{
-	if(aGroup>=kNumSIS3305Groups)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:aGroup withValue:[self energyGapTime:aGroup]];
-    aValue = [self limitIntValue:aValue min:0 max:0xff];
-	[energyGapTimes replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aValue]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyGapTimeChanged object:self];
-}
+//
+//- (int) energySampleLength {
+//    return energySampleLength;
+//}
+//
+//- (void) setEnergySampleLength:(int)aEnergySampleLength
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
+//    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:kSIS3305MaxEnergyWaveform];
+//	[self calculateSampleValues];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleLengthChanged object:self];
+//}
+//
+//- (int) energyTauFactor:(short)aChannel 
+//{ 
+//	if(aChannel>=kNumSIS3305Channels)return 0;
+//	return [[energyTauFactors objectAtIndex:aChannel] intValue];
+//}
+//- (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue
+//{
+//	if(aChannel>=kNumSIS3305Channels)return;
+//    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:aChannel withValue:[self energyTauFactor:aChannel]];
+//    int energyTauFactor = [self limitIntValue:aValue min:0 max:0x3f];
+//	[energyTauFactors replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:energyTauFactor]];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyTauFactorChanged object:self];
+//}
+//- (int) energyGapTime:(short)aGroup 
+//{ 
+//	if(aGroup>=kNumSIS3305Groups)return 0;
+//	return [[energyGapTimes objectAtIndex:aGroup] intValue]; 
+//}
+//- (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue
+//{
+//	if(aGroup>=kNumSIS3305Groups)return;
+//    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:aGroup withValue:[self energyGapTime:aGroup]];
+//    aValue = [self limitIntValue:aValue min:0 max:0xff];
+//	[energyGapTimes replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aValue]];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyGapTimeChanged object:self];
+//}
 
 
 - (int) triggerGateLength:(short)aGroup 
@@ -1120,11 +1237,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (int) preTriggerDelay:(short)aChannel
 {
-    if(aChannel>kNumSIS3305Channels)return 0;
-//FIX: set this up to use the array, or change the other bits to use this object
-    int value = [[preTriggerDelays objectAtIndex:aChannel] intValue];
-
-    return value;
+ //   if(aChannel>kNumSIS3305Channels)return 0; //FIX: set this up to use the array, or change the other bits to use this object
+//    int value  = [[preTriggerDelays objectAtIndex:aChannel] intValue];
+    
+    return preTriggerDelays[aChannel];
+    
+ //   return value;
 }
 
 - (void) setPreTriggerDelay:(short)aChannel withValue:(int)aPreTriggerDelay
@@ -1133,14 +1251,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setPreTriggerDelay:aChannel withValue:[self preTriggerDelay:aChannel]];
     int preTriggerDelay = [self limitIntValue:aPreTriggerDelay min:1 max:1023];
 	
-    short maxInternalTrigDelay = [[internalTriggerDelays valueForKeyPath:@"@max.self"] intValue];//MAX([self internalTriggerDelay:aChannel*2],[self internalTriggerDelay:aChannel*2+1]);
-	short decimation = powf(2.,(float)[self triggerDecimation:aChannel]);
-	if(preTriggerDelay< (decimation + maxInternalTrigDelay)){
-		preTriggerDelay = decimation + maxInternalTrigDelay;
-		NSLogColor([NSColor redColor], @"SIS3305: Increased the pretrigger delay (channel %d) to be >= decimation+triggerDelay\n",aChannel);
-	}
-	
-	[preTriggerDelays replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:preTriggerDelay]];
+//    short maxInternalTrigDelay = [[internalTriggerDelays valueForKeyPath:@"@max.self"] intValue];//MAX([self internalTriggerDelay:aChannel*2],[self internalTriggerDelay:aChannel*2+1]);
+//	short decimation = powf(2.,(float)[self triggerDecimation:aChannel]);
+//	if(preTriggerDelay< (decimation + maxInternalTrigDelay)){
+//		preTriggerDelay = decimation + maxInternalTrigDelay;
+//		NSLogColor([NSColor redColor], @"SIS3305: Increased the pretrigger delay (channel %d) to be >= decimation+triggerDelay\n",aChannel);
+//	}
+//	[preTriggerDelays replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:preTriggerDelay]];
+    
+    preTriggerDelays[aChannel] = preTriggerDelay;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelPreTriggerDelayChanged object:self];
 }
@@ -1226,8 +1345,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //		[self setThreshold:i withValue:0x64];
 //		[self setHighThreshold:i withValue:0x0];
 //        [self setEnabled:i withValue:YES];
-		[self setPeakingTime:i withValue:250];
-		[self setSumG:i withValue:263];
 		[self setInternalTriggerDelay:i withValue:0];
 		[self setDacOffset:i withValue:30000];
         [self setPreTriggerDelay:i withValue:1];
@@ -1238,19 +1355,28 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setGTThresholdOff:i withValue:1023];
         [self setGTThresholdOn:i withValue:1023];
         [self setTapDelay:i withValue:0];
+
+        [self setPreTriggerDelay:i withValue:0];
+        [self setGateLength:i withValue:64];
+        [self setGain:i withValue:1];
+
 	}
 	for(i=0;i<kNumSIS3305Groups;i++){
 		[self setSampleLength:i withValue:2048];
 		[self setTriggerGateLength:i withValue:2048];
-		[self setTriggerDecimation:i withValue:0];
-		[self setEnergyDecimation:i withValue:0];
 		[self setSampleStartIndex:i withValue:0];
-		[self setEnergyGapTime:i withValue:25];
-        [self setInternalTriggerEnabled:i withValue:YES];
-	}
+        
+        [self setInternalTriggerEnabled:i toValue:YES];
+        [self setGlobalTriggerEnabledOnGroup:i toValue:NO];
+        [self setClearTimestampDisabled:i toValue:NO];
+        [self setClearTimestampWhenSamplingEnabledEnabled:i toValue:YES];
+        [self setGrayCodeEnabled:i toValue:NO];
+        [self setDirectMemoryHeaderDisabled:i toValue:NO];
+        [self setEventSavingModeOf:i toValue:0];
+        [self setADCGateModeEnabled:i toValue:NO];
+        [self setWaitPreTrigTimeBeforeDirectMemTrig:i toValue:YES];
+    }
     
-	[self setShipEnergyWaveform:NO];
-	[self setShipSummedWaveform:NO];
 	[self setTriggerOutEnabledMask:0x0];
 	[self setInputInvertedMask:0x0];
 	[self setInternalGateEnabledMask:0xff];
@@ -1434,59 +1560,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self setTriggerOutEnabledMask:aMask];
 }
 
-- (BOOL) shipEnergyWaveform { return shipEnergyWaveform;}
-- (void) setShipEnergyWaveform:(BOOL)aState
-{ 
-	[[[self undoManager] prepareWithInvocationTarget:self] setShipEnergyWaveform:shipEnergyWaveform];
-	shipEnergyWaveform = aState;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SetShipWaveformChanged object:self];
-	if (!shipEnergyWaveform && ![self shipSummedWaveform]) {
-		[self setEnergySampleLength:0];		
-	} 
-	else {
-		[self setEnergySampleLength:kSIS3305MaxEnergyWaveform];
-		// The following forces the start indices to calculate automatically.
-		// This could avoid some confusion about the special cases of 
-		// start indices 2 and 3 being 0.  This forces them to be
-		// at least span the max sample length.  (There's a check 
-		// in calculateSampleValues.)
-		[self setEnergySampleStartIndex2:1];
-	}
-}
-
-- (BOOL) shipSummedWaveform { return shipSummedWaveform;}
-- (void) setShipSummedWaveform:(BOOL)aState
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setShipSummedWaveform:shipSummedWaveform];
-	shipSummedWaveform = aState;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SetShipSummedWaveformChanged object:self];
-	if (!shipSummedWaveform && ![self shipEnergyWaveform]) {
-		[self setEnergySampleLength:0];
-	} 
-	else {
-		[self setEnergySampleLength:kSIS3305MaxEnergyWaveform];
-		[self setEnergySampleStartIndex2:0];
-		[self setEnergySampleStartIndex3:0];
-		
-		// The following forces the start indices to calculate automatically.
-		// This could avoid some confusion about the special cases of 
-		// start indices 2 and 3 being 0.  This forces them to be
-		// at least span the max sample length.  (There's a check 
-		// in calculateSampleValues.)
-		//[self setEnergySampleStartIndex2:1];
-	}
-}
-- (NSString*) energyBufferAssignment
-{
-	if(shipSummedWaveform == YES){
-		return @"Post-Trig Samples:";
-	}
-	else {
-		return @"Start Indexes:";
-	}
-}
-
-
 
 
 //- (short) cfdControl:(short)aChannel 
@@ -1504,19 +1577,21 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //}
 //
 
-- (short) energyDecimation:(short)aGroup 
-{ 
-	if(aGroup>=kNumSIS3305Groups)return 0;
-	return [[energyDecimations objectAtIndex:aGroup] intValue]; 
+
+
+- (BOOL) ledEnabled:(unsigned short)ledNum
+{
+    return ledEnable[ledNum];
 }
 
-- (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue 
-{ 
- 	if(aGroup>=kNumSIS3305Groups)return;
-	[[[self undoManager] prepareWithInvocationTarget:self] setEnergyDecimation:aGroup withValue:[self energyDecimation:aGroup]];
-    int energyDecimation = [self limitIntValue:aValue min:0 max:0x3];
-	[energyDecimations replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:energyDecimation]];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnergyDecimationChanged object:self];
+- (void) setLed:(unsigned short)ledNum to:(BOOL)state
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLed:ledNum to:[self ledEnabled:ledNum]];
+    
+    ledEnable[ledNum] = state;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LEDEnabledChanged object:self];
+   
 }
 
 - (unsigned long) endAddressThreshold:(short)aGroup  
@@ -1537,103 +1612,145 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEndAddressThresholdChanged object:self];
 }
 
-- (int) triggerDecimation:(short)aGroup 
-{ 
-	if(aGroup>=kNumSIS3305Groups)return 0;
-	return [[triggerDecimations objectAtIndex:aGroup] intValue]; 
-}
-
-- (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue 
-{ 
-	if(aGroup>=kNumSIS3305Groups)return;
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerDecimation:aGroup withValue:[self triggerDecimation:aGroup]];
-    int triggerDecimation = [self limitIntValue:aValue min:0 max:0x3];
-		
-	[triggerDecimations replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:triggerDecimation]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305TriggerDecimationChanged object:self];
-	
-	//force a constraint check by reloading the pretrigger delay
-	[self setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
-
-}
 
 
-- (void) calculateSampleValues
-{
-//	if(runMode == kMcaRunMode)   return;
-//	else {
-		numEnergyValues = energySampleLength;
-		
-		if(numEnergyValues > kSIS3305MaxEnergyWaveform){
-			// This should never be happen in the current implementation since we 
-			// handle this value internally, but checking nonetheless in case 
-			// in the future we modify this.  
-			NSLogColor([NSColor redColor],@"Number of energy values is to high (max = %d) ; actual = %d \n",
-					   kSIS3305MaxEnergyWaveform, numEnergyValues);
-			NSLogColor([NSColor redColor],@"Value forced to %d\n", kSIS3305MaxEnergyWaveform);
-			numEnergyValues = kSIS3305MaxEnergyWaveform;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleLengthChanged object:self];
+//- (void) calculateSampleValues
+//{
+////	if(runMode == kMcaRunMode)   return;
+////	else {
+//		numEnergyValues = energySampleLength;
+//		
+//		if(numEnergyValues > kSIS3305MaxEnergyWaveform){
+//			// This should never be happen in the current implementation since we 
+//			// handle this value internally, but checking nonetheless in case 
+//			// in the future we modify this.  
+//			NSLogColor([NSColor redColor],@"Number of energy values is to high (max = %d) ; actual = %d \n",
+//					   kSIS3305MaxEnergyWaveform, numEnergyValues);
+//			NSLogColor([NSColor redColor],@"Value forced to %d\n", kSIS3305MaxEnergyWaveform);
+//			numEnergyValues = kSIS3305MaxEnergyWaveform;
+//			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleLengthChanged object:self];
+////		}
+//		
+//		int group;
+//		for(group=0;group<kNumSIS3305Groups;group++){
+//			numRawDataLongWords = [self sampleLength:group]/2;
+//			rawDataIndex  = 2 ;
+//			
+//			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
+//			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header 
+//			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
+//			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
+//			
+//			unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
+//			//unsigned long maxEvents = 1;
+//			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
+//			// Check the sample indices
+//			// Don't call setEnergy* from in here!  Cause stack overflow...
+//			if (numEnergyValues == 0) {
+//				// Set all indices to 0
+//				energySampleStartIndex1 = 1;
+//				energySampleStartIndex2 = 0;
+//				energySampleStartIndex3 = 0;
+//			} 
+//			else if (energySampleStartIndex2 != 0 || energySampleStartIndex3 != 0) {
+//				// Means we are requesting different pieces of the waveform.
+//				// Make sure they are correct.
+//				if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3 + 1) {
+//					int aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
+//					energySampleStartIndex2 = aValue;
+//					if (energySampleStartIndex3 == 0) {
+//						// This forces us to also reset the third index if it is set to 0.
+//						energySampleStartIndex3 = 0;
+//					}
+//				}
+//				
+//				if (energySampleStartIndex2 == 0 && energySampleStartIndex3 != 0) {
+//					energySampleStartIndex3 = 0;
+//				} 
+//				else if (energySampleStartIndex2 != 0 && 
+//						 energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
+//					int aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
+//					energySampleStartIndex3 = aValue;
+//				}
+//			}			
+//			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex1Changed object:self];
+//			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex2Changed object:self];
+//			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex3Changed object:self];
+//			
+//			// Finally check the trigger gate length to make sure it is big enough
+//			if ([self triggerGateLength:group] < [self sampleLength:group]) {
+//				[self setTriggerGateLength:group withValue:[self sampleLength:group]];
+//			}
 //		}
-		
-		int group;
-		for(group=0;group<kNumSIS3305Groups;group++){
-			numRawDataLongWords = [self sampleLength:group]/2;
-			rawDataIndex  = 2 ;
-			
-			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
-			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header 
-			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;  
-			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;   
-			
-			unsigned long maxEvents = (0x200000 / eventLengthLongWords)/2;
-			//unsigned long maxEvents = 1;
-			[self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
-			// Check the sample indices
-			// Don't call setEnergy* from in here!  Cause stack overflow...
-			if (numEnergyValues == 0) {
-				// Set all indices to 0
-				energySampleStartIndex1 = 1;
-				energySampleStartIndex2 = 0;
-				energySampleStartIndex3 = 0;
-			} 
-			else if (energySampleStartIndex2 != 0 || energySampleStartIndex3 != 0) {
-				// Means we are requesting different pieces of the waveform.
-				// Make sure they are correct.
-				if (energySampleStartIndex2 < energySampleStartIndex1 + energySampleLength/3 + 1) {
-					int aValue = energySampleLength/3 + energySampleStartIndex1 + 1;
-					energySampleStartIndex2 = aValue;
-					if (energySampleStartIndex3 == 0) {
-						// This forces us to also reset the third index if it is set to 0.
-						energySampleStartIndex3 = 0;
-					}
-				}
-				
-				if (energySampleStartIndex2 == 0 && energySampleStartIndex3 != 0) {
-					energySampleStartIndex3 = 0;
-				} 
-				else if (energySampleStartIndex2 != 0 && 
-						 energySampleStartIndex3 < energySampleStartIndex2 + energySampleLength/3 + 1) {
-					int aValue = energySampleLength/3 + energySampleStartIndex2 + 1;
-					energySampleStartIndex3 = aValue;
-				}
-			}			
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex1Changed object:self];
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex2Changed object:self];
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleStartIndex3Changed object:self];
-			
-			// Finally check the trigger gate length to make sure it is big enough
-			if ([self triggerGateLength:group] < [self sampleLength:group]) {
-				[self setTriggerGateLength:group withValue:[self sampleLength:group]];
-			}
-		}
-	}
-}
+//	}
+//}
 
 
 
 
 
 #pragma mark - Hardware Access
+
+#pragma mark Setup for register R/W in dialog
+
+- (unsigned long) readRegister:(unsigned int)index
+{
+    if (index >= kNumSIS3305ReadRegs) return -1;
+    if (![self canReadRegister:index]) return -1;
+    unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_information[index].offset
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return theValue;
+}
+
+- (void) writeRegister:(unsigned int)index withValue:(unsigned long)value
+{
+    if (index >= kNumSIS3305ReadRegs) return;
+    if (![self canWriteRegister:index]) return;
+    [[self adapter] writeLongBlock:&value
+                         atAddress:[self baseAddress] + register_information[index].offset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue
+{
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + anAddress
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    
+}
+
+- (unsigned long) readFromAddress:(unsigned long)anAddress
+{
+    unsigned long value = 0;
+    [[self adapter] readLongBlock:&value
+                        atAddress:[self baseAddress] + anAddress
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    return value;
+}
+
+- (BOOL) canReadRegister:(unsigned int)index
+{
+    if (index >= kNumSIS3305ReadRegs) return NO;
+    return register_information[index].canRead;
+}
+
+- (BOOL) canWriteRegister:(unsigned int)index
+{
+    if (index >= kNumSIS3305ReadRegs) return NO;
+    return register_information[index].canWrite;
+}
+
+
 
 #pragma mark Control Status Register(s)
 
@@ -1752,6 +1869,39 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305IDChanged object:self];
 }
 
+- (unsigned long) readInterruptConfig:(BOOL)verbose
+{
+    // Interrupt config register is at 0x8, and is read/write D32
+    
+    unsigned long value;
+    
+    [[self adapter] readLongBlock:&value
+                        atAddress:[self baseAddress] + kSIS3305IrqConfig
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    
+    if(verbose)
+    {
+        NSLog(@"SIS3305 Interrupt Config: 0x%x\n",value);
+    }
+    
+    return value;
+
+}
+
+- (void) writeInterruptConfig:(unsigned long)value
+{
+    // Interrupt config register is at 0x8, and is read/write D32
+    
+    [[self adapter] writeLongBlock:&value
+                         atAddress:[self baseAddress] + kSIS3305IrqConfig
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+    return;
+}
+
 - (unsigned long) readInterruptControl:(BOOL)verbose
 {
     // Interrupt control register is at 0xC, and is read/write D32
@@ -1764,7 +1914,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    // should fix this to have more detail, but I don't really understand what this is used for...
     if(verbose)
     {
         NSLog(@"SIS3305 Interrupt Control: 0x%x\n",value);
@@ -1805,24 +1954,24 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     if (verbose)
     {
-        short triggerInTDC                  = (aValue << 4)     & 0x1;
-        short clockSourceStatus             = (aValue << 12)    & 0x3;
-        short ADCSampleLogicArmed           = (aValue << 16)    & 0x1;
-        short ADCSampleLogicEnabled         = (aValue << 17)    & 0x1;
-        short eventsToMemoryLogicBusy       = (aValue << 18)    & 0x1;
-        short memoryEndAddressThreshold     = (aValue << 19)    & 0x1;
-        short ADC1EventsToMemoryLogicBusy   = (aValue << 20)    & 0x1;
-        short ADC2EventsToMemoryLogicBusy   = (aValue << 21)    & 0x1;
-        short ADC1MemoryEndAddressThreshold = (aValue << 22)    & 0x1;
-        short ADC2MemoryEndAddressThreshold = (aValue << 23)    & 0x1;
-        short externalDirectVetoStatus      = (aValue << 24)    & 0x1;
-        short internalVetoFlag              = (aValue << 25)    & 0x1;
-        short externalVetoDelayLengthLogic  = (aValue << 26)    & 0x1;
-        short enabledMemoryOverrunVetoFlag  = (aValue << 27)    & 0x1;
-        short directMemoryBusyFlag          = (aValue << 28)    & 0x1;
-        short directMemoryStoppedFlag       = (aValue << 29)    & 0x1;
-        short ADC1MemoryOverrunVetoFlag     = (aValue << 30)    & 0x1;
-        short ADC2MemoryOverrunVetoFlag     = (aValue << 31)    & 0x1;
+        short triggerInTDC                  = (aValue >> 4)     & 0x1;
+        short clockSourceStatus             = (aValue >> 12)    & 0x3;
+        short ADCSampleLogicArmed           = (aValue >> 16)    & 0x1;
+        short ADCSampleLogicEnabled         = (aValue >> 17)    & 0x1;
+        short eventsToMemoryLogicBusy       = (aValue >> 18)    & 0x1;
+        short memoryEndAddressThreshold     = (aValue >> 19)    & 0x1;
+        short ADC1EventsToMemoryLogicBusy   = (aValue >> 20)    & 0x1;
+        short ADC2EventsToMemoryLogicBusy   = (aValue >> 21)    & 0x1;
+        short ADC1MemoryEndAddressThreshold = (aValue >> 22)    & 0x1;
+        short ADC2MemoryEndAddressThreshold = (aValue >> 23)    & 0x1;
+        short externalDirectVetoStatus      = (aValue >> 24)    & 0x1;
+        short internalVetoFlag              = (aValue >> 25)    & 0x1;
+        short externalVetoDelayLengthLogic  = (aValue >> 26)    & 0x1;
+        short enabledMemoryOverrunVetoFlag  = (aValue >> 27)    & 0x1;
+        short directMemoryBusyFlag          = (aValue >> 28)    & 0x1;
+        short directMemoryStoppedFlag       = (aValue >> 29)    & 0x1;
+        short ADC1MemoryOverrunVetoFlag     = (aValue >> 30)    & 0x1;
+        short ADC2MemoryOverrunVetoFlag     = (aValue >> 31)    & 0x1;
 
         NSLog(@"Acquisition Register (0x%04x) \n",kSIS3305AcquisitionControl);
         NSLog(@"    Trigger-in TDC MEasurement Logic is: %2s\n",triggerInTDC ? "ENABLED" : "DISABLED");
@@ -1848,7 +1997,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return aValue;
 }
 
-- (void) writeAcquistionControl
+- (void) writeAcquisitionControl
 {
     /*
      The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.
@@ -2031,6 +2180,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
     if ((readValue>>31)&1) {
         // EEPROM busy.... FIX
+        NSLog(@"SIS3305: Error, EEPROM busy\n");
     }
 
     return readValue;
@@ -2408,6 +2558,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) writeADCSerialInterface
 {
+//    this method is incomplete a written, and has more or less been replaced by the above:
+//    [self writeADCSerialInterface:
+//                            onADC:
+//                        toAddress:
+//                           viaSPI:];
     /*
      This is completely adapted from the SIS3305_ADC_SPI_Setup method in sis3305_configuration_readout_lib.c
      
@@ -2433,7 +2588,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         
         packet.chipID[i] = 1;
         
-        //        FIX: This is completely unfinished...
+        //        FIX: This is completely unfinished... was mostly replaced by another function
     }
     
     
@@ -2452,7 +2607,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 
 
-- (void) writeDataTransferControlRegister:(short)group withCommand:(short)command
+- (void) writeDataTransferControlRegister:(short)group withCommand:(short)command withAddress:(unsigned long)value
 {
     // commands:
     //      00      reset transfer FSM
@@ -2480,9 +2635,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     }
     
     if (group>=0 && group <kNumSIS3305Groups) {
-        unsigned long aValue = command<<30;
+        unsigned long writeValue = command<<30;
+        writeValue |= value;
         
-        [[self adapter] writeLongBlock:&aValue
+        [[self adapter] writeLongBlock:&writeValue
                              atAddress:[self baseAddress] + addr
                             numToWrite:1
                             withAddMod:[self addressModifier]
@@ -2706,7 +2862,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     
-    NSLog(@"SIS3305 ADC Synch Reset");
+    NSLog(@"SIS3305 ADC Synch Reset\n");
 }
 
 - (void) ADCFPGAReset
@@ -2803,32 +2959,45 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      */
     
     int i;
-    //	unsigned long tempIntGateMask  = internalGateEnabledMask;
-    //	unsigned long tempExtGateMask  = externalGateEnabledMask;
+
     
     ORCommandList* aList = [ORCommandList commandList];
     for(i=0;i<kNumSIS3305Groups;i++){
         unsigned long aValueMask = 0x0;
         
-        aValueMask |= (eventSavingMode[i]               & 0x7)    << 0;
+        aValueMask |= (eventSavingMode[i]               & 0x7)      << 0;
         // bit 3: unused
-        // bit 4 ADC Gate Mode (ERROR: should implement)
-        aValueMask |= (globalTriggerEnabled[i]          & 0x1)    << 5;
-        aValueMask |= ([self internalTriggerEnabled:i]  &0x1)     << 6;
+        // bit 4 ADC Gate Mode
+        aValueMask |= ([self ADCGateModeEnabled:i]      & 0x1)      << 4;
+        aValueMask |= (globalTriggerEnabled[i]          & 0x1)      << 5;
+        aValueMask |= ([self internalTriggerEnabled:i]  & 0x1)      << 6;
         // bit 7: unused
-        // bit 8: enable "ADC event sampling with next external trigger" (FIX: should implement)
-        // bit 9: enable timestamp clear with sample enable (FIX: should implement)
-        // bit 10: disable timestamp clear (FIX: should implement)
+        // bit 8: enable "ADC event sampling with next external trigger"
+        aValueMask |= ([self startEventSamplingWithExtTrigEnabled:i] & 0x1) << 8;
+        // bit 9: enable timestamp clear with sample enable
+        aValueMask |= ([self clearTimestampWhenSamplingEnabledEnabled:i] & 0x1) << 9;
+
+        // bit 10: disable timestamp clear
+        aValueMask |= ([self clearTimestampDisabled:i] & 0x1)       << 10;
+        
         // bit 11: unused
-        // bit 12: Gray code enable (FIX: should implement)
+        // bit 12: Gray code enable
+        aValueMask |= ([self grayCodeEnabled:i]        & 0x1)       << 12;
+        
         // bit 13,14: unused
         // bit 15: ADC Memory write via VME Test Enable (FIX: should implement)
-        // bit 16: Disable "direct memory header" bit (FIX: should implement)
+        // bit 16: Disable "direct memory header" bit
+        aValueMask |= ([self directMemoryHeaderDisabled:i] & 0x1)   << 16;
+
         // bit 17: unused
         // bit 18: Enable "direct memory stop arm for trigger after pretrigger delay" (FIX: should implement)
+
         // bit 19: unused
         // bit 20-23: ADC event header programmable info bits 0-3
+        aValueMask |= (0x3)  << 20;
         // bit 24-31: ADC event header programmable ID bits 0-7
+        aValueMask |= i << 24;
+        aValueMask |= ([self baseAddress] & 0x7F000000) << 1;    // this is the geographic address 30:24 pushed to 31:25 of this register
         
         [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
                                                        atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
@@ -2885,7 +3054,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     if (value != (value&0xFFFFFF) )
     {
-        NSLog(@"SIS3305: Invalud sample start address value, must be less than 2^24");
+        NSLog(@"SIS3305: Invalid sample start address value, must be less than 2^24\n");
         return;
     }
     
@@ -3118,29 +3287,31 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return delay;       // raw value, not converted to take into account the rate
 }
 
-- (void) writeRingbufferPretriggerDelayOnChannel:(short)chan toValue:(unsigned long)value
+- (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value
 {
     // to handle this, we need to know all of the values ahead of time (so we don't write 0 to the chan shared in the same reg)
     // to do this, we will pull from an object ringbufferPreDelay[chan]
+    // FIX: this method needs no inputs....
+    
     
     unsigned long addr, writeValue, topVal, bottomVal;
     unsigned short topChan, bottomChan;
     
     addr = [self getRingbufferPretriggerDelayOffset:chan];
 
-    if(chan%2 == 0)     // channel number is 2,4,6,8
+    if((chan%2) == 0)     // channel number is 2,4,6,8
     {
         topChan     = chan - 1;
         bottomChan  = chan;
     }
-    if((chan%2) == 1)     // channel number is 1,3,5,7
+    else if((chan%2) == 1)     // channel number is 1,3,5,7
     {
         topChan     = chan;
         bottomChan  = chan + 1;
     }
     else
     {
-        NSLog(@"SIS3305: Invalid channel. Pretrigger delay not written!\n");
+        NSLog(@"SIS3305: Invalid channel (%d). Pretrigger delay not written!\n", chan);
         return;
     }
     
@@ -3150,7 +3321,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     writeValue = (topVal << 16) | (bottomVal);
 
     
-    [[self adapter] writeLongBlock:&value
+    [[self adapter] writeLongBlock:&writeValue
                          atAddress:[self baseAddress] + addr
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -3466,7 +3637,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         case 1:
             return kSIS3305SamplingStatusRegADC58;
         default:
-            NSLog(@" Invalid group number");
+            NSLog(@" Invalid group number\n");
             return 0;
     }
 }
@@ -3501,7 +3672,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             break;
         default:
             addr = 0;
-            NSLog(@" Invalid group number");
+            NSLog(@" Invalid group number\n");
             return 0;
             break;
     }
@@ -3533,7 +3704,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             break;
         default:
             addr = 0;
-            NSLog(@" Invalid group number");
+            NSLog(@" Invalid group number\n");
             return 0;
             break;
     }
@@ -3565,7 +3736,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             break;
         default:
             addr = 0;
-            NSLog(@" Invalid group number");
+            NSLog(@" Invalid group number\n");
             return 0;
             break;
     }
@@ -3599,7 +3770,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         addr = kSIS3305ActualSampleValueADC78;
     else{
         addr = 0;
-        NSLog(@" Invalid channel number");
+        NSLog(@" Invalid channel number\n");
         return 0;
     }
     
@@ -3627,7 +3798,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     else if(group == 1)
         return kSIS3305IndividualSelectSetVetoADC58;
     else{
-        NSLog(@" Invalid group number");
+        NSLog(@" Invalid group number\n");
         return 0;
     }
 }
@@ -3732,7 +3903,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     }
     
     [self executeCommandList:aList];
-    NSLog(@"SIS3305 Tap Delays Written");
+    NSLog(@"SIS3305 Tap Delays Written\n");
     return;
     
 }
@@ -3835,14 +4006,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) initBoard
 {  
-	[self calculateSampleValues];
+//	[self calculateSampleValues];
 	[self readModuleID:NO];
 	[self writeEventConfiguration];
 	[self writeEndAddressThresholds];
 
 	[self writeThresholds];
 
-	[self writeAcquistionControl];			// set up the Acquisition Register
+	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
     
 //    [self disarmAndArmBank:0];
@@ -3860,10 +4031,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	
-	uint32_t bankMask = bankOneArmed?0x10000:0x20000;
-	return ((data_rd & 0x80000) == 0x80000) && ((data_rd & bankMask) == bankMask);
+//	uint32_t bankMask = bankOneArmed?0x10000:0x20000;
+//	return ((data_rd & 0x80000) == 0x80000) && ((data_rd & bankMask) == bankMask);
+    
+    // return yes if either group has reached the end address threshold?
+    return (data_rd & 0x800000) | (data_rd & 0x400000);
 }
-
 
 
 - (NSString*) runSummary
@@ -3876,17 +4049,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     BOOL tracesShipped = ([self sampleLength:0] || [self sampleLength:1]);
     summary = @"Energy";
     if(tracesShipped) summary = [summary stringByAppendingString:@" + Traces"];
-    if(shipEnergyWaveform) summary = [summary stringByAppendingString:@" + Energy Filter"];
     summary = [summary stringByAppendingString:@"\n"];
-    if(shipSummedWaveform) summary = [summary stringByAppendingString:@" + Summed Raw Trace"];
-    summary = [summary stringByAppendingString:@"\n"];
+//    if(shipSummedWaveform) summary = [summary stringByAppendingString:@" + Summed Raw Trace"];
+//    summary = [summary stringByAppendingString:@"\n"];
     if(tracesShipped){
         summary = [summary stringByAppendingFormat:@"Traces 0:%d  1:%d \n", [self sampleLength:0],[self sampleLength:1]];
     }
-    if(shipEnergyWaveform) summary = [summary stringByAppendingFormat:@"Energy Filter: 510 values\n"];
-    if(shipSummedWaveform) summary = [summary stringByAppendingFormat:@"Summed Raw Trace: 510 values\n"];
+//    if(shipSummedWaveform) summary = [summary stringByAppendingFormat:@"Summed Raw Trace: 510 values\n"];
     return summary;
-    //	}
+//    	}
 }
 
 - (void) writeHistogramParams
@@ -4018,7 +4189,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Internal Trigger Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setInternalTriggerEnabled:withValue:) getMethod:@selector(internalTriggerEnabled:)];
+    [p setSetMethod:@selector(setInternalTriggerEnabled:toValue:) getMethod:@selector(internalTriggerEnabled:)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -4072,18 +4243,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Sum G"];
-    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setSumG:withValue:) getMethod:@selector(sumG:)];
-    [a addObject:p];
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Peaking Time"];
-    [p setFormat:@"##0" upperLimit:0x3ff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPeakingTime:withValue:) getMethod:@selector(peakingTime:)];
-    [a addObject:p];
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Dac Offset"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setDacOffset:withValue:) getMethod:@selector(dacOffset:)];
@@ -4093,18 +4252,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [p setName:@"InternalTriggerDelay"];
     [p setFormat:@"##0" upperLimit:(firmwareVersion<15?63:255) lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setInternalTriggerDelay:withValue:) getMethod:@selector(internalTriggerDelay:)];
-    [a addObject:p];
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Energy Decimation"];
-    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyDecimation:withValue:) getMethod:@selector(energyDecimation:)];
-    [a addObject:p];
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Trigger Decimation"];
-    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setTriggerDecimation:withValue:) getMethod:@selector(triggerDecimation:)];
     [a addObject:p];
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
@@ -4126,26 +4273,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [a addObject:p];
 	
 
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Energy Gap Time"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyGapTime:withValue:) getMethod:@selector(energyGapTime:)];
-    [a addObject:p];
-	
 
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Energy Sample Length"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergySampleLength:) getMethod:@selector(energySampleLength)];
-    [a addObject:p];
-	
-	p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Energy Tau Factor"];
-    [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setEnergyTauFactor:withValue:) getMethod:@selector(energyTauFactor:)];
-    [a addObject:p];
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
@@ -4174,8 +4302,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //	else if([param isEqualToString:@"CFD"])							return [[cardDictionary objectForKey:@"cfdControls"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"GateLength"])					return [[cardDictionary objectForKey:@"gateLengths"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"PulseLength"])					return [[cardDictionary objectForKey:@"pulseLengths"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"SumG"])						return [[cardDictionary objectForKey:@"sumGs"] objectAtIndex:aChannel];
-	else if([param isEqualToString:@"PeakingTime"])					return [[cardDictionary objectForKey:@"peakingTimes"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"InternalTriggerDelay"])		return [[cardDictionary objectForKey:@"internalTriggerDelays"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"Dac Offset"])					return [[cardDictionary objectForKey:@"dacOffsets"] objectAtIndex:aChannel];
 	else if([param isEqualToString:@"TriggerDecimation"])			return [cardDictionary objectForKey:@"triggerDecimation"];
@@ -4300,10 +4426,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [self writeThresholds];
     [self writeControlStatus];  // actually done already in initBoard
-    [self writeAcquistionControl];
+    [self writeAcquisitionControl];
     
     
-    [self sampleStartIndex:1];
+//    [self sampleStartIndex:1];
+    
+    int group;
+    unsigned long maxEvents = 1;
+    			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
+    //			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header
+    //			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;
+    //			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;
+    for (group =0; group<kNumSIS3305Groups; group++) {
+        [self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
+    }
     
     [self writeLedApplicationMode];
     [self writeLed:1 to:YES];
@@ -4311,13 +4447,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
     
 	firstTime	= YES;
-	currentBank = 0;
-	isRunning	= NO;
+
+    isRunning	= NO;
 	count=0;
 	wrapMaskForRun = bufferWrapEnabledMask;
     [self startRates];
 	
-	int group;
+//	int group;
 	for(group=0;group<kNumSIS3305Groups;group++){
 		dataRecord[group] = nil;
 	}
@@ -4340,7 +4476,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 if(wrapMaskForRun & (1L<<group))
                     sisHeaderLength = 4;
                 
-                dataRecordlength[group] = 4 + sisHeaderLength + [self sampleLength:group]/2 + energySampleLength/2 + 4;
+                dataRecordlength[group] = 4 + sisHeaderLength + [self sampleLength:group]/2 + 4;
                                             //Orca header+sisheader+samples+energy+sistrailer
                 dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(unsigned long)+100);
             }
@@ -4368,34 +4504,53 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
             unsigned long ac = 0;  // acquisition control register value
             unsigned long pollcount = 1;
-            
-            bool DMStopped = NO;
-            while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
-            {
-                ac = [self readAcquisitionControl:NO];
-                pollcount++;
-                if(pollcount%1000 == 0){
-                    NSLog(@"Polling for direct memory stopped flag...");
-                }
-                if(pollcount%100000 == 0){
-                    NSLog(@"Not triggering????");
-                    return;
-                }
-                DMStopped = (ac & 0x20000000);
-            }
+//            
+//            bool DMStopped = NO;
+//            while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
+//            {
+//                ac = [self readAcquisitionControl:NO];
+//                pollcount++;
+//                if(pollcount%1000 == 0){
+//                    NSLog(@"Polling for direct memory stopped flag... \n");
+//                }
+//                if(pollcount%100000 == 0){
+//                    NSLog(@"Not triggering????");
+//                    return;
+//                }
+//                DMStopped = (ac & 0x20000000);
+//            }
             
             pollcount = 1;
             
             bool endAddThreshFlag = NO;
-            while (!endAddThreshFlag)     // Check if the end address threshold has been reached
+            unsigned long sampleAddress14 = 0;
+            unsigned long sampleAddress58 = 0;
+            unsigned long endThresh14 = 0;
+            unsigned long endThresh58 = 0;
+            unsigned long sampleStatus14 = 0;
+            unsigned long sampleStatus58 = 0;
+            unsigned long value1 = 0;
+            unsigned long value2 = 0;
+            
+            while (!endAddThreshFlag && pollcount<2000)     // Check if the end address threshold has been reached
             {
                 ac = [self readAcquisitionControl:NO];
+                sampleAddress14 = [self readActualSampleAddress:0];
+                sampleAddress58 = [self readActualSampleAddress:1];
+                endThresh14     = [self readEndAddressThresholdOfGroup:0];
+                endThresh58     = [self readEndAddressThresholdOfGroup:1];
+                sampleStatus14  = [self readSamplingStatusForGroup:0];
+                sampleStatus58  = [self readSamplingStatusForGroup:1];
+                value1         = [self readActualSampleValueOfChannel:1];
+                value2         = [self readActualSampleValueOfChannel:2];
                 
                 if(pollcount%1000 == 0){
-                    NSLog(@"Polling for end address threshold flag...");
+                    NSLog(@"Polling for end address threshold flag (%d)...\n", pollcount);
+                    [self forceTrigger];
                 }
                 
-                endAddThreshFlag = (ac&0x80000);
+                endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
+                pollcount++;
             }
             
             // disarm/disable sampling?
@@ -4414,7 +4569,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 if (enabled[i]) {
                     // prepare readout SMs
 
-                    [self writeDataTransferControlRegister:group withCommand:2];
+                    [self writeDataTransferControlRegister:group withCommand:2 withAddress:0];
 
                     endSampleAddress = [self endAddressThreshold:i];
                     NSLog(@"     end: 0x%x\n",endSampleAddress);
@@ -4444,7 +4599,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                 wrapMode;
                                 
                                 dataRecord[group][index++] = [self sampleLength:group]/2;
-                                dataRecord[group][index++] = energySampleLength;
                                 
 //                                unsigned long* p = &dataRecord[group][index];
 //                                [[self adapter] readLongBlock: p
@@ -4586,7 +4740,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		configStruct->card_info[index].deviceSpecificData[1]	= [self sampleLength:1]/2;
 		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
 		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
-		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
+//		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
 		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
 		configStruct->card_info[index].deviceSpecificData[6]	= [self pulseMode];
 		
@@ -4654,11 +4808,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self setRunMode:					[decoder decodeIntForKey:@"runMode"]];
     [self setInternalExternalTriggersOred:[decoder decodeBoolForKey:@"internalExternalTriggersOred"]];
     [self setLemoInEnabledMask:			[decoder decodeIntForKey:@"lemoInEnabledMask"]];
-    [self setEnergySampleStartIndex3:	[decoder decodeIntForKey:@"energySampleStartIndex3"]];
-    [self setEnergySampleStartIndex2:	[decoder decodeIntForKey:@"energySampleStartIndex2"]];
-    [self setEnergySampleStartIndex1:	[decoder decodeIntForKey:@"energySampleStartIndex1"]];
-	[self setEnergyNumberToSum:			[decoder decodeIntForKey:@"energyNumberToSum"]];
-    [self setEnergySampleLength:		[decoder decodeIntForKey:@"energySampleLength"]];
+    
     [self setLemoInMode:				[decoder decodeIntForKey:@"lemoInMode"]];
     [self setLemoOutMode:				[decoder decodeIntForKey:@"lemoOutMode"]];
 	
@@ -4669,15 +4819,22 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     int i;
     for (i=0; i<kNumSIS3305Groups; i++) {
-        [self setInternalTriggerEnabled:i       withValue:[decoder decodeInt32ForKey:[@"internalTriggerEnabled" stringByAppendingFormat:@"%d",i]]];
+        [self setEventSavingModeOf:i            toValue:[decoder decodeInt32ForKey:[@"eventSavingMode" stringByAppendingFormat:@"%d",i]]];
+
+        [self setGlobalTriggerEnabledOnGroup:i toValue:[decoder decodeInt32ForKey:[@"globalTriggerEnabled" stringByAppendingFormat:@"%d",i]]];
+        [self setInternalTriggerEnabled:i toValue:[decoder decodeInt32ForKey:[@"internalTriggerEnabled" stringByAppendingFormat:@"%d",i]]];
+        [self setStartEventSamplingWithExtTrigEnabled:i toValue:[decoder decodeInt32ForKey:[@"startSamplingAfterFirstExternalTrigger" stringByAppendingFormat:@"%d",i]]];
+        [self setClearTimestampWhenSamplingEnabledEnabled:i toValue:[decoder decodeInt32ForKey:[@"clearTimestampWhenSamplingEnabledEnabled" stringByAppendingFormat:@"%d",i]]];
+        [self setClearTimestampDisabled:i toValue:[decoder decodeInt32ForKey:[@"clearTimestampDisabled" stringByAppendingFormat:@"%d",i]]];
+        [self setWaitPreTrigTimeBeforeDirectMemTrig:i toValue:[decoder decodeInt32ForKey:[@"waitPreTrigTimeBeforeDirectMemTrig" stringByAppendingFormat:@"%d",i]]];
+        [self setDirectMemoryHeaderDisabled:i toValue:[decoder decodeInt32ForKey:[@"directMemoryHeaderDisabled" stringByAppendingFormat:@"%d",i]]];
     }
     
     [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
     [self setInternalGateEnabledMask:	[decoder decodeInt32ForKey:@"internalGateEnabledMask"]];
     [self setExternalGateEnabledMask:	[decoder decodeInt32ForKey:@"externalGateEnabledMask"]];
     
-    [self setShipEnergyWaveform:		[decoder decodeBoolForKey:@"shipEnergyWaveform"]];
-	[self setShipSummedWaveform:		[decoder decodeBoolForKey:@"shipSummedWaveform"]];
+//	[self setShipSummedWaveform:		[decoder decodeBoolForKey:@"shipSummedWaveform"]];
     [self setWaveFormRateGroup:			[decoder decodeObjectForKey:@"waveFormRateGroup"]];
 	
     // becauase these are set up as c-arrays, we have to step through them
@@ -4688,9 +4845,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setLTThresholdEnabled:chan    withValue:[decoder decodeIntForKey:[@"LTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
         [self setGTThresholdEnabled:chan    withValue:[decoder decodeIntForKey:[@"GTThresholdEnabled"	    stringByAppendingFormat:@"%d",chan]]];
         [self setLTThresholdOn:chan         withValue:[decoder decodeIntForKey:[@"LTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
-        [self setLTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"LTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
+        [self setLTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"LTThresholdOff"           stringByAppendingFormat:@"%d",chan]]];
         [self setGTThresholdOn:chan         withValue:[decoder decodeIntForKey:[@"GTThresholdOn"            stringByAppendingFormat:@"%d",chan]]];
-        [self setGTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"GTThresholdOff"            stringByAppendingFormat:@"%d",chan]]];
+        [self setGTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"GTThresholdOff"           stringByAppendingFormat:@"%d",chan]]];
+
+        [self setPreTriggerDelay:chan       withValue:[decoder decodeIntForKey:[@"preTriggerDelay"          stringByAppendingFormat:@"%d",chan]]];
+
     }
     
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
@@ -4699,16 +4859,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     dacOffsets  =				[[decoder decodeObjectForKey:@"dacOffsets"] retain];
 	gateLengths =				[[decoder decodeObjectForKey:@"gateLengths"] retain];
 	pulseLengths =				[[decoder decodeObjectForKey:@"pulseLengths"] retain];
-	sumGs =						[[decoder decodeObjectForKey:@"sumGs"] retain];
-	peakingTimes =				[[decoder decodeObjectForKey:@"peakingTimes"] retain];
 	internalTriggerDelays =		[[decoder decodeObjectForKey:@"internalTriggerDelays"] retain];
-	triggerDecimations = 		[[decoder decodeObjectForKey:@"triggerDecimations"] retain];
     triggerGateLengths =		[[decoder decodeObjectForKey:@"triggerGateLengths"] retain];
     sampleStartIndexes =		[[decoder decodeObjectForKey:@"sampleStartIndexes"] retain];
-    energyTauFactors =			[[decoder decodeObjectForKey:@"energyTauFactors"] retain];
-	energyDecimations=			[[decoder decodeObjectForKey:@"energyDecimations"]retain];
-	energyGapTimes = 			[[decoder decodeObjectForKey:@"energyGapTimes"]retain];
-    preTriggerDelays =			[[decoder decodeObjectForKey:@"preTriggerDelays"] retain];
+
 	
 	//force a constraint check by reloading the pretrigger delays
 	int aGroup;
@@ -4776,52 +4930,48 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [encoder encodeInt:GTThresholdOff[chan]         forKey:[@"GTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
         
         [encoder encodeInt:gain[chan]                   forKey:[@"Gain"                 stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:preTriggerDelays[chan]       forKey:[@"preTriggerDelay"      stringByAppendingFormat:@"%d",chan]];
+
     }
     int i;
     for (i=0; i<kNumSIS3305Groups; i++) {
-        [encoder encodeInt32:internalTriggerEnabled[i] forKey:[@"internalTriggerEnabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:eventSavingMode[i]         forKey:[@"eventSavingMode" stringByAppendingFormat:@"%d",i]];
+        
+        [encoder encodeInt:globalTriggerEnabled[i] forKey:[@"globalTriggerEnabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:internalTriggerEnabled[i] forKey:[@"internalTriggerEnabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:startEventSamplingWithExtTrigEnabled[i] forKey:[@"startSamplingAfterFirstExternalTrigger" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:clearTimestampWhenSamplingEnabledEnabled[i] forKey:[@"clearTimestampWhenSamplingEnabledEnabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:clearTimestampDisabled[i]  forKey:[@"clearTimestampDisabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:waitPreTrigTimeBeforeDirectMemTrig[i]  forKey:[@"waitPreTrigTimeBeforeDirectMemTrig" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:directMemoryHeaderDisabled[i]  forKey:[@"directMemoryHeaderDisabled" stringByAppendingFormat:@"%d",i]];
+
     }
     
     [encoder encodeInt:runMode					forKey:@"runMode"];
     [encoder encodeInt:clockSource				forKey:@"clockSource"];
 	[encoder encodeInt:lemoInEnabledMask		forKey:@"lemoInEnabledMask"];
-	[encoder encodeInt:energySampleStartIndex3	forKey:@"energySampleStartIndex3"];
-	[encoder encodeInt:energySampleStartIndex2	forKey:@"energySampleStartIndex2"];
-	[encoder encodeInt:energySampleStartIndex1	forKey:@"energySampleStartIndex1"];
-	[encoder encodeInt:energyNumberToSum		forKey:@"energyNumberToSum"];
-	[encoder encodeInt:energySampleLength		forKey:@"energySampleLength"];
 	[encoder encodeInt:lemoInMode				forKey:@"lemoInMode"];
 	[encoder encodeInt:lemoOutMode				forKey:@"lemoOutMode"];
-	[encoder encodeBool:shipEnergyWaveform		forKey:@"shipEnergyWaveform"];
-	[encoder encodeBool:shipSummedWaveform		forKey:@"shipSummedWaveform"];
 	
 	[encoder encodeBool:internalExternalTriggersOred	forKey:@"internalExternalTriggersOred"];
 	[encoder encodeInt32:triggerOutEnabledMask			forKey:@"triggerOutEnabledMask"];
-	[encoder encodeInt32:highEnergySuppressMask			forKey:@"highEnergySuppressMask"];
 	[encoder encodeInt32:inputInvertedMask				forKey:@"inputInvertedMask"];
 	[encoder encodeInt32:internalTriggerEnabledMask		forKey:@"internalTriggerEnabledMask"];
 	[encoder encodeInt32:externalTriggerEnabledMask		forKey:@"externalTriggerEnabledMask"];
 	[encoder encodeInt32:internalGateEnabledMask		forKey:@"internalGateEnabledMask"];
 	[encoder encodeInt32:externalGateEnabledMask		forKey:@"externalGateEnabledMask"];
 	
-	[encoder encodeObject:energyDecimations		forKey:@"energyDecimations"];
-	[encoder encodeObject:energyGapTimes		forKey:@"energyGapTimes"];
+
     [encoder encodeObject:waveFormRateGroup		forKey:@"waveFormRateGroup"];
 	[encoder encodeObject:sampleLengths			forKey:@"sampleLengths"];
 	[encoder encodeObject:thresholds			forKey:@"thresholds"];
 	[encoder encodeObject:dacOffsets			forKey:@"dacOffsets"];
 	[encoder encodeObject:gateLengths			forKey:@"gateLengths"];
 	[encoder encodeObject:pulseLengths			forKey:@"pulseLengths"];
-	[encoder encodeObject:sumGs					forKey:@"sumGs"];
-	[encoder encodeObject:peakingTimes			forKey:@"peakingTimes"];
 	[encoder encodeObject:internalTriggerDelays	forKey:@"internalTriggerDelays"];
 	[encoder encodeObject:triggerGateLengths	forKey:@"triggerGateLengths"];
-	[encoder encodeObject:preTriggerDelays		forKey:@"preTriggerDelays"];
 	[encoder encodeObject:sampleStartIndexes	forKey:@"sampleStartIndexes"];
-	[encoder encodeObject:triggerDecimations	forKey:@"triggerDecimations"];
-	[encoder encodeObject:energyTauFactors		forKey:@"energyTauFactors"];
 	//firmware 15xx
-//	[encoder encodeObject:cfdControls			forKey:@"cfdControls"];
     [encoder encodeInt32:bufferWrapEnabledMask	forKey:@"bufferWrapEnabledMask"];
 
 	
@@ -4840,7 +4990,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[objDictionary setObject: [NSNumber numberWithInt:clockSource]					forKey:@"clockSource"];
 
 	[objDictionary setObject: [NSNumber numberWithLong:triggerOutEnabledMask]		forKey:@"triggerOutEnabledMask"];
-	[objDictionary setObject: [NSNumber numberWithLong:highEnergySuppressMask]		forKey:@"highEnergySuppressMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:inputInvertedMask]			forKey:@"inputInvertedMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:internalTriggerEnabledMask]	forKey:@"internalTriggerEnabledMask"];
 	[objDictionary setObject: [NSNumber numberWithLong:externalTriggerEnabledMask]	forKey:@"externalTriggerEnabledMask"];
@@ -4851,36 +5000,34 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[objDictionary setObject:[NSNumber numberWithInt:shipTimeRecordAlso]			forKey:@"shipTimeRecordAlso"];
 	
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInEnabledMask]				forKey:@"lemoInEnabledMask"];
-	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex3]		forKey:@"energySampleStartIndex3"];
-	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex2]		forKey:@"energySampleStartIndex2"];
-	[objDictionary setObject:[NSNumber numberWithInt:energySampleStartIndex1]		forKey:@"energySampleStartIndex1"];
-	[objDictionary setObject:[NSNumber numberWithInt:energyNumberToSum]				forKey:@"energyNumberToSum"];
-	[objDictionary setObject:[NSNumber numberWithInt:energySampleLength]			forKey:@"energySampleLength"];
 	[objDictionary setObject:[NSNumber numberWithInt:lemoInMode]					forKey:@"lemoInMode"];
 	[objDictionary setObject:[NSNumber numberWithInt:lemoOutMode]					forKey:@"lemoOutMode"];
-	[objDictionary setObject:[NSNumber numberWithBool:shipEnergyWaveform]			forKey:@"shipEnergyWaveform"];
-	[objDictionary setObject:[NSNumber numberWithBool:shipSummedWaveform]			forKey:@"shipSummedWaveform"];
+//	[objDictionary setObject:[NSNumber numberWithBool:shipSummedWaveform]			forKey:@"shipSummedWaveform"];
 	[objDictionary setObject:[NSNumber numberWithBool:internalExternalTriggersOred]	forKey:@"internalExternalTriggersOred"];
 	[objDictionary setObject:[NSNumber numberWithBool:pulseMode]					forKey:@"pulseMode"];
 	
 	[objDictionary setObject: internalTriggerDelays	forKey:@"internalTriggerDelays"];	
-    [objDictionary setObject: energyDecimations     forKey:@"energyDecimations"];
-	[objDictionary setObject: energyTauFactors      forKey:@"energyTauFactors"];
-	[objDictionary setObject: energyGapTimes		forKey:@"energyGapTimes"];
+
 	[objDictionary setObject: sampleLengths		forKey:@"sampleLengths"];
 	[objDictionary setObject: dacOffsets		forKey:@"dacOffsets"];
     [objDictionary setObject: thresholds		forKey:@"thresholds"];	
     [objDictionary setObject: gateLengths		forKey:@"gateLengths"];	
     [objDictionary setObject: pulseLengths		forKey:@"pulseLengths"];	
-    [objDictionary setObject: sumGs				forKey:@"sumGs"];	
-    [objDictionary setObject: peakingTimes		forKey:@"peakingTimes"];	
 	[objDictionary setObject: triggerGateLengths	forKey:@"triggerGateLengths"];
-	[objDictionary setObject: preTriggerDelays		forKey:@"preTriggerDelays"];
 	[objDictionary setObject: sampleStartIndexes	forKey:@"sampleStartIndexes"];
-    [objDictionary setObject: triggerDecimations	forKey:@"triggerDecimations"];	
 	
-	//firmware 15xx
-//	[objDictionary setObject: cfdControls		forKey:@"cfdControls"];	
+    // not sure if this is the right way to add this
+    // group level parameters for those stored as c-arrays
+    int i = 0;
+    for (i=0; i<kNumSIS3305Groups; i++) {
+        [objDictionary setObject:[NSNumber numberWithInteger:eventSavingMode[i]] forKey:[@"eventSavingMode" stringByAppendingFormat:@"%d",i]];
+    }
+    
+    // channel level params for those stored as c-arrays
+    for (i=0; i<kNumSIS3305Channels; i++) {
+        [objDictionary setObject:[NSNumber numberWithInteger:preTriggerDelays[i]]		forKey:[@"preTriggerDelays" stringByAppendingFormat:@"%d",i]];
+    }
+    
 	[objDictionary setObject: [NSNumber numberWithLong:bufferWrapEnabledMask]		forKey:@"bufferWrapEnabledMask"];
 	
     return objDictionary;
@@ -4949,19 +5096,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	if(!dacOffsets)				dacOffsets			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!gateLengths)			gateLengths			  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!pulseLengths)			pulseLengths		  = [[self arrayOfLength:kNumSIS3305Channels] retain];
-	if(!sumGs)					sumGs				  = [[self arrayOfLength:kNumSIS3305Channels] retain];
-	if(!peakingTimes)			peakingTimes		  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 	if(!internalTriggerDelays)	internalTriggerDelays = [[self arrayOfLength:kNumSIS3305Channels] retain];
-	if(!energyTauFactors)		energyTauFactors	  = [[self arrayOfLength:kNumSIS3305Channels] retain];
 //	if(!cfdControls)			cfdControls		      = [[self arrayOfLength:kNumSIS3305Channels] retain];
     
-    if(!preTriggerDelays)        preTriggerDelays	= [[self arrayOfLength:kNumSIS3305Channels] retain];
     if(!triggerGateLengths)	triggerGateLengths	= [[self arrayOfLength:kNumSIS3305Channels] retain];
 	
 	if(!sampleLengths)		sampleLengths		= [[self arrayOfLength:kNumSIS3305Groups] retain];
-	if(!triggerDecimations)	triggerDecimations	= [[self arrayOfLength:kNumSIS3305Groups] retain];
-	if(!energyDecimations)	energyDecimations	= [[self arrayOfLength:kNumSIS3305Groups] retain];
-	if(!energyGapTimes)		energyGapTimes		= [[self arrayOfLength:kNumSIS3305Groups] retain];
+
 	if(!sampleStartIndexes)	sampleStartIndexes	= [[self arrayOfLength:kNumSIS3305Groups] retain];
 	if(!endAddressThresholds)endAddressThresholds	= [[self arrayOfLength:kNumSIS3305Groups] retain];
 	

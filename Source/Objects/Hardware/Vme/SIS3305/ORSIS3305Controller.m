@@ -48,9 +48,11 @@
 
 - (void) awakeFromNib
 {
-	
-    settingSize     = NSMakeSize(1267,620);
-    rateSize		= NSMakeSize(790,300);
+    basicSize       = NSMakeSize(1200   ,700);
+    settingSize     = NSMakeSize(900    ,620);
+    rateSize		= NSMakeSize(790    ,300);
+    miscSize        = NSMakeSize(1200   ,600);
+    
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -95,6 +97,13 @@
 		[theCell setFormatter:rateFormatter];
 	}
 		
+    for (i=0;i<kNumSIS3305ReadRegs;i++){
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i], [model registerNameAt:i]];
+        
+        [registerIndexPU insertItemWithTitle:s	atIndex:i];
+        [[registerIndexPU itemAtIndex:i] setEnabled:YES];
+
+    }
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
@@ -207,183 +216,85 @@
                      selector : @selector(TDCLogicEnabledChanged:)
                          name : ORSIS3305TDCMeasurementEnabledChanged
                         object: model];
-    
+
+    // FIX: should add in the LED mode parts
 //    [notifyCenter addObserver : self
 //                     selector : @selector(ledApplicationModeChanged:)
 //                         name : ORSIS3305LEDApplicationModeChanged
 //                       object : model];
-    
-    
 
+    
+    // event config items
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(eventSavingModeChanged:)
+                         name: ORSIS3305EventSavingModeChanged
+                       object: model];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(ADCGateModeEnabledChanged:)
+                         name: ORSIS3305ADCGateModeEnabledChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(globalTriggerEnabledChanged:)
+                         name: ORSIS3305GlobalTriggerEnabledChanged
+                       object: model];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(internalTriggerEnabledChanged:)
+                         name: ORSIS3305InternalTriggerEnabledChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(startEventSamplingWithExtTrigEnabledChanged:)
+                         name: ORSIS3305StartEventSamplingWithExtTrigEnabledChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(clearTimestampWhenSamplingEnabledEnabledChanged:)
+                         name: ORSIS3305ClearTimestampWhenSamplingEnabledEnabledChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(grayCodeEnabledChanged:)
+                         name: ORSIS3305GrayCodeEnabledChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(clearTimestampDisabledChanged:)
+                         name: ORSIS3305ClearTimestampDisabledChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(waitPreTrigTimeBeforeDirectMemTrigChanged:)
+                         name: ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(disableDirectMemoryHeaderChanged:)
+                         name: ORSIS3305DirectMemoryHeaderDisabledChanged
+                       object: model];
+    
+    
+    
+    
 	[notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3305ClockSourceChanged
 						object: model];
-//
-////    [notifyCenter addObserver : self
-////                     selector : @selector(eventConfigChanged:)
-// //                        name : ORSIS3305EventConfigChanged
-////						object: model];
-//		
-//    [notifyCenter addObserver : self
-//                     selector : @selector(gateLengthChanged:)
-//                         name : ORSIS3305GateLengthChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(pulseLengthChanged:)
-//                         name : ORSIS3305PulseLengthChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(sumGChanged:)
-//                         name : ORSIS3305SumGChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(peakingTimeChanged:)
-//                         name : ORSIS3305PeakingTimeChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(internalTriggerDelayChanged:)
-//                         name : ORSIS3305InternalTriggerDelayChanged
-//						object: model];	
-//
-//	[notifyCenter addObserver : self
-//                     selector : @selector(triggerDecimationChanged:)
-//                         name : ORSIS3305TriggerDecimationChanged
-//						object: model];	
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(energyDecimationChanged:)
-//                         name : ORSIS3305EnergyDecimationChanged
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(lemoOutModeChanged:)
-//                         name : ORSIS3305LemoOutModeChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(lemoInModeChanged:)
-//                         name : ORSIS3305LemoInModeChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(dacOffsetChanged:)
-//                         name : ORSIS3305DacOffsetChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(sampleLengthChanged:)
-//                         name : ORSIS3305SampleLengthChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(sampleStartIndexChanged:)
-//                         name : ORSIS3305SampleStartIndexChanged
-//						object: model];
-//
+
+
     [notifyCenter addObserver : self
                      selector : @selector(preTriggerDelayChanged:)
                          name : ORSIS3305ModelPreTriggerDelayChanged
 						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(triggerGateLengthChanged:)
-//                         name : ORSIS3305ModelTriggerGateLengthChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energyPeakingTimeChanged:)
-//                         name : ORSIS3305ModelEnergyPeakingTimeChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energyGapTimeChanged:)
-//                         name : ORSIS3305ModelEnergyGapTimeChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energySampleStartIndex1Changed:)
-//                         name : ORSIS3305ModelEnergySampleStartIndex1Changed
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energySampleStartIndex2Changed:)
-//                         name : ORSIS3305ModelEnergySampleStartIndex2Changed
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energyNumberToSumChanged:)
-//                         name : ORSIS3305ModelEnergyNumberToSumChanged
-//						object: model];	
-//    
-//	[notifyCenter addObserver : self
-//                     selector : @selector(energyTauFactorChanged:)
-//                         name : ORSIS3305ModelEnergyTauFactorChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energySampleStartIndex3Changed:)
-//                         name : ORSIS3305ModelEnergySampleStartIndex3Changed
-//						object: model];
-//
+
     [notifyCenter addObserver : self
                      selector : @selector(runModeChanged:)
                          name : ORSIS3305ModelRunModeChanged
 						object: model];
 
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energyGateLengthChanged:)
-//                         name : ORSIS3305ModelEnergyGateLengthChanged
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(energySetShipWaveformChanged:)
-//                         name : ORSIS3305SetShipWaveformChanged
-//						object: model];
-//
-//	[notifyCenter addObserver : self
-//                     selector : @selector(energySetShipSummedWaveformChanged:)
-//                         name : ORSIS3305SetShipSummedWaveformChanged
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(lemoInEnabledMaskChanged:)
-//                         name : ORSIS3305ModelLemoInEnabledMaskChanged
-//						object: model];
-//
-//    [notifyCenter addObserver : self
-//                     selector : @selector(internalExternalTriggersOredChanged:)
-//                         name : ORSIS3305ModelInternalExternalTriggersOredChanged
-//						object: model];
-//	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(extendedThresholdEnabledChanged:)
-//                         name : ORSIS3305ExtendedThresholdEnabledChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(internalTriggerEnabledChanged:)
-//                         name : ORSIS3305InternalTriggerEnabledChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(externalTriggerEnabledChanged:)
-//                         name : ORSIS3305ExternalTriggerEnabledChanged
-//						object: model];
-//
-//	[notifyCenter addObserver : self
-//                     selector : @selector(internalGateEnabledChanged:)
-//                         name : ORSIS3305InternalGateEnabledChanged
-//						object: model];
-//	
-//	[notifyCenter addObserver : self
-//                     selector : @selector(externalGateEnabledChanged:)
-//                         name : ORSIS3305ExternalGateEnabledChanged
-//						object: model];
 	
 	[self registerRates];
 
@@ -442,11 +353,9 @@
 
 	[self gateLengthChanged:nil];
 	[self pulseLengthChanged:nil];
-	[self sumGChanged:nil];
-	[self peakingTimeChanged:nil];
 	[self internalTriggerDelayChanged:nil];
-	[self triggerDecimationChanged:nil];
-	[self energyDecimationChanged:nil];
+
+    [self ORSIS3305LEDEnabledChanged:nil];
 	
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
@@ -477,15 +386,22 @@
     [self TDCLogicEnabledChanged:nil];
     
     // group settings
-    [self eventSavingMode14Changed:nil];
-    [self eventSavingMode58Changed:nil];
-    [self thresholdModeChanged:nil];
+    // event config
+    [self eventSavingModeChanged:nil];
+    [self globalTriggerEnabledChanged:nil];
+    [self internalTriggerEnabledChanged:nil];
+    [self startEventSamplingWithExtTrigEnabledChanged:nil];
+    [self clearTimestampWhenSamplingEnabledEnabledChanged:nil];
+    [self clearTimestampDisabledChanged:nil];
+    [self disableDirectMemoryHeaderChanged:nil];
+    [self grayCodeEnabledChanged:nil];
+    
     
     
     //channel settings
+    [self thresholdModeChanged:nil];
     [self channelEnabledChanged:nil];
-    [self eventSavingMode14Changed:nil];
-    [self eventSavingMode58Changed:nil];
+
     [self GTThresholdOffChanged:nil];
     [self GTThresholdOnChanged:nil];
     [self LTThresholdOffChanged:nil];
@@ -665,21 +581,92 @@
     }
 }
 
+
+
+
+
+#pragma mark -- event config Changed Updaters
+
+- (void) eventSavingModeChanged:(NSNotification*)aNote
+{
+    [eventSavingMode14PU selectItemAtIndex: [model eventSavingMode:0]]; // 0 is for group 1
+    [eventSavingMode58PU selectItemAtIndex: [model eventSavingMode:1]]; // 1 is for group 2
+}
+
+- (void) ADCGateModeEnabledChanged:(NSNotification*)aNote
+{
+    [ADCGateModeEnabled14Button setState: [model ADCGateModeEnabled:0]]; // 0 is for group 1
+    [ADCGateModeEnabled14Button setState: [model ADCGateModeEnabled:1]]; // 1 is for group 2
+    
+}
+
+- (void) globalTriggerEnabledChanged:(NSNotification*)aNote
+{
+
+    [globalTriggerEnable14Button setState:[model globalTriggerEnabledOnGroup:0]];
+    [globalTriggerEnable58Button setState:[model globalTriggerEnabledOnGroup:1]];
+
+}
+
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote
 {
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[internalTriggerEnabledMatrix cellWithTag:i] setState:[model internalTriggerEnabled:i]];
-	}
+    [internalTriggerEnabled14Button setState:[model internalTriggerEnabled:0]];
+    [internalTriggerEnabled58Button setState:[model internalTriggerEnabled:1]];
 }
 
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote
 {
+    // FIX: isn't this a event config thing? Not channel level?
 	short i;
 	for(i=0;i<kNumSIS3305Channels;i++){
 		[[externalTriggerEnabledMatrix cellWithTag:i] setState:[model externalTriggerEnabled:i]];
 	}
 }
+
+- (void) startEventSamplingWithExtTrigEnabledChanged:(NSNotification*)aNote
+{
+
+    [startEventSamplingWithExtTrigEnabled14Button setState:[model startEventSamplingWithExtTrigEnabled:0]];
+    [startEventSamplingWithExtTrigEnabled58Button setState:[model startEventSamplingWithExtTrigEnabled:1]];
+}
+
+- (void) clearTimestampWhenSamplingEnabledEnabledChanged:(NSNotification*)aNote
+{
+    [clearTimestampWhenSamplingEnabledEnabled14Button setState:[model clearTimestampWhenSamplingEnabledEnabled:0]];
+    [clearTimestampWhenSamplingEnabledEnabled58Button setState:[model clearTimestampWhenSamplingEnabledEnabled:1]];
+    
+}
+
+- (void) grayCodeEnabledChanged:(NSNotification*)aNote
+{
+    [grayCodeEnable14Button setState:[model grayCodeEnabled:0]];
+    [grayCodeEnable58Button setState:[model grayCodeEnabled:1]];
+}
+
+- (void) clearTimestampDisabledChanged:(NSNotification*)aNote
+{
+    [clearTimestampDisabled14Button setState:[model clearTimestampDisabled:0]];
+    [clearTimestampDisabled58Button setState:[model clearTimestampDisabled:1]];
+}
+
+- (void) disableDirectMemoryHeaderChanged:(NSNotification*)aNote
+{
+    [disableDirectMemoryHeader14Button setState:[model directMemoryHeaderDisabled:0]];
+    [disableDirectMemoryHeader58Button setState:[model directMemoryHeaderDisabled:1]];
+}
+
+- (void) waitPreTrigTimeBeforeDirectMemTrigChanged:(NSNotification*)aNote
+{
+    [waitPreTrigTimeBeforeDirectMemTrig14Button setState:[model waitPreTrigTimeBeforeDirectMemTrig:0]];
+    [waitPreTrigTimeBeforeDirectMemTrig58Button setState:[model waitPreTrigTimeBeforeDirectMemTrig:1]];
+}
+
+
+
+
+#pragma mark end of event config chnged updaters
+
+
 
 
 
@@ -726,15 +713,7 @@
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
 }
 
-- (void) eventSavingMode14Changed:(NSNotification*)aNote
-{
-    [eventSavingMode14PU selectItemAtIndex: [model eventSavingMode:1]]; // 1 is for group 1
-}
 
-- (void) eventSavingMode58Changed:(NSNotification*)aNote
-{
-    [eventSavingMode58PU selectItemAtIndex: [model eventSavingMode:2]];   // 2 is for group 2
-}
 
 - (void) thresholdModeChanged:(NSNotification*)aNote
 {
@@ -912,21 +891,6 @@
 	}
 }
 
-- (void) sumGChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[sumGMatrix cellWithTag:i] setIntValue:[model sumG:i]];
-	}
-}
-
-- (void) peakingTimeChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<kNumSIS3305Channels;i++){
-		[[peakingTimeMatrix cellWithTag:i] setIntValue:[model peakingTime:i]];
-	}
-}
 
 - (void) internalTriggerDelayChanged:(NSNotification*)aNote
 {
@@ -936,20 +900,9 @@
 	}
 }
 
-- (void) triggerDecimationChanged:(NSNotification*)aNote
+- (void) ORSIS3305LEDEnabledChanged:(NSNotification*)aNote
 {
-	[triggerDecimation0 selectItemAtIndex:[model triggerDecimation:0]];
-	[triggerDecimation1 selectItemAtIndex:[model triggerDecimation:1]];
-	[triggerDecimation2 selectItemAtIndex:[model triggerDecimation:2]];
-	[triggerDecimation3 selectItemAtIndex:[model triggerDecimation:3]];
-}
-
-- (void) energyDecimationChanged:(NSNotification*)aNote
-{
-	[energyDecimation0 selectItemAtIndex:[model energyDecimation:0]];
-	[energyDecimation1 selectItemAtIndex:[model energyDecimation:1]];
-	[energyDecimation2 selectItemAtIndex:[model energyDecimation:2]];
-	[energyDecimation3 selectItemAtIndex:[model energyDecimation:3]];
+    //FIX: No-op
 }
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
@@ -1017,9 +970,6 @@
     [forceTriggerButton			setEnabled:!lockedOrRunningMaintenance];
 	
     [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
-	[energyTauFactorMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[energyGapTimeMatrix			setEnabled:!lockedOrRunningMaintenance];
-	[energyPeakingTimeMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[triggerGateLengthMatrix		setEnabled:!lockedOrRunningMaintenance];
     [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
     [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
@@ -1027,103 +977,54 @@
 	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
 
     [clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
+    
+    //event config items
     [eventSavingMode14PU			setEnabled:!lockedOrRunningMaintenance];
     [eventSavingMode58PU			setEnabled:!lockedOrRunningMaintenance];
     [thresholdMode14PUMatrix        setEnabled:!lockedOrRunningMaintenance];
     [thresholdMode58PUMatrix        setEnabled:!lockedOrRunningMaintenance];
-	[triggerDecimation0				setEnabled:!lockedOrRunningMaintenance];
-	[triggerDecimation1				setEnabled:!lockedOrRunningMaintenance];
-	[triggerDecimation2				setEnabled:!lockedOrRunningMaintenance];
-	[triggerDecimation3				setEnabled:!lockedOrRunningMaintenance];
-	[energyDecimation0				setEnabled:!lockedOrRunningMaintenance];
-	[energyDecimation1				setEnabled:!lockedOrRunningMaintenance];
-	[energyDecimation2				setEnabled:!lockedOrRunningMaintenance];
-	[energyDecimation3				setEnabled:!lockedOrRunningMaintenance];
+
+    // begin key regs
+    [generalResetButton             setEnabled:!locked && !runInProgress];
+    [armSampleLogicButton           setEnabled:!locked && !runInProgress];
+    [disarmSampleLogicButton        setEnabled:!locked && !runInProgress];
+    [triggerButton                  setEnabled:!locked && !runInProgress];
+    [enableSampleLogicButton        setEnabled:!locked && !runInProgress];
+    [setVetoButton                  setEnabled:!locked && !runInProgress];
+    [clearVetoButton                setEnabled:!locked && !runInProgress];
+    [ADCClockSynchButton            setEnabled:!locked && !runInProgress];
+    [ResetADCFPGALogicButton        setEnabled:!locked && !runInProgress];
+    [externalTriggerOutPulseButton  setEnabled:!locked && !runInProgress];
+    // end key regs
+    
 
 //	[gtMatrix						setEnabled:!lockedOrRunningMaintenance];
 	[inputInvertedMatrix			setEnabled:!lockedOrRunningMaintenance];
 //	[thresholdMatrix				setEnabled:!lockedOrRunningMaintenance];
-	[internalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
-	[externalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
+//	[internalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
+//	[externalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
 	[internalGateEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[externalGateEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[internalTriggerDelayMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[dacOffsetMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[gateLengthMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[pulseLengthMatrix				setEnabled:!lockedOrRunningMaintenance];
-	[sumGMatrix						setEnabled:!lockedOrRunningMaintenance];
-	[peakingTimeMatrix				setEnabled:!lockedOrRunningMaintenance];
 	
 	[lemoInEnabledMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[triggerOutEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
 	
-	//mca specific
-//	[mcaModePU					setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaHistoSizePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaLNESourcePU				setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaPileupEnabledCB			setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaAutoClearCB				setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaNofScansPresetField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaPrescaleFactorField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//    [mcaNofHistoPresetField		setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//	
-//	BOOL useEnergyCalc = [model mcaUseEnergyCalculation];
-//	[mcaUseEnergyCalculationButton	setEnabled:!lockedOrRunningMaintenance && mcaMode];
-//	[mcaEnergyOffsetField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
-//    [mcaEnergyMultiplierField	setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
-//    [mcaEnergyDividerField		setEnabled:!lockedOrRunningMaintenance && mcaMode && !useEnergyCalc];
-
 	//can't be changed during a run or the card and probably the sbc will be hosed.
 	[sampleLengthMatrix				setEnabled:!locked && !runInProgress];
 	[bufferWrapEnabledMatrix		setEnabled:!locked && !runInProgress && firmwareGEV15xx];
-	//	[energySampleStartIndex3Field	setEnabled:!locked && !runInProgress];
-	//	[energySampleStartIndex2Field	setEnabled:!locked && !runInProgress];
-	//	[energySampleStartIndex1Field	setEnabled:!locked && !runInProgress];
+
 	
     
-    
-	
-	if(![model shipSummedWaveform])
-        [energyShipWaveformButton		setEnabled:!locked && !runInProgress];
-	else
-        [energyShipWaveformButton			setEnabled:NO];
-    
-	if(![model shipEnergyWaveform])
-        [energyShipSummedWaveformButton setEnabled:!locked && !runInProgress && firmwareGEV15xx];
-	else
-        [energyShipSummedWaveformButton	setEnabled:NO];
-    
-	if([model shipSummedWaveform])
-        [energyNumberToSumField			setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-	else
-        [energyNumberToSumField			setEnabled:NO];
-	
 	int i;
-	
-//	for(i=0;i<kNumSIS3305Channels;i++){
-//		if([model highEnergySuppress:i] && ([model cfdControl:i]!=0))[[highThresholdMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
-//		else [[highThresholdMatrix cellWithTag:i]	setEnabled:NO];
-//	}
 		
 	for(i=0;i<kNumSIS3305Groups;i++){
 		if([model bufferWrapEnabled:i])[[sampleStartIndexMatrix	cellWithTag:i]setEnabled:!locked && !runInProgress];
 		else [[sampleStartIndexMatrix cellWithTag:i]	setEnabled:NO];
 	}
-	
-//	for(i=0;i<kNumSIS3305Channels;i++){
-//		if([model cfdControl:i]!=0)[[highEnergySuppressMatrix cellWithTag:i]setEnabled:!locked && !runInProgress];
-//		else [[highEnergySuppressMatrix cellWithTag:i]	setEnabled:NO];
-//	}
-	
-//	[cfdControl0					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl1					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl2					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl3					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl4					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl5					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl6					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	[cfdControl7					setEnabled:!lockedOrRunningMaintenance && firmwareGEV15xx];
-//	
 	
 }
 
@@ -1224,7 +1125,18 @@
     }
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
+- (void) setRegisterDisplay:(unsigned int)index
+{
+    if (index < kNumSIS3305ReadRegs)
+    {
+            [writeRegisterButton setEnabled:[model canWriteRegister:index]];
+            [registerWriteValueField setEnabled:[model canWriteRegister:index]];
+            [readRegisterButton setEnabled:[model canReadRegister:index]];
+            [registerStatusField setStringValue:@""];
+    }
+}
+
+#pragma mark - Actions
 
 - (void) pulseModeAction:(id)sender
 {
@@ -1377,66 +1289,8 @@
 }
 
 
-//- (IBAction) mcaUseEnergyCalculationAction:(id)sender
-//{
-//	[model setMcaUseEnergyCalculation:[sender intValue]];
-//	[self settingsLockChanged:nil];
-//}
-//
-//- (IBAction) mcaEnergyOffsetAction:(id)sender
-//{
-//	[model setMcaEnergyOffset:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaEnergyMultiplierAction:(id)sender
-//{
-//	[model setMcaEnergyMultiplier:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaEnergyDividerAction:(id)sender
-//{
-//	[model setMcaEnergyDivider:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaModeAction:(id)sender
-//{
-//	[model setMcaMode:[sender indexOfSelectedItem]];	
-//}
-//
-//- (IBAction) mcaPileupEnabledAction:(id)sender
-//{
-//	[model setMcaPileupEnabled:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaHistoSizeAction:(id)sender
-//{
-//	[model setMcaHistoSize:[sender indexOfSelectedItem]];	
-//}
-//
-//- (IBAction) mcaNofScansPresetAction:(id)sender
-//{
-//	[model setMcaNofScansPreset:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaAutoClearAction:(id)sender
-//{
-//	[model setMcaAutoClear:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaPrescaleFactorAction:(id)sender
-//{
-//	[model setMcaPrescaleFactor:[sender intValue]];	
-//}
-//
-//- (IBAction) mcaLNESetupAction:(id)sender
-//{
-//	[model setMcaLNESetup:[sender indexOfSelectedItem]];	
-//}
-//
-//- (IBAction) mcaNofHistoPresetAction:(id)sender
-//{
-//	[model setMcaNofHistoPreset:[sender intValue]];	
-//}
+
+
 
 - (IBAction) internalGateEnabledMaskAction:(id)sender
 {
@@ -1448,15 +1302,15 @@
 	[model setExternalGateEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) internalTriggerEnabledMaskAction:(id)sender
-{
-	[model setInternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
-- (IBAction) externalTriggerEnabledMaskAction:(id)sender
-{
-	[model setExternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
+//- (IBAction) internalTriggerEnabledMaskAction:(id)sender
+//{
+//	[model setInternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+//}
+//
+//- (IBAction) externalTriggerEnabledMaskAction:(id)sender
+//{
+//	[model setExternalTriggerEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+//}
 
 
 - (IBAction) internalExternalTriggersOredAction:(id)sender
@@ -1474,35 +1328,7 @@
 	[model setRunMode:[sender indexOfSelectedItem]];	
 }
 
-- (IBAction) energyShipWaveformAction:(id)sender
-{
-	if ([sender state] == 1) {
-		[model setShipEnergyWaveform:YES];
-		[energySampleStartIndex3Field setEnabled:YES];
-		[energySampleStartIndex2Field setEnabled:YES];
-		[energySampleStartIndex1Field setEnabled:YES];
-	} else {
-		[model setShipEnergyWaveform:NO];
-		[energySampleStartIndex3Field setEnabled:NO];
-		[energySampleStartIndex2Field setEnabled:NO];
-		[energySampleStartIndex1Field setEnabled:NO];
-	}
-}
 
-- (IBAction) energyShipSummedWaveformAction:(id)sender
-{
-	if ([sender state] == 1) {
-		[model setShipSummedWaveform:YES];
-		[energySampleStartIndex3Field setEnabled:NO];
-		[energySampleStartIndex2Field setEnabled:NO];
-		[energySampleStartIndex1Field setEnabled:YES];
-	} else {
-		[model setShipSummedWaveform:NO];
-		[energySampleStartIndex3Field setEnabled:NO];
-		[energySampleStartIndex2Field setEnabled:NO];
-		[energySampleStartIndex1Field setEnabled:NO];
-	}
-}
 
 - (IBAction) lemoInModeAction:(id)sender
 {
@@ -1513,6 +1339,51 @@
 {
 	[model setLemoOutMode:[sender indexOfSelectedItem]];	
 }
+
+#pragma mark - hardware actions
+
+#pragma mark -- register R/W access
+
+- (IBAction) registerIndexPUAction:(id)sender
+{
+    unsigned int index = [sender indexOfSelectedItem];
+    [model setRegisterIndex:index];
+    [self setRegisterDisplay:index];
+}
+
+- (IBAction) readRegisterAction:(id)sender
+{
+    [self endEditing];
+    unsigned long aValue = 0;
+    unsigned int index = [model registerIndex];
+    if (index < kNumSIS3305ReadRegs) {
+        aValue = [model readRegister:index];
+        NSLog(@"SIS3305(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
+    }
+    
+}
+
+- (IBAction) writeRegisterAction:(id)sender
+{
+    [self endEditing];
+    unsigned long aValue = [model registerWriteValue];
+    unsigned int index = [model registerIndex];
+    if (index < kNumSIS3305ReadRegs) {
+        [model writeRegister:index withValue:aValue];
+    }
+    else {
+        NSLog(@"Invalid register name");
+    }
+}
+
+- (IBAction) registerWriteValueAction:(id)sender
+{
+    [model setRegisterWriteValue:[sender intValue]];
+}
+
+
+
+#pragma mark -- misc hardware actions
 
 //hardware actions
 - (IBAction) probeBoardAction:(id)sender;
@@ -1529,7 +1400,7 @@
 
 - (IBAction) TDCLogicEnabledAction:(id)sender
 {
-    bool value = [sender boolValue];
+    bool value = [sender state];
     [model setTDCMeasurementEnabled:value];
 }
 
@@ -1538,19 +1409,140 @@
 	[model setClockSource:[sender indexOfSelectedItem]];	
 }
 
+
+#pragma mark -- Event config actions
+// event config actions
 - (IBAction) eventSavingMode14Action:(id)sender
 {
     short mode = [sender indexOfSelectedItem];
-    
-    [model setEventSavingModeOf:0 toValue:mode];    // 1 is for group 1
+    [model setEventSavingModeOf:0 toValue:mode];    // 0 is for group 1
 }
 
 - (IBAction) eventSavingMode58Action:(id)sender
 {
     short mode = [sender indexOfSelectedItem];
-    
-    [model setEventSavingModeOf:1 toValue:mode];    // 2 is for group 2
+    [model setEventSavingModeOf:1 toValue:mode];    // 1 is for group 2
 }
+
+- (IBAction) ADCGateModeEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setADCGateModeEnabled:0 toValue:mode];
+}
+
+- (IBAction) ADCGateModeEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setADCGateModeEnabled:1 toValue:mode];
+}
+
+- (IBAction) globalTriggerEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setGlobalTriggerEnabledOnGroup:0 toValue:mode];
+}
+- (IBAction) globalTriggerEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setGlobalTriggerEnabledOnGroup:1 toValue:mode];
+}
+
+- (IBAction) internalTriggerEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setInternalTriggerEnabled:0 toValue:mode];
+}
+- (IBAction) internalTriggerEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setInternalTriggerEnabled:1 toValue:mode];
+}
+
+- (IBAction) externalTriggerEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setExternalTriggerEnabled:0 withValue:mode];
+}
+- (IBAction) externalTriggerEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setExternalTriggerEnabled:0 withValue:mode];
+}
+
+- (IBAction) startEventSamplingWithExtTrigEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setStartEventSamplingWithExtTrigEnabled:0 toValue:mode];
+}
+- (IBAction) startEventSamplingWithExtTrigEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setStartEventSamplingWithExtTrigEnabled:1 toValue:mode];
+}
+
+- (IBAction) clearTimestampWhenSamplingEnabledEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setClearTimestampWhenSamplingEnabledEnabled:0 toValue:mode];
+}
+- (IBAction) clearTimestampWhenSamplingEnabledEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setClearTimestampWhenSamplingEnabledEnabled:1 toValue:mode];
+}
+
+- (IBAction) grayCodeEnabled14Action:(id)sender
+{
+    short mode = [sender state];
+    [model setGrayCodeEnabled:0 toValue:mode];
+}
+
+- (IBAction) grayCodeEnabled58Action:(id)sender
+{
+    short mode = [sender state];
+    [model setGrayCodeEnabled:1 toValue:mode];
+}
+
+- (IBAction) clearTimestampDisabled14Changed:(id)sender
+{
+    short mode = [sender state];
+    [model setClearTimestampDisabled:0 toValue:mode];
+   
+}
+- (IBAction) clearTimestampDisabled58Changed:(id)sender
+{
+    short mode = [sender state];
+    [model setClearTimestampDisabled:1 toValue:mode];
+}
+- (IBAction) disableDirectMemoryHeader14Changed:(id)sender
+{
+    short mode = [sender state];
+    [model setDirectMemoryHeaderDisabled:0 toValue:mode];
+}
+- (IBAction) disableDirectMemoryHeader58Changed:(id)sender
+{
+    short mode = [sender state];
+    [model setDirectMemoryHeaderDisabled:1 toValue:mode];
+}
+
+- (IBAction) waitPreTrigTimeBeforeDirectMemTrig14Changed:(id)sender
+{
+    short mode = [sender state];
+    [model setWaitPreTrigTimeBeforeDirectMemTrig:0 toValue:mode];
+}
+
+- (IBAction) waitPreTrigTimeBeforeDirectMemTrig58Changed:(id)sender
+{
+    short mode = [sender state];
+    [model setWaitPreTrigTimeBeforeDirectMemTrig:1 toValue:mode];
+}
+
+
+
+
+
+
+
 
 - (IBAction) thresholdMode14Action:(id)sender
 {
@@ -1601,19 +1593,19 @@
 	[model setBufferWrapEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) triggerDecimationAction:(id)sender
-{
-	if([sender indexOfSelectedItem] != [model triggerDecimation:[sender tag]]){
-		[model setTriggerDecimation:[sender tag] withValue:[sender indexOfSelectedItem]];
-	}
-}
+//- (IBAction) triggerDecimationAction:(id)sender
+//{
+//	if([sender indexOfSelectedItem] != [model triggerDecimation:[sender tag]]){
+//		[model setTriggerDecimation:[sender tag] withValue:[sender indexOfSelectedItem]];
+//	}
+//}
 
-- (IBAction) energyDecimationAction:(id)sender
-{
-    if([sender indexOfSelectedItem] != [model energyDecimation:[sender tag]]){
-		[model setEnergyDecimation:[sender tag] withValue:[sender indexOfSelectedItem]];
-	}
-}
+//- (IBAction) energyDecimationAction:(id)sender
+//{
+//    if([sender indexOfSelectedItem] != [model energyDecimation:[sender tag]]){
+//		[model setEnergyDecimation:[sender tag] withValue:[sender indexOfSelectedItem]];
+//	}
+//}
 
 //- (IBAction) thresholdAction:(id)sender
 //{
@@ -1629,19 +1621,19 @@
 //	}
 //}
 
-- (IBAction) cfdControlAction:(id)sender
-{
-    //if([sender intValue] != [model cfdControl:[sender tag]]){
-//		[model setCfdControl:[sender tag] withValue:[sender indexOfSelectedItem]];
-	//}
-}
+//- (IBAction) cfdControlAction:(id)sender
+//{
+//    //if([sender intValue] != [model cfdControl:[sender tag]]){
+////		[model setCfdControl:[sender tag] withValue:[sender indexOfSelectedItem]];
+//	//}
+//}
 
-- (IBAction) triggerGateLengthAction:(id)sender
-{
-    if([sender intValue] != [model triggerGateLength:[[sender selectedCell] tag]]){
-		[model setTriggerGateLength:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
+//- (IBAction) triggerGateLengthAction:(id)sender
+//{
+//    if([sender intValue] != [model triggerGateLength:[[sender selectedCell] tag]]){
+//		[model setTriggerGateLength:[[sender selectedCell] tag] withValue:[sender intValue]];
+//	}
+//}
 
 - (IBAction) preTriggerDelay14Action:(id)sender
 {
@@ -1661,6 +1653,63 @@
         [model setPreTriggerDelay:chan withValue:value];
     }
 }
+
+#pragma mark KEY Reg actions
+
+- (IBAction) generalResetAction:(id)sender
+{
+    [model reset];
+}
+
+- (IBAction) armSampleLogicAction:(id)sender
+{
+    [model armSampleLogic];
+}
+
+- (IBAction) disarmSampleLogicAction:(id)sender
+{
+    [model disarmSampleLogic];
+}
+
+- (IBAction) triggerAction:(id)sender
+{
+    [model forceTrigger];
+}
+
+- (IBAction) enableSampleLogicAction:(id)sender
+{
+    [model enableSampleLogic];
+}
+
+- (IBAction) setVetoAction:(id)sender
+{
+    [model setVeto];
+}
+
+- (IBAction) clearVetoAction:(id)sender
+{
+    [model clearVeto];
+}
+
+- (IBAction) ADCClockSynchAction:(id)sender
+{
+    [model ADCSynchReset];
+}
+
+- (IBAction) resetADCFPGALogicAction:(id)sender
+{
+    [model ADCFPGAReset];
+}
+
+- (IBAction) externalTriggerOutPulseAction:(id)sender
+{
+    [model pulseExternalTriggerOut];
+}
+
+
+#pragma mark -- Don't know about these
+
+
 
 - (IBAction) sampleStartIndexAction:(id)sender
 {
@@ -1694,20 +1743,6 @@
 {
     if([sender intValue] != [model pulseLength:[[sender selectedCell] tag]]){
 //		[model setPulseLength:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
-
-- (IBAction) sumGAction:(id)sender
-{
-    if([sender intValue] != [model sumG:[[sender selectedCell] tag]]){
-		[model setSumG:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
-
-- (IBAction) peakingTimeAction:(id)sender
-{
-    if([sender intValue] != [model peakingTime:[[sender selectedCell] tag]]){
-		[model setPeakingTime:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
@@ -1758,15 +1793,24 @@
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:settingSize];
+		[self resizeWindowToSize:basicSize];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
-		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:rateSize];
-		[[self window] setContentView:tabView];
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:settingSize];
+        [[self window] setContentView:tabView];
     }
-	
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:miscSize];
+        [[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:rateSize];
+        [[self window] setContentView:tabView];
+    }
     NSString* key = [NSString stringWithFormat: @"orca.ORSIS3305%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];

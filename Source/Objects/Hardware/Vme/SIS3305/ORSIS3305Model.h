@@ -44,6 +44,34 @@
     BOOL            ledApplicationMode;
     BOOL            ledEnable[3];
     
+    
+    unsigned long   registerWriteValue;
+    int             registerIndex;
+    unsigned long   spiWriteValue;
+    
+    
+    // event config bits
+    BOOL    ADCGateModeEnabled[kNumSIS3305Groups];
+    BOOL    globalTriggerEnabled[kNumSIS3305Groups];
+    BOOL    internalTriggerEnabled[kNumSIS3305Groups];
+    BOOL    startEventSamplingWithExtTrigEnabled[kNumSIS3305Groups];
+    BOOL    clearTimestampWhenSamplingEnabledEnabled[kNumSIS3305Groups];
+    BOOL    clearTimestampDisabled[kNumSIS3305Groups];
+    BOOL    grayCodeEnabled[kNumSIS3305Groups];
+    BOOL    directMemoryHeaderDisabled[kNumSIS3305Groups];
+    BOOL    waitPreTrigTimeBeforeDirectMemTrig[kNumSIS3305Groups];
+    
+    
+    
+    short			internalTriggerEnabledMask;
+    short			externalTriggerEnabledMask;
+    short			internalGateEnabledMask;
+    short			externalGateEnabledMask;
+    short			inputInvertedMask;
+    short			triggerOutEnabledMask;
+    
+    
+    
     BOOL        enableExternalLEMODirectVetoIn;
     BOOL        enableExternalLEMOResetIn;
     BOOL        enableExternalLEMOCountIn;
@@ -68,15 +96,9 @@
 	unsigned long   mcaId;
 	
 	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
-    BOOL            internalTriggerEnabled[kNumSIS3305Groups];
-    BOOL            globalTriggerEnabled[kNumSIS3305Groups];
-	short			internalTriggerEnabledMask; 
-	short			externalTriggerEnabledMask;
-	short			internalGateEnabledMask;
-	short			externalGateEnabledMask;
-	short			inputInvertedMask;
-	short			triggerOutEnabledMask;
-	short			highEnergySuppressMask;
+
+
+
 //    short			ltMask;
 //    short			gtMask;
 	bool			waitingForSomeChannels;
@@ -95,7 +117,7 @@
     int     GTThresholdOff[kNumSIS3305Channels];
     int     LTThresholdOn[kNumSIS3305Channels];
     int     LTThresholdOff[kNumSIS3305Channels];
-    
+    int     preTriggerDelays[kNumSIS3305Channels];
     int     gain[kNumSIS3305Channels];
     
     
@@ -103,18 +125,15 @@
     NSMutableArray* dacOffsets;
 	NSMutableArray* gateLengths;
 	NSMutableArray* pulseLengths;
-	NSMutableArray* sumGs;
-	NSMutableArray* peakingTimes;
+//	NSMutableArray* peakingTimes;
 	NSMutableArray* internalTriggerDelays;
 	NSMutableArray* sampleLengths;
     NSMutableArray* sampleStartIndexes;
-    NSMutableArray* preTriggerDelays;
+//    NSMutableArray* preTriggerDelays;
     NSMutableArray* triggerGateLengths;
-	NSMutableArray*	triggerDecimations;
+//	NSMutableArray*	triggerDecimations;
     NSMutableArray* energyGateLengths;
-    NSMutableArray* energyGapTimes;
-    NSMutableArray* energyTauFactors;
-	NSMutableArray* energyDecimations;
+
 	NSMutableArray* endAddressThresholds;
 	
 	ORRateGroup*	waveFormRateGroup;
@@ -123,20 +142,20 @@
 	unsigned long location;
 	short wrapMaskForRun;
 	id theController;
-	int currentBank;
+//	int currentBank;
 	long count;
     short lemoOutMode;
     short lemoInMode;
-	BOOL bankOneArmed;
+//	BOOL bankOneArmed;
 	BOOL firstTime;
-	BOOL shipEnergyWaveform;
-	BOOL shipSummedWaveform;
+//	BOOL shipEnergyWaveform;
+//	BOOL shipSummedWaveform;
 	
-    int energySampleLength;
-    int energySampleStartIndex1;
-    int energySampleStartIndex2;
-    int energySampleStartIndex3;
-	int energyNumberToSum;
+//    int energySampleLength;
+//    int energySampleStartIndex1;
+//    int energySampleStartIndex2;
+//    int energySampleStartIndex3;
+//	int energyNumberToSum;
     int runMode;
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
@@ -164,7 +183,7 @@
 //    BOOL			mcaUseEnergyCalculation;
     BOOL			shipTimeRecordAlso;
     float			firmwareVersion;
-	time_t			lastBankSwitchTime;
+//	time_t			lastBankSwitchTime;
 	unsigned long	waitCount;
 	unsigned long	channelsToReadMask;
     BOOL pulseMode;
@@ -287,8 +306,40 @@
 
 //- (short) internalTriggerEnabledMask;
 //- (void) setInternalTriggerEnabledMask:(short)aMask;
+
+
+// register R/W accessors
+- (short) registerIndex;
+- (void) setRegisterIndex:(int)aRegisterIndex;
+- (unsigned long) registerWriteValue;
+- (void) setRegisterWriteValue:(unsigned long)aWriteValue;
+- (NSString*) registerNameAt:(unsigned int)index;
+- (unsigned short) registerOffsetAt:(unsigned int)index;
+
+// event config accessors
+- (BOOL) ADCGateModeEnabled:(unsigned short)group;
+- (void) setADCGateModeEnabled:(unsigned short)group toValue:(BOOL)value;
+- (BOOL) globalTriggerEnabledOnGroup:(unsigned short)group;
+- (void) setGlobalTriggerEnabledOnGroup:(unsigned short)group toValue:(BOOL)value;
 - (BOOL) internalTriggerEnabled:(short)chan;
-- (void) setInternalTriggerEnabled:(short)chan withValue:(BOOL)aValue;
+- (void) setInternalTriggerEnabled:(short)chan toValue:(BOOL)aValue;
+- (BOOL) startEventSamplingWithExtTrigEnabled:(unsigned short)group;
+- (void) setStartEventSamplingWithExtTrigEnabled:(unsigned short)group toValue:(BOOL)value;
+- (BOOL) clearTimestampWhenSamplingEnabledEnabled:(unsigned short)group;
+- (void) setClearTimestampWhenSamplingEnabledEnabled:(unsigned short)group toValue:(BOOL)value;
+- (BOOL) clearTimestampDisabled:(unsigned short)group;
+- (void) setClearTimestampDisabled:(unsigned short)group toValue:(BOOL)value;
+- (BOOL) grayCodeEnabled:(unsigned short)group;
+- (void) setGrayCodeEnabled:(unsigned short)group toValue:(BOOL) value;
+- (BOOL) directMemoryHeaderDisabled:(unsigned short)group;
+- (void) setDirectMemoryHeaderDisabled:(unsigned short)group toValue:(BOOL)value;
+- (BOOL) waitPreTrigTimeBeforeDirectMemTrig:(unsigned short)group;
+- (void) setWaitPreTrigTimeBeforeDirectMemTrig:(unsigned short)group toValue:(BOOL)value;
+
+
+
+
+
 
 - (short) externalTriggerEnabledMask;
 - (void) setExternalTriggerEnabledMask:(short)aMask;
@@ -315,12 +366,12 @@
 - (BOOL) triggerOutEnabled:(short)chan;
 - (void) setTriggerOutEnabled:(short)chan withValue:(BOOL)aValue;
 
-- (BOOL) shipEnergyWaveform;
-- (void) setShipEnergyWaveform:(BOOL)aState;
+//- (BOOL) shipEnergyWaveform;
+//- (void) setShipEnergyWaveform:(BOOL)aState;
 
-- (BOOL) shipSummedWaveform;
-- (void) setShipSummedWaveform:(BOOL)aState;
-- (NSString*) energyBufferAssignment;
+//- (BOOL) shipSummedWaveform;
+//- (void) setShipSummedWaveform:(BOOL)aState;
+//- (NSString*) energyBufferAssignment;
 
 //- (short) ltMask;
 //- (short) gtMask;
@@ -333,10 +384,10 @@
 
 - (short) internalTriggerDelay:(short)chan;
 - (void) setInternalTriggerDelay:(short)chan withValue:(short)aValue;
-- (int) triggerDecimation:(short)aGroup;
-- (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue;
-- (short) energyDecimation:(short)aGroup;
-- (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue;
+//- (int) triggerDecimation:(short)aGroup;
+//- (void) setTriggerDecimation:(short)aGroup withValue:(short)aValue;
+//- (short) energyDecimation:(short)aGroup;
+//- (void) setEnergyDecimation:(short)aGroup withValue:(short)aValue;
 //- (short) cfdControl:(short)aChannel;
 //- (void) setCfdControl:(short)aChannel withValue:(short)aValue;
 
@@ -344,7 +395,8 @@
 //- (void) setThreshold:(short)chan withValue:(int)aValue;    // should be properly removed
 
 // control status reg
-//- (void) setLed:(short)ledNum to:(BOOL)state;
+- (void) setLed:(unsigned short)ledNum to:(BOOL)state;
+
 
 - (void) setEnableExternalLEMODirectVetoIn:(BOOL)state;
 - (void) setEnableExternalLEMOResetIn:(BOOL)state;
@@ -399,10 +451,6 @@
 - (short) pulseLength:(short)chan;
 - (void) setGateLength:(short)aChan withValue:(short)aValue;
 - (short) gateLength:(short)chan;
-- (void) setSumG:(short)aChan withValue:(short)aValue;
-- (short) sumG:(short)chan;
-- (short) peakingTime:(short)aChan;
-- (void) setPeakingTime:(short)aChan withValue:(short)aValue;
 
 - (void) initParams;
 
@@ -412,7 +460,7 @@
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
-- (void) calculateSampleValues;
+//- (void) calculateSampleValues;
 
 
 
@@ -423,18 +471,28 @@
 
 
 #pragma mark - Hardware Access
+
+- (unsigned long) readRegister:(unsigned int)index;
+- (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
+- (void) writeToAddress:(unsigned long)anAddress aValue:(unsigned long)aValue;
+- (unsigned long) readFromAddress:(unsigned long)anAddress;
+- (BOOL) canReadRegister:(unsigned int)index;
+- (BOOL) canWriteRegister:(unsigned int)index;
+
 - (void) writeControlStatus;
 
 - (void) writeLed:(short)ledNum to:(BOOL)state;
 - (void) writeLedApplicationMode;
 
 - (void) readModuleID:(BOOL)verbose;
+- (unsigned long) readInterruptConfig:(BOOL)verbose;
+- (void) writeInterruptConfig:(unsigned long)value;
 - (unsigned long) readInterruptControl:(BOOL)verbose;
 - (void) writeInterruptControl:(unsigned long)value;
 
 // acquisition control methods
 - (unsigned long) readAcquisitionControl:(BOOL)verbose;
-- (void) writeAcquistionControl;
+- (void) writeAcquisitionControl;
 - (void) writeClockSource:(unsigned long)aState;
 
 - (unsigned long) readVetoLength:(BOOL)verbose;
@@ -471,7 +529,7 @@
 - (void) writeADCSerialInterface;
 
 - (unsigned long) readDataTransferControlRegister:(short)group;
-- (void) writeDataTransferControlRegister:(short)group withCommand:(short)command;
+- (void) writeDataTransferControlRegister:(short)group withCommand:(short)command withAddress:(unsigned long)value;
 
 - (unsigned long) readDataTransferStatusRegister:(short)group;
 
@@ -506,7 +564,7 @@
 - (unsigned long) readSamplePretriggerLengthOfGroup:(short)group;
 - (void) writeSamplePretriggerLengthOfGroup:(short)group toValue:(unsigned long)value;
 - (unsigned long) readRingbufferPretriggerDelayOnChannel:(short)chan;
-- (void) writeRingbufferPretriggerDelayOnChannel:(short)chan toValue:(unsigned long)value;
+- (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value;
 
 - (unsigned long) readMaxNumOfEventsInGroup:(short)group;
 - (void) writeMaxNumOfEventsInGroup:(short)group toValue:(unsigned int)maxValue;
@@ -631,15 +689,12 @@ extern NSString* ORSIS3305ModelMcaLNESetupChanged;
 extern NSString* ORSIS3305ModelMcaNofHistoPresetChanged;
 extern NSString* ORSIS3305ModelInternalExternalTriggersOredChanged;
 extern NSString* ORSIS3305ModelLemoInEnabledMaskChanged;
-extern NSString* ORSIS3305ModelEnergyGateLengthChanged;
+//extern NSString* ORSIS3305ModelEnergyGateLengthChanged;
 extern NSString* ORSIS3305ModelRunModeChanged;
 extern NSString* ORSIS3305ModelEndAddressThresholdChanged;
-extern NSString* ORSIS3305ModelEnergySampleStartIndex3Changed;
-extern NSString* ORSIS3305ModelEnergySampleStartIndex2Changed;
-extern NSString* ORSIS3305ModelEnergySampleStartIndex1Changed;
-extern NSString* ORSIS3305ModelEnergyNumberToSumChanged;
-extern NSString* ORSIS3305ModelEnergySampleLengthChanged;
-extern NSString* ORSIS3305ModelEnergyGapTimeChanged;
+
+//extern NSString* ORSIS3305ModelEnergySampleLengthChanged;
+//extern NSString* ORSIS3305ModelEnergyGapTimeChanged;
 extern NSString* ORSIS3305ModelTriggerGateLengthChanged;
 extern NSString* ORSIS3305ModelPreTriggerDelayChanged;
 extern NSString* ORSIS3305SampleStartIndexChanged;
@@ -679,14 +734,38 @@ extern NSString* ORSIS3305SampleDone;
 extern NSString* ORSIS3305IDChanged;
 extern NSString* ORSIS3305GateLengthChanged;
 extern NSString* ORSIS3305PulseLengthChanged;
-extern NSString* ORSIS3305SumGChanged;
-extern NSString* ORSIS3305PeakingTimeChanged;
 extern NSString* ORSIS3305InternalTriggerDelayChanged;
 extern NSString* ORSIS3305TriggerDecimationChanged;
 extern NSString* ORSIS3305EnergyDecimationChanged;
+extern NSString* ORSIS3305LEDEnabledChanged;
 extern NSString* ORSIS3305SetShipWaveformChanged;
-extern NSString* ORSIS3305SetShipSummedWaveformChanged;
+//extern NSString* ORSIS3305SetShipSummedWaveformChanged;
 extern NSString* ORSIS3305InputInvertedChanged;
+
+// event config
+extern NSString* ORSIS3305EventSavingModeChanged;
+extern NSString* ORSIS3305ADCGateModeEnabledChanged;
+extern NSString* ORSIS3305GlobalTriggerEnabledChanged;
+extern NSString* ORSIS3305InternalTriggerEnabledChanged;
+extern NSString* ORSIS3305StartEventSamplingWithExtTrigEnabledChanged;
+extern NSString* ORSIS3305ClearTimestampWhenSamplingEnabledEnabledChanged;
+extern NSString* ORSIS3305ClearTimestampDisabledChanged;
+extern NSString* ORSIS3305GrayCodeEnabledChanged;
+extern NSString* ORSIS3305DirectMemoryHeaderDisabledChanged;
+extern NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged;
+
+
+
+
+
+
+extern NSString* ORSIS3305ExternalTriggerEnabledChanged;
+extern NSString* ORSIS3305InternalGateEnabledChanged;
+extern NSString* ORSIS3305ExternalGateEnabledChanged;
+extern NSString* ORSIS3305McaStatusChanged;
+extern NSString* ORSIS3305CardInited;
+
+
 
 // control status
 extern NSString* ORSIS3305LEDApplicationModeChanged;
@@ -702,10 +781,7 @@ extern NSString* ORSIS3305GateModeExternalVetoInDelayLengthLogic;
 extern NSString* ORSIS3305EnableMemoryOverrunVeto;
 extern NSString* ORSIS3305EControlLEMOTriggerOut;
 
+extern NSString* ORSIS3305ModelRegisterIndexChanged;
+extern NSString* ORSIS3305ModelRegisterWriteValueChanged;
 
-extern NSString* ORSIS3305InternalTriggerEnabledChanged;
-extern NSString* ORSIS3305ExternalTriggerEnabledChanged;
-extern NSString* ORSIS3305InternalGateEnabledChanged;
-extern NSString* ORSIS3305ExternalGateEnabledChanged;
-extern NSString* ORSIS3305McaStatusChanged;
-extern NSString* ORSIS3305CardInited;
+

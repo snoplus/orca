@@ -20,6 +20,8 @@
 #pragma mark - General Card Properties
 #define kNumSIS3305Channels	8 
 #define kNumSIS3305Groups	2 
+#define kNumSIS3305ReadRegs 92
+
 
 #define kMcaRunMode			0
 #define kEnergyRunMode		1

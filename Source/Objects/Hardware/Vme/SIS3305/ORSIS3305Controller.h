@@ -88,12 +88,13 @@
 	IBOutlet NSTextField*	energyBufferAssignmentField;
 	IBOutlet NSTextField*	runSummaryField;
 
+    
+    
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
     IBOutlet NSPopUpButton* clockSourcePU;
-    IBOutlet NSPopUpButton* eventSavingMode14PU;
-    IBOutlet NSPopUpButton* eventSavingMode58PU;
+
     IBOutlet NSMatrix*      thresholdMode14PUMatrix;
     IBOutlet NSMatrix*      thresholdMode58PUMatrix;
 
@@ -105,13 +106,8 @@
 //	IBOutlet NSMatrix*		highThresholdMatrix;
 	IBOutlet NSMatrix*		gateLengthMatrix;
 	IBOutlet NSMatrix*		pulseLengthMatrix;
-	IBOutlet NSMatrix*		sumGMatrix;
-	IBOutlet NSMatrix*		peakingTimeMatrix;
 	IBOutlet NSMatrix*		internalTriggerDelayMatrix;
 	IBOutlet NSMatrix*		sampleLengthMatrix;
- 	IBOutlet NSMatrix*		energyTauFactorMatrix;
-	IBOutlet NSMatrix*		energyGapTimeMatrix;
-	IBOutlet NSMatrix*		energyPeakingTimeMatrix;
 
 	IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -119,25 +115,64 @@
     IBOutlet NSButton*      regDumpButton;
     IBOutlet NSButton*      probeButton;
     IBOutlet NSButton*      forceTriggerButton;
+
+    
+// low level page
+    // key address buttons
+    IBOutlet NSButton*      generalResetButton;
+    IBOutlet NSButton*      armSampleLogicButton;
+    IBOutlet NSButton*      disarmSampleLogicButton;
+    IBOutlet NSButton*      triggerButton;
+    IBOutlet NSButton*      enableSampleLogicButton;
+    IBOutlet NSButton*      setVetoButton;
+    IBOutlet NSButton*      clearVetoButton;
+    IBOutlet NSButton*      ADCClockSynchButton;
+    IBOutlet NSButton*      ResetADCFPGALogicButton;
+    IBOutlet NSButton*      externalTriggerOutPulseButton;
+
+    // register access
+    IBOutlet NSPopUpButton*	registerIndexPU;
+    IBOutlet NSTextField*	registerWriteValueField;
+    IBOutlet NSButton*		writeRegisterButton;
+    IBOutlet NSButton*		readRegisterButton;
+    IBOutlet NSTextField*	registerStatusField;
+
+    
+    
+    // event config things
+    IBOutlet NSPopUpButton* eventSavingMode14PU;
+    IBOutlet NSPopUpButton* eventSavingMode58PU;
+    IBOutlet NSButton*      ADCGateModeEnabled14Button;
+    IBOutlet NSButton*      ADCGateModeEnabled58Button;
+    IBOutlet NSButton*      globalTriggerEnable14Button;
+    IBOutlet NSButton*      globalTriggerEnable58Button;
+    IBOutlet NSButton*      internalTriggerEnabled14Button;
+    IBOutlet NSButton*      internalTriggerEnabled58Button;
+    IBOutlet NSButton*      startEventSamplingWithExtTrigEnabled14Button;
+    IBOutlet NSButton*      startEventSamplingWithExtTrigEnabled58Button;
+    IBOutlet NSButton*      clearTimestampWhenSamplingEnabledEnabled14Button;
+    IBOutlet NSButton*      clearTimestampWhenSamplingEnabledEnabled58Button;
+    IBOutlet NSButton*      clearTimestampDisabled14Button;
+    IBOutlet NSButton*      clearTimestampDisabled58Button;
+    IBOutlet NSButton*      grayCodeEnable14Button;
+    IBOutlet NSButton*      grayCodeEnable58Button;
+    IBOutlet NSButton*      disableDirectMemoryHeader14Button;
+    IBOutlet NSButton*      disableDirectMemoryHeader58Button;
+    IBOutlet NSButton*      waitPreTrigTimeBeforeDirectMemTrig14Button;
+    IBOutlet NSButton*      waitPreTrigTimeBeforeDirectMemTrig58Button;
+    
+    
+    
 	
-	IBOutlet NSPopUpButton*	triggerDecimation0;
-	IBOutlet NSPopUpButton*	triggerDecimation1;
-	IBOutlet NSPopUpButton*	triggerDecimation2;
-	IBOutlet NSPopUpButton*	triggerDecimation3;
-	IBOutlet NSPopUpButton*	energyDecimation0;
-	IBOutlet NSPopUpButton*	energyDecimation1;
-	IBOutlet NSPopUpButton*	energyDecimation2;
-	IBOutlet NSPopUpButton*	energyDecimation3;
-	
-	IBOutlet NSPopUpButton* cfdControl0;
-	IBOutlet NSPopUpButton* cfdControl1;
-	IBOutlet NSPopUpButton* cfdControl2;
-	IBOutlet NSPopUpButton* cfdControl3;
-	IBOutlet NSPopUpButton* cfdControl4;
-	IBOutlet NSPopUpButton* cfdControl5;
-	IBOutlet NSPopUpButton* cfdControl6;
-	IBOutlet NSPopUpButton* cfdControl7;
-	
+//	IBOutlet NSPopUpButton* cfdControl0;
+//	IBOutlet NSPopUpButton* cfdControl1;
+//	IBOutlet NSPopUpButton* cfdControl2;
+//	IBOutlet NSPopUpButton* cfdControl3;
+//	IBOutlet NSPopUpButton* cfdControl4;
+//	IBOutlet NSPopUpButton* cfdControl5;
+//	IBOutlet NSPopUpButton* cfdControl6;
+//	IBOutlet NSPopUpButton* cfdControl7;
+//	
 //    IBOutlet NSTextField*	mcaBusyField;
 	
 //    IBOutlet NSTextField*   mcaScanHistogramCounterField;
@@ -161,8 +196,11 @@
     IBOutlet NSButton*					timeRateLogCB;
 		
     NSView *blankView;
+    NSSize basicSize;
     NSSize settingSize;
     NSSize rateSize;
+    NSSize miscSize;
+    
 }
 
 - (id)   init;
@@ -182,6 +220,25 @@
 //- (void) ledEnabledChanged:(NSNotification*)aNote;
 //- (void) ledApplicationModeChanged:(NSNotification*)aNote;
 
+
+//event config changed updaters
+- (void) eventSavingModeChanged:(NSNotification*)aNote;
+- (void) ADCGateModeEnabledChanged:(NSNotification*)aNote;
+- (void) globalTriggerEnabledChanged:(NSNotification*)aNote;
+- (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
+- (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
+- (void) startEventSamplingWithExtTrigEnabledChanged:(NSNotification*)aNote;
+- (void) clearTimestampWhenSamplingEnabledEnabledChanged:(NSNotification*)aNote;
+- (void) clearTimestampDisabledChanged:(NSNotification*)aNote;
+- (void) grayCodeEnabledChanged:(NSNotification*)aNote;
+- (void) disableDirectMemoryHeaderChanged:(NSNotification*)aNote;
+- (void) waitPreTrigTimeBeforeDirectMemTrigChanged:(NSNotification*)aNote;
+
+
+
+
+
+
 - (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
@@ -200,8 +257,7 @@
 - (void) lemoOutModeChanged:(NSNotification*)aNote;
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
-- (void) eventSavingMode14Changed:(NSNotification*)aNote;
-- (void) eventSavingMode58Changed:(NSNotification*)aNote;
+
 - (void) thresholdModeChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
@@ -216,11 +272,9 @@
 
 - (void) gateLengthChanged:(NSNotification*)aNote;
 - (void) pulseLengthChanged:(NSNotification*)aNote;
-- (void) sumGChanged:(NSNotification*)aNote;
-- (void) peakingTimeChanged:(NSNotification*)aNote;
 - (void) internalTriggerDelayChanged:(NSNotification*)aNote;
-- (void) triggerDecimationChanged:(NSNotification*)aNote;
-- (void) energyDecimationChanged:(NSNotification*)aNote;
+
+- (void) ORSIS3305LEDEnabledChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
@@ -229,7 +283,6 @@
 #pragma mark - Actions
 - (IBAction) pulseModeAction:(id)sender;
 - (IBAction) bufferWrapEnabledAction:(id)sender;
-- (IBAction) cfdControlAction:(id)sender;
 - (IBAction) shipTimeRecordAlsoAction:(id)sender;
 - (IBAction) TDCLogicEnabledAction:(id)sender;
 //- (IBAction) tapDelayAction:(id)sender;
@@ -237,15 +290,15 @@
 - (IBAction) channelEnabledMaskAction:(id)sender;
 
 - (IBAction) internalExternalTriggersOredAction:(id)sender;
-- (IBAction) internalTriggerEnabledMaskAction:(id)sender;
-- (IBAction) externalTriggerEnabledMaskAction:(id)sender;
+//- (IBAction) internalTriggerEnabledMaskAction:(id)sender;
+//- (IBAction) externalTriggerEnabledMaskAction:(id)sender;
 - (IBAction) internalGateEnabledMaskAction:(id)sender;
 - (IBAction) externalGateEnabledMaskAction:(id)sender;
 - (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) lemoInEnabledMaskAction:(id)sender;
 - (IBAction) runModeAction:(id)sender;
 
-- (IBAction) triggerGateLengthAction:(id)sender;
+//- (IBAction) triggerGateLengthAction:(id)sender;
 - (IBAction) preTriggerDelay14Action:(id)sender;
 - (IBAction) preTriggerDelay58Action:(id)sender;
 - (IBAction) sampleStartIndexAction:(id)sender;
@@ -255,16 +308,39 @@
 - (IBAction) lemoOutModeAction:(id)sender;
 
 - (IBAction) clockSourceAction:(id)sender;
+
+
+//event config actions
 - (IBAction) eventSavingMode14Action:(id)sender;
 - (IBAction) eventSavingMode58Action:(id)sender;
+- (IBAction) ADCGateModeEnabled14Action:(id)sender;
+- (IBAction) ADCGateModeEnabled58Action:(id)sender;
+- (IBAction) globalTriggerEnabled14Action:(id)sender;
+- (IBAction) globalTriggerEnabled58Action:(id)sender;
+- (IBAction) internalTriggerEnabled14Action:(id)sender;
+- (IBAction) internalTriggerEnabled58Action:(id)sender;
+- (IBAction) externalTriggerEnabled14Action:(id)sender;
+- (IBAction) externalTriggerEnabled58Action:(id)sender;
+- (IBAction) startEventSamplingWithExtTrigEnabled14Action:(id)sender;
+- (IBAction) startEventSamplingWithExtTrigEnabled58Action:(id)sender;
+- (IBAction) clearTimestampWhenSamplingEnabledEnabled14Action:(id)sender;
+- (IBAction) clearTimestampWhenSamplingEnabledEnabled58Action:(id)sender;
+- (IBAction) clearTimestampDisabled14Changed:(id)sender;
+- (IBAction) clearTimestampDisabled58Changed:(id)sender;
+- (IBAction) disableDirectMemoryHeader14Changed:(id)sender;
+- (IBAction) disableDirectMemoryHeader58Changed:(id)sender;
+- (IBAction) waitPreTrigTimeBeforeDirectMemTrig14Changed:(id)sender;
+- (IBAction) waitPreTrigTimeBeforeDirectMemTrig58Changed:(id)sender;
+
+
+
+
 //- (IBAction) thresholdModeAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) probeBoardAction:(id)sender;
-- (IBAction) triggerDecimationAction:(id)sender;
-- (IBAction) energyDecimationAction:(id)sender;
 
 - (IBAction) inputInvertedAction:(id)sender;
 - (IBAction) triggerOutEnabledAction:(id)sender;
@@ -280,15 +356,28 @@
 - (IBAction) LTThresholdOff14Action:(id)sender;
 - (IBAction) LTThresholdOff58Action:(id)sender;
 
-//- (IBAction) highThresholdAction:(id)sender;
+
 - (IBAction) gateLengthAction:(id)sender;
 - (IBAction) pulseLengthAction:(id)sender;
-- (IBAction) sumGAction:(id)sender;
-- (IBAction) peakingTimeAction:(id)sender;
 - (IBAction) internalTriggerDelayAction:(id)sender;
 - (IBAction) briefReport:(id)sender;
 - (IBAction) regDump:(id)sender;
 - (IBAction) forceTriggerAction:(id)sender;
+
+// key actions
+- (IBAction) generalResetAction:(id)sender;
+- (IBAction) armSampleLogicAction:(id)sender;
+- (IBAction) disarmSampleLogicAction:(id)sender;
+- (IBAction) triggerAction:(id)sender;
+- (IBAction) enableSampleLogicAction:(id)sender;
+- (IBAction) setVetoAction:(id)sender;
+- (IBAction) clearVetoAction:(id)sender;
+- (IBAction) ADCClockSynchAction:(id)sender;
+- (IBAction) resetADCFPGALogicAction:(id)sender;
+- (IBAction) externalTriggerOutPulseAction:(id)sender;
+
+
+
 
 #pragma mark - Data Source
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

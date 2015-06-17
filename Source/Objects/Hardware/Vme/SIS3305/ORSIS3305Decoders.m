@@ -76,17 +76,17 @@
 
 - (void) filterLengthChanged:(NSNotification*)aNote
 {
-    @synchronized (self){
-        ORSIS3305Model* theCard		= [aNote object];
-        NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
-        NSString* cardKey			= [self getCardKey: [theCard slot]];
-        NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
-        int group;
-        for(group=0;group<[theCard numberOfChannels]/2;group++){
-            [theValues addObject:[NSNumber numberWithInt:[theCard peakingTime:group]]];
-        }
-        [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
-    }
+//    @synchronized (self){
+//        ORSIS3305Model* theCard		= [aNote object];
+//        NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+//        NSString* cardKey			= [self getCardKey: [theCard slot]];
+//        NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
+//        int group;
+//        for(group=0;group<[theCard numberOfChannels]/2;group++){
+//            [theValues addObject:[NSNumber numberWithInt:[theCard peakingTime:group]]];
+//        }
+//        [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
+//    }
 }
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
@@ -531,7 +531,7 @@
     NSMutableArray*  theValues  = [NSMutableArray arrayWithCapacity:8];
 	int group;
 	for(group=0;group<[theCard numberOfChannels]/2;group++){
-        [theValues addObject:[NSNumber numberWithInt:[theCard peakingTime:group]]];
+//        [theValues addObject:[NSNumber numberWithInt:[theCard energyPeakingTime:group]]];
 	}
     [self setObject:theValues forNestedKey:crateKey,cardKey,kFilterLengthKey,nil];
 }
