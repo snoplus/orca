@@ -1329,13 +1329,14 @@ void SwapLongBlock(void* p, int32_t n)
     [self setHvBVoltageDACSetValue:[decoder decodeIntForKey:@"ORXL3ModelHvBVoltageDACSetValue"]];
     [self setHvAVoltageTargetValue:[decoder decodeIntForKey:@"ORXL3ModelhvAVoltageTargetValue"]];
     [self setHvBVoltageTargetValue:[decoder decodeIntForKey:@"ORXL3ModelhvBVoltageTargetValue"]];
-    [self setHvACMOSRateLimit:[decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateLimit"]];
-    [self setHvBCMOSRateLimit:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateLimit"]];
-    [self setHvACMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateIgnore"]];
-    [self setHvBCMOSRateIgnore:[decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateIgnore"]];
-    [self setHvNominalVoltageA:[decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageA"]];
-    [self setHvNominalVoltageB:[decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageB"]];
-
+    [self setHvACMOSRateLimit:  [decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateLimit"]];
+    [self setHvBCMOSRateLimit:  [decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateLimit"]];
+    [self setHvACMOSRateIgnore: [decoder decodeIntForKey:@"ORXL3ModelhvACMOSRateIgnore"]];
+    [self setHvBCMOSRateIgnore: [decoder decodeIntForKey:@"ORXL3ModelhvBCMOSRateIgnore"]];
+    [self setHvNominalVoltageA: [decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageA"]];
+    [self setHvNominalVoltageB: [decoder decodeIntForKey:@"ORXL3ModelHvNominalVoltageB"]];
+    [self setXl3Mode:           [decoder decodeIntForKey:@"Xl3Mode"]];
+    
     //FIXME from ORCADB
     if ([self hvNominalVoltageA] == 0) {
         [self setHvNominalVoltageA:2500];
@@ -1377,19 +1378,19 @@ void SwapLongBlock(void* p, int32_t n)
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
-	[encoder encodeInt:selectedRegister	forKey:@"ORXL3ModelSelectedRegister"];
-	[encoder encodeInt:[self slot]		forKey:@"slot"];
-	[encoder encodeObject:xl3Link		forKey:@"XL3_Link"];
-	[encoder encodeBool:autoIncrement	forKey:@"ORXL3ModelAutoIncrement"];
-	[encoder encodeInt:repeatDelay		forKey:@"ORXL3ModelRepeatDelay"];
-	[encoder encodeInt:repeatOpCount	forKey:@"ORXL3ModelRepeatOpCount"];
-	[encoder encodeInt:xl3Mode		forKey:@"ORXL3ModelXl3Mode"];
-	[encoder encodeInt:slotMask		forKey:@"ORXL3ModelSlotMask"];
+	[encoder encodeInt:selectedRegister     forKey:@"ORXL3ModelSelectedRegister"];
+	[encoder encodeInt:[self slot]          forKey:@"slot"];
+	[encoder encodeObject:xl3Link           forKey:@"XL3_Link"];
+	[encoder encodeBool:autoIncrement       forKey:@"ORXL3ModelAutoIncrement"];
+	[encoder encodeInt:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
+	[encoder encodeInt:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
+	[encoder encodeInt:xl3Mode              forKey:@"ORXL3ModelXl3Mode"];
+	[encoder encodeInt:slotMask             forKey:@"ORXL3ModelSlotMask"];
 	[encoder encodeInt:xl3RWAddressValue	forKey:@"ORXL3ModelXl3RWAddressValue"];
-	[encoder encodeInt:xl3RWDataValue	forKey:@"ORXL3ModelXl3RWDataValue"];
-	[encoder encodeInt:xl3PedestalMask	forKey:@"ORXL3ModelXl3PedestalMask"];
-    [encoder encodeInt:xl3ChargeInjMask forKey:@"ORXL3ModelXl3ChargeInjMask"];
-    [encoder encodeInt:xl3ChargeInjCharge forKey:@"ORXL3ModelXl3ChargeInjCharge"];
+	[encoder encodeInt:xl3RWDataValue       forKey:@"ORXL3ModelXl3RWDataValue"];
+	[encoder encodeInt:xl3PedestalMask      forKey:@"ORXL3ModelXl3PedestalMask"];
+    [encoder encodeInt:xl3ChargeInjMask     forKey:@"ORXL3ModelXl3ChargeInjMask"];
+    [encoder encodeInt:xl3ChargeInjCharge   forKey:@"ORXL3ModelXl3ChargeInjCharge"];
 
     [encoder encodeInt:pollXl3Time              forKey:@"ORXL3ModelPollXl3Time"];
     [encoder encodeBool:isPollingXl3            forKey:@"ORXL3ModelIsPollingXl3"];
@@ -1403,20 +1404,23 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeBool:isPollingHVSupply       forKey:@"ORXL3ModelIsPollingHVSupply"];
     [encoder encodeBool:isPollingXl3WithRun     forKey:@"ORXL3ModelIsPollingXl3WithRun"];
     [encoder encodeBool:isPollingVerbose        forKey:@"ORXL3ModelIsPollingVerbose"];
-    [encoder encodeInt:hvAVoltageDACSetValue forKey:@"ORXL3ModelHvAVoltageDACSetValue"];
-    [encoder encodeInt:hvBVoltageDACSetValue forKey:@"ORXL3ModelHvBVoltageDACSetValue"];
-    [encoder encodeInt:_hvAVoltageTargetValue forKey:@"ORXL3ModelhvAVoltageTargetValue"];
-    [encoder encodeInt:_hvBVoltageTargetValue forKey:@"ORXL3ModelhvBVoltageTargetValue"];
-    [encoder encodeInt:_hvNominalVoltageA forKey:@"ORXL3ModelHvNominalVoltageA"];
-    [encoder encodeInt:_hvNominalVoltageB forKey:@"ORXL3ModelHvNominalVoltageB"];
-    [encoder encodeInt64:relayMask forKey:@"ORXL3ModelRelayMask"];
-    [encoder encodeInt32:relayLowMask forKey:@"ORXL3ModelRelayLowMask"];
-    [encoder encodeInt32:relayHighMask forKey:@"ORXL3ModelRelayHighMask"];
-    [encoder encodeInt:_hvACMOSRateLimit forKey:@"ORXL3ModelhvACMOSRateLimit"];
-    [encoder encodeInt:_hvBCMOSRateLimit forKey:@"ORXL3ModelhvBCMOSRateLimit"];
-    [encoder encodeInt:_hvACMOSRateIgnore forKey:@"ORXL3ModelhvACMOSRateIgnore"];
-    [encoder encodeInt:_hvBCMOSRateIgnore forKey:@"ORXL3ModelhvBCMOSRateIgnore"];
+    [encoder encodeInt:hvAVoltageDACSetValue    forKey:@"ORXL3ModelHvAVoltageDACSetValue"];
+    [encoder encodeInt:hvBVoltageDACSetValue    forKey:@"ORXL3ModelHvBVoltageDACSetValue"];
+    [encoder encodeInt:_hvAVoltageTargetValue   forKey:@"ORXL3ModelhvAVoltageTargetValue"];
+    [encoder encodeInt:_hvBVoltageTargetValue   forKey:@"ORXL3ModelhvBVoltageTargetValue"];
+    [encoder encodeInt:_hvNominalVoltageA       forKey:@"ORXL3ModelHvNominalVoltageA"];
+    [encoder encodeInt:_hvNominalVoltageB       forKey:@"ORXL3ModelHvNominalVoltageB"];
+    [encoder encodeInt64:relayMask              forKey:@"ORXL3ModelRelayMask"];
+    [encoder encodeInt32:relayLowMask           forKey:@"ORXL3ModelRelayLowMask"];
+    [encoder encodeInt32:relayHighMask          forKey:@"ORXL3ModelRelayHighMask"];
+    [encoder encodeInt:_hvACMOSRateLimit        forKey:@"ORXL3ModelhvACMOSRateLimit"];
+    [encoder encodeInt:_hvBCMOSRateLimit        forKey:@"ORXL3ModelhvBCMOSRateLimit"];
+    [encoder encodeInt:_hvACMOSRateIgnore       forKey:@"ORXL3ModelhvACMOSRateIgnore"];
+    [encoder encodeInt:_hvBCMOSRateIgnore       forKey:@"ORXL3ModelhvBCMOSRateIgnore"];
+    [encoder encodeInt:xl3Mode                  forKey:@"Xl3Mode"];
     
+    [self setXl3Mode:[decoder decodeIntForKey:@""]];
+
     unsigned short i;
     for (i=0; i<12; i++) {
         [encoder encodeFloat:[self xl3VltThreshold:i] forKey:[NSString stringWithFormat:@"ORXL3ModelVltThreshold%hd", i]];
