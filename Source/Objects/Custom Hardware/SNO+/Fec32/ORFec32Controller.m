@@ -30,6 +30,7 @@
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
 #import "ORSNOCableDB.h"
+#import "ORQuadStateBox.h"
 
 @implementation ORFec32Controller
 
@@ -102,6 +103,12 @@
 		[[cmosRates0Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 		[[cmosRates1Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 	}
+    
+    for(i=0;i<16;i++){
+        [[pmtStateLabelMatrix0_15  cellAtRow:i column:0] setIntValue:i];
+        [[pmtStateLabelMatrix16_31 cellAtRow:i column:0] setIntValue:i+16];
+    }
+    
     [[self window] makeFirstResponder:groupView];
 	[super awakeFromNib];
 }
@@ -216,6 +223,28 @@
                          name : ORSNOCableDBReadIn
 						object: nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(updateSequencerInfo:)
+                         name : ORFecSeqDisabledMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(update20nTriggerInfo:)
+                         name : ORFecTrigger20nsDisabledMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(update100nTriggerInfo:)
+                         name : ORFecTrigger100nsDisabledMaskChanged
+                        object: nil];
+
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateCmosReadInfo:)
+                         name : ORFecCmosReadDisabledMaskChanged
+                        object: nil];
+
+
 	[notifyCenter addObserver : self
                      selector : @selector(cmosRatesChanged:)
                          name : ORFec32ModelCmosRateChanged
@@ -243,7 +272,12 @@
 	[self dcThresholdsChanged:nil];
 	[self dcVBsChanged:nil];
 	[self cmosRatesChanged:nil];
-	[self updatePMTInfo:nil];
+    [self updatePMTInfo:nil];
+    [self updateSequencerInfo:nil];
+    [self update20nTriggerInfo:nil];
+    [self update100nTriggerInfo:nil];
+    [self updateCmosReadInfo:nil];
+    
 }
 
 #pragma mark •••Accessors
@@ -301,6 +335,55 @@
 			[[pmtImages3 cellAtRow:0 column:i-24] setImage:[pmtImageCatalog pmtWithColor:tubeColor angle:0]];
 		}
 	}	
+}
+
+- (void) updateSequencerInfo:(NSNotification*)aNote
+{
+    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
+    int i;
+    for(i=0;i<16;i++){
+        int theState = ([model seqPendingEnabled:i]<<1) | [model seqEnabled:i];
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTStateSeqColumn] setImage:[quadStateBox imageForState:theState]];
+        
+        theState = ([model seqPendingEnabled:i+16]<<1) | [model seqEnabled:i+16];
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTStateSeqColumn] setImage:[quadStateBox imageForState:theState]];
+    }
+}
+
+- (void) update20nTriggerInfo:(NSNotification*)aNote
+{
+    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
+    int i;
+    for(i=0;i<16;i++){
+        int theState = ((int)[model trigger20nsPendingEnabled:i]<<1) | (int)[model trigger20nsEnabled:i];
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTState20nsColumn] setImage:[quadStateBox imageForState:theState]];
+        
+        theState = ((int)[model trigger20nsPendingEnabled:i+16]<<1) | (int)[model trigger20nsEnabled:i+16];
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTState20nsColumn] setImage:[quadStateBox imageForState:theState]];
+    }
+}
+- (void) update100nTriggerInfo:(NSNotification*)aNote
+{
+    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
+    int i;
+    for(i=0;i<16;i++){
+        int theState = ((int)[model trigger100nsPendingEnabled:i]<<1) | (int)[model trigger100nsEnabled:i];
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTState100nsColumn] setImage:[quadStateBox imageForState:theState]];
+        theState = ((int)[model trigger100nsPendingEnabled:i+16]<<1) | (int)[model trigger100nsEnabled:i+16];
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTState100nsColumn] setImage:[quadStateBox imageForState:theState]];
+    }
+}
+
+- (void) updateCmosReadInfo:(NSNotification*)aNote
+{
+    ORQuadStateBox* quadStateBox = [ORQuadStateBox sharedQuadStateBox];
+    int i;
+    for(i=0;i<16;i++){
+        int theState = ((int)[model cmosReadPendingEnabled:i]<<1) | (int)[model cmosReadEnabled:i];
+        [[pmtStateMatrix0_15  cellAtRow:i column:kPMTStateCMOSColumn] setImage:[quadStateBox imageForState:theState]];
+        theState = ((int)[model cmosReadPendingEnabled:i+16]<<1) | (int)[model cmosReadEnabled:i+16];
+        [[pmtStateMatrix16_31 cellAtRow:i column:kPMTStateCMOSColumn] setImage:[quadStateBox imageForState:theState]];
+    }
 }
 
 - (void) dcThresholdsChanged:(NSNotification*)aNote
@@ -445,7 +528,8 @@
 		[onlineSwitches[i] setEnabled:[model dcPresent:i]];
 		[pmtImages[i] setEnabled:[model dcPresent:i]];
 	}
-	[readVoltagesButton setEnabled:!lockedOrRunningMaintenance && ([model variableDisplay] == 0)];
+    [readVoltagesButton  setEnabled:!lockedOrRunningMaintenance && ([model variableDisplay] == 0)];
+    [readCMOSRatesButton setEnabled:!lockedOrRunningMaintenance && ([model variableDisplay] == 3)];
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -535,7 +619,7 @@
 		[model autoInit];
 	}
 	@catch (NSException* localException) {
-		NSBeginAlertSheet(@"Fec32 AutoInit Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
+		ORRunAlertPanel([localException name],@"%@\nFec32 AutoInit Failed",@"OK",nil,nil,localException);
 		NSLog(@"AutoInit of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
 	}
 }
@@ -548,7 +632,7 @@
 				[model readVoltages];
 			}
 			@catch (NSException* localException) {
-				NSBeginAlertSheet(@"Fec32 Voltage Read Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
+				ORRunAlertPanel([localException name],@"%@\nFec32 Voltage Read Failed",@"OK",nil,nil,localException);
 				NSLog(@"Read Voltages of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
 			}
 		break;
@@ -567,7 +651,7 @@
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Scan of Fec32 FAILED.\n");
-		NSBeginAlertSheet(@"Fec32 Scan Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
+		ORRunAlertPanel([localException name],@"%@\nFec32 Scan Failed",@"OK",nil,nil,localException);
 	}
 }
 
@@ -578,7 +662,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Probe of Fec32 FAILED.\n");
-		NSBeginAlertSheet(@"Fec32 Probe Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
+		ORRunAlertPanel([localException name],@"@\nFec32 Probe Failed",@"OK",nil,nil,localException);
 	}
 }
 
@@ -622,6 +706,18 @@
 {
 	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
 }
-
-
+- (IBAction) pmtStateClickAction:(id)sender
+{
+    int offset = 0;
+    if(sender == pmtStateMatrix16_31)offset=16;
+    int channel = [sender selectedRow]+offset;
+    int col = [sender selectedColumn];
+    switch (col){
+        case kPMTStateSeqColumn:    [model togglePendingSeq:channel];           break;
+        case kPMTState20nsColumn:   [model togglePendingTrigger20ns:channel];   break;
+        case kPMTState100nsColumn:  [model togglePendingTrigger100ns:channel];  break;
+        case kPMTStateCMOSColumn :  [model togglePendingCmosRead:channel];      break;
+        default:                                                                break;
+    }
+}
 @end

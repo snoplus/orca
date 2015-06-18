@@ -26,6 +26,11 @@
 @class ORFecPmtsView;
 @class ORGroupView;
 
+#define kPMTStateSeqColumn      0
+#define kPMTState20nsColumn     1
+#define kPMTState100nsColumn    2
+#define kPMTStateCMOSColumn     3
+
 @interface ORFec32Controller : OrcaObjectController  {
     IBOutlet NSTabView* tabView;
     IBOutlet ORGroupView*	groupView;
@@ -47,10 +52,16 @@
 	IBOutlet NSMatrix*		pmtImages1;
 	IBOutlet NSMatrix*		pmtImages2;
 	IBOutlet NSMatrix*		pmtImages3;
+    ;
+    IBOutlet NSMatrix*      pmtStateLabelMatrix0_15;
+    IBOutlet NSMatrix*      pmtStateMatrix0_15;
+    IBOutlet NSMatrix*      pmtStateLabelMatrix16_31;
+    IBOutlet NSMatrix*      pmtStateMatrix16_31;
 	IBOutlet NSTextField*	boardIdField;
     IBOutlet NSButton*		initButton;
 	IBOutlet NSButton*		autoInitButton;
-	IBOutlet NSButton*		readVoltagesButton;
+    IBOutlet NSButton*		readVoltagesButton;
+    IBOutlet NSButton*		readCMOSRatesButton;
 	
 	//labels
 	IBOutlet NSMatrix*		dc0Labels;
@@ -121,6 +132,10 @@
 - (void) cmosChanged:(NSNotification*)aNote;
 - (void) boardIdChanged:(NSNotification*)aNote;
 - (void) cmosRatesChanged:(NSNotification*)aNote;
+- (void) updateSequencerInfo:(NSNotification*)aNote;
+- (void) update20nTriggerInfo:(NSNotification*)aNote;
+- (void) update100nTriggerInfo:(NSNotification*)aNote;
+- (void) updateCmosReadInfo:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) readCmosRatesAction:(id)sender;
@@ -138,5 +153,6 @@
 - (IBAction) cmosAction:(id)sender;
 - (IBAction) autoInitAction:(id)sender;
 - (IBAction) readVoltagesAction:(id)sender;
+- (IBAction) pmtStateClickAction:(id)sender;
 
 @end

@@ -43,7 +43,6 @@
 #define UPPER_CHANNELS	1
 
 
-NSString* ORFec32ModelCmosReadDisabledMaskChanged	= @"ORFec32ModelCmosReadDisabledMaskChanged";
 NSString* ORFec32ModelCmosRateChanged				= @"ORFec32ModelCmosRateChanged";
 NSString* ORFec32ModelBaseCurrentChanged			= @"ORFec32ModelBaseCurrentChanged";
 NSString* ORFec32ModelVariableDisplayChanged		= @"ORFec32ModelVariableDisplayChanged";
@@ -58,11 +57,11 @@ NSString* ORFecPedEnabledMaskChanged				= @"ORFecPedEnabledMaskChanged";
 NSString* ORFecSeqDisabledMaskChanged				= @"ORFecSeqDisabledMaskChanged";
 NSString* ORFecTrigger100nsDisabledMaskChanged		= @"ORFecTrigger100nsDisabledMaskChanged";
 NSString* ORFecTrigger20nsDisabledMaskChanged		= @"ORFecTrigger20nsDisabledMaskChanged";
+NSString* ORFecCmosReadDisabledMaskChanged          = @"ORFecCmosReadDisabledMaskChanged";
 NSString* ORFecQllEnabledChanged					= @"ORFecQllEnabledChanged";
 NSString* ORFec32ModelAdcVoltageChanged				= @"ORFec32ModelAdcVoltageChanged";
 NSString* ORFec32ModelAdcVoltageStatusChanged		= @"ORFec32ModelAdcVoltageStatusChanged";
 NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageStatusOfCardChanged";
-
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
@@ -145,23 +144,6 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 }
 
 #pragma mark ***Accessors
-
-- (unsigned long) cmosReadDisabledMask;
-{
-    return cmosReadDisabledMask;
-}
-
-- (void) setCmosReadDisabledMask:(unsigned long)aCmosReadDisabledMask;
-{
-    cmosReadDisabledMask = aCmosReadDisabledMask;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosReadDisabledMaskChanged object:self];
-}
-
-- (BOOL) cmosReadDisabled:(short)aChannel
-{
-	return (cmosReadDisabledMask & (1<aChannel))!=0;
-}
 
 - (long) cmosRate:(short)index
 {
@@ -305,6 +287,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     return (pedEnabledMask & (1<<chan)) != 0;
 }
 
+#pragma mark Sequencer enable/disable methods
 - (unsigned long) seqDisabledMask
 {
 	return seqDisabledMask;
@@ -317,77 +300,57 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
 }
 
--(void) setSeq:(short)chan enabled:(short)state
+- (BOOL) seqEnabled:(short)chan
 {
-    if(state) seqDisabledMask &= ~(1<<chan);
-    else      seqDisabledMask |= (1<<chan);
+    return (seqDisabledMask & (1<<chan))==0;
+}
+
+- (void) setSeq:(short)chan enabled:(short)state
+{
+    unsigned long aMask = seqDisabledMask;
+    if(state) aMask &= ~(1<<chan);
+    else      aMask |= (1<<chan);
+    [self setSeqDisabledMask:aMask];
 }
 
 - (BOOL) seqDisabled:(short)chan
 {
     return (seqDisabledMask & (1<<chan))!=0;
 }
-- (BOOL) seqEnabled:(short)chan
+
+- (unsigned long) seqPendingDisabledMask
 {
-    return (seqDisabledMask & (1<<chan))==0;
+    return seqPendingDisabledMask;
 }
 
-- (BOOL) trigger20nsDisabled:(short)chan
+- (void) setSeqPendingDisabledMask:(unsigned long) aMask
 {
-    return (trigger20nsDisabledMask & (1<<chan))!=0;
-}
-- (BOOL) trigger20nsEnabled:(short)chan
-{
-    return (trigger20nsDisabledMask & (1<<chan))==0;
-}
-- (void) setTrigger20ns:(short) chan disabled:(short)state
-{
-    if(state) trigger20nsDisabledMask |= (1<<chan);
-    else      trigger20nsDisabledMask &= ~(1<<chan);
-}
-- (void) setTrigger20ns:(short) chan enabled:(short)state
-{
-    if(state) trigger20nsDisabledMask &= ~(1<<chan);
-    else      trigger20nsDisabledMask |= (1<<chan);
+    [[[self undoManager] prepareWithInvocationTarget:self] setSeqPendingDisabledMask:seqPendingDisabledMask];
+    seqPendingDisabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
 }
 
-- (BOOL) trigger100nsDisabled:(short)chan
+- (BOOL) seqPendingEnabled:(short)chan
 {
-    return (trigger100nsDisabledMask & (1<<chan))!=0;
-}
-- (BOOL) trigger100nsEnabled:(short)chan
-{
-    return (trigger100nsDisabledMask & (1<<chan))==0;
-}
-- (void) setTrigger100ns:(short) chan disabled:(short)state
-{
-    if(state) trigger100nsDisabledMask |= (1<<chan);
-    else      trigger100nsDisabledMask &= ~(1<<chan);
-}
-- (void) setTrigger100ns:(short) chan enabled:(short)state
-{
-    if(state) trigger100nsDisabledMask &= ~(1<<chan);
-    else      trigger100nsDisabledMask |= (1<<chan);
+    return (seqPendingDisabledMask & (1<<chan))==0;
 }
 
-- (BOOL) trigger20ns100nsEnabled:(short)chan
+- (BOOL) seqPendingDisabled:(short)chan
 {
-    return (trigger20nsDisabledMask & (1<<chan))==0 && (trigger100nsDisabledMask & (1<<chan))==0;
-}
-- (void) setTrigger20ns100ns:(short) chan enabled:(short)state
-{
-    if(state) {
-        trigger20nsDisabledMask &= ~(1<<chan);
-        trigger100nsDisabledMask &= ~(1<<chan);
-    } else {
-        trigger20nsDisabledMask |= (1<<chan);
-        trigger100nsDisabledMask |= (1<<chan);
-    }
+    return (seqPendingDisabledMask & (1<<chan))!=0;
 }
 
+- (void) togglePendingSeq:(short)chan
+{
+    unsigned long aMask = seqPendingDisabledMask;
+    aMask ^= (1<<chan);
+    [self setSeqPendingDisabledMask:aMask];
+}
+
+#pragma mark Trigger 20ns enable/disable methods
 - (unsigned long) trigger20nsDisabledMask
 {
-	return trigger20nsDisabledMask;
+    return trigger20nsDisabledMask;
 }
 
 - (void) setTrigger20nsDisabledMask:(unsigned long) aMask
@@ -397,9 +360,65 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger20nsDisabledMaskChanged object:self];
 }
 
+- (BOOL) trigger20nsDisabled:(short)chan
+{
+    return (trigger20nsDisabledMask & (1<<chan))!=0;
+}
+
+- (BOOL) trigger20nsEnabled:(short)chan
+{
+    return (trigger20nsDisabledMask & (1<<chan))==0;
+}
+
+- (void) setTrigger20ns:(short) chan disabled:(short)state
+{
+    unsigned long aMask = trigger20nsDisabledMask;
+    if(state) aMask |= (1<<chan);
+    else      aMask &= ~(1<<chan);
+    [self setTrigger20nsDisabledMask:aMask];
+}
+
+- (void) setTrigger20ns:(short) chan enabled:(short)state
+{
+    unsigned long aMask = trigger20nsDisabledMask;
+    if(state) aMask &= ~(1<<chan);
+    else      aMask |= (1<<chan);
+    [self setTrigger20nsDisabledMask:aMask];
+}
+
+- (unsigned long) trigger20nsPendingDisabledMask
+{
+    return trigger20nsPendingDisabledMask;
+}
+
+- (void) setTrigger20nsPendingDisabledMask:(unsigned long) aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrigger20nsPendingDisabledMask:trigger20nsPendingDisabledMask];
+    trigger20nsPendingDisabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger20nsDisabledMaskChanged object:self];
+}
+
+- (BOOL) trigger20nsPendingEnabled:(short)chan
+{
+    return (trigger20nsPendingDisabledMask & (1<<chan))==0;
+}
+
+- (BOOL) trigger20nsPendingDisabled:(short)chan
+{
+    return (trigger20nsPendingDisabledMask & (1<<chan))!=0;
+}
+
+- (void) togglePendingTrigger20ns:(short)chan
+{
+    unsigned long aMask = trigger20nsPendingDisabledMask;
+    aMask ^= (1<<chan);
+    [self setTrigger20nsPendingDisabledMask:aMask];
+}
+
+#pragma mark Trigger 100ns enable/disable methods
 - (unsigned long) trigger100nsDisabledMask
 {
-	return trigger100nsDisabledMask;
+    return trigger100nsDisabledMask;
 }
 
 - (void) setTrigger100nsDisabledMask:(unsigned long) aMask
@@ -407,6 +426,145 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger100nsDisabledMask:trigger100nsDisabledMask];
     trigger100nsDisabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger100nsDisabledMaskChanged object:self];
+}
+
+- (BOOL) trigger100nsDisabled:(short)chan
+{
+    return (trigger100nsDisabledMask & (1<<chan))!=0;
+}
+
+- (BOOL) trigger100nsEnabled:(short)chan
+{
+    return (trigger100nsDisabledMask & (1<<chan))==0;
+}
+
+- (void) setTrigger100ns:(short) chan disabled:(short)state
+{
+    unsigned long aMask = trigger100nsDisabledMask;
+    if(state) trigger100nsDisabledMask |= (1<<chan);
+    else      trigger100nsDisabledMask &= ~(1<<chan);
+    [self setTrigger100nsDisabledMask:aMask];
+}
+
+- (void) setTrigger100ns:(short) chan enabled:(short)state
+{
+    unsigned long aMask = trigger100nsDisabledMask;
+    if(state) aMask &= ~(1<<chan);
+    else      aMask |= (1<<chan);
+    [self setTrigger100nsDisabledMask:aMask];
+}
+
+- (unsigned long) trigger100nsPendingDisabledMask
+{
+    return trigger100nsPendingDisabledMask;
+}
+
+- (void) setTrigger100nsPendingDisabledMask:(unsigned long) aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrigger100nsPendingDisabledMask:trigger100nsPendingDisabledMask];
+    trigger100nsPendingDisabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecTrigger100nsDisabledMaskChanged object:self];
+}
+- (BOOL) trigger100nsPendingDisabled:(short)chan
+{
+    return (trigger100nsPendingDisabledMask & (1<<chan))!=0;
+}
+
+- (BOOL) trigger100nsPendingEnabled:(short)chan
+{
+    return (trigger100nsPendingDisabledMask & (1<<chan))==0;
+}
+
+- (void) togglePendingTrigger100ns:(short)chan
+{
+    unsigned long aMask = trigger100nsPendingDisabledMask;
+    aMask ^= (1<<chan);
+    [self setTrigger100nsPendingDisabledMask:aMask];
+}
+
+#pragma mark CMOS enable/disable methods
+- (unsigned long) cmosReadDisabledMask
+{
+    return cmosReadDisabledMask;
+}
+
+- (void) setCmosReadDisabledMask:(unsigned long) aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmosReadDisabledMask:cmosReadDisabledMask];
+    cmosReadDisabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosReadDisabledMaskChanged object:self];
+}
+
+- (BOOL) cmosReadDisabled:(short)chan
+{
+    return (cmosReadDisabledMask & (1<<chan))!=0;
+}
+
+- (BOOL) cmosReadEnabled:(short)chan
+{
+    return (cmosReadDisabledMask & (1<<chan))==0;
+}
+
+- (void) setCmosRead:(short) chan disabled:(short)state
+{
+    unsigned long aMask = cmosReadDisabledMask;
+    if(state) cmosReadDisabledMask |= (1<<chan);
+    else      cmosReadDisabledMask &= ~(1<<chan);
+    [self setCmosReadDisabledMask:aMask];
+}
+
+- (void) setCmosRead:(short) chan enabled:(short)state
+{
+    unsigned long aMask = cmosReadDisabledMask;
+    if(state) aMask &= ~(1<<chan);
+    else      aMask |= (1<<chan);
+    [self setCmosReadDisabledMask:aMask];
+}
+
+- (unsigned long) cmosReadPendingDisabledMask
+{
+    return cmosReadPendingDisabledMask;
+}
+
+- (void) setCmosReadPendingDisabledMask:(unsigned long) aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmosReadPendingDisabledMask:cmosReadPendingDisabledMask];
+    cmosReadPendingDisabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCmosReadDisabledMaskChanged object:self];
+}
+- (BOOL) cmosReadPendingDisabled:(short)chan
+{
+    return (cmosReadPendingDisabledMask & (1<<chan))!=0;
+}
+
+- (BOOL) cmosReadPendingEnabled:(short)chan
+{
+    return (cmosReadPendingDisabledMask & (1<<chan))==0;
+}
+
+- (void) togglePendingCmosRead:(short)chan
+{
+    unsigned long aMask = cmosReadPendingDisabledMask;
+    aMask ^= (1<<chan);
+    [self setCmosReadPendingDisabledMask:aMask];
+}
+
+
+#pragma mark Trigger 20/100ns enable/disable methods
+- (BOOL) trigger20ns100nsEnabled:(short)chan
+{
+    return (trigger20nsDisabledMask & (1<<chan))==0 && (trigger100nsDisabledMask & (1<<chan))==0;
+}
+- (void) setTrigger20ns100ns:(short) chan enabled:(short)state
+{
+    if(state) {
+        trigger20nsDisabledMask &= ~(1<<chan);
+        trigger100nsDisabledMask &= ~(1<<chan);
+    }
+    else {
+        trigger20nsDisabledMask |= (1<<chan);
+        trigger100nsDisabledMask |= (1<<chan);
+    }
 }
 
 - (unsigned long) onlineMask
@@ -617,14 +775,14 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 
 -(void) hwWizardActionBegin:(NSNotification*)note
 {
-    startSeqDisabledMask = seqDisabledMask;
-    startPedEnabledMask = pedEnabledMask;
-    startTrigger20nsDisabledMask = trigger20nsDisabledMask;
+    startSeqDisabledMask          = seqDisabledMask;
+    startPedEnabledMask           = pedEnabledMask;
+    startTrigger20nsDisabledMask  = trigger20nsDisabledMask;
     startTrigger100nsDisabledMask = trigger100nsDisabledMask;
-    startOnlineMask = onlineMask;
+    startOnlineMask               = onlineMask;
     cardChangedFlag = false;
     crateInitMask = 0;
-    cratePedMask = 0;
+    cratePedMask  = 0;
 }
 
 -(void) hwWizardActionEnd:(NSNotification*)note
@@ -794,16 +952,23 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 	
     [[self undoManager] disableUndoRegistration];
 	
-    [self setCmosReadDisabledMask:	[decoder decodeInt32ForKey:	@"cmosReadDisabledMask;"]];
-    [self setVariableDisplay:		[decoder decodeIntForKey:	@"variableDisplay"]];
-    [self setShowVolts:				[decoder decodeBoolForKey:  @"showVolts"]];
-    [self setComments:				[decoder decodeObjectForKey:@"comments"]];
-    [self setVRes:					[decoder decodeFloatForKey: @"vRes"]];
-    [self setHVRef:					[decoder decodeFloatForKey: @"hVRef"]];
-	[self setOnlineMask:			[decoder decodeInt32ForKey: @"onlineMask"]];
-	[self setPedEnabledMask:		[decoder decodeInt32ForKey: @"pedEnableMask"]];
-	[self setSeqDisabledMask:		[decoder decodeInt32ForKey: @"seqDisabledMask"]];
-	[self setAdcVoltageStatusOfCard:[decoder decodeIntForKey:	@"adcVoltageStatusOfCard"]];
+    [self setVariableDisplay:               [decoder decodeIntForKey:	@"variableDisplay"]];
+    [self setShowVolts:                     [decoder decodeBoolForKey:  @"showVolts"]];
+    [self setComments:                      [decoder decodeObjectForKey:@"comments"]];
+    [self setVRes:                          [decoder decodeFloatForKey: @"vRes"]];
+    [self setHVRef:                         [decoder decodeFloatForKey: @"hVRef"]];
+	[self setOnlineMask:                    [decoder decodeInt32ForKey: @"onlineMask"]];
+	[self setPedEnabledMask:                [decoder decodeInt32ForKey: @"pedEnableMask"]];
+    [self setAdcVoltageStatusOfCard:        [decoder decodeIntForKey:	@"adcVoltageStatusOfCard"]];
+    [self setSeqDisabledMask:               [decoder decodeInt32ForKey: @"seqDisabledMask"]];
+    [self setCmosReadDisabledMask:              [decoder decodeInt32ForKey: @"cmosReadDisabledMask"]];
+    [self setTrigger20nsDisabledMask:           [decoder decodeInt32ForKey: @"trigger20nsDisabledMask"]];
+    [self setTrigger100nsDisabledMask:          [decoder decodeInt32ForKey: @"trigger100nsDisabledMask"]];
+    [self setSeqPendingDisabledMask:            [decoder decodeInt32ForKey: @"seqPendingDisabledMask"]];
+    [self setTrigger20nsPendingDisabledMask:    [decoder decodeInt32ForKey: @"trigger20nsPendingDisabledMask"]];
+    [self setTrigger100nsPendingDisabledMask:   [decoder decodeInt32ForKey: @"trigger100nsPendingDisabledMask"]];
+    [self setCmosReadPendingDisabledMask:       [decoder decodeInt32ForKey: @"cmosReadPendingDisabledMask"]];
+    
 	int i;
 	for(i=0;i<6;i++){
 		[self setCmos:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"cmos%d",i]]];
@@ -826,17 +991,23 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 {
 	[super encodeWithCoder:encoder];
 	
-	[encoder encodeInt32:cmosReadDisabledMask	forKey: @"cmosReadDisabledMask;"];
+	[encoder encodeInt:variableDisplay              forKey: @"variableDisplay"];
+	[encoder encodeBool:showVolts                   forKey: @"showVolts"];
+	[encoder encodeObject:comments                  forKey: @"comments"];
+	[encoder encodeFloat:vRes                       forKey: @"vRes"];
+	[encoder encodeFloat:hVRef                      forKey: @"hVRef"];
+	[encoder encodeInt32:onlineMask                 forKey: @"onlineMask"];
+    [encoder encodeInt:adcVoltageStatusOfCard       forKey: @"adcVoltageStatusOfCard"];
+	[encoder encodeInt32:pedEnabledMask             forKey: @"pedEnabledMask"];
+    [encoder encodeInt32:seqDisabledMask                    forKey: @"seqDisabledMask"];
+    [encoder encodeInt32:cmosReadDisabledMask               forKey: @"cmosReadDisabledMask"];
+    [encoder encodeInt32:trigger20nsDisabledMask            forKey: @"trigger20nsDisabledMask"];
+    [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigge100nsDisabledMask"];
+    [encoder encodeInt32:seqPendingDisabledMask             forKey: @"seqDisabledPendingMask"];
+    [encoder encodeInt32:cmosReadPendingDisabledMask        forKey: @"cmosReadPendingDisabledMask"];
+    [encoder encodeInt32:trigger20nsPendingDisabledMask     forKey: @"trigger20nsPendingDisabledMask"];
+    [encoder encodeInt32:trigger100nsPendingDisabledMask	forKey: @"trigge100nsPendingDisabledMask"];
 
-	[encoder encodeInt:variableDisplay			forKey: @"variableDisplay"];
-	[encoder encodeBool:showVolts				forKey: @"showVolts"];
-	[encoder encodeObject:comments				forKey: @"comments"];
-	[encoder encodeFloat:vRes					forKey: @"vRes"];
-	[encoder encodeFloat:hVRef					forKey: @"hVRef"];
-	[encoder encodeInt32:onlineMask				forKey: @"onlineMask"];
-	[encoder encodeInt32:pedEnabledMask			forKey: @"pedEnabledMask"];
-	[encoder encodeInt32:seqDisabledMask		forKey: @"seqDisabledMask"];
-	[encoder encodeInt:adcVoltageStatusOfCard	forKey: @"adcVoltageStatusOfCard"];
 	
 	int i;
 	for(i=0;i<6;i++){

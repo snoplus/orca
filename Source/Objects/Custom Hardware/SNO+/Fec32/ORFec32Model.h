@@ -185,13 +185,21 @@ typedef struct Fec32CmosShiftReg{
     NSString*		comments;
     BOOL			showVolts;	
 	unsigned long   onlineMask;
-    unsigned long	cmosReadDisabledMask;
-	unsigned long   pedEnabledMask;
+    unsigned long   pedEnabledMask;
+    
 	unsigned long   seqDisabledMask;
+    unsigned long   trigger20nsDisabledMask;
+    unsigned long   trigger100nsDisabledMask;
+    unsigned long	cmosReadDisabledMask;
+
+    unsigned long   seqPendingDisabledMask;
+    unsigned long   trigger20nsPendingDisabledMask;
+    unsigned long   trigger100nsPendingDisabledMask;
+    unsigned long	cmosReadPendingDisabledMask;
+
+    
 	unsigned long   dirtyMask;
 	unsigned long   thresholdToMax;
-	unsigned long   trigger20nsDisabledMask;
-	unsigned long   trigger100nsDisabledMask;
     float			baseCurrent[32];
 	NSDate*			cmosCountTimeStamp;
 	unsigned long	cmosCount[32];
@@ -222,9 +230,6 @@ typedef struct Fec32CmosShiftReg{
 
 #pragma mark •••Accessors
 - (int)             stationNumber;
-- (unsigned long)	cmosReadDisabledMask;
-- (void)			setCmosReadDisabledMask:(unsigned long)aCmosReadDisabledMask;
-- (BOOL)			cmosReadDisabled:(short)aChannel;
 - (long)			cmosRate:(short)index;
 - (void)			setCmosRate:(short)index withValue:(long)aCmosRate;
 - (id)				xl1;
@@ -244,25 +249,50 @@ typedef struct Fec32CmosShiftReg{
 - (void)			setOnlineMaskNoInit:(unsigned long) aMask;
 - (BOOL)            getOnline:(short)chan;
 - (void)            setOnline:(short)chan enabled:(short)state;
+
 - (unsigned long)	seqDisabledMask;
 - (void)			setSeqDisabledMask:(unsigned long) aMask;
 - (void)			setSeq:(short)chan enabled:(short)state;
 - (BOOL)			seqDisabled:(short)chan;
 - (BOOL)			seqEnabled:(short)chan;
-- (BOOL)			trigger20nsDisabled:(short)chan;
-- (BOOL)			trigger100nsDisabled:(short)chan;
-- (BOOL)			trigger20nsEnabled:(short)chan;
-- (BOOL)			trigger100nsEnabled:(short)chan;
-- (BOOL)			trigger20ns100nsEnabled:(short)chan;
-- (void)			setTrigger20ns:(short) chan disabled:(short)state;
-- (void)			setTrigger100ns:(short) chan disabled:(short)state;
-- (void)            setTrigger20ns:(short)chan enabled:(short)state;
-- (void)            setTrigger100ns:(short)chan enabled:(short)state;
-- (void)            setTrigger20ns100ns:(short)chan enabled:(short)state;
+- (BOOL)            seqPendingEnabled:(short)chan;
+- (BOOL)            seqPendingDisabled:(short)chan;
+- (void)            togglePendingSeq:(short)chan;
+
 - (unsigned long)	trigger20nsDisabledMask;
 - (void)			setTrigger20nsDisabledMask:(unsigned long) aMask;
+- (void)            setTrigger20ns:(short)chan enabled:(short)state;
+- (void)			setTrigger20ns:(short) chan disabled:(short)state;
+- (BOOL)			trigger20nsEnabled:(short)chan;
+- (BOOL)			trigger20nsDisabled:(short)chan;
+- (void)            togglePendingTrigger20ns:(short)chan;
+- (BOOL)			trigger20nsPendingEnabled:(short)chan;
+- (BOOL)			trigger20nsPendingDisabled:(short)chan;
+
 - (unsigned long)	trigger100nsDisabledMask;
 - (void)			setTrigger100nsDisabledMask:(unsigned long) aMask;
+- (void)            setTrigger100ns:(short)chan enabled:(short)state;
+- (void)			setTrigger100ns:(short) chan disabled:(short)state;
+- (BOOL)			trigger100nsEnabled:(short)chan;
+- (BOOL)			trigger100nsDisabled:(short)chan;
+- (void)            togglePendingTrigger100ns:(short)chan;
+- (BOOL)			trigger100nsPendingEnabled:(short)chan;
+- (BOOL)			trigger100nsPendingDisabled:(short)chan;
+
+- (unsigned long)	cmosReadDisabledMask;
+- (void)			setCmosReadDisabledMask:(unsigned long) aMask;
+- (void)            setCmosRead:(short)chan enabled:(short)state;
+- (void)			setCmosRead:(short) chan disabled:(short)state;
+- (BOOL)			cmosReadEnabled:(short)chan;
+- (BOOL)			cmosReadDisabled:(short)chan;
+- (void)            togglePendingCmosRead:(short)chan;
+- (BOOL)			cmosReadPendingEnabled:(short)chan;
+- (BOOL)			cmosReadPendingDisabled:(short)chan;
+
+
+- (void)            setTrigger20ns100ns:(short)chan enabled:(short)state;
+- (BOOL)			trigger20ns100nsEnabled:(short)chan;
+
 - (BOOL)			qllEnabled;
 - (void)			setQllEnabled:(BOOL) aState;
 - (short)           getVth:(short)chan;
@@ -377,6 +407,7 @@ extern NSString* ORFecPedEnabledMaskChanged;
 extern NSString* ORFecSeqDisabledMaskChanged;
 extern NSString* ORFecTrigger20nsDisabledMaskChanged;
 extern NSString* ORFecTrigger100nsDisabledMaskChanged;
+extern NSString* ORFecCmosReadDisabledMaskChanged;
 extern NSString* ORFecQllEnabledChanged;
 extern NSString* ORFec32ModelAdcVoltageChanged;
 extern NSString* ORFec32ModelAdcVoltageStatusChanged;
