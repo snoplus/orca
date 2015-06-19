@@ -1996,6 +1996,12 @@
 		8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6B80F21315300BCD331 /* ORCMC203Decoders.m */; };
 		8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493D6B90F21315300BCD331 /* ORCMC203Model.h */; };
 		8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6BA0F21315300BCD331 /* ORCMC203Model.m */; };
+		849415831B330FEB00ED42F8 /* offBox.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494157C1B330FEB00ED42F8 /* offBox.tif */; };
+		849415841B330FEB00ED42F8 /* offOnPendingBox.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494157D1B330FEB00ED42F8 /* offOnPendingBox.tif */; };
+		849415851B330FEB00ED42F8 /* onBox.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494157E1B330FEB00ED42F8 /* onBox.tif */; };
+		849415861B330FEB00ED42F8 /* onOffPendingBox.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494157F1B330FEB00ED42F8 /* onOffPendingBox.tif */; };
+		849415871B330FEB00ED42F8 /* ORQuadStateBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 849415801B330FEB00ED42F8 /* ORQuadStateBox.h */; };
+		849415881B330FEB00ED42F8 /* ORQuadStateBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 849415811B330FEB00ED42F8 /* ORQuadStateBox.m */; };
 		8494C0231316CEBA00151E7B /* BootBar.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8494C01D1316CEBA00151E7B /* BootBar.nib */; };
 		8494C0241316CEBA00151E7B /* BootBar.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494C01E1316CEBA00151E7B /* BootBar.tif */; };
 		8494C0251316CEBA00151E7B /* ORBootBarController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494C01F1316CEBA00151E7B /* ORBootBarController.h */; };
@@ -5309,6 +5315,12 @@
 		8493D6BA0F21315300BCD331 /* ORCMC203Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCMC203Model.m; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Model.m; sourceTree = SOURCE_ROOT; };
 		84940B3E04E07FA6005F64B1 /* ORRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRate.h; sourceTree = "<group>"; };
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
+		8494157C1B330FEB00ED42F8 /* offBox.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = offBox.tif; sourceTree = "<group>"; };
+		8494157D1B330FEB00ED42F8 /* offOnPendingBox.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = offOnPendingBox.tif; sourceTree = "<group>"; };
+		8494157E1B330FEB00ED42F8 /* onBox.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = onBox.tif; sourceTree = "<group>"; };
+		8494157F1B330FEB00ED42F8 /* onOffPendingBox.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = onOffPendingBox.tif; sourceTree = "<group>"; };
+		849415801B330FEB00ED42F8 /* ORQuadStateBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORQuadStateBox.h; sourceTree = "<group>"; };
+		849415811B330FEB00ED42F8 /* ORQuadStateBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORQuadStateBox.m; sourceTree = "<group>"; };
 		8494C01D1316CEBA00151E7B /* BootBar.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BootBar.nib; path = Source/Objects/Hardware/Internet/BootBar/BootBar.nib; sourceTree = SOURCE_ROOT; };
 		8494C01E1316CEBA00151E7B /* BootBar.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BootBar.tif; path = Source/Objects/Hardware/Internet/BootBar/BootBar.tif; sourceTree = SOURCE_ROOT; };
 		8494C01F1316CEBA00151E7B /* ORBootBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBootBarController.h; path = Source/Objects/Hardware/Internet/BootBar/ORBootBarController.h; sourceTree = SOURCE_ROOT; };
@@ -10579,6 +10591,19 @@
 			path = "Source/Objects/Misc Objects/Rates";
 			sourceTree = SOURCE_ROOT;
 		};
+		8494157B1B330FEB00ED42F8 /* QuadStateBox */ = {
+			isa = PBXGroup;
+			children = (
+				8494157C1B330FEB00ED42F8 /* offBox.tif */,
+				8494157D1B330FEB00ED42F8 /* offOnPendingBox.tif */,
+				8494157E1B330FEB00ED42F8 /* onBox.tif */,
+				8494157F1B330FEB00ED42F8 /* onOffPendingBox.tif */,
+				849415801B330FEB00ED42F8 /* ORQuadStateBox.h */,
+				849415811B330FEB00ED42F8 /* ORQuadStateBox.m */,
+			);
+			path = QuadStateBox;
+			sourceTree = "<group>";
+		};
 		8494C01C1316CEBA00151E7B /* BootBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -12508,6 +12533,7 @@
 				840832280FC3307F002B2394 /* LongTermView */,
 				840823C90F9F83DC007E6061 /* FlippedView */,
 				8491F4730EC0CDEF0084BAD6 /* pmtImage */,
+				8494157B1B330FEB00ED42F8 /* QuadStateBox */,
 				8491FE880EC1DF780084BAD6 /* switchImage */,
 				8443573C0B5AC9DA0033B918 /* ScriptView */,
 				84F5E10A0A151D9300707A0F /* OpenGLView */,
@@ -14883,6 +14909,7 @@
 				8435AAD110C6D0EF00E03F7F /* ORVarianTPSModel.h in Headers */,
 				849516B610C95382001C8112 /* ORStateLabelController.h in Headers */,
 				849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */,
+				849415871B330FEB00ED42F8 /* ORQuadStateBox.h in Headers */,
 				8455097A10CEF7DD008A019C /* ORCaen965Decoder.h in Headers */,
 				84550CB110D033F2008A019C /* ORCAEN965Readout.hh in Headers */,
 				84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */,
@@ -15350,6 +15377,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				849415861B330FEB00ED42F8 /* onOffPendingBox.tif in Resources */,
 				840C80001955E1D300E36622 /* RelaunchOrca in Resources */,
 				8434A244055B3287002D3102 /* Credits.rtf in Resources */,
 				8434A246055B3287002D3102 /* InfoPlist.strings in Resources */,
@@ -15412,6 +15440,7 @@
 				8434A29F055B3287002D3102 /* notice.gif in Resources */,
 				8434A2A0055B3287002D3102 /* NetConnect.gif in Resources */,
 				8434A2A1055B3287002D3102 /* ReplayData.gif in Resources */,
+				849415841B330FEB00ED42F8 /* offOnPendingBox.tif in Resources */,
 				8434A2A2055B3287002D3102 /* ReplayData.nib in Resources */,
 				8434A2A4055B3287002D3102 /* PlotSubview.nib in Resources */,
 				8434A2A5055B3287002D3102 /* CommandCenter.nib in Resources */,
@@ -15519,6 +15548,7 @@
 				6B40D6661B2B79960000F7C1 /* ResistorDBWindow.xib in Resources */,
 				8446CE1F07B847B8006CD9C4 /* AD413A.nib in Resources */,
 				8446CE2007B847B8006CD9C4 /* AD413ACard.gif in Resources */,
+				849415831B330FEB00ED42F8 /* offBox.tif in Resources */,
 				843A54D807BBE7A500534C27 /* 4ChanTriggerCard.gif in Resources */,
 				84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */,
 				84DDEBA207BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist in Resources */,
@@ -16225,6 +16255,7 @@
 				8497E602180C5A1E00CE974A /* A3818.nib in Resources */,
 				8497E603180C5A1E00CE974A /* A3818Card.gif in Resources */,
 				8497E616180C640D00CE974A /* V2718.nib in Resources */,
+				849415851B330FEB00ED42F8 /* onBox.tif in Resources */,
 				8497E617180C640D00CE974A /* V2718Card.gif in Resources */,
 				2D7731A2181188F400070A4A /* LanNetio230.nib in Resources */,
 				2D7731A3181188F400070A4A /* LanNetio230.tif in Resources */,
@@ -17037,6 +17068,7 @@
 				844FD9E01180E89B00FD5A46 /* ORKJL2200IonGaugeController.m in Sources */,
 				844FD9E21180E89B00FD5A46 /* ORKJL2200IonGaugeDecoders.m in Sources */,
 				844FD9E41180E89B00FD5A46 /* ORKJL2200IonGaugeModel.m in Sources */,
+				849415881B330FEB00ED42F8 /* ORQuadStateBox.m in Sources */,
 				84E966D211848BEF008D9119 /* MajoranaController.m in Sources */,
 				84E966D411848BEF008D9119 /* MajoranaDetectorView.m in Sources */,
 				84E966D611848BEF008D9119 /* MajoranaModel.m in Sources */,
