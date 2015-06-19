@@ -357,8 +357,8 @@ int filterGraph(nodeType*);
 	}
 	
 	//pass it on
+    [dataArray retain];
 	[thePassThruObject processData:dataArray decoder:aDecoder];
-	[dataArray retain];
 	//each block of data is an array of NSData objects, each potentially containing many records..
 	for(id data in dataArray){
 		[data retain];
@@ -370,9 +370,7 @@ int filterGraph(nodeType*);
 				
 				long recordLen = ExtractLength(*ptr);
 				if(recordLen > totalLen){
-					NSLog(@"Bad Record Length\n");
 					NSLogError(@" ",@"Filter",@"Bad Record:Incorrect Length",nil);
-					printf("Bad Record Length\n");
 					break;
 				}
 				
