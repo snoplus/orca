@@ -347,6 +347,14 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [self setSeqPendingDisabledMask:aMask];
 }
 
+- (void) makeAllSeqPendingStatesSameAs:(short)chan
+{
+    unsigned long newMask;
+    if((seqPendingDisabledMask & (1<<chan))==0) newMask = 0x00000000;
+    else                                        newMask = 0xFFFFFFFF;
+    [self setSeqPendingDisabledMask:newMask];
+}
+
 #pragma mark Trigger 20ns enable/disable methods
 - (unsigned long) trigger20nsDisabledMask
 {
@@ -415,6 +423,14 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [self setTrigger20nsPendingDisabledMask:aMask];
 }
 
+- (void) makeAll20nsPendingStatesSameAs:(short)chan
+{
+    unsigned long newMask;
+    if((trigger20nsPendingDisabledMask & (1<<chan))==0) newMask = 0x00000000;
+    else                                                newMask = 0xFFFFFFFF;
+    [self setTrigger20nsPendingDisabledMask:newMask];
+}
+
 #pragma mark Trigger 100ns enable/disable methods
 - (unsigned long) trigger100nsDisabledMask
 {
@@ -481,7 +497,13 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     aMask ^= (1<<chan);
     [self setTrigger100nsPendingDisabledMask:aMask];
 }
-
+- (void) makeAll100nsPendingStatesSameAs:(short)chan
+{
+    unsigned long newMask;
+    if((trigger100nsPendingDisabledMask & (1<<chan))==0) newMask = 0x00000000;
+    else                                                 newMask = 0xFFFFFFFF;
+    [self setTrigger100nsPendingDisabledMask:newMask];
+}
 #pragma mark CMOS enable/disable methods
 - (unsigned long) cmosReadDisabledMask
 {
@@ -549,6 +571,13 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [self setCmosReadPendingDisabledMask:aMask];
 }
 
+- (void) makeAllCmosPendingStatesSameAs:(short)chan
+{
+    unsigned long newMask;
+    if((cmosReadPendingDisabledMask & (1<<chan))==0) newMask = 0x00000000;
+    else                                             newMask = 0xFFFFFFFF;
+    [self setCmosReadPendingDisabledMask:newMask];
+}
 
 #pragma mark Trigger 20/100ns enable/disable methods
 - (BOOL) trigger20ns100nsEnabled:(short)chan

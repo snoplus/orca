@@ -258,6 +258,7 @@ typedef struct Fec32CmosShiftReg{
 - (BOOL)            seqPendingEnabled:(short)chan;
 - (BOOL)            seqPendingDisabled:(short)chan;
 - (void)            togglePendingSeq:(short)chan;
+- (void)            makeAllSeqPendingStatesSameAs:(short)chan;
 
 - (unsigned long)	trigger20nsDisabledMask;
 - (void)			setTrigger20nsDisabledMask:(unsigned long) aMask;
@@ -268,6 +269,7 @@ typedef struct Fec32CmosShiftReg{
 - (void)            togglePendingTrigger20ns:(short)chan;
 - (BOOL)			trigger20nsPendingEnabled:(short)chan;
 - (BOOL)			trigger20nsPendingDisabled:(short)chan;
+- (void)            makeAll20nsPendingStatesSameAs:(short)chan;
 
 - (unsigned long)	trigger100nsDisabledMask;
 - (void)			setTrigger100nsDisabledMask:(unsigned long) aMask;
@@ -278,6 +280,7 @@ typedef struct Fec32CmosShiftReg{
 - (void)            togglePendingTrigger100ns:(short)chan;
 - (BOOL)			trigger100nsPendingEnabled:(short)chan;
 - (BOOL)			trigger100nsPendingDisabled:(short)chan;
+- (void)            makeAll100nsPendingStatesSameAs:(short)chan;
 
 - (unsigned long)	cmosReadDisabledMask;
 - (void)			setCmosReadDisabledMask:(unsigned long) aMask;
@@ -288,6 +291,7 @@ typedef struct Fec32CmosShiftReg{
 - (void)            togglePendingCmosRead:(short)chan;
 - (BOOL)			cmosReadPendingEnabled:(short)chan;
 - (BOOL)			cmosReadPendingDisabled:(short)chan;
+- (void)            makeAllCmosPendingStatesSameAs:(short)chan;
 
 
 - (void)            setTrigger20ns100ns:(short)chan enabled:(short)state;

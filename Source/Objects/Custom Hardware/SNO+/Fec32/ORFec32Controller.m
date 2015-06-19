@@ -706,12 +706,17 @@
 {
 	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
 }
+
 - (IBAction) pmtStateClickAction:(id)sender
 {
     int offset = 0;
     if(sender == pmtStateMatrix16_31)offset=16;
+    
     int channel = [sender selectedRow]+offset;
-    int col = [sender selectedColumn];
+    int col     = [sender selectedColumn];
+    BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
+    
+    if(cmdKeyDown)[[model undoManager] disableUndoRegistration];
     switch (col){
         case kPMTStateSeqColumn:    [model togglePendingSeq:channel];           break;
         case kPMTState20nsColumn:   [model togglePendingTrigger20ns:channel];   break;
@@ -719,5 +724,16 @@
         case kPMTStateCMOSColumn :  [model togglePendingCmosRead:channel];      break;
         default:                                                                break;
     }
+    if(cmdKeyDown)[[model undoManager] enableUndoRegistration];
+
+    if(cmdKeyDown){
+        switch(col){
+            case kPMTStateSeqColumn:  [model makeAllSeqPendingStatesSameAs:channel];  break;
+            case kPMTState20nsColumn: [model makeAll20nsPendingStatesSameAs:channel]; break;
+            case kPMTState100nsColumn:[model makeAll100nsPendingStatesSameAs:channel];break;
+            case kPMTStateCMOSColumn: [model makeAllCmosPendingStatesSameAs:channel]; break;
+        }
+    }
+
 }
 @end
