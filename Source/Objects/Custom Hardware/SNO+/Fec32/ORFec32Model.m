@@ -579,9 +579,16 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [self setCmosReadPendingDisabledMask:newMask];
 }
 
+// load hardware from pending state
 - (void) loadHardware
 {
-    
+    [[self undoManager] disableUndoRegistration];
+    [self setSeqDisabledMask:[self seqPendingDisabledMask]];
+    [self setTrigger20nsDisabledMask:[self trigger20nsPendingDisabledMask]];
+    [self setTrigger100nsDisabledMask:[self trigger100nsPendingDisabledMask]];
+    [self setCmosReadDisabledMask:[self cmosReadPendingDisabledMask]];
+    [[[self guardian] adapter] initCrateRegistersOnly];
+    [[self undoManager] enableUndoRegistration];
 }
 
 #pragma mark Trigger 20/100ns enable/disable methods
@@ -821,6 +828,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
 
 -(void) hwWizardActionEnd:(NSNotification*)note
 {
+    [[self undoManager] disableUndoRegistration];
     // go ahead and "officially" change the masks, sending the appropriate notifications
     if (seqDisabledMask != startSeqDisabledMask) {
         unsigned long mask = seqDisabledMask;
@@ -858,6 +866,7 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
         crateInitMask |= (1UL << [self crateNumber]);
         cardChangedFlag = false;  // clear this temporary flag
     }
+    [[self undoManager] enableUndoRegistration];
 }
 
 -(void) hwWizardActionFinal:(NSNotification*)note

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" promptedForUpgradeToXcode5="NO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
@@ -117,7 +117,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="XL3 Crate" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="839" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -127,7 +127,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="485" height="558"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView autoresizesSubviews="NO" focusRingType="none" controlSize="mini" id="841">
+                    <tabView focusRingType="none" controlSize="mini" id="841">
                         <rect key="frame" x="2" y="40" width="480" height="512"/>
                         <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
                         <font key="font" metaFont="miniSystem"/>
@@ -135,7 +135,7 @@
                             <tabViewItem label="Basic" identifier="BasicOps" id="861">
                                 <view key="view" focusRingType="none" id="862">
                                     <rect key="frame" x="10" y="19" width="460" height="480"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="XL3 Register Operations" borderType="line" id="3388">
                                             <rect key="frame" x="29" y="395" width="368" height="78"/>
@@ -1199,7 +1199,7 @@
                                                             <action selector="monIsPollingHVSupplyAction:" target="-2" id="4046"/>
                                                         </connections>
                                                     </button>
-                                                    <box autoresizesSubviews="NO" verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="4018">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="4018">
                                                         <rect key="frame" x="18" y="89" width="330" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1266,12 +1266,12 @@
                                                     <popUpButton verticalHuggingPriority="750" id="4013">
                                                         <rect key="frame" x="250" y="37" width="101" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Fastest" bezelStyle="rounded" alignment="right" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" id="4014">
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="right" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" id="4014">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="4015">
                                                                 <items>
-                                                                    <menuItem title="Fastest" state="on" id="4016">
+                                                                    <menuItem title="Fastest" id="4016">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                     <menuItem title="1 sec" tag="1" id="4021">
@@ -1603,7 +1603,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <box autoresizesSubviews="NO" verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="4639">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="4639">
                                                         <rect key="frame" x="18" y="36" width="334" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1799,7 +1799,7 @@
                             <tabViewItem label="HV" identifier="" id="872">
                                 <view key="view" id="873">
                                     <rect key="frame" x="10" y="19" width="460" height="480"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Power Supply" borderType="line" id="4053">
                                             <rect key="frame" x="5" y="-1" width="451" height="189"/>
