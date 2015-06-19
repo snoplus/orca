@@ -621,10 +621,18 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 					if(contents){
 						NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:contents];
 						//the address may be a list... if so it must be a comma separated list... try to make it so...
-						NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
-						[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
-						[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
-						ORMailer* mailer = [ORMailer mailer];
+                        NSString* finalAddressList = [address stringByReplacingOccurrencesOfString:@"\n" withString:@","];
+                        finalAddressList = [finalAddressList stringByReplacingOccurrencesOfString:@"\r" withString:@","];
+                        finalAddressList = [finalAddressList stringByReplacingOccurrencesOfString:@" " withString:@","];
+                        
+                        while([finalAddressList rangeOfString:@",,"].location!=NSNotFound){
+                            finalAddressList = [finalAddressList stringByReplacingOccurrencesOfString:@",," withString:@","];
+                        }
+                        if([finalAddressList hasPrefix:@","]) finalAddressList = [finalAddressList substringFromIndex:1];
+                        if([finalAddressList hasSuffix:@","]) finalAddressList = [finalAddressList substringToIndex:[finalAddressList length]-1];
+                                            
+                        
+                        ORMailer* mailer = [ORMailer mailer];
 						[mailer setTo:finalAddressList];
 						[mailer setSubject:[NSString stringWithFormat:@"ORCA Crash Log for: %@",computerName()]];
 						[mailer setBody:crashLog];
