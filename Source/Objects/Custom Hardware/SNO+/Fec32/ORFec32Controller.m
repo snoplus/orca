@@ -734,6 +734,10 @@
             case kPMTStateCMOSColumn: [model makeAllCmosPendingStatesSameAs:channel]; break;
         }
     }
-
 }
+- (IBAction) loadHardware:(id)sender
+{
+    [model loadHardware];
+}
+
 @end

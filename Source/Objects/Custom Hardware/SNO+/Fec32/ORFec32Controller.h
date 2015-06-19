@@ -154,5 +154,5 @@
 - (IBAction) autoInitAction:(id)sender;
 - (IBAction) readVoltagesAction:(id)sender;
 - (IBAction) pmtStateClickAction:(id)sender;
-
+- (IBAction) loadHardware:(id)sender;
 @end

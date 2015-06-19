@@ -579,6 +579,11 @@ static unsigned long cratePedMask;  // crates that need their pedestals set
     [self setCmosReadPendingDisabledMask:newMask];
 }
 
+- (void) loadHardware
+{
+    
+}
+
 #pragma mark Trigger 20/100ns enable/disable methods
 - (BOOL) trigger20ns100nsEnabled:(short)chan
 {

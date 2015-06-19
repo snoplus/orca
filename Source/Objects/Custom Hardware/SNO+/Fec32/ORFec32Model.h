@@ -292,7 +292,7 @@ typedef struct Fec32CmosShiftReg{
 - (BOOL)			cmosReadPendingEnabled:(short)chan;
 - (BOOL)			cmosReadPendingDisabled:(short)chan;
 - (void)            makeAllCmosPendingStatesSameAs:(short)chan;
-
+- (void)            loadHardware;
 
 - (void)            setTrigger20ns100ns:(short)chan enabled:(short)state;
 - (BOOL)			trigger20ns100nsEnabled:(short)chan;
