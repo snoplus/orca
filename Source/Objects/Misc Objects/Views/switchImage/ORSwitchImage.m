@@ -1,5 +1,5 @@
 //
-//  ORPmtImage.m
+//  ORSwitchImage.m
 //  Orca
 //
 //  Created by Mark Howe on Fri Oct 22, 2004.
