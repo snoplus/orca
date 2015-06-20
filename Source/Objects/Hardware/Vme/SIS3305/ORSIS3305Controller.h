@@ -162,6 +162,15 @@
     IBOutlet NSButton*      waitPreTrigTimeBeforeDirectMemTrig58Button;
     
     
+    // ADC SPI Settings
+    IBOutlet NSPopUpButton* channelMode14PU;
+    IBOutlet NSPopUpButton* channelMode58PU;
+    IBOutlet NSPopUpButton* bandwidth14PU;
+    IBOutlet NSPopUpButton* bandwidth58PU;
+    IBOutlet NSPopUpButton* testMode14PU;
+    IBOutlet NSPopUpButton* testMode58PU;
+
+
     
 	
 //	IBOutlet NSPopUpButton* cfdControl0;
@@ -235,6 +244,10 @@
 - (void) waitPreTrigTimeBeforeDirectMemTrigChanged:(NSNotification*)aNote;
 
 
+
+- (void) channelModeChanged:(NSNotification*)aNote;
+- (void) bandwidthChanged:(NSNotification*)aNote;
+- (void) testModeChanged:(NSNotification*)aNote;
 
 
 
@@ -325,7 +338,7 @@
 - (IBAction) startEventSamplingWithExtTrigEnabled58Action:(id)sender;
 - (IBAction) clearTimestampWhenSamplingEnabledEnabled14Action:(id)sender;
 - (IBAction) clearTimestampWhenSamplingEnabledEnabled58Action:(id)sender;
-- (IBAction) clearTimestampDisabled14Changed:(id)sender;
+- (IBAction) clearTimestampDisabled14Changed:(id)sender;    // FIX: These methods names should end in "ACTION"....
 - (IBAction) clearTimestampDisabled58Changed:(id)sender;
 - (IBAction) disableDirectMemoryHeader14Changed:(id)sender;
 - (IBAction) disableDirectMemoryHeader58Changed:(id)sender;
@@ -333,6 +346,12 @@
 - (IBAction) waitPreTrigTimeBeforeDirectMemTrig58Changed:(id)sender;
 
 
+- (IBAction) channelMode14Action:(id)sender;
+- (IBAction) channelMode58Action:(id)sender;
+- (IBAction) bandwidth14Action:(id)sender;
+- (IBAction) bandwidth58Action:(id)sender;
+- (IBAction) testMode14Action:(id)sender;
+- (IBAction) testMode58Action:(id)sender;
 
 
 //- (IBAction) thresholdModeAction:(id)sender;

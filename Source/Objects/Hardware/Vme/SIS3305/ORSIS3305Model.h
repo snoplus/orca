@@ -62,6 +62,10 @@
     BOOL    waitPreTrigTimeBeforeDirectMemTrig[kNumSIS3305Groups];
     
     
+    unsigned short  channelMode[kNumSIS3305Groups];
+    unsigned short  bandwidth[kNumSIS3305Groups];
+    unsigned short  testMode[kNumSIS3305Groups];
+    
     
     short			internalTriggerEnabledMask;
     short			externalTriggerEnabledMask;
@@ -160,14 +164,17 @@
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
 	
-	unsigned long* dataRecord[4];
-	unsigned long  dataRecordlength[4];
+	unsigned long* dataRecord[kNumSIS3305Groups];
+	unsigned long  dataRecordlength[kNumSIS3305Groups];
 	
 	//calculated values
 	unsigned long numEnergyValues;
 	unsigned long numRawDataLongWords;
 	unsigned long rawDataIndex;
-	unsigned long eventLengthLongWords;
+	unsigned long eventLengthLongWords[kNumSIS3305Groups];
+    
+    
+    unsigned long sampleStartAddress[kNumSIS3305Groups];
 //    unsigned long mcaNofHistoPreset;
 //    BOOL			mcaLNESetup;
 //    unsigned long	mcaPrescaleFactor;
@@ -338,6 +345,12 @@
 
 
 
+- (unsigned short) channelMode:(unsigned short)group;
+- (void) setChannelMode:(unsigned short)group withValue:(unsigned short)mode;
+- (unsigned short) bandwidth:(unsigned short)group;
+- (void) setBandwidth:(unsigned short)group withValue:(unsigned short)value;
+- (unsigned short) testMode:(unsigned short)group;
+- (void) setTestMode:(unsigned short)group withValue:(unsigned short)value;
 
 
 
@@ -479,6 +492,8 @@
 - (BOOL) canReadRegister:(unsigned int)index;
 - (BOOL) canWriteRegister:(unsigned int)index;
 
+
+
 - (void) writeControlStatus;
 
 - (void) writeLed:(short)ledNum to:(BOOL)state;
@@ -524,9 +539,16 @@
 - (unsigned long) readTemperature:(BOOL)verbose;
 - (void) writeTemperatureThreshold:(unsigned long)thresh;
 
+
+
 - (unsigned long) readADCSerialInterface:(BOOL)verbose;
 - (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr viaSPI:(char)spiOn;
 - (void) writeADCSerialInterface;
+- (unsigned long) readADCChipID;
+- (unsigned long) readADCControlReg:(bool)verbose;
+
+
+
 
 - (unsigned long) readDataTransferControlRegister:(short)group;
 - (void) writeDataTransferControlRegister:(short)group withCommand:(short)command withAddress:(unsigned long)value;
@@ -561,10 +583,12 @@
 
 - (unsigned long) readActualSampleAddress:(short)group;
 - (void) writeSampleLengthOfGroup:(short)group toValue:(unsigned long)value;
+- (void) writeSampleLengths;
 - (unsigned long) readSamplePretriggerLengthOfGroup:(short)group;
 - (void) writeSamplePretriggerLengthOfGroup:(short)group toValue:(unsigned long)value;
 - (unsigned long) readRingbufferPretriggerDelayOnChannel:(short)chan;
 - (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value;
+- (void) writeRingbufferPretriggerDelays;
 
 - (unsigned long) readMaxNumOfEventsInGroup:(short)group;
 - (void) writeMaxNumOfEventsInGroup:(short)group toValue:(unsigned int)maxValue;
@@ -699,6 +723,7 @@ extern NSString* ORSIS3305ModelTriggerGateLengthChanged;
 extern NSString* ORSIS3305ModelPreTriggerDelayChanged;
 extern NSString* ORSIS3305SampleStartIndexChanged;
 extern NSString* ORSIS3305SampleLengthChanged;
+extern NSString* ORSIS3305SampleStartAddressChanged;
 extern NSString* ORSIS3305DacOffsetChanged;
 extern NSString* ORSIS3305LemoInModeChanged;
 extern NSString* ORSIS3305LemoOutModeChanged;
@@ -755,7 +780,9 @@ extern NSString* ORSIS3305DirectMemoryHeaderDisabledChanged;
 extern NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged;
 
 
-
+extern NSString* ORSIS3305ChannelModeChanged;
+extern NSString* ORSIS3305BandwidthChanged;
+extern NSString* ORSIS3305TestModeChanged;
 
 
 

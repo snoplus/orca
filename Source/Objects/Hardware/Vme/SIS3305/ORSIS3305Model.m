@@ -65,6 +65,7 @@ NSString* ORSIS3305ModelTriggerGateLengthChanged = @"ORSIS3305ModelTriggerGateLe
 NSString* ORSIS3305ModelPreTriggerDelayChanged  = @"ORSIS3305ModelPreTriggerDelayChanged";
 NSString* ORSIS3305SampleStartIndexChanged		= @"ORSIS3305SampleStartIndexChanged";
 NSString* ORSIS3305SampleLengthChanged			= @"ORSIS3305SampleLengthChanged";
+NSString* ORSIS3305SampleStartAddressChanged    = @"ORSIS3305SampleStartAddressChanged";
 NSString* ORSIS3305DacOffsetChanged				= @"ORSIS3305DacOffsetChanged";
 NSString* ORSIS3305LemoInModeChanged			= @"ORSIS3305LemoInModeChanged";
 NSString* ORSIS3305LemoOutModeChanged			= @"ORSIS3305LemoOutModeChanged";
@@ -117,6 +118,9 @@ NSString* ORSIS3305DirectMemoryHeaderDisabledChanged                = @"ORSIS330
 NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged        = @"ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged";
 
 
+NSString* ORSIS3305ChannelModeChanged   = @"ORSIS3305ChannelModeChanged";
+NSString* ORSIS3305BandwidthChanged     = @"ORSIS3305BandwidthChanged";
+NSString* ORSIS3305TestModeChanged      = @"ORSIS3305TestModeChanged";
 
 
 NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged    = @"ORSIS3305EnableExternalLEMODirectVetoInChanged";
@@ -192,7 +196,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     {0x0005C,  @"TDC FSM Reg4 Value" , YES, YES},
     {0x00060,  @"XILINX JTAG_TEST/JTAG_DATA_IN", YES, YES},
     {0x00070,  @"Temperature and Temperature Supervisor", YES, YES},
-    {0x00074,  @"ADC Serial Interface (SPI)", NO, YES},
+    {0x00074,  @"ADC Serial Interface (SPI)", YES, YES},
 
     {0x000C0,  @"ADC1 ch1-ch4 FPGA Data Transfer Control", YES, YES},
     {0x000C4,  @"ADC2 ch5-ch8 FPGA Data Transfer Control", YES, YES},
@@ -320,9 +324,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [internalTriggerDelays release];
 	[endAddressThresholds release];
  	[thresholds release];
-//	[highThresholds release];
 	
-//	[cfdControls release];
     [dacOffsets release];
 	[sampleLengths release];
     [sampleStartIndexes release];
@@ -611,6 +613,44 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setWaitPreTrigTimeBeforeDirectMemTrig:group toValue:waitPreTrigTimeBeforeDirectMemTrig[group]];
     waitPreTrigTimeBeforeDirectMemTrig[group] = value;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged object:self];
+}
+
+
+- (unsigned short) channelMode:(unsigned short)group
+{
+    return channelMode[group];
+}
+
+- (void) setChannelMode:(unsigned short)group withValue:(unsigned short)mode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setChannelMode:group withValue:channelMode[group]];
+    channelMode[group] = mode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ChannelModeChanged object:self];
+}
+
+
+- (unsigned short) bandwidth:(unsigned short)group
+{
+    return bandwidth[group];
+}
+
+- (void) setBandwidth:(unsigned short)group withValue:(unsigned short)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBandwidth:group withValue:bandwidth[group]];
+    bandwidth[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305BandwidthChanged object:self];
+}
+
+- (unsigned short) testMode:(unsigned short)group
+{
+    return testMode[group];
+}
+
+- (void) setTestMode:(unsigned short)group withValue:(unsigned short)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTestMode:group withValue:testMode[group]];
+    testMode[group] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305TestModeChanged object:self];
 }
 
 
@@ -1048,8 +1088,24 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 ////    return (gtMask & (1L<<bit)) != 0;
 //}
 
-- (unsigned short) sampleLength:(short)aChan {
-    return [[sampleLengths objectAtIndex:aChan] unsignedShortValue];
+- (unsigned long) sampleStartAddress:(unsigned short)group
+{
+    return sampleStartAddress[group];
+}
+
+- (void) setSampleStartAddress:(unsigned short)group toValue:(unsigned long)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSampleStartAddress:group toValue:[self sampleStartAddress:group]];
+    
+    sampleStartAddress[group] = value;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SampleStartAddressChanged object:self];
+}
+
+
+
+- (unsigned short) sampleLength:(short)group {
+    return [[sampleLengths objectAtIndex:group] unsignedShortValue];
 }
 
 - (void) setSampleLength:(short)aChan withValue:(int)aValue
@@ -1365,6 +1421,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		[self setSampleLength:i withValue:2048];
 		[self setTriggerGateLength:i withValue:2048];
 		[self setSampleStartIndex:i withValue:0];
+        [self setSampleStartAddress:i toValue:0];
         
         [self setInternalTriggerEnabled:i toValue:YES];
         [self setGlobalTriggerEnabledOnGroup:i toValue:NO];
@@ -1375,6 +1432,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setEventSavingModeOf:i toValue:0];
         [self setADCGateModeEnabled:i toValue:NO];
         [self setWaitPreTrigTimeBeforeDirectMemTrig:i toValue:YES];
+        
+        [self setChannelMode:i withValue:0];
+        [self setBandwidth:i withValue:1];
+        [self setTestMode:i withValue:0];
     }
     
 	[self setTriggerOutEnabledMask:0x0];
@@ -2513,6 +2574,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return;
 }
 
+#pragma mark ADC Serial Interface Control
 
 - (unsigned long) readADCSerialInterface:(BOOL)verbose
 {
@@ -2541,7 +2603,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr viaSPI:(char)spi
 {
     // write to the ADC SPI on 0x74
-    // probably won't use this
+    // used for talking directly to the ADC chip to setup bandwidth, channel mode (1.25/2.5/5 gsps)
+    
     unsigned long writeValue = 0;
     
     writeValue = data | (addr << 16) | (adcSelect << 24) | (spi << 31);
@@ -2558,13 +2621,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) writeADCSerialInterface
 {
-//    this method is incomplete a written, and has more or less been replaced by the above:
+//    this method is incomplete as written, and has more or less been replaced by the above:
 //    [self writeADCSerialInterface:
 //                            onADC:
 //                        toAddress:
 //                           viaSPI:];
     /*
-     This is completely adapted from the SIS3305_ADC_SPI_Setup method in sis3305_configuration_readout_lib.c
+     This is completely adapted from the SIS3305_ADC_SPI_Setup method in sis3305_configuration_readout_lib.c:888
      
      1. First we read the ID's for ADC1 and ADC2.
      
@@ -2576,35 +2639,314 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      
      
      */
-    unsigned long value = 0;
-    unsigned int data = 0;
-    int chan = 0;
-    ORCommandList* aList = [ORCommandList commandList];
+}
+
+- (unsigned long) readADCChipID
+{
+    /*
+        Uses the SPI protocol of the ADC to read out the ADC Chip ID. 
+        Only 16 bits of data per chip
+            15:8    Chip type
+            7:4     Branch number
+            3:0     Version number
+        So I return both in the same 32 bit word
+            31:24   ADC 1: Chip type
+            23:20   ADC 1: Branch number
+            19:16   ADC 1: Version number
+            15:8    ADC 0: Chip type
+            7:4     ADC 0: Branch number
+            3:0     ADC 0: Version number
+     */
+    
+    unsigned long readValue = 0;
+    unsigned long writeValue = 0;
+    BOOL logicBusy = YES;
+    
+    unsigned long addr, adc;
+    unsigned long RWcmd; // Read/write command (0 = read, 1 = write)
+    
+    unsigned int readCount = 0;
+    unsigned int maxPolls = 100;
+    
+//    ORCommandList* aList = [ORCommandList commandList];
     
     struct SIS3305_ADC_SPI_Config_Struct packet;
-    int i;
-    for (i = 0; i<2; i++) {
-        data = 0x00000000;
+    for (adc = 0; adc<2; adc++) {
+        // read ADC Chip ID
+        addr = 0x0;     // chip ID reg
+        RWcmd = 0x0;    // read command
         
-        packet.chipID[i] = 1;
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+                    | ((addr    &0x7F)  << 16)
+                    | ((adc     & 0x1)  << 24);
         
-        //        FIX: This is completely unfinished... was mostly replaced by another function
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    
+        do {
+            readCount++;
+            readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+            logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+        }
+        while ((readCount<maxPolls) && logicBusy == YES);
+        if (logicBusy == YES) {
+            NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+            return 0x0;
+        }
+        packet.chipID[adc] = readValue;
     }
     
+    // make the output as expected
+    readValue = 0;
+    readValue = packet.chipID[0] | (packet.chipID[1] << 16);
+    return readValue;
+}
+
+
+- (unsigned long) readADCControlReg:(bool)verbose
+{
+    /*
+     Uses the SPI protocol of the ADC to read out the ADC Chip Configuration.
+     Only 16 bits of data per chip
+     15:14  Unused
+     13     0
+     12     Test
+     11     0
+     10     RM
+     9      Unused
+     8      Bandwidth
+     7      Binary/Gray
+     6      Unused
+     5:4    Standby
+     3:0    ADC Mode
+
+     
+     */
     
-    for(chan = 0; chan<kNumSIS3305Channels;chan++)
-    {
+    unsigned long readValue = 0;
+    unsigned long writeValue = 0;
+    BOOL logicBusy = YES;
+    
+    unsigned long addr, adc;
+    unsigned long RWcmd; // Read/write command (0 = read, 1 = write)
+    
+    unsigned int readCount = 0;
+    unsigned int maxPolls = 100;
+    
+    //    ORCommandList* aList = [ORCommandList commandList];
+    
+    struct SIS3305_ADC_SPI_Config_Struct packet;
+    for (adc = 0; adc<kNumSIS3305Groups; adc++) {
+        // read ADC Chip ID
+        addr = 0x1;     // control reg
+        RWcmd = 0x0;    // read command
         
-        [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &value
-                                                       atAddress: [self baseAddress] + [self getLTThresholdRegOffsets:chan]
-                                                      numToWrite: 1
-                                                      withAddMod: [self addressModifier]
-                                                   usingAddSpace: 0x01]];
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+        | ((addr    &0x7F)  << 16)
+        | ((adc     & 0x1)  << 24);
+        
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        
+        do {
+            readCount++;
+            readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+            logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+        }
+        while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
+        if (logicBusy == YES) {
+            NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+            return 0x0;
+        }
+        packet.control[adc] = readValue;
     }
     
-    [self executeCommandList:aList];
+    if (verbose) {
+        for (adc =0; adc<kNumSIS3305Groups; adc++) {
+            BOOL test =                 ((packet.control[adc] >>12) & 0x1);
+            BOOL rm =                   ((packet.control[adc] >>10) & 0x1);
+            BOOL bw =                   ((packet.control[adc] >> 8) & 0x1);
+            BOOL grayMode =             ((packet.control[adc] >> 7) & 0x1);
+            unsigned short standby =    ((packet.control[adc] >> 4) & 0x3);
+            unsigned short adcMode =    ((packet.control[adc]       & 0xF));
+            
+            BOOL fourChannel, twoChannel,oneChannel, chanA, chanB, chanC, chanD;
+            
+            NSMutableString* mode = [[NSMutableString alloc] init]; // FIX does this need to be released?
+            
+            switch (adcMode) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    [mode setString:@"Four-channel mode (1.25 Gsps per channel"];
+                    oneChannel = NO;
+                    twoChannel = NO;
+                    fourChannel = YES;
+                    chanA = YES;
+                    chanB = YES;
+                    chanC = YES;
+                    chanD = YES;
+                    break;
+                case 0x4:
+                    [mode setString:@"Two-channel mode (Channel A and Channel C, 2.5 Gsps per channel"];
+                    chanA = YES;
+                    chanB = NO;
+                    chanC = YES;
+                    chanD = NO;
+                    break;
+                case 0x5:
+                    [mode setString:@"Two-channel mode (Channel B and Channel C, 2.5 Gsps per channel"];
+                    chanA = NO;
+                    chanB = YES;
+                    chanC = YES;
+                    chanD = NO;
+                    break;
+                case 0x6:
+                    // FIX: fill the rest of this out...
+                    [mode setString:@"Two-channel mode (Channel B and Channel C, 2.5 Gsps per channel)"];
+                    break;
+                case 0x7:
+                    [mode setString:@"Two-channel mode (Channel B and Channel D, 2.5 Gsps per channel)"];
+                    break;
+                case 0x8:
+                    [mode setString:@"One-channel mode (Channel A, 5 Gsps)"];
+                    break;
+                case 0x9:
+                    [mode setString:@"One-channel mode (Channel B, 5 Gsps)"];
+                    break;
+                case 0xA:
+                    [mode setString:@"One-channel mode (Channel C, 5 Gsps)"];
+                    break;
+                case 0xB:
+                    [mode setString:@"One-channel mode (Channel D, 5 Gsps)"];
+                    break;
+                case 0xC:
+                    [mode setString:@"Common input mode, simultaneous sampling (Channel A)"];
+                    break;
+                case 0xD:
+                    [mode setString:@"Common input mode, simultaneous sampling (Channel B)"];
+                    break;
+                case 0xE:
+                    [mode setString:@"Common input mode, simultaneous sampling (Channel C)"];
+                    break;
+                case 0xF:
+                    [mode setString:@"Common input mode, simultaneous sampling (Channel D)"];
+                    break;
+                default:
+                    [mode setString:@"Invalid ADC mode... there is a problem."];
+                    break;
+            }
+            
+            
+//          10     RM
+            // FIX: implement RM, but I don't know what it means, really...
+            
+//          8      Bandwidth
+            NSLog(@"ADC%d bandwidth is: %@ \n", adc, (bw?@"Full bandwidth":@"Nominal bandwidth (1 GHz typical)"));
+//          7      Binary/Gray
+            NSLog(@"ADC%d is using %@ coding\n", adc, grayMode?@"gray":@"binary");
+
+            //          5:4    Standby
+            // FIX: this is a dodgy way of handling this, and it probably doesn't work right.
+            switch (standby) {
+                case 0x0:
+                    NSLog(@"ADC%d standby mode: FULL ACTIVE\n",adc);
+                    break;
+                case 0x1:
+                    NSLog(@"ADC%d standby mode: A/B STANDBY \n",adc);
+                    break;
+                case 0x2:
+                    NSLog(@"ADC%d standby mode: C/D STANDBY \n",adc);
+                    break;
+                case 0x3:
+                    NSLog(@"ADC%d standby mode: FULL STANDBY \n",adc);
+                    break;
+            }
+            
+ /*
+            NSLog(@"ADC%d standby is %@ \n",adc), ((standby&0x2)?
+                                                            ((standby&0x1)?@"Full standby":@"C/D standby")
+                                                           :((standby&0x1)?@"A/B standby":@"Full active"));
+*/
+  //          3:0    ADC Mode
+            NSLog(@"ADC%d mode: %@ \n",adc,mode);
+
+        }
+        
+    }
+    
+    // make the output as expected
+    readValue = packet.control[0] | (packet.control[1] << 16);
+    return readValue;
+}
+
+- (void) writeADCControlReg
+{
+    /*
+     Uses the SPI protocol of the ADC to read out the ADC Chip Configuration.
+     Only 16 bits of data per chip
+     15:14  Unused
+     13     0
+     12     Test
+     11     0
+     10     RM
+     9      Unused
+     8      Bandwidth
+     7      Binary/Gray
+     6      Unused
+     5:4    Standby
+     3:0    ADC Mode
+     
+     
+     */
+    
+//    unsigned long readValue = 0;
+    unsigned long writeValue = 0;
+    unsigned long writeData = 0;
+//    BOOL logicBusy = YES;
+    
+    unsigned long addr, adc;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+//    unsigned int readCount = 0;
+//    unsigned int maxPolls = 100;
+//    
+//    struct SIS3305_ADC_SPI_Config_Struct packet;
+    
+    [self readEndAddressThresholdOfGroup:0];
+    for (adc = 0; adc<kNumSIS3305Groups; adc++) {
+        // read ADC Chip ID
+        addr = 0x1;     // control reg
+        RWcmd = 0x1;    // write command
+        writeData = (([self channelMode:adc]    & 0xF)  << 0)
+                |   (([self bandwidth:adc]      & 0x1)  << 8)
+                |   (([self testMode:adc]       & 0x1)  << 12);
+        
+        
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+        | ((addr    &0x7F)  << 16)
+        | ((adc     & 0x1)  << 24)
+        | ((writeData&0xFFFF) << 0);
+        
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        
+//        do {
+//            readCount++;
+//            readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+//            logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+//        }
+//        while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
+//        if (logicBusy == YES) {
+//            NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+//            return;
+//        }
+//        packet.control[adc] = readValue;
+    }
+    
     
 }
+
+
+#pragma mark end ADC Serial control
 
 
 - (void) writeDataTransferControlRegister:(short)group withCommand:(short)command withAddress:(unsigned long)value
@@ -2615,8 +2957,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     //      10      start Read transfer
     //      11      start Write transfer
     
-    if (group%kNumSIS3305Groups != group) {
-        NSLog(@" invalid number for group");
+    if (group>=kNumSIS3305Groups) {
+        NSLog(@" invalid number for group\n");
         return;
     }
     
@@ -3080,6 +3422,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return;
 }
 
+- (void) writeSampleStartAddresses
+{
+    unsigned short group;
+    for (group =0; group>kNumSIS3305Groups; group++) {
+        [self writeSampleStartAddressOfGroup:group toValue:[self sampleStartAddress:group]];
+    }
+}
+
+
 - (unsigned long) readSampleLength:(short) group
 {
     // 0x2008 or 0x3008
@@ -3117,7 +3468,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                        withAddMod: [self addressModifier]
                     usingAddSpace: 0x01];
     
-    if (mode == 0 || mode == 1 || mode ==4)
+    if (mode == 0 || mode == 1 || mode == 4)
         length = value&0xFF;        // F^2 = 7:0
     
     if (mode == 6 || mode == 7)
@@ -3175,6 +3526,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                      usingAddSpace:0x01];
 }
 
+- (void) writeSampleLengths
+{
+    unsigned short group;
+    for (group =0; group>kNumSIS3305Groups; group++) {
+        [self writeSampleLengthOfGroup:group toValue:[self sampleLength:group]];
+    }
+}
 
 - (unsigned long) readSamplePretriggerLengthOfGroup:(short)group
 {
@@ -3330,6 +3688,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return;
 }
 
+- (void) writeRingbufferPretriggerDelays
+{
+    unsigned short chan;
+    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+        [self writeRingbufferPretriggerDelayOnChannel:chan toValue:[self preTriggerDelay:chan]];
+    }
+}
 
 
 - (unsigned long) readMaxNumOfEventsInGroup:(short)group
@@ -3860,7 +4225,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) writeTapDelays
 {
-    //    SIS3305_ADC_SYNCH_PULSE
+    //    SIS3305_ADC_INPUT_TAP_DELAY
     /*
      This is to set up the Tap Delays on each ADC channel. These adjust the ADC-FPGA data strobe timing.
      These can be written
@@ -4012,6 +4377,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self writeEndAddressThresholds];
 
 	[self writeThresholds];
+    
+    [self writeADCControlReg];              // set up the bandwidth, channel mode etc.
 
 	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
@@ -4417,32 +4784,50 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      */
     
 	[self reset];
-	[self initBoard];
+//	[self initBoard];
     
     [self writeClockSource:NO];
     [self ADCSynchReset];
     [self writeTapDelays];
-    [self writeADCSerialInterface];
+    [self writeADCControlReg];
     
     [self writeThresholds];
     [self writeControlStatus];  // actually done already in initBoard
     [self writeAcquisitionControl];
     
+    // FIX: this is a hack
+    [self writeSampleStartAddressOfGroup:0 toValue:0];
+    [self writeSampleStartAddressOfGroup:1 toValue:0];
     
-//    [self sampleStartIndex:1];
+    // could write sample start address, but it will always be zero?
+    [self writeSampleLengths];
+    
+    // this is a hack.
+ //   [self setEndAddressThreshold:0 withValue:1];
+   // [self setEndAddressThreshold:1 withValue:1];
+   // [self writeEndAddressThresholds];
     
     int group;
     unsigned long maxEvents = 1;
-    			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
+    //			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
     //			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header
     //			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;
     //			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;
-    for (group =0; group<kNumSIS3305Groups; group++) {
-        [self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords];
-    }
     
-    [self writeLedApplicationMode];
-    [self writeLed:1 to:YES];
+    // FIX: Should this actually write to    [self writeMaxNumOfEventsInGroup:<#(short)#> toValue:<#(unsigned int)#>] ?
+    for (group =0; group<kNumSIS3305Groups; group++) {
+        eventLengthLongWords[group]     = 2 + [self sampleLength:group];
+        [self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords[group]];
+    }
+    [self writeEndAddressThresholds];
+    
+    [self writeRingbufferPretriggerDelays];
+
+    [self writeEventConfiguration];
+    //    [self sampleStartIndex:1];
+    
+//    [self writeLedApplicationMode];
+//    [self writeLed:1 to:YES];
 //	[self clearTimeStamp];
 
     
@@ -4474,33 +4859,24 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             for(group=0;group<kNumSIS3305Groups;group++){
                 long sisHeaderLength = 2;
                 if(wrapMaskForRun & (1L<<group))
-                    sisHeaderLength = 4;
+                    sisHeaderLength = 4; // 32-bit Lwords
                 
                 dataRecordlength[group] = 4 + sisHeaderLength + [self sampleLength:group]/2 + 4;
                                             //Orca header+sisheader+samples+energy+sistrailer
+                NSLog(@"Data record length%d: %d",group,dataRecordlength[group]);
+                
                 dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(unsigned long)+100);
             }
             isRunning = YES;
             firstTime = NO;
             
             [self enableSampleLogic];
-            [self armSampleLogic];
+            [self pulseExternalTriggerOut];
+//            [self armSampleLogic];
             
             waitingForSomeChannels = NO;
         }
         else {  // Not the first time
-
-            /*
-            if(!waitingForSomeChannels){
-                time_t theTime;
-                time(&theTime);
-//                if(((theTime - lastBankSwitchTime) < 2) && ![self isEvent])	return; //not going to readout so return
-                //					[self disarmAndArmNextBank];
-                //					[self setUpPageReg];
-                waitCount = 0;
-            }
-            */
-            
 
             unsigned long ac = 0;  // acquisition control register value
             unsigned long pollcount = 1;
@@ -4520,7 +4896,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //                DMStopped = (ac & 0x20000000);
 //            }
             
-            pollcount = 1;
+            pollcount = 0;
             
             bool endAddThreshFlag = NO;
             unsigned long sampleAddress14 = 0;
@@ -4532,9 +4908,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             unsigned long value1 = 0;
             unsigned long value2 = 0;
             
-            while (!endAddThreshFlag && pollcount<2000)     // Check if the end address threshold has been reached
+            while (!endAddThreshFlag && (pollcount<100))     // Check if the end address threshold has been reached
             {
-                ac = [self readAcquisitionControl:NO];
+                ac =                [self readAcquisitionControl:NO];
                 sampleAddress14 = [self readActualSampleAddress:0];
                 sampleAddress58 = [self readActualSampleAddress:1];
                 endThresh14     = [self readEndAddressThresholdOfGroup:0];
@@ -4544,13 +4920,17 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 value1         = [self readActualSampleValueOfChannel:1];
                 value2         = [self readActualSampleValueOfChannel:2];
                 
-                if(pollcount%1000 == 0){
-                    NSLog(@"Polling for end address threshold flag (%d)...\n", pollcount);
-                    [self forceTrigger];
+                if(pollcount%10 == 0){
+                    //NSLog(@"Polling for end address threshold flag (%d)...\n", pollcount);
+                    //[self forceTrigger];
                 }
                 
                 endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
                 pollcount++;
+            }
+            
+            if (endAddThreshFlag == NO) {
+                return;
             }
             
             // disarm/disable sampling?
@@ -4558,32 +4938,44 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             
             //if we get here, there may be something to read out
-            unsigned long endSampleAddress      = 0;
-            unsigned long numberOfWords         = 0;
-            unsigned long numberBytesToRead     = 2048;
-            int i;
-            for(i=0;i<kNumSIS3305Channels;i++) {
-                int group				 = i<4?0:1;
+            unsigned long sampleAddress[kNumSIS3305Groups];
+            unsigned long numberOfWords[kNumSIS3305Groups];
+            unsigned long numberBytesToRead[kNumSIS3305Groups];
+            
+            unsigned short group =0;
+            for (group=0; group<kNumSIS3305Groups; group++) {
+                sampleAddress[group] = [self readActualSampleAddress:0];
+                numberOfWords[group] = ([self readSampleLength:group]+1)*(12);
+                numberBytesToRead[group]= (numberOfWords[group] * 4);
+            }
+            
+            [self writeDataTransferControlRegister:0 withCommand:2 withAddress:0];  // read command
+            [self writeDataTransferControlRegister:1 withCommand:2 withAddress:0];  // read command
+
+            
+            
+            for(group=0;group<kNumSIS3305Groups;group++) {
+
+//                int group				 = i<4?0:1;
                 
 //                if ( channelsToReadMask & (1<<i)){
-                if (enabled[i]) {
+//                if (enabled[group]) {
                     // prepare readout SMs
 
-                    [self writeDataTransferControlRegister:group withCommand:2 withAddress:0];
 
-                    endSampleAddress = [self endAddressThreshold:i];
-                    NSLog(@"     end: 0x%x\n",endSampleAddress);
+                    numberBytesToRead[group] = [self readActualSampleAddress:group];
+                    NSLog(@"     sample address: 0x%x\n",sampleAddress[group]);
 
 //                    unsigned long endSampleAddress = 8096;
 //                    if (((endSampleAddress >> 24) & 0x1) ==  (bankOneArmed ? 1:0)) {
-                        channelsToReadMask &= ~(1<<i);
-                        
+//                        channelsToReadMask &= ~(1<<i);
+                
 //                        unsigned long numberBytesToRead	= (endSampleAddress & 0xffffff) * 2;
-                    numberOfWords       = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
-                    numberBytesToRead     = 2048;
-                    numberBytesToRead   = [self readActualSampleAddress:group] * 64;
+                    numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
+//                    numberBytesToRead[group]     = 2048;
+                    numberBytesToRead[group]   = numberOfWords[group] * 4;
                     
-                        if(numberBytesToRead){
+                        if(numberBytesToRead[group] > 0){
                             unsigned long addrOffset = 0;
                             int eventCount			 = 0;
 
@@ -4593,19 +4985,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                 
                                 int index = 0;
                                 dataRecord[group][index++] =   dataId | dataRecordlength[group];
+                                
                                 dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) |
                                 (([self slot] & 0x0000001f)<<16)      |
-                                ((i & 0x000000ff)<<8)			      |
+                                ((group & 0x000000ff)<<8)			      |
                                 wrapMode;
                                 
                                 dataRecord[group][index++] = [self sampleLength:group]/2;
                                 
-//                                unsigned long* p = &dataRecord[group][index];
-//                                [[self adapter] readLongBlock: p
-//                                                    atAddress: [self baseAddress] + [self getSampleStartAddress:group] + addrOffset
-//                                                    numToRead: dataRecordlength[group] * numberOfWords
-//                                                   withAddMod: [self addressModifier]
-//                                                usingAddSpace: 0x01];
+                                unsigned long* p = &dataRecord[group][index];
+                                [[self adapter] readLongBlock: p
+                                                    atAddress: [self baseAddress] + [self readActualSampleAddress:group] + addrOffset
+                                                    numToRead: dataRecordlength[group]
+                                                   withAddMod: [self addressModifier]
+                                                usingAddSpace: 0x01];
                                 
 //                                if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
                                     [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
@@ -4617,27 +5010,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                 
                                 addrOffset += (dataRecordlength[group]-4)*4;
                                 if(++eventCount > 25)break;
-                            } while (addrOffset < endSampleAddress);
+                            } while (addrOffset < sampleAddress[group]);
                         }
 //                    }
-                }
-                
-				waitingForSomeChannels = (channelsToReadMask!=0);
-				
-//				if(waitingForSomeChannels)
-//                {
-//					//if we wait too long, do a logic reset
-//					waitCount++;
-//					if(waitCount > 10){						
-//						int index = 0;
-//						dataRecord[0][index++] = lostDataId | 3; 
-//						dataRecord[0][index++] = (([self crateNumber] & 0x0000000f) << 21)  | 
-//												 (([self slot]        & 0x0000001f) << 16)  | 1; //1 == reset event
-//						dataRecord[0][index++] = channelsToReadMask<<16;
-//						[aDataPacket addLongsToFrameBuffer:dataRecord[0] length:3];
-////						[self resetSamplingLogic];
-//					}
-//				}
+//                }
+
 			}
 		}
 	}
@@ -4828,6 +5205,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setClearTimestampDisabled:i toValue:[decoder decodeInt32ForKey:[@"clearTimestampDisabled" stringByAppendingFormat:@"%d",i]]];
         [self setWaitPreTrigTimeBeforeDirectMemTrig:i toValue:[decoder decodeInt32ForKey:[@"waitPreTrigTimeBeforeDirectMemTrig" stringByAppendingFormat:@"%d",i]]];
         [self setDirectMemoryHeaderDisabled:i toValue:[decoder decodeInt32ForKey:[@"directMemoryHeaderDisabled" stringByAppendingFormat:@"%d",i]]];
+        
+        
+        [self setGrayCodeEnabled:i toValue:[decoder decodeInt32ForKey:[@"grayCodeEnabled" stringByAppendingFormat:@"%d",i]]];
+        [self setADCGateModeEnabled:i toValue:[decoder decodeInt32ForKey:[@"ADCGateModeEnabled" stringByAppendingFormat:@"%d",i]]];
+        [self setBandwidth:i withValue:[decoder decodeInt32ForKey:[@"bandwidth" stringByAppendingFormat:@"%d",i]]];
+        
+        [self setTestMode:i withValue:[decoder decodeInt32ForKey:[@"testMode" stringByAppendingFormat:@"%d",i]]];
+        [self setChannelMode:i withValue:[decoder decodeInt32ForKey:[@"channelMode" stringByAppendingFormat:@"%d",i]]];
     }
     
     [self setExternalTriggerEnabledMask:[decoder decodeInt32ForKey:@"externalTriggerEnabledMask"]];
@@ -4906,18 +5291,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[encoder encodeBool:pulseMode               forKey:@"pulseMode"];
 	[encoder encodeFloat:firmwareVersion		forKey:@"firmwareVersion"];
 	[encoder encodeBool:shipTimeRecordAlso		forKey:@"shipTimeRecordAlso"];
-//	[encoder encodeBool:mcaUseEnergyCalculation forKey:@"mcaUseEnergyCalculation"];
-//	[encoder encodeInt:mcaEnergyOffset			forKey:@"mcaEnergyOffset"];
-//	[encoder encodeInt:mcaEnergyMultiplier		forKey:@"mcaEnergyMultiplier"];
-//	[encoder encodeInt:mcaEnergyDivider			forKey:@"mcaEnergyDivider"];
-//	[encoder encodeInt:mcaMode					forKey:@"mcaMode"];
-//	[encoder encodeBool:mcaPileupEnabled		forKey:@"mcaPileupEnabled"];
-//	[encoder encodeInt:mcaHistoSize				forKey:@"mcaHistoSize"];
-//	[encoder encodeInt32:mcaNofScansPreset		forKey:@"mcaNofScansPreset"];
-//	[encoder encodeBool:mcaAutoClear			forKey:@"mcaAutoClear"];
-//	[encoder encodeInt32:mcaPrescaleFactor		forKey:@"mcaPrescaleFactor"];
-//	[encoder encodeBool:mcaLNESetup				forKey:@"mcaLNESetup"];
-//	[encoder encodeInt32:mcaNofHistoPreset		forKey:@"mcaNofHistoPreset"];
 	
     //channel-level c-arrays:
     int chan;
@@ -4944,7 +5317,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [encoder encodeInt:clearTimestampDisabled[i]  forKey:[@"clearTimestampDisabled" stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:waitPreTrigTimeBeforeDirectMemTrig[i]  forKey:[@"waitPreTrigTimeBeforeDirectMemTrig" stringByAppendingFormat:@"%d",i]];
         [encoder encodeInt:directMemoryHeaderDisabled[i]  forKey:[@"directMemoryHeaderDisabled" stringByAppendingFormat:@"%d",i]];
-
+        [encoder encodeInt:grayCodeEnabled[i] forKey:[@"grayCodeEnabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:ADCGateModeEnabled[i] forKey:[@"ADCGateModeEnabled" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:bandwidth[i] forKey:[@"bandwidth" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:testMode[i] forKey:[@"testMode" stringByAppendingFormat:@"%d",i]];
+        [encoder encodeInt:channelMode[i] forKey:[@"channelMode" stringByAppendingFormat:@"%d",i]];
     }
     
     [encoder encodeInt:runMode					forKey:@"runMode"];

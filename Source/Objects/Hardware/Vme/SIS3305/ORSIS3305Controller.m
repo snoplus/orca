@@ -66,6 +66,9 @@
 	NSNumberFormatter *rateFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	[rateFormatter setFormat:@"##0.0;0;-##0.0"];
 	
+    NSNumberFormatter *hexFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [hexFormatter setFormat:@"##%x;0"];
+    
 	int i;
 //	for(i=0;i<kNumSIS3305Channels/kNumSIS3305Groups;i++){
 //		NSCell* theCell = [GTThresholdOn14Matrix cellAtRow:i column:0];
@@ -276,6 +279,22 @@
                          name: ORSIS3305DirectMemoryHeaderDisabledChanged
                        object: model];
     
+    [notifyCenter addObserver: self
+                     selector: @selector(channelModeChanged:)
+                         name: ORSIS3305ChannelModeChanged
+                       object: model];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(bandwidthChanged:)
+                         name: ORSIS3305BandwidthChanged
+                       object: model];
+
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(testModeChanged:)
+                         name: ORSIS3305TestModeChanged
+                       object: model];
+
     
     
     
@@ -318,6 +337,13 @@
                      selector : @selector(pulseModeChanged:)
                          name : ORSIS3305ModelPulseModeChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(null)
+                         name : ORSIS3305SampleStartAddressChanged
+                        object: model];
+    
+    
 
 }
 
@@ -384,6 +410,7 @@
 	[self runModeChanged:nil];
 	[self shipTimeRecordAlsoChanged:nil];
     [self TDCLogicEnabledChanged:nil];
+    [self clockSourceChanged:nil];
     
     // group settings
     // event config
@@ -395,7 +422,13 @@
     [self clearTimestampDisabledChanged:nil];
     [self disableDirectMemoryHeaderChanged:nil];
     [self grayCodeEnabledChanged:nil];
+    [self ADCGateModeEnabledChanged:nil];
+    [self waitPreTrigTimeBeforeDirectMemTrigChanged:nil];
     
+    
+    [self bandwidthChanged:nil];
+    [self testModeChanged:nil];
+    [self channelModeChanged:nil];
     
     
     //channel settings
@@ -596,7 +629,7 @@
 - (void) ADCGateModeEnabledChanged:(NSNotification*)aNote
 {
     [ADCGateModeEnabled14Button setState: [model ADCGateModeEnabled:0]]; // 0 is for group 1
-    [ADCGateModeEnabled14Button setState: [model ADCGateModeEnabled:1]]; // 1 is for group 2
+    [ADCGateModeEnabled58Button setState: [model ADCGateModeEnabled:1]]; // 1 is for group 2
     
 }
 
@@ -662,10 +695,26 @@
 }
 
 
-
-
 #pragma mark end of event config chnged updaters
 
+
+- (void) channelModeChanged:(NSNotification *)aNote
+{
+    [channelMode14PU selectItemAtIndex:[model channelMode:0]];
+    [channelMode58PU selectItemAtIndex:[model channelMode:1]];
+}
+
+- (void) bandwidthChanged:(NSNotification *)aNote
+{
+    [bandwidth14PU selectItemAtIndex:[model bandwidth:0]];
+    [bandwidth58PU selectItemAtIndex:[model bandwidth:1]];
+}
+
+- (void) testModeChanged:(NSNotification *)aNote
+{
+    [testMode14PU selectItemAtIndex:[model testMode:0]];
+    [testMode58PU selectItemAtIndex:[model testMode:1]];
+}
 
 
 
@@ -1370,6 +1419,8 @@
     unsigned int index = [model registerIndex];
     if (index < kNumSIS3305ReadRegs) {
         [model writeRegister:index withValue:aValue];
+        NSLog(@"SIS3305(%d,%d) Writing to %@: with value %u (0x%0x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
+
     }
     else {
         NSLog(@"Invalid register name");
@@ -1537,6 +1588,56 @@
     [model setWaitPreTrigTimeBeforeDirectMemTrig:1 toValue:mode];
 }
 
+
+
+
+
+- (IBAction) channelMode14Action:(id)sender
+{
+    unsigned short mode = [[sender selectedCell] indexOfSelectedItem];
+    const unsigned short group = 0;
+    
+    [model setChannelMode:group withValue:mode];
+}
+- (IBAction) channelMode58Action:(id)sender
+{
+    unsigned short mode = [[sender selectedCell] indexOfSelectedItem];
+    const unsigned short group = 1;
+    
+    [model setChannelMode:group withValue:mode];
+}
+
+- (IBAction) bandwidth14Action:(id)sender;
+{
+    unsigned short mode = [[sender selectedCell] indexOfSelectedItem];
+    const unsigned short group = 0;
+    
+    [model setBandwidth:group withValue:mode];
+}
+
+- (IBAction) bandwidth58Action:(id)sender
+{
+    unsigned short mode = [[sender selectedCell] indexOfSelectedItem];
+    const unsigned short group = 1;
+    
+    [model setBandwidth:group withValue:mode];
+}
+
+- (IBAction) testMode14Action:(id)sender;
+{
+    unsigned short mode = [[sender selectedCell] indexOfSelectedItem];
+    const unsigned short group = 0;
+    
+    [model setTestMode:group withValue:mode];
+}
+
+- (IBAction) testMode58Action:(id)sender;
+{
+    unsigned short mode = [[sender selectedCell] indexOfSelectedItem];
+    const unsigned short group = 1;
+    
+    [model setTestMode:group withValue:mode];
+}
 
 
 
