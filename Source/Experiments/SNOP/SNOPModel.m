@@ -338,10 +338,10 @@ mtcConfigDoc = _mtcConfigDoc;
 	if([runObjects count]){
 		ORRunModel* rc = [runObjects objectAtIndex:0];
         _rhdrStruct.runNumber = [rc runNumber];
-        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+        NSCalendar *gregorian = [[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian] autorelease];
         NSDateComponents *cmpStartTime = [gregorian components:
-                                                 (NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit |
-                                                  NSHourCalendarUnit | NSMinuteCalendarUnit |NSSecondCalendarUnit)
+                                                 (NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay |
+                                                  NSCalendarUnitHour | NSCalendarUnitMinute |NSCalendarUnitSecond)
                                                       fromDate:[NSDate date]];
         _rhdrStruct.date = [cmpStartTime day] + [cmpStartTime month] * 100 + [cmpStartTime year] * 10000;
         _rhdrStruct.time = [cmpStartTime second] * 100 + [cmpStartTime minute] * 10000 + [cmpStartTime hour] * 1000000;
