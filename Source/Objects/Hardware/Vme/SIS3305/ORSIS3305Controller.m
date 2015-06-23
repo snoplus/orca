@@ -2090,6 +2090,13 @@
     }
 }
 
+- (IBAction) sampleLengthAction:(id)sender
+{
+    unsigned short group = [[sender selectedCell] tag];
+    unsigned long value = [sender intValue];
+    [model setSampleLength:group withValue:value];
+}
+
 #pragma mark KEY Reg actions
 
 - (IBAction) generalResetAction:(id)sender
@@ -2154,12 +2161,7 @@
 	}
 }
 
-- (IBAction) sampleLengthAction:(id)sender
-{
-    if([sender intValue] != [model sampleLength:[[sender selectedCell] tag]]){
-		[model setSampleLength:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
-}
+
 
 - (IBAction) dacOffsetAction:(id)sender
 {

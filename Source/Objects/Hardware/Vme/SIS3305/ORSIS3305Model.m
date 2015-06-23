@@ -3592,10 +3592,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
         // bit 19: unused
         // bit 20-23: ADC event header programmable info bits 0-3
-        aValueMask |= (0xF)  << 20;
+        aValueMask |= (0x0)  << 20;
         // bit 24-31: ADC event header programmable ID bits 0-7
-        aValueMask |= i << 24;
-        aValueMask |= ([self baseAddress] & 0x7F000000) << 1;    // this is the geographic address 30:24 pushed to 31:25 of this register
+        aValueMask |= (0x0) << 24; //i << 24;
+        aValueMask |= (0x0) << 1; // ([self baseAddress] & 0x7F000000) << 1;    // this is the geographic address 30:24 pushed to 31:25 of this register
         
         [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
                                                        atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
@@ -5151,8 +5151,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 if(wrapMaskForRun & (1L<<group))
                     sisHeaderLength = 4; // 32-bit Lwords
                 
-                dataRecordlength[group] = 4 + sisHeaderLength + [self sampleLength:group]/2 + 4;
-                                            //Orca header+sisheader+samples+energy+sistrailer
+                
+                dataRecordlength[group] = 4 + sisHeaderLength + [self sampleLength:group] + 4;
+                                            //Orca header+sisheader+samples+sistrailer
                 NSLog(@"Data record length%d: %d",group,dataRecordlength[group]);
                 
                 dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(unsigned long)+100);
