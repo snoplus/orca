@@ -20,7 +20,7 @@
 #pragma mark - General Card Properties
 #define kNumSIS3305Channels	8 
 #define kNumSIS3305Groups	2 
-#define kNumSIS3305ReadRegs 92
+#define kNumSIS3305ReadRegs 96
 
 
 #define kMcaRunMode			0
@@ -33,6 +33,7 @@
 #define kSIS3305MaxEnergyWaveform	510
 
 #define CSRMask(state,A) ((state)?(A):(A<<16))
+#define tempRawToC(value) ((float)((signed short)(value))) / 4 // method described in manual...
 
 
 // Config addresses
@@ -175,6 +176,13 @@
 #pragma mark - Input tap delay registers
 #define kSIS3305ADCInputTapDelayADC14               0x2400
 #define kSIS3305ADCInputTapDelayADC58               0x3400
+
+
+#define kSIS3305Space1ADCDataFIFOCh14      0x8000
+#define kSIS3305Space1ADCDataFIFOCh58      0xC000
+
+#define kSIS3305Space2ADCDataFIFOCh14      0x800000
+#define kSIS3305Space2ADCDataFIFOCh58      0xC00000
 
 //#define kSIS3305     0x
 

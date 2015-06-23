@@ -48,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-    basicSize       = NSMakeSize(1200   ,700);
+    basicSize       = NSMakeSize(1100   ,700);
     settingSize     = NSMakeSize(900    ,620);
     rateSize		= NSMakeSize(790    ,300);
     miscSize        = NSMakeSize(1200   ,600);
@@ -118,7 +118,7 @@
 	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Notifications
+#pragma mark - Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -298,6 +298,92 @@
     
     
     
+    
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectTriggerChanged:)
+                         name : ORSIS3305LemoOutSelectTriggerChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectTriggerInChanged:)
+                         name : ORSIS3305LemoOutSelectTriggerInChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectTriggerInPulseChanged:)
+                         name : ORSIS3305LemoOutSelectTriggerInPulseChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectTriggerInPulseWithSampleAndTDCChanged:)
+                         name : ORSIS3305LemoOutSelectTriggerInPulseWithSampleAndTDCChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectSampleLogicArmedChanged:)
+                         name : ORSIS3305LemoOutSelectSampleLogicArmedChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectSampleLogicEnabledChanged:)
+                         name : ORSIS3305LemoOutSelectSampleLogicEnabledChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectKeyOutputPulseChanged:)
+                         name : ORSIS3305LemoOutSelectKeyOutputPulseChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectControlLemoTriggerOutChanged:)
+                         name : ORSIS3305LemoOutSelectControlLemoTriggerOutChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectExternalVetoChanged:)
+                         name : ORSIS3305LemoOutSelectExternalVetoChanged
+                        object: model];
+    
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectInternalKeyVetoChanged:)
+                         name : ORSIS3305LemoOutSelectInternalKeyVetoChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectExternalVetoLengthChanged:)
+                         name : ORSIS3305LemoOutSelectExternalVetoLengthChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoOutSelectMemoryOverrunVetoChanged:)
+                         name : ORSIS3305LemoOutSelectMemoryOverrunVetoChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(enableLemoInputTriggerChanged:)
+                         name : ORSIS3305EnableLemoInputTriggerChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(enableLemoInputCountChanged:)
+                         name : ORSIS3305EnableLemoInputCountChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(enableLemoInputResetChanged:)
+                         name : ORSIS3305EnableLemoInputResetChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(enableLemoInputDirectVetoChanged:)
+                         name : ORSIS3305EnableLemoInputDirectVetoChanged
+                        object: model];
+    
+    
+    
+    
 	[notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3305ClockSourceChanged
@@ -314,6 +400,9 @@
                          name : ORSIS3305ModelRunModeChanged
 						object: model];
 
+    
+    
+    
 	
 	[self registerRates];
 
@@ -332,12 +421,20 @@
                      selector : @selector(firmwareVersionChanged:)
                          name : ORSIS3305ModelFirmwareVersionChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(temperatureChanged:)
+                         name : ORSIS3305TemperatureChanged
+                        object: model];
+    
 
     [notifyCenter addObserver : self
                      selector : @selector(pulseModeChanged:)
                          name : ORSIS3305ModelPulseModeChanged
 						object: model];
     
+    
+    // FIX: This needs the action/changed?
     [notifyCenter addObserver : self
                      selector : @selector(null)
                          name : ORSIS3305SampleStartAddressChanged
@@ -390,16 +487,16 @@
     [self updateTimePlot:nil];
     [self waveFormRateChanged:nil];
 	
-	[self lemoOutModeChanged:nil];
-	[self lemoInModeChanged:nil];
-	[self dacOffsetChanged:nil];
+//	[self lemoOutModeChanged:nil];
+//	[self lemoInModeChanged:nil];
+//	[self dacOffsetChanged:nil];
 	[self sampleLengthChanged:nil];
 	[self sampleStartIndexChanged:nil];
 	[self preTriggerDelayChanged:nil];
 	[self triggerGateLengthChanged:nil];
 
     [self lemoInEnabledMaskChanged:nil];
-	[self internalExternalTriggersOredChanged:nil];
+//	[self internalExternalTriggersOredChanged:nil];
 	
 	[self internalTriggerEnabledChanged:nil];
 	[self externalTriggerEnabledChanged:nil];
@@ -431,6 +528,24 @@
     [self channelModeChanged:nil];
     
     
+    [self lemoOutSelectTriggerChanged:nil];
+    [self lemoOutSelectTriggerInChanged:nil];
+    [self lemoOutSelectTriggerInPulseChanged:nil];
+    [self lemoOutSelectTriggerInPulseWithSampleAndTDCChanged:nil];
+    [self lemoOutSelectSampleLogicArmedChanged:nil];
+    [self lemoOutSelectSampleLogicEnabledChanged:nil];
+    [self lemoOutSelectKeyOutputPulseChanged:nil];
+    [self lemoOutSelectControlLemoTriggerOutChanged:nil];
+    [self lemoOutSelectExternalVetoChanged:nil];
+    [self lemoOutSelectInternalKeyVetoChanged:nil];
+    [self lemoOutSelectExternalVetoLengthChanged:nil];
+    [self lemoOutSelectMemoryOverrunVetoChanged:nil];
+    [self enableLemoInputTriggerChanged:nil];
+    [self enableLemoInputCountChanged:nil];
+    [self enableLemoInputResetChanged:nil];
+    [self enableLemoInputDirectVetoChanged:nil];
+    
+    
     //channel settings
     [self thresholdModeChanged:nil];
     [self channelEnabledChanged:nil];
@@ -447,7 +562,7 @@
 	[self pulseModeChanged:nil];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Interface Management
+#pragma mark - Interface Management
 
 - (void) pulseModeChanged:(NSNotification*)aNote
 {
@@ -458,6 +573,12 @@
 	[firmwareVersionTextField setFloatValue: [model firmwareVersion]];
 	[self settingsLockChanged:nil];
 }
+
+- (void) temperatureChanged:(NSNotification*)aNote
+{
+    [temperatureTextField setStringValue:[NSString stringWithFormat:@"%3.1f C",[model temperature]]];
+}
+
 
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote
 {
@@ -588,17 +709,13 @@
 //	[mcaNofHistoPresetField setIntValue: [model mcaNofHistoPreset]];
 //}
 
-- (void) internalExternalTriggersOredChanged:(NSNotification*)aNote
-{
-	[internalExternalTriggersOredCB setIntValue: [model internalExternalTriggersOred]];
-}
 
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote
 {
-	short i;
-	for(i=0;i<3;i++){
-		[[lemoInEnabledMatrix cellWithTag:i] setState:[model lemoInEnabled:i]];
-	}
+//	short i;
+//	for(i=0;i<3;i++){
+//		[[lemoInEnabledMatrix cellWithTag:i] setState:[model lemoInEnabled:i]];
+//	}
 }
 
 - (void) channelEnabledChanged:(NSNotification*)aNote
@@ -695,7 +812,7 @@
 }
 
 
-#pragma mark end of event config chnged updaters
+#pragma mark end of event config changed updaters
 
 
 - (void) channelModeChanged:(NSNotification *)aNote
@@ -738,24 +855,123 @@
 - (void) runModeChanged:(NSNotification*)aNote
 {
 	[runModePU selectItemAtIndex: [model runMode]];
-	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
-	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
+//	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
+//	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
 	[runSummaryField setStringValue: [model runSummary]];
 	[self settingsLockChanged:nil];
 }
 
 
-- (void) lemoInModeChanged:(NSNotification*)aNote
+//- (void) lemoInModeChanged:(NSNotification*)aNote
+//{
+//	[lemoInModePU selectItemAtIndex: [model lemoInMode]];
+//	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
+//}
+//
+//- (void) lemoOutModeChanged:(NSNotification*)aNote
+//{
+//	[lemoOutModePU selectItemAtIndex: [model lemoOutMode]];
+//	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
+//}
+
+
+
+#pragma mark LEMO Out Select Changeds
+
+- (void) controlLemoTriggerOutChanged:(NSNotification*)aNote
 {
-	[lemoInModePU selectItemAtIndex: [model lemoInMode]];
-	[lemoInAssignmentsField setStringValue: [model lemoInAssignments]];
+    [controlLemoTriggerOutButton setState:[model controlLEMOTriggerOut]];
 }
 
-- (void) lemoOutModeChanged:(NSNotification*)aNote
+- (void) lemoOutSelectTriggerChanged:(NSNotification*)aNote
 {
-	[lemoOutModePU selectItemAtIndex: [model lemoOutMode]];
-	[lemoOutAssignmentsField setStringValue: [model lemoOutAssignments]];
+    int i;
+    for(i=0;i<kNumSIS3305Channels/kNumSIS3305Groups;i++){
+        [[lemoOutSelectTrigger14Matrix cellWithTag:i] setState:[model lemoOutSelectTrigger:i]];
+    }
 }
+
+- (void) lemoOutSelectTriggerInChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectTriggerInButton setState:[model lemoOutSelectTriggerIn]];
+}
+
+- (void) lemoOutSelectTriggerInPulseChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectTriggerInPulseButton setState:[model lemoOutSelectTriggerInPulse]];
+}
+
+- (void) lemoOutSelectTriggerInPulseWithSampleAndTDCChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectTriggerInPulseWithSampleAndTDCButton setState:[model lemoOutSelectTriggerInPulseWithSampleAndTDC]];
+}
+
+- (void) lemoOutSelectSampleLogicArmedChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectSampleLogicArmedButton setState:[model lemoOutSelectSampleLogicArmed]];
+}
+
+- (void) lemoOutSelectSampleLogicEnabledChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectSampleLogicEnabledButton setState:[model lemoOutSelectSampleLogicEnabled]];
+}
+
+- (void) lemoOutSelectKeyOutputPulseChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectKeyOutputPulseButton setState:[model lemoOutSelectKeyOutputPulse]];
+}
+
+- (void) lemoOutSelectControlLemoTriggerOutChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectControlLemoTriggerOutButton setState:[model lemoOutSelectControlLemoTriggerOut]];
+}
+
+- (void) lemoOutSelectExternalVetoChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectExternalVetoButton setState:[model lemoOutSelectExternalVeto]];
+}
+
+- (void) lemoOutSelectInternalKeyVetoChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectInternalKeyVetoButton setState:[model lemoOutSelectInternalKeyVeto]];
+}
+
+- (void) lemoOutSelectExternalVetoLengthChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectExternalVetoLengthButton setState:[model lemoOutSelectExternalVetoLength]];
+}
+
+- (void) lemoOutSelectMemoryOverrunVetoChanged:(NSNotification*)aNote
+{
+    [lemoOutSelectMemoryOverrunVetoButton setState:[model lemoOutSelectMemoryOverrunVeto]];
+}
+
+
+#pragma mark LEMO Input changeds
+
+- (void) enableLemoInputTriggerChanged:(NSNotification*)aNote
+{
+    [enableLemoInputTriggerButton setState:[model enableExternalLEMOTriggerIn]];
+}
+
+- (void) enableLemoInputCountChanged:(NSNotification*)aNote
+{
+    [enableLemoInputCountButton setState:[model enableExternalLEMOCountIn]];
+}
+
+- (void) enableLemoInputResetChanged:(NSNotification*)aNote
+{
+    [enableLemoInputResetButton setState:[model enableExternalLEMOResetIn]];
+}
+
+- (void) enableLemoInputDirectVetoChanged:(NSNotification*)aNote
+{
+    [enableLemoInputDirectVetoButton setState:[model enableExternalLEMODirectVetoIn]];
+}
+
+
+#pragma mark other changeds
+
 
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
@@ -1004,6 +1220,9 @@
 	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
 //    BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
 	
+    // temp
+
+    
 	[settingLockButton			setState: locked];
 	//[settingLockButton			setState: locked];
 
@@ -1018,12 +1237,10 @@
 	[probeButton				setEnabled:!lockedOrRunningMaintenance];
     [forceTriggerButton			setEnabled:!lockedOrRunningMaintenance];
 	
-    [internalExternalTriggersOredCB	setEnabled:!lockedOrRunningMaintenance];
 	[triggerGateLengthMatrix		setEnabled:!lockedOrRunningMaintenance];
     [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
     [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
-	[lemoInModePU					setEnabled:!lockedOrRunningMaintenance];
-	[lemoOutModePU					setEnabled:!lockedOrRunningMaintenance];
+
 
     [clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
     
@@ -1047,7 +1264,6 @@
     // end key regs
     
 
-//	[gtMatrix						setEnabled:!lockedOrRunningMaintenance];
 	[inputInvertedMatrix			setEnabled:!lockedOrRunningMaintenance];
 //	[thresholdMatrix				setEnabled:!lockedOrRunningMaintenance];
 //	[internalTriggerEnabledMatrix	setEnabled:!lockedOrRunningMaintenance];
@@ -1059,7 +1275,6 @@
 	[gateLengthMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[pulseLengthMatrix				setEnabled:!lockedOrRunningMaintenance];
 	
-	[lemoInEnabledMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[triggerOutEnabledMatrix		setEnabled:!lockedOrRunningMaintenance];
 	
 	//can't be changed during a run or the card and probably the sbc will be hosed.
@@ -1388,6 +1603,126 @@
 {
 	[model setLemoOutMode:[sender indexOfSelectedItem]];	
 }
+
+
+- (IBAction) controlLemoTriggerOutAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setControlLEMOTriggerOut:mode];
+}
+
+- (IBAction) lemoOutSelectTrigger14Action:(id)sender
+{
+    int chan;
+    BOOL mode;
+    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
+        mode = [[sender cellAtIndex:chan] state];
+        [model setLemoOutSelectTrigger:chan toState:mode];
+    }
+}
+
+- (IBAction) lemoOutSelectTrigger58Action:(id)sender
+{
+    int chan;
+    BOOL mode;
+    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
+        mode = [[sender cellAtIndex:chan] state];
+        [model setLemoOutSelectTrigger:(chan+4) toState:mode];
+    }
+}
+- (IBAction) lemoOutSelectTriggerInAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectTriggerIn:mode];
+}
+
+- (IBAction) lemoOutSelectTriggerInPulseAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectTriggerInPulse:mode];
+}
+
+- (IBAction) lemoOutSelectTriggerInPulseWithSampleAndTDCAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectTriggerInPulseWithSampleAndTDC:mode];
+}
+
+- (IBAction) lemoOutSelectSampleLogicArmedAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectSampleLogicArmed:mode];
+}
+
+- (IBAction) lemoOutSelectSampleLogicEnabledAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectSampleLogicEnabled:mode];
+}
+
+- (IBAction) lemoOutSelectKeyOutputPulseAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectKeyOutputPulse:mode];
+}
+
+- (IBAction) lemoOutSelectControlLemoTriggerOutAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectControlLemoTriggerOut:mode];
+}
+
+- (IBAction) lemoOutSelectExternalVetoAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectExternalVeto:mode];
+}
+
+- (IBAction) lemoOutSelectInternalKeyVetoAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectInternalKeyVeto:mode];
+}
+
+- (IBAction) lemoOutSelectExternalVetoLengthAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectExternalVetoLength:mode];
+}
+
+- (IBAction) lemoOutSelectMemoryOverrunVetoAction:(id)sender
+{
+    BOOL mode = [sender state];
+    [model setLemoOutSelectMemoryOverrunVeto:mode];
+}
+
+
+
+- (IBAction) enableLemoInputTriggerAction:(id)sender
+{
+    BOOL aState = [sender state];
+    [model setEnableExternalLEMOTriggerIn:aState];
+}
+
+
+- (IBAction) enableLemoInputCountAction:(id)sender
+{
+    BOOL aState = [sender state];
+    [model setEnableExternalLEMOCountIn:aState];
+}
+
+- (IBAction) enableLemoInputResetAction:(id)sender
+{
+    BOOL aState = [sender state];
+    [model setEnableExternalLEMOResetIn:aState];
+}
+
+- (IBAction) enableLemoInputDirectVetoAction:(id)sender
+{
+    BOOL aState = [sender state];
+    [model setEnableExternalLEMODirectVetoIn:aState];
+}
+
 
 #pragma mark - hardware actions
 

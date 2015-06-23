@@ -34,6 +34,8 @@ NSString* ORSIS3305TDCMeasurementEnabledChanged         = @"ORSIS3305ModelTDCMea
 NSString* ORSIS3305TapDelayChanged                      = @"ORSIS3305TapDelayChanged";
 NSString* ORSIS3305ModelPulseModeChanged				= @"ORSIS3305ModelPulseModeChanged";
 NSString* ORSIS3305ModelFirmwareVersionChanged			= @"ORSIS3305ModelFirmwareVersionChanged";
+NSString* ORSIS3305TemperatureChanged                   = @"ORSIS3305TemperatureChanged";
+
 NSString* ORSIS3305ModelBufferWrapEnabledChanged		= @"ORSIS3305ModelBufferWrapEnabledChanged";
 //NSString* ORSIS3305ModelCfdControlChanged				= @"ORSIS3305ModelCfdControlChanged";
 NSString* ORSIS3305ModelShipTimeRecordAlsoChanged		= @"ORSIS3305ModelShipTimeRecordAlsoChanged";
@@ -122,6 +124,37 @@ NSString* ORSIS3305ChannelModeChanged   = @"ORSIS3305ChannelModeChanged";
 NSString* ORSIS3305BandwidthChanged     = @"ORSIS3305BandwidthChanged";
 NSString* ORSIS3305TestModeChanged      = @"ORSIS3305TestModeChanged";
 
+//NSString* ORSIS3305ModelLemoOutSelectTriggerChanged = @"ORSIS3305ModelLemoOutSelectTriggerChanged";
+//NSString* ORSIS3305ModelLemoOutSelectTriggerInChanged = @"ORSIS3305ModelLemoOutSelectTriggerInChanged";
+//NSString* ORSIS3305ModelLemoOutSelectTriggerInPulseChanged  = @"ORSIS3305ModelLemoOutSelectTriggerInPulseChanged";
+//NSString* ORSIS3305ModelLemoOutSelectTriggerInPulseWithSampleAndTDCChanged = @"ORSIS3305ModelLemoOutSelectTriggerInPulseWithSampleAndTDCChanged";
+//NSString* ORSIS3305ModelLemoOutSelectSampleLogicArmedChanged = @"ORSIS3305ModelLemoOutSelectSampleLogicArmedChanged";
+//NSString* ORSIS3305ModelLemoOutSelectSampleLogicEnabledChanged = @"ORSIS3305ModelLemoOutSelectSampleLogicEnabledChanged";
+//NSString* ORSIS3305ModelLemoOutSelectKeyOutputPulseChanged = @"ORSIS3305ModelLemoOutSelectKeyOutputPulseChanged";
+//NSString* ORSIS3305ModelLemoOutSelectControlLemoTriggerOutChanged = @"ORSIS3305ModelLemoOutSelectControlLemoTriggerOutChanged";
+//NSString* ORSIS3305ModelLemoOutSelectExternalVetoChanged = @"ORSIS3305ModelLemoOutSelectExternalVetoChanged";
+//NSString* ORSIS3305ModelLemoOutSelectInternalKeyVetoChanged = @"ORSIS3305ModelLemoOutSelectInternalKeyVetoChanged";
+//NSString* ORSIS3305ModelLemoOutSelectExternalVetoLengthChanged = @"ORSIS3305ModelLemoOutSelectExternalVetoLengthChanged";
+//NSString* ORSIS3305ModelLemoOutSelectMemoryOverrunVetoChanged = @"ORSIS3305ModelLemoOutSelectMemoryOverrunVetoChanged";
+NSString* ORSIS3305EnableLemoInputTriggerChanged = @"ORSIS3305EnableLemoInputTriggerChanged";
+NSString* ORSIS3305EnableLemoInputCountChanged = @"ORSIS3305EnableLemoInputCountChanged";
+NSString* ORSIS3305EnableLemoInputResetChanged = @"ORSIS3305EnableLemoInputResetChanged";
+NSString* ORSIS3305EnableLemoInputDirectVetoChanged = @"ORSIS3305EnableLemoInputDirectVetoChanged";
+
+NSString* ORSIS3305ControlLemoTriggerOut                   = @"ORSIS3305ControlLemoTriggerOut";
+NSString* ORSIS3305LemoOutSelectTriggerChanged              = @"ORSIS3305LemoOutSelectTriggerChanged";
+NSString* ORSIS3305LemoOutSelectTriggerInChanged            = @"ORSIS3305LemoOutSelectTriggerInChanged";
+NSString* ORSIS3305LemoOutSelectTriggerInPulseChanged       = @"ORSIS3305LemoOutSelectTriggerInPulseChanged";
+NSString* ORSIS3305LemoOutSelectTriggerInPulseWithSampleAndTDCChanged = @"ORSIS3305LemoOutSelectTriggerInPulseWithSampleAndTDCChanged";
+NSString* ORSIS3305LemoOutSelectSampleLogicArmedChanged     = @"ORSIS3305LemoOutSelectSampleLogicArmedChanged";
+NSString* ORSIS3305LemoOutSelectSampleLogicEnabledChanged   = @"ORSIS3305LemoOutSelectSampleLogicEnabledChanged";
+NSString* ORSIS3305LemoOutSelectKeyOutputPulseChanged       = @"ORSIS3305LemoOutSelectKeyOutputPulseChanged";
+NSString* ORSIS3305LemoOutSelectControlLemoTriggerOutChanged= @"ORSIS3305LemoOutSelectControlLemoTriggerOutChanged";
+NSString* ORSIS3305LemoOutSelectExternalVetoChanged         = @"ORSIS3305LemoOutSelectExternalVetoChanged";
+NSString* ORSIS3305LemoOutSelectInternalKeyVetoChanged      = @"ORSIS3305LemoOutSelectInternalKeyVetoChanged";
+NSString* ORSIS3305LemoOutSelectExternalVetoLengthChanged   = @"ORSIS3305LemoOutSelectExternalVetoLengthChanged";
+NSString* ORSIS3305LemoOutSelectMemoryOverrunVetoChanged    = @"ORSIS3305LemoOutSelectMemoryOverrunVetoChanged";
+
 
 NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged    = @"ORSIS3305EnableExternalLEMODirectVetoInChanged";
 NSString* ORSIS3305EnableExternalLEMOResetInChanged         = @"ORSIS3305EnableExternalLEMOResetInChanged";
@@ -133,7 +166,9 @@ NSString* ORSIS3305EdgeSensitiveExternalVetoDelayLengthLogic    = @"ORSIS3305Edg
 NSString* ORSIS3305InvertExternalVetoInDelayLengthLogic     = @"ORSIS3305InvertExternalVetoInDelayLengthLogic";
 NSString* ORSIS3305GateModeExternalVetoInDelayLengthLogic   = @"ORSIS3305GateModeExternalVetoInDelayLengthLogic";
 NSString* ORSIS3305EnableMemoryOverrunVeto                  = @"ORSIS3305EnableMemoryOverrunVeto";
-NSString* ORSIS3305EControlLEMOTriggerOut                   = @"ORSIS3305EControlLEMOTriggerOut";
+
+
+
 
 
 NSString* ORSIS3305SampleDone					= @"ORSIS3305SampleDone";
@@ -299,6 +334,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     {0x03400,  @"Input Tap Delay (ADC2 ch5-ch8)", YES, YES},
     
+    {kSIS3305Space1ADCDataFIFOCh14, @"ADC1 Ch1-4 Memory Data FIFO (space 1)",YES, NO},
+    {kSIS3305Space1ADCDataFIFOCh58, @"ADC2 Ch5-8 Memory Data FIFO (space 1)",YES, NO},
+    {kSIS3305Space2ADCDataFIFOCh14, @"ADC1 Ch1-4 Memory Data FIFO (space 2)",YES, NO},
+    {kSIS3305Space2ADCDataFIFOCh58, @"ADC2 Ch5-8 Memory Data FIFO (space 2)",YES, NO},
 };
 
 #pragma mark - Initialization
@@ -352,10 +391,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (NSRange)	memoryFootprint
 {
-	return NSMakeRange(baseAddress, 0x00780000 + (8*0x1024*0x1024));
+    return NSMakeRange(baseAddress, 0x0FFFFFF); //0x00780000 + (8*0x1024*0x1024));
 }
 
 #pragma mark - Accessors
+
+
 
 #pragma mark -- Board Settings
 
@@ -413,6 +454,31 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelShipTimeRecordAlsoChanged object:self];
 }
+
+
+#pragma mark -- Board Status
+
+- (float) temperature
+{
+    return temperature;
+}
+
+- (void) setTemperature:(float)temp
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTemperature:temperature];
+    temperature = temp;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305TemperatureChanged object:self];
+
+}
+
+- (float) getTemperature
+{
+    unsigned long value = [self readTemperature:NO];
+    float temp = tempRawToC(value&0x3FF);
+    
+    return temp;
+}
+
 
 #pragma mark -- register r/w accessors
 - (short) registerIndex
@@ -750,16 +816,162 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (BOOL) enableMemoryOverrunVeto    {return enableMemoryOverrunVeto;}
 
 
+#pragma mark LEMO Trigger Out settings
+
 - (void) setControlLEMOTriggerOut:(BOOL)state{
     [[[self undoManager] prepareWithInvocationTarget:self] setControlLEMOTriggerOut:controlLEMOTriggerOut];
     controlLEMOTriggerOut = state;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EControlLEMOTriggerOut object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ControlLemoTriggerOut object:self];
 }
 - (BOOL) controlLEMOTriggerOut      {return controlLEMOTriggerOut;}
 
+/* 
+ There are 19 items which can be OR-ed together to determine what is written to the LEMO trigger out
+ 
+ [19]   Memory overrun veto
+ [18]   External Veto Length Logic
+ [17]   Internal veto (key veto)
+ [16]   External Veto
+ [15]   Control LEMO trigger out (control reg [15])
+ [14]   Key output pulse
+ [13]   Sample logic enabled
+ [12]   Sample logic armed
+ [11]   Trigger in pulser (if sample logic and TDC Measurement logic are enabled)
+ [10]   Trigger in pulse (if LEMO IN is enabled)
+ [9]    Trigger in (if LEMO IN is enabled)
+ [8]    Trigger in (direct)
+ [7:0]  Triggering on channel 8:1
+
+ BOOL    lemoOutSelectTrigger[kNumSIS3305Channels];
+ BOOL    lemoOutSelectTriggerIn;
+ BOOL    lemoOutSelectTriggerInPulse;
+ BOOL    lemoOutSelectTriggerInPulseWithSampleAndTDC;
+ BOOL    lemoOutSelectSampleLogicArmed;
+ BOOL    lemoOutSelectSampleLogicEnabled;
+ BOOL    lemoOutSelectKeyOutputPulse;
+ BOOL    lemoOutSelectControlLemoTriggerOut;
+ BOOL    lemoOutSelectExternalVeto;
+ BOOL    lemoOutSelectInternalKeyVeto;
+ BOOL    lemoOutSelectExternalVetoLength;
+ BOOL    lemoOutSelectMemoryOverrunVeto;
+*/
+
+- (BOOL) lemoOutSelectTrigger:(unsigned short)chan{
+    return lemoOutSelectTrigger[chan];
+}
+- (void) setLemoOutSelectTrigger:(unsigned short)chan toState:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectTrigger:chan toState:lemoOutSelectTrigger[chan]];
+    lemoOutSelectTrigger[chan] = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectTriggerChanged object:self];
+}
 
 
-#pragma mark -- Group settings
+
+- (BOOL) lemoOutSelectTriggerIn{
+    return lemoOutSelectTriggerIn;
+}
+- (void) setLemoOutSelectTriggerIn:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectTriggerIn:lemoOutSelectTriggerIn];
+    lemoOutSelectTriggerIn = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectTriggerInChanged object:self];
+}
+
+
+
+- (BOOL) lemoOutSelectTriggerInPulse{
+    return lemoOutSelectTriggerInPulse;
+}
+- (void) setLemoOutSelectTriggerInPulse:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectTriggerInPulse:lemoOutSelectTriggerInPulse];
+    lemoOutSelectTriggerInPulse = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectTriggerInPulseChanged object:self];
+}
+
+
+
+- (BOOL) lemoOutSelectTriggerInPulseWithSampleAndTDC{
+    return lemoOutSelectTriggerInPulseWithSampleAndTDC;
+}
+- (void) setLemoOutSelectTriggerInPulseWithSampleAndTDC:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectTriggerInPulseWithSampleAndTDC:lemoOutSelectTriggerInPulseWithSampleAndTDC];
+    lemoOutSelectTriggerInPulseWithSampleAndTDC = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectTriggerInPulseWithSampleAndTDCChanged object:self];
+}
+
+- (BOOL) lemoOutSelectSampleLogicArmed{
+    return lemoOutSelectSampleLogicArmed;
+}
+- (void) setLemoOutSelectSampleLogicArmed:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectSampleLogicArmed:lemoOutSelectSampleLogicArmed];
+    lemoOutSelectSampleLogicArmed = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectSampleLogicArmedChanged object:self];
+}
+
+- (BOOL) lemoOutSelectSampleLogicEnabled{
+    return lemoOutSelectSampleLogicEnabled;
+}
+- (void) setLemoOutSelectSampleLogicEnabled:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectSampleLogicEnabled:lemoOutSelectSampleLogicEnabled];
+    lemoOutSelectSampleLogicEnabled = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectSampleLogicEnabledChanged object:self];
+}
+
+- (BOOL) lemoOutSelectKeyOutputPulse{
+    return lemoOutSelectKeyOutputPulse;
+}
+- (void) setLemoOutSelectKeyOutputPulse:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectKeyOutputPulse:lemoOutSelectKeyOutputPulse];
+    lemoOutSelectKeyOutputPulse = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectKeyOutputPulseChanged object:self];
+}
+
+- (BOOL) lemoOutSelectControlLemoTriggerOut{
+    return lemoOutSelectControlLemoTriggerOut;
+}
+- (void) setLemoOutSelectControlLemoTriggerOut:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectControlLemoTriggerOut:lemoOutSelectControlLemoTriggerOut];
+    lemoOutSelectControlLemoTriggerOut = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectControlLemoTriggerOutChanged object:self];
+}
+
+- (BOOL) lemoOutSelectExternalVeto{
+    return lemoOutSelectExternalVeto;
+}
+- (void) setLemoOutSelectExternalVeto:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectExternalVeto:lemoOutSelectExternalVeto];
+    lemoOutSelectExternalVeto = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectExternalVetoChanged object:self];
+}
+
+- (BOOL) lemoOutSelectInternalKeyVeto{
+    return lemoOutSelectInternalKeyVeto;
+}
+- (void) setLemoOutSelectInternalKeyVeto:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectInternalKeyVeto:lemoOutSelectInternalKeyVeto];
+    lemoOutSelectInternalKeyVeto = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectInternalKeyVetoChanged object:self];
+}
+
+- (BOOL) lemoOutSelectExternalVetoLength{
+    return lemoOutSelectExternalVetoLength;
+}
+- (void) setLemoOutSelectExternalVetoLength:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectExternalVetoLength:lemoOutSelectExternalVetoLength];
+    lemoOutSelectExternalVetoLength = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectExternalVetoLengthChanged object:self];
+}
+
+- (BOOL) lemoOutSelectMemoryOverrunVeto{
+    return lemoOutSelectMemoryOverrunVeto;
+}
+- (void) setLemoOutSelectMemoryOverrunVeto:(BOOL)state{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLemoOutSelectMemoryOverrunVeto:lemoOutSelectMemoryOverrunVeto];
+    lemoOutSelectMemoryOverrunVeto = state;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LemoOutSelectMemoryOverrunVetoChanged object:self];
+}
+
+
+#pragma mark Group settings
 
 
 
@@ -1415,6 +1627,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setPreTriggerDelay:i withValue:0];
         [self setGateLength:i withValue:64];
         [self setGain:i withValue:1];
+        [self setLemoOutSelectTrigger:i toState:YES];
 
 	}
 	for(i=0;i<kNumSIS3305Groups;i++){
@@ -1456,6 +1669,19 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self setGateModeExternalVetoInDelayLengthLogic:NO];
     [self setEnableMemoryOverrunVeto:YES];
     [self setControlLEMOTriggerOut:YES];
+    
+    [self setLemoOutSelectTriggerIn:YES];
+    
+    [self setLemoOutSelectTriggerInPulse:NO];
+    [self setLemoOutSelectTriggerInPulseWithSampleAndTDC:NO];
+    [self setLemoOutSelectSampleLogicArmed:YES];
+    [self setLemoOutSelectSampleLogicEnabled:YES];
+    [self setLemoOutSelectKeyOutputPulse:YES];
+    [self setLemoOutSelectControlLemoTriggerOut:NO];
+    [self setLemoOutSelectExternalVeto:NO];
+    [self setLemoOutSelectInternalKeyVeto:NO];
+    [self setLemoOutSelectExternalVetoLength:NO];
+    [self setLemoOutSelectMemoryOverrunVeto:NO];
     
      
 	[self setBufferWrapEnabledMask:0x0];
@@ -2331,6 +2557,31 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return;
 }
 
+- (void) writeLEMOTriggerOutSelect
+{
+    unsigned long writeValue = 0;
+    unsigned short chan;
+    
+    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+        writeValue |= (lemoOutSelectTrigger[chan]?1:0) << chan;
+    }
+    writeValue |= (lemoOutSelectTriggerIn?1:0)              << 8;
+    writeValue |= (lemoOutSelectTriggerIn?1:0)              << 9;   // 8 and 9 are made the same value!
+    writeValue |= (lemoOutSelectTriggerInPulse?1:0)         << 10;
+    writeValue |= (lemoOutSelectTriggerInPulseWithSampleAndTDC?1:0) << 11;
+    writeValue |= (lemoOutSelectSampleLogicArmed?1:0)       << 12;
+    writeValue |= (lemoOutSelectSampleLogicEnabled?1:0)     << 13;
+    writeValue |= (lemoOutSelectKeyOutputPulse?1:0)         << 14;
+    writeValue |= (lemoOutSelectControlLemoTriggerOut?1:0)  << 15;
+    writeValue |= (lemoOutSelectExternalVeto?1:0)           << 16;
+    writeValue |= (lemoOutSelectInternalKeyVeto?1:0)        << 17;
+    writeValue |= (lemoOutSelectExternalVetoLength?1:0)     << 18;
+    writeValue |= (lemoOutSelectMemoryOverrunVeto?1:0)      << 19;
+
+    [self writeLEMOTriggerOutSelect:writeValue];
+}
+
+
 - (unsigned long) readExternalTriggerCounter
 {
     // at 0x4C, Read only D32
@@ -2525,6 +2776,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 #pragma mark -- Other regs
 
+
+
 - (unsigned long) readTemperature:(BOOL)verbose
 {
     // This digitizer has a temperature sensor onboard which can disable ADCs at a given threshold
@@ -2534,6 +2787,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     unsigned long value = 0;
     
+    
     [[self adapter] readLongBlock:&value
                         atAddress:[self baseAddress] + kSIS3305InternalTemperatureReg
                         numToRead:1
@@ -2541,18 +2795,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     usingAddSpace:0x01];
 
 
+    float temp =        tempRawToC(value&0x3FF);
+    float threshTemp =  tempRawToC((value>>16)&0x3FF);
+    
+    BOOL threshFlag     = (value>>28)&1;
+    BOOL supervisorEnable = (value>>31)&1;
+    
+    [self setTemperature:temp];
+
     if (verbose)
     {
-        unsigned int thresh = (value>>16)&0x3FF;
-        signed short temp   = ((float)((signed short)value)) / 4;
-        
-        BOOL threshFlag     = (value>>28)&1;
-        BOOL supervisorEnable = (value>>31)&1;
-        
-        NSLog(@"SIS3305: Board Temperature %3.2f \n",temp);
-        NSLog(@"SIS3305: Threshold Temp: %3.2f \n",((float)((signed short)thresh))/4);
-        NSLog(@"SIS3305: Threshold Flag %s .", threshFlag?"SET":"NOT SET");
-        NSLog(@"SIS3305: Temperature Supervisor is %s .", supervisorEnable?"ENABLED":"DISABLED");
+        NSLog(@"SIS3305: Board Temperature %3.1f C \n",temp);
+        NSLog(@"SIS3305: Threshold Temp: %3.1f C \n",threshTemp);
+        NSLog(@"SIS3305: Threshold Flag %s .\n", threshFlag?"SET":"NOT SET");
+        NSLog(@"SIS3305: Temperature Supervisor is %s .\n", supervisorEnable?"ENABLED":"DISABLED");
     }
     
     return value;
@@ -3336,7 +3592,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
         // bit 19: unused
         // bit 20-23: ADC event header programmable info bits 0-3
-        aValueMask |= (0x3)  << 20;
+        aValueMask |= (0xF)  << 20;
         // bit 24-31: ADC event header programmable ID bits 0-7
         aValueMask |= i << 24;
         aValueMask |= ([self baseAddress] & 0x7F000000) << 1;    // this is the geographic address 30:24 pushed to 31:25 of this register
@@ -4273,6 +4529,23 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
 }
 
+- (unsigned long) getFIFOAddressOfGroup:(unsigned short)group
+{
+    switch (group) {
+        case 0:
+            return kSIS3305Space1ADCDataFIFOCh14;
+            break;
+        case 1:
+            return kSIS3305Space1ADCDataFIFOCh58;
+            break;
+        default:
+            NSLog(@"Invalid group to getFIFOAddress\n");
+            return 0;
+            break;
+    }
+}
+
+
 #pragma mark -Working point
 
 
@@ -4372,6 +4645,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) initBoard
 {  
 //	[self calculateSampleValues];
+    [self readTemperature:NO];
 	[self readModuleID:NO];
 	[self writeEventConfiguration];
 	[self writeEndAddressThresholds];
@@ -4382,7 +4656,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
-    
+    [self writeLEMOTriggerOutSelect];
 //    [self disarmAndArmBank:0];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305CardInited object:self];
@@ -4440,11 +4714,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 #pragma mark - Data Taker
 
-- (unsigned long) mcaId { return mcaId; }
-- (void) setMcaId: (unsigned long) anId
-{
-    mcaId = anId;
-}
+//- (unsigned long) mcaId { return mcaId; }
+//- (void) setMcaId: (unsigned long) anId
+//{
+//    mcaId = anId;
+//}
 - (unsigned long) lostDataId { return lostDataId; }
 - (void) setLostDataId: (unsigned long) anId
 {
@@ -4474,23 +4748,39 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary;
+//    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+//				   @"ORSIS3305DecoderForEnergy",				@"decoder",
+//				   [NSNumber numberWithLong:dataId],@"dataId",
+//				   [NSNumber numberWithBool:YES],   @"variable",
+//				   [NSNumber numberWithLong:-1],	@"length",
+//				   nil];
+//    [dataDictionary setObject:aDictionary forKey:@"Energy"];
+	
+//	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+//				   @"ORSIS3305DecoderForMca",			@"decoder",
+//				   [NSNumber numberWithLong:mcaId], @"dataId",
+//				   [NSNumber numberWithBool:YES],   @"variable",
+//				   [NSNumber numberWithLong:-1],	@"length",
+//				   nil];
+//    [dataDictionary setObject:aDictionary forKey:@"MCA"];
+	
+    	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+    				   @"ORSIS3305DecoderFor1x5GspsFIFO",			@"decoder",
+    				   [NSNumber numberWithLong:0xF], @"dataId",    // FIX: Pick a real data ID
+    				   [NSNumber numberWithBool:YES],   @"variable",
+    				   [NSNumber numberWithLong:-1],	@"length",
+    				   nil];
+        [dataDictionary setObject:aDictionary forKey:@"1x5GspsFIFO"];
+    
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORSIS3305DecoderForEnergy",				@"decoder",
-				   [NSNumber numberWithLong:dataId],@"dataId",
-				   [NSNumber numberWithBool:YES],   @"variable",
-				   [NSNumber numberWithLong:-1],	@"length",
-				   nil];
-    [dataDictionary setObject:aDictionary forKey:@"Energy"];
-	
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORSIS3305DecoderForMca",			@"decoder",
-				   [NSNumber numberWithLong:mcaId], @"dataId",
-				   [NSNumber numberWithBool:YES],   @"variable",
-				   [NSNumber numberWithLong:-1],	@"length",
-				   nil];
-    [dataDictionary setObject:aDictionary forKey:@"MCA"];
-	
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                   @"ORSIS3305DecoderFor2x25GspsFIFO",			@"decoder",
+                   [NSNumber numberWithLong:0xF], @"dataId",    // FIX: Pick a real data ID
+                   [NSNumber numberWithBool:YES],   @"variable",
+                   [NSNumber numberWithLong:-1],	@"length",
+                   nil];
+    [dataDictionary setObject:aDictionary forKey:@"2x25GspsFIFO"];
+    
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 				   @"ORSIS3305DecoderForLostData",			@"decoder",
 				   [NSNumber numberWithLong:lostDataId],	@"dataId",
 				   [NSNumber numberWithBool:NO],			@"variable",
@@ -4942,80 +5232,78 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             unsigned long numberOfWords[kNumSIS3305Groups];
             unsigned long numberBytesToRead[kNumSIS3305Groups];
             
+            // read now all  Sample Addresses of all at which the sampling has stoped
+
             unsigned short group =0;
-            for (group=0; group<kNumSIS3305Groups; group++) {
-                sampleAddress[group] = [self readActualSampleAddress:0];
-                numberOfWords[group] = ([self readSampleLength:group]+1)*(12);
-                numberBytesToRead[group]= (numberOfWords[group] * 4);
-            }
+//            for (group=0; group<kNumSIS3305Groups; group++) {
+//                sampleAddress[group] = [self readActualSampleAddress:0];
+//                numberOfWords[group] = ([self readSampleLength:group]+1)*(16);
+//                numberBytesToRead[group]= (numberOfWords[group] * 4);
+//            }
             
+            // prepare readout statemachines
+            // Transfer Control ch1to4, start internal readout (copy from Memory to VME FPGA)
+            // Transfer Control ch5to8, start internal readout (copy from Memory to VME FPGA)
+
             [self writeDataTransferControlRegister:0 withCommand:2 withAddress:0];  // read command
             [self writeDataTransferControlRegister:1 withCommand:2 withAddress:0];  // read command
 
             
-            
+            // loop over all modules
             for(group=0;group<kNumSIS3305Groups;group++) {
-
 //                int group				 = i<4?0:1;
+
+                    // read  Data from fifo chip ADC1/2
+                unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
                 
-//                if ( channelsToReadMask & (1<<i)){
-//                if (enabled[group]) {
-                    // prepare readout SMs
+                numberBytesToRead[group] = [self readActualSampleAddress:group];
+                NSLog(@"     sample address: 0x%x\n",sampleAddress[group]);
 
 
-                    numberBytesToRead[group] = [self readActualSampleAddress:group];
-                    NSLog(@"     sample address: 0x%x\n",sampleAddress[group]);
-
-//                    unsigned long endSampleAddress = 8096;
-//                    if (((endSampleAddress >> 24) & 0x1) ==  (bankOneArmed ? 1:0)) {
-//                        channelsToReadMask &= ~(1<<i);
+                numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
                 
-//                        unsigned long numberBytesToRead	= (endSampleAddress & 0xffffff) * 2;
-                    numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
-//                    numberBytesToRead[group]     = 2048;
-                    numberBytesToRead[group]   = numberOfWords[group] * 4;
+                // we can only readout the full buffer at once
+                if (numberOfWords[group] > adcBufferLength) {
+                    numberOfWords[group] = adcBufferLength;
+                }
+                
+                numberBytesToRead[group]   = numberOfWords[group] * 4;
                     
-                        if(numberBytesToRead[group] > 0){
-                            unsigned long addrOffset = 0;
-                            int eventCount			 = 0;
+                if(numberBytesToRead[group] > 0){
+                    unsigned long addrOffset = 0;
+                    int eventCount			 = 0;
+                    
+                    do {
+                        BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
+                        
+                        int index = 0;
+                        dataRecord[group][index++] =   dataId | dataRecordlength[group];
+                        
+                        dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) |
+                        (([self slot] & 0x0000001f)<<16)      |
+                        ((group & 0x000000ff)<<8)			      |
+                        wrapMode;
+                        
+                        dataRecord[group][index++] = [self sampleLength:group]/2;
+                        // [self readActualSampleAddress:group] + addrOffset
+                        unsigned long* p = &dataRecord[group][index];
+                        [[self adapter] readLongBlock: p
+                                            atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
+                                            numToRead: dataRecordlength[group]
+                                           withAddMod: [self addressModifier]
+                                        usingAddSpace: 0x01];
+                        
+ 
+                        // this should push it return
+                        [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
 
-
-                            do {
-                                BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
-                                
-                                int index = 0;
-                                dataRecord[group][index++] =   dataId | dataRecordlength[group];
-                                
-                                dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) |
-                                (([self slot] & 0x0000001f)<<16)      |
-                                ((group & 0x000000ff)<<8)			      |
-                                wrapMode;
-                                
-                                dataRecord[group][index++] = [self sampleLength:group]/2;
-                                
-                                unsigned long* p = &dataRecord[group][index];
-                                [[self adapter] readLongBlock: p
-                                                    atAddress: [self baseAddress] + [self readActualSampleAddress:group] + addrOffset
-                                                    numToRead: dataRecordlength[group]
-                                                   withAddMod: [self addressModifier]
-                                                usingAddSpace: 0x01];
-                                
-//                                if(dataRecord[group][dataRecordlength[group]-1] == 0xdeadbeef){
-                                    [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
-//                                }
-//                                else continue;
-                                
-                                NSLog(@"  read: 0x%x\n",dataRecord[group][index]);
-
-                                
-                                addrOffset += (dataRecordlength[group]-4)*4;
-                                if(++eventCount > 25)break;
-                            } while (addrOffset < sampleAddress[group]);
-                        }
-//                    }
-//                }
-
-			}
+                       // NSLog(@"  read: 0x%x\n",dataRecord[group][index]);
+                        
+                        addrOffset += (dataRecordlength[group]-4)*4;
+                        if(++eventCount > 25)break;
+                    } while (addrOffset < sampleAddress[group]);
+                }
+            }
 		}
 	}
 	@catch(NSException* localException) {

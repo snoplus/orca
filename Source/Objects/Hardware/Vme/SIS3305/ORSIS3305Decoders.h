@@ -46,24 +46,12 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
-@interface ORSIS3305DecoderForMca : ORVmeCardDecoder {
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
 
 //**********old...leave in for backward compatiblity
 @interface ORSIS3305Decoder : ORVmeCardDecoder {
     @private 
         BOOL getRatesFromDecodeStage;
         NSMutableDictionary* actualSIS3305Cards;
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-
-@interface ORSIS3305McaDecoder : ORVmeCardDecoder {
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

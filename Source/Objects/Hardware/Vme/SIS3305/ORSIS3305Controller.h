@@ -30,26 +30,12 @@
     IBOutlet NSTabView* 	tabView;
 	IBOutlet NSButton*		pulseModeButton;
 	IBOutlet NSTextField*	firmwareVersionTextField;
+    IBOutlet NSTextField*   temperatureTextField;
 	IBOutlet NSMatrix*		bufferWrapEnabledMatrix;
 	IBOutlet NSButton*		shipTimeRecordAlsoCB;
     
     IBOutlet NSButton* 		TDCLogicEnabledCB;
-    
-//	IBOutlet NSButton*		mcaUseEnergyCalculationButton;
-//	IBOutlet NSTextField*	mcaEnergyOffsetField;
-//	IBOutlet NSTextField*	mcaEnergyMultiplierField;
-//	IBOutlet NSTextField*	mcaEnergyDividerField;
-//	IBOutlet NSPopUpButton* mcaModePU;
-//	IBOutlet NSButton*		mcaPileupEnabledCB;
-//	IBOutlet NSPopUpButton* mcaHistoSizePU;
-//	IBOutlet NSPopUpButton* mcaLNESourcePU;
-//	
-//	IBOutlet NSTextField*	mcaNofScansPresetField;
-//	IBOutlet NSButton*		mcaAutoClearCB;
-//	IBOutlet NSTextField*	mcaPrescaleFactorField;
-//	IBOutlet NSTextField*	mcaNofHistoPresetField;
 	
-	IBOutlet NSButton*		internalExternalTriggersOredCB;
     
     IBOutlet NSMatrix*		channelEnabled14Matrix;
     IBOutlet NSMatrix*		channelEnabled58Matrix;
@@ -73,22 +59,37 @@
     IBOutlet NSMatrix*		preTriggerDelay14Matrix;
     IBOutlet NSMatrix*		preTriggerDelay58Matrix;
 	IBOutlet NSMatrix*		sampleStartIndexMatrix;
-	IBOutlet NSMatrix*		lemoInEnabledMatrix;
+    IBOutlet NSMatrix*      gain14Matrix;
+    IBOutlet NSMatrix*      gain58Matrix;
+    IBOutlet NSMatrix*      phase14Matrix;
+    IBOutlet NSMatrix*      phase58Matrix;
+    IBOutlet NSMatrix*      offset14Matrix;
+    IBOutlet NSMatrix*      offset58Matrix;
 	IBOutlet NSPopUpButton* runModePU;
-	IBOutlet NSTextField*	energySampleStartIndex3Field;
-	IBOutlet NSTextField*	energySampleStartIndex2Field;
-	IBOutlet NSTextField*	energySampleStartIndex1Field;
-	IBOutlet NSTextField*	energyNumberToSumField;
-	IBOutlet NSButton*		energyShipWaveformButton;
-	IBOutlet NSButton*		energyShipSummedWaveformButton;
-	IBOutlet NSPopUpButton* lemoInModePU;
-	IBOutlet NSTextField*	lemoInAssignmentsField;
-	IBOutlet NSPopUpButton* lemoOutModePU;
-	IBOutlet NSTextField*	lemoOutAssignmentsField;
+
 	IBOutlet NSTextField*	energyBufferAssignmentField;
 	IBOutlet NSTextField*	runSummaryField;
 
+    IBOutlet NSButton* controlLemoTriggerOutButton;
     
+    IBOutlet NSMatrix* lemoOutSelectTrigger14Matrix;
+    IBOutlet NSMatrix* lemoOutSelectTrigger58Matrix;
+    IBOutlet NSButton* lemoOutSelectTriggerInButton;
+    IBOutlet NSButton* lemoOutSelectTriggerInPulseButton;
+    IBOutlet NSButton* lemoOutSelectTriggerInPulseWithSampleAndTDCButton;
+    IBOutlet NSButton* lemoOutSelectSampleLogicArmedButton;
+    IBOutlet NSButton* lemoOutSelectSampleLogicEnabledButton;
+    IBOutlet NSButton* lemoOutSelectKeyOutputPulseButton;
+    IBOutlet NSButton* lemoOutSelectControlLemoTriggerOutButton;
+    IBOutlet NSButton* lemoOutSelectExternalVetoButton;
+    IBOutlet NSButton* lemoOutSelectInternalKeyVetoButton;
+    IBOutlet NSButton* lemoOutSelectExternalVetoLengthButton;
+    IBOutlet NSButton* lemoOutSelectMemoryOverrunVetoButton;
+    
+    IBOutlet NSButton* enableLemoInputTriggerButton;
+    IBOutlet NSButton* enableLemoInputCountButton;
+    IBOutlet NSButton* enableLemoInputResetButton;
+    IBOutlet NSButton* enableLemoInputDirectVetoButton;
     
 	//base address
     IBOutlet NSTextField*   slotField;
@@ -170,26 +171,6 @@
     IBOutlet NSPopUpButton* testMode14PU;
     IBOutlet NSPopUpButton* testMode58PU;
 
-
-    
-	
-//	IBOutlet NSPopUpButton* cfdControl0;
-//	IBOutlet NSPopUpButton* cfdControl1;
-//	IBOutlet NSPopUpButton* cfdControl2;
-//	IBOutlet NSPopUpButton* cfdControl3;
-//	IBOutlet NSPopUpButton* cfdControl4;
-//	IBOutlet NSPopUpButton* cfdControl5;
-//	IBOutlet NSPopUpButton* cfdControl6;
-//	IBOutlet NSPopUpButton* cfdControl7;
-//	
-//    IBOutlet NSTextField*	mcaBusyField;
-	
-//    IBOutlet NSTextField*   mcaScanHistogramCounterField;
-//    IBOutlet NSTextField*   mcaMultiScanScanCounterField;
-//	IBOutlet NSMatrix*		mcaTriggerStartCounterMatrix;
-//	IBOutlet NSMatrix*		mcaPileupCounterMatrix;
-//	IBOutlet NSMatrix*		mcaEnergy2LowCounterMatrix;
-//	IBOutlet NSMatrix*		mcaEnergy2HighCounterMatrix;
 	
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
@@ -252,7 +233,7 @@
 
 
 
-- (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
+//- (void) internalExternalTriggersOredChanged:(NSNotification*)aNote;
 - (void) internalTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) externalTriggerEnabledChanged:(NSNotification*)aNote;
 - (void) internalGateEnabledChanged:(NSNotification*)aNote;
@@ -266,8 +247,29 @@
 - (void) sampleStartIndexChanged:(NSNotification*)aNote;
 - (void) sampleLengthChanged:(NSNotification*)aNote;
 - (void) dacOffsetChanged:(NSNotification*)aNote;
-- (void) lemoInModeChanged:(NSNotification*)aNote;
-- (void) lemoOutModeChanged:(NSNotification*)aNote;
+//- (void) lemoInModeChanged:(NSNotification*)aNote;
+//- (void) lemoOutModeChanged:(NSNotification*)aNote;
+
+
+- (void) lemoOutSelectTriggerChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectTriggerInChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectTriggerInPulseChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectTriggerInPulseWithSampleAndTDCChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectSampleLogicArmedChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectSampleLogicEnabledChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectKeyOutputPulseChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectControlLemoTriggerOutChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectExternalVetoChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectInternalKeyVetoChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectExternalVetoLengthChanged:(NSNotification*)aNote;
+- (void) lemoOutSelectMemoryOverrunVetoChanged:(NSNotification*)aNote;
+
+- (void) enableLemoInputTriggerChanged:(NSNotification*)aNote;
+- (void) enableLemoInputCountChanged:(NSNotification*)aNote;
+- (void) enableLemoInputResetChanged:(NSNotification*)aNote;
+- (void) enableLemoInputDirectVetoChanged:(NSNotification*)aNote;
+
+
 
 - (void) clockSourceChanged:(NSNotification*)aNote;
 
@@ -319,6 +321,32 @@
 - (IBAction) dacOffsetAction:(id)sender;
 - (IBAction) lemoInModeAction:(id)sender;
 - (IBAction) lemoOutModeAction:(id)sender;
+
+- (IBAction) controlLemoTriggerOutAction:(id)sender;
+- (IBAction) lemoOutSelectTrigger14Action:(id)sender;
+- (IBAction) lemoOutSelectTrigger58Action:(id)sender;
+- (IBAction) lemoOutSelectTriggerInAction:(id)sender;
+- (IBAction) lemoOutSelectTriggerInPulseAction:(id)sender;
+- (IBAction) lemoOutSelectTriggerInPulseWithSampleAndTDCAction:(id)sender;
+- (IBAction) lemoOutSelectSampleLogicArmedAction:(id)sender;
+- (IBAction) lemoOutSelectSampleLogicEnabledAction:(id)sender;
+- (IBAction) lemoOutSelectKeyOutputPulseAction:(id)sender;
+- (IBAction) lemoOutSelectControlLemoTriggerOutAction:(id)sender;
+- (IBAction) lemoOutSelectExternalVetoAction:(id)sender;
+- (IBAction) lemoOutSelectInternalKeyVetoAction:(id)sender;
+- (IBAction) lemoOutSelectExternalVetoLengthAction:(id)sender;
+- (IBAction) lemoOutSelectMemoryOverrunVetoAction:(id)sender;
+- (IBAction) enableLemoInputTriggerAction:(id)sender;
+- (IBAction) enableLemoInputCountAction:(id)sender;
+- (IBAction) enableLemoInputResetAction:(id)sender;
+- (IBAction) enableLemoInputDirectVetoAction:(id)sender;
+
+
+
+
+
+
+
 
 - (IBAction) clockSourceAction:(id)sender;
 

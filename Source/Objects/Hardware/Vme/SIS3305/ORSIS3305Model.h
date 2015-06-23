@@ -25,7 +25,6 @@
 #import "AutoTesting.h"
 #import "ORSISRegisterDefs.h"
 
-#define kNumMcaStatusRequests 35 //don't change this unless you know what you are doing....
 
 @class ORRateGroup;
 @class ORAlarm;
@@ -43,6 +42,7 @@
     BOOL            TDCMeasurementEnabled;
     BOOL            ledApplicationMode;
     BOOL            ledEnable[3];
+    float   temperature;
     
     
     unsigned long   registerWriteValue;
@@ -88,6 +88,20 @@
     BOOL        enableMemoryOverrunVeto;
     BOOL        controlLEMOTriggerOut;
     
+    BOOL    lemoOutSelectTrigger[kNumSIS3305Channels];
+    BOOL    lemoOutSelectTriggerIn;
+    BOOL    lemoOutSelectTriggerInPulse;
+    BOOL    lemoOutSelectTriggerInPulseWithSampleAndTDC;
+    BOOL    lemoOutSelectSampleLogicArmed;
+    BOOL    lemoOutSelectSampleLogicEnabled;
+    BOOL    lemoOutSelectKeyOutputPulse;
+    BOOL    lemoOutSelectControlLemoTriggerOut;
+    BOOL    lemoOutSelectExternalVeto;
+    BOOL    lemoOutSelectInternalKeyVeto;
+    BOOL    lemoOutSelectExternalVetoLength;
+    BOOL    lemoOutSelectMemoryOverrunVeto;
+    
+    
     // temp and temp supervisor
     BOOL   temperatureSupervisorEnable;
     unsigned long   tempThreshRaw;
@@ -99,8 +113,6 @@
 	unsigned long   dataId;
 	unsigned long   mcaId;
 	
-	unsigned long   mcaStatusResults[kNumMcaStatusRequests];
-
 
 
 //    short			ltMask;
@@ -256,6 +268,8 @@
 - (void) setPulseMode:(BOOL)aPulseMode;
 - (float) firmwareVersion;
 - (void) setFirmwareVersion:(float)aFirmwareVersion;
+- (float) temperature;
+- (float) getTemperature;
 - (BOOL) shipTimeRecordAlso;
 - (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso;
 
@@ -424,6 +438,7 @@
 - (void) setEnableMemoryOverrunVeto:(BOOL)state;
 - (void) setControlLEMOTriggerOut:(BOOL)state;
 - (BOOL) enableExternalLEMODirectVetoIn;
+- (BOOL) enableExternalLEMOTriggerIn;
 - (BOOL) enableExternalLEMOResetIn;
 - (BOOL) enableExternalLEMOCountIn;
 - (BOOL) invertExternalLEMODirectVetoIn;
@@ -435,6 +450,34 @@
 - (BOOL) gateModeExternalVetoInDelayLengthLogic;
 - (BOOL) enableMemoryOverrunVeto;
 - (BOOL) controlLEMOTriggerOut;
+
+
+
+- (BOOL) lemoOutSelectTrigger:(unsigned short)chan;
+- (void) setLemoOutSelectTrigger:(unsigned short)chan toState:(BOOL)state;
+- (BOOL) lemoOutSelectTriggerIn;
+- (void) setLemoOutSelectTriggerIn:(BOOL)state;
+- (BOOL) lemoOutSelectTriggerInPulse;
+- (void) setLemoOutSelectTriggerInPulse:(BOOL)state;
+- (BOOL) lemoOutSelectTriggerInPulseWithSampleAndTDC;
+- (void) setLemoOutSelectTriggerInPulseWithSampleAndTDC:(BOOL)state;
+- (BOOL) lemoOutSelectSampleLogicArmed;
+- (void) setLemoOutSelectSampleLogicArmed:(BOOL)state;
+- (BOOL) lemoOutSelectSampleLogicEnabled;
+- (void) setLemoOutSelectSampleLogicEnabled:(BOOL)state;
+- (BOOL) lemoOutSelectKeyOutputPulse;
+- (void) setLemoOutSelectKeyOutputPulse:(BOOL)state;
+- (BOOL) lemoOutSelectControlLemoTriggerOut;
+- (void) setLemoOutSelectControlLemoTriggerOut:(BOOL)state;
+- (BOOL) lemoOutSelectExternalVeto;
+- (void) setLemoOutSelectExternalVeto:(BOOL)state;
+- (BOOL) lemoOutSelectInternalKeyVeto;
+- (void) setLemoOutSelectInternalKeyVeto:(BOOL)state;
+- (BOOL) lemoOutSelectExternalVetoLength;
+- (void) setLemoOutSelectExternalVetoLength:(BOOL)state;
+- (BOOL) lemoOutSelectMemoryOverrunVeto;
+- (void) setLemoOutSelectMemoryOverrunVeto:(BOOL)state;
+
 
 
 
@@ -521,6 +564,7 @@
 - (unsigned long) readBroadcastSetup:(bool)verbose;
 - (unsigned long) readLEMOTriggerOutSelect;
 - (void) writeLEMOTriggerOutSelect:(unsigned long)value;
+- (void) writeLEMOTriggerOutSelect;
 - (unsigned long) readExternalTriggerCounter;
 
 #pragma mark --- TDC Regs
@@ -646,6 +690,9 @@
 //- (void) clearTimeStamp;
 - (void) writeTapDelays;
 
+- (unsigned long) getFIFOAddressOfGroup:(unsigned short)group;
+
+
 
 #pragma mark other
 - (void) executeCommandList:(ORCommandList*) aList;
@@ -696,6 +743,7 @@
 #pragma mark --- CSR
 extern NSString* ORSIS3305ModelPulseModeChanged;
 extern NSString* ORSIS3305ModelFirmwareVersionChanged;
+extern NSString* ORSIS3305TemperatureChanged;
 extern NSString* ORSIS3305ModelBufferWrapEnabledChanged;
 //extern NSString* ORSIS3305ModelCfdControlChanged;
 extern NSString* ORSIS3305ModelShipTimeRecordAlsoChanged;
@@ -727,6 +775,7 @@ extern NSString* ORSIS3305SampleStartAddressChanged;
 extern NSString* ORSIS3305DacOffsetChanged;
 extern NSString* ORSIS3305LemoInModeChanged;
 extern NSString* ORSIS3305LemoOutModeChanged;
+
 //extern NSString* ORSIS3305AcqRegEnableMaskChanged;
 
 //extern NSString* ORSIS3305AcqRegChanged;
@@ -783,6 +832,40 @@ extern NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged;
 extern NSString* ORSIS3305ChannelModeChanged;
 extern NSString* ORSIS3305BandwidthChanged;
 extern NSString* ORSIS3305TestModeChanged;
+
+
+
+//extern NSString* ORSIS3305ControlLemoTriggerOut;
+//extern NSString* ORSIS3305LemoOutSelectTriggerChanged;
+//extern NSString* ORSIS3305LemoOutSelectTriggerInChanged;
+//extern NSString* ORSIS3305LemoOutSelectTriggerInPulseChanged;
+//extern NSString* ORSIS3305LemoOutSelectTriggerInPulseWithSampleAndTDCChanged;
+//extern NSString* ORSIS3305LemoOutSelectSampleLogicArmedChanged;
+//extern NSString* ORSIS3305LemoOutSelectSampleLogicEnabledChanged;
+//extern NSString* ORSIS3305LemoOutSelectKeyOutputPulseChanged;
+//extern NSString* ORSIS3305LemoOutSelectControlLemoTriggerOutChanged;
+//extern NSString* ORSIS3305LemoOutSelectExternalVetoChanged;
+//extern NSString* ORSIS3305LemoOutSelectInternalKeyVetoChanged;
+//extern NSString* ORSIS3305LemoOutSelectExternalVetoLengthChanged;
+//extern NSString* ORSIS3305LemoOutSelectMemoryOverrunVetoChanged;
+
+extern NSString* ORSIS3305LemoOutSelectTriggerChanged;
+extern NSString* ORSIS3305LemoOutSelectTriggerInChanged;
+extern NSString* ORSIS3305LemoOutSelectTriggerInPulseChanged;
+extern NSString* ORSIS3305LemoOutSelectTriggerInPulseWithSampleAndTDCChanged;
+extern NSString* ORSIS3305LemoOutSelectSampleLogicArmedChanged;
+extern NSString* ORSIS3305LemoOutSelectSampleLogicEnabledChanged;
+extern NSString* ORSIS3305LemoOutSelectKeyOutputPulseChanged;
+extern NSString* ORSIS3305LemoOutSelectControlLemoTriggerOutChanged;
+extern NSString* ORSIS3305LemoOutSelectExternalVetoChanged;
+extern NSString* ORSIS3305LemoOutSelectInternalKeyVetoChanged;
+extern NSString* ORSIS3305LemoOutSelectExternalVetoLengthChanged;
+extern NSString* ORSIS3305LemoOutSelectMemoryOverrunVetoChanged;
+extern NSString* ORSIS3305EnableLemoInputTriggerChanged;
+extern NSString* ORSIS3305EnableLemoInputCountChanged;
+extern NSString* ORSIS3305EnableLemoInputResetChanged;
+extern NSString* ORSIS3305EnableLemoInputDirectVetoChanged;
+
 
 
 
