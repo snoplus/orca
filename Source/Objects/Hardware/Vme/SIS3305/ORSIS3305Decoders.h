@@ -25,42 +25,14 @@
 @class ORDataPacket;
 @class ORDataSet;
 
-@interface ORSIS3305DecoderForEnergy : ORVmeCardDecoder {
+@interface ORSIS3305DecoderForWaveform : ORVmeCardDecoder {
 @private 
 	BOOL getRatesFromDecodeStage;
 	NSMutableDictionary* actualSIS3305Cards;
-	//BOOL dumpedOneNormal;
-	//BOOL dumpedOneBad[8];
-	//int recordCount[8];
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-- (void) filterLengthChanged:(NSNotification*)aNote;
-//- (void) dumpRecord:(void*)someData;
-@end
-
-@interface ORSIS3305GenericDecoderForWaveform : ORVmeCardDecoder {
-    NSMutableDictionary* currentWaveformCache;
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
 
-//**********old...leave in for backward compatiblity
-@interface ORSIS3305Decoder : ORVmeCardDecoder {
-    @private 
-        BOOL getRatesFromDecodeStage;
-        NSMutableDictionary* actualSIS3305Cards;
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
-
-@interface ORSIS3305DecoderForLostData : ORVmeCardDecoder {
-	unsigned long totalLost[8];
-}
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
-@end
 

@@ -4714,17 +4714,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 #pragma mark - Data Taker
 
-//- (unsigned long) mcaId { return mcaId; }
-//- (void) setMcaId: (unsigned long) anId
-//{
-//    mcaId = anId;
-//}
-- (unsigned long) lostDataId { return lostDataId; }
-- (void) setLostDataId: (unsigned long) anId
-{
-    lostDataId = anId;
-}
-
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -4733,60 +4722,24 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setDataIds:(id)assigner
 {
     dataId   = [assigner assignDataIds:kLongForm];
-    mcaId    = [assigner assignDataIds:kLongForm]; 
-    lostDataId  = [assigner assignDataIds:kLongForm]; 
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
-    [self setMcaId:[anotherCard mcaId]];
-    [self setLostDataId:[anotherCard lostDataId]];
 }
 
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary;
-//    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-//				   @"ORSIS3305DecoderForEnergy",				@"decoder",
-//				   [NSNumber numberWithLong:dataId],@"dataId",
-//				   [NSNumber numberWithBool:YES],   @"variable",
-//				   [NSNumber numberWithLong:-1],	@"length",
-//				   nil];
-//    [dataDictionary setObject:aDictionary forKey:@"Energy"];
-	
-//	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-//				   @"ORSIS3305DecoderForMca",			@"decoder",
-//				   [NSNumber numberWithLong:mcaId], @"dataId",
-//				   [NSNumber numberWithBool:YES],   @"variable",
-//				   [NSNumber numberWithLong:-1],	@"length",
-//				   nil];
-//    [dataDictionary setObject:aDictionary forKey:@"MCA"];
-	
-    	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-    				   @"ORSIS3305DecoderFor1x5GspsFIFO",			@"decoder",
-    				   [NSNumber numberWithLong:0xF], @"dataId",    // FIX: Pick a real data ID
-    				   [NSNumber numberWithBool:YES],   @"variable",
-    				   [NSNumber numberWithLong:-1],	@"length",
-    				   nil];
-        [dataDictionary setObject:aDictionary forKey:@"1x5GspsFIFO"];
-    
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-                   @"ORSIS3305DecoderFor2x25GspsFIFO",			@"decoder",
-                   [NSNumber numberWithLong:0xF], @"dataId",    // FIX: Pick a real data ID
-                   [NSNumber numberWithBool:YES],   @"variable",
-                   [NSNumber numberWithLong:-1],	@"length",
-                   nil];
-    [dataDictionary setObject:aDictionary forKey:@"2x25GspsFIFO"];
-    
-    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-				   @"ORSIS3305DecoderForLostData",			@"decoder",
-				   [NSNumber numberWithLong:lostDataId],	@"dataId",
-				   [NSNumber numberWithBool:NO],			@"variable",
-				   [NSNumber numberWithLong:3],				@"length",
+				   @"ORSIS3305DecoderForWaveform",	@"decoder",
+				   [NSNumber numberWithLong:dataId],@"dataId",
+				   [NSNumber numberWithBool:YES],   @"variable",
+				   [NSNumber numberWithLong:-1],	@"length",
 				   nil];
-    [dataDictionary setObject:aDictionary forKey:@"LostData"];
+    [dataDictionary setObject:aDictionary forKey:@"Waveform"];
 	
     return dataDictionary;
 }
@@ -5151,12 +5104,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 if(wrapMaskForRun & (1L<<group))
                     sisHeaderLength = 4; // 32-bit Lwords
                 
-                
-                dataRecordlength[group] = 4 + sisHeaderLength + [self sampleLength:group] + 4;
-                                            //Orca header+sisheader+samples+sistrailer
+                int fixMe; //fix the sample length
+                //dataRecordlength[group] = 3 + sisHeaderLength + [self sampleLength:group];
+                dataRecordlength[group] = sisHeaderLength + 1024;
+                                            //Orca header+sisheader+samples
                 NSLog(@"Data record length%d: %d",group,dataRecordlength[group]);
                 
-                dataRecord[group]		= malloc(dataRecordlength[group]*sizeof(unsigned long)+100);
+                dataRecord[group]		= malloc((dataRecordlength[group]+3)*sizeof(unsigned long));
             }
             isRunning = YES;
             firstTime = NO;
@@ -5201,15 +5155,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             while (!endAddThreshFlag && (pollcount<100))     // Check if the end address threshold has been reached
             {
-                ac =                [self readAcquisitionControl:NO];
+                ac =              [self readAcquisitionControl:NO];
                 sampleAddress14 = [self readActualSampleAddress:0];
                 sampleAddress58 = [self readActualSampleAddress:1];
                 endThresh14     = [self readEndAddressThresholdOfGroup:0];
                 endThresh58     = [self readEndAddressThresholdOfGroup:1];
                 sampleStatus14  = [self readSamplingStatusForGroup:0];
                 sampleStatus58  = [self readSamplingStatusForGroup:1];
-                value1         = [self readActualSampleValueOfChannel:1];
-                value2         = [self readActualSampleValueOfChannel:2];
+                value1          = [self readActualSampleValueOfChannel:1];
+                value2          = [self readActualSampleValueOfChannel:2];
                 
                 if(pollcount%10 == 0){
                     //NSLog(@"Polling for end address threshold flag (%d)...\n", pollcount);
@@ -5258,7 +5212,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
                 
                 numberBytesToRead[group] = [self readActualSampleAddress:group];
-                NSLog(@"     sample address: 0x%x\n",sampleAddress[group]);
+                //NSLog(@"     sample address: 0x%x\n",sampleAddress[group]);
 
 
                 numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
@@ -5278,14 +5232,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
                         
                         int index = 0;
-                        dataRecord[group][index++] =   dataId | dataRecordlength[group];
+                        dataRecord[group][index++] =   dataId | dataRecordlength[group]+3;
                         
                         dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) |
-                        (([self slot] & 0x0000001f)<<16)      |
-                        ((group & 0x000000ff)<<8)			      |
-                        wrapMode;
-                        
-                        dataRecord[group][index++] = [self sampleLength:group]/2;
+                                                        (([self slot] & 0x0000001f)<<16)      |
+                                                        ((group & 0x000000ff)<<8)			  |
+                                                            wrapMode;
+                        int fixmeto;
+                        //dataRecord[group][index++] = [self sampleLength:group]/2;
+                        dataRecord[group][index++] = 1024;
                         // [self readActualSampleAddress:group] + addrOffset
                         unsigned long* p = &dataRecord[group][index];
                         [[self adapter] readLongBlock: p
@@ -5296,11 +5251,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         
  
                         // this should push it return
-                        [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]];
+                        [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]+3];
 
                        // NSLog(@"  read: 0x%x\n",dataRecord[group][index]);
                         
-                        addrOffset += (dataRecordlength[group]-4)*4;
+                        addrOffset += (dataRecordlength[group]-3)*4;
                         if(++eventCount > 25)break;
                     } while (addrOffset < sampleAddress[group]);
                 }
@@ -5397,7 +5352,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		configStruct->total_cards++;
 		configStruct->card_info[index].hw_type_id				= kSIS3305; //should be unique
 		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
-		configStruct->card_info[index].hw_mask[1]				= lostDataId;	//better be unique
 		configStruct->card_info[index].slot						= [self slot];
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];

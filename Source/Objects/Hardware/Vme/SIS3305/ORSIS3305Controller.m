@@ -381,6 +381,11 @@
                          name : ORSIS3305EnableLemoInputDirectVetoChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(sampleLengthChanged:)
+                         name : ORSIS3305SampleLengthChanged
+                        object: model];
+    
     
     
     

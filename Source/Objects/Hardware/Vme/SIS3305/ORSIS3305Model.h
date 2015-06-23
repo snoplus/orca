@@ -109,9 +109,7 @@
 	
     unsigned long   ringbufferPreDelay[kNumSIS3305Channels];    // ringbuffer pretrigger delays
     
-	unsigned long   lostDataId;
 	unsigned long   dataId;
-	unsigned long   mcaId;
 	
 
 
@@ -705,10 +703,6 @@
 - (NSString*) runSummary;
 
 #pragma mark --- Data Taker
-- (unsigned long) lostDataId;
-- (void) setLostDataId: (unsigned long) anId;
-- (unsigned long) mcaId;
-- (void) setMcaId: (unsigned long) anId;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
