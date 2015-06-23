@@ -684,15 +684,15 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void)sendCustomSmellieCmd:(NSString*)customCmd withArgument1:(NSString*)customArgument1 withArgument2:(NSString*)customArgument2
 {
     //Make sure all the arguments default to a safe value if not specified
-    if([customCmd isEqualToString:nil]){
+    if([customCmd length]==0){
         customCmd = @"0";
     }
     
-    if([customArgument1 isEqualToString:nil] || [customArgument1 isEqualToString:@""]){
+    if(([customArgument1 length]==0) || [customArgument1 isEqualToString:@""]){
         customArgument1 = @"0";
     }
     
-    if([customArgument2 isEqualToString:nil] || [customArgument2 isEqualToString:@""]){
+    if(([customArgument2 length]==0) || [customArgument2 isEqualToString:@""]){
         customArgument2 = @"0";
     }
         
