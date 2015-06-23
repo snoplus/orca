@@ -235,7 +235,7 @@
 {
 	if(aNotification){
 		ORHV4032Supply* aSupply = [[aNotification userInfo] objectForKey:ORHV4032SupplyId];
-		[self updateTwoStateCheckbox:[controlMatrix cellWithTag:[aSupply supply]] setting:[aSupply controlled]];
+		[[controlMatrix cellWithTag:[aSupply supply]] setState:[aSupply controlled]];
 	}
 	else {
 		NSEnumerator* e = [[model supplies] objectEnumerator];

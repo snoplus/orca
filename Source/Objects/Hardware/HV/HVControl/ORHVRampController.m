@@ -266,13 +266,13 @@
 {
 	if(aNotification){
 		ORHVSupply* aSupply = [[aNotification userInfo] objectForKey:ORHVSupplyId];
-		[self updateTwoStateCheckbox:[controlMatrix cellWithTag:[aSupply supply]] setting:[aSupply controlled]];
+		[[controlMatrix cellWithTag:[aSupply supply]] setState:[aSupply controlled]];
 	}
 	else {
 		NSEnumerator* e = [[model supplies] objectEnumerator];
 		ORHVSupply* s;
 		while(s = [e nextObject]){
-			[self updateTwoStateCheckbox:[controlMatrix cellWithTag:[s supply]] setting:[s controlled]];
+			[[controlMatrix cellWithTag:[s supply]] setState:[s controlled]];
 		}
 	}
 	[self updateButtons];   
