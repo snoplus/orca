@@ -315,7 +315,7 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:NcdMuxChan] intValue];
 	int value = [model thresholdDac:chan];
-	[self updateStepper:[thresholdDacSteppers cellWithTag:chan] setting:value];
+	[[thresholdDacSteppers cellWithTag:chan] setIntValue:value];
 	[[thresholdDacTextFields cellWithTag:chan] setIntValue: value];
 	[[calibrationThresholdMatrix cellWithTag:chan] setIntValue: value];
 }
@@ -326,7 +326,7 @@
 	short chan;
 	for(chan=0;chan<kNumMuxChannels;chan++){
 		int value = [model thresholdDac:chan];
-		[self updateStepper:[thresholdDacSteppers cellWithTag:chan] setting:value];
+		[[thresholdDacSteppers cellWithTag:chan] setIntValue:value];
 		[[thresholdDacTextFields cellWithTag:chan] setIntValue: value];
 		[[calibrationThresholdMatrix cellWithTag:chan] setIntValue: value];
 	}
