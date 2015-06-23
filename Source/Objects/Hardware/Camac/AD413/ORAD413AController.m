@@ -149,7 +149,7 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
 	[[discriminatorFieldMatrix cellWithTag:chan] setIntValue:[model discriminatorForChan:chan]];
-	[self updateStepper:[discriminatorStepperMatrix cellWithTag:chan] setting:[model discriminatorForChan:chan]];
+	[[discriminatorStepperMatrix cellWithTag:chan] setIntValue:[model discriminatorForChan:chan]];
 }
 
 
