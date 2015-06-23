@@ -1269,13 +1269,13 @@ static NSDictionary* xl3Ops;
 
     if (sup == 0 && [model hvASwitch]) {
         if ([model hvAVoltageDACSetValue] > 30) {
-            NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
+            ORRunAlertPanel (@"Not turning OFF",@"OK",nil,nil,@"Voltage too high. Ramp down first.");
             return;
         }
     }
     else if (sup == 1 && [model hvBSwitch]) {
         if ([model hvBVoltageDACSetValue] > 30) {
-            NSBeginAlertSheet (@"Not turning OFF",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Voltage too high. Ramp down first.");
+            ORRunAlertPanel (@"Not turning OFF",@"OK",nil,nil,@"Voltage too high. Ramp down first.");
             return;
         }
     }
@@ -1318,7 +1318,7 @@ static NSDictionary* xl3Ops;
     }
     if ((sup == 0 && nextTargetValue + 20 < [model hvAVoltageDACSetValue]) || (sup == 1 && nextTargetValue + 20 < [model hvBVoltageDACSetValue])) {
         [self hvTargetValueChanged:nil];
-        NSBeginAlertSheet (@"HV target NOT changed.",@"OK",nil,nil,[self window],self,nil,nil,nil,
+        ORRunAlertPanel (@"HV target NOT changed.",@"OK",nil,nil,
                            @"Can not set target value lower than the current HV. Ramp down first.");
         return;
     }

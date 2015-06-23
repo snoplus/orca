@@ -1486,7 +1486,8 @@ resetFifoOnStart = _resetFifoOnStart;
 	//set the 10MHz counter to a time based on the number of seconds since 1/1/1996 (GMT)
 	//static unsigned long theSecondsToSubtract = 0;
     
-    double theTicks10MHz = [[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
+
+    double theTicks10MHz = [[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
 	
     theTicks10MHz /= 100.E-9;
     unsigned long theLowerBits  = (unsigned long) fmod(theTicks10MHz,4294967296.0);
@@ -1582,8 +1583,7 @@ resetFifoOnStart = _resetFifoOnStart;
 	static unsigned long theSecondsToAdd = 0;
 	
  	if( theSecondsToAdd == 0 ) {
-		NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"GMT"];
-		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:timeZone]];
+		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
  	}
 	
     return theSecondsToAdd + (unsigned long)[self get10MHzSeconds];

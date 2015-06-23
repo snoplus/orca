@@ -81,8 +81,9 @@ mtcModel = _mtcModel;
 - (id) init
 {
 	self = [super init];
-    [self setBaseDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0
-             timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
+    NSDate* aDate = [NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0
+                                 timeZone:@"GMT"];
+    [self setBaseDate:aDate];
 
     [self setMtcDateFormatter:[[[NSDateFormatter alloc] init] autorelease]];
     [[self mtcDateFormatter] setDateFormat:@"yyyy'-'MM'-'dd' 'HH':'mm':'ss"];
