@@ -198,12 +198,12 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 		NSArray* dateComponents = [ dateStr componentsSeparatedByString: @"," ];
 		
 		sprintf( timeBuffer, "%s/%s/%s %s:%s:%s", 
-				[[ dateComponents objectAtIndex: 2 ] cString ],
-				[[ dateComponents objectAtIndex: 1 ] cString ],
-				[[ dateComponents objectAtIndex: 0 ] cString ],
-				[[ dateComponents objectAtIndex: 3 ] cString ],
-				[[ dateComponents objectAtIndex: 4 ] cString ],
-				[[ dateComponents objectAtIndex: 5 ] cString ] );
+                [[ dateComponents objectAtIndex: 2 ] cStringUsingEncoding:NSASCIIStringEncoding ],
+				[[ dateComponents objectAtIndex: 1 ] cStringUsingEncoding:NSASCIIStringEncoding ],
+				[[ dateComponents objectAtIndex: 0 ] cStringUsingEncoding:NSASCIIStringEncoding ],
+				[[ dateComponents objectAtIndex: 3 ] cStringUsingEncoding:NSASCIIStringEncoding ],
+				[[ dateComponents objectAtIndex: 4 ] cStringUsingEncoding:NSASCIIStringEncoding ],
+				[[ dateComponents objectAtIndex: 5 ] cStringUsingEncoding:NSASCIIStringEncoding ] );
 		
 		timeLong = convertTimeCharToLong( timeBuffer );		
 	}
