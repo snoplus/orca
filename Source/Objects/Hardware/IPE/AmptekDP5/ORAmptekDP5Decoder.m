@@ -629,7 +629,7 @@ if((eventFlags4bit == 0x1) || (eventFlags4bit == 0x3)){//raw UDP packet
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFF							// when displayed all values will be masked with this value
 			   specialBits:0x0000	
-				  bitNames: [NSArray arrayWithObjects:nil]
+				  bitNames: [NSArray array]
 					sender: self 
 				  withKeys: @"IPE-SLT-EW", @"FLT-Event-old",crateKey,stationKey,trigChannelKey/*totalChannelKey*/,nil];
 				 // withKeys: @"IPE-SLT", @"ADCChannels",crateKey,stationKey,fiberKey,channelKey,nil];

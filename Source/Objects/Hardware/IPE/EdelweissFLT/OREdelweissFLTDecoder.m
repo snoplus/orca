@@ -277,7 +277,7 @@ startIndex=0;
 				startIndex:	startIndex					// first Point Index (past the header offset!!!)
 					  mask:	0xFFFF							// when displayed all values will be masked with this value
 			   specialBits:0x0000	
-				  bitNames: [NSArray arrayWithObjects:nil]
+				  bitNames: [NSArray array]
 					sender: self 
 				  withKeys: @"FLTv4", @"Waveform",crateKey,stationKey,fiberKey,channelKey,nil];
 
