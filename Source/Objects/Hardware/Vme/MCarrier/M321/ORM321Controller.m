@@ -101,7 +101,7 @@
 - (IBAction) statusAction:(id)sender
 {
     @try {
-        [model status];
+        [(ORM321Model*)model status];
     }
 	@catch(NSException* localException) {
         NSLog(@"Exception on M321 Status: %@\n",localException);

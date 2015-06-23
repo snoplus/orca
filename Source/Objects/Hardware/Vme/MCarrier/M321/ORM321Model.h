@@ -171,6 +171,7 @@ enum {
 - (void) loadBreakPoint:(int)amount absolute:(BOOL)useAbs motor:(id)aMotor;
 - (void) moveMotor:(id)aMotor amount:(long)amount;
 - (void) moveMotor:(id)aMotor to:(long)position;
+- (void) status;
 
 - (void) executeMotorCmd:(unsigned short) theCommand 
                    motor:(id)aMotor
