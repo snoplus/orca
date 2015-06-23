@@ -808,7 +808,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setLTThresholdEnabled:(short)aChan withValue:(BOOL)aValue
 {
     if (aChan >= kNumSIS3305Channels || aChan < 0) {
-        NSLog(@"Invalid channel (%d) to write LT threshold to. ", aChan);
+        NSLog(@"Invalid channel (%d) to write LT threshold to. \n", aChan);
         return;
     }
     
@@ -823,7 +823,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setGTThresholdEnabled:(short)aChan withValue:(BOOL)aValue
 {
     if (aChan >= kNumSIS3305Channels || aChan < 0) {
-        NSLog(@"Invalid channel (%d) to write GT threshold to. ", aChan);
+        NSLog(@"Invalid channel (%d) to write GT threshold to. \n", aChan);
         return;
     }
     [[[self undoManager] prepareWithInvocationTarget:self] setGTThresholdEnabled:aChan withValue:aValue];
@@ -832,7 +832,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         GTThresholdEnabled[aChan] = aValue;
     }
     else
-        NSLog(@"That wasn't supposed to happen...");
+        NSLog(@"That wasn't supposed to happen...\n");
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GTThresholdEnabledChanged object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ChannelEnabledChanged object:self];
@@ -950,7 +950,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[[self undoManager] prepareWithInvocationTarget:self] setThresholdMode:chan withValue:[self thresholdMode:chan]];
     
     if (chan >= kNumSIS3305Channels || chan < 0) {
-        NSLog(@"Invalid channel (%d) to apply threshold mode to. ", chan);
+        NSLog(@"Invalid channel (%d) to apply threshold mode to. \n", chan);
         return;
     }
     
@@ -975,7 +975,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         default:    // I make the default case to enable both, but we shouldn't get here -SJM
             [self setGTThresholdEnabled:chan withValue:YES];
             [self setLTThresholdEnabled:chan withValue:YES];
-            NSLog(@"Threshold mode was somehow set to %d, please report this error!",aValue);
+            NSLog(@"Threshold mode was somehow set to %d, please report this error!\n",aValue);
             break;
     }
     
@@ -993,7 +993,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setLTThresholdOn:(short)aChan withValue:(int)aValue
 {
     if (aChan >= kNumSIS3305Channels || aChan < 0) {
-        NSLog(@"Invalid channel (%d) to write LT threshold On value to. ", aChan);
+        NSLog(@"Invalid channel (%d) to write LT threshold On value to. \n", aChan);
         return;
     }
     aValue = [self limitIntValue:aValue min:0 max:0x3FF];
@@ -1010,7 +1010,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setLTThresholdOff:(short)aChan withValue:(int)aValue
 {
     if (aChan >= kNumSIS3305Channels || aChan < 0) {
-        NSLog(@"Invalid channel (%d) to write LT threshold Off value to. ", aChan);
+        NSLog(@"Invalid channel (%d) to write LT threshold Off value to. \n", aChan);
         return;
     }
     aValue = [self limitIntValue:aValue min:0 max:0x3FF];
@@ -1027,7 +1027,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setGTThresholdOn:(short)aChan withValue:(int)aValue
 {
     if (aChan >= kNumSIS3305Channels || aChan < 0) {
-        NSLog(@"Invalid channel (%d) to write GT threshold On value to. ", aChan);
+        NSLog(@"Invalid channel (%d) to write GT threshold On value to. \n", aChan);
         return;
     }
     aValue = [self limitIntValue:aValue min:0 max:0x3FF];
@@ -1045,7 +1045,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setGTThresholdOff:(short)aChan withValue:(int)aValue
 {
     if (aChan >= kNumSIS3305Channels || aChan < 0) {
-        NSLog(@"Invalid channel (%d) to write GT threshold Off value to. ", aChan);
+        NSLog(@"Invalid channel (%d) to write GT threshold Off value to. \n", aChan);
         return;
     }
     aValue = [self limitIntValue:aValue min:0 max:0x3FF];
@@ -1150,7 +1150,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setInternalTriggerDelay:(short)aChan withValue:(short)aValue
 {
     if (aChan >= [internalTriggerDelays count]) {
-        NSLog(@"Internal trigger delay is too large");
+        NSLog(@"Internal trigger delay is too large\n");
         return;
     }
     aValue = [self limitIntValue:aValue min:0 max:firmwareVersion<15?63:255];
@@ -1162,7 +1162,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     }
     @catch(NSException* localException){
         [localException raise];
-        NSLog(@"Failed to set Internal Trigger Delay");
+        NSLog(@"Failed to set Internal Trigger Delay\n");
     }
     
     //force a constraint check by reloading the pretrigger delay
@@ -2761,8 +2761,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     if (verbose) {
         for (adc =0; adc<kNumSIS3305Groups; adc++) {
-            BOOL test =                 ((packet.control[adc] >>12) & 0x1);
-            BOOL rm =                   ((packet.control[adc] >>10) & 0x1);
+            //BOOL test =                 ((packet.control[adc] >>12) & 0x1);
+            //BOOL rm =                   ((packet.control[adc] >>10) & 0x1);
             BOOL bw =                   ((packet.control[adc] >> 8) & 0x1);
             BOOL grayMode =             ((packet.control[adc] >> 7) & 0x1);
             unsigned short standby =    ((packet.control[adc] >> 4) & 0x3);
