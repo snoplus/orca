@@ -242,7 +242,7 @@
     for (index=0; index < [model getNumberOfChannels]; index++) {
         NSInteger currentColumn = index / rows;
         NSInteger currentRow = index % rows;    
-        [self updatePopUpButton:[channelGainSettings cellAtRow:currentRow column:currentColumn] setting:[model getGain:index]];
+        [[channelGainSettings cellAtRow:currentRow column:currentColumn] selectItemAtIndex:[model getGain:index]];
     }
 	[self updatePopUpButton:autoscanModePopUp setting:index];
 }

@@ -309,7 +309,7 @@
 {
 	short chan;
 	for(chan=0;chan<kNumShaperChannels;chan++){
-		[self updateStepper:[thresholdSteppers cellWithTag:chan] setting:[model threshold:chan]];
+		[[thresholdSteppers cellWithTag:chan] setIntValue:[model threshold:chan]];
 		if([model displayRaw]){
 			[[thresholdTextFields cellWithTag:chan] setIntValue: [model threshold:chan]];
 		}
@@ -323,7 +323,7 @@
 {
 	short chan;
 	for(chan=0;chan<kNumShaperChannels;chan++){
-		[self updateStepper:[gainSteppers cellWithTag:chan] setting:[model gain:chan]];
+		[[gainSteppers cellWithTag:chan] setIntValue:[model gain:chan]];
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
 	}
 }
@@ -338,7 +338,7 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORShaperChan] intValue];
-	[self updateStepper:[thresholdSteppers cellWithTag:chan] setting:[model threshold:chan]];
+    [[thresholdSteppers cellWithTag:chan] setIntValue:[model threshold:chan]];
 	if([model displayRaw]){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [model threshold:chan]];
 	}
@@ -352,7 +352,7 @@
 - (void) gainChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORShaperChan] intValue];
-	[self updateStepper:[gainSteppers cellWithTag:chan] setting:[model gain:chan]];
+	[[gainSteppers cellWithTag:chan] setIntValue:[model gain:chan]];
 	[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
 }
 
