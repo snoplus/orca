@@ -581,7 +581,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 {
 	//subclasses can use as needed.
 }
-- (void) doCntrlClick:(id)sender
+- (void) doCntrlClick:(NSView*)aView
 {
 	NSEvent* theCurrentEvent = [NSApp currentEvent];
     NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
@@ -604,7 +604,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 				 keyEquivalent:@""
 					   atIndex:1] setTarget:self];
 	[menu setDelegate:self];
-    [NSMenu popUpContextMenu:menu withEvent:event forView:nil];
+    [NSMenu popUpContextMenu:menu withEvent:event forView:aView];
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem

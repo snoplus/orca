@@ -441,7 +441,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [encoder encodeObject:controllerString	forKey:@"controllerString"];
 	[encoder encodeInt:updateInterval		forKey:@"updateInterval"];
 }
-- (void) doCntrlClick:(id)sender
+- (void) doCntrlClick:(NSView*)aView
 {
 	NSEvent* theCurrentEvent = [NSApp currentEvent];
     NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
@@ -470,7 +470,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 				 keyEquivalent:@""
 					   atIndex:1] setTarget:self];
 	[menu setDelegate:self];
-    [NSMenu popUpContextMenu:menu withEvent:event forView:nil];
+    [NSMenu popUpContextMenu:menu withEvent:event forView:aView];
 }
 
 - (NSAttributedString*) stringToDisplay:(BOOL)highlight

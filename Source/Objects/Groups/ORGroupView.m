@@ -330,7 +330,7 @@
 		}
 		if( [obj1 acceptsClickAtPoint:localPoint]){
             if(cntrlKeyDown){
-                [obj1 doCntrlClick:obj1];
+                [obj1 doCntrlClick:[[self window]contentView]];
                 somethingHit = YES;
                 break;
             }
@@ -416,7 +416,7 @@
     }
     //[self setNeedsDisplay:YES];
 }
-- (void) doControlClick:(id)sender
+- (void) doControlClick:(NSView*)aView
 {
 	if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
 		
@@ -441,7 +441,7 @@
 					 keyEquivalent:@""
 						   atIndex:0] setTarget:self];
 		[menu setDelegate:self];
-		[NSMenu popUpContextMenu:menu withEvent:event forView:nil];
+		[NSMenu popUpContextMenu:menu withEvent:event forView:aView];
 	}
 }
 

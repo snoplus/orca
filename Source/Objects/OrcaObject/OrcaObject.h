@@ -133,7 +133,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) doCmdClick:(id)sender atPoint:(NSPoint)aPoint;
 - (void) doShiftCmdClick:(id)sender atPoint:(NSPoint)aPoint;
 - (void) doCmdDoubleClick:(id)sender atPoint:(NSPoint)aPoint;
-- (void) doCntrlClick:(id)sender;
+- (void) doCntrlClick:(NSView*)aView;
 - (ORConnector*) requestsConnection: (NSPoint)aPoint;
 - (BOOL) rectIntersectsIcon:(NSRect)aRect;
 - (BOOL) validateMenuItem:(NSMenuItem *)anItem;

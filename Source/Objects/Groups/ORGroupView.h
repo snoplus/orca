@@ -67,8 +67,8 @@
 - (void) moveSelectedObjectsRight:(NSEvent*)event;
 - (void) moveSelectedObjects:(NSPoint)delta;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
-- (void) doControlClick:(id)sender;
-    - (void) setEnableIconControls:(BOOL) aState;
+- (void) doControlClick:(NSView*)aView;
+- (void) setEnableIconControls:(BOOL) aState;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender;

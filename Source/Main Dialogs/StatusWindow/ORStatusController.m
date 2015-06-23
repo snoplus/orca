@@ -515,7 +515,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (IBAction) insertConfigurationName:(id)sender
 {
-	NSString* theConfigFile = [NSString stringWithFormat:@"Configuration File: %@",[[(ORAppDelegate*)[NSApp delegate] document] fileName]];
+	NSString* theConfigFile = [NSString stringWithFormat:@"Configuration File: %@",[[[(ORAppDelegate*)[NSApp delegate] document] fileURL] path]];
 	[logBookField insertText: theConfigFile];
 }
 
