@@ -99,9 +99,20 @@
             [NSBezierPath setDefaultLineWidth:.5];
             int i;
             for(i=0;i<21;i++){
+                 [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y) toPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y + inside.size.height)];
+            }
+            float xx = 0;
+            for(i=0;i<21;i++){
+                if(i%2 == 0){
+                    NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d",i] attributes:attrsDictionary];
+                    float sw = [s size].width;
+                    [s drawAtPoint:NSMakePoint(kCrateInsideX+5-sw/2 + xx,yOffset+kCrateInsideY-10)];
+                    [s release];
+                }
+                xx += 11.3;
                 [NSBezierPath strokeLineFromPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y) toPoint:NSMakePoint(inside.origin.x+i*dx,inside.origin.y + inside.size.height)];
             }
-            
+          
             NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Crate %d",crate] attributes:attrsDictionary];
             float sw = [s size].width;
             [s drawAtPoint:NSMakePoint(kCrateInsideX+kCrateInsideWidth/2-sw/2,yOffset+kCrateInsideY+kCrateInsideHeight+1)];
