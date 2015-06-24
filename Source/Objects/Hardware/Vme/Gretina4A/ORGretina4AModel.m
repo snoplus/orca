@@ -1122,6 +1122,7 @@ static Gretina4ARegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setUpImage];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AEnabledChanged object:self userInfo:userInfo];
+    [self postAdcInfoProvidingValueChanged];
 }
 
 

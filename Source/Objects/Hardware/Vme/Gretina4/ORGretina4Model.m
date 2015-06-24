@@ -873,6 +873,7 @@ static struct {
 	enabled[chan] = aValue;
     [self setUpImage];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelEnabledChanged object:self];
+    [self postAdcInfoProvidingValueChanged];
 }
 
 - (void) setCFDEnabled:(short)chan withValue:(short)aValue		

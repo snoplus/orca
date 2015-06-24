@@ -968,6 +968,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [self setUpImage];
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MEnabledChanged object:self userInfo:userInfo];
+    [self postAdcInfoProvidingValueChanged];
+    
 }
 
 - (void) setForceFullInit:(short)chan withValue:(BOOL)aValue
@@ -1064,6 +1066,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     [[[self undoManager] prepareWithInvocationTarget:self] setTrapThreshold:chan withValue:trapThreshold[chan]];
 	trapThreshold[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTrapThresholdChanged object:self];
+    [self postAdcInfoProvidingValueChanged];
 }
 
 
