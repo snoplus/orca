@@ -2961,7 +2961,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan
 {
-	return [self ledThreshold:aChan];
+    if(trapEnabled[aChan])  return [self trapThreshold:aChan];
+	else                    return [self ledThreshold:aChan];
 }
 
 - (unsigned short) gainForDisplay:(unsigned short) aChan
