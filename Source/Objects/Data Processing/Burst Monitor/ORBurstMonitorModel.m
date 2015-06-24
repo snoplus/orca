@@ -140,6 +140,7 @@ NSDate* burstStart = NULL;
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setNHit:nHit];
     nHit = value;
+    foundMult = nHit;
     //buffer
     //[chans removeAllObjects];
     //[cards removeAllObjects];
@@ -504,14 +505,29 @@ unsigned long long facto(unsigned long long num)
                                     double firstTime = ([[Nsecs objectAtIndex:(nHit-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(nHit-1)] longValue]);
                                     double diffTime = (lastTime - firstTime);
                                     if(diffTime < timeWindow && burstForce==0){ //burst found, start saveing everything untill it stops
+                                        //Record mult in foundMult and see if the count increases it
+                                        if (burstState == 1)
+                                        {
+                                            double lastT = ([[Nsecs objectAtIndex:0] longValue] + 0.000001*[[Nmics objectAtIndex:0] longValue]);
+                                            double firstT = ([[Nsecs objectAtIndex:(foundMult)] longValue] + 0.000001*[[Nmics objectAtIndex:(foundMult)] longValue]); //fixme exists?
+                                            double diffT = (lastT - firstT);
+                                            if(diffT < timeWindow)
+                                            {
+                                                foundMult = foundMult + 1;
+                                                //NSLog(@"foundMult is %i \n", foundMult);
+                                            }
+                                        }
                                         burstState = 1;
-                                        novaState = 1;
+                                        //novaState = 1;
                                         novaP = 1;
                                     }
                                     else{ //no burst found, stop saveing things and send alarm if there was a burst directly before.
                                         if(burstState == 1){
                                             @synchronized(self) //maybe not Bchans
                                             {
+                                                multInBurst = foundMult;
+                                                foundMult = nHit;
+                                                
                                                 [Bchans release];
                                                 Bchans = [chans mutableCopy]; //part of crash line
                                                 
@@ -566,7 +582,7 @@ unsigned long long facto(unsigned long long num)
                                                 int numChan = [self channelsCheck:(reChans)];
                                                 numBurstChan = numChan;
                                                 
-                                                //Find ADC likelyhood of burst
+                                                //Find ADC likelyhood of burst //fixme: has sporatically broken, don't know why.  Possibly stopped breaking after trivial edits.
                                                 peakN = 0;
                                                 lowN = 0;
                                                 int n;
@@ -592,9 +608,22 @@ unsigned long long facto(unsigned long long num)
                                                     //unsigned long long nfac = facto(n);
                                                     //unsigned long long neutfac = facto(peakN+lowN);
                                                     //unsigned long long allfac = facto(peakN+lowN-n);
-                                                    int nummy = peakN+lowN-n;
+                                                    //int nummy = peakN+lowN-n;
                                                     //NSLog(@"n!, (peak+low-n)!, nummy!, denom is %i, %i, %i, %i \n", facto(n), facto(peakN + lowN - n), facto(nummy), (facto(n)*facto(peakN + lowN - n)));
-                                                    double partP = ( facto(peakN + lowN)/(facto(n)*facto(nummy)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
+                                                    //double partP = ( facto(peakN + lowN)/(facto(n)*facto(nummy)) )*pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
+                                                    double partPtop = facto(peakN + lowN);
+                                                    double partPbot = facto(n)*facto(peakN + lowN - n);
+                                                    double partPpow = pow(peakP,n)*pow((1-peakP),(peakN + lowN - n));
+                                                    double partP = 0;
+                                                    if (partPbot == 0)
+                                                    {
+                                                        NSLog(@"Error, factorial failed, n, peak, low, is %i, %i, %i, \n", n, peakN, lowN);
+                                                    }
+                                                    else
+                                                    {
+                                                        //NSLog(@"NP ok, n, peak, low is %i, %i, %i \n", n, peakN, lowN);
+                                                        partP = (partPtop/partPbot)*partPpow;
+                                                    }
                                                     double partDisk = fabs(n-(peakP*(peakN + lowN)));
                                                     if ((partDisk+0.01)>fabs(peakN - peakExpect))
                                                     {
@@ -721,7 +750,7 @@ unsigned long long facto(unsigned long long num)
                                         }//end of burststate = 1 stuff
                                         loudSec=0;
                                         burstForce=0;
-                                        novaState = 0;
+                                        //novaState = 0;
                                         novaP = 0;
                                         burstState = 0;
                                         if(Nchans.count<nHit){ // happens if a burst had too few channels and just got whiped
@@ -832,7 +861,7 @@ unsigned long long facto(unsigned long long num)
     
     burstTell   = 0;
     burstState  = 0;
-    novaState   = 0;
+    //novaState   = 0;
     novaP       = 0;
     quietSec    = 0;
     loudSec     = 0;
@@ -1073,8 +1102,17 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
     //calc chan prob
     double exChan =999.999;
-    if(durSec<100) //Send a cping somewhere if the burst is good enough
+    if((multInBurst > 4 && durSec > 1 && adcP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001))
     {
+        novaState = 1;
+    }
+    else
+    {
+        novaState = 0;
+    }
+    if(novaState == 1) //Send a cping somewhere if the burst is good enough
+    {
+        NSLog(@"novaState is 1, sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
         NSTask* Cping;
         Cping =[[NSTask alloc] init];
         NSPipe* pipe;
@@ -1082,7 +1120,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         [Cping setStandardOutput: pipe];
         NSFileHandle* pingfile;
         pingfile =[pipe fileHandleForReading];
-        if(0) //Send to local machine
+        if(1) //Send to local machine  //mod change to ping again
         {
             [Cping setLaunchPath: @"/usr/bin/printf"];
             [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
@@ -1114,6 +1152,15 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     int numMicTillBurst = (1000000*fmod(numSecTillBurst,1));
     NSString* theContent = @"";
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+    if(novaState == 1)
+    {
+        theContent = [theContent stringByAppendingString:@"Triage: SN candidate!  Ping sent to snews (not actually, test mode cuts are weaker)\n"];
+    }
+    else
+    {
+        theContent = [theContent stringByAppendingString:@"Triage: Not a supernova :(\n"];
+    }
+    theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
     theContent = [theContent stringByAppendingFormat:@"First event in burst:\n"];
@@ -1124,7 +1171,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Minimum ADC Energy: %d\n",minimumEnergyAllowed];
     theContent = [theContent stringByAppendingFormat:@"Number of channels required: %d\n",numBurstsNeeded];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
-    theContent = [theContent stringByAppendingFormat:@"Number of counts in the burst: %d\n",countsInBurst];
+    theContent = [theContent stringByAppendingFormat:@"Total counts in the burst: %d\n",countsInBurst];
+    theContent = [theContent stringByAppendingFormat:@"Detected multiplicity in time window: %d\n",multInBurst];
     theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
     theContent = [theContent stringByAppendingFormat:@"Epected number of channels: %f, Probablility given number of counts: %f \n", exChan, chanpvalue];
     theContent = [theContent stringByAppendingFormat:@"Number of events with neutron-like energy: %d\n",peakN + lowN];
