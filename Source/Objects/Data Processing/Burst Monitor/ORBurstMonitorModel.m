@@ -1120,14 +1120,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         [Cping setStandardOutput: pipe];
         NSFileHandle* pingfile;
         pingfile =[pipe fileHandleForReading];
-        if(1) //Send to local machine  //mod change to ping again
+        if(0) //Send to local machine  //mod change to ping again
         {
             [Cping setLaunchPath: @"/usr/bin/printf"];
             [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
         }
         else{ //Send to halo shift
             [Cping setLaunchPath: @"/usr/bin/ssh"];  //@"/usr/bin/ssh"
-            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.225", @"cd snews/coinccode/ ; ./cping all 0 0 0 9", nil]];
+            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.223", @"cd snews/coinccode/ ; ./cping all 0 0 0 9", nil]];
             //[Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.225", @"cd snews/coinccode/ ; mkdir AAASNEWSPINGTEST", nil]];
         }  // -c successfully made directories in home
         [Cping launch]; //Send the ping!
