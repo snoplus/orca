@@ -1157,7 +1157,8 @@ nil];
                                             [NSNumber numberWithInt:0], @"alertMessageType",
                                             nil];
     [self addObject:self valueDictionary:alertMessageDictionary];
-  
+    NSLog(@"Database operator message cleared from database\n");
+
 }
 - (void) postAlert
 {
@@ -1170,7 +1171,7 @@ nil];
                                             [NSNumber numberWithInt:alertType], @"alertMessageType",
                                             nil];
     [self addObject:self valueDictionary:alertMessageDictionary];
-    NSLog(@"Posted To Database: %@\n",messageToPost);
+    NSLog(@"Operator message posted To database: %@\n",messageToPost);
 
 }
 
