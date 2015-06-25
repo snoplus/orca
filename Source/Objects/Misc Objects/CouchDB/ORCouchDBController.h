@@ -38,10 +38,13 @@
 	IBOutlet NSTextField* keepHistoryStatusField;
 	IBOutlet NSTextField* dbStatusField;
     IBOutlet NSTextField* usingUpdateHandlerField;
+    IBOutlet NSTextField* alertMessageField;
+    IBOutlet NSPopUpButton* alertTypePU;
 	double queueCount;
 }
 
 #pragma mark ***Interface Management
+- (void) alertMessageChanged:(NSNotification*)aNote;
 - (void) replicationRunningChanged:(NSNotification*)aNote;
 - (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
@@ -74,6 +77,9 @@
 - (IBAction) infoAction:(id)sender;
 - (IBAction) compactAction:(id)sender;
 - (IBAction) listTasks:(id)sender;
+- (IBAction) alertMessageAction:(id)sender;
+- (IBAction) alertTypeAction:(id)sender;
+- (IBAction) postAlertAction:(id)sender;
 
 
 @end

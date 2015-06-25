@@ -36,6 +36,8 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
+NSString* ORCouchDBModelAlertTypeChanged = @"ORCouchDBModelAlertTypeChanged";
+NSString* ORCouchDBModelAlertMessageChanged = @"ORCouchDBModelAlertMessageChanged";
 NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationRunningChanged";
 NSString* ORCouchDBModelKeepHistoryChanged		= @"ORCouchDBModelKeepHistoryChanged";
 NSString* ORCouchDBModelStealthModeChanged		= @"ORCouchDBModelStealthModeChanged";
@@ -102,6 +104,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) dealloc
 {
+    [alertMessage release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [password release];
@@ -273,6 +276,37 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 }
 
 #pragma mark ***Accessors
+
+- (int) alertType
+{
+    return alertType;
+}
+
+- (void) setAlertType:(int)aAlertType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAlertType:alertType];
+    
+    alertType = aAlertType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelAlertTypeChanged object:self];
+}
+
+- (NSString*) alertMessage
+{
+    if(!alertMessage)return @"";
+    else             return alertMessage;
+}
+
+- (void) setAlertMessage:(NSString*)aAlertMessage
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAlertMessage:alertMessage];
+    
+    [alertMessage autorelease];
+    alertMessage = [aAlertMessage copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelAlertMessageChanged object:self];
+}
+
 - (BOOL) usingUpdateHandler
 {
     return usingUpdateHandler;
@@ -1116,6 +1150,30 @@ nil];
     [self updateRunInfo];
 }
 
+- (void) clearAlert
+{
+    NSDictionary* alertMessageDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                            @"",                        @"alertMessage",
+                                            [NSNumber numberWithInt:0], @"alertMessageType",
+                                            nil];
+    [self addObject:self valueDictionary:alertMessageDictionary];
+  
+}
+- (void) postAlert
+{
+    NSString* messageToPost;
+    if([alertMessage length]==0)messageToPost = @"";
+    else messageToPost = alertMessage;
+    
+    NSDictionary* alertMessageDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                            messageToPost,                      @"alertMessage",
+                                            [NSNumber numberWithInt:alertType], @"alertMessageType",
+                                            nil];
+    [self addObject:self valueDictionary:alertMessageDictionary];
+    NSLog(@"Posted To Database: %@\n",messageToPost);
+
+}
+
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote
 {
 	[self updateRunState:[aNote object]];
@@ -1484,6 +1542,8 @@ nil];
 {    
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setAlertType:[decoder decodeIntForKey:@"alertType"]];
+    [self setAlertMessage:[decoder decodeObjectForKey:@"alertMessage"]];
     [self setKeepHistory:[decoder decodeBoolForKey:@"keepHistory"]];
     [self setPassword:[decoder decodeObjectForKey:@"Password"]];
     [self setLocalHostName:[decoder decodeObjectForKey:@"LocalHostName"]];
@@ -1508,6 +1568,8 @@ nil];
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:alertType forKey:@"alertType"];
+    [encoder encodeObject:alertMessage forKey:@"alertMessage"];
     [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeBool:stealthMode forKey:@"stealthMode"];
     [encoder encodeObject:password forKey:@"Password"];

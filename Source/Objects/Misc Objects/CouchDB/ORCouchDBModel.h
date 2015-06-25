@@ -24,28 +24,30 @@
 @interface ORCouchDBModel : OrcaObject
 {
 @private
-	NSString*	remoteHostName;
-    NSString*	userName;
-    NSString*	password;
-    NSString*   localHostName;
-	BOOL		stealthMode;
-    NSUInteger  portNumber;
-	NSDictionary* dBInfo;
-	NSDictionary* dBHistoryInfo;
+	NSString*       remoteHostName;
+    NSString*       userName;
+    NSString*       password;
+    NSString*       localHostName;
+	BOOL            stealthMode;
+    NSUInteger      portNumber;
+	NSDictionary*   dBInfo;
+	NSDictionary*   dBHistoryInfo;
 	NSMutableArray* dataMonitors;
-	BOOL statusUpdateScheduled;
-	BOOL historyUpdateScheduled;
-    BOOL keepHistory;
+	BOOL            statusUpdateScheduled;
+	BOOL            historyUpdateScheduled;
+    BOOL            keepHistory;
 	//cache
-	unsigned long runNumber;
-	unsigned long subRunNumber;
-    BOOL replicationRunning;
-	NSDictionary* docList;
-    BOOL wasReplicationRunning;
-    int replicationCheckCount;
-    ORAlarm* replicationAlarm;
+	unsigned long   runNumber;
+	unsigned long   subRunNumber;
+    BOOL            replicationRunning;
+	NSDictionary*   docList;
+    BOOL            wasReplicationRunning;
+    int             replicationCheckCount;
+    ORAlarm*        replicationAlarm;
     NSMutableDictionary* customDataBases;
-    BOOL usingUpdateHandler;
+    BOOL            usingUpdateHandler;
+    NSString*       alertMessage;
+    int             alertType;
 }
 
 #pragma mark ***Initialization
@@ -72,6 +74,10 @@
 - (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef;
 
 #pragma mark ***Accessors
+- (int) alertType;
+- (void) setAlertType:(int)aAlertType;
+- (NSString*) alertMessage;
+- (void) setAlertMessage:(NSString*)aAlertMessage;
 - (BOOL) usingUpdateHandler;
 - (void) setUsingUpdateHandler:(BOOL)aState;
 - (BOOL) replicationRunning;
@@ -133,12 +139,16 @@
 - (void) updateRunInfo;
 - (void) replicate:(BOOL)continuously;
 - (void) replicate:(BOOL)continuously restart:(BOOL)aRestart;
+- (void) postAlert;
+- (void) clearAlert;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORCouchDBModelAlertTypeChanged;
+extern NSString* ORCouchDBModelAlertMessageChanged;
 extern NSString* ORCouchDBModelReplicationRunningChanged;
 extern NSString* ORCouchDBModelKeepHistoryChanged;
 extern NSString* ORCouchDBPasswordChanged;

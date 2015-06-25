@@ -145,12 +145,26 @@
                      selector : @selector(usingUpdateHandlerChanged:)
                          name : ORCouchDBModelUsingUpdateHandleChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(alertMessageChanged:)
+                         name : ORCouchDBModelAlertMessageChanged
+                        object: model];
+
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(alertTypeChanged:)
+                         name : ORCouchDBModelAlertTypeChanged
+                        object: model];
+
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
-	[self remoteHostNameChanged:nil];
+    [self alertMessageChanged:nil];
+    [self alertTypeChanged:nil];
+    [self remoteHostNameChanged:nil];
 	[self localHostNameChanged:nil];
 	[self userNameChanged:nil];
 	[self passwordChanged:nil];
@@ -161,6 +175,16 @@
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
 	[self usingUpdateHandlerChanged:nil];
+}
+
+- (void) alertMessageChanged:(NSNotification*)aNote
+{
+    [alertMessageField setStringValue:[model alertMessage]];
+}
+
+- (void) alertTypeChanged:(NSNotification*)aNote
+{
+    [alertTypePU selectItemAtIndex:[model alertType]];
 }
 
 - (void) usingUpdateHandlerChanged:(NSNotification*)aNote
@@ -445,6 +469,28 @@
 	[model compactDatabase];
 }
 
+
+- (IBAction) alertTypeAction:(id)sender
+{
+    [model setAlertType:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) alertMessageAction:(id)sender
+{
+    [model setAlertMessage:[sender stringValue]];
+}
+
+- (IBAction) postAlertAction:(id)sender
+{
+    [self endEditing];
+    [model postAlert];
+}
+
+- (IBAction) clearAlertAction:(id)sender
+{
+    [self endEditing];
+    [model clearAlert];
+}
 @end
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
