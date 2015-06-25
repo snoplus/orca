@@ -45,7 +45,7 @@ typedef struct {
 @interface ORMJDInterlocks : NSObject
 {
     MajoranaModel*      delegate;
-    int                 module;
+    int                 slot;
     BOOL                isRunning;
     int                 currentState;
     int                 retryState;
@@ -64,7 +64,7 @@ typedef struct {
     ORAlarm*            interlockFailureAlarm;
 }
 
-- (id)          initWithDelegate:(MajoranaModel*)aDelegate module:(int)aModule;
+- (id)          initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
 - (void)        dealloc;
 - (void)        start;
 - (void)        stop;
@@ -78,12 +78,16 @@ typedef struct {
 - (void)        addToReport:(NSString*)aString;
 - (void)        postInterlockFailureAlarm:(NSString*)reason;
 - (void)        clearInterlockFailureAlarm;
+- (int)         vacSystem;
+- (NSString*)   vacSystemName;
+- (int)         module;
+- (NSString*)   moduleName;
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;
 @property (retain) NSDictionary*              remoteOpStatus;
 @property (assign,nonatomic) int              currentState;
-@property (assign,nonatomic) int              module;
+@property (assign,nonatomic) int              slot;
 @property (retain,nonatomic) NSMutableArray*  stateStatus;
 @property (retain) NSMutableArray*            finalReport;
 

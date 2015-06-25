@@ -44,16 +44,16 @@ static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
 
 @implementation ORMJDInterlocks
 
-@synthesize delegate,isRunning,currentState,stateStatus,module,finalReport,remoteOpStatus;
+@synthesize delegate,isRunning,currentState,stateStatus,slot,finalReport,remoteOpStatus;
 
 NSString* ORMJDInterlocksIsRunningChanged = @"ORMJDInterlocksIsRunningChanged";
 NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
-- (id) initWithDelegate:(MajoranaModel*)aDelegate module:(int)aModule;
+- (id) initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
 {
     self = [super init];
     self.delegate = aDelegate;
-    self.module = aModule;
+    self.slot = aSlot;
     retryCount = 0;
     return self;
 }
@@ -72,6 +72,29 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     [super dealloc];
 }
 
+- (int) vacSystem
+{
+    if(slot==0) return 1; //CryoVacB
+    else        return 0; //CryoVacA
+}
+
+- (NSString*) vacSystemName
+{
+    return [NSString stringWithFormat:@"CryoVac%c",'A'+[self vacSystem]];
+}
+
+- (int) module
+{
+    if(slot==0) return 1; //module 1 (assumes VME crate 1)
+    else        return 2; //module 2 (assumes VME crate 2)
+}
+
+- (NSString*) moduleName
+{
+    return [NSString stringWithFormat:@"Module%d",[self module]];
+}
+
+
 - (void) reset:(BOOL)continueRunning
 {
     printedErrorReport  = NO;
@@ -84,7 +107,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     queue=nil;
     currentState = kMJDInterlocks_Idle;
     [self setupStateArray]; //info for display in dialog
-    NSLog(@"HV Interlocks procedure reset for module %d\n",module+1);
+    NSLog(@"HV Interlocks procedure reset for %@\n",[self moduleName]);
     if(!continueRunning){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     }
@@ -210,7 +233,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     }
                     else {
                         retryCount++;
-                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c failed ping. HV will rampDown.",'A'+module]];
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ failed ping. HV will rampDown.",[self vacSystemName]]];
                         [self setState:kMJDInterlocks_PingWait status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedPingRetry] color:badColor];
                         [self setState:kMJDInterlocks_Ping status:@"Will Retry" color:concernColor];
                         retryState = kMJDInterlocks_Ping;  //force a re-ping next time around
@@ -222,7 +245,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         //lots depends on whether or not we are already biased.
         case kMJDInterlocks_CheckHVisOn:
-            hvIsOn = [delegate anyHvOnVMECrate:module];
+            hvIsOn = [delegate anyHvOnVMECrate:[self module]];
             [self setState:kMJDInterlocks_CheckHVisOn status:[NSString stringWithFormat:@"HV is %@",hvIsOn?@"ON":@"OFF"] color:normalColor];
             if(pingedSuccessfully){
                 [self setCurrentState:kMJDInterlocks_UpdateVacSystem];
@@ -285,7 +308,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     else {
                         //no connection
                         retryCount++;
-                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c unreachable. HV will rampDown.",'A'+module]];
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable. HV will rampDown.",[self vacSystemName]]];
                         [self setState:kMJDInterlocks_UpdateVacSystem status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_UpdateVacSystem;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -344,7 +367,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     else {
                         //no connection
                         retryCount++;
-                         [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c unreachable. HV will rampDown.",'A'+module]];
+                         [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable. HV will rampDown.",[self vacSystemName]]];
                         [self setState:kMJDInterlocks_GetShouldUnBias status:[NSString stringWithFormat:@"Waited: %d/%d",retryCount,kAllowedResponseRetry] color:badColor];
                         retryState = kMJDInterlocks_GetShouldUnBias;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -400,7 +423,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     }
                     else {
                         retryCount++;
-                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"Cryovac%c unreachable. HV will rampDown.",'A'+module]];
+                        [self postInterlockFailureAlarm: [NSString stringWithFormat:@"%@ unreachable. HV will rampDown.",[self vacSystemName]]];
                         [self setState:kMJDInterlocks_GetOKToBias status:[NSString stringWithFormat:@"Failed: %d/%d",retryCount,kAllowedConnectionRetry] color:badColor];
                         retryState = kMJDInterlocks_GetOKToBias;  //force a retry of this state next time around
                         [self setCurrentState:kMJDInterlocks_Idle];
@@ -421,9 +444,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         case kMJDInterlocks_HVRampDown:
             retryCount=0;
             if(hvIsOn){
-                [delegate rampDownHV:module vac:module];
-                if((module == 0 && [delegate ignorePanicOnA]) ||
-                   (module == 1 && [delegate ignorePanicOnB])){
+                [delegate rampDownHV:[self module] vac:[self vacSystem]];
+                if((([self module] == 2) && [delegate ignorePanicOnA]) ||
+                   (([self module] == 1) && [delegate ignorePanicOnB]) ){
                     [self addToReport:@"HV should be ramped down, but was ignored"];
                     [self addToReport:@"HV Did NOT actually ramp down, because the 'Ignore Ramp Down Actions' was selected"];
                     [self setState:kMJDInterlocks_HVRampDown status:@"HV Ramp Ignored!"  color:badColor];
@@ -445,7 +468,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
             
         case kMJDInterlocks_HandleHVDialog:
-            [delegate setVmeCrateHVConstraint:module state:lockHVDialog];
+            [delegate setVmeCrateHVConstraint:[self module] state:lockHVDialog];
             if(lockHVDialog)[self setState:kMJDInterlocks_HandleHVDialog status:@"Locked" color:badColor];
             else [self setState:kMJDInterlocks_HandleHVDialog status:@"Unlocked" color:okColor];
             [self setCurrentState:kMJDInterlocks_FinalState];
@@ -472,7 +495,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     if(printedErrorReport)return;
     printedErrorReport = YES;
     NSLog(@"------------------------------------------------\n");
-    NSLog(@"HV Interlock Voliation Report for Module %d\n",module+1);
+    NSLog(@"HV Interlock Voliation Report for %@\n",[self moduleName]);
     for(id aString in finalReport){
         NSLog(@"%@\n",aString);
     }
@@ -481,12 +504,12 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (void) postInterlockFailureAlarm:(NSString*)reason
 {
-    BOOL hvOn = [delegate anyHvOnVMECrate:module];
+    BOOL hvOn = [delegate anyHvOnVMECrate:[self module]];
     if(hvOn){
         if(!interlockFailureAlarm){
             interlockFailureAlarm = [[ORAlarm alloc] initWithName:reason severity:kEmergencyAlarm];
             [interlockFailureAlarm setSticky:YES];
-            [interlockFailureAlarm setHelpString:[NSString stringWithFormat:@"HV will be ramped down soon on Vac %c because [%@].\nThis alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it", 'A'+module,reason]];
+            [interlockFailureAlarm setHelpString:[NSString stringWithFormat:@"HV will be ramped down soon on %@ because [%@].\nThis alarm will not be cleared until the condition causing it goes away.\nYou can silence this alarm by acknowledging it", [self vacSystemName],reason]];
             [interlockFailureAlarm postAlarm];
         }
     }
@@ -519,7 +542,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         queue = [[NSOperationQueue alloc] init];
         [queue setMaxConcurrentOperationCount:1]; //can only do one at a time
     }
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
+    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
     [remObj setConnectionTimeout:5];
     if(![remObj isConnected])[remObj connect];
 
@@ -530,7 +553,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (BOOL) sendCommandWithResponse:(NSString*)aCmd
 {
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
+    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
     if(![remObj isConnected])[remObj connect]; //might be connect already and waiting
     BOOL isConnected = [remObj isConnected];
     if(isConnected){
@@ -543,7 +566,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (id) getResponseForKey:(NSString*)aKey
 {
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
+    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
     if([remObj responseExistsForKey:aKey]){
         id response = [remObj responseForKey:aKey];
         [remObj disconnect];
@@ -554,7 +577,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
 
 - (void) disconnect
 {
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
+    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
     if([remObj isConnected])[remObj disconnect];
 }
 
@@ -563,7 +586,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     if(!pingTask){
         pingedSuccessfully = NO;
         
-        ORRemoteSocketModel* remObj = [delegate remoteSocket:module];
+        ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
         NSString*               ip  = [remObj remoteHost];
         
         ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];

@@ -300,6 +300,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         NSMutableArray* thresholdArray  = [NSMutableArray array];
         NSMutableArray* totalCountArray = [NSMutableArray array];
         NSMutableArray* rateArray       = [NSMutableArray array];
+        NSMutableArray* onlineArray     = [NSMutableArray array];
         
         ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
         int numSegments = [self numberSegmentsInGroup:aSet];
@@ -308,6 +309,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             [thresholdArray     addObject:[NSNumber numberWithFloat:[segmentGroup getThreshold:i]]];
             [totalCountArray    addObject:[NSNumber numberWithFloat:[segmentGroup getTotalCounts:i]]];
             [rateArray          addObject:[NSNumber numberWithFloat:[segmentGroup getRate:i]]];
+            [onlineArray        addObject:[NSNumber numberWithFloat:[segmentGroup online:i]]];
         }
         
         NSArray* mapEntries = [[segmentGroup paramsAsString] componentsSeparatedByString:@"\n"];
@@ -315,6 +317,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         if([thresholdArray count])  [aDictionary setObject:thresholdArray   forKey: @"thresholds"];
         if([totalCountArray count]) [aDictionary setObject:totalCountArray  forKey: @"totalcounts"];
         if([rateArray count])       [aDictionary setObject:rateArray        forKey: @"rates"];
+        if([onlineArray count])     [aDictionary setObject:onlineArray      forKey: @"online"];
         if([mapEntries count])      [aDictionary setObject:mapEntries       forKey: @"geometry"];
         
         NSArray* totalRateArray = [[[self segmentGroup:aSet] totalRate] ratesAsArray];
@@ -424,7 +427,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (id) mjdInterlocks:(int)index
 {
     if(!mjdInterlocks[index]){
-        mjdInterlocks[index] = [[ORMJDInterlocks alloc] initWithDelegate:self module:index];
+        mjdInterlocks[index] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:index];
     }
     return mjdInterlocks[index];
 }
@@ -557,7 +560,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
     int i;
     for(i=0;i<2;i++){
-        mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self module:i];
+        mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
     }
     pollTime  = [decoder decodeIntForKey:	@"pollTime"];
     stringMap = [[decoder decodeObjectForKey:@"stringMap"] retain];

@@ -76,11 +76,11 @@
 							</set>
 							<string key="NSFrame">{{-7, -10}, {1043, 751}}</string>
 							<reference key="NSSuperview" ref="63912161"/>
-							<reference key="NSNextKeyView" ref="310617234"/>
+							<reference key="NSNextKeyView" ref="618824186"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="536685356">
 									<object class="NSView" key="NSView" id="310617234">
-										<reference key="NSNextResponder" ref="975150536"/>
+										<nil key="NSNextResponder"/>
 										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSCustomView" id="719989598">
@@ -1240,11 +1240,11 @@ AAABAAAAAQ</bytes>
 														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
 														<int key="NSState">1</int>
-														<object class="NSCustomResource" key="NSOnImage" id="57327675">
+														<object class="NSCustomResource" key="NSOnImage" id="35963237">
 															<string key="NSClassName">NSImage</string>
 															<string key="NSResourceName">NSMenuCheckmark</string>
 														</object>
-														<object class="NSCustomResource" key="NSMixedImage" id="667037624">
+														<object class="NSCustomResource" key="NSMixedImage" id="209816118">
 															<string key="NSClassName">NSImage</string>
 															<string key="NSResourceName">NSMenuMixedState</string>
 														</object>
@@ -1261,8 +1261,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<reference key="NSTarget" ref="1064672646"/>
 															</object>
@@ -1304,8 +1304,8 @@ AAABAAAAAQ</bytes>
 														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
 														<int key="NSState">1</int>
-														<reference key="NSOnImage" ref="57327675"/>
-														<reference key="NSMixedImage" ref="667037624"/>
+														<reference key="NSOnImage" ref="35963237"/>
+														<reference key="NSMixedImage" ref="209816118"/>
 														<string key="NSAction">_popUpItemAction:</string>
 														<int key="NSTag">4</int>
 														<reference key="NSTarget" ref="778192372"/>
@@ -1320,8 +1320,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<int key="NSTag">1</int>
 																<reference key="NSTarget" ref="778192372"/>
@@ -1332,8 +1332,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<int key="NSTag">2</int>
 																<reference key="NSTarget" ref="778192372"/>
@@ -1656,7 +1656,6 @@ AAABAAAAAQ</bytes>
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 25}, {1023, 713}}</string>
-										<reference key="NSSuperview" ref="975150536"/>
 										<reference key="NSNextKeyView" ref="832553978"/>
 									</object>
 									<string key="NSLabel">Detector</string>
@@ -2251,8 +2250,8 @@ AAABAAAAAQ</bytes>
 														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
 														<int key="NSState">1</int>
-														<reference key="NSOnImage" ref="57327675"/>
-														<reference key="NSMixedImage" ref="667037624"/>
+														<reference key="NSOnImage" ref="35963237"/>
+														<reference key="NSMixedImage" ref="209816118"/>
 														<string key="NSAction">_popUpItemAction:</string>
 														<int key="NSTag">1</int>
 														<reference key="NSTarget" ref="772914483"/>
@@ -2268,8 +2267,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<int key="NSTag">2</int>
 																<reference key="NSTarget" ref="772914483"/>
@@ -2280,8 +2279,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<int key="NSTag">4</int>
 																<reference key="NSTarget" ref="772914483"/>
@@ -2314,7 +2313,7 @@ AAABAAAAAQ</bytes>
 								<object class="NSTabViewItem" id="118053325">
 									<string key="NSIdentifier">1</string>
 									<object class="NSView" key="NSView" id="618824186">
-										<nil key="NSNextResponder"/>
+										<reference key="NSNextResponder" ref="975150536"/>
 										<int key="NSvFlags">274</int>
 										<array class="NSMutableArray" key="NSSubviews">
 											<object class="NSTextField" id="28513198">
@@ -2327,7 +2326,7 @@ AAABAAAAAQ</bytes>
 												<object class="NSTextFieldCell" key="NSCell" id="202520581">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">71438336</int>
-													<string key="NSContents">Remote Socket to Cryo VacB</string>
+													<string key="NSContents">Remote Socket to Cryo VacA</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="28513198"/>
 													<reference key="NSBackgroundColor" ref="293449411"/>
@@ -2346,7 +2345,7 @@ AAABAAAAAQ</bytes>
 												<object class="NSTextFieldCell" key="NSCell" id="767004058">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">71438336</int>
-													<string key="NSContents">Remote Socket to Cryo VacA</string>
+													<string key="NSContents">Remote Socket to Cryo VacB</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSControlView" ref="962936806"/>
 													<reference key="NSBackgroundColor" ref="293449411"/>
@@ -2520,8 +2519,8 @@ AAABAAAAAQ</bytes>
 														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
 														<int key="NSState">1</int>
-														<reference key="NSOnImage" ref="57327675"/>
-														<reference key="NSMixedImage" ref="667037624"/>
+														<reference key="NSOnImage" ref="35963237"/>
+														<reference key="NSMixedImage" ref="209816118"/>
 														<string key="NSAction">_popUpItemAction:</string>
 														<reference key="NSTarget" ref="432830952"/>
 													</object>
@@ -2535,8 +2534,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<reference key="NSTarget" ref="432830952"/>
 															</object>
@@ -2546,8 +2545,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<reference key="NSTarget" ref="432830952"/>
 															</object>
@@ -2557,8 +2556,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<reference key="NSTarget" ref="432830952"/>
 															</object>
@@ -2568,8 +2567,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<reference key="NSTarget" ref="432830952"/>
 															</object>
@@ -2643,7 +2642,7 @@ AAABAAAAAQ</bytes>
 																				<int key="NSvFlags">256</int>
 																				<string key="NSFrameSize">{263, 173}</string>
 																				<reference key="NSSuperview" ref="908262087"/>
-																				<reference key="NSNextKeyView" ref="406252638"/>
+																				<reference key="NSNextKeyView" ref="396664227"/>
 																				<bool key="NSEnabled">YES</bool>
 																				<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																				<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -2796,12 +2795,13 @@ AAABAAAAAQ</bytes>
 																</array>
 																<string key="NSFrame">{{2, 40}, {265, 191}}</string>
 																<reference key="NSSuperview" ref="681168526"/>
-																<reference key="NSNextKeyView" ref="908262087"/>
+																<reference key="NSNextKeyView" ref="406252638"/>
 																<int key="NSsFlags">133122</int>
 																<reference key="NSVScroller" ref="406252638"/>
 																<reference key="NSHScroller" ref="755564438"/>
 																<reference key="NSContentView" ref="908262087"/>
 																<reference key="NSHeaderClipView" ref="821913731"/>
+																<reference key="NSCornerView" ref="390485050"/>
 																<bytes key="NSScrollAmts">QSAAAEEgAABBiAAAQYgAAA</bytes>
 																<double key="NSMinMagnification">0.25</double>
 																<double key="NSMaxMagnification">4</double>
@@ -2870,7 +2870,7 @@ AAABAAAAAQ</bytes>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Prototype/CryoVacA</string>
+													<string key="NSContents">Module 1/CryoVacB</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="170088782"/>
 													<reference key="NSTextColor" ref="276571355"/>
@@ -2902,7 +2902,7 @@ AAABAAAAAQ</bytes>
 																				<int key="NSvFlags">256</int>
 																				<string key="NSFrameSize">{263, 173}</string>
 																				<reference key="NSSuperview" ref="220863239"/>
-																				<reference key="NSNextKeyView" ref="83418983"/>
+																				<reference key="NSNextKeyView" ref="535073958"/>
 																				<bool key="NSEnabled">YES</bool>
 																				<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																				<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -3052,12 +3052,13 @@ AAABAAAAAQ</bytes>
 																</array>
 																<string key="NSFrame">{{2, 40}, {265, 191}}</string>
 																<reference key="NSSuperview" ref="103400"/>
-																<reference key="NSNextKeyView" ref="220863239"/>
+																<reference key="NSNextKeyView" ref="83418983"/>
 																<int key="NSsFlags">133122</int>
 																<reference key="NSVScroller" ref="83418983"/>
 																<reference key="NSHScroller" ref="572186228"/>
 																<reference key="NSContentView" ref="220863239"/>
 																<reference key="NSHeaderClipView" ref="236566998"/>
+																<reference key="NSCornerView" ref="937851564"/>
 																<bytes key="NSScrollAmts">QSAAAEEgAABBiAAAQYgAAA</bytes>
 																<double key="NSMinMagnification">0.25</double>
 																<double key="NSMaxMagnification">4</double>
@@ -3127,7 +3128,7 @@ AAABAAAAAQ</bytes>
 												<object class="NSTextFieldCell" key="NSTitleCell">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Module 1/CryoVacB</string>
+													<string key="NSContents">Module 2/CryoVacA</string>
 													<reference key="NSSupport" ref="26"/>
 													<reference key="NSBackgroundColor" ref="170088782"/>
 													<reference key="NSTextColor" ref="276571355"/>
@@ -3213,6 +3214,7 @@ AAABAAAAAQ</bytes>
 											</object>
 										</array>
 										<string key="NSFrame">{{10, 25}, {1023, 713}}</string>
+										<reference key="NSSuperview" ref="975150536"/>
 										<reference key="NSNextKeyView" ref="536969861"/>
 									</object>
 									<string key="NSLabel">Constraints</string>
@@ -4709,8 +4711,8 @@ AAABAAAAAQ</bytes>
 														<int key="NSKeyEquivModMask">1048576</int>
 														<int key="NSMnemonicLoc">2147483647</int>
 														<int key="NSState">1</int>
-														<reference key="NSOnImage" ref="57327675"/>
-														<reference key="NSMixedImage" ref="667037624"/>
+														<reference key="NSOnImage" ref="35963237"/>
+														<reference key="NSMixedImage" ref="209816118"/>
 														<string key="NSAction">_popUpItemAction:</string>
 														<reference key="NSTarget" ref="784593695"/>
 													</object>
@@ -4724,8 +4726,8 @@ AAABAAAAAQ</bytes>
 																<string key="NSKeyEquiv"/>
 																<int key="NSKeyEquivModMask">1048576</int>
 																<int key="NSMnemonicLoc">2147483647</int>
-																<reference key="NSOnImage" ref="57327675"/>
-																<reference key="NSMixedImage" ref="667037624"/>
+																<reference key="NSOnImage" ref="35963237"/>
+																<reference key="NSMixedImage" ref="209816118"/>
 																<string key="NSAction">_popUpItemAction:</string>
 																<reference key="NSTarget" ref="784593695"/>
 															</object>
@@ -4767,12 +4769,12 @@ AAABAAAAAQ</bytes>
 									<reference key="NSTabView" ref="975150536"/>
 								</object>
 							</array>
-							<reference key="NSSelectedTabViewItem" ref="536685356"/>
+							<reference key="NSSelectedTabViewItem" ref="118053325"/>
 							<reference key="NSFont" ref="26"/>
 							<int key="NSTvFlags">134217728</int>
 							<bool key="NSAllowTruncatedLabels">YES</bool>
 							<array class="NSMutableArray" key="NSSubviews">
-								<reference ref="310617234"/>
+								<reference ref="618824186"/>
 							</array>
 						</object>
 					</array>
