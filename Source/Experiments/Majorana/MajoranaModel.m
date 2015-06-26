@@ -515,8 +515,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(!rampHVAlarm[aVacSystem]){
         rampHVAlarm[aVacSystem] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Panic HV (Vac %c)",'A'+aVacSystem] severity:(kEmergencyAlarm)];
         [rampHVAlarm[aVacSystem] setSticky:NO];
-        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"HV was ramped down on Module %d because Vac %c failed interlocks\nThe alarm can be cleared by acknowledging it.",aCrate+1, 'A'+aVacSystem]];
-        NSLogColor([NSColor redColor], @"HV was ramped down on Module %d because Vac %c failed interlocks\n",aCrate+1,
+        [rampHVAlarm[aVacSystem] setHelpString:[NSString stringWithFormat:@"HV was ramped down on Module %d because Vac %c failed interlocks\nThe alarm can be cleared by acknowledging it.",aCrate, 'A'+aVacSystem]];
+        NSLogColor([NSColor redColor], @"HV was ramped down on Module %d because Vac %c failed interlocks\n",aCrate,
                    'A'+aVacSystem);
     }
     
