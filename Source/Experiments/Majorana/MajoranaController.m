@@ -305,13 +305,13 @@
 - (void) ignorePanicOnBChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnBCB setIntValue: [model ignorePanicOnB]];
-    [ignore2Field setStringValue: [model ignorePanicOnB]?@"HV Ramp will be IGNORED":@""];
+    [ignore1Field setStringValue: [model ignorePanicOnB]?@"HV Ramp will be IGNORED":@""];
 }
 
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnACB setIntValue: [model ignorePanicOnA]];
-    [ignore1Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
+    [ignore2Field setStringValue: [model ignorePanicOnA]?@"HV Ramp will be IGNORED":@""];
 }
 
 - (void) specialUpdate:(NSNotification*)aNote
