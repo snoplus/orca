@@ -179,10 +179,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(ignorePanicOnB != aState){
         ignorePanicOnB = aState;
         if(ignorePanicOnB){
-            NSLogColor([NSColor redColor],@"WARNING: HV checks will ignore HV Ramp Action on Module 2\n");
+            NSLogColor([NSColor redColor],@"WARNING: HV checks will ignore HV Ramp Action on Module 1\n");
         }
         else {
-            NSLog(@"HV checks will NOT ignore HV ramp action on Module 2\n");
+            NSLog(@"HV checks will NOT ignore HV ramp action on Module 1\n");
         }
     }
     
@@ -201,10 +201,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(ignorePanicOnA != aState){
         ignorePanicOnA = aState;
         if(ignorePanicOnA){
-            NSLogColor([NSColor redColor],@"WARNING: HV checks will ignore HV Ramp Action on Module 1\n");
+            NSLogColor([NSColor redColor],@"WARNING: HV checks will ignore HV Ramp Action on Module 2\n");
         }
         else {
-            NSLog(@"HV checks will NOT ignore HV ramp action on Module 1\n");
+            NSLog(@"HV checks will NOT ignore HV ramp action on Module 2\n");
         }
     }
 
