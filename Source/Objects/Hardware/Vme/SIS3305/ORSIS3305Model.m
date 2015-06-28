@@ -188,6 +188,30 @@ NSString* ORSIS3305ModelRegisterIndexChanged    = @"ORSIS3305ModelRegisterIndexC
 NSString* ORSIS3305ModelRegisterWriteValueChanged = @"ORSIS3305ModelRegisterWriteValueChanged";
 
 
+//
+//const unsigned short kchannelModeAndEventID[16][16] = {
+//    {0,1,2,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 0
+//    {0,1,2,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 1
+//    {0,1,2,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 2
+//    {0,1,2,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 3
+//    
+//    {0xF,0xF,0xF,0xF,0,2,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 4
+//    {0xF,0xF,0xF,0xF,1,2,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 5
+//    {0xF,0xF,0xF,0xF,0,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 6
+//    {0xF,0xF,0xF,0xF,1,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 7
+//    
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,0,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,1,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,2,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,0,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,1,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,2,0xF,0xF,0xF,0xF,0xF,0xF,0xF},  // channel mode 8
+//    {0xF,0xF,0xF,0xF,0xF,0xF,0xF,3,0xF,0xF,0xF,0xF,0xF,0xF,0xF}  // channel mode 8
+//};
+
+
+
 @interface ORSIS3305Model (private)
 //- (void) writeDacOffsets;
 - (void) setUpArrays;
@@ -1320,12 +1344,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return [[sampleLengths objectAtIndex:group] unsignedShortValue];
 }
 
-- (void) setSampleLength:(short)aChan withValue:(int)aValue
+- (void) setSampleLength:(short)group withValue:(int)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:aChan withValue:[self sampleLength:aChan]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:group withValue:[self sampleLength:group]];
     aValue = [self limitIntValue:aValue min:4 max:0xfffc];
     aValue = (aValue/4)*4;
-    [sampleLengths replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    [sampleLengths replaceObjectAtIndex:group withObject:[NSNumber numberWithInt:aValue]];
 //    [self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SampleLengthChanged object:self];
 }
@@ -3174,6 +3198,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         addr = 0x1;     // control reg
         RWcmd = 0x1;    // write command
         writeData = (([self channelMode:adc]    & 0xF)  << 0)
+//                |   ((1<<7))        // turn on gray code
                 |   (([self bandwidth:adc]      & 0x1)  << 8)
                 |   (([self testMode:adc]       & 0x1)  << 12);
         
@@ -3376,7 +3401,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     
-    NSLog(@"SIS3305 Sample logic armed\n");
+//    NSLog(@"SIS3305 Sample logic armed\n");
 }
 
 - (void) disarmSampleLogic
@@ -3388,7 +3413,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     
-    NSLog(@"SIS3305 Sample logic disarmed\n");
+//    NSLog(@"SIS3305 Sample logic disarmed\n");
 }
 
 
@@ -3415,7 +3440,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     
-    NSLog(@"SIS3305 Sample logic enabled \n");
+//    NSLog(@"SIS3305 Sample logic enabled \n");
     
 }
 
@@ -4744,6 +4769,149 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return dataDictionary;
 }
 
+//- (unsigned short) getChannelfromEventID:(unsigned short)eventID andGroup:(unsigned short)group
+//{
+//    // This method is incomplete! It does not account for all event IDs / modes
+//    // Instead, it is expected that the analyst will determine the channel number after, to speed the data taking.
+//    
+////    unsigned short channel;
+////    unsigned short eventMode = [self eventSavingMode:group];
+////    unsigned short chanMode = [self channelMode:group];
+//    
+//    
+////    if(eventID < 8)
+//        return kchannelModeAndEventID[ channelMode[group] ][ eventID ] + group<<2;
+//    
+////    if ((chanMode >> 2) == 0)                   // 4-channel modes
+////        channel = (4*group) + (eventID & 0x3);
+////
+////    else if ((chanMode >> 2) == 0x02)           // 1-channel modes
+////        channel = (4*group) + (eventID & 0x3);
+////    
+////    else if ((chanMode >> 2) == 0x03)           // common input modes
+////        channel = (4*group) + (eventID & 0x3);
+////    
+////    // the harder case...
+////    else if ((chanMode >> 2) == 0x01)           // 2-channel modes
+////        channel = (chanMode >> ((eventID>>1) & 0x1))&0x1 + ((chanMode >> ((eventID>>1) & 0x1))&0x1)<<2 + group<<2;
+////    else
+////        channel = 0xF;  // error!
+//    
+//
+//    
+////    return channel;
+//
+//    /*
+//    switch (chanMode) {
+//        case 0x0:
+//        case 0x1:
+//        case 0x2:
+//        case 0x3:// 4-channel event FIFO Mode, 1.25 GSPS. Event ID is channel here (modulo group)
+//            channel = eventID+(4*group);
+//            break;
+//        case 0x4:// 2-channel A and C enabled at 2.5 gsps
+//            if (eventMode == 1) {
+//                if(eventID == 4)
+//                    channel = 1 + (4*group); // 1 or 5 (ADC1 or ADC2)
+//                else if (eventID == 5)
+//                    channel = 3 +(4*group); // 3 or 7
+//                else{// Nothing else should be possible!
+//                    channel = 0xFF;
+//                    NSLog(@"Error, event ID  %d shouldn't be possible here!",eventID);
+//                }
+//            }
+//            else{
+//                channel = 0xFF;
+//                NSLog(@"Error, only Event Saving Mode 1 should be possible for two channel mode! Your data taking setup should not be allowed!\n");
+//            }
+//            break;
+//        case 0x5: // 2-channel B and C enabled at 2.5 Gsps
+//            if (eventMode == 1) // 2-ch event FIFO mode
+//            {
+//                if(eventID == 4)        // A or B (but must be B here)
+//                    channel = 2 + (4*group);        // 2 or 6 (ADC1 or ADC2)
+//                else if (eventID == 5)  // C or D (but must be C here)
+//                    channel = 3 +(4*group);         // 3 or 7
+//                else{// Nothing else should be possible!
+//                    channel = 0xFF;
+//                    NSLog(@"Error, event ID  %d shouldn't be possible here!",eventID);
+//                }
+//            }
+//            else{
+//                channel = 0xFF;
+//                NSLog(@"Error, only Event Saving Mode 1 should be possible for two channel mode! Your data taking setup should not be allowed!\n");
+//            }
+//            break;
+//        case 0x6:   // 2-channel A and D enabled at 2.5 Gsps
+//            if (eventMode == 1) // 2-ch event FIFO mode
+//            {
+//                if(eventID == 4)        // A or B (but must be A here)
+//                    channel = 0 + (4*group);        // 2 or 6 (ADC1 or ADC2)
+//                else if (eventID == 5)  // C or D (but must be D here)
+//                    channel = 4 +(4*group);         // 3 or 7
+//                else{// Nothing else should be possible!
+//                    channel = 0xFF;
+//                    NSLog(@"Error, event ID  %d shouldn't be possible here!",eventID);
+//                }
+//            }
+//            else{
+//                channel = 0xFF;
+//                NSLog(@"Error, only Event Saving Mode 1 should be possible for two channel mode! Your data taking setup should not be allowed!\n");}
+//            // FIX: This doesn't allow for most of the possible event modes. This is not at all a completed method!!!
+//            break;
+//            
+//            
+//        default:
+//            channel = 0xFF;
+//            break;
+//    }
+//    */
+//    
+//}
+
+
+- (unsigned short) digitizationRate:(unsigned short) group
+{
+    // Returns an indication of the digitization rate for a given group:
+    //      0: 1.25 Ghz
+    //      1: 2.5 Gsps
+    //      2: 5 Gsps
+    
+    unsigned short chanMode = [self channelMode:group];
+    unsigned short speed = chanMode >> 2;               // this is just a coincidence, but it is basically true
+    
+    switch (speed) {
+        case 0x0:   // 4-channel event FIFO Mode, 1.25 GSPS. Event ID is channel here (modulo group)
+            return 0;
+        case 0x1:   // 2 channel 2.5 Gsps mode
+            return 1;
+        case 0x2:   // One channel 5 Gsps mode
+            return 2;
+        case 0x3:   // Common input mode, which is some kind of 1.25 Gsps mode.
+            return 0;
+        default:
+            NSLog(@"Rate unknown! Error...");
+            return 0xFF;
+            break;
+    }
+}
+
+- (unsigned long) longsInSample:(unsigned short)group
+{
+    // the number of longs in a sample will depend on the event saving mode and the rate of digitization
+    // (as well as obviously the sample size)
+//    unsigned short savingMode = [self eventSavingMode:group];
+
+    // Sample length is number of 128-bit (4-word) blocks minutes 1.
+    // Higher sample rates interlace between 
+    
+    unsigned long sampleLength = [self sampleLength:group];     // number of 128-bit blocks minus 1
+    unsigned short rate = [self digitizationRate:group];
+    
+    return (sampleLength+1)*( 4*(rate+1) );
+}
+
+
 #pragma mark - HW Wizard
 -(BOOL) hasParmetersToRamp
 {
@@ -5027,7 +5195,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      */
     
 	[self reset];
-//	[self initBoard];
+	[self initBoard];
     
     [self writeClockSource:NO];
     [self ADCSynchReset];
@@ -5104,13 +5272,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 if(wrapMaskForRun & (1L<<group))
                     sisHeaderLength = 4; // 32-bit Lwords
                 
-                int fixMe; //fix the sample length
-                //dataRecordlength[group] = 3 + sisHeaderLength + [self sampleLength:group];
-                dataRecordlength[group] = sisHeaderLength + 1024;
-                                            //Orca header+sisheader+samples
-                NSLog(@"Data record length%d: %d",group,dataRecordlength[group]);
+                orcaHeaderLength = 3;   // 3 words in the Orca header
                 
-                dataRecord[group]		= malloc((dataRecordlength[group]+3)*sizeof(unsigned long));
+                // data record length is the length without the Orca header (how much we will read)
+                // total record length is how much space it will take on disk (with Orca header)
+                dataRecordLength[group] = sisHeaderLength + [self longsInSample:group];
+                totalRecordLength[group] = dataRecordLength[group] + orcaHeaderLength;
+                
+                dataRecord[group]		= malloc((totalRecordLength[group])*sizeof(unsigned long));
             }
             isRunning = YES;
             firstTime = NO;
@@ -5118,14 +5287,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             [self enableSampleLogic];
             [self pulseExternalTriggerOut];
 //            [self armSampleLogic];
-            
-            waitingForSomeChannels = NO;
         }
         else {  // Not the first time
 
             unsigned long ac = 0;  // acquisition control register value
-            unsigned long pollcount = 1;
-//            
+//
 //            bool DMStopped = NO;
 //            while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
 //            {
@@ -5141,7 +5307,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //                DMStopped = (ac & 0x20000000);
 //            }
             
-            pollcount = 0;
             
             bool endAddThreshFlag = NO;
             unsigned long sampleAddress14 = 0;
@@ -5152,27 +5317,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             unsigned long sampleStatus58 = 0;
             unsigned long value1 = 0;
             unsigned long value2 = 0;
+
+            ac =              [self readAcquisitionControl:NO];
+            sampleAddress14 = [self readActualSampleAddress:0];
+            sampleAddress58 = [self readActualSampleAddress:1];
+            endThresh14     = [self readEndAddressThresholdOfGroup:0];
+            endThresh58     = [self readEndAddressThresholdOfGroup:1];
+            sampleStatus14  = [self readSamplingStatusForGroup:0];
+            sampleStatus58  = [self readSamplingStatusForGroup:1];
+            value1          = [self readActualSampleValueOfChannel:1];
+            value2          = [self readActualSampleValueOfChannel:8];
             
-            while (!endAddThreshFlag && (pollcount<100))     // Check if the end address threshold has been reached
-            {
-                ac =              [self readAcquisitionControl:NO];
-                sampleAddress14 = [self readActualSampleAddress:0];
-                sampleAddress58 = [self readActualSampleAddress:1];
-                endThresh14     = [self readEndAddressThresholdOfGroup:0];
-                endThresh58     = [self readEndAddressThresholdOfGroup:1];
-                sampleStatus14  = [self readSamplingStatusForGroup:0];
-                sampleStatus58  = [self readSamplingStatusForGroup:1];
-                value1          = [self readActualSampleValueOfChannel:1];
-                value2          = [self readActualSampleValueOfChannel:2];
-                
-                if(pollcount%10 == 0){
-                    //NSLog(@"Polling for end address threshold flag (%d)...\n", pollcount);
-                    //[self forceTrigger];
-                }
-                
-                endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
-                pollcount++;
-            }
+            endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
             
             if (endAddThreshFlag == NO) {
                 return;
@@ -5180,7 +5336,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             // disarm/disable sampling?
 //            [self disarmSampleLogic];
-            
             
             //if we get here, there may be something to read out
             unsigned long sampleAddress[kNumSIS3305Groups];
@@ -5190,12 +5345,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             // read now all  Sample Addresses of all at which the sampling has stoped
 
             unsigned short group =0;
-//            for (group=0; group<kNumSIS3305Groups; group++) {
-//                sampleAddress[group] = [self readActualSampleAddress:0];
-//                numberOfWords[group] = ([self readSampleLength:group]+1)*(16);
-//                numberBytesToRead[group]= (numberOfWords[group] * 4);
-//            }
-            
+
             // prepare readout statemachines
             // Transfer Control ch1to4, start internal readout (copy from Memory to VME FPGA)
             // Transfer Control ch5to8, start internal readout (copy from Memory to VME FPGA)
@@ -5204,20 +5354,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             [self writeDataTransferControlRegister:1 withCommand:2 withAddress:0];  // read command
 
             
-            // loop over all modules
+            // loop over all groups
             for(group=0;group<kNumSIS3305Groups;group++) {
 //                int group				 = i<4?0:1;
-
-                    // read  Data from fifo chip ADC1/2
                 unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
                 
                 numberBytesToRead[group] = [self readActualSampleAddress:group];
-                //NSLog(@"     sample address: 0x%x\n",sampleAddress[group]);
-
-
                 numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
                 
-                // we can only readout the full buffer at once
+                // we can only readout at max one full buffer at once
                 if (numberOfWords[group] > adcBufferLength) {
                     numberOfWords[group] = adcBufferLength;
                 }
@@ -5231,37 +5376,42 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     do {
                         BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
                         
-                        int index = 0;
-                        dataRecord[group][index++] =   dataId | dataRecordlength[group]+3;
+                        dataRecord[group][0] =   dataId | totalRecordLength[group];
                         
-                        dataRecord[group][index++] =	(([self crateNumber]&0x0000000f)<<21) |
-                                                        (([self slot] & 0x0000001f)<<16)      |
-                                                        ((group & 0x000000ff)<<8)			  |
-                                                            wrapMode;
-                        int fixmeto;
-                        //dataRecord[group][index++] = [self sampleLength:group]/2;
-                        dataRecord[group][index++] = 1024;
-                        // [self readActualSampleAddress:group] + addrOffset
-                        unsigned long* p = &dataRecord[group][index];
+                        dataRecord[group][1] =	(([self crateNumber]            & 0xf) << 28)   |
+                                                (([self slot]                   & 0x1f)<< 20)   |
+                                                (([self channelMode:group]      & 0xF) << 16)   |
+                                                ((group                         & 0xF) << 12)   |
+                                                (([self digitizationRate:group] & 0xF) << 8)    |
+                                                (([self eventSavingMode:group]  & 0xF) << 4)    |
+                                                (wrapMode                       & 0x1);
+
+                        dataRecord[group][2] = dataRecordLength[group];
+
+                        unsigned long* p = &dataRecord[group][3];
                         [[self adapter] readLongBlock: p
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
-                                            numToRead: dataRecordlength[group]
+                                            numToRead: dataRecordLength[group]
                                            withAddMod: [self addressModifier]
                                         usingAddSpace: 0x01];
                         
- 
-                        // this should push it return
-                        [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:dataRecordlength[group]+3];
-
-                       // NSLog(@"  read: 0x%x\n",dataRecord[group][index]);
+                        [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
                         
-                        addrOffset += (dataRecordlength[group]-3)*4;
+                        addrOffset += (dataRecordLength[group]-orcaHeaderLength)*4;
                         if(++eventCount > 25)break;
                     } while (addrOffset < sampleAddress[group]);
                 }
-            }
-		}
-	}
+            } // loop over groups
+            
+            // after reading out everything:
+            [self writeRingbufferPretriggerDelays];
+            
+            // refresh ringbuffer predelay?
+            // key arm/enable again
+            [self armSampleLogic];
+            [self enableSampleLogic];
+		}   // End if: not first time
+	}   // end TRY
 	@catch(NSException* localException) {
 		[self incExceptionCount];
 		[localException raise];

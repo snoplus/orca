@@ -1125,7 +1125,7 @@
         if(i<4)
             [[preTriggerDelay14Matrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
         else if(i>=4)
-            [[preTriggerDelay58Matrix cellWithTag:i] setIntValue:[model preTriggerDelay:i]];
+            [[preTriggerDelay58Matrix cellWithTag:i-4] setIntValue:[model preTriggerDelay:i]];
     }
 }
 
@@ -1259,13 +1259,13 @@
     [generalResetButton             setEnabled:!locked && !runInProgress];
     [armSampleLogicButton           setEnabled:!locked && !runInProgress];
     [disarmSampleLogicButton        setEnabled:!locked && !runInProgress];
-    [triggerButton                  setEnabled:!locked && !runInProgress];
+    [triggerButton                  setEnabled:!lockedOrRunningMaintenance];
     [enableSampleLogicButton        setEnabled:!locked && !runInProgress];
     [setVetoButton                  setEnabled:!locked && !runInProgress];
-    [clearVetoButton                setEnabled:!locked && !runInProgress];
+    [clearVetoButton                setEnabled:!lockedOrRunningMaintenance];
     [ADCClockSynchButton            setEnabled:!locked && !runInProgress];
     [ResetADCFPGALogicButton        setEnabled:!locked && !runInProgress];
-    [externalTriggerOutPulseButton  setEnabled:!locked && !runInProgress];
+    [externalTriggerOutPulseButton  setEnabled:!lockedOrRunningMaintenance];
     // end key regs
     
 
@@ -1628,12 +1628,13 @@
 
 - (IBAction) lemoOutSelectTrigger58Action:(id)sender
 {
-    int chan;
+//    int chan;
     BOOL mode;
-    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
-        mode = [[sender cellAtIndex:chan] state];
+    unsigned short chan = [sender selectedCel];
+//    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
+        mode = [[sender selectedCell] state];
         [model setLemoOutSelectTrigger:(chan+4) toState:mode];
-    }
+//    }
 }
 - (IBAction) lemoOutSelectTriggerInAction:(id)sender
 {

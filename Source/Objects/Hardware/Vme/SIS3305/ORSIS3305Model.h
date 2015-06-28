@@ -174,8 +174,10 @@
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
 	
-	unsigned long* dataRecord[kNumSIS3305Groups];
-	unsigned long  dataRecordlength[kNumSIS3305Groups];
+	unsigned long*  dataRecord[kNumSIS3305Groups];
+	unsigned long   dataRecordLength[kNumSIS3305Groups];
+    unsigned long   orcaHeaderLength;
+    unsigned long   totalRecordLength[kNumSIS3305Groups];
 	
 	//calculated values
 	unsigned long numEnergyValues;
@@ -228,6 +230,11 @@
         unsigned int 	spi_1chModeD_gain_adc[8];	   // 1-channel Mode use input D
         unsigned int 	spi_1chModeD_offset_adc[8];   // 1-channel Mode use input D
     } ;
+    
+    
+//    const unsigned short kchannelModeAndEventID[16][8];
+    
+    
 //    struct SIS3305_ADC_SPI_Config_Struct {
 //        unsigned int 	uintChipID[2]; 		// addr=0, read
 //        unsigned int 	uintControl[2]; 	// addr=1  write
@@ -513,6 +520,10 @@
 - (id)              rateObject:(int)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
+
+
+- (unsigned short) digitizationRate:(unsigned short) group;
+- (unsigned long) longsInSample:(unsigned short)group;
 
 //- (void) calculateSampleValues;
 
