@@ -644,7 +644,8 @@ unsigned long long facto(unsigned long long num)
                                                 NSLog(@"Burst duration is %f, start is %f, end is %f, adc %i \n", durSec, startTime, endTime, adcStart);
                                                 countsInBurst = countofNchan - 1;
                                                 
-                                                //Position of burst
+                                                //Position and reduced duration of burst
+                                                rSec = 0;
                                                 int BurstLen = Nchans.count;
                                                 int m;
                                                 Xcenter = 0;
@@ -666,7 +667,17 @@ unsigned long long facto(unsigned long long num)
                                                     Xsqr = Xsqr + (Xposn * Xposn);
                                                     Ycenter = Ycenter + Yposn;
                                                     Ysqr = Ysqr + (Yposn * Yposn);
+                                                    //Record reduced time
+                                                    if(m>1)
+                                                    {
+                                                        double rsTime = ([[Nsecs objectAtIndex:(m)] longValue] + 0.000001*[[Nmics objectAtIndex:(m)] longValue]);
+                                                        double reTime = ([[Nsecs objectAtIndex:(m-1)] longValue] + 0.000001*[[Nmics objectAtIndex:(m-1)] longValue]);
+                                                        rSec = rSec + pow((reTime - rsTime),2);
+                                                    }
                                                 }
+                                                //reduced time scaling
+                                                rSec = rSec/(pow(durSec,2));
+                                                rSec = (1 - (sqrt(rSec)))*durSec;
                                                 //NSLog(@"xcenter is %i \n", Xcenter);
                                                 Xcenter = Xcenter / (BurstLen - 1);
                                                 Ycenter = Ycenter / (BurstLen - 1);
@@ -961,7 +972,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	NSLog(@"Process Center status was sent to:\n%@\n",address);
 }
 
-- (void) sendMail:(id)userInfo
+- (void) sendMail:(id)userInfo state:(int)eventState;
 {
 	NSString* address =  [userInfo objectForKey:@"Address"];
 	NSString* content = [NSString string];
@@ -986,8 +997,24 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
 	ORMailer* mailer = [ORMailer mailer];
 	[mailer setTo:address];
-	[mailer setSubject:@"HALO Burst Notification"];
-	[mailer setBody:theContent];
+    NSLog(@"EventState is %i \n", eventState); //mod remove
+    if(eventState == 3)
+    {
+        [mailer setSubject:@"(Test) HALO Burst Notification: SN candidate"];
+	}
+    else if(eventState == 2)
+    {
+        [mailer setSubject:@"(Test) HALO Burst Notification: Spallation"];
+	}
+    else if(eventState == 1)
+    {
+        [mailer setSubject:@"(Test) HALO Burst Notification: Coincidence"];
+	}
+    else
+    {
+        [mailer setSubject:@"(Test) HALO Burst Notification: Other"];
+    }
+    [mailer setBody:theContent];
 	[mailer send:self];
 	[theContent release];
 }
@@ -1102,17 +1129,26 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
     //calc chan prob
     double exChan =999.999;
-    if((multInBurst > 4 && durSec > 1 && adcP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001))
+    if((multInBurst > 4 && rSec > 0.01 && adcP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001))
     {
-        novaState = 1;
+        novaState = 3;
     }
     else
     {
-        novaState = 0;
+        novaState = 0; //Other
+        if (adcP > 0.001) //Coincidence
+        {
+            novaState = 1;
+        }
+        if (multInBurst > 4 && rSec < 0.01 && adcP > 0.001) //Spallation
+        {
+            novaState = 2;
+        }
     }
-    if(novaState == 1) //Send a cping somewhere if the burst is good enough
+    NSLog(@"Novastate set to %i \n", novaState);
+    if(novaState == 3) //Send a cping somewhere if the burst is good enough
     {
-        NSLog(@"novaState is 1, sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
+        NSLog(@"Sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
         NSTask* Cping;
         Cping =[[NSTask alloc] init];
         NSPipe* pipe;
@@ -1150,15 +1186,24 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     //send email to announce the burst
     int numMicTillBurst = (1000000*fmod(numSecTillBurst,1));
+    NSLog(@"Novastate is now %i \n", novaState); ////////////////////////////////////////////////////////////
     NSString* theContent = @"";
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
-    if(novaState == 1)
+    if(novaState == 3)
     {
         theContent = [theContent stringByAppendingString:@"Triage: SN candidate!  Ping sent to snews (not actually, test mode cuts are weaker)\n"];
     }
-    else
+    if(novaState == 2)
     {
-        theContent = [theContent stringByAppendingString:@"Triage: Not a supernova :(\n"];
+        theContent = [theContent stringByAppendingString:@"Triage: Spallation \n"];
+    }
+    if(novaState == 1)
+    {
+        theContent = [theContent stringByAppendingString:@"Triage: Neutron coincidence \n"];
+    }
+    if(novaState == 0)
+    {
+        theContent = [theContent stringByAppendingString:@"Triage: Other (Not neutrons) \n"];
     }
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
@@ -1181,6 +1226,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"SN expected: (x,y)=(0+-655,0+-508) mm, r=0 mm, rms=829 mm  \n"];
     theContent = [theContent stringByAppendingFormat:@"Likelyhood of central position: chisquared %f/2, p = %f \n", rSqrNorm, exp(-0.5*rSqrNorm)];
     theContent = [theContent stringByAppendingFormat:@"Duration of burst: %f seconds \n",durSec];
+    theContent = [theContent stringByAppendingFormat:@"Reduced  duration: %f seconds \n",rSec];
     theContent = [theContent stringByAppendingFormat:@"Num Bursts this run: %d\n",burstCount];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:@"Counts from 5 seconds before the burst untill the next out-of-burst above-threshold event \n"];
@@ -1203,7 +1249,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     
     NSLog(@"theContent in delayedBurstEvent is: \n %@", theContent);
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
-    [self sendMail:userInfo];
+    [self sendMail:userInfo state:novaState];
     
     //flush all queues to the disk fle
     NSString* fileSuffix = [NSString stringWithFormat:@"Burst_%d_",burstCount];

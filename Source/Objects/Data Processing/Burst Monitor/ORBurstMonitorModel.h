@@ -77,6 +77,7 @@
     long int removedMic;
     int numBurstChan;
     double durSec; //The number of seconds the burst takes to finish
+    double rSec; //reduced number of seconds corresponding to most of the counts
     int countsInBurst;
     int foundMult;
     int multInBurst;
@@ -141,7 +142,7 @@
 
 #pragma mark •••EMail
 - (void) mailSent:(NSString*)address;
-- (void) sendMail:(id)userInfo;
+- (void) sendMail:(id)userInfo state:(int)eventState;
 - (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses;
 
 #pragma mark •••Archival
