@@ -1065,7 +1065,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     if(aValue>0xFFFFFF)aValue = 0xFFFFFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setTrapThreshold:chan withValue:trapThreshold[chan]];
 	trapThreshold[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTrapThresholdChanged object:self];
+    NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTrapThresholdChanged object:self userInfo:userInfo];
     [self postAdcInfoProvidingValueChanged];
 }
 
@@ -1957,6 +1958,12 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 {
 	if(noiseFloorRunning){
 		noiseFloorRunning = NO;
+        int i;
+        for(i=0;i<kNumGretina4MChannels;i++){
+            [self setEnabled:i       withValue:oldEnabled[i]];
+            [self setTestThreshold:i withValue:newThreshold[i]];
+        }
+        [self initBoard];
 	}
 	else {
 		noiseFloorState = 0;
@@ -1964,6 +1971,30 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 		[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4MNoiseFloorChanged object:self];
+}
+
+- (void) setTestThreshold:(short)chan withValue:(int)aValue
+{
+    if([self trapEnabled:chan]) [self setTrapThreshold:chan withValue:aValue];
+    else                        [self setLEDThreshold:chan withValue:aValue];
+}
+
+- (unsigned long) testThreshold:(short)chan
+{
+    if([self trapEnabled:chan]) return [self trapThreshold:chan];
+    else                        return [self ledThreshold:chan];
+}
+
+- (unsigned long) maxTestThreshold:(short)chan
+{
+    if([self trapEnabled:chan]) return 0xffffff;
+    else                        return 0x01ffff;
+}
+
+- (void) writeTestThreshold:(short)chan
+{
+    if([self trapEnabled:chan]) [self writeTrapThreshold:chan];
+    else                        [self writeLEDThreshold:chan];
 }
 
 - (void) stepNoiseFloor
@@ -1979,16 +2010,15 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 				//disable all channels
 				for(i=0;i<kNumGretina4MChannels;i++){
 					oldEnabled[i] = [self enabled:i];
-					oldTrapEnabled[i] = [self trapEnabled:i];
 					[self setEnabled:i withValue:NO];
-					[self setTrapEnabled:i withValue:NO];
 					[self writeControlReg:i enabled:NO];
-					oldLEDThreshold[i] = [self ledThreshold:i];
-					[self setLEDThreshold:i withValue:0x1ffff];
-					newLEDThreshold[i] = 0x1ffff;
+					oldThreshold[i] = [self testThreshold:i];
+                    [self setTestThreshold:i withValue:[self maxTestThreshold:i]];
+                    newThreshold[i] = [self testThreshold:i];
 				}
 				[self initBoard];
 				noiseFloorWorkingChannel = -1;
+            
 				//find first channel
 				for(i=0;i<kNumGretina4MChannels;i++){
 					if(oldEnabled[i]){
@@ -1997,11 +2027,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 					}
 				}
 				if(noiseFloorWorkingChannel>=0){
-					noiseFloorLow			= 0;
-					noiseFloorHigh		= 0x1FFFF;
-					noiseFloorTestValue	= 0x1FFFF/2;              //Initial probe position
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:noiseFloorHigh];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
+					noiseFloorLow		= 0;
+					noiseFloorHigh		= [self maxTestThreshold:noiseFloorWorkingChannel];
+					noiseFloorTestValue	= noiseFloorHigh/2;              //Initial probe position
+					[self setTestThreshold:noiseFloorWorkingChannel withValue:noiseFloorHigh];
+					[self writeTestThreshold:noiseFloorWorkingChannel];
 					[self setEnabled:noiseFloorWorkingChannel withValue:YES];
 					[self writeControlReg:noiseFloorWorkingChannel enabled:YES];
 					[self resetFIFO];
@@ -2013,17 +2043,17 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 				break;
 				
 			case 1:
-				if(noiseFloorLow <= noiseFloorHigh) {
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:noiseFloorTestValue];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
+                if(noiseFloorLow <= noiseFloorHigh) {
+					[self setTestThreshold:noiseFloorWorkingChannel withValue:noiseFloorTestValue];
+					[self writeTestThreshold:noiseFloorWorkingChannel];
 					noiseFloorState = 2;	//go check for data
 				}
 				else {
-					newLEDThreshold[noiseFloorWorkingChannel] = noiseFloorTestValue + noiseFloorOffset;
+					newThreshold[noiseFloorWorkingChannel] = noiseFloorTestValue + noiseFloorOffset;
 					[self setEnabled:noiseFloorWorkingChannel withValue:NO];
 					[self writeControlReg:noiseFloorWorkingChannel enabled:NO];
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x1ffff];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
+					[self setTestThreshold:noiseFloorWorkingChannel withValue:[self maxTestThreshold:noiseFloorWorkingChannel]];
+					[self writeTestThreshold:noiseFloorWorkingChannel];
 					noiseFloorState = 3;	//done with this channel
 				}
 				break;
@@ -2038,8 +2068,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 				
 				if((val & kGretina4MFIFOEmpty) == 0){
 					//there's some data in fifo so we're too low with the threshold
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x1ffff];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
+					[self setTestThreshold:noiseFloorWorkingChannel withValue:[self maxTestThreshold:noiseFloorWorkingChannel]];
+					[self writeTestThreshold:noiseFloorWorkingChannel];
 					[self resetFIFO];
 					noiseFloorLow = noiseFloorTestValue + 1;
 				}
@@ -2050,10 +2080,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 				
 			case 3:
 				//go to next channel
-				noiseFloorLow		= 0;
-				noiseFloorHigh		= 0x7FFF;
-				noiseFloorTestValue	= 0x7FFF/2;              //Initial probe position
 				//find first channel
+                noiseFloorLow		= 0;
 				int startChan = noiseFloorWorkingChannel+1;
 				noiseFloorWorkingChannel = -1;
 				for(i=startChan;i<kNumGretina4MChannels;i++){
@@ -2062,6 +2090,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 						break;
 					}
 				}
+                noiseFloorHigh		= [self maxTestThreshold:noiseFloorWorkingChannel];
+                noiseFloorTestValue	= noiseFloorHigh/2;              //Initial probe position
 				if(noiseFloorWorkingChannel >= startChan){
 					[self setEnabled:noiseFloorWorkingChannel withValue:YES];
 					[self writeControlReg:noiseFloorWorkingChannel enabled:YES];
@@ -2075,9 +2105,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 			case 4: //finish up	
 				//load new results
 				for(i=0;i<kNumGretina4MChannels;i++){
-					[self setEnabled:i withValue:oldEnabled[i]];
-					[self setTrapEnabled:i withValue:oldTrapEnabled[i]];
-					[self setLEDThreshold:i withValue:newLEDThreshold[i]];
+					[self setEnabled:i       withValue:oldEnabled[i]];
+					[self setTestThreshold:i withValue:newThreshold[i]];
 				}
 				[self initBoard];
                
@@ -2095,8 +2124,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
         int i;
         for(i=0;i<kNumGretina4MChannels;i++){
             [self setEnabled:i withValue:oldEnabled[i]];
-            [self setTrapEnabled:i withValue:oldTrapEnabled[i]];
-            [self setLEDThreshold:i withValue:oldLEDThreshold[i]];
+            [self setTestThreshold:i withValue:oldThreshold[i]];
         }
 		NSLog(@"Gretina4M LED threshold finder quit because of exception\n");
     }

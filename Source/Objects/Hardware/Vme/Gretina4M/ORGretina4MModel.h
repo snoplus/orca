@@ -251,9 +251,8 @@ enum Gretina4MFIFOStates {
 	unsigned long fifoStateAddress;
 
 	BOOL oldEnabled[kNumGretina4MChannels];
-	BOOL oldTrapEnabled[kNumGretina4MChannels];
-	int oldLEDThreshold[kNumGretina4MChannels];
-	int newLEDThreshold[kNumGretina4MChannels];
+	int oldThreshold[kNumGretina4MChannels];
+	int newThreshold[kNumGretina4MChannels];
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
 	int noiseFloorWorkingChannel;
@@ -481,6 +480,9 @@ enum Gretina4MFIFOStates {
 - (void) writeWindowTiming:(short)channel;
 - (void) writeRisingEdgeWindow:(short)channel;
 - (unsigned short) readFifoState;
+- (void) setTestThreshold:(short)chan withValue:(int)aValue;
+- (unsigned long) testThreshold:(short)chan;
+- (unsigned long) maxTestThreshold:(short)chan;
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;

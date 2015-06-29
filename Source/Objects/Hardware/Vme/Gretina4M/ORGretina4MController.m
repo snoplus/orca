@@ -1639,12 +1639,12 @@
 {
 	[noiseFloorPanel endEditingFor:nil];		
     @try {
-        NSLog(@"Gretina (slot %d) Finding LED Thresholds \n",[model slot]);
+        NSLog(@"Gretina (slot %d) Finding Thresholds \n",[model slot]);
 		[model findNoiseFloors];
     }
 	@catch(NSException* localException) {
-        NSLog(@"LED Threshold Finder for Gretina4M Board FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
+        NSLog(@"Threshold Finder for Gretina4M Board FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nFailed Threshold finder", @"OK", nil, nil,
                         localException);
     }
 }
