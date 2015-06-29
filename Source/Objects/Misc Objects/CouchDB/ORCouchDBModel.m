@@ -1152,6 +1152,7 @@ nil];
 
 - (void) clearAlert
 {
+    [self setAlertMessage:@""];
     NSDictionary* alertMessageDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
                                             @"",                        @"alertMessage",
                                             [NSNumber numberWithInt:0], @"alertMessageType",
