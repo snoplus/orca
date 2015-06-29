@@ -92,7 +92,7 @@
     //burst tags
     unsigned short burstTell; //1 if a bust still needs printing
     unsigned short burstState; //1 if in burst, 0 if not
-    unsigned short novaState; //1 if nova possible, 0 if not
+    //unsigned short novaState; //1 if nova possible, 0 if not
     double novaP; //probability of data appearing from supernova
     
     NSMutableArray*      queueArray;

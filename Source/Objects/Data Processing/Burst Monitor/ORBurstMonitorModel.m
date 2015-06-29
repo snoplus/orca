@@ -1129,6 +1129,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(delayedBurstEvent) object:nil];
     //calc chan prob
     double exChan =999.999;
+    int novaState = 0;
     if((multInBurst > 4 && rSec > 0.01 && adcP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001))
     {
         novaState = 3;
