@@ -546,13 +546,34 @@ unsigned long long facto(unsigned long long num)
                                                 [Bwords release];
                                                 Bwords = [words mutableCopy];
                                                 
+                                                double firstTime=[[Nsecs objectAtIndex:(countofNchan-1)] intValue] + 0.000001*[[Nmics objectAtIndex:(countofNchan-1)] intValue];
                                                 int iter;
                                                 NSString* bString = @"";
+                                                NSString* lString = @"";
                                                 for(iter=1; iter<countofchan; iter++) //Skip most recent event, print all others
                                                 {
                                                     double countTime = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
                                                     //NSLog(@"count %i t=%f, adc=%i, chan=%i-%i \n", iter, countTime, [[adcs objectAtIndex:iter] intValue], [[cards objectAtIndex:iter] intValue], [[chans objectAtIndex:iter] intValue]);
-                                                    bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, adc=%i, chan=%i-%i ", (countofchan - iter), countTime, [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                                    //bString = [bString stringByAppendingString:[NSString stringWithFormat:@"count %i t=%lf, t-tB=%lf, adc=%i, chan=%i-%i ", (countofchan - iter), countTime, (countTime-firstTime), [[Badcs objectAtIndex:iter] intValue], [[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                                    lString = @"";
+                                                    lString = [lString stringByAppendingString:[NSString stringWithFormat:@"count %i ",(countofchan - iter)]];
+                                                    lString = [lString stringByPaddingToLength:10 withString:@" " startingAtIndex:0];               //lenth 10
+                                                    lString = [lString stringByAppendingString:[NSString stringWithFormat:@"t=%lf, ",countTime]];   //lenth 21
+                                                    lString = [lString stringByAppendingString:[NSString stringWithFormat:@"t-tB=%lf,  ",(countTime-firstTime)]];
+                                                    lString = [lString stringByPaddingToLength:47 withString:@" " startingAtIndex:0];               //lenth 16 if <100sec long
+                                                    lString = [lString stringByAppendingString:[NSString stringWithFormat:@"adc=%i, ",[[Badcs objectAtIndex:iter] intValue]]];
+                                                    lString = [lString stringByPaddingToLength:57 withString:@" " startingAtIndex:0];               //lenth 10
+                                                    lString = [lString stringByAppendingString:[NSString stringWithFormat:@"chan=%i-%i, ",[[Bcards objectAtIndex:iter] intValue], [[Bchans objectAtIndex:iter] intValue]]];
+                                                    lString = [lString stringByPaddingToLength:68 withString:@" " startingAtIndex:0];
+                                                    int Xbormm=0;
+                                                    int Ybormm=0;
+                                                    NSLog(@"preborxy iter is %i \n", iter);
+                                                    Xbormm = [self boreX:[[Bcards objectAtIndex:iter] intValue] Channel:[[Bchans objectAtIndex:iter] intValue]];
+                                                    Ybormm = [self boreY:[[Bcards objectAtIndex:iter] intValue] Channel:[[Bchans objectAtIndex:iter] intValue]];
+                                                    NSLog(@"postborxy iter is %i \n", iter);
+                                                    lString = [lString stringByAppendingString:[NSString stringWithFormat:@"(x,y)=(%i,%i) ",Xbormm, Ybormm]];
+                                                    lString = [lString stringByPaddingToLength:85 withString:@" " startingAtIndex:0];               //lenth 17
+                                                    bString = [bString stringByAppendingString:lString];        //Place the line in burststring
                                                     if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
                                                     {
                                                         bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <---"]];
@@ -562,6 +583,11 @@ unsigned long long facto(unsigned long long num)
                                                     {
                                                         bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <= Burst Start"]];
                                                         numSecTillBurst = [[secs objectAtIndex:iter] longValue] + 0.000001*[[mics objectAtIndex:iter] longValue];
+                                                    }
+                                                    if([[Bsecs objectAtIndex:iter] intValue] == [[Nsecs objectAtIndex:1] intValue] &&
+                                                       [[Bmics objectAtIndex:iter] intValue] == [[Nmics objectAtIndex:1] intValue])
+                                                    {
+                                                        bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <= Burst End"]];
                                                     }
                                                     bString = [bString stringByAppendingString:[NSString stringWithFormat:@"\n"]];
                                                 }
@@ -1000,19 +1026,19 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"EventState is %i \n", eventState); //mod remove
     if(eventState == 3)
     {
-        [mailer setSubject:@"(Test) HALO Burst Notification: SN candidate"];
+        [mailer setSubject:@"(Test) HALO Burst: SN candidate"];
 	}
     else if(eventState == 2)
     {
-        [mailer setSubject:@"(Test) HALO Burst Notification: Spallation"];
+        [mailer setSubject:@"(Test) HALO Burst: Spallation"];
 	}
     else if(eventState == 1)
     {
-        [mailer setSubject:@"(Test) HALO Burst Notification: Coincidence"];
+        [mailer setSubject:@"(Test) HALO Burst: Coincidence"];
 	}
     else
     {
-        [mailer setSubject:@"(Test) HALO Burst Notification: Other"];
+        [mailer setSubject:@"(Test) HALO Bursy: Other"];
     }
     [mailer setBody:theContent];
 	[mailer send:self];
@@ -1230,7 +1256,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Reduced  duration: %f seconds \n",rSec];
     theContent = [theContent stringByAppendingFormat:@"Num Bursts this run: %d\n",burstCount];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
-    theContent = [theContent stringByAppendingString:@"Counts from 5 seconds before the burst untill the next out-of-burst above-threshold event \n"];
+    theContent = [theContent stringByAppendingString:@"Counts from 5 seconds before the burst untill the next out-of-burst above-threshold event. Time in s, distance in mm \n"];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:burstString];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
