@@ -727,14 +727,24 @@ unsigned long long facto(unsigned long long num)
                                                 {
                                                     phi = phi + 3.14159;
                                                 }
-                                                Xsqr = Xsqr / (BurstLen - 1);
-                                                Ysqr = Ysqr / (BurstLen - 1);
-                                                Xrms = (Xsqr - (Xcenter * Xcenter))*(BurstLen - 1)/(BurstLen - 2);
-                                                Yrms = (Ysqr - (Ycenter * Ycenter))*(BurstLen - 1)/(BurstLen - 2);
-                                                Rrms = Xrms + Yrms;
-                                                Xrms = sqrt(Xrms);
-                                                Yrms = sqrt(Yrms);
-                                                Rrms = sqrt(Rrms);
+                                                if(BurstLen > 2)
+                                                {
+                                                    Xsqr = Xsqr / (BurstLen - 1);
+                                                    Ysqr = Ysqr / (BurstLen - 1);
+                                                    Xrms = (Xsqr - (Xcenter * Xcenter))*(BurstLen - 1)/(BurstLen - 2);
+                                                    Yrms = (Ysqr - (Ycenter * Ycenter))*(BurstLen - 1)/(BurstLen - 2);
+                                                    Rrms = Xrms + Yrms;
+                                                    Xrms = sqrt(Xrms);
+                                                    Yrms = sqrt(Yrms);
+                                                    Rrms = sqrt(Rrms);
+                                                }
+                                                else
+                                                {
+                                                    Xrms = 0;
+                                                    Yrms = 0;
+                                                    Rrms = 0;
+                                                    
+                                                }
                                                 rSqrNorm = ((BurstLen-1) * ((Xcenter/250.0) * (Xcenter/250.0)) * 0.145877) + ((BurstLen-1) * ((Ycenter/250.0) * (Ycenter/250.0)) * 0.241784);
                                                 [Bx release];
                                                 [By release];
@@ -1178,12 +1188,12 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         NSLog(@"Sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
         NSTask* Cping;
         Cping =[[NSTask alloc] init];
-        NSPipe* pipe;
-        pipe = [NSPipe pipe];
-        [Cping setStandardOutput: pipe];
-        NSFileHandle* pingfile;
-        pingfile =[pipe fileHandleForReading];
-        if(0) //Send to local machine  //mod change to ping again
+        //NSPipe* pipe;
+        //pipe = [NSPipe pipe];
+        //[Cping setStandardOutput: pipe];
+        //NSFileHandle* pingfile;
+        //pingfile =[pipe fileHandleForReading];
+        if(1) //Send to local machine  //mod change to ping again
         {
             [Cping setLaunchPath: @"/usr/bin/printf"];
             [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
