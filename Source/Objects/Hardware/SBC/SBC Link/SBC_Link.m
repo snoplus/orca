@@ -719,7 +719,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     if(busErrorRate > kSBCMaxBusErrorRate){
         if(!busErrorsAlarm){
-            busErrorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ busErrorRate High",[delegate fullID]] severity:kDataFlowAlarm];
+            busErrorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ busErrorRate High",[delegate fullID]] severity:kHardwareAlarm];
             [busErrorsAlarm setSticky:YES];
             [busErrorsAlarm setHelpString:[NSString stringWithFormat:@"%@ is throwing bus errors at a high rate. Something is seriously wrong with the hardware. This alarm will not go away until it is acknowledged and the error rate is zero.",[delegate fullID]]];
         }
@@ -731,7 +731,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     
     if(errorRate > kSBCMaxErrorRate){
         if(!errorsAlarm){
-            errorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ errorRate High",[delegate fullID]] severity:kDataFlowAlarm];
+            errorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ errorRate High",[delegate fullID]] severity:kHardwareAlarm];
             [errorsAlarm setSticky:YES];
             [errorsAlarm setHelpString:[NSString stringWithFormat:@"%@ is posting errors at a high rate. Something is seriously wrong with the hardware. This alarm will not go away until it is acknowledged and the error rate is zero.",[delegate fullID]]];
         }
