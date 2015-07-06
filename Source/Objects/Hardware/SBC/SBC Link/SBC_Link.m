@@ -50,6 +50,9 @@
 #define kNoData				-2
 
 #define kSBCRateIntegrationTime 1.5
+#define kSBCMaxErrorRate    10
+#define kSBCMaxBusErrorRate 10
+
 
 #pragma mark ***External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
@@ -172,6 +175,11 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	[eCpuCBLostDataAlarm release];
 	[connectionDroppedAlarm clearAlarm];
 	[connectionDroppedAlarm release];
+    
+    [errorsAlarm clearAlarm];
+    [errorsAlarm release];
+    [busErrorsAlarm clearAlarm];
+    [busErrorsAlarm release];
 
     
     [lastRateUpdate release];
@@ -194,7 +202,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) wakeUp 
 {
-	[self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
+	//[self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
 }
 
 - (void) sleep 	
@@ -664,6 +672,20 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 }
 
+- (void) clearRates
+{
+    bytesReceived = 0;
+    bytesSent = 0;
+    lastBusErrorCount = 0;
+    lastErrorCount = 0;
+    
+    [lastRateUpdate release];
+    lastRateUpdate = nil;
+    [self setByteRateSent: 0];
+    [self setByteRateReceived: 0];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkByteRateChanged object:self];
+}
+
 - (void) calculateRates
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
@@ -673,8 +695,17 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
         if(deltaTime>0){
             [self setByteRateSent: bytesSent/deltaTime];
             [self setByteRateReceived: bytesReceived/deltaTime];
-            bytesReceived = 0;
-            bytesSent = 0;
+            bytesReceived   = 0;
+            bytesSent       = 0;
+            
+            busErrorRate = (lastBusErrorCount - runInfo.busErrorCount)/deltaTime;
+            errorRate    = (lastErrorCount    - runInfo.err_count)    /deltaTime;
+
+            lastBusErrorCount   = runInfo.busErrorCount;
+            lastErrorCount      = runInfo.err_count;
+            
+            [self checkErrorRates];
+            
             [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkByteRateChanged object:self];
         }
     }
@@ -682,6 +713,33 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     lastRateUpdate = [now retain];
 
 	[self performSelector:@selector(calculateRates) withObject:nil afterDelay:kSBCRateIntegrationTime];
+}
+
+- (void) checkErrorRates
+{
+    if(busErrorRate > kSBCMaxBusErrorRate){
+        if(!busErrorsAlarm){
+            busErrorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ busErrorRate High",[delegate fullID]] severity:kDataFlowAlarm];
+            [busErrorsAlarm setSticky:YES];
+            [busErrorsAlarm setHelpString:[NSString stringWithFormat:@"%@ is throwing bus errors at a high rate. Something is seriously wrong with the hardware. This alarm will not go away until it is acknowledged and the error rate is zero.",[delegate fullID]]];
+        }
+        if(![busErrorsAlarm isPosted]){
+            [busErrorsAlarm setAcknowledged:NO];
+            [busErrorsAlarm postAlarm];
+        }
+    }
+    
+    if(errorRate > kSBCMaxErrorRate){
+        if(!errorsAlarm){
+            errorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ errorRate High",[delegate fullID]] severity:kDataFlowAlarm];
+            [errorsAlarm setSticky:YES];
+            [errorsAlarm setHelpString:[NSString stringWithFormat:@"%@ is posting errors at a high rate. Something is seriously wrong with the hardware. This alarm will not go away until it is acknowledged and the error rate is zero.",[delegate fullID]]];
+        }
+        if(![errorsAlarm isPosted]){
+            [errorsAlarm setAcknowledged:NO];
+            [errorsAlarm postAlarm];
+        }
+    }
 }
 
 - (void) setByteRateSent:(float)aRate
@@ -916,7 +974,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	id pw = [[SBCPacketWrapper alloc] init];
 	SBC_Packet* aPacket = [pw sbcPacket];
 	aPacket->cmdHeader.destination			= kSBC_Process;
-	aPacket->cmdHeader.cmdID			= kSBC_RunInfoRequest;
+	aPacket->cmdHeader.cmdID                = kSBC_RunInfoRequest;
 	aPacket->cmdHeader.numberBytesinPayload	= 0;
 	
 	[self send:aPacket receive:aPacket];
@@ -1633,6 +1691,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(update) object:nil];
 	if(isRunning){
 		[self getRunInfoBlock];
+        
 		if(runInfo.readCycles == oldCycleCount){
 			if(++missedHeartBeat == 10){
 				if(!eCpuDeadAlarm){
@@ -1680,7 +1739,11 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 				[eCpuCBLostDataAlarm postAlarm];
 			}
 		}
-		
+        if(updateCount%120 == 0){
+            [self postCouchDBRecord];
+        }
+        updateCount++;
+
 	}
  
 	if(isRunning){
@@ -1690,23 +1753,27 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	
+    updateCount=0;
 	if([[self orcaObjects] count]){
 		//set up the irq thread to watch that socket, but only if there are LAMS defined
 		stopWatchingIRQ = NO;
 		[NSThread detachNewThreadSelector:@selector(watchIrqSocket) toTarget:self withObject:nil];
 	}
 	
-	[eCpuDeadAlarm clearAlarm];
-	[eRunFailedAlarm clearAlarm];
-	[eCpuCBFillingAlarm clearAlarm];
+    [errorsAlarm         clearAlarm];
+    [busErrorsAlarm      clearAlarm];
+    
+    [eCpuDeadAlarm       clearAlarm];
+	[eRunFailedAlarm     clearAlarm];
+	[eCpuCBFillingAlarm  clearAlarm];
 	[eCpuCBLostDataAlarm clearAlarm];
 
 	throttleCount = 0;
 	missedHeartBeat = 0;
 	throttle = 1000;
 	[self tellClientToStartRun];
-	[self update];
+    [self calculateRates];
+    [self update];
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1771,6 +1838,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	[eCpuCBFillingAlarm clearAlarm];
 	[eCpuCBLostDataAlarm clearAlarm];
     [self pingVerbose:NO];
+    [self clearRates];
+    [self postCouchDBRecord];
 }
 
 
@@ -2764,6 +2833,46 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 		[pw releaseAndCache];
 	}
 }
+
+- (void) postCouchDBRecord
+{
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithLong: runInfo.statusBits],          @"statusBits",
+                            [NSNumber numberWithLong: runInfo.busErrorCount],       @"busErrorCount",
+                            [NSNumber numberWithLong: runInfo.err_count],           @"err_count",
+                            [NSNumber numberWithLong: runInfo.lostByteCount],       @"lostByteCount",
+                            [NSNumber numberWithLong: runInfo.amountInBuffer],      @"amountInBuffer",
+                            [NSNumber numberWithLong: runInfo.pollingRate],         @"pollingRate",
+                            [NSNumber numberWithLong: runInfo.wrapArounds],         @"wrapArounds",
+                            [NSNumber numberWithLong: runInfo.recordsTransfered],   @"recordsTransfered",
+                            [NSNumber numberWithLong: byteRateReceived],            @"byteRateReceived",
+                            [NSNumber numberWithLong: byteRateSent],                @"byteRateSent",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+
+    NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   [delegate fullID],               @"name",
+                                   @"SBCInfo",                       @"title",
+                                   [NSArray arrayWithObjects:
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.statusBits]        forKey:@"statusBits"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.err_count]         forKey:@"err_count"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.busErrorCount]     forKey:@"busErrorCount"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.lostByteCount]     forKey:@"lostByteCount"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.amountInBuffer]    forKey:@"amountInBuffer"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.pollingRate]       forKey:@"pollingRate"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.wrapArounds]       forKey:@"wrapArounds"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.recordsTransfered] forKey:@"recordsTransfered"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithDouble: byteRateReceived]        forKey:@"byteRateReceived"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithDouble: byteRateSent]           forKey:@"byteRateSent"],
+                                    nil
+                                    ],
+                                   @"adcs",
+                                   nil
+                                   ];
+    
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:historyRecord];
+}
+
 @end
 
 //a quicky wrapper so we can pass the job status around as an object.
@@ -2788,9 +2897,5 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 - (long) running	 { return status.running; }
 - (long) finalStatus { return status.finalStatus; }
 - (long) progress	 { return status.progress; }
-
-
-
-
 
 @end

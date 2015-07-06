@@ -49,7 +49,9 @@ typedef enum eSBC_ThrottleConsts{
 
 @interface SBC_Link : ORGroup {
 	id				delegate;
-	ORAlarm*        eCpuDeadAlarm;
+    ORAlarm*        busErrorsAlarm;
+    ORAlarm*        errorsAlarm;
+    ORAlarm*        eCpuDeadAlarm;
 	ORAlarm*        eRunFailedAlarm;
 	ORAlarm*        eCpuCBFillingAlarm;
 	ORAlarm*		eCpuCBLostDataAlarm;
@@ -74,6 +76,10 @@ typedef enum eSBC_ThrottleConsts{
     unsigned long	writeValue;
 	unsigned long   addressModifier;
 	SBC_info_struct runInfo;
+    unsigned long   lastBusErrorCount;
+    unsigned long   lastErrorCount;
+    float           busErrorRate;
+    float           errorRate;
 	NSDate*			lastQueUpdate;
     BOOL			reloading;
 	BOOL			goScriptFailed;
@@ -141,6 +147,7 @@ typedef enum eSBC_ThrottleConsts{
 	long			sbcCodeVersion;
     NSDate*         lastRateUpdate;
 	unsigned long	sbcPollingRate;
+    int             updateCount;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -222,11 +229,13 @@ typedef enum eSBC_ThrottleConsts{
 - (BOOL) pingInProgress;
 - (BOOL) pingedSuccessfully;
 
+- (void) clearRates;
 - (void) calculateRates;
 - (void) setByteRateSent:(float)aRate;
 - (float)byteRateSent;
 - (void) setByteRateReceived:(float)aRate;
 - (float)byteRateReceived;
+- (void) checkErrorRates;
 
 - (void) fileMoverIsDone:(NSNotification*)aNote;
 
@@ -373,6 +382,7 @@ typedef enum eSBC_ThrottleConsts{
 		   operation:(unsigned long) anOperationID
 		   numToRead:(unsigned int) numberLongs;
 
+- (void) postCouchDBRecord;
 @end
 
 @interface ORSBCLinkJobStatus : NSObject
