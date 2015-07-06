@@ -2164,13 +2164,17 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         if(lengthBytes%4)     NSLog(@"ERROR in %@::%@!  lengthBytes %i not multiple of 4! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,lengthBytes);//TODO: DEBUG -tb-
 
         int length32 = lengthBytes/4;
-			time_t	ut_time;
-			time(&ut_time);
-
+			//time_t	ut_time;
+			//time(&ut_time);
+            struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+            //timing
+            gettimeofday(&t,NULL);
+        
 			data[0] = spectrumEventId | (length32); 
 			data[1] = location;    //called "deviceID" in the ROOT file
-			data[2] = ut_time;	   //sec
-			data[3] = 0;	       //subsec
+            //data[2] = ut_time;	   //sec
+            data[2] = t.tv_sec;	   //sec
+			data[3] = t.tv_usec;   //subsec
 			data[4] = specLength;  //spectrum length
 			data[5] = hasStatus;   //additional info
 			data[6] = acqtime;	
