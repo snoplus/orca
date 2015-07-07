@@ -1471,10 +1471,10 @@ struct {
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:theRecord];
     
-    
+    NSString* s =  [NSString stringWithFormat:@"PreAmpSupply%lu",[self uniqueIdNumber]];
     NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   [self fullID],               @"name",
-                                   @"PreAmpSupplyErrors",       @"title",
+                                   s,       @"name",
+                                   s,       @"title",
                                    [NSArray arrayWithObjects:
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: supplyErrors[0]]        forKey:@"+12VErrors"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: supplyErrors[1]]        forKey:@"-12VErrors"],
