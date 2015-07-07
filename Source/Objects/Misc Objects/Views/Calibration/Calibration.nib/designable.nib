@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">13F1066</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6751</string>
-		<string key="IBDocument.AppKitVersion">1265.21</string>
-		<string key="IBDocument.HIToolboxVersion">698.00</string>
+		<string key="IBDocument.SystemVersion">14E46</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6751</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -188,9 +188,14 @@
 										<bytes key="NSWhite">MQA</bytes>
 									</object>
 								</object>
-								<object class="NSColor" key="NSTextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MCAwLjgwMDAwMDAxAA</bytes>
+								<object class="NSColor" key="NSTextColor" id="1010317220">
+									<int key="NSColorSpace">6</int>
+									<string key="NSCatalogName">System</string>
+									<string key="NSColorName">labelColor</string>
+									<object class="NSColor" key="NSColor" id="84166166">
+										<int key="NSColorSpace">3</int>
+										<bytes key="NSWhite">MAA</bytes>
+									</object>
 								</object>
 							</object>
 							<int key="NSBorderType">3</int>
@@ -212,10 +217,7 @@
 								<string key="NSContents">Box</string>
 								<reference key="NSSupport" ref="138302266"/>
 								<reference key="NSBackgroundColor" ref="941300942"/>
-								<object class="NSColor" key="NSTextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MCAwLjgwMDAwMDAxAA</bytes>
-								</object>
+								<reference key="NSTextColor" ref="1010317220"/>
 							</object>
 							<int key="NSBorderType">3</int>
 							<int key="NSBoxType">2</int>
@@ -236,10 +238,7 @@
 								<string key="NSContents">Box</string>
 								<reference key="NSSupport" ref="138302266"/>
 								<reference key="NSBackgroundColor" ref="941300942"/>
-								<object class="NSColor" key="NSTextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MCAwLjgwMDAwMDAxAA</bytes>
-								</object>
+								<reference key="NSTextColor" ref="1010317220"/>
 							</object>
 							<int key="NSBorderType">3</int>
 							<int key="NSBoxType">2</int>
@@ -270,10 +269,7 @@
 									<int key="NSColorSpace">6</int>
 									<string key="NSCatalogName">System</string>
 									<string key="NSColorName">textColor</string>
-									<object class="NSColor" key="NSColor" id="84166166">
-										<int key="NSColorSpace">3</int>
-										<bytes key="NSWhite">MAA</bytes>
-									</object>
+									<reference key="NSColor" ref="84166166"/>
 								</object>
 							</object>
 							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -367,7 +363,6 @@
 							<string key="NSFrame">{{233, 14}, {66, 28}}</string>
 							<reference key="NSSuperview" ref="585086763"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="213903098">
 								<int key="NSCellFlags">67108864</int>
@@ -449,10 +444,7 @@
 								<string key="NSContents">Box</string>
 								<reference key="NSSupport" ref="138302266"/>
 								<reference key="NSBackgroundColor" ref="941300942"/>
-								<object class="NSColor" key="NSTextColor">
-									<int key="NSColorSpace">3</int>
-									<bytes key="NSWhite">MCAwLjgwMDAwMDAxAA</bytes>
-								</object>
+								<reference key="NSTextColor" ref="1010317220"/>
 							</object>
 							<int key="NSBorderType">3</int>
 							<int key="NSBoxType">2</int>
@@ -747,6 +739,7 @@
 										<bytes key="NSRGB">MC43MTA3MzE1MSAxIDAuNzU4MDA1NTYAA</bytes>
 									</object>
 									<int key="NScvFlags">6</int>
+									<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 								</object>
 								<object class="NSScroller" id="590366513">
 									<reference key="NSNextResponder" ref="446823762"/>
@@ -756,6 +749,8 @@
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="567094741"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+									<string key="NSControlAction">_doScroller:</string>
+									<reference key="NSControlTarget" ref="446823762"/>
 									<reference key="NSTarget" ref="446823762"/>
 									<string key="NSAction">_doScroller:</string>
 									<double key="NSCurValue">37</double>
@@ -769,6 +764,8 @@
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="553054609"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+									<string key="NSControlAction">_doScroller:</string>
+									<reference key="NSControlTarget" ref="446823762"/>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="446823762"/>
 									<string key="NSAction">_doScroller:</string>
@@ -787,6 +784,7 @@
 									<reference key="NSDocView" ref="1037182537"/>
 									<reference key="NSBGColor" ref="468889443"/>
 									<int key="NScvFlags">4</int>
+									<bool key="NSAutomaticallyAdjustsContentInsets">YES</bool>
 								</object>
 								<reference ref="553054609"/>
 							</array>
@@ -857,7 +855,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="439720072"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -911,14 +909,6 @@
 						<reference key="destination" ref="17399969"/>
 					</object>
 					<int key="connectionID">347</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">apply:</string>
-						<reference key="source" ref="584493710"/>
-						<reference key="destination" ref="718275869"/>
-					</object>
-					<int key="connectionID">348</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1095,6 +1085,14 @@
 						<reference key="destination" ref="953462778"/>
 					</object>
 					<int key="connectionID">530</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">ignore:</string>
+						<reference key="source" ref="584493710"/>
+						<reference key="destination" ref="718275869"/>
+					</object>
+					<int key="connectionID">533</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1587,7 +1585,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">531</int>
+			<int key="maxID">533</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1600,6 +1598,7 @@
 						<string key="cancel:">id</string>
 						<string key="deleteAction:">id</string>
 						<string key="done:">id</string>
+						<string key="ignore:">id</string>
 						<string key="remove:">id</string>
 						<string key="removePtAction:">id</string>
 						<string key="selectionAction:">id</string>
@@ -1625,6 +1624,10 @@
 						</object>
 						<object class="IBActionInfo" key="done:">
 							<string key="name">done:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="ignore:">
+							<string key="name">ignore:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="remove:">
@@ -1745,6 +1748,7 @@
 						<string key="cancel:">id</string>
 						<string key="deleteAction:">id</string>
 						<string key="done:">id</string>
+						<string key="ignore:">id</string>
 						<string key="remove:">id</string>
 						<string key="removePtAction:">id</string>
 						<string key="selectionAction:">id</string>
@@ -1770,6 +1774,10 @@
 						</object>
 						<object class="IBActionInfo" key="done:">
 							<string key="name">done:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="ignore:">
+							<string key="name">ignore:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="remove:">
@@ -2027,8 +2035,8 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NSMenuCheckmark">{11, 11}</string>
-			<string key="NSMenuMixedState">{10, 3}</string>
+			<string key="NSMenuCheckmark">{12, 12}</string>
+			<string key="NSMenuMixedState">{10, 2}</string>
 			<string key="NSRadioButton">{16, 15}</string>
 			<string key="NSSwitch">{15, 15}</string>
 		</dictionary>

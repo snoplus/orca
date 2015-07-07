@@ -39,6 +39,7 @@
 	IBOutlet NSButton*		addPtButton;
 	IBOutlet NSButton*		removePtButton;
 	id                      model;
+    ORCalibration*          calibration;
 }
 
 + (id) calibrateForWindow:(NSWindow *)aWindow modalDelegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo;
@@ -48,7 +49,7 @@
 - (void) calibrate;
 - (void) enableControls;
 - (void) populateSelectionPU;
-- (void) loadUI:(ORCalibration*) aCalibration;
+- (void) loadUI;
 
 - (IBAction) storeAction:(id)sender;
 - (IBAction) typeAction:(id)sender;
@@ -60,6 +61,10 @@
 - (IBAction) cancel:(id)sender;
 - (IBAction) addPtAction:(id)sender;
 - (IBAction) removePtAction:(id)sender;
+- (IBAction) ignore:(id)sender;
+
+@property (retain) ORCalibration* calibration;
+
 @end
 
 @interface ORCalibration : NSObject 

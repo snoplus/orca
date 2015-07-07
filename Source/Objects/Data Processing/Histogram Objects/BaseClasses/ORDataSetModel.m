@@ -79,30 +79,19 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 - (id) calibration
 {
-    if(!calibration) calibration = [[ORCalibration alloc] init];
 	return calibration;
 }
 
 - (void) setCalibration:(id)aCalibration
 {
-    if([aCalibration isValidCalibration]){
-        [aCalibration retain];
-        [calibration release];
-        calibration  = aCalibration;
-    }
-    else {
-        [calibration release];
-        calibration = nil;
-    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setCalibration:calibration];
+    
+    [aCalibration retain];
+    [calibration release];
+    calibration  = aCalibration;
         
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetCalibrationChanged object:self];
 }
-
-- (void) updateCalibration
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetCalibrationChanged object:self];    
-}
-
 
 - (void) setDataSet:(id)aDataSet
 {

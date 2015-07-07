@@ -40,7 +40,6 @@
 - (void) setRefreshMode:(int)aRefreshMode;
 - (void) setDataSet:(id)aDataSet;
 - (id) dataSet;
-- (void) updateCalibration;
 - (id) calibration;
 - (void) setCalibration:(id)aCalibration;
 - (void) setKey:(NSString*)akey;

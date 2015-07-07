@@ -23,6 +23,8 @@
 
 @implementation ORCalibrationPane
 
+@synthesize calibration;
+
 + (id) calibrateForWindow:(NSWindow *)aWindow modalDelegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo
 {
     ORCalibrationPane* calibrationPane = [[ORCalibrationPane alloc] initWithModel:[aDelegate model]];
@@ -33,59 +35,48 @@
 - (id) initWithModel:(id)aModel
 {
     self = [super initWithWindowNibName:@"Calibration"];
-    model = [aModel retain];
+    model = aModel;
 	return self;
 }
 
 - (void) dealloc
 {
-    [model release];
+    self.calibration = nil;
 	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
 	[self populateSelectionPU];
-    if(![model calibration]){
-        ORCalibration* aCalibration = [[ORCalibration alloc]init];
-        [model setCalibration:aCalibration];
-        [aCalibration release];
-    }
-    [self loadUI:[model calibration]];
+    [self loadUI];
 }
 
-- (void) loadUI:(ORCalibration*) aCalibration
+- (void) loadUI
 {
-	if(aCalibration){
-		
-		[calibrationTableView reloadData];
-		
-		[unitsField setStringValue:[aCalibration units]];
-		[labelField setStringValue:[aCalibration label]];
-		[nameField setStringValue:[aCalibration calibrationName]];
-		[ignoreButton setIntValue:[aCalibration ignoreCalibration]];
-		[catalogButton setIntValue:[aCalibration type]];
-		[customButton setIntValue:![aCalibration type]];
-		if([[aCalibration calibrationName] length]){
-			if([selectionPU indexOfItemWithTitle:[aCalibration calibrationName]] >=0){
-				[selectionPU selectItemWithTitle:[aCalibration calibrationName]];
-			}
-			else [selectionPU selectItemWithTitle:@"---"];;
-		}
-		else [selectionPU selectItemWithTitle:@"---"];
-	}
-	else {
+	if(self.calibration == nil){
+        if([model calibration]) self.calibration = [model calibration];
+        else                    self.calibration = [[[ORCalibration alloc]init] autorelease];
+    }
 
-		[unitsField setStringValue:@"keV"];
-		[labelField setStringValue:@"Energy"];
-		[ignoreButton setIntValue:NO];
-		[nameField setStringValue:@""];
-		[catalogButton setIntValue:0];
-		[customButton setIntValue:1];
-		[selectionPU selectItemWithTitle:@"---"];
-	}
+    [calibrationTableView reloadData];
+
+    [unitsField setStringValue:[calibration units]];
+    [labelField setStringValue:[calibration label]];
+    [nameField setStringValue:[calibration calibrationName]];
+    [ignoreButton setIntValue:[calibration ignoreCalibration]];
+    [catalogButton setIntValue:[calibration type]];
+    [customButton setIntValue:![calibration type]];
+    if([[calibration calibrationName] length]){
+        if([selectionPU indexOfItemWithTitle:[calibration calibrationName]] >=0){
+            [selectionPU selectItemWithTitle:[calibration calibrationName]];
+        }
+        else [selectionPU selectItemWithTitle:@"---"];;
+    }
+    else [selectionPU selectItemWithTitle:@"---"];
+	
+    [customButton setIntValue:![calibration type]];
+
 	[self enableControls];
-
 }
 
 
@@ -100,12 +91,11 @@
 		[[self window] endEditingFor:nil];		
 	}
 
-	ORCalibration* cal	= [model calibration];
-	[cal setUnits:[unitsField stringValue]];
-	[cal setLabel:[labelField stringValue]];
-	[cal setCalibrationName:[nameField stringValue]];
-	[cal setType:![customButton intValue]];
-	[cal setIgnoreCalibration:[ignoreButton intValue]];
+	[calibration setUnits:[unitsField stringValue]];
+	[calibration setLabel:[labelField stringValue]];
+	[calibration setCalibrationName:[nameField stringValue]];
+	[calibration setType:![customButton intValue]];
+	[calibration setIgnoreCalibration:[ignoreButton intValue]];
 	
 	if([storeButton intValue]== 1 && [[nameField stringValue] length]){
 	
@@ -115,7 +105,7 @@
 			
 		NSMutableData*   calAsData     = [NSMutableData data];
 		NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:calAsData];
-		[archiver encodeObject:cal forKey:@"aCalibration"];
+		[archiver encodeObject:calibration forKey:@"aCalibration"];
 		[archiver finishEncoding];		
 		[archiver release];
 		
@@ -127,9 +117,7 @@
 		[self populateSelectionPU];
 		[selectionPU selectItemWithTitle:[nameField stringValue]];
 	}
-    [cal calibrate];
-    [model updateCalibration];
-
+    [calibration calibrate];
 }
 
 - (void) populateSelectionPU
@@ -147,19 +135,21 @@
 
 - (void) enableControls
 {
-	[calibrationTableView  setEnabled: [customButton intValue]  == 1];
-	[addPtButton	 setEnabled: [customButton intValue]  == 1];
-	[removePtButton  setEnabled: [customButton intValue]  == 1];
-	[unitsField   setEnabled: [customButton intValue]  == 1];
-	[labelField   setEnabled: [customButton intValue]  == 1];
-	[nameField    setEnabled: [customButton intValue]  == 1 && [storeButton intValue] == 1];
-	[storeButton  setEnabled: [customButton intValue]  == 1];
+	[calibrationTableView   setEnabled: [customButton intValue]  == 1];
+	[addPtButton            setEnabled: [customButton intValue]  == 1];
+	[removePtButton         setEnabled: [customButton intValue]  == 1];
+	[unitsField             setEnabled: [customButton intValue]  == 1];
+	[labelField             setEnabled: [customButton intValue]  == 1];
+	[nameField              setEnabled: [customButton intValue]  == 1 &&
+                                        [storeButton intValue] == 1];
+	[storeButton            setEnabled: [customButton intValue]  == 1];
 	
-	[selectionPU  setEnabled: [catalogButton intValue] == 1];
-	[deleteButton setEnabled: [catalogButton intValue] == 1 &&  [selectionPU indexOfSelectedItem] != 0];
+	[selectionPU            setEnabled: [catalogButton intValue] == 1];
+	[deleteButton           setEnabled: [catalogButton intValue] == 1 &&
+                                        [selectionPU indexOfSelectedItem] != 0];
 	
-	[cancelButton setEnabled:[customButton intValue]  == 1];
-	[applyButton setEnabled:[customButton intValue]  == 1];
+	[cancelButton           setEnabled:[customButton intValue]  == 1];
+	[applyButton            setEnabled:[customButton intValue]  == 1];
 }
 
 - (IBAction) storeAction:(id)sender
@@ -190,17 +180,17 @@
 	NSData*   calAsData     = [calDic objectForKey:[selectionPU titleOfSelectedItem]];
 	if(calAsData){
 		NSKeyedUnarchiver* unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:calAsData];
-		ORCalibration* cal = [unarchiver decodeObjectForKey:@"aCalibration"];
-		[cal setType:1];
-		[cal setCalibrationName:[selectionPU titleOfSelectedItem]];
+		self.calibration = [unarchiver decodeObjectForKey:@"aCalibration"];
+		[calibration setType:1];
+		[calibration setCalibrationName:[selectionPU titleOfSelectedItem]];
 		[unarchiver finishDecoding];
 		[unarchiver release];
-        [model setCalibration:cal];
-		[self loadUI:cal];
+		[self loadUI];
 	}
-	else [self loadUI:nil];
+	else [self loadUI];
 
 	[self calibrate];
+    [model setCalibration:calibration];
 }
 
 - (IBAction) deleteAction:(id)sender
@@ -211,7 +201,7 @@
 	[defaults setObject:calDic forKey:@"ORCACalibrations"];
 	[self populateSelectionPU];
 	[selectionPU selectItemAtIndex:0];
-	[self loadUI:nil];
+	[self loadUI];
 	if([selectionPU numberOfItems] > 1){
 		[catalogButton setIntValue:1]; 
 		[customButton setIntValue:0]; 
@@ -226,11 +216,18 @@
 - (IBAction) apply:(id)sender
 {	
 	[self calibrate];
+    [model setCalibration:calibration];
+}
+
+- (IBAction) ignore:(id)sender
+{
+    [calibration setIgnoreCalibration:[sender intValue]];
+    [self apply:sender];
 }
 
 - (IBAction) addPtAction:(id)sender
 {
-    [[[model calibration] calibrationArray] addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0],@"Channel",[NSNumber numberWithFloat:0],@"Energy",nil]];
+    [[calibration calibrationArray] addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0],@"Channel",[NSNumber numberWithFloat:0],@"Energy",nil]];
 	[calibrationTableView reloadData];
 }
 
@@ -238,11 +235,11 @@
 {
 	NSInteger selectedRow = [calibrationTableView selectedRow];
 	if(selectedRow == -1){
-		[[[model calibration] calibrationArray] removeLastObject];
+		[[calibration calibrationArray] removeLastObject];
 		[calibrationTableView reloadData];
 	}
-	else if(selectedRow<[[[model calibration] calibrationArray] count]){
-		[[[model calibration] calibrationArray] removeObjectAtIndex:selectedRow];
+	else if(selectedRow<[[calibration calibrationArray] count]){
+		[[calibration calibrationArray] removeObjectAtIndex:selectedRow];
 		[calibrationTableView reloadData];
 	}
 }
@@ -250,6 +247,8 @@
 - (IBAction) done:(id)sender
 {	
 	[self calibrate];
+    [model setCalibration:calibration];
+
 	[[self window] orderOut:self];
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
@@ -271,7 +270,6 @@
 - (IBAction) remove:(id)sender
 {
     [model setCalibration:nil];
-    [self calibrate];
     [[self window] orderOut:self];
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     [NSApp endSheet:[self window] returnCode:NSModalResponseOK];
@@ -283,14 +281,14 @@
 #pragma mark •••Table Data Source
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	if( aTableView == calibrationTableView)return [[[model calibration] calibrationArray] count];
+	if( aTableView == calibrationTableView)return [[calibration calibrationArray] count];
 	else return 0;
 }
 
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
 	if(aTableView == calibrationTableView ){
-		return [[[[model calibration] calibrationArray] objectAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
+		return [[[calibration calibrationArray] objectAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
 	}
 	else return nil;
 }
@@ -298,7 +296,7 @@
 - (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	if(aTableView == calibrationTableView){
-		[[[[model calibration] calibrationArray] objectAtIndex:rowIndex] setObject: anObject forKey:[aTableColumn identifier]];
+		[[[calibration calibrationArray] objectAtIndex:rowIndex] setObject: anObject forKey:[aTableColumn identifier]];
 	}
 }
 
@@ -365,7 +363,6 @@
     }
 }
 
-
 - (double) slope
 {
 	return slope;
@@ -398,13 +395,13 @@
 
 - (NSString*) units
 {
-	if(!units)return @"";
+	if(!units)return @"keV";
 	else return units;
 }
 
 - (void) setUnits:(NSString*)unitString
 {
-	if([unitString length]==0) unitString = @"";
+	if([unitString length]==0) unitString = @"keV";
 	[units autorelease];
 	units = [unitString copy];
 }
@@ -450,12 +447,12 @@
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self		= [super init];
-    calibrationArray =			[[decoder decodeObjectForKey:@"calibrationArray"] retain];
-	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
-	[self setLabel:				[decoder decodeObjectForKey:@"label"]];
-	[self setIgnoreCalibration:	[decoder decodeBoolForKey:@"ignoreCalibration"]];
-	[self setCalibrationName:	[decoder decodeObjectForKey:@"calibrationName"]];
-	[self setType:				[decoder decodeIntForKey:@"type"]];
+    calibrationArray =			[[decoder decodeObjectForKey: @"calibrationArray"] retain];
+	[self setUnits:				[decoder  decodeObjectForKey: @"units"]];
+	[self setLabel:				[decoder  decodeObjectForKey: @"label"]];
+	[self setIgnoreCalibration:	[decoder  decodeBoolForKey:   @"ignoreCalibration"]];
+	[self setCalibrationName:	[decoder  decodeObjectForKey: @"calibrationName"]];
+	[self setType:				[decoder  decodeIntForKey:    @"type"]];
 	[self calibrate];
     return self;
 }
@@ -463,11 +460,11 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [encoder encodeObject:calibrationArray	forKey: @"calibrationArray"];
-	[encoder encodeObject:units				forKey:@"units"];
-	[encoder encodeObject:label				forKey:@"label"];
-	[encoder encodeBool:ignoreCalibration	forKey:@"ignoreCalibration"];
-	[encoder encodeObject:calibrationName	forKey:@"calibrationName"];
-	[encoder encodeInt:type					forKey:@"type"];
+	[encoder encodeObject:units				forKey: @"units"];
+	[encoder encodeObject:label				forKey: @"label"];
+	[encoder encodeBool:ignoreCalibration	forKey: @"ignoreCalibration"];
+	[encoder encodeObject:calibrationName	forKey: @"calibrationName"];
+	[encoder encodeInt:type					forKey: @"type"];
 }
 
 
