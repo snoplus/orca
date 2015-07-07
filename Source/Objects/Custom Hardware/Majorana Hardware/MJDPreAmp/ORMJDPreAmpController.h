@@ -108,6 +108,7 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) boardRevAction:(id)sender;
+- (IBAction) clearSupplyErrorsAction:(id)sender;
 - (IBAction) useSBCAction:(id)sender;
 - (IBAction) detectorNameAction:(id)sender;
 - (IBAction) adcEnabledMaskAction:(id)sender;

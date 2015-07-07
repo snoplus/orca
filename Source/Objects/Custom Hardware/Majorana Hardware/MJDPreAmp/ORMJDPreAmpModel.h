@@ -60,6 +60,9 @@
     BOOL            useSBC;
     int             boardRev;
     BOOL            connected;
+    
+    //error counting
+    unsigned long   supplyErrors[4];
 }
 
 - (void) setUpArrays;
@@ -80,7 +83,8 @@
 - (void) setBaselineVoltages:(NSMutableArray*)anArray;
 - (float) baselineVoltage:(unsigned short) aChan;
 - (void) setBaselineVoltage:(int) aChan value:(float) aValue;
-
+- (void) incSupplyError:(int)anIndex;
+- (void) clearSupplyErrors;
 - (ORTimeRate*)adcHistory:(int)index;
 - (ORTimeRate*)leakageCurrentHistory:(int)index;
 - (unsigned long) adcEnabledMask;

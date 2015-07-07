@@ -377,7 +377,6 @@
                      selector : @selector(setWindowTitle)
                          name : ORVmeCardSlotChangedNotification
                         object: nil];
-   
 }
 
 - (void) updateWindow
@@ -408,11 +407,12 @@
 }
 
 #pragma mark ¥¥¥Interface Management
+
 - (void) boardRevChanged:(NSNotification*)aNote
 {
 	[boardRevPU selectItemAtIndex: [model boardRev]];
     [self setWindowTitle];
- }
+}
 
 - (void) useSBCChanged:(NSNotification*)aNote
 {
@@ -790,6 +790,12 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (IBAction) clearSupplyErrorsAction:(id)sender
+{
+    [model clearSupplyErrors];
+}
+
 - (IBAction) detectorNameAction:(id)sender
 {
    	[model setDetector:[[sender selectedCell] tag] name:[sender stringValue]];

@@ -280,15 +280,16 @@ struct {
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelUseSBCChanged object:self];
 }
+
 - (NSString*) detectorName:(int)i
 {
     if(i>=0 && i<kMJDPreAmpAdcChannels){
         switch(i){
-            case 5:  return @"+12V";
-            case 6:  return @"-12V";
+            case 5:  return (supplyErrors[0] == 0)?@"+12V":[NSString stringWithFormat:@"+12V (%lu Errors)",supplyErrors[0]];
+            case 6:  return (supplyErrors[1] == 0)?@"-12V":[NSString stringWithFormat:@"-12V (%lu Errors)",supplyErrors[1]];
             case 7:  return @"Temp Chip 1";
-            case 13: return @"+24V";
-            case 14: return @"-24V";
+            case 13: return (supplyErrors[2] == 0)?@"+24V":[NSString stringWithFormat:@"+24V (%lu Errors)",supplyErrors[2]];
+            case 14: return (supplyErrors[3] == 0)?@"-24V":[NSString stringWithFormat:@"-24V (%lu Errors)",supplyErrors[3]];
             case 15: return @"Temp Chip 2";
             default: if(!detectorName[i].length)return @"";
                      else return detectorName[i];
@@ -1264,31 +1265,35 @@ struct {
     NSString* alarmName = nil;
     switch(anIndex){
         case 5:
-	  if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
+            if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
                 alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
-                postAlarm  = YES;
+                //postAlarm  = YES;
+                [self incSupplyError:0];
             }
         break;
             
         case 6:
             if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
-                postAlarm  = YES;
-            }
+                //postAlarm  = YES;
+                [self incSupplyError:2];
+           }
         break;
             
         case 13:
             if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
-                postAlarm  = YES;
-            }
+                //postAlarm  = YES;
+                [self incSupplyError:3];
+          }
         break;
             
         case 14:
             if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
-                postAlarm  = YES;
-            }
+                //postAlarm  = YES;
+                [self incSupplyError:4];
+           }
         break;
     }
     
@@ -1304,9 +1309,24 @@ struct {
         [adcAlarm[anIndex] clearAlarm];
         [adcAlarm[anIndex] release];
         adcAlarm[anIndex] = nil;
-        
     }
 }
+
+- (void) incSupplyError:(int)anIndex
+{
+    supplyErrors[anIndex]++;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDetectorNameChanged object:self];
+}
+
+- (void) clearSupplyErrors;
+{
+    int i;
+    for(i=0;i<4;i++){
+        supplyErrors[i] = 0;
+    }
+     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDetectorNameChanged object:self];
+}
+
 @end
 
 #pragma mark ¥¥¥Private Implementation
@@ -1439,14 +1459,37 @@ struct {
     if([detectorArray count])[theRecord setObject:detectorArray forKey:@"detectors"];
     
     [theRecord setObject:temperatures                        forKey:@"temperatures"];
-    [theRecord setObject:[NSNumber numberWithFloat:adcs[13]] forKey:@"+24V"];
-    [theRecord setObject:[NSNumber numberWithFloat:adcs[14]] forKey:@"-24V"];
     [theRecord setObject:[NSNumber numberWithFloat:adcs[5]]  forKey:@"+12V"];
     [theRecord setObject:[NSNumber numberWithFloat:adcs[6]]  forKey:@"-12V"];
+    [theRecord setObject:[NSNumber numberWithFloat:adcs[13]] forKey:@"+24V"];
+    [theRecord setObject:[NSNumber numberWithFloat:adcs[14]] forKey:@"-24V"];
     [theRecord setObject:[NSNumber numberWithInt:pollTime]   forKey:@"pollTime"];
+    [theRecord setObject:[NSNumber numberWithLong:supplyErrors[0]] forKey:@"+12VErrors"];
+    [theRecord setObject:[NSNumber numberWithLong:supplyErrors[1]] forKey:@"-12VErrors"];
+    [theRecord setObject:[NSNumber numberWithLong:supplyErrors[2]] forKey:@"+24VErrors"];
+    [theRecord setObject:[NSNumber numberWithLong:supplyErrors[3]] forKey:@"-24VErrors"];
     
-     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:theRecord];
+    
+    
+    NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   [self fullID],               @"name",
+                                   @"PreAmpSupplyErrors",       @"title",
+                                   [NSArray arrayWithObjects:
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: supplyErrors[0]]        forKey:@"+12VErrors"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: supplyErrors[1]]        forKey:@"-12VErrors"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: supplyErrors[2]]        forKey:@"+24VErrors"],
+                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: supplyErrors[3]]        forKey:@"-24VErrors"],
+                                     nil
+                                    ],
+                                   @"adcs",
+                                   nil
+                                   ];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:historyRecord];
+
+    
+    
 }
 
 @end
