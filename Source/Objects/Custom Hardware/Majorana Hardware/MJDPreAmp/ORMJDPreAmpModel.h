@@ -30,26 +30,26 @@
 #define kMJDPreAmpDataRecordLen             20
 
 @interface ORMJDPreAmpModel : OrcaObject {
-    NSString* detectorName[kMJDPreAmpAdcChannels];
-    float adcs[kMJDPreAmpAdcChannels];
-    float leakageCurrents[kMJDPreAmpLeakageCurrentChannels];
+    NSString*       detectorName[kMJDPreAmpAdcChannels];
+    float           adcs[kMJDPreAmpAdcChannels];
+    float           leakageCurrents[kMJDPreAmpLeakageCurrentChannels];
     NSMutableArray* feedBackResistors;
     NSMutableArray* baselineVoltages;
     NSMutableArray* dacs;
     NSMutableArray* amplitudes;
-    unsigned short pulserMask;
-    int pulseLowTime;
-    int pulseHighTime;
-    BOOL attenuated[2];
-    BOOL finalAttenuated[2];
-    BOOL enabled[2];
-    unsigned short pulseCount;
-    BOOL loopForever;
-    int pollTime;
-    BOOL shipValues;
+    unsigned short  pulserMask;
+    int             pulseLowTime;
+    int             pulseHighTime;
+    BOOL            attenuated[2];
+    BOOL            finalAttenuated[2];
+    BOOL            enabled[2];
+    unsigned short  pulseCount;
+    BOOL            loopForever;
+    int             pollTime;
+    BOOL            shipValues;
 	unsigned long	dataId;
-	unsigned long timeMeasured;
-    unsigned long adcEnabledMask;
+	unsigned long   timeMeasured;
+    unsigned long   adcEnabledMask;
     ORTimeRate*		adcHistory[kMJDPreAmpAdcChannels];
     ORTimeRate*		leakageCurrentHistory[kMJDPreAmpLeakageCurrentChannels];
     ORAlarm*		temperatureAlarm[2];
@@ -62,6 +62,7 @@
     BOOL            connected;
     
     //error counting
+    BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
     unsigned long   supplyErrors[4];
 }
 
@@ -83,7 +84,7 @@
 - (void) setBaselineVoltages:(NSMutableArray*)anArray;
 - (float) baselineVoltage:(unsigned short) aChan;
 - (void) setBaselineVoltage:(int) aChan value:(float) aValue;
-- (void) incSupplyError:(int)anIndex;
+- (void) checkSupplyError:(int)anIndex postAlarm:(BOOL)aState;
 - (void) clearSupplyErrors;
 - (ORTimeRate*)adcHistory:(int)index;
 - (ORTimeRate*)leakageCurrentHistory:(int)index;

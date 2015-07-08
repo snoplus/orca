@@ -1267,36 +1267,38 @@ struct {
         case 5:
             if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
                 alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
-                //postAlarm  = YES;
-                [self incSupplyError:0];
+                postAlarm  = YES;
             }
-        break;
+            [self checkSupplyError:0 postAlarm:postAlarm];
+       break;
             
         case 6:
             if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
-                //postAlarm  = YES;
-                [self incSupplyError:2];
-           }
-        break;
+                postAlarm  = YES;
+            }
+            [self checkSupplyError:1 postAlarm:postAlarm];
+       break;
             
         case 13:
             if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
-                //postAlarm  = YES;
-                [self incSupplyError:3];
-          }
-        break;
+                postAlarm  = YES;
+            }
+            [self checkSupplyError:2 postAlarm:postAlarm];
+       break;
             
         case 14:
             if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
                 alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
-                //postAlarm  = YES;
-                [self incSupplyError:4];
+                postAlarm  = YES;
            }
+           [self checkSupplyError:3 postAlarm:postAlarm];
+
         break;
     }
     
+    /* Turn off the alarms for now
     if(postAlarm){
         if(!adcAlarm[anIndex]){
             adcAlarm[anIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
@@ -1310,19 +1312,26 @@ struct {
         [adcAlarm[anIndex] release];
         adcAlarm[anIndex] = nil;
     }
+     */
 }
 
-- (void) incSupplyError:(int)anIndex
+- (void) checkSupplyError:(int)anIndex postAlarm:(BOOL)aState
 {
-    supplyErrors[anIndex]++;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDetectorNameChanged object:self];
+    if((anIndex>=0) && (anIndex<4)){
+        if(aState && !supplyOutOfBounds[anIndex]){
+            supplyErrors[anIndex]++;
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDetectorNameChanged object:self];
+        }
+        supplyOutOfBounds[anIndex] = aState;
+     }
 }
 
 - (void) clearSupplyErrors;
 {
     int i;
     for(i=0;i<4;i++){
-        supplyErrors[i] = 0;
+        supplyErrors[i]        = 0;
+        supplyOutOfBounds[i]   = NO;
     }
      [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDetectorNameChanged object:self];
 }
