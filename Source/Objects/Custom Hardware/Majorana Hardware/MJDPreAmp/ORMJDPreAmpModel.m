@@ -285,11 +285,11 @@ struct {
 {
     if(i>=0 && i<kMJDPreAmpAdcChannels){
         switch(i){
-            case 5:  return (supplyErrors[0] == 0)?@"+12V":[NSString stringWithFormat:@"+12V (%lu Errors)",supplyErrors[0]];
-            case 6:  return (supplyErrors[1] == 0)?@"-12V":[NSString stringWithFormat:@"-12V (%lu Errors)",supplyErrors[1]];
+            case 5:  return (supplyErrors[0] == 0)?@"+12V":[NSString stringWithFormat:@"+12V (%lu Error%@)",supplyErrors[0],supplyErrors[0]>1?@"s":@""];
+            case 6:  return (supplyErrors[1] == 0)?@"-12V":[NSString stringWithFormat:@"-12V (%lu Error%@)",supplyErrors[1],supplyErrors[1]>1?@"s":@""];
             case 7:  return @"Temp Chip 1";
-            case 13: return (supplyErrors[2] == 0)?@"+24V":[NSString stringWithFormat:@"+24V (%lu Errors)",supplyErrors[2]];
-            case 14: return (supplyErrors[3] == 0)?@"-24V":[NSString stringWithFormat:@"-24V (%lu Errors)",supplyErrors[3]];
+            case 13: return (supplyErrors[2] == 0)?@"+24V":[NSString stringWithFormat:@"+24V (%lu Error%@)",supplyErrors[2],supplyErrors[2]>1?@"s":@""];
+            case 14: return (supplyErrors[3] == 0)?@"-24V":[NSString stringWithFormat:@"-24V (%lu Error%@)",supplyErrors[3],supplyErrors[3]>1?@"s":@""];
             case 15: return @"Temp Chip 2";
             default: if(!detectorName[i].length)return @"";
                      else return detectorName[i];
