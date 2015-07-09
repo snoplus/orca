@@ -51,7 +51,6 @@
 
 #define kSBCRateIntegrationTime 1.5
 #define kSBCMaxErrorRate    10
-#define kSBCMaxBusErrorRate 10
 
 
 #pragma mark ***External Strings
@@ -178,8 +177,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     
     [errorsAlarm clearAlarm];
     [errorsAlarm release];
-    [busErrorsAlarm clearAlarm];
-    [busErrorsAlarm release];
 
     
     [lastRateUpdate release];
@@ -676,7 +673,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     bytesReceived = 0;
     bytesSent = 0;
-    lastBusErrorCount = 0;
     lastErrorCount = 0;
     
     [lastRateUpdate release];
@@ -698,10 +694,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
             bytesReceived   = 0;
             bytesSent       = 0;
             
-            busErrorRate = (lastBusErrorCount - runInfo.busErrorCount)/deltaTime;
-            errorRate    = (lastErrorCount    - runInfo.err_count)    /deltaTime;
+            errorRate    = (runInfo.err_count     - lastErrorCount)    /deltaTime;
 
-            lastBusErrorCount   = runInfo.busErrorCount;
             lastErrorCount      = runInfo.err_count;
             
             [self checkErrorRates];
@@ -717,17 +711,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) checkErrorRates
 {
-    if(busErrorRate > kSBCMaxBusErrorRate){
-        if(!busErrorsAlarm){
-            busErrorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ busErrorRate High",[delegate fullID]] severity:kHardwareAlarm];
-            [busErrorsAlarm setSticky:NO];
-            [busErrorsAlarm setHelpString:[NSString stringWithFormat:@"%@ is throwing bus errors at a high rate. Something is seriously wrong with the hardware. This alarm will not go away until it is acknowledged and the error rate is zero.",[delegate fullID]]];
-        }
-        if(![busErrorsAlarm isPosted]){
-            [busErrorsAlarm setAcknowledged:NO];
-            [busErrorsAlarm postAlarm];
-        }
-    }
     
     if(errorRate > kSBCMaxErrorRate){
         if(!errorsAlarm){
@@ -1761,7 +1744,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 	
     [errorsAlarm         clearAlarm];
-    [busErrorsAlarm      clearAlarm];
     
     [eCpuDeadAlarm       clearAlarm];
 	[eRunFailedAlarm     clearAlarm];
@@ -2838,7 +2820,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithLong: runInfo.statusBits],          @"statusBits",
-                            [NSNumber numberWithLong: runInfo.busErrorCount],       @"busErrorCount",
                             [NSNumber numberWithLong: runInfo.err_count],           @"err_count",
                             [NSNumber numberWithLong: runInfo.lostByteCount],       @"lostByteCount",
                             [NSNumber numberWithLong: runInfo.amountInBuffer],      @"amountInBuffer",
@@ -2856,7 +2837,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
                                    [NSArray arrayWithObjects:
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.statusBits]        forKey:@"statusBits"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.err_count]         forKey:@"err_count"],
-                                    [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.busErrorCount]     forKey:@"busErrorCount"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.lostByteCount]     forKey:@"lostByteCount"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.amountInBuffer]    forKey:@"amountInBuffer"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.pollingRate]       forKey:@"pollingRate"],

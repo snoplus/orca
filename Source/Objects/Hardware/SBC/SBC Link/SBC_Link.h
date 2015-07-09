@@ -49,7 +49,6 @@ typedef enum eSBC_ThrottleConsts{
 
 @interface SBC_Link : ORGroup {
 	id				delegate;
-    ORAlarm*        busErrorsAlarm;
     ORAlarm*        errorsAlarm;
     ORAlarm*        eCpuDeadAlarm;
 	ORAlarm*        eRunFailedAlarm;
@@ -76,9 +75,7 @@ typedef enum eSBC_ThrottleConsts{
     unsigned long	writeValue;
 	unsigned long   addressModifier;
 	SBC_info_struct runInfo;
-    unsigned long   lastBusErrorCount;
     unsigned long   lastErrorCount;
-    float           busErrorRate;
     float           errorRate;
 	NSDate*			lastQueUpdate;
     BOOL			reloading;
