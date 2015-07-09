@@ -199,12 +199,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) wakeUp 
 {
-	//[self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
 }
 
 - (void) sleep 	
 {	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
 - (void) initConnectionHistory
@@ -674,7 +672,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     bytesReceived = 0;
     bytesSent = 0;
     lastErrorCount = 0;
-    
+    errorRate = 0;
     [lastRateUpdate release];
     lastRateUpdate = nil;
     [self setByteRateSent: 0];
@@ -684,7 +682,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) calculateRates
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
     NSDate* now = [NSDate date];
      if(lastRateUpdate){
         NSTimeInterval deltaTime = [now timeIntervalSinceDate:lastRateUpdate];
@@ -694,24 +691,22 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
             bytesReceived   = 0;
             bytesSent       = 0;
             
-            errorRate    = (runInfo.err_count     - lastErrorCount)    /deltaTime;
+            
+            if(runInfo.err_count>=lastErrorCount){
+                errorRate       = (runInfo.err_count - lastErrorCount)    /deltaTime;
+                [self checkErrorRates];
+            }
+            lastErrorCount  = runInfo.err_count;
 
-            lastErrorCount      = runInfo.err_count;
-            
-            [self checkErrorRates];
-            
             [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkByteRateChanged object:self];
         }
     }
     [lastRateUpdate release];
     lastRateUpdate = [now retain];
-
-	[self performSelector:@selector(calculateRates) withObject:nil afterDelay:kSBCRateIntegrationTime];
 }
 
 - (void) checkErrorRates
 {
-    
     if(errorRate > kSBCMaxErrorRate){
         if(!errorsAlarm){
             errorsAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ errorRate High",[delegate fullID]] severity:kHardwareAlarm];
@@ -861,8 +856,6 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	exitCBTest    = YES;
 	cbTestRunning = NO;
     
-    [self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
-
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
@@ -1674,7 +1667,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(update) object:nil];
 	if(isRunning){
 		[self getRunInfoBlock];
-        
+        [self calculateRates];
 		if(runInfo.readCycles == oldCycleCount){
 			if(++missedHeartBeat == 10){
 				if(!eCpuDeadAlarm){
@@ -1754,7 +1747,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	missedHeartBeat = 0;
 	throttle = 1000;
 	[self tellClientToStartRun];
-    [self calculateRates];
+    [self clearRates];
     [self update];
 }
 
