@@ -430,6 +430,7 @@ unsigned long long facto(unsigned long long num)
                     NSString* runHeaderString   = [[[NSString alloc] initWithBytes:&ptr[2] length:ptr[1] encoding:NSASCIIStringEncoding] autorelease];
                     NSDictionary* runHeader     = [runHeaderString propertyList];
                     shaperID                    = [[runHeader nestedObjectForKey:@"dataDescription",@"ORShaperModel",@"Shaper",@"dataId",nil] unsignedLongValue];
+                    //runtype = [shaperID dataDesc
                 }
                 // header gets here
                 if (dataID == shaperID || burstForce==1) {
@@ -1186,6 +1187,23 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     if(novaState == 3) //Send a cping somewhere if the burst is good enough
     {
         NSLog(@"Sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
+        //make the time into a sendable string
+        NSDate* burstdate = [NSDate dateWithTimeIntervalSince1970:numSecTillBurst];
+        NSCalendar* cal = [NSCalendar currentCalendar];
+        [cal setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+        NSDateComponents* burstcomp = [cal components:(NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond) fromDate:burstdate];
+        NSInteger century = ([burstcomp year]/100);
+        NSInteger yy = [burstcomp year] - (100*century);
+        NSInteger mmo = 100*[burstcomp month];
+        NSInteger dd = 10000*[burstcomp day];
+        NSInteger hh = 10000*[burstcomp hour];
+        NSInteger mmi = 100*[burstcomp minute];
+        NSInteger ss = [burstcomp second];
+        NSInteger dateint = yy + mmo + dd;
+        NSInteger timeint = ss + mmi + hh;
+        NSString* burstcommand = @"";
+        burstcommand = [burstcommand stringByAppendingFormat:@"cd snews/coinccode/ ; ./cping all %i %i 0 9", dateint, timeint];
+        NSLog(@"burstcommand witha a space on each side: | %@ |\n", burstcommand);
         NSTask* Cping;
         Cping =[[NSTask alloc] init];
         //NSPipe* pipe;
@@ -1200,7 +1218,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         }
         else{ //Send to halo shift
             [Cping setLaunchPath: @"/usr/bin/ssh"];  //@"/usr/bin/ssh"
-            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.223", @"cd snews/coinccode/ ; ./cping all 0 0 0 9", nil]];
+            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.223", burstcommand, nil]];
             //[Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.225", @"cd snews/coinccode/ ; mkdir AAASNEWSPINGTEST", nil]];
         }  // -c successfully made directories in home
         [Cping launch]; //Send the ping!
