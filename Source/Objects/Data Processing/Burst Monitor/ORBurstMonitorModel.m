@@ -430,7 +430,27 @@ unsigned long long facto(unsigned long long num)
                     NSString* runHeaderString   = [[[NSString alloc] initWithBytes:&ptr[2] length:ptr[1] encoding:NSASCIIStringEncoding] autorelease];
                     NSDictionary* runHeader     = [runHeaderString propertyList];
                     shaperID                    = [[runHeader nestedObjectForKey:@"dataDescription",@"ORShaperModel",@"Shaper",@"dataId",nil] unsignedLongValue];
-                    //runtype = [shaperID dataDesc
+                    //Find run information
+                    //headerID                    = [[runHeader nestedObjectForKey:@"ObjectInfo",@"DataChain",@"Run Control",@"runType",nil] unsignedLongValue];
+                    //headerID                    = [[runHeader valueForKeyPath:@"dataDescription.ORShaperModel.Shaper.dataID"] unsignedLongValue];  //gets 0
+                    NSDictionary* thing1 = [runHeader objectForKey:@"ObjectInfo"];
+                    NSDictionary* thing2 = [thing1 objectForKey:@"DataChain"];
+                    NSString* runglob = [NSString stringWithFormat:@"%@", thing2]; //The most specific reference that has no spaces
+                    //NSLog(@"%@",runglob);
+                    
+                    NSRange runnumtitle = [runglob rangeOfString:@"RunNumber = "]; //12 lengnth, need 4 char for run number
+                    NSRange runRange = NSMakeRange((runnumtitle.location+12), 4); ///109 4 for runnumber
+                    NSString* runnumstr = [runglob substringWithRange:runRange];
+                    //NSLog(@"string is %@\n",runnumstr);
+                    runnum = [runnumstr intValue];
+                    NSLog(@"Run Number is %i\n", runnum);
+                    
+                    NSRange runtypetitle = [runglob rangeOfString:@"runType = "]; //10 lengnth, need 10 char for run number
+                    NSRange typeRange = NSMakeRange((runtypetitle.location+10), 10); ///109 4 for runnumber
+                    NSString* runtypestr = [runglob substringWithRange:typeRange];
+                    //NSLog(@"string is space on each side| %@ |.....\n",runtypestr);
+                    runtype = [runtypestr intValue];
+                    NSLog(@"Run Type is %i (4 is now snews connectivity test) \n", runtype);
                 }
                 // header gets here
                 if (dataID == shaperID || burstForce==1) {
@@ -568,10 +588,10 @@ unsigned long long facto(unsigned long long num)
                                                     lString = [lString stringByPaddingToLength:68 withString:@" " startingAtIndex:0];
                                                     int Xbormm=0;
                                                     int Ybormm=0;
-                                                    NSLog(@"preborxy iter is %i \n", iter);
+                                                    //NSLog(@"preborxy iter is %i \n", iter);
                                                     Xbormm = [self boreX:[[Bcards objectAtIndex:iter] intValue] Channel:[[Bchans objectAtIndex:iter] intValue]];
                                                     Ybormm = [self boreY:[[Bcards objectAtIndex:iter] intValue] Channel:[[Bchans objectAtIndex:iter] intValue]];
-                                                    NSLog(@"postborxy iter is %i \n", iter);
+                                                    //NSLog(@"postborxy iter is %i \n", iter);
                                                     lString = [lString stringByAppendingString:[NSString stringWithFormat:@"(x,y)=(%i,%i) ",Xbormm, Ybormm]];
                                                     lString = [lString stringByPaddingToLength:85 withString:@" " startingAtIndex:0];               //lenth 17
                                                     bString = [bString stringByAppendingString:lString];        //Place the line in burststring
@@ -1184,7 +1204,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         }
     }
     NSLog(@"Novastate set to %i \n", novaState);
-    if(novaState == 3) //Send a cping somewhere if the burst is good enough
+    if(novaState == 3 || runtype == 4) //Send a cping somewhere if the burst is good enough
     {
         NSLog(@"Sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
         //make the time into a sendable string
@@ -1211,7 +1231,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         //[Cping setStandardOutput: pipe];
         //NSFileHandle* pingfile;
         //pingfile =[pipe fileHandleForReading];
-        if(1) //Send to local machine  //mod change to ping again
+        if(0) //Send to local machine  //mod change to ping again
         {
             [Cping setLaunchPath: @"/usr/bin/printf"];
             [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
@@ -1262,7 +1282,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
-    theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine)\n",[NSDate date]];
+    theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine) in run number %i of run type %i \n",[NSDate date], runnum, runtype];
     theContent = [theContent stringByAppendingFormat:@"First event in burst:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@, %i us (UTC), time from SBC cards \n", [NSDate dateWithTimeIntervalSince1970:numSecTillBurst], numMicTillBurst];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];

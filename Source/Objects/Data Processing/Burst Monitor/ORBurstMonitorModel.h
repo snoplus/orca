@@ -38,7 +38,9 @@
     unsigned short       nHit;
     unsigned short       minimumEnergyAllowed;
     unsigned long        shaperID;
-    NSString*            runtype;
+    unsigned long        headerID;
+    int runtype;
+    int runnum;
     
     //buffer
     NSMutableArray* chans;
