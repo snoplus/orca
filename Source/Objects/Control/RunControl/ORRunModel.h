@@ -108,6 +108,7 @@
 #pragma mark ¥¥¥Accessors
 - (int) selectedRunTypeScript;
 - (void) setSelectedRunTypeScript:(int)aSelectedRunTypeScript;
+- (void) selectRunTypeScriptByName:(NSString*)aName;
 - (NSDictionary*)runInfo;
 - (NSDictionary*) fullRunInfo;
 
@@ -123,6 +124,7 @@
 - (ORRunScriptModel*) startScript;
 - (void) setStartScript:(ORRunScriptModel*)aStartScript;
 - (BOOL) isRunning;
+- (BOOL) isStopped;
 - (BOOL) runPaused;
 - (void) setRunPaused:(BOOL)aFlag;
 - (BOOL) remoteInterface;
@@ -194,6 +196,7 @@
 - (void) runAbortFromScript;
 
 - (void) startRun;
+- (void) startNoScriptRun;
 - (void) restartRun;
 - (void) stopRun;
 - (void) haltRun;

@@ -247,11 +247,24 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) setSelectedRunTypeScript:(int)aSelectedRunTypeScript
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRunTypeScript:selectedRunTypeScript];
-    
     selectedRunTypeScript = aSelectedRunTypeScript;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSelectedRunTypeScriptChanged object:self];
 }
+
+- (void) selectRunTypeScriptByName:(NSString*)aName
+{
+    int i = 1; //zero is the standard run -- no script there
+    NSArray* scriptList = [self runScriptList];
+    for(NSString* scriptName in scriptList){
+        if([scriptName isEqualToString: aName]){
+            [self setSelectedRunTypeScript:i];
+            break;
+        }
+        i++;
+    }
+}
+
+
 - (NSString*) fullRunNumberString
 {
 	NSString* rn;
@@ -429,10 +442,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 object: self];
 }
 
-- (BOOL)isRunning
+- (BOOL) isRunning
 {
 	return [self runningState] != eRunStopped;
 }
+
+- (BOOL) isStopped
+{
+    return [self runningState] == eRunStopped;
+}
+
 
 - (NSString*) startTimeAsString
 {
@@ -834,6 +853,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Run Modifiers
+- (void) startNoScriptRun
+{
+    [self setSelectedRunTypeScript:0];
+    [self startRun];
+}
+
 - (void) startRun
 {
 	if([self runningState] == eRunStarting){
@@ -2191,7 +2216,8 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 {
 	NSArray* selectorArray = [NSArray arrayWithObjects:
 		@"isRunning",
-		@"startRun",
+        @"startNoScriptRun",
+        @"startRun",
 		@"restartRun",
 		@"stopRun",
 		@"prepareForNewSubRun",
