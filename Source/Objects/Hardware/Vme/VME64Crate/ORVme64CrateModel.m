@@ -34,7 +34,8 @@
     //so, we cache the image here so that each crate can have its own version for drawing into.
     //---------------------------------------------------------------------------------------------------
     NSImage* aCachedImage = [NSImage imageNamed:@"Vme64CrateSmall"];
-    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    NSSize cachedImageSize = [aCachedImage size];
+    NSImage* i = [[NSImage alloc] initWithSize:cachedImageSize];
     [i lockFocus];
     [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
     if(powerOff){
@@ -45,7 +46,14 @@
                                                                      nil]] autorelease]; 
         [s drawAtPoint:NSMakePoint(25,5)];
     }
+    NSFont* theFont = [NSFont messageFontOfSize:9];
+    NSAttributedString* theName =  [[[NSAttributedString alloc]
+                                     initWithString:[NSString stringWithFormat:@"Crate %d",[self crateNumber]]
+                                     attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
+    NSSize textSize = [theName size];
     
+    [theName drawInRect:NSMakeRect(cachedImageSize.width/2-textSize.width/2,cachedImageSize.height-textSize.height-4,textSize.width,textSize.height)];
+   
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
         [transform translateXBy:15 yBy:30];
@@ -60,6 +68,8 @@
             [anObject setHighlighted:oldHighlightState];
         }
     }
+    
+
     [i unlockFocus];
     [self setImage:i];
     [i release];
