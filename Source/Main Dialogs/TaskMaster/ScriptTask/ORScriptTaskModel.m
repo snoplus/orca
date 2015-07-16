@@ -77,6 +77,11 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     }
 }
 
+- (NSRect) defaultFrame
+{
+    return NSMakeRect(0,0,50,51);
+}
+
 - (void) setUpImage
 {
     //---------------------------------------------------------------------------------------------------
@@ -85,8 +90,19 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     //---------------------------------------------------------------------------------------------------
     
     NSImage* aCachedImage = [NSImage imageNamed:@"ScriptTask"];
-	    
-    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    
+    NSSize textSize = NSMakeSize(0,0);
+    NSAttributedString* theName = nil;
+    if([self scriptName]){
+        NSFont* theFont = [NSFont messageFontOfSize:9];
+        theName =  [[[NSAttributedString alloc]
+                                         initWithString:[self scriptName]
+                                         attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
+        textSize = [theName size];
+    }
+    NSSize originalImageSize = [aCachedImage size];
+    NSSize theSize = NSMakeSize(originalImageSize.width+textSize.width,[aCachedImage size].height);
+    NSImage* i = [[NSImage alloc] initWithSize:theSize];
     [i lockFocus];
     [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
 	[self decorateIcon:i];
@@ -107,7 +123,11 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
         else              theImage = [NSImage imageNamed:@"Play"];
          [theImage drawInRect:NSMakeRect(3,3,25,25) fromRect:[theImage imageRect] operation:NSCompositeSourceOver fraction:1];
     }
-	
+    
+    if([self scriptName]){
+        [theName drawInRect:NSMakeRect(originalImageSize.width,originalImageSize.height/2-textSize.height/2+3,textSize.width,textSize.height)];
+    }
+    
     [i unlockFocus];
     
     [self setImage:i];
