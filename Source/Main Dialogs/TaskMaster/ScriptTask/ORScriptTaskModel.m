@@ -45,7 +45,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
 - (void) makeConnectors
 {
-    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize-4,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(50 - kConnectorSize-4,[self frame].size.height-kConnectorSize) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORScriptTaskInConnector];
 	[aConnector setOffColor:[NSColor brownColor]];
 	[aConnector setConnectorType: 'SCRI'];
@@ -53,7 +53,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     [aConnector release];
  
     
-    aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize-4,0) withGuardian:self withObjectLink:self];
+    aConnector = [[ORConnector alloc] initAt:NSMakePoint(50 - kConnectorSize-4,0) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORScriptTaskOutConnector];
 	[aConnector setOffColor:[NSColor brownColor]];
 	[aConnector setConnectorType: 'SCRO'];
