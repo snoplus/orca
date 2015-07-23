@@ -26,9 +26,9 @@
 
 typedef struct  {
 	NSString*       regName;
-	bool			dataReset;
+    bool			hwReset;
 	bool			softwareReset;
-	bool			hwReset;
+    bool			dataReset;
 	unsigned long 	addressOffset;
 	short			accessType;
 } CV1730RegisterNamesStruct; 
@@ -38,19 +38,21 @@ typedef struct  {
 enum {
 	kOutputBuffer,			//0x0000
 	kDummy32,				//0x1024
-	kGain,                  //0x1028
-	kThresholds,			//0x1080
-	kStatus,				//0x1088
+    kGain,                  //0x1028
+    kPulseWidth,            //0x1070
+    kThresholds,			//0x1080
+    kSelfTriggerLogic,		//0x1084
+	kChannelStatus,			//0x1088
 	kFirmwareVersion,		//0x108C
 	kBufferOccupancy,		//0x1094
 	kDacs,					//0x1098
-	kAdcConfig,				//0x109C
-    kTempMonitor,           //0x10A8
+    kTemperature,           //0x10A8
 	kChanConfig,			//0x8000
 	kChanConfigBitSet,		//0x8004
 	kChanConfigBitClr,		//0x8008
-	kBufferOrganization,	//0x800C
+    kBufferOrganization,	//0x800C
 	kCustomSize,			//0x8020
+    kChannelCalibration,	//0x809C
 	kAcqControl,			//0x8100
 	kAcqStatus,				//0x8104
 	kSWTrigger,				//0x8108
@@ -69,7 +71,9 @@ enum {
 	kEventSize,				//0x814C
     kMemBufferAlmostFullLvl,//0x816C
     kRunStartStopDelay,     //0x8170
+    kBoardFailStatus,       //0x8178
     kFPLvdsIONew,           //0x81A0
+    kChannelsShutdown,      //0x81C0
 	kVMEControl,			//0xEF00
 	kVMEStatus,				//0xEF04
 	kBoardID,				//0xEF08
@@ -104,30 +108,29 @@ enum {
 	unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   writeValue;
-	unsigned short  thresholds[8];
-	unsigned short	dac[8];
-	unsigned short	overUnderThreshold[8];
+	unsigned short  thresholds[16];
+    unsigned short	dac[16];
+    unsigned short	selfTriggerLogic[8];
     unsigned short	channelConfigMask;
-    unsigned long	customSize;
-	BOOL		isCustomSize;
-	BOOL		isFixedSize;
     BOOL			countAllTriggers;
     unsigned short	acquisitionMode;
     unsigned short  coincidenceLevel;
+    unsigned short  coincidenceWindow;
+    unsigned short  majorityLevel;
     unsigned long   triggerSourceMask;
 	unsigned long   triggerOutMask;
+    unsigned short  triggerOutLogic;
 	unsigned long   frontPanelControlMask;
     unsigned long	postTriggerSetting;
     unsigned short	enabledMask;
 	ORRateGroup*	waveFormRateGroup;
-	unsigned long 	waveFormCount[8];
+	unsigned long 	waveFormCount[16];
     int				bufferState;
 	ORAlarm*        bufferFullAlarm;
 	int				bufferEmptyCount;
 	BOOL			isRunning;
     int				eventSize;
     unsigned long   numberBLTEventsToReadout;
-    BOOL            continuousMode;
 	
 	//cached variables, valid only during running
 	unsigned int    statusReg;
@@ -135,8 +138,6 @@ enum {
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
 }
-
-@property (assign, nonatomic)   BOOL    continuousMode;
 
 #pragma mark ***Accessors
 - (int)				eventSize;
@@ -159,28 +160,26 @@ enum {
 - (void)			setPostTriggerSetting:(unsigned long)aPostTriggerSetting;
 - (unsigned long)	triggerSourceMask;
 - (void)			setTriggerSourceMask:(unsigned long)aTriggerSourceMask;
+- (unsigned short)	triggerOutLogic;
+- (void)			setTriggerOutLogic:(unsigned short)aValue;
 - (unsigned long)	triggerOutMask;
 - (void)			setTriggerOutMask:(unsigned long)aTriggerOutMask;
 - (unsigned long)	frontPanelControlMask;
 - (void)			setFrontPanelControlMask:(unsigned long)aFrontPanelControlMask;
 - (unsigned short)	coincidenceLevel;
-- (void)			setCoincidenceLevel:(unsigned short)aCoincidenceLevel;
+- (void)			setCoincidenceLevel:(unsigned short)aValue;
+- (unsigned short)	coincidenceWindow;
+- (void)			setCoincidenceWindow:(unsigned short)aValue;
+- (unsigned short)	majorityLevel;
+- (void)			setMajorityLevel:(unsigned short)aValue;
 - (unsigned short)	acquisitionMode;
 - (void)			setAcquisitionMode:(unsigned short)aMode;
 - (BOOL)			countAllTriggers;
 - (void)			setCountAllTriggers:(BOOL)aCountAllTriggers;
-- (BOOL)		isCustomSize;
-- (void)		setIsCustomSize:(BOOL)aIsCustomSize;
-- (BOOL)		isFixedSize;
-- (void)		setIsFixedSize:(BOOL)aIsFixedSize;
-- (unsigned long)	customSize;
-- (void)			setCustomSize:(unsigned long)aCustomSize;
 - (unsigned short)	channelConfigMask;
 - (void)			setChannelConfigMask:(unsigned short)aChannelConfigMask;
 - (unsigned short)	dac:(unsigned short) aChnl;
 - (void)			setDac:(unsigned short) aChnl withValue:(unsigned short) aValue;
-- (unsigned short)	overUnderThreshold:(unsigned short) aChnl;
-- (void)			setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue;
 - (unsigned long)	numberBLTEventsToReadout;
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
@@ -230,6 +229,10 @@ enum {
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
 - (void)			writeThreshold:(unsigned short) pChan;
 - (void)			writeBufferOrganization;
+- (void)			writeSelfTriggerLogic;
+- (void)			writeSelfTriggerLogic:(unsigned short)aChnl;
+- (unsigned short)	selfTriggerLogic:(unsigned short) aChnl;
+- (void)			setSelfTriggerLogic:(unsigned short) aChnl withValue:(unsigned long) aValue;
 
 #pragma mark •••DataTaker
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
@@ -257,17 +260,16 @@ extern NSString* ORCV1730ModelEnabledMaskChanged;
 extern NSString* ORCV1730ModelPostTriggerSettingChanged;
 extern NSString* ORCV1730ModelTriggerSourceMaskChanged;
 extern NSString* ORCV1730ModelTriggerOutMaskChanged;
+extern NSString* ORCV1730ModelTriggerOutLogicChanged;
 extern NSString* ORCV1730ModelFrontPanelControlMaskChanged;
 extern NSString* ORCV1730ModelCoincidenceLevelChanged;
+extern NSString* ORCV1730ModelCoincidenceWindowChanged;
+extern NSString* ORCV1730ModelMajorityLevelChanged;
 extern NSString* ORCV1730ModelAcquisitionModeChanged;
 extern NSString* ORCV1730ModelCountAllTriggersChanged;
-extern NSString* ORCV1730ModelCustomSizeChanged;
-extern NSString* ORCV1730ModelIsCustomSizeChanged;
-extern NSString* ORCV1730ModelIsFixedSizeChanged;
 extern NSString* ORCV1730ModelChannelConfigMaskChanged;
 extern NSString* ORCV1730ModelNumberBLTEventsToReadoutChanged;
 extern NSString* ORCV1730ChnlDacChanged;
-extern NSString* ORCV1730OverUnderThresholdChanged;
 extern NSString* ORCV1730Chnl;
 extern NSString* ORCV1730ChnlThresholdChanged;
 extern NSString* ORCV1730SelectedRegIndexChanged;
@@ -278,7 +280,8 @@ extern NSString* ORCV1730BasicLock;
 extern NSString* ORCV1730SettingsLock;
 extern NSString* ORCV1730RateGroupChanged;
 extern NSString* ORCV1730ModelBufferCheckChanged;
-extern NSString* ORCV1730ModelContinuousModeChanged;
+extern NSString* ORCV1730SelfTriggerLogicChanged;
+
 //the decoder concrete decoder class
 @interface ORCV1730DecoderForCAEN : ORCaenDataDecoder
 {}

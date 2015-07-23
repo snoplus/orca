@@ -30,62 +30,65 @@
 
 
 // Address information for this unit.
-#define k792DefaultBaseAddress 		0xa00000
-#define k792DefaultAddressModifier 	0x09
+#define k1730DefaultBaseAddress 		0xa00000
+#define k1730DefaultAddressModifier 	0x09
 #define kNumberBLTEventsToReadout   12 //most BLTEvent numbers don't make sense, make sure you know what you change
 
-NSString* ORCV1730ModelEventSizeChanged = @"ORCV1730ModelEventSizeChanged";
 static NSString* CV1730RunModeString[4] = {
-@"Register-Controlled",
-@"S-In Controlled",
-@"S-In Gate",
-@"Multi-Board Sync",
+    @"Register-Controlled",
+    @"S-In Controlled",
+    @"S-In Gate",
+    @"Multi-Board Sync",
 };
 // Define all the registers available to this unit.
 static CV1730RegisterNamesStruct reg[kNumRegisters] = {
 {@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly}, //not implemented in HW yet
-{@"Dummy32",			false,	true, 	true,	0x1024,		kReadWrite},
+{@"Dummy32",			true,	true, 	false,	0x1024,		kReadWrite},
 {@"Gain",               false,  true,   true,   0x1028,     kReadWrite},
-{@"Thresholds",			false,	true, 	true,	0x1080,		kReadWrite},
-{@"Status",				false,	true, 	true,	0x1088,		kReadOnly},
+{@"PulseWidth",         true,   true,   false,  0x1070,     kReadWrite},
+{@"Thresholds",			true,	true, 	false,	0x1080,		kReadWrite},
+{@"Self Trigger Logic",	true,	true, 	false,	0x1084,		kReadWrite},
+{@"Status",				true,	true, 	false,	0x1088,		kReadOnly},
 {@"Firmware Version",	false,	false, 	false,	0x108C,		kReadOnly},
 {@"Buffer Occupancy",	true,	true, 	true,	0x1094,		kReadOnly},
-{@"Dacs",				false,	true, 	true,	0x1098,		kReadWrite},
-{@"Adc Config",			false,	false, 	false,	0x109C,		kWriteOnly},
+{@"Dacs",				true,	true, 	false,	0x1098,		kReadWrite},
 {@"Temp Monitor",       false,  false,  false,  0x10A8,     kReadOnly},
-{@"Chan Config",		false,	true, 	true,	0x8000,		kReadWrite},
+{@"Chan Config",		true,	true, 	false,	0x8000,		kReadWrite},
 {@"Chan Config Bit Set",false,	false, 	false,	0x8004,		kWriteOnly},
 {@"Chan Config Bit Clr",false,	false, 	false,	0x8008,		kWriteOnly},
-{@"Buffer Organization",false,	true, 	true,	0x800C,		kReadWrite},
-{@"Custom Size",		false,	true, 	true,	0x8020,		kReadWrite},
-{@"Acq Control",		false,	true, 	true,	0x8100,		kReadWrite},
+{@"Buffer Organization",true,	true, 	false,	0x800C,		kReadWrite},
+{@"Custom Size",		true,	true, 	false,	0x8020,		kReadWrite},
+{@"Channel Calibration",false,	false, 	false,	0x809C,		kReadWrite},
+{@"Acq Control",		true,	true, 	false,	0x8100,		kReadWrite},
 {@"Acq Status",			false,	false, 	false,	0x8104,		kReadOnly},
 {@"SW Trigger",			false,	false, 	false,	0x8108,		kWriteOnly},
-{@"Trig Src Enbl Mask",	false,	true, 	true,	0x810C,		kReadWrite},
-{@"FP Trig Out Enbl Mask",false,true, 	true,	0x8110,		kReadWrite},
-{@"Post Trig Setting",	false,	true, 	true,	0x8114,		kReadWrite},
-{@"FP I/O Data",		false,	true, 	true,	0x8118,		kReadWrite},
-{@"FP I/O Control",		false,	true, 	true,	0x811C,		kReadWrite},
-{@"Chan Enable Mask",	false,	true, 	true,	0x8120,		kReadWrite},
+{@"Trig Src Enbl Mask",	true,	true, 	false,	0x810C,		kReadWrite},
+{@"FP Trig Out Enbl Mask",true,true, 	false,	0x8110,		kReadWrite},
+{@"Post Trig Setting",	true,	true, 	false,	0x8114,		kReadWrite},
+{@"FP I/O Data",		true,	true, 	true,	0x8118,		kReadWrite},
+{@"FP I/O Control",		true,	true, 	false,	0x811C,		kReadWrite},
+{@"Chan Enable Mask",	true,	true, 	false,	0x8120,		kReadWrite},
 {@"ROC FPGA Version",	false,	false, 	false,	0x8124,		kReadOnly},
 {@"Event Stored",		true,	true, 	true,	0x812C,		kReadOnly},
-{@"Set Monitor DAC",	false,	true, 	true,	0x8138,		kReadWrite},
+{@"Set Monitor DAC",	true,	true, 	false,	0x8138,		kReadWrite},
 {@"SW Clk Sync",        false,  false,  false,  0x813C,     kWriteOnly},
 {@"Board Info",			false,	false, 	false,	0x8140,		kReadOnly},
-{@"Monitor Mode",		false,	true, 	true,	0x8144,		kReadWrite},
+{@"Monitor Mode",		true,	true, 	false,	0x8144,		kReadWrite},
 {@"Event Size",			true,	true, 	true,	0x814C,		kReadOnly},
-{@"Mem Buffer Almost Full Lvl", false,  true,   true,   0x816C, kReadWrite},
-{@"Run Start Stop Delay",false, true,   true,   0x8170,     kReadWrite},
-{@"FP LVDS I/O New",    false,  true,   true,   0x81A0,     kReadWrite},
-{@"VME Control",		false,	false, 	true,	0xEF00,		kReadWrite},
+{@"Mem Buffer Almost Full Lvl", true,  true,   false,   0x816C, kReadWrite},
+{@"Run Start Stop Delay",true, true,   false,   0x8170,     kReadWrite},
+{@"Board Fail Status",  true, true,   false,   0x8178,     kReadOnly},
+{@"FP LVDS I/O New",    true,  true,   false,   0x81A0,     kReadWrite},
+{@"Channels Shutdown",    true,  true,   false,   0x81C0,     kReadWrite},
+{@"VME Control",		true,	false, 	false,	0xEF00,		kReadWrite},
 {@"VME Status",			false,	false, 	false,	0xEF04,		kReadOnly},
-{@"Board ID",			false,	true, 	true,	0xEF08,		kReadWrite},
-{@"MultCast Base Add",	false,	false, 	true,	0xEF0C,		kReadWrite},
-{@"Relocation Add",		false,	false, 	true,	0xEF10,		kReadWrite},
-{@"Interrupt Status ID",false,	false, 	true,	0xEF14,		kReadWrite},
-{@"Interrupt Event Num",false,	true, 	true,	0xEF18,		kReadWrite},
-{@"BLT Event Num",		false,	true, 	true,	0xEF1C,		kReadWrite},
-{@"Scratch",			false,	true, 	true,	0xEF20,		kReadWrite},
+{@"Board ID",			true,	true, 	false,	0xEF08,		kReadWrite},
+{@"MultCast Base Add",	true,	false, 	false,	0xEF0C,		kReadWrite},
+{@"Relocation Add",		true,	false, 	false,	0xEF10,		kReadWrite},
+{@"Interrupt Status ID",true,	false, 	false,	0xEF14,		kReadWrite},
+{@"Interrupt Event Num",true,	true, 	false,	0xEF18,		kReadWrite},
+{@"BLT Event Num",		true,	true, 	false,	0xEF1C,		kReadWrite},
+{@"Scratch",			true,	true, 	false,	0xEF20,		kReadWrite},
 {@"SW Reset",			false,	false, 	false,	0xEF24,		kWriteOnly},
 {@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly},
 {@"Config Reload",		false,	false, 	false,	0xEF34,		kWriteOnly},
@@ -98,17 +101,16 @@ NSString* ORCV1730ModelEnabledMaskChanged                 = @"ORCV1730ModelEnabl
 NSString* ORCV1730ModelPostTriggerSettingChanged          = @"ORCV1730ModelPostTriggerSettingChanged";
 NSString* ORCV1730ModelTriggerSourceMaskChanged           = @"ORCV1730ModelTriggerSourceMaskChanged";
 NSString* ORCV1730ModelTriggerOutMaskChanged              = @"ORCV1730ModelTriggerOutMaskChanged";
+NSString* ORCV1730ModelTriggerOutLogicChanged             = @"ORCV1730ModelTriggerOutLogicChanged";
 NSString* ORCV1730ModelFrontPanelControlMaskChanged	      = @"ORCV1730ModelFrontPanelControlMaskChanged";
 NSString* ORCV1730ModelCoincidenceLevelChanged            = @"ORCV1730ModelCoincidenceLevelChanged";
+NSString* ORCV1730ModelCoincidenceWindowChanged           = @"ORCV1730ModelCoincidenceWindowChanged";
+NSString* ORCV1730ModelMajorityLevelChanged               = @"ORCV1730ModelMajorityLevelChanged";
 NSString* ORCV1730ModelAcquisitionModeChanged             = @"ORCV1730ModelAcquisitionModeChanged";
 NSString* ORCV1730ModelCountAllTriggersChanged            = @"ORCV1730ModelCountAllTriggersChanged";
-NSString* ORCV1730ModelCustomSizeChanged                  = @"ORCV1730ModelCustomSizeChanged";
-NSString* ORCV1730ModelIsCustomSizeChanged                = @"ORCV1730ModelIsCustomSizeChanged";
-NSString* ORCV1730ModelIsFixedSizeChanged                 = @"ORCV1730ModelIsFixedSizeChanged";
 NSString* ORCV1730ModelChannelConfigMaskChanged           = @"ORCV1730ModelChannelConfigMaskChanged";
 NSString* ORCV1730ModelNumberBLTEventsToReadoutChanged    = @"ORCV1730ModelNumberBLTEventsToReadoutChanged";
 NSString* ORCV1730ChnlDacChanged                          = @"ORCV1730ChnlDacChanged";
-NSString* ORCV1730OverUnderThresholdChanged               = @"ORCV1730OverUnderThresholdChanged";
 NSString* ORCV1730Chnl                                    = @"ORCV1730Chnl";
 NSString* ORCV1730ChnlThresholdChanged                    = @"ORCV1730ChnlThresholdChanged";
 NSString* ORCV1730SelectedChannelChanged                  = @"ORCV1730SelectedChannelChanged";
@@ -118,8 +120,8 @@ NSString* ORCV1730BasicLock                               = @"ORCV1730BasicLock"
 NSString* ORCV1730SettingsLock                            = @"ORCV1730SettingsLock";
 NSString* ORCV1730RateGroupChanged                        = @"ORCV1730RateGroupChanged";
 NSString* ORCV1730ModelBufferCheckChanged                 = @"ORCV1730ModelBufferCheckChanged";
-NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelContinuousModeChanged";
-
+NSString* ORCV1730ModelEventSizeChanged                   = @"ORCV1730ModelEventSizeChanged";
+NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTriggerLogicChanged";
 @implementation ORCV1730Model
 
 #pragma mark ***Initialization
@@ -128,8 +130,8 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	
-    [self setBaseAddress:k792DefaultBaseAddress];
-    [self setAddressModifier:k792DefaultAddressModifier];
+    [self setBaseAddress:k1730DefaultBaseAddress];
+    [self setAddressModifier:k1730DefaultAddressModifier];
 	[self setEnabledMask:0xFF];
     [self setEventSize:0xa];
     [self setNumberBLTEventsToReadout:kNumberBLTEventsToReadout];
@@ -147,7 +149,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (NSRange)	memoryFootprint
 {
-	return NSMakeRange(baseAddress,0xEF28);
+	return NSMakeRange(baseAddress,0xF088);
 }
 
 #pragma mark ***Accessors
@@ -176,7 +178,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
-		if(counterTag>=0 && counterTag<8){
+		if(counterTag>=0 && counterTag<16){
 			return waveFormCount[counterTag];
 		}	
 		else return 0;
@@ -219,17 +221,11 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) setSelectedRegIndex:(unsigned short) anIndex
 {
-    // Set the undo manager action.  The label has already been set by the controller calling this method.
-    [[[self undoManager] prepareWithInvocationTarget:self]
-	 setSelectedRegIndex:[self selectedRegIndex]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegIndex:[self selectedRegIndex]];
     
-    // Set the new value in the model.
     selectedRegIndex = anIndex;
     
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCV1730SelectedRegIndexChanged
-	 object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730SelectedRegIndexChanged object:self];
 }
 
 - (unsigned short) selectedChannel
@@ -239,17 +235,11 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) setSelectedChannel:(unsigned short) anIndex
 {
-    // Set the undo manager action.  The label has already been set by the controller calling this method.
-    [[[self undoManager] prepareWithInvocationTarget:self]
-	 setSelectedChannel:[self selectedChannel]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:[self selectedChannel]];
     
-    // Set the new value in the model.
     selectedChannel = anIndex;
     
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCV1730SelectedChannelChanged
-	 object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730SelectedChannelChanged object:self];
 }
 
 - (unsigned long) writeValue
@@ -259,16 +249,11 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) setWriteValue:(unsigned long) aValue
 {
-    // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     
-    // Set the new value in the model.
     writeValue = aValue;
     
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCV1730WriteValueChanged
-	 object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730WriteValueChanged object:self];
 }
 
 - (unsigned short) enabledMask
@@ -328,6 +313,21 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelTriggerOutMaskChanged object:self];
 }
 
+- (unsigned short) triggerOutLogic
+{
+    return triggerOutLogic;
+}
+
+- (void) setTriggerOutLogic:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerOutLogic:triggerOutLogic];
+    
+    triggerOutLogic = aValue & 0x3;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelTriggerOutLogicChanged object:self];
+}
+
+
 - (unsigned long) frontPanelControlMask
 {
 	return frontPanelControlMask;
@@ -347,14 +347,43 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     return coincidenceLevel;
 }
 
-- (void) setCoincidenceLevel:(unsigned short)aCoincidenceLevel
+- (void) setCoincidenceLevel:(unsigned short)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCoincidenceLevel:coincidenceLevel];
     
-    coincidenceLevel = aCoincidenceLevel;
+    coincidenceLevel = aValue;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelCoincidenceLevelChanged object:self];
 }
+
+- (unsigned short) coincidenceWindow
+{
+    return coincidenceWindow;
+}
+
+- (void) setCoincidenceWindow:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCoincidenceWindow:coincidenceLevel];
+    
+    coincidenceWindow = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelCoincidenceWindowChanged object:self];
+}
+
+- (unsigned short) majorityLevel
+{
+    return majorityLevel;
+}
+
+- (void) setMajorityLevel:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMajorityLevel:majorityLevel];
+    
+    majorityLevel = aValue;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelMajorityLevelChanged object:self];
+}
+
 
 - (unsigned short) acquisitionMode
 {
@@ -384,48 +413,6 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelCountAllTriggersChanged object:self];
 }
 
-- (unsigned long) customSize
-{
-    return customSize;
-}
-
-- (void) setCustomSize:(unsigned long)aCustomSize
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCustomSize:customSize];
-    
-    customSize = aCustomSize;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelCustomSizeChanged object:self];
-}
-
-- (BOOL) isCustomSize
-{
-	return isCustomSize;
-}
-
-- (void) setIsCustomSize:(BOOL)aIsCustomSize
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setIsCustomSize:isCustomSize];
-	
-	isCustomSize = aIsCustomSize;
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelIsCustomSizeChanged object:self];
-}
-
-- (BOOL) isFixedSize
-{
-	return isFixedSize;
-}
-
-- (void) setIsFixedSize:(BOOL)aIsFixedSize
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setIsFixedSize:isFixedSize];
-	
-	isFixedSize = aIsFixedSize;
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelIsFixedSizeChanged object:self];
-}
-
 - (unsigned short) channelConfigMask
 {
     return channelConfigMask;
@@ -437,12 +424,6 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     
     channelConfigMask = aChannelConfigMask;
 	
-	//can't get the packed form to work so just make sure that bit is cleared.
-	channelConfigMask &= ~(1L<<11);
-
-	//we do the sequential memory access only
-	channelConfigMask |= (1L<<4);
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelChannelConfigMaskChanged object:self];
 }
 
@@ -470,19 +451,6 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     [self linkToController:@"ORCV1730Controller"];
 }
 
-- (BOOL) continuousMode
-{
-    return continuousMode;
-}
-
-- (void) setContinuousMode:(BOOL)aContinuousMode
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setContinuousMode:continuousMode];
-    
-    continuousMode = aContinuousMode;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ModelContinuousModeChanged object:self];    
-}
 
 #pragma mark ***Register - General routines
 - (short) getNumberRegisters
@@ -548,30 +516,6 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 	 userInfo:userInfo];
 }
 
-- (unsigned short) overUnderThreshold:(unsigned short) aChnl
-{
-    return overUnderThreshold[aChnl];
-}
-
-- (void) setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue
-{
-	
-    // Set the undo manager action.  The label has already been set by the controller calling this method.
-    [[[self undoManager] prepareWithInvocationTarget:self] setOverUnderThreshold:aChnl withValue:overUnderThreshold[aChnl]];
-    
-    // Set the new value in the model.
-    overUnderThreshold[aChnl] = aValue;
-    
-    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
-    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCV1730Chnl];
-    
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCV1730OverUnderThresholdChanged
-	 object:self
-	 userInfo:userInfo];
-}
 
 - (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
 {
@@ -629,23 +573,39 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
 {
-    
-    // Set the undo manager action.  The label has already been set by the controller calling this method.
+    if(aValue>0x3FFF)aValue=0x3FFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
     
-    // Set the new value in the model.
     thresholds[aChnl] = aValue;
     
-    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCV1730Chnl];
     
-    // Send out notification that the value has changed.
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCV1730ChnlThresholdChanged
-	 object:self
-	 userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter]   postNotificationName:ORCV1730ChnlThresholdChanged
+                                                          object:self
+                                                        userInfo:userInfo];
 }
+
+- (unsigned short) selfTriggerLogic:(unsigned short)aChnl
+{
+    return selfTriggerLogic[aChnl];
+}
+
+- (void) setSelfTriggerLogic:(unsigned short) aChnl withValue:(unsigned long) aValue
+{
+    if(aValue>0x3)aValue=0x3;
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelfTriggerLogic:aChnl withValue:[self selfTriggerLogic:aChnl]];
+    
+    selfTriggerLogic[aChnl] = aValue;
+    
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCV1730Chnl];
+    
+    [[NSNotificationCenter defaultCenter]   postNotificationName:ORCV1730SelfTriggerLogicChanged
+                                                          object:self
+                                                        userInfo:userInfo];
+}
+
 
 - (void) read
 {
@@ -657,7 +617,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     short theRegIndex		 = [self selectedRegIndex];
     
     @try {
-        if (theRegIndex >= kDummy32 && theRegIndex<=kAdcConfig){
+        if (theRegIndex >= kDummy32 && theRegIndex<=kChanConfig){
             start = theChannelIndex;
             end = theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]) {
@@ -706,7 +666,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
         NSLog(@"Register is:%@\n", [self getRegisterName:theRegIndex]);
         NSLog(@"Value is   :0x%04x\n", theValue);
         
-        if (theRegIndex >= kDummy32 && theRegIndex <= kAdcConfig){
+        if (theRegIndex >= kDummy32 && theRegIndex <= kChanConfig){
             start	= theChannelIndex;
             end 	= theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]){
@@ -797,23 +757,54 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
                      usingAddSpace:0x01];
 }
 
+- (void) writeSelfTriggerLogic
+{
+    short	i;
+    for (i = 0; i < [self numberOfChannels]/2; i++){
+       [self writeSelfTriggerLogic:i];
+    }
+}
+
+- (void) writeSelfTriggerLogic:(unsigned short)aChnl
+{
+    unsigned long 	aValue = 0x2 | ([self selfTriggerLogic:aChnl/2] & 0x3);
+    
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kSelfTriggerLogic].addressOffset + (aChnl * 0x100)
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+  
+}
+
 - (void) writeDacs
 {
     short	i;
     for (i = 0; i < [self numberOfChannels]; i++){
-        [self writeDac:i];
+        if([self enabledMask] & (0x1<<i))[self writeDac:i];
     }
 }
 
 - (void) writeDac:(unsigned short) pChan
 {
-    unsigned long 	aValue = [self dac:pChan];
-    
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kDacs].addressOffset + (pChan * 0x100)
-                        numToWrite:1
+    //from manual: Warning: check that the SPI Bus Busy flag in the status reg is set to 0
+    unsigned long statusValue = 0;
+    [[self adapter] readLongBlock:&statusValue
+                         atAddress:[self baseAddress] + reg[kChannelStatus].addressOffset + (pChan * 0x100)
+                        numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+    
+    if((statusValue & 0x4) != 0x4){
+        
+        unsigned long 	aValue = [self dac:pChan];
+        
+        [[self adapter] writeLongBlock:&aValue
+                             atAddress:[self baseAddress] +     reg[kDacs].addressOffset + (pChan * 0x100)
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+    }
 }
 
 - (void) generateSoftwareTrigger
@@ -828,7 +819,15 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) writeChannelConfiguration
 {
-	unsigned long mask = [self channelConfigMask];
+    unsigned long mask = 0x0;
+    //some bits must be set or cleared
+    mask |= (0x1<<4);   //bit 4 must be 1
+
+    if(channelConfigMask & 0x1) mask |= (0x1<<1);
+    if(channelConfigMask & 0x2) mask |= (0x1<<3);
+    if(channelConfigMask & 0x4) mask |= (0x1<<6);
+
+    
 	[[self adapter] writeLongBlock:&mask
                          atAddress:[self baseAddress] + reg[kChanConfig].addressOffset
                         numToWrite:1
@@ -838,7 +837,12 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) writeCustomSize
 {
-	unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
+    //NS = NLOC * 10
+    //NLOC = NS/10;
+    
+    //don't support custom sizes
+	unsigned long aValue = 0UL;
+    
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kCustomSize].addressOffset
                         numToWrite:1
@@ -848,29 +852,29 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) report
 {
-	unsigned long enabled, threshold, status, bufferOccupancy, dacValue,triggerSrc;
-	[self read:kChanEnableMask returnValue:&enabled];
+	unsigned long enabled, threshold, status, dacValue,triggerSrc;
+	[self read:kChanEnableMask  returnValue:&enabled];
 	[self read:kTrigSrcEnblMask returnValue:&triggerSrc];
 	int chan;
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Chan Enabled Thres  NumOver Status Buffers  Offset trigSrc\n");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Chan Enabled  Thres  Status  Offset trigEnable\n");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
-	for(chan=0;chan<8;chan++){
-		[self readChan:chan reg:kThresholds returnValue:&threshold];
-		[self readChan:chan reg:kStatus returnValue:&status];
-		[self readChan:chan reg:kBufferOccupancy returnValue:&bufferOccupancy];
-		[self readChan:chan reg:kDacs returnValue:&dacValue];
+	for(chan=0;chan<16;chan++){
+		[self readChan:chan reg:kThresholds         returnValue:&threshold];
+		[self readChan:chan reg:kChannelStatus      returnValue:&status];
+		[self readChan:chan reg:kDacs               returnValue:&dacValue];
 		NSString* statusString = @"";
-		if(status & 0x20)			statusString = @"Error";
-		else if(status & 0x04)		statusString = @"Busy ";
+		if(status & 0x04)           statusString = @"Busy ";
 		else {
 			if(status & 0x02)		statusString = @"Empty";
 			else if(status & 0x01)	statusString = @"Full ";
 		}
-		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  %@  0x%04x  %6.3f  %@\n",
-				  chan, enabled&(1<<chan)?@"E":@"X",
-				  threshold&0xfff, statusString,
-				  bufferOccupancy&0x7ff, [self convertDacToVolts:dacValue], 
+		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %2d     %@    0x%04x  %@  %6.4f  %@\n",
+				  chan,
+                  enabled&(1<<chan)?@"E":@"X",
+				  threshold&0x3fff,
+                  statusString,
+                  [self convertDacToVolts:dacValue],
 				  triggerSrc&(1<<chan)?@"Y":@"N");
 	}
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
@@ -887,11 +891,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 	[self read:kAcqControl returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run Mode        : %@\n",CV1730RunModeString[aValue&0x3]);
-	
-	[self read:kCustomSize returnValue:&aValue];
-	if(aValue)NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : %d\n",aValue);
-	else      NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : Disabled\n");
-	
+		
 	[self read:kAcqStatus returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
@@ -910,29 +910,27 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 {
     [self writeAcquistionControl:NO]; // Make sure it's off.
 	[self clearAllMemory];
-	[self softwareReset];
+    [self writeDacs];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
 	[self writeTriggerSource];
 	[self writeTriggerOut];
 	[self writeFrontPanelControl];
-	[self writeChannelEnabledMask];
 	[self writeBufferOrganization];
-	[self writeDacs];
 	[self writePostTriggerSetting];
+    [self writeSelfTriggerLogic];
+    [self writeChannelEnabledMask];
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
-{ 
-	return 2*aDacValue/65535. - 0.9999;  
-    //return 2*((short)aDacValue)/65535.;  
+{
+	return 2*aDacValue/65535. - 1.0;
 }
 
-- (unsigned short) convertVoltsToDac:(float)aVoltage  
-{ 
-	return 65535. * (aVoltage+1)/2.; 
-    //return (unsigned short)((short) (65535. * (aVoltage)/2.)); 
+- (unsigned short) convertVoltsToDac:(float)aVoltage
+{
+	return 65535. * (aVoltage+1)/2.;
 }
 
 - (void) writeThresholds
@@ -965,20 +963,11 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 	
 }
 
-- (void) writeTriggerCount
-{
-	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
-
 - (void) writeTriggerSource
 {
-	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
+	unsigned long aValue = ((coincidenceLevel  & 0x7) << 24) |
+                           ((coincidenceWindow & 0xf) << 20) |
+                            (triggerSourceMask & 0xc00000ff); //software and ext trigger are encode in the top
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
                         numToWrite:1
@@ -989,8 +978,11 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) writeTriggerOut
 {
-	unsigned long aValue = triggerOutMask;
-	[[self adapter] writeLongBlock:&aValue
+    unsigned long aValue =  (triggerOutMask & 0xffff)         |
+                            ((triggerOutLogic & 0x3) << 29)   |
+                            ((majorityLevel & 0x7)   << 8);
+ 
+    [[self adapter] writeLongBlock:&aValue
 			     atAddress:[self baseAddress] + reg[kFPTrigOutEnblMask].addressOffset
 			    numToWrite:1
 			    withAddMod:[self addressModifier]
@@ -999,7 +991,8 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) writeFrontPanelControl
 {
-	unsigned long aValue = frontPanelControlMask;
+    unsigned long aValue = (frontPanelControlMask & 0xffffffff);
+
 	[[self adapter] writeLongBlock:&aValue
 			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
 			    numToWrite:1
@@ -1043,7 +1036,8 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (void) writePostTriggerSetting
 {
-	[[self adapter] writeLongBlock:&postTriggerSetting
+    unsigned long aValue = postTriggerSetting/2;
+	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -1078,17 +1072,10 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 - (void) writeEnableBerr:(BOOL)enable
 {
     unsigned long aValue;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
 
 	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
-	if ( enable ) aValue |= 0x30;
-	else aValue &= 0xFFCF;
-	//if ( enable ) aValue |= 0x10;
-	//else aValue &= 0xFFEF;
+    if (enable)aValue = 0x30;
+	else       aValue =0;
     
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
@@ -1167,7 +1154,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 - (void) clearWaveFormCounts
 {
     int i;
-    for(i=0;i<8;i++){
+    for(i=0;i<16;i++){
         waveFormCount[i]=0;
     }
 }
@@ -1198,15 +1185,11 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
     [self startRates];
 
-	if ([self continuousMode] && ![[userInfo objectForKey:@"doinit"] boolValue]) {
-        //??
-    }
-    else {
-        [self initBoard];
-        [self writeNumberBLTEvents:sbcRun];
-        [self writeEnableBerr:sbcRun];
-        [self writeAcquistionControl:YES];
-    }
+    [self initBoard];
+    [self writeNumberBLTEvents:sbcRun];
+    [self writeEnableBerr:sbcRun];
+    [self writeAcquistionControl:YES];
+    
 	
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
@@ -1222,18 +1205,18 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 						numToRead:1
 					   withAddMod:addressModifier 
 					usingAddSpace:0x01];
-		bufferState = (status & 0x10) >> 4;						
+        
+		bufferState = (status & 0x10) >> 4; //buffer full
+        
 		if(status & kEventReadyMask){
 			//OK, at least one event is ready
-			unsigned long theFirst;
-			[controller readLongBlock:&theFirst
-					atAddress:dataReg
+			unsigned long theEventSize;
+			[controller readLongBlock:&theEventSize
+					atAddress:eventSizeReg
 					numToRead:1
 				       withAddMod:addressModifier 
 				    usingAddSpace:0x01]; //we set it to not increment the address.
 			
-			unsigned long theEventSize;
-			theEventSize = theFirst&0x0FFFFFFF;
 			if ( theEventSize == 0 ) return;
 
 			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
@@ -1241,7 +1224,6 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 			unsigned long* p = (unsigned long*)[theData bytes];
 			*p++ = dataId | (2 + theEventSize);
 			*p++ = location; 
-			*p++ = theFirst;
 
 			[controller readLongBlock:p
 							atAddress:dataReg
@@ -1252,7 +1234,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 			[aDataPacket addData:theData];
 			unsigned short chanMask = p[0]; //remember, the point was already inc'ed to the start of data+1
 			int i;
-			for(i=0;i<8;i++){
+			for(i=0;i<16;i++){
 				if(chanMask & (1<<i)) ++waveFormCount[i]; 
 			}
 		}
@@ -1266,16 +1248,8 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     isRunning = NO;
     [waveFormRateGroup stop];
 	short i;
-    for(i=0;i<8;i++)waveFormCount[i] = 0;
-    
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    if ([objs count]) {
-        runControl = [objs objectAtIndex:0];
-        if ([self continuousMode] && [runControl nextRunWillQuickStart]) {
-            return;
-        }
-    }
+    for(i=0;i<16;i++)waveFormCount[i] = 0;
+
     [self writeAcquistionControl:NO];
 }
 
@@ -1290,19 +1264,19 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 1720 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 1730 (Slot %d) ",[self slot]];
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
-	//configStruct->card_info[index].hw_type_id	= kCV1730; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
-	configStruct->card_info[index].slot			= [self slot];
-	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= [self addressModifier];
-	configStruct->card_info[index].base_add		= [self baseAddress];
+	configStruct->card_info[index].hw_type_id               = kCaen1730; //should be unique
+	configStruct->card_info[index].hw_mask[0]               = dataId; //better be unique
+	configStruct->card_info[index].slot                     = [self slot];
+	configStruct->card_info[index].crate                    = [self crateNumber];
+	configStruct->card_info[index].add_mod                  = [self addressModifier];
+	configStruct->card_info[index].base_add                 = [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0]	= reg[kVMEStatus].addressOffset; //VME Status buffer
     configStruct->card_info[index].deviceSpecificData[1]	= reg[kEventSize].addressOffset; // "next event size" address
     configStruct->card_info[index].deviceSpecificData[2]	= reg[kOutputBuffer].addressOffset; // fifo Address
@@ -1311,24 +1285,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     configStruct->card_info[index].deviceSpecificData[5]	= location;
     configStruct->card_info[index].deviceSpecificData[6]	= reg[kVMEControl].addressOffset; // VME Control address
     configStruct->card_info[index].deviceSpecificData[7]	= reg[kBLTEventNum].addressOffset; // Num of BLT events address
-
-    //sizeOfEvent is the size of a single event, regardless what the BLTEvent number is
-    //SBC uses it to calculate number of blocks for the DMA transfer
-    //unit is uint32_t word
-	unsigned sizeOfEvent = 0;
-	if (isFixedSize) {
-		unsigned long numChan = 0;
-		unsigned long chanMask = [self enabledMask];
-		for (; chanMask; numChan++) chanMask &= chanMask - 1;
-		if (isCustomSize) {
-			sizeOfEvent = numChan * customSize * 2 + 4;
-		}
-		else {
-			sizeOfEvent = numChan * (1UL << 20 >> [self eventSize]) / 4 + 4; //(1MB / num of blocks)
-		}
-	}
-	configStruct->card_info[index].deviceSpecificData[8] = sizeOfEvent;
-    configStruct->card_info[index].deviceSpecificData[9] = kNumberBLTEventsToReadout;
+    configStruct->card_info[index].deviceSpecificData[8]    = kNumberBLTEventsToReadout;
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	configStruct->card_info[index].next_Card_Index = index+1;
 	
@@ -1341,22 +1298,21 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     self = [super initWithCoder:aDecoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setEventSize:[aDecoder decodeIntForKey:@"ORCV1730ModelEventSize"]];
-    [self setEnabledMask:[aDecoder decodeIntForKey:@"ORCV1730ModelEnabledMask"]];
-    [self setPostTriggerSetting:[aDecoder decodeInt32ForKey:@"ORCV1730ModelPostTriggerSetting"]];
-    [self setTriggerSourceMask:[aDecoder decodeInt32ForKey:@"ORCV1730ModelTriggerSourceMask"]];
-	[self setTriggerOutMask:[aDecoder decodeInt32ForKey:@"ORCV1730ModelTriggerOutMask"]];
-	[self setFrontPanelControlMask:[aDecoder decodeInt32ForKey:@"ORCV1730ModelFrontPanelControlMask"]];
-    [self setCoincidenceLevel:[aDecoder decodeIntForKey:@"ORCV1730ModelCoincidenceLevel"]];
-    [self setAcquisitionMode:[aDecoder decodeIntForKey:@"acquisitionMode"]];
-    [self setCountAllTriggers:[aDecoder decodeBoolForKey:@"countAllTriggers"]];
-    [self setCustomSize:[aDecoder decodeInt32ForKey:@"customSize"]];
-	[self setIsCustomSize:[aDecoder decodeBoolForKey:@"isCustomSize"]];
-	[self setIsFixedSize:[aDecoder decodeBoolForKey:@"isFixedSize"]];
-    [self setChannelConfigMask:[aDecoder decodeIntForKey:@"channelConfigMask"]];
-    [self setWaveFormRateGroup:[aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
-    [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:@"numberBLTEventsToReadout"]];
-    [self setContinuousMode:[aDecoder decodeBoolForKey:@"continuousMode"]];
+    [self setEventSize:                 [aDecoder decodeIntForKey:   @"eventSize"]];
+    [self setEnabledMask:               [aDecoder decodeIntForKey:   @"enabledMask"]];
+    [self setPostTriggerSetting:        [aDecoder decodeInt32ForKey: @"postTriggerSetting"]];
+    [self setTriggerSourceMask:         [aDecoder decodeInt32ForKey: @"triggerSourceMask"]];
+    [self setTriggerOutMask:            [aDecoder decodeInt32ForKey: @"triggerOutMask"]];
+    [self setTriggerOutLogic:           [aDecoder decodeIntForKey:   @"triggerOutLogic"]];
+	[self setFrontPanelControlMask:     [aDecoder decodeInt32ForKey: @"frontPanelControlMask"]];
+    [self setCoincidenceLevel:          [aDecoder decodeIntForKey:   @"coincidenceLevel"]];
+    [self setCoincidenceWindow:         [aDecoder decodeIntForKey:   @"coincidenceWindow"]];
+    [self setMajorityLevel:             [aDecoder decodeIntForKey:   @"majorityLevel"]];
+    [self setAcquisitionMode:           [aDecoder decodeIntForKey:   @"acquisitionMode"]];
+    [self setCountAllTriggers:          [aDecoder decodeBoolForKey:  @"countAllTriggers"]];
+    [self setChannelConfigMask:         [aDecoder decodeIntForKey:   @"channelConfigMask"]];
+    [self setWaveFormRateGroup:         [aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
+    [self setNumberBLTEventsToReadout:  [aDecoder decodeInt32ForKey: @"numberBLTEventsToReadout"]];
     
     if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
@@ -1367,9 +1323,13 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 	
 	int i;
     for (i = 0; i < [self numberOfChannels]; i++){
-        [self setDac:i withValue:      [aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENDacChnl%d", i]]];
-        [self setThreshold:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENThresChnl%d", i]]];
-        [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENOverUnderChnl%d", i]]];
+        [self setDac:i              withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"dac%d",i]]];
+        [self setThreshold:i        withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"thresholds%d",i]]];
+
+    }
+    
+    for (i = 0; i < [self numberOfChannels]/2; i++){
+        [self setSelfTriggerLogic:i withValue:[aDecoder decodeIntForKey:   [NSString stringWithFormat:@"selfTriggerLogic%d",i]]];
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -1379,34 +1339,35 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
-	[anEncoder encodeInt:eventSize forKey:@"ORCV1730ModelEventSize"];
-	[anEncoder encodeInt:enabledMask forKey:@"ORCV1730ModelEnabledMask"];
-	[anEncoder encodeInt32:postTriggerSetting forKey:@"ORCV1730ModelPostTriggerSetting"];
-	[anEncoder encodeInt32:triggerSourceMask forKey:@"ORCV1730ModelTriggerSourceMask"];
-	[anEncoder encodeInt32:triggerOutMask forKey:@"ORCV1730ModelTriggerOutMask"];
-	[anEncoder encodeInt32:frontPanelControlMask forKey:@"ORCV1730ModelFrontPanelControlMask"];
-	[anEncoder encodeInt:coincidenceLevel forKey:@"ORCV1730ModelCoincidenceLevel"];
-	[anEncoder encodeInt:acquisitionMode forKey:@"acquisitionMode"];
-	[anEncoder encodeBool:countAllTriggers forKey:@"countAllTriggers"];
-	[anEncoder encodeInt32:customSize forKey:@"customSize"];
-	[anEncoder encodeBool:isCustomSize forKey:@"isCustomSize"];
-	[anEncoder encodeBool:isFixedSize forKey:@"isFixedSize"];
-	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
-    [anEncoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
+	[anEncoder encodeInt:eventSize                  forKey:@"eventSize"];
+	[anEncoder encodeInt:enabledMask                forKey:@"enabledMask"];
+	[anEncoder encodeInt32:postTriggerSetting       forKey:@"postTriggerSetting"];
+	[anEncoder encodeInt32:triggerSourceMask        forKey:@"triggerSourceMask"];
+    [anEncoder encodeInt32:triggerOutMask           forKey:@"triggerOutMask"];
+    [anEncoder encodeInt:triggerOutLogic            forKey:@"triggerOutLogic"];
+	[anEncoder encodeInt32:frontPanelControlMask    forKey:@"frontPanelControlMask"];
+    [anEncoder encodeInt:coincidenceLevel           forKey:@"coincidenceLevel"];
+    [anEncoder encodeInt:coincidenceWindow          forKey:@"coincidenceWindow"];
+    [anEncoder encodeInt:majorityLevel              forKey:@"majorityLevel"];
+	[anEncoder encodeInt:acquisitionMode            forKey:@"acquisitionMode"];
+	[anEncoder encodeBool:countAllTriggers          forKey:@"countAllTriggers"];
+	[anEncoder encodeInt:channelConfigMask          forKey:@"channelConfigMask"];
+    [anEncoder encodeObject:waveFormRateGroup       forKey:@"waveFormRateGroup"];
     [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
-    [anEncoder encodeBool:continuousMode forKey:@"continuousMode"];
 	int i;
 	for (i = 0; i < [self numberOfChannels]; i++){
-        [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];
-        [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
-        [anEncoder encodeInt:overUnderThreshold[i] forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
+        [anEncoder encodeInt32:dac[i]               forKey:[NSString stringWithFormat:@"dac%d", i]];
+        [anEncoder encodeInt32:thresholds[i]        forKey:[NSString stringWithFormat:@"thresholds%d", i]];
+    }
+    for (i = 0; i < [self numberOfChannels]/2; i++){
+        [anEncoder encodeInt:selfTriggerLogic[i]    forKey:[NSString stringWithFormat:@"selfTriggerLogic%d", i]];
     }
 }
 
 #pragma mark •••HW Wizard
 - (int) numberOfChannels
 {
-    return 8;
+    return 16;
 }
 -(BOOL) hasParmetersToRamp
 {
@@ -1419,7 +1380,7 @@ NSString* ORCV1730ModelContinuousModeChanged              = @"ORCV1730ModelConti
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:1200 lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x3fff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
 	[p setInitMethodSelector:@selector(writeThresholds)];

@@ -67,17 +67,25 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         if (*ptr == 0 || *ptr >> 28 != 0xa) break; //trailing zeros or
         unsigned long eventSize = *ptr & 0x0fffffff;
         if (eventSize > eventLength) return length;
-        
-        unsigned long channelMask = *++ptr & 0x000000ff;
+        ptr++;
+        unsigned long channelMask1 = *ptr & 0xff;
+        ptr++;
+        unsigned long channelMask2 = (*ptr >> 24) & 0xff;
         //NSLog(@"Channel Mask: %d Len: %d Size: %d\n",channelMask,length,eventSize);
         ptr += 3; //point to the start of data
 
         short numChans = 0;
-        short chan[8];
+        short chan[16];
         int i;
         for(i=0;i<8;i++){
-            if(channelMask & (1<<i)){
+            if(channelMask1 & (1<<i)){
                 chan[numChans] = i;
+                numChans++;
+            }
+        }
+        for(i=0;i<8;i++){
+            if(channelMask2 & (1<<i)){
+                chan[numChans] = i+8;
                 numChans++;
             }
         }
@@ -92,37 +100,23 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         eventSize = eventSize/numChans;
         int j;
         
-        BOOL fullDecode = NO;
-        if(numChans){
-            time_t now;
-            time(&now);
-            if(now - lastTime >= 1){
-                fullDecode = YES;
-                lastTime = now;
+         for(j=0;j<numChans;j++){
+            NSMutableData* tmpData = [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
+            
+            unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+            int k;
+            int wordCount = 0;
+            for(k=0;k<eventSize;k++){
+                dPtr[wordCount++] =	0x00003fff & *ptr;
+                dPtr[wordCount++] =	(0x3fff0000 & *ptr) >> 16;
+                ptr++;
             }
-        }
-        for(j=0;j<numChans;j++){
-            if(fullDecode){
-                NSMutableData* tmpData = [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
-                
-                unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-                int k;
-                int wordCount = 0;
-                for(k=0;k<eventSize;k++){
-                    dPtr[wordCount++] =	0x00000fff & *ptr;
-                    dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;
-                    ptr++;
-                }
-                [aDataSet loadWaveform:tmpData
-                                offset:0 //bytes!
-                              unitSize:2 //unit size in bytes!
-                                sender:self
-                              withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-            }
-            else {
-                [aDataSet incrementCount:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-                ptr += eventSize;
-            }
+            [aDataSet loadWaveform:tmpData
+                            offset:0 //bytes!
+                          unitSize:2 //unit size in bytes!
+                            sender:self
+                          withKeys:@"CAEN1730", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+        
             if(getRatesFromDecodeStage && !skipRateCounts){
                 NSString* aKey = [crateKey stringByAppendingString:cardKey];
                 if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];

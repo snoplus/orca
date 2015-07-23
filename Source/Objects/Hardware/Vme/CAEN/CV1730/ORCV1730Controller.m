@@ -31,10 +31,7 @@
 #import "ORCompositePlotView.h"
 #import "ORValueBarGroupView.h"
 
-#define kNumChanConfigBits 5
 #define kNumTrigSourceBits 10
-
-int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 
 @implementation ORCV1730Controller
 
@@ -55,30 +52,61 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	
     basicSize      = NSMakeSize(280,400);
-    settingsSize   = NSMakeSize(780,450);
-    monitoringSize = NSMakeSize(783,320);
+    settingsSize   = NSMakeSize(880,650);
+    monitoringSize = NSMakeSize(783,450);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-	
+
+    [super awakeFromNib];
+
+    
     [registerAddressPopUp setAlignment:NSCenterTextAlignment];
     [channelPopUp setAlignment:NSCenterTextAlignment];
 	
     [self populatePullDown];
-   
+    
+    [[rate0 xAxis] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
+    [[totalRate xAxis] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
+
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
 	[timeRatePlot addPlot: aPlot];
 	[(ORTimeAxis*)[timeRatePlot xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 	[aPlot release];	
 	
-    [super awakeFromNib];
-	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-	
-	[rate0 setNumber:8 height:10 spacing:5];
+
+	[rate0 setNumber:16 height:10 spacing:5];
+    
+    NSNumberFormatter* rateFormatter = [[NSNumberFormatter alloc] init];
+    [rateFormatter setFormat:@"##0.00"];
+
+    int i;
+    for(i=0;i<16;i++){
+        [[thresholdMatrix cellAtRow:i column:0] setTag:i];
+        [[enabledMaskMatrix cellAtRow:i column:0] setTag:i];
+        [[dacMatrix cellAtRow:i column:0] setTag:i];
+        [[dacMatrix cellAtRow:i column:0] setFormatter:rateFormatter];
+    }
+    
+    for(i=0;i<8;i++){
+        [[triggerSourceMaskMatrix cellAtRow:i column:0] setTag:i];
+        [[chanTriggerOutMatrix    cellAtRow:i column:0] setTag:i];
+        [[selfTriggerLogicMatrix  cellAtRow:i column:0] setTag:i];
+        
+        int chan = i*2;
+        [[selfTriggerLogicMatrix  cellAtRow:i column:0] removeAllItems];
+        [[selfTriggerLogicMatrix  cellAtRow:i column:0] insertItemWithTitle:[NSString stringWithFormat:@"%d And %d",chan,chan+1] atIndex:0];
+        [[selfTriggerLogicMatrix  cellAtRow:i column:0] insertItemWithTitle:[NSString stringWithFormat:@"Only %d",chan]          atIndex:1];
+        [[selfTriggerLogicMatrix  cellAtRow:i column:0] insertItemWithTitle:[NSString stringWithFormat:@"Only %d",chan+1]        atIndex:2];
+        [[selfTriggerLogicMatrix  cellAtRow:i column:0] insertItemWithTitle:[NSString stringWithFormat:@"%d Or %d",chan,chan+1]  atIndex:3];
+
+    }
+    
+    [rateFormatter release];
 }
 
 #pragma mark •••Notifications
@@ -117,30 +145,10 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 						 name : ORCV1730ChnlDacChanged
 					   object : model];
 	
-	[notifyCenter addObserver : self
-					 selector : @selector(overUnderChanged:)
-						 name : ORCV1730OverUnderThresholdChanged
-					   object : model];
-	
     [notifyCenter addObserver : self
                      selector : @selector(channelConfigMaskChanged:)
                          name : ORCV1730ModelChannelConfigMaskChanged
 					   object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(customSizeChanged:)
-                         name : ORCV1730ModelCustomSizeChanged
-					   object : model];
-
-	[notifyCenter addObserver : self
-			 selector : @selector(isCustomSizeChanged:)
-			     name : ORCV1730ModelIsCustomSizeChanged
-			   object : model];
-	
-	[notifyCenter addObserver : self
-			 selector : @selector(isFixedSizeChanged:)
-			     name : ORCV1730ModelIsFixedSizeChanged
-			   object : model];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(countAllTriggersChanged:)
@@ -156,20 +164,37 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
                      selector : @selector(coincidenceLevelChanged:)
                          name : ORCV1730ModelCoincidenceLevelChanged
 					   object : model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(coincidenceWindowChanged:)
+                         name : ORCV1730ModelCoincidenceWindowChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(majorityLevelChanged:)
+                         name : ORCV1730ModelMajorityLevelChanged
+                       object : model];
+
     [notifyCenter addObserver : self
                      selector : @selector(triggerSourceMaskChanged:)
                          name : ORCV1730ModelTriggerSourceMaskChanged
 					   object : model];
-	[notifyCenter addObserver : self
-			 selector : @selector(triggerOutMaskChanged:)
-			     name : ORCV1730ModelTriggerOutMaskChanged
-			   object : model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerOutMaskChanged:)
+                         name : ORCV1730ModelTriggerOutMaskChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerOutLogicChanged:)
+                         name : ORCV1730ModelTriggerOutLogicChanged
+                       object : model];
+
+    
 	[notifyCenter addObserver : self
-			 selector : @selector(fpIOControlChanged:)
-			     name : ORCV1730ModelFrontPanelControlMaskChanged
-			   object : model];
+                     selector : @selector(fpIOControlChanged:)
+                         name : ORCV1730ModelFrontPanelControlMaskChanged
+                       object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(postTriggerSettingChanged:)
@@ -216,7 +241,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
                          name : ORRunStatusChangedNotification
                        object : nil];
 	
-	
     [notifyCenter addObserver : self
                      selector : @selector(setBufferStateLabel)
                          name : ORCV1730ModelBufferCheckChanged
@@ -233,10 +257,23 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 					   object : model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(continousRunsChanged:)
-						 name : ORCV1730ModelContinuousModeChanged
-					   object : model];
+                     selector : @selector(selfTriggerLogicChanged:)
+                         name : ORCV1730SelfTriggerLogicChanged
+                       object : model];
+    
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(scaleAction:)
+                         name : ORAxisRangeChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(miscAttributesChanged:)
+                         name : ORMiscAttributesChanged
+                       object : model];
+    
 
+    
 	[self registerRates];
 	
 }
@@ -273,26 +310,93 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[self baseAddressChanged:nil];
 	[self dacChanged:nil];
 	[self thresholdChanged:nil];
-	[self overUnderChanged:nil];
 	[self channelConfigMaskChanged:nil];
-	[self customSizeChanged:nil];
-	[self isCustomSizeChanged:nil];
-	[self isFixedSizeChanged:nil];
 	[self countAllTriggersChanged:nil];
 	[self acquisitionModeChanged:nil];
-	[self coincidenceLevelChanged:nil];
+    [self coincidenceLevelChanged:nil];
+    [self coincidenceWindowChanged:nil];
+    [self majorityLevelChanged:nil];
 	[self triggerSourceMaskChanged:nil];
-	[self triggerOutMaskChanged:nil];
+    [self triggerOutMaskChanged:nil];
+    [self triggerOutLogicChanged:nil];
 	[self fpIOControlChanged:nil];
 	[self postTriggerSettingChanged:nil];
 	[self enabledMaskChanged:nil];
     [self waveFormRateChanged:nil];
  	[self eventSizeChanged:nil];
  	[self slotChanged:nil];
-    [self continousRunsChanged:nil];
-	
+    [self selfTriggerLogicChanged:nil];
 	[self settingsLockChanged:nil];
     [self basicLockChanged:nil];
+}
+
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+    if(!aNote || ([aNote object] == [[model waveFormRateGroup]timeRate])){
+        [timeRatePlot setNeedsDisplay:YES];
+    }
+}
+//a fake action from the scale object
+- (void) scaleAction:(NSNotification*)aNotification
+{
+    if(aNotification == nil || [aNotification object] == [rate0 xAxis]){
+        [model setMiscAttributes:[[rate0 xAxis]attributes] forKey:@"RateXAttributes"];
+    };
+    
+    if(aNotification == nil || [aNotification object] == [totalRate xAxis]){
+        [model setMiscAttributes:[[totalRate xAxis]attributes] forKey:@"TotalRateXAttributes"];
+    };
+    
+    if(aNotification == nil || [aNotification object] == [timeRatePlot xAxis]){
+        [model setMiscAttributes:[(ORAxis*)[timeRatePlot xAxis]attributes] forKey:@"TimeRateXAttributes"];
+    };
+    
+    if(aNotification == nil || [aNotification object] == [timeRatePlot yAxis]){
+        [model setMiscAttributes:[(ORAxis*)[timeRatePlot yAxis]attributes] forKey:@"TimeRateYAttributes"];
+    };
+    
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+    NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+    NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+    
+    if(aNote == nil || [key isEqualToString:@"RateXAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"RateXAttributes"];
+        if(attrib){
+            [[rate0 xAxis] setAttributes:attrib];
+            [rate0 setNeedsDisplay:YES];
+            [[rate0 xAxis] setNeedsDisplay:YES];
+            [rateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+        }
+    }
+    if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
+        if(attrib){
+            [[totalRate xAxis] setAttributes:attrib];
+            [totalRate setNeedsDisplay:YES];
+            [[totalRate xAxis] setNeedsDisplay:YES];
+            [totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+        }
+    }
+    if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
+        if(attrib){
+            [(ORAxis*)[timeRatePlot xAxis] setAttributes:attrib];
+            [timeRatePlot setNeedsDisplay:YES];
+            [[timeRatePlot xAxis] setNeedsDisplay:YES];
+        }
+    }
+    if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
+        if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
+        if(attrib){
+            [(ORAxis*)[timeRatePlot yAxis] setAttributes:attrib];
+            [timeRatePlot setNeedsDisplay:YES];
+            [[timeRatePlot yAxis] setNeedsDisplay:YES];
+            [timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+        }
+    }
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -310,9 +414,13 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) eventSizeChanged:(NSNotification*)aNote
 {
-	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
-	[eventSizeTextField setIntValue:	1024*1024./powf(2.,(float)[model eventSize]) / 2]; //in Samples
-	
+    int puIndex = [model eventSize];
+	[eventSizePopUp selectItemAtIndex:	puIndex];
+    NSString* eventSizeString;
+    int numBuffers = pow(2.,puIndex);
+    if(puIndex<8) eventSizeString = [NSString stringWithFormat:@"%dK",640/numBuffers];
+    else           eventSizeString = [NSString stringWithFormat:@"%d",(640*1024)/numBuffers];
+    [eventSizeTextField setStringValue: eventSizeString];
 }
 
 - (void) checkGlobalSecurity
@@ -393,7 +501,7 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[basicReadButton setEnabled:readAllowed];
 	
 	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCV1730BasicLock];
-	if ([model selectedRegIndex] >= kGain && [model selectedRegIndex]<=kAdcConfig){
+	if ([model selectedRegIndex] >= kGain && [model selectedRegIndex]<=kChanConfig){
 		[channelPopUp setEnabled:!lockedOrRunningMaintenance];
 	}
 	else [channelPopUp setEnabled:NO];
@@ -425,7 +533,7 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	int i;
 	unsigned long mask = [model triggerSourceMask];
-	for(i=0;i<8;i++){
+	for(i=0;i<16;i++){
 		[[chanTriggerMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
 	}
 	[[otherTriggerMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
@@ -436,29 +544,43 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	int i;
 	unsigned long mask = [model triggerOutMask];
-	for(i=0;i<8;i++){
+	for(i=0;i<16;i++){
 		[[chanTriggerOutMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
 	}
 	[[otherTriggerOutMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
 	[[otherTriggerOutMatrix cellWithTag:1] setIntValue:(mask & (1L << 31)) !=0];
 }
 
+- (void) triggerOutLogicChanged:(NSNotification*)aNote
+{
+    [triggerOutLogicPopUp selectItemAtIndex:[model triggerOutLogic]];
+}
+
 - (void) fpIOControlChanged:(NSNotification*)aNote
 {
-	[fpIOModeMatrix selectCellWithTag:([model frontPanelControlMask] >> 6) & 0x3UL];
-	[fpIOPatternLatchMatrix selectCellWithTag:([model frontPanelControlMask] >> 9) & 0x1UL];
-	[fpIOTrgInMatrix selectCellWithTag:([model frontPanelControlMask] & 0x1UL)];
-	[fpIOTrgOutMatrix selectCellWithTag:([model frontPanelControlMask] >> 1) & 0x1UL];
-	[fpIOLVDS0Matrix selectCellWithTag:([model frontPanelControlMask] >> 2) & 0x1UL];
-	[fpIOLVDS1Matrix selectCellWithTag:([model frontPanelControlMask] >> 3) & 0x1UL];
-	[fpIOLVDS2Matrix selectCellWithTag:([model frontPanelControlMask] >> 4) & 0x1UL];
-	[fpIOLVDS3Matrix selectCellWithTag:([model frontPanelControlMask] >> 5) & 0x1UL];
-	[fpIOTrgOutModeMatrix selectCellWithTag:([model frontPanelControlMask] >> 14) & 0x3UL];
+	[fpIOTrgInMatrix        selectCellWithTag:  ([model frontPanelControlMask] >> 0) & 0x1];
+	[fpIOTrgOutMatrix       selectCellWithTag:  ([model frontPanelControlMask] >> 1) & 0x1];
+	[fpIOLVDS0Matrix        selectCellWithTag:  ([model frontPanelControlMask] >> 2) & 0x1];
+	[fpIOLVDS1Matrix        selectCellWithTag:  ([model frontPanelControlMask] >> 3) & 0x1];
+	[fpIOLVDS2Matrix        selectCellWithTag:  ([model frontPanelControlMask] >> 4) & 0x1];
+	[fpIOLVDS3Matrix        selectCellWithTag:  ([model frontPanelControlMask] >> 5) & 0x1];
+    [fpIOModeMatrix         selectCellWithTag:  ([model frontPanelControlMask] >> 6) & 0x3];
+    [fpIOPatternLatchMatrix selectCellWithTag:  ([model frontPanelControlMask] >> 9) & 0x1];
 }
 
 - (void) coincidenceLevelChanged:(NSNotification*)aNote
 {
 	[coincidenceLevelTextField setIntValue: [model coincidenceLevel]];
+}
+
+- (void) coincidenceWindowChanged:(NSNotification*)aNote
+{
+    [coincidenceWindowTextField setIntValue: [model coincidenceWindow]];
+}
+
+- (void) majorityLevelChanged:(NSNotification*)aNote
+{
+    [majorityLevelTextField setIntValue: [model majorityLevel]];
 }
 
 - (void) acquisitionModeChanged:(NSNotification*)aNote
@@ -471,36 +593,18 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[countAllTriggersMatrix selectCellWithTag: [model countAllTriggers]];
 }
 
-- (void) customSizeChanged:(NSNotification*)aNote
-{
-	//todo: *4 in std mode, *5 in packed mode
-	[customSizeTextField setIntValue:([model customSize] * 4)];
-}
-
-- (void) isCustomSizeChanged:(NSNotification*)aNote
-{
-	[customSizeButton setIntValue:[model isCustomSize]];
-	[customSizeTextField setEnabled:[model isCustomSize]];
-}
-
-- (void) isFixedSizeChanged:(NSNotification*)aNote
-{
-	[fixedSizeButton setIntValue:[model isFixedSize]];
-}
-
 - (void) channelConfigMaskChanged:(NSNotification*)aNote
 {
 	int i;
 	unsigned short mask = [model channelConfigMask];
-	for(i=0;i<kNumChanConfigBits;i++){
-		[[channelConfigMaskMatrix cellWithTag:i] setIntValue:(mask & (1<<chanConfigToMaskBit1730[i])) !=0];
+	for(i=0;i<3;i++){
+		[[channelConfigMaskMatrix cellWithTag:i] setIntValue:(mask & (0x1<<i)) >0];
 	}
 }
 
 - (void) baseAddressChanged:(NSNotification*) aNotification
 {
 	//  Set value of both text and stepper
-	[self updateStepper:addressStepper setting:[model baseAddress]];
 	[addressTextField setIntValue:[model baseAddress]];
 }
 
@@ -519,6 +623,21 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	}
 }
 
+- (void) selfTriggerLogicChanged:(NSNotification*) aNotification
+{
+    if(aNotification){
+        int chnl = [[[aNotification userInfo] objectForKey:ORCV1730Chnl] intValue];
+        [[selfTriggerLogicMatrix cellAtRow:chnl column:0] selectItemAtIndex:[model selfTriggerLogic:chnl]];
+    }
+    else {
+        int i;
+        for (i = 0; i < [model numberOfChannels]/2; i++){
+            [[selfTriggerLogicMatrix cellAtRow:i column:0] selectItemAtIndex:[model selfTriggerLogic:i]];
+        }
+    }
+}
+
+
 - (void) dacChanged: (NSNotification*) aNotification
 {
 	if(aNotification){
@@ -533,25 +652,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	}
 }
 
-- (void) overUnderChanged: (NSNotification*) aNotification
-{
-	if(aNotification){
-		int chnl = [[[aNotification userInfo] objectForKey:ORCV1730Chnl] intValue];
-		[[overUnderMatrix cellWithTag:chnl] setIntValue:[model overUnderThreshold:chnl]];
-	}
-	else {
-		int i;
-		for (i = 0; i < [model numberOfChannels]; i++){
-			[[overUnderMatrix cellWithTag:i] setIntValue:[model overUnderThreshold:i]];
-		}
-	}
-}
-
-- (void) continousRunsChanged:(NSNotification *)aNote
-{
-    [continousRunsButton setIntValue:[model continuousMode]];
-}
-
 - (void) basicLockChanged:(NSNotification*)aNotification
 {	
     BOOL runInProgress				= [gOrcaGlobals runInProgress];
@@ -561,7 +661,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	//[softwareTriggerButton setEnabled: !locked && !runInProgress]; 
     [basicLockButton setState: locked];
     
-    [addressStepper setEnabled:!locked && !runInProgress];
     [addressTextField setEnabled:!locked && !runInProgress];
 	
     [writeValueStepper setEnabled:!lockedOrRunningMaintenance];
@@ -588,7 +687,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
     [settingsLockButton setState: locked];
 	[self setBufferStateLabel];
     [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [overUnderMatrix setEnabled:!lockedOrRunningMaintenance]; 
     //[softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
 	[softwareTriggerButton setEnabled:YES]; 
     [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
@@ -607,8 +705,10 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[fpIOSetButton setEnabled:!lockedOrRunningMaintenance]; 
     [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
     [triggerSourceMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance]; 
-    [dacMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance];
+    [coincidenceWindowTextField setEnabled:!lockedOrRunningMaintenance];
+    [majorityLevelTextField setEnabled:!lockedOrRunningMaintenance];
+    [dacMatrix setEnabled:!lockedOrRunningMaintenance];
     [acquisitionModeMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [countAllTriggersMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [channelConfigMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
@@ -617,10 +717,7 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
     [initButton setEnabled:!lockedOrRunningMaintenance]; 
 	
 	//these must NOT or can not be changed when run in progress
-    [customSizeTextField setEnabled:!locked && !runInProgress && [model isCustomSize]]; 
-	[customSizeButton setEnabled:!locked && !runInProgress]; 
-	[fixedSizeButton setEnabled:!locked && !runInProgress]; 
-    [eventSizePopUp setEnabled:!locked && !runInProgress]; 
+    [eventSizePopUp setEnabled:!locked && !runInProgress];
     [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
 	
     NSString* s = @"";
@@ -648,7 +745,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 }
 - (IBAction) baseAddressAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender intValue] != [model baseAddress]){
 		[[[model document] undoManager] setActionName:@"Set Base Address"]; // Set undo name.
 		[model setBaseAddress:[aSender intValue]]; // set new value.
@@ -681,7 +777,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) writeValueAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
 		[[[model document] undoManager] setActionName:@"Set Write Value"]; // Set undo name.
 		[model setWriteValue:[aSender intValue]]; // Set new value
@@ -690,7 +785,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) selectRegisterAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
 	    [[[model document] undoManager] setActionName:@"Select Register"]; // Set undo name
 	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
@@ -699,7 +793,6 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) selectChannelAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedChannel]){
 		[[[model document] undoManager] setActionName:@"Select Channel"]; // Set undo name
 		[model setSelectedChannel:[aSender indexOfSelectedItem]]; // Set new value
@@ -792,20 +885,23 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[model setTriggerOutMask:mask];	
 }
 
+- (IBAction) triggerOutLogicAction:(id)sender
+{
+    [model setTriggerOutLogic:[triggerOutLogicPopUp indexOfSelectedItem]];
+}
+
 - (IBAction) fpIOControlAction:(id)sender
 {
-	
 	unsigned long mask = 0;
-	mask |= [[fpIOModeMatrix selectedCell] tag] << 6;
-	mask |= [[fpIOPatternLatchMatrix selectedCell] tag] << 9;
-	mask |= [[fpIOTrgInMatrix selectedCell] tag];
-	mask |= [[fpIOTrgOutMatrix selectedCell] tag] << 1;
-	mask |= [[fpIOLVDS0Matrix selectedCell] tag] << 2;
-	mask |= [[fpIOLVDS1Matrix selectedCell] tag] << 3;
-	mask |= [[fpIOLVDS2Matrix selectedCell] tag] << 4;
-	mask |= [[fpIOLVDS3Matrix selectedCell] tag] << 5;
-	mask |= [[fpIOTrgOutModeMatrix selectedCell] tag] << 14;
-	
+    mask |= [[fpIOTrgInMatrix           selectedCell] tag] << 0;
+    mask |= [[fpIOTrgOutMatrix          selectedCell] tag] << 1;
+    mask |= [[fpIOLVDS0Matrix           selectedCell] tag] << 2;
+    mask |= [[fpIOLVDS1Matrix           selectedCell] tag] << 3;
+    mask |= [[fpIOLVDS2Matrix           selectedCell] tag] << 4;
+    mask |= [[fpIOLVDS3Matrix           selectedCell] tag] << 5;
+    mask |= [[fpIOModeMatrix            selectedCell] tag] << 6;
+    mask |= [[fpIOFeaturesMatrix        selectedCell] tag] << 8;
+    mask |= [[fpIOPatternLatchMatrix    selectedCell] tag] << 9;
 	[model setFrontPanelControlMask:mask];	
 }
 
@@ -836,6 +932,16 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[model setCoincidenceLevel:[sender intValue]];	
 }
 
+- (IBAction) coincidenceWindowTextFieldAction:(id)sender
+{
+    [model setCoincidenceWindow:[sender intValue]];
+}
+
+- (IBAction) majorityLevelTextFieldAction:(id)sender
+{
+    [model setMajorityLevel:[sender intValue]];
+}
+
 - (IBAction) generateTriggerAction:(id)sender
 {
 	@try {
@@ -857,72 +963,29 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 	[model setCountAllTriggers:[[sender selectedCell] tag]];	
 }
 
-- (IBAction) customSizeAction:(id)sender
-{
-	NSUInteger maxNumSamples = (NSUInteger) 1024 * 1024./powf(2.,(float)[model eventSize]) / 2;
-	if(maxNumSamples > [sender intValue]) {
-		//todo /4 in std mode /5 in packed mode
-		[model setCustomSize:([sender intValue] / 4)];
-	}
-	else {
-		[model setCustomSize:maxNumSamples / 4];
-	}
-}
-
-- (IBAction) isCustomSizeAction:(id)sender
-{
-	[model setIsCustomSize:[sender intValue]];	
-}
-
-- (IBAction) isFixedSizeAction:(id)sender
-{
-	//incompatible with overlapping triggers, gate acq, and zero length encoding
-	//trigger overlap || sync-in gate
-	if (([model channelConfigMask] & 0x2UL) || ([model acquisitionMode] == 2)) {
-		ORRunAlertPanel(@"You will loose data! Fixed Event Size is not compatible with Trigger Overlap and Sync-In Gate acq mode",
-					@"Fixed event size doesn't poll the card to get the next event size, and doesn't flush CAEN buffer on memory full. It's faster and fits better heavy bursts. Disable trigger overlap and sync-in gate.",
-					@"OK", nil, nil);
-		[model setIsFixedSize:NO];
-	}
-	else {
-		[model setIsFixedSize:[sender intValue]];
-	}
-
-}
-
 - (IBAction) channelConfigMaskAction:(id)sender
 {
 	int i;
 	unsigned short mask = 0;
-	for(i=0;i<kNumChanConfigBits;i++){
-		if([[sender cellWithTag:i] intValue]) mask |= (1 << chanConfigToMaskBit1730[i]);
+	for(i=0;i<3;i++){
+		if([[sender cellWithTag:i] intValue]) mask |= (0x1 << i);
 	}
 	[model setChannelConfigMask:mask];	
 }
 
 - (IBAction) dacAction:(id) aSender
 {
-	[[[model document] undoManager] setActionName:@"Set dacs"]; // Set name of undo.
-	[model setDac:[[aSender selectedCell] tag] withValue:[model convertVoltsToDac:[[aSender selectedCell] floatValue]]]; // Set new value
-}
-
-- (IBAction) overUnderAction: (id) aSender
-{
-	[[[model document] undoManager] setActionName:@"Set Over_Under"]; // Set name of undo.
-	[model setOverUnderThreshold:[[aSender selectedCell] tag] withValue:[[aSender selectedCell] intValue]]; // Set new value
+	[model setDac:[[aSender selectedCell] tag] withValue:[model convertVoltsToDac:[[aSender selectedCell] floatValue]]];
 }
 
 - (IBAction) thresholdAction:(id) aSender
 {
-    if ([aSender intValue] != [model threshold:[[aSender selectedCell] tag]]){
-        [[[model document] undoManager] setActionName:@"Set thresholds"]; // Set name of undo.
-        [model setThreshold:[[aSender selectedCell] tag] withValue:[aSender intValue]]; // Set new value
-    }
+    [model setThreshold:[[aSender selectedCell] tag] withValue:[aSender intValue]]; // Set new value
 }
 
-- (IBAction)countinuousRunsAction:(id)sender
+- (IBAction) selfTriggerLogicAction:(id)aSender
 {
-    [model setContinuousMode:[sender intValue]];
+    [model setSelfTriggerLogic:[aSender selectedRow] withValue:[[aSender selectedCell] indexOfSelectedItem]];
 }
 
 #pragma mark ***Misc Helpers
@@ -939,11 +1002,11 @@ int chanConfigToMaskBit1730[kNumChanConfigBits] = {1,3,4,6,11};
 										  atIndex:i];
     }
 	
-	for (i = 0; i < 8 ; i++) {
+	for (i = 0; i < 16 ; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
 								  atIndex:i];
     }
-    [channelPopUp insertItemWithTitle:@"All" atIndex:8];
+    [channelPopUp insertItemWithTitle:@"All" atIndex:16];
     
     [self selectedRegIndexChanged:nil];
     [self selectedRegChannelChanged:nil];

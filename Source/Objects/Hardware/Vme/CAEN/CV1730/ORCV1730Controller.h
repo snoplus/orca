@@ -25,7 +25,6 @@
 
 @interface ORCV1730Controller : OrcaObjectController {
     IBOutlet NSTabView* 	tabView;
-    IBOutlet NSStepper* 	addressStepper;
     IBOutlet NSTextField* 	addressTextField;
     IBOutlet NSStepper* 	writeValueStepper;
     IBOutlet NSTextField* 	writeValueTextField;
@@ -34,6 +33,7 @@
     IBOutlet NSTextField*   basicLockDocField;
     IBOutlet NSButton*		basicWriteButton;
     IBOutlet NSButton*		basicReadButton;
+    IBOutlet NSPopUpButton*	triggerOutLogicPopUp;
 
 	IBOutlet NSTextField*	regNameField;
     IBOutlet NSTextField*	drTextField;
@@ -44,13 +44,14 @@
 
 
     IBOutlet NSMatrix*		thresholdMatrix;
+    IBOutlet NSMatrix*      selfTriggerLogicMatrix;
     IBOutlet NSButton*		softwareTriggerButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
 	IBOutlet NSMatrix*		chanTriggerMatrix;
 	IBOutlet NSMatrix*		otherTriggerMatrix;
-	IBOutlet NSMatrix*		chanTriggerOutMatrix;
 	IBOutlet NSMatrix*		otherTriggerOutMatrix;
-	IBOutlet NSMatrix*		fpIOModeMatrix;
+    IBOutlet NSMatrix*		fpIOFeaturesMatrix;
+    IBOutlet NSMatrix*		fpIOModeMatrix;
 	IBOutlet NSMatrix*		fpIOPatternLatchMatrix;
 	IBOutlet NSMatrix*		fpIOTrgInMatrix;
 	IBOutlet NSMatrix*		fpIOTrgOutMatrix;
@@ -63,24 +64,22 @@
 	IBOutlet NSButton*		fpIOSetButton;
 	IBOutlet NSTextField*	postTriggerSettingTextField;
 	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
-	IBOutlet NSTextField*	coincidenceLevelTextField;
+    IBOutlet NSMatrix*		chanTriggerOutMatrix;
+    IBOutlet NSTextField*	coincidenceLevelTextField;
+    IBOutlet NSTextField*	coincidenceWindowTextField;
+    IBOutlet NSTextField*	majorityLevelTextField;
     IBOutlet NSMatrix*		dacMatrix;
 	IBOutlet NSMatrix*		acquisitionModeMatrix;
 	IBOutlet NSMatrix*		countAllTriggersMatrix;
-	IBOutlet NSTextField*	customSizeTextField;
-	IBOutlet NSButton*	customSizeButton;
-	IBOutlet NSButton*	fixedSizeButton;
 	IBOutlet NSMatrix*		channelConfigMaskMatrix;
-    IBOutlet NSMatrix*		overUnderMatrix;
 	IBOutlet NSPopUpButton* eventSizePopUp;
 	IBOutlet NSTextField*	eventSizeTextField;
     IBOutlet NSTextField*	slotField;
     IBOutlet NSTextField*	slot1Field;
-	
+    
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
     IBOutlet NSButton*		loadThresholdsButton;
-    IBOutlet NSButton *continousRunsButton;
 	
 	//rates page
 	IBOutlet NSMatrix*      rateTextFields;
@@ -129,26 +128,27 @@
 - (void) postTriggerSettingChanged:(NSNotification*)aNote;
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote;
 - (void) triggerOutMaskChanged:(NSNotification*)aNote;
+- (void) triggerOutLogicChanged:(NSNotification*)aNote;
 - (void) fpIOControlChanged:(NSNotification*)aNote;
 - (void) coincidenceLevelChanged:(NSNotification*)aNote;
+- (void) coincidenceWindowChanged:(NSNotification*)aNote;
+- (void) majorityLevelChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) acquisitionModeChanged:(NSNotification*)aNote;
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
-- (void) customSizeChanged:(NSNotification*)aNote;
-- (void) isCustomSizeChanged:(NSNotification*)aNote;
-- (void) isFixedSizeChanged:(NSNotification*)aNote;
 - (void) channelConfigMaskChanged:(NSNotification*)aNote;
 - (void) dacChanged: (NSNotification*) aNote;
-- (void) overUnderChanged: (NSNotification*) aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) thresholdChanged: (NSNotification*) aNote;
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
-- (void) continousRunsChanged:(NSNotification*)aNote;
-
+- (void) selfTriggerLogicChanged:(NSNotification*)aNote;
 - (void) setBufferStateLabel;
+- (void) scaleAction:(NSNotification*)aNotification;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) eventSizeAction:(id)sender;
@@ -170,21 +170,20 @@
 - (IBAction) postTriggerSettingTextFieldAction:(id)sender;
 - (IBAction) triggerSourceMaskAction:(id)sender;
 - (IBAction) triggerOutMaskAction:(id)sender;
+- (IBAction) triggerOutLogicAction:(id)sender;
 - (IBAction) fpIOControlAction:(id)sender;
 - (IBAction) fpIOGetAction:(id)sender;
 - (IBAction) fpIOSetAction:(id)sender;
 - (IBAction) coincidenceLevelTextFieldAction:(id)sender;
+- (IBAction) coincidenceWindowTextFieldAction:(id)sender;
+- (IBAction) majorityLevelTextFieldAction:(id)sender;
 - (IBAction) generateTriggerAction:(id)sender;
 - (IBAction) acquisitionModeAction:(id)sender;
 - (IBAction) countAllTriggersAction:(id)sender;
-- (IBAction) customSizeAction:(id)sender;
-- (IBAction) isCustomSizeAction:(id)sender;
-- (IBAction) isFixedSizeAction:(id)sender;
 - (IBAction) channelConfigMaskAction:(id)sender;
 - (IBAction) dacAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;
-- (IBAction) overUnderAction: (id) aSender;
-- (IBAction)countinuousRunsAction:(id)sender;
+- (IBAction) selfTriggerLogicAction:(id)sender;
 
 #pragma mark •••Misc Helpers
 - (void)    populatePullDown;
