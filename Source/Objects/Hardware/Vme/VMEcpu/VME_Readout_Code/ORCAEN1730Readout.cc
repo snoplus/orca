@@ -29,7 +29,6 @@ bool ORCAEN1730Readout::Start() {
     return true;
 }   
 
-
 bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
 {
     uint32_t vmeStatusReg       = GetDeviceSpecificData()[0];
