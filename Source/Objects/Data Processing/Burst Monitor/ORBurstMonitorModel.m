@@ -443,14 +443,36 @@ unsigned long long facto(unsigned long long num)
                     NSString* runnumstr = [runglob substringWithRange:runRange];
                     //NSLog(@"string is %@\n",runnumstr);
                     runnum = [runnumstr intValue];
-                    NSLog(@"Run Number is %i\n", runnum);
+                    //NSLog(@"Run Number is %i\n", runnum);
                     
                     NSRange runtypetitle = [runglob rangeOfString:@"runType = "]; //10 lengnth, need 10 char for run number
                     NSRange typeRange = NSMakeRange((runtypetitle.location+10), 10); ///109 4 for runnumber
                     NSString* runtypestr = [runglob substringWithRange:typeRange];
                     //NSLog(@"string is space on each side| %@ |.....\n",runtypestr);
                     runtype = [runtypestr intValue];
-                    NSLog(@"Run Type is %i (4 is now snews connectivity test) \n", runtype);
+                    NSLog(@"Run Type is %i \n", runtype);
+                    
+                    //convert runtype int to array of binary bits
+                    int bitval =0;
+                    int runtypemeal = runtype;
+                    int bitplace;
+                    int bitnum = 0;
+                    for(bitplace=0; bitplace<11; bitplace++)
+                    {
+                        bitnum = 10 - bitplace;
+                        bitval = log2(runtypemeal) - bitnum + 1;
+                        if(bitval<1)
+                        {
+                            bitval = 0;
+                        }
+                        else
+                        {
+                            bitval = 1;
+                            runtypemeal = runtypemeal - pow(2,bitnum);
+                        }
+                        [runbits insertObject:[NSNumber numberWithInt:bitval]  atIndex:0];
+                    }
+                    
                 }
                 // header gets here
                 if (dataID == shaperID || burstForce==1) {
@@ -471,7 +493,7 @@ unsigned long long facto(unsigned long long num)
                             
                             
                             //make array of data to be buffered
-                            [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];
+                            [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];  //crash line, stopoing after burst
                             [cards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
                             [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
                             [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
@@ -927,6 +949,8 @@ unsigned long long facto(unsigned long long num)
     Nsecs   = [[NSMutableArray alloc] init];
     Nmics   = [[NSMutableArray alloc] init];
     
+    runbits   = [[NSMutableArray alloc] init];
+    
     burstTell   = 0;
     burstState  = 0;
     //novaState   = 0;
@@ -965,6 +989,9 @@ unsigned long long facto(unsigned long long num)
     [Nadcs release];
     [Nsecs release];
     [Nmics release];
+    
+    [runbits removeAllObjects]; //cb fixme not sure if needed
+    [runbits release];
 
 }
 
@@ -1204,9 +1231,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         }
     }
     NSLog(@"Novastate set to %i \n", novaState);
-    if(novaState == 3 || runtype == 4) //Send a cping somewhere if the burst is good enough
+    if(novaState == 3) //Send a cping somewhere if the burst is good enough
     {
-        NSLog(@"Sending ping !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");
+        NSLog(@"Supdernova candidate, send ping if SNEWS run\n");
         //make the time into a sendable string
         NSDate* burstdate = [NSDate dateWithTimeIntervalSince1970:numSecTillBurst];
         NSCalendar* cal = [NSCalendar currentCalendar];
@@ -1231,17 +1258,22 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         //[Cping setStandardOutput: pipe];
         //NSFileHandle* pingfile;
         //pingfile =[pipe fileHandleForReading];
-        if(0) //Send to local machine  //mod change to ping again
+        NSLog(@"end1\n");
+        if(1-[[runbits objectAtIndex:6] intValue])  //Send to local machine  //mod change to ping again
         {
+            NSLog(@"No pulse sent to snews because run type is not 'SNEWS'\n");
             [Cping setLaunchPath: @"/usr/bin/printf"];
             [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
         }
         else{ //Send to halo shift
+            NSLog(@"Pulse sent to SNEWS\n");
             [Cping setLaunchPath: @"/usr/bin/ssh"];  //@"/usr/bin/ssh"
-            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.223", burstcommand, nil]];
+            [Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.223", burstcommand, nil]];  //.223 only for ug
             //[Cping setArguments: [NSArray arrayWithObjects: @"halo@142.51.71.225", @"cd snews/coinccode/ ; mkdir AAASNEWSPINGTEST", nil]];
         }  // -c successfully made directories in home
+        NSLog(@"end2\n");
         [Cping launch]; //Send the ping!
+        NSLog(@"end3\n");
         //system("ssh halo@142.51.71.225 'cd snews/coinccode/ && ./cping all 0 0 0 3'"); freezes orca for about 30 seconds but works
         
         //NSData* pingdata;
@@ -1259,6 +1291,19 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     else{
         chanpvalue = 999.999;
     }
+    //make runtype string
+    NSString* theRuntypes = @"";
+    if([[runbits objectAtIndex:0] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Maintenance"];
+    if([[runbits objectAtIndex:1] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Supernova"];
+    if([[runbits objectAtIndex:2] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Calibration"];
+    if([[runbits objectAtIndex:3] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Underground"];
+    if([[runbits objectAtIndex:4] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Front Shielding"];
+    if([[runbits objectAtIndex:5] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Unusual Condition"];
+    if([[runbits objectAtIndex:6] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", SNEWS"];
+    if([[runbits objectAtIndex:7] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Pulser"];
+    if([[runbits objectAtIndex:8] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in Storage"];
+    if([[runbits objectAtIndex:9] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in Area"];
+    if([[runbits objectAtIndex:10] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in HALO"];
     //send email to announce the burst
     int numMicTillBurst = (1000000*fmod(numSecTillBurst,1));
     NSLog(@"Novastate is now %i \n", novaState); ////////////////////////////////////////////////////////////
@@ -1266,7 +1311,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     if(novaState == 3)
     {
-        theContent = [theContent stringByAppendingString:@"Triage: SN candidate!  Ping sent to snews (not actually, test mode cuts are weaker)\n"];
+        if([[runbits objectAtIndex:6] intValue])
+        {
+            theContent = [theContent stringByAppendingString:@"Triage: SN candidate!  Ping sent to snews (test mode cuts are weaker) \n"];
+        }
+        else
+        {
+            theContent = [theContent stringByAppendingString:@"Triage: SN candidate, ping not sent beacsue run tag 'SNEWS' is off. \n"];
+        }
     }
     if(novaState == 2)
     {
@@ -1283,6 +1335,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@ (Local time of ORCA machine) in run number %i of run type %i \n",[NSDate date], runnum, runtype];
+    theContent = [theContent stringByAppendingFormat:@"Run type: %@ \n",theRuntypes];
     theContent = [theContent stringByAppendingFormat:@"First event in burst:\n"];
     theContent = [theContent stringByAppendingFormat:@"%@, %i us (UTC), time from SBC cards \n", [NSDate dateWithTimeIntervalSince1970:numSecTillBurst], numMicTillBurst];
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];

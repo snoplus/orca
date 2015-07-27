@@ -41,6 +41,7 @@
     unsigned long        headerID;
     int runtype;
     int runnum;
+    NSMutableArray* runbits;
     
     //buffer
     NSMutableArray* chans;
