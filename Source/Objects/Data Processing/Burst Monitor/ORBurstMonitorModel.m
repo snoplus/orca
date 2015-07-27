@@ -381,13 +381,13 @@ NSDate* burstStart = NULL;
         return ([self diffprob:co Channels:(ch - 1) Expect:ex Found:fd]);
     }
 }
-unsigned long long facto(unsigned long long num)
+double facto(unsigned long long num)
 {
     if (num == 0) {
         return 1;
     }
     else {
-        int factorial = 1;
+        double factorial = 1;
         int k;
         for(k = 1; k<num+1; k++)
         {
@@ -499,7 +499,7 @@ unsigned long long facto(unsigned long long num)
                             [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
                             [mics insertObject:[NSNumber numberWithLong:microseconds] atIndex:0];
                             [words insertObject:[NSNumber numberWithLong:firstword] atIndex:0];
-                            if((energy >= minimumEnergyAllowed && cardNum <= 15) || burstForce ==1){  //Filter
+                            if((energy >= minimumEnergyAllowed && energy <= 1400 && cardNum <= 15) || burstForce ==1){  //Filter
                                 //make a key for looking up the correct queue for this record
                                 NSString* aShaperKey = [NSString stringWithFormat:@"%d,%d,%d",crateNum,cardNum,chanNum];
                                 
@@ -617,9 +617,13 @@ unsigned long long facto(unsigned long long num)
                                                     lString = [lString stringByAppendingString:[NSString stringWithFormat:@"(x,y)=(%i,%i) ",Xbormm, Ybormm]];
                                                     lString = [lString stringByPaddingToLength:85 withString:@" " startingAtIndex:0];               //lenth 17
                                                     bString = [bString stringByAppendingString:lString];        //Place the line in burststring
-                                                    if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed)
+                                                    if([[Badcs objectAtIndex:iter] intValue] >= minimumEnergyAllowed && [[Badcs objectAtIndex:iter] intValue] <= 1400)
                                                     {
                                                         bString = [bString stringByAppendingString:[NSString stringWithFormat:@" <---"]];
+                                                    }
+                                                    if([[Badcs objectAtIndex:iter] intValue] > 1400)
+                                                    {
+                                                        bString = [bString stringByAppendingString:[NSString stringWithFormat:@" *a*"]];
                                                     }
                                                     if([[Bsecs objectAtIndex:iter] intValue] == [[Nsecs objectAtIndex:(countofNchan-1)] intValue] &&
                                                        [[Bmics objectAtIndex:iter] intValue] == [[Nmics objectAtIndex:(countofNchan-1)] intValue])
@@ -687,11 +691,12 @@ unsigned long long facto(unsigned long long num)
                                                     if (partPbot == 0)
                                                     {
                                                         NSLog(@"Error, factorial failed, n, peak, low, is %i, %i, %i, \n", n, peakN, lowN);
+                                                        NSLog(@"And partPtop is %i \n", partPtop);
                                                     }
                                                     else
                                                     {
                                                         //NSLog(@"NP ok, n, peak, low is %i, %i, %i \n", n, peakN, lowN);
-                                                        partP = (partPtop/partPbot)*partPpow;
+                                                        partP = (partPtop*partPpow)/partPbot;
                                                     }
                                                     double partDisk = fabs(n-(peakP*(peakN + lowN)));
                                                     if ((partDisk+0.01)>fabs(peakN - peakExpect))
@@ -701,6 +706,8 @@ unsigned long long facto(unsigned long long num)
                                                     
                                                 }
                                                 NSLog(@"adcP is %f, peak/lowN is %i, %i \n", adcP, peakN, lowN); //fixme CB remove when confident this works
+                                                
+                                                //Find background likelyhood in burst //fixme
                                                 
                                                 
                                                 
