@@ -928,7 +928,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             if([runControl isRunning]){
                wasLocalRun = YES;
                [self appendToSentryLog:@"Stopping local run."];
-               [runControl stopRun];
+               [runControl haltRun];
                 [self setNextState:eWaitForLocalRunStop stepTime:.1];
             }
             else if (remoteRunInProgress == eYES){
