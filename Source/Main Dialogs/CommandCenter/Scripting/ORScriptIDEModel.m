@@ -110,8 +110,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		NSAttributedString* s = [[NSAttributedString alloc] initWithString:@"A" attributes:attrsDictionary];
 		NSSize labelSize = [s size];
 		float height = iconSize.height;
-		float width = iconSize.width;
-		[s drawAtPoint:NSMakePoint(width - labelSize.width - 10,height-labelSize.height-5)];
+		[s drawAtPoint:NSMakePoint(50 - labelSize.width-10,height-labelSize.height-5)];
 		[s release];
     }
 }
