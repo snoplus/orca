@@ -25,6 +25,7 @@
 #import "SBC_Link.h"
 #import "ORShaperModel.h"
 #import "ORDataFileModel.h"
+#import "ORDataTaskModel.h"
 
 NSString* HaloSentryIpNumber2Changed = @"HaloSentryIpNumber2Changed";
 NSString* HaloSentryIpNumber1Changed = @"HaloSentryIpNumber1Changed";
@@ -1305,9 +1306,9 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
         [[self undoManager] disableUndoRegistration];
 
         NSArray* dataTasks = [[(ORAppDelegate*)[NSApp delegate]document] collectObjectsOfClass:NSClassFromString(@"ORDataTaskModel")];
-        for(id aDataTask in dataTasks){
+        for(ORDataTaskModel* aDataTask in dataTasks){
             for(id anObj in someObjects){
-                [aDataTask removeObject:anObj];
+                [aDataTask removeOrcaObject:anObj];
             }
         }
         [self postListModAlarm];
