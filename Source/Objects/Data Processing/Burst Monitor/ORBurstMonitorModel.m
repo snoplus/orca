@@ -1236,6 +1236,10 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         {
             novaState = 2;
         }
+        if (rSec > durSec + 2) //SBC disconnected
+        {
+            novaState = 0;
+        }
     }
     NSLog(@"Novastate set to %i \n", novaState);
     if(novaState == 3) //Send a cping somewhere if the burst is good enough
