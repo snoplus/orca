@@ -401,6 +401,7 @@ double facto(unsigned long long num)
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
     //pass it on
+    
     [thePassThruObject processData:dataArray decoder:aDecoder];
     
     if(!theDecoder){
@@ -1320,28 +1321,34 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"Novastate is now %i \n", novaState); ////////////////////////////////////////////////////////////
     NSString* theContent = @"";
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+    theContent = [theContent stringByAppendingString:@"Triage: "];
+    NSString* theTriage = @"";
     if(novaState == 3)
     {
+        theTriage = [theTriage stringByAppendingString:@"SN candidate!"];
         if([[runbits objectAtIndex:6] intValue])
         {
-            theContent = [theContent stringByAppendingString:@"Triage: SN candidate!  Ping sent to snews (test mode cuts are weaker) \n"];
+            theContent = [theContent stringByAppendingString:@"SN candidate!  Ping sent to snews (test mode cuts are weaker) \n"];
         }
         else
         {
-            theContent = [theContent stringByAppendingString:@"Triage: SN candidate, ping not sent beacsue run tag 'SNEWS' is off. \n"];
+            theContent = [theContent stringByAppendingString:@"SN candidate, ping not sent beacsue run tag 'SNEWS' is off. \n"];
         }
     }
     if(novaState == 2)
     {
-        theContent = [theContent stringByAppendingString:@"Triage: Spallation \n"];
+        theTriage = [theTriage stringByAppendingString:@"Spallation"];
+        theContent = [theContent stringByAppendingString:@"Spallation \n"];
     }
     if(novaState == 1)
     {
-        theContent = [theContent stringByAppendingString:@"Triage: Neutron coincidence \n"];
+        theTriage = [theTriage stringByAppendingString:@"Coincidence"];
+        theContent  = [theContent stringByAppendingString:@"Neutron coincidence \n"];
     }
     if(novaState == 0)
     {
-        theContent = [theContent stringByAppendingString:@"Triage: Other (Not neutrons) \n"];
+        theTriage = [theTriage stringByAppendingString:@"Other"];
+        theContent  = [theContent stringByAppendingString:@"Other (Not neutrons) \n"];
     }
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingFormat:@"This report was generated automatically at:\n"];
@@ -1397,7 +1404,20 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	[theBurstMonitoredObject setInvolvedInCurrentRun:YES];
 
     //Creating the data file
-    [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //this is the header of the data file
+    NSMutableString* headerAsString = [[NSMutableString alloc] initWithData:header encoding:NSASCIIStringEncoding];
+    
+    NSRange headerLengthSpot = [headerAsString rangeOfString:@"<key>Header Length</key>"];
+    NSString* header1 = [headerAsString substringToIndex:headerLengthSpot.location];
+    NSString* header2 = [headerAsString substringFromIndex:headerLengthSpot.location];
+    int intSecTillBurst = numSecTillBurst;
+    header1 = [header1 stringByAppendingFormat:@"<key>BurstInfo</key>\n\t<dict>\n\t\t<key>BurstNumber</key>\n\t\t<integer>%i</integer>\n\t\t<key>BurstStartTime</key>\n\t\t<integer>%i</integer>\n\t\t<key>Triage</key>\n\t\t<string>%@</string>\n\t\t<key>BurstDuration</key>\n\t\t<real>%f</real>\n\t\t<key>Multiplicity</key>\n\t\t<integer>%i</integer>\n\t</dict>\n\t", burstCount, intSecTillBurst, theTriage, durSec, countsInBurst];  //theTriage or novaState?
+    header1 = [header1 stringByAppendingString:header2];
+    //NSLog(@"%@\n", header1);
+    
+    NSData* newheader=[header1 dataUsingEncoding:NSUTF8StringEncoding];
+    //NSLog(@"%@", newheader);
+    
+    [theBurstMonitoredObject processData:[NSArray arrayWithObject:newheader] decoder:theDecoder]; //this is the header of the data file
     NSMutableArray* anArrayOfData = [NSMutableArray array];
     //Make the data record from the burst array
     @synchronized(self)
