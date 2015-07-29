@@ -670,19 +670,22 @@
 
 - (void) pulseHighTimeChanged:(NSNotification*)aNote
 {
-	[pulseHighTimeField setFloatValue: [model pulseHighTime]*2]; //convert to 탎econds
+	//[pulseHighTimeField setFloatValue: [model pulseHighTime]*2]; //convert to 탎econds
+    [pulseHighTimeField setFloatValue: [model pulseHighTime]*64]; //convert to 탎econds, 32 multiplier in new firmware
 	[self displayFrequency];
 }
 
 - (void) pulseLowTimeChanged:(NSNotification*)aNote
 {
-	[pulseLowTimeField setFloatValue: [model pulseLowTime]*2]; //convert to 탎econds
+	//[pulseLowTimeField setFloatValue: [model pulseLowTime]*2]; //convert to 탎econds
+    [pulseLowTimeField setFloatValue: [model pulseLowTime]*64]; //convert to 탎econds, 32 multiplier in new firmware
 	[self displayFrequency];
 }
 
 - (void) displayFrequency
 {
-	[frequencyField setFloatValue: 1/ (([model pulseLowTime] + [model pulseHighTime]) * 2.0E-6)];
+	//[frequencyField setFloatValue: 1/ (([model pulseLowTime] + [model pulseHighTime]) * 2.0E-6)];
+    [frequencyField setFloatValue: 1/ (([model pulseLowTime] + [model pulseHighTime]) * 64.0E-6)];
 }
 
 - (void) checkGlobalSecurity
@@ -832,12 +835,14 @@
 
 - (IBAction) pulseHighTimeAction:(id)sender
 {
-	[model setPulseHighTime:[sender intValue]/2]; //convert from 탎econds to hw value
+	//[model setPulseHighTime:[sender intValue]/2]; //convert from 탎econds to hw value
+    [model setPulseHighTime:[sender intValue]/64]; //convert from 탎econds to hw value
 }
 
 - (IBAction) pulseLowTimeAction:(id)sender
 {
-	[model setPulseLowTime:[sender intValue]/2];	 //convert from 탎econds to hw value
+	//[model setPulseLowTime:[sender intValue]/2];	 //convert from 탎econds to hw value
+    [model setPulseLowTime:[sender intValue]/64];	 //convert from 탎econds to hw value
 }
 
 - (IBAction) dacsAction:(id)sender
