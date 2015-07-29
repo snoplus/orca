@@ -508,6 +508,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return temp;
 }
 
+- (void) probeBoard
+{
+    [self readModuleID:YES];
+    [self readTemperature:NO];
+}
 
 #pragma mark -- register r/w accessors
 - (short) registerIndex

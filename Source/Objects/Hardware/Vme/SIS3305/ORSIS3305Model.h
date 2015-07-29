@@ -277,6 +277,8 @@
 - (void) setFirmwareVersion:(float)aFirmwareVersion;
 - (float) temperature;
 - (float) getTemperature;
+- (void) probeBoard;
+
 - (BOOL) shipTimeRecordAlso;
 - (void) setShipTimeRecordAlso:(BOOL)aShipTimeRecordAlso;
 

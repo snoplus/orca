@@ -1816,7 +1816,7 @@
 - (IBAction) probeBoardAction:(id)sender;
 {
 	@try {
-		[model readModuleID:YES];
+		[model probeBoard];
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
