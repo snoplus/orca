@@ -380,6 +380,11 @@
 - (IBAction) bandwidth58Action:(id)sender;
 - (IBAction) testMode14Action:(id)sender;
 - (IBAction) testMode58Action:(id)sender;
+- (IBAction) adcGain14Action:(id)sender;
+- (IBAction) adcGain58Action:(id)sender;
+- (IBAction) adcOffset14Action:(id)sender;
+- (IBAction) adcOffset58Action:(id)sender;
+
 
 
 //- (IBAction) thresholdModeAction:(id)sender;

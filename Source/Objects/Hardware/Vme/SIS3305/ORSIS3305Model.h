@@ -65,6 +65,8 @@
     unsigned short  channelMode[kNumSIS3305Groups];
     unsigned short  bandwidth[kNumSIS3305Groups];
     unsigned short  testMode[kNumSIS3305Groups];
+    unsigned long   adcOffset[kNumSIS3305Channels];
+    unsigned long   adcGain[kNumSIS3305Channels];
     
     
     short			internalTriggerEnabledMask;
@@ -371,6 +373,12 @@
 - (unsigned short) testMode:(unsigned short)group;
 - (void) setTestMode:(unsigned short)group withValue:(unsigned short)value;
 
+- (unsigned long) adcOffset:(unsigned short)chan;
+- (void) setAdcOffset:(unsigned short)chan toValue:(unsigned long)value;
+- (unsigned long) adcGain:(unsigned short)chan;
+- (void) setAdcGain:(unsigned short)chan toValue:(unsigned long)value;
+
+
 
 
 - (short) externalTriggerEnabledMask;
@@ -599,6 +607,13 @@
 - (void) writeADCSerialInterface;
 - (unsigned long) readADCChipID;
 - (unsigned long) readADCControlReg:(bool)verbose;
+- (void) writeADCSerialChannelSelect:(unsigned short)chan;
+- (unsigned long) readADCSerialChannelSelect:(unsigned short)adc;
+- (unsigned long) readADCOffset:(unsigned short)chan;
+- (void) writeADCOffsets;
+- (void) applyADCCalibration:(unsigned short)adc;
+
+
 
 
 
@@ -837,7 +852,8 @@ extern NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged;
 extern NSString* ORSIS3305ChannelModeChanged;
 extern NSString* ORSIS3305BandwidthChanged;
 extern NSString* ORSIS3305TestModeChanged;
-
+extern NSString* ORSIS3305AdcOffsetChanged;
+extern NSString* ORSIS3305AdcGainChanged;
 
 
 //extern NSString* ORSIS3305ControlLemoTriggerOut;
@@ -884,11 +900,11 @@ extern NSString* ORSIS3305CardInited;
 
 // control status
 extern NSString* ORSIS3305LEDApplicationModeChanged;
-extern NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged;
-extern NSString* ORSIS3305EnableExternalLEMOResetInChanged;
-extern NSString* ORSIS3305EnableExternalLEMOCountIn;
+//extern NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged;
+//extern NSString* ORSIS3305EnableExternalLEMOResetInChanged;
+//extern NSString* ORSIS3305EnableExternalLEMOCountIn;
 extern NSString* ORSIS3305InvertExternalLEMODirectVetoIn;
-extern NSString* ORSIS3305EnableExternalLEMOTriggerIn;
+//extern NSString* ORSIS3305EnableExternalLEMOTriggerIn;
 extern NSString* ORSIS3305EnableExternalLEMOVetoDelayLengthLogic;
 extern NSString* ORSIS3305EdgeSensitiveExternalVetoDelayLengthLogic;
 extern NSString* ORSIS3305InvertExternalVetoInDelayLengthLogic;

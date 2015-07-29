@@ -123,6 +123,9 @@ NSString* ORSIS3305WaitPreTrigTimeBeforeDirectMemTrigChanged        = @"ORSIS330
 NSString* ORSIS3305ChannelModeChanged   = @"ORSIS3305ChannelModeChanged";
 NSString* ORSIS3305BandwidthChanged     = @"ORSIS3305BandwidthChanged";
 NSString* ORSIS3305TestModeChanged      = @"ORSIS3305TestModeChanged";
+NSString* ORSIS3305AdcOffsetChanged     = @"ORSIS3305AdcOffsetChanged";
+NSString* ORSIS3305AdcGainChanged       = @"ORSIS3305AdcGainChanged";
+
 
 //NSString* ORSIS3305ModelLemoOutSelectTriggerChanged = @"ORSIS3305ModelLemoOutSelectTriggerChanged";
 //NSString* ORSIS3305ModelLemoOutSelectTriggerInChanged = @"ORSIS3305ModelLemoOutSelectTriggerInChanged";
@@ -136,7 +139,7 @@ NSString* ORSIS3305TestModeChanged      = @"ORSIS3305TestModeChanged";
 //NSString* ORSIS3305ModelLemoOutSelectInternalKeyVetoChanged = @"ORSIS3305ModelLemoOutSelectInternalKeyVetoChanged";
 //NSString* ORSIS3305ModelLemoOutSelectExternalVetoLengthChanged = @"ORSIS3305ModelLemoOutSelectExternalVetoLengthChanged";
 //NSString* ORSIS3305ModelLemoOutSelectMemoryOverrunVetoChanged = @"ORSIS3305ModelLemoOutSelectMemoryOverrunVetoChanged";
-NSString* ORSIS3305EnableLemoInputTriggerChanged = @"ORSIS3305EnableLemoInputTriggerChanged";
+NSString* ORSIS3305EnableLemoInputTriggerChanged = @"ORSIS3305EnableLemotrChanged";
 NSString* ORSIS3305EnableLemoInputCountChanged = @"ORSIS3305EnableLemoInputCountChanged";
 NSString* ORSIS3305EnableLemoInputResetChanged = @"ORSIS3305EnableLemoInputResetChanged";
 NSString* ORSIS3305EnableLemoInputDirectVetoChanged = @"ORSIS3305EnableLemoInputDirectVetoChanged";
@@ -155,12 +158,14 @@ NSString* ORSIS3305LemoOutSelectInternalKeyVetoChanged      = @"ORSIS3305LemoOut
 NSString* ORSIS3305LemoOutSelectExternalVetoLengthChanged   = @"ORSIS3305LemoOutSelectExternalVetoLengthChanged";
 NSString* ORSIS3305LemoOutSelectMemoryOverrunVetoChanged    = @"ORSIS3305LemoOutSelectMemoryOverrunVetoChanged";
 
-
-NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged    = @"ORSIS3305EnableExternalLEMODirectVetoInChanged";
-NSString* ORSIS3305EnableExternalLEMOResetInChanged         = @"ORSIS3305EnableExternalLEMOResetInChanged";
-NSString* ORSIS3305EnableExternalLEMOCountIn                = @"ORSIS3305EnableExternalLEMOCountIn";
 NSString* ORSIS3305InvertExternalLEMODirectVetoIn           = @"ORSIS3305InvertExternalLEMODirectVetoIn";
-NSString* ORSIS3305EnableExternalLEMOTriggerIn              = @"ORSIS3305EnableExternalLEMOTriggerIn";
+
+
+//NSString* ORSIS3305EnableExternalLEMODirectVetoInChanged    = @"ORSIS3305EnableExternalLEMODirectVetoInChanged";
+//NSString* ORSIS3305EnableExternalLEMOResetInChanged         = @"ORSIS3305EnableExternalLEMOResetInChanged";
+//NSString* ORSIS3305EnableExternalLEMOCountIn                = @"ORSIS3305EnableExternalLEMOCountIn";
+//NSString* ORSIS3305InvertExternalLEMODirectVetoIn           = @"ORSIS3305InvertExternalLEMODirectVetoIn";
+//NSString* ORSIS3305EnableExternalLEMOTriggerIn              = @"ORSIS3305EnableExternalLEMOTriggerIn";
 NSString* ORSIS3305EnableExternalLEMOVetoDelayLengthLogic   = @"ORSIS3305EnableExternalLEMOVetoDelayLengthLogic";
 NSString* ORSIS3305EdgeSensitiveExternalVetoDelayLengthLogic    = @"ORSIS3305EdgeSensitiveExternalVetoDelayLengthLogic";
 NSString* ORSIS3305InvertExternalVetoInDelayLengthLogic     = @"ORSIS3305InvertExternalVetoInDelayLengthLogic";
@@ -763,7 +768,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setEnableExternalLEMODirectVetoIn:(BOOL)state{
     [[[self undoManager] prepareWithInvocationTarget:self] setEnableExternalLEMODirectVetoIn:enableExternalLEMODirectVetoIn];
     enableExternalLEMODirectVetoIn = state;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableExternalLEMODirectVetoInChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableLemoInputDirectVetoChanged object:self];
 }
 - (BOOL) enableExternalLEMODirectVetoIn         {return enableExternalLEMODirectVetoIn;}
 
@@ -771,7 +776,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setEnableExternalLEMOResetIn:(BOOL)state{
     [[[self undoManager] prepareWithInvocationTarget:self] setEnableExternalLEMOResetIn:enableExternalLEMOResetIn];
     enableExternalLEMOResetIn = state;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableExternalLEMOResetInChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableLemoInputResetChanged object:self];
 }
 - (BOOL) enableExternalLEMOResetIn              {return enableExternalLEMOResetIn;}
 
@@ -779,7 +784,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setEnableExternalLEMOCountIn:(BOOL)state{
     [[[self undoManager] prepareWithInvocationTarget:self] setEnableExternalLEMOCountIn:enableExternalLEMOCountIn];
     enableExternalLEMOCountIn = state;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableExternalLEMOCountIn object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableLemoInputCountChanged object:self];
 }
 - (BOOL) enableExternalLEMOCountIn              {return enableExternalLEMOCountIn;}
 
@@ -787,7 +792,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setEnableExternalLEMOTriggerIn:(BOOL)state{
     [[[self undoManager] prepareWithInvocationTarget:self] setEnableExternalLEMOTriggerIn:enableExternalLEMOTriggerIn];
     enableExternalLEMOTriggerIn = state;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableExternalLEMOTriggerIn object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305EnableLemoInputTriggerChanged object:self];
 }
 - (BOOL) enableExternalLEMOTriggerIn         {return enableExternalLEMOTriggerIn;}
 
@@ -1406,7 +1411,29 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 
 
+- (unsigned long) adcOffset:(unsigned short)chan{
+    return adcOffset[chan];
+}
 
+- (void) setAdcOffset:(unsigned short)chan toValue:(unsigned long)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcOffset:chan toValue:adcOffset[chan]];
+    adcOffset[chan] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305AdcOffsetChanged object:self];
+
+}
+
+- (unsigned long) adcGain:(unsigned short)chan{
+    return adcGain[chan];
+}
+
+- (void) setAdcGain:(unsigned short)chan toValue:(unsigned long)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcGain:chan toValue:adcGain[chan]];
+    adcGain[chan] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305AdcGainChanged object:self];
+    
+}
 
 
 
@@ -1652,6 +1679,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setGateLength:i withValue:64];
         [self setGain:i withValue:1];
         [self setLemoOutSelectTrigger:i toState:YES];
+        
+        [self setAdcGain:i toValue:0x200];
+        [self setAdcOffset:i toValue:0x200];
 
 	}
 	for(i=0;i<kNumSIS3305Groups;i++){
@@ -3014,6 +3044,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     //    ORCommandList* aList = [ORCommandList commandList];
     
+    [self writeADCSerialChannelSelect:0xF];   // resets us to not having any channel selected
+    
+    
     struct SIS3305_ADC_SPI_Config_Struct packet;
     for (adc = 0; adc<kNumSIS3305Groups; adc++) {
         // read ADC Chip ID
@@ -3192,7 +3225,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //    
 //    struct SIS3305_ADC_SPI_Config_Struct packet;
     
-    [self readEndAddressThresholdOfGroup:0];
+    [self writeADCSerialChannelSelect:0xF];   // resets us to not having any channel selected
+
+ //   [self readEndAddressThresholdOfGroup:0];    // FIX: Why is this here?
     for (adc = 0; adc<kNumSIS3305Groups; adc++) {
         // read ADC Chip ID
         addr = 0x1;     // control reg
@@ -3224,6 +3259,247 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     }
     
     
+}
+
+- (void) writeADCSerialChannelSelect:(unsigned short)chan
+{
+    /*
+     Uses the SPI protocol of the ADC to read out the ADC Chip Configuration.
+     Only 16 bits of data per chip
+     
+     Only three bits can be written to in this register (2:0)
+     000: No channel selected
+     001: Channel A
+     010: Channel B
+     011: Channel C
+     100: Channel D
+     else: No channel selected
+     
+     After finishing the channel-basis settings, this should probably be set back to 0.
+     */
+ 
+    // `chan` here is the actual channel, not the ADC channel
+    
+    unsigned long writeValue = 0;
+    unsigned long writeData = 0;
+    
+    unsigned long addr, adc, adcChan;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    BOOL resetFlag = NO;
+    
+    //    unsigned int readCount = 0;
+    
+    if (chan<8){
+        adcChan = chan%4;       // the relative channel on each ADC
+        adc = (chan-adcChan)/4;     // the adc the channel is on
+    }
+    else{
+        adc = 0;
+        adcChan = 0x5;  // just a made up value, greater than 4
+        resetFlag = YES;
+    }
+    
+    addr = 0xF;     // Channel Selector register
+    RWcmd = 0x1;    // write command
+    
+    // 16-bit value written to the SPI chip
+    if(resetFlag == NO)
+        writeData = ((adcChan+1   & 0x7)  << 0);
+    else
+        writeData = 0;
+    
+    // 32-bit value written to full digitizer register
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24)
+    | ((writeData&0xFFFF) << 0);
+    
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
+    if (resetFlag == YES) { // reset the other chip too for good measure.
+        adc = 1;
+        
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+        | ((addr    &0x7F)  << 16)
+        | ((adc     & 0x1)  << 24)
+        | ((writeData&0xFFFF) << 0);
+        
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    }
+    
+    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.1 second.
+}
+
+
+- (unsigned long) readADCSerialChannelSelect:(unsigned short)adc
+{
+    unsigned long addr;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    unsigned long writeValue, readValue;
+    unsigned long writeData;
+    unsigned int readCount = 0;
+    unsigned int maxPolls = 100;
+    
+    BOOL logicBusy;
+    
+    if (adc >= kNumSIS3305Groups) {
+        NSLog(@"Invalid ADC specified for readADCChannelSelect.... Returning.\n");
+        return 0xFFFF;
+    }
+    addr = 0xF;     // Channel Selector register
+    RWcmd = 0x0;    // read command
+    writeData = 0x0;    // just a placeholder, since we're reading...
+    
+    // 32-bit value written to full digitizer register
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+                | ((addr    &0x7F)  << 16)
+                | ((adc     & 0x1)  << 24)
+                | ((writeData&0xFFFF) << 0);
+    
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    
+    do {
+        readCount++;
+        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+    }
+    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
+    if (logicBusy == YES) {
+        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+        return 0x0;
+    }
+    return readValue & 0xFFFF;
+}
+
+
+
+
+- (unsigned long) readADCOffset:(unsigned short)chan
+{
+    // this reads from 0x21 of the ADC, the "Offset Register", a read only reg
+    unsigned short adcChan,adc;
+    
+    unsigned long writeValue = 0;
+    unsigned long readValue = 0;
+    
+    unsigned long addr;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+
+    unsigned short maxPolls = 100;
+    unsigned long readCount = 0;
+    BOOL logicBusy;
+    
+    
+    adcChan = chan%4;       // the relative channel on each ADC
+    adc = (chan-adcChan)/4;     // the adc the channel is on
+    
+    struct SIS3305_ADC_SPI_Config_Struct packet;        // probably overkill.
+    
+    addr = 0x21;    // offset reg
+    RWcmd = 0x0;    // read command
+    
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+                | ((addr    &0x7F)  << 16)
+                | ((adc     & 0x1)  << 24);
+    
+    [self writeADCSerialChannelSelect:chan];
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    
+    do {
+        readCount++;
+        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+    }
+    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
+    if (logicBusy == YES) {
+        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+        return 0x0;
+    }
+    
+    // FIX: This should actually go to the right spot, but we don't use it anyways...
+    packet.spi_1chModeA_gain_adc[adc] = readValue;
+    
+    
+    return  readValue;
+}
+
+
+
+- (void) writeADCOffsets
+{
+    unsigned long writeValue = 0;
+    unsigned long writeData = 0;
+    
+    unsigned long addr, adc;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    unsigned short adcChan,chan;
+    
+
+    addr = 0x20;    // External Offset register
+    RWcmd = 0x1;    // write command
+    
+    // 16-bit value written to the SPI chip
+    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+        adcChan = chan%4;       // the relative channel on each ADC
+        adc = (chan-adcChan)/4;     // the adc the channel is on
+        
+        [self writeADCSerialChannelSelect:chan];
+        
+        writeData = (([self adcOffset:chan]   & 0x3FF)  << 0);
+        
+        // 32-bit value written to full digitizer register
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+        | ((addr    &0x7F)  << 16)
+        | ((adc     & 0x1)  << 24)
+        | ((writeData&0xFFFF) << 0);
+        
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        
+        // next, force the ADC to pull in these values as the "calibration"
+        [self applyADCCalibration:adc];
+    }
+    
+    [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
+}
+
+
+- (void) applyADCCalibration:(unsigned short)adc
+{
+    /* 
+     After writing values to the external gain, phase, or offset, the values have to be
+     pulled in as "calibration". To do this, we write to the ADC calibration reg.
+     
+     This is written as a worst case, slightly lower performance version, since it 
+     tries to write all three (gain, phase, offset), though they may not all need 
+     writing.
+     
+     0xA8 = b 1010 1000
+     */
+    
+    unsigned long writeValue = 0;
+    unsigned long writeData = 0;
+    
+    unsigned long addr;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    
+    addr = 0x10;    // calibration control reg
+    RWcmd = 0x1;    // write
+    
+    writeData = 0xA8;    // force external offset adjust for selected channel
+    
+    // 32-bit value written to full digitizer register
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24)
+    | ((writeData&0xFFFF) << 0);
+    
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+
+    return;
 }
 
 
@@ -4678,6 +4954,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self writeThresholds];
     
     [self writeADCControlReg];              // set up the bandwidth, channel mode etc.
+    [self writeADCOffsets];
+    
 
 	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
@@ -5286,7 +5564,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             [self enableSampleLogic];
             [self pulseExternalTriggerOut];
+            
+            
+//            
 //            [self armSampleLogic];
+//
+            
+            
+            
         }
         else {  // Not the first time
 
@@ -5325,8 +5610,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             endThresh58     = [self readEndAddressThresholdOfGroup:1];
             sampleStatus14  = [self readSamplingStatusForGroup:0];
             sampleStatus58  = [self readSamplingStatusForGroup:1];
-            value1          = [self readActualSampleValueOfChannel:1];
-            value2          = [self readActualSampleValueOfChannel:8];
+            value1          = [self readActualSampleValueOfChannel:0];
+            value2          = [self readActualSampleValueOfChannel:1];
             
             endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
             
@@ -5349,7 +5634,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             // prepare readout statemachines
             // Transfer Control ch1to4, start internal readout (copy from Memory to VME FPGA)
             // Transfer Control ch5to8, start internal readout (copy from Memory to VME FPGA)
-
             [self writeDataTransferControlRegister:0 withCommand:2 withAddress:0];  // read command
             [self writeDataTransferControlRegister:1 withCommand:2 withAddress:0];  // read command
 
@@ -5628,7 +5912,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setGTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"GTThresholdOff"           stringByAppendingFormat:@"%d",chan]]];
 
         [self setPreTriggerDelay:chan       withValue:[decoder decodeIntForKey:[@"preTriggerDelay"          stringByAppendingFormat:@"%d",chan]]];
-
+        [self setAdcOffset:chan             toValue:[decoder decodeIntForKey:[@"adcOffset" stringByAppendingFormat:@"%d",chan]]];
+        [self setAdcGain:chan               toValue:[decoder decodeIntForKey:[@"adcGain" stringByAppendingFormat:@"%d",chan]]];
+        
     }
     
     sampleLengths = 			[[decoder decodeObjectForKey:@"sampleLengths"]retain];
@@ -5697,7 +5983,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         
         [encoder encodeInt:gain[chan]                   forKey:[@"Gain"                 stringByAppendingFormat:@"%d",chan]];
         [encoder encodeInt:preTriggerDelays[chan]       forKey:[@"preTriggerDelay"      stringByAppendingFormat:@"%d",chan]];
-
+        
+        
+        [encoder encodeInt:adcOffset[chan]              forKey:[@"adcOffset"            stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:adcGain[chan]                forKey:[@"adcGain"              stringByAppendingFormat:@"%d",chan]];
     }
     int i;
     for (i=0; i<kNumSIS3305Groups; i++) {

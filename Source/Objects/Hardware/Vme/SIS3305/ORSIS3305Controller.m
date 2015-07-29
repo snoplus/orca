@@ -295,9 +295,15 @@
                          name: ORSIS3305TestModeChanged
                        object: model];
 
+    [notifyCenter addObserver: self
+                     selector: @selector(adcOffsetChanged:)
+                         name: ORSIS3305AdcOffsetChanged
+                       object: model];
     
-    
-    
+    [notifyCenter addObserver: self
+                     selector: @selector(adcGainChanged:)
+                         name: ORSIS3305AdcGainChanged
+                       object: model];
     
     
     [notifyCenter addObserver : self
@@ -565,6 +571,9 @@
 	[self firmwareVersionChanged:nil];
 	[self clockSourceChanged:nil];
 	[self pulseModeChanged:nil];
+
+    [self adcGainChanged:nil];
+    [self adcOffsetChanged:nil];
 }
 
 #pragma mark - Interface Management
@@ -838,6 +847,30 @@
     [testMode58PU selectItemAtIndex:[model testMode:1]];
 }
 
+- (void) adcOffsetChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3305Channels;i++){
+        if (i<4)
+            [[offset14Matrix cellWithTag:i] setIntValue:[model adcOffset:i]];
+        else if (i >= 4)
+            [[offset58Matrix cellWithTag:(i-4)] setIntValue:[model adcOffset:i]];
+    }
+}
+
+- (void) adcGainChanged:(NSNotification*)aNote
+{
+    short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
+    short chan;
+    for (chan=0; chan<chPerGroup; chan++) {
+//        [[GTThresholdOff14Matrix cellWithTag:chan]      setIntValue:[model GTThresholdOff:chan]];
+//        [[GTThresholdOff58Matrix cellWithTag:(chan)]  setIntValue:[model GTThresholdOff:(chan+4)]];
+        
+        [[gain14Matrix cellWithTag:chan] setIntValue:[model adcGain:chan]];
+        [[gain58Matrix cellWithTag:(chan)] setIntValue:[model adcGain:(chan+4)]];
+
+    }
+}
 
 
 
@@ -1048,7 +1081,7 @@
 
 - (void) GTThresholdOnChanged:(NSNotification*)aNote
 {
-    // This method combins 1-4 and 5-8.
+    // This method combines 1-4 and 5-8.
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
     short chan;
     for (chan=0; chan<chPerGroup; chan++) {
@@ -1059,7 +1092,7 @@
 
 - (void) GTThresholdOffChanged:(NSNotification*)aNote
 {
-    // This method combins 1-4 and 5-8.
+    // This method combines 1-4 and 5-8.
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
     short chan;
     for (chan=0; chan<chPerGroup; chan++) {
@@ -1630,7 +1663,9 @@
 {
 //    int chan;
     BOOL mode;
-    unsigned short chan = [sender selectedCel];
+    
+    // FIX: Does this work?
+    unsigned short chan = [[sender selectedCell] tag];
 //    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
         mode = [[sender selectedCell] state];
         [model setLemoOutSelectTrigger:(chan+4) toState:mode];
@@ -1981,6 +2016,37 @@
 }
 
 
+- (IBAction) adcGain14Action:(id)sender
+{
+    unsigned short chan = [[sender selectedCell] tag];
+    unsigned short value = [sender intValue];
+    
+    [model setAdcGain:chan toValue:value];
+}
+
+- (IBAction) adcGain58Action:(id)sender
+{
+    unsigned short chan = 4 + [[sender selectedCell] tag];
+    unsigned short value = [sender intValue];
+    
+    [model setAdcGain:chan toValue:value];
+}
+
+- (IBAction) adcOffset14Action:(id)sender
+{
+    unsigned short chan = [[sender selectedCell] tag];
+    unsigned short value = [sender intValue];
+    
+    [model setAdcOffset:chan toValue:value];
+}
+
+- (IBAction) adcOffset58Action:(id)sender
+{
+    unsigned short chan = 4 + [[sender selectedCell] tag];
+    unsigned short value = [sender intValue];
+    
+    [model setAdcOffset:chan toValue:value];
+}
 
 
 
