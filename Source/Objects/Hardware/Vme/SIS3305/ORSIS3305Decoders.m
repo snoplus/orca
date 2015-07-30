@@ -134,27 +134,28 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
         }
         else if(savingMode == 4){  // 1.25 Gsps Event fifo mode
-            [recordAsData setLength:(waveformLength*3)];  // there are 3 samples in each Long of the waveform
+            [recordAsData setLength:(waveformLength*3*2)];  // length in bytes! there are 3 samples in each Long of the waveform
             unsigned long* lptr = (unsigned long*)&ptr[orcaHeaderLength + sisHeaderLength]; // skip ORCA header + SIS header
             int i=0;
-            unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+            unsigned short* waveData = [recordAsData mutableBytes];
             int waveformIndex = 0;
-            // here `i` increments through each word in the data
-            //
-            
+            // here `i` increments through each long word in the data
             do{
                 waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
                 waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
                 waveData[waveformIndex++] = (lptr[i])       &0x3ff;
                 i++;
-            }while (waveformIndex < waveformLength*3);
+            }while (waveformIndex < waveformLength*3*2);
+            NSLog(@"Final waveform index: %d, final 'i' (Lwords): %d\n",waveformIndex,i);
+            NSLog(@"    [recordAsData length] = %d bytes\n",[recordAsData length]);
+            
         }
         else if(savingMode == 0){  // 1 x 5 Gsps Event fifo mode
             
             
             
 //            unsigned long numBlocks = (ptr[6]&0xFFFF);
-            [recordAsData setLength:waveformLength*3];
+            [recordAsData setLength:waveformLength*3*2];    // length is in bytes (hence 2)
             
             if (rate == 2) { // 5gsps
                 // if we're reading out at 5 gsps, we have to unpack and de-interlace all four of the 4-word blocks at once...
@@ -206,7 +207,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
         }
         else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
-            [recordAsData setLength:3*length];
+            [recordAsData setLength:3*2*length];
             unsigned long* lptr = (unsigned long*)&ptr[3 + sisHeaderLength]; //ORCA header + SIS header
             int i = 0;
             unsigned short* waveData = (unsigned short*)[recordAsData bytes];
@@ -254,7 +255,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         
         if(recordAsData)[aDataSet loadWaveform:recordAsData
                         offset: 0 //bytes!
-                      unitSize: 2 //unit size in bytes! 10 bits needs 2 bytes
+                      unitSize: sizeof( unsigned short ) //unit size in bytes! 10 bits needs 2 bytes
                         sender: self  
                       withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
     }

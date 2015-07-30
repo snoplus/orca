@@ -41,15 +41,38 @@ uint32_t ORSIS3305Card::GetADCBufferRegisterOffset(size_t channel)
 
 bool ORSIS3305Card::Start()
 {
-	//---------------------------------------------------------------------------
-	//special mode. 
-	fProcessPulse = false;
-	fPulseMode = GetDeviceSpecificData()[6];
-	//---------------------------------------------------------------------------
 	
-	DisarmAndArmBank(2);
-	DisarmAndArmBank(1);
+//	DisarmAndArmBank(2);
+//	DisarmAndArmBank(1);
 	//bank one is armed are taking data
+    
+    
+    int group;
+    for(group=0;group<kNumSIS3305Groups;group++){
+        unsigned long sisHeaderLength = 4;  // 4 long words in the normal sis headers
+        
+        //                long sisHeaderLength = 2;
+        //                if(wrapMaskForRun & (1L<<group))
+        //                     sisHeaderLength = 4; // 32-bit Lwords
+        
+        orcaHeaderLength = 3;   // 3 words in the Orca header
+        
+        // data record length is the length without the Orca header (how much we will read)
+        // total record length is how much space it will take on disk (with Orca header)
+        dataRecordLength[group] = kSISHeaderSizeInLongs + [self longsInSample:group];
+        totalRecordLength[group] = dataRecordLength[group] + kOrcaHeaderInLongs;
+        
+        dataRecord[group]		= malloc((totalRecordLength[group])*sizeof(unsigned long));
+    }
+    isRunning = YES;
+    firstTime = NO;
+    
+    [self enableSampleLogic];
+    [self pulseExternalTriggerOut];     // this may or may not be desired
+
+    
+    
+    
 	return true;
 }
 
@@ -86,18 +109,7 @@ bool ORSIS3305Card::IsEvent()
 			((data_rd & bankMask) == bankMask);
 }
 
-bool ORSIS3305Card::SetupPageReg()
-{
-	uint32_t data_wr;				
-	if (fBankOneArmed)  data_wr = 0x4;	// Bank 1 is armed and bank two must be read 
-	else				data_wr = 0x0;	// Bank 2 is armed and bank one must be read
-	uint32_t addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
-	if (VMEWrite(addr,GetAddressModifier(), GetDataWidth(),data_wr) != sizeof(data_wr)){
-		LogBusError("Page Reg Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno)); 
-		return false;
-	}
-	else return true;
-}
+
 
 bool ORSIS3305Card::resetSampleLogic()
 {
@@ -111,7 +123,13 @@ bool ORSIS3305Card::resetSampleLogic()
 }
 
 bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/) 
-{		
+{
+    uint32_t dataId            = GetHardwareMask()[0];
+    uint32_t locationMask      = ((GetCrate() & 0xf)<<21) |
+    ((GetSlot() & 0x1f)<<16);
+    uint32_t onlineMask        = GetDeviceSpecificData()[0];
+    uint32_t firstAdcRegOffset = GetDeviceSpecificData()[2];
+    uint8_t  shipTimeStamp     = GetDeviceSpecificData()[3];
 	//---------------------------------------------------------------------------
 	//special run mode. If in the pulse mode we will only read one bank one time the SBC is unpaused.
 	if(fPulseMode && !fProcessPulse)return true;
@@ -252,30 +270,46 @@ void ORSIS3305Card::ReadOutChannel(size_t channel)
 	}
 }
 
-bool ORSIS3305Card::DisarmAndArmBank(size_t bank) 
+
+bool ORSIS3305Card::armSampleLogic()
 {
-	time(&fLastBankSwitchTime);
-	fWaitingForSomeChannels = true;
-	fChannelsToReadMask = 0xff;
-    uint32_t addr;
-	fBankOneArmed = (bank==1);
-    if (bank==1) addr = GetBaseAddress() + 0x420;
-    else		 addr = GetBaseAddress() + 0x424;
-	
-    if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), (uint32_t) 0x0) == sizeof(uint32_t)){
-		return SetupPageReg();
-	}
-	else {
-		LogBusError("Bank Arm Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno)); 
-		return false;
-	}
-	
-	
+    uint32_t addr = kSIS3305KeyArmSampleLogic;
+    uint32_t data_wr = 1;
+    
+    if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), data_wr) != sizeof(data_wr)) {
+        LogBusError("Arm Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        return false;
+    }
 }
 
-bool ORSIS3305Card::DisarmAndArmNextBank()
-{ 	
-	if(fBankOneArmed)	return DisarmAndArmBank(2);
-	else				return DisarmAndArmBank(1);
+bool ORSIS3305Card::enableSampleLogic()
+{
+    uint32_t addr = kSIS3305KeyEnableSampleLogic;
+    uint32_t data_wr = 1;
+    
+    if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), data_wr) != sizeof(data_wr)) {
+        LogBusError("Enable Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        return false;
+    }
+}
+bool ORSIS3305Card::disarmSampleLogic()
+{
+    uint32_t addr = kSIS3305KeyDisarmSampleLogic;
+    uint32_t data_wr = 1;
+    
+    if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), data_wr) != sizeof(data_wr)) {
+        LogBusError("Disarm/Disable Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        return false;
+    }
+}
+
+
+unsigned long longsInSample()
+{
+    unsigned long value;
+    unsigned long sampleLength;
+    unsigned short rate;
+    
+    
 }
 

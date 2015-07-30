@@ -5807,13 +5807,26 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		configStruct->card_info[index].crate					= [self crateNumber];
 		configStruct->card_info[index].add_mod					= [self addressModifier];
 		configStruct->card_info[index].base_add					= [self baseAddress];
-		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength:0]/2;
-		configStruct->card_info[index].deviceSpecificData[1]	= [self sampleLength:1]/2;
-		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
-		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
-//		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
-		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
-		configStruct->card_info[index].deviceSpecificData[6]	= [self pulseMode];
+        
+        configStruct->card_info[index].deviceSpecificData[0]    = [self longsInSample:0];
+        configStruct->card_info[index].deviceSpecificData[1]    = [self longsInSample:1];
+        
+        configStruct->card_info[index].deviceSpecificData[2]    = [self channelMode:0];
+        configStruct->card_info[index].deviceSpecificData[3]    = [self channelMode:1];
+
+        configStruct->card_info[index].deviceSpecificData[4]    = [self digitizationRate:0];
+        configStruct->card_info[index].deviceSpecificData[5]    = [self digitizationRate:1];
+        
+        configStruct->card_info[index].deviceSpecificData[6]    = [self eventSavingMode:0];
+        configStruct->card_info[index].deviceSpecificData[7]    = [self eventSavingMode:1];
+        
+//		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength:0]/2;
+//		configStruct->card_info[index].deviceSpecificData[1]	= [self sampleLength:1]/2;
+//		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
+//		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
+////		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
+//		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
+//		configStruct->card_info[index].deviceSpecificData[6]	= [self pulseMode];
 		
 		configStruct->card_info[index].num_Trigger_Indexes		= 0;
 		
