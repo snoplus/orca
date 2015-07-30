@@ -96,7 +96,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     unsigned short savingMode = ShiftAndExtract(ptr[1], 4, 0xF);
 	BOOL wrapMode		= ShiftAndExtract(ptr[1],0,0x1);
     //   unsigned int channel    = ShiftAndExtract(ptr[3], 28, 0xF);     // event ID (meaning depends on mode...) FIX: This isn't actually the channel!!
-    unsigned long dataLength = ptr[2];
+    unsigned long dataLength = ptr[2];      // SIS header + data length, in longs
 
     // extract things from the SIS header
     unsigned short eventID = ShiftAndExtract(ptr[3], 28, 0xF);
@@ -113,11 +113,12 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 	long sisHeaderLength;
 	if(wrapMode)sisHeaderLength = 16;
 	else		sisHeaderLength = 4;
+    unsigned long orcaHeaderLength = 3;
     
-    unsigned long waveformLength = ptr[2]-3; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
+    unsigned long waveformLength = dataLength-sisHeaderLength; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
 
     if(waveformLength /*&& (waveformLength == (length - 3))*/){ // this is a sanity check that we have data and it is the size we expect
-        NSMutableData*  recordAsData = [NSMutableData dataWithCapacity:waveformLength*3*8];
+        NSMutableData*  recordAsData = [NSMutableData dataWithCapacity:(waveformLength*3*8)];
         if(wrapMode){
             unsigned long nof_wrap_samples = ptr[6] ;
             if(nof_wrap_samples <= waveformLength*3){
@@ -133,18 +134,20 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
         }
         else if(savingMode == 4){  // 1.25 Gsps Event fifo mode
-            [recordAsData setLength:waveformLength*3];  // FIX: check vars
-            unsigned long* lptr = (unsigned long*)&ptr[3 + sisHeaderLength]; // skip ORCA header + SIS header
-            int i;
+            [recordAsData setLength:(waveformLength*3)];  // there are 3 samples in each Long of the waveform
+            unsigned long* lptr = (unsigned long*)&ptr[orcaHeaderLength + sisHeaderLength]; // skip ORCA header + SIS header
+            int i=0;
             unsigned short* waveData = (unsigned short*)[recordAsData bytes];
             int waveformIndex = 0;
             // here `i` increments through each word in the data
             //
-            for(i=0;i<waveformLength;i++){
+            
+            do{
                 waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
                 waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
-                waveData[waveformIndex++] = (lptr[i])       &0x3ff;            
-            }
+                waveData[waveformIndex++] = (lptr[i])       &0x3ff;
+                i++;
+            }while (waveformIndex < waveformLength*3);
         }
         else if(savingMode == 0){  // 1 x 5 Gsps Event fifo mode
             
@@ -248,7 +251,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         
         if(recordAsData)[aDataSet loadWaveform:recordAsData
                         offset: 0 //bytes!
-                      unitSize: 2 //unit size in bytes!
+                      unitSize: 2 //unit size in bytes! 10 bits needs 2 bytes
                         sender: self  
                       withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
     }

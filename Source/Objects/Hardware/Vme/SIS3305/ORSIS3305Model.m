@@ -1357,8 +1357,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setSampleLength:(short)group withValue:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:group withValue:[self sampleLength:group]];
-    aValue = [self limitIntValue:aValue min:4 max:0xfffc];
-    aValue = (aValue/4)*4;
+
+    
+    // FIX: are these limits correctly handled?
+    if ([self eventSavingMode:group] <= 4 ) {
+        aValue = [self limitIntValue:aValue min:4 max:0xff];
+    }
+    else if([self eventSavingMode:group] >4){
+        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
+    }
+    
+//    aValue = (aValue/4)*4;  // FIX: What is this for again?
+    
     [sampleLengths replaceObjectAtIndex:group withObject:[NSNumber numberWithInt:aValue]];
 //    [self calculateSampleValues];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305SampleLengthChanged object:self];
@@ -1503,46 +1513,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelRunModeChanged object:self];
 //	[self calculateSampleValues];
 }
-//
-//- (int) energySampleLength {
-//    return energySampleLength;
-//}
-//
-//- (void) setEnergySampleLength:(int)aEnergySampleLength
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setEnergySampleLength:energySampleLength];
-//    energySampleLength = [self limitIntValue:aEnergySampleLength min:0 max:kSIS3305MaxEnergyWaveform];
-//	[self calculateSampleValues];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergySampleLengthChanged object:self];
-//}
-//
-//- (int) energyTauFactor:(short)aChannel 
-//{ 
-//	if(aChannel>=kNumSIS3305Channels)return 0;
-//	return [[energyTauFactors objectAtIndex:aChannel] intValue];
-//}
-//- (void) setEnergyTauFactor:(short)aChannel withValue:(int)aValue
-//{
-//	if(aChannel>=kNumSIS3305Channels)return;
-//    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyTauFactor:aChannel withValue:[self energyTauFactor:aChannel]];
-//    int energyTauFactor = [self limitIntValue:aValue min:0 max:0x3f];
-//	[energyTauFactors replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:energyTauFactor]];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyTauFactorChanged object:self];
-//}
-//- (int) energyGapTime:(short)aGroup 
-//{ 
-//	if(aGroup>=kNumSIS3305Groups)return 0;
-//	return [[energyGapTimes objectAtIndex:aGroup] intValue]; 
-//}
-//- (void) setEnergyGapTime:(short)aGroup withValue:(int)aValue
-//{
-//	if(aGroup>=kNumSIS3305Groups)return;
-//    [[[self undoManager] prepareWithInvocationTarget:self] setEnergyGapTime:aGroup withValue:[self energyGapTime:aGroup]];
-//    aValue = [self limitIntValue:aValue min:0 max:0xff];
-//	[energyGapTimes replaceObjectAtIndex:aGroup withObject:[NSNumber numberWithInt:aValue]];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelEnergyGapTimeChanged object:self];
-//}
-
 
 - (int) triggerGateLength:(short)aGroup 
 {
@@ -1551,6 +1521,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 - (void) setTriggerGateLength:(short)aGroup withValue:(int)aTriggerGateLength
 {
+    
+    //FIX: THIS isn't currently used, I don't think
+    
+    
 	if(aGroup>kNumSIS3305Groups)return;
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerGateLength:aGroup withValue:[self triggerGateLength:aGroup]];
 	if (aTriggerGateLength < [self sampleLength:aGroup]) aTriggerGateLength = [self sampleLength:aGroup];
@@ -1564,7 +1538,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
  //   if(aChannel>kNumSIS3305Channels)return 0; //FIX: set this up to use the array, or change the other bits to use this object
 //    int value  = [[preTriggerDelays objectAtIndex:aChannel] intValue];
     
-    return preTriggerDelays[aChannel];
+    return ringbufferPreDelay[aChannel];
     
  //   return value;
 }
@@ -1583,7 +1557,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //	}
 //	[preTriggerDelays replaceObjectAtIndex:aChannel withObject:[NSNumber numberWithInt:preTriggerDelay]];
     
-    preTriggerDelays[aChannel] = preTriggerDelay;
+    ringbufferPreDelay[aChannel] = preTriggerDelay;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelPreTriggerDelayChanged object:self];
 }
@@ -4031,7 +4005,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     usingAddSpace: 0x01];
     
     if (mode == 0 || mode == 1 || mode == 4)
-        length = value&0xFF;        // F^2 = 7:0
+        length = value&0xFF;        // FF = 7:0
     
     if (mode == 6 || mode == 7)
         length = value&0xFFFFFF;    // F^6 = 23:0
@@ -4070,15 +4044,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     if (mode == 0 || mode == 1 || mode == 4)
     {
         if (value > 0xFF)
+        {
             NSLog(@"SIS3305: The sample length value you tried to write was too large for this mode (mode %d). It will clip!!!\n",mode);
-        
+            value = 0xFF;
+        }
         value = value&0xFF;        // F^2 = 7:0
     }
     
     if (mode == 6 || mode == 7)
         if (value > 0xFFFFFF)
+        {
             NSLog(@"SIS3305: The sample length value you tried to write was too large for this mode (mode %d). It will clip!!!\n",mode);
-        value = value&0xFFFFFF;    // F^6 = 23:0
+            value = 0xFFFFFF;
+        }
+            value = value&0xFFFFFF;    // F^6 = 23:0
     
     
     [[self adapter] writeLongBlock:&value
@@ -4163,7 +4142,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (unsigned long) getRingbufferPretriggerDelayOffset:(int) aChannel
 {
-    // FIX: I don't think this should be used anywhere and can be deleted
+    // FIX: I don't think this should be used anywhere and can be deleted - actually, not true... reconsidering...
     switch (aChannel) {
         case 0: return kSIS3305RingbufferPreDelayADC12;
         case 1: return kSIS3305RingbufferPreDelayADC12;
@@ -4207,54 +4186,73 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return delay;       // raw value, not converted to take into account the rate
 }
 
-- (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value
-{
-    // to handle this, we need to know all of the values ahead of time (so we don't write 0 to the chan shared in the same reg)
-    // to do this, we will pull from an object ringbufferPreDelay[chan]
-    // FIX: this method needs no inputs....
-    
-    
-    unsigned long addr, writeValue, topVal, bottomVal;
-    unsigned short topChan, bottomChan;
-    
-    addr = [self getRingbufferPretriggerDelayOffset:chan];
-
-    if((chan%2) == 0)     // channel number is 2,4,6,8
-    {
-        topChan     = chan - 1;
-        bottomChan  = chan;
-    }
-    else if((chan%2) == 1)     // channel number is 1,3,5,7
-    {
-        topChan     = chan;
-        bottomChan  = chan + 1;
-    }
-    else
-    {
-        NSLog(@"SIS3305: Invalid channel (%d). Pretrigger delay not written!\n", chan);
-        return;
-    }
-    
-    topVal = ringbufferPreDelay[topChan];
-    bottomVal = ringbufferPreDelay[bottomChan];
-    
-    writeValue = (topVal << 16) | (bottomVal);
-
-    
-    [[self adapter] writeLongBlock:&writeValue
-                         atAddress:[self baseAddress] + addr
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-    return;
-}
+//- (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value
+//{
+//    // to handle this, we need to know all of the values ahead of time (so we don't write 0 to the chan shared in the same reg)
+//    // to do this, we will pull from an object ringbufferPreDelay[chan]
+//    // FIX: this method needs no inputs....
+//    
+//    
+//    unsigned long addr, writeValue, topVal, bottomVal;
+//    unsigned short topChan, bottomChan;
+//    
+//    addr = [self getRingbufferPretriggerDelayOffset:chan];
+//    chan = chan + 1; // these are referred to in a 1-index way....
+//    
+//    if((chan%2) == 0)     // channel number is 2,4,6,8
+//    {
+//        topChan     = chan - 1;
+//        bottomChan  = chan;
+//    }
+//    else if((chan%2) == 1)     // channel number is 1,3,5,7
+//    {
+//        topChan     = chan;
+//        bottomChan  = chan + 1;
+//    }
+//    else
+//    {
+//        NSLog(@"SIS3305: Invalid channel (%d). Pretrigger delay not written!\n", chan);
+//        return;
+//    }
+//    
+//    topVal = ringbufferPreDelay[topChan];
+//    bottomVal = ringbufferPreDelay[bottomChan];
+//    
+//    writeValue = (topVal << 16) | (bottomVal);
+//
+//    
+//    [[self adapter] writeLongBlock:&writeValue
+//                         atAddress:[self baseAddress] + addr
+//                        numToWrite:1
+//                        withAddMod:[self addressModifier]
+//                     usingAddSpace:0x01];
+//    
+//    return;
+//}
 
 - (void) writeRingbufferPretriggerDelays
 {
-    unsigned short chan;
-    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
-        [self writeRingbufferPretriggerDelayOnChannel:chan toValue:[self preTriggerDelay:chan]];
+//    unsigned short chan;
+//    unsigned long delayValue;
+    unsigned long writeValue[4];
+    unsigned long addr;
+
+//    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+//        delayValue = [self preTriggerDelay:chan];
+//        [self writeRingbufferPretriggerDelayOnChannel:chan toValue:delayValue];
+//    }
+//    
+    unsigned short i;
+    for (i = 0; i<4; i++) {
+        writeValue[i] = (ringbufferPreDelay[2*i] << 16) | ringbufferPreDelay[(2*i)+1];
+        addr = [self getRingbufferPretriggerDelayOffset:2*i];
+        [[self adapter] writeLongBlock:&writeValue[i]
+                             atAddress:[self baseAddress] + addr
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                         usingAddSpace:0x01];
+        
+        //[self writeToAddress:addr aValue:writeValue[i]];
     }
 }
 
@@ -4965,6 +4963,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
     [self writeLEMOTriggerOutSelect];
+    
+    [self writeRingbufferPretriggerDelays];
+    
 //    [self disarmAndArmBank:0];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305CardInited object:self];
@@ -5187,11 +5188,19 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
     // Sample length is number of 128-bit (4-word) blocks minutes 1.
     // Higher sample rates interlace between 
+    unsigned long value;
+    unsigned long multiplier;
     
     unsigned long sampleLength = [self sampleLength:group];     // number of 128-bit blocks minus 1
     unsigned short rate = [self digitizationRate:group];
+    // 'rate' carries a value of one of the following:
+    //      0: 1.25 Ghz
+    //      1: 2.5 Gsps
+    //      2: 5 Gsps
+    multiplier = (rate+1)*4;
+    value = (sampleLength+1) * multiplier;
     
-    return (sampleLength+1)*( 4*(rate+1) );
+    return value;
 }
 
 
@@ -5551,9 +5560,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         if(firstTime){
             int group;
             for(group=0;group<kNumSIS3305Groups;group++){
-                long sisHeaderLength = 2;
-                if(wrapMaskForRun & (1L<<group))
-                    sisHeaderLength = 4; // 32-bit Lwords
+                unsigned long sisHeaderLength = 4;  // 4 long words in the normal sis headers
+
+//                long sisHeaderLength = 2;
+//                if(wrapMaskForRun & (1L<<group))
+//                     sisHeaderLength = 4; // 32-bit Lwords
                 
                 orcaHeaderLength = 3;   // 3 words in the Orca header
                 
@@ -5568,7 +5579,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             firstTime = NO;
             
             [self enableSampleLogic];
-            [self pulseExternalTriggerOut];
+            [self pulseExternalTriggerOut];     // this may or may not be desired
             
             
 //            
@@ -5650,14 +5661,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 
                 numberBytesToRead[group] = [self readActualSampleAddress:group];
                 numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
-                
+                numberBytesToRead[group]   = numberOfWords[group] * 4;
+
                 // we can only readout at max one full buffer at once
                 if (numberOfWords[group] > adcBufferLength) {
                     numberOfWords[group] = adcBufferLength;
                 }
                 
-                numberBytesToRead[group]   = numberOfWords[group] * 4;
-                    
+                
                 if(numberBytesToRead[group] > 0){
                     unsigned long addrOffset = 0;
                     int eventCount			 = 0;
@@ -5686,7 +5697,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         
                         [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
                         
-                        addrOffset += (dataRecordLength[group]-orcaHeaderLength)*4;
+                        addrOffset += (dataRecordLength[group])*4;
                         if(++eventCount > 25)break;
                     } while (addrOffset < sampleAddress[group]);
                 }
@@ -5987,7 +5998,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [encoder encodeInt:GTThresholdOff[chan]         forKey:[@"GTThresholdOff"		stringByAppendingFormat:@"%d",chan]];
         
         [encoder encodeInt:gain[chan]                   forKey:[@"Gain"                 stringByAppendingFormat:@"%d",chan]];
-        [encoder encodeInt:preTriggerDelays[chan]       forKey:[@"preTriggerDelay"      stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:ringbufferPreDelay[chan]       forKey:[@"preTriggerDelay"      stringByAppendingFormat:@"%d",chan]];
         
         
         [encoder encodeInt:adcOffset[chan]              forKey:[@"adcOffset"            stringByAppendingFormat:@"%d",chan]];
@@ -6089,7 +6100,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     // channel level params for those stored as c-arrays
     for (i=0; i<kNumSIS3305Channels; i++) {
-        [objDictionary setObject:[NSNumber numberWithInteger:preTriggerDelays[i]]		forKey:[@"preTriggerDelays" stringByAppendingFormat:@"%d",i]];
+        [objDictionary setObject:[NSNumber numberWithInteger:ringbufferPreDelay[i]]		forKey:[@"preTriggerDelays" stringByAppendingFormat:@"%d",i]];
     }
     
 	[objDictionary setObject: [NSNumber numberWithLong:bufferWrapEnabledMask]		forKey:@"bufferWrapEnabledMask"];
