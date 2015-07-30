@@ -248,6 +248,9 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
             
         }
+//        unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+//        NSLog(@"         waveData[0,10,20,100] = (%d,%d,%d,%d)\n",waveData[0],waveData[10],waveData[20],waveData[100]);
+        
         
         if(recordAsData)[aDataSet loadWaveform:recordAsData
                         offset: 0 //bytes!
@@ -262,22 +265,52 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 	
-	//TODO ---- 
-	/*
-	 ptr++;
-	 NSString* title= @"SIS3305 Waveform Record\n\n";
-	 NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-	 NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	 NSString* moduleID = (*ptr&0x1)?@"SIS3301":@"SIS3305";
-	 ptr++;
-	 NSString* triggerWord = [NSString stringWithFormat:@"TriggerWord  = 0x08%x\n",*ptr];
-	 ptr++;
-	 NSString* Event = [NSString stringWithFormat:@"Event  = 0x%08x\n",(*ptr>>24)&0xff];
-	 NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x%08x\n",*ptr&0xffffff];
+ //   unsigned long length= ExtractLength(ptr[0]);
+    unsigned int crateNum	= ShiftAndExtract(ptr[1],28,0xf);
+    unsigned int cardNum	= ShiftAndExtract(ptr[1],20,0x1f);
+    unsigned short channelModeNum = ShiftAndExtract(ptr[1], 16, 0xF);
+    unsigned int groupNum	= ShiftAndExtract(ptr[1],12,0xf);
+    unsigned short rateNum = ShiftAndExtract(ptr[1], 8, 0xF);
+    unsigned short savingModeNum = ShiftAndExtract(ptr[1], 4, 0xF);
+ //   BOOL wrapMode		= ShiftAndExtract(ptr[1],0,0x1);
+    
+    
+//	 ptr++;
+    NSString* title= @"SIS3305 Waveform Record\n\n";
+    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",crateNum];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",cardNum];
+    NSString* group  = [NSString stringWithFormat:@"Group  = %d\n",groupNum];
+    NSString* rate  = [NSString stringWithFormat:@"Rate  = %d\n",rateNum];
+    NSString* savingMode  = [NSString stringWithFormat:@"SavingMode  = %d\n",savingModeNum];
+    NSString* channelMode  = [NSString stringWithFormat:@"Channel Mode  = %d\n",channelModeNum];
+
 	 
-	 return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];       
-	 */
-	return @"Description not implemented yet";
+    unsigned long timestampLow = ptr[4];
+    unsigned long timestampHigh = ptr[3]&0xFFFF;
+    unsigned long long timestamp = timestampLow | (timestampHigh << 31);
+    NSString* timeStamp = [NSString stringWithFormat:@"Timestamp:\n  0x%llx\n",timestamp];
+    
+    
+    NSString* rawHeader = @"Raw header:\n";
+    unsigned int i;
+    for(i=0;i<4;i++){
+        NSString* tmp = [NSString stringWithFormat:@"%03d: 0x%08lx \n",i,(*ptr++)];
+        rawHeader = [rawHeader stringByAppendingString:tmp];
+    }
+    rawHeader = [rawHeader stringByAppendingString:@"\n"];
+
+    
+    
+    NSString* raw = @"Raw data:\n";
+    for(i=0;i<100;i++){
+        NSString* tmp1 = [NSString stringWithFormat:@"%03d: 0x%04lx, ",i,(((*ptr++)>>20)&0x3ff)];
+        NSString* tmp2 = [NSString stringWithFormat:@"0x%04lx, ",(((*ptr++)>>10)&0x3ff)];
+        NSString* tmp3 = [NSString stringWithFormat:@"0x%04lx \n",(((*ptr++)>>00)&0x3ff)];
+        raw = [raw stringByAppendingString:[tmp1 stringByAppendingString:[tmp2 stringByAppendingString:tmp3]]];
+    }
+
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@",title,crate,card,group,rate,savingMode,channelMode,timeStamp,rawHeader,raw];
+    
 }
 @end
 

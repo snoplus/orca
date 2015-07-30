@@ -5610,24 +5610,24 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             
             bool endAddThreshFlag = NO;
-            unsigned long sampleAddress14 = 0;
-            unsigned long sampleAddress58 = 0;
-            unsigned long endThresh14 = 0;
-            unsigned long endThresh58 = 0;
-            unsigned long sampleStatus14 = 0;
-            unsigned long sampleStatus58 = 0;
-            unsigned long value1 = 0;
-            unsigned long value2 = 0;
+//            unsigned long sampleAddress14 = 0;
+//            unsigned long sampleAddress58 = 0;
+//            unsigned long endThresh14 = 0;
+//            unsigned long endThresh58 = 0;
+//            unsigned long sampleStatus14 = 0;
+//            unsigned long sampleStatus58 = 0;
+//            unsigned long value1 = 0;
+//            unsigned long value2 = 0;
 
             ac =              [self readAcquisitionControl:NO];
-            sampleAddress14 = [self readActualSampleAddress:0];
-            sampleAddress58 = [self readActualSampleAddress:1];
-            endThresh14     = [self readEndAddressThresholdOfGroup:0];
-            endThresh58     = [self readEndAddressThresholdOfGroup:1];
-            sampleStatus14  = [self readSamplingStatusForGroup:0];
-            sampleStatus58  = [self readSamplingStatusForGroup:1];
-            value1          = [self readActualSampleValueOfChannel:0];
-            value2          = [self readActualSampleValueOfChannel:1];
+//            sampleAddress14 = [self readActualSampleAddress:0];
+//            sampleAddress58 = [self readActualSampleAddress:1];
+//            endThresh14     = [self readEndAddressThresholdOfGroup:0];
+//            endThresh58     = [self readEndAddressThresholdOfGroup:1];
+//            sampleStatus14  = [self readSamplingStatusForGroup:0];
+//            sampleStatus58  = [self readSamplingStatusForGroup:1];
+//            value1          = [self readActualSampleValueOfChannel:0];
+//            value2          = [self readActualSampleValueOfChannel:1];
             
             endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
             
@@ -5636,7 +5636,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             }
             
             // disarm/disable sampling?
-//            [self disarmSampleLogic];
+            [self disarmSampleLogic];
             
             //if we get here, there may be something to read out
             unsigned long sampleAddress[kNumSIS3305Groups];
@@ -5693,7 +5693,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
                                             numToRead: dataRecordLength[group]
                                            withAddMod: [self addressModifier]
-                                        usingAddSpace: 0x01];
+                                        usingAddSpace: 0xFF];
                         
                         [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
                         
@@ -5704,12 +5704,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             } // loop over groups
             
             // after reading out everything:
-            [self writeRingbufferPretriggerDelays];
+//            [self writeRingbufferPretriggerDelays];
             
             // refresh ringbuffer predelay?
             // key arm/enable again
-            [self armSampleLogic];
             [self enableSampleLogic];
+            [self armSampleLogic];
+            
 		}   // End if: not first time
 	}   // end TRY
 	@catch(NSException* localException) {
