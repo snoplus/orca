@@ -29,28 +29,28 @@
 #define kSIS3305ADCFpgaReset                        0x434   /* write only D32 */
 #define kSIS3305ADCExternalTriggerOutPulse          0x43C   /* write only D32 */
 
-#pragma mark - Event Configuration Registers
+// Event Configuration Registers
 #define kSIS3305EventConfigADC14                    0x2000  /* read/write */
 #define kSIS3305EventConfigADC58                    0x3000  /* read/write */
 
 
-#pragma mark - Sample Memory Start Address Registers
+// Sample Memory Start Address Registers
 #define kSIS3305SampleStartAddressADC14             0x2004
 #define kSIS3305SampleStartAddressADC58             0x3004
 
-#pragma mark - Sample/Extended Block Length Registers
+// Sample/Extended Block Length Registers
 #define kSIS3305SampleLengthADC14                   0x2008
 #define kSIS3305SampleLengthADC58                   0x3008
 
-#pragma mark - Direct Memory Stop Pretrigger Block Length Registers
+//vDirect Memory Stop Pretrigger Block Length Registers
 #define kSIS3305SamplePretriggerLengthADC14         0x200C
 #define kSIS3305SamplePretriggerLengthADC58         0x300C
 
-#pragma mark - Direct Memory Max Nof Events Registers
+// Direct Memory Max Nof Events Registers
 #define kSIS3305MaxNofEventsADC14                   0x2018
 #define kSIS3305MaxNofEventsADC58                   0x3018
 
-#pragma mark - End Address Threshold registers
+// End Address Threshold registers
 #define kSIS3305EndAddressThresholdADC14            0x201C
 #define kSIS3305EndAddressThresholdADC58            0x301C
 
@@ -84,22 +84,52 @@ public:
 
 	
 protected:
-	virtual uint32_t GetPreviousBankSampleRegisterOffset(size_t channel);
-	virtual uint32_t GetADCBufferRegisterOffset(size_t channel);
-	
+
+
+    /*
+     unsigned long*  dataRecord[kNumSIS3305Groups];
+     unsigned long   dataRecordLength[kNumSIS3305Groups];
+     unsigned long   orcaHeaderLength;
+     unsigned long   totalRecordLength[kNumSIS3305Groups];
+     */
+//    virtual uint32_t*   dataRecord[2]; // 2 groups to read out
+ //   virtual uint32_t    dataRecordLength[2];
+//    virtual uint32_t    totalRecordLength[2];
+    
 	virtual inline uint32_t GetAcquisitionControl()		{ return 0x10; }
 	virtual inline uint32_t GetADCMemoryPageRegister()	{ return 0x34; }
 	virtual inline uint32_t GetDataWidth()				{ return 0x4; }
 	virtual inline  size_t  GetNumberOfChannels()		{ return kNumberOfChannels; }
 	
-
+    // things that access the card info struct
+    /*
+    virtual uint32_t longsInSample(uint8_t);
+    virtual uint32_t GetChannelMode(uint8_t);
+    virtual uint32_t GetDigitizationRate(uint8_t);
+    virtual uint32_t GetEventSavingMode(uint8_t);
+*/
+    // things for reading/writing to HW
+    virtual bool writeDataTransferControlReg(uint8_t, uint8_t, uint32_t);
+    virtual uint32_t readActualSampleAddress(uint8_t);
+    
+    // things that look things up
+    virtual uint32_t GetFIFOAddressOffset(uint8_t group);
+    
+    // other class methods
 	virtual bool IsEvent();
 	virtual void ReadOutChannel(size_t channel);
-	virtual bool resetSampleLogic();
-	
-	bool     fPulseMode;
-	bool     fProcessPulse;
-	bool	 fWaitingForSomeChannels;
-	uint32_t fChannelsToReadMask;
+//	virtual bool resetSampleLogic();
+    virtual bool armSampleLogic();
+    virtual bool enableSampleLogic();
+    virtual bool disarmSampleLogic();
+    
+    // handy class variables
+    bool        firstTime;
 	uint32_t dmaBuffer[0x200000]; //2M Longs (8MB)
+    //	bool        fPulseMode;
+    //	bool        fProcessPulse;
+    //	bool        fWaitingForSomeChannels;
+    //	uint32_t fChannelsToReadMask;
+    
+    
 };
