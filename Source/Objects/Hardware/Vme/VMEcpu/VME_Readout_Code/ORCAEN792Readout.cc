@@ -18,7 +18,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
     uint16_t status2;
     int32_t result;
 	uint32_t dataId             = GetHardwareMask()[0];
-	uint32_t locationMask       = ((GetCrate() & 0x01e)<<21) | ((GetSlot() & 0x0000001f)<<16);
+	uint32_t locationMask       = ((GetCrate() & 0x0f)<<21) | ((GetSlot() & 0x0000001f)<<16);
     //uint32_t modelType          = GetDeviceSpecificData()[0];
     uint32_t status1Address     = GetDeviceSpecificData()[1];
     uint32_t status2Address     = GetDeviceSpecificData()[2];

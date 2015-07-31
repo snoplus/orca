@@ -39,8 +39,8 @@
     short i;
     long* ptr = (long*) aSomeData;
 	long length = ExtractLength(ptr[0]);
-    int crate = ShiftAndExtract(ptr[1],21,0x0000000f);
-    int card  = ShiftAndExtract(ptr[1],16,0x0000001f);
+    int crate = ShiftAndExtract(ptr[1],21,0xf);
+    int card  = ShiftAndExtract(ptr[1],16,0x1f);
     
 	NSString* crateKey = [self getCrateKey:crate];
 	NSString* cardKey  = [self getCardKey: card];
