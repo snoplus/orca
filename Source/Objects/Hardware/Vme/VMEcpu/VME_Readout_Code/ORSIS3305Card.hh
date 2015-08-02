@@ -10,30 +10,8 @@
 //
 //#define kSIS3305ADCSerialInterfaceReg               0x74    /* read/write D32 */
 //
-//
-//
-//
-//
-//// Event Configuration Registers
-//#define kSIS3305EventConfigADC14                    0x2000  /* read/write */
-//#define kSIS3305EventConfigADC58                    0x3000  /* read/write */
-//
-//
-//// Sample Memory Start Address Registers
-//#define kSIS3305SampleStartAddressADC14             0x2004
-//#define kSIS3305SampleStartAddressADC58             0x3004
-//
-//// Sample/Extended Block Length Registers
-//#define kSIS3305SampleLengthADC14                   0x2008
-//#define kSIS3305SampleLengthADC58                   0x3008
-//
-////vDirect Memory Stop Pretrigger Block Length Registers
-//#define kSIS3305SamplePretriggerLengthADC14         0x200C
-//#define kSIS3305SamplePretriggerLengthADC58         0x300C
-//
-//// Direct Memory Max Nof Events Registers
-//#define kSIS3305MaxNofEventsADC14                   0x2018
-//#define kSIS3305MaxNofEventsADC58                   0x3018
+
+
 //
 //
 //
@@ -87,7 +65,23 @@ public:
         kSIS3305EndAddressThresholdADC58    = 0x301C,
 
         kSIS3305Space1ADCDataFIFOCh14       = 0x8000,
-        kSIS3305Space1ADCDataFIFOCh58       = 0xC000
+        kSIS3305Space1ADCDataFIFOCh58       = 0xC000,
+        
+        //// Sample Memory Start Address Registers
+        kSIS3305SampleStartAddressADC14     = 0x2004,
+        kSIS3305SampleStartAddressADC58     = 0x3004,
+        //
+        //// Sample/Extended Block Length Registers
+        kSIS3305SampleLengthADC14           = 0x2008,
+        kSIS3305SampleLengthADC58           = 0x3008,
+        //
+        ////vDirect Memory Stop Pretrigger Block Length Registers
+        kSIS3305SamplePretriggerLengthADC14 = 0x200C,
+        kSIS3305SamplePretriggerLengthADC58 = 0x300C,
+        //
+        //// Direct Memory Max Nof Events Registers
+        kSIS3305MaxNofEventsADC14           = 0x2018,
+        kSIS3305MaxNofEventsADC58           = 0x3018
     };
     
 

@@ -5659,7 +5659,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //                int group				 = i<4?0:1;
                 unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
                 
-                numberBytesToRead[group] = [self readActualSampleAddress:group];
+//                numberBytesToRead[group] = [self readActualSampleAddress:group];
                 numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
                 numberBytesToRead[group]   = numberOfWords[group] * 4;
 
@@ -5668,7 +5668,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     numberOfWords[group] = adcBufferLength;
                 }
                 
-                
                 if(numberBytesToRead[group] > 0){
                     unsigned long addrOffset = 0;
                     int eventCount			 = 0;
@@ -5676,7 +5675,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     do {
                         BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
                         
-                        dataRecord[group][0] =   dataId | totalRecordLength[group];
+                        dataRecord[group][0] =   dataId | numberBytesToRead[group]; //totalRecordLength[group];
                         
                         dataRecord[group][1] =	(([self crateNumber]            & 0xf) << 28)   |
                                                 (([self slot]                   & 0x1f)<< 20)   |
@@ -5695,11 +5694,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                            withAddMod: [self addressModifier]
                                         usingAddSpace: 0xFF];
                         
+                        NSLog(@"ORSIS3305Model:takeData - Event read out and added to frame buffer.\n");
                         [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
-                        
+
                         addrOffset += (dataRecordLength[group])*4;
                         if(++eventCount > 25)break;
-                    } while (addrOffset < sampleAddress[group]);
+                    } while (addrOffset < numberBytesToRead[group]);
                 }
             } // loop over groups
             
