@@ -230,6 +230,9 @@
 - (void) bandwidthChanged:(NSNotification*)aNote;
 - (void) testModeChanged:(NSNotification*)aNote;
 
+- (void) adcOffsetChanged:(NSNotification*)aNote;
+- (void) adcGainChanged:(NSNotification*)aNote;
+- (void) adcPhaseChanged:(NSNotification*)aNote;
 
 
 
@@ -384,7 +387,8 @@
 - (IBAction) adcGain58Action:(id)sender;
 - (IBAction) adcOffset14Action:(id)sender;
 - (IBAction) adcOffset58Action:(id)sender;
-
+- (IBAction) adcPhase14Action:(id)sender;
+- (IBAction) adcPhase58Action:(id)sender;
 
 
 //- (IBAction) thresholdModeAction:(id)sender;

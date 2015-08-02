@@ -67,7 +67,7 @@
     unsigned short  testMode[kNumSIS3305Groups];
     unsigned long   adcOffset[kNumSIS3305Channels];
     unsigned long   adcGain[kNumSIS3305Channels];
-    
+    unsigned long   adcPhase[kNumSIS3305Channels];
     
     short			internalTriggerEnabledMask;
     short			externalTriggerEnabledMask;
@@ -302,7 +302,7 @@
 
 
 - (unsigned short) sampleLength:(short)group;
-- (void) setSampleLength:(short)group withValue:(int)aValue;
+- (void) setSampleLength:(short)group withValue:(unsigned long)aValue;
 
 - (int)  triggerGateLength:(short)group;
 - (void) setTriggerGateLength:(short)group withValue:(int)aTriggerGateLength;
@@ -379,7 +379,8 @@
 - (void) setAdcOffset:(unsigned short)chan toValue:(unsigned long)value;
 - (unsigned long) adcGain:(unsigned short)chan;
 - (void) setAdcGain:(unsigned short)chan toValue:(unsigned long)value;
-
+- (unsigned long) adcPhase:(unsigned short)chan;
+- (void) setAdcPhase:(unsigned short)chan toValue:(unsigned long)value;
 
 
 
@@ -611,9 +612,16 @@
 - (unsigned long) readADCControlReg:(bool)verbose;
 - (void) writeADCSerialChannelSelect:(unsigned short)chan;
 - (unsigned long) readADCSerialChannelSelect:(unsigned short)adc;
+
 - (unsigned long) readADCOffset:(unsigned short)chan;
 - (void) writeADCOffsets;
+- (unsigned long) readADCGain:(unsigned short)chan;
+- (void) writeADCGains;
+- (unsigned long) readADCPhase:(unsigned short)chan;
+- (void) writeADCPhase;
+
 - (void) applyADCCalibration:(unsigned short)adc;
+- (unsigned long) validateSerialADCCalibration;
 
 
 
@@ -856,6 +864,7 @@ extern NSString* ORSIS3305BandwidthChanged;
 extern NSString* ORSIS3305TestModeChanged;
 extern NSString* ORSIS3305AdcOffsetChanged;
 extern NSString* ORSIS3305AdcGainChanged;
+extern NSString* ORSIS3305AdcPhaseChanged;
 
 
 //extern NSString* ORSIS3305ControlLemoTriggerOut;

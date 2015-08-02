@@ -125,7 +125,7 @@ NSString* ORSIS3305BandwidthChanged     = @"ORSIS3305BandwidthChanged";
 NSString* ORSIS3305TestModeChanged      = @"ORSIS3305TestModeChanged";
 NSString* ORSIS3305AdcOffsetChanged     = @"ORSIS3305AdcOffsetChanged";
 NSString* ORSIS3305AdcGainChanged       = @"ORSIS3305AdcGainChanged";
-
+NSString* ORSIS3305AdcPhaseChanged      = @"ORSIS3305AdcPhaseChanged";
 
 //NSString* ORSIS3305ModelLemoOutSelectTriggerChanged = @"ORSIS3305ModelLemoOutSelectTriggerChanged";
 //NSString* ORSIS3305ModelLemoOutSelectTriggerInChanged = @"ORSIS3305ModelLemoOutSelectTriggerInChanged";
@@ -1354,18 +1354,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return [[sampleLengths objectAtIndex:group] unsignedShortValue];
 }
 
-- (void) setSampleLength:(short)group withValue:(int)aValue
+- (void) setSampleLength:(short)group withValue:(unsigned long)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:group withValue:[self sampleLength:group]];
 
     
     // FIX: are these limits correctly handled?
-    if ([self eventSavingMode:group] <= 4 ) {
-        aValue = [self limitIntValue:aValue min:4 max:0xff];
-    }
-    else if([self eventSavingMode:group] >4){
-        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
-    }
+//    if ([self eventSavingMode:group] <= 4 ) {
+//        aValue = [self limitIntValue:aValue min:4 max:0xff];
+//    }
+//    else if([self eventSavingMode:group] >4){
+//        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
+//    }
     
 //    aValue = (aValue/4)*4;  // FIX: What is this for again?
     
@@ -1433,6 +1433,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setAdcOffset:(unsigned short)chan toValue:(unsigned long)value
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAdcOffset:chan toValue:adcOffset[chan]];
+    
+    if(value>0x3FF)
+        value = 0x3ff;
+    
     adcOffset[chan] = value;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305AdcOffsetChanged object:self];
 
@@ -1445,11 +1449,30 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) setAdcGain:(unsigned short)chan toValue:(unsigned long)value
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAdcGain:chan toValue:adcGain[chan]];
+    
+    if(value>0x3FF)
+        value = 0x3ff;
+
     adcGain[chan] = value;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305AdcGainChanged object:self];
     
 }
 
+- (unsigned long) adcPhase:(unsigned short)chan{
+    return adcPhase[chan];
+}
+
+- (void) setAdcPhase:(unsigned short)chan toValue:(unsigned long)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcPhase:chan toValue:adcPhase[chan]];
+    
+    if(value>0x3FF)
+        value = 0x3ff;
+    
+    adcPhase[chan] = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305AdcPhaseChanged object:self];
+    
+}
 
 
 #pragma mark -- Unsorted 
@@ -1661,6 +1684,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         
         [self setAdcGain:i toValue:0x200];
         [self setAdcOffset:i toValue:0x200];
+        [self setAdcPhase:i toValue:0x200];
 
 	}
 	for(i=0;i<kNumSIS3305Groups;i++){
@@ -3444,6 +3468,169 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
 }
 
+- (unsigned long) readADCGain:(unsigned short)chan
+{
+    // this reads from 0x23 of the ADC, the "Offset Register", a read only reg
+    unsigned short adcChan,adc;
+    
+    unsigned long writeValue = 0;
+    unsigned long readValue = 0;
+    
+    unsigned long addr;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    unsigned short maxPolls = 100;
+    unsigned long readCount = 0;
+    BOOL logicBusy;
+    
+    adcChan = chan%4;       // the relative channel on each ADC
+    adc = (chan-adcChan)/4;     // the adc the channel is on
+    
+    addr = 0x23;    // gain reg
+    RWcmd = 0x0;    // read command
+    
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+                | ((addr    &0x7F)  << 16)
+                | ((adc     & 0x1)  << 24);
+    
+    [self writeADCSerialChannelSelect:chan];
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    
+    do {
+        readCount++;
+        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+    }
+    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
+    if (logicBusy == YES) {
+        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+        return 0x0;
+    }
+    
+    return  readValue;
+}
+
+- (void) writeADCGains
+{
+    unsigned long writeValue = 0;
+    unsigned long writeData = 0;
+    
+    unsigned long addr, adc;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    unsigned short adcChan,chan;
+    
+    
+    addr = 0x22;    // External Gain register
+    RWcmd = 0x1;    // write command
+    
+    // 16-bit value written to the SPI chip
+    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+        adcChan = chan%4;       // the relative channel on each ADC
+        adc = (chan-adcChan)/4;     // the adc the channel is on
+        
+        [self writeADCSerialChannelSelect:chan];
+        
+        writeData = (([self adcGain:chan]   & 0x3FF)  << 0);
+        
+        // 32-bit value written to full digitizer register
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+        | ((addr    &0x7F)  << 16)
+        | ((adc     & 0x1)  << 24)
+        | ((writeData&0xFFFF) << 0);
+        
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+
+        // next, force the ADC to pull in these values as the "calibration"
+        [self applyADCCalibration:adc];
+    }
+    
+    [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
+}
+
+
+- (unsigned long) readADCPhase:(unsigned short)chan
+{
+    // this reads from 0x23 of the ADC, the "Offset Register", a read only reg
+    unsigned short adcChan,adc;
+    
+    unsigned long writeValue = 0;
+    unsigned long readValue = 0;
+    
+    unsigned long addr;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    unsigned short maxPolls = 100;
+    unsigned long readCount = 0;
+    BOOL logicBusy;
+    
+    adcChan = chan%4;       // the relative channel on each ADC
+    adc = (chan-adcChan)/4;     // the adc the channel is on
+    
+    addr = 0x25;    // gain reg
+    RWcmd = 0x0;    // read command
+    
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24);
+    
+    [self writeADCSerialChannelSelect:chan];
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    
+    do {
+        readCount++;
+        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
+    }
+    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
+    if (logicBusy == YES) {
+        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
+        return 0x0;
+    }
+    
+    return  readValue;
+}
+
+- (void) writeADCPhase
+{
+    unsigned long writeValue = 0;
+    unsigned long writeData = 0;
+    
+    unsigned long addr, adc;
+    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    
+    unsigned short adcChan,chan;
+    
+    
+    addr = 0x24;    // External Gain register
+    RWcmd = 0x1;    // write command
+    
+    // 16-bit value written to the SPI chip
+    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+        adcChan = chan%4;       // the relative channel on each ADC
+        adc = (chan-adcChan)/4;     // the adc the channel is on
+        
+        [self writeADCSerialChannelSelect:chan];
+        
+        writeData = (([self adcPhase:chan]   & 0x3FF)  << 0);
+        
+        // 32-bit value written to full digitizer register
+        writeValue =  ((RWcmd   & 0x1)  << 23)
+        | ((addr    &0x7F)  << 16)
+        | ((adc     & 0x1)  << 24)
+        | ((writeData&0xFFFF) << 0);
+        
+        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        
+        // next, force the ADC to pull in these values as the "calibration"
+        [self applyADCCalibration:adc];
+    }
+    
+    [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
+}
+
 
 - (void) applyADCCalibration:(unsigned short)adc
 {
@@ -3458,27 +3645,76 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      0xA8 = b 1010 1000
      */
     
-    unsigned long writeValue = 0;
-    unsigned long writeData = 0;
+    unsigned long writeValue = 0;   // 32-bit value written to full digitizer register
+    unsigned long writeData = 0;    // 16 bit value written to ADC chip
     
-    unsigned long addr;
+    unsigned long addr;         // address in ADC chip
     unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
     
     
     addr = 0x10;    // calibration control reg
     RWcmd = 0x1;    // write
     
-    writeData = 0xA8;    // force external offset adjust for selected channel
-    
-    // 32-bit value written to full digitizer register
+    writeData = 0x8;    // force external offset adjust for selected channel
+
     writeValue =  ((RWcmd   & 0x1)  << 23)
     | ((addr    &0x7F)  << 16)
     | ((adc     & 0x1)  << 24)
     | ((writeData&0xFFFF) << 0);
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
     
+    
+    writeData = 0x20;    // force external gain adjust for selected channel
+    
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24)
+    | ((writeData&0xFFFF) << 0);
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+ 
+    
+    writeData = 0x80;    // force external phase adjust for selected channel
+    
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24)
+    | ((writeData&0xFFFF) << 0);
     [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
 
+    
+    [self validateSerialADCCalibration];
     return;
+}
+
+
+- (unsigned long) validateSerialADCCalibration
+{
+    // here I put in some error checking to make sure that the values "stick" and are actually written
+    unsigned short chan;
+    unsigned long error = 0;
+    for (chan=0; chan<8; chan++) {
+        if([self readADCGain:chan] != [self adcGain:chan])
+        {
+            NSLogColor([NSColor redColor], @"SIS3305 (slot %d) did not correctly write ADC gain of channel %d. \n",[self slot],chan);
+            error++;
+        }
+        if([self readADCPhase:chan] != [self adcPhase:chan])
+        {
+            NSLogColor([NSColor redColor], @"SIS3305 (slot %d) did not correctly write ADC phase of channel %d. \n",[self slot],chan);
+            error++;
+        }
+        if([self readADCOffset:chan] != [self adcOffset:chan])
+        {
+            NSLogColor([NSColor redColor], @"SIS3305 (slot %d) did not correctly write ADC offset of channel %d. \n",[self slot],chan);
+            error++;
+        }
+    }
+    if (error > 0)
+    {
+        NSLogColor([NSColor redColor], @"SIS3305 (slot %d) had %d values that did not get correctly written to the ADC. \n",[self slot],error);
+        
+    }
+    return error;
 }
 
 
@@ -4958,6 +5194,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [self writeADCControlReg];              // set up the bandwidth, channel mode etc.
     [self writeADCOffsets];
+    [self writeADCGains];
+    [self writeADCPhase];
     
 
 	[self writeAcquisitionControl];			// set up the Acquisition Register
@@ -5612,8 +5850,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             bool endAddThreshFlag = NO;
 //            unsigned long sampleAddress14 = 0;
 //            unsigned long sampleAddress58 = 0;
-//            unsigned long endThresh14 = 0;
-//            unsigned long endThresh58 = 0;
+            unsigned long endThresh14 = 0;
+            unsigned long endThresh58 = 0;
 //            unsigned long sampleStatus14 = 0;
 //            unsigned long sampleStatus58 = 0;
 //            unsigned long value1 = 0;
@@ -5622,8 +5860,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             ac =              [self readAcquisitionControl:NO];
 //            sampleAddress14 = [self readActualSampleAddress:0];
 //            sampleAddress58 = [self readActualSampleAddress:1];
-//            endThresh14     = [self readEndAddressThresholdOfGroup:0];
-//            endThresh58     = [self readEndAddressThresholdOfGroup:1];
+            endThresh14     = [self readEndAddressThresholdOfGroup:0];
+            endThresh58     = [self readEndAddressThresholdOfGroup:1];
 //            sampleStatus14  = [self readSamplingStatusForGroup:0];
 //            sampleStatus58  = [self readSamplingStatusForGroup:1];
 //            value1          = [self readActualSampleValueOfChannel:0];
@@ -5634,6 +5872,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             if (endAddThreshFlag == NO) {
                 return;
             }
+            
+            NSLog(@"End Address Threshold 0: 0x%x\n",endThresh14);
+            NSLog(@"End Address Threshold 1: 0x%x\n",endThresh58);
             
             // disarm/disable sampling?
             [self disarmSampleLogic];
@@ -5942,8 +6183,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setGTThresholdOff:chan        withValue:[decoder decodeIntForKey:[@"GTThresholdOff"           stringByAppendingFormat:@"%d",chan]]];
 
         [self setPreTriggerDelay:chan       withValue:[decoder decodeIntForKey:[@"preTriggerDelay"          stringByAppendingFormat:@"%d",chan]]];
-        [self setAdcOffset:chan             toValue:[decoder decodeIntForKey:[@"adcOffset" stringByAppendingFormat:@"%d",chan]]];
-        [self setAdcGain:chan               toValue:[decoder decodeIntForKey:[@"adcGain" stringByAppendingFormat:@"%d",chan]]];
+        [self setAdcOffset:chan             toValue:[decoder decodeIntForKey:[@"adcOffset"                  stringByAppendingFormat:@"%d",chan]]];
+        [self setAdcGain:chan               toValue:[decoder decodeIntForKey:[@"adcGain"                    stringByAppendingFormat:@"%d",chan]]];
+        [self setAdcPhase:chan              toValue:[decoder decodeIntForKey:[@"adcPhase"                   stringByAppendingFormat:@"%d",chan]]];
         
     }
     
@@ -6017,6 +6259,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         
         [encoder encodeInt:adcOffset[chan]              forKey:[@"adcOffset"            stringByAppendingFormat:@"%d",chan]];
         [encoder encodeInt:adcGain[chan]                forKey:[@"adcGain"              stringByAppendingFormat:@"%d",chan]];
+        [encoder encodeInt:adcPhase[chan]               forKey:[@"adcPhase"             stringByAppendingFormat:@"%d",chan]];
+
     }
     int i;
     for (i=0; i<kNumSIS3305Groups; i++) {
@@ -6115,6 +6359,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     // channel level params for those stored as c-arrays
     for (i=0; i<kNumSIS3305Channels; i++) {
         [objDictionary setObject:[NSNumber numberWithInteger:ringbufferPreDelay[i]]		forKey:[@"preTriggerDelays" stringByAppendingFormat:@"%d",i]];
+
+        [objDictionary setObject:[NSNumber numberWithInteger:adcGain[i]]		forKey:[@"adcGain" stringByAppendingFormat:@"%d",i]];
+        [objDictionary setObject:[NSNumber numberWithInteger:adcPhase[i]]		forKey:[@"adcPhase" stringByAppendingFormat:@"%d",i]];
+        [objDictionary setObject:[NSNumber numberWithInteger:adcOffset[i]]		forKey:[@"adcOffset" stringByAppendingFormat:@"%d",i]];
+        
     }
     
 	[objDictionary setObject: [NSNumber numberWithLong:bufferWrapEnabledMask]		forKey:@"bufferWrapEnabledMask"];

@@ -305,6 +305,10 @@
                          name: ORSIS3305AdcGainChanged
                        object: model];
     
+    [notifyCenter addObserver: self
+                     selector: @selector(adcPhaseChanged:)
+                         name: ORSIS3305AdcPhaseChanged
+                       object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(lemoOutSelectTriggerChanged:)
@@ -574,6 +578,7 @@
 
     [self adcGainChanged:nil];
     [self adcOffsetChanged:nil];
+    [self adcPhaseChanged:nil];
 }
 
 #pragma mark - Interface Management
@@ -863,15 +868,20 @@
     short chPerGroup = kNumSIS3305Channels/kNumSIS3305Groups;
     short chan;
     for (chan=0; chan<chPerGroup; chan++) {
-//        [[GTThresholdOff14Matrix cellWithTag:chan]      setIntValue:[model GTThresholdOff:chan]];
-//        [[GTThresholdOff58Matrix cellWithTag:(chan)]  setIntValue:[model GTThresholdOff:(chan+4)]];
-        
         [[gain14Matrix cellWithTag:chan] setIntValue:[model adcGain:chan]];
         [[gain58Matrix cellWithTag:(chan)] setIntValue:[model adcGain:(chan+4)]];
 
     }
 }
 
+- (void) adcPhaseChanged:(NSNotification*)aNote
+{
+    short i;
+    for (i=0; i<4; i++) {
+        [[phase14Matrix cellWithTag:i] setIntValue:[model adcPhase:i]];
+        [[phase58Matrix cellWithTag:i] setIntValue:[model adcPhase:(i+4)]];
+    }
+}
 
 
 - (void) internalGateEnabledChanged:(NSNotification*)aNote
@@ -2048,6 +2058,21 @@
     [model setAdcOffset:chan toValue:value];
 }
 
+- (IBAction) adcPhase14Action:(id)sender
+{
+    unsigned short chan = [[sender selectedCell] tag];
+    unsigned short value = [sender intValue];
+    
+    [model setAdcPhase:chan toValue:value];
+}
+
+- (IBAction) adcPhase58Action:(id)sender
+{
+    unsigned short chan = 4 + [[sender selectedCell] tag];
+    unsigned short value = [sender intValue];
+    
+    [model setAdcPhase:chan toValue:value];
+}
 
 
 

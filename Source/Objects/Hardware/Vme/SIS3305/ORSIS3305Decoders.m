@@ -183,10 +183,10 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                     unsigned short* waveData = (unsigned short*)[recordAsData bytes];
                     int waveformIndex = 0;
                     
-                    for(i=0;i<(waveformLength*3-48);i+=16)
+                    for(i=0;i<(waveformLength*3-48);i+=16) // i steps through the entire waveform
                     {
                         unsigned short k;
-                        for (k = 0; k<4; k++) {
+                        for (k = 0; k<4; k++) { // k steps through the 4-word block that each ADC produces
                             waveData[waveformIndex++] = (lptr[0+i+k]>>20)   &0x3ff;   // sample 1 + 12*k
                             waveData[waveformIndex++] = (lptr[8+i+k]>>20)   &0x3ff;   // sample 2 + 12*k
                             waveData[waveformIndex++] = (lptr[4+i+k]>>20)   &0x3ff;   // sample 3 + 12*k
@@ -232,7 +232,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 int waveformIndex = 0;
                 unsigned short k = 0;
                 //            for(i=0;i<2*waveformLength/3;i++){
-                for(i=0;i<(waveformLength-24);i+=7) {
+                for(i=0;i<(waveformLength*3-24);i+=7) {
                     // lptr[i] is at the first word of the 8x32-bit data block
                     for (k=0; k<4; k++ )
                     {
