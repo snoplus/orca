@@ -421,14 +421,14 @@
 		else {
 			//channel is on
 			[powerOnButton setEnabled:NO];
-			if([model voltage:selectedChannel]<10 && ![model channelIsRamping:selectedChannel]) [powerOffButton setEnabled:YES];
+			if(fabs([model voltage:selectedChannel])<10 && ![model channelIsRamping:selectedChannel]) [powerOffButton setEnabled:YES];
 			else [powerOffButton setEnabled:NO];
 			[panicButton setEnabled:YES];
 			[loadButton setEnabled:!constrainstsInPlace];
 			[stopRampButton setEnabled:[model channelIsRamping:selectedChannel]];
-			[rampToZeroButton setEnabled:voltage > 0];
+			[rampToZeroButton setEnabled:fabs(voltage) > 0];
 			[stateField setStringValue:@"ON"];
-			[panicButton setEnabled:voltage > 0];
+			[panicButton setEnabled:fabs(voltage) > 0];
 			[targetField setEnabled:!lockedOrRunningMaintenance];
 			[riseRateField setEnabled:!lockedOrRunningMaintenance];
 			[maxCurrentField setEnabled:!lockedOrRunningMaintenance];

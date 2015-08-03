@@ -444,7 +444,8 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
 		float voltage	= [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
-		if(voltage > 0)count++;
+        int state       = [self channel:i readParamAsInt:@"outputSwitch"];
+		if((state == kiSegHVCardOutputOn) && (fabs(voltage) > 1))count++;
 	}
 	return count;
 }
