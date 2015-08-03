@@ -943,7 +943,9 @@
 {
 	NSString* s = NodeValue(0);
 	s = [s stringByExpandingTildeInPath];
-	return [NSString stringWithContentsOfFile:s encoding:NSASCIIStringEncoding error:nil];
+	NSString* contents = [NSString stringWithContentsOfFile:s encoding:NSASCIIStringEncoding error:nil];
+    if([contents length])return contents;
+    else return @"";
 }
 
 - (id) requestFromUser:(id) p
@@ -1702,7 +1704,6 @@
 	if(![fm fileExistsAtPath:path]){
 		[fm createDirectoryAtPath:[path stringByDeletingLastPathComponent]  withIntermediateDirectories:YES attributes:nil error:nil];
 		[fm createFileAtPath:path contents:nil attributes:nil];
-
 	}
 	NSFileHandle* fp = [NSFileHandle fileHandleForUpdatingAtPath:path];
 	[fp seekToEndOfFile];
@@ -2052,7 +2053,8 @@
     self.title = aTitle;
     NSString* s = [[aString componentsSeparatedByString:@"\\n"] componentsJoinedByString:@"\n"]; //have to convert the newLine string into actual new line char
     self.confirmString = [[s componentsSeparatedByString:@"\\r"] componentsJoinedByString:@"\r"]; //have to convert the newLine string into actual new line char
-	return self;
+    [[self window] center];
+    return self;
 }
      
 - (void) dealloc
