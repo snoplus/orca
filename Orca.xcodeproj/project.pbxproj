@@ -2325,6 +2325,14 @@
 		84AB8BD40D2314DD00EC39F2 /* ORJAMFModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */; };
 		84AB8BD50D2314DD00EC39F2 /* ORJAMFModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */; };
 		84ABE7A319C896CE00BD8DC7 /* ORDataProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84ABE7A219C896CE00BD8DC7 /* ORDataProcessing.h */; };
+		84AC14DE1B70E2460071C4EF /* MjdDataScanner.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84AC14D61B70E2460071C4EF /* MjdDataScanner.gif */; };
+		84AC14DF1B70E2460071C4EF /* MjdDataScanner.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AC14D71B70E2460071C4EF /* MjdDataScanner.nib */; };
+		84AC14E01B70E2460071C4EF /* ORMjdFileReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC14D81B70E2460071C4EF /* ORMjdFileReader.h */; };
+		84AC14E11B70E2460071C4EF /* ORMjdFileReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC14D91B70E2460071C4EF /* ORMjdFileReader.m */; };
+		84AC14E21B70E2460071C4EF /* ORMjdDataScannerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC14DA1B70E2460071C4EF /* ORMjdDataScannerController.h */; };
+		84AC14E31B70E2460071C4EF /* ORMjdDataScannerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC14DB1B70E2460071C4EF /* ORMjdDataScannerController.m */; };
+		84AC14E41B70E2460071C4EF /* ORMjdDataScannerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC14DC1B70E2460071C4EF /* ORMjdDataScannerModel.h */; };
+		84AC14E51B70E2460071C4EF /* ORMjdDataScannerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC14DD1B70E2460071C4EF /* ORMjdDataScannerModel.m */; };
 		84AC6A510A34F9A800A0018E /* NcdPulseChannelsTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */; };
 		84AC6A520A34F9A900A0018E /* NcdPulseChannelsTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */; };
 		84AC6A530A34F9A900A0018E /* NcdPulseChannelsTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */; };
@@ -5661,6 +5669,14 @@
 		84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFModel.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.h; sourceTree = SOURCE_ROOT; };
 		84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFModel.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.m; sourceTree = SOURCE_ROOT; };
 		84ABE7A219C896CE00BD8DC7 /* ORDataProcessing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataProcessing.h; sourceTree = "<group>"; };
+		84AC14D61B70E2460071C4EF /* MjdDataScanner.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = MjdDataScanner.gif; sourceTree = "<group>"; };
+		84AC14D71B70E2460071C4EF /* MjdDataScanner.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MjdDataScanner.nib; sourceTree = "<group>"; };
+		84AC14D81B70E2460071C4EF /* ORMjdFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMjdFileReader.h; sourceTree = "<group>"; };
+		84AC14D91B70E2460071C4EF /* ORMjdFileReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMjdFileReader.m; sourceTree = "<group>"; };
+		84AC14DA1B70E2460071C4EF /* ORMjdDataScannerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMjdDataScannerController.h; sourceTree = "<group>"; };
+		84AC14DB1B70E2460071C4EF /* ORMjdDataScannerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMjdDataScannerController.m; sourceTree = "<group>"; };
+		84AC14DC1B70E2460071C4EF /* ORMjdDataScannerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMjdDataScannerModel.h; sourceTree = "<group>"; };
+		84AC14DD1B70E2460071C4EF /* ORMjdDataScannerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMjdDataScannerModel.m; sourceTree = "<group>"; };
 		84AC47601454BE5F009D6F83 /* Bug.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Bug.tif; sourceTree = "<group>"; };
 		84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdPulseChannelsTask.h; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.h; sourceTree = SOURCE_ROOT; };
 		84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NcdPulseChannelsTask.m; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.m; sourceTree = SOURCE_ROOT; };
@@ -7352,6 +7368,7 @@
 			isa = PBXGroup;
 			children = (
 				8402B5AB14C70522007999C1 /* MJDPreAmp */,
+				84AC14D51B70E2460071C4EF /* MjdDataScanner */,
 			);
 			name = "Majorana Hardware";
 			path = "Source/Objects/Custom Hardware/Majorana Hardware";
@@ -11378,6 +11395,21 @@
 			path = Source/Objects/Hardware/Camac/JAM_F;
 			sourceTree = SOURCE_ROOT;
 		};
+		84AC14D51B70E2460071C4EF /* MjdDataScanner */ = {
+			isa = PBXGroup;
+			children = (
+				84AC14D61B70E2460071C4EF /* MjdDataScanner.gif */,
+				84AC14D71B70E2460071C4EF /* MjdDataScanner.nib */,
+				84AC14D81B70E2460071C4EF /* ORMjdFileReader.h */,
+				84AC14D91B70E2460071C4EF /* ORMjdFileReader.m */,
+				84AC14DA1B70E2460071C4EF /* ORMjdDataScannerController.h */,
+				84AC14DB1B70E2460071C4EF /* ORMjdDataScannerController.m */,
+				84AC14DC1B70E2460071C4EF /* ORMjdDataScannerModel.h */,
+				84AC14DD1B70E2460071C4EF /* ORMjdDataScannerModel.m */,
+			);
+			path = MjdDataScanner;
+			sourceTree = "<group>";
+		};
 		84AC6A4D0A34F9A800A0018E /* PulseChannelsTask */ = {
 			isa = PBXGroup;
 			children = (
@@ -14332,6 +14364,7 @@
 				842A643B0700C01C007536B6 /* OROscDecoder.h in Headers */,
 				842A65740700D5FC007536B6 /* NcdDecoders.h in Headers */,
 				842A65BB0700E210007536B6 /* ORHPPulserDecoders.h in Headers */,
+				84AC14E41B70E2460071C4EF /* ORMjdDataScannerModel.h in Headers */,
 				84978A290701F02000B7887E /* ORDataGenDecoders.h in Headers */,
 				84978B4C0702190100B7887E /* ORDataTypeAssigner.h in Headers */,
 				84662A68070A3249001CDA7E /* BiStateView.h in Headers */,
@@ -15050,6 +15083,7 @@
 				8472AA7C12DB44B400DEEB02 /* ORMPodCController.h in Headers */,
 				8472AA7E12DB44B400DEEB02 /* ORMPodCModel.h in Headers */,
 				8438C37718451D6500A6F4D6 /* ORInvocationStep.h in Headers */,
+				84AC14E01B70E2460071C4EF /* ORMjdFileReader.h in Headers */,
 				8472AA8312DB44B400DEEB02 /* ORMPodMiniCrateController.h in Headers */,
 				8472AA8512DB44B400DEEB02 /* ORMPodMiniCrateModel.h in Headers */,
 				84BDF04312DC943700B974F8 /* ORSNMP.h in Headers */,
@@ -15184,6 +15218,7 @@
 				84913CA21538698000597004 /* OROutputCallBackController.h in Headers */,
 				84913CA41538698000597004 /* OROutputCallBackModel.h in Headers */,
 				84BBE097153CB5110084E6B1 /* ORTPG256AController.h in Headers */,
+				84AC14E21B70E2460071C4EF /* ORMjdDataScannerController.h in Headers */,
 				84BBE099153CB5110084E6B1 /* ORTPG256ADecoders.h in Headers */,
 				84BBE09B153CB5110084E6B1 /* ORTPG256AModel.h in Headers */,
 				84F3085215483A4000663573 /* ORMks660BController.h in Headers */,
@@ -15639,6 +15674,7 @@
 				840E001D0944B29000049827 /* SPDTRelayOff.tif in Resources */,
 				840E001E0944B29000049827 /* SPDTRelayOn.tif in Resources */,
 				840E00230944B29000049827 /* SPSTRelay.nib in Resources */,
+				84AC14DF1B70E2460071C4EF /* MjdDataScanner.nib in Resources */,
 				840E00270944B29000049827 /* AndGate.tif in Resources */,
 				840E002F0944B29000049827 /* ORGate.tif in Resources */,
 				84F16AF718900D530074B787 /* XTR6.nib in Resources */,
@@ -16075,6 +16111,7 @@
 				840AC63712639B92007B6CAF /* nTPCPadPositions.txt in Resources */,
 				2D24A8D0126F516D00BA2E2E /* IpeSimulation.nib in Resources */,
 				2D24A8D1126F516D00BA2E2E /* IpeSimulation.tif in Resources */,
+				84AC14DE1B70E2460071C4EF /* MjdDataScanner.gif in Resources */,
 				2D24A8D8126F516D00BA2E2E /* SimStart.tif in Resources */,
 				2D24A8D9126F516D00BA2E2E /* SimStop.tif in Resources */,
 				2D24A8DF126F543400BA2E2E /* Fieldline.gif in Resources */,
@@ -16414,6 +16451,7 @@
 				8434A30B055B3287002D3102 /* ORConnectionTask.m in Sources */,
 				8434A30C055B3287002D3102 /* ORSelectionTask.m in Sources */,
 				8434A30D055B3287002D3102 /* NetSocket.m in Sources */,
+				84AC14E31B70E2460071C4EF /* ORMjdDataScannerController.m in Sources */,
 				8434A311055B3287002D3102 /* ORTriggerController.m in Sources */,
 				8434A313055B3287002D3102 /* ORTriggerModel.m in Sources */,
 				8434A316055B3287002D3102 /* OR620Model.m in Sources */,
@@ -17132,6 +17170,7 @@
 				EFAC073211E9A6CB00336793 /* XL3_Link.m in Sources */,
 				EFAC074011E9A9DB00336793 /* XL3_LinkController.m in Sources */,
 				84EE03BF120AFA4400B804B3 /* ORInverterModel.m in Sources */,
+				84AC14E11B70E2460071C4EF /* ORMjdFileReader.m in Sources */,
 				840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */,
 				840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */,
 				84065D971226B600004E8970 /* ORPxi8336MacController.m in Sources */,
@@ -17286,6 +17325,7 @@
 				8415EB66152DF0970092C975 /* ORAdcProcessorModel.m in Sources */,
 				8491303415334EAA00597004 /* ORBitProcessorController.m in Sources */,
 				8491303615334EAA00597004 /* ORBitProcessorModel.m in Sources */,
+				84AC14E51B70E2460071C4EF /* ORMjdDataScannerModel.m in Sources */,
 				8491303815334EAA00597004 /* ORTwoBitProcessorController.m in Sources */,
 				8491303A15334EAA00597004 /* ORTwoBitProcessorModel.m in Sources */,
 				84913AC615376BBF00597004 /* ORMJDPreAmpDecoders.m in Sources */,
