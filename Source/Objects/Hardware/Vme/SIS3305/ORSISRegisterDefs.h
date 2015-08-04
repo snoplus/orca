@@ -32,8 +32,30 @@
 
 #define kSIS3305MaxEnergyWaveform	510
 
+
+//** These come from the example SIS code
+#define kSIS3305_HEADER_EVENT_ID_1_25G_ADC1				0x00000000
+#define kSIS3305_HEADER_EVENT_ID_1_25G_ADC2				0x10000000
+#define kSIS3305_HEADER_EVENT_ID_1_25G_ADC3				0x20000000
+#define kSIS3305_HEADER_EVENT_ID_1_25G_ADC4				0x30000000
+#define kSIS3305_HEADER_EVENT_ID_2_5G_ADC12				0x40000000
+#define kSIS3305_HEADER_EVENT_ID_2_5G_ADC34				0x50000000
+#define kSIS3305_HEADER_EVENT_ID_5G_ADC1234				0x70000000
+#define kSIS3305_HEADER_EVENT_ID_TDC						0x80000000
+
+#define kSIS3305_HEADER_EVENT_ID_DIRECT_MEMORY_START		0xC0000000	  // add 1.2.2011
+#define kSIS3305_HEADER_EVENT_ID_DIRECT_MEMORY_STOP		0xD0000000	  // add 1.2.2011
+
+#define kSIS3305_HEADER_EVENT_ID_MASK					0xf0000000
+#define kSIS3305_HEADER_EVENT_ID_END_MARKER				0xF0000000
+//**
+
+
 #define CSRMask(state,A) ((state)?(A):(A<<16))
 #define tempRawToC(value) ((float)((signed short)(value))) / 4 // method described in manual...
+
+
+
 
 
 // Config addresses
