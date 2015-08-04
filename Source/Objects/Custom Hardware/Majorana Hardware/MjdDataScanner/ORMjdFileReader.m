@@ -204,7 +204,7 @@
             
             if(gretinaEventsCount!=0){
                 NSLog(@"Total Gretina events: %d. (%d timestamps out of order)\n",gretinaEventsCount,gretinaOutOfOrderCount);
-                NSLog(@"Percent of timestamp out of order: %.2f%%\n",100.* gretinaOutOfOrderCount/(float)gretinaEventsCount);
+                NSLog(@"Percent of timestamps out of order: %.2f%%\n",100.* gretinaOutOfOrderCount/(float)gretinaEventsCount);
                 NSLog(@"Total Gretina events with obviously bad headers: %d.\n",badGretinaHeaderCount);
                 NSLog(@"Percent with bad headers: %.2f%%\n",100.* badGretinaHeaderCount/(float)gretinaEventsCount);
             }
@@ -263,7 +263,7 @@
                         lastTimeStamp[card][channel] = ledTimeStamp;
                     }
                     else {
-                        NSLog(@"timestamp out of order on %d,%d,%d at event %d\n",crate,card,channel,gretinaEventsCount);
+                        NSLog(@"gretina4M timestamp out of order on %d,%d,%d at event %d\n",crate,card,channel,gretinaEventsCount);
                         gretinaOutOfOrderCount++;
                    }
                 }
