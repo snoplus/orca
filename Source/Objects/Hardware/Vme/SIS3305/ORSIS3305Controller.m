@@ -1286,8 +1286,8 @@
     [forceTriggerButton			setEnabled:!lockedOrRunningMaintenance];
 	
 	[triggerGateLengthMatrix		setEnabled:!lockedOrRunningMaintenance];
-    [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
-    [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
+//    [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
+//    [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
 
 
     [clockSourcePU					setEnabled:!lockedOrRunningMaintenance];

@@ -85,13 +85,13 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
     
-    NSLog(@"ORSIS3305Decoders:decodeData - Decoder woken up.\n");
+//    NSLog(@"ORSIS3305Decoders:decodeData - Decoder woken up.\n");
 
     unsigned long* ptr	= (unsigned long*)someData;
     
     // extract things from the Orca header
-	unsigned long length= ExtractLength(ptr[0]);
-	unsigned int crate	= ShiftAndExtract(ptr[1],28,0xf);
+	unsigned long length= ExtractLength(ptr[0]);                // From Orca header, the SIS header + data length, in bytes
+    unsigned int crate	= ShiftAndExtract(ptr[1],28,0xf);
 	unsigned int card	= ShiftAndExtract(ptr[1],20,0x1f);
 
     // extract group level things from the SIS header
@@ -102,26 +102,35 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     unsigned short savingMode = ShiftAndExtract(ptr[1], 4, 0xF);
     BOOL wrapMode		= ShiftAndExtract(ptr[1],0,0x1);
     
-    unsigned long dataLength = ptr[2];      // SIS header + data length, in longs
+    unsigned long dataLength = ptr[2];                      // From Orca header, SIS header longs + longs in sample
 
-    unsigned short numEvents = (length-3)/(dataLength*4);
-    NSLog(@"    Expected numEvents to add: %d \n",numEvents);
+//    unsigned short numEvents = (length-3)/(dataLength*4);
+//    NSLog(@"    Expected numEvents to add: %d \n",numEvents);
     
 	long sisHeaderLength;
 	if(wrapMode)sisHeaderLength = 16;
 	else		sisHeaderLength = 4;
     unsigned long orcaHeaderLength = 3;
     
-    unsigned long waveformLength = dataLength-sisHeaderLength; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
+    unsigned long waveformLength = dataLength - sisHeaderLength; // this is the waveform + sisheader in longs.Each long word is 3 10 bit adc samples
     
-    unsigned long* dataPtr = ptr;
-    unsigned short n;
-    for(n=0;n<numEvents;n++)
-    {
-        dataLength = dataPtr[2];      // SIS header + data length, in longs
-
+    unsigned long* dataPtr = ptr+orcaHeaderLength;
+//    unsigned short n;
+//    for(n=0;n<numEvents;n++)
+    BOOL endFlag = NO;
+    while ((&dataPtr + dataLength < &ptr + length) && endFlag == NO) { // keep reading while the next waveform will not exceed the total packet length
+    
+        // dataRecordLength (ptr[2]) is the amount that was read out at once (the amount followed by the Orca header)
+        // 
+        
+        unsigned long dataLength = dataPtr[2];      // SIS header + data length, in longs
+        unsigned long nextRecordLength;
         unsigned long* nextRecordPtr = dataPtr + dataLength + orcaHeaderLength;
-
+        if(&nextRecordPtr + dataLength < &ptr + length)
+        {
+            nextRecordLength = nextRecordPtr[2];
+            endFlag = YES;
+        }
         //   unsigned int channel    = ShiftAndExtract(ptr[3], 28, 0xF);     // event ID (meaning depends on mode...) FIX: This isn't actually the channel!!
         
         // extract things from the SIS header
@@ -154,7 +163,8 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
             else if(savingMode == 4){  // 1.25 Gsps Event fifo mode
                 [recordAsData setLength:(waveformLength*3*2)];  // length in bytes! there are 3 samples in each Long of the waveform
-                unsigned long* lptr = (unsigned long*)&dataPtr[orcaHeaderLength + sisHeaderLength]; // skip ORCA header + SIS header
+                unsigned long dl = dataPtr[2];   // data length of this sample, in blocks
+                unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
                 int i=0;
                 unsigned short* waveData = [recordAsData mutableBytes];
                 int waveformIndex = 0;
@@ -164,9 +174,10 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                     waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
                     waveData[waveformIndex++] = (lptr[i])       &0x3ff;
                     i++;
-                }while (waveformIndex < waveformLength*3*2);
+                }while (waveformIndex < dl*12);
+//            }while (waveformIndex < waveformLength*3);
 //                NSLog(@"ORSIS3305Decoders:decodeData - Event being decoded.\n");
-                
+            
 //                NSLog(@"    Final waveform index: %d, final 'i' (Lwords): %d\n",waveformIndex,i);
 //                NSLog(@"    [recordAsData length] = %d bytes\n",[recordAsData length]);
                 
@@ -243,34 +254,10 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                         waveData[waveformIndex++] = (lptr[0+i+k])       &0x3ff;   // sample 5
                         waveData[waveformIndex++] = (lptr[4+i+k])       &0x3ff;   // sample 6
                     }
-                    //                waveData[waveformIndex++] = (lptr[1+i]>>20)   &0x3ff;   // sample 7
-                    //                waveData[waveformIndex++] = (lptr[5+i]>>20)   &0x3ff;   // sample 8
-                    //                waveData[waveformIndex++] = (lptr[1+i]>>10)   &0x3ff;   // sample 9
-                    //                waveData[waveformIndex++] = (lptr[5+i]>>10)   &0x3ff;   // sample 10
-                    //                waveData[waveformIndex++] = (lptr[1+i])       &0x3ff;   // sample 11
-                    //                waveData[waveformIndex++] = (lptr[5+i])       &0x3ff;   // sample 12
-                    //
-                    //                waveData[waveformIndex++] = (lptr[2+i]>>20)   &0x3ff;   // sample 13
-                    //                waveData[waveformIndex++] = (lptr[6+i]>>20)   &0x3ff;   // sample 14
-                    //                waveData[waveformIndex++] = (lptr[2+i]>>10)   &0x3ff;   // sample 15
-                    //                waveData[waveformIndex++] = (lptr[6+i]>>10)   &0x3ff;   // sample 16
-                    //                waveData[waveformIndex++] = (lptr[2+i])       &0x3ff;   // sample 17
-                    //                waveData[waveformIndex++] = (lptr[6+i])       &0x3ff;   // sample 18
-                    //
-                    //                waveData[waveformIndex++] = (lptr[3+i]>>20)   &0x3ff;   // sample 19
-                    //                waveData[waveformIndex++] = (lptr[7+i]>>20)   &0x3ff;   // sample 20
-                    //                waveData[waveformIndex++] = (lptr[3+i]>>10)   &0x3ff;   // sample 21
-                    //                waveData[waveformIndex++] = (lptr[7+i]>>10)   &0x3ff;   // sample 22
-                    //                waveData[waveformIndex++] = (lptr[3+i])       &0x3ff;   // sample 23
-                    //                waveData[waveformIndex++] = (lptr[7+i])       &0x3ff;   // sample 24
-                    //
                 }
                 
             }
-            //        unsigned short* waveData = (unsigned short*)[recordAsData bytes];
-            //        NSLog(@"         waveData[0,10,20,100] = (%d,%d,%d,%d)\n",waveData[0],waveData[10],waveData[20],waveData[100]);
-            
-            
+
             if(recordAsData)[aDataSet loadWaveform:recordAsData
                                             offset: 0 //bytes!
                                           unitSize: sizeof( unsigned short ) //unit size in bytes! 10 bits needs 2 bytes
@@ -278,8 +265,10 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                                           withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
         }
         
+        // updates
         dataPtr = nextRecordPtr;
-        NSLog(@"    Decoded %d/%d events so far\n",n,numEvents);
+        dataLength = nextRecordLength;
+        
     }// end of loop over numEvents
     return waveformLength; //must return number of longs
 }
@@ -315,7 +304,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     
     NSString* rawHeader = @"Raw header:\n";
     unsigned int i;
-    for(i=0;i<4;i++){
+    for(i=0;i<5;i++){
         NSString* tmp = [NSString stringWithFormat:@"%03d: 0x%08lx \n",i,(*ptr++)];
         rawHeader = [rawHeader stringByAppendingString:tmp];
     }
