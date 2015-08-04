@@ -301,7 +301,7 @@
 
 
 
-- (unsigned short) sampleLength:(short)group;
+- (unsigned long) sampleLength:(short)group;
 - (void) setSampleLength:(short)group withValue:(unsigned long)aValue;
 
 - (int)  triggerGateLength:(short)group;

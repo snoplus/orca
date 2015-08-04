@@ -1351,22 +1351,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 
 
-- (unsigned short) sampleLength:(short)group {
-    return [[sampleLengths objectAtIndex:group] unsignedShortValue];
+- (unsigned long) sampleLength:(short)group {
+    return [[sampleLengths objectAtIndex:group] unsignedLongValue];
 }
 
 - (void) setSampleLength:(short)group withValue:(unsigned long)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:group withValue:[self sampleLength:group]];
 
-    
-    // FIX: are these limits correctly handled?
-//    if ([self eventSavingMode:group] <= 4 ) {
-//        aValue = [self limitIntValue:aValue min:4 max:0xff];
-//    }
-//    else if([self eventSavingMode:group] >4){
-//        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
-//    }
+    if ([self eventSavingMode:group] <= 4 ) {
+        aValue = [self limitIntValue:aValue min:4 max:0xff];
+    }
+    else if([self eventSavingMode:group] >4){
+        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
+    }
     
 //    aValue = (aValue/4)*4;  // FIX: What is this for again?
     
@@ -4340,7 +4338,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) writeSampleLengths
 {
     unsigned short group;
-    for (group =0; group>kNumSIS3305Groups; group++) {
+    for (group =0; group<kNumSIS3305Groups; group++) {
         [self writeSampleLengthOfGroup:group toValue:[self sampleLength:group]];
     }
 }
@@ -5231,7 +5229,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self writeADCGains];
     [self writeADCPhase];
     
-
+    [self writeSampleLengths];
 	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
     [self writeLEMOTriggerOutSelect];
@@ -5934,7 +5932,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     do {
                         BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
 
-                        dataRecord[group][0] =   dataId | numberBytesToRead[group];
+                        dataRecord[group][0] =   dataId | totalRecordLength[group];
 
                         dataRecord[group][1] =	(([self crateNumber]            & 0xf) << 28)   |
                                                 (([self slot]                   & 0x1F)<< 20)   |
@@ -5949,13 +5947,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         unsigned long* p = &dataRecord[group][3];
                         [[self adapter] readLongBlock: p
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
-                                            numToRead: dataRecordLength[group] // not numberBytesToRead?
+                                            numToRead: dataRecordLength[group] // we read out one record at a time here
                                            withAddMod: [self addressModifier]
                                         usingAddSpace: 0x01];
                         
                         [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
 
-                        addrOffset += (numberOfWordsToRead[group]*4); //(dataRecordLength[group])*4;
+                        addrOffset += (dataRecordLength[group])*4; // (numberOfWordsToRead[group]*4); //
                         if(++eventCount > 25)break;
                     } while (addrOffset < numberBytesToRead[group]);
                 }
