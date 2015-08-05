@@ -1359,12 +1359,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleLength:group withValue:[self sampleLength:group]];
 
-    if ([self eventSavingMode:group] <= 4 ) {
-        aValue = [self limitIntValue:aValue min:4 max:0xff];
-    }
-    else if([self eventSavingMode:group] >4){
-        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
-    }
+    
+    // FIX: are these limits correctly handled?
+//    if ([self eventSavingMode:group] <= 4 ) {
+//        aValue = [self limitIntValue:aValue min:4 max:0xff];
+//    }
+//    else if([self eventSavingMode:group] >4){
+//        aValue = [self limitIntValue:aValue min:4 max:0xffFFFF];
+//    }
     
 //    aValue = (aValue/4)*4;  // FIX: What is this for again?
     
@@ -1940,7 +1942,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (unsigned long) endAddressThreshold:(short)aGroup  
 {
     /*
-        The end address threshold indicates when a group has reached the end od one of its memory banks and has stopped sampling. This can be set to change the amount the FIFO will fill before reading out (setting the acquisition control reg flag to make a readout happen)
+        The end address threshold indicates when a group has reached the end od one of its memory banks and has stopped sampling. I have no idea why you should ever write to it.
         The value of "actual next sample" should be compared with this
      */
     
@@ -2867,12 +2869,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         NSLog(@"SIS3305: Temperature Supervisor is %s .\n", supervisorEnable?"ENABLED":"DISABLED");
     }
     
-    if (threshFlag) {
-        [NSException raise:@"High temperature" format:@"ADCs have been disabled by the temperature supervisor!"];
-
-        NSLogError(@"SIS3305 in 0x%x has been disabled by the temperature supervisor! At %3.1f C, threshold is %3.1f C. \n",[self baseAddress], temp, threshTemp);
-    }
-    
     return value;
 
 }
@@ -3324,7 +3320,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     | ((writeData&0xFFFF) << 0);
     
     [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
+//    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
     if (resetFlag == YES) { // reset the other chip too for good measure.
         adc = 1;
         
@@ -3336,7 +3332,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
     }
     
-    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
+//    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.1 second.
 }
 
 
@@ -3465,14 +3461,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         | ((writeData&0xFFFF) << 0);
         
         [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-        [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
-
+        
         // next, force the ADC to pull in these values as the "calibration"
         [self applyADCCalibration:adc];
-        [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
-
     }
-    
     
     [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
 }
@@ -3622,7 +3614,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         adc = (chan-adcChan)/4;     // the adc the channel is on
         
         [self writeADCSerialChannelSelect:chan];
-
+        
         writeData = (([self adcPhase:chan]   & 0x3FF)  << 0);
         
         // 32-bit value written to full digitizer register
@@ -3664,7 +3656,17 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     addr = 0x10;    // calibration control reg
     RWcmd = 0x1;    // write
     
+    writeData = 0x8;    // force external offset adjust for selected channel
+
+    writeValue =  ((RWcmd   & 0x1)  << 23)
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24)
+    | ((writeData&0xFFFF) << 0);
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    
+    
     writeData = 0x20;    // force external gain adjust for selected channel
+    
     writeValue =  ((RWcmd   & 0x1)  << 23)
     | ((addr    &0x7F)  << 16)
     | ((adc     & 0x1)  << 24)
@@ -3672,49 +3674,16 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
  
     
-    writeData = 0x8;    // force external offset adjust for selected channel
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-                | ((addr    &0x7F)  << 16)
-                | ((adc     & 0x1)  << 24)
-                | ((writeData&0xFFFF) << 0);
-    
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    
-    // should check bit 31 of CAL control reg here?
-    
-    
     writeData = 0x80;    // force external phase adjust for selected channel
+    
     writeValue =  ((RWcmd   & 0x1)  << 23)
-                | ((addr    &0x7F)  << 16)
-                | ((adc     & 0x1)  << 24)
-                | ((writeData&0xFFFF) << 0);
+    | ((addr    &0x7F)  << 16)
+    | ((adc     & 0x1)  << 24)
+    | ((writeData&0xFFFF) << 0);
     [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
 
     
-    // here I'll do some checking that it is right, and keep trying a few times to get it in.
-    
-//    unsigned short chan;
-//    unsigned short numTries = 0;
-//    for (chan = 0; chan<kNumSIS3305Channels; chan++)
-//    {
-//        
-//        if(([self readADCGain:chan] != [self adcGain:chan]) && numTries <10)
-//        {
-//            for (adc = 0; adc<2; adc++) {
-//                writeData = 0x20;    // force external gain adjust for selected channel
-//                writeValue =  ((RWcmd   & 0x1)  << 23)
-//                | ((addr    &0x7F)  << 16)
-//                | ((adc     & 0x1)  << 24)
-//                | ((writeData&0xFFFF) << 0);
-//                [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-//                
-//                numTries++;
-//            }
-//        }
-//    }
-
-    
-//    [self validateSerialADCCalibration];
+    [self validateSerialADCCalibration];
     return;
 }
 
@@ -5229,7 +5198,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self writeADCGains];
     [self writeADCPhase];
     
-    [self writeSampleLengths];
+
 	[self writeAcquisitionControl];			// set up the Acquisition Register
     [self writeControlStatus];              // set all the control status reg at once
     [self writeLEMOTriggerOutSelect];
@@ -5789,9 +5758,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     // FIX: Should this actually write to    [self writeMaxNumOfEventsInGroup:<#(short)#> toValue:<#(unsigned int)#>] ?
     for (group =0; group<kNumSIS3305Groups; group++) {
-//        eventLengthLongWords[group]     = 2 + [self sampleLength:group];
-//        [self setEndAddressThreshold:group withValue:maxEvents*eventLengthLongWords[group]];
-        [self setEndAddressThreshold:group withValue:1];
+        eventLengthLongWords[group]     = 2 + [self sampleLength:group];
+        [self setEndAddressThreshold:group withValue:1];    //maxEvents*eventLengthLongWords[group]];
     }
     [self writeEndAddressThresholds];
     
@@ -5833,6 +5801,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             for(group=0;group<kNumSIS3305Groups;group++){
                 unsigned long sisHeaderLength = 4;  // 4 long words in the normal sis headers
 
+//                long sisHeaderLength = 2;
 //                if(wrapMaskForRun & (1L<<group))
 //                     sisHeaderLength = 4; // 32-bit Lwords
                 
@@ -5850,59 +5819,72 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             [self enableSampleLogic];
             [self pulseExternalTriggerOut];     // this may or may not be desired
-//            
+            
 //            [self armSampleLogic];
+           
         }
         else {  // Not the first time
+
             unsigned long ac = 0;  // acquisition control register value
-//
-//            bool DMStopped = NO;
-//            while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
-//            {
-//                ac = [self readAcquisitionControl:NO];
-//                pollcount++;
-//                if(pollcount%1000 == 0){
-//                    NSLog(@"Polling for direct memory stopped flag... \n");
-//                }
-//                if(pollcount%100000 == 0){
-//                    NSLog(@"Not triggering????");
-//                    return;
-//                }
-//                DMStopped = (ac & 0x20000000);
-//            }
+            /*
+
+            bool DMStopped = NO;
+            while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
+            {
+                ac = [self readAcquisitionControl:NO];
+                pollcount++;
+                if(pollcount%1000 == 0){
+                    NSLog(@"Polling for direct memory stopped flag... \n");
+                }
+                if(pollcount%100000 == 0){
+                    NSLog(@"Not triggering????");
+                    return;
+                }
+                DMStopped = (ac & 0x20000000);
+            }
+            */
             
             bool endAddThreshFlag = NO;
-            ac = [self readAcquisitionControl:NO];
+//            unsigned long sampleAddress14 = 0;
+//            unsigned long sampleAddress58 = 0;
+            unsigned long endThresh14 = 0;
+            unsigned long endThresh58 = 0;
+//            unsigned long sampleStatus14 = 0;
+//            unsigned long sampleStatus58 = 0;
+//            unsigned long value1 = 0;
+//            unsigned long value2 = 0;
+
+            ac =              [self readAcquisitionControl:NO];
+//            sampleAddress14 = [self readActualSampleAddress:0];
+//            sampleAddress58 = [self readActualSampleAddress:1];
+            endThresh14     = [self readEndAddressThresholdOfGroup:0];
+            endThresh58     = [self readEndAddressThresholdOfGroup:1];
+//            sampleStatus14  = [self readSamplingStatusForGroup:0];
+//            sampleStatus58  = [self readSamplingStatusForGroup:1];
+//            value1          = [self readActualSampleValueOfChannel:0];
+//            value2          = [self readActualSampleValueOfChannel:1];
+            
             endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
             
-            // FIX: implement LED display here using acquisition control reg value
+            if (endAddThreshFlag == NO) {
+                return;
+            }
             
-            if (endAddThreshFlag == NO){return;}
-
-            // ****************************************
-            // ****    ****    ****    ****    ****
-            // **** Polling stopped, moving to readout
-            // ****    ****    ****    ****    ****
-            // ****************************************
+//            NSLog(@"End Address Threshold 0: 0x%x\n",endThresh14);
+//            NSLog(@"End Address Threshold 1: 0x%x\n",endThresh58);
             
-            //if we get here, there may be something to read out
-            unsigned long numberOfWordsToRead[kNumSIS3305Groups];
-            unsigned long numberBytesToRead[kNumSIS3305Groups];
-            
-            
+            // disarm/disable sampling?
             [self disarmSampleLogic];
             
-            // read acquisition control for displaying LEDs
-            // FIX: implement LEDs here
+            //if we get here, there may be something to read out
+            unsigned long sampleAddress[kNumSIS3305Groups];
+            unsigned long numberOfWords[kNumSIS3305Groups];
+            unsigned long numberBytesToRead[kNumSIS3305Groups];
             
-            
-            numberOfWordsToRead[0]  = [self readActualSampleAddress:0] * 16;  // 1 block == 64 bytes == 16 Lwords
-            numberOfWordsToRead[1]  = [self readActualSampleAddress:1] * 16;  // 1 block == 64 bytes == 16 Lwords
+            // read now all  Sample Addresses of all at which the sampling has stoped
 
-            // "Check ADC Clock synchronization" here, except there is no documentation of this...
-            // FIX: Guess my way through the synch check?
-            
-            
+            unsigned short group =0;
+
             // prepare readout statemachines
             // Transfer Control ch1to4, start internal readout (copy from Memory to VME FPGA)
             // Transfer Control ch5to8, start internal readout (copy from Memory to VME FPGA)
@@ -5910,50 +5892,50 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             [self writeDataTransferControlRegister:1 withCommand:2 withAddress:0];  // read command
 
             
-
-            
-            // loop over both groups
-            unsigned short group =0;
+            // loop over all groups
             for(group=0;group<kNumSIS3305Groups;group++) {
+//                int group				 = i<4?0:1;
                 unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
+                
+//                numberBytesToRead[group] = [self readActualSampleAddress:group];
+                numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
+                numberBytesToRead[group]   = numberOfWords[group] * 4;
 
                 // we can only readout at max one full buffer at once
-                if (numberOfWordsToRead[group] > adcBufferLength) {
-                    numberOfWordsToRead[group] = adcBufferLength;
-                    NSLogColor([NSColor redColor], @"Truncating read to one full buffer\n");
+                if (numberOfWords[group] > adcBufferLength) {
+                    numberOfWords[group] = adcBufferLength;
                 }
                 
-                numberBytesToRead[group]   = numberOfWordsToRead[group] * 4; // 1 Lword = 4 bytes
-                
-                if(numberBytesToRead[group] > 0){   // weeds out a group that doesn't have data present
+                if(numberBytesToRead[group] > 0){
                     unsigned long addrOffset = 0;
                     int eventCount			 = 0;
                     
                     do {
                         BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
-
-                        dataRecord[group][0] =   dataId | totalRecordLength[group];
-
+                        
+                        dataRecord[group][0] =   dataId | totalRecordLength[group]; //numberBytesToRead[group];
+                        
                         dataRecord[group][1] =	(([self crateNumber]            & 0xf) << 28)   |
-                                                (([self slot]                   & 0x1F)<< 20)   |
+                                                (([self slot]                   & 0x1f)<< 20)   |
                                                 (([self channelMode:group]      & 0xF) << 16)   |
                                                 ((group                         & 0xF) << 12)   |
                                                 (([self digitizationRate:group] & 0xF) << 8)    |
                                                 (([self eventSavingMode:group]  & 0xF) << 4)    |
                                                 (wrapMode                       & 0x1);
 
-                        dataRecord[group][2] = dataRecordLength[group]; // SIS header longs + longs in sample
+                        dataRecord[group][2] = dataRecordLength[group];
 
                         unsigned long* p = &dataRecord[group][3];
                         [[self adapter] readLongBlock: p
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
-                                            numToRead: dataRecordLength[group] // we read out one record at a time here
+                                            numToRead: dataRecordLength[group]
                                            withAddMod: [self addressModifier]
-                                        usingAddSpace: 0x01];
+                                        usingAddSpace: 0xFF];
                         
+//                        NSLog(@"ORSIS3305Model:takeData - Event read out and added to frame buffer.\n");
                         [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
 
-                        addrOffset += (dataRecordLength[group])*4; // (numberOfWordsToRead[group]*4); //
+                        addrOffset += (dataRecordLength[group])*4;
                         if(++eventCount > 25)break;
                     } while (addrOffset < numberBytesToRead[group]);
                 }
@@ -6051,47 +6033,52 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-    configStruct->total_cards++;
-    configStruct->card_info[index].hw_type_id				= kSIS3305; //should be unique
-    configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
-    configStruct->card_info[index].slot						= [self slot];
-    configStruct->card_info[index].crate					= [self crateNumber];
-    configStruct->card_info[index].add_mod					= [self addressModifier];
-    configStruct->card_info[index].base_add					= [self baseAddress];
-    
-    configStruct->card_info[index].deviceSpecificData[0]    = [self longsInSample:0];
-    configStruct->card_info[index].deviceSpecificData[1]    = [self longsInSample:1];
-    
-    configStruct->card_info[index].deviceSpecificData[2]    = [self channelMode:0];
-    configStruct->card_info[index].deviceSpecificData[3]    = [self channelMode:1];
-    
-    configStruct->card_info[index].deviceSpecificData[4]    = [self digitizationRate:0];
-    configStruct->card_info[index].deviceSpecificData[5]    = [self digitizationRate:1];
-    
-    configStruct->card_info[index].deviceSpecificData[6]    = [self eventSavingMode:0];
-    configStruct->card_info[index].deviceSpecificData[7]    = [self eventSavingMode:1];
-    
-    //		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength:0]/2;
-    //		configStruct->card_info[index].deviceSpecificData[1]	= [self sampleLength:1]/2;
-    //		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
-    //		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
-    ////		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
-    //		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
-    //		configStruct->card_info[index].deviceSpecificData[6]	= [self pulseMode];
-    
-    configStruct->card_info[index].num_Trigger_Indexes		= 0;
-    
-    configStruct->card_info[index].next_Card_Index 	= index+1;
-    
-    return index+1;
+	if(runMode == kMcaRunMode){
+		//in MCA mode there is nothing for the SBC to do... so don't ship any card config data to it.
+		return index; 
+	}
+	else {
+		configStruct->total_cards++;
+		configStruct->card_info[index].hw_type_id				= kSIS3305; //should be unique
+		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
+		configStruct->card_info[index].slot						= [self slot];
+		configStruct->card_info[index].crate					= [self crateNumber];
+		configStruct->card_info[index].add_mod					= [self addressModifier];
+		configStruct->card_info[index].base_add					= [self baseAddress];
+        
+        configStruct->card_info[index].deviceSpecificData[0]    = [self longsInSample:0];
+        configStruct->card_info[index].deviceSpecificData[1]    = [self longsInSample:1];
+        
+        configStruct->card_info[index].deviceSpecificData[2]    = [self channelMode:0];
+        configStruct->card_info[index].deviceSpecificData[3]    = [self channelMode:1];
 
+        configStruct->card_info[index].deviceSpecificData[4]    = [self digitizationRate:0];
+        configStruct->card_info[index].deviceSpecificData[5]    = [self digitizationRate:1];
+        
+        configStruct->card_info[index].deviceSpecificData[6]    = [self eventSavingMode:0];
+        configStruct->card_info[index].deviceSpecificData[7]    = [self eventSavingMode:1];
+        
+//		configStruct->card_info[index].deviceSpecificData[0]	= [self sampleLength:0]/2;
+//		configStruct->card_info[index].deviceSpecificData[1]	= [self sampleLength:1]/2;
+//		configStruct->card_info[index].deviceSpecificData[2]	= [self sampleLength:2]/2;
+//		configStruct->card_info[index].deviceSpecificData[3]	= [self sampleLength:3]/2;
+////		configStruct->card_info[index].deviceSpecificData[4]	= [self energySampleLength];
+//		configStruct->card_info[index].deviceSpecificData[5]	= [self bufferWrapEnabledMask];
+//		configStruct->card_info[index].deviceSpecificData[6]	= [self pulseMode];
+		
+		configStruct->card_info[index].num_Trigger_Indexes		= 0;
+		
+		configStruct->card_info[index].next_Card_Index 	= index+1;	
+		
+		return index+1;
+	}
 }
 
 
 
 //- (void) resetSamplingLogic
 //{
-// 	unsigned long aValue = 0; //value doesn't matter
+// 	unsigned long aValue = 0; //value doesn't matter 
 //	[[self adapter] writeLongBlock:&aValue
 //                         atAddress:[self baseAddress] + kSIS3305KeySampleLogicReset
 //                        numToWrite:1
