@@ -175,11 +175,7 @@
     int runMode;
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
-	
-	unsigned long   dataRecordLength[kNumSIS3305Groups];
-    unsigned long   orcaHeaderLength;
-    unsigned long   totalRecordLength[kNumSIS3305Groups];
-	
+		
 	//calculated values
 	unsigned long numEnergyValues;
 	unsigned long numRawDataLongWords;
@@ -257,6 +253,8 @@
 //        unsigned int 	uint_spi_1chModeD_gain_adc[8];	   // 1-channel Mode use input D
 //        unsigned int 	uint_spi_1chModeD_offset_adc[8];   // 1-channel Mode use input D
 //    } ;
+    
+    int groupToRead;
 }
 
 - (id) init;

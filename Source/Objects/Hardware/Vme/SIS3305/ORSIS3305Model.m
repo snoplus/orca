@@ -5629,7 +5629,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     else if([param isEqualToString:@"External Gate Enabled"])		return [cardDictionary objectForKey:@"externalGateEnabledMask"];
     else if([param isEqualToString:@"Trigger Decimation"])			return [cardDictionary objectForKey:@"triggerDecimation"];
     else if([param isEqualToString:@"Energy Decimation"])			return [cardDictionary objectForKey:@"energyDecimation"];
-     else if([param isEqualToString:@"Energy Tau Factor"])			return [cardDictionary objectForKey:@"energyTauFactor"];
+    else if([param isEqualToString:@"Energy Tau Factor"])			return [cardDictionary objectForKey:@"energyTauFactor"];
     else if([param isEqualToString:@"Energy Sample Length"])		return [cardDictionary objectForKey:@"energySampleLength"];
     else if([param isEqualToString:@"Energy Gap Time"])				return [cardDictionary objectForKey:@"energyGapTime"];
     else if([param isEqualToString:@"Trigger Gate Delay"])			return [cardDictionary objectForKey:@"triggerGateLength"];
@@ -5751,18 +5751,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
    // [self setEndAddressThreshold:1 withValue:1];
    // [self writeEndAddressThresholds];
     
-    int group;
-    unsigned long maxEvents = 1;
+    // unsigned long maxEvents = 1;
     //			eventLengthLongWords = 2 + 4  ; // Timestamp/Header, MAX, MIN, Trigger-FLags, Trailer
     //			if(bufferWrapEnabledMask && firmwareVersion>15)eventLengthLongWords+=2; //1510 added two words to the header
     //			eventLengthLongWords = eventLengthLongWords + numRawDataLongWords  ;
     //			eventLengthLongWords = eventLengthLongWords + numEnergyValues  ;
     
     // FIX: Should this actually write to    [self writeMaxNumOfEventsInGroup:<#(short)#> toValue:<#(unsigned int)#>] ?
+    int group;
     for (group =0; group<kNumSIS3305Groups; group++) {
         eventLengthLongWords[group]     = 2 + [self sampleLength:group];
         [self setEndAddressThreshold:group withValue:1];    //maxEvents*eventLengthLongWords[group]];
+
     }
+    
     [self writeEndAddressThresholds];
     
     [self writeRingbufferPretriggerDelays];
@@ -5786,7 +5788,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //	for(group=0;group<kNumSIS3305Groups;group++){
 //		dataRecord = nil;
 //	}
-	
+    groupToRead = 0;
 
 }
 
@@ -5796,40 +5798,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	//Because of this we limit the number of events from any one buffer read. The SBC should be used if possible.
     @try {
         if(firstTime){
-            int group;
-            for(group=0;group<kNumSIS3305Groups;group++){
-                unsigned long sisHeaderLength = 4;  // 4 long words in the normal sis headers
-
-//                long sisHeaderLength = 2;
-//                if(wrapMaskForRun & (1L<<group))
-//                     sisHeaderLength = 4; // 32-bit Lwords
-                
-                orcaHeaderLength = 3;   // 3 words in the Orca header
-                
-                // data record length is the length without the Orca header (how much we will read)
-                // total record length is how much space it will take on disk (with Orca header)
-                dataRecordLength[group] = sisHeaderLength + [self longsInSample:group];
-                totalRecordLength[group] = dataRecordLength[group] + orcaHeaderLength;
-                
-            }
             isRunning = YES;
             firstTime = NO;
-            
-
-//            dataRecord      = malloc((longestRecordLength)*sizeof(unsigned long));
-
-            
+        
             [self enableSampleLogic];
             [self pulseExternalTriggerOut];     // this may or may not be desired
             
-//            [self armSampleLogic];
+//           [self armSampleLogic];
            
         }
-        else {  // Not the first time
+        else {
 
-            unsigned long ac = 0;  // acquisition control register value
             /*
-
             bool DMStopped = NO;
             while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
             {
@@ -5846,34 +5826,19 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             }
             */
             
-            bool endAddThreshFlag = NO;
+            unsigned long ac              = [self readAcquisitionControl:NO];
+            unsigned long endThresh14     = [self readEndAddressThresholdOfGroup:0];
+            unsigned long endThresh58     = [self readEndAddressThresholdOfGroup:1];
 
-            unsigned long endThresh14 = 0;
-            unsigned long endThresh58 = 0;
-
-
-            ac =              [self readAcquisitionControl:NO];
-
-            endThresh14     = [self readEndAddressThresholdOfGroup:0];
-            endThresh58     = [self readEndAddressThresholdOfGroup:1];
-
+            BOOL endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
             
-            endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
+            if (endAddThreshFlag == NO) return;
             
-            if (endAddThreshFlag == NO) {
-                return;
-            }
             //if we get here, there may be something to read out
 
-            // disarm/disable sampling (we can't read out while sampling)
-            [self disarmSampleLogic];
-            
-            unsigned long numberOfWords[kNumSIS3305Groups];
-            unsigned long numberBytesToRead[kNumSIS3305Groups];
+            [self disarmSampleLogic]; //can't readout while sample
             
             // read now all  Sample Addresses of all at which the sampling has stoped
-
-
             // prepare readout statemachines
             // Transfer Control ch1to4, start internal readout (copy from Memory to VME FPGA)
             // Transfer Control ch5to8, start internal readout (copy from Memory to VME FPGA)
@@ -5887,59 +5852,61 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //            }
             
             // loop over all groups
-            unsigned short group =0;
-            for(group=0;group<kNumSIS3305Groups;group++) {
+            //unsigned short group;
+            //for(group=0;group<kNumSIS3305Groups;group++) {
 //                int group				 = i<4?0:1;
                 unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
 
 //                numberBytesToRead[group] = [self readActualSampleAddress:group];
-                numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
-                numberBytesToRead[group]   = numberOfWords[group] * 4;
+                unsigned long numberOfWords     = [self readActualSampleAddress:groupToRead] * 16;        // 1 block == 64 bytes == 16 Lwords
+                unsigned long numberBytesToRead = numberOfWords * 4;
 
                 // we can only readout at max one full buffer at once
-                if (numberOfWords[group] > adcBufferLength) {
-                    numberOfWords[group] = adcBufferLength;
+                if (numberOfWords > adcBufferLength) {
+                    numberOfWords = adcBufferLength;
                 }
                 
-                if(numberBytesToRead[group] > 0){
-                    unsigned long addrOffset = 0;
-                    int eventCount			 = 0;
-                    
-                    do {
-                        BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
-                        unsigned long  dataRecord[256*48];//dataRecord[longestRecordLength+512];
+                if(numberBytesToRead > 0){
+                    unsigned long sisHeaderLength   = 4;  // 4 long words in the normal sis headers
+                    unsigned long orcaHeaderLength  = 3;   // 3 words in the Orca header
+                    unsigned long dataRecordLength  = sisHeaderLength  + [self longsInSample:groupToRead]; //just the data length
+                    unsigned long totalRecordLength = dataRecordLength + orcaHeaderLength;  //data length + orca header
 
-                        dataRecord[0] =   dataId | totalRecordLength[group]; //numberBytesToRead[group];
+                    BOOL wrapMode = (wrapMaskForRun & (1L<<groupToRead))!=0;
+                    
+                   // do {
+                        unsigned long  dataRecord[1031];//dataRecord[longestRecordLength+512];
+
+                        dataRecord[0] =   dataId | totalRecordLength; //numberBytesToRead[group];
                         
                         dataRecord[1] =	(([self crateNumber]            & 0xf) << 28)   |
-                                                (([self slot]                   & 0x1f)<< 20)   |
-                                                (([self channelMode:group]      & 0xF) << 16)   |
-                                                ((group                         & 0xF) << 12)   |
-                                                (([self digitizationRate:group] & 0xF) << 8)    |
-                                                (([self eventSavingMode:group]  & 0xF) << 4)    |
-                                                (wrapMode                       & 0x1);
+                                        (([self slot]                   & 0x1f)<< 20)   |
+                                        (([self channelMode:groupToRead]      & 0xF) << 16)   |
+                                        ((groupToRead                         & 0xF) << 12)   |
+                                        (([self digitizationRate:groupToRead] & 0xF) << 8)    |
+                                        (([self eventSavingMode:groupToRead]  & 0xF) << 4)    |
+                                        (wrapMode                       & 0x1);
 
-                        dataRecord[2] = dataRecordLength[group];
+                        dataRecord[2] = dataRecordLength;
 
-                        unsigned long* p = &dataRecord[3];
-                        [[self adapter] readLongBlock: p
-                                            atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
-                                            numToRead: dataRecordLength[group]
+                        [[self adapter] readLongBlock: &dataRecord[3]
+                                            atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:groupToRead]
+                                            numToRead: dataRecordLength
                                            withAddMod: [self addressModifier]
                                         usingAddSpace: 0x01];
                         
-                        [aDataPacket addLongsToFrameBuffer:dataRecord length:totalRecordLength[group]];
-                        NSLog(@"Group %d             event added to frame buffer. (takedata)\n", group);
+                        [aDataPacket addLongsToFrameBuffer:dataRecord length:totalRecordLength];
+                        
+                        NSLog(@"Group %d            event added to frame buffer. (takedata)\n", groupToRead);
+                        NSLog(@"                     record had word 0 of: 0x%08x (takedata)\n",dataRecord[0]);
+                        NSLog(@"                     record had word 1 of: 0x%08x (takedata)\n",dataRecord[1]);
 
-                        NSLog(@"                        record had word 0 of: 0x%08x (takedata)\n",dataRecord[0]);
-                        NSLog(@"                        record had word 1 of: 0x%08x (takedata)\n",dataRecord[1]);
-                        NSLog(@"                        record had word 4 of: 0x%08x (takedata)\n",dataRecord[4]);
-
-                        addrOffset += (dataRecordLength[group])*4;
-                        if(++eventCount > 25)break;
-                    } while (addrOffset < numberBytesToRead[group]);
+                       // addrOffset += dataRecordLength*4;
+                       // if(++eventCount > 25)break;
+                    //} while (addrOffset < numberBytesToRead);
                 }
-            } // loop over groups
+            groupToRead = (groupToRead+1)%kNumSIS3305Groups;
+            //} // loop over groups
             
             // after reading out everything:
             [self writeRingbufferPretriggerDelays];
