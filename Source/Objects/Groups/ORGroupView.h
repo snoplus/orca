@@ -19,15 +19,16 @@
 //-------------------------------------------------------------
 
 @interface ORGroupView : NSView <NSMenuDelegate>{
-    id mouseTask;
-    BOOL dragSessionInProgress;
-    BOOL goodObjectsInDrag;
-    id group;
-    NSColor* backgroundColor;
-    NSArray* draggedObjects;
-    NSArray* savedObjects;
-    NSMutableArray*  draggedNodes;
-	NSImage* backgroundImage;
+    id                  mouseTask;
+    BOOL                dragSessionInProgress;
+    BOOL                goodObjectsInDrag;
+    id                  group;
+    NSColor*            backgroundColor;
+    NSArray*            draggedObjects;
+    NSArray*            savedObjects;
+    NSMutableArray*     draggedNodes;
+	NSImage*            backgroundImage;
+    BOOL                lockMovement;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -39,16 +40,17 @@
 - (void) setBackgroundColor:(NSColor*)aColor;
 - (NSEnumerator*) objectEnumerator;
 - (id) dataSource;
+- (void) setLockMovement:(BOOL)aState;
 
 #pragma mark ¥¥¥Graphics
-- (void) setBackgroundImage:(NSImage *)newImage;
-- (void) drawBackground:(NSRect)aRect;
-- (void) drawContents:(NSRect)aRect;
-- (void) backgroundColorChanged:(NSNotification*)note;
-- (void) lineColorChanged:(NSNotification*)note;
-- (void) lineTypeChanged:(NSNotification*)note;
-- (void) contentSizeChanged:(NSNotification*)note;
-- (void) imageChanged:(NSNotification*)note;
+- (void) setBackgroundImage:    (NSImage *)newImage;
+- (void) drawBackground:        (NSRect)aRect;
+- (void) drawContents:          (NSRect)aRect;
+- (void) backgroundColorChanged:(NSNotification*)aNotification;
+- (void) lineColorChanged:      (NSNotification*)aNotification;
+- (void) lineTypeChanged:       (NSNotification*)aNotification;
+- (void) contentSizeChanged:    (NSNotification*)aNotification;
+- (void) imageChanged:          (NSNotification*)aNotification;
 
 - (NSRect) resizeView:(NSRect)aNewRect;
 - (NSRect) normalized;
@@ -103,10 +105,12 @@
 - (void) moveObject:(id)obj to:(NSPoint)aPoint;
 - (BOOL) canAddObject:(id) obj atPoint:(NSPoint)aPoint;
 
+
 #pragma mark ¥¥¥Connection Management
 -(void)doConnectionFrom:(NSPoint)pt1 to:(NSPoint)pt2;
 
 @end
+
 
 @interface NSObject (ORGroupView)
 - (NSString*) backgroundImagePath;

@@ -24,11 +24,12 @@
 @class ORCrateLabelView;
 
 @interface ORCrateController : OrcaObjectController {
-    IBOutlet NSTextField*   lockDocField;
-	IBOutlet NSButton*		showLabelsButton;
-    IBOutlet NSTextField*   powerField;
+    IBOutlet NSTextField*           lockDocField;
+	IBOutlet NSButton*              showLabelsButton;
+    IBOutlet NSTextField*           powerField;
     IBOutlet ORCardContainerView*   groupView;
-    IBOutlet ORCrateLabelView*   labelView;
+    IBOutlet ORCrateLabelView*      labelView;
+    IBOutlet NSButton*              movementLockButton;
 }
 
 #pragma mark *Accessors
@@ -36,12 +37,13 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) groupChanged:(NSNotification*)note;
-- (void) documentLockChanged:(NSNotification*)aNotification;
-- (void) powerFailed:(NSNotification*)aNotification;
-- (void) powerRestored:(NSNotification*)aNotification;
-- (void) crateNumberChanged:(NSNotification*)aNotification;
-- (void) updateView:(NSNotification*)aNotification;
+- (void) groupChanged:          (NSNotification*)aNotification;
+- (void) documentLockChanged:   (NSNotification*)aNotification;
+- (void) powerFailed:           (NSNotification*)aNotification;
+- (void) powerRestored:         (NSNotification*)aNotification;
+- (void) crateNumberChanged:    (NSNotification*)aNotification;
+- (void) updateView:            (NSNotification*)aNotification;
+- (void) movementLockChanged:   (NSNotification*)aNotification;
 
 #pragma mark •••Interface Management
 - (void) showLabelsChanged:(NSNotification*)aNote;
@@ -50,4 +52,6 @@
 
 #pragma mark •••Actions
 - (IBAction) showLabelsAction:(id)sender;
+- (IBAction) movementLockAction:(id)sender;
 @end
+

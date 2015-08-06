@@ -22,7 +22,7 @@
     BOOL drawSlots;
     BOOL drawSlotNumbers;
 }
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
+- (BOOL) prepareForDragOperation:(id <NSDraggingInfo>)sender;
 - (void) drawBackground:(NSRect)aRect;
 - (void) contentSizeChanged:(NSNotification*)note;
 - (BOOL) canAddObject:(id) obj atPoint:(NSPoint)aPoint;

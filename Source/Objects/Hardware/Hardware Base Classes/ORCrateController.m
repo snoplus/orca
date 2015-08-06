@@ -104,7 +104,11 @@
                          name : OROrcaObjectImageChanged
                         object: model];
 
-
+    [notifyCenter addObserver:self
+                      selector:@selector(movementLockChanged:)
+                          name:ORCrateModelLockMovementChanged
+                        object:nil];
+    
 }
 - (void) updateView:(NSNotification*)aNotification
 {
@@ -158,6 +162,12 @@
 	}
 }
 
+- (void) movementLockChanged:(NSNotification*)note
+{
+    [movementLockButton setIntValue:[model lockMovement]];
+    [groupView setLockMovement:[model lockMovement]];
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
 	return [groupView validateMenuItem:menuItem];
@@ -177,7 +187,8 @@
     [self documentLockChanged:nil];
     [groupView setNeedsDisplay:YES];
 	[labelView forceRedraw];
-	[self showLabelsChanged:nil];
+    [self showLabelsChanged:nil];
+    [self movementLockChanged:nil];
 }
 
 
@@ -185,6 +196,11 @@
 - (IBAction) showLabelsAction:(id)sender
 {
 	[model setShowLabels:[sender intValue]];
+}
+
+- (IBAction) movementLockAction:(id)sender
+{
+    [model setLockMovement:[sender intValue]];
 }
 
 //---------------------------------------------------------------

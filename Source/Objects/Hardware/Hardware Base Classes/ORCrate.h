@@ -26,6 +26,8 @@
 	id				adapter;
     ORAlarm*        cratePowerAlarm;
 	BOOL			showLabels;
+    BOOL            lockMovement;
+
 }
 
 - (void) dealloc;
@@ -47,6 +49,8 @@
 - (void) setShowLabels:(BOOL)aState;
 - (NSComparisonResult)sortCompare:(OrcaObject*)anObj;
 - (NSComparisonResult) crateNumberCompare:(id)aCard;
+- (BOOL) lockMovement;
+- (void) setLockMovement:(BOOL)aState;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
@@ -94,3 +98,4 @@ extern NSString* ORCrateAdapterChangedNotification;
 extern NSString* ORCrateAdapterConnector;
 extern NSString* ORCrateModelShowLabelsChanged;
 extern NSString* ORCrateModelCrateNumberChanged;
+extern NSString* ORCrateModelLockMovementChanged;

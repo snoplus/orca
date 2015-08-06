@@ -27,6 +27,8 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 
+
+
 @interface ORGroupView (ExperimentViewPrivateMethods)
 - (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (BOOL) _canTakeValueFromPasteboard:(NSPasteboard *)pb;
@@ -98,12 +100,18 @@
                       selector:@selector(imageChanged:)
                           name:OROrcaObjectImageChanged
                         object:nil];
-      
+  
+
+    
     [self backgroundColorChanged:nil];
     [self setNeedsDisplay:YES];
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) setLockMovement:(BOOL)aState
+{
+    lockMovement = aState;
+}
 - (void) setGroup:(id)aModel
 {	
     group = aModel;
@@ -179,16 +187,16 @@
     [self setNeedsDisplay:YES];
 }
 
-- (void)lineTypeChanged:(NSNotification*)note
-{
-    [self setNeedsDisplay:YES];
-}
-
 - (void) imageChanged:(NSNotification*)note
 {
     if(note == nil || (ORGroup*)[[note object] guardian] == group){
         [self setNeedsDisplay:YES];
     }
+}
+
+- (void)lineTypeChanged:(NSNotification*)note
+{
+    [self setNeedsDisplay:YES];
 }
 
 - (void) contentSizeChanged:(NSNotification*)note
@@ -931,7 +939,7 @@
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
 {	// no prep needed, but we do want to proceed...
-    return YES;
+    return lockMovement;
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
@@ -1015,6 +1023,7 @@
 
 - (void)keyDown:(NSEvent *)event
 {
+    if(lockMovement)return;
     int keyCode = [event keyCode];
 	if(keyCode == 126){
 		[self moveSelectedObjectsUp:event];
@@ -1088,6 +1097,9 @@
 	
     [self setNeedsDisplay:YES];
 }
+
+
+
 @end
 
 @implementation ORGroupView (private)

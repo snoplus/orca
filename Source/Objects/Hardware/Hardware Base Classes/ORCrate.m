@@ -16,6 +16,7 @@ NSString* ORCrateAdapterChangedNotification = @"ORCrateAdapterChangedNotificatio
 NSString* ORCrateAdapterConnector		    = @"ORCrateAdapterConnector";
 NSString* ORCrateModelShowLabelsChanged		= @"ORCrateModelShowLabelsChanged";
 NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
+NSString* ORCrateModelLockMovementChanged   = @"ORCrateModelLockMovementChanged";
 
 @implementation ORCrate
 
@@ -313,6 +314,18 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {
 }
 
+- (BOOL) lockMovement
+{
+    return lockMovement;
+}
+
+- (void) setLockMovement:(BOOL)aState
+{
+    [[[self  undoManager] prepareWithInvocationTarget:self] setLockMovement:lockMovement];
+    lockMovement = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCrateModelLockMovementChanged
+                                                        object:self];
+}
 
 #pragma mark ¥¥¥Archival
 - (NSString*) adapterArchiveKey
@@ -327,7 +340,9 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[[self undoManager] disableUndoRegistration];
     
 	//[self setAdapter:[decoder decodeObjectForKey:[self adapterArchiveKey]]];
-    [self setShowLabels:[decoder decodeBoolForKey:@"showLabels"]];
+    [self setShowLabels:  [decoder decodeBoolForKey:@"showLabels"]];
+    [self setLockMovement:[decoder decodeBoolForKey:@"lockMovement"]];
+    
 	[[self undoManager] enableUndoRegistration];
 	
 	[self registerNotificationObservers];
@@ -339,7 +354,8 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {
     [super encodeWithCoder:encoder];
 	//[encoder encodeObject:adapter forKey:[self adapterArchiveKey]];
-	[encoder encodeBool:showLabels forKey:@"showLabels"];
+    [encoder encodeBool:showLabels   forKey:@"showLabels"];
+    [encoder encodeBool:lockMovement forKey:@"lockMovement"];
 }
 
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray
