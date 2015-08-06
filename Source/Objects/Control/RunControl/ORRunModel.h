@@ -166,6 +166,8 @@
 - (void)	clearExceptionCount;
 - (unsigned long)runType;
 - (void)	setRunType:(unsigned long)aMask;
+- (void)    setRunTypeAndModifySavedRunType:(unsigned long)aMask;
+- (void)    restoreSavedRunType;
 - (BOOL)	remoteControl;
 - (void)	setRemoteControl:(BOOL)aState;
 - (NSString*)   commandID;

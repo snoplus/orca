@@ -674,7 +674,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	unsigned long aMask = [self runType];
 	if(aState)aMask |= eMaintenanceRunType;
-	else aMask &= ~eMaintenanceRunType;
+	else      aMask &= ~eMaintenanceRunType;
 	[self setRunType:aMask];
 }
 
@@ -682,9 +682,25 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunType:runType];
     runType = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunTypeChangedNotification object: self];
+}
+
+- (void) setRunTypeAndModifySavedRunType:(unsigned long)aMask
+{
+    if([self isRunning]){
+        unsigned long changedBits = runType ^ aMask;
+        savedRunType = savedRunType ^ changedBits;
+    }
+    [self setRunType:aMask];
+}
+
+- (void) restoreSavedRunType
+{
+    runType = savedRunType;
+    
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORRunTypeChangedNotification
-	 object: self];
+     postNotificationName:ORRunTypeChangedNotification
+     object: self];
     
 }
 
@@ -1480,7 +1496,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
     [[self undoManager] disableUndoRegistration];
     if(savedSelectedRunTypeScript){
-        [self setRunType:savedRunType];
+        [self restoreSavedRunType];
     }
     [[self undoManager] enableUndoRegistration];
 

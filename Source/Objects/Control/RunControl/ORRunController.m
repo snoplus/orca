@@ -916,13 +916,13 @@
 
 - (IBAction) runTypeAction:(id)sender
 {
-    short i = [[sender selectedCell] tag];
+    short i     = [[sender selectedCell] tag];
     BOOL state  = [[sender selectedCell] state];
     unsigned long currentRunMask = [model runType];
-    if(state)currentRunMask |= (1L<<i);
+    if(state) currentRunMask |= (1L<<i);
     else      currentRunMask &= ~(1L<<i);
     
-    [model setRunType:currentRunMask];
+    [model setRunTypeAndModifySavedRunType:currentRunMask];
 }
 
 - (IBAction) clearRunTypeAction:(id)sender
