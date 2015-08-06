@@ -28,7 +28,7 @@
     NSArray*            savedObjects;
     NSMutableArray*     draggedNodes;
 	NSImage*            backgroundImage;
-    BOOL                lockMovement;
+    BOOL                dragLocked;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -40,7 +40,7 @@
 - (void) setBackgroundColor:(NSColor*)aColor;
 - (NSEnumerator*) objectEnumerator;
 - (id) dataSource;
-- (void) setLockMovement:(BOOL)aState;
+- (void) setDragLocked:(BOOL)aState;
 
 #pragma mark ¥¥¥Graphics
 - (void) setBackgroundImage:    (NSImage *)newImage;

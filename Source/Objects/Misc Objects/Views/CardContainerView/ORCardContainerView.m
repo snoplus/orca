@@ -39,12 +39,12 @@
 
 - (BOOL) prepareForDragOperation:(id <NSDraggingInfo>)sender
 {
-    if([super prepareForDragOperation:sender])return NO;
-    else {
+    if([super prepareForDragOperation:sender]){
         NSPoint aPoint     = [sender draggedImageLocation];
         NSPoint localPoint = [self convertPoint:aPoint fromView:nil];
         return [[OROrderedObjManager for:group] dropPositionOK:localPoint];
     }
+    else return NO;
 }
 
 - (NSPoint) suggestPasteLocationFor:(id)aCard

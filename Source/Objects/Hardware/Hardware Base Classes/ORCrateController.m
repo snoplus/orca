@@ -165,7 +165,7 @@
 - (void) movementLockChanged:(NSNotification*)note
 {
     [movementLockButton setIntValue:[model lockMovement]];
-    [groupView setLockMovement:[model lockMovement]];
+    [groupView setDragLocked:[model lockMovement]];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem

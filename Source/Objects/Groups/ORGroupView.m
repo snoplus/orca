@@ -108,10 +108,11 @@
 }
 
 #pragma mark ¥¥¥Accessors
-- (void) setLockMovement:(BOOL)aState
+- (void) setDragLocked:(BOOL)aState
 {
-    lockMovement = aState;
+    dragLocked = aState;
 }
+
 - (void) setGroup:(id)aModel
 {	
     group = aModel;
@@ -937,9 +938,9 @@
     [self setNeedsDisplay:YES];
 }
 
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+- (BOOL) prepareForDragOperation:(id <NSDraggingInfo>)sender
 {	// no prep needed, but we do want to proceed...
-    return lockMovement;
+    return !dragLocked;
 }
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
@@ -1023,7 +1024,8 @@
 
 - (void)keyDown:(NSEvent *)event
 {
-    if(lockMovement)return;
+    if(dragLocked)return;
+    
     int keyCode = [event keyCode];
 	if(keyCode == 126){
 		[self moveSelectedObjectsUp:event];
