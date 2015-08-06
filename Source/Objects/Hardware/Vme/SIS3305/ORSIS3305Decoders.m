@@ -89,11 +89,11 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 
     unsigned long* ptr	= (unsigned long*)someData;
     
-    NSLog(@"ptr[0]:    0x%08x\n",ptr[0]);
-    NSLog(@"ptr[1]:    0x%08x\n",ptr[1]);
-    NSLog(@"ptr[2]:    0x%08x\n",ptr[2]);
-    NSLog(@"ptr[3]:    0x%08x\n",ptr[3]);
-    NSLog(@"ptr[4]:    0x%08x\n\n",ptr[4]);
+    NSLog(@"ptr[0]:    0x%08x (in decoder)\n",ptr[0]);
+    NSLog(@"ptr[1]:    0x%08x (in decoder)\n",ptr[1]);
+    NSLog(@"ptr[2]:    0x%08x (in decoder)\n",ptr[2]);
+    NSLog(@"ptr[3]:    0x%08x (in decoder)\n",ptr[3]);
+    NSLog(@"ptr[4]:    0x%08x (in decoder)\n\n",ptr[4]);
 
     // extract things from the Orca header
 	unsigned long length= ExtractLength(ptr[0]);        // should be the totalRecordLength in longs, including both headers and full waveform
@@ -124,7 +124,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     }
     
     NSLog(@"Group %d        event being decoded\n",group);
-    
+
     
     unsigned long waveformLength = dataLength-sisHeaderLength; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
     
@@ -133,7 +133,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     unsigned short n;
     for(n=0;n<numEvents;n++)    // actually, there should only ever be one event
     {
-        NSLog(@"Group %d    n = %d\n",group,n);
+        NSLog(@"Group %d    n = %d (decoder)\n",group,n);
         dataLength = dataPtr[2];      // SIS header + data length, in longs
 
 //        unsigned long* nextRecordPtr = dataPtr + dataLength + orcaHeaderLength;
@@ -146,8 +146,9 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         unsigned long timestampLow = dataPtr[1];
         unsigned long timestampHigh = dataPtr[0]&0xFFFF;
         unsigned long long timestamp = timestampLow | (timestampHigh << 31);
+        NSLog(@"                        event had low ts of: 0x%08x (decoder)\n",timestampLow);
 
-        unsigned short channel = 31;    // Biggest pre-computer value - if you see this, there's an error somewhere.
+        unsigned short channel = 31;    // Biggest pre-computed value - if you see this, there's an error somewhere.
         NSString* channelKey = [self getChannelKey: channel];;
         
         NSString* crateKey		= [self getCrateKey: crate];

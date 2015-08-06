@@ -176,7 +176,6 @@
     unsigned short lemoInEnabledMask;
     BOOL internalExternalTriggersOred;
 	
-	unsigned long*  dataRecord[kNumSIS3305Groups];
 	unsigned long   dataRecordLength[kNumSIS3305Groups];
     unsigned long   orcaHeaderLength;
     unsigned long   totalRecordLength[kNumSIS3305Groups];

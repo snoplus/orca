@@ -5194,9 +5194,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	[self writeThresholds];
     
     [self writeADCControlReg];              // set up the bandwidth, channel mode etc.
-    [self writeADCOffsets];
-    [self writeADCGains];
-    [self writeADCPhase];
+
+    NSLogColor([NSColor redColor], @"Not writing the ADC Gain/Offset/Phase!\n");
+//    [self writeADCOffsets];
+//    [self writeADCGains];
+//    [self writeADCPhase];
     
 
 	[self writeAcquisitionControl];			// set up the Acquisition Register
@@ -5781,14 +5783,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [self startRates];
 	
 //	int group;
-	for(group=0;group<kNumSIS3305Groups;group++){
-		dataRecord[group] = nil;
-	}
+//	for(group=0;group<kNumSIS3305Groups;group++){
+//		dataRecord = nil;
+//	}
 	
 
-	if(pulseMode){
-		NSLogColor([NSColor redColor], @"SIS3305 Slot %d is in special readout mode -- only one buffer will be read each time the SBC is unpaused\n",[self slot]);
-	}
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -5812,10 +5811,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 dataRecordLength[group] = sisHeaderLength + [self longsInSample:group];
                 totalRecordLength[group] = dataRecordLength[group] + orcaHeaderLength;
                 
-                dataRecord[group]		= malloc((totalRecordLength[group])*sizeof(unsigned long));
             }
             isRunning = YES;
             firstTime = NO;
+            
+
+//            dataRecord      = malloc((longestRecordLength)*sizeof(unsigned long));
+
             
             [self enableSampleLogic];
             [self pulseExternalTriggerOut];     // this may or may not be desired
@@ -5845,44 +5847,32 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             */
             
             bool endAddThreshFlag = NO;
-//            unsigned long sampleAddress14 = 0;
-//            unsigned long sampleAddress58 = 0;
+
             unsigned long endThresh14 = 0;
             unsigned long endThresh58 = 0;
-//            unsigned long sampleStatus14 = 0;
-//            unsigned long sampleStatus58 = 0;
-//            unsigned long value1 = 0;
-//            unsigned long value2 = 0;
+
 
             ac =              [self readAcquisitionControl:NO];
-//            sampleAddress14 = [self readActualSampleAddress:0];
-//            sampleAddress58 = [self readActualSampleAddress:1];
+
             endThresh14     = [self readEndAddressThresholdOfGroup:0];
             endThresh58     = [self readEndAddressThresholdOfGroup:1];
-//            sampleStatus14  = [self readSamplingStatusForGroup:0];
-//            sampleStatus58  = [self readSamplingStatusForGroup:1];
-//            value1          = [self readActualSampleValueOfChannel:0];
-//            value2          = [self readActualSampleValueOfChannel:1];
+
             
             endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
             
             if (endAddThreshFlag == NO) {
                 return;
             }
-            
-//            NSLog(@"End Address Threshold 0: 0x%x\n",endThresh14);
-//            NSLog(@"End Address Threshold 1: 0x%x\n",endThresh58);
-            
-            // disarm/disable sampling?
+            //if we get here, there may be something to read out
+
+            // disarm/disable sampling (we can't read out while sampling)
             [self disarmSampleLogic];
             
-            //if we get here, there may be something to read out
             unsigned long numberOfWords[kNumSIS3305Groups];
             unsigned long numberBytesToRead[kNumSIS3305Groups];
             
             // read now all  Sample Addresses of all at which the sampling has stoped
 
-            unsigned short group =0;
 
             // prepare readout statemachines
             // Transfer Control ch1to4, start internal readout (copy from Memory to VME FPGA)
@@ -5890,12 +5880,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             [self writeDataTransferControlRegister:0 withCommand:2 withAddress:0];  // read command
             [self writeDataTransferControlRegister:1 withCommand:2 withAddress:0];  // read command
 
+            // we can only read out one group's FIFO at a time, so we just make the buffer big enough to hold whichever one is bigger.
+//            unsigned long longestRecordLength = dataRecordLength[0];
+//            if (dataRecordLength[0] < dataRecordLength[1]) {
+//                longestRecordLength = dataRecordLength[1];
+//            }
             
             // loop over all groups
+            unsigned short group =0;
             for(group=0;group<kNumSIS3305Groups;group++) {
 //                int group				 = i<4?0:1;
                 unsigned long adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
-                
+
 //                numberBytesToRead[group] = [self readActualSampleAddress:group];
                 numberOfWords[group]  = [self readActualSampleAddress:group] * 16;        // 1 block == 64 bytes == 16 Lwords
                 numberBytesToRead[group]   = numberOfWords[group] * 4;
@@ -5911,10 +5907,11 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     
                     do {
                         BOOL wrapMode = (wrapMaskForRun & (1L<<group))!=0;
+                        unsigned long  dataRecord[256*48];//dataRecord[longestRecordLength+512];
+
+                        dataRecord[0] =   dataId | totalRecordLength[group]; //numberBytesToRead[group];
                         
-                        dataRecord[group][0] =   dataId | totalRecordLength[group]; //numberBytesToRead[group];
-                        
-                        dataRecord[group][1] =	(([self crateNumber]            & 0xf) << 28)   |
+                        dataRecord[1] =	(([self crateNumber]            & 0xf) << 28)   |
                                                 (([self slot]                   & 0x1f)<< 20)   |
                                                 (([self channelMode:group]      & 0xF) << 16)   |
                                                 ((group                         & 0xF) << 12)   |
@@ -5922,17 +5919,21 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                                 (([self eventSavingMode:group]  & 0xF) << 4)    |
                                                 (wrapMode                       & 0x1);
 
-                        dataRecord[group][2] = dataRecordLength[group];
+                        dataRecord[2] = dataRecordLength[group];
 
-                        unsigned long* p = &dataRecord[group][3];
+                        unsigned long* p = &dataRecord[3];
                         [[self adapter] readLongBlock: p
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
                                             numToRead: dataRecordLength[group]
                                            withAddMod: [self addressModifier]
                                         usingAddSpace: 0x01];
                         
-                        NSLog(@"Group %d             event added to frame buffer.\n", group);
-                        [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
+                        [aDataPacket addLongsToFrameBuffer:dataRecord length:totalRecordLength[group]];
+                        NSLog(@"Group %d             event added to frame buffer. (takedata)\n", group);
+
+                        NSLog(@"                        record had word 0 of: 0x%08x (takedata)\n",dataRecord[0]);
+                        NSLog(@"                        record had word 1 of: 0x%08x (takedata)\n",dataRecord[1]);
+                        NSLog(@"                        record had word 4 of: 0x%08x (takedata)\n",dataRecord[4]);
 
                         addrOffset += (dataRecordLength[group])*4;
                         if(++eventCount > 25)break;
@@ -6019,13 +6020,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [waveFormRateGroup stop];
     //[self setLed:1 to:NO];
 	
-	int group;
-	for(group=0;group<kNumSIS3305Groups;group++){
-		if(dataRecord){
-			free(dataRecord[group]);
-			dataRecord[group] = nil;
-		}
-	}
+//	int group;
+//	for(group=0;group<kNumSIS3305Groups;group++){
+//		if(dataRecord){
+//			free(dataRecord);
+//			dataRecord = nil;
+//		}
+//	}
 	
 }
 

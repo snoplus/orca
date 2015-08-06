@@ -121,7 +121,8 @@ protected:
     virtual bool disarmSampleLogic();
     
     // handy class variables
-    bool        firstTime;
+    
+    uint32_t dmaBuffer[0x200000]; //2M Longs (8MB)
     //	bool        fPulseMode;
     //	bool        fProcessPulse;
     //	bool        fWaitingForSomeChannels;
