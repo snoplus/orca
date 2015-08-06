@@ -305,7 +305,7 @@
 											<object class="NSButtonCell" key="NSCell" id="863213980">
 												<int key="NSCellFlags">67108864</int>
 												<int key="NSCellFlags2">138018816</int>
-												<string key="NSContents">Start Replay</string>
+												<string key="NSContents">Start Scan</string>
 												<reference key="NSSupport" ref="26"/>
 												<reference key="NSControlView" ref="565799266"/>
 												<int key="NSButtonFlags">-2038284288</int>
@@ -827,14 +827,6 @@
 						<reference key="destination" ref="498205961"/>
 					</object>
 					<int key="connectionID">242</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">headerTextDrawer</string>
-						<reference key="source" ref="82237256"/>
-						<reference key="destination" ref="357299380"/>
-					</object>
-					<int key="connectionID">266</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
