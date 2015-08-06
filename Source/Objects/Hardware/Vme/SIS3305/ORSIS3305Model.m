@@ -5877,7 +5877,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             [self disarmSampleLogic];
             
             //if we get here, there may be something to read out
-            unsigned long sampleAddress[kNumSIS3305Groups];
             unsigned long numberOfWords[kNumSIS3305Groups];
             unsigned long numberBytesToRead[kNumSIS3305Groups];
             
@@ -5930,9 +5929,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:group]
                                             numToRead: dataRecordLength[group]
                                            withAddMod: [self addressModifier]
-                                        usingAddSpace: 0xFF];
+                                        usingAddSpace: 0x01];
                         
-//                        NSLog(@"ORSIS3305Model:takeData - Event read out and added to frame buffer.\n");
+                        NSLog(@"Group %d             event added to frame buffer.\n", group);
                         [aDataPacket addLongsToFrameBuffer:dataRecord[group] length:totalRecordLength[group]];
 
                         addrOffset += (dataRecordLength[group])*4;

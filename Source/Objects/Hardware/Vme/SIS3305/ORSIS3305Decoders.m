@@ -89,6 +89,12 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 
     unsigned long* ptr	= (unsigned long*)someData;
     
+    NSLog(@"ptr[0]:    0x%08x\n",ptr[0]);
+    NSLog(@"ptr[1]:    0x%08x\n",ptr[1]);
+    NSLog(@"ptr[2]:    0x%08x\n",ptr[2]);
+    NSLog(@"ptr[3]:    0x%08x\n",ptr[3]);
+    NSLog(@"ptr[4]:    0x%08x\n\n",ptr[4]);
+
     // extract things from the Orca header
 	unsigned long length= ExtractLength(ptr[0]);        // should be the totalRecordLength in longs, including both headers and full waveform
 	unsigned int crate	= ShiftAndExtract(ptr[1],28,0xf);
@@ -117,6 +123,9 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         return -1;
     }
     
+    NSLog(@"Group %d        event being decoded\n",group);
+    
+    
     unsigned long waveformLength = dataLength-sisHeaderLength; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
     
     unsigned long* dataPtr = ptr +orcaHeaderLength;   // hold on to this here
@@ -124,6 +133,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     unsigned short n;
     for(n=0;n<numEvents;n++)    // actually, there should only ever be one event
     {
+        NSLog(@"Group %d    n = %d\n",group,n);
         dataLength = dataPtr[2];      // SIS header + data length, in longs
 
 //        unsigned long* nextRecordPtr = dataPtr + dataLength + orcaHeaderLength;
