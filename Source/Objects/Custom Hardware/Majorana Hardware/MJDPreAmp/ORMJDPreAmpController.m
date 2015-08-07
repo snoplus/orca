@@ -752,7 +752,8 @@
 - (void) dacChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
-	[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];		//convert to volts
+	//[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.];   //convert to volts
+    [[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*3./65535.];		//new voltage ref
 }
 
 - (void) amplitudeChanged:(NSNotification*)aNotification
@@ -765,7 +766,8 @@
 {
 	short chan;
 	for(chan=0;chan<kMJDPreAmpDacChannels;chan++){
-		[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.]; //convert to volts
+		//[[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*4.1/65535.]; //convert to volts
+        [[dacsMatrix cellWithTag:chan] setFloatValue: [model dac:chan]*3./65535.];   //new voltage ref
 	}
 }
 
@@ -876,7 +878,8 @@
 
 - (IBAction) dacsAction:(id)sender
 {
-	[model setDac:[[sender selectedCell] tag] withValue:[sender floatValue]*65535./4.1]; //convert from volts to hw value
+	//[model setDac:[[sender selectedCell] tag] withValue:[sender floatValue]*65535./4.1]; //convert from volts to hw value
+    [model setDac:[[sender selectedCell] tag] withValue:[sender floatValue]*65535./3.];  //new voltage ref
 }
 
 - (IBAction) amplitudesAction:(id)sender
