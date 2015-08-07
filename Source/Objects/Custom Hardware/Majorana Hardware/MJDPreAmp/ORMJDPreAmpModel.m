@@ -24,6 +24,7 @@
 #import "ORTimeRate.h"
 #import "ORAlarm.h"
 #import "ORMJDSegmentGroup.h"
+#import "MajoranaModel.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
@@ -269,7 +270,16 @@ struct {
 }
 - (void) hardwareMapChanged:(NSNotification*)aNote
 {
-    if([[aNote object] class] == NSClassFromString(@"ORMJDSegmentGroup")){
+    if(aNote == nil || [[aNote object] class] == NSClassFromString(@"ORMJDSegmentGroup")){
+        NSArray* segments = nil;
+        if(aNote)segments = [[aNote object] segments];
+        else {
+            NSArray* mjdObjects = [[[NSApp delegate] document] collectObjectsWithClassName:@"MajoranaModel"];
+            if([mjdObjects count]){
+                MajoranaModel* mjdObject = [mjdObjects objectAtIndex:0];
+                segments = [[mjdObject segmentGroup:0] segments];
+            }
+        }
         ORConnector* inputConnector     = [[self connectors] objectForKey:MJDPreAmpInputConnector];
         ORConnector* otherObjConnector  = [inputConnector connector];
         OrcaObject*  digitizerObj       = [otherObjConnector objectLink];
@@ -284,7 +294,6 @@ struct {
                 for(i=0;i<kMJDPreAmpAdcChannels;i++){
                     newNames[i] = @"";
                 }
-                NSArray* segments = [[aNote object] segments];
                 for(ORDetectorSegment* aSegment in segments){
                     NSString* vmeString     = [aSegment objectForKey:@"kVME"];
                     NSString* digString     = [aSegment objectForKey:@"kPreAmpDigitizer"];
@@ -331,11 +340,13 @@ struct {
 - (void) setDoNotUseHWMap:(BOOL)aDoNotUseHWMap
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDoNotUseHWMap:doNotUseHWMap];
-    
     doNotUseHWMap = aDoNotUseHWMap;
-    
+    if(!doNotUseHWMap){
+        [self hardwareMapChanged:nil];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDoNotUseHWMapChanged object:self];
 }
+
 - (int) boardRev
 {
     return boardRev;
