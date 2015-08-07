@@ -22,6 +22,7 @@
 @interface ORMJDPreAmpController : OrcaObjectController
 {
     @private
+        IBOutlet NSPopUpButton* doNotUseHWMapPU;
 		IBOutlet NSButton*		settingsLockButton;
         IBOutlet NSPopUpButton* boardRevPU;
         IBOutlet NSButton*      useSBCCB;
@@ -55,6 +56,7 @@
         IBOutlet ORCompositeTimeLineView*	voltagePlot;
         IBOutlet ORCompositeTimeLineView*	leakageCurrentPlot0;
         IBOutlet ORCompositeTimeLineView*	leakageCurrentPlot1;
+        IBOutlet NSTextField*   nameSourceHelpField;
         BOOL     scheduledToUpdatePlot;
 }
 
@@ -68,6 +70,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) doNotUseHWMapChanged:(NSNotification*)aNote;
 - (void) boardRevChanged:(NSNotification*)aNote;
 - (void) useSBCChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNotification;
@@ -107,6 +110,7 @@
 - (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) doNotUseHWMapAction:(id)sender;
 - (IBAction) boardRevAction:(id)sender;
 - (IBAction) clearSupplyErrorsAction:(id)sender;
 - (IBAction) useSBCAction:(id)sender;

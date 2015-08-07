@@ -60,6 +60,7 @@
     BOOL            useSBC;
     int             boardRev;
     BOOL            connected;
+    BOOL            doNotUseHWMap;
     
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
@@ -68,6 +69,8 @@
 
 - (void) setUpArrays;
 - (NSString*) connectedObjectName;
+- (void) registerNotificationObservers;
+- (void) hardwareMapChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
 - (int)  boardRev;
@@ -123,6 +126,8 @@
 - (void) setDac:(unsigned short) aChan withValue:(unsigned long) aValue;
 - (unsigned long) amplitude:(int) aChan;
 - (void) setAmplitude:(int) aChan withValue:(unsigned long) aValue;
+- (BOOL) doNotUseHWMap;
+- (void) setDoNotUseHWMap:(BOOL)aDoNotUseHWMap;
 
 #pragma mark ¥¥¥Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -159,6 +164,7 @@
 @end
 
 #pragma mark ¥¥¥External Strings
+extern NSString* ORMJDPreAmpModelDoNotUseHWMapChanged;
 extern NSString* ORMJDPreAmpModelBoardRevChanged;
 extern NSString* ORMJDPreAmpModelUseSBCChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
@@ -184,6 +190,7 @@ extern NSString* ORMJDFeedBackResistorChanged;
 extern NSString* ORMJDBaselineVoltageChanged;
 extern NSString* ORMJDPreAmpModelDetectorNameChanged;
 extern NSString* ORMJDPreAmpModelConnectionChanged;
+extern NSString* ORMJDPreAmpModelDoNotUseHWMapChanged;
 
 @interface NSObject (ORMJDPreAmpModel)
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;

@@ -377,6 +377,11 @@
                      selector : @selector(setWindowTitle)
                          name : ORVmeCardSlotChangedNotification
                         object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(doNotUseHWMapChanged:)
+                         name : ORMJDPreAmpModelDoNotUseHWMapChanged
+                        object: model];
 }
 
 - (void) updateWindow
@@ -404,9 +409,30 @@
 	[self useSBCChanged:nil];
 	[self boardRevChanged:nil];
     [self adcChanged:nil];
+    [self doNotUseHWMapChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) doNotUseHWMapChanged:(NSNotification*)aNote
+{
+    [doNotUseHWMapPU selectItemAtIndex: [model doNotUseHWMap]];
+    
+    if([model doNotUseHWMap]){
+        [nameSourceHelpField setStringValue:@"The detector ID is IMPORTANT! It is used to label this data in the database!"];
+
+    }
+    else {
+        [nameSourceHelpField setStringValue:@"Detector IDs will be synced from the MJD HW Map. Make sure the map is up-to-date!"];
+    }
+    short chan;
+    for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
+        if(chan<=4 || chan>=8 && chan<=12){
+            [[detectorNameMatrix cellWithTag:chan] setBezeled: [model doNotUseHWMap]];
+            /*if([model doNotUseHWMap])*/[[detectorNameMatrix cellWithTag:chan] setDrawsBackground: [model doNotUseHWMap]];
+        }
+    }
+    [self updateButtons];
+}
 
 - (void) boardRevChanged:(NSNotification*)aNote
 {
@@ -719,7 +745,8 @@
 	[pulserMaskMatrix	setEnabled:!lockedOrRunningMaintenance];	
 	[startPulserButton	setEnabled:!lockedOrRunningMaintenance];	
 	[stopPulserButton	setEnabled:!lockedOrRunningMaintenance];	
-	[pollTimePU			setEnabled:!locked];	
+	[pollTimePU			setEnabled:!locked];
+    [detectorNameMatrix setEnabled:!locked && [model doNotUseHWMap]];
 }
 
 - (void) dacChanged:(NSNotification*)aNotification
@@ -751,17 +778,21 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) doNotUseHWMapAction:(id)sender
+{
+    [model setDoNotUseHWMap:[sender indexOfSelectedItem]];
+}
 
-- (void) boardRevAction:(id)sender
+- (IBAction) boardRevAction:(id)sender
 {
 	[model setBoardRev:[sender indexOfSelectedItem]];
 }
 
-- (void) useSBCAction:(id)sender
+- (IBAction) useSBCAction:(id)sender
 {
 	[model setUseSBC:[sender intValue]];
 }
-- (void) adcEnabledMaskAction:(id)sender
+- (IBAction) adcEnabledMaskAction:(id)sender
 {
 	unsigned short mask = 0;
 	int i;
@@ -772,27 +803,25 @@
 	[model setAdcEnabledMask:mask];	
 }
 
-- (void) shipValuesAction:(id)sender
+- (IBAction) shipValuesAction:(id)sender
 {
 	[model setShipValues:[sender intValue]];	
 }
 
-- (void) pollTimeAction:(id)sender
+- (IBAction) pollTimeAction:(id)sender
 {
 	[model setPollTime:[[sender selectedItem] tag]];
 }
 
-- (void) loopForeverAction:(id)sender
+- (IBAction) loopForeverAction:(id)sender
 {
 	[model setLoopForever:![sender indexOfSelectedItem]];	
 }
 
-- (void) pulseCountAction:(id)sender
+- (IBAction) pulseCountAction:(id)sender
 {
 	[model setPulseCount:[sender intValue]];	
 }
-
-#pragma mark ¥¥¥Actions
 
 - (IBAction) clearSupplyErrorsAction:(id)sender
 {

@@ -23,6 +23,7 @@
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
 #import "ORAlarm.h"
+#import "ORMJDSegmentGroup.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
@@ -50,6 +51,7 @@ NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
 NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
 NSString* ORMJDPreAmpModelDetectorNameChanged		= @"ORMJDPreAmpModelDetectorNameChanged";
 NSString* ORMJDPreAmpModelConnectionChanged		= @"ORMJDPreAmpModelConnectionChanged";
+NSString* ORMJDPreAmpModelDoNotUseHWMapChanged = @"ORMJDPreAmpModelDoNotUseHWMapChanged";
 
 
 #pragma mark ¥¥¥Local Strings
@@ -137,6 +139,7 @@ struct {
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [lastDataBaseUpdate release];
     [dacs release];
 	int i;
@@ -162,6 +165,7 @@ struct {
 - (void) sleep
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super sleep];
 }
 
@@ -171,6 +175,7 @@ struct {
 	if(pollTime){
 		[self pollValues];
 	}
+    [self registerNotificationObservers];
 }
 
 - (void) setUpArrays
@@ -250,9 +255,87 @@ struct {
 {
     [self linkToController:@"ORMJDPreAmpController"];
 }
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hardwareMapChanged:)
+                         name : ORSegmentGroupConfiguationChanged
+                       object : nil];
+    
+}
+- (void) hardwareMapChanged:(NSNotification*)aNote
+{
+    if([[aNote object] class] == NSClassFromString(@"ORMJDSegmentGroup")){
+        ORConnector* inputConnector     = [[self connectors] objectForKey:MJDPreAmpInputConnector];
+        ORConnector* otherObjConnector  = [inputConnector connector];
+        OrcaObject*  digitizerObj       = [otherObjConnector objectLink];
+        if(digitizerObj){
+            NSString* digitizerID = [digitizerObj fullID];
+            NSArray* parts = [digitizerID componentsSeparatedByString:@","];
+            if([parts count] == 3){
+                int ourVmeCrate = [[parts objectAtIndex: 1]intValue];
+                int ourVmeSlot  = [[parts objectAtIndex: 2]intValue];
+                NSString* newNames[kMJDPreAmpAdcChannels];
+                int i;
+                for(i=0;i<kMJDPreAmpAdcChannels;i++){
+                    newNames[i] = @"";
+                }
+                NSArray* segments = [[aNote object] segments];
+                for(ORDetectorSegment* aSegment in segments){
+                    NSString* vmeString     = [aSegment objectForKey:@"kVME"];
+                    NSString* digString     = [aSegment objectForKey:@"kPreAmpDigitizer"];
+                    NSString* preAmpChan    = [aSegment objectForKey:@"kPreAmpChan"];
+                    NSString* detName       = [aSegment objectForKey:@"kDetectorName"];
+                    if([self validMapName:vmeString]  &&
+                       [self validMapName:digString]  &&
+                       [self validMapName:preAmpChan]){
+                        
+                        int vmeCrate    = [vmeString intValue];
+                        int slot        = [digString intValue];
+                        int chan        = [preAmpChan intValue];
+                        if((vmeCrate == ourVmeCrate) && (slot == ourVmeSlot)){
+                            if([detName length]){
+                                if(chan>=0 && chan<=4 || chan>=8 && chan<=12){
+                                    newNames[chan] = detName;
+                                }
+                            }
+                        }
+                    }
+                }
+                for(i=0;i<kMJDPreAmpAdcChannels;i++){
+                    [[self undoManager] disableUndoRegistration];
+                    [self setDetector:i name:newNames[i]];
+                    [[self undoManager] enableUndoRegistration];
+                }
+            }
+        }
+    }
+}
+
+- (BOOL) validMapName:(NSString*)aName
+{
+    if([aName length]>0 && ![aName hasPrefix:@"-"])return YES;
+    else return NO;
+}
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) doNotUseHWMap
+{
+    return doNotUseHWMap;
+}
 
+- (void) setDoNotUseHWMap:(BOOL)aDoNotUseHWMap
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDoNotUseHWMap:doNotUseHWMap];
+    
+    doNotUseHWMap = aDoNotUseHWMap;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelDoNotUseHWMapChanged object:self];
+}
 - (int) boardRev
 {
     return boardRev;
@@ -1098,17 +1181,21 @@ struct {
     [self setAmplitudes:	[decoder decodeObjectForKey: @"amplitudes"]];
     [self setFeedBackResistors:	[decoder decodeObjectForKey: @"feedBackResistors"]];
     [self setBaselineVoltages:	[decoder decodeObjectForKey: @"baselineVoltages"]];
+    [self setDoNotUseHWMap:[decoder decodeBoolForKey:@"doNotUseHWMap"]];
 	
     if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
 
-    [[self undoManager] enableUndoRegistration];
+    [self registerNotificationObservers];
     
+    [[self undoManager] enableUndoRegistration];
+   
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:doNotUseHWMap   forKey:@"doNotUseHWMap"];
 	[encoder encodeInt:boardRev         forKey:@"boardRev"];
 	[encoder encodeBool:useSBC          forKey:@"useSBC"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
