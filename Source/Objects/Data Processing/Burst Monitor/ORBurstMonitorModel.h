@@ -92,6 +92,8 @@
     int peakN;
     int lowN;
     double adcP;
+    double alphaP;
+    double gammaP;
     
     //burst tags
     unsigned short burstTell; //1 if a bust still needs printing

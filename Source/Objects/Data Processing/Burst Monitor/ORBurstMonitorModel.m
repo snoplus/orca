@@ -407,6 +407,7 @@ double facto(unsigned long long num)
     if(!theDecoder){
         theDecoder = [aDecoder retain];
     }
+    //NSLog(@"%@", [aDecoder fileHeader]);
     NSDate* now = [NSDate date];
     [dataArray retain];
     //each block of data is an array of NSData objects, each potentially containing many records
@@ -494,7 +495,7 @@ double facto(unsigned long long num)
                             
                             
                             //make array of data to be buffered
-                            [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];  //crash line, stopoing after burst
+                            [chans insertObject:[NSNumber numberWithInt:chanNum] atIndex:0];  //crash line, stopoing after burst //Fixme //CBdo
                             [cards insertObject:[NSNumber numberWithInt:cardNum] atIndex:0];
                             [adcs insertObject:[NSNumber numberWithInt:energy]  atIndex:0];
                             [secs insertObject:[NSNumber numberWithLong:secondsSinceEpoch] atIndex:0];
@@ -571,9 +572,9 @@ double facto(unsigned long long num)
                                             {
                                                 multInBurst = foundMult;
                                                 foundMult = nHit;
-                                                
+                                                //Make copies of the chans so analysis does not look at new stuff coming in
                                                 [Bchans release];
-                                                Bchans = [chans mutableCopy]; //part of crash line
+                                                Bchans = [chans mutableCopy]; //part of (old)crash line
                                                 
                                                 [Bcards release];
                                                 Bcards = [cards mutableCopy];
@@ -657,6 +658,7 @@ double facto(unsigned long long num)
                                                 numBurstChan = numChan;
                                                 
                                                 //Find ADC likelyhood of burst //fixme: has sporatically broken, don't know why.  Possibly stopped breaking after trivial edits.
+                                                // did I fix this?  I think it was stuff with the type if the factorial
                                                 peakN = 0;
                                                 lowN = 0;
                                                 int n;
@@ -709,8 +711,57 @@ double facto(unsigned long long num)
                                                 NSLog(@"adcP is %f, peak/lowN is %i, %i \n", adcP, peakN, lowN); //fixme CB remove when confident this works
                                                 
                                                 //Find background likelyhood in burst //fixme
-                                                
-                                                
+                                                int numgamma = 0;
+                                                double rategamma = 3.8; // From run 3681
+                                                int numalpha = 0;
+                                                double ratealpha = 319.0/86400.0; // From a bunch of runs before Aug 2015
+                                                double tbackground = 1;
+                                                for(n=1; n<[Badcs count]; n++)
+                                                {
+                                                    if([[Badcs objectAtIndex:n] intValue]<250) //CBdo fixme this should be less than peak/4 - a few peaksigma
+                                                    {
+                                                        numgamma++;
+                                                    }
+                                                    else
+                                                    {
+                                                        if([[Badcs objectAtIndex:n] intValue]>1400)
+                                                        {
+                                                            numalpha++;
+                                                        }
+                                                    }
+                                                }
+                                                tbackground = ([[Bsecs objectAtIndex:1] longValue] + 0.000001*[[Bmics objectAtIndex:1] longValue]) - ([[Bsecs objectAtIndex:([Bsecs count]-1)] longValue] + 0.000001*[[Bmics objectAtIndex:([Bmics count]-1)] longValue]);
+                                                double egamma = rategamma*tbackground;
+                                                double ealpha = ratealpha*tbackground;
+                                                double errgamma=0;
+                                                double erralpha=0;
+                                                if(numgamma>0)
+                                                {
+                                                    errgamma = (numgamma - egamma)/(sqrt(numgamma));
+                                                }
+                                                if(numalpha>0)
+                                                {
+                                                    erralpha = (numalpha - ealpha)/(sqrt(numalpha));
+                                                }
+                                                NSLog(@"BG parameters are time of %f, gamma of %i, alpha of %i, expect %f,%f, errs %f,%f \n", tbackground, numgamma, numalpha, rategamma*tbackground, ratealpha*tbackground, errgamma, erralpha );
+                                                double inprob = 0;
+                                                for(n=0; n<(numgamma + 2*egamma); n++)
+                                                {
+                                                    if(fabs(n-egamma) < fabs(numgamma - egamma))
+                                                    {
+                                                        inprob = inprob + (pow(egamma,n)/(pow(2.7182818284,egamma)*facto(n)));
+                                                    }
+                                                }
+                                                gammaP = 1 - inprob;
+                                                inprob = 0;
+                                                for(n=0; n<(numalpha + 2*ealpha); n++)
+                                                {
+                                                    if(fabs(n-ealpha) < fabs(numalpha - ealpha))
+                                                    {
+                                                        inprob = inprob + (pow(ealpha,n)/(pow(2.7182818284,ealpha)*facto(n)));
+                                                    }
+                                                }
+                                                alphaP = 1 - inprob;
                                                 
                                                 
                                                 //Report basic traits before veto
@@ -1367,7 +1418,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     theContent = [theContent stringByAppendingFormat:@"Number of channels in this burst: %d\n",numBurstChan];
     theContent = [theContent stringByAppendingFormat:@"Epected number of channels: %f, Probablility given number of counts: %f \n", exChan, chanpvalue];
     theContent = [theContent stringByAppendingFormat:@"Number of events with neutron-like energy: %d\n",peakN + lowN];
-    theContent = [theContent stringByAppendingFormat:@"Likelyhood of neutron energy distribution: %f\n",adcP];
+    theContent = [theContent stringByAppendingFormat:@"Likelyhood of neutron energy distribution: %f, Likelyhood of (<250adc, >1400adc) background: %f,%f\n",adcP,gammaP,alphaP];
     theContent = [theContent stringByAppendingFormat:@"Position: (x,y)=(%i+-%f,%i+-%f) mm, phi=%f, r=%f mm, rms=%f mm  \n", Xcenter, Xrms, Ycenter, Yrms, phi, Rcenter, Rrms];
     theContent = [theContent stringByAppendingFormat:@"SN expected: (x,y)=(0+-655,0+-508) mm, r=0 mm, rms=829 mm  \n"];
     theContent = [theContent stringByAppendingFormat:@"Likelyhood of central position: chisquared %f/2, p = %f \n", rSqrNorm, exp(-0.5*rSqrNorm)];
@@ -1412,10 +1463,10 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     int intSecTillBurst = numSecTillBurst;
     header1 = [header1 stringByAppendingFormat:@"<key>BurstInfo</key>\n\t<dict>\n\t\t<key>BurstNumber</key>\n\t\t<integer>%i</integer>\n\t\t<key>BurstStartTime</key>\n\t\t<integer>%i</integer>\n\t\t<key>Triage</key>\n\t\t<string>%@</string>\n\t\t<key>BurstDuration</key>\n\t\t<real>%f</real>\n\t\t<key>Multiplicity</key>\n\t\t<integer>%i</integer>\n\t</dict>\n\t", burstCount, intSecTillBurst, theTriage, durSec, countsInBurst];  //theTriage or novaState?
     header1 = [header1 stringByAppendingString:header2];
-    //NSLog(@"%@\n", header1);
+    //NSLog(@"notherenotherenothernotherenotherenothernotherenotherenothernotherenotherenother %@\n", header1);
     
     NSData* newheader=[header1 dataUsingEncoding:NSUTF8StringEncoding];
-    //NSLog(@"%@", newheader);
+    //NSLog(@" notherenotherenotherenotherenotherenothernotherenotherenothernotherenotherenother %@", newheader);
     
     [theBurstMonitoredObject processData:[NSArray arrayWithObject:newheader] decoder:theDecoder]; //this is the header of the data file
     NSMutableArray* anArrayOfData = [NSMutableArray array];
