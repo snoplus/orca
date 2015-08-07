@@ -153,12 +153,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (void) objectsAdded:(NSNotification*)aNote
 {
-    [self findObjects];
+    if([[aNote object] isKindOfClass:NSClassFromString(@"ORGroup")]){
+        [self findObjects];
+    }
 }
 
 - (void) objectsRemoved:(NSNotification*)aNote
 {
-    [self findObjects];
+    if([[aNote object] isKindOfClass:NSClassFromString(@"ORGroup")]){
+        [self findObjects];
+    }
 }
 
 #pragma mark ¥¥¥Accessors
