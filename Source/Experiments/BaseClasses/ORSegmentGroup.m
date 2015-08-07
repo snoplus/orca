@@ -152,13 +152,16 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) configurationChanged:(NSNotification*)aNote
 {
-	NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
-	[segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
-	[self registerForRates];
-	
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORSegmentGroupConfiguationChanged
-                      object:self];
+    if([[aNote object] isKindOfClass:NSClassFromString(@"ORGroup")]){
+
+        NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
+        [segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
+        [self registerForRates];
+        
+        [[NSNotificationCenter defaultCenter]
+            postNotificationName:ORSegmentGroupConfiguationChanged
+                          object:self];
+    }
 }
 
 #pragma mark •••Accessors

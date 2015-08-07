@@ -244,15 +244,19 @@
 
 - (void) configurationChanged:(NSNotification*)aNote
 {
-    NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
-    adcObjects = [adcObjects arrayByAddingObjectsFromArray:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")]];
-    adcObjects = [adcObjects arrayByAddingObjectsFromArray:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4AModel")]];
-    [segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
-    [self registerForRates];
     
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:ORSegmentGroupConfiguationChanged
-     object:self];
+    if([[aNote object] isKindOfClass:NSClassFromString(@"ORGroup")]){
+        
+        NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
+        adcObjects = [adcObjects arrayByAddingObjectsFromArray:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4MModel")]];
+        adcObjects = [adcObjects arrayByAddingObjectsFromArray:[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4AModel")]];
+        [segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
+        [self registerForRates];
+        
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:ORSegmentGroupConfiguationChanged
+         object:self];
+    }
 }
 
 @end
