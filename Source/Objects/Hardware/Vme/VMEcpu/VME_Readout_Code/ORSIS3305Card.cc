@@ -173,6 +173,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                 (wrapMode                                       & 0x1);
                 
                 data[dataIndex++] = dataRecordLength[group];
+                LogMessage("group %d: data['1'] = 0x%08x",group, data[dataIndex - 2]);
                 
                 // I memcpy totalRL because the orca header is added to the datastream for each packet here
                 memcpy(data + dataIndex, &dmaBuffer, totalRecordLength[group]*sizeof(uint32_t));

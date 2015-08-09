@@ -662,7 +662,7 @@
 - (unsigned long) readSamplePretriggerLengthOfGroup:(short)group;
 - (void) writeSamplePretriggerLengthOfGroup:(short)group toValue:(unsigned long)value;
 - (unsigned long) readRingbufferPretriggerDelayOnChannel:(short)chan;
-- (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value;
+//- (void) writeRingbufferPretriggerDelayOnChannel:(unsigned short)chan toValue:(unsigned long)value;
 - (void) writeRingbufferPretriggerDelays;
 
 - (unsigned long) readMaxNumOfEventsInGroup:(short)group;

@@ -93,216 +93,208 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     NSLog(@"ptr[1]:    0x%08x (in decoder)\n",ptr[1]);
 
     // extract things from the Orca header
-	unsigned long length = ExtractLength(ptr[0]);        // should be the totalRecordLength in longs, including both headers and full waveform
+	unsigned long length = ExtractLength(ptr[0]);        // the length in longs of the full *read* record (may contain multiple waveforms), with Orca header
 	unsigned int crate	 = ShiftAndExtract(ptr[1],28,0xf);
 	unsigned int card	 = ShiftAndExtract(ptr[1],20,0x1f);
 
     // extract group level things from the SIS header
 
     //unsigned short  channelMode = ShiftAndExtract(ptr[1],16, 0xF);
-    unsigned int    group       = ShiftAndExtract(ptr[1],12, 0xf);
+    unsigned int    group       = ShiftAndExtract(ptr[1],12, 0x1);
     unsigned short  rate        = ShiftAndExtract(ptr[1], 8, 0xF);
     unsigned short  savingMode  = ShiftAndExtract(ptr[1], 4, 0xF);
     BOOL            wrapMode    = ShiftAndExtract(ptr[1], 0, 0x1);
     
-    unsigned long dataLength = ptr[2];      // SIS header + data length, in longs
+    unsigned long dataLength = ptr[2];      // SIS header + data length of single record, in longs
+    
     
 	long sisHeaderLength;
 	if(wrapMode)sisHeaderLength = 16;
 	else		sisHeaderLength = 4;
-    unsigned long orcaHeaderLength = 3;
+    unsigned long orcaHeaderLength = 4;
     
-    if (length != dataLength+orcaHeaderLength) {
-        NSLogColor([NSColor redColor], @"Lengths reported in orca header(ptr[0]=0x%x and ptr[2]+orca header= 0x%x) disagree with each other\n.",length,dataLength+orcaHeaderLength);
-        return length; //must return the length
-    }
+    unsigned long totalLongsInAllWords = (ptr[3]>>16)&0xFFFF;
+    unsigned short numEvents = floor((length-orcaHeaderLength)/dataLength);
+    unsigned long numEventsFromHeader = ptr[3]&0xFFFF;
+    
+    
+//    if (length != dataLength+orcaHeaderLength) {
+//        NSLogColor([NSColor redColor], @"Lengths reported in orca header(ptr[0]=0x%x and ptr[2]+orca header= 0x%x) disagree with each other\n.",length,dataLength+orcaHeaderLength);
+//        return length; //must return the length
+//    }
     
     NSLog(@"Group %d        event being decoded\n",group);
 
     unsigned long waveformLength = dataLength-sisHeaderLength; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
-    unsigned long* dataPtr       = ptr +orcaHeaderLength;   // hold on to this here
+    unsigned long* dataPtr       = ptr + orcaHeaderLength;   // hold on to this here
     
-    //NSLog(@"Group %d    n = %d (decoder)\n",group,n);
-    dataLength = dataPtr[2];      // SIS header + data length, in longs
 
-    //unsigned long* nextRecordPtr = dataPtr + dataLength + orcaHeaderLength;
-    //unsigned int channel    = ShiftAndExtract(ptr[3], 28, 0xF);     // event ID (meaning depends on mode...) FIX: This isn't actually the channel!!
-    
-    // extract things from the SIS header
-    unsigned short eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
-    unsigned long  timestampLow = dataPtr[1];
-    unsigned long  timestampHigh = dataPtr[0]&0xFFFF;
-    unsigned long  long timestamp = timestampLow | (timestampHigh << 31);
-   // NSLog(@"                        event had low ts of: 0x%08x (decoder)\n",timestampLow);
 
-    unsigned short channel = 31;    // Biggest pre-computed value - if you see this, there's an error somewhere.
-    NSString* channelKey = [self getChannelKey: channel];;
     
-    NSString* crateKey		= [self getCrateKey: crate];
-    NSString* cardKey		= [self getCardKey: card];
-    
-    if(waveformLength /*&& (waveformLength == (length - 3))*/){ // this is a sanity check that we have data and it is the size we expect
+    NSLog(@"We guessed %d events from the sizes, the header reported %ld events should be there \n",numEvents,numEventsFromHeader);
+    unsigned short n;
+    for(n=0;n<numEvents;n++)
+    {
+//        NSLog(@"Group %d    n = %d (decoder)\n",group,n);
+        dataLength = (dataPtr[3]&0xFFFF)*4;      // SIS header + data length, in longs
+
+        unsigned long* nextRecordPtr = dataPtr + dataLength + sisHeaderLength;
+//        unsigned int channel    = ShiftAndExtract(ptr[0], 28, 0xF);     // event ID (meaning depends on mode...) FIX: This isn't actually the channel!!
+        
+        // extract things from the SIS header
+        unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
+        unsigned long       timestampLow = dataPtr[1];
+        unsigned long       timestampHigh = dataPtr[0]&0xFFFF;
+        unsigned long long  timestamp = timestampLow | (timestampHigh << 31);
+
+        unsigned short channel = 31;    // Biggest pre-computed value - if you see this, there's an error somewhere.
+        NSString* channelKey = [self getChannelKey: channel];;
+        
+        NSString* crateKey		= [self getCrateKey: crate];
+        NSString* cardKey		= [self getCardKey: card];
         NSMutableData*  recordAsData = [NSMutableData dataWithCapacity:(waveformLength*3*8)];
-        if(wrapMode){
-            return (unsigned long)(-1);
-            /*
-            channel = (kchannelModeAndEventID[channelMode][eventID] + (group*4));
-            channelKey    = [self getChannelKey: channel];
 
-            unsigned long nof_wrap_samples = dataPtr[6] ;
-            if(nof_wrap_samples <= waveformLength*3){
-                unsigned long wrap_start_index = dataPtr[7] ;
-                unsigned short* dataPtr			  = (unsigned short*)[recordAsData bytes];
-                unsigned short* ushort_buffer_ptr = (unsigned short*) &dataPtr[8];
-                int i;
-                unsigned long j	=	wrap_start_index;
-                for (i=0;i<nof_wrap_samples;i++) {
-                    if(j >= nof_wrap_samples ) j=0;
-                    dataPtr[i] = ushort_buffer_ptr[j++];
-                }
-            }
-             */
-        }
-        else if(savingMode == 4){  // 1.25 Gsps Event fifo mode
-            channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
-            channelKey    = [self getChannelKey: channel];
-            
-            unsigned long sisDataLength = 4*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+        if(waveformLength /*&& (waveformLength == (length - 3))*/){ // this is a sanity check that we have data and it is the size we expect
+            if(wrapMode){
+                return (unsigned long)(-1);
+                /*
+                channel = (kchannelModeAndEventID[channelMode][eventID] + (group*4));
+                channelKey    = [self getChannelKey: channel];
 
-            [recordAsData setLength:(sisDataLength*3*2)];  // length in bytes! there are 3 samples in each Long of the waveform, each takes 2 bytes
-            unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
-            int i=0;
-            unsigned short* waveData = [recordAsData mutableBytes];
-            int waveformIndex = 0;
-            // here `i` increments through each long word in the data
-            do{
-                waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
-                waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
-                waveData[waveformIndex++] = (lptr[i])       &0x3ff;
-                i++;
-            }while (waveformIndex < sisDataLength*3); // sisDataLength*3 = number samples in waveform
-        }
-        else if(savingMode == 0){  // 1 x 5 Gsps Event fifo mode
-            //            unsigned long numBlocks = (ptr[6]&0xFFFF);
-            channel = group*4;  //  FIX: use the real channel number
-            channelKey    = [self getChannelKey: channel];
-            
-            unsigned long sisDataLength = 16*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
-
-            [recordAsData setLength:sisDataLength*3*2];    // length is in bytes (hence 2), 3 samples per Lword
-            
-            if (rate == 2) { // 5gsps
-                // if we're reading out at 5 gsps, we have to unpack and de-interlace all four of the 4-word blocks at once...
-                
-                unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
-                int i;
-                unsigned short* waveData = (unsigned short*)[recordAsData bytes];
-                int waveformIndex = 0;
-                
-                // sisDataLength*3 = number samples in waveform
-                for(i=0;i<(sisDataLength*3);i+=16) // i steps through the entire waveform
-                {
-                    unsigned short k;
-                    for (k = 0; k<4; k++) { // k steps through the 4-word block that each ADC produces
-                        waveData[waveformIndex++] = (lptr[0+i+k]>>20)   &0x3ff;   // sample 1 + 12*k
-                        waveData[waveformIndex++] = (lptr[8+i+k]>>20)   &0x3ff;   // sample 2 + 12*k
-                        waveData[waveformIndex++] = (lptr[4+i+k]>>20)   &0x3ff;   // sample 3 + 12*k
-                        waveData[waveformIndex++] = (lptr[12+i+k]>>20)  &0x3ff;   // sample 4 + 12*k
-                        
-                        waveData[waveformIndex++] = (lptr[0+i+k]>>10)   &0x3ff;   // sample 5 + 12*k
-                        waveData[waveformIndex++] = (lptr[8+i+k]>>10)   &0x3ff;   // sample 6 + 12*k
-                        waveData[waveformIndex++] = (lptr[4+i+k]>>10)   &0x3ff;   // sample 7 + 12*k
-                        waveData[waveformIndex++] = (lptr[12+i+k]>>10)  &0x3ff;   // sample 8 + 12*k
-                        
-                        waveData[waveformIndex++] = (lptr[0+i+k])       &0x3ff;   // sample 9 + 12*k
-                        waveData[waveformIndex++] = (lptr[8+i+k])         &0x3ff;   // sample 10 + 12*k
-                        waveData[waveformIndex++] = (lptr[4+i+k])         &0x3ff;   // sample 11 + 12*k
-                        waveData[waveformIndex++] = (lptr[12+i+k])        &0x3ff;   // sample 12 + 12*k
-                        
+                unsigned long nof_wrap_samples = dataPtr[6] ;
+                if(nof_wrap_samples <= waveformLength*3){
+                    unsigned long wrap_start_index = dataPtr[7] ;
+                    unsigned short* dataPtr			  = (unsigned short*)[recordAsData bytes];
+                    unsigned short* ushort_buffer_ptr = (unsigned short*) &dataPtr[8];
+                    int i;
+                    unsigned long j	=	wrap_start_index;
+                    for (i=0;i<nof_wrap_samples;i++) {
+                        if(j >= nof_wrap_samples ) j=0;
+                        dataPtr[i] = ushort_buffer_ptr[j++];
                     }
                 }
+                 */
             }
-            
-            
-            if (rate == 1) {
-                // FIX: THIS COMPLETELY WON'T WORK -- just a placeholder!!!!!!
+            else if(savingMode == 4){  // 1.25 Gsps Event fifo mode
+                channel = ((dataPtr[0]>>28)&0xF) + (group*4);
+                channelKey    = [self getChannelKey: channel];
                 
+                unsigned long sisDataLength = 4*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+
+                [recordAsData setLength:(sisDataLength*3*2)];  // length in bytes! there are 3 samples in each Long of the waveform, each takes 2 bytes
                 unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
-                int i;
-                unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+                int i=0;
+                unsigned short* waveData = (unsigned short*)[recordAsData mutableBytes];
                 int waveformIndex = 0;
-                // here `i` increments through each word in the data
-                //
-                for(i=0;i<waveformLength;i++){
+                // here `i` increments through each long word in the data
+                do{
                     waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
                     waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
                     waveData[waveformIndex++] = (lptr[i])       &0x3ff;
+                    i++;
+                }while (waveformIndex < sisDataLength*3); // sisDataLength*3 = number samples in waveform
+            }
+            else if(savingMode == 0){  // 1 x 5 Gsps Event fifo mode
+                //            unsigned long numBlocks = (ptr[6]&0xFFFF);
+                channel = group*4;  //  FIX: use the real channel number
+                channelKey    = [self getChannelKey: channel];
+            
+                unsigned long sisDataLength = 16*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+
+                [recordAsData setLength:sisDataLength*3*2];    // length is in bytes (hence 2), 3 samples per Lword
+                
+                if (rate == 2) { // 5gsps
+                    // if we're reading out at 5 gsps, we have to unpack and de-interlace all four of the 4-word blocks at once...
+                    
+                    unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
+                    int i;
+                    unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+                    int waveformIndex = 0;
+                    
+                    // sisDataLength*3 = number samples in waveform
+                    for(i=0;i<(sisDataLength*3);i+=16) // i steps through the entire waveform
+                    {
+                        unsigned short k;
+                        for (k = 0; k<4; k++) { // k steps through the 4-word block that each ADC produces
+                            waveData[waveformIndex++] = (lptr[0+i+k]>>20)   &0x3ff;   // sample 1 + 12*k
+                            waveData[waveformIndex++] = (lptr[8+i+k]>>20)   &0x3ff;   // sample 2 + 12*k
+                            waveData[waveformIndex++] = (lptr[4+i+k]>>20)   &0x3ff;   // sample 3 + 12*k
+                            waveData[waveformIndex++] = (lptr[12+i+k]>>20)  &0x3ff;   // sample 4 + 12*k
+                            
+                            waveData[waveformIndex++] = (lptr[0+i+k]>>10)   &0x3ff;   // sample 5 + 12*k
+                            waveData[waveformIndex++] = (lptr[8+i+k]>>10)   &0x3ff;   // sample 6 + 12*k
+                            waveData[waveformIndex++] = (lptr[4+i+k]>>10)   &0x3ff;   // sample 7 + 12*k
+                            waveData[waveformIndex++] = (lptr[12+i+k]>>10)  &0x3ff;   // sample 8 + 12*k
+                            
+                            waveData[waveformIndex++] = (lptr[0+i+k])       &0x3ff;   // sample 9 + 12*k
+                            waveData[waveformIndex++] = (lptr[8+i+k])         &0x3ff;   // sample 10 + 12*k
+                            waveData[waveformIndex++] = (lptr[4+i+k])         &0x3ff;   // sample 11 + 12*k
+                            waveData[waveformIndex++] = (lptr[12+i+k])        &0x3ff;   // sample 12 + 12*k
+                            
+                        }
+                    }
                 }
                 
-            }
-        }
-        else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
-            channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
-
-            channelKey    = [self getChannelKey: channel];
-            
-            unsigned long sisDataLength = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
-
-            [recordAsData setLength:3*2*length];
-            unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; //ORCA header + SIS header
-            int i = 0;
-            unsigned short* waveData = (unsigned short*)[recordAsData bytes];
-            int waveformIndex = 0;
-            unsigned short k = 0;
-            //            for(i=0;i<2*waveformLength/3;i++){
-            for(i=0;i<(sisDataLength*3);i+=7) { // sisDataLength*3 = number samples in waveform
-                // lptr[i] is at the first word of the 8x32-bit data block
-                for (k=0; k<4; k++ )
-                {
-                    waveData[waveformIndex++] = (lptr[0+i+k]>>20)   &0x3ff;   // sample 1
-                    waveData[waveformIndex++] = (lptr[4+i+k]>>20)   &0x3ff;   // sample 2
-                    waveData[waveformIndex++] = (lptr[0+i+k]>>10)   &0x3ff;   // sample 3
-                    waveData[waveformIndex++] = (lptr[4+i+k]>>10)   &0x3ff;   // sample 4
-                    waveData[waveformIndex++] = (lptr[0+i+k])       &0x3ff;   // sample 5
-                    waveData[waveformIndex++] = (lptr[4+i+k])       &0x3ff;   // sample 6
+                
+                if (rate == 1) {
+                    // FIX: THIS COMPLETELY WON'T WORK -- just a placeholder!!!!!!
+                    
+                    unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
+                    int i;
+                    unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+                    int waveformIndex = 0;
+                    // here `i` increments through each word in the data
+                    //
+                    for(i=0;i<waveformLength;i++){
+                        waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
+                        waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
+                        waveData[waveformIndex++] = (lptr[i])       &0x3ff;
+                    }
+                    
                 }
-                //                waveData[waveformIndex++] = (lptr[1+i]>>20)   &0x3ff;   // sample 7
-                //                waveData[waveformIndex++] = (lptr[5+i]>>20)   &0x3ff;   // sample 8
-                //                waveData[waveformIndex++] = (lptr[1+i]>>10)   &0x3ff;   // sample 9
-                //                waveData[waveformIndex++] = (lptr[5+i]>>10)   &0x3ff;   // sample 10
-                //                waveData[waveformIndex++] = (lptr[1+i])       &0x3ff;   // sample 11
-                //                waveData[waveformIndex++] = (lptr[5+i])       &0x3ff;   // sample 12
-                //
-                //                waveData[waveformIndex++] = (lptr[2+i]>>20)   &0x3ff;   // sample 13
-                //                waveData[waveformIndex++] = (lptr[6+i]>>20)   &0x3ff;   // sample 14
-                //                waveData[waveformIndex++] = (lptr[2+i]>>10)   &0x3ff;   // sample 15
-                //                waveData[waveformIndex++] = (lptr[6+i]>>10)   &0x3ff;   // sample 16
-                //                waveData[waveformIndex++] = (lptr[2+i])       &0x3ff;   // sample 17
-                //                waveData[waveformIndex++] = (lptr[6+i])       &0x3ff;   // sample 18
-                //
-                //                waveData[waveformIndex++] = (lptr[3+i]>>20)   &0x3ff;   // sample 19
-                //                waveData[waveformIndex++] = (lptr[7+i]>>20)   &0x3ff;   // sample 20
-                //                waveData[waveformIndex++] = (lptr[3+i]>>10)   &0x3ff;   // sample 21
-                //                waveData[waveformIndex++] = (lptr[7+i]>>10)   &0x3ff;   // sample 22
-                //                waveData[waveformIndex++] = (lptr[3+i])       &0x3ff;   // sample 23
-                //                waveData[waveformIndex++] = (lptr[7+i])       &0x3ff;   // sample 24
-                //
             }
+            else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
+                channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
+
+                channelKey    = [self getChannelKey: channel];
+                
+                unsigned long sisDataLength = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+
+                [recordAsData setLength:3*2*length];
+                unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; //ORCA header + SIS header
+                int i = 0;
+                unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+                int waveformIndex = 0;
+                unsigned short k = 0;
+                //            for(i=0;i<2*waveformLength/3;i++){
+                for(i=0;i<(sisDataLength*3);i+=7) { // sisDataLength*3 = number samples in waveform
+                    // lptr[i] is at the first word of the 8x32-bit data block
+                    for (k=0; k<4; k++ )
+                    {
+                        waveData[waveformIndex++] = (lptr[0+i+k]>>20)   &0x3ff;   // sample 1
+                        waveData[waveformIndex++] = (lptr[4+i+k]>>20)   &0x3ff;   // sample 2
+                        waveData[waveformIndex++] = (lptr[0+i+k]>>10)   &0x3ff;   // sample 3
+                        waveData[waveformIndex++] = (lptr[4+i+k]>>10)   &0x3ff;   // sample 4
+                        waveData[waveformIndex++] = (lptr[0+i+k])       &0x3ff;   // sample 5
+                        waveData[waveformIndex++] = (lptr[4+i+k])       &0x3ff;   // sample 6
+                    }
+                }
+                
+            }   // end if( savingMode == 1)
+            //        unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+            //        NSLog(@"         waveData[0,10,20,100] = (%d,%d,%d,%d)\n",waveData[0],waveData[10],waveData[20],waveData[100]);
             
         }
-        //        unsigned short* waveData = (unsigned short*)[recordAsData bytes];
-        //        NSLog(@"         waveData[0,10,20,100] = (%d,%d,%d,%d)\n",waveData[0],waveData[10],waveData[20],waveData[100]);
+            if(recordAsData)[aDataSet loadWaveform:recordAsData
+                                            offset: 0 //bytes!
+                                          unitSize: sizeof( unsigned short ) //unit size in bytes! 10 bits needs 2 bytes
+                                            sender: self
+                                          withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
+
         
-        
-        if(recordAsData)[aDataSet loadWaveform:recordAsData
-                                        offset: 0 //bytes!
-                                      unitSize: sizeof( unsigned short ) //unit size in bytes! 10 bits needs 2 bytes
-                                        sender: self  
-                                      withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
-    }
-    
-//        dataPtr = nextRecordPtr;
-//        NSLog(@"    Decoded %d/%d events so far\n",n,numEvents);
+        dataPtr = nextRecordPtr;
+        NSLog(@"    Decoded %d/%d events so far\n",n+1,numEvents);
+    }// end of loop over numEvents
     return waveformLength; //must return number of longs
 }
 
