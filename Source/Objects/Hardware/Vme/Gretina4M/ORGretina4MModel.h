@@ -281,12 +281,14 @@ enum Gretina4MFIFOStates {
 	BOOL			isRunning;
     NSString*       firmwareStatusString;
     BOOL            locked;
+    unsigned long   boardSerialNumber;
     
     //------------------internal use only
     NSOperationQueue*	fileQueue;
     int                 initializationState;
     unsigned long       snapShot[kNumberOfGretina4MRegisters];
     unsigned long       fpgaSnapShot[kNumberOfFPGARegisters];
+    unsigned long       serialNumber;
 }
 
 - (id) init;

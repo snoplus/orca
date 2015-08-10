@@ -268,6 +268,7 @@ enum Gretina4FIFOStates {
     //------------------internal use only
     NSOperationQueue*	fileQueue;
     int                 initializationState;
+    unsigned long       serialNumber;
 }
 
 - (id) init;

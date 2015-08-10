@@ -233,6 +233,7 @@ enum Gretina4AFIFOStates {
     int				fifoEmptyCount;
     int             fifoResetCount;
     ORAlarm*        fifoFullAlarm;
+    unsigned long       serialNumber;
     
     //hardware params
     BOOL			forceFullInit[kNumGretina4AChannels];

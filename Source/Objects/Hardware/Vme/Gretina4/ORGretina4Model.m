@@ -2163,9 +2163,23 @@ static struct {
     // first add our description to the data description
     
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORGretina4Model"];    
+ 
+    if(serialNumber==0){
+        @try {
+            [[self adapter] readLongBlock:&serialNumber
+                                atAddress:[self baseAddress] + fpga_register_information[kVMEFPGAVersionStatus].offset
+                                numToRead:1
+                               withAddMod:[self addressModifier]
+                            usingAddSpace:0x01];
+            
+            serialNumber = serialNumber&0xffff;
+        }
+        @catch(NSException* e) {
+        }
+    }
     
     //cache some stuff
-    location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
+    location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16) | serialNumber;
     theController   = [self adapter];
     fifoAddress     = [self baseAddress] + 0x1000;
     fifoStateAddress= [self baseAddress] + register_information[kProgrammingDone].offset;
