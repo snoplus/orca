@@ -101,12 +101,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         int j;
         
          for(j=0;j<numChans;j++){
-            NSMutableData* tmpData = [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
+            NSMutableData* tmpData = [[[NSMutableData alloc] initWithLength:2*(eventSize-1)*sizeof(unsigned short)] autorelease];
             
             unsigned short* dPtr = (unsigned short*)[tmpData bytes];
             int k;
             int wordCount = 0;
-            for(k=0;k<eventSize;k++){
+            for(k=0;k<eventSize-1;k++){
                 dPtr[wordCount++] =	0x00003fff & *ptr;
                 dPtr[wordCount++] =	(0x3fff0000 & *ptr) >> 16;
                 ptr++;

@@ -32,13 +32,14 @@
 // Address information for this unit.
 #define k1730DefaultBaseAddress 		0xa00000
 #define k1730DefaultAddressModifier 	0x09
-#define kNumberBLTEventsToReadout   12 //most BLTEvent numbers don't make sense, make sure you know what you change
+#define kNumberBLTEventsToReadout       12 //most BLTEvent numbers don't make sense, make sure you know what you change
+#define kPostTriggerLatency             65
 
 static NSString* CV1730RunModeString[4] = {
-    @"Register-Controlled",
+    @"SW-Controlled",
     @"S-In Controlled",
-    @"S-In Gate",
-    @"Multi-Board Sync",
+    @"First Trigger",
+    @"GPIO Controlled",
 };
 // Define all the registers available to this unit.
 static CV1730RegisterNamesStruct reg[kNumRegisters] = {
@@ -111,6 +112,9 @@ NSString* ORCV1730ModelCountAllTriggersChanged            = @"ORCV1730ModelCount
 NSString* ORCV1730ModelChannelConfigMaskChanged           = @"ORCV1730ModelChannelConfigMaskChanged";
 NSString* ORCV1730ModelNumberBLTEventsToReadoutChanged    = @"ORCV1730ModelNumberBLTEventsToReadoutChanged";
 NSString* ORCV1730ChnlDacChanged                          = @"ORCV1730ChnlDacChanged";
+NSString* ORCV1730ChnlGainChanged                         = @"ORCV1730ChnlGainChanged";
+NSString* ORCV1730ChnlPulseWidthChanged                   = @"ORCV1730ChnlPulseWidthChanged";
+NSString* ORCV1730ChnlPulseTypeChanged                    = @"ORCV1730ChnlPulseTypeChanged";
 NSString* ORCV1730Chnl                                    = @"ORCV1730Chnl";
 NSString* ORCV1730ChnlThresholdChanged                    = @"ORCV1730ChnlThresholdChanged";
 NSString* ORCV1730SelectedChannelChanged                  = @"ORCV1730SelectedChannelChanged";
@@ -516,6 +520,80 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
 	 userInfo:userInfo];
 }
 
+- (unsigned short) gain:(unsigned short) aChnl
+{
+    return gain[aChnl];
+}
+
+- (void) setGain:(unsigned short) aChnl withValue:(unsigned short) aValue
+{
+    
+    // Set the undo manager action.  The label has already been set by the controller calling this method.
+    [[[self undoManager] prepareWithInvocationTarget:self] setGain:aChnl withValue:gain[aChnl]];
+    
+    // Set the new value in the model.
+    gain[aChnl] = aValue;
+    
+    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCV1730Chnl];
+    
+    // Send out notification that the value has changed.
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ChnlGainChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+
+- (unsigned short) pulseWidth:(unsigned short) aChnl
+{
+    return pulseWidth[aChnl];
+}
+
+- (void) setPulseWidth:(unsigned short) aChnl withValue:(unsigned short) aValue
+{
+    
+    // Set the undo manager action.  The label has already been set by the controller calling this method.
+    [[[self undoManager] prepareWithInvocationTarget:self] setPulseWidth:aChnl withValue:pulseWidth[aChnl]];
+    
+    // Set the new value in the model.
+    pulseWidth[aChnl] = aValue;
+    
+    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCV1730Chnl];
+    
+    // Send out notification that the value has changed.
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ChnlPulseWidthChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+
+- (unsigned short) pulseType:(unsigned short) aChnl
+{
+    return pulseType[aChnl];
+}
+
+- (void) setPulseType:(unsigned short) aChnl withValue:(unsigned short) aValue
+{
+    
+    // Set the undo manager action.  The label has already been set by the controller calling this method.
+    [[[self undoManager] prepareWithInvocationTarget:self] setPulseType:aChnl withValue:pulseType[aChnl]];
+    
+    // Set the new value in the model.
+    pulseType[aChnl] = aValue;
+    
+    // Create a dictionary object that stores a pointer to this object and the channel that was changed.
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCV1730Chnl];
+    
+    // Send out notification that the value has changed.
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCV1730ChnlPulseTypeChanged
+                                                        object:self
+                                                      userInfo:userInfo];
+}
+
+
+
 
 - (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
 {
@@ -767,7 +845,8 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
 
 - (void) writeSelfTriggerLogic:(unsigned short)aChnl
 {
-    unsigned long 	aValue = 0x2 | ([self selfTriggerLogic:aChnl/2] & 0x3);
+    unsigned long 	aValue = (([self pulseType:aChnl] & 0x1) << 2) |
+                              ([self selfTriggerLogic:aChnl/2] & 0x3);
     
     [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kSelfTriggerLogic].addressOffset + (aChnl * 0x100)
@@ -807,14 +886,50 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
     }
 }
 
-- (void) generateSoftwareTrigger
+- (void) writeGains
 {
-	unsigned long dummy = 0;
-    [[self adapter] writeLongBlock:&dummy
-                         atAddress:[self baseAddress] + reg[kSWTrigger].addressOffset
+    short	i;
+    for (i = 0; i < [self numberOfChannels]; i++){
+        [self writeGain:i];
+    }
+}
+
+- (void) writeGain:(unsigned short) pChan
+{
+    unsigned long 	aValue = [self gain:pChan];
+    
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] +     reg[kGain].addressOffset + (pChan * 0x100)
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+}
+
+- (void) writePulseWidth
+{
+    short	i;
+    for (i = 0; i < [self numberOfChannels]; i++){
+        [self writePulseWidth:i];
+    }
+}
+
+- (void) writePulseWidth:(unsigned short) pChan
+{
+    unsigned long 	aValue = [self pulseWidth:pChan];
+    
+    [[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] +     reg[kPulseWidth].addressOffset + (pChan * 0x100)
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) writePulseType
+{
+    short	i;
+    for (i = 0; i < [self numberOfChannels]; i++){
+        [self writePulseType:i];
+    }
 }
 
 - (void) writeChannelConfiguration
@@ -823,9 +938,9 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
     //some bits must be set or cleared
     mask |= (0x1<<4);   //bit 4 must be 1
 
-    if(channelConfigMask & 0x1) mask |= (0x1<<1);
-    if(channelConfigMask & 0x2) mask |= (0x1<<3);
-    if(channelConfigMask & 0x4) mask |= (0x1<<6);
+    if(channelConfigMask & 0x1) mask |= (0x1<<1);   //overlap enable
+    if(channelConfigMask & 0x2) mask |= (0x1<<3);   //test pattern enable
+    if(channelConfigMask & 0x4) mask |= (0x1<<6);   //polarity
 
     
 	[[self adapter] writeLongBlock:&mask
@@ -893,13 +1008,13 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run Mode        : %@\n",CV1730RunModeString[aValue&0x3]);
 		
 	[self read:kAcqStatus returnValue:&aValue];
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Bypass      : %@\n",aValue&0x40?@"YES":@"NO");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Clock source    : %@\n",aValue&0x20?@"External":@"Internal");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Buffer full     : %@\n",aValue&0x10?@"YES":@"NO");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Ready    : %@\n",aValue&0x08?@"YES":@"NO");
-	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run             : %@\n",aValue&0x04?@"ON":@"OFF");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Board Ready     : %@\n",aValue&(0x1<<8)?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Locked      : %@\n",aValue&(0x1<<7)?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Bypass      : %@\n",aValue&(0x1<<6)?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Clock source    : %@\n",aValue&(0x1<<5)?@"External":@"Internal");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Buffer full     : %@\n",aValue&(0x1<<4)?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Ready    : %@\n",aValue&(0x1<<3)?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run             : %@\n",aValue&(0x1<<2)?@"ON":@"OFF");
 	
 	[self read:kEventStored returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Stored   : %d\n",aValue);
@@ -910,6 +1025,7 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
 {
     [self writeAcquistionControl:NO]; // Make sure it's off.
 	[self clearAllMemory];
+    [self writeBufferOrganization];
     [self writeDacs];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
@@ -917,7 +1033,6 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
 	[self writeTriggerSource];
 	[self writeTriggerOut];
 	[self writeFrontPanelControl];
-	[self writeBufferOrganization];
 	[self writePostTriggerSetting];
     [self writeSelfTriggerLogic];
     [self writeChannelEnabledMask];
@@ -1036,7 +1151,9 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
 
 - (void) writePostTriggerSetting
 {
-    unsigned long aValue = postTriggerSetting/2;
+    long setting = (postTriggerSetting-kPostTriggerLatency)/8;
+    if(setting<0)setting=0;
+    unsigned long aValue = setting;
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset
                         numToWrite:1

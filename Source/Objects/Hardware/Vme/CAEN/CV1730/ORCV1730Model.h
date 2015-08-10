@@ -110,6 +110,9 @@ enum {
     unsigned long   writeValue;
 	unsigned short  thresholds[16];
     unsigned short	dac[16];
+    unsigned short	gain[16];
+    unsigned short	pulseWidth[16];
+    unsigned short	pulseType[16];
     unsigned short	selfTriggerLogic[8];
     unsigned short	channelConfigMask;
     BOOL			countAllTriggers;
@@ -180,6 +183,12 @@ enum {
 - (void)			setChannelConfigMask:(unsigned short)aChannelConfigMask;
 - (unsigned short)	dac:(unsigned short) aChnl;
 - (void)			setDac:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (unsigned short)	gain:(unsigned short) aChnl;
+- (void)			setGain:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (unsigned short)	pulseWidth:(unsigned short) aChnl;
+- (void)			setPulseWidth:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (unsigned short)	pulseType:(unsigned short) aChnl;
+- (void)			setPulseType:(unsigned short) aChnl withValue:(unsigned short) aValue;
 - (unsigned long)	numberBLTEventsToReadout;
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
@@ -225,6 +234,14 @@ enum {
 - (void)			readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue;
 - (void)			writeDacs;
 - (void)			writeDac:(unsigned short) pChan;
+- (void)			writeGains;
+- (void)			writeGain:(unsigned short) pChan;
+- (void)			writePulseWidths;
+- (void)			writePulseWidth:(unsigned short) pChan;
+- (void)			writePulseTypes;
+- (void)			writePulsetype:(unsigned short) pChan;
+
+
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
 - (void)			writeThreshold:(unsigned short) pChan;
@@ -270,6 +287,9 @@ extern NSString* ORCV1730ModelCountAllTriggersChanged;
 extern NSString* ORCV1730ModelChannelConfigMaskChanged;
 extern NSString* ORCV1730ModelNumberBLTEventsToReadoutChanged;
 extern NSString* ORCV1730ChnlDacChanged;
+extern NSString* ORCV1730ChnlGainChanged;
+extern NSString* ORCV1730ChnlPulseWidthChanged;
+extern NSString* ORCV1730ChnlPulseTypeChanged;
 extern NSString* ORCV1730Chnl;
 extern NSString* ORCV1730ChnlThresholdChanged;
 extern NSString* ORCV1730SelectedRegIndexChanged;

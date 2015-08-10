@@ -69,6 +69,9 @@
     IBOutlet NSTextField*	coincidenceWindowTextField;
     IBOutlet NSTextField*	majorityLevelTextField;
     IBOutlet NSMatrix*		dacMatrix;
+    IBOutlet NSMatrix*		gainMatrix;
+    IBOutlet NSMatrix*		pulseWidthMatrix;
+    IBOutlet NSMatrix*		pulseTypeMatrix;
 	IBOutlet NSMatrix*		acquisitionModeMatrix;
 	IBOutlet NSMatrix*		countAllTriggersMatrix;
 	IBOutlet NSMatrix*		channelConfigMaskMatrix;
@@ -138,6 +141,9 @@
 - (void) countAllTriggersChanged:(NSNotification*)aNote;
 - (void) channelConfigMaskChanged:(NSNotification*)aNote;
 - (void) dacChanged: (NSNotification*) aNote;
+- (void) gainChanged: (NSNotification*) aNote;
+- (void) pulseWidthChanged: (NSNotification*) aNote;
+- (void) pulseTypeChanged: (NSNotification*) aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) thresholdChanged: (NSNotification*) aNote;
@@ -182,6 +188,9 @@
 - (IBAction) countAllTriggersAction:(id)sender;
 - (IBAction) channelConfigMaskAction:(id)sender;
 - (IBAction) dacAction: (id) aSender;
+- (IBAction) gainAction: (id) aSender;
+- (IBAction) pulseWidthAction: (id) aSender;
+- (IBAction) pulseTypeAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;
 - (IBAction) selfTriggerLogicAction:(id)sender;
 

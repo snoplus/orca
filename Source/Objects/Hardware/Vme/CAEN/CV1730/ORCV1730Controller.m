@@ -90,6 +90,11 @@
         [[enabledMaskMatrix cellAtRow:i column:0] setTag:i];
         [[dacMatrix cellAtRow:i column:0] setTag:i];
         [[dacMatrix cellAtRow:i column:0] setFormatter:rateFormatter];
+        
+        [[gainMatrix cellAtRow:i column:0] setTag:i];
+        [[pulseWidthMatrix cellAtRow:i column:0] setTag:i];
+        [[pulseTypeMatrix cellAtRow:i column:0] setTag:i];
+
     }
     
     for(i=0;i<8;i++){
@@ -144,7 +149,23 @@
 					 selector : @selector(dacChanged:)
 						 name : ORCV1730ChnlDacChanged
 					   object : model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(gainChanged:)
+                         name : ORCV1730ChnlGainChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(pulseWidthChanged:)
+                         name : ORCV1730ChnlPulseWidthChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(pulseTypeChanged:)
+                         name : ORCV1730ChnlPulseTypeChanged
+                       object : model];
+
+    
     [notifyCenter addObserver : self
                      selector : @selector(channelConfigMaskChanged:)
                          name : ORCV1730ModelChannelConfigMaskChanged
@@ -308,7 +329,10 @@
     [self selectedRegIndexChanged:nil];
     [self selectedRegChannelChanged:nil];
 	[self baseAddressChanged:nil];
-	[self dacChanged:nil];
+    [self dacChanged:nil];
+    [self gainChanged:nil];
+    [self pulseWidthChanged:nil];
+    [self pulseTypeChanged:nil];
 	[self thresholdChanged:nil];
 	[self channelConfigMaskChanged:nil];
 	[self countAllTriggersChanged:nil];
@@ -525,8 +549,7 @@
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
 {
-	//todo *4 in std mode *5 in packed mode
-	[postTriggerSettingTextField setIntValue:([model postTriggerSetting] * 4)];
+	[postTriggerSettingTextField setIntValue:[model postTriggerSetting]];
 }
 
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote
@@ -651,6 +674,50 @@
 		}
 	}
 }
+
+- (void) gainChanged: (NSNotification*) aNotification
+{
+    if(aNotification){
+        int chnl = [[[aNotification userInfo] objectForKey:ORCV1730Chnl] intValue];
+        [[gainMatrix cellAtRow:chnl column:0] selectItemAtIndex:[model selfTriggerLogic:chnl]];
+    }
+    else {
+        int i;
+        for (i = 0; i < [model numberOfChannels]; i++){
+            [[gainMatrix cellAtRow:i column:0] selectItemAtIndex:[model gain:i]];
+        }
+    }
+}
+
+- (void) pulseWidthChanged: (NSNotification*) aNotification
+{
+    if(aNotification){
+        int chnl = [[[aNotification userInfo] objectForKey:ORCV1730Chnl] intValue];
+        [[pulseWidthMatrix cellWithTag:chnl] setIntValue:[model pulseWidth:chnl]];
+    }
+    else {
+        int i;
+        for (i = 0; i < [model numberOfChannels]; i++){
+            [[pulseWidthMatrix cellWithTag:i] setIntValue:[model pulseWidth:i]];
+        }
+    }
+}
+
+- (void) pulseTypeChanged: (NSNotification*) aNotification
+{
+    if(aNotification){
+        int chnl = [[[aNotification userInfo] objectForKey:ORCV1730Chnl] intValue];
+        [[pulseTypeMatrix cellAtRow:chnl column:0] selectItemAtIndex:[model selfTriggerLogic:chnl]];
+    }
+    else {
+        int i;
+        for (i = 0; i < [model numberOfChannels]; i++){
+            [[pulseTypeMatrix cellAtRow:i column:0] selectItemAtIndex:[model selfTriggerLogic:i]];
+        }
+    }
+}
+
+
 
 - (void) basicLockChanged:(NSNotification*)aNotification
 {	
@@ -857,8 +924,7 @@
 
 - (void) postTriggerSettingTextFieldAction:(id)sender
 {
-	//todo /4 in std mode /5 in packed mode
-	[model setPostTriggerSetting:([sender intValue] / 4)];	
+	[model setPostTriggerSetting:[sender intValue]];
 }
 
 - (IBAction) triggerSourceMaskAction:(id)sender
@@ -868,9 +934,9 @@
 	for(i=0;i<8;i++){
 		if([[chanTriggerMatrix cellWithTag:i] intValue]) mask |= (1L << i);
 	}
-	if([[otherTriggerMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
-	if([[otherTriggerMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
-	[model setTriggerSourceMask:mask];	
+    if([[triggerSourceMaskMatrix cellWithTag:0] intValue]) mask |= (1L << 31);
+	if([[triggerSourceMaskMatrix cellWithTag:1] intValue]) mask |= (1L << 30);
+	[model setTriggerSourceMask:mask];
 }
 
 - (IBAction) triggerOutMaskAction:(id)sender
@@ -976,6 +1042,21 @@
 - (IBAction) dacAction:(id) aSender
 {
 	[model setDac:[[aSender selectedCell] tag] withValue:[model convertVoltsToDac:[[aSender selectedCell] floatValue]]];
+}
+
+- (IBAction) gainAction:(id) aSender
+{
+    [model setGain:[aSender selectedRow] withValue:[[aSender selectedCell] indexOfSelectedItem]];
+}
+
+- (IBAction) pulseWidthAction:(id) aSender
+{
+    [model setPulseWidth:[[aSender selectedCell] tag] withValue:[[aSender selectedCell] intValue]];
+}
+
+- (IBAction) pulseTypeAction:(id) aSender
+{
+    [model setPulseType:[aSender selectedRow] withValue:[[aSender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) thresholdAction:(id) aSender

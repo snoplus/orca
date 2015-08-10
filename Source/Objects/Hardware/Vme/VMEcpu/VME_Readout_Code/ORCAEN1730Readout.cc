@@ -37,7 +37,6 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
     uint32_t fifoAddressMod     = GetDeviceSpecificData()[3];
     uint32_t fifoBuffSize       = GetDeviceSpecificData()[4];
     uint32_t location           = GetDeviceSpecificData()[5];
-    uint32_t numBLTEventsReg    = GetDeviceSpecificData()[7];
     uint32_t dataId             = GetHardwareMask()[0];
     uint32_t numEventsToRead;
     uint32_t vmeStatus;
@@ -72,48 +71,13 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
         return false;
     }
     
-    if(numEventsToRead * eventSize > kMaxDataBufferSizeLongs){
-        numEventsToRead = kMaxDataBufferSizeLongs/(eventSize+1);
-    }
+    //because of problems with transfer rate, we will limit the numEventsToRead to 2
     
-    //make sure we can get all the user requested events, grab 1 otherwise
-    //the change will take place after we read out this event
-    uint32_t thisBLTEventsNumber = currentBLTEventsNumber;
-    if (numEventsToRead > kFastBLTThreshold + 2 * userBLTEventsNumber) {
-        if (currentBLTEventsNumber == 1) {
-            int32_t result = VMEWrite(GetBaseAddress() + numBLTEventsReg,
-                                      GetAddressModifier(),
-                                      sizeof(userBLTEventsNumber),
-                                      userBLTEventsNumber);
-            
-            if (result != sizeof(userBLTEventsNumber)) {
-                LogBusError("V1730 0x%0x Couldn't set BLT Number", numBLTEventsReg);
-                return false;
-            }
-            
-            currentBLTEventsNumber = userBLTEventsNumber;
-        }
-    }
-    else {
-        if (currentBLTEventsNumber == userBLTEventsNumber) {
-            uint32_t newBLTEventsNumber = 1;
-            int32_t result = VMEWrite(GetBaseAddress() + numBLTEventsReg,
-                                      GetAddressModifier(),
-                                      sizeof(newBLTEventsNumber),
-                                      newBLTEventsNumber);
-            
-            if (result != sizeof(newBLTEventsNumber)) {
-                LogBusError("V1730 0x%0x Couldn't set BLT Number", numBLTEventsReg);
-                return false;
-            }
-            
-            currentBLTEventsNumber = 1;
-        }
-    }
- 
+    if(numEventsToRead>2)numEventsToRead = 2;
+    
     uint32_t startIndex = dataIndex;
     //eventSize in uint32_t words, fifoBuffSize in Bytes
-    uint32_t dmaTransferCount = thisBLTEventsNumber * eventSize * 4 / fifoBuffSize + 1;
+    uint32_t dmaTransferCount = currentBLTEventsNumber * eventSize * 4 / fifoBuffSize + 1;
     int32_t bufferSizeNeeded  = dmaTransferCount * fifoBuffSize / 4 + 1 + 2; //+orca_header
     
 //    printf("----------------------------\n");
@@ -132,7 +96,7 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
         return false;
     }
     ensureDataCanHold(bufferSizeNeeded);
-    //dmaTransferCount++;
+    dmaTransferCount++;
     dataIndex += 2; //the header to be filled after the DMA transfer succeeds
     do {
         result = DMARead(GetBaseAddress()+fifoBuffReg,
@@ -174,10 +138,16 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
     */
     uint32_t bufferSizeUsed = 2 + numEventsToRead * eventSize;
     //printf("bufferSizeUsed: %d\n",bufferSizeUsed);
+    if(bufferSizeUsed>0x7ffff){
+        LogBusError("V1730 waveform too large");
+        dataIndex = startIndex;
+        return false;
+    }
     dataIndex = startIndex + bufferSizeUsed;
-    data[startIndex] = dataId | bufferSizeUsed;
+    data[startIndex] = dataId | (bufferSizeUsed & 0x7ffff);
     data[startIndex + 1] = location;
-//        printf("0: 0x%08x\n",data[startIndex]);
+//    printf("id: 0x%08x\n",dataId);
+//    printf("0: 0x%08x\n",data[startIndex]);
 //        printf("1: 0x%08x\n",data[startIndex+1]);
 //        printf("2: 0x%08x\n",data[startIndex+2]);
 //        printf("3: 0x%08x\n",data[startIndex+3]);
