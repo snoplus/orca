@@ -58,6 +58,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 
 - (void) wakeUp
 {
+    firstPowerCheck = YES;
     if([self aWake])return;
     [super wakeUp];
 	[[ORSNMPQueue queue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
@@ -274,7 +275,8 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 {
 	NSString* noteName;
 	BOOL currentPower = [self power];
-	if(currentPower != oldPower){
+	if(firstPowerCheck || (currentPower != oldPower)){
+        firstPowerCheck = NO;
         if(doNotSkipPowerCheck){
 			NSLog(@"MPod (%d) power changed state from %@ to %@\n",[self uniqueIdNumber],
               oldPower?@"ON":@"OFF",currentPower?@"ON":@"OFF");

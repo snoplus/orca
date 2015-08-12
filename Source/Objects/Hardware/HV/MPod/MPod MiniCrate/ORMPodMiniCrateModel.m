@@ -39,7 +39,7 @@
                                                                      [NSColor redColor],NSForegroundColorAttributeName,
                                                                      [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
                                                                      nil]] autorelease]; 
-        [s drawAtPoint:NSMakePoint(90,0)];
+        [s drawAtPoint:NSMakePoint(5,40)];
     }
     
     if([[self hvConstraints] count]){

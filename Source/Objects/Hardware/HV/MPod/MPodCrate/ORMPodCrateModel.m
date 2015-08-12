@@ -40,7 +40,7 @@
                                                                      [NSColor redColor],NSForegroundColorAttributeName,
                                                                      [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
                                                                      nil]] autorelease]; 
-        [s drawAtPoint:NSMakePoint(90,0)];
+        [s drawAtPoint:NSMakePoint(10,[aCachedImage size].height - 25)];
     }
     
     if([[self hvConstraints] count]){

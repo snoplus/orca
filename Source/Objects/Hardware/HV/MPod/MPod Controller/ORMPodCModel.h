@@ -33,6 +33,7 @@
     BOOL			verbose;
 	BOOL		    doNotSkipPowerCheck;
 	NSDictionary*   parameterDictionary;
+    BOOL            firstPowerCheck;
 }
 
 #pragma mark ***Accessors

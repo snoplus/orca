@@ -96,7 +96,7 @@
 								<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</set>
-							<string key="NSFrame">{{96, 145}, {16, 21}}</string>
+							<string key="NSFrame">{{98, 126}, {16, 21}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
@@ -161,7 +161,7 @@
 						<object class="NSTextField" id="307987623">
 							<reference key="NSNextResponder" ref="672222250"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{39, 87}, {67, 17}}</string>
+							<string key="NSFrame">{{39, 155}, {67, 17}}</string>
 							<reference key="NSSuperview" ref="672222250"/>
 							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
@@ -224,7 +224,7 @@
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -339,10 +339,10 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="679016295"/>
 							<reference ref="644564861"/>
-							<reference ref="307987623"/>
-							<reference ref="892660984"/>
 							<reference ref="962082114"/>
 							<reference ref="775655113"/>
+							<reference ref="307987623"/>
+							<reference ref="892660984"/>
 						</array>
 						<reference key="parent" ref="887694496"/>
 					</object>
