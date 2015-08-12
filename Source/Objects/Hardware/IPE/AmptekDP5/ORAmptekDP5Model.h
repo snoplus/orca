@@ -46,6 +46,25 @@
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
 
 
+//Amptek ASCII Commands
+typedef struct AmptekDP5ASCIICommandsStruct {
+	NSString*       regName;
+	unsigned long 	addressOffset;
+	int				length;
+	short			accessType;
+} AmptekDP5ASCIICommandsStruct; 
+
+enum AmptekDP5ASCIICommandEnum {
+	kAmptekMCAC,
+	kAmptekGAIA,
+	kAmptekGAIF,
+	kAmptekGAIN,
+	kAmptekNumCommands //must be last
+};
+
+
+
+
 
 //Amptek constants
 //status packet

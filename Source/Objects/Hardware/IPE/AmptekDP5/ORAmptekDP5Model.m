@@ -43,6 +43,15 @@
 #include <pthread.h>
 
 
+//Amptek ASCII Commands
+static AmptekDP5ASCIICommandsStruct amptekCmds[kAmptekNumCommands] = {
+{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
+{@"Status",				0xa80004,		1,			kIpeRegReadable },
+{@"Command",			0xa80008,		1,			kIpeRegWriteable },
+{@"Command",			0xa80008,		1,			kIpeRegWriteable }
+};
+
+
 //IPE V4 register definitions
 enum AmptekDP5V4Enum {
 	kEWSltV4ControlReg,
