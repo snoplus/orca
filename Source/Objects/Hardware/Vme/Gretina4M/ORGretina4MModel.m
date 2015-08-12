@@ -1997,6 +1997,11 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     else                        [self writeLEDThreshold:chan];
 }
 
+- (void) openPreampDialog
+{
+    [[[spiConnector connector]objectLink] makeMainController];
+}
+
 - (void) stepNoiseFloor
 {
 	[[self undoManager] disableUndoRegistration];

@@ -298,6 +298,7 @@ enum Gretina4MFIFOStates {
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
+- (void) openPreampDialog;
 
 #pragma mark ***Accessors
 - (BOOL) forceFullInitCard;

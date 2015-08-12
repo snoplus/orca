@@ -45,6 +45,7 @@
     IBOutlet NSMatrix*		enabledMatrix;
     IBOutlet NSMatrix*		forceFullInitMatrix;
     IBOutlet NSButton*      forceFullInitCardButton;
+    IBOutlet NSButton*      viewPreampButton;
     
 	IBOutlet NSMatrix*		trapEnabledMatrix;
 	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
@@ -293,6 +294,7 @@
 - (IBAction) histEMultiplierAction:(id)sender;
 - (IBAction) snapShotRegistersAction:(id)sender;
 - (IBAction) compareToSnapShotAction:(id)sender;
+- (IBAction) viewPreampAction:(id)sender;
 
 
 #pragma mark •••Data Source

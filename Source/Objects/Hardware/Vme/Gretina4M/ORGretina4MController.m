@@ -425,6 +425,12 @@
                          name : ORGretina4MLockChanged
 						object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(settingsLockChanged:)
+                         name : ORConnectionChanged
+                        object: model];
+    
+    
    	[self registerRates];
 
 }
@@ -1059,6 +1065,9 @@
 
     [diagnosticsReportButton setEnabled:[model diagnosticsEnabled]];
     [diagnosticsClearButton  setEnabled:[model diagnosticsEnabled]];
+    
+    
+    [viewPreampButton setEnabled:[model spiConnector]];
     
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
@@ -1787,6 +1796,11 @@
 - (IBAction) forceFullInitCardAction:(id)sender
 {
     [model setForceFullInitCard:[sender intValue]];
+}
+
+- (IBAction) viewPreampAction:(id)sender
+{
+    [model openPreampDialog];
 }
 
 #pragma mark •••Data Source
