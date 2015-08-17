@@ -43,7 +43,7 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    #define koffset -8192
+#define koffset -8180
 	if(![self cacheSetUp]){
 		[self cacheCardLevelObject:kIntegrateTimeKey fromHeader:[aDecoder fileHeader]];
 		[self cacheCardLevelObject:kHistEMultiplierKey fromHeader:[aDecoder fileHeader]];
@@ -77,16 +77,19 @@
             ptr++; //Sample baseline bits 23:0
             ptr++; //CFD sample 2
             ptr++; //post-rise sum (7:0) ...
+            unsigned long sumWord1 = *ptr;
             ptr++; //Timestamp of peak detect bits 15:0 ..
+            unsigned long sumWord2 = *ptr;
             ptr++; //Timestamp of peak detect bits 47:16..
             ptr++; //Post-rise end samle ...
             ptr++; //Pre-rise end sample ...
             ptr++; //Base sample ...
-        
-            long peakSample = (long)(*ptr & 0x3fff);
-            peakSample += koffset;
-            if(peakSample>=0){
-                [aDataSet histogram:peakSample numBins:0x3fff sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
+            unsigned long scaleFactor = 1000;
+            unsigned long postRiseSum = ((sumWord2 & 0xFFFF)<< 8) | ((sumWord1 >> 24) & 0xff);
+            unsigned long preRiseSum  = sumWord1 & 0xFFFFFF;
+            long energy      = (postRiseSum - preRiseSum)/scaleFactor;
+            if(energy >= 0){
+                [aDataSet histogram:energy numBins:0xFFFFFF/scaleFactor  sender:self  withKeys:@"Gretina4A", @"Energy",crateKey,cardKey,channelKey,nil];
             }
             
             if(headerLength!=0){
