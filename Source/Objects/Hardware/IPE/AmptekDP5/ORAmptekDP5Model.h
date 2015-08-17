@@ -48,10 +48,11 @@
 
 //Amptek ASCII Commands
 typedef struct AmptekDP5ASCIICommandsStruct {
-	NSString*       regName;
-	unsigned long 	addressOffset;
-	int				length;
-	short			accessType;
+	NSString*       name;
+	NSString*       value;
+	int 	        init;
+	NSString*       comment;
+	int				id;
 } AmptekDP5ASCIICommandsStruct; 
 
 enum AmptekDP5ASCIICommandEnum {
@@ -297,6 +298,10 @@ enum AmptekDP5ASCIICommandEnum {
     struct timeval lastRequestTime;//    struct timezone tz; is obsolete ... -tb-
     
     NSString* lastRequest;
+
+    NSMutableArray* commandTable;//content of the Amptek Command Table View
+
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Initialization
@@ -314,6 +319,11 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (NSMutableArray*) commandTable;
+- (NSDictionary*) commandTableRow:(int)row;
+- (int) commandTableCount;
+- (void) initCommandTable;
+
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aLastRequest;
 - (int) isPollingSpectrum;

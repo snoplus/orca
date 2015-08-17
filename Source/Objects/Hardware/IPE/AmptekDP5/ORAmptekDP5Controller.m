@@ -90,6 +90,9 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
     [self updateWindow];
 	
 	[self populatePullDown];
+    
+    // command table view
+	//[self  populateCommandTableView];
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Notifications
@@ -411,6 +414,19 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
 
+// command table view
+//----------------------
+- (void) populateCommandTableView
+{
+}
+
+
+
+
+
+
+//others
+//-------
 - (void) isPollingSpectrumChanged:(NSNotification*)aNote
 {
 	//[isPollingSpectrumIndicator setIntValue: [model isPollingSpectrum]];
@@ -1986,7 +2002,88 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 }
 
 
+
+
+
+#pragma mark •••Data Source Methods (TableView)
+- (int) numberOfRowsInTableView:(NSTableView *)tableView
+{
+return 4;
+#if 0
+    if(tableView==itemTableView){
+        return [model pollingLookUpCount];
+    }
+	else if(tableView == pendingRequestsTable){
+		return [model pendingRequestsCount];
+	}
+	else if(tableView == setpointRequestsQueueTableView){
+		return [model setpointRequestsQueueCount];
+	}
+	return 0;
+#endif
+}
+
+
+- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+{
+//return @"till";
+    if(tableView==commandTableView){
+		if(row<[model commandTableCount]){
+			//NSString* theIdentifier				= [tableColumn identifier];
+			NSString* theIdentifier				= [[tableColumn headerCell] stringValue];
+	        //DEBUG      
+            NSLog(@"%@::%@  theIdentifier:%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),theIdentifier);//DEBUG OUTPUT -tb-  
+			if([theIdentifier isEqual:@"Name"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: @"Name"];
+                //return @"name";
+			}
+			else if([theIdentifier isEqual:@"Value"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: @"Value"];
+			}
+			else if([theIdentifier isEqual:@"Init"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: @"Init"];
+			}
+			else if([theIdentifier isEqual:@"ID"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: @"ID"];
+			}
+			else if([theIdentifier isEqual:@"Comment"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: @"Comment"];
+                //return @"comment";
+			}
+			else return @"--";
+		}
+	}
+
+
+    return @"-";
+}
+
+
+- (void) tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
+{
+	if(tableView==commandTableView){
+		if(row<[model commandTableCount]){
+	        //DEBUG      
+            NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+			//[topLevelDictionary setObject:object forKey:[tableColumn identifier]];
+		}
+		//[self tableViewSelectionDidChange:nil];
+    }
+}
+
+
+
+
+
 @end
+
+
+
 
 @implementation ORAmptekDP5Controller (private)
 

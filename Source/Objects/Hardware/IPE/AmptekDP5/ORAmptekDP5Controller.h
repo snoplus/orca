@@ -25,6 +25,8 @@
 //#import "SBC_LinkController.h"
 
 @interface ORAmptekDP5Controller : OrcaObjectController {
+    // command table view
+	IBOutlet NSTableView*			commandTableView;
 
 	IBOutlet NSTabView*				tabView;
 	IBOutlet NSPopUpButton*         spectrumRequestRatePU;
@@ -181,6 +183,11 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+// command table view
+- (void) populateCommandTableView;
+
+
 - (void) isPollingSpectrumChanged:(NSNotification*)aNote;
 - (void) spectrumRequestRateChanged:(NSNotification*)aNote;
 - (void) spectrumRequestTypeChanged:(NSNotification*)aNote;
@@ -234,6 +241,7 @@
 - (void) pageSizeChanged:(NSNotification*)aNote;
 - (void) displayEventLoopChanged:(NSNotification*)aNote;
 - (void) displayTriggerChanged:(NSNotification*)aNote;
+
 - (void) populatePullDown;
 - (void) updateWindow;
 - (void) setWindowTitle;
@@ -382,4 +390,16 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _SLTv4killCrateAndStartSimDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 #endif
+
+
+
+#pragma mark •••Data Source Methods (TableView)
+- (int)numberOfRowsInTableView:(NSTableView *)tableView;
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+//- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+//- (BOOL) tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard;
+//- (void) dragDone;
+
+
+
 @end

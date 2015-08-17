@@ -45,10 +45,10 @@
 
 //Amptek ASCII Commands
 static AmptekDP5ASCIICommandsStruct amptekCmds[kAmptekNumCommands] = {
-{@"Control",			0xa80000,		1,			kIpeRegReadable | kIpeRegWriteable },
-{@"Status",				0xa80004,		1,			kIpeRegReadable },
-{@"Command",			0xa80008,		1,			kIpeRegWriteable },
-{@"Command",			0xa80008,		1,			kIpeRegWriteable }
+{@"MCAC",     @"1024",			1,			  @"MCA/MCS channels" , 1  },
+{@"GAIA",     @"1",			 	1,			  @"Analog gain index [##]" , 2  },
+{@"GAIF",     @"1.0",			1,			  @"Fine gain [##.###]" , 3  },
+{@"GAIN",     @"1.00",			 	1,			  @"Total gain (analog*fine) [##.###]" , 4  },
 };
 
 
@@ -649,6 +649,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	crateUDPCommandPort = 10001;
 	crateUDPCommandIP = @"192.168.1.102";
     
+	//if(!commandTable)  commandTable = [[NSMutableArray array] retain];
+    [self initCommandTable];
     
     
     
@@ -675,6 +677,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	[readOutGroup release];
     [poller stop];
     [poller release];
+    [commandTable release];
     [super dealloc];
 }
 
@@ -772,6 +775,55 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+- (NSMutableArray*) commandTable
+{ return commandTable; }
+
+- (NSDictionary*) commandTableRow:(int)row
+{
+    if(row<[commandTable count]) return [commandTable objectAtIndex: row];
+    return 0;
+}
+
+
+
+- (int) commandTableCount
+{
+    if(!commandTable) return 0;
+	return [commandTable count];
+}
+
+
+- (void) initCommandTable
+{
+	if(!commandTable)  commandTable = [[NSMutableArray array] retain];
+    else [commandTable removeAllObjects];
+
+    int i;
+    for(i=0; i<kAmptekNumCommands;i++){
+        NSMutableDictionary* commandTableRow = [NSMutableDictionary dictionary];
+	    [commandTableRow setObject: amptekCmds[i].name		    forKey:@"Name"]; //used by processing
+	    [commandTableRow setObject: amptekCmds[i].value		    forKey:@"Value"]; //used by processing
+	    [commandTableRow setObject: [NSNumber numberWithInt: amptekCmds[i].init]		    forKey:@"Init"]; //used by processing
+	    [commandTableRow setObject: amptekCmds[i].comment		forKey:@"Comment"]; //used by processing
+	    [commandTableRow setObject: [NSNumber numberWithInt: amptekCmds[i].id]		    forKey:@"ID"]; //used by processing
+//	    [commandTableRow setObject:[NSNumber numberWithInt:0]		forKey:@"LoAlarm"]; //used by processing
+
+        [commandTable addObject: commandTableRow];
+        //[commandTable replaceObjectAtIndex: i withObject: commandTableRow];
+    }
+    
+    
+    
+    //DEBUG      
+            NSLog(@"%@::%@ commandTable is:%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),commandTable);//DEBUG OUTPUT -tb-  
+    
+}
+
+
+
+
+
+
 
 - (NSString*) lastRequest
 {
@@ -4085,6 +4137,8 @@ return ;
 		[readList release];
 	}
 	
+    if(!commandTable) [self initCommandTable];
+    
 	[[self undoManager] enableUndoRegistration];
 
 	[self registerNotificationObservers];
