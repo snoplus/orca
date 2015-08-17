@@ -591,8 +591,8 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         
         NSString* gainType = [self getValueForPartStartingWith: @" GainType"   parts:parts];
         if([gainType length]==0)return @"Not Mapped";
-        if([gainType intValue]==0)gainType = @"Low Gain";
-        else gainType = @"Hi Gain";
+        if([gainType intValue]==0)gainType = @"LG";
+        else gainType = @"HG";
  
         NSString* detType = [self getValueForPartStartingWith: @" DetectorType"   parts:parts];
         if([detType length]==0)return @"Not Mapped";
