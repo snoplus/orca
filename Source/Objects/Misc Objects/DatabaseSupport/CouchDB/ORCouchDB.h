@@ -49,6 +49,7 @@
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
+- (void) updateLowPriorityDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag informingDelegate:(BOOL)ok;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
@@ -223,21 +224,27 @@
 //a thin wrapper around NSOperationQueue to make a shared queue for couch access
 @interface ORCouchDBQueue : NSObject {
     NSOperationQueue* queue;
+    NSOperationQueue* lowPriorityQueue;
     NSOperationQueue* changesFeedQueue;
 }
 + (ORCouchDBQueue*) sharedCouchDBQueue;
 + (void) addOperation:(NSOperation*)anOp;
++ (void) addLowPriorityOperation:(NSOperation*)anOp;
 + (void) addChangeFeedOperation:(ORCouchDBChangesfeedOp*)feedOp;
 + (NSOperationQueue*) queue;
++ (NSOperationQueue*) lowPriorityQueue;
 + (NSOperationQueue*) changesFeedQueue;
 + (NSUInteger) operationCount;
 + (void) cancelAllOperations;
 - (void) addOperation:(NSOperation*)anOp;
+- (void) addLowPriorityOperation:(NSOperation*)anOp;
 - (void) addChangesFeedOperation:(ORCouchDBChangesfeedOp*)feedOp;
 - (NSOperationQueue*) queue;
+- (NSOperationQueue*) lowPriorityQueue;
 - (NSOperationQueue*) changesFeedQueue;
 - (void) cancelAllOperations;
 - (NSInteger) operationCount;
+- (NSInteger) lowPriorityOperationCount;
 @end
 
 @interface NSObject (ORCouchDB)

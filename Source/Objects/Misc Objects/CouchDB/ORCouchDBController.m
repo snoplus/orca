@@ -44,39 +44,47 @@
 
 - (void) dealloc
 {
-	[[[ORCouchDBQueue sharedCouchDBQueue] queue] removeObserver:self forKeyPath:@"operationCount"];
+    [[[ORCouchDBQueue sharedCouchDBQueue] queue]            removeObserver:self forKeyPath:@"operationCount"];
+    [[[ORCouchDBQueue sharedCouchDBQueue] lowPriorityQueue] removeObserver:self forKeyPath:@"operationCount"];
 	[super dealloc];
 }
 
 -(void) awakeFromNib
 {
 	[super awakeFromNib];
-	[[[ORCouchDBQueue sharedCouchDBQueue]queue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
+    [[[ORCouchDBQueue sharedCouchDBQueue]queue]            addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
+    [[[ORCouchDBQueue sharedCouchDBQueue]lowPriorityQueue] addObserver:self forKeyPath:@"operationCount" options:0 context:NULL];
+    [queueValueBars setNumber:2 height:10 spacing:5];
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object 
                          change:(NSDictionary *)change context:(void *)context
 {
 	NSOperationQueue* queue = [[ORCouchDBQueue sharedCouchDBQueue] queue];
+    NSOperationQueue* lowPriorityQueue = [[ORCouchDBQueue sharedCouchDBQueue] lowPriorityQueue];
     if (object == queue && [keyPath isEqual:@"operationCount"]) {
 		NSNumber* n = [NSNumber numberWithInt:[[[ORCouchDBQueue queue] operations] count]];
 		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
     }
+    else if (object == lowPriorityQueue && [keyPath isEqual:@"operationCount"]) {
+        NSNumber* n = [NSNumber numberWithInt:[[[ORCouchDBQueue lowPriorityQueue] operations] count]];
+        [self performSelectorOnMainThread:@selector(setLowPriorityQueCount:) withObject:n waitUntilDone:NO];
+    }
     else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
-	
 }
 
 - (void) setQueCount:(NSNumber*)n
 {
-	queueCount = [n intValue];
-	[queueValueBar setNeedsDisplay:YES];
+    [[queueCountsMatrix cellAtRow:0 column:0] setIntValue:[n intValue]];
+	[queueValueBars setNeedsDisplay:YES];
 }
 
-- (double) doubleValue
+- (void) setLowPriorityQueCount:(NSNumber*)n
 {
-	return queueCount;
+    [[queueCountsMatrix cellAtRow:1 column:0] setIntValue:[n intValue]];
+    [queueValueBars setNeedsDisplay:YES];
 }
 
 #pragma mark •••Registration

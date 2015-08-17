@@ -31,7 +31,8 @@
 	IBOutlet NSTextField* dataBaseNameField;
 	IBOutlet NSTextField* historyDataBaseNameField;
     IBOutlet NSButton*    couchDBLockButton;
-    IBOutlet ORValueBarGroupView*  queueValueBar;
+    IBOutlet NSMatrix*    queueCountsMatrix;
+    IBOutlet ORValueBarGroupView*  queueValueBars;
 	IBOutlet NSButton*	  stealthModeButton;
 	IBOutlet NSTextField* dbSizeField;
 	IBOutlet NSTextField* dbHistorySizeField;
@@ -40,7 +41,6 @@
     IBOutlet NSTextField* usingUpdateHandlerField;
     IBOutlet NSTextField* alertMessageField;
     IBOutlet NSPopUpButton* alertTypePU;
-	double queueCount;
 }
 
 #pragma mark ***Interface Management

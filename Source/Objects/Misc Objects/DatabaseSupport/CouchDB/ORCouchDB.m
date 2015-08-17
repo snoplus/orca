@@ -153,6 +153,15 @@
 	[anOp release];
 }
 
+- (void) updateLowPriorityDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
+{
+    ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
+    [anOp setDocument:aDict documentID:anId];
+    [ORCouchDBQueue addLowPriorityOperation:anOp];
+    [anOp release];
+}
+
+
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 {
 	ORCouchDBUpdateDocumentOp* anOp = [[ORCouchDBUpdateDocumentOp alloc] initWithHost:host username:username pwd:pwd port:port database:database delegate:delegate tag:aTag];
@@ -1118,58 +1127,40 @@ static void ORCouchDB_Feed_callback(CFReadStreamRef stream,
 //-----------------------------------------------------------
 @implementation ORCouchDBQueue
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
-+ (NSOperationQueue*) queue
-{
-	return [[ORCouchDBQueue sharedCouchDBQueue] queue];
-}
++ (NSOperationQueue*) queue             { return [[ORCouchDBQueue sharedCouchDBQueue] queue];              }
++ (NSOperationQueue*) lowPriorityQueue  { return [[ORCouchDBQueue sharedCouchDBQueue] lowPriorityQueue];   }
++ (NSOperationQueue*) changesFeedQueue  { return [[ORCouchDBQueue sharedCouchDBQueue] changesFeedQueue];   }
++ (void) addOperation:(NSOperation*)anOp{ [[ORCouchDBQueue sharedCouchDBQueue] addOperation:anOp];         }
 
-+ (NSOperationQueue*) changesFeedQueue
-{
-	return [[ORCouchDBQueue sharedCouchDBQueue] changesFeedQueue];
-}
++ (void) addLowPriorityOperation:(NSOperation*)anOp              { [[ORCouchDBQueue sharedCouchDBQueue] addLowPriorityOperation:anOp];   }
++ (void) addChangeFeedOperation:(ORCouchDBChangesfeedOp *)feedOp { [[ORCouchDBQueue sharedCouchDBQueue] addChangesFeedOperation:feedOp]; }
 
-+ (void) addOperation:(NSOperation*)anOp
-{
-	[[ORCouchDBQueue sharedCouchDBQueue] addOperation:anOp];
-}
-
-+ (void) addChangeFeedOperation:(ORCouchDBChangesfeedOp *)feedOp
-{
-	[[ORCouchDBQueue sharedCouchDBQueue] addChangesFeedOperation:feedOp];
-}
-
-+ (NSUInteger) operationCount
-{
-	return 	[[ORCouchDBQueue sharedCouchDBQueue] operationCount];
-}
-+ (void) cancelAllOperations
-{
-	[[ORCouchDBQueue sharedCouchDBQueue] cancelAllOperations];
-}
++ (NSUInteger) operationCount            { return 	[[ORCouchDBQueue sharedCouchDBQueue] operationCount];  }
++ (NSUInteger) lowPriorityOperationCount { return 	[[ORCouchDBQueue sharedCouchDBQueue] lowPriorityOperationCount];}
++ (void)       cancelAllOperations       { [[ORCouchDBQueue sharedCouchDBQueue] cancelAllOperations]; }
 
 //don't call this unless you're using this class in a special, non-global way.
 - (id) init
 {
     self = [super init];
-	queue = [[NSOperationQueue alloc] init];
+    queue = [[NSOperationQueue alloc] init];
 	[queue setMaxConcurrentOperationCount:4];
+
+    lowPriorityQueue = [[NSOperationQueue alloc] init];
+    [lowPriorityQueue setMaxConcurrentOperationCount:1];
+
     changesFeedQueue = [[NSOperationQueue alloc] init];
     return self;
 }
 
-- (NSOperationQueue*) queue
+- (NSOperationQueue*) queue                         { return queue;             }
+- (NSOperationQueue*) lowPriorityQueue              { return lowPriorityQueue;  }
+- (NSOperationQueue*) changesFeedQueue              { return changesFeedQueue;  }
+- (void) addOperation:(NSOperation*)anOp            { [queue addOperation:anOp];            }
+- (void) addLowPriorityOperation:(NSOperation*)anOp
 {
-	return queue;
-}
-
-- (NSOperationQueue*) changesFeedQueue
-{
-	return changesFeedQueue;
-}
-
-- (void) addOperation:(NSOperation*)anOp
-{
-	[queue addOperation:anOp];
+    [anOp setQueuePriority:NSOperationQueuePriorityVeryLow];
+    [lowPriorityQueue addOperation:anOp];
 }
 
 - (void) addChangesFeedOperation:(ORCouchDBChangesfeedOp *)feedOp
@@ -1183,15 +1174,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CouchDBQueue);
         [changesFeedQueue addOperation:feedOp];
     }
 }
+
 - (void) cancelAllOperations
 {
-	[queue cancelAllOperations];
+    [queue cancelAllOperations];
+    [lowPriorityQueue cancelAllOperations];
     [changesFeedQueue cancelAllOperations];
 }
 			 
-- (NSInteger) operationCount
-{
-	return [[queue operations]count];
-}
-			 
+- (NSInteger) operationCount            { return [[queue operations]count];            }
+- (NSInteger) lowPriorityOperationCount { return [[lowPriorityQueue operations]count]; }
+
 @end

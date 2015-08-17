@@ -36,19 +36,19 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
-NSString* ORCouchDBModelAlertTypeChanged = @"ORCouchDBModelAlertTypeChanged";
-NSString* ORCouchDBModelAlertMessageChanged = @"ORCouchDBModelAlertMessageChanged";
+NSString* ORCouchDBModelAlertTypeChanged          = @"ORCouchDBModelAlertTypeChanged";
+NSString* ORCouchDBModelAlertMessageChanged       = @"ORCouchDBModelAlertMessageChanged";
 NSString* ORCouchDBModelReplicationRunningChanged = @"ORCouchDBModelReplicationRunningChanged";
-NSString* ORCouchDBModelKeepHistoryChanged		= @"ORCouchDBModelKeepHistoryChanged";
-NSString* ORCouchDBModelStealthModeChanged		= @"ORCouchDBModelStealthModeChanged";
-NSString* ORCouchDBPasswordChanged				= @"ORCouchDBPasswordChanged";
-NSString* ORCouchDBPortNumberChanged            = @"ORCouchDBPortNumberChanged";
-NSString* ORCouchDBUserNameChanged				= @"ORCouchDBUserNameChanged";
-NSString* ORCouchDBRemoteHostNameChanged		= @"ORCouchDBRemoteHostNameChanged";
-NSString* ORCouchDBModelDBInfoChanged			= @"ORCouchDBModelDBInfoChanged";
-NSString* ORCouchDBLock							= @"ORCouchDBLock";
-NSString* ORCouchDBLocalHostNameChanged         = @"ORCouchDBLocalHostNameChanged";
-NSString* ORCouchDBModelUsingUpdateHandleChanged = @"ORCouchDBModelUsingUpdateHandleChanged";
+NSString* ORCouchDBModelKeepHistoryChanged		  = @"ORCouchDBModelKeepHistoryChanged";
+NSString* ORCouchDBModelStealthModeChanged		  = @"ORCouchDBModelStealthModeChanged";
+NSString* ORCouchDBPasswordChanged				  = @"ORCouchDBPasswordChanged";
+NSString* ORCouchDBPortNumberChanged              = @"ORCouchDBPortNumberChanged";
+NSString* ORCouchDBUserNameChanged				  = @"ORCouchDBUserNameChanged";
+NSString* ORCouchDBRemoteHostNameChanged		  = @"ORCouchDBRemoteHostNameChanged";
+NSString* ORCouchDBModelDBInfoChanged			  = @"ORCouchDBModelDBInfoChanged";
+NSString* ORCouchDBLock							  = @"ORCouchDBLock";
+NSString* ORCouchDBLocalHostNameChanged           = @"ORCouchDBLocalHostNameChanged";
+NSString* ORCouchDBModelUsingUpdateHandleChanged  = @"ORCouchDBModelUsingUpdateHandleChanged";
 
 #define kCreateDB           @"kCreateDB"
 #define kReplicateDB        @"kReplicateDB"
@@ -67,7 +67,7 @@ NSString* ORCouchDBModelUsingUpdateHandleChanged = @"ORCouchDBModelUsingUpdateHa
 #define kInfoInternalDB     @"kInfoInternalDB"
 #define kAttachmentAdded    @"kAttachmentAdded"
 #define kInfoHistoryDB      @"kInfoHistoryDB"
-#define kAddUpdateHandler @"kAddUpdateHandler"
+#define kAddUpdateHandler   @"kAddUpdateHandler"
 
 #define kCouchDBPort 5984
 #define kUpdateStatsInterval 30
@@ -1421,8 +1421,7 @@ nil];
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
-        NSUInteger n = [ORCouchDBQueue operationCount];
-        if(n<10){
+        if([[ORCouchDBQueue sharedCouchDBQueue]lowPriorityOperationCount]<10){
             NSMutableArray* dataSetNames = [NSMutableArray array];
             for(id aMonitor in dataMonitors){
                 NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
@@ -1460,7 +1459,7 @@ nil];
                             [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"_id",dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
                          ];
 
-                        [[self statusDBRef] updateDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
+                        [[self statusDBRef] updateLowPriorityDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
                         
                     }
                     
@@ -1506,6 +1505,7 @@ nil];
     [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:5];
     [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 }
+
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
