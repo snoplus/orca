@@ -86,7 +86,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) processElementStateChanged:(NSNotification*)aNote;
 - (void) periodicCompact;
 - (void) updateDataSets;
-- (void) updateStatus;
 - (void) _cancelAllPeriodicOperations;
 - (void) _startAllPeriodicOperations;
 @end
@@ -125,7 +124,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         [self createDatabases];
         [self _startAllPeriodicOperations];
         [self registerNotificationObservers];
-        statusUpdateScheduled = NO;
 
     }
     [super wakeUp];
@@ -217,12 +215,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                      selector : @selector(alarmsChanged:)
                          name : ORAlarmWasClearedNotification
                        object : nil];	
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(statusLogChanged:)
-                         name : ORStatusLogUpdatedNotification
-                       object : nil];    
-	
+		
 	[notifyCenter addObserver : self
 					 selector : @selector(updateProcesses)
 						 name : ORProcessRunningChangedNotification
@@ -265,7 +258,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	[self updateRunInfo];
 	[self alarmsChanged:nil];
-	[self statusLogChanged:nil];
 	[self updateExperiment];
     NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
                          @"ORCA restarted",                                     @"comment",
@@ -1400,15 +1392,6 @@ nil];
 	}
 }
 
-- (void) statusLogChanged:(NSNotification*)aNote
-{
-	if(!stealthMode){
-		if(!statusUpdateScheduled){
-			[self performSelector:@selector(updateStatus) withObject:nil afterDelay:120];
-			statusUpdateScheduled = YES;
-		}
-	}
-}
 
 - (void) updateExperiment
 {
@@ -1418,21 +1401,6 @@ nil];
         [experiment postCouchDBRecord];
         [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:30];
 	}
-}
-
-- (void) updateStatus
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateStatus) object:nil];
-	statusUpdateScheduled = NO;
-	NSString* s = [[ORStatusController sharedStatusController] contents];
-	NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-							  @"statuslog",		@"_id",
-							  s,				@"statuslog",
-							  @"StatusLog",		@"type",
-							  nil];
-	
-	[[self statusDBRef] updateDocument:dataInfo documentId:@"statuslog" tag:kDocumentUpdated];
-	
 }
 
 - (void) alarmsChanged:(NSNotification*)aNote

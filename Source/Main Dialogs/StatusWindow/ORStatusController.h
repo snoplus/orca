@@ -45,6 +45,8 @@
 	NSString*				logBookFile;
 	NSDate*					lastSnapShot;
     unsigned  long long     alarmLogSize;
+    BOOL                    scheduledToPostToDB;
+    BOOL                    notFirstTime;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -74,6 +76,9 @@
 - (oneway void) printString: (NSString*)aComment;
 - (oneway void) printAttributedString:(NSAttributedString*)s1;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
+- (void) scheduleCouchDBUpdate;
+- (void) postToCouchDB;
+- (NSString*) fullID;
 
 #pragma mark ¥¥¥Data Source Methods
 - (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;

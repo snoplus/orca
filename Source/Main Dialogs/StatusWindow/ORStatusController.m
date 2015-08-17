@@ -831,6 +831,37 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	}
 }
 
+- (NSString*) fullID
+{
+    //need to provide for the couchDB stuff
+    return @"StatusLog";
+}
+
+- (void) scheduleCouchDBUpdate
+{
+    if([NSThread isMainThread]){
+        if(!scheduledToPostToDB){
+            scheduledToPostToDB = YES;
+            [self performSelector:@selector(postToCouchDB) withObject:nil afterDelay:notFirstTime?60:10];
+        }
+    }
+}
+
+- (void) postToCouchDB
+{
+    scheduledToPostToDB = NO;
+    notFirstTime        = YES;
+    if([NSThread isMainThread]){
+        NSString* s = [self contents];
+        NSDictionary* dbRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  s,				@"statuslog",
+                                  @"StatusLog",		@"type",
+                                  nil];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:dbRecord];
+
+    }
+}
 
 @end
 
@@ -942,12 +973,14 @@ void NSLogAttr(NSAttributedString* s)
         
         [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
-        
+        [sharedStatusController scheduleCouchDBUpdate];
+
 	}
 	@catch(NSException* localException) {
 	}
 	[pool release];
 }
+
 
 //----------------------------------------------------------------------------------------------------
 //NSLogColor

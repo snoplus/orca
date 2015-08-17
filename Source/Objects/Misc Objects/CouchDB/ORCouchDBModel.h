@@ -33,7 +33,6 @@
 	NSDictionary*   dBInfo;
 	NSDictionary*   dBHistoryInfo;
 	NSMutableArray* dataMonitors;
-	BOOL            statusUpdateScheduled;
 	BOOL            historyUpdateScheduled;
     BOOL            keepHistory;
 	//cache
@@ -60,7 +59,6 @@
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote;
 - (void) runStatusChanged:(NSNotification*)aNote;
 - (void) alarmsChanged:(NSNotification*)aNote;
-- (void) statusLogChanged:(NSNotification*)aNote;
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
 - (void) addObjectValueRecord:(NSNotification*)aNote;
