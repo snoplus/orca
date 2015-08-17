@@ -49,9 +49,9 @@
 - (void) addDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) getDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
-- (void) updateLowPriorityDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId attachmentData:(NSData*)someData attachmentName:(NSString*)aName tag:(NSString*)aTag;
 - (void) updateDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag informingDelegate:(BOOL)ok;
+- (void) updateLowPriorityDocument:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) deleteDocumentId:(NSString*)anId tag:(NSString*)aTag;
 - (void) listTasks:(id)aDelegate tag:(NSString*)aTag;
 - (void) updateEventCatalog:(NSDictionary*)aDict documentId:(NSString*)anId tag:(NSString*)aTag;
