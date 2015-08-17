@@ -259,13 +259,9 @@ NSString* ORCrateModelLockMovementChanged   = @"ORCrateModelLockMovementChanged"
 
 - (void)setPowerOff:(BOOL)state
 {
-    if(state != powerOff){
-        powerOff = state;
-        [self viewChanged:nil];
-        [[NSNotificationCenter defaultCenter]
-		 postNotificationName:ORForceRedraw
-		 object:self];
-    }
+    powerOff = state;
+    [self viewChanged:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object:self];
 }
 
 - (void) pollCratePower
