@@ -5852,7 +5852,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     
                     unsigned short numEventsInBuffer = actualBytesToRead/(dataRecordLength*sizeof(unsigned long));
                     unsigned long bytesOfData = sizeof(unsigned long)*(numEventsInBuffer*dataRecordLength);
-                    unsigned long bytesToReturn = sizeof(unsigned long)*(orcaHeaderLength) + bytesOfData;
+//                    unsigned long bytesToReturn = sizeof(unsigned long)*(orcaHeaderLength) + bytesOfData;
                     
                     unsigned long bufferAddLongs = (orcaHeaderLength+(numEventsInBuffer*dataRecordLength)); // num longs to add to the data stream
 
