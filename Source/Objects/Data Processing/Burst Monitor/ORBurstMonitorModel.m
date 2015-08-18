@@ -1273,14 +1273,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //calc chan prob
     double exChan =999.999;
     int novaState = 0;
-    if((multInBurst > 4 && rSec > 0.01 && adcP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001))
+    if((multInBurst > 4 && rSec > 0.01 && adcP > 0.00001 && gammaP > 0.00001 && alphaP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001 && gammaP > 0.00001 && alphaP > 0.00001))
     {
         novaState = 3;
     }
     else
     {
         novaState = 0; //Other
-        if (adcP > 0.001) //Coincidence
+        if (adcP > 0.001 && gammaP > 0.001 && alphaP > 0.001) //Coincidence
         {
             novaState = 1;
         }
