@@ -48,10 +48,10 @@
 
 - (void) awakeFromNib
 {
-    basicSize       = NSMakeSize(1100   ,700);
-    settingSize     = NSMakeSize(900    ,620);
-    rateSize		= NSMakeSize(790    ,300);
-    miscSize        = NSMakeSize(1200   ,600);
+    basicSize       = NSMakeSize(1010  ,660);
+    settingSize     = NSMakeSize(700   ,600);
+    rateSize		= NSMakeSize(790   ,300);
+    miscSize        = NSMakeSize(680   ,480);
     
     
     blankView = [[NSView alloc] init];
@@ -1829,7 +1829,7 @@
 		[model probeBoard];
 	}
 	@catch (NSException* localException) {
-		NSLog(@"Probe of SIS 3300 board ID failed\n");
+		NSLog(@"Probe of SIS 3305 board ID failed\n");
         ORRunAlertPanel([localException name], @"%@\nProbe Failed", @"OK", nil, nil,
                         localException);
 	}

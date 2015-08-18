@@ -129,10 +129,10 @@
 //	NSMutableArray*	cfdControls;
 	NSMutableArray* thresholds;
     
-    int     GTThresholdOn[kNumSIS3305Channels];
-    int     GTThresholdOff[kNumSIS3305Channels];
-    int     LTThresholdOn[kNumSIS3305Channels];
-    int     LTThresholdOff[kNumSIS3305Channels];
+    unsigned int     GTThresholdOn[kNumSIS3305Channels];
+    unsigned int     GTThresholdOff[kNumSIS3305Channels];
+    unsigned int     LTThresholdOn[kNumSIS3305Channels];
+    unsigned int     LTThresholdOff[kNumSIS3305Channels];
 //    int     preTriggerDelays[kNumSIS3305Channels];
     int     gain[kNumSIS3305Channels];
     

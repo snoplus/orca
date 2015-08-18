@@ -1049,8 +1049,18 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return tapDelay[chan];
 }
 
-- (BOOL) LTThresholdEnabled:(short)aChan{    return LTThresholdEnabled[aChan];}
-- (BOOL) GTThresholdEnabled:(short)aChan{    return GTThresholdEnabled[aChan];}
+- (BOOL) LTThresholdEnabled:(short)aChan{
+    if (aChan > kNumSIS3305Channels)
+        return NO;
+
+    return LTThresholdEnabled[aChan];
+}
+
+- (BOOL) GTThresholdEnabled:(short)aChan{
+    if (aChan > kNumSIS3305Channels) {
+        return NO;
+    }
+    return GTThresholdEnabled[aChan];}
 
 - (void) setLTThresholdEnabled:(short)aChan withValue:(BOOL)aValue
 {
@@ -1063,6 +1073,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     LTThresholdEnabled[aChan] = aValue;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LTThresholdEnabledChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ChannelEnabledChanged object:self];
+
 //    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ThresholdModeChanged object:self];
 
 }
@@ -1090,39 +1102,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 }
 
 
-//- (short) ltMask { return ltMask; }
-//- (BOOL) lt:(short)chan	 { return ltMask & (1<<chan); }
-//- (void) setLtMask:(long)aMask
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setLtMask:ltMask];
-//    ltMask = aMask;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305LtChanged object:self];
-//}
-//
-//- (void) setLtBit:(short)chan withValue:(BOOL)aValue
-//{
-//    unsigned char aMask = ltMask;
-//    if(aValue)aMask |= (1<<chan);
-//    else aMask &= ~(1<<chan);
-//    [self setLtMask:aMask];
-//}
-//
-//- (short) gtMask { return gtMask; }
-//- (BOOL) gt:(short)chan	 { return gtMask & (1<<chan); }
-//- (void) setGtMask:(long)aMask
-//{
-//    [[[self undoManager] prepareWithInvocationTarget:self] setGtMask:gtMask];
-//    gtMask = aMask;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305GtChanged object:self];
-//}
-//
-//- (void) setGtBit:(short)chan withValue:(BOOL)aValue
-//{
-//    unsigned char aMask = gtMask;
-//    if(aValue)aMask |= (1<<chan);
-//    else aMask &= ~(1<<chan);
-//    [self setGtMask:aMask];
-//}
+
 
 - (int) limitIntValue:(int)aValue min:(int)aMin max:(int)aMax
 {
@@ -1151,7 +1131,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     A note on the way threshod modes are implemented
     threshold mode (thresholdMode) is a composite of which thresholds are enabled (GT, LT, GT&LT, !(GT||LT) ).
     You may want to set individually which of these is true, or you may just want to set the mode. 
-    In order to encode this correctly for saving,
+    In order to encode this correctly for saving, thresholdMode is "derived" by
  
  */
 
@@ -1159,8 +1139,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 {
     /*
         0: Disabled
-        1: GT
-        2: LT
+        1: LT
+        2: GT
         3: GT AND LT
      */
     
@@ -1168,7 +1148,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     BOOL lt = [self LTThresholdEnabled:chan];
     short mode = -1;
 
-    mode = gt + 2*lt;
+    mode = lt + 2*gt;
     
 //    if (!gt && !lt)
 //        mode = 0;
@@ -1192,8 +1172,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) setThresholdMode:(short)chan withValue:(short)aValue
 {
-//    [[[self undoManager] prepareWithInvocationTarget:self] setGTThresholdEnabled:chan withValue:[self GTThresholdEnabled:chan]];
-//    [[[self undoManager] prepareWithInvocationTarget:self] setLTThresholdEnabled:chan withValue:[self LTThresholdEnabled:chan]];
     [[[self undoManager] prepareWithInvocationTarget:self] setThresholdMode:chan withValue:[self thresholdMode:chan]];
     
     if (chan >= kNumSIS3305Channels || chan < 0) {
@@ -1207,13 +1185,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             [self setGTThresholdEnabled:chan withValue:NO];
             [self setLTThresholdEnabled:chan withValue:NO];
             break;
-        case 1:     // GT ENABLED
-            [self setGTThresholdEnabled:chan withValue:YES];
-            [self setLTThresholdEnabled:chan withValue:NO];
-            break;
-        case 2:     // LT ENABLED
+        case 1:     // LT ENABLED
             [self setGTThresholdEnabled:chan withValue:NO];
             [self setLTThresholdEnabled:chan withValue:YES];
+            break;
+        case 2:     // GT ENABLED
+            [self setGTThresholdEnabled:chan withValue:YES];
+            [self setLTThresholdEnabled:chan withValue:NO];
             break;
         case 3:     // BOTH ENABLED
             [self setGTThresholdEnabled:chan withValue:YES];
@@ -4747,29 +4725,36 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) writeLTThresholds
 {
-    ORCommandList* aList = [ORCommandList commandList];
+//    ORCommandList* aList = [ORCommandList commandList];
     int i;
     unsigned long thresholdMask;
+    unsigned long onThresh;
+    unsigned long offThresh;
+    unsigned long LTEnabled;
     for(i = 0; i < kNumSIS3305Channels; i++)
     {
         thresholdMask = 0;
         
-        thresholdMask |= ([self LTThresholdOn:i]    & 0x3ff)    <<0;
-        thresholdMask |= ([self LTThresholdOff:i]   & 0x3ff)    <<16;
-        thresholdMask |= ([self LTThresholdEnabled:i]&0x1)      <<31;
+        onThresh = [self LTThresholdOn:i];
+        offThresh = [self LTThresholdOff:i];
+        LTEnabled = [self LTThresholdEnabled:i];
         
-        [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+        thresholdMask |= (onThresh   & 0x3ff)    <<0;
+        thresholdMask |= (offThresh  & 0x3ff)    <<16;
+        thresholdMask |= (LTEnabled  &0x1)      <<31;
+        
+        [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
                                                        atAddress: [self baseAddress] + [self getLTThresholdRegOffsets:i]
                                                       numToWrite: 1
                                                       withAddMod: [self addressModifier]
-                                                   usingAddSpace: 0x01]];
+                                                   usingAddSpace: 0x01];
     }
     
-    [self executeCommandList:aList];
+//    [self executeCommandList:aList];
 }
 - (void) writeGTThresholds
 {
-    ORCommandList* aList = [ORCommandList commandList];
+//    ORCommandList* aList = [ORCommandList commandList];
     int i;
     unsigned long thresholdMask;
     for(i = 0; i < kNumSIS3305Channels; i++)
@@ -4780,14 +4765,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         thresholdMask |= ([self GTThresholdOff:i]   & 0x3ff)    <<16;
         thresholdMask |= ([self GTThresholdEnabled:i]&0x1)      <<31;
         
-        [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+        [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
                                                        atAddress: [self baseAddress] + [self getGTThresholdRegOffsets:i]
                                                       numToWrite: 1
                                                       withAddMod: [self addressModifier]
-                                                   usingAddSpace: 0x01]];
+                                                   usingAddSpace: 0x01];
     }
     
-    [self executeCommandList:aList];
+//    [self executeCommandList:aList];
 }
 
 - (unsigned long) getSamplingStatusAddressForGroup:(short)group
@@ -5237,13 +5222,13 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     //	}
     //	else {
     BOOL tracesShipped = ([self sampleLength:0] || [self sampleLength:1]);
-    summary = @"Energy";
-    if(tracesShipped) summary = [summary stringByAppendingString:@" + Traces"];
+    summary = @"";
+    if(tracesShipped) summary = [summary stringByAppendingString:@"Traces"];
     summary = [summary stringByAppendingString:@"\n"];
 //    if(shipSummedWaveform) summary = [summary stringByAppendingString:@" + Summed Raw Trace"];
 //    summary = [summary stringByAppendingString:@"\n"];
     if(tracesShipped){
-        summary = [summary stringByAppendingFormat:@"Traces 0:%ld  1:%ld \n", [self sampleLength:0],[self sampleLength:1]];
+        summary = [summary stringByAppendingFormat:@"Traces 0:%ld  1:%ld \n", 3*[self longsInSample:0],3*[self longsInSample:1]];
     }
 //    if(shipSummedWaveform) summary = [summary stringByAppendingFormat:@"Summed Raw Trace: 510 values\n"];
     return summary;
@@ -5789,7 +5774,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
            
         }
         else {
-
             /*
             bool DMStopped = NO;
             while (!DMStopped)   // while direct memory is not stopped, keep waiting for the direct memory to stop
@@ -5807,8 +5791,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             }
             */
             
-            unsigned long ac              = [self readAcquisitionControl:NO];
-            BOOL endAddThreshFlag = ((ac>>19)&0x1)?YES:NO;
+            unsigned long ac        = [self readAcquisitionControl:NO];
+            BOOL endAddThreshFlag   = ((ac>>19)&0x1)?YES:NO;
             if (endAddThreshFlag == NO) return;
             
             //if we get here, there may be something to read out
@@ -5835,75 +5819,71 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     numberOfWords = adcBufferLength;
                 }
                 
-                if(numberBytesToRead > 0){
+                if(numberBytesToRead > 0){ // if there is data to read out, we'll compute handy things and read it out
+                    BOOL wrapMode = (wrapMaskForRun & (1L<<gr))!=0;
+
                     unsigned long sisHeaderLength   = 4;  // 4 long words in the normal sis headers
                     unsigned long orcaHeaderLength  = 4;   // 3 words in the Orca header
-                    unsigned long dataRecordLength  = sisHeaderLength  + [self longsInSample:gr]; //just the data length
-//                    unsigned long totalRecordLength = dataRecordLength + orcaHeaderLength;  //data length + orca header
+                    unsigned long dataRecordLength  = sisHeaderLength  + [self longsInSample:gr]; //just the data length in longs
                     
-                    BOOL wrapMode = (wrapMaskForRun & (1L<<gr))!=0;
-                    
-//                    unsigned long addrOffset = 0;
-//                    unsigned short eventCount = 0;
-                    
-//                    unsigned long maxBytesForSBC = 1024*1024*2; //2 MB max SBC packet size
-                    unsigned long actualBytesToRead = (numberBytesToRead%64) + numberBytesToRead;
-//                    unsigned long actualBytesToReadNow = actualBytesToRead/maxBytesForSBC;
-                    
-                    unsigned short numEventsInBuffer = actualBytesToRead/(dataRecordLength*sizeof(unsigned long));
+                    unsigned long maxBytesForSBC = 1024*1024*1; //2 MB max SBC packet size, we limit to 1 here for safety
+                    unsigned long actualBytesToBeRead = (numberBytesToRead%64) + numberBytesToRead;
+                    unsigned short numEventsInBuffer = actualBytesToBeRead/(dataRecordLength*sizeof(unsigned long));
                     unsigned long bytesOfData = sizeof(unsigned long)*(numEventsInBuffer*dataRecordLength);
-//                    unsigned long bytesToReturn = sizeof(unsigned long)*(orcaHeaderLength) + bytesOfData;
                     
-                    unsigned long bufferAddLongs = (orcaHeaderLength+(numEventsInBuffer*dataRecordLength)); // num longs to add to the data stream
+                    unsigned long bufferAddLongs = (orcaHeaderLength + bytesOfData/4); //(numEventsInBuffer*dataRecordLength)); // num longs to add to the data stream
 
-                    NSLog(@"Number bytes to read = %d, actual requested bytes to read: %d\n",numberBytesToRead,actualBytesToRead);
-                    NSLog(@"        Number bytes in a data record = %d\n",dataRecordLength*4);
-                    NSLog(@"        Number bytes of data = %d\n",bytesOfData);
-                    NSLog(@"        Expected number of events: %d\n",numEventsInBuffer);
+//                    unsigned long maxReadBuffer = 1024*1024*1; // limit it to 1 MB (actually can take 2)
                     
-                    unsigned long  dataRecord[4096];//dataRecord[longestRecordLength+512];
-                        
-                    dataRecord[0] = dataId | orcaHeaderLength+actualBytesToRead/4;
+                    unsigned long dataRecord[bufferAddLongs+4];
+                    
+                    // here we start filling the data record:
+                    
+                    dataRecord[0] = dataId | bufferAddLongs;
                     
                     dataRecord[1] =	(([self crateNumber]            & 0xf) << 28)   |
                                     (([self slot]                   & 0x1f)<< 20)   |
                                     (([self channelMode:groupToRead]      & 0xF) << 16)   |
-                                    ((gr                         & 0x1) << 12)   |
+                                    ((gr                            & 0x1) << 12)   |
                                     (([self digitizationRate:groupToRead] & 0xF) << 8)    |
                                     (([self eventSavingMode:groupToRead]  & 0xF) << 4)    |
                                     (wrapMode                       & 0x1);
                     
-                    dataRecord[2] = dataRecordLength;   // number of events expected in the event
+                    dataRecord[2] = dataRecordLength;               // length of single record 1 x (SIS header + SIS data)
                     
-                    dataRecord[3] = numEventsInBuffer & 0xFFFF |
-                                    ((bufferAddLongs & 0xFFFF) << 16);  //
+                    dataRecord[3] = (numEventsInBuffer & 0xFFFF) |    // number of events expected in the event
+                                    ((0 & 0xFFFF) << 16);  //
                     
-                    [[self adapter] readLongBlock: &dataRecord[4]
-                                        atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:gr]
-                                        numToRead: actualBytesToRead/4
-                                       withAddMod: [self addressModifier]
-                                    usingAddSpace: 0x01];
-                    
+                    unsigned long bytesLeftToRead = actualBytesToBeRead;
+                    unsigned long bytesToReadNow;
+                    unsigned long currentIndex = 4;
+                    unsigned short eventCount = 0;
+                    while (bytesLeftToRead > 0)
+                    {
+                        if (bytesLeftToRead > maxBytesForSBC) {
+                            bytesToReadNow = maxBytesForSBC;
+                        }
+                        else
+                            bytesToReadNow = bytesLeftToRead;
+                        
+                        [[self adapter] readLongBlock: &dataRecord[currentIndex]
+                                            atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:gr]
+                                            numToRead: bytesToReadNow/4
+                                           withAddMod: [self addressModifier]
+                                        usingAddSpace: 0x01];
+                        
+                        currentIndex += bytesToReadNow/4;
+                        bytesLeftToRead -= bytesToReadNow;
+                        if(++eventCount > 25)break;
+                    }
+                        
                     [aDataPacket addLongsToFrameBuffer:dataRecord length:bufferAddLongs];
-                    
-                    NSLog(@"Group %d            event added to frame buffer. (takedata)\n", gr);
-                    NSLog(@"                    record had word 1 of: 0x%04x (takedata)\n",dataRecord[1]);
-
-                    
-//                        addrOffset += totalRecordLength*4; //dataRecordLength*4;
-//                        if(++eventCount > 25)break;
-//                    } while (addrOffset < numberBytesToRead);
-                    
-                    
-                    //                    NSLog(@"                     record had word 0 of: 0x%08x (takedata)\n",dataRecord[0]);
                 }
-                //            groupToRead = (groupToRead+1)%kNumSIS3305Groups;
             } // loop over groups
             
             // after reading out everything:
-            [self writeRingbufferPretriggerDelays];
+            [self writeRingbufferPretriggerDelays]; // if in maintenance mode you can change this in realtime
             
-            // refresh ringbuffer predelay?
             // key arm/enable again
             [self enableSampleLogic];
             [self armSampleLogic];
@@ -5992,11 +5972,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-	if(runMode == kMcaRunMode){
-		//in MCA mode there is nothing for the SBC to do... so don't ship any card config data to it.
-		return index; 
-	}
-	else {
+
 		configStruct->total_cards++;
 		configStruct->card_info[index].hw_type_id				= kSIS3305; //should be unique
 		configStruct->card_info[index].hw_mask[0]				= dataId;	//better be unique
@@ -6030,7 +6006,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 		configStruct->card_info[index].next_Card_Index 	= index+1;	
 		
 		return index+1;
-	}
+
 }
 
 
@@ -6161,12 +6137,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 	for(aGroup=0;aGroup<kNumSIS3305Groups;aGroup++){
 		[self setPreTriggerDelay:aGroup withValue:[self preTriggerDelay:aGroup]];
 	}
-	
-//    int aChan;
-//    for (aChan = 0; aChan<kNumSIS3305Channels; aChan++) {
-////        [self setLTThresholdEnabled:aChan withValue:[decoder]]
 
-//    }
     
 	//firmware 15xx
 //    cfdControls =					[[decoder decodeObjectForKey:@"cfdControls"] retain];
