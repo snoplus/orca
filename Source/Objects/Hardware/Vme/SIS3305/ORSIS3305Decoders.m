@@ -142,25 +142,30 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         NSString* cardKey		= [self getCardKey: card];
         NSMutableData*  recordAsData = [NSMutableData dataWithCapacity:(waveformLength*3*8)];
 
-        if(waveformLength /*&& (waveformLength == (length - 3))*/){ // this is a sanity check that we have data and it is the size we expect
-            if(wrapMode){
+        if(waveformLength /*&& (waveformLength == (length - 3))*/)
+        { // this is a sanity check that we have data and it is the size we expect
+            if(wrapMode)
+            {
                 return (unsigned long)(-1);
-                /*
+              
                 channel = (kchannelModeAndEventID[channelMode][eventID] + (group*4));
                 channelKey    = [self getChannelKey: channel];
 
                 unsigned long nof_wrap_samples = dataPtr[6] ;
-                if(nof_wrap_samples <= waveformLength*3){
+                if(nof_wrap_samples <= waveformLength*3)
+                {
                     unsigned long wrap_start_index = dataPtr[7] ;
                     unsigned short* dataPtr			  = (unsigned short*)[recordAsData bytes];
                     unsigned short* ushort_buffer_ptr = (unsigned short*) &dataPtr[8];
                     int i;
                     unsigned long j	=	wrap_start_index;
-                    for (i=0;i<nof_wrap_samples;i++) {
+                    for (i=0;i<nof_wrap_samples;i++)
+                    {
                         if(j >= nof_wrap_samples ) j=0;
                         dataPtr[i] = ushort_buffer_ptr[j++];
                     }
                 }
+               
             }
             else if((savingMode == 4) && (channelMode < 4)){  // 1.25 Gsps Event fifo mode with all four channels potentially enabled
                 channel = ((dataPtr[0]>>28)&0xF) + (group*4);
@@ -172,12 +177,12 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 unsigned short* waveData = (unsigned short*)[recordAsData mutableBytes];
                 int waveformIndex = 0;
                 // here `i` increments through each long word in the data
-                do{
+                for(i=0;i<waveformLength;i++){
                     waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
                     waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
                     waveData[waveformIndex++] = (lptr[i])       &0x3ff;
                 }
-                
+            
             }
             else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
                 channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
