@@ -231,9 +231,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 }
 
 - (void) applicationWillTerminate:(NSNotification *)aNotification
-
 {
-
 	[queue cancelAllOperations];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatEnabled] intValue]){
         NSString* finalPath = [[[NSUserDefaults standardUserDefaults] objectForKey:ORPrefHeartBeatPath] stringByAppendingPathComponent:@"Heartbeat"];
@@ -371,7 +369,9 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
 		[ORTimer delay:1];
 		
-		[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:ORNormalShutDownFlag];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO]  forKey:ORWasInDebuggerFlag];
+
 		[[NSUserDefaults standardUserDefaults] synchronize];
 
         [[NSNotificationCenter defaultCenter] postNotificationName:OROrcaAboutToQuitNotice object:self];
@@ -464,8 +464,7 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
         [self deleteCrashLogs];
     }
     
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
-   
+
     NSError* fileOpenError = nil;
 	configLoadedOK = NO;
     
@@ -548,6 +547,12 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 		NSLogColor([NSColor redColor],@"ORCA will be slow, leak memory like crazy, and eventually bring the machine to its knees!\n");
 		NSLogColor([NSColor redColor],@"==============================================================================\n");
 	}
+    
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:debugging] forKey:ORWasInDebuggerFlag];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    //NSLog(@"%@\n",1);
+
 }
 
 - (void) closeSplashWindow

@@ -34,6 +34,7 @@
 #define  OROrcaPassword             @"Orca Password"
 #define  ORGlobalSecurityStateChanged  @"ORGlobalSecurityStateChanged"
 #define  ORNormalShutDownFlag       @"ORNormalShutDownFlag"
+#define  ORWasInDebuggerFlag        @"ORWasInDebuggerFlag"
 #define  ORMailBugReportFlag	    @"ORMailBugReportFlag"
 #define  ORMailBugReportEMail       @"ORMailBugReportEMail"
 

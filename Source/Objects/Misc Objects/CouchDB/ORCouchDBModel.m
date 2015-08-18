@@ -69,8 +69,8 @@ NSString* ORCouchDBModelUsingUpdateHandleChanged  = @"ORCouchDBModelUsingUpdateH
 #define kInfoHistoryDB      @"kInfoHistoryDB"
 #define kAddUpdateHandler   @"kAddUpdateHandler"
 
-#define kCouchDBPort 5984
-#define kUpdateStatsInterval 30
+#define kCouchDBPort            5984
+#define kUpdateStatsInterval    30
 
 static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
@@ -106,14 +106,15 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     [alertMessage release];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [password release];
-    [userName release];
-    [localHostName release];
+    [password       release];
+    [userName       release];
+    [localHostName  release];
     [remoteHostName release];
-	[docList release];
+	[docList        release];
     [replicationAlarm clearAlarm];
     [replicationAlarm release];
-    [customDataBases release];
+    [customDataBases  release];
+    [thisHostAdress   release];
 
 	[super dealloc];
 }
@@ -246,13 +247,8 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) applicationIsTerminating:(NSNotification*)aNote
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	//[self deleteDatabases];
-    //int i;
-    //for(i=0;i<15;i++){
-    //    if([ORCouchDBQueue operationCount]==0)break;
-    //    [NSThread sleepForTimeInterval:1];
-    //}
-}
+    [[ORCouchDBQueue sharedCouchDBQueue] cancelAllOperations];
+ }
 
 - (void) awakeAfterDocumentLoaded
 {
@@ -265,6 +261,20 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
                          nil];
 
     [self recordEvent:@"Restart" document:doc];
+    
+    NSNumber* didShutdown   = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag];
+    NSNumber* wasInDebugger = [[NSUserDefaults standardUserDefaults] objectForKey:ORWasInDebuggerFlag];
+    
+    if((didShutdown && ![didShutdown boolValue]) && (wasInDebugger && ![wasInDebugger boolValue])){
+        NSDictionary* doc = [NSDictionary dictionaryWithObjectsAndKeys:
+                             @"ORCA crashed",                                     @"comment",
+                             @"C",                                                @"Symbol",
+                             nil];
+    
+        [self recordEvent:@"Crash" document:doc];
+    }
+
+
 }
 
 #pragma mark ***Accessors
@@ -697,87 +707,90 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateMachineRecord) object:nil];
-		
-		struct ifaddrs *ifaddr, *ifa;
-        if (getifaddrs(&ifaddr) == 0) {
-            // Successfully received the structs of addresses.
-            NSString* thisHostAdress = @"";
-            char tempInterAddr[INET_ADDRSTRLEN];
-            NSMutableArray* names = [NSMutableArray array];
-            // The following is a replacement for [[NSHost currentHost] addresses].  The problem is
-            // that the NSHost call can do reverse DNS calls which block and are *very* slow.  The 
-            // following is much faster.
-            for (ifa = ifaddr; ifa != nil; ifa = ifa->ifa_next) {
-                // skip IPv6 addresses
-                if (ifa->ifa_addr->sa_family != AF_INET) continue;
-                inet_ntop(AF_INET, 
-                          &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
-                          tempInterAddr,
-                          sizeof(tempInterAddr));
-                [names addObject:[NSString stringWithCString:tempInterAddr encoding:NSASCIIStringEncoding]];
-            }
-            freeifaddrs(ifaddr);
-            // Now enumerate and find the first non-loop-back address.
-            NSEnumerator* e = [names objectEnumerator];
-            id aName;
-            while(aName = [e nextObject]){
-                if([aName rangeOfString:@".0.0."].location == NSNotFound){
-                    thisHostAdress = aName;
-                    break;
+        if([thisHostAdress length]==0){
+            //only have to get this once
+            struct ifaddrs *ifaddr, *ifa;
+            if (getifaddrs(&ifaddr) == 0) {
+                // Successfully received the structs of addresses.
+                char tempInterAddr[INET_ADDRSTRLEN];
+                NSMutableArray* names = [NSMutableArray array];
+                // The following is a replacement for [[NSHost currentHost] addresses].  The problem is
+                // that the NSHost call can do reverse DNS calls which block and are *very* slow.  The 
+                // following is much faster.
+                for (ifa = ifaddr; ifa != nil; ifa = ifa->ifa_next) {
+                    // skip IPv6 addresses
+                    if (ifa->ifa_addr->sa_family != AF_INET) continue;
+                    inet_ntop(AF_INET, 
+                              &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
+                              tempInterAddr,
+                              sizeof(tempInterAddr));
+                    [names addObject:[NSString stringWithCString:tempInterAddr encoding:NSASCIIStringEncoding]];
+                }
+                freeifaddrs(ifaddr);
+                // Now enumerate and find the first non-loop-back address.
+                NSEnumerator* e = [names objectEnumerator];
+                id aName;
+                while(aName = [e nextObject]){
+                    if([aName rangeOfString:@".0.0."].location == NSNotFound){
+                        thisHostAdress = [aName copy];
+                        break;
+                    }
                 }
             }
-            
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-            
-            NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-            [dateFormatter setTimeZone:gmt];
-            NSString *lastTimeStamp = [dateFormatter stringFromDate:[NSDate date]];
-            NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
-            unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
-            [dateFormatter release];
-            
-            
-            if(![lastTimeStamp length]) lastTimeStamp = @"0";
-            
-            NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                    @"machineinfo", @"_id",
-                                                    @"machineinfo", @"type",
-                                                    [NSNumber numberWithLong:[[(ORAppDelegate*)(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
-                                                    computerName(), @"name",
-                                                    macAddress(),   @"hw_address",
-                                                    thisHostAdress, @"ip_address",
-                                                    fullVersion(),  @"version",
-                                                    lastTimeStamp,  @"timestamp",
-                                                    [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+        }
+        if(!thisHostAdress)thisHostAdress = @"";
+        
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+        
+        NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+        [dateFormatter setTimeZone:gmt];
+        NSString *lastTimeStamp = [dateFormatter stringFromDate:[NSDate date]];
+        NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+        unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+        [dateFormatter release];
+        
+        
+        if(![lastTimeStamp length]) lastTimeStamp = @"0";
+        
+        NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                @"machineinfo", @"_id",
+                                                @"machineinfo", @"type",
+                                                [NSNumber numberWithLong:[[(ORAppDelegate*)(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+                                                computerName(), @"name",
+                                                macAddress(),   @"hw_address",
+                                                thisHostAdress, @"ip_address",
+                                                fullVersion(),  @"version",
+                                                lastTimeStamp,  @"timestamp",
+                                                [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
 nil];
+        
+        NSFileManager* fm = [NSFileManager defaultManager];
+        
+        NSArray* diskInfo = [fm mountedVolumeURLsIncludingResourceValuesForKeys:0 options:NSVolumeEnumerationSkipHiddenVolumes];
+        NSMutableArray* diskStats = [NSMutableArray array];
+        for(id aVolume in diskInfo){
+            NSError *fsError = nil;
+            aVolume = [aVolume relativePath];
+            NSDictionary *fsDictionary = [fm attributesOfFileSystemForPath:aVolume error:&fsError];
             
-            NSFileManager* fm = [NSFileManager defaultManager];
-            
-            NSArray* diskInfo = [fm mountedVolumeURLsIncludingResourceValuesForKeys:0 options:NSVolumeEnumerationSkipHiddenVolumes];
-            NSMutableArray* diskStats = [NSMutableArray array];
-            for(id aVolume in diskInfo){
-                NSError *fsError = nil;
-                aVolume = [aVolume relativePath];
-                NSDictionary *fsDictionary = [fm attributesOfFileSystemForPath:aVolume error:&fsError];
-                
-                if (fsDictionary != nil){
-                    double freeSpace   = [[fsDictionary objectForKey:@"NSFileSystemFreeSize"] doubleValue]/1E9;
-                    double totalSpace  = [[fsDictionary objectForKey:@"NSFileSystemSize"] doubleValue]/1E9;
-                    double percentUsed   = 100*(totalSpace-freeSpace)/totalSpace;
-                    if([aVolume rangeOfString:@"Volumes"].location !=NSNotFound){
-                        aVolume = [aVolume substringFromIndex:9];
-                    }
-                    NSDictionary* dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.02f%% Full",percentUsed] forKey:aVolume];
-                    [diskStats addObject:dict];
-                 }
-            }
-            if([diskStats count]>0) [machineInfo setObject:diskStats forKey:@"diskInfo"];
+            if (fsDictionary != nil){
+                double freeSpace   = [[fsDictionary objectForKey:@"NSFileSystemFreeSize"] doubleValue]/1E9;
+                double totalSpace  = [[fsDictionary objectForKey:@"NSFileSystemSize"] doubleValue]/1E9;
+                double percentUsed   = 100*(totalSpace-freeSpace)/totalSpace;
+                if([aVolume rangeOfString:@"Volumes"].location !=NSNotFound){
+                    aVolume = [aVolume substringFromIndex:9];
+                }
+                NSDictionary* dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.02f%% Full",percentUsed] forKey:aVolume];
+                [diskStats addObject:dict];
+             }
+        }
+        if([diskStats count]>0) [machineInfo setObject:diskStats forKey:@"diskInfo"];
 
-            [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
-		}
-		[self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
-	}
+        [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
+    }
+    [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
+	
 }
 
 - (void) processElementStateChanged:(NSNotification*)aNote

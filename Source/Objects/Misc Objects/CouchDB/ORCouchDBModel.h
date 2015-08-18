@@ -47,6 +47,7 @@
     BOOL            usingUpdateHandler;
     NSString*       alertMessage;
     int             alertType;
+    NSString*       thisHostAdress;
 }
 
 #pragma mark ***Initialization
