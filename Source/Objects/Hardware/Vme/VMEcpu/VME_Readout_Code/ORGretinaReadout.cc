@@ -71,10 +71,10 @@ bool ORGretinaReadout::Readout(SBC_LAM_Data* /*lamData*/)
             data[savedIndex] |= totalNumLongs; //see, we did fill it in...
        
         } else if(result < 0) {
-            LogBusError("Rd Err: Gretina 0x%04x %s",baseAddress,strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Rd Err: Gretina 0x%04x %s",baseAddress,strerror(errno));
         } else {
             //oops... really bad -- the buffer read is out of sequence -- try to recover 
-            LogError("Rd Err: Gretina 0x%04x Buffer out of sequence, trying to recover",baseAddress);
+            LogErrorForCard(GetSlot(),"Rd Err: Gretina 0x%04x Buffer out of sequence, trying to recover",baseAddress);
             uint32_t i = 0;
             while(i < sizeOfFIFO) {
                 result = VMERead(fifoAddress,
@@ -84,7 +84,7 @@ bool ORGretinaReadout::Readout(SBC_LAM_Data* /*lamData*/)
                 if (result == 0) { // means the FIFO is empty
                     return true; 
                 } else if (result < 0) {
-                    LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                    LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
                     return true; 
                 }
                 if (theValue == kGretinaPacketSeparater) break;
@@ -99,7 +99,7 @@ bool ORGretinaReadout::Readout(SBC_LAM_Data* /*lamData*/)
                              theValue); 
            
             if (result < 0) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
+                LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
                 return true; 
             }
             uint32_t numLongsLeft  = ((theValue & kGretinaNumberWordsMask)>>16)-1;
@@ -107,7 +107,7 @@ bool ORGretinaReadout::Readout(SBC_LAM_Data* /*lamData*/)
             result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
                              (uint8_t*)(&data[dataIndex]),numLongsLeft*4); 
             if (result < 0) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
                 return true; 
             }
             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.

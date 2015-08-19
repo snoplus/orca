@@ -33,7 +33,7 @@ bool ORCAEN260Readout::Readout(SBC_LAM_Data* lamData)
 		if(enabledMask & (0x1<<i)){
 			int32_t result = VMERead(GetBaseAddress()+dataBufferOffset+(i*0x04), 0x39, sizeof(dataValue), dataValue);
 			if(result != sizeof(dataValue)){
-                LogBusError("Error for V260: %s", strerror(errno));
+                LogBusErrorForCard(GetSlot(),"Error for V260: %s", strerror(errno));
 				dataIndex = savedDataIndex;
 				break;
 			}

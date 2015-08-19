@@ -25,13 +25,13 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     int32_t  result;
     uint32_t fifoState = 0;
-
-    result = VMERead(fifoStateAddress, 
+    LogBusErrorForCard(slot,"test");
+    result = VMERead(fifoStateAddress,
                      GetAddressModifier(),
                      (uint32_t) 0x4,
                      fifoState);
     if (result != sizeof(fifoState)){
-        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoStateAddress,strerror(errno));
+        LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",fifoStateAddress,strerror(errno));
     }
     else if ((fifoState & kGretina4MFIFOEmpty) == 0 ) {
         //we want to read as much as possible to have the highest thru-put
@@ -51,7 +51,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
                          (uint8_t*)(&data[eventStartIndex]),1024*4*numEventsToRead);
         
         if (result < 0) {
-            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+            LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
             clearFifo(fifoResetAddress);
         }
@@ -71,7 +71,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
             else {
                 //oops... really bad -- the buffer read is out of sequence
                 dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-                LogBusError("Fifo Rst: Gretina4 slot %d",slot);
+                LogBusErrorForCard(slot,"Fifo Rst: Gretina4 slot %d",slot);
                 clearFifo(fifoResetAddress);
             }
         }
@@ -82,6 +82,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
 void ORGretina4MReadout::clearFifo(uint32_t fifoClearAddress)
 {
+    uint32_t slot             = GetSlot();
     uint32_t orginalData = 0;
     int32_t result = VMERead(fifoClearAddress, 
                      GetAddressModifier(),
@@ -89,7 +90,7 @@ void ORGretina4MReadout::clearFifo(uint32_t fifoClearAddress)
                      orginalData);
     
     if (result != sizeof(orginalData)){
-        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
+        LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
         return;
     }
     orginalData |= (0x1<<27);
@@ -100,7 +101,7 @@ void ORGretina4MReadout::clearFifo(uint32_t fifoClearAddress)
                       orginalData);
 
     if (result != sizeof(orginalData)){
-        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
+        LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
         return;
     }
     orginalData &= ~(0x1<<27);
@@ -111,7 +112,7 @@ void ORGretina4MReadout::clearFifo(uint32_t fifoClearAddress)
                       orginalData);
     
     if (result != sizeof(orginalData)){
-        LogBusError("Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
+        LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",fifoClearAddress,strerror(errno));
         return;
     }
 }

@@ -62,7 +62,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                 GetAddressModifier(),
                 sizeof(status),
                 status) != sizeof(uint32_t)) {
-		LogBusError("Rd Status Err: SIS3320 0x%04x %s", GetBaseAddress() + kAcquisitionControlReg,strerror(errno));
+		LogBusErrorForCard(GetSlot(),"Rd Status Err: SIS3320 0x%04x %s", GetBaseAddress() + kAcquisitionControlReg,strerror(errno));
 	}
     else if((status & kEndAddressThresholdFlag) == kEndAddressThresholdFlag){
         
@@ -87,7 +87,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                         GetAddressModifier(),
                         sizeof(endSampleAddress),
                         endSampleAddress) != sizeof(uint32_t)) {
-                LogBusError("Rd End Add Err: SIS3320 0x%04x %s", GetBaseAddress() + GetNextBankSampleRegisterOffset(i),strerror(errno));
+                LogBusErrorForCard(GetSlot(),"Rd End Add Err: SIS3320 0x%04x %s", GetBaseAddress() + GetNextBankSampleRegisterOffset(i),strerror(errno));
             }
             
             // now apply appropriate mask and shift to translate this number into words to read
@@ -121,7 +121,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                 if(bytesRead < 0) {
                     //something wrong.. dump the data
                     dataIndex = savedDataStart;
-                    LogError("Rd Buffer Err: SIS3320 0x%04x %s", GetBaseAddress() +
+                    LogErrorForCard(GetSlot(),"Rd Buffer Err: SIS3320 0x%04x %s", GetBaseAddress() +
                                 GetADCBufferRegisterOffset(i),strerror(errno));
                     
                 }
@@ -173,7 +173,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                             }
                             else {
                                 // bad header.. who knows what to do!
-                                LogError("3320 0x%04x found a bad header",GetBaseAddress());
+                                LogErrorForCard(GetSlot(),"3320 0x%04x found a bad header",GetBaseAddress());
                                 getOut = 1;
                                 break;
                             }
@@ -206,7 +206,7 @@ bool ORSIS3320Readout::Readout(SBC_LAM_Data* /*lam_data*/)
                 
                 if(bytesRead < 0) {
                     //something wrong..
-                    LogBusError("Rd Buffer Err: SIS3320 0x%04x %s", GetBaseAddress() +
+                    LogBusErrorForCard(GetSlot(),"Rd Buffer Err: SIS3320 0x%04x %s", GetBaseAddress() +
                                 GetADCBufferRegisterOffset(i),strerror(errno));
                 }
             }
@@ -220,7 +220,7 @@ void ORSIS3320Readout::armBank1()
     uint32_t addr = GetBaseAddress() + kDisarmAndArmBank1;
     uint32_t data_wr = 1;
     if (VMEWrite(addr, GetAddressModifier(),sizeof(data_wr),data_wr) != sizeof(data_wr)){
-		LogBusError("Arm 1 Err: SIS3320 0x%04x %s", addr,strerror(errno));
+		LogBusErrorForCard(GetSlot(),"Arm 1 Err: SIS3320 0x%04x %s", addr,strerror(errno));
 	}
     
     fBankOneArmed = true;
@@ -232,7 +232,7 @@ void ORSIS3320Readout::armBank2()
     uint32_t addr = GetBaseAddress() + kDisarmAndArmBank2;
     uint32_t data_wr = 1;
     if (VMEWrite(addr, GetAddressModifier(),sizeof(data_wr),data_wr) != sizeof(data_wr)){
-		LogBusError("Arm 2 Err: SIS3320 0x%04x %s", addr,strerror(errno));
+		LogBusErrorForCard(GetSlot(),"Arm 2 Err: SIS3320 0x%04x %s", addr,strerror(errno));
 	}
     fBankOneArmed = false;
 }

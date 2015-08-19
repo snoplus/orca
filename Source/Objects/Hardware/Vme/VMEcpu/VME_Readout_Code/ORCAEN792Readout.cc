@@ -29,7 +29,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 	
 	result = VMERead(status2Address, addressModifier, sizeof(status2),status2);
     if (result != sizeof(status2)) {
-        LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
+        LogBusErrorForCard(GetSlot(),"CAEN 0x%0x status 2 read",GetBaseAddress());
         return false;
 	}
     uint8_t bufferIsFull    =  (status2 & 0x0004) >> 2;
@@ -116,7 +116,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 			
 		}
 		else {
-			LogBusError("CAEN 0x%0x dma read error",GetBaseAddress());
+			LogBusErrorForCard(GetSlot(),"CAEN 0x%0x dma read error",GetBaseAddress());
 			return false; 
 		}
 	}
@@ -126,7 +126,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 		result = VMERead(status1Address,addressModifier,sizeof(status1),status1);
 		
 		if (result != sizeof(status1)) {
-			LogBusError("CAEN 0x%0x status 1 read",GetBaseAddress());
+			LogBusErrorForCard(GetSlot(),"CAEN 0x%0x status 1 read",GetBaseAddress());
 			return false; 
 		}
         
@@ -156,7 +156,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 						else {
 							dataOK = false;
 							dataIndex = savedDataIndex;
-							LogBusError("Rd Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+							LogBusErrorForCard(GetSlot(),"Rd Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno));
 							FlushDataBuffer();
 							break;
 						}
@@ -166,7 +166,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 						result = VMERead(fifoAddress, addressModifier, sizeof(dataWord), dataWord);
 						if((result != sizeof(dataWord)) || (ShiftAndExtract(dataWord,24,0x7) != 0x4)){
 							//some kind of bad error, report and flush the buffer
-							LogBusError("Rd Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+							LogBusErrorForCard(GetSlot(),"Rd Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno));
 							dataIndex = savedDataIndex;
 							FlushDataBuffer();
 						}
@@ -189,7 +189,7 @@ void ORCAEN792Readout::FlushDataBuffer()
 		uint32_t dataValue;
 		int32_t result = VMERead(fifoAddress, 0x9, sizeof(dataValue), dataValue);
 		if(result<0){
-			LogBusError("Flush Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+			LogBusErrorForCard(GetSlot(),"Flush Err: CAEN 792 0x%04x %s", GetBaseAddress(),strerror(errno));
 			break;
 		}
 		if(ShiftAndExtract(dataValue,24,0x7) == 0x6) break;

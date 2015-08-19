@@ -44,7 +44,7 @@ bool ORCAEN1785Readout::Readout(SBC_LAM_Data* lamData)
 				result = VMERead(GetBaseAddress()+dataBufferOffset, 0x39, sizeof(dataValue), dataValue);
 				if((result != sizeof(dataValue)) || (ShiftAndExtract(dataValue,24,0x7) != 0x4)){
 					//some kind of bad error, report and flush the buffer
-					LogBusError("Rd Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+					LogBusErrorForCard(GetSlot(),"Rd Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno));
 					dataIndex = savedDataIndex;
 					FlushDataBuffer();
 				}
@@ -56,7 +56,7 @@ bool ORCAEN1785Readout::Readout(SBC_LAM_Data* lamData)
 					if (!card) {
 						// means we couldn't find the card.
 						// Shouldn't happen but...
-						LogError("Readout Err: Card at index %i not found",leaf_index);
+						LogErrorForCard(GetSlot(),"Readout Err: Card at index %i not found",leaf_index);
 						break;
 					}
 					leaf_index = readout_card(leaf_index,lamData);
@@ -77,7 +77,7 @@ void ORCAEN1785Readout::FlushDataBuffer()
 		uint32_t dataValue;
 		int32_t result = VMERead(GetBaseAddress()+dataBufferOffset, 0x39, sizeof(dataValue), dataValue);
 		if(result<0){
-			LogBusError("Flush Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+			LogBusErrorForCard(GetSlot(),"Flush Err: CAEN 965 0x%04x %s", GetBaseAddress(),strerror(errno));
 			break;
 		}
 		if(ShiftAndExtract(dataValue,24,0x7) == 0x6) break;

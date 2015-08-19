@@ -29,7 +29,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     uint32_t amountToRead = 0;
     if (result != sizeof(fifoState)){
-        LogBusError("Rd Err: Gretina4A 0x%04x %s",fifoStateAddress,strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4A 0x%04x %s",fifoStateAddress,strerror(errno));
         return true;
     }
     
@@ -42,7 +42,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
     
     if(amountToRead != 0){
         
-        //LogMessage("Gretina4A Fifo state: 0x%x",fifoState);
+        //LogMessageForCard(GetSlot(),"Gretina4A Fifo state: 0x%x",fifoState);
         ensureDataCanHold(amountToRead+2);
      
         int32_t savedIndex = dataIndex;
@@ -55,7 +55,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
         
 
         if (result < 0) {
-            LogBusError("Rd Err: Gretina4A 0x%04x %s",baseAddress,strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4A 0x%04x %s",baseAddress,strerror(errno));
             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
             clearFifo(fifoResetAddress);
         }
@@ -67,7 +67,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
             while(data[eventStartIndex] == kGretinaPacketSeparator){
                 eventStartIndex += eventLength+1;
                 
-                //LogMessage("len: %d",eventLength);
+                //LogMessage"len: %d",eventLength);
                // LogMessage("-1: 0x%x",data[eventStartIndex-1]);
                 //LogMessage("0: 0x%x",data[eventStartIndex]);
                 //LogMessage("+1: 0x%x",data[eventStartIndex+1]);
@@ -86,7 +86,7 @@ bool ORGretina4AReadout::Readout(SBC_LAM_Data* /*lamData*/)
             else {
                 //oops... really bad -- the buffer read is out of sequence
                 dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-                LogBusError("Fifo Rst: Gretina4A slot %d",slot);
+                LogBusErrorForCard(GetSlot(),"Fifo Rst: Gretina4A slot %d",slot);
                 clearFifo(fifoResetAddress);
             }
         }
@@ -104,7 +104,7 @@ void ORGretina4AReadout::clearFifo(uint32_t fifoClearAddress)
                      orginalData);
     
     if (result != sizeof(orginalData)){
-        LogBusError("Rd Err: Gretina4A 0x%04x %s",fifoClearAddress,strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4A 0x%04x %s",fifoClearAddress,strerror(errno));
         return;
     }
     orginalData |= (0x1<<27);
@@ -115,7 +115,7 @@ void ORGretina4AReadout::clearFifo(uint32_t fifoClearAddress)
                       orginalData);
 
     if (result != sizeof(orginalData)){
-        LogBusError("Rd Err: Gretina4A 0x%04x %s",fifoClearAddress,strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4A 0x%04x %s",fifoClearAddress,strerror(errno));
         return;
     }
     orginalData &= ~(0x1<<27);
@@ -126,7 +126,7 @@ void ORGretina4AReadout::clearFifo(uint32_t fifoClearAddress)
                       orginalData);
     
     if (result != sizeof(orginalData)){
-        LogBusError("Rd Err: Gretina4A 0x%04x %s",fifoClearAddress,strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err: Gretina4A 0x%04x %s",fifoClearAddress,strerror(errno));
         return;
     }
 }

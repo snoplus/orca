@@ -78,7 +78,7 @@ bool ORSIS3302Card::IsEvent()
 	uint32_t addr = GetBaseAddress() + GetAcquisitionControl(); 
     uint32_t data_rd = 0;
     if (VMERead(addr,GetAddressModifier(),4,data_rd) != sizeof(data_rd)) { 
-		LogBusError("Bank Arm Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+		LogBusErrorForCard(GetSlot(),"Bank Arm Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno));
     	return false;
     }
 	uint32_t bankMask = fBankOneArmed?0x10000:0x20000;
@@ -93,7 +93,7 @@ bool ORSIS3302Card::SetupPageReg()
 	else				data_wr = 0x0;	// Bank 2 is armed and bank one must be read
 	uint32_t addr = GetBaseAddress() + GetADCMemoryPageRegister() ;
 	if (VMEWrite(addr,GetAddressModifier(), GetDataWidth(),data_wr) != sizeof(data_wr)){
-		LogBusError("Page Reg Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+		LogBusErrorForCard(GetSlot(),"Page Reg Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno));
 		return false;
 	}
 	else return true;
@@ -104,7 +104,7 @@ bool ORSIS3302Card::resetSampleLogic()
 	uint32_t data_wr = 0;				
 	uint32_t addr = GetBaseAddress() + 0x404 ;
 	if (VMEWrite(addr , GetAddressModifier(), GetDataWidth(),data_wr) != sizeof(data_wr)){
-		LogBusError("Logic Reset Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno));
+		LogBusErrorForCard(GetSlot(),"Logic Reset Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno));
 		return false;
 	}
 	return DisarmAndArmNextBank();
@@ -138,7 +138,7 @@ bool ORSIS3302Card::Readout(SBC_LAM_Data* /*lam_data*/)
 		//if we wait too long, do a logic reset
 		fWaitCount++;
 		if(fWaitCount > 1000){
-			LogError("SIS3302 0x%x Rd delay reset:  0x%02x", GetBaseAddress(),fChannelsToReadMask); 
+			LogErrorForCard(GetSlot(),"SIS3302 0x%x Rd delay reset:  0x%02x", GetBaseAddress(),fChannelsToReadMask);
 			
 			ensureDataCanHold(3);
 			data[dataIndex++] = GetHardwareMask()[1] | 3; 
@@ -168,7 +168,7 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 	uint32_t endSampleAddress = 0;
 	
 	if (VMERead(addr,GetAddressModifier(),GetDataWidth(),(uint8_t*)&endSampleAddress,sizeof(uint32_t)) != sizeof(uint32_t)) { 
-		LogBusError("Rd NextSpl Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+		LogBusErrorForCard(GetSlot(),"Rd NextSpl Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno));
 		return;
 	}
 	usleep(1);
@@ -205,7 +205,7 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 				uint32_t oldSize  = numberBytesToRead;
 				numberBytesToRead = sizeOfRecordBytes * (0x800000/sizeOfRecordBytes);
 				numRecordsLost	  = (oldSize - numberBytesToRead)/sizeOfRecordBytes;
-				LogMessage("ch%d>8MB: %u %u (lost: %u)",channel,numberBytesToRead, sizeOfRecordBytes,numRecordsLost);
+				LogMessageForCard(GetSlot(),"ch%d>8MB: %u %u (lost: %u)",channel,numberBytesToRead, sizeOfRecordBytes,numRecordsLost);
 				
 				ensureDataCanHold(3);
 				data[dataIndex++] = GetHardwareMask()[1] | 3; 
@@ -225,7 +225,7 @@ void ORSIS3302Card::ReadOutChannel(size_t channel)
 									numberBytesToRead);
 			
 			if (error != (int32_t) numberBytesToRead) { 
-				if(error > 0) LogError("DMA:SIS3302 0x%04x %d!=%d", GetBaseAddress(),error,numberBytesToRead); 
+				if(error > 0) LogErrorForCard(GetSlot(),"DMA:SIS3302 0x%04x %d!=%d", GetBaseAddress(),error,numberBytesToRead);
 				return;
 			}
 			
@@ -266,7 +266,7 @@ bool ORSIS3302Card::DisarmAndArmBank(size_t bank)
 		return SetupPageReg();
 	}
 	else {
-		LogBusError("Bank Arm Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+		LogBusErrorForCard(GetSlot(),"Bank Arm Err: SIS3302 0x%04x %s", GetBaseAddress(),strerror(errno));
 		return false;
 	}
 	

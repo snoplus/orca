@@ -39,7 +39,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                      sizeof(theValue),
                      theValue); 
     if (result < (int32_t) sizeof(theValue)){
-        LogBusError("Rd Err0: SIS3300 0x%04x %s",kSISAcqReg,strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err0: SIS3300 0x%04x %s",kSISAcqReg,strerror(errno));
         return true; 
     }
     mask = (fCurrentBank) ? kSISBank2ClockStatus : kSISBank1ClockStatus;
@@ -56,7 +56,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                          sizeof(numEvents),
                          numEvents);
         if (result < (int32_t) sizeof(numEvents)){
-            LogBusError("Rd Err1: SIS3300 0x%04x %s",
+            LogBusErrorForCard(GetSlot(),"Rd Err1: SIS3300 0x%04x %s",
                 eventCountOffset[fCurrentBank][0],strerror(errno));
             return true; 
         }
@@ -73,7 +73,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                              sizeof(triggerEventDir),
                              triggerEventDir);
             if (result < (int32_t) sizeof(triggerEventDir)){
-                LogBusError("Rd Err2: SIS3300 0x%04x %s",
+                LogBusErrorForCard(GetSlot(),"Rd Err2: SIS3300 0x%04x %s",
                     triggerEventBankReg,strerror(errno));
                 return true; 
             }
@@ -90,7 +90,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                              sizeof(triggerTime),
                              triggerTime);
             if (result < (int32_t) sizeof(triggerTime)){
-                LogBusError("Rd Err3: SIS3300 0x%04x %s",
+                LogBusErrorForCard(GetSlot(),"Rd Err3: SIS3300 0x%04x %s",
                     triggerTriggerReg,strerror(errno));
                 return true; 
             }
@@ -128,7 +128,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                                      nLongsToRead*4);
                     if (result < (int32_t) nLongsToRead*4){
                         dataIndex = startIndex; //dump the record
-                        LogBusError("DMA2: SIS3300 Rd Error: %s",
+                        LogBusErrorForCard(GetSlot(),"DMA2: SIS3300 Rd Error: %s",
                             strerror(errno));
                         return true; 
                     }
@@ -147,7 +147,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                 
                     if (result < (int32_t) startOffset*4){
                         dataIndex = startIndex; //dump the record
-                        LogBusError("Rd Err5: SIS3300 0x%04x %s",
+                        LogBusErrorForCard(GetSlot(),"Rd Err5: SIS3300 0x%04x %s",
                             bankMemory[group][fCurrentBank],strerror(errno));
                         return true;
                     }
@@ -171,7 +171,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                           sizeof(dummy),
                           dummy);
         if (result < (int32_t) sizeof(dummy)){
-            LogBusError("Rd Err6: SIS3300 0x%04x %s",
+            LogBusErrorForCard(GetSlot(),"Rd Err6: SIS3300 0x%04x %s",
                 clearBankReg,strerror(errno));
             return true; 
         }        
@@ -188,7 +188,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                           sizeof(armBit),
                           armBit);
         if (result < (int32_t) sizeof(armBit)){
-            LogBusError("Rd Err7: SIS3300 0x%04x %s",
+            LogBusErrorForCard(GetSlot(),"Rd Err7: SIS3300 0x%04x %s",
                 kSISAcqReg,strerror(errno));
             return true; 
         }        
@@ -198,7 +198,7 @@ bool ORSIS3300Readout::Readout(SBC_LAM_Data* lamData)
                           sizeof(dummy),
                           dummy);
         if (result < (int32_t) sizeof(dummy)){
-            LogBusError("Rd Err8: SIS3300 0x%04x %s",
+            LogBusErrorForCard(GetSlot(),"Rd Err8: SIS3300 0x%04x %s",
                 kStartSampling,strerror(errno));
             return true; 
         }

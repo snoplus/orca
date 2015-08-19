@@ -10,13 +10,13 @@ bool ORCAEN1724Readout::Start() {
 				 sizeof(numEventsToReadout),
 				 numEventsToReadout);
 	if ( result != sizeof(numEventsToReadout) ) { 
-		LogBusError("V1724 0x%0x Couldn't read register", numBLTEventsReg);
+		LogBusErrorForCard(GetSlot(),"V1724 0x%0x Couldn't read register", numBLTEventsReg);
 		return false; 
 	}
 	if ( numEventsToReadout == 0 ) {
 		// We will have a problem, this needs to be set *before*
 		// starting a run.
-		LogError("CAEN: BLT Events register must be set BEFORE run start");
+		LogErrorForCard(GetSlot(),"CAEN: BLT Events register must be set BEFORE run start");
 		return false; 
 	}
 	
@@ -68,7 +68,7 @@ bool ORCAEN1724Readout::Readout(SBC_LAM_Data* lamData)
 		    if ((int32_t)(dmaTransferCount * fifoBuffSize / 4 + 1 + 2) >
 			(kMaxDataBufferSizeLongs-dataIndex) ) {
 			    /* We can't read out. */ 
-			    LogError("Temp buffer too small, requested (%d) > available (%d)",
+			    LogErrorForCard(GetSlot(),"Temp buffer too small, requested (%d) > available (%d)",
 				     numEventsToReadout*(eventSize+1)+2, 
 				     kMaxDataBufferSizeLongs-dataIndex);
 			    return false; 
@@ -91,13 +91,13 @@ bool ORCAEN1724Readout::Readout(SBC_LAM_Data* lamData)
 		
 		//ignore the last BERR, it's there on purpose
 		if (result < 0 && dmaTransferCount) {
-			LogBusError("Error reading DMA for V1724: %s", strerror(errno));
+			LogBusErrorForCard(GetSlot(),"Error reading DMA for V1724: %s", strerror(errno));
 			dataIndex = startIndex;
 			return true; 
 		}
 		
 		if (!dmaTransferCount && result > 0) {
-			LogError("Error reading DMA for V1724, BERR missing");
+			LogErrorForCard(GetSlot(),"Error reading DMA for V1724, BERR missing");
 			dataIndex = startIndex;
 			return true;
 		}
@@ -111,10 +111,10 @@ bool ORCAEN1724Readout::Readout(SBC_LAM_Data* lamData)
 					  GetAddressModifier(),
 					  sizeof(clearMem),
 					  clearMem);
-			LogError("Rd Err: V1724 Buffer FULL, flushed."); 
+			LogErrorForCard(GetSlot(),"Rd Err: V1724 Buffer FULL, flushed.");
 		}
 		else {
-			LogBusError("Rd Err: V1724 0x%04x %s",
+			LogBusErrorForCard(GetSlot(),"Rd Err: V1724 0x%04x %s",
 				    GetBaseAddress(),strerror(errno));          
 		}
         }

@@ -70,13 +70,13 @@ bool ORShaperReadout::Readout(SBC_LAM_Data* lamData)
                     }
                 } 
 				else if (result < 0) {
-                    LogBusError("Rd Err: Shaper 0x%04x %s",
+                    LogBusErrorForCard(GetSlot(),"Rd Err: Shaper 0x%04x %s",
                         GetBaseAddress(),strerror(errno));                
                 }
             }
         }
     } else if (result < 0) {
-        LogBusError("Rd Err: Shaper 0x%04x %s",GetBaseAddress(),strerror(errno)); 
+        LogBusErrorForCard(GetSlot(),"Rd Err: Shaper 0x%04x %s",GetBaseAddress(),strerror(errno)); 
     }
 
     return true; 

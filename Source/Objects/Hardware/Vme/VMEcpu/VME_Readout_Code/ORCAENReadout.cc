@@ -32,7 +32,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
                      statusOne);
 
     if (result != sizeof(statusOne)) {
-        LogBusError("CAEN 0x%0x status 1 read",GetBaseAddress());
+        LogBusErrorForCard(GetSlot(),"CAEN 0x%0x status 1 read",GetBaseAddress());
         return false; 
     }
 
@@ -41,7 +41,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
                      sizeof(statusTwo),
                      statusTwo);
     if (result != sizeof(statusTwo)) {
-        LogBusError("CAEN 0x%0x status 2 read",GetBaseAddress());
+        LogBusErrorForCard(GetSlot(),"CAEN 0x%0x status 2 read",GetBaseAddress());
         return false; 
     }
 
@@ -57,7 +57,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
                          sizeof(dataValue),
                          dataValue);
         if (result != sizeof(dataValue)) {
-            LogBusError("CAEN 0x%0x FIFO header read",GetBaseAddress());
+            LogBusErrorForCard(GetSlot(),"CAEN 0x%0x FIFO header read",GetBaseAddress());
             return false; 
         }
                                 
@@ -91,7 +91,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
                                  sizeof(dataValue),
                                  dataValue);
                 if (result != sizeof(dataValue)) {
-                    LogBusError("CAEN 0x%0x fifo read",GetBaseAddress());
+                    LogBusErrorForCard(GetSlot(),"CAEN 0x%0x fifo read",GetBaseAddress());
                     dataIndex = dataIndexStart; //don't allow this data out.
                     return false; 
                 }
@@ -101,7 +101,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
                 }
                 else {
                     //oh-oh. big problems flush the buffer.
-                    LogError("CAEN 0x%0x fifo flushed",GetBaseAddress());
+                    LogErrorForCard(GetSlot(),"CAEN 0x%0x fifo flushed",GetBaseAddress());
                     dataIndex = dataIndexStart; //don't allow this data out.
                     Flush_CAEN_FIFO();
                     return false; 
@@ -114,7 +114,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
                              dataValue);
             //read the end of block
             if (result != sizeof(dataValue)) {
-                LogBusError("CAEN 0x%0x EOB read",GetBaseAddress());
+                LogBusErrorForCard(GetSlot(),"CAEN 0x%0x EOB read",GetBaseAddress());
                 dataIndex = dataIndexStart; //don't allow this data out.
                 return false;
             }
@@ -129,7 +129,7 @@ bool ORCAENReadout::Readout(SBC_LAM_Data* lamData)
             }
             else {
                 //error...the end of block not where we expected it
-                LogError("CAEN 0x%0x fifo flushed",GetBaseAddress());
+                LogErrorForCard(GetSlot(),"CAEN 0x%0x fifo flushed",GetBaseAddress());
                 dataIndex = dataIndexStart; //don't allow this data out.
                 Flush_CAEN_FIFO();
                 return false;
@@ -154,7 +154,7 @@ void ORCAENReadout::Flush_CAEN_FIFO()
                          sizeof(dataValue),
                          dataValue);
         if (result != sizeof(dataValue)) {
-            LogBusError("CAEN 0x%0x Couldn't flush fifo",GetBaseAddress());
+            LogBusErrorForCard(GetSlot(),"CAEN 0x%0x Couldn't flush fifo",GetBaseAddress());
             break;
         }
     }

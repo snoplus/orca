@@ -12,13 +12,13 @@ bool ORCAEN1721Readout::Start() {
                              sizeof(currentBLTEventsNumber),
                              currentBLTEventsNumber);
     if (result != sizeof(currentBLTEventsNumber)) {
-        LogBusError("V1721 0x%0x Couldn't read register", numBLTEventsReg);
+        LogBusErrorForCard(GetSlot(),"V1721 0x%0x Couldn't read register", numBLTEventsReg);
         return false;
     }
     if (currentBLTEventsNumber == 0) {
         // We will have a problem, this needs to be set *before*
         // starting a run.
-        LogError("CAEN: BLT Events register must be set BEFORE run start");
+        LogErrorForCard(GetSlot(),"CAEN: BLT Events register must be set BEFORE run start");
         return false;
     }
     
@@ -47,7 +47,7 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
                              eventStored);
     
     if (result != sizeof(eventStored)) {
-        LogBusError("V1721 0x%0x Couldn't read VME status", vmeStatusReg);
+        LogBusErrorForCard(GetSlot(),"V1721 0x%0x Couldn't read VME status", vmeStatusReg);
         return false;
     }
     
@@ -69,7 +69,7 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
     }
     
     if (result != sizeof(eventSize)) {
-        LogBusError("Rd Err eventSize: V1721 0x%04x %s", GetBaseAddress(), strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err eventSize: V1721 0x%04x %s", GetBaseAddress(), strerror(errno));
         return false;
     }
     
@@ -88,7 +88,7 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
                                       userBLTEventsNumber);
             
            if (result != sizeof(userBLTEventsNumber)) {
-                LogBusError("V1721 0x%0x Couldn't set BLT Number", numBLTEventsReg);
+                LogBusErrorForCard(GetSlot(),"V1721 0x%0x Couldn't set BLT Number", numBLTEventsReg);
                 return false;
             }
             
@@ -104,7 +104,7 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
                                       newBLTEventsNumber);
             
             if (result != sizeof(newBLTEventsNumber)) {
-                LogBusError("V1721 0x%0x Couldn't set BLT Number", numBLTEventsReg);
+                LogBusErrorForCard(GetSlot(),"V1721 0x%0x Couldn't set BLT Number", numBLTEventsReg);
                 return false;
             }
             
@@ -118,7 +118,7 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
 
     if ((int32_t)(bufferSizeNeeded) > (kMaxDataBufferSizeLongs - dataIndex)) {
         /* We can't read out. */
-        LogError("Temp buffer too small, requested (%d) > available (%d)",
+        LogErrorForCard(GetSlot(),"Temp buffer too small, requested (%d) > available (%d)",
                  bufferSizeNeeded,
                  kMaxDataBufferSizeLongs-dataIndex);
         return false;
@@ -161,13 +161,13 @@ bool ORCAEN1721Readout::Readout(SBC_LAM_Data* lamData)
     
     //ignore the last BERR, it's there on purpose
     if (result < 0 && dmaTransferCount && errno != 0) {
-        LogBusError("Error reading DMA for V1721: %s", strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Error reading DMA for V1721: %s", strerror(errno));
         dataIndex = startIndex;
         return true; 
     }
     
     if (!dmaTransferCount && result > 0) {
-        LogError("Error reading DMA for V1721, BERR missing");
+        LogErrorForCard(GetSlot(),"Error reading DMA for V1721, BERR missing");
         dataIndex = startIndex;
         return true;
     }

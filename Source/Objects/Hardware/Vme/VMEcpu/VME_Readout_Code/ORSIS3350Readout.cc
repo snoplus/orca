@@ -22,7 +22,7 @@ bool ORSIS3350Readout::Readout(SBC_LAM_Data* lamData)
                GetAddressModifier(),
                sizeof(status),
                status) != sizeof(status)) {  //Check Acq Control Reg
-        LogBusError("SIS3350 VME Exception 0: %s 0x%08x",
+        LogBusErrorForCard(GetSlot(),"SIS3350 VME Exception 0: %s 0x%08x",
             strerror(errno),GetBaseAddress());
     }
 
@@ -44,7 +44,7 @@ bool ORSIS3350Readout::Readout(SBC_LAM_Data* lamData)
                         GetAddressModifier(),
                         sizeof(disarmIt),
                         disarmIt) != sizeof(disarmIt)){ //sample disarm register
-                LogBusError("SIS3350 VME Exception 1: %s 0x%08x",
+                LogBusErrorForCard(GetSlot(),"SIS3350 VME Exception 1: %s 0x%08x",
                     strerror(errno),GetBaseAddress());
             }
         }
@@ -57,7 +57,7 @@ bool ORSIS3350Readout::Readout(SBC_LAM_Data* lamData)
                        sizeof(stop_next_sample_addr[i]),
                        stop_next_sample_addr[i]) != 
                sizeof(stop_next_sample_addr[i])) {  //Check Acq Control Reg
-                LogBusError("SIS3350 VME Exception 2: %s 0x%08x",
+                LogBusErrorForCard(GetSlot(),"SIS3350 VME Exception 2: %s 0x%08x",
                     strerror(errno),GetBaseAddress());
              }
              if (stop_next_sample_addr[i] != 0 
@@ -92,7 +92,7 @@ bool ORSIS3350Readout::Readout(SBC_LAM_Data* lamData)
                     }
                 }
                 else {
-                    LogBusError("SIS3350 VME Exception 3: %s 0x%08x",
+                    LogBusErrorForCard(GetSlot(),"SIS3350 VME Exception 3: %s 0x%08x",
                         strerror(errno),GetBaseAddress()+adcOffsets[i]);
                     dataIndex = startIndex; //dump the record
                 }
@@ -104,7 +104,7 @@ bool ORSIS3350Readout::Readout(SBC_LAM_Data* lamData)
                     GetAddressModifier(),
                     sizeof(armIt),
                     armIt) != sizeof(armIt)){ //sample arm register
-            LogBusError("SIS3350 VME Exception 6: %s 0x%08x",
+            LogBusErrorForCard(GetSlot(),"SIS3350 VME Exception 6: %s 0x%08x",
                 strerror(errno),GetBaseAddress());
         }
     } //End Check Acq Control Reg

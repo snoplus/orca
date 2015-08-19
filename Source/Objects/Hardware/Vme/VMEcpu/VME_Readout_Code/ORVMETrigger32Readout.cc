@@ -27,7 +27,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                         sizeof(statusReg),
                         statusReg); //short access, the adc Value
     if (result != sizeof(statusReg)) {
-        LogError("Rd Err: TR32 0x%04x Status",baseAddress);
+        LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Status",baseAddress);
         return false; 
     }
     
@@ -55,7 +55,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                               lValue);
             
              if (result != sizeof(lValue)) {
-                LogError("Wr Err: TR32 0x%04x Trig1 Latch",baseAddress);
+                LogErrorForCard(GetSlot(),"Wr Err: TR32 0x%04x Trig1 Latch",baseAddress);
                 return false; 
             }
            
@@ -64,7 +64,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                 sizeof(gtid),
                                 gtid); //short access, the adc Value
             if (result != sizeof(gtid)) {
-                LogError("Rd Err: TR32 0x%04x Status",baseAddress);
+                LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Status",baseAddress);
                 return false; 
             }
             
@@ -86,7 +86,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                         statusReg); //short access, the adc Value
                   
                     if (result != sizeof(statusReg)) {
-                       LogError("Rd Err: TR32 0x%04x Status",baseAddress);
+                       LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Status",baseAddress);
                        return false;  
                     }
                     if(statusReg & kValidTrigger1GTClockMask)break;
@@ -101,7 +101,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                         sizeof(gtid),
                                         gtid); //short access, the adc Value
                     if (result != sizeof(gtid)) {
-                        LogError("Rd Err: TR32 0x%04x Trig1 GTID",baseAddress);
+                        LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Trig1 GTID",baseAddress);
                         return false;   
                     }
                 }
@@ -126,7 +126,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                 sizeof(high_word),
                                 high_word); //short access, the adc Value
             if (result != sizeof(high_word)) {
-                LogError("Rd Err: TR32 0x%04x Upper Trig1",baseAddress);
+                LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Upper Trig1",baseAddress);
                 dataIndex = savedIndex; //dump the event back to the last marker
                 return false; 
             }
@@ -135,7 +135,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                 sizeof(low_word),
                                 low_word); //short access, the adc Value
             if (result != sizeof(low_word)) {
-                LogError("Rd Err: TR32 0x%04x Low Trig1",baseAddress);
+                LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Low Trig1",baseAddress);
                 dataIndex = savedIndex; //dump the event back to the last marker
                 return false; 
             }
@@ -173,7 +173,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                         reReadStatusReg); //short access, the adc Value
   
                     if (result != sizeof(reReadStatusReg)) {
-                        LogError("Rd Err: TR32 0x%04x Status",baseAddress);
+                        LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Status",baseAddress);
                         return false;  
                     }
                     
@@ -196,7 +196,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                               sizeof(sValue),
                               sValue); //short access, the adc Value
             if (result != sizeof(sValue)) {
-                LogError("Wr Err: TR32 0x%04x SAM Reset",baseAddress);
+                LogErrorForCard(GetSlot(),"Wr Err: TR32 0x%04x SAM Reset",baseAddress);
             }
         }
         
@@ -209,7 +209,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
             if (!card) {
                 // means we couldn't find the card.
                 // Shouldn't happen but...
-                LogError("Readout Err: Card at index %i not found",leaf_index);
+                LogErrorForCard(GetSlot(),"Readout Err: Card at index %i not found",leaf_index);
                 break;
             }
             if(card->GetHWTypeID() != kSBCLAM){
@@ -229,7 +229,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                             sizeof(statusReg),
                             statusReg); //short access, the adc Value
         if (result != sizeof(statusReg)) {
-            LogError("Rd Err: TR32 0x%04x Status",baseAddress);
+            LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Status",baseAddress);
             return false;   
         }
     }
@@ -253,7 +253,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                               sizeof(lValue),
                               lValue); //short access, the adc Value
             if (result != sizeof(lValue)) {
-                LogError("Wr Err: TR32 0x%04x Latch Trig2",baseAddress);
+                LogErrorForCard(GetSlot(),"Wr Err: TR32 0x%04x Latch Trig2",baseAddress);
                 return false;    
             }
             //soft gtid, so set the bit ourselves
@@ -268,7 +268,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                     sizeof(statusReg),
                                     statusReg); //short access, the adc Value
                 if (result != sizeof(statusReg)) {
-                    LogError("Rd Err: TR32 0x%04x Status",baseAddress);
+                    LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Status",baseAddress);
                     return false;     
                 }
                 if(statusReg & kValidTrigger2GTClockMask)break;
@@ -305,7 +305,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                     sizeof(gtid),
                                     gtid); //short access, the adc Value
                 if (result != sizeof(gtid)){
-                    LogError("Rd Err: TR32 0x%04x Trig2 GTID",baseAddress);
+                    LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Trig2 GTID",baseAddress);
                     dataIndex = savedIndex; //dump the event back to the last marker
                     return false; 
                 }
@@ -316,7 +316,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                     sizeof(gtid),
                                     gtid); //short access, the adc Value
                 if (result != sizeof(gtid)) {
-                    LogError("Rd Err: TR32 0x%04x AuxGTID",baseAddress);
+                    LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x AuxGTID",baseAddress);
                     return false; 
                 }
                 ResetTR32(kTrigger2GTEventReset);
@@ -339,7 +339,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                         sizeof(high_word),
                                         high_word); //short access, the adc Value
                     if (result != sizeof(high_word)) {
-                        LogError("Rd Err: TR32 0x%04x Upper Trig2",baseAddress);
+                        LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x Upper Trig2",baseAddress);
                         dataIndex = savedIndex; //dump the event back to the last marker
                         return false; 
                     }
@@ -349,7 +349,7 @@ bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
                                         sizeof(low_word),
                                         low_word); //short access, the adc Value
                     if (result != sizeof(low_word)) {
-                        LogError("Rd Err: TR32 0x%04x LowerTrig2",baseAddress);
+                        LogErrorForCard(GetSlot(),"Rd Err: TR32 0x%04x LowerTrig2",baseAddress);
                         dataIndex = savedIndex; //dump the event back to the last marker
                         return false; 
                     }
@@ -373,6 +373,6 @@ void ORVMETrigger32Readout::ResetTR32(uint32_t offset)
                               sizeof(value),
                               value);
     if(result != sizeof(value)){
-        LogError("Wr Err: TR32 0x%04x Reset",GetBaseAddress());
+        LogErrorForCard(GetSlot(),"Wr Err: TR32 0x%04x Reset",GetBaseAddress());
     }
 }

@@ -37,7 +37,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 			uint32_t mebEventNumRegOffset	= GetDeviceSpecificData()[2];
             result = VMERead(baseAdd + mebEventNumRegOffset,addressModifier, sizeof(numEvents), numEvents);
 			if(result != sizeof(numEvents)){
-				LogBusError("Num Events Rd: V830 0x%04x %s",baseAdd+mebEventNumRegOffset,strerror(errno));
+				LogBusErrorForCard(GetSlot(),"Num Events Rd: V830 0x%04x %s",baseAdd+mebEventNumRegOffset,strerror(errno));
 			}
 			else if(numEvents){
 				
@@ -56,14 +56,14 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                     //get the header -- always the first word
                     uint32_t dataHeader = 0;
                     if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(dataHeader),dataHeader)!= sizeof(dataHeader)){
-                        LogBusError("Header Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
+                        LogBusErrorForCard(GetSlot(),"Header Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
                     }
                     data[dataIndex++] = dataHeader;
                     
                     for(uint16_t i=0 ; i<numEnabledChannels ; i++){
                         uint32_t aValue;
                         if(VMERead(baseAdd + eventBufferOffset,addressModifier, sizeof(aValue), aValue) != sizeof(aValue)){
-                            LogBusError("Data Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
+                            LogBusErrorForCard(GetSlot(),"Data Rd: V830 0x%04x %s",baseAdd+eventBufferOffset,strerror(errno));
                         }
                         //keep a rollover count for channel zero
                         if(chan0Enabled && i==0){
@@ -78,7 +78,7 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
                             }
                             else {
                                 errorCount++;
-                                LogMessage("Bad Count: V830 0x%x %d/%d",baseAdd,errorCount,goodCount);
+                                LogMessageForCard(GetSlot(),"Bad Count: V830 0x%x %d/%d",baseAdd,errorCount,goodCount);
                                 data[indexForRollOver] = 0xffffffff;
                                 data[dataIndex++]      = 0xffffffff;
                             }
