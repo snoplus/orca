@@ -2870,6 +2870,23 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) postCouchDBRecord
 {
+    
+    NSMutableArray* cardErrorCounts     = [NSMutableArray arrayWithCapacity:MAX_CARDS];
+    NSMutableArray* cardBusErrorCounts  = [NSMutableArray arrayWithCapacity:MAX_CARDS];
+    NSMutableArray* cardMessageCounts   = [NSMutableArray arrayWithCapacity:MAX_CARDS];
+    unsigned long cardErrorCount        = 0;
+    unsigned long cardBusErrorCount     = 0;
+    unsigned long cardMessageCount      = 0;
+    int i;
+    for(i=0;i<MAX_CARDS;i++){
+        [cardErrorCounts    addObject:[NSNumber numberWithUnsignedLong:errorInfo.card[i].errorCount]];
+        [cardBusErrorCounts addObject:[NSNumber numberWithUnsignedLong:errorInfo.card[i].busErrorCount]];
+        [cardMessageCounts  addObject:[NSNumber numberWithUnsignedLong:errorInfo.card[i].messageCount]];
+        cardErrorCount     += errorInfo.card[i].errorCount;
+        cardBusErrorCount  += errorInfo.card[i].busErrorCount;
+        cardMessageCount   += errorInfo.card[i].messageCount;
+    }
+    
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithLong: runInfo.statusBits],          @"statusBits",
                             [NSNumber numberWithLong: runInfo.err_count],           @"err_count",
@@ -2880,12 +2897,18 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
                             [NSNumber numberWithLong: runInfo.recordsTransfered],   @"recordsTransfered",
                             [NSNumber numberWithLong: byteRateReceived],            @"byteRateReceived",
                             [NSNumber numberWithLong: byteRateSent],                @"byteRateSent",
+                            [NSNumber numberWithLong: cardErrorCount],              @"cardErrorCount",
+                            [NSNumber numberWithLong: cardBusErrorCount],           @"cardBusErrorCount",
+                            [NSNumber numberWithLong: cardMessageCount],            @"cardMessageCount",
+                            cardErrorCounts,                                        @"cardErrorCounts",
+                            cardBusErrorCounts,                                     @"cardBusErrorCounts",
+                            cardMessageCounts,                                      @"cardMessageCounts",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 
     NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                                    [delegate fullID],               @"name",
-                                   @"SBCInfo",                       @"title",
+                                   @"SBCInfo",                      @"title",
                                    [NSArray arrayWithObjects:
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.statusBits]        forKey:@"statusBits"],
                                     [NSDictionary dictionaryWithObject: [NSNumber numberWithLong: runInfo.err_count]         forKey:@"err_count"],
