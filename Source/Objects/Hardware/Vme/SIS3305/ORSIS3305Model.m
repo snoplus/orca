@@ -4053,7 +4053,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     int i;
 
     
-    ORCommandList* aList = [ORCommandList commandList];
+//    ORCommandList* aList = [ORCommandList commandList];
     for(i=0;i<kNumSIS3305Groups;i++){
         unsigned long aValueMask = 0x0;
         
@@ -4091,14 +4091,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         aValueMask |= (0x0) << 24; //i << 24;
         aValueMask |= (0x0) << 1; // ([self baseAddress] & 0x7F000000) << 1;    // this is the geographic address 30:24 pushed to 31:25 of this register
         
-        [aList addCommand: [ORVmeReadWriteCommand writeLongBlock: &aValueMask
+        [[self adapter] writeLongBlock: &aValueMask
                                                        atAddress: [self baseAddress] + [self getEventConfigOffsets:i]
                                                       numToWrite: 1
                                                       withAddMod: [self addressModifier]
-                                                   usingAddSpace: 0x01]];
+                                                   usingAddSpace: 0x01];
     }
 
-    [self executeCommandList:aList];
+//    [self executeCommandList:aList];
     
 }
 
@@ -4743,18 +4743,16 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         thresholdMask |= (offThresh  & 0x3ff)    <<16;
         thresholdMask |= (LTEnabled  &0x1)      <<31;
         
-        [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+        [[self adapter] writeLongBlock: &thresholdMask
                                                        atAddress: [self baseAddress] + [self getLTThresholdRegOffsets:i]
                                                       numToWrite: 1
                                                       withAddMod: [self addressModifier]
                                                    usingAddSpace: 0x01];
     }
-    
-//    [self executeCommandList:aList];
 }
+
 - (void) writeGTThresholds
 {
-//    ORCommandList* aList = [ORCommandList commandList];
     int i;
     unsigned long thresholdMask;
     for(i = 0; i < kNumSIS3305Channels; i++)
@@ -4765,14 +4763,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         thresholdMask |= ([self GTThresholdOff:i]   & 0x3ff)    <<16;
         thresholdMask |= ([self GTThresholdEnabled:i]&0x1)      <<31;
         
-        [ORVmeReadWriteCommand writeLongBlock: &thresholdMask
+        [[self adapter] writeLongBlock: &thresholdMask
                                                        atAddress: [self baseAddress] + [self getGTThresholdRegOffsets:i]
                                                       numToWrite: 1
                                                       withAddMod: [self addressModifier]
                                                    usingAddSpace: 0x01];
     }
-    
-//    [self executeCommandList:aList];
 }
 
 - (unsigned long) getSamplingStatusAddressForGroup:(short)group

@@ -1,4 +1,4 @@
-//
+    //
 //  ORSIS3305Decoders.m
 //  Orca
 //
@@ -92,45 +92,55 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 	unsigned int crate	 = ShiftAndExtract(ptr[1],28,0xf);
 	unsigned int card	 = ShiftAndExtract(ptr[1],20,0x1f);
 
-    // extract group level things from the SIS header
-
     unsigned short  channelMode = ShiftAndExtract(ptr[1],16, 0xF);
     unsigned int    group       = ShiftAndExtract(ptr[1],12, 0x1);
     unsigned short  rate        = ShiftAndExtract(ptr[1], 8, 0xF);
     unsigned short  savingMode  = ShiftAndExtract(ptr[1], 4, 0xF);
     BOOL            wrapMode    = ShiftAndExtract(ptr[1], 0, 0x1);
     
-    unsigned long dataLength = ptr[2];      // SIS header + data length of single record, in longs
+    unsigned long dataLengthSingle = ptr[2];      // SIS header + data length of single record, in longs
     
 	long sisHeaderLength;
 	if(wrapMode)sisHeaderLength = 16;
 	else		sisHeaderLength = 4;
     unsigned long orcaHeaderLength = 4;
     
-    unsigned short numEvents = floor((length-orcaHeaderLength)/dataLength);
+    unsigned short numEvents = floor((length-orcaHeaderLength)/dataLengthSingle);
     unsigned long numEventsFromHeader = ptr[3]&0xFFFF;
-    
     if (numEvents != numEventsFromHeader)
     {
-        NSLogColor([NSColor redColor], @"SIS3305: Number of events incorrectly determined in at least one location!");
+        NSLogColor([NSColor redColor], @"SIS3305: Number of events incorrectly determined in at least one location!\n");
     }
 
-    unsigned long waveformLength = dataLength-sisHeaderLength; // this is the waveform + sisheader.Each long word is 3 10 bit adc samples
+    unsigned long waveformLengthSet = dataLengthSingle-sisHeaderLength;
+    // this is the length of (waveform + sisheader) in longs. Each long word is 3 10 bit adc samples
+    // "waveformLengthSet" is the value Orca thinks should be the length based on the sample length settings that have been used.
+    // It should always be right, but if something went wrong, a safer place to look is in the SIS header, at the block length of samples.
+    // I will compare the value from the header to this each time to be safe.
+    unsigned long dataLengthSIS;
+    unsigned long waveformLengthSIS;
+    
     unsigned long* dataPtr       = ptr + orcaHeaderLength;   // hold on to this here
 
     
     unsigned short n;
     for(n=0;n<numEvents;n++)
     {
-//        NSLog(@"Group %d    n = %d (decoder)\n",group,n);
-        dataLength = (dataPtr[3]&0xFFFF)*4;      // SIS header + data length, in longs
-
-        unsigned long* nextRecordPtr = dataPtr + sisHeaderLength + dataLength; // take you to the start of the next SIS header
+//        if(!wrapMode)
+//            waveformLengthSIS   = (dataPtr[3]&0xFFFF)*4;      // data length (no headers), in longs
+//        else
+//            waveformLengthSIS   = (dataPtr[3])*16;
+        
+//        dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
+//        if(dataLengthSingle != dataLengthSIS){
+//            NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree! This is serious!\n");
+//            break;
+//        }
+        unsigned long* nextRecordPtr = 0; // take you to the start of the next SIS header
         
         // extract things from the SIS header
-        unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
-        unsigned long       timestampLow = dataPtr[1];
-        unsigned long       timestampHigh = dataPtr[0]&0xFFFF;
+//        unsigned long       timestampLow = dataPtr[1];
+//        unsigned long       timestampHigh = dataPtr[0]&0xFFFF;
 //        unsigned long long  timestamp = timestampLow | (timestampHigh << 31);
 
         // Biggest pre-computed value  is 31 - if you see this in the data, there IS an error somewhere (only 8 channels...)
@@ -140,14 +150,14 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         
         NSString* crateKey		= [self getCrateKey: crate];
         NSString* cardKey		= [self getCardKey: card];
-        NSMutableData*  recordAsData = [NSMutableData dataWithCapacity:(waveformLength*3*8)];
+        NSMutableData*  recordAsData; // = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
 
-        if(waveformLength /*&& (waveformLength == (length - 3))*/)
-        { // this is a sanity check that we have data and it is the size we expect
+//        if(waveformLengthSIS /*&& (waveformLength == (length - 3))*/)
+//        { // this is a sanity check that we have data and it is the size we expect
             if(wrapMode)
             {
                 return (unsigned long)(-1);
-              
+              /*
                 channel = (kchannelModeAndEventID[channelMode][eventID] + (group*4));
                 channelKey    = [self getChannelKey: channel];
 
@@ -165,40 +175,125 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                         dataPtr[i] = ushort_buffer_ptr[j++];
                     }
                 }
-               
+               */
             }
-            else if((savingMode == 4) && (channelMode < 4)){  // 1.25 Gsps Event fifo mode with all four channels potentially enabled
-                channel = ((dataPtr[0]>>28)&0xF) + (group*4);
+            else if((savingMode == 4) && (channelMode < 4))  // 1.25 Gsps Event fifo mode with all four channels potentially enabled
+            {
+                unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
+                channel = eventID + (group*4);
                 channelKey    = [self getChannelKey: channel];
                 
+                
+                waveformLengthSIS   = (dataPtr[3]&0xFFFF)*4;      // data length (no headers), in longs
+                dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
+                if(dataLengthSingle != dataLengthSIS){
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree! This is serious!\n");
+                    break;
+                }
+                recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
+                
+                [recordAsData setLength:(waveformLengthSIS*3*2)];  // length in bytes! there are 3 samples in each Long of the waveform, each takes 2 bytes
                 unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
                 
                 int i=0;
                 unsigned short* waveData = (unsigned short*)[recordAsData mutableBytes];
                 int waveformIndex = 0;
                 // here `i` increments through each long word in the data
-                for(i=0;i<waveformLength;i++){
+                for(i=0;i<waveformLengthSIS;i++){
                     waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
                     waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
                     waveData[waveformIndex++] = (lptr[i])       &0x3ff;
                 }
             
             }
+            else if(savingMode == 0){  // 1 x 5 Gsps Event fifo mode
+                //            unsigned long numBlocks = (ptr[6]&0xFFFF);
+                channel = group*4;  //  FIX: use the real channel number
+                channelKey    = [self getChannelKey: channel];
+                
+                waveformLengthSIS = 16*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+                dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
+                if(dataLengthSingle != dataLengthSIS){
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree! This is serious!\n");
+                    break;
+                }
+                recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
+                [recordAsData setLength:waveformLengthSIS*3*2];    // length is in bytes (hence 2), 3 samples per Lword
+                
+                if (rate == 2) { // 5gsps
+                    // if we're reading out at 5 gsps, we have to unpack and de-interlace all four of the 4-word blocks at once...
+                    
+                    unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
+                    int i;
+                    unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+                    int waveformIndex = 0;
+                    
+                    // sisDataLength*3 = number samples in waveform
+                    for(i=0;i<(dataLengthSIS*3);i+=16) // i steps through the entire waveform
+                    {
+                        unsigned short k;
+                        for (k = 0; k<4; k++) { // k steps through the 4-word block that each ADC produces
+                            waveData[waveformIndex++] = (lptr[0+i+k]>>20)   &0x3ff;   // sample 1 + 12*k
+                            waveData[waveformIndex++] = (lptr[8+i+k]>>20)   &0x3ff;   // sample 2 + 12*k
+                            waveData[waveformIndex++] = (lptr[4+i+k]>>20)   &0x3ff;   // sample 3 + 12*k
+                            waveData[waveformIndex++] = (lptr[12+i+k]>>20)  &0x3ff;   // sample 4 + 12*k
+                            
+                            waveData[waveformIndex++] = (lptr[0+i+k]>>10)   &0x3ff;   // sample 5 + 12*k
+                            waveData[waveformIndex++] = (lptr[8+i+k]>>10)   &0x3ff;   // sample 6 + 12*k
+                            waveData[waveformIndex++] = (lptr[4+i+k]>>10)   &0x3ff;   // sample 7 + 12*k
+                            waveData[waveformIndex++] = (lptr[12+i+k]>>10)  &0x3ff;   // sample 8 + 12*k
+                            
+                            waveData[waveformIndex++] = (lptr[0+i+k])       &0x3ff;   // sample 9 + 12*k
+                            waveData[waveformIndex++] = (lptr[8+i+k])         &0x3ff;   // sample 10 + 12*k
+                            waveData[waveformIndex++] = (lptr[4+i+k])         &0x3ff;   // sample 11 + 12*k
+                            waveData[waveformIndex++] = (lptr[12+i+k])        &0x3ff;   // sample 12 + 12*k
+                            
+                        }
+                    }
+                }
+                
+                
+                if (rate == 1) {
+                    // FIX: THIS COMPLETELY WON'T WORK -- just a placeholder!!!!!!
+                    
+                    unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; // skip ORCA header + SIS header
+                    int i;
+                    unsigned short* waveData = (unsigned short*)[recordAsData bytes];
+                    int waveformIndex = 0;
+                    // here `i` increments through each word in the data
+                    //
+                    for(i=0;i<waveformLengthSIS;i++){
+                        waveData[waveformIndex++] = (lptr[i]>>20)   &0x3ff; // sample (3*i + waveformIndex)
+                        waveData[waveformIndex++] = (lptr[i]>>10)   &0x3ff;
+                        waveData[waveformIndex++] = (lptr[i])       &0x3ff;
+                    }
+                    
+                }
+            }
             else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
                 channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
 
                 channelKey    = [self getChannelKey: channel];
                 
-                unsigned long sisDataLength = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+                waveformLengthSIS = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+                dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
+                if(dataLengthSingle != dataLengthSIS){
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree! This is serious!\n");
+                    break;
+                }
+                recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
 
-                [recordAsData setLength:3*2*length];
+                
+//                unsigned long sisDataLength = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
+
+                [recordAsData setLength:3*2*waveformLengthSIS];
                 unsigned long* lptr = (unsigned long*)&dataPtr[sisHeaderLength]; //ORCA header + SIS header
                 int i = 0;
                 unsigned short* waveData = (unsigned short*)[recordAsData bytes];
                 int waveformIndex = 0;
                 unsigned short k = 0;
                 //            for(i=0;i<2*waveformLength/3;i++){
-                for(i=0;i<(sisDataLength*3);i+=7) { // sisDataLength*3 = number samples in waveform
+                for(i=0;i<(dataLengthSIS*3);i+=8) { // sisDataLength*3 = number samples in waveform
                     // lptr[i] is at the first word of the 8x32-bit data block
                     for (k=0; k<4; k++ )
                     {
@@ -212,17 +307,23 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
                 
             }   // end if( savingMode == 1)
+            else
+            {
+                NSLogColor([NSColor redColor], @"SIS3305: Apparently there was no decoder for this data!\n");
+                // take a guess at the data length... will probably fail, but we should never get here.
+                return length;
+            }
             //        unsigned short* waveData = (unsigned short*)[recordAsData bytes];
             //        NSLog(@"         waveData[0,10,20,100] = (%d,%d,%d,%d)\n",waveData[0],waveData[10],waveData[20],waveData[100]);
             
-        }
+//        } // if(waveformLength)
             if(recordAsData)[aDataSet loadWaveform:recordAsData
                                             offset: 0 //bytes!
                                           unitSize: sizeof( unsigned short ) //unit size in bytes! 10 bits needs 2 bytes
                                             sender: self
                                           withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
 
-        
+        nextRecordPtr = dataPtr + dataLengthSIS; // take you to the start of the next SIS header
         dataPtr = nextRecordPtr;
 //        NSLog(@"    Decoded %d/%d events so far\n",n+1,numEvents);
     }// end of loop over numEvents
