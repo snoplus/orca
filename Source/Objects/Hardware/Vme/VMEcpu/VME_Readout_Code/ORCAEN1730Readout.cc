@@ -14,7 +14,7 @@ bool ORCAEN1730Readout::Start() {
                              sizeof(currentBLTEventsNumber),
                              currentBLTEventsNumber);
     if (result != sizeof(currentBLTEventsNumber)) {
-        LogBusError("V1730 0x%0x Couldn't read register", numBLTEventsReg);
+        LogBusErrorForCard(GetSlot(),"V1730 0x%0x Couldn't read register", numBLTEventsReg);
         return false;
     }
     if (currentBLTEventsNumber == 0) {
@@ -49,7 +49,7 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
                              numEventsToRead);
    
     if (result != sizeof(numEventsToRead)) {
-        LogBusError("V1730 0x%0x Couldn't read num Events", numEventsToRead);
+        LogBusErrorForCard(GetSlot(),"V1730 0x%0x Couldn't read num Events", numEventsToRead);
         return false;
     }
     
@@ -63,7 +63,7 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
     
     
     if (result != sizeof(eventSize)) {
-        LogBusError("Rd Err eventSize: V1730 0x%04x %s", GetBaseAddress(), strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Rd Err eventSize: V1730 0x%04x %s", GetBaseAddress(), strerror(errno));
         return false;
     }
     
@@ -123,7 +123,7 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
    } while (dmaTransferCount && result > 0);
     
     if (result < 0 && dmaTransferCount && errno != 0) {
-        LogBusError("Error reading DMA for V1730: %s", strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Error reading DMA for V1730: %s", strerror(errno));
         dataIndex = startIndex;
         return true; 
     }
@@ -139,7 +139,7 @@ bool ORCAEN1730Readout::Readout(SBC_LAM_Data*)
     uint32_t bufferSizeUsed = 2 + numEventsToRead * eventSize;
     //printf("bufferSizeUsed: %d\n",bufferSizeUsed);
     if(bufferSizeUsed>0x7ffff){
-        LogBusError("V1730 waveform too large");
+        LogBusErrorForCard(GetSlot(),"V1730 waveform too large");
         dataIndex = startIndex;
         return false;
     }

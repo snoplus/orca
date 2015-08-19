@@ -55,7 +55,7 @@ bool ORSIS3305Card::IsEvent()
     uint32_t addr = GetBaseAddress() + ORSIS3305Card::GetAcquisitionControl();
     uint32_t data_rd = 0;
     if (VMERead(addr,GetAddressModifier(),4,data_rd) != sizeof(data_rd)) { 
-		LogBusError("Bank Arm Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno)); 
+		LogBusErrorForCard(GetSlot(),"Bank Arm Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
     	return false;
     }
 	uint32_t bankMask = fBankOneArmed?0x10000:0x20000;
@@ -71,7 +71,7 @@ bool ORSIS3305Card::IsEvent()
                              (uint8_t*)&ac,             // buffer* (short)
                              sizeof(uint32_t));         // number of bytes
     if (error != sizeof(int32_t)){
-        LogBusError("Acquisition Control Reg Readout Error: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Acquisition Control Reg Readout Error: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
         return 0;
     }
     
@@ -193,7 +193,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                 
                 if (error != (int32_t) dataRecordLength[group])
                 {
-                    if(error > 0) LogError("DMA:SIS3305 0x%04x %d!=%d", GetBaseAddress(),error,dataRecordLength[group]);
+                    if(error > 0) LogErrorForCard(GetSlot(),"DMA:SIS3305 0x%04x %d!=%d", GetBaseAddress(),error,dataRecordLength[group]);
                         ORSIS3305Card::armSampleLogic();
                         ORSIS3305Card::enableSampleLogic();
                         return false;
@@ -243,7 +243,7 @@ bool ORSIS3305Card::armSampleLogic()
     uint32_t data_wr = 1;
     
     if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), data_wr) != sizeof(data_wr)) {
-        LogBusError("Arm Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Arm Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
         return false;
     }
     
@@ -257,7 +257,7 @@ bool ORSIS3305Card::enableSampleLogic()
     uint32_t data_wr = 1;
     
     if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), data_wr) != sizeof(data_wr)) {
-        LogBusError("Enable Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Enable Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
         return false;
     }
     
@@ -271,7 +271,7 @@ bool ORSIS3305Card::disarmSampleLogic()
     uint32_t data_wr = 1;
     
     if (VMEWrite(addr, GetAddressModifier(), GetDataWidth(), data_wr) != sizeof(data_wr)) {
-        LogBusError("Disarm/Disable Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Disarm/Disable Sample Logic Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
         return false;
     }
     
@@ -285,7 +285,7 @@ uint32_t ORSIS3305Card::longsInSample(uint8_t group)
         case 0: return GetDeviceSpecificData()[0];
         case 1: return GetDeviceSpecificData()[1];
         default:
-            LogBusError("Error reading device specific data (longs in sample): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Error reading device specific data (longs in sample): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
             return 0;
     }
 }
@@ -296,7 +296,7 @@ uint32_t ORSIS3305Card::GetChannelMode(uint8_t group)
         case 0: return GetDeviceSpecificData()[2];
         case 1: return GetDeviceSpecificData()[3];
         default:
-            LogBusError("Error reading device specific data (channel mode): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Error reading device specific data (channel mode): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
             return 0;
     }
 }
@@ -307,7 +307,7 @@ uint32_t ORSIS3305Card::GetDigitizationRate(uint8_t group)
         case 0: return GetDeviceSpecificData()[4];
         case 1: return GetDeviceSpecificData()[5];
         default:
-            LogBusError("Error reading device specific data (digitization rate): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Error reading device specific data (digitization rate): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
             return 0;
     }
 }
@@ -318,7 +318,7 @@ uint32_t ORSIS3305Card::GetEventSavingMode(uint8_t group)
         case 0: return GetDeviceSpecificData()[6];
         case 1: return GetDeviceSpecificData()[7];
         default:
-            LogBusError("Error reading device specific data (event saving mode): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Error reading device specific data (event saving mode): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
             return 0;
     }
 }
@@ -331,7 +331,7 @@ uint32_t ORSIS3305Card::GetFIFOAddressOfGroup(uint8_t group)
         case 1: return kSIS3305Space1ADCDataFIFOCh58;
     }
     
-    LogBusError("FIFO Address Err (invalid group requested): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+    LogBusErrorForCard(GetSlot(),"FIFO Address Err (invalid group requested): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
     return (uint32_t)(-1);
 }
 
@@ -359,7 +359,7 @@ bool ORSIS3305Card::writeDataTransferControlReg(uint8_t group, uint8_t command, 
         if( VMEWrite(addr, GetAddressModifier(), GetDataWidth(), writeValue)
             != sizeof(writeValue) )
         {
-            LogBusError("Write Data Transfer Control Reg Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Write Data Transfer Control Reg Err: SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
             return false;
         }
     }
@@ -382,7 +382,7 @@ uint32_t ORSIS3305Card::readActualSampleAddress(uint8_t group)
             break;
         default:
             addr = 0;
-            LogBusError("Read Sample Address Err (bad group): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+            LogBusErrorForCard(GetSlot(),"Read Sample Address Err (bad group): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
             return 0;
             break;
     }
@@ -395,7 +395,7 @@ uint32_t ORSIS3305Card::readActualSampleAddress(uint8_t group)
     
     if (error != sizeof(int32_t))
     {
-        LogBusError("Sample Address readout error (read failed): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
+        LogBusErrorForCard(GetSlot(),"Sample Address readout error (read failed): SIS3305 0x%04x %s", GetBaseAddress(),strerror(errno));
         return 0;
     }
     return (value & 0xFFFFFF); // sample memory address is only 23:0
