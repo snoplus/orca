@@ -74,7 +74,8 @@ typedef enum eSBC_ThrottleConsts{
     unsigned long	writeAddress;
     unsigned long	writeValue;
 	unsigned long   addressModifier;
-	SBC_info_struct runInfo;
+    SBC_info_struct runInfo;
+    SBC_error_struct errorInfo;
     unsigned long   lastErrorCount;
     float           errorRate;
 	NSDate*			lastQueUpdate;
@@ -240,6 +241,7 @@ typedef enum eSBC_ThrottleConsts{
 
 - (int) connectToPort:(unsigned short) aPort;
 - (void) getRunInfoBlock;
+- (void) getErrorInfoBlock;
 - (void) reloadClient;
 - (void) killCrate;
 - (void) taskData:(NSString*)text;
@@ -326,6 +328,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) load_HW_Config:(SBC_crate_config*)aConfig;
 - (unsigned long) throttle;
+- (void)reportErrorsByCard;
 
 - (NSString*) sbcLockName;
 - (NSString*) crateName;
@@ -438,4 +441,5 @@ extern NSString* SBC_LinkErrorTimeOutChanged;
 extern NSString* SBC_CodeVersionChanged;
 extern NSString* SBC_SocketDroppedUnexpectedly;
 extern NSString* SBC_LinkSbcPollingRateChanged;
+extern NSString* SBC_LinkErrorInfoChanged;
 

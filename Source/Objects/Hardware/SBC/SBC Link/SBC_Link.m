@@ -89,6 +89,7 @@ NSString* SBC_LinkErrorTimeOutChanged		= @"SBC_LinkErrorTimeOutChanged";
 NSString* SBC_CodeVersionChanged			= @"SBC_CodeVersionChanged";
 NSString* SBC_SocketDroppedUnexpectedly     = @"SBC_SocketDroppedUnexpectedly";
 NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
+NSString* SBC_LinkErrorInfoChanged          = @"SBC_LinkErrorInfoChanged";
 
 @interface SBCPacketWrapper : NSObject {
     NSMutableData* data;
@@ -961,6 +962,23 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
 
+- (void) getErrorInfoBlock
+{
+    id pw = [[SBCPacketWrapper alloc] init];
+    SBC_Packet* aPacket = [pw sbcPacket];
+    aPacket->cmdHeader.destination			= kSBC_Process;
+    aPacket->cmdHeader.cmdID                = kSBC_ErrorInfoRequest;
+    aPacket->cmdHeader.numberBytesinPayload	= 0;
+    
+    [self send:aPacket receive:aPacket];
+    
+    memcpy(&errorInfo,aPacket->payload,sizeof(SBC_error_struct));
+    [pw releaseAndCache];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkErrorInfoChanged object:self];
+}
+
+
 - (unsigned long) throttle
 {
 	return throttle;
@@ -1716,6 +1734,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 			}
 		}
         if(updateCount%120 == 0){
+            [self getErrorInfoBlock];
             [self postCouchDBRecord];
         }
         updateCount++;
@@ -1779,6 +1798,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 		[self tellClientToStopRun];
 		stopWatchingIRQ = YES;
 		[self getRunInfoBlock];
+
 		/* We no longer need the throttle since we are just clearing the circular buffer.
 		 It will be reset when the run starts.                                           */
 		throttle = 0;
@@ -1797,7 +1817,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	//the remote client has  been told to stop taking data, but there is probably still
 	//data in the CB. The run will not actually stop until we return YES from this method.
 	[self getRunInfoBlock];
-	
+
 	if(lastAmountInBuffer != runInfo.amountInBuffer){
 		//as long as the amount in the buffer is changing, we'll ask for more time.
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORNeedMoreTimeToStopRun object:self];
@@ -1809,7 +1829,9 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
-	[self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
+    [self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
+    [self getErrorInfoBlock];
+    [self reportErrorsByCard];
 	[eCpuCBFillingAlarm clearAlarm];
 	[eCpuCBLostDataAlarm clearAlarm];
     [self pingVerbose:NO];
@@ -1817,6 +1839,43 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     [self postCouchDBRecord];
 }
 
+- (void) reportErrorsByCard
+{
+    unsigned long busErrorCount = 0;
+    unsigned long errorCount    = 0;
+    unsigned long messageCount  = 0;
+    int slot;
+    for(slot=0;slot<MAX_CARDS;slot++){
+        busErrorCount     += errorInfo.card[slot].busErrorCount;
+        errorCount        += errorInfo.card[slot].errorCount;
+        messageCount      += errorInfo.card[slot].messageCount;
+    }
+    if(messageCount || errorCount || busErrorCount){
+        NSLog(@"----------------------------\n");
+        NSLog(@"Error Report For Crate %d\n",[delegate crateNumber]);
+    
+        if(messageCount){
+            NSLog(@"------Messages------\n");
+            for(slot=0;slot<MAX_CARDS;slot++){
+                if(errorInfo.card[slot].messageCount)NSLog(@"slot %d: %d\n",slot, errorInfo.card[slot].messageCount);
+            }
+        }
+        if(errorCount){
+            NSLog(@"------Errors------\n");
+            for(slot=0;slot<MAX_CARDS;slot++){
+                if(errorInfo.card[slot].errorCount)NSLog(@"slot %d: %d\n",slot, errorInfo.card[slot].errorCount);
+            }
+        }
+        if(busErrorCount){
+            NSLog(@"------Bus Errors------\n");
+            for(slot=0;slot<MAX_CARDS;slot++){
+                if(errorInfo.card[slot].busErrorCount)NSLog(@"slot %d: %d\n",slot, errorInfo.card[slot].busErrorCount);
+            }
+        }
+        NSLog(@"----------------------------\n");
+    }
+    else NSLog(@"No Errors reported for crate %d\n",[delegate crateNumber]);
+}
 
 - (void) load_HW_Config:(SBC_crate_config*) aConfig
 {	

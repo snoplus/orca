@@ -57,6 +57,7 @@ void stopRun (void);
 char pauseRun(void);
 char resumeRun(void);
 void sendRunInfo(void);
+void sendErrorInfo(void);
 void sendCBRecord(void);
 void runCBTest(SBC_Packet* aPacket);
 void setPacketOptions(SBC_Packet* aPacket);
@@ -65,6 +66,7 @@ void setPacketOptions(SBC_Packet* aPacket);
 char                timeToExit;
 SBC_crate_config    crate_config;
 SBC_info_struct     run_info;
+SBC_error_struct    error_info;
 SBC_LAM_info_struct lam_info[kMaxNumberLams];
 time_t              lastTime;
 
@@ -182,8 +184,16 @@ int32_t main(int32_t argc, char *argv[])
         
         minCycleTime                = 0;
         
+        int32_t i;
+        for(i=0;i<MAX_CARDS;i++){
+            error_info.card[i].busErrorCount = 0;
+            error_info.card[i].errorCount    = 0;
+            error_info.card[i].messageCount  = 0;
+        }
+
         pthread_mutex_unlock (&runInfoMutex);//end critical section
 		
+        
         pthread_attr_init(&sbc_job.jobThreadAttr);
         pthread_attr_setdetachstate(&sbc_job.jobThreadAttr, PTHREAD_CREATE_JOINABLE);
 		pthread_mutex_init(&jobInfoMutex, NULL);
@@ -304,6 +314,7 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
         case kSBC_StopRun:          doRunCommand(aPacket);		break;
         case kSBC_SetPollingDelay:	doRunCommand(aPacket);		break;
         case kSBC_RunInfoRequest:   sendRunInfo();				break;
+        case kSBC_ErrorInfoRequest: sendErrorInfo();			break;
         case kSBC_CBRead:           sendCBRecord();				break;
 		case kSBC_CBTest:			runCBTest(aPacket);			break;
 		case kSBC_PacketOptions:	setPacketOptions(aPacket);	break;
@@ -452,9 +463,9 @@ void sendResponse(SBC_Packet* aPacket)
 void sendRunInfo(void)
 {
     SBC_Packet aPacket;
-    aPacket.cmdHeader.destination        = kSBC_Process;
+    aPacket.cmdHeader.destination          = kSBC_Process;
     aPacket.cmdHeader.cmdID                = kSBC_RunInfoRequest;
-    aPacket.cmdHeader.numberBytesinPayload    = sizeof(SBC_info_struct);
+    aPacket.cmdHeader.numberBytesinPayload = sizeof(SBC_info_struct);
     
     SBC_info_struct* runInfoPtr = (SBC_info_struct*)aPacket.payload;
 
@@ -473,6 +484,24 @@ void sendRunInfo(void)
         LogError("sendRunInfo Error: %s", strerror(errno));   
     }
 }
+
+void sendErrorInfo(void)
+{
+    SBC_Packet aPacket;
+    aPacket.cmdHeader.destination          = kSBC_Process;
+    aPacket.cmdHeader.cmdID                = kSBC_ErrorInfoRequest;
+    aPacket.cmdHeader.numberBytesinPayload = sizeof(SBC_error_struct);
+    
+    SBC_error_struct* errorInfoPtr = (SBC_error_struct*)aPacket.payload;
+    
+    memcpy(errorInfoPtr, &error_info, sizeof(SBC_error_struct));    //make copy
+    
+    if(needToSwap)SwapLongBlock(errorInfoPtr,sizeof(SBC_error_struct));
+    if (writeBuffer(&aPacket) < 0) {
+        LogError("sendErrorInfo Error: %s", strerror(errno));
+    }
+}
+
 
 void sendCBRecord(void)
 {
@@ -647,7 +676,13 @@ char startRun (void)
     run_info.msg_count         = 0;
     run_info.err_buf_index     = 0;
     run_info.msg_buf_index     = 0;
-    
+    int32_t i;
+    for(i=0;i<MAX_CARDS;i++){
+        error_info.card[i].busErrorCount = 0;
+        error_info.card[i].errorCount    = 0;
+        error_info.card[i].messageCount  = 0;
+    }
+
     if(run_info.statusBits | kSBC_ConfigLoadedMask){
 
         initializeHWRun(&crate_config);
@@ -911,6 +946,68 @@ void LogBusError (const char *format,...)
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     run_info.err_count++;
     run_info.busErrorCount++;
+    va_end (ap);
+    pthread_mutex_unlock(&runInfoMutex);
+}
+
+void LogMessageForCard (uint32_t card,const char *format,...)
+{
+    if(strlen(format) > kSBC_MaxStrSize*.75) return; //not a perfect check, but it will have to do....
+    
+    //we misuse the runInfoMutex to sync threads, on purpose
+    pthread_mutex_lock(&runInfoMutex);
+    va_list ap;
+    va_start (ap, format);
+    vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
+    run_info.msg_buf_index = (run_info.msg_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
+    run_info.msg_count++;
+    error_info.card[card].messageCount++;
+    va_end (ap);
+    pthread_mutex_unlock(&runInfoMutex);
+}
+
+void LogErrorForCard (uint32_t card,const char *format,...)
+{
+    //we misuse the runInfoMutex to sync threads, on purpose
+    pthread_mutex_lock(&runInfoMutex);
+    va_list ap;
+    va_start (ap, format);
+    int32_t len = strlen(format);
+    if(len > kSBC_MaxStrSize-1) {
+        len = kSBC_MaxStrSize-1;
+    }
+    char finalStr[kSBC_MaxStrSize];
+    strncpy(finalStr,format,len);
+    finalStr[len] = '\0';
+    vsprintf (run_info.errorStrings[run_info.err_buf_index], finalStr, ap);
+    run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
+    run_info.err_count++;
+    error_info.card[card].errorCount++;
+
+    va_end (ap);
+    pthread_mutex_unlock(&runInfoMutex);
+}
+
+void LogBusErrorForCard (uint32_t card,const char *format,...)
+{
+    //we misuse the runInfoMutex to sync threads, on purpose
+    pthread_mutex_lock(&runInfoMutex);
+    va_list ap;
+    va_start (ap, format);
+    int32_t len = strlen(format);
+    if(len > kSBC_MaxStrSize-1) {
+        len = kSBC_MaxStrSize-1;
+    }
+    char finalStr[kSBC_MaxStrSize];
+    strncpy(finalStr,format,len);
+    finalStr[len] = '\0';
+    vsprintf (run_info.errorStrings[run_info.err_buf_index], finalStr, ap);
+    run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
+    run_info.err_count++;
+    run_info.busErrorCount++;
+    
+    error_info.card[card].busErrorCount++;
+
     va_end (ap);
     pthread_mutex_unlock(&runInfoMutex);
 }

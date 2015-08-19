@@ -60,4 +60,8 @@ void postLAM(SBC_Packet* lamPacket);
 void LogMessage (const char *format,...);
 void LogError (const char *format,...);
 void LogBusError (const char *format,...);
+void LogMessageForCard (uint32_t card,const char *format,...);
+void LogErrorForCard (uint32_t card,const char *format,...);
+void LogBusErrorForCard (uint32_t card,const char *format,...);
+
 #endif
