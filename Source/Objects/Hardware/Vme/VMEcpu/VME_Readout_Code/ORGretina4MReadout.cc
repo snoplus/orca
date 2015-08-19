@@ -25,7 +25,6 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     int32_t  result;
     uint32_t fifoState = 0;
-    LogBusErrorForCard(slot,"test");
     result = VMERead(fifoStateAddress,
                      GetAddressModifier(),
                      (uint32_t) 0x4,
