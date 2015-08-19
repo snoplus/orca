@@ -1183,7 +1183,10 @@ nil];
 
 - (void) runOptionsOrTimeChanged:(NSNotification*)aNote
 {
-	[self updateRunState:[aNote object]];
+    if(!scheduledForRunInfoUpdate){
+        scheduledForRunInfoUpdate = YES;
+        [self performSelector:@selector(updateRunState:) withObject:[aNote object] afterDelay:5];
+    }
 }
 
 - (void) addObjectValueRecord:(NSNotification*)aNote
@@ -1358,7 +1361,8 @@ nil];
 {
 	if(!stealthMode){
 		@try {
-			
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateRunState:) object:rc];
+            scheduledForRunInfoUpdate = NO;
 			id nextObject = [self nextObject];
 			NSString* experimentName;
 			if(!nextObject)	experimentName = @"TestStand";

@@ -48,6 +48,7 @@
     NSString*       alertMessage;
     int             alertType;
     NSString*       thisHostAdress;
+    BOOL            scheduledForRunInfoUpdate;
 }
 
 #pragma mark ***Initialization
