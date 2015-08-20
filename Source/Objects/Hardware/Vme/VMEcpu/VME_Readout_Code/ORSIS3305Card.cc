@@ -6,14 +6,14 @@
 ORSIS3305Card::ORSIS3305Card(SBC_card_info* ci) :
 ORVVmeCard(ci)
 {
-//    LogMessage("Entering constructor.../n");
+    LogMessage("Entering constructor.../n");
 }
 
 
 bool ORSIS3305Card::Start()
 {
     
-//    LogMessage("Entering start.../n");
+    LogMessage("Entering start.../n");
 
     int group;
     for(group=0;group<2;group++){
@@ -92,7 +92,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
     if(ORSIS3305Card::IsEvent() == false)
         return false;
     
-//    LogMessage("Flag indicates data ready (SBC readout)");
+    LogMessage("Flag indicates data ready (SBC readout)");
     // ****************************************
     // ****    ****    ****    ****    ****
     // **** Polling stopped, moving to readout
@@ -144,10 +144,10 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
         
         if (numberBytesToRead > 0){
 //            uint32_t addrOffset = 0;    // should cumulatively indicate the amount of data read out during a read (this loop)
-            uint32_t readCount = 0;
+//            uint32_t readCount = 0;
 
-            uint32_t numEventsInBuffer = numberOfWords[group]/(dataRecordLength[group]);
-            uint32_t bytesOfData = sizeof(uint32_t)*(numEventsInBuffer*dataRecordLength[group]);
+            uint32_t numEventsInBuffer = numberOfWords[group]/(totalRecordLength[group]);
+            uint32_t bytesOfData = sizeof(uint32_t)*(numEventsInBuffer*totalRecordLength[group]);
             numberBytesToReturn = (orcaHeaderLength*4 + bytesOfData);
 
             bool wrapMode = 0;//(wrapMaskForRun & (1L<<group))!=0; // FIX: Implement wrap mode
@@ -159,7 +159,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
             
             // manually adding in the Orca header dataRecord[0,1,2] as the first 3 words
             //                    data[dataIndex++] =  GetHardwareMask()[0] | (numLongsToRead+orcaHeaderLength);
-            data[dataIndex++] = GetHardwareMask()[0] | (orcaHeaderLength + (numberBytesToReturn/4));   // this packet can contain many waveforms.
+            data[dataIndex++] = GetHardwareMask()[0] | (numberBytesToReturn/4);   // this packet can contain many waveforms.
             
             data[dataIndex++] =
             ((GetCrate()                                    & 0xf) << 28)   |
@@ -196,6 +196,8 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                                         (uint8_t*)dmaBuffer,
                                         numLongsToReadNow
                                         );
+                
+                LogMessage("read out 0x%x longs just now (group %d)",numLongsToReadNow, group);
                 
                 if (error != (int32_t) numLongsToReadNow)
                 {
