@@ -1293,11 +1293,17 @@
     [clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
     
     //event config items
-    [eventSavingMode14PU			setEnabled:!lockedOrRunningMaintenance];
-    [eventSavingMode58PU			setEnabled:!lockedOrRunningMaintenance];
+    [eventSavingMode14PU			setEnabled:NO];
+    [eventSavingMode58PU			setEnabled:NO];
+//    [eventSavingMode14PU			setEnabled:!lockedOrRunningMaintenance];
+//    [eventSavingMode58PU			setEnabled:!lockedOrRunningMaintenance];
+    [channelMode14PU setEnabled:NO];
+    [channelMode58PU setEnabled:NO];
     [thresholdMode14PUMatrix        setEnabled:!lockedOrRunningMaintenance];
     [thresholdMode58PUMatrix        setEnabled:!lockedOrRunningMaintenance];
 
+
+    
     // begin key regs
     [generalResetButton             setEnabled:!locked && !runInProgress];
     [armSampleLogicButton           setEnabled:!locked && !runInProgress];

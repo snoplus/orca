@@ -1677,11 +1677,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setClearTimestampWhenSamplingEnabledEnabled:i toValue:YES];
         [self setGrayCodeEnabled:i toValue:NO];
         [self setDirectMemoryHeaderDisabled:i toValue:NO];
-        [self setEventSavingModeOf:i toValue:0];
         [self setADCGateModeEnabled:i toValue:NO];
         [self setWaitPreTrigTimeBeforeDirectMemTrig:i toValue:YES];
         
+        [self setEventSavingModeOf:i toValue:4];
         [self setChannelMode:i withValue:0];
+        
         [self setBandwidth:i withValue:1];
         [self setTestMode:i withValue:0];
     }
@@ -5831,19 +5832,19 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 //                    unsigned long maxReadBuffer = 1024*1024*1; // limit it to 1 MB (actually can take 2)
                     
-                    unsigned long dataRecord[bufferAddLongs+4];
+                    unsigned long dataRecord[bufferAddLongs+8];
                     
                     // here we start filling the data record:
                     
                     dataRecord[0] = dataId | bufferAddLongs;
                     
-                    dataRecord[1] =	(([self crateNumber]            & 0xf) << 28)   |
-                                    (([self slot]                   & 0x1f)<< 20)   |
-                                    (([self channelMode:groupToRead]      & 0xF) << 16)   |
-                                    ((gr                            & 0x1) << 12)   |
+                    dataRecord[1] =	(([self crateNumber]                & 0xF) << 28)   |
+                                    (([self slot]                       & 0x1F)<< 20)   |
+                                    (([self channelMode:groupToRead]    & 0xF) << 16)   |
+                                    ((gr                                & 0x1) << 12)   |
                                     (([self digitizationRate:groupToRead] & 0xF) << 8)    |
                                     (([self eventSavingMode:groupToRead]  & 0xF) << 4)    |
-                                    (wrapMode                       & 0x1);
+                                    (wrapMode                           & 0x1);
                     
                     dataRecord[2] = dataRecordLength;               // length of single record 1 x (SIS header + SIS data)
                     
@@ -5857,10 +5858,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     while (bytesLeftToRead > 0)
                     {
                         if (bytesLeftToRead > maxBytesForSBC) {
+                            NSLog(@"Separating 0x%x bytes into more than 1 read\n",bytesLeftToRead);
                             bytesToReadNow = maxBytesForSBC;
                         }
                         else
-                            bytesToReadNow = bytesLeftToRead;
+                            bytesToReadNow = bytesLeftToRead + (bytesLeftToRead%4);
+                        
                         
                         [[self adapter] readLongBlock: &dataRecord[currentIndex]
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:gr]
@@ -5872,8 +5875,9 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         bytesLeftToRead -= bytesToReadNow;
                         if(++eventCount > 25)break;
                     }
-                        
+                    
                     [aDataPacket addLongsToFrameBuffer:dataRecord length:bufferAddLongs];
+                    dataRecord[0] = 0xA;
                 }
             } // loop over groups
             
