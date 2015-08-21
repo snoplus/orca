@@ -650,6 +650,47 @@ snotDb = _snotDb;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelPollStatusChanged object:self];        
 }
 
+- (BOOL) hvEverUpdated
+{
+    return hvEverUpdated;
+    
+}
+
+- (void) setHvEverUpdated:(BOOL)ever
+{
+    hvEverUpdated = ever;
+}
+
+- (BOOL) hvSwitchEverUpdated
+{
+    return hvSwitchEverUpdated;
+}
+
+- (void) setHvSwitchEverUpdated:(BOOL)ever
+{
+    hvSwitchEverUpdated = ever;
+}
+
+- (BOOL) hvARamping
+{
+    return hvARamping;
+}
+
+- (void) setHvARamping:(BOOL)ramping
+{
+    hvARamping = ramping;
+}
+
+- (BOOL) hvBRamping
+{
+    return hvBRamping;
+}
+
+- (void) setHvBRamping:(BOOL)ramping
+{
+    hvBRamping = ramping;
+}
+
 - (BOOL) hvASwitch
 {
     return hvASwitch;
@@ -1366,9 +1407,7 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
     }
     
-    //hack to start the HV monitoring automiatically on init
-    [self setHVSwitch:YES forPowerSupply:0];
-    [self setHVSwitch:YES forPowerSupply:1];
+    [self setHvEverUpdated:NO];
     
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -3249,6 +3288,7 @@ void SwapLongBlock(void* p, int32_t n)
         SwapLongBlock(payload.payload, sizeof(hv_readback_results_t)/4);
     }
     memcpy(status, payload.payload, sizeof(hv_readback_results_t));
+    [self setHvEverUpdated:YES];
 }
 
 //used from polling loop and/or ORCA script
@@ -3299,6 +3339,8 @@ void SwapLongBlock(void* p, int32_t n)
             [pdata release];
             pdata = nil;
         }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
     }
 }
 
@@ -3428,6 +3470,8 @@ void SwapLongBlock(void* p, int32_t n)
     
     *aIsOn = aValue & 0x1;
     *bIsOn = (aValue >> 16) & 0x1;
+    
+    [self setHvSwitchEverUpdated:YES];
 }
 
 - (void) readHVSwitchOn
@@ -4333,6 +4377,7 @@ void SwapLongBlock(void* p, int32_t n)
     //unsigned long cmosLimit;
     
     while (!isTimeToQuit) {
+        bool aUp = false, bUp = false;
         if ([self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvANextStepValue];
             
@@ -4345,12 +4390,10 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvPanicFlag] && [self hvANextStepValue] < [self hvAVoltageDACSetValue] - 100 / 3000. * 4096) {
                 aValueToSet = [self hvAVoltageDACSetValue] - 100 / 3000. * 4096;
             }
-            if (aValueToSet > [self hvAVoltageTargetValue]) {
+            if (aValueToSet > [self hvAVoltageTargetValue]) { //never go above target (?)
                 aValueToSet = [self hvAVoltageTargetValue];
             }
-            if (aValueToSet > [self hvAVoltageDACSetValue] + 10 / 3000. * 4096) {
-                NSLog(@"%@ HV voltage calculation screwed. stopping\n", [[self xl3Link] crateName]);
-            }
+            aUp = aValueToSet > [self hvAVoltageDACSetValue];
             @try {
                 [self setHVDacA:aValueToSet dacB:[self hvBVoltageDACSetValue]];
                 //assume it worked
@@ -4375,12 +4418,10 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvPanicFlag] && [self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 100 / 3000. * 4096) {
                 aValueToSet = [self hvBVoltageDACSetValue] - 100 / 3000. * 4096;
             }
-            if (aValueToSet > [self hvBVoltageTargetValue]) {
+            if (aValueToSet > [self hvBVoltageTargetValue]) { // never go above target (?)
                 aValueToSet = [self hvBVoltageTargetValue];
             }
-            if (aValueToSet > [self hvBVoltageDACSetValue] + 10 / 3000. * 4096) {
-                NSLog(@"%@ HV B voltage calculation screwed. stopping\n", [[self xl3Link] crateName]);
-            }
+            bUp = aValueToSet > [self hvBVoltageDACSetValue];
             @try {
                 [self setHVDacA:[self hvAVoltageDACSetValue] dacB:aValueToSet];
                 //assume it worked
@@ -4391,8 +4432,7 @@ void SwapLongBlock(void* p, int32_t n)
             }
         }
 
-        if (([self hvANextStepValue] != [self hvAVoltageDACSetValue]) ||
-            ([self hvBNextStepValue] != [self hvBVoltageDACSetValue])) {
+        if (([self hvANextStepValue] != [self hvAVoltageDACSetValue]) || ([self hvBNextStepValue] != [self hvBVoltageDACSetValue])) {
 
             usleep(500000);
             //try to read back HV even in panic mode, do not care what it is
@@ -4406,17 +4446,13 @@ void SwapLongBlock(void* p, int32_t n)
         
         //monitoring loop updates
         if (![self hvPanicFlag]) {
-            if ([self hvASwitch] && fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
-                NSLog(@"%@ HVA read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
-                usleep(100000);
+            if ([self hvASwitch] && aUp && fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
+                NSLog(@"%@ HVA read value differs from the set one. stopping!\nPress Ramp UP to continue.", [[self xl3Link] crateName]);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
-                if (![self hvBSwitch]) isTimeToQuit = YES;
             }
-            if ([self hvBSwitch] && fabs([self hvBVoltageReadValue] / 3000. * 4096 - [self hvBVoltageDACSetValue]) > 100) {
-                NSLog(@"%@ HVB read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
-                usleep(100000);
+            if ([self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] / 3000. * 4096 - [self hvBVoltageDACSetValue]) > 100) {
+                NSLog(@"%@ HVB read value differs from the set one. stopping!\nPress Ramp UP to continue.", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
-                if (![self hvASwitch]) isTimeToQuit = YES;
             }
             
             /*
@@ -4433,6 +4469,9 @@ void SwapLongBlock(void* p, int32_t n)
             }
              */
         }
+        
+        [self setHvARamping:([self hvANextStepValue] != [self hvAVoltageDACSetValue])];
+        [self setHvBRamping:([self hvBNextStepValue] != [self hvBVoltageDACSetValue])];
                 
         //if panic mode switch off power supply when done
         if ([self hvPanicFlag] && [self hvASwitch] && [self hvAVoltageDACSetValue] == 0){

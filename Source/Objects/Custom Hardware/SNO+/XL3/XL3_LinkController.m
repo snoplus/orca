@@ -597,6 +597,28 @@ static NSDictionary* xl3Ops;
 
 #pragma mark •hv
 
+- (void) updateHVButtons
+{
+    if ([hvPowerSupplyMatrix selectedColumn] == 0) { //A
+        [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvASwitch]];
+        [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch]];
+        [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvStepDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvRampUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvRampDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && ![model hvARamping]];
+        [hvStopRampButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvASwitch] && [model hvARamping]];
+    } else {
+        [hvOnButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && ![model hvBSwitch]];
+        [hvOffButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch]];
+        [hvStepUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvStepDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvRampUpButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvRampDownButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && ![model hvBRamping]];
+        [hvStopRampButton setEnabled:[model hvEverUpdated] && [model hvSwitchEverUpdated] && [model hvBSwitch] && [model hvBRamping]];
+     }
+    
+}
+
 - (void) hvRelayMaskChanged:(NSNotification*)aNote
 {
     unsigned long long relayMask = [model relayMask];
@@ -629,7 +651,7 @@ static NSDictionary* xl3Ops;
         }
     }
     
-    [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
+    [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];\
     [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
     [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
     [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
@@ -656,6 +678,7 @@ static NSDictionary* xl3Ops;
         [hvRelayOpenButton setEnabled:YES];
         [hvRelayCloseButton setEnabled:YES];        
     }
+    [self updateHVButtons];
 }
 
 - (void) hvTriggerStatusChanged:(NSNotification*)aNote
