@@ -147,7 +147,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
 //            uint32_t readCount = 0;
 
             uint32_t numEventsInBuffer = numberOfWords[group]/(totalRecordLength[group]);
-            uint32_t bytesOfData = sizeof(uint32_t)*(numEventsInBuffer*totalRecordLength[group]);
+            uint32_t bytesOfData = 4*(numberOfWords[group]);                                // 4 is sizeof long in bytes
             numberBytesToReturn = (orcaHeaderLength*4 + bytesOfData);
 
             bool wrapMode = 0;//(wrapMaskForRun & (1L<<group))!=0; // FIX: Implement wrap mode
@@ -159,7 +159,9 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
             
             // manually adding in the Orca header dataRecord[0,1,2] as the first 3 words
             //                    data[dataIndex++] =  GetHardwareMask()[0] | (numLongsToRead+orcaHeaderLength);
-            data[dataIndex++] = GetHardwareMask()[0] | (numberBytesToReturn/4);   // this packet can contain many waveforms.
+            
+            data[dataIndex++] = GetHardwareMask()[0] | ((numberBytesToReturn+3)/4);   // this packet can contain many waveforms.
+            // the +3 just forces the /4 to round up
             
             data[dataIndex++] =
             ((GetCrate()                                    & 0xf) << 28)   |
@@ -176,46 +178,55 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
             // ****************************************
             // Next to add in the data behind it
             // ****************************************
-            // We will continue reading the SBC-packet-sized chunks out of the FIFO until we've gotten
-            // it all (or alternately, we've hit 25 events - this stops this card from hogging all the
-            // read time).
+            // We will continue reading the SBC-packet-sized chunks out of the FIFO until we've gotten it all
+            // (or alternately, we've hit 25 events - this stops this card from hogging all the read time).
             
             uint32_t numLongsToReadNow;
-            uint32_t bytesLeftToRead = numberBytesToReturn; //numberBytesToRead;
+            uint32_t numBytesToReadNow;
+            uint32_t bytesLeftToRead = bytesOfData; //numberBytesToRead;
             do
             {
                 if(bytesLeftToRead < maxSBCBufferSize)
-                    numLongsToReadNow = numberBytesToReturn/4;
+                {
+                    numLongsToReadNow = (numberBytesToReturn+3)/4; // adding +3 forces it to round up.
+                    numBytesToReadNow = bytesLeftToRead;
+                }
                 else
+                {
                     numLongsToReadNow = maxSBCBufferSize/4;
-                    
+                    numBytesToReadNow = maxSBCBufferSize;
+                    LogMessage("   Temporarily truncating bytesLeft from 0x%x to 0x%x",bytesLeftToRead,numBytesToReadNow);
+                }
+                
                 int32_t error = DMARead(
                                         (ORSIS3305Card::GetFIFOAddressOfGroup(group) + GetBaseAddress() ),       // FIFO read address
                                         (uint32_t)0x08, // Address Modifier, request MBLT
                                         (uint32_t)8,	// Read 64-bits at a time (redundant request)
                                         (uint8_t*)dmaBuffer,
-                                        numLongsToReadNow
+                                        numBytesToReadNow
                                         );
                 
-                LogMessage("read out 0x%x longs just now (group %d)",numLongsToReadNow, group);
+                LogMessage("   read out 0x%x bytes just now (group %d)",numBytesToReadNow, group);
                 
-                if (error != (int32_t) numLongsToReadNow)
+                if (error != (int32_t) numBytesToReadNow)
                 {
-                    if(error > 0) LogErrorForCard(GetSlot(),"DMA:SIS3305 0x%04x %d!=%d", GetBaseAddress(),error,dataRecordLength[group]);
+                    if(error > 0) LogErrorForCard(GetSlot(),"DMA:SIS3305 0x%04x %d!=%d", GetBaseAddress(),error,numBytesToReadNow);
                         ORSIS3305Card::armSampleLogic();
                         ORSIS3305Card::enableSampleLogic();
                         return false;
                 }
                 
+                LogMessage("   About to add in the data now...");
                 // Put the data into the data stream
-                ensureDataCanHold(numLongsToReadNow);
-                
+                ensureDataCanHold((numBytesToReadNow+3)/4);
+                LogMessage("   Data set to hold 0x%x longs",(numBytesToReadNow+3)/4);
+
                 // I memcpy numLongsToReadNow because the orca header is added to the datastream already
-                memcpy(data + dataIndex, &dmaBuffer, numLongsToReadNow*sizeof(uint32_t));
+                memcpy(data + dataIndex, &dmaBuffer, numBytesToReadNow);
+                LogMessage("  Added 0x%x bytes of 0x%x. Each record = 0x%x longs",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
+                dataIndex += 4*numBytesToReadNow;
                 
-                dataIndex += numLongsToReadNow;
-                
-                bytesLeftToRead -= numLongsToReadNow*4;
+                bytesLeftToRead -= numBytesToReadNow;
 //                if(++readCount > 100)break;
             } while (bytesLeftToRead > 0);
         }   // end of: if (numberBytesToRead > 0)

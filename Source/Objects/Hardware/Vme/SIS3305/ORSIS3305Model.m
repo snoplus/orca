@@ -5864,12 +5864,19 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                         else
                             bytesToReadNow = bytesLeftToRead + (bytesLeftToRead%4);
                         
-                        
+//                        
                         [[self adapter] readLongBlock: &dataRecord[currentIndex]
                                             atAddress: [self baseAddress] + [self getFIFOAddressOfGroup:gr]
                                             numToRead: bytesToReadNow/4
                                            withAddMod: [self addressModifier]
                                         usingAddSpace: 0x01];
+                        
+                        // could read one at a time instead of as a block.... no real difference
+//                        [theController readLong:&dataRecord[currentIndex]
+//                                      atAddress:[self baseAddress] + [self getFIFOAddressOfGroup:gr]
+//                                    timesToRead:bytesToReadNow/4
+//                                     withAddMod:[self addressModifier]
+//                                  usingAddSpace:0x01];
                         
                         currentIndex += bytesToReadNow/4;
                         bytesLeftToRead -= bytesToReadNow;
