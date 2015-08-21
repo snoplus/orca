@@ -48,10 +48,10 @@
 
 - (void) awakeFromNib
 {
-    basicSize       = NSMakeSize(1010  ,660);
-    settingSize     = NSMakeSize(700   ,600);
-    rateSize		= NSMakeSize(790   ,300);
-    miscSize        = NSMakeSize(680   ,480);
+    basicSize       = NSMakeSize(840  ,660);
+    settingSize     = NSMakeSize(700  ,600);
+    rateSize		= NSMakeSize(790  ,300);
+    miscSize        = NSMakeSize(680  ,480);
     
     
     blankView = [[NSView alloc] init];
@@ -1286,19 +1286,22 @@
     [forceTriggerButton			setEnabled:!lockedOrRunningMaintenance];
 	
 	[triggerGateLengthMatrix		setEnabled:!lockedOrRunningMaintenance];
-//    [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
-//    [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
+    [preTriggerDelay14Matrix			setEnabled:!lockedOrRunningMaintenance];
+    [preTriggerDelay58Matrix			setEnabled:!lockedOrRunningMaintenance];
 
 
     [clockSourcePU					setEnabled:!lockedOrRunningMaintenance];
     
     //event config items
-    [eventSavingMode14PU			setEnabled:NO];
-    [eventSavingMode58PU			setEnabled:NO];
-//    [eventSavingMode14PU			setEnabled:!lockedOrRunningMaintenance];
-//    [eventSavingMode58PU			setEnabled:!lockedOrRunningMaintenance];
-    [channelMode14PU setEnabled:NO];
-    [channelMode58PU setEnabled:NO];
+//    [eventSavingMode14PU			setEnabled:NO];
+//    [eventSavingMode58PU			setEnabled:NO];
+    [eventSavingMode14PU			setEnabled:!lockedOrRunningMaintenance];
+    [eventSavingMode58PU			setEnabled:!lockedOrRunningMaintenance];
+//    [channelMode14PU                setEnabled:NO];
+//    [channelMode58PU                setEnabled:NO];
+    [channelMode14PU                setEnabled:!lockedOrRunningMaintenance];
+    [channelMode58PU                setEnabled:!lockedOrRunningMaintenance];
+    
     [thresholdMode14PUMatrix        setEnabled:!lockedOrRunningMaintenance];
     [thresholdMode58PUMatrix        setEnabled:!lockedOrRunningMaintenance];
 
