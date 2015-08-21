@@ -97,6 +97,7 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) doBasicOp;
 - (NSString*) stringDate;
 - (void) _pollXl3;
+- (void) _hvInit;
 - (void) _hvXl3;
 - (void) sendCommandWithDict:(NSDictionary*)argDict;
 - (void) initCrateDone:(NSDictionary*)resp;
@@ -1408,7 +1409,10 @@ void SwapLongBlock(void* p, int32_t n)
     }
     
     [self setHvEverUpdated:NO];
+    [self setHvSwitchEverUpdated:NO];
     
+    [[[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil] start];
+     
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	return self;
@@ -4357,6 +4361,20 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     [pollPool release];
+}
+
+- (void) _hvInit
+{
+    NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
+    NSLog(@"Attempting to readout HV status from XL3\n");
+    while (![self hvEverUpdated] || ![self hvSwitchEverUpdated]) {
+        if ([self xl3Link] && [[self xl3Link] isConnected]) {
+            [self readHVSwitchOn];
+            [self readHVStatus];
+        }
+        sleep(1);
+    }
+    [hvPool release];
 }
 
 - (void) _hvXl3
