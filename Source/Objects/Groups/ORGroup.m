@@ -219,8 +219,6 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 - (void) awakeAfterDocumentLoaded
 {
     [orcaObjects makeObjectsPerformSelector:@selector(awakeAfterDocumentLoaded)];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORGroupObjectsAdded object:self userInfo: nil];
-
 }
 
 - (void) unHighlightAll
