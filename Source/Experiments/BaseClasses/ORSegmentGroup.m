@@ -152,7 +152,7 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 
 - (void) configurationChanged:(NSNotification*)aNote
 {
-    if([[aNote object] isKindOfClass:NSClassFromString(@"ORGroup")]){
+    if(!aNote || [[aNote object] isKindOfClass:NSClassFromString(@"ORGroup")]){
 
         NSArray* adcObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(adcClassName)];
         [segments makeObjectsPerformSelector:@selector(configurationChanged:) withObject:adcObjects];
