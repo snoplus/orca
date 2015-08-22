@@ -4415,7 +4415,7 @@ void SwapLongBlock(void* p, int32_t n)
     //unsigned long cmosLimit;
     
     while (!isTimeToQuit) {
-        bool aUp = false, bUp = false;
+        bool aUp = false, bUp = false, changing = false;
         if ([self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvANextStepValue];
             
@@ -4432,6 +4432,7 @@ void SwapLongBlock(void* p, int32_t n)
                 aValueToSet = [self hvAVoltageTargetValue];
             }
             aUp = aValueToSet > [self hvAVoltageDACSetValue];
+            if ([self hvAVoltageDACSetValue] != aValueToSet) changing = true;
             @try {
                 [self setHVDacA:aValueToSet dacB:[self hvBVoltageDACSetValue]];
                 //assume it worked
@@ -4460,6 +4461,7 @@ void SwapLongBlock(void* p, int32_t n)
                 aValueToSet = [self hvBVoltageTargetValue];
             }
             bUp = aValueToSet > [self hvBVoltageDACSetValue];
+            if ([self hvAVoltageDACSetValue] != aValueToSet) changing = true;
             @try {
                 [self setHVDacA:[self hvAVoltageDACSetValue] dacB:aValueToSet];
                 //assume it worked
@@ -4469,15 +4471,10 @@ void SwapLongBlock(void* p, int32_t n)
                 NSLog(@"%@ HV B failed to set HV!\n", [[self xl3Link] crateName]);
             }
         }
-
-        if (([self hvANextStepValue] != [self hvAVoltageDACSetValue]) || ([self hvBNextStepValue] != [self hvBVoltageDACSetValue])) {
-            usleep(500000);
-            //try to read back HV even in panic mode, do not care what it is
-            //if (![self hvPanicFlag]) [self readHVStatus];
-            [self readHVStatus];
-        } else {
-            usleep(500000);
-        }
+        
+        //wait for supplies to update before doing anything
+        usleep(500000);
+        if (changing) [self readHVStatus];
 
         //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
         //    usleep(100000);

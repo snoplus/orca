@@ -651,14 +651,23 @@ static NSDictionary* xl3Ops;
         }
     }
     
-    [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];\
-    [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
+    [hvAOnStatusField setStringValue:[model hvASwitch]?@"ON":@"OFF"];
     [hvAVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvAVoltageDACSetValue]*3000/4096]];
-    [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
     [hvAVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvAVoltageReadValue]]];
-    [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
     [hvACurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvACurrentReadValue]]];
-    [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
+    
+    // Only crate 16 has an HV B (apparently)
+    if ([model crateNumber] == 16) {
+        [hvBOnStatusField setStringValue:[model hvBSwitch]?@"ON":@"OFF"];
+        [hvBVoltageSetField setStringValue:[NSString stringWithFormat:@"%lu V",[model hvBVoltageDACSetValue]*3000/4096]];
+        [hvBVoltageReadField setStringValue:[NSString stringWithFormat:@"%d V",(unsigned int)[model hvBVoltageReadValue]]];
+        [hvBCurrentReadField setStringValue:[NSString stringWithFormat:@"%3.1f mA",[model hvBCurrentReadValue]]];
+    } else {
+        [hvBOnStatusField setStringValue:@"N/A"];
+        [hvBVoltageSetField setStringValue:@""];
+        [hvBVoltageReadField setStringValue:@""];
+        [hvBCurrentReadField setStringValue:@""];
+    }
 
     //todo: add exception for OWLs
     //if ([hvPowerSupplyMatrix selectedColumn] == 0 && [model hvASwitch]) {
