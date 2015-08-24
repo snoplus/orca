@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">13F1096</string>
-		<string key="IBDocument.InterfaceBuilderVersion">6254</string>
-		<string key="IBDocument.AppKitVersion">1265.21</string>
-		<string key="IBDocument.HIToolboxVersion">698.00</string>
+		<string key="IBDocument.SystemVersion">14F27</string>
+		<string key="IBDocument.InterfaceBuilderVersion">7706</string>
+		<string key="IBDocument.AppKitVersion">1348.17</string>
+		<string key="IBDocument.HIToolboxVersion">758.70</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">6254</string>
+			<string key="NS.object.0">7706</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -68,10 +68,12 @@
 						<object class="NSTabView" id="818506012">
 							<reference key="NSNextResponder" ref="566441890"/>
 							<int key="NSvFlags">274</int>
+							<set class="NSMutableSet" key="NSDragTypes">
+								<string>public.item</string>
+							</set>
 							<string key="NSFrame">{{-7, -40}, {1267, 681}}</string>
 							<reference key="NSSuperview" ref="566441890"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="189780115"/>
 							<array class="NSMutableArray" key="NSTabViewItems">
 								<object class="NSTabViewItem" id="201506703">
 									<object class="NSView" key="NSView" id="189780115">
@@ -1612,7 +1614,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSMatrix" id="604307360">
 																<reference key="NSNextResponder" ref="203595572"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{8, 37}, {13, 76}}</string>
+																<string key="NSFrame">{{8, 39}, {13, 76}}</string>
 																<reference key="NSSuperview" ref="203595572"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="681875608"/>
@@ -1624,7 +1626,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="34435308">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">5</string>
+																		<string key="NSContents">4</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="604307360"/>
 																		<reference key="NSBackgroundColor" ref="252786761"/>
@@ -1633,7 +1635,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="852193861">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">6</string>
+																		<string key="NSContents">5</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="604307360"/>
 																		<int key="NSTag">1</int>
@@ -1643,7 +1645,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="792817786">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">7</string>
+																		<string key="NSContents">6</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="604307360"/>
 																		<int key="NSTag">2</int>
@@ -1653,7 +1655,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="973966646">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">8</string>
+																		<string key="NSContents">7</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="604307360"/>
 																		<int key="NSTag">3</int>
@@ -4050,7 +4052,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 															<object class="NSMatrix" id="880805726">
 																<reference key="NSNextResponder" ref="432615114"/>
 																<int key="NSvFlags">256</int>
-																<string key="NSFrame">{{8, 11}, {13, 76}}</string>
+																<string key="NSFrame">{{8, 13}, {13, 76}}</string>
 																<reference key="NSSuperview" ref="432615114"/>
 																<reference key="NSWindow"/>
 																<reference key="NSNextKeyView" ref="768094873"/>
@@ -4062,7 +4064,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="753819448">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">1</string>
+																		<string key="NSContents">0</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="880805726"/>
 																		<reference key="NSBackgroundColor" ref="252786761"/>
@@ -4071,7 +4073,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="918762098">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">2</string>
+																		<string key="NSContents">1</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="880805726"/>
 																		<int key="NSTag">1</int>
@@ -4081,7 +4083,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="359607774">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">3</string>
+																		<string key="NSContents">2</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="880805726"/>
 																		<int key="NSTag">2</int>
@@ -4091,7 +4093,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<object class="NSTextFieldCell" id="346886682">
 																		<int key="NSCellFlags">67108864</int>
 																		<int key="NSCellFlags2">71303168</int>
-																		<string key="NSContents">4</string>
+																		<string key="NSContents">3</string>
 																		<reference key="NSSupport" ref="298115673"/>
 																		<reference key="NSControlView" ref="880805726"/>
 																		<int key="NSTag">3</int>
@@ -11067,7 +11069,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="818506012"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -24079,8 +24081,8 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
 			<string key="Locked">{33, 36}</string>
-			<string key="NSMenuCheckmark">{11, 11}</string>
-			<string key="NSMenuMixedState">{10, 3}</string>
+			<string key="NSMenuCheckmark">{12, 12}</string>
+			<string key="NSMenuMixedState">{10, 2}</string>
 			<string key="NSSwitch">{15, 15}</string>
 			<string key="SIS3300Card">{16, 128}</string>
 			<string key="Unlocked">{33, 36}</string>

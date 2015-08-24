@@ -179,7 +179,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
                 
                 unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
-                channel = eventID + (group*4) + 1;
+                channel = eventID + (group*4);
                 channelKey    = [self getChannelKey: channel];
                 
                 
@@ -207,7 +207,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
             else if(savingMode == 0){  // 1 x 5 Gsps Event fifo mode
                 //            unsigned long numBlocks = (ptr[6]&0xFFFF);
-                channel = group*4 +1;  //  FIX: use the real channel number - this is unique, but not right
+                channel = group*4;  //  FIX: use the real channel number - this is unique, but not right
                 channelKey    = [self getChannelKey: channel];
                 
                 waveformLengthSIS = 16*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
@@ -269,7 +269,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
             }
             else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
-                channel = ((dataPtr[0]>>28)&0xF)+ (group*4) + 1;
+                channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
 
                 channelKey    = [self getChannelKey: channel];
                 
