@@ -173,6 +173,11 @@ const unsigned short kchannelModeAndEventID[16][16] = {
             }
             else if((savingMode == 4) && (channelMode < 4))  // 1.25 Gsps Event fifo mode with all four channels potentially enabled
             {
+                if (dataPtr[0] == 0xFFFFFFFF) {
+                    NSLog(@"Data was packed with 0xFFFF at end, returning...\n");
+                    return length;
+                }
+                
                 unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
                 channel = eventID + (group*4) + 1;
                 channelKey    = [self getChannelKey: channel];
@@ -208,8 +213,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 waveformLengthSIS = 16*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
                 dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
                 if(dataLengthSingle != dataLengthSIS){
-                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree! This is serious!\n");
-                    break;
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree (0x%x vs 0x%x) in group %d. This is serious!\n",dataLengthSingle,dataLengthSIS, group);                    break;
                 }
                 recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
                 [recordAsData setLength:waveformLengthSIS*3*2];    // length is in bytes (hence 2), 3 samples per Lword
@@ -272,8 +276,13 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 waveformLengthSIS = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
                 dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
                 if(dataLengthSingle != dataLengthSIS){
-                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree! This is serious!\n");
-                    break;
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree (0x%x vs 0x%x) in group %d. This is serious!\n",dataLengthSingle,dataLengthSIS, group);                    break;
+                }
+                
+                if(waveformLengthSIS > 0x300)
+                {
+                    NSLogColor([NSColor redColor], @"SIS3305: waveform length 0x%x is too long. \n",waveformLengthSIS*12 );
+                    return length;
                 }
                 recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
 

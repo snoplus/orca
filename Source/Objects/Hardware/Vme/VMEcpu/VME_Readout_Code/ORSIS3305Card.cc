@@ -128,7 +128,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
         uint32_t numberBytesToReturn; // readout is packed in blocks of 128 bits (4 longs)
         
         uint32_t adcBufferLength = 0x10000000; // 256 MLWorte ; 1G Mbyte MByte (from sis3305_global.h:440)
-        uint32_t maxSBCBufferSize = 1024*1024*2 - 512; // SBC read buffer can only have a 2 MB packet. I save a bit of headspace (512 bytes) for safety.
+        uint32_t maxSBCBufferSize = (1024*1024*2) - 512; // SBC read buffer can only have a 2 MB packet. I save a bit of headspace (512 bytes) for safety.
         
         // since we can only read out 2 MB at once, but the ADC buffer can
         // hold 256 Megalong words = 1 GB, we may need to loop over the FIFO
@@ -148,7 +148,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
             uint32_t savedIndex = dataIndex;
 
             uint32_t numEventsInBuffer = numberOfWords[group]/(totalRecordLength[group]);
-            uint32_t bytesOfData = 4*(numberOfWords[group]);                                // 4 is sizeof long in bytes
+            uint32_t bytesOfData = 4*(numberOfWords[group]);                                // 4 is sizeof( long ) in bytes
             numberBytesToReturn = (orcaHeaderLength*4 + bytesOfData);
 
             bool wrapMode = 0;//(wrapMaskForRun & (1L<<group))!=0; // FIX: Implement wrap mode
@@ -201,17 +201,17 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                 
                 // Put the data into the data stream
                 ensureDataCanHold((numBytesToReadNow+3)/4);
-//                LogMessage("   Data set to hold 0x%x bytes",(numBytesToReadNow));
+                LogMessage("   About to DMA read 0x%x bytes",(numBytesToReadNow));
                 
                 // reading directly into the data buffer.
                 int32_t error = DMARead(
                                         (ORSIS3305Card::GetFIFOAddressOfGroup(group) + GetBaseAddress() ),       // FIFO read address
                                         (uint32_t)0x08, // Address Modifier, request MBLT
                                         (uint32_t)8,	// Read 64-bits at a time (redundant request)
-                                        (uint8_t*)(uint8_t*)(&data[dataIndex]),//dmaBuffer,
+                                        (uint8_t*)(&data[dataIndex]),//(uint8_t*)dmaBuffer,
                                         numBytesToReadNow
                                         );
-                
+                LogMessage("  Added 0x%x bytes of 0x%x to datastream. Each record = 0x%x longs",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
 //                LogMessage("   read out 0x%x bytes just now (group %d)",numBytesToReadNow, group);
                 
                 if (error != (int32_t) numBytesToReadNow)
@@ -231,7 +231,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
 
                 // I memcpy numLongsToReadNow because the orca header is added to the datastream already
 //                memcpy(data + dataIndex, &dmaBuffer, numBytesToReadNow);
-//                LogMessage("  Added 0x%x bytes of 0x%x. Each record = 0x%x longs",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
+
                 dataIndex += numBytesToReadNow/4;
                 
                 bytesLeftToRead -= numBytesToReadNow;

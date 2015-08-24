@@ -5218,15 +5218,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     //		return @"MCA Spectrum";
     //	}
     //	else {
-    BOOL tracesShipped = ([self sampleLength:0] || [self sampleLength:1]);
+//    BOOL tracesShipped = ([self sampleLength:0] || [self sampleLength:1]);
     summary = @"";
-    if(tracesShipped) summary = [summary stringByAppendingString:@"Traces"];
+    summary = [summary stringByAppendingString:@"Traces"];
     summary = [summary stringByAppendingString:@"\n"];
 //    if(shipSummedWaveform) summary = [summary stringByAppendingString:@" + Summed Raw Trace"];
 //    summary = [summary stringByAppendingString:@"\n"];
-    if(tracesShipped){
-        summary = [summary stringByAppendingFormat:@"Traces 0:%ld  1:%ld \n", 3*[self longsInSample:0],3*[self longsInSample:1]];
-    }
+    
+    summary = [summary stringByAppendingFormat:@"Traces 0:%ld  1:%ld \n", 3*[self longsInSample:0],3*[self longsInSample:1]];
+    
 //    if(shipSummedWaveform) summary = [summary stringByAppendingFormat:@"Summed Raw Trace: 510 values\n"];
     return summary;
 //    	}
