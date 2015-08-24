@@ -114,7 +114,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         NSLogColor([NSColor redColor], @"SIS3305: Header gives 0x%x, calculation gives 0x%x\n",numEventsFromHeader,numEvents);
     }
 
-    unsigned long waveformLengthSet = dataLengthSingle-sisHeaderLength;
+    //unsigned long waveformLengthSet = dataLengthSingle-sisHeaderLength;
     // this is the length of (waveform + sisheader) in longs. Each long word is 3 10 bit adc samples
     // "waveformLengthSet" is the value Orca thinks should be the length based on the sample length settings that have been used.
     // It should always be right, but if something went wrong, a safer place to look is in the SIS header, at the block length of samples.
@@ -329,6 +329,27 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         nextRecordPtr = dataPtr + dataLengthSIS; // take you to the start of the next SIS header
         dataPtr = nextRecordPtr;
 //        NSLog(@"    Decoded %d/%d events so far\n",n+1,numEvents);
+        
+        //get the actual object
+        if(getRatesFromDecodeStage && !skipRateCounts){
+            NSString* aKey = [crateKey stringByAppendingString:cardKey];
+            if(!actualSIS3305Cards)actualSIS3305Cards = [[NSMutableDictionary alloc] init];
+            ORSIS3305Model* obj = [actualSIS3305Cards objectForKey:aKey];
+            if(!obj){
+                NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3305Model")];
+                NSEnumerator* e = [listOfCards objectEnumerator];
+                ORSIS3305Model* aCard;
+                while(aCard = [e nextObject]){
+                    if([aCard slot] == card){
+                        [actualSIS3305Cards setObject:aCard forKey:aKey];
+                        obj = aCard;
+                        break;
+                    }
+                }
+            }
+            getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+        }
+
     }// end of loop over numEvents
     
     return length; //must return number of longs
