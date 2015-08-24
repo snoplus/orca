@@ -196,23 +196,23 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                 {
                     numLongsToReadNow = maxSBCBufferSize/4;
                     numBytesToReadNow = maxSBCBufferSize;
-//                    LogMessage("   Temporarily truncating bytesLeft from 0x%x to 0x%x",bytesLeftToRead,numBytesToReadNow);
+                    LogMessage("   Temporarily truncating bytesLeft from 0x%x to 0x%x (max buffer is 0x%x bytes)",bytesLeftToRead,numBytesToReadNow,maxSBCBufferSize);
                 }
                 
                 // Put the data into the data stream
-                ensureDataCanHold((numBytesToReadNow+3)/4);
-                LogMessage("   About to DMA read 0x%x bytes",(numBytesToReadNow));
+                ensureDataCanHold(numBytesToReadNow);
+                LogMessage("   About to DMA read %d events,as 0x%x bytes into data[0x%x]",numEventsInBuffer,(numBytesToReadNow),dataIndex);
                 
                 // reading directly into the data buffer.
                 int32_t error = DMARead(
                                         (ORSIS3305Card::GetFIFOAddressOfGroup(group) + GetBaseAddress() ),       // FIFO read address
                                         (uint32_t)0x08, // Address Modifier, request MBLT
                                         (uint32_t)8,	// Read 64-bits at a time (redundant request)
-                                        (uint8_t*)(&data[dataIndex]),//(uint8_t*)dmaBuffer,
+                                        (uint8_t*)(&data[dataIndex]), //(uint8_t*)dmaBuffer, //
                                         numBytesToReadNow
                                         );
-                LogMessage("  Added 0x%x bytes of 0x%x to datastream. Each record = 0x%x longs",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
-//                LogMessage("   read out 0x%x bytes just now (group %d)",numBytesToReadNow, group);
+                
+                LogMessage(" - Added 0x%x bytes of 0x%x to datastream. Each record = 0x%x longs",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
                 
                 if (error != (int32_t) numBytesToReadNow)
                 {
@@ -225,13 +225,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                     
                     return false;
                 }
-                
-//                LogMessage("   About to add in the data now...");
-
-
-                // I memcpy numLongsToReadNow because the orca header is added to the datastream already
 //                memcpy(data + dataIndex, &dmaBuffer, numBytesToReadNow);
-
                 dataIndex += numBytesToReadNow/4;
                 
                 bytesLeftToRead -= numBytesToReadNow;

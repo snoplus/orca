@@ -113,6 +113,8 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         NSLogColor([NSColor redColor], @"SIS3305: Number of events incorrectly determined in at least one location!\n");
         NSLogColor([NSColor redColor], @"SIS3305: Header gives 0x%x, calculation gives 0x%x\n",numEventsFromHeader,numEvents);
     }
+    
+    NSLog(@"Record is 0x%x longs in total length, which should be %d events.\n",length,numEvents);
 
     //unsigned long waveformLengthSet = dataLengthSingle-sisHeaderLength;
     // this is the length of (waveform + sisheader) in longs. Each long word is 3 10 bit adc samples
@@ -123,7 +125,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
     unsigned long waveformLengthSIS;
     
     unsigned long* dataPtr       = ptr + orcaHeaderLength;   // hold on to this here
-
+    unsigned long* oldDataPtr = 0;
     
     unsigned short n;
     for(n=0;n<numEvents;n++)
@@ -182,11 +184,10 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 channel = eventID + (group*4);
                 channelKey    = [self getChannelKey: channel];
                 
-                
                 waveformLengthSIS   = (dataPtr[3]&0xFFFF)*4;      // data length (no headers), in longs
                 dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
                 if(dataLengthSingle != dataLengthSIS){
-                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree (0x%x vs 0x%x) in group %d. This is serious!\n",dataLengthSingle,dataLengthSIS, group);
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree (0x%x vs 0x%x) in group %d after (%d / %d) records processed. This is serious!\n",dataLengthSingle,dataLengthSIS, group,n,numEvents);
                     break;
                 }
                 recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
@@ -276,7 +277,8 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 waveformLengthSIS = 8*(dataPtr[3]&0xFFFF); // # longs SIS header claims are in waveform
                 dataLengthSIS       = sisHeaderLength + waveformLengthSIS;
                 if(dataLengthSingle != dataLengthSIS){
-                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree (0x%x vs 0x%x) in group %d. This is serious!\n",dataLengthSingle,dataLengthSIS, group);                    break;
+                    NSLogColor([NSColor redColor], @"SIS3305: Header-written data lengths disagree (0x%x vs 0x%x) in group %d. This is serious!\n",dataLengthSingle,dataLengthSIS, group);
+                    break;
                 }
                 
                 if(waveformLengthSIS > 0x300)
@@ -326,7 +328,8 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                                             sender: self
                                           withKeys: @"SIS3305", @"Waveform",crateKey,cardKey,channelKey,nil];
 
-        nextRecordPtr = dataPtr + dataLengthSIS; // take you to the start of the next SIS header
+        oldDataPtr = dataPtr;
+        nextRecordPtr = dataPtr + dataLengthSingle; // take you to the start of the next SIS header
         dataPtr = nextRecordPtr;
 //        NSLog(@"    Decoded %d/%d events so far\n",n+1,numEvents);
         
@@ -352,6 +355,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 
     }// end of loop over numEvents
     
+    NSLog(@"Processed %d events\n",n);
     return length; //must return number of longs
 }
 
