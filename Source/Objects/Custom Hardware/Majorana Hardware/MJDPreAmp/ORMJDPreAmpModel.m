@@ -683,9 +683,12 @@ struct {
 
 - (void) setPulseHighTime:(int)aPulseHighTime
 {
-	if(aPulseHighTime<1)			aPulseHighTime=1;
-	else if(aPulseHighTime>0xFFFF)	aPulseHighTime = 0xFFFF;
-	[[[self undoManager] prepareWithInvocationTarget:self] setPulseHighTime:pulseHighTime];
+	//if(aPulseHighTime<1)			aPulseHighTime=0;
+    //else if(aPulseHighTime>0xFFFF)	aPulseHighTime = 0xFFFF;
+    if(aPulseHighTime<2)			aPulseHighTime=0;
+    else if(aPulseHighTime>0x200000)	aPulseHighTime = 0xFFFFF8>>3;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setPulseHighTime:pulseHighTime];
     pulseHighTime = aPulseHighTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpPulseHighTimeChanged object:self];
 }
@@ -697,8 +700,10 @@ struct {
 
 - (void) setPulseLowTime:(int)aPulseLowTime
 {
-	if(aPulseLowTime<1)			aPulseLowTime=1;
-	else if(aPulseLowTime>0xFFFF)	aPulseLowTime = 0xFFFF;
+	//if(aPulseLowTime<1)			aPulseLowTime=0;
+    //else if(aPulseLowTime>0xFFFF)	aPulseLowTime = 0xFFFF;
+    if(aPulseLowTime<2)			aPulseLowTime=0;
+    else if(aPulseLowTime>0x200000)	aPulseLowTime = 0xFFFFF8>>3;
 	
 	[[[self undoManager] prepareWithInvocationTarget:self] setPulseLowTime:pulseLowTime];
     pulseLowTime = aPulseLowTime;
@@ -917,15 +922,26 @@ struct {
     else {
         for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
             if(adcEnabledMask & (0x1<<chan)){
+            
+                /*
+                unsigned long controlWord;
+                controlWord = (kControlReg << 13)               //sel the chan set
+                |((chan%8)<<10)                                 //set chan
+                |(mjdPreAmpTable[chan].conversionType << 5)
+                |(0x1 << 4)                                     //use internal voltage reference for conversion
+                |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
+
                 
+            
                 //-------------------------------------------------------
                 //don't like the following where we have to read four times, but seems we have no choice
-                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                //rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 //-------------------------------------------------------
                 
+                */
                 unsigned long controlWord;
                 if( (chan%8)==0 ){
                 
@@ -946,6 +962,9 @@ struct {
                     |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
                     
                     rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
+                    
+                    
+                    
                 }
                 if( ((chan%8)>0) && ((chan%8)<5) ){
                  
@@ -1009,6 +1028,8 @@ struct {
                     rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                     rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 }
+                
+                
             }
         }
         
@@ -1019,10 +1040,30 @@ struct {
             //int decodedChannel = (~rawAdcValue[chan] & 0xE000) >> 13;                      //use the whichever chan was converted, may be diff than the one selected above.
             //if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
+            
+            // firmware rev2_3 => 16 data bits shifted by one bit
+            rawAdcValue[chan] = ((rawAdcValue[chan]&0x1FFFE)>>1);
+            
+            
             long adcValue;
             if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
-                if(rawAdcValue[chan] & 0x1000)adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
-                else                          adcValue = rawAdcValue[chan] & 0x1FFF;
+                
+                if(rawAdcValue[chan] & 0x1000){ // negative bit sign
+                //if(((rawAdcValue[chan]&0x1FFFE)>>1) & 0x1000){ // negative bit sign
+                    
+                    //adcValue = rawAdcValue[chan] ^ 0x1000; // kick bit sign out
+                    //adcValue = -((adcValue ^ 0xFFF) + 0x1); // revert two's complement (flip, add one, take negative)
+                    
+                    adcValue = -(~rawAdcValue[chan] & 0x1FFF) + 1;
+                    //adcValue = -(~((rawAdcValue[chan]&0x1FFFE)>>1) & 0x1FFF) + 1;
+                }
+                else{
+
+                    //adcValue = (rawAdcValue[chan] ^ 0xFFF) + 0x1; // revert two's complement (flip, add one)
+                    
+                    adcValue = rawAdcValue[chan] & 0x1FFF;
+                    //adcValue = ((rawAdcValue[chan]&0x1FFFE)>>1) & 0x1FFF;
+                }
             }
             else {
                 adcValue = rawAdcValue[chan] & 0x1FFF;
@@ -1030,7 +1071,7 @@ struct {
             
             float convertedValue = (-adcValue+mjdPreAmpTable[chan].adcOffset)*mjdPreAmpTable[chan].slope + mjdPreAmpTable[chan].intercept;
 			
-            if(verbose)NSLog(@"[%d], raw: %d, converted:%.2f\n",chan,adcValue,convertedValue);
+            if(verbose)NSLog(@"[%d], raw: %d, converted:%.2f, raw: %#x\n",chan,adcValue,convertedValue,rawAdcValue[chan]);
             
             
             if(boardRev == 0){  //Orginal Board Rev 1
@@ -1128,9 +1169,19 @@ struct {
 
 	unsigned long aValue = 0;
 	//set the high and low times (frequency)
-	aValue = kPulserLowTimeMask | ((pulseLowTime&0xFFFF)<<8);
+	aValue = kPulserLowTimeMask | ((pulseLowTime<<3)&0xFFFFF8);
+    //aValue = kPulserLowTimeMask | ((0x7FFFF8&0xFFFFF8));
+
+
+    
+    NSLog(@" kPulserLowTimeMask %#x, pulseLowTime %#x, aValue %#x\n",kPulserLowTimeMask,pulseLowTime,aValue);
+    
 	[self writeAuxIOSPI:aValue];
-	aValue = kPulserHighTimeMask | ((pulseHighTime&0xFFFF)<<8);
+
+    
+    aValue = kPulserHighTimeMask | ((pulseHighTime<<3)&0xFFFFF8);
+    //aValue = kPulserHighTimeMask | ((0x7FFFF8&0xFFFFF8));
+
 	[self writeAuxIOSPI:aValue];
 	
 	//set the bit pattern and global attenuators / enables
