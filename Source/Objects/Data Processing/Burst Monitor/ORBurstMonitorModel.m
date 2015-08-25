@@ -1496,21 +1496,37 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSError *errorStr;
     NSData *burstHeaderData = [NSPropertyListSerialization dataWithPropertyList:runHeader format:NSPropertyListXMLFormat_v1_0 options:0 error:&errorStr];
     
-    //Trying this
-    NSMutableData *allData = [NSMutableData dataWithLength:64];
-    [allData replaceBytesInRange:NSMakeRange(14,18) withBytes:[burstHeaderData length]/sizeof(long)];
-    [allData replaceBytesInRange:NSMakeRange(32,32) withBytes:[burstHeaderData length]];
+    //First word
+    NSMutableData *firstWord = [NSMutableData dataWithLength:4];
+    NSData *lengthInLongs = [NSData dataWithBytes:[burstHeaderData length]/sizeof(long) length:sizeof(burstHeaderData length]/sizeof(long))];
+    [firstWord appendData:lengthInLongs];
+    NSLog(@"First word %@\n lengthInLongs %@\n", firstWord);
+    
+    //Second word
+    NSMutableData *secondWord = [NSMutableData dataWithLength:4];
+    NSData *lengthInBytes = [NSData dataWithBytes:[burstHeaderData length] length:sizeof([burstHeaderData length])];
+    [secondWord appendData:lengthInBytes];
+    NSLog(@"Second word %@\n", secondWord);
+    
+    //Add all words together and append burst header
+    NSMutableData *allData = [NSMutableData data];
+    [allData appendData:firstWord];
+    [allData appendData:secondWord];
     [allData appendData:burstHeaderData];
+    
+    NSLog(@"%u\n", [burstHeaderData length]/sizeof(long));
+    NSLog(@"Full data record %@\n", allData);
     
     NSLog(@"LENGTH: %i\n", [burstHeaderData length]);
     
-    long totalLen = [allData length]/sizeof(long);
+    long totalLen = [firstWord length]/sizeof(long);
     if(totalLen>0){
-        unsigned long* ptr = (unsigned long*)[allData bytes];
+        unsigned long* ptr = (unsigned long*)[firstWord bytes];
         NSLog(@"Count %u\n FIRST %u\n SECOND %u\n THIRD %u\n FOURTH %u\n", ptr[0], ptr[1], ptr[2], ptr[3]);
         if(totalLen>0){
             unsigned long dataID = ExtractDataId(ptr[0]);
             long recordLen       = ExtractLength(ptr[0]);
+            NSLog(@"test");
         }
     }
     
