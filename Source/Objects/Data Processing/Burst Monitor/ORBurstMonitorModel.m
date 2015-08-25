@@ -381,6 +381,17 @@ NSDate* burstStart = NULL;
         return ([self diffprob:co Channels:(ch - 1) Expect:ex Found:fd]);
     }
 }
+//double gaussp(double sigma) //resolition of 0.01 sigma
+//{
+//    double nowspot = 0;
+//    double p = 0;
+//    while(nowspot<sigma)
+//    {
+//        p = p + 2*0.01*(1/sqrt(2*3.14159))*exp(0.5*sigma*sigma);
+//        nowspot = nowspot + 0.01;
+//    }
+//    return p;
+//}
 double facto(unsigned long long num)
 {
     if (num == 0) {
@@ -430,7 +441,9 @@ double facto(unsigned long long num)
                 if(dataID==0){
                     header                      = [[NSData dataWithBytes:ptr length:recordLen*4] retain]; //save it for the secondary file
                     NSString* runHeaderString   = [[[NSString alloc] initWithBytes:&ptr[2] length:ptr[1] encoding:NSASCIIStringEncoding] autorelease];
-                    NSDictionary* runHeader     = [runHeaderString propertyList];
+                    //NSDictionary* runHeader     = [runHeaderString propertyList];
+                    runHeader = [[runHeaderString propertyList] retain]; //save for burst file
+                    
                     shaperID                    = [[runHeader nestedObjectForKey:@"dataDescription",@"ORShaperModel",@"Shaper",@"dataId",nil] unsignedLongValue];
                     //Find run information
                     //headerID                    = [[runHeader nestedObjectForKey:@"ObjectInfo",@"DataChain",@"Run Control",@"runType",nil] unsignedLongValue];
@@ -489,6 +502,15 @@ double facto(unsigned long long num)
                         
                         unsigned long secondsSinceEpoch = ShiftAndExtract(ptr[2], 0, 0xffffffff);
                         unsigned long microseconds = ShiftAndExtract(ptr[3], 0, 0xffffffff);
+                        //cbmod check facto power //fixme // 171! == inf //1-erf(x/sqrt(2))
+                        //int jj;
+                        //double testnum;
+                        //for(jj=0; jj<50; jj++)
+                        //{
+                            //testnum = facto(jj);
+                            //testnum = erf(jj/(10.0*sqrt(2.0)));
+                            //NSLog(@"%i, %f \n", jj, testnum);
+                        //}
                         if(cardNum<=15){ //was break here, now just skip section to include release
                             
                             quietSec=0;
@@ -733,8 +755,8 @@ double facto(unsigned long long num)
                                                 tbackground = ([[Bsecs objectAtIndex:1] longValue] + 0.000001*[[Bmics objectAtIndex:1] longValue]) - ([[Bsecs objectAtIndex:([Bsecs count]-1)] longValue] + 0.000001*[[Bmics objectAtIndex:([Bmics count]-1)] longValue]);
                                                 double egamma = rategamma*tbackground;
                                                 double ealpha = ratealpha*tbackground;
-                                                double errgamma=0;
-                                                double erralpha=0;
+                                                double errgamma=egamma;
+                                                double erralpha=ealpha;
                                                 if(numgamma>0)
                                                 {
                                                     errgamma = (numgamma - egamma)/(sqrt(numgamma));
@@ -745,12 +767,19 @@ double facto(unsigned long long num)
                                                 }
                                                 NSLog(@"BG parameters are time of %f, gamma of %i, alpha of %i, expect %f,%f, errs %f,%f \n", tbackground, numgamma, numalpha, rategamma*tbackground, ratealpha*tbackground, errgamma, erralpha );
                                                 double inprob = 0;
-                                                for(n=0; n<(numgamma + 2*egamma); n++)
+                                                if(egamma + fabs(numgamma - egamma) < 150) //factorial will work
                                                 {
-                                                    if(fabs(n-egamma) < fabs(numgamma - egamma))
+                                                    for(n=0; n<(numgamma + 2*egamma); n++)
                                                     {
-                                                        inprob = inprob + (pow(egamma,n)/(pow(2.7182818284,egamma)*facto(n)));
+                                                        if(fabs(n-egamma) < fabs(numgamma - egamma))
+                                                        {
+                                                            inprob = inprob + (pow(egamma,n)/(pow(2.7182818284,egamma)*facto(n)));
+                                                        }
                                                     }
+                                                }
+                                                else //normal will work
+                                                {
+                                                    inprob =erf(fabs(errgamma)/sqrt(2.0));
                                                 }
                                                 gammaP = 1 - inprob;
                                                 inprob = 0;
@@ -1455,20 +1484,52 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	[theBurstMonitoredObject setInvolvedInCurrentRun:YES];
 
     //Creating the data file
-    NSMutableString* headerAsString = [[NSMutableString alloc] initWithData:header encoding:NSASCIIStringEncoding];
+    //Note: NSDictionaries only take object and pointer references
+    NSNumber* burstCountObject = [NSNumber numberWithShort:burstCount];
+    int intSecTillBurst = numSecTillBurst;
+    NSNumber* intSecTillBurstObject = [NSNumber numberWithInt:intSecTillBurst];
+    NSNumber* durSecObject = [NSNumber numberWithDouble:durSec];
+    NSNumber* countsInBurstObject = [NSNumber numberWithInt:countsInBurst];
+    NSDictionary* burstDict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: burstCountObject, intSecTillBurstObject, durSecObject, theTriage, countsInBurstObject, nil] forKeys:[NSArray arrayWithObjects:@"BurstNumber", @"BurstStartTime", @"BurstDuration", @"Triage", @"Multiplicity", nil]];
     
-    NSRange headerLengthSpot = [headerAsString rangeOfString:@"<key>Header Length</key>"];
+    [runHeader setObject:burstDict forKey:@"BurstInfo"];
+    NSError *errorStr;
+    NSData *burstHeaderData = [NSPropertyListSerialization dataWithPropertyList:runHeader format:NSPropertyListXMLFormat_v1_0 options:0 error:&errorStr];
+    
+    //Trying this
+    NSMutableData *allData = [NSMutableData dataWithLength:64];
+    [allData replaceBytesInRange:NSMakeRange(14,18) withBytes:[burstHeaderData length]/sizeof(long)];
+    [allData replaceBytesInRange:NSMakeRange(32,32) withBytes:[burstHeaderData length]];
+    [allData appendData:burstHeaderData];
+    
+    NSLog(@"LENGTH: %i\n", [burstHeaderData length]);
+    
+    long totalLen = [allData length]/sizeof(long);
+    if(totalLen>0){
+        unsigned long* ptr = (unsigned long*)[allData bytes];
+        NSLog(@"Count %u\n FIRST %u\n SECOND %u\n THIRD %u\n FOURTH %u\n", ptr[0], ptr[1], ptr[2], ptr[3]);
+        if(totalLen>0){
+            unsigned long dataID = ExtractDataId(ptr[0]);
+            long recordLen       = ExtractLength(ptr[0]);
+        }
+    }
+    
+    [theBurstMonitoredObject processData:[NSArray arrayWithObject:burstHeaderData] decoder:theDecoder]; //this is the header of the data file
+    
+    /*NSRange headerLengthSpot = [headerAsString rangeOfString:@"</string>"];
     NSString* header1 = [headerAsString substringToIndex:headerLengthSpot.location];
     NSString* header2 = [headerAsString substringFromIndex:headerLengthSpot.location];
     int intSecTillBurst = numSecTillBurst;
-    header1 = [header1 stringByAppendingFormat:@"<key>BurstInfo</key>\n\t<dict>\n\t\t<key>BurstNumber</key>\n\t\t<integer>%i</integer>\n\t\t<key>BurstStartTime</key>\n\t\t<integer>%i</integer>\n\t\t<key>Triage</key>\n\t\t<string>%@</string>\n\t\t<key>BurstDuration</key>\n\t\t<real>%f</real>\n\t\t<key>Multiplicity</key>\n\t\t<integer>%i</integer>\n\t</dict>\n\t", burstCount, intSecTillBurst, theTriage, durSec, countsInBurst];  //theTriage or novaState?
+    
+    //header1 = [header1 stringByAppendingFormat:@"<key>BurstInfo</key>\n\t<dict>\n\t\t<key>BurstNumber</key>\n\t\t<integer>%i</integer>\n\t\t<key>BurstStartTime</key>\n\t\t<integer>%i</integer>\n\t\t<key>Triage</key>\n\t\t<string>%@</string>\n\t\t<key>BurstDuration</key>\n\t\t<real>%f</real>\n\t\t<key>Multiplicity</key>\n\t\t<integer>%i</integer>\n\t</dict>\n\t", burstCount, intSecTillBurst, theTriage, durSec, countsInBurst];  //theTriage or novaState?
+    //header1 = [header1 stringByAppendingFormat:@"Num(%i)T(%i)Tr(%@)BD(%f)M(%i)", burstCount, intSecTillBurst, theTriage, durSec, countsInBurst];
+    //header1 = [header1 stringByAppendingFormat:@"Num(%i)T(%i)Tr(%@)BD(%f)M(%i)", burstCount, intSecTillBurst, theTriage, durSec, countsInBurst];
     header1 = [header1 stringByAppendingString:header2];
-    //NSLog(@"notherenotherenothernotherenotherenothernotherenotherenothernotherenotherenother %@\n", header1);
+    NSLog(header1);
+    NSData* newheader=[header1 dataUsingEncoding:NSASCIIStringEncoding];
+                       //NSUTF8StringEncoding];
+    */
     
-    NSData* newheader=[header1 dataUsingEncoding:NSUTF8StringEncoding];
-    //NSLog(@" notherenotherenotherenotherenotherenothernotherenotherenothernotherenotherenother %@", newheader);
-    
-    [theBurstMonitoredObject processData:[NSArray arrayWithObject:newheader] decoder:theDecoder]; //this is the header of the data file
     NSMutableArray* anArrayOfData = [NSMutableArray array];
     //Make the data record from the burst array
     @synchronized(self)

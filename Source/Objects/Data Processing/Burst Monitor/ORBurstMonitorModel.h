@@ -107,6 +107,7 @@
     NSMutableArray*      emailList;
     unsigned short       numBurstsNeeded;
     NSData*              header;
+    NSMutableDictionary* runHeader; //SV
     ORDecoder*           theDecoder;
     NSMutableDictionary* runUserInfo;
     unsigned short       burstCount;
