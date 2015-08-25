@@ -698,11 +698,18 @@ struct {
 
 - (void) setPulseHighTime:(int)aPulseHighTime
 {
-	//if(aPulseHighTime<1)			aPulseHighTime=0;
-    //else if(aPulseHighTime>0xFFFF)	aPulseHighTime = 0xFFFF;
-    if(aPulseHighTime<2)			aPulseHighTime=0;
-    else if(aPulseHighTime>0x200000)	aPulseHighTime = 0xFFFFF8>>3;
-	
+    // Firmware Rev 1
+    if( firmwareRev==0 )
+    {
+        if(aPulseHighTime<2)			aPulseHighTime=0;
+        else if(aPulseHighTime>0x10000)	aPulseHighTime = 0xFFFF;
+    }
+    else // Firmware Rev 2
+    {
+        if(aPulseHighTime<2)			aPulseHighTime=0;
+        else if(aPulseHighTime>0x200000)	aPulseHighTime = 0xFFFFF8>>3;
+    }
+    
     [[[self undoManager] prepareWithInvocationTarget:self] setPulseHighTime:pulseHighTime];
     pulseHighTime = aPulseHighTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpPulseHighTimeChanged object:self];
@@ -715,11 +722,18 @@ struct {
 
 - (void) setPulseLowTime:(int)aPulseLowTime
 {
-	//if(aPulseLowTime<1)			aPulseLowTime=0;
-    //else if(aPulseLowTime>0xFFFF)	aPulseLowTime = 0xFFFF;
-    if(aPulseLowTime<2)			aPulseLowTime=0;
-    else if(aPulseLowTime>0x200000)	aPulseLowTime = 0xFFFFF8>>3;
-	
+    // Firmware Rev 1
+    if( firmwareRev==0 )
+    {
+        if(aPulseLowTime<2)			aPulseLowTime=0;
+        else if(aPulseLowTime>0x10000)	aPulseLowTime = 0xFFFF;
+    }
+    else // Firmware Rev 2
+    {
+        if(aPulseLowTime<2)			aPulseLowTime=0;
+        else if(aPulseLowTime>0x200000)	aPulseLowTime = 0xFFFFF8>>3;
+    }
+    
 	[[[self undoManager] prepareWithInvocationTarget:self] setPulseLowTime:pulseLowTime];
     pulseLowTime = aPulseLowTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpPulseLowTimeChanged object:self];
@@ -955,8 +969,8 @@ struct {
                 rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 //-------------------------------------------------------
-                
                 */
+                
                 unsigned long controlWord;
                 if( (chan%8)==0 ){
                 
@@ -1043,8 +1057,6 @@ struct {
                     rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                     rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
                 }
-                
-                
             }
         }
         
@@ -1056,8 +1068,9 @@ struct {
             //if(mjdPreAmpTable[decodedChannel].adcSelection & 0x1000000) decodedChannel += 8;  //two adc chips, so the second chip is offset by 8 to get the right adc index
             
             
-            // firmware rev2_3 => 16 data bits shifted by one bit
-            rawAdcValue[chan] = ((rawAdcValue[chan]&0x1FFFE)>>1);
+            // Firmware Rev 2: controller firmware rev2_3 => 16 data bits shifted by one bit
+            if(firmwareRev == 1)
+                rawAdcValue[chan] = ((rawAdcValue[chan]&0x1FFFE)>>1);
             
             
             long adcValue;
@@ -1089,11 +1102,12 @@ struct {
             if(verbose)NSLog(@"[%d], raw: %d, converted:%.2f, raw: %#x\n",chan,adcValue,convertedValue,rawAdcValue[chan]);
             
             
-            if(boardRev == 0){  //Orginal Board Rev 1
+            // Hardware Rev 1: original boards (CC-BXX series, XX =< 05)
+            if(boardRev == 0){
                 [self setAdc:chan value:convertedValue];
             }
             else {
-                //this is a Rev 2 board.
+                // Hardware Rev 2: new boards (CC-BXX series, XX >= 06)
                 //----------------------------------------------------------
                 // Fix for controller rev2 + mother board rev2 configuration
                 // Ground and signal connector pins swapped on board
@@ -1184,20 +1198,26 @@ struct {
 
 	unsigned long aValue = 0;
 	//set the high and low times (frequency)
-	aValue = kPulserLowTimeMask | ((pulseLowTime<<3)&0xFFFFF8);
-    //aValue = kPulserLowTimeMask | ((0x7FFFF8&0xFFFFF8));
-
-
     
-    NSLog(@" kPulserLowTimeMask %#x, pulseLowTime %#x, aValue %#x\n",kPulserLowTimeMask,pulseLowTime,aValue);
-    
-	[self writeAuxIOSPI:aValue];
+    // Firmware Rev 1
+    if( firmwareRev==0 )
+    {
+        aValue = kPulserLowTimeMask | ((pulseLowTime&0xFFFF)<<8);
+        [self writeAuxIOSPI:aValue];
+        
+        aValue = kPulserHighTimeMask | ((pulseHighTime&0xFFFF)<<8);
+        [self writeAuxIOSPI:aValue];
+    }
+    else // Firmware Rev 2
+    {
+        aValue = kPulserLowTimeMask | ((pulseLowTime<<3)&0xFFFFF8);
+        [self writeAuxIOSPI:aValue];
+        
+        aValue = kPulserHighTimeMask | ((pulseHighTime<<3)&0xFFFFF8);
+        [self writeAuxIOSPI:aValue];
+    }
 
-    
-    aValue = kPulserHighTimeMask | ((pulseHighTime<<3)&0xFFFFF8);
-    //aValue = kPulserHighTimeMask | ((0x7FFFF8&0xFFFFF8));
-
-	[self writeAuxIOSPI:aValue];
+        
 	
 	//set the bit pattern and global attenuators / enables
 	aValue =  kAttnPatternMask | 
