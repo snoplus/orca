@@ -23,6 +23,7 @@
 {
     @private
         IBOutlet NSPopUpButton* doNotUseHWMapPU;
+        IBOutlet NSPopUpButton* firmwareRevPU;
 		IBOutlet NSButton*		settingsLockButton;
         IBOutlet NSPopUpButton* boardRevPU;
         IBOutlet NSButton*      useSBCCB;
@@ -70,6 +71,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) firmwareRevChanged:(NSNotification*)aNote;
 - (void) doNotUseHWMapChanged:(NSNotification*)aNote;
 - (void) boardRevChanged:(NSNotification*)aNote;
 - (void) useSBCChanged:(NSNotification*)aNote;
@@ -110,6 +112,7 @@
 - (NSString*) adcName:(int)adcIndex;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) firmwareRevAction:(id)sender;
 - (IBAction) doNotUseHWMapAction:(id)sender;
 - (IBAction) boardRevAction:(id)sender;
 - (IBAction) clearSupplyErrorsAction:(id)sender;
