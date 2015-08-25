@@ -50,9 +50,10 @@ NSString* ORMJDFeedBackResistorArrayChanged = @"ORMJDFeedBackResistorArrayChange
 NSString* ORMJDBaselineVoltageArrayChanged  = @"ORMJDBaselineVoltageArrayChanged";
 NSString* ORMJDFeedBackResistorChanged      = @"ORMJDFeedBackResistorChanged";
 NSString* ORMJDBaselineVoltageChanged		= @"ORMJDBaselineVoltageChanged";
-NSString* ORMJDPreAmpModelDetectorNameChanged		= @"ORMJDPreAmpModelDetectorNameChanged";
+NSString* ORMJDPreAmpModelDetectorNameChanged	= @"ORMJDPreAmpModelDetectorNameChanged";
 NSString* ORMJDPreAmpModelConnectionChanged		= @"ORMJDPreAmpModelConnectionChanged";
-NSString* ORMJDPreAmpModelDoNotUseHWMapChanged = @"ORMJDPreAmpModelDoNotUseHWMapChanged";
+NSString* ORMJDPreAmpModelDoNotUseHWMapChanged  = @"ORMJDPreAmpModelDoNotUseHWMapChanged";
+NSString* ORMJDPreAmpModelFirmwareRevChanged    = @"ORMJDPreAmpModelFirmwareRevChanged";
 
 
 #pragma mark ¥¥¥Local Strings
@@ -359,6 +360,20 @@ struct {
     boardRev = aBoardRev;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelBoardRevChanged object:self];
+}
+
+- (int) firmwareRev
+{
+    return firmwareRev;
+}
+
+- (void) setFirmwareRev:(int)aFirmwareRev
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFirmwareRev:firmwareRev];
+    
+    firmwareRev = aFirmwareRev;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelFirmwareRevChanged object:self];
 }
 
 - (BOOL) useSBC
@@ -1219,12 +1234,13 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setBoardRev:      [decoder decodeIntForKey:@"boardRev"]];
-    [self setUseSBC:        [decoder decodeBoolForKey:@"useSBC"]];
-    [self setAdcEnabledMask:[decoder decodeInt32ForKey:@"adcEnabledMask"]];
-    [self setShipValues:	[decoder decodeBoolForKey: @"shipValues"]];
-	[self setPollTime:		[decoder decodeIntForKey:  @"pollTime"]];
-	
+    [self setBoardRev:      [decoder decodeIntForKey:   @"boardRev"]];
+    [self setUseSBC:        [decoder decodeBoolForKey:  @"useSBC"]];
+    [self setAdcEnabledMask:[decoder decodeInt32ForKey: @"adcEnabledMask"]];
+    [self setShipValues:	[decoder decodeBoolForKey:  @"shipValues"]];
+	[self setPollTime:		[decoder decodeIntForKey:   @"pollTime"]];
+    [self setFirmwareRev:   [decoder decodeIntForKey:   @"firmwareRev"]];
+
 	int i;
 	for(i=0;i<2;i++){
 		[self setEnabled:i		   value:[decoder decodeBoolForKey:[NSString stringWithFormat: @"enabled%d",i]]];
@@ -1263,6 +1279,8 @@ struct {
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];
+    [encoder encodeInt:firmwareRev      forKey:@"firmwareRev"];
+    
 	int i;
 	for(i=0;i<2;i++){
 		[encoder encodeBool:enabled[i]			forKey:[NSString stringWithFormat:@"enabled%d",i]];

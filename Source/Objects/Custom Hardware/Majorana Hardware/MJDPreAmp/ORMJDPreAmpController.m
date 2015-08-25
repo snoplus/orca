@@ -382,6 +382,12 @@
                      selector : @selector(doNotUseHWMapChanged:)
                          name : ORMJDPreAmpModelDoNotUseHWMapChanged
                         object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(firmwareRevChanged:)
+                         name : ORMJDPreAmpModelFirmwareRevChanged
+                        object: model];
+
 }
 
 - (void) updateWindow
@@ -410,9 +416,16 @@
 	[self boardRevChanged:nil];
     [self adcChanged:nil];
     [self doNotUseHWMapChanged:nil];
+    [self firmwareRevChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) firmwareRevChanged:(NSNotification*)aNote
+{
+    [firmwareRevPU selectItemAtIndex: [model firmwareRev]];
+}
+
 - (void) doNotUseHWMapChanged:(NSNotification*)aNote
 {
     [doNotUseHWMapPU selectItemAtIndex: [model doNotUseHWMap]];
@@ -785,6 +798,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) firmwareRevAction:(id)sender
+{
+    [model setFirmwareRev:[sender indexOfSelectedItem]];
+}
+
 - (IBAction) doNotUseHWMapAction:(id)sender
 {
     [model setDoNotUseHWMap:[sender indexOfSelectedItem]];
