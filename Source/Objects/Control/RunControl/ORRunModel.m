@@ -687,10 +687,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) setRunTypeAndModifySavedRunType:(unsigned long)aMask
 {
-    if([self isRunning]){
+   // if([self isRunning]){
         unsigned long changedBits = runType ^ aMask;
         savedRunType = savedRunType ^ changedBits;
-    }
+   // }
     [self setRunType:aMask];
 }
 
