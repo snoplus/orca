@@ -226,6 +226,7 @@ typedef enum eSBC_ThrottleConsts{
 - (id) connectionHistoryItem:(unsigned)index;
 - (BOOL) pingInProgress;
 - (BOOL) pingedSuccessfully;
+- (unsigned long) totalErrorCount;
 
 - (void) clearRates;
 - (void) calculateRates;

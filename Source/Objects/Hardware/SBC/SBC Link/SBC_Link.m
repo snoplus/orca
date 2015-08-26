@@ -50,7 +50,7 @@
 #define kNoData				-2
 
 #define kSBCRateIntegrationTime 1.5
-#define kSBCMaxErrorRate    10
+#define kSBCMaxErrorRate    1000
 
 
 #pragma mark ***External Strings
@@ -978,6 +978,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkErrorInfoChanged object:self];
 }
 
+- (unsigned long) totalErrorCount
+{
+    return runInfo.err_count + runInfo.busErrorCount;
+}
 
 - (unsigned long) throttle
 {
