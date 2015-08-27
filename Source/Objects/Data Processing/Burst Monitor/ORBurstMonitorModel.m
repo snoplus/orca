@@ -1533,10 +1533,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     
     data[5] = countsInBurst;
     
-    //this post will put the data record into the start of the data chain, so it will go into all objects, i.e. disks, etc..
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-                                                        object:[NSData dataWithBytes:data length:sizeof(long)*kBurstRecordLength]];
-    
+    //pass the record on to the next object
+    [theBurstMonitoredObject processData:[NSArray arrayWithObject:[NSData dataWithBytes:data length:sizeof(long)*kBurstRecordLength]] decoder:theDecoder];
+
     //First word
 //    NSMutableData *firstWord = [NSMutableData dataWithLength:4];
 //    NSData *lengthInLongs = [NSData dataWithBytes:[burstHeaderData length]/sizeof(long) length:sizeof(burstHeaderData length]/sizeof(long))];
