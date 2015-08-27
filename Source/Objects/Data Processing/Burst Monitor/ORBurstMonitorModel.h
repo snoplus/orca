@@ -112,6 +112,7 @@
     NSMutableDictionary* runUserInfo;
     unsigned short       burstCount;
     NSString*            burstString;
+    unsigned long         dataId;
 }
 //unsigned long long facto(unsigned long long num); recusive one does not work any more
 
@@ -140,6 +141,15 @@
 - (int) channelsCheck:(NSMutableArray*) aChans;
 - (void) lockArray;
 - (void) unlockArray;
+
+#pragma mark ***Data Records
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherVXM;
+
 #pragma mark •••Run Methods
 - (void) runTaskStarted:(id)userInfo;
 - (void) runTaskStopped:(id)userInfo;

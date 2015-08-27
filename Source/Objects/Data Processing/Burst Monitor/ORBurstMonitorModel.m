@@ -44,6 +44,7 @@ NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 NSDate* burstStart = NULL;
 
+#define kBurstRecordLength 6
 
 @interface ORBurstMonitorModel (private)
 - (void) deleteQueues;
@@ -1212,6 +1213,33 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [queueLock unlock];//--end critial section  
 }
 
+#pragma mark ***Data Records
+- (unsigned long) dataId
+{
+    return dataId;   }
+- (void) setDataId: (unsigned long) DataId  { dataId = DataId; }
+- (void) setDataIds:(id)assigner            { dataId  = [assigner assignDataIds:kLongForm]; }
+- (void) syncDataIdsWith:(id)anotherVXM     { [self setDataId:[anotherVXM dataId]]; }
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    // add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"VXMModel"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"ORBurstMonitorDecoderForBurst",              @"decoder",
+                                 [NSNumber numberWithLong:dataId],              @"dataId",
+                                 [NSNumber numberWithBool:NO],                  @"variable",
+                                 [NSNumber numberWithLong:kBurstRecordLength],  @"length",
+                                 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Burst"];
+    return dataDictionary;
+}
+
 @end
 
 @implementation ORBurstMonitorModel (private)
@@ -1483,18 +1511,30 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	[theBurstMonitoredObject runTaskStarted:runUserInfo];
 	[theBurstMonitoredObject setInvolvedInCurrentRun:YES];
 
-    //Creating the data file
-    //Note: NSDictionaries only take object and pointer references
-    NSNumber* burstCountObject = [NSNumber numberWithShort:burstCount];
-    int intSecTillBurst = numSecTillBurst;
-    NSNumber* intSecTillBurstObject = [NSNumber numberWithInt:intSecTillBurst];
-    NSNumber* durSecObject = [NSNumber numberWithDouble:durSec];
-    NSNumber* countsInBurstObject = [NSNumber numberWithInt:countsInBurst];
-    NSDictionary* burstDict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: burstCountObject, intSecTillBurstObject, durSecObject, theTriage, countsInBurstObject, nil] forKeys:[NSArray arrayWithObjects:@"BurstNumber", @"BurstStartTime", @"BurstDuration", @"Triage", @"Multiplicity", nil]];
+    //ship the burst data record
+    //use a union to encode the duration
+    union {
+        long asLong;
+        float asFloat;
+    }LongFloatUnion;
     
-    [runHeader setObject:burstDict forKey:@"BurstInfo"];
-    NSError *errorStr;
-    NSData *burstHeaderData = [NSPropertyListSerialization dataWithPropertyList:runHeader format:NSPropertyListXMLFormat_v1_0 options:0 error:&errorStr];
+    //get the time(UT!)
+    time_t	ut_time;
+    time(&ut_time);
+    
+    unsigned long data[kBurstRecordLength];
+    data[0] = dataId | kBurstRecordLength;
+    data[1] = ut_time;
+    data[2] = burstCount;
+    data[3] = numSecTillBurst;
+    
+    LongFloatUnion.asFloat = durSec;
+    data[4] = LongFloatUnion.asLong;
+    
+    data[5] = countsInBurst;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                        object:[NSData dataWithBytes:data length:sizeof(long)*kBurstRecordLength]];
     
     //First word
 //    NSMutableData *firstWord = [NSMutableData dataWithLength:4];
@@ -1530,7 +1570,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 //        }
 //    }
     
-    [theBurstMonitoredObject processData:[NSArray arrayWithObject:burstHeaderData] decoder:theDecoder]; //this is the header of the data file
+//    [theBurstMonitoredObject processData:[NSArray arrayWithObject:burstHeaderData] decoder:theDecoder]; //this is the header of the data file
     
     /*NSRange headerLengthSpot = [headerAsString rangeOfString:@"</string>"];
     NSString* header1 = [headerAsString substringToIndex:headerLengthSpot.location];
