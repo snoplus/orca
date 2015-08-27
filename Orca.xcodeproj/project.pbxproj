@@ -3055,6 +3055,8 @@
 		84F5E1640A15246000707A0F /* trackball.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F5E15C0A15245F00707A0F /* trackball.m */; };
 		84F5E1650A15246000707A0F /* trackball.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F5E15D0A15245F00707A0F /* trackball.h */; };
 		84F5E3210A154C6700707A0F /* KatrinController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F5B6FA087206D9003AC228 /* KatrinController.m */; };
+		84F604841B8F399200C4C554 /* ORBurstMonitorDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F604821B8F399200C4C554 /* ORBurstMonitorDecoders.h */; };
+		84F604851B8F399200C4C554 /* ORBurstMonitorDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F604831B8F399200C4C554 /* ORBurstMonitorDecoders.m */; };
 		84F69CF70B331BB9000BE0CA /* ORSegmentGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F69CF50B331BB9000BE0CA /* ORSegmentGroup.h */; };
 		84F69CF80B331BBA000BE0CA /* ORSegmentGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F69CF60B331BB9000BE0CA /* ORSegmentGroup.m */; };
 		84F7E2330B68281A00E52AA5 /* ORCrateLabelView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7E2310B68281900E52AA5 /* ORCrateLabelView.h */; };
@@ -6508,6 +6510,8 @@
 		84F5E11A0A151E0B00707A0F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		84F5E15C0A15245F00707A0F /* trackball.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = trackball.m; sourceTree = "<group>"; };
 		84F5E15D0A15245F00707A0F /* trackball.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = trackball.h; path = "Source/Objects/Misc Objects/Views/OpenGLView/trackball.h"; sourceTree = SOURCE_ROOT; };
+		84F604821B8F399200C4C554 /* ORBurstMonitorDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORBurstMonitorDecoders.h; sourceTree = "<group>"; };
+		84F604831B8F399200C4C554 /* ORBurstMonitorDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORBurstMonitorDecoders.m; sourceTree = "<group>"; };
 		84F62E770506904F005F64B1 /* NcdElectronics.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = NcdElectronics.gif; path = Source/Experiments/Ncd/NcdElectronics.gif; sourceTree = SOURCE_ROOT; };
 		84F689CB044F7837005F64B1 /* ORWaveform.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORWaveform.h; sourceTree = "<group>"; };
 		84F689CC044F7837005F64B1 /* ORWaveform.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORWaveform.m; sourceTree = "<group>"; };
@@ -11832,6 +11836,8 @@
 				84B51979191D285A003A580B /* ORBurstMonitorController.m */,
 				84B5197A191D285A003A580B /* ORBurstMonitorModel.h */,
 				84B5197B191D285A003A580B /* ORBurstMonitorModel.m */,
+				84F604821B8F399200C4C554 /* ORBurstMonitorDecoders.h */,
+				84F604831B8F399200C4C554 /* ORBurstMonitorDecoders.m */,
 			);
 			path = "Burst Monitor";
 			sourceTree = "<group>";
@@ -15154,6 +15160,7 @@
 				B322A309146D64D000491347 /* ORTcpIpProtocol.h in Headers */,
 				848E59171472B34400A70AB4 /* ORTTCPX400DPController.h in Headers */,
 				848E59191472B34400A70AB4 /* ORTTCPX400DPModel.h in Headers */,
+				84F604841B8F399200C4C554 /* ORBurstMonitorDecoders.h in Headers */,
 				8475EC0C14759D53003A165D /* libusb.h in Headers */,
 				8475EC3D1475A66F003A165D /* ORLabJackController.h in Headers */,
 				8475EC3F1475A66F003A165D /* ORLabJackDecoders.h in Headers */,
@@ -16509,6 +16516,7 @@
 				5B5A40521A79385C00543633 /* ORSIS3305Decoders.m in Sources */,
 				847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */,
 				84F03CDB059A145E00275624 /* ORGlobal.m in Sources */,
+				84F604851B8F399200C4C554 /* ORBurstMonitorDecoders.m in Sources */,
 				84F18E6805AF49A8001799E6 /* ORHeartBeat.m in Sources */,
 				8434F87605B4637700E03AAE /* ORSafeQueue.m in Sources */,
 				8439D65A05BF31480077EFF2 /* SubviewTableViewCell.m in Sources */,
