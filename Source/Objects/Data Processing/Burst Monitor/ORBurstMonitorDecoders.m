@@ -23,16 +23,21 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+
 //------------------------------------------------------------------------------------------------
 // Data Format
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//0 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 // ^^^^ ^^^^ ^^^^ ^^------------------------data id
 //                  ^^ ^^^^ ^^^^ ^^^^ ^^^^--length in longs
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  ut time
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  burst count
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  numSecTilBurst
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  float duration encoded as long
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counts in burst
+//1 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  burst count
+//2 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  numSecTilBurst
+//3 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  float duration encoded as long
+//4 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  mult
+//5 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  triage
+//6 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Rcm
+//7 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Rrms
+//8 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  neutronP
+//9 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  ut time
 //-----------------------------------------------------------------------------------------------
 
 @implementation ORBurstMonitorDecoderForBurst
@@ -57,14 +62,23 @@
         long theLong;
         float theFloat;
     }duration;
-    duration.theLong = ptr[4];
+    duration.theLong = ptr[3];
+    union {
+        long theLong;
+        float theFloat;
+    }neutP;
+    neutP.theLong = ptr[8];
+
+    NSString* theDuration           = [NSString stringWithFormat:@"Duration = %.6f seconds\n",duration.theFloat];
+    NSString* theBurstCount         = [NSString stringWithFormat:@"Burst Count = %ld\n",ptr[1]];
+    NSString* theNumSecTilBurst     = [NSString stringWithFormat:@"Time of burst(sec) = %ld\n",ptr[2]];
+    NSString* countsInBurst         = [NSString stringWithFormat:@"Window Multiplicity = %ld\n",ptr[4]];
+    NSString* Triage                = [NSString stringWithFormat:@"Triage = %ld\n",ptr[5]];
+    NSString* Rcm                   = [NSString stringWithFormat:@"Center = %ld mm\n",ptr[6]];
+    NSString* Rrms                  = [NSString stringWithFormat:@"Position rms = %ld mm\n",ptr[7]];
+    NSString* neutronP              = [NSString stringWithFormat:@"Neutron Likelyhood = %.6f\n",neutP.theFloat];
     
-    NSString* theDuration           = [NSString stringWithFormat:@"Duration = %.3f seconds\n",duration.theFloat];
-    NSString* theBurstCount         = [NSString stringWithFormat:@"Burst Count = %ld\n",ptr[2]];
-    NSString* theNumSecTilBurst     = [NSString stringWithFormat:@"Sec Til Burst = %ld\n",ptr[3]];
-    NSString* countsInBurst         = [NSString stringWithFormat:@"Counts in burst = %ld\n",ptr[5]];
-    
-    return [NSString stringWithFormat:@"%@%s%@%@%@%@",title,ctime((const time_t *)(&ptr[1])),theDuration,theBurstCount,theNumSecTilBurst,countsInBurst];
+    return [NSString stringWithFormat:@"%@%s%@%@%@%@%@%@%@%@",title,ctime((const time_t *)(&ptr[9])),Triage,countsInBurst,neutronP,theDuration,Rcm,Rrms,theBurstCount,theNumSecTilBurst];
 }
 @end
 

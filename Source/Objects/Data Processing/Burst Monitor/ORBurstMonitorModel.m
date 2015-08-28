@@ -44,7 +44,7 @@ NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 NSDate* burstStart = NULL;
 
-#define kBurstRecordLength 6
+#define kBurstRecordLength 10
 
 @interface ORBurstMonitorModel (private)
 - (void) deleteQueues;
@@ -1511,6 +1511,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	[theBurstMonitoredObject runTaskStarted:runUserInfo];
 	[theBurstMonitoredObject setInvolvedInCurrentRun:YES];
 
+    
+    [theBurstMonitoredObject processData:[NSArray arrayWithObject:header] decoder:theDecoder]; //this is the header of the data file
     //ship the burst data record
     //use a union to encode the duration
     union {
@@ -1522,53 +1524,47 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     time_t	ut_time;
     time(&ut_time);
     
+    
     unsigned long data[kBurstRecordLength];
     data[0] = dataId | kBurstRecordLength;
-    data[1] = ut_time;
-    data[2] = burstCount;
-    data[3] = numSecTillBurst;
+    data[1] = burstCount;
+    data[2] = numSecTillBurst;
     
     LongFloatUnion.asFloat = durSec;
-    data[4] = LongFloatUnion.asLong;
+    data[3] = LongFloatUnion.asLong;
     
-    data[5] = countsInBurst;
-    
+    data[4] = multInBurst;
+    data[5] = novaState;
+    data[6] = Rcenter;
+    data[7] = Rrms;
+    LongFloatUnion.asFloat = adcP;
+    data[8] = LongFloatUnion.asLong;
+    data[9] = ut_time;
+
     //pass the record on to the next object
     [theBurstMonitoredObject processData:[NSArray arrayWithObject:[NSData dataWithBytes:data length:sizeof(long)*kBurstRecordLength]] decoder:theDecoder];
-
-    //First word
-//    NSMutableData *firstWord = [NSMutableData dataWithLength:4];
-//    NSData *lengthInLongs = [NSData dataWithBytes:[burstHeaderData length]/sizeof(long) length:sizeof(burstHeaderData length]/sizeof(long))];
-//    [firstWord appendData:lengthInLongs];
-//    NSLog(@"First word %@\n lengthInLongs %@\n", firstWord);
-//    
-//    //Second word
-//    NSMutableData *secondWord = [NSMutableData dataWithLength:4];
-//    NSData *lengthInBytes = [NSData dataWithBytes:[burstHeaderData length] length:sizeof([burstHeaderData length])];
-//    [secondWord appendData:lengthInBytes];
-//    NSLog(@"Second word %@\n", secondWord);
-//    
-//    //Add all words together and append burst header
-//    NSMutableData *allData = [NSMutableData data];
-//    [allData appendData:firstWord];
-//    [allData appendData:secondWord];
-//    [allData appendData:burstHeaderData];
     
-//    NSLog(@"%u\n", [burstHeaderData length]/sizeof(long));
-//    NSLog(@"Full data record %@\n", allData);
-//    
-//    NSLog(@"LENGTH: %i\n", [burstHeaderData length]);
-//    
-//    long totalLen = [firstWord length]/sizeof(long);
-//    if(totalLen>0){
-//        unsigned long* ptr = (unsigned long*)[firstWord bytes];
-//        NSLog(@"Count %u\n FIRST %u\n SECOND %u\n THIRD %u\n FOURTH %u\n", ptr[0], ptr[1], ptr[2], ptr[3]);
-//        if(totalLen>0){
-//            unsigned long dataID = ExtractDataId(ptr[0]);
-//            long recordLen       = ExtractLength(ptr[0]);
-//            NSLog(@"test");
-//        }
-//    }
+    NSMutableArray* anArrayOfData = [NSMutableArray array];
+    //ORBurstData* someData = [[[ORBurstData alloc] init] autorelease]; //<<<<MAH. added the autorelease to prevent memory leak below. //was separate, test
+    /*
+    int dursecond = durSec;
+    int durmicro = (durSec - dursecond)*1000000;
+    int intSecTillBurst = numSecTillBurst;
+    int burstbit = MIN(burstCount,250);
+    int multbit = MIN(multInBurst,4000);
+    //novastate alread int from 0 to 4
+    dursecond = MIN(dursecond,250);
+    unsigned long burststats[4];
+    burststats[0]=[[Bwords objectAtIndex:0] longValue];
+    burststats[1]=burstbit+(multbit << 8)+(novaState << 20) + (dursecond << 24); // adc 3 digets, channel, card
+    burststats[2]=durmicro;
+    burststats[3]=intSecTillBurst;
+    NSLog(@"before: %@\n", someData.dataRecord);
+    //someData.dataRecord = [NSData dataWithBytes:&testsec length: sizeof(testsec)];
+    someData.dataRecord = [NSData dataWithBytes:burststats length: sizeof(burststats)];
+    [anArrayOfData addObject:someData.dataRecord];
+    NSLog(@"after: %@\n", someData.dataRecord);
+     */
     
 //    [theBurstMonitoredObject processData:[NSArray arrayWithObject:burstHeaderData] decoder:theDecoder]; //this is the header of the data file
     
@@ -1586,7 +1582,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
                        //NSUTF8StringEncoding];
     */
     
-    NSMutableArray* anArrayOfData = [NSMutableArray array];
+    //NSMutableArray* anArrayOfData = [NSMutableArray array];  //Cb moved this thing //fixme
     //Make the data record from the burst array
     @synchronized(self)
     {
