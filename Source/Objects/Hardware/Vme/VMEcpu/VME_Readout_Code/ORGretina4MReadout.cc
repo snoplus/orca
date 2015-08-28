@@ -33,45 +33,31 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
         LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",fifoStateAddress,strerror(errno));
     }
     else if ((fifoState & kGretina4MFIFOEmpty) == 0 ) {
+        
         //we want to read as much as possible to have the highest thru-put
-        int32_t numEventsToRead = 1;
-        if(fifoState & kGretina4MFIFO30KFull) numEventsToRead = 16;
-        else if(fifoState & kGretina4MFIFO16KFull)numEventsToRead = 8;
+        int32_t                                     numEventsToRead = 1;
+        if(fifoState & kGretina4MFIFO30KFull)       numEventsToRead = 16;
+        else if(fifoState & kGretina4MFIFO16KFull)  numEventsToRead = 8;
 
-        ensureDataCanHold((1024*numEventsToRead)+2);
+        int32_t i;
+        for(i=0;i<numEventsToRead;i++){
+            ensureDataCanHold(1024+2);
      
-        int32_t savedIndex = dataIndex;
-        data[dataIndex++] = dataId | 0; //we will pack in as many events as we can and fill in the length below
-        data[dataIndex++] = location;
-        
-        int32_t eventStartIndex = dataIndex;
-        
-        result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4,
-                         (uint8_t*)(&data[eventStartIndex]),1024*4*numEventsToRead);
-        
-        if (result < 0) {
-            LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-            dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-            clearFifo(fifoResetAddress);
-        }
-        
-        else {
-            int32_t eventCount = 0;
-            while(data[eventStartIndex] == kGretinaPacketSeparator){
-                eventCount++;
-                if(eventCount>=numEventsToRead)break;
-                eventStartIndex+=1024;
-            }
+            int32_t savedIndex = dataIndex;
+            data[dataIndex++]  = dataId | 1026;
+            data[dataIndex++]  = location;
             
-            if(eventCount>0){
-                data[savedIndex] |= ((numEventsToRead*1024)+2);
-                dataIndex += eventCount*1024;
+            result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4, (uint8_t*)(&data[dataIndex]),1024*4);
+        
+            if ((result < 0) || (data[dataIndex] != kGretinaPacketSeparator)) {
+                dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
+                if(result < 0)  LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                else            LogBusErrorForCard(slot,"No Separator: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                clearFifo(fifoResetAddress);
+                break;
             }
             else {
-                //oops... really bad -- the buffer read is out of sequence
-                dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-                LogBusErrorForCard(slot,"Fifo Rst: Gretina4 slot %d",slot);
-                clearFifo(fifoResetAddress);
+                dataIndex+=1024;
             }
         }
     }
