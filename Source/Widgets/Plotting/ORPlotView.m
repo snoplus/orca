@@ -712,7 +712,7 @@
 		double minY = 0;
 		double maxY = 0;
 		[[self topPlot] getyMin:&minY yMax:&maxY];
-		[yScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:10];
+		[yScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:[yScale minimumRange]];
 		double pad = 0.2*fabs(maxY-minY);
 		//double pad = MAX((0.2*maxY),(0.2*minY));
 		if(minY == 0) [yScale setRngLow:0 withHigh:maxY+pad];
