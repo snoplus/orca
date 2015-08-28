@@ -77,7 +77,7 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(650,670);
+	controlSize			= NSMakeSize(750,670);
     statusSize			= NSMakeSize(650,670);
     lowLevelSize		= NSMakeSize(650,500);
     networkConnectionSize	= NSMakeSize(650,500);
@@ -410,6 +410,12 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelIsPollingSpectrumChanged
 						object: model];
 
+
+    [notifyCenter addObserver : self
+                     selector : @selector(commandTableChanged:)
+                         name : ORAmptekDP5ModelCommandTableChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
@@ -424,9 +430,15 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 
 
 
-
 //others
 //-------
+- (void) commandTableChanged:(NSNotification*)aNote
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [commandTableView  reloadData];
+}
+
 - (void) isPollingSpectrumChanged:(NSNotification*)aNote
 {
 	//[isPollingSpectrumIndicator setIntValue: [model isPollingSpectrum]];
@@ -1085,7 +1097,133 @@ return;
 	[pulserDelayField setFloatValue:[model pulserDelay]];
 }
 
+
+
+
 #pragma mark ***Actions
+- (IBAction) debugButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    NSLog(@"CommandTable:%@\n", [model commandTable]);
+    
+}
+
+
+- (void) readAllCommandSettingsButtonAction:(id)sender
+{
+    //DEBUG            NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model readbackCommandTableAsTextCommand];
+}
+
+- (void) writeAllCommandSettingsButtonAction:(id)sender
+{
+    //DEBUG            
+    NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model writeCommandTableSettingsAsTextCommand];
+}
+
+
+- (void) readSelectedCommandSettingButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    //DEBUG     
+           NSLog(@"Called %@::%@! index %i [sender intValue] %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[commandTableView selectedRow],[commandTableView intValue]);//TODO: DEBUG -tb-
+NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
+    int row=[commandTableView selectedRow];
+    if(row<0){
+        NSLog(@"Nothing selected!\n");
+        return;
+    }
+    [model readbackCommandOfRow:row];
+}
+
+- (void) writeSelectedCommandSettingButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    int row=[commandTableView selectedRow];
+    if(row<0){
+        NSLog(@"Nothing selected!\n");
+        return;
+    }
+    [model writeCommandOfRow:row];
+
+}
+
+
+
+
+
+
+- (IBAction) openCommandsFromCSVFileButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];   
+    [openPanel setTitle: @"Open AmptekDP5 Command Table File"];
+    
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString *filename = [[openPanel URL]path];
+            NSLog( @"You selected filename: %@\n",filename);
+            BOOL loadOK = [model loadCommandTableFile: filename];	
+            if (loadOK) {
+                NSLog( @"Loaded file: %@\n",filename);
+                //[commandTableView  reloadData];
+            }
+            else{
+                NSLog( @"ERROR: Could not load file: %@\n",filename);
+            }
+        }
+    }];
+
+}
+
+- (IBAction) saveCommandsAsCSVFileButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+    
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+	//[op setMessage: @"Save the Config File ..."];
+	[savePanel setNameFieldLabel: @"Save as:"];
+	//[op setNameFieldStringValue: @"config.txt"];
+	[savePanel setTitle: @"Save AmptekDP5 Command Table File"];
+	[savePanel setAllowedFileTypes: nil];
+	[savePanel setAllowsOtherFileTypes: YES];
+	[savePanel setCanSelectHiddenExtension: YES];
+    
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString *filename = [[savePanel URL]path];
+            NSLog( @"You selected filename: %@\n",filename);
+
+            BOOL saveOK = [model saveAsCommandTableFile: filename];
+            if (saveOK) {
+                NSLog( @"Saved file: %@\n",filename);
+            }
+            else{
+                NSLog( @"ERROR: Could not save file: %@\n",filename);
+            }
+            
+        }
+    }];
+}
+
+
+
+
+
+
+
 
 - (void) spectrumRequestRatePUAction:(id)sender
 {
@@ -2008,7 +2146,13 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 #pragma mark •••Data Source Methods (TableView)
 - (int) numberOfRowsInTableView:(NSTableView *)tableView
 {
-return 4;
+	if(tableView==commandTableView){
+        return [model commandTableCount];
+    }
+
+
+
+    return 0;
 #if 0
     if(tableView==itemTableView){
         return [model pollingLookUpCount];
@@ -2031,8 +2175,7 @@ return 4;
 		if(row<[model commandTableCount]){
 			//NSString* theIdentifier				= [tableColumn identifier];
 			NSString* theIdentifier				= [[tableColumn headerCell] stringValue];
-	        //DEBUG      
-            NSLog(@"%@::%@  theIdentifier:%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),theIdentifier);//DEBUG OUTPUT -tb-  
+	        //DEBUG                  NSLog(@"%@::%@  theIdentifier:%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),theIdentifier);//DEBUG OUTPUT -tb-  
 			if([theIdentifier isEqual:@"Name"]){
                 NSDictionary* theRow = [model commandTableRow:row];
                 return [theRow objectForKey: @"Name"];
@@ -2055,6 +2198,11 @@ return 4;
                 return [theRow objectForKey: @"Comment"];
                 //return @"comment";
 			}
+			else if([theIdentifier isEqual:@"Test"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: @"Init"];
+                //return @"comment";
+			}
 			else return @"--";
 		}
 	}
@@ -2069,8 +2217,27 @@ return 4;
 	if(tableView==commandTableView){
 		if(row<[model commandTableCount]){
 	        //DEBUG      
-            NSLog(@"%@::%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd));//DEBUG OUTPUT -tb-  
+            NSLog(@"%@::%@ called for commandTableView: row %i, col identifier %@, headerCell title %@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),row,[tableColumn identifier],[[tableColumn headerCell] title]);//DEBUG OUTPUT -tb-  
+            //title and stringValue seems to be the same -tb-
+            NSLog(@"%@::%@ called for commandTableView: row %i, col identifier %@, headerCell stringValue %@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),row,[tableColumn identifier],[[tableColumn headerCell] stringValue]);//DEBUG OUTPUT -tb-  
 			//[topLevelDictionary setObject:object forKey:[tableColumn identifier]];
+            NSLog(@"%@::%@ setObjectValue is %@ (class %@)\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),object,NSStringFromClass([object class]));//DEBUG OUTPUT -tb-  
+            NSString* key = [NSString stringWithString: [[tableColumn headerCell] title]];
+            if([key isEqual:@"Name"]){
+                //[model setCommandTableRow:row setObject:object forKey:@"Init"];//-tb-: works, but this is better:
+                //[model setCommandTableRow:row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];
+                //DEBUG    
+                    NSLog(@"Called %@::%@ column 'Name' is not editable!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+                return;
+            }
+            if([key isEqual:@"Test"]){
+                //[model setCommandTableRow:row setObject:object forKey:@"Init"];//-tb-: works, but this is better:
+                [model setCommandTableRow:row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];
+                                [commandTableView  reloadData];
+
+                return;
+            }
+            [model setCommandTableRow:row setObject:object forKey:key];
 		}
 		//[self tableViewSelectionDidChange:nil];
     }

@@ -187,6 +187,7 @@
 // command table view
 - (void) populateCommandTableView;
 
+- (void) commandTableChanged:(NSNotification*)aNote;
 
 - (void) isPollingSpectrumChanged:(NSNotification*)aNote;
 - (void) spectrumRequestRateChanged:(NSNotification*)aNote;
@@ -261,6 +262,16 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Actions
+- (IBAction) debugButtonAction:(id)sender;
+
+- (IBAction) readAllCommandSettingsButtonAction:(id)sender;
+- (IBAction) writeAllCommandSettingsButtonAction:(id)sender;
+- (IBAction) readSelectedCommandSettingButtonAction:(id)sender;
+- (IBAction) writeSelectedCommandSettingButtonAction:(id)sender;
+
+- (IBAction) openCommandsFromCSVFileButtonAction:(id)sender;
+- (IBAction) saveCommandsAsCSVFileButtonAction:(id)sender;
+
 - (IBAction) spectrumRequestRatePUAction:(id)sender;
 - (IBAction) spectrumRequestNowButtonAction:(id)sender;
 - (IBAction) spectrumRequestTypePUAction:(id)sender;

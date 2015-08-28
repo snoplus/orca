@@ -43,6 +43,17 @@
 #include <pthread.h>
 
 
+
+
+//is currently in ORIpeSlowControlModel.m -tb- 2015-08-26
+@interface NSString (ParsingExtensions)
+-(NSArray *)csvRows;
+@end
+
+
+
+
+
 //Amptek ASCII Commands
 static AmptekDP5ASCIICommandsStruct amptekCmds[kAmptekNumCommands] = {
 {@"MCAC",     @"1024",			1,			  @"MCA/MCS channels" , 1  },
@@ -555,6 +566,7 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelCommandTableChanged = @"ORAmptekDP5ModelCommandTableChanged";
 NSString* ORAmptekDP5ModelIsPollingSpectrumChanged = @"ORAmptekDP5ModelIsPollingSpectrumChanged";
 NSString* ORAmptekDP5ModelSpectrumRequestRateChanged = @"ORAmptekDP5ModelSpectrumRequestRateChanged";
 NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged = @"ORAmptekDP5ModelSpectrumRequestTypeChanged";
@@ -778,6 +790,14 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 - (NSMutableArray*) commandTable
 { return commandTable; }
 
+- (void) setCommandTable:(NSMutableArray*)aArray
+{
+    [commandTable release];
+    commandTable = aArray;
+    [commandTable retain];
+}
+
+
 - (NSDictionary*) commandTableRow:(int)row
 {
     if(row<[commandTable count]) return [commandTable objectAtIndex: row];
@@ -818,6 +838,243 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             NSLog(@"%@::%@ commandTable is:%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),commandTable);//DEBUG OUTPUT -tb-  
     
 }
+
+
+- (int) setCommandTableItem:(NSString*)itemName setObject:(id)object forKey:(NSString*)key
+{
+    int retval=0, num=[commandTable count];
+    int i;
+    for(i=0;i<num;i++){
+        NSMutableDictionary* line = [commandTable objectAtIndex:i];
+        NSString* name = [line objectForKey: @"Name"];
+        if([name isEqualToString: itemName]){
+            [line setObject: object forKey:key];
+            retval++;
+        }
+    }
+    
+    return retval;
+}
+
+- (int) setCommandTableRow:(int)row setObject:(id)object forKey:(NSString*)key
+{
+    int num=[commandTable count];
+
+    if(row >= 0 && row<num){
+        NSMutableDictionary* line = [commandTable objectAtIndex:row];
+        [line setObject: object forKey:key];
+        return 1;
+    }
+    
+    return 0;
+}
+
+
+
+- (BOOL) loadCommandTableFile:(NSString*) filename
+{
+    BOOL success = FALSE;
+    
+    //DEBUG
+	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+
+    NSStringEncoding encoding=0;
+	
+    NSError* error=nil;
+    NSString* myString = [NSString stringWithContentsOfFile:filename usedEncoding:&encoding error:&error];
+	if(error) NSLog(@"Error >>>%@<<<\n",error);
+	if(!myString){
+	    NSLog(@"Could not read file!\n");
+	    return FALSE;
+	}
+	//NSLog(@"Encoding >>>%i<<<\n",encoding);
+	//NSLog(@"Read string >>>%@<<<\n",myString);
+    //NSLog(@"Read with encoding %@ string >>>%@<<<\n",&encoding,myString);
+
+    NSArray *csvtable = [myString csvRows];
+	if(!csvtable) return FALSE;
+	int nlines = [csvtable count];
+	//if(csvtable) NSLog(@"csvtable (%i lines) >>>%@<<<\n", nlines, csvtable);//TODO: enable with debug output setting??? -tb-
+	if(nlines<=1) return FALSE;
+	
+	int indexName, indexValue, indexInit, indexComment, indexId;
+	NSArray *colnames = [csvtable objectAtIndex: 0];
+	indexName = [colnames indexOfObject: @"Name"];
+	indexValue = [colnames indexOfObject: @"Value"];
+	indexInit = [colnames indexOfObject: @"Init"];
+	indexComment = [colnames indexOfObject: @"Comment"];
+	indexId = [colnames indexOfObject: @"ID"];
+	
+	
+    //DEBUG
+	NSLog(@"Called: %@::%@  indexName,indexValue,indexInit,indexComment,indexId is %i,%i,%i,%i,%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),indexName,indexValue,indexInit,indexComment,indexId);//TODO: debug output -tb-
+	
+	//NSLog(@"colnames >>>%@<<<\n", colnames);
+	//NSLog(@"indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType is %i, %i, %i, %i, %i, %i, %i, %i, %i \n", 
+	//        indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType);
+
+    //now create command entry
+    //NSMutableArray * newCommandTable = [[NSMutableArray alloc] initWithCapacity:10];
+    NSMutableArray * newCommandTable = [[NSMutableArray array] retain];
+    NSMutableDictionary* commandTableRow;
+    NSArray *line;
+	int init=0, id=0;
+	NSString *name;
+	NSString *value;
+	NSString *comment;
+	int i;
+    for(i=1; i<nlines; i++){
+	    line = [csvtable objectAtIndex: i];
+		//NSLog(@"Scan line: %@  \n",line);
+//[self dumpSensorlist];// dumps the requestCache and others  -tb-
+
+
+//TODO: check for double existing entries???
+//        itemKey = [channelLookup objectForKey:[NSNumber numberWithInt:chan]];
+//		if(itemKey) NSLog(@"The channel %i is already used by %@!\n",chan,itemKey);
+//
+	    name =  [line  objectAtIndex: indexName] ;
+	    value =  [line  objectAtIndex: indexValue] ;
+	    comment =  [line  objectAtIndex: indexComment] ;
+	    init = [[line  objectAtIndex: indexInit] intValue];
+	    id = [[line  objectAtIndex: indexId] intValue];
+
+    //DEBUG
+
+	NSLog(@"Called: %@::%@: Command is: %@, %@, init:%i, Comment:%@, ID:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),
+         name, value, init,comment,id);//TODO: debug output -tb-
+         
+        commandTableRow = [NSMutableDictionary dictionary];
+	    [commandTableRow setObject: name		    forKey:@"Name"]; //used by processing
+	    [commandTableRow setObject: value		    forKey:@"Value"]; //used by processing
+	    [commandTableRow setObject: [NSNumber numberWithInt: init]		    forKey:@"Init"]; //used by processing
+	    [commandTableRow setObject: comment		forKey:@"Comment"]; //used by processing
+	    [commandTableRow setObject: [NSNumber numberWithInt: id]		    forKey:@"ID"]; //used by processing
+//	    [commandTableRow setObject:[NSNumber numberWithInt:0]		forKey:@"LoAlarm"]; //used by processing
+
+        [newCommandTable addObject: commandTableRow];
+        
+        success = TRUE;
+
+
+//TODO: check for double existing entries???
+//		chantest = [self findChanOfItem: url path: path];
+//		if(chantest != -1){
+//		    NSLog(@"This item already exists! (%@  ,  %@)\n",url,path);
+//			continue;
+//		}
+		
+		//create new chan
+		//NSLog(@"Create: URL:%@  ,  path:%@  \n",url,path);
+//		newchan = [self createChannelWithUrl:url path:path chan:chan controlType:controlType];// if chan already used, it will assign a free chan and return it
+//TODO: check for double existing entries???
+//		if(newchan != chan) NSLog(@"Created chan %i instead of chan %i with  URL:%@  ,  path:%@  \n",newchan, chan, url,path);
+        //... and make settings
+
+	}
+
+    //TODO: handle undo??? -tb-
+    if(success){
+        [savedCommandTable release];
+        savedCommandTable = commandTable;
+        commandTable = newCommandTable;
+    }
+
+    if(success) [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCommandTableChanged object:self];
+
+    return success;
+}
+
+
+- (BOOL) saveAsCommandTableFile:(NSString*) filename
+{
+    //DEBUG    
+    	NSLog(@"Called: %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: debug output -tb-
+        
+    int num = [commandTable count];
+    //DEBUG    
+        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+	NSMutableString *csvtableString = [NSMutableString stringWithString: @"Name,Value,Init,Comment,ID\n"];
+    
+    NSMutableDictionary* line;
+   	NSString *name;
+	NSString *value;
+	NSString *comment;
+    int init, id;
+
+    int i; //row index
+    for(i=0; i<num; i++){
+        line = [commandTable objectAtIndex:i];
+        name = [line objectForKey: @"Name"];
+        value = [line objectForKey: @"Value"];
+        comment = [line objectForKey: @"Comment"];
+        init = [[line objectForKey: @"Init"] intValue];
+        id = [[line objectForKey: @"ID"] intValue];
+        
+		[csvtableString appendFormat: @"%@,%@,%i,\"%@\",%i\n",name,value,init,comment,id];
+    }
+    
+	//NSLog(@"TABLE:>>>%@<<<\n",csvtableString);
+    //return TRUE;
+    
+	BOOL success = [csvtableString writeToFile: filename atomically: YES encoding: NSASCIIStringEncoding  error: nil];
+	//could use [filename stringByExpandingTildeInPath] instead of filename -tb-
+	if(!success) NSLog(@"ERROR during writing the channel table to %@ ...\n",filename);
+	
+	return success;
+}
+
+
+
+
+// listCommonScriptMethods
+//-------------should use only these methods in scripts---------------------------------
+- (NSString*) commonScriptMethods
+{
+    NSMutableString *methods = [[NSMutableString alloc] init];
+    //I return two types of methods:
+    #if 0
+	// 1. manually added methods
+	NSArray* selectorArray = [NSArray arrayWithObjects:
+							  @"convertedValue:(int)channel",
+							  @"maxValueForChan:(int)channel",
+							  @"minValueForChan:(int)channel",
+							  nil];
+    
+    [methods appendString: [selectorArray componentsJoinedByString:@"\n"]];
+    [methods appendString: @"\n"];
+	#endif
+    
+
+	// 2. all methods between methods commonScriptMethodSectionBegin and commonScriptMethodSectionBegin
+    [methods appendString: methodsInCommonSection(self)];
+
+    return [methods autorelease];
+}
+
+
+
+
+
+
+
+//-------------Methode to flag beginning of common script methods---------------------------------
+- (void) commonScriptMethodSectionBegin { }
+
+
+
+
+
+
+
+
+
+
+
+- (void) commonScriptMethodSectionEnd { }
+//-------------end of common script methods---------------------------------
+
 
 
 
@@ -2136,6 +2393,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             NSLog(@"   MESSAGE: this is a configuration readback packet\n");
             dp5Packet[length+6]=0;
             NSLog(@"   readback is: %s\n",&(dp5Packet[6]));
+            [self parseReadbackCommandTableResponse:length];
+            return 1;//OK
         }
     }
     
@@ -2485,6 +2744,137 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     return retval;
     //return [self sendUDPCommandString: crateUDPCommand];
 }
+
+
+- (int) readbackCommandTableAsTextCommand
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+
+    int num = [commandTable count];
+    //DEBUG    
+        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    int i; //row index
+    for(i=0; i<num; i++){
+        [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
+        [stringCommand appendString:@"=???;"];
+    }
+    NSLog(@"stringCommand is:>%@<\n",stringCommand);
+    
+    [self readbackTextCommandString: stringCommand];
+    
+    return num;
+}
+
+
+- (int) parseReadbackCommandTableResponse:(int)length
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@ length:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),length);//TODO: DEBUG -tb-
+    int num=0;
+    
+    dp5Packet[length+6]=0;
+    NSString *responseString = [NSString stringWithUTF8String: (char*) &(dp5Packet[6]) ];//0-terminated char string
+    
+    NSArray *commands = [responseString componentsSeparatedByString: @";"];
+    num = [commands count];
+    //DEBUG
+        NSLog(@"Called %@::%@  response is:%@\n  commands:%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),responseString,commands);//TODO: DEBUG -tb-
+    
+    int i;
+    for(i=0; i<num; i++){
+        if([[commands objectAtIndex:i] length] > 0){
+            NSLog(@"Called %@::%@  command %i is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,[commands objectAtIndex:i]);//TODO: DEBUG -tb-
+            NSArray *command = [[commands objectAtIndex:i] componentsSeparatedByString: @"="];
+            NSLog(@"Called %@::%@  command %@ has value %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[command objectAtIndex:0],[command objectAtIndex:1]);//TODO: DEBUG -tb-
+            [self setCommandTableItem:[command objectAtIndex:0] setObject:[command objectAtIndex:1] forKey:@"Value"];
+        }
+    }
+    
+    if(num>0) [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCommandTableChanged object:self];
+
+    return num;
+}
+
+
+
+
+- (int) writeCommandTableSettingsAsTextCommand
+{
+    //DEBUG    
+        NSLog(@"%@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+
+    int num = [commandTable count];
+    //DEBUG    
+        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    int i; //row index
+    for(i=0; i<num; i++){
+        [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
+        [stringCommand appendString:@"="];
+        [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Value"]];
+        [stringCommand appendString:@"=;"];
+    }
+    NSLog(@"stringCommand is:>%@<\n",stringCommand);
+    
+    [self sendTextCommandString: stringCommand];
+    
+    return num;
+}
+
+
+- (int) readbackCommandOfRow:(int)row
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+
+    int num = [commandTable count];
+    //DEBUG    
+        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+        [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Name"] ];
+        [stringCommand appendString:@"=???;"];
+
+    NSLog(@"stringCommand is:>%@<\n",stringCommand);
+    
+    [self readbackTextCommandString: stringCommand];
+    
+    return num;
+}
+
+
+- (int) writeCommandOfRow:(int)row
+{
+    //DEBUG    
+        NSLog(@"%@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+
+    int num = [commandTable count];
+    //DEBUG    
+        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+        [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Name"] ];
+        [stringCommand appendString:@"="];
+        [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Value"]];
+        [stringCommand appendString:@"=;"];
+
+    NSLog(@"stringCommand is:>%@<\n",stringCommand);
+    
+    [self sendTextCommandString: stringCommand];
+    
+    return num;
+}
+
+
+
 
 //-----
 
@@ -4137,6 +4527,8 @@ return ;
 		[readList release];
 	}
 	
+    //Amptek commands/settings
+    [self setCommandTable:		[decoder decodeObjectForKey:@"CommandTable"]];
     if(!commandTable) [self initCommandTable];
     
 	[[self undoManager] enableUndoRegistration];
@@ -4174,9 +4566,13 @@ return ;
 	[encoder encodeFloat:pulserDelay	 forKey:@"ORAmptekDP5ModelPulserDelay"];
 	[encoder encodeFloat:pulserAmp		 forKey:@"ORAmptekDP5ModelPulserAmp"];
 		
+    //Amptek commands/settings
+	[encoder encodeObject:commandTable  forKey:@"CommandTable"];
+    
 	//special
     [encoder encodeInt:nextPageDelay     forKey:@"nextPageDelay"]; // ak, 5.10.07
 	
+    
 	[encoder encodeObject:readOutGroup  forKey:@"ReadoutGroup"];
     [encoder encodeObject:poller         forKey:@"poller"];
 	
@@ -4990,3 +5386,87 @@ return 0;
 
 @end
 
+
+
+
+
+
+#if 0 //this is already defined in ORIpeSlowControlModel.m/.h -tb- 2015-08-26
+
+//from http://www.macresearch.org/cocoa-scientists-part-xxvi-parsing-csv-data
+//NSString category to read a CSV table from a given string and convert it to a array of arrays
+//-tb- 2011-12-15
+
+@implementation NSString (ParsingExtensions)
+
+-(NSArray *)csvRows {
+    NSMutableArray *rows = [NSMutableArray array];
+
+    // Get newline character set
+    NSMutableCharacterSet *newlineCharacterSet = (id)[NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
+    [newlineCharacterSet formIntersectionWithCharacterSet:[[NSCharacterSet whitespaceCharacterSet] invertedSet]];
+
+    // Characters that are important to the parser
+    NSMutableCharacterSet *importantCharactersSet = (id)[NSMutableCharacterSet characterSetWithCharactersInString:@",\""];
+    [importantCharactersSet formUnionWithCharacterSet:newlineCharacterSet];
+
+    // Create scanner, and scan string
+    NSScanner *scanner = [NSScanner scannerWithString:self];
+    [scanner setCharactersToBeSkipped:nil];
+    while ( ![scanner isAtEnd] ) {        
+        BOOL insideQuotes = NO;
+        BOOL finishedRow = NO;
+        NSMutableArray *columns = [NSMutableArray arrayWithCapacity:10];
+        NSMutableString *currentColumn = [NSMutableString string];
+        while ( !finishedRow ) {
+            NSString *tempString;
+            if ( [scanner scanUpToCharactersFromSet:importantCharactersSet intoString:&tempString] ) {
+                [currentColumn appendString:tempString];
+            }
+
+            if ( [scanner isAtEnd] ) {
+                if ( ![currentColumn isEqualToString:@""] ) [columns addObject:currentColumn];
+                finishedRow = YES;
+            }
+            else if ( [scanner scanCharactersFromSet:newlineCharacterSet intoString:&tempString] ) {
+                if ( insideQuotes ) {
+                    // Add line break to column text
+                    [currentColumn appendString:tempString];
+                }
+                else {
+                    // End of row
+                    if ( ![currentColumn isEqualToString:@""] ) [columns addObject:currentColumn];
+                    finishedRow = YES;
+                }
+            }
+            else if ( [scanner scanString:@"\"" intoString:NULL] ) {
+                if ( insideQuotes && [scanner scanString:@"\"" intoString:NULL] ) {
+                    // Replace double quotes with a single quote in the column string.
+                    [currentColumn appendString:@"\""]; 
+                }
+                else {
+                    // Start or end of a quoted string.
+                    insideQuotes = !insideQuotes;
+                }
+            }
+            else if ( [scanner scanString:@"," intoString:NULL] ) {  
+                if ( insideQuotes ) {
+                    [currentColumn appendString:@","];
+                }
+                else {
+                    // This is a column separating comma
+                    [columns addObject:currentColumn];
+                    currentColumn = [NSMutableString string];
+                    [scanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:NULL];
+                }
+            }
+        }
+        if ( [columns count] > 0 ) [rows addObject:columns];
+    }
+
+    return rows;
+}
+
+@end
+
+#endif

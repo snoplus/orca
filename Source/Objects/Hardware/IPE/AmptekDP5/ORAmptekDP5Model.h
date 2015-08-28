@@ -300,6 +300,7 @@ enum AmptekDP5ASCIICommandEnum {
     NSString* lastRequest;
 
     NSMutableArray* commandTable;//content of the Amptek Command Table View
+    NSMutableArray* savedCommandTable;//saved content of the Amptek Command Table View for undo etc.
 
 
 }
@@ -320,9 +321,27 @@ enum AmptekDP5ASCIICommandEnum {
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
 - (NSMutableArray*) commandTable;
+- (void) setCommandTable:(NSMutableArray*)aArray;
 - (NSDictionary*) commandTableRow:(int)row;
 - (int) commandTableCount;
 - (void) initCommandTable;
+- (int) setCommandTableItem:(NSString*)itemName setObject:(id)object forKey:(NSString*)key;
+- (int) setCommandTableRow:(int)row setObject:(id)object forKey:(NSString*)key;
+
+
+
+#pragma mark •••Main Scripting Methods
+- (NSString*) commonScriptMethods;
+- (void) commonScriptMethodSectionBegin;
+
+//Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
+- (BOOL) loadCommandTableFile:(NSString*) filename;
+- (BOOL) saveAsCommandTableFile:(NSString*) filename;
+
+- (void) commonScriptMethodSectionEnd;
+
+//dont use in scripts:
+
 
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aLastRequest;
@@ -510,6 +529,13 @@ enum AmptekDP5ASCIICommandEnum {
 - (int) sendTextCommandString:(NSString*)aString;
 - (int) readbackTextCommand;
 - (int) readbackTextCommandString:(NSString*)aString;
+- (int) readbackCommandTableAsTextCommand;
+- (int) parseReadbackCommandTableResponse:(int)length;
+- (int) writeCommandTableSettingsAsTextCommand;
+
+- (int) readbackCommandOfRow:(int)row;
+- (int) writeCommandOfRow:(int)row;
+
 - (int) sendUDPCommand;
 - (int) sendUDPCommandString:(NSString*)aString;
 - (int) sendUDPPacket:(unsigned char*)packet length:(int) aLength;
@@ -659,6 +685,7 @@ enum AmptekDP5ASCIICommandEnum {
 
 @end
 
+extern NSString* ORAmptekDP5ModelCommandTableChanged;
 extern NSString* ORAmptekDP5ModelIsPollingSpectrumChanged;
 extern NSString* ORAmptekDP5ModelSpectrumRequestRateChanged;
 extern NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged;
@@ -726,3 +753,12 @@ extern NSString* ORAmptekDP5ModelReadAllChanged;
 
 extern NSString* ORAmptekDP5V4cpuLock;	
 
+
+
+
+
+//not necessary to declare ->							
+//#pragma mark •••Other Categories
+//@interface NSString (ParsingExtensions)
+//-(NSArray *)csvRows;
+//@end
