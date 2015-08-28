@@ -114,7 +114,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
         NSLogColor([NSColor redColor], @"SIS3305: Header gives 0x%x, calculation gives 0x%x\n",numEventsFromHeader,numEvents);
     }
     
-    NSLog(@"Record is 0x%x longs in total length, which should be %d events.\n",length,numEvents);
+//    NSLog(@"Record is 0x%x longs in total length, which should be %d events.\n",length,numEvents);
 
     //unsigned long waveformLengthSet = dataLengthSingle-sisHeaderLength;
     // this is the length of (waveform + sisheader) in longs. Each long word is 3 10 bit adc samples
@@ -181,7 +181,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
                 
                 unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
-                channel = eventID + (group*4);
+                channel = eventID + (group*4) + 1;
                 channelKey    = [self getChannelKey: channel];
                 
                 waveformLengthSIS   = (dataPtr[3]&0xFFFF)*4;      // data length (no headers), in longs
@@ -270,7 +270,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
             }
             else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
-                channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
+                channel = ((dataPtr[0]>>28)&0xF)+ (group*4) + 1;
 
                 channelKey    = [self getChannelKey: channel];
                 
@@ -281,11 +281,11 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                     break;
                 }
                 
-                if(waveformLengthSIS > 0x300)
-                {
-                    NSLogColor([NSColor redColor], @"SIS3305: waveform length 0x%x is too long. \n",waveformLengthSIS*12 );
-                    return length;
-                }
+//                if(waveformLengthSIS > 0x300)
+//                {
+//                    NSLogColor([NSColor redColor], @"SIS3305: waveform length 0x%x is too long. \n",waveformLengthSIS*12 );
+//                    return length;
+//                }
                 recordAsData = [NSMutableData dataWithCapacity:(waveformLengthSIS*3*8)];
 
                 
@@ -355,7 +355,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
 
     }// end of loop over numEvents
     
-    NSLog(@"Processed %d events\n",n);
+//    NSLog(@"Processed %d events\n",n);
     return length; //must return number of longs
 }
 

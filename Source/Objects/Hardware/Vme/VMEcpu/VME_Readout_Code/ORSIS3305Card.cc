@@ -6,14 +6,14 @@
 ORSIS3305Card::ORSIS3305Card(SBC_card_info* ci) :
 ORVVmeCard(ci)
 {
-//    LogMessage("Entering constructor.../n");
+//    LogMessage("Entering constructor...");
 }
 
 
 bool ORSIS3305Card::Start()
 {
     
-//    LogMessage("Entering start.../n");
+//    LogMessage("Entering start...   ");
 
     int group;
     for(group=0;group<2;group++){
@@ -212,7 +212,7 @@ bool ORSIS3305Card::Readout(SBC_LAM_Data* /*lam_data*/)
                                         numBytesToReadNow
                                         );
                 
-                LogMessage(" - Added 0x%x bytes of 0x%x to datastream. Each record = 0x%x longs",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
+//                LogMessage("- Add 0x%x b of 0x%x to data. Each is 0x%x L",numBytesToReadNow,bytesOfData,dataRecordLength[group]);
                 
                 if (error != (int32_t) numBytesToReadNow)
                 {

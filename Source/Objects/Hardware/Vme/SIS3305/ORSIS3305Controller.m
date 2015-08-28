@@ -534,7 +534,7 @@
     [self clearTimestampDisabledChanged:nil];
     [self disableDirectMemoryHeaderChanged:nil];
     [self grayCodeEnabledChanged:nil];
-    [self ADCGateModeEnabledChanged:nil];
+//    [self ADCGateModeEnabledChanged:nil];
     [self waitPreTrigTimeBeforeDirectMemTrigChanged:nil];
     
     
@@ -579,6 +579,9 @@
     [self adcGainChanged:nil];
     [self adcOffsetChanged:nil];
     [self adcPhaseChanged:nil];
+    
+    [self ADCGateModeEnabledChanged:nil];
+
 }
 
 #pragma mark - Interface Management
@@ -1305,6 +1308,19 @@
     [thresholdMode14PUMatrix        setEnabled:!lockedOrRunningMaintenance];
     [thresholdMode58PUMatrix        setEnabled:!lockedOrRunningMaintenance];
 
+    [LTThresholdOn14Matrix          setEnabled:!lockedOrRunningMaintenance];
+    [GTThresholdOn14Matrix          setEnabled:!lockedOrRunningMaintenance];
+    [LTThresholdOn58Matrix          setEnabled:!lockedOrRunningMaintenance];
+    [GTThresholdOn58Matrix          setEnabled:!lockedOrRunningMaintenance];
+
+    bool gate[kNumSIS3305Groups];
+    gate[0] = [model ADCGateModeEnabled:0];
+    gate[1] = [model ADCGateModeEnabled:1];
+    // only enable the "off" if you're in ADC gate mode.
+    [LTThresholdOff14Matrix         setEnabled:(gate[0] && !lockedOrRunningMaintenance)];
+    [GTThresholdOff14Matrix         setEnabled:(gate[0] && !lockedOrRunningMaintenance)];
+    [LTThresholdOff58Matrix         setEnabled:(gate[1] && !lockedOrRunningMaintenance)];
+    [GTThresholdOff58Matrix         setEnabled:(gate[1] && !lockedOrRunningMaintenance)];
 
     
     // begin key regs
