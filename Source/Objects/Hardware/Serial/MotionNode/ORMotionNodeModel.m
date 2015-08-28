@@ -48,9 +48,9 @@ NSString* ORMotionNodeModelLock							= @"ORMotionNodeModelLock";
 NSString* ORMotionNodeModelSerialNumberChanged			= @"ORMotionNodeModelSerialNumberChanged";
 NSString* ORMotionNodeModelUpdateLongTermTrace			= @"ORMotionNodeModelUpdateLongTermTrace";
 
-#define kMotionNodeDriverPath1 @"/System/Library/Extensions/SiLabsUSBDriver.kext"
-#define kMotionNodeDriverPath2 @"/System/Library/Extensions/SiLabsUSBDriver64.kext"
-#define kMotionNodeDriverPath3 @"/System/Library/Extensions/SLAB_USBtoUART.kext"
+#define kMotionNodeDriverPath1 @"~/Library/Extensions/SiLabsUSBDriver.kext"
+#define kMotionNodeDriverPath2 @"~/Library/Extensions/SiLabsUSBDriver64.kext"
+#define kMotionNodeDriverPath3 @"~/Library/Extensions/SLAB_USBtoUART.kext"
 
 #define kMotionNodeAveN (2/(100.+1.))
 
@@ -480,9 +480,13 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 
     if(state) {
 		[serialPort open];
-		NSMutableDictionary* options = [[[serialPort getOptions] mutableCopy] autorelease];
-		[options setObject:@"57600" forKey:ORSerialOptionSpeed];
-		[serialPort setOptions:options];
+        
+        [serialPort setSpeed:57600];
+        [serialPort setParityNone];
+        [serialPort setStopBits2:NO];
+        [serialPort setDataBits:8];
+        [serialPort commitChanges];
+
  		[serialPort setDelegate:self];
 		[self performSelector:@selector(initDevice) withObject:nil afterDelay:1];
     }
@@ -503,6 +507,7 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 	[[self undoManager] enableUndoRegistration];
    
 }
+
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -845,10 +850,10 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 - (void) enqueCmd:(int)aCmdNum
 {
 	if([serialPort isOpen]){
-		NSString* theCommand = motionNodeCmds[aCmdNum].command;
-		int theCommandNumber = motionNodeCmds[aCmdNum].cmdNumber;
+		NSString* theCommand  = motionNodeCmds[aCmdNum].command;
+		int theCommandNumber  = motionNodeCmds[aCmdNum].cmdNumber;
 		int theExpectedLength = motionNodeCmds[aCmdNum].expectedLength;
-		BOOL okToTimeOut = motionNodeCmds[aCmdNum].okToTimeOut;
+		BOOL okToTimeOut      = motionNodeCmds[aCmdNum].okToTimeOut;
 		if(theCommandNumber == kMotionNodeStart) {
 			if(nodeVersion>= 7)theCommand = [theCommand stringByAppendingString:@"\151"];
 			else if(nodeVersion>= 6)theCommand = [theCommand stringByAppendingString:@"\093"];
@@ -990,9 +995,9 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 {
 	//make sure the driver is installed.
 	NSFileManager* fm = [NSFileManager defaultManager];
-	if(![fm fileExistsAtPath:kMotionNodeDriverPath1] &&
-	   ![fm fileExistsAtPath:kMotionNodeDriverPath2] && 
-	   ![fm fileExistsAtPath:kMotionNodeDriverPath3]){
+	if(![fm fileExistsAtPath:[kMotionNodeDriverPath1 stringByExpandingTildeInPath]] &&
+	   ![fm fileExistsAtPath:[kMotionNodeDriverPath2 stringByExpandingTildeInPath]] &&
+	   ![fm fileExistsAtPath:[kMotionNodeDriverPath3 stringByExpandingTildeInPath]]){
 		NSLogColor([NSColor redColor],@"*** Unable To Locate a MotionNode Driver ***\n");
 		if(!noDriverAlarm){
 			noDriverAlarm = [[ORAlarm alloc] initWithName:@"No MotionNode Drivers Found" severity:0];

@@ -159,9 +159,9 @@
 	[[tracePlot xScale] setRngLimitsLow:0 withHigh:kModeNodeTraceLength withMinRng:kModeNodeTraceLength];
 	[[tracePlot yScale] setLabel:@"Accel (g)"];
 	[[tracePlot yScale]  setInteger:NO];
-	[[tracePlot yScale]  setRngDefaultsLow:-2 withHigh:2];
-	[[tracePlot yScale] setRngLow:-2 withHigh:2];
-	[[tracePlot yScale] setRngLimitsLow:-2 withHigh:2 withMinRng:.02];
+	[[tracePlot yScale]  setRngDefaultsLow:-3.0 withHigh:3.0];
+	[[tracePlot yScale] setRngLow:-3.0 withHigh:1.0];
+	[[tracePlot yScale] setRngLimitsLow:-3.0 withHigh:3.0 withMinRng:.01];
 	
 	ORXYPlot* aPlot;
 	aPlot = [[ORXYPlot alloc] initWithTag:0 andDataSource:self];
@@ -180,7 +180,7 @@
 	[aPlot release];
 	
 	aPlot = [[ORXYPlot alloc] initWithTag:3 andDataSource:self];
-	[aPlot setLineColor:[NSColor brownColor]];
+	[aPlot setLineColor:[NSColor redColor]];
 	[tracePlot addPlot: aPlot];
 	[aPlot release];
 	
