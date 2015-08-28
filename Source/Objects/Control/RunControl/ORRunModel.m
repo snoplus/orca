@@ -247,6 +247,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) setSelectedRunTypeScript:(int)aSelectedRunTypeScript
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRunTypeScript:selectedRunTypeScript];
+    [self setIgnoreSelectedScript:NO];
     selectedRunTypeScript = aSelectedRunTypeScript;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSelectedRunTypeScriptChanged object:self];
 }
@@ -812,7 +813,19 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             }
         }
     }
-    
+}
+- (void) quitSelectedRunScript
+{
+    if(selectedRunTypeScript){
+        NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
+        for (ORRunScriptModel* aScript in theScripts){
+            if([aScript selectionIndex] == selectedRunTypeScript){
+                [aScript stopScript]; //force the script to make it look like it finished OK
+                break;
+            }
+        }
+    }
+  
 }
 
 //not private, but don't call
@@ -869,6 +882,19 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Run Modifiers
+
+//secret methods for dangerous uses in run scripts
+- (void) startFromRunScript
+{
+    [self startRun];
+}
+
+- (void) stopFromRunScript
+{
+    [self stopRun];
+}
+
+
 - (void) startNoScriptRun
 {
     [self setSelectedRunTypeScript:0];
@@ -1158,7 +1184,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) startRunStage0:(NSNumber*)doInitBool
 {
-    if(selectedRunTypeScript){
+    if(selectedRunTypeScript && !ignoreSelectedScript){
         savedRunType = runType; //run type scripts can changed the run type, but we need to change it back then at the end
         savedSelectedRunTypeScript = selectedRunTypeScript;
         NSArray* theScripts = [self collectObjectsOfClass:[ORRunScriptModel class]];
@@ -1272,6 +1298,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRunOfflineRunNotification
                                                         object: self
                                                       userInfo: nil];
+}
+
+- (void) setIgnoreSelectedScript:(BOOL)aFlag
+{
+    ignoreSelectedScript = aFlag;
 }
 
 - (BOOL) offlineRun

@@ -52,6 +52,7 @@
         ORDataPacket*	dataPacket;
 		NSMutableDictionary* runInfo;
         BOOL            ignoreRepeat;
+        BOOL            ignoreSelectedScript;
         unsigned long	runType;
         unsigned long	savedRunType;
         BOOL            remoteControl;
@@ -188,6 +189,7 @@
 - (void) setOfflineRun:(BOOL)flag;
 - (BOOL) offlineRun;
 - (void) setMaintenanceRuns:(BOOL)aState;
+- (void) setIgnoreSelectedScript:(BOOL)aFlag;
 
 #pragma mark ¥¥¥Run Modifiers
 - (void) remoteStartRun:(unsigned long)aRunNumber;
@@ -258,6 +260,13 @@
 - (BOOL) processValue:(int)channel;
 - (void) setProcessOutput:(int)channel value:(int)value;
 - (NSString*) processingTitle;
+
+#pragma mark ¥¥¥Dangerous methods
+- (void) startFromRunScript;
+- (void) stopFromRunScript;
+- (void) quitSelectedRunScript;
+
+
 @end
 
 @interface ORRunModel (OROrderedObjHolding)

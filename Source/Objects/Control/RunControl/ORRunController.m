@@ -627,10 +627,9 @@
 }
 
 #pragma  mark ¥¥¥Actions
-
-- (void) selectedRunTypeScriptPUAction:(id)sender
+- (IBAction) selectedRunTypeScriptPUAction:(id)sender
 {
-	[model setSelectedRunTypeScript:[sender indexOfSelectedItem]];
+    [model setSelectedRunTypeScript:[sender indexOfSelectedItem]];
 }
 - (IBAction) startNewSubRunAction:(id)sender
 {
@@ -711,6 +710,7 @@
 	[startSubRunButton setEnabled:NO];
 	[restartRunButton setEnabled:NO];
 	[stopRunButton setEnabled:NO];
+    [model setIgnoreSelectedScript:NO];
 	[model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
@@ -729,6 +729,7 @@
 
 - (IBAction) stopRunAction:(id)sender
 {
+    [model quitSelectedRunScript];
     [self endEditing];
     [statusField setStringValue:[self getStoppingString]];
     [model performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
