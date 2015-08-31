@@ -92,7 +92,8 @@ typedef struct HPPulserCustomWaveformStruct {
 		kNeedle,
 		kGermaniumHighE,
 		kGermaniumLowE,
-		kWaveformFromFile,
+        kWaveformFromFile,
+        kWaveformFromScript,
 		kNumWaveforms   //must be last
     } userWaveformConsts;
 	

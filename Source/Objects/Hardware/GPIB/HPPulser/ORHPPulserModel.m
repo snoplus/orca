@@ -1066,7 +1066,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) buildWave
 {
-    [self setWaveform: [NSMutableData dataWithCapacity:[self maxNumberOfWaveformPoints] *sizeof(float)]];
+    if(selectedWaveform != kWaveformFromScript){
+        [self setWaveform: [NSMutableData dataWithCapacity:[self maxNumberOfWaveformPoints] *sizeof(float)]];
+    }
     
     //int count = [self numPoints];
 	
@@ -1228,6 +1230,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 			
         }
 			break;
+            
+        case kWaveformFromScript:
+            NSLog(@"Will load waveform from script\n");
+            break;
+        default:
+            break;
             
     }
 	    
