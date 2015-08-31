@@ -40,6 +40,8 @@
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
 
+#import "ORSafeQueue.h"
+
 #include <pthread.h>
 
 
@@ -567,6 +569,7 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 #pragma mark ***External Strings
 
 NSString* ORAmptekDP5ModelCommandTableChanged = @"ORAmptekDP5ModelCommandTableChanged";
+NSString* ORAmptekDP5ModelCommandQueueCountChanged = @"ORAmptekDP5ModelCommandQueueCountChanged";
 NSString* ORAmptekDP5ModelIsPollingSpectrumChanged = @"ORAmptekDP5ModelIsPollingSpectrumChanged";
 NSString* ORAmptekDP5ModelSpectrumRequestRateChanged = @"ORAmptekDP5ModelSpectrumRequestRateChanged";
 NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged = @"ORAmptekDP5ModelSpectrumRequestTypeChanged";
@@ -664,7 +667,8 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	//if(!commandTable)  commandTable = [[NSMutableArray array] retain];
     [self initCommandTable];
     
-    
+    useCommandQueue=YES;//just for debugging -tb-
+
     
     
     //TODO: REMOVE
@@ -690,6 +694,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     [poller stop];
     [poller release];
     [commandTable release];
+    
+	[cmdQueue release];
+    
+    
     [super dealloc];
 }
 
@@ -786,7 +794,92 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 }
 
+
+
+#pragma mark •••Commands
+- (void) queueStringCommand:(NSString*)aCommand
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+        
+	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
+	[cmdQueue enqueue:aCommand];
+    //DEBUG            NSLog(@"       %@::%@  queue count: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self commandQueueCount]);//TODO: DEBUG -tb-
+   //         sleep(1);
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCommandQueueCountChanged object: self];
+    
+	if(!lastRequest)[self processOneCommandFromQueue];//wait until response returned ...
+}
+
+
+
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#if 0
+- (NSData*) lastRequest
+{
+	return lastRequest;
+}
+
+- (void) setLastRequest:(NSData*)aRequest
+{
+	[aRequest retain];
+	[lastRequest release];
+	lastRequest = aRequest;
+}
+#endif
+
+- (int) commandQueueCount
+{
+    return [cmdQueue count];
+}
+
+- (ORSafeQueue*) commandQueue
+{
+    return cmdQueue;
+}
+
+- (void) clearCommandQueue
+{
+    if([cmdQueue count]>0){
+        [cmdQueue removeAllObjects]; //if we timeout we just flush the queue
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCommandQueueCountChanged object: self];
+
+    }
+}
+
+
+
+- (void) processOneCommandFromQueue
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+        
+	if([cmdQueue count] > 0){
+		NSString* cmd = [cmdQueue dequeue];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelCommandQueueCountChanged object: self];
+        if([cmd hasPrefix:@"+ra:"]){//readback ascii command -tb-
+            [self readbackTextCommandString: [cmd substringFromIndex:4]];
+        }else
+        if([cmd hasPrefix:@"+wa:"]){//readback ascii command -tb-
+            [self sendTextCommandString: [cmd substringFromIndex:4]];
+        }else
+        {
+        }
+    }
+    
+}
+
+
+- (BOOL) useCommandQueue
+{ return useCommandQueue; }
+
+- (void) setUseCommandQueue:(BOOL)aValue
+{  useCommandQueue=aValue; }
+
+
+
+
 - (NSMutableArray*) commandTable
 { return commandTable; }
 
@@ -2142,7 +2235,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
 }
 
-
+#define DEBUG_SPECTRUM_READOUT 0
 
 - (int) receiveFromReplyServer
 {
@@ -2168,11 +2261,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         if(loopCounter%1000 == 0) NSLog(@"loopCounter %i \n",loopCounter);
         retval = recvfrom(UDP_COMMAND_CLIENT_SOCKET, readBuffer, maxSizeOfReadbuffer, MSG_DONTWAIT,(struct sockaddr *) &sockaddr_from, &sockaddr_fromLength);
 	    if(retval>=0){
-	        printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
+	        if(DEBUG_SPECTRUM_READOUT) printf("recvfromGlobalServer retval:  %i (bytes), maxSize %i, from IP %s\n",retval,maxSizeOfReadbuffer,inet_ntoa(sockaddr_from.sin_addr));
             //DEBUG 	    NSLog(@"loopCounter %i \n",loopCounter);
 			//printf("Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
 			//NSLog(@"Got UDP data from %s\n", inet_ntoa(sockaddr_from.sin_addr));
-	        NSLog(@" %@::%@ Got UDP data from UDP_COMMAND_CLIENT_SOCKET  !  numBytes: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , retval);//TODO: DEBUG -tb-
+	        if(DEBUG_SPECTRUM_READOUT) NSLog(@" %@::%@ Got UDP data from UDP_COMMAND_CLIENT_SOCKET  !  numBytes: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) , retval);//TODO: DEBUG -tb-
             //is it the first response packet?
             if(countReceivedPackets==0 && retval>=6){
                 if(readBuffer[0]==0xf5 && readBuffer[1]==0xfa){
@@ -2181,7 +2274,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
                     uint16_t *readBuf16 = (uint16_t *)(&(readBuffer[4]));
                     dataLenFromHeader = ntohs(*readBuf16);//on Intel machines, we need to swap ... -tb-
                     packetLenFromHeader = dataLenFromHeader + 8;
-                    NSLog(@" %@::%@ DP5DataLen: %i   DP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,dataLenFromHeader,packetLenFromHeader);
+                    if(DEBUG_SPECTRUM_READOUT) NSLog(@" %@::%@ DP5DataLen: %i   DP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,dataLenFromHeader,packetLenFromHeader);
                     expectedDP5PacketLen = packetLenFromHeader;
                     if(expectedDP5PacketLen<retval){//expect more packets
                         waitForResponse = TRUE;
@@ -2206,9 +2299,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             memcpy(&(dp5Packet[currentDP5PacketLen]),readBuffer,retval);
             currentDP5PacketLen += retval;
             countReceivedPackets++;
-            NSLog(@" %@::%@ currentDP5PacketLen: %i   expectedDP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,currentDP5PacketLen,expectedDP5PacketLen);
+            if(DEBUG_SPECTRUM_READOUT) NSLog(@" %@::%@ currentDP5PacketLen: %i   expectedDP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,currentDP5PacketLen,expectedDP5PacketLen);
             if(currentDP5PacketLen >= expectedDP5PacketLen){
-                NSLog(@" %@::%@ RECEIVED FULL RESPONSE!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );
+                if(DEBUG_SPECTRUM_READOUT) NSLog(@" %@::%@ RECEIVED FULL RESPONSE!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );
                 [self parseReceivedDP5Packet];
                 currentDP5PacketLen  = 0;
                 countReceivedPackets = 0;
@@ -2225,7 +2318,11 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     }
     
     double delayTime=0.0;
-    if(!waitForResponse) delayTime = 0.5; //TODO: could even be 1.0 or larger ... -tb-
+    
+                //TODO: improve timing!!!! -tb-
+                //NSLog(@" %@::%@ waitForResponse: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),waitForResponse );
+                //waitForResponse is at this point always 0 except another command was already sent -tb-
+    if(!waitForResponse) delayTime = 0.1; //TODO: could even be 1.0 or larger ... -tb-
 	if(	[self isListeningOnServerSocket]) [self performSelector:@selector(receiveFromReplyServer) withObject:nil afterDelay: delayTime];
     
     return retval;
@@ -2326,8 +2423,12 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 - (int) parseReceivedDP5Packet
 {
-	//DEBUG 
-    NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+	//DEBUG     NSLog(@"Called %@::%@!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+    
+    if(lastRequest){
+         if(DEBUG_SPECTRUM_READOUT) NSLog(@"       %@::%@!  lastRequest>0! Clear it!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) );//TODO: DEBUG -tb-
+        [self setLastRequest:nil];
+    }
     
     //check length
     if(currentDP5PacketLen<8){
@@ -2337,7 +2438,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     
     //check header
     if(dp5Packet[0]==0xf5 && dp5Packet[1]==0xfa){
-        NSLog(@"   MESSAGE: Header starts with 0xf5fa - OK\n");
+        if(DEBUG_SPECTRUM_READOUT) NSLog(@"   MESSAGE: Header starts with 0xf5fa - OK\n");
         //TODO: packet counter in display?
     }else{
         NSLog(@"   ERROR: Header starts NOT with 0xf5fa - NOT a valid DP5 packet!\n");
@@ -2350,7 +2451,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
                 uint16_t *readBuf16 = (uint16_t *)(&(dp5Packet[4]));
                 dataLenFromHeader = ntohs(*readBuf16);//on Intel machines, we need to swap ... -tb-
                 packetLenFromHeader = dataLenFromHeader + 8;
-                NSLog(@"   %@::%@ DP5DataLen: %i   DP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,dataLenFromHeader,packetLenFromHeader);
+                if(DEBUG_SPECTRUM_READOUT) NSLog(@"   %@::%@ DP5DataLen: %i   DP5PacketLen: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,dataLenFromHeader,packetLenFromHeader);
                 
     //check checksum  
     int i;
@@ -2358,14 +2459,14 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     for(i=packetLenFromHeader-3; i>=0; i--) sum += dp5Packet[i];          
     uint16_t checkSum2er =   ~(sum) +1;//((chkmsb & 0xff)<<8) | (chklsb & 0xff);
 
-    NSLog(@"   MESSAGE: checksum: %u (0x%08x),  2-complement:  %u (0x%08x)\n",sum,sum,checkSum2er,checkSum2er);
+    if(DEBUG_SPECTRUM_READOUT) NSLog(@"   MESSAGE: checksum: %u (0x%08x),  2-complement:  %u (0x%08x)\n",sum,sum,checkSum2er,checkSum2er);
     uint32_t chkmsb = dp5Packet[packetLenFromHeader-2]   & 0x000000ff;
     uint32_t chklsb = dp5Packet[packetLenFromHeader-1]   & 0x000000ff;
-    NSLog(@"   MESSAGE: checksum bytes in header: MSB (0x%08x)  LSB (0x%08x)\n",chkmsb,chklsb);
+    if(DEBUG_SPECTRUM_READOUT)NSLog(@"   MESSAGE: checksum bytes in header: MSB (0x%08x)  LSB (0x%08x)\n",chkmsb,chklsb);
     uint16_t checkSum2erFromHeader =  ((chkmsb & 0xff)<<8) | (chklsb & 0xff);
     
     if(checkSum2er==checkSum2erFromHeader){
-        NSLog(@"   MESSAGE: checksum - OK\n");
+        if(DEBUG_SPECTRUM_READOUT) NSLog(@"   MESSAGE: checksum - OK\n");
     }else{
         NSLog(@"   ERROR: computed checksum and checksum from packet differ - NOT a valid DP5 packet!\n");
         //TODO: handle checksum error
@@ -2429,16 +2530,17 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         if((PID2 %2) ==0){
             hasStatus = 1;
             statusOffset = 6 + specLength *3;
-            NSLog(@"   MESSAGE: this is a spectrum+status packet, spectrum length is: %i     statusOffset: %i\n",specLength,statusOffset);
+            if(DEBUG_SPECTRUM_READOUT) NSLog(@"   MESSAGE: this is a spectrum+status packet, spectrum length is: %i     statusOffset: %i\n",specLength,statusOffset);
             //dp5Packet[length+6]=0;
             //NSLog(@"   readback is: %s\n",&(dp5Packet[6]));
         }else{
             hasStatus = 0;
             statusOffset = 0;
-            NSLog(@"   MESSAGE: this is a pure spectrum packet, spectrum length is: %i\n",specLength);
+            if(DEBUG_SPECTRUM_READOUT) NSLog(@"   MESSAGE: this is a pure spectrum packet, spectrum length is: %i\n",specLength);
         }
         
         //show status
+        if(DEBUG_SPECTRUM_READOUT) 
         if(hasStatus){
             uint32_t var32=0;
             uint16_t var16=0; var16=0;
@@ -2591,6 +2693,13 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     return [self requestSpectrumOfType: spectrumRequestType];
 }
 
+
+
+//TODO: use command queue !!! -tb-
+//TODO: use command queue !!! -tb-
+//TODO: use command queue !!! -tb-
+//TODO: use command queue !!! -tb-
+//TODO: use command queue !!! -tb-
 - (int) requestSpectrumOfType:(int)pid2
 {
     switch(pid2){
@@ -2606,14 +2715,26 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 - (int) sendTextCommand
 {
-    return [self sendTextCommandString: textCommand];
+    return [self shipSendTextCommandString: textCommand];
+}
+
+- (int) shipSendTextCommandString:(NSString*)cmd
+{
+    if(useCommandQueue){
+        [self queueStringCommand: [NSString stringWithFormat:@"+wa:%@", cmd]];
+    }else{
+        return [self sendTextCommandString: cmd];
+    }
+    
+    return 0;
 }
 
 
 
+//send a write ASCII command to Amptek DP5 -tb-
 - (int) sendTextCommandString:(NSString*)cmd;
 {
-	NSLog(@"Called %@::%@!  text command is: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd);//TODO: DEBUG -tb-
+	NSLog(@"Called %@::%@!  text command is: >%@< length %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd,[cmd length]);//TODO: DEBUG -tb-
 
     if([cmd length]>512){
         NSLog(@"    ERROR: text command to long!\n");
@@ -2683,14 +2804,26 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 //----------
 - (int) readbackTextCommand
 {
-    return [self readbackTextCommandString: textCommand];
+    //return [self readbackTextCommandString: textCommand];
+    return [self shipReadbackTextCommandString: textCommand];
+}
+
+- (int) shipReadbackTextCommandString:(NSString*)cmd
+{
+    if(useCommandQueue){
+        [self queueStringCommand: [NSString stringWithFormat:@"+ra:%@", cmd]];
+    }else{
+        return [self readbackTextCommandString: cmd];
+    }
+    
+    return 0;
 }
 
 
-
+//send a read back ASCII command to Amptek DP5 -tb-
 - (int) readbackTextCommandString:(NSString*)cmd;
 {
-	NSLog(@"Called %@::%@!  text command is: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd);//TODO: DEBUG -tb-
+	NSLog(@"Called %@::%@!  text command is: >%@< length is: %i (max. 512)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),cmd,[cmd length]);//TODO: DEBUG -tb-
 
     if([cmd length]>512){
         NSLog(@"    ERROR: text command to long!\n");
@@ -2710,6 +2843,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     
     int i;
      
+      //TODO: should be improved - use cStringUsingEncoding:
     for(i=0; i<len; i++){
         buffer[6+i] = [cmd characterAtIndex:i] & 0xff; //characterAtIndex: returns unichar = 16 bit
     }
@@ -2764,7 +2898,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     }
     NSLog(@"stringCommand is:>%@<\n",stringCommand);
     
-    [self readbackTextCommandString: stringCommand];
+    //[self readbackTextCommandString: stringCommand];
+    [self shipReadbackTextCommandString: stringCommand];
+    //if([self commandQueueCount]>0)[self processOneCommandFromQueue];
     
     return num;
 }
@@ -2818,14 +2954,49 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
         [stringCommand appendString:@"="];
         [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Value"]];
-        [stringCommand appendString:@"=;"];
+        [stringCommand appendString:@";"];
     }
     NSLog(@"stringCommand is:>%@<\n",stringCommand);
     
-    [self sendTextCommandString: stringCommand];
+    //[self sendTextCommandString: stringCommand];
+    [self shipSendTextCommandString: stringCommand];
+    //if([self commandQueueCount]>0)[self processOneCommandFromQueue];
     
     return num;
 }
+
+
+- (int) writeCommandTableInitSettingsAsTextCommand
+{
+    //DEBUG    
+        NSLog(@"%@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+
+
+    int num = [commandTable count], count=0;
+    //DEBUG    
+        NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
+        
+    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    int i; //row index
+    for(i=0; i<num; i++){
+        if([[[commandTable objectAtIndex:i] objectForKey:@"Init"] boolValue]){
+            count++;
+            [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
+            [stringCommand appendString:@"="];
+            [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Value"]];
+            [stringCommand appendString:@";"];
+        }
+    }
+    NSLog(@"stringCommand is:>%@<\n",stringCommand);
+    
+    if(count>0)
+        [self sendTextCommandString: stringCommand];
+    //[self shipSendTextCommandString: stringCommand];
+    //if([self commandQueueCount]>0)[self processOneCommandFromQueue];
+    
+    return num;
+}
+
 
 
 - (int) readbackCommandOfRow:(int)row
@@ -2844,7 +3015,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
     NSLog(@"stringCommand is:>%@<\n",stringCommand);
     
-    [self readbackTextCommandString: stringCommand];
+    //[self readbackTextCommandString: stringCommand];
+    [self shipReadbackTextCommandString: stringCommand];
+    //if([self commandQueueCount]>0)[self processOneCommandFromQueue];
     
     return num;
 }
@@ -2864,11 +3037,13 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Name"] ];
         [stringCommand appendString:@"="];
         [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Value"]];
-        [stringCommand appendString:@"=;"];
+        [stringCommand appendString:@";"];
 
     NSLog(@"stringCommand is:>%@<\n",stringCommand);
     
-    [self sendTextCommandString: stringCommand];
+    //[self sendTextCommandString: stringCommand];
+    [self shipSendTextCommandString: stringCommand];
+    //if([self commandQueueCount]>0)[self processOneCommandFromQueue];
     
     return num;
 }
@@ -2999,7 +3174,7 @@ commands:
 - (int) sendUDPCommandString:(NSString*)aString
 {
     //taken from ipe4reader6.cpp, function int sendtoGlobalClient3(const void *buffer, size_t length, char* receiverIPAddr, uint32_t port)
-	NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aString);//TODO: DEBUG -tb-
+	//NSLog(@"Called %@::%@! Send string: >%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aString);//TODO: DEBUG -tb-
 	//[model setCrateUDPCommand:[sender stringValue]];	
     if(UDP_COMMAND_CLIENT_SOCKET<=0){ NSLog(@"   socket not open\n"); return 1;}
 
@@ -3091,8 +3266,7 @@ commands:
 
 - (int) sendBinaryString:(NSString*)aString
 {
-    //DEBUG     
-	NSLog(@"Called %@::%@! Send string: >%@< (length %i)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aString,[aString length]);//TODO: DEBUG -tb-
+    //DEBUG     	NSLog(@"Called %@::%@! Send string: >%@< (length %i)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),  aString,[aString length]);//TODO: DEBUG -tb-
 
     if(![aString hasPrefix:@"0x"]){
         NSLog(@"   not a binary command!\n");
@@ -3119,7 +3293,7 @@ commands:
         int val =   strtol(buffer, NULL, 0);
         binaryCommand[i] = val;
 
-        NSLog(@"   byte %i is: %s = %i\n",i,buffer,val);
+        //NSLog(@"   byte %i is: %s = %i\n",i,buffer,val);
     }
     
     
@@ -3598,6 +3772,7 @@ for(l=0;l<2500;l++){
 
 
 
+//TODO: obsolete, from slt -tb-
 - (int) sendUDPDataCommandRequestPackets:(int8_t) num
 {
     char data[6];
@@ -3613,11 +3788,13 @@ for(l=0;l<2500;l++){
 }
 
 
+//TODO: obsolete, from slt -tb-
 - (int) sendUDPDataCommandRequestUDPData
 {
 	return [self sendUDPDataCommandRequestPackets:  numRequestedUDPPackets];	
 }
 
+//TODO: obsolete, from slt -tb-
 - (int) sendUDPDataCommandChargeBBFile
 {
     NSString *cmd = [[NSString alloc] initWithFormat: @"KWC_chargeBBFile_%@", [self chargeBBFile]];
@@ -3628,6 +3805,7 @@ for(l=0;l<2500;l++){
 }
 
 
+//TODO: obsolete, from slt -tb-
 
 - (void) loopCommandRequestUDPData
 {
@@ -3637,6 +3815,7 @@ for(l=0;l<2500;l++){
     [self performSelector:@selector(loopCommandRequestUDPData) withObject:nil afterDelay: 10.0];//repeat every 10 seconds
 }
 
+//TODO: obsolete, from slt -tb-
 - (int) sendUDPDataWCommandRequestPacketArg1:(int) arg1 arg2:(int) arg2 arg3:(int) arg3  arg4:(int) arg4
 {
 	//debug 
@@ -3653,6 +3832,7 @@ for(l=0;l<2500;l++){
 	return [self sendUDPDataCommand: data length: len];	
 }
 
+//TODO: obsolete, from slt -tb-
 - (int) sendUDPDataWCommandRequestPacket
 {
     return [self sendUDPDataWCommandRequestPacketArg1: cmdWArg1 arg2: cmdWArg2 arg3: cmdWArg3  arg4:cmdWArg4];
@@ -4326,8 +4506,12 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 //TODO: initBoard: switch to online, event readout etc. -tb-
 
 //DEBUG OUTPUT:
- 	NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+ 	//NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
+    //new version: write all parameters marked in Command Table
+    [self writeCommandTableInitSettingsAsTextCommand];
+
+#if 0 //old version: write manually
     //write "MCA disable"
     [self sendTextCommandString: @"MCAE=OFF;"];
 
@@ -4341,7 +4525,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
     
     //write "MCA enable"
     [self sendTextCommandString: @"MCAE=ON;"];
-
+#endif
 return ;
 
 //TODO: rm   slt - - 	[self writeControlReg];
@@ -4455,6 +4639,9 @@ return ;
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
+    useCommandQueue=YES;//just for debugging -tb-
+
+
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
@@ -4681,8 +4868,10 @@ return ;
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
-NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
+//NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-
 
+
+    [self clearCommandQueue];
 
     if(takeEventData || [[userInfo objectForKey:@"doinit"]intValue]){
        accessAllowedToHardwareAndSBC = YES;
@@ -4817,7 +5006,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         // -------TIMER-VARIABLES-----------
         static struct timeval starttime, /*stoptime,*/ currtime;//    struct timezone tz; is obsolete ... -tb-
         //struct timezone	timeZone;
-	    static double currDiffTime=0.0, lastDiffTime=0.0;
+	    static double currDiffTime=0.0, lastDiffTime=0.0, elapsedTime = 0.0;
 
 
 
@@ -4841,11 +5030,13 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         gettimeofday(&currtime,NULL);
         currDiffTime =      (  (double)(currtime.tv_sec  - starttime.tv_sec)  ) +
                     ( ((double)(currtime.tv_usec - starttime.tv_usec)) * 0.000001 );
-        double elapsedTime = currDiffTime - lastDiffTime;
+        elapsedTime = currDiffTime - lastDiffTime;
         
         
         //if takeUDPstreamData is checked, check every 0.5 sec. the UDP buffer ...
         //if(takeUDPstreamData) 
+        #if 0
+        {
         if(elapsedTime >= 1.5){// ----> x= this value (e.g. 1.0/0.5 ...)
 		    //code to be executed every x seconds -BEGIN
 		    //
@@ -4895,25 +5086,28 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 		    //code to be executed every second -END
 		    lastDiffTime = currDiffTime;
 		}
+        }
+        #endif
         
         if(isPollingSpectrum){
             double diffTimeSinceLastRequest =      (  (double)(currtime.tv_sec  - lastRequestTime.tv_sec)  ) +
                     ( ((double)(currtime.tv_usec - lastRequestTime.tv_usec)) * 0.000001 );
             if( diffTimeSinceLastRequest > spectrumRequestRate ){
 
-	 NSLog(@"=== waitForResponse: %i   expectedDP5PacketLen: %i=========\n", waitForResponse,expectedDP5PacketLen);
+	 //DEBUG   NSLog(@"=== waitForResponse: %i   expectedDP5PacketLen: %i=========\n", waitForResponse,expectedDP5PacketLen);
 
                 //TODO
                 if(waitForResponse){//we are still waiting for a reply of a previous request, do not send a new command ...
 			        NSLog(@"================PENDING===================\n");
                     usleep(100000);
                 }else{
-			        NSLog(@"================START NEW REQUEST===================\n");
+//DEBUG TIMING --->			        NSLog(@"================START NEW REQUEST===================\n");
                     [self requestSpectrum];
                     gettimeofday(&lastRequestTime,NULL);
                 }
             }else{//if we have plenty of time, we may take a small nap
                 if( (spectrumRequestRate-diffTimeSinceLastRequest) > 0.5){
+                    [self receiveFromReplyServer];//TODO: improve timing!!!!! -tb-
                     usleep(100);
                 }
             }
@@ -4928,7 +5122,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             //DEBUG
     NSLog(@"Called %@::%@: FIRST TIME\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
 			NSLog(@"===================================\n");
-			NSLog(@"   Datataker Loop: first time: %f\n",currDiffTime);
+			NSLog(@"   Datataker Loop: first time: %f (elapsedTime %f)\n",currDiffTime,elapsedTime);
 			NSLog(@"===================================\n");
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];

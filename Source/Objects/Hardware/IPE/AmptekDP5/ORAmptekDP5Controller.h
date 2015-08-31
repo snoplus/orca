@@ -23,10 +23,14 @@
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Imported Files
 #import "ORAmptekDP5Model.h"
 //#import "SBC_LinkController.h"
+@class ORValueBarGroupView;
+
 
 @interface ORAmptekDP5Controller : OrcaObjectController {
     // command table view
 	IBOutlet NSTableView*			commandTableView;
+    IBOutlet ORValueBarGroupView*   commandQueueValueBar;
+    IBOutlet   NSTextField*         commandQueueCountField;
 
 	IBOutlet NSTabView*				tabView;
 	IBOutlet NSPopUpButton*         spectrumRequestRatePU;
@@ -188,6 +192,7 @@
 - (void) populateCommandTableView;
 
 - (void) commandTableChanged:(NSNotification*)aNote;
+- (void) commandQueueCountChanged:(NSNotification*)aNotification;
 
 - (void) isPollingSpectrumChanged:(NSNotification*)aNote;
 - (void) spectrumRequestRateChanged:(NSNotification*)aNote;
@@ -263,6 +268,10 @@
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Actions
 - (IBAction) debugButtonAction:(id)sender;
+- (IBAction) clearCommandQueueButtonAction:(id)sender;
+- (IBAction) sendCommandOfCommandQueueButtonAction:(id)sender;
+- (IBAction) dumpCommandQueueButtonAction:(id)sender;
+
 
 - (IBAction) readAllCommandSettingsButtonAction:(id)sender;
 - (IBAction) writeAllCommandSettingsButtonAction:(id)sender;

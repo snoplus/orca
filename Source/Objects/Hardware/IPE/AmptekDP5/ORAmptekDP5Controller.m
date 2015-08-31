@@ -23,6 +23,8 @@
 #import "ORAmptekDP5Controller.h"
 #import "ORAmptekDP5Model.h"
 #import "TimedWorker.h"
+#import "ORValueBarGroupView.h"
+#import "ORAxis.h"
 //#import "SBC_Link.h"
 
 //Amptek ASCII Commands
@@ -93,6 +95,10 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
     
     // command table view
 	//[self  populateCommandTableView];
+    
+    [[commandQueueValueBar xAxis] setRngLimitsLow:0 withHigh:30 withMinRng:3];
+    [[commandQueueValueBar xAxis] setRngDefaultsLow:0 withHigh:100];
+    
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Notifications
@@ -416,6 +422,11 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelCommandTableChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(commandQueueCountChanged:)
+                         name : ORAmptekDP5ModelCommandQueueCountChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
@@ -423,7 +434,7 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 // command table view
 //----------------------
 - (void) populateCommandTableView
-{
+{ //unused
 }
 
 
@@ -438,6 +449,17 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
         NSLog(@"Called %@::%@  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
     [commandTableView  reloadData];
 }
+
+
+- (void) commandQueueCountChanged:(NSNotification*)aNotification
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+	[commandQueueCountField setIntValue:[model commandQueueCount]];
+    [commandQueueValueBar setNeedsDisplay:YES];
+}
+
+
 
 - (void) isPollingSpectrumChanged:(NSNotification*)aNote
 {
@@ -1106,6 +1128,30 @@ return;
     //DEBUG    
         NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
     NSLog(@"CommandTable:%@\n", [model commandTable]);
+    
+}
+
+- (IBAction) clearCommandQueueButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model clearCommandQueue];
+    
+}
+
+- (IBAction) sendCommandOfCommandQueueButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@"Called %@::%@ calling processOneCommandFromQueue\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+    [model processOneCommandFromQueue];
+    
+}
+
+- (IBAction) dumpCommandQueueButtonAction:(id)sender
+{
+    //DEBUG    
+        NSLog(@" %@::%@ Command Queue is:>%@<\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model commandQueue]);//TODO: DEBUG -tb-
+    ;
     
 }
 

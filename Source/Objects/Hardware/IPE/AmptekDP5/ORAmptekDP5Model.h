@@ -41,6 +41,7 @@
 @class PMC_Link;
 @class SBC_Link;
 @class ORSBCLinkJobStatus;
+@class ORSafeQueue;
 
 #define IsBitSet(A,B) (((A) & (B)) == (B))
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
@@ -297,10 +298,13 @@ enum AmptekDP5ASCIICommandEnum {
     int isPollingSpectrum;
     struct timeval lastRequestTime;//    struct timezone tz; is obsolete ... -tb-
     
-    NSString* lastRequest;
 
     NSMutableArray* commandTable;//content of the Amptek Command Table View
     NSMutableArray* savedCommandTable;//saved content of the Amptek Command Table View for undo etc.
+    ORSafeQueue*		cmdQueue;
+    //NSData*				lastRequest;
+    NSString* lastRequest;
+    BOOL useCommandQueue;
 
 
 }
@@ -319,7 +323,24 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 
+
+#pragma mark •••Commands
+- (void) queueStringCommand:(NSString*)aCommand;
+
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (NSString*) lastRequest;
+- (void) setLastRequest:(NSString*)aLastRequest;
+//- (NSData*) lastRequest;
+//- (void) setLastRequest:(NSData*)aRequest;
+- (int) commandQueueCount;
+- (ORSafeQueue*) commandQueue;
+- (void) clearCommandQueue;
+- (void) processOneCommandFromQueue;
+
+- (BOOL) useCommandQueue;
+- (void) setUseCommandQueue:(BOOL)aValue;
+
+
 - (NSMutableArray*) commandTable;
 - (void) setCommandTable:(NSMutableArray*)aArray;
 - (NSDictionary*) commandTableRow:(int)row;
@@ -343,8 +364,6 @@ enum AmptekDP5ASCIICommandEnum {
 //dont use in scripts:
 
 
-- (NSString*) lastRequest;
-- (void) setLastRequest:(NSString*)aLastRequest;
 - (int) isPollingSpectrum;
 - (void) setIsPollingSpectrum:(int)aIsPollingSpectrum;
 - (void) requestSpectrumTimedWorker;
@@ -526,12 +545,15 @@ enum AmptekDP5ASCIICommandEnum {
 - (int) requestSpectrum;
 - (int) requestSpectrumOfType:(int)pid2;
 - (int) sendTextCommand;
+- (int) shipSendTextCommandString:(NSString*)cmd;
 - (int) sendTextCommandString:(NSString*)aString;
 - (int) readbackTextCommand;
+- (int) shipReadbackTextCommandString:(NSString*)cmd;
 - (int) readbackTextCommandString:(NSString*)aString;
 - (int) readbackCommandTableAsTextCommand;
 - (int) parseReadbackCommandTableResponse:(int)length;
 - (int) writeCommandTableSettingsAsTextCommand;
+- (int) writeCommandTableInitSettingsAsTextCommand;
 
 - (int) readbackCommandOfRow:(int)row;
 - (int) writeCommandOfRow:(int)row;
@@ -686,6 +708,7 @@ enum AmptekDP5ASCIICommandEnum {
 @end
 
 extern NSString* ORAmptekDP5ModelCommandTableChanged;
+extern NSString* ORAmptekDP5ModelCommandQueueCountChanged;
 extern NSString* ORAmptekDP5ModelIsPollingSpectrumChanged;
 extern NSString* ORAmptekDP5ModelSpectrumRequestRateChanged;
 extern NSString* ORAmptekDP5ModelSpectrumRequestTypeChanged;
