@@ -91,6 +91,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 { @"GermaniumHighE",    @"GEHIGHE",  NO , NO },
 { @"GermaniumLowE",     @"GELOWE",   NO , NO },
 { @"From File",         @"",         NO , NO },
+{ @"Script Defined",    @"",         NO , NO },
 };
 
 
