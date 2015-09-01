@@ -278,7 +278,9 @@ primary_expr
 | leftArrayElement			{ $$ = $1; }
 | '(' expr ')'				{ $$ = $2; }
 | confirm_statement			{ $$ = $1; }
+| request_statement			{ $$ = $1; }
 | wait_statement			{ $$ = $1; }
+| makeObj                   { $$ = $1; }
 ;
 
 postfix_expr
