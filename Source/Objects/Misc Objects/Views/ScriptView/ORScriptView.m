@@ -838,10 +838,9 @@
 	NSArray* lines = [[originalText substringWithRange:paragraphRange] componentsSeparatedByString:@"\n"];
 	//step one -- remove all leading tabs and spaces
 	NSMutableArray* newLines = [NSMutableArray array];
-	NSEnumerator* e = [lines objectEnumerator];
-	NSString* s;
 	int level = 0;
-	while(s = [e nextObject]){
+    BOOL inCaseBlock = NO;
+	for(NSString* s in lines){
 		while([s hasPrefix:@" "] || [s hasPrefix:@"\t"]){
 			s = [s stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:@""];
 		} 
@@ -849,21 +848,33 @@
 		int i;
 		for(i=0;i<level;i++)[tabs insertString:@"\t" atIndex:0];
 		s = [s stringByReplacingCharactersInRange:NSMakeRange(0,0) withString:tabs];
-		if( (([s rangeOfString:@"{"].location != NSNotFound) && ([s rangeOfString:@"}"].location == NSNotFound)) || 
-		   ([s rangeOfString:@"case"].location != NSNotFound) || 
-		   ([s rangeOfString:@"default"].location != NSNotFound)){
-			level++;
-		}
-		if( (([s rangeOfString:@"}"].location != NSNotFound) && ([s rangeOfString:@"{"].location == NSNotFound)) ||
-			([s rangeOfString:@"break;"].location != NSNotFound)){
+        if(([s rangeOfString:@"{"].location != NSNotFound) &&
+           ([s rangeOfString:@"}"].location == NSNotFound)) {
+            level++;
+            inCaseBlock = NO;
+        }
+        else if(([s rangeOfString:@"case"].location    != NSNotFound) ||
+                ([s rangeOfString:@"default"].location != NSNotFound)){
+            level++;
+            inCaseBlock = YES;
+        }
+        if(([s rangeOfString:@"}"].location != NSNotFound) &&
+           ([s rangeOfString:@"{"].location == NSNotFound)){
+            inCaseBlock = NO;
 
-			level--;
-			if(level<0)level=0;
-			if([s hasPrefix:@"\t"])	s = [s stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:@""];
-		}
+            level--;
+            if(level<0)level=0;
+            if([s hasPrefix:@"\t"])	s = [s stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:@""];
+        }
+        else if([s rangeOfString:@"break;"].location != NSNotFound && inCaseBlock){
+            inCaseBlock = NO;
+            level--;
+            if(level<0)level=0;
+            if([s hasPrefix:@"\t"])	s = [s stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:@""];
+        }
 		[newLines addObject:s];
 	}
-	
+    NSString* s;
 	s = [newLines componentsJoinedByString:@"\n"];
 	s = [s substringToIndex:[s length]];
 	//put the text back
