@@ -521,7 +521,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) insert:(unsigned short) numPoints value:(float) theValue;
 {
 	if ([self numPoints] >= [self maxNumberOfWaveformPoints]) return;
-    short i;
+    unsigned short i;
     for(i=0;i<numPoints;i++){
         [waveform appendBytes:&theValue length:sizeof(float)];
     }
@@ -531,7 +531,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     double theAngleStepSize = (2*PI)/(float)numPoints;
     double anAngle = thePhase*2*PI/360.;
-    short i;
+    unsigned short i;
 	int inverter = negativePulse?1:-1;
     for(i=0;i<numPoints;i++){
         float number = inverter*0.5*fabs(theAmplitude)*(sin(anAngle) - 1);
@@ -542,7 +542,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) insertGaussian:(unsigned short)numPoints amplitude:(float) theAmplitude
 {
-    short i;
+    unsigned short i;
 	int inverter = negativePulse?-1:1;
 	float multipler = inverter*2.*theAmplitude*(1/sqrtf(2*3.14159));
 	float x=0;
@@ -558,7 +558,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) insertPinDiode:(unsigned short)numPoints amplitude:(float) theAmplitude
 {
-    short i;
+    unsigned short i;
 	int inverter = negativePulse?1:-1;
     for(i=0;i<numPoints;i++){
 		float number = -inverter*theAmplitude*expf(-i/((float)numPoints/10.));
