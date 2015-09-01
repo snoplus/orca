@@ -603,7 +603,9 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[model title]];
+    if(aModel){
+        [[self window] setTitle:[model title]];
+    }
 }
 
 
