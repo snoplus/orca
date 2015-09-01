@@ -65,12 +65,12 @@ typedef struct HPPulserCustomWaveformStruct {
     BOOL            verbose;
 	
 	enum {
-                kBuiltInSine,
-                kBuiltInSquare,
-                kBuiltInRamp,
-                kBuiltInPulse,
-                kBuiltInNoise,
-                kBuiltInDC,
+        kBuiltInSine,
+        kBuiltInSquare,
+        kBuiltInRamp,
+        kBuiltInPulse,
+        kBuiltInNoise,
+        kBuiltInDC,
 		kBuiltInSinc,
 		kBuiltInNegRamp,
 		kBuiltInExpRise,

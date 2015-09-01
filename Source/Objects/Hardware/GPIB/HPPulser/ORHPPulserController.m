@@ -661,6 +661,7 @@
 - (void) selectedWaveformChanged:(NSNotification*)aNotification
 {
 	[selectionPopUpButton selectItemAtIndex:[model selectedWaveform]];
+    [self setButtonStates];
 }
 
 - (void) volatileChanged:(NSNotification*)aNotification
@@ -776,7 +777,11 @@
 	[[plotter yAxis] setNeedsDisplay:YES];
 	[[plotter xAxis] setNeedsDisplay:YES];
 	[plotter setNeedsDisplay:YES];
-	[downloadButton setEnabled:![model loading] && ![model lockGUI]];
+    
+    
+	[downloadButton setEnabled: ![model loading] &&
+                                ![model lockGUI] &&
+                                ([model selectedWaveform]!= kWaveformFromScript)];
 	
 	[downloadTypeField setStringValue:@""];
 		
@@ -786,7 +791,9 @@
     [minTimeStepper setEnabled: !locked && triggerModeIsSoftware];	
     [maxTimeStepper setEnabled: !locked && triggerModeIsSoftware];	
 	
-    [negativePulseMatrix setEnabled:!loading && !locked];
+    [negativePulseMatrix setEnabled:!loading &&
+                                    !locked  &&
+                                    ([model selectedWaveform]!= kWaveformFromScript)];
     [mPrimaryAddress setEnabled:!loading && !locked];
     [mConnectButton setEnabled:!loading && !locked];
     [readIdButton setEnabled:!loading && !locked];
@@ -811,7 +818,6 @@
     [loadParamsButton setEnabled:!locked && !loading];
     [sendCommandButton setEnabled:!locked && !loading];
     [commandField setEnabled:!locked && !loading];
-    [downloadButton setEnabled:!locked && !loading];
     
     NSString* s = @"";
 	if([model lockGUI]){
