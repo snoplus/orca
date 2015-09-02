@@ -37,7 +37,9 @@
 //6 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Rcm
 //7 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Rrms
 //8 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  neutronP
-//9 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  ut time
+//9 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  gammaP
+//10 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  alphaP
+//11 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  ut time
 //-----------------------------------------------------------------------------------------------
 
 @implementation ORBurstMonitorDecoderForBurst
@@ -68,6 +70,16 @@
         float theFloat;
     }neutP;
     neutP.theLong = ptr[8];
+    union {
+        long theLong;
+        float theFloat;
+    }gamP;
+    gamP.theLong = ptr[9];
+    union {
+        long theLong;
+        float theFloat;
+    }alpP;
+    alpP.theLong = ptr[10];
 
     NSString* theDuration           = [NSString stringWithFormat:@"Duration = %.6f seconds\n",duration.theFloat];
     NSString* theBurstCount         = [NSString stringWithFormat:@"Burst Count = %ld\n",ptr[1]];
@@ -77,8 +89,10 @@
     NSString* Rcm                   = [NSString stringWithFormat:@"Center = %ld mm\n",ptr[6]];
     NSString* Rrms                  = [NSString stringWithFormat:@"Position rms = %ld mm\n",ptr[7]];
     NSString* neutronP              = [NSString stringWithFormat:@"Neutron Likelyhood = %.6f\n",neutP.theFloat];
+    NSString* gammaP              = [NSString stringWithFormat:@"Gamma Likelyhood = %.6f\n",gamP.theFloat];
+    NSString* alphaP              = [NSString stringWithFormat:@"Alpha Likelyhood = %.6f\n",alpP.theFloat];
     
-    return [NSString stringWithFormat:@"%@%s%@%@%@%@%@%@%@%@",title,ctime((const time_t *)(&ptr[9])),Triage,countsInBurst,neutronP,theDuration,Rcm,Rrms,theBurstCount,theNumSecTilBurst];
+    return [NSString stringWithFormat:@"%@%s%@%@%@%@%@%@%@%@%@%@",title,ctime((const time_t *)(&ptr[11])),Triage,countsInBurst,neutronP,gammaP,alphaP,theDuration,Rcm,Rrms,theBurstCount,theNumSecTilBurst];
 }
 @end
 

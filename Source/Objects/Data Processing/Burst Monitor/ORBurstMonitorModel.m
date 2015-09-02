@@ -44,7 +44,7 @@ NSString* ORBurstMonitorEmailListChanged		    = @"ORBurstMonitorEmailListChanged
 NSString* ORBurstMonitorLock                        = @"ORBurstMonitorLock";
 NSDate* burstStart = NULL;
 
-#define kBurstRecordLength 10
+#define kBurstRecordLength 12
 
 @interface ORBurstMonitorModel (private)
 - (void) deleteQueues;
@@ -1539,7 +1539,11 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     data[7] = Rrms;
     LongFloatUnion.asFloat = adcP;
     data[8] = LongFloatUnion.asLong;
-    data[9] = ut_time;
+    LongFloatUnion.asFloat = gammaP;
+    data[9] = LongFloatUnion.asLong;
+    LongFloatUnion.asFloat = alphaP;
+    data[10] = LongFloatUnion.asLong;
+    data[11] = ut_time;
 
     //pass the record on to the next object
     [theBurstMonitoredObject processData:[NSArray arrayWithObject:[NSData dataWithBytes:data length:sizeof(long)*kBurstRecordLength]] decoder:theDecoder];
