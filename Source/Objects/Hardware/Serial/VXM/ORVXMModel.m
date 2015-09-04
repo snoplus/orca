@@ -618,7 +618,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		abortAllRepeats = YES;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
         [self sendCommand:@"K"]; //NO <CR>
-        [self queryFinalPositions];
+        //[self queryFinalPositions];
     }
 }
 
