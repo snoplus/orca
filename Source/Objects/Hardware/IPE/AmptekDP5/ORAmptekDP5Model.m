@@ -870,7 +870,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     
 }
 
-
+//mainly for debugging, not accessible for users - set it to false to directly send commands to Amptek DP5 -tb-
 - (BOOL) useCommandQueue
 { return useCommandQueue; }
 
