@@ -442,7 +442,11 @@
                          name : ORSIS3305TemperatureChanged
                         object: model];
     
-
+    [notifyCenter addObserver : self
+                     selector : @selector(writeGainPhaseOffsetEnableChanged:)
+                         name : ORSIS3305WriteGainPhaseOffsetChanged
+                       object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(pulseModeChanged:)
                          name : ORSIS3305ModelPulseModeChanged
@@ -537,6 +541,7 @@
 //    [self ADCGateModeEnabledChanged:nil];
     [self waitPreTrigTimeBeforeDirectMemTrigChanged:nil];
     
+    [self writeGainPhaseOffsetEnableChanged:nil];
     
     [self bandwidthChanged:nil];
     [self testModeChanged:nil];
@@ -601,6 +606,13 @@
     [temperatureTextField setStringValue:[NSString stringWithFormat:@"%3.1f C",[model temperature]]];
 }
 
+- (void) writeGainPhaseOffsetEnableChanged:(NSNotification *)aNote
+{
+    BOOL value = [model writeGainPhaseOffsetEnabled];
+    [writeGainPhaseOffsetEnableCB setIntValue: value];
+    [self settingsLockChanged:nil];
+
+}
 
 - (void) shipTimeRecordAlsoChanged:(NSNotification*)aNote
 {
@@ -611,125 +623,6 @@
 {
     [TDCLogicEnabledCB setIntValue: [model TDCMeasurementEnabled]];
 }
-
-//- (void) mcaUseEnergyCalculationChanged:(NSNotification*)aNote
-//{
-//	[mcaUseEnergyCalculationButton setIntValue: [model mcaUseEnergyCalculation]];
-//	[self mcaEnergyCalculationValues];
-//}
-//
-//- (void) mcaEnergyCalculationValues
-//{
-//	BOOL useEnergyCalc = [model mcaUseEnergyCalculation];
-//	if(useEnergyCalc){
-//		if([model mcaHistoSize] == 0)      [mcaEnergyDividerField setIntValue: 0x6];
-//		else if([model mcaHistoSize] == 1) [mcaEnergyDividerField setIntValue: 0x5];
-//		else if([model mcaHistoSize] == 2) [mcaEnergyDividerField setIntValue: 0x4];
-//		else if([model mcaHistoSize] == 3) [mcaEnergyDividerField setIntValue: 0x3];
-//		[mcaEnergyMultiplierField setIntValue: 0x80];
-//		[mcaEnergyOffsetField setIntValue: 0x0];
-//	}
-//	else {
-//		[mcaEnergyDividerField setIntValue: [model mcaEnergyDivider]];
-//		[mcaEnergyMultiplierField setIntValue: [model mcaEnergyMultiplier]];
-//		[mcaEnergyOffsetField setIntValue: [model mcaEnergyOffset]];
-//	}
-//}
-//
-//- (void) mcaEnergyOffsetChanged:(NSNotification*)aNote
-//{
-//	[mcaEnergyOffsetField setIntValue: [model mcaEnergyOffset]];
-//}
-//
-//- (void) mcaEnergyMultiplierChanged:(NSNotification*)aNote
-//{
-//	[mcaEnergyMultiplierField setIntValue: [model mcaEnergyMultiplier]];
-//}
-//
-//- (void) mcaEnergyDividerChanged:(NSNotification*)aNote
-//{
-//	[mcaEnergyDividerField setIntValue: [model mcaEnergyDivider]];
-//}
-
-//- (void) mcaStatusChanged:(NSNotification*)aNote
-//{
-//	//sorry about the hard-coded indexes --- values from a command list....
-//	unsigned long acqRegValue = [model mcaStatusResult:0];
-//	
-//	BOOL mcaBusy = (acqRegValue & 0x100000) || (acqRegValue & 0x200000);
-//	[mcaBusyField setStringValue:mcaBusy?@"MCA Busy":@"--"];
-//	
-//	[mcaScanHistogramCounterField setIntValue:[model mcaStatusResult:1]];
-//	[mcaMultiScanScanCounterField setIntValue:[model mcaStatusResult:2]];
-//	int i;
-//	for(i=0;i<kNumSIS3305Channels;i++){
-//		unsigned long aValue;
-//		aValue = [model mcaStatusResult:3 + (4*i)];
-//		if(aValue>100000){
-//			[[mcaTriggerStartCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
-//		}
-//		else [[mcaTriggerStartCounterMatrix	cellWithTag:i] setIntValue:aValue];
-//
-//		aValue = [model mcaStatusResult:4 + (4*i)];
-//		if(aValue>100000){
-//			[[mcaPileupCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
-//		}
-//		else [[mcaPileupCounterMatrix	cellWithTag:i] setIntValue:aValue];
-//
-//		aValue = [model mcaStatusResult:5 + (4*i)];
-//		if(aValue>100000){
-//			[[mcaEnergy2LowCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
-//		}
-//		else [[mcaEnergy2LowCounterMatrix	cellWithTag:i] setIntValue:aValue];
-//
-//		aValue = [model mcaStatusResult:6 + (4*i)];
-//		if(aValue>100000){
-//			[[mcaEnergy2HighCounterMatrix	cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%luK",aValue/1000]];
-//		}
-//		else [[mcaEnergy2HighCounterMatrix	cellWithTag:i] setIntValue:aValue];
-//	}
-//}
-//
-//- (void) mcaModeChanged:(NSNotification*)aNote
-//{
-//	[mcaModePU selectItemAtIndex: [model mcaMode]];
-//}
-//
-//- (void) mcaPileupEnabledChanged:(NSNotification*)aNote
-//{
-//	[mcaPileupEnabledCB setIntValue: [model mcaPileupEnabled]];
-//}
-//
-//- (void) mcaHistoSizeChanged:(NSNotification*)aNote
-//{
-//	[mcaHistoSizePU selectItemAtIndex: [model mcaHistoSize]];
-//	[self mcaEnergyCalculationValues];
-//}
-//
-//- (void) mcaNofScansPresetChanged:(NSNotification*)aNote
-//{
-//	[mcaNofScansPresetField setIntValue: [model mcaNofScansPreset]];
-//}
-//
-//- (void) mcaAutoClearChanged:(NSNotification*)aNote
-//{
-//	[mcaAutoClearCB setIntValue: [model mcaAutoClear]];
-//}
-//
-//- (void) mcaPrescaleFactorChanged:(NSNotification*)aNote
-//{
-//	[mcaPrescaleFactorField setIntValue: [model mcaPrescaleFactor]];
-//}
-//
-//- (void) mcaLNESetupChanged:(NSNotification*)aNote
-//{
-//	[mcaLNESourcePU selectItemAtIndex: [model mcaLNESetup]];
-//}
-//
-//- (void) mcaNofHistoPresetChanged:(NSNotification*)aNote
-//{
-//	[mcaNofHistoPresetField setIntValue: [model mcaNofHistoPreset]];
-//}
 
 
 - (void) lemoInEnabledMaskChanged:(NSNotification*)aNote
@@ -1269,6 +1162,8 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3305SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3305SettingsLock];
 	BOOL firmwareGEV15xx = [model firmwareVersion] >= 15;
+    
+    BOOL writeGPO = [model writeGainPhaseOffsetEnabled];
 //    BOOL mcaMode = (([model runMode] == kMcaRunMode) && !firmwareGEV15xx);
 	
     // temp
@@ -1322,6 +1217,12 @@
     [LTThresholdOff58Matrix         setEnabled:(gate[1] && !lockedOrRunningMaintenance)];
     [GTThresholdOff58Matrix         setEnabled:(gate[1] && !lockedOrRunningMaintenance)];
 
+    [gain14Matrix           setEnabled:(writeGPO && !lockedOrRunningMaintenance)];
+    [gain58Matrix           setEnabled:(writeGPO && !lockedOrRunningMaintenance)];
+    [phase14Matrix          setEnabled:(writeGPO && !lockedOrRunningMaintenance)];
+    [phase58Matrix          setEnabled:(writeGPO && !lockedOrRunningMaintenance)];
+    [offset14Matrix         setEnabled:(writeGPO && !lockedOrRunningMaintenance)];
+    [offset58Matrix         setEnabled:(writeGPO && !lockedOrRunningMaintenance)];
     
     // begin key regs
     [generalResetButton             setEnabled:!locked && !runInProgress];
@@ -1359,9 +1260,11 @@
 	int i;
 		
 	for(i=0;i<kNumSIS3305Groups;i++){
-		if([model bufferWrapEnabled:i])[[sampleStartIndexMatrix	cellWithTag:i]setEnabled:!locked && !runInProgress];
-		else [[sampleStartIndexMatrix cellWithTag:i]	setEnabled:NO];
-	}
+		if([model bufferWrapEnabled:i])
+            [[sampleStartIndexMatrix	cellWithTag:i]setEnabled:!locked && !runInProgress];
+		else
+            [[sampleStartIndexMatrix cellWithTag:i]	setEnabled:NO];
+    }
 	
 }
 
@@ -1503,6 +1406,12 @@
 //    
 //    [model setThresholdMode:chan withValue:value];
 //}
+
+- (IBAction) writeGainPhaseOffsetEnableAction:(id)sender
+{
+    BOOL value = [sender intValue];
+    [model setWriteGainPhaseOffsetEnabled:value];
+}
 
 - (IBAction) GTThresholdOn14Action:(id)sender
 {

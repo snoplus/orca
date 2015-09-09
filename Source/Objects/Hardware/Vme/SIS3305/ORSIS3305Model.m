@@ -35,6 +35,7 @@ NSString* ORSIS3305TapDelayChanged                      = @"ORSIS3305TapDelayCha
 NSString* ORSIS3305ModelPulseModeChanged				= @"ORSIS3305ModelPulseModeChanged";
 NSString* ORSIS3305ModelFirmwareVersionChanged			= @"ORSIS3305ModelFirmwareVersionChanged";
 NSString* ORSIS3305TemperatureChanged                   = @"ORSIS3305TemperatureChanged";
+NSString* ORSIS3305WriteGainPhaseOffsetChanged          = @"ORSIS3305WriteGainPhaseOffsetChanged";
 
 NSString* ORSIS3305ModelBufferWrapEnabledChanged		= @"ORSIS3305ModelBufferWrapEnabledChanged";
 //NSString* ORSIS3305ModelCfdControlChanged				= @"ORSIS3305ModelCfdControlChanged";
@@ -484,6 +485,17 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305ModelShipTimeRecordAlsoChanged object:self];
 }
 
+
+- (BOOL) writeGainPhaseOffsetEnabled
+{
+    return writeGainPhaseOffset;
+}
+- (void) setWriteGainPhaseOffsetEnabled:(BOOL)value
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteGainPhaseOffsetEnabled:writeGainPhaseOffset];
+    writeGainPhaseOffset = value;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3305WriteGainPhaseOffsetChanged object:self];
+}
 
 #pragma mark -- Board Status
 
@@ -1687,6 +1699,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         [self setTestMode:i withValue:0];
     }
     
+    [self setWriteGainPhaseOffsetEnabled:NO];
+
 	[self setTriggerOutEnabledMask:0x0];
 	[self setInputInvertedMask:0x0];
 	[self setInternalGateEnabledMask:0xff];
@@ -2871,7 +2885,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (unsigned long) readADCSerialInterface:(BOOL)verbose
 {
     // reads out the ADC SPI at 0x74
-    // probably no need to ever do this....
     
     unsigned long value;
     
@@ -2892,24 +2905,46 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     return value;
 }
 
+- (unsigned long) readADCSerialInterfaceOnADC:(char)adcSelect fromAddress:(unsigned int)addr
+{
+    // Reading from the Serial Interface is a 2 step process:
+    //      1: Write to the interface with the address you're interested in
+    //      2: Read back from the register
+    
+    unsigned long writeValue = 0;
+    writeValue = (addr << 16) | (adcSelect << 24);
+    
+    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    [self waitUntilADCSerialInterfaceNotBusy];
+    
+    unsigned long value = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+    
+    return value;
+}
+
 - (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr viaSPI:(char)spi
 {
     // write to the ADC SPI on 0x74
     // used for talking directly to the ADC chip to setup bandwidth, channel mode (1.25/2.5/5 gsps)
     
     unsigned long writeValue = 0;
-    
-    writeValue = data | (addr << 16) | (adcSelect << 24) | (spi << 31);
+    unsigned short write = 1;
+    writeValue = data | (addr << 16) | (write << 23) | (adcSelect << 24) | (spi << 31);
  
     [[self adapter] writeLongBlock:&writeValue
                          atAddress:[self baseAddress] + kSIS3305ADCSerialInterfaceReg
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-    
+    [self waitUntilADCSerialInterfaceNotBusy];
+
     return;
 }
 
+- (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr
+{
+    [self writeADCSerialInterface:data onADC:adcSelect toAddress:addr viaSPI:NO];
+}
 
 - (void) writeADCSerialInterface
 {
@@ -3072,7 +3107,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                 case 1:
                 case 2:
                 case 3:
-                    [mode setString:@"Four-channel mode (1.25 Gsps per channel"];
+                    [mode setString:@"Four-channel mode (1.25 Gsps per channel)"];
                     oneChannel = NO;
                     twoChannel = NO;
                     fourChannel = YES;
@@ -3082,14 +3117,14 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
                     chanD = YES;
                     break;
                 case 0x4:
-                    [mode setString:@"Two-channel mode (Channel A and Channel C, 2.5 Gsps per channel"];
+                    [mode setString:@"Two-channel mode (Channel A and Channel C, 2.5 Gsps per channel)"];
                     chanA = YES;
                     chanB = NO;
                     chanC = YES;
                     chanD = NO;
                     break;
                 case 0x5:
-                    [mode setString:@"Two-channel mode (Channel B and Channel C, 2.5 Gsps per channel"];
+                    [mode setString:@"Two-channel mode (Channel B and Channel C, 2.5 Gsps per channel)"];
                     chanA = NO;
                     chanB = YES;
                     chanC = YES;
@@ -3177,7 +3212,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 - (void) writeADCControlReg
 {
     /*
-     Uses the SPI protocol of the ADC to read out the ADC Chip Configuration.
+     Uses the SPI protocol of the ADC to write out the ADC Chip Configuration.
      Only 16 bits of data per chip
      15:14  Unused
      13     0
@@ -3190,60 +3225,28 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      6      Unused
      5:4    Standby
      3:0    ADC Mode
-     
-     
      */
     
-//    unsigned long readValue = 0;
-    unsigned long writeValue = 0;
     unsigned long writeData = 0;
-//    BOOL logicBusy = YES;
-    
     unsigned long addr, adc;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
-    
-//    unsigned int readCount = 0;
-//    unsigned int maxPolls = 100;
-//    
-//    struct SIS3305_ADC_SPI_Config_Struct packet;
     
     [self writeADCSerialChannelSelect:0xF];   // resets us to not having any channel selected
 
- //   [self readEndAddressThresholdOfGroup:0];    // FIX: Why is this here?
-    for (adc = 0; adc<kNumSIS3305Groups; adc++) {
-        // read ADC Chip ID
+    for (adc = 0; adc<kNumSIS3305Groups; adc++)
+    {
         addr = 0x1;     // control reg
-        RWcmd = 0x1;    // write command
         writeData = (([self channelMode:adc]    & 0xF)  << 0)
-//                |   ((1<<7))        // turn on gray code
+                |   (([self grayCodeEnabled:adc] &0x1)  << 7)
                 |   (([self bandwidth:adc]      & 0x1)  << 8)
                 |   (([self testMode:adc]       & 0x1)  << 12);
         
-        
-        writeValue =  ((RWcmd   & 0x1)  << 23)
-        | ((addr    &0x7F)  << 16)
-        | ((adc     & 0x1)  << 24)
-        | ((writeData&0xFFFF) << 0);
-        
-        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-        
-//        do {
-//            readCount++;
-//            readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
-//            logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
-//        }
-//        while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
-//        if (logicBusy == YES) {
-//            NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
-//            return;
-//        }
-//        packet.control[adc] = readValue;
+        [self writeADCSerialInterface:writeData onADC:adc toAddress:addr viaSPI:NO];
     }
-    
-    
+    [self waitUntilADCSerialInterfaceNotBusy];
+    [self ADCSynchReset];   // this is necessary every time you change channel mode, I write it every time here.
 }
 
-- (void) writeADCSerialChannelSelect:(unsigned short)chan
+- (void) writeADCSerialChannelSelect:(unsigned short)cardChan
 {
     /*
      Uses the SPI protocol of the ADC to read out the ADC Chip Configuration.
@@ -3262,19 +3265,20 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
  
     // `chan` here is the actual channel, not the ADC channel
     
-    unsigned long writeValue = 0;
     unsigned long writeData = 0;
     
     unsigned long addr, adc, adcChan;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
     
     BOOL resetFlag = NO;
     
     //    unsigned int readCount = 0;
     
-    if (chan<8){
-        adcChan = chan%4;       // the relative channel on each ADC
-        adc = (chan-adcChan)/4;     // the adc the channel is on
+    
+    if (cardChan<8){
+        adc = floor(cardChan/4);    // the adc the channel is on
+        adcChan = (cardChan - 4*adc);   // the relative channel on each ADC
+//        adcChan = chan%4;
+//        adc = (chan-adcChan)/4;
     }
     else{
         adc = 0;
@@ -3283,7 +3287,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     }
     
     addr = 0xF;     // Channel Selector register
-    RWcmd = 0x1;    // write command
     
     // 16-bit value written to the SPI chip
     if(resetFlag == NO)
@@ -3291,67 +3294,27 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     else
         writeData = 0;
     
-    // 32-bit value written to full digitizer register
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-    | ((addr    &0x7F)  << 16)
-    | ((adc     & 0x1)  << 24)
-    | ((writeData&0xFFFF) << 0);
-    
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-//    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.01 second.
-    if (resetFlag == YES) { // reset the other chip too for good measure.
-        adc = 1;
-        
-        writeValue =  ((RWcmd   & 0x1)  << 23)
-        | ((addr    &0x7F)  << 16)
-        | ((adc     & 0x1)  << 24)
-        | ((writeData&0xFFFF) << 0);
-        
-        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    }
-    
-//    [NSThread sleepForTimeInterval:0.01f];   // pause for 0.1 second.
+    [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+
+//    if (resetFlag == YES) { // reset the other chip too for good measure.
+//        adc = 1;
+//        [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+//    }
 }
 
 
 - (unsigned long) readADCSerialChannelSelect:(unsigned short)adc
 {
     unsigned long addr;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
-    
-    unsigned long writeValue, readValue;
-    unsigned long writeData;
-    unsigned int readCount = 0;
-    unsigned int maxPolls = 100;
-    
-    BOOL logicBusy;
+    unsigned long readValue;
     
     if (adc >= kNumSIS3305Groups) {
         NSLog(@"Invalid ADC specified for readADCChannelSelect.... Returning.\n");
         return 0xFFFF;
     }
     addr = 0xF;     // Channel Selector register
-    RWcmd = 0x0;    // read command
-    writeData = 0x0;    // just a placeholder, since we're reading...
-    
-    // 32-bit value written to full digitizer register
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-                | ((addr    &0x7F)  << 16)
-                | ((adc     & 0x1)  << 24)
-                | ((writeData&0xFFFF) << 0);
-    
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    
-    do {
-        readCount++;
-        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
-        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
-    }
-    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
-    if (logicBusy == YES) {
-        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
-        return 0x0;
-    }
+
+    readValue = [self readADCSerialInterfaceOnADC:adc fromAddress:addr];
     return readValue & 0xFFFF;
 }
 
@@ -3362,48 +3325,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 {
     // this reads from 0x21 of the ADC, the "Offset Register", a read only reg
     unsigned short adcChan,adc;
-    
-    unsigned long writeValue = 0;
     unsigned long readValue = 0;
-    
     unsigned long addr;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
-
-    unsigned short maxPolls = 100;
-    unsigned long readCount = 0;
-    BOOL logicBusy;
-    
     
     adcChan = chan%4;       // the relative channel on each ADC
     adc = (chan-adcChan)/4;     // the adc the channel is on
-    
-    struct SIS3305_ADC_SPI_Config_Struct packet;        // probably overkill.
-    
     addr = 0x21;    // offset reg
-    RWcmd = 0x0;    // read command
-    
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-                | ((addr    &0x7F)  << 16)
-                | ((adc     & 0x1)  << 24);
-    
-    [self writeADCSerialChannelSelect:chan];
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    
-    do {
-        readCount++;
-        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
-        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
-    }
-    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
-    if (logicBusy == YES) {
-        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
-        return 0x0;
-    }
-    
-    // FIX: This should actually go to the right spot, but we don't use it anyways...
-    packet.spi_1chModeA_gain_adc[adc] = readValue;
-    
-    
+
+    readValue = [self readADCSerialInterfaceOnADC:adc fromAddress:addr];
+
     return  readValue;
 }
 
@@ -3418,7 +3348,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
     
     unsigned short adcChan,chan;
-    
 
     addr = 0x20;    // External Offset register
     RWcmd = 0x1;    // write command
@@ -3427,18 +3356,10 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     for (chan = 0; chan<kNumSIS3305Channels; chan++) {
         adcChan = chan%4;       // the relative channel on each ADC
         adc = (chan-adcChan)/4;     // the adc the channel is on
-        
         [self writeADCSerialChannelSelect:chan];
         
         writeData = (([self adcOffset:chan]   & 0x3FF)  << 0);
-        
-        // 32-bit value written to full digitizer register
-        writeValue =  ((RWcmd   & 0x1)  << 23)
-        | ((addr    &0x7F)  << 16)
-        | ((adc     & 0x1)  << 24)
-        | ((writeData&0xFFFF) << 0);
-        
-        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
         
         // next, force the ADC to pull in these values as the "calibration"
         [self applyADCCalibration:adc];
@@ -3451,140 +3372,111 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 {
     // this reads from 0x23 of the ADC, the "Offset Register", a read only reg
     unsigned short adcChan,adc;
-    
-    unsigned long writeValue = 0;
     unsigned long readValue = 0;
-    
     unsigned long addr;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
-    
-    unsigned short maxPolls = 100;
-    unsigned long readCount = 0;
-    BOOL logicBusy;
     
     adcChan = chan%4;       // the relative channel on each ADC
     adc = (chan-adcChan)/4;     // the adc the channel is on
     
     addr = 0x23;    // gain reg
-    RWcmd = 0x0;    // read command
-    
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-                | ((addr    &0x7F)  << 16)
-                | ((adc     & 0x1)  << 24);
-    
-    [self writeADCSerialChannelSelect:chan];
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    
-    do {
-        readCount++;
-        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
-        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
-    }
-    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
-    if (logicBusy == YES) {
-        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
-        return 0x0;
-    }
+    readValue = [self readADCSerialInterfaceOnADC:adc fromAddress:addr];
     
     return  readValue;
 }
 
 - (void) writeADCGains
 {
-    unsigned long writeValue = 0;
     unsigned long writeData = 0;
+    unsigned long gainExtAddr, gainIntAddr, chanSelectAddr, calAddr;
+    unsigned short adc,chan;
     
-    unsigned long addr, adc;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
+    gainExtAddr = 0x22;    // External Gain register
+    gainIntAddr = 0x23;
+    chanSelectAddr = 0xF;
+    calAddr = 0x10;
     
-    unsigned short adcChan,chan;
-    
-    
-    addr = 0x22;    // External Gain register
-    RWcmd = 0x1;    // write command
-    
-    // 16-bit value written to the SPI chip
-    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
-        adcChan = chan%4;       // the relative channel on each ADC
-        adc = (chan-adcChan)/4;     // the adc the channel is on
+//    unsigned short bigChan;
+    for(chan=0;chan<8;chan++)
+    {
+        adc = floor(chan/4);
         
         [self writeADCSerialChannelSelect:chan];
         
-        writeData = (([self adcGain:chan]   & 0x3FF)  << 0);
+        // write the gain
+        writeData =  ([self adcGain:chan] & 0xFFF);
+        [self writeADCSerialInterface:writeData onADC:adc toAddress:gainExtAddr];
         
-        // 32-bit value written to full digitizer register
-        writeValue =  ((RWcmd   & 0x1)  << 23)
-        | ((addr    &0x7F)  << 16)
-        | ((adc     & 0x1)  << 24)
-        | ((writeData&0xFFFF) << 0);
+        // now we pull this into the gain reg
+        writeData = 0x20;
+        [self writeADCSerialInterface:writeData onADC:adc toAddress:calAddr];
+
+        if([self checkADCCalibrationMailboxReady:adc])
+        {
+            writeData = 0x00;
+            [self writeADCSerialInterface:writeData onADC:adc toAddress:calAddr];
+        };	
+    }
+    
+    return;
+    /*
+    
+    
+    
+    
+    for (chan = 0; chan<kNumSIS3305Channels; chan++) {
+        adcChan = chan%4;       // the relative channel on each ADC
+        adc = floor(chan/4);
+
+        [self writeADCSerialChannelSelect:chan];
         
-        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+        [self writeADCSerialInterface:0x0 onADC:adc toAddress:calAddr]; // reset calibration
+        
+        writeData = ([self adcGain:chan]   & 0x3FF);
+        [self writeADCSerialInterface:writeData onADC:adc toAddress:gainExtAddr];
 
         // next, force the ADC to pull in these values as the "calibration"
-        [self applyADCCalibration:adc];
+//        [self applyADCCalibration:adc];
+//        [self applyADCGainCalibration:chan];
+
+//        writeData = 0x20;
+//        [self writeADCSerialInterface:writeData onADC:adc toAddress:calAddr];
+        
+//        [self checkADCCalibrationMailboxReady:adc];
+//        [self writeADCSerialInterface:0x0 onADC:adc toAddress:calAddr];
+//        [self checkADCCalibrationMailboxReady:adc];
     }
     
     [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
+    
+    
+    */
 }
 
 
 - (unsigned long) readADCPhase:(unsigned short)chan
 {
-    // this reads from 0x23 of the ADC, the "Offset Register", a read only reg
+    // this reads from 0x25 of the ADC, the "Phase Register", a read only reg
     unsigned short adcChan,adc;
-    
-    unsigned long writeValue = 0;
     unsigned long readValue = 0;
-    
     unsigned long addr;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
-    
-    unsigned short maxPolls = 100;
-    unsigned long readCount = 0;
-    BOOL logicBusy;
-    
+
     adcChan = chan%4;       // the relative channel on each ADC
     adc = (chan-adcChan)/4;     // the adc the channel is on
     
     addr = 0x25;    // gain reg
-    RWcmd = 0x0;    // read command
     
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-    | ((addr    &0x7F)  << 16)
-    | ((adc     & 0x1)  << 24);
-    
-    [self writeADCSerialChannelSelect:chan];
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    
-    do {
-        readCount++;
-        readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
-        logicBusy = (readValue >> 31) & 0x1;    // Is bit 31 high?
-    }
-    while ((readCount<maxPolls) && logicBusy == YES);   // check until not busy or too many polls
-    if (logicBusy == YES) {
-        NSLog(@"SIS3305 ADC %d SPI logic is busy, unable to write to it...",adc);
-        return 0x0;
-    }
-    
+    readValue = [self readADCSerialInterfaceOnADC:adc fromAddress:addr];
     return  readValue;
 }
 
 - (void) writeADCPhase
 {
-    unsigned long writeValue = 0;
     unsigned long writeData = 0;
-    
     unsigned long addr, adc;
-    unsigned long RWcmd;        // Read/write command (0 = read, 1 = write)
-    
     unsigned short adcChan,chan;
     
     
     addr = 0x24;    // External Gain register
-    RWcmd = 0x1;    // write command
     
     // 16-bit value written to the SPI chip
     for (chan = 0; chan<kNumSIS3305Channels; chan++) {
@@ -3592,22 +3484,70 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
         adc = (chan-adcChan)/4;     // the adc the channel is on
         
         [self writeADCSerialChannelSelect:chan];
-        
         writeData = (([self adcPhase:chan]   & 0x3FF)  << 0);
-        
-        // 32-bit value written to full digitizer register
-        writeValue =  ((RWcmd   & 0x1)  << 23)
-        | ((addr    &0x7F)  << 16)
-        | ((adc     & 0x1)  << 24)
-        | ((writeData&0xFFFF) << 0);
-        
-        [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-        
+        [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+ 
         // next, force the ADC to pull in these values as the "calibration"
         [self applyADCCalibration:adc];
     }
     
     [self writeADCSerialChannelSelect:0xF]; // reset to `no channel selected`
+}
+
+- (unsigned long) readADCCalibrationMailbox:(unsigned short)adc
+{
+    return [self readADCSerialInterfaceOnADC:adc fromAddress:0x11];
+}
+
+- (BOOL) checkADCCalibrationMailboxReady:(unsigned short)adc
+{
+    // checking this is just a way of introducing some delay
+    // there's nothing I can do except reset the chip if it gets stuck high...
+    
+    unsigned long value;
+    unsigned long numReads = 0;
+    unsigned long maxReads = 1000;
+    do{
+        value = [self readADCCalibrationMailbox:adc];
+        numReads++;
+    }while ((value != 0) && (numReads < maxReads));
+    
+    if (value != 0) {
+        unsigned short currentChan = [self readADCSerialChannelSelect:adc];
+        NSLogColor([NSColor redColor], @"ADC Calibration mailbox for channel %d not ready\n",currentChan);
+        return NO;
+    }
+    else
+        return YES;
+    
+}
+- (void) applyADCGainCalibration:(unsigned short)chan
+{
+    unsigned short addr = 0x10;
+    unsigned short setGain = 0x2;
+    unsigned short setIdle = 0x0;
+    unsigned short adc = floor(chan/4);
+    
+    // check that we're ready to do a calibration
+    if([self checkADCCalibrationMailboxReady:adc] == NO)
+    {
+        NSLogColor([NSColor redColor], @"Error: ADC mailbox indicates channel 0x%x is not ready to calibrate\n", chan);
+        return;
+    }
+    
+    // apply the calibration
+    [self writeADCSerialInterface:setGain onADC:adc toAddress:addr];
+    
+    // check that it's all good afterwards
+    if([self checkADCCalibrationMailboxReady:adc] == NO)
+    {
+        NSLogColor([NSColor redColor], @"Error: ADC mailbox indicates channel 0x%x is still calibrating? Probably an error?",chan);
+        return;
+    }
+    
+    // return the calibration setting manually?
+    [self writeADCSerialInterface:setIdle onADC:adc toAddress:addr];
+
 }
 
 
@@ -3624,7 +3564,6 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
      0xA8 = b 1010 1000
      */
     
-    unsigned long writeValue = 0;   // 32-bit value written to full digitizer register
     unsigned long writeData = 0;    // 16 bit value written to ADC chip
     
     unsigned long addr;         // address in ADC chip
@@ -3634,37 +3573,91 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     addr = 0x10;    // calibration control reg
     RWcmd = 0x1;    // write
     
-    writeData = 0x8;    // force external offset adjust for selected channel
 
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-    | ((addr    &0x7F)  << 16)
-    | ((adc     & 0x1)  << 24)
-    | ((writeData&0xFFFF) << 0);
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
-    
+    [self checkADCCalibrationMailboxReady:adc];
+
+    writeData = 0x8;    // force external offset adjust for selected channel
+    [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+    [self checkADCCalibrationMailboxReady:adc];
     
     writeData = 0x20;    // force external gain adjust for selected channel
-    
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-    | ((addr    &0x7F)  << 16)
-    | ((adc     & 0x1)  << 24)
-    | ((writeData&0xFFFF) << 0);
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
- 
+    [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+    [self checkADCCalibrationMailboxReady:adc];
     
     writeData = 0x80;    // force external phase adjust for selected channel
-    
-    writeValue =  ((RWcmd   & 0x1)  << 23)
-    | ((addr    &0x7F)  << 16)
-    | ((adc     & 0x1)  << 24)
-    | ((writeData&0xFFFF) << 0);
-    [self writeToAddress:kSIS3305ADCSerialInterfaceReg aValue:writeValue];
+    [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+    [self checkADCCalibrationMailboxReady:adc];
 
+    writeData = 0x00;    // when we're done, set it back to 0
+    [self writeADCSerialInterface:writeData onADC:adc toAddress:addr];
+    [self checkADCCalibrationMailboxReady:adc];
     
     [self validateSerialADCCalibration];
     return;
 }
 
+- (BOOL) checkADCSerialInterfaceBusy
+{
+    BOOL busy;
+    unsigned long readValue = 0;
+    
+    readValue = [self readFromAddress:kSIS3305ADCSerialInterfaceReg];
+    
+    busy = ((readValue>>31)&0x1)?YES:NO;
+    
+    return busy;
+}
+
+- (void) waitUntilADCSerialInterfaceNotBusy
+{
+    [self waitUntilADCSerialInterfaceNotBusy:100];
+}
+
+- (unsigned long) waitUntilADCSerialInterfaceNotBusy:(unsigned long)maxReads
+{
+    unsigned int numReads = 0;
+    BOOL busy;
+    do{
+        numReads++;
+        busy = [self checkADCSerialInterfaceBusy];
+    } while( busy == YES && (numReads < maxReads));
+    
+    if (busy == YES)
+    {
+        NSLogColor([NSColor blueColor], @"Logic is busy!");
+    } // Logic is busy
+    
+    return numReads;
+}
+
+
+- (unsigned long) validateSerialADCCalibrationOnChannel:(unsigned short)chan
+{
+    unsigned long error = 0;
+    
+    if([self readADCGain:chan] != [self adcGain:chan])
+    {
+        NSLogColor([NSColor redColor], @"SIS3305 (slot %d) did not correctly write ADC gain of channel %d. \n",[self slot],chan);
+        error++;
+    }
+    if([self readADCPhase:chan] != [self adcPhase:chan])
+    {
+        NSLogColor([NSColor redColor], @"SIS3305 (slot %d) did not correctly write ADC phase of channel %d. \n",[self slot],chan);
+        error++;
+    }
+    if([self readADCOffset:chan] != [self adcOffset:chan])
+    {
+        NSLogColor([NSColor redColor], @"SIS3305 (slot %d) did not correctly write ADC offset of channel %d. \n",[self slot],chan);
+        error++;
+    }
+
+    if (error > 0)
+    {
+        NSLogColor([NSColor redColor], @"SIS3305 (slot %d) had %d values that did not get correctly written to the ADC. \n",[self slot],error);
+    
+    }
+    return error;
+}
 
 - (unsigned long) validateSerialADCCalibration
 {
@@ -4734,12 +4727,12 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     unsigned long LTEnabled;
     for(i = 0; i < kNumSIS3305Channels; i++)
     {
-        thresholdMask = 0;
         
         onThresh = [self LTThresholdOn:i];
         offThresh = [self LTThresholdOff:i];
         LTEnabled = [self LTThresholdEnabled:i];
         
+        thresholdMask = 0;
         thresholdMask |= (onThresh   & 0x3ff)    <<0;
         thresholdMask |= (offThresh  & 0x3ff)    <<16;
         thresholdMask |= (LTEnabled  &0x1)      <<31;
@@ -4758,8 +4751,8 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     unsigned long thresholdMask;
     for(i = 0; i < kNumSIS3305Channels; i++)
     {
-        thresholdMask = 0;
         
+        thresholdMask = 0;
         thresholdMask |= ([self GTThresholdOn:i]    & 0x3ff)    <<0;
         thresholdMask |= ([self GTThresholdOff:i]   & 0x3ff)    <<16;
         thresholdMask |= ([self GTThresholdEnabled:i]&0x1)      <<31;
@@ -5176,10 +5169,15 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
     
     [self writeADCControlReg];              // set up the bandwidth, channel mode etc.
 
-    NSLogColor([NSColor redColor], @"Not writing the ADC Gain/Offset/Phase!\n");
-//    [self writeADCOffsets];
-//    [self writeADCGains];
-//    [self writeADCPhase];
+    if([self writeGainPhaseOffsetEnabled])
+    {
+        [self writeADCOffsets];
+        [self writeADCGains];
+        [self writeADCPhase];
+    }
+    else
+        NSLogColor([NSColor redColor], @"Not writing the ADC Gain/Offset/Phase!\n");
+
     
 
 	[self writeAcquisitionControl];			// set up the Acquisition Register

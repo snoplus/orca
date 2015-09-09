@@ -95,7 +95,8 @@
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
     IBOutlet NSPopUpButton* clockSourcePU;
-
+    IBOutlet NSButton*      writeGainPhaseOffsetEnableCB;
+    
     IBOutlet NSMatrix*      thresholdMode14PUMatrix;
     IBOutlet NSMatrix*      thresholdMode58PUMatrix;
 
@@ -209,6 +210,8 @@
 - (void) channelEnabledChanged:(NSNotification*)aNote;
 //- (void) ledEnabledChanged:(NSNotification*)aNote;
 //- (void) ledApplicationModeChanged:(NSNotification*)aNote;
+- (void) writeGainPhaseOffsetEnableChanged:(NSNotification*)aNote;
+
 
 
 //event config changed updaters
@@ -305,6 +308,7 @@
 - (IBAction) TDCLogicEnabledAction:(id)sender;
 //- (IBAction) tapDelayAction:(id)sender;
 
+- (IBAction) writeGainPhaseOffsetEnableAction:(id)sender;
 - (IBAction) channelEnabledMaskAction:(id)sender;
 
 - (IBAction) internalExternalTriggersOredAction:(id)sender;

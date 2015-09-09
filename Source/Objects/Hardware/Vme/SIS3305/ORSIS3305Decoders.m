@@ -181,7 +181,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
                 
                 unsigned short      eventID = ShiftAndExtract(dataPtr[0], 28, 0xF);
-                channel = eventID + (group*4) + 1;
+                channel = eventID + (group*4);
                 channelKey    = [self getChannelKey: channel];
                 
                 waveformLengthSIS   = (dataPtr[3]&0xFFFF)*4;      // data length (no headers), in longs
@@ -270,7 +270,7 @@ const unsigned short kchannelModeAndEventID[16][16] = {
                 }
             }
             else if(savingMode == 1){   // 2.5 Gsps Event FIFO mode
-                channel = ((dataPtr[0]>>28)&0xF)+ (group*4) + 1;
+                channel = ((dataPtr[0]>>28)&0xF)+ (group*4);
 
                 channelKey    = [self getChannelKey: channel];
                 

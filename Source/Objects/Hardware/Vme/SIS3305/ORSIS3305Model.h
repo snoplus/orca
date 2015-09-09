@@ -42,6 +42,7 @@
     BOOL            TDCMeasurementEnabled;
     BOOL            ledApplicationMode;
     BOOL            ledEnable[3];
+    BOOL    writeGainPhaseOffset;
     float   temperature;
     
     
@@ -320,6 +321,9 @@
 
 - (int) clockSource;
 - (void) setClockSource:(int)aClockSource;
+
+- (BOOL) writeGainPhaseOffsetEnabled;
+- (void) setWriteGainPhaseOffsetEnabled:(BOOL)value;
 
 - (short) eventSavingMode:(short)aGroup;
 - (void) setEventSavingModeOf:(short)aGroup toValue:(short)aMode;
@@ -603,11 +607,13 @@
 
 
 - (unsigned long) readADCSerialInterface:(BOOL)verbose;
+- (unsigned long) readADCSerialInterfaceOnADC:(char)adcSelect fromAddress:(unsigned int)addr;
 - (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr viaSPI:(char)spiOn;
+- (void) writeADCSerialInterface:(unsigned int)data onADC:(char)adcSelect toAddress:(unsigned int)addr;
 - (void) writeADCSerialInterface;
 - (unsigned long) readADCChipID;
 - (unsigned long) readADCControlReg:(bool)verbose;
-- (void) writeADCSerialChannelSelect:(unsigned short)chan;
+- (void) writeADCSerialChannelSelect:(unsigned short)cardChan;
 - (unsigned long) readADCSerialChannelSelect:(unsigned short)adc;
 
 - (unsigned long) readADCOffset:(unsigned short)chan;
@@ -617,8 +623,18 @@
 - (unsigned long) readADCPhase:(unsigned short)chan;
 - (void) writeADCPhase;
 
+- (unsigned long) readADCCalibrationMailbox:(unsigned short)adc;
+- (BOOL) checkADCCalibrationMailboxReady:(unsigned short)adc;
+- (void) applyADCGainCalibration:(unsigned short)chan;
+
+
 - (void) applyADCCalibration:(unsigned short)adc;
+- (BOOL) checkADCSerialInterfaceBusy;
+- (unsigned long) waitUntilADCSerialInterfaceNotBusy:(unsigned long)maxReads;
+- (void) waitUntilADCSerialInterfaceNotBusy;
 - (unsigned long) validateSerialADCCalibration;
+- (unsigned long) validateSerialADCCalibrationOnChannel:(unsigned short)chan;
+
 
 
 
@@ -771,6 +787,8 @@
 extern NSString* ORSIS3305ModelPulseModeChanged;
 extern NSString* ORSIS3305ModelFirmwareVersionChanged;
 extern NSString* ORSIS3305TemperatureChanged;
+extern NSString* ORSIS3305WriteGainPhaseOffsetChanged;
+
 extern NSString* ORSIS3305ModelBufferWrapEnabledChanged;
 //extern NSString* ORSIS3305ModelCfdControlChanged;
 extern NSString* ORSIS3305ModelShipTimeRecordAlsoChanged;

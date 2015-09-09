@@ -1464,22 +1464,23 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<nil key="NSMenuItem"/>
+																	<object class="NSMenuItem" key="NSMenuItem" id="861714740">
+																		<reference key="NSMenu" ref="580436496"/>
+																		<string key="NSTitle">4-Ch (1.25 Gsps)</string>
+																		<string key="NSKeyEquiv"/>
+																		<int key="NSMnemonicLoc">2147483647</int>
+																		<int key="NSState">1</int>
+																		<reference key="NSOnImage" ref="189738902"/>
+																		<reference key="NSMixedImage" ref="283134345"/>
+																		<string key="NSAction">_popUpItemAction:</string>
+																		<int key="NSTag">4</int>
+																		<reference key="NSTarget" ref="861167742"/>
+																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
 																	<object class="NSMenu" key="NSMenu" id="580436496">
 																		<string key="NSTitle">OtherViews</string>
 																		<array class="NSMutableArray" key="NSMenuItems">
-																			<object class="NSMenuItem" id="861714740">
-																				<reference key="NSMenu" ref="580436496"/>
-																				<string key="NSTitle">4-Ch (1.25 Gsps)</string>
-																				<string key="NSKeyEquiv"/>
-																				<int key="NSMnemonicLoc">2147483647</int>
-																				<reference key="NSOnImage" ref="189738902"/>
-																				<reference key="NSMixedImage" ref="283134345"/>
-																				<string key="NSAction">_popUpItemAction:</string>
-																				<int key="NSTag">4</int>
-																				<reference key="NSTarget" ref="861167742"/>
-																			</object>
+																			<reference ref="861714740"/>
 																			<object class="NSMenuItem" id="202077856">
 																				<reference key="NSMenu" ref="580436496"/>
 																				<string key="NSTitle">4-Ch (1.25 Gsps)</string>
@@ -3881,22 +3882,23 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<string key="NSKeyEquivalent"/>
 																	<int key="NSPeriodicDelay">400</int>
 																	<int key="NSPeriodicInterval">75</int>
-																	<nil key="NSMenuItem"/>
+																	<object class="NSMenuItem" key="NSMenuItem" id="97354199">
+																		<reference key="NSMenu" ref="848845341"/>
+																		<string key="NSTitle">4-Ch (1.25 Gsps)</string>
+																		<string key="NSKeyEquiv"/>
+																		<int key="NSMnemonicLoc">2147483647</int>
+																		<int key="NSState">1</int>
+																		<reference key="NSOnImage" ref="189738902"/>
+																		<reference key="NSMixedImage" ref="283134345"/>
+																		<string key="NSAction">_popUpItemAction:</string>
+																		<int key="NSTag">4</int>
+																		<reference key="NSTarget" ref="347120253"/>
+																	</object>
 																	<bool key="NSMenuItemRespectAlignment">YES</bool>
 																	<object class="NSMenu" key="NSMenu" id="848845341">
 																		<string key="NSTitle">OtherViews</string>
 																		<array class="NSMutableArray" key="NSMenuItems">
-																			<object class="NSMenuItem" id="97354199">
-																				<reference key="NSMenu" ref="848845341"/>
-																				<string key="NSTitle">4-Ch (1.25 Gsps)</string>
-																				<string key="NSKeyEquiv"/>
-																				<int key="NSMnemonicLoc">2147483647</int>
-																				<reference key="NSOnImage" ref="189738902"/>
-																				<reference key="NSMixedImage" ref="283134345"/>
-																				<string key="NSAction">_popUpItemAction:</string>
-																				<int key="NSTag">4</int>
-																				<reference key="NSTarget" ref="347120253"/>
-																			</object>
+																			<reference ref="97354199"/>
 																			<object class="NSMenuItem" id="1020006565">
 																				<reference key="NSMenu" ref="848845341"/>
 																				<string key="NSTitle">4-Ch (1.25 Gsps)</string>
@@ -5336,7 +5338,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																<string key="NSFrame">{{5, 29}, {230, 20}}</string>
 																<reference key="NSSuperview" ref="778844513"/>
 																<reference key="NSWindow"/>
-																<reference key="NSNextKeyView" ref="1016528023"/>
+																<reference key="NSNextKeyView" ref="483185798"/>
 																<string key="NSReuseIdentifierKey">_NS:9</string>
 																<bool key="NSEnabled">YES</bool>
 																<object class="NSButtonCell" key="NSCell" id="22082262">
@@ -5346,6 +5348,33 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 																	<reference key="NSSupport" ref="26"/>
 																	<string key="NSCellIdentifier">_NS:9</string>
 																	<reference key="NSControlView" ref="332361334"/>
+																	<int key="NSButtonFlags">1211912448</int>
+																	<int key="NSButtonFlags2">2</int>
+																	<reference key="NSNormalImage" ref="356190940"/>
+																	<reference key="NSAlternateImage" ref="413127617"/>
+																	<string key="NSAlternateContents"/>
+																	<string key="NSKeyEquivalent"/>
+																	<int key="NSPeriodicDelay">200</int>
+																	<int key="NSPeriodicInterval">25</int>
+																</object>
+																<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+															</object>
+															<object class="NSButton" id="483185798">
+																<reference key="NSNextResponder" ref="778844513"/>
+																<int key="NSvFlags">268</int>
+																<string key="NSFrame">{{5, 11}, {230, 20}}</string>
+																<reference key="NSSuperview" ref="778844513"/>
+																<reference key="NSWindow"/>
+																<reference key="NSNextKeyView" ref="1016528023"/>
+																<string key="NSReuseIdentifierKey">_NS:9</string>
+																<bool key="NSEnabled">YES</bool>
+																<object class="NSButtonCell" key="NSCell" id="818358735">
+																	<int key="NSCellFlags">67108864</int>
+																	<int key="NSCellFlags2">268566528</int>
+																	<string key="NSContents">Write Gain/Phase/Offset</string>
+																	<reference key="NSSupport" ref="26"/>
+																	<string key="NSCellIdentifier">_NS:9</string>
+																	<reference key="NSControlView" ref="483185798"/>
 																	<int key="NSButtonFlags">1211912448</int>
 																	<int key="NSButtonFlags2">2</int>
 																	<reference key="NSNormalImage" ref="356190940"/>
@@ -12614,6 +12643,22 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 					<int key="connectionID">7658</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">writeGainPhaseOffsetEnableCB</string>
+						<reference key="source" ref="614878284"/>
+						<reference key="destination" ref="483185798"/>
+					</object>
+					<int key="connectionID">7666</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">writeGainPhaseOffsetEnableAction:</string>
+						<reference key="source" ref="614878284"/>
+						<reference key="destination" ref="483185798"/>
+					</object>
+					<int key="connectionID">7667</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">incDialog:</string>
 						<reference key="source" ref="913630690"/>
@@ -16891,6 +16936,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<reference key="object" ref="57616937"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="332361334"/>
+							<reference ref="483185798"/>
 						</array>
 						<reference key="parent" ref="189780115"/>
 					</object>
@@ -18438,6 +18484,19 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<reference key="object" ref="866260048"/>
 						<reference key="parent" ref="47648824"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">7663</int>
+						<reference key="object" ref="483185798"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="818358735"/>
+						</array>
+						<reference key="parent" ref="57616937"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">7664</int>
+						<reference key="object" ref="818358735"/>
+						<reference key="parent" ref="483185798"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -19318,12 +19377,14 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 				<string key="7660.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="7661.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="7662.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="7663.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="7664.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">7662</int>
+			<int key="maxID">7667</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -22047,6 +22108,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<string key="triggerOutEnabledAction:">id</string>
 						<string key="waitPreTrigTimeBeforeDirectMemTrig14Changed:">id</string>
 						<string key="waitPreTrigTimeBeforeDirectMemTrig58Changed:">id</string>
+						<string key="writeGainPhaseOffsetEnableAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="ADCClockSynchAction:">
@@ -22445,6 +22507,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 							<string key="name">waitPreTrigTimeBeforeDirectMemTrig58Changed:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="writeGainPhaseOffsetEnableAction:">
+							<string key="name">writeGainPhaseOffsetEnableAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="ADCClockSynchButton">NSButton</string>
@@ -22570,6 +22636,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<string key="triggerOutEnabledMatrix">NSMatrix</string>
 						<string key="waitPreTrigTimeBeforeDirectMemTrig14Button">NSButton</string>
 						<string key="waitPreTrigTimeBeforeDirectMemTrig58Button">NSButton</string>
+						<string key="writeGainPhaseOffsetEnableCB">NSButton</string>
 						<string key="writeRegisterButton">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -23065,6 +23132,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 							<string key="name">waitPreTrigTimeBeforeDirectMemTrig58Button</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
+						<object class="IBToOneOutletInfo" key="writeGainPhaseOffsetEnableCB">
+							<string key="name">writeGainPhaseOffsetEnableCB</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
 						<object class="IBToOneOutletInfo" key="writeRegisterButton">
 							<string key="name">writeRegisterButton</string>
 							<string key="candidateClassName">NSButton</string>
@@ -23184,6 +23255,7 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						<string key="triggerOutEnabledAction:">id</string>
 						<string key="waitPreTrigTimeBeforeDirectMemTrig14Changed:">id</string>
 						<string key="waitPreTrigTimeBeforeDirectMemTrig58Changed:">id</string>
+						<string key="writeGainPhaseOffsetEnableAction:">id</string>
 						<string key="writeRegisterAction:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
@@ -23609,6 +23681,10 @@ AAAAAC9rAACXdAAADjlYWVogAAAAAAAAJQMAABjwAADFQg</bytes>
 						</object>
 						<object class="IBActionInfo" key="waitPreTrigTimeBeforeDirectMemTrig58Changed:">
 							<string key="name">waitPreTrigTimeBeforeDirectMemTrig58Changed:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="writeGainPhaseOffsetEnableAction:">
+							<string key="name">writeGainPhaseOffsetEnableAction:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="writeRegisterAction:">
