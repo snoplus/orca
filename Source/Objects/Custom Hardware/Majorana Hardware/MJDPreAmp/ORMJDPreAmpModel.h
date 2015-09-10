@@ -20,6 +20,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORHWWizard.h"
 #import "MJDCmds.h"
+#import "ORAuxHw.h"
 
 @class ORTimeRate;
 @class ORAlarm;
@@ -29,7 +30,7 @@
 #define kMJDPreAmpLeakageCurrentChannels    10
 #define kMJDPreAmpDataRecordLen             20
 
-@interface ORMJDPreAmpModel : OrcaObject {
+@interface ORMJDPreAmpModel : ORAuxHw {
     NSString*       detectorName[kMJDPreAmpAdcChannels];
     float           adcs[kMJDPreAmpAdcChannels];
     float           leakageCurrents[kMJDPreAmpLeakageCurrentChannels];

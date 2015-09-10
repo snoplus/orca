@@ -25,6 +25,7 @@
 #import "ORAlarm.h"
 #import "ORMJDSegmentGroup.h"
 #import "MajoranaModel.h"
+#import "ORCard.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
@@ -178,6 +179,11 @@ struct {
 		[self pollValues];
 	}
     [self registerNotificationObservers];
+}
+
+- (NSString*) identifier
+{
+    return @"MJDPreAmp";
 }
 
 - (void) setUpArrays
@@ -1324,10 +1330,45 @@ struct {
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
+    
+    ORConnector* inputConnector = [[self connectors] objectForKey:MJDPreAmpInputConnector];
+    ORConnector* otherObjConnector = [inputConnector connector];
+    ORCard* digitizerObj = (ORCard*)([otherObjConnector objectLink]);
+    int crate = [digitizerObj crateNumber];
+    int slot = [digitizerObj slot];
+
+    
+    
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-    [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
+    [objDictionary setObject:NSStringFromClass([self class])                forKey:@"Class Name"];
+    [objDictionary setObject:[self connectedObjectName]                     forKey:@"ConnectedTo"];
+    [objDictionary setObject:[NSNumber numberWithInt:crate]                 forKey:@"crate"];
+    [objDictionary setObject:[NSNumber numberWithInt:slot]                  forKey:@"slot"];
+
     [objDictionary setObject:[NSNumber numberWithInt:[self uniqueIdNumber]] forKey:@"preampID"];
-    [objDictionary setObject:[NSNumber numberWithInt:[self boardRev]] forKey:@"boardRev"];
+    [objDictionary setObject:[NSNumber numberWithInt:[self boardRev]]       forKey:@"boardRev"];
+    [objDictionary setObject:[NSNumber numberWithLong:adcEnabledMask]       forKey:@"adcEnabledMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:pollTime]              forKey:@"pollTime"];
+    [objDictionary setObject:[NSNumber numberWithInt:firmwareRev]           forKey:@"firmwareRev"];
+    
+    int i;
+    for(i=0;i<2;i++){
+        [objDictionary setObject:[NSNumber numberWithInt:enabled[i]] forKey:[NSString stringWithFormat:@"enabled%d",i]];
+        [objDictionary setObject:[NSNumber numberWithInt:attenuated[i]] forKey:[NSString stringWithFormat:@"attenuated%d",i]];
+        [objDictionary setObject:[NSNumber numberWithInt:finalAttenuated[i]] forKey:[NSString stringWithFormat:@"finalAttenuated%d",i]];
+    }
+    for(i=0;i<kMJDPreAmpAdcChannels;i++){
+        [objDictionary setObject:detectorName[i] forKey:[NSString stringWithFormat:@"detectorName%d",i]];
+    }
+    [objDictionary setObject:[NSNumber numberWithInt:loopForever]   forKey:@"loopForever"];
+    [objDictionary setObject:[NSNumber numberWithInt:pulseCount]    forKey:@"pulseCount"];
+    [objDictionary setObject:[NSNumber numberWithInt:pulseHighTime] forKey:@"pulseHighTime"];
+    [objDictionary setObject:[NSNumber numberWithInt:pulseLowTime]  forKey:@"pulseLowTime"];
+    [objDictionary setObject:[NSNumber numberWithInt:pulserMask]    forKey:@"pulserMask"];
+    [objDictionary setObject:dacs               forKey:@"dacs"];
+    [objDictionary setObject:amplitudes         forKey:@"amplitudes"];
+    [objDictionary setObject:feedBackResistors  forKey:@"feedBackResistors"];
+    [objDictionary setObject:baselineVoltages   forKey:@"baselineVoltages"];
     
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
