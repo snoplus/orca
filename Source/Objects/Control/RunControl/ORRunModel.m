@@ -688,16 +688,32 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) setRunTypeAndModifySavedRunType:(unsigned long)aMask
 {
-   // if([self isRunning]){
-        unsigned long changedBits = runType ^ aMask;
-        savedRunType = savedRunType ^ changedBits;
-   // }
+    //find which bits user set or cleared
+    int i;
+    for(i=0;i<32;i++){
+        BOOL newBit = (BOOL)((aMask   >> i) & 0x1);
+        BOOL oldBit = (BOOL)((runType >> i) & 0x1);
+        if(!oldBit && newBit){
+            userSetRunTypes     |= (0x1<<i);
+            userClearedRunTypes &= ~(0x1<<i);
+        }
+        else if(oldBit && !newBit){
+            userClearedRunTypes |= (0x1<<i);
+            userSetRunTypes     &= ~(0x1<<i);
+        }
+    }
     [self setRunType:aMask];
 }
 
 - (void) restoreSavedRunType
 {
+    savedRunType |= userSetRunTypes;
+    savedRunType &= ~userClearedRunTypes;
+    
     runType = savedRunType;
+    
+    userSetRunTypes = 0x0;
+    userClearedRunTypes = 0x0;
     
     [[NSNotificationCenter defaultCenter]
      postNotificationName:ORRunTypeChangedNotification

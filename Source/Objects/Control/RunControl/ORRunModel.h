@@ -55,6 +55,8 @@
         BOOL            ignoreSelectedScript;
         unsigned long	runType;
         unsigned long	savedRunType;
+        unsigned long	userSetRunTypes;
+        unsigned long	userClearedRunTypes;
         BOOL            remoteControl;
         unsigned long   dataId;
        
