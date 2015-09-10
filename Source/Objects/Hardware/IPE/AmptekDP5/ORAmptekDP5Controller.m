@@ -798,12 +798,14 @@ return;
 {
     if([model isOpenCommandSocket]){
 	    [openCommandSocketIndicator  startAnimation: nil];
+        [openCommandSocketTextField setStringValue:@"Connected"];
 		[openCommandSocketButton setEnabled:NO];
 		[closeCommandSocketButton setEnabled:YES];
 	}
     else
 	{
 	    [openCommandSocketIndicator  stopAnimation: nil];
+        [openCommandSocketTextField setStringValue:@"Not Connected"];
 		[openCommandSocketButton setEnabled:YES];
 		[closeCommandSocketButton setEnabled:NO];
 	}

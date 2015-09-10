@@ -93,7 +93,8 @@
 	    IBOutlet   NSTextField* crateUDPCommandTextField;
 	    IBOutlet NSTextField*   crateUDPCommandIPTextField;
 	    IBOutlet NSTextField*   crateUDPCommandPortTextField;
-	    IBOutlet NSProgressIndicator*   openCommandSocketIndicator;
+        IBOutlet NSProgressIndicator*   openCommandSocketIndicator;
+        IBOutlet NSTextField*   openCommandSocketTextField;
 
 
 	    // UDP Data Packet reader tab -----

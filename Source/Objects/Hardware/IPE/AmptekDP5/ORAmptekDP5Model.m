@@ -1122,7 +1122,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG    
         NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
-	NSMutableString *csvtableString = [NSMutableString stringWithString: @"Name,Value,Init,Comment,ID\n"];
+	NSMutableString *csvtableString = [NSMutableString stringWithString: @"Name,Setpoint,Value,Init,Comment,ID\n"];
     
     NSMutableDictionary* line;
    	NSString *name;
@@ -1141,7 +1141,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         init = [[line objectForKey: @"Init"] intValue];
         id = [[line objectForKey: @"ID"] intValue];
         
-		[csvtableString appendFormat: @"%@,%@,%i,\"%@\",%i\n",name,value,init,comment,id];
+		[csvtableString appendFormat: @"%@,%@,%@,%i,\"%@\",%i\n",name,setpoint,value,init,comment,id];
     }
     
 	//NSLog(@"TABLE:>>>%@<<<\n",csvtableString);
