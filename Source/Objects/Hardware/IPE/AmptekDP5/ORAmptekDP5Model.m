@@ -58,10 +58,10 @@
 
 //Amptek ASCII Commands
 static AmptekDP5ASCIICommandsStruct amptekCmds[kAmptekNumCommands] = {
-{@"MCAC",     @"1024",			1,			  @"MCA/MCS channels" , 1  },
-{@"GAIA",     @"1",			 	1,			  @"Analog gain index [##]" , 2  },
-{@"GAIF",     @"1.0",			1,			  @"Fine gain [##.###]" , 3  },
-{@"GAIN",     @"1.00",			 	1,			  @"Total gain (analog*fine) [##.###]" , 4  },
+{@"MCAC",     @"1025",     @"1024",			1,			  @"MCA/MCS channels" , 1  },
+{@"GAIA",     @"20",	       @"1",			 	1,			  @"Analog gain index [##]" , 2  },
+{@"GAIF",     @"1.0",	 @"1.0",			1,			  @"Fine gain [##.###]" , 3  },
+{@"GAIN",     @"1.00",	@"1.00",			 	1,			  @"Total gain (analog*fine) [##.###]" , 4  },
 };
 
 
@@ -568,6 +568,8 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelDropFirstSpectrumChanged = @"ORAmptekDP5ModelDropFirstSpectrumChanged";
+NSString* ORAmptekDP5ModelAutoReadbackSetpointChanged = @"ORAmptekDP5ModelAutoReadbackSetpointChanged";
 NSString* ORAmptekDP5ModelCommandTableChanged = @"ORAmptekDP5ModelCommandTableChanged";
 NSString* ORAmptekDP5ModelCommandQueueCountChanged = @"ORAmptekDP5ModelCommandQueueCountChanged";
 NSString* ORAmptekDP5ModelIsPollingSpectrumChanged = @"ORAmptekDP5ModelIsPollingSpectrumChanged";
@@ -815,6 +817,34 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+
+- (BOOL) dropFirstSpectrum
+{
+    return dropFirstSpectrum;
+}
+
+- (void) setDropFirstSpectrum:(BOOL)aDropFirstSpectrum
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDropFirstSpectrum:dropFirstSpectrum];
+    
+    dropFirstSpectrum = aDropFirstSpectrum;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelDropFirstSpectrumChanged object:self];
+}
+
+- (BOOL) autoReadbackSetpoint
+{
+    return autoReadbackSetpoint;
+}
+
+- (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoReadbackSetpoint:autoReadbackSetpoint];
+    
+    autoReadbackSetpoint = aAutoReadbackSetpoint;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelAutoReadbackSetpointChanged object:self];
+}
 #if 0
 - (NSData*) lastRequest
 {
@@ -990,9 +1020,10 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 	//if(csvtable) NSLog(@"csvtable (%i lines) >>>%@<<<\n", nlines, csvtable);//TODO: enable with debug output setting??? -tb-
 	if(nlines<=1) return FALSE;
 	
-	int indexName, indexValue, indexInit, indexComment, indexId;
+	int indexName, indexSetpoint, indexValue, indexInit, indexComment, indexId;
 	NSArray *colnames = [csvtable objectAtIndex: 0];
 	indexName = [colnames indexOfObject: @"Name"];
+	indexSetpoint = [colnames indexOfObject: @"Setpoint"];
 	indexValue = [colnames indexOfObject: @"Value"];
 	indexInit = [colnames indexOfObject: @"Init"];
 	indexComment = [colnames indexOfObject: @"Comment"];
@@ -1013,6 +1044,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     NSArray *line;
 	int init=0, id=0;
 	NSString *name;
+	NSString *setpoint;
 	NSString *value;
 	NSString *comment;
 	int i;
@@ -1027,6 +1059,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 //		if(itemKey) NSLog(@"The channel %i is already used by %@!\n",chan,itemKey);
 //
 	    name =  [line  objectAtIndex: indexName] ;
+	    setpoint =  [line  objectAtIndex: indexSetpoint] ;
 	    value =  [line  objectAtIndex: indexValue] ;
 	    comment =  [line  objectAtIndex: indexComment] ;
 	    init = [[line  objectAtIndex: indexInit] intValue];
@@ -1039,6 +1072,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
          
         commandTableRow = [NSMutableDictionary dictionary];
 	    [commandTableRow setObject: name		    forKey:@"Name"]; //used by processing
+	    [commandTableRow setObject: setpoint		    forKey:@"Setpoint"]; //used by processing
 	    [commandTableRow setObject: value		    forKey:@"Value"]; //used by processing
 	    [commandTableRow setObject: [NSNumber numberWithInt: init]		    forKey:@"Init"]; //used by processing
 	    [commandTableRow setObject: comment		forKey:@"Comment"]; //used by processing
@@ -1092,6 +1126,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     
     NSMutableDictionary* line;
    	NSString *name;
+	NSString *setpoint;
 	NSString *value;
 	NSString *comment;
     int init, id;
@@ -1100,6 +1135,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     for(i=0; i<num; i++){
         line = [commandTable objectAtIndex:i];
         name = [line objectForKey: @"Name"];
+        setpoint = [line objectForKey: @"Setpoint"];
         value = [line objectForKey: @"Value"];
         comment = [line objectForKey: @"Comment"];
         init = [[line objectForKey: @"Init"] intValue];
@@ -2586,6 +2622,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
         if(lengthBytes%4)     NSLog(@"ERROR in %@::%@!  lengthBytes %i not multiple of 4! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd) ,lengthBytes);//TODO: DEBUG -tb-
 
         int length32 = lengthBytes/4;
+        if(!needToDropFirstSpectrum){
 			//time_t	ut_time;
 			//time(&ut_time);
             struct timeval t;//    struct timezone tz; is obsolete ... -tb-
@@ -2611,6 +2648,9 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
             [pdata release];
             pdata = nil;
+            
+            needToDropFirstSpectrum = FALSE; //dropped one
+        }
 
 
     }
@@ -2953,7 +2993,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     for(i=0; i<num; i++){
         [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
         [stringCommand appendString:@"="];
-        [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Value"]];
+        [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Setpoint"]];
         [stringCommand appendString:@";"];
     }
     NSLog(@"stringCommand is:>%@<\n",stringCommand);
@@ -2983,7 +3023,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             count++;
             [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
             [stringCommand appendString:@"="];
-            [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Value"]];
+            [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Setpoint"]];
             [stringCommand appendString:@";"];
         }
     }
@@ -3036,7 +3076,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
         [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Name"] ];
         [stringCommand appendString:@"="];
-        [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Value"]];
+        [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Setpoint"]];
         [stringCommand appendString:@";"];
 
     NSLog(@"stringCommand is:>%@<\n",stringCommand);
@@ -4645,6 +4685,8 @@ return ;
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setDropFirstSpectrum:[decoder decodeBoolForKey:@"dropFirstSpectrum"]];
+	[self setAutoReadbackSetpoint:[decoder decodeBoolForKey:@"autoReadbackSetpoint"]];
 	[self setSpectrumRequestRate:[decoder decodeIntForKey:@"spectrumRequestRate"]];
 	[self setSpectrumRequestType:[decoder decodeIntForKey:@"spectrumRequestType"]];
 	[self setNumSpectrumBins:[decoder decodeIntForKey:@"numSpectrumBins"]];
@@ -4729,6 +4771,8 @@ return ;
 {
 	[super encodeWithCoder:encoder];
 	
+	[encoder encodeBool:dropFirstSpectrum forKey:@"dropFirstSpectrum"];
+	[encoder encodeBool:autoReadbackSetpoint forKey:@"autoReadbackSetpoint"];
 	[encoder encodeInt:spectrumRequestRate forKey:@"spectrumRequestRate"];
 	[encoder encodeInt:spectrumRequestType forKey:@"spectrumRequestType"];
 	[encoder encodeInt:numSpectrumBins forKey:@"numSpectrumBins"];
@@ -4978,6 +5022,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	actualPageIndex = 0;
 	eventCounter    = 0;
 	first = YES;
+    needToDropFirstSpectrum = dropFirstSpectrum;//Amptek -tb-
 	lastDisplaySec = 0;
 	lastDisplayCounter = 0;
 	lastDisplayRate = 0;

@@ -427,9 +427,30 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelCommandQueueCountChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(autoReadbackSetpointChanged:)
+                         name : ORAmptekDP5ModelAutoReadbackSetpointChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dropFirstSpectrumChanged:)
+                         name : ORAmptekDP5ModelDropFirstSpectrumChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) dropFirstSpectrumChanged:(NSNotification*)aNote
+{
+    //DEBUG         NSLog(@"Called %@::%@! [model dropFirstSpectrum] %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model dropFirstSpectrum]);//TODO: DEBUG -tb-
+	[dropFirstSpectrumCB setIntValue: [model dropFirstSpectrum]];
+}
+
+- (void) autoReadbackSetpointChanged:(NSNotification*)aNote
+{
+	[autoReadbackSetpointCB setIntValue: [model autoReadbackSetpoint]];
+}
 
 // command table view
 //----------------------
@@ -963,6 +984,8 @@ return;
 	[self spectrumRequestTypeChanged:nil];
 	[self spectrumRequestRateChanged:nil];
 	[self isPollingSpectrumChanged:nil];
+	[self autoReadbackSetpointChanged:nil];
+	[self dropFirstSpectrumChanged:nil];
 }
 
 - (void) setWindowTitle
@@ -1123,6 +1146,18 @@ return;
 
 
 #pragma mark ***Actions
+
+- (void) dropFirstSpectrumCBAction:(id)sender
+{
+    //DEBUG OUTPUT:        NSLog(@"   %@::%@: UNDER CONSTRUCTION %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+
+	[model setDropFirstSpectrum:[sender intValue]];	
+}
+
+- (void) autoReadbackSetpointCBAction:(id)sender
+{
+	[model setAutoReadbackSetpoint:[sender intValue]];	
+}
 - (IBAction) debugButtonAction:(id)sender
 {
     //DEBUG    
@@ -1195,6 +1230,9 @@ NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
         return;
     }
     [model writeCommandOfRow:row];
+    if([model autoReadbackSetpoint]){
+        [model readbackCommandOfRow:row];
+    }
 
 }
 
@@ -2227,6 +2265,10 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
                 return [theRow objectForKey: @"Name"];
                 //return @"name";
 			}
+			else if([theIdentifier isEqual:@"Setpoint"]){
+                NSDictionary* theRow = [model commandTableRow:row];
+                return [theRow objectForKey: theIdentifier];
+			}
 			else if([theIdentifier isEqual:@"Value"]){
                 NSDictionary* theRow = [model commandTableRow:row];
                 return [theRow objectForKey: @"Value"];
@@ -2269,13 +2311,22 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 			//[topLevelDictionary setObject:object forKey:[tableColumn identifier]];
             NSLog(@"%@::%@ setObjectValue is %@ (class %@)\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),object,NSStringFromClass([object class]));//DEBUG OUTPUT -tb-  
             NSString* key = [NSString stringWithString: [[tableColumn headerCell] title]];
+#if 0
             if([key isEqual:@"Name"]){
                 //[model setCommandTableRow:row setObject:object forKey:@"Init"];//-tb-: works, but this is better:
                 //[model setCommandTableRow:row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];
                 //DEBUG    
-                    NSLog(@"Called %@::%@ column 'Name' is not editable!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+                NSLog(@"Called %@::%@ column 'Name' is not editable!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
                 return;
             }
+#else
+            if([key isEqual:@"Name"]){
+                //[model setCommandTableRow:row setObject:object forKey:@"Init"];//-tb-: works, but this is better:
+                //[model setCommandTableRow:row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];
+                //DEBUG    
+                NSLog(@"WARNING in %@::%@ column 'Name' MUST be unique!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+            }
+#endif
             if([key isEqual:@"Test"]){
                 //[model setCommandTableRow:row setObject:object forKey:@"Init"];//-tb-: works, but this is better:
                 [model setCommandTableRow:row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];

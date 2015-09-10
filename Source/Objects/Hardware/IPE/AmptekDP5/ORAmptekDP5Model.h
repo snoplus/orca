@@ -49,11 +49,14 @@
 
 //Amptek ASCII Commands
 typedef struct AmptekDP5ASCIICommandsStruct {
+	NSString*       setpoint;
 	NSString*       name;
 	NSString*       value;
 	int 	        init;
 	NSString*       comment;
 	int				id;
+    BOOL autoReadbackSetpoint;
+    BOOL dropFirstSpectrum;
 } AmptekDP5ASCIICommandsStruct; 
 
 enum AmptekDP5ASCIICommandEnum {
@@ -305,7 +308,10 @@ enum AmptekDP5ASCIICommandEnum {
     //NSData*				lastRequest;
     NSString* lastRequest;
     BOOL useCommandQueue;
-
+    BOOL dropFirstSpectrum;
+    BOOL autoReadbackSetpoint;
+    
+    BOOL needToDropFirstSpectrum;
 
 }
 
@@ -328,6 +334,10 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) queueStringCommand:(NSString*)aCommand;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (BOOL) dropFirstSpectrum;
+- (void) setDropFirstSpectrum:(BOOL)aDropFirstSpectrum;
+- (BOOL) autoReadbackSetpoint;
+- (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aLastRequest;
 //- (NSData*) lastRequest;
@@ -707,6 +717,8 @@ enum AmptekDP5ASCIICommandEnum {
 
 @end
 
+extern NSString* ORAmptekDP5ModelDropFirstSpectrumChanged;
+extern NSString* ORAmptekDP5ModelAutoReadbackSetpointChanged;
 extern NSString* ORAmptekDP5ModelCommandTableChanged;
 extern NSString* ORAmptekDP5ModelCommandQueueCountChanged;
 extern NSString* ORAmptekDP5ModelIsPollingSpectrumChanged;

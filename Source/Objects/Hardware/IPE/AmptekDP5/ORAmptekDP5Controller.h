@@ -29,6 +29,8 @@
 @interface ORAmptekDP5Controller : OrcaObjectController {
     // command table view
 	IBOutlet NSTableView*			commandTableView;
+	IBOutlet NSButton*              dropFirstSpectrumCB;
+	IBOutlet NSButton*              autoReadbackSetpointCB;
     IBOutlet ORValueBarGroupView*   commandQueueValueBar;
     IBOutlet   NSTextField*         commandQueueCountField;
 
@@ -187,6 +189,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+- (void) dropFirstSpectrumChanged:(NSNotification*)aNote;
+- (void) autoReadbackSetpointChanged:(NSNotification*)aNote;
 
 // command table view
 - (void) populateCommandTableView;
@@ -267,6 +271,8 @@
 - (void) enableRegControls;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Actions
+- (IBAction) dropFirstSpectrumCBAction:(id)sender;
+- (IBAction) autoReadbackSetpointCBAction:(id)sender;
 - (IBAction) debugButtonAction:(id)sender;
 - (IBAction) clearCommandQueueButtonAction:(id)sender;
 - (IBAction) sendCommandOfCommandQueueButtonAction:(id)sender;
