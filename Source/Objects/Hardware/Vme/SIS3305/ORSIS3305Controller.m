@@ -51,7 +51,7 @@
     basicSize       = NSMakeSize(840  ,660);
     settingSize     = NSMakeSize(700  ,600);
     rateSize		= NSMakeSize(790  ,300);
-    miscSize        = NSMakeSize(680  ,480);
+    miscSize        = NSMakeSize(450  ,250);
     
     
     blankView = [[NSView alloc] init];
@@ -663,6 +663,7 @@
     [ADCGateModeEnabled14Button setState: [model ADCGateModeEnabled:0]]; // 0 is for group 1
     [ADCGateModeEnabled58Button setState: [model ADCGateModeEnabled:1]]; // 1 is for group 2
     
+    [self settingsLockChanged:nil];
 }
 
 - (void) globalTriggerEnabledChanged:(NSNotification*)aNote
@@ -830,8 +831,9 @@
 - (void) lemoOutSelectTriggerChanged:(NSNotification*)aNote
 {
     int i;
-    for(i=0;i<kNumSIS3305Channels/kNumSIS3305Groups;i++){
+    for(i=0;i<4;i++){   // 4 channels per group
         [[lemoOutSelectTrigger14Matrix cellWithTag:i] setState:[model lemoOutSelectTrigger:i]];
+        [[lemoOutSelectTrigger58Matrix cellWithTag:i] setState:[model lemoOutSelectTrigger:(i+4)]];
     }
 }
 
@@ -1597,23 +1599,23 @@
 {
     int chan;
     BOOL mode;
-    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
-        mode = [[sender cellAtIndex:chan] state];
-        [model setLemoOutSelectTrigger:chan toState:mode];
-    }
+
+    chan = [[sender selectedCell] tag];     // set to 0-3
+    mode = [[sender selectedCell] state];
+    
+    [model setLemoOutSelectTrigger:chan toState:mode];
 }
 
 - (IBAction) lemoOutSelectTrigger58Action:(id)sender
 {
 //    int chan;
     BOOL mode;
+    unsigned short chan;
     
-    // FIX: Does this work?
-    unsigned short chan = [[sender selectedCell] tag];
-//    for (chan = 0; chan < kNumSIS3305Channels/kNumSIS3305Groups; chan++) {
-        mode = [[sender selectedCell] state];
-        [model setLemoOutSelectTrigger:(chan+4) toState:mode];
-//    }
+    chan = ([[sender selectedCell] tag] + 4);   // tag is 0-3 here
+    mode = [[sender selectedCell] state];
+    
+    [model setLemoOutSelectTrigger:chan toState:mode];
 }
 - (IBAction) lemoOutSelectTriggerInAction:(id)sender
 {
