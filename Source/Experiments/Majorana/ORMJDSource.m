@@ -68,7 +68,7 @@ static MJDSourceStateInfo state_info [kMJDSource_NumStates] = {
 @implementation ORMJDSource
 
 @synthesize delegate,slot,isDeploying,isRetracting,currentState;
-@synthesize sourceInMirrorTrack,stateStatus,firstTime,order,runningTime,gateValveIsOpen;
+@synthesize sourceIsIn,stateStatus,firstTime,order,runningTime,gateValveIsOpen;
 
 NSString* ORMJDSourceModeChanged            = @"ORMJDSourceModeChanged";
 NSString* ORMJDSourceStateChanged           = @"ORMJDSourceStateChanged";
@@ -76,6 +76,7 @@ NSString* ORMJDSourceIsMovingChanged        = @"ORMJDSourceIsMovingChanged";
 NSString* ORMJDSourceIsConnectedChanged     = @"ORMJDSourceIsConnectedChanged";
 NSString* ORMJDSourcePatternChanged         = @"ORMJDSourcePatternChanged";
 NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
+NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
 - (id) initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
 {
@@ -223,12 +224,18 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDSourcePatternChanged object:self];
 }
 
+- (void) setSourceIsIn:(int)aState
+{
+    sourceIsIn = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDSourceIsInChanged object:self];
+}
 
 - (NSString*) currentStateName
 {
     if(currentState<kMJDSource_NumStates)return state_info[currentState].name;
     else return @"?";
 }
+
 - (void) setState:(int)aState status:(id)aString color:(NSColor*)aColor
 {
     NSDictionary* attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:aColor,NSForegroundColorAttributeName,nil];
@@ -298,6 +305,7 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
             if(gateValveIsOpen != kMJDSource_Unknown){
                 nextTime = kNormalStepTime; //go back to the faster stepping
                 if(gateValveIsOpen == kMJDSource_True){
+                    NSLog(@"Module %d GV appears to be OPEN\n",slot+1);
                     [self turnOffGVPower];
                     if(isRetracting)[self setCurrentState:kMJDSource_StartRetraction];
                     else            [self setCurrentState:kMJDSource_StartDeployment];
@@ -363,9 +371,9 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
             break;
             
         case kMJDSource_VerifyInMirrorTrack:
-            if(sourceInMirrorTrack != kMJDSource_Unknown){
+            if(sourceIsIn != kMJDSource_Unknown){
                 nextTime = kNormalStepTime; //go back to the faster stepping
-                if(sourceInMirrorTrack == kMJDSource_True){
+                if(sourceIsIn == kMJDSource_True){
                     [self setCurrentState:kMJDSource_CloseGV];
                 }
                 else {
@@ -422,20 +430,22 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
         //Error Conditions
         case kMJDSource_GVOpenError:
             [self resetFlags];
+            [self turnOffGVPower];
             [self stopArduino];
             if(self.isDeploying)self.order = [NSMutableString stringWithString:@"Deployment Aborted"];
             else                self.order = [NSMutableString stringWithString:@"Retraction Aborted"];
             NSLogColor([NSColor redColor],@"Module %d Source gatevalve is Closed. Source can not be moved.\n",slot+1);
-            [self setCurrentState:kMJDSource_StopMotion];
+            [self setCurrentState:kMJDSource_Idle];
            break;
  
         case kMJDSource_GVCloseError:
             [self resetFlags];
+            [self turnOffGVPower];
             [self stopArduino];
             self.gateValveIsOpen = kMJDSource_Unknown;
             self.order = [NSMutableString stringWithString:@"GV Close Error"];
             NSLogColor([NSColor redColor],@"Module %d Source could not verify GV closed.\n",slot+1);
-            [self setCurrentState:kMJDSource_StopMotion];
+            [self setCurrentState:kMJDSource_Idle];
            break;
 
         case kMJDSource_ConnectionError:
@@ -452,7 +462,7 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
             [self stopArduino];
             self.order = [NSMutableString stringWithString:@"Not In Mirror Track"];
             NSLogColor([NSColor redColor],@"Module %d Source not in mirror track. GV could not be closed.\n",slot+1);
-            [self setCurrentState:kMJDSource_StopMotion];
+            [self setCurrentState:kMJDSource_Idle];
             break;
 
     }
@@ -514,13 +524,17 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
         
         float kLEDAdcOffset = 1.6;
         float  ledAdc = [[remoteOpStatus objectForKey:@"ledAdc"]floatValue];
-        if((ledAdc - kLEDAdcOffset)>0.1) sourceInMirrorTrack = kMJDSource_True;
-        else                             sourceInMirrorTrack = kMJDSource_False;
+        if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True;
+        else                             self.sourceIsIn = kMJDSource_False;
         
         if(oneTimeGVVerbose){
             if(gateValveIsOpen == kMJDSource_True)NSLog(@"Module %d Source GV is OPEN\n",slot+1);
             else if(gateValveIsOpen == kMJDSource_False)NSLog(@"Module %d Source GV is CLOSED\n",slot+1);
             else    NSLog(@"Module %d Source GV state is UNKNOWN\n",slot+1);
+            if(sourceIsIn == kMJDSource_True)NSLog(@"Module %d Source is IN\n",slot+1);
+            else if(sourceIsIn == kMJDSource_False)NSLog(@"Module %d Source is OUT\n",slot+1);
+            else    NSLog(@"Module %d Source state is UNKNOWN\n",slot+1);
+            self.order = nil;
             oneTimeGVVerbose = NO;
         }
         
@@ -581,8 +595,8 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
 {
     NSString* s = @"?";
     switch (isMoving){
-        case kMJDSource_True:  s = @"Source Moving";  break;
-        case kMJDSource_False: s = @"Source Stopped"; break;
+        case kMJDSource_True:  s = @"Moving";  break;
+        case kMJDSource_False: s = @"Stopped"; break;
         default:               s = @"?";       break;
     }
     return s;
@@ -657,13 +671,23 @@ NSString* ORMJDSourceGateValveChanged       = @"ORMJDSourceGateValveChanged";
 {
     NSString* s = @"?";
     switch (gateValveIsOpen){
-        case kMJDSource_True:  s = @"Gatevalve Open";   break;
-        case kMJDSource_False: s = @"Gatevalve Closed"; break;
-        default:               s = @"Gatevalve ????";   break;
+        case kMJDSource_True:  s = @"Open";   break;
+        case kMJDSource_False: s = @"Closed"; break;
+        default:               s = @"????";   break;
     }
     return s;
 }
 
+- (NSString*) sourceIsInState
+{
+    NSString* s = @"?";
+    switch (sourceIsIn){
+        case kMJDSource_True:  s = @"In";   break;
+        case kMJDSource_False: s = @"Out"; break;
+        default:               s = @"????";   break;
+    }
+    return s;
+}
 
 - (void) setIsConnected:(int)aState
 {

@@ -82,7 +82,7 @@ typedef struct {
     BOOL                isDeploying;
     BOOL                isRetracting;
     int                 gateValveIsOpen;
-    int                 sourceInMirrorTrack;
+    int                 sourceIsIn;
     int                 isMoving;
     int                 isConnected;
     int                 currentState;
@@ -125,6 +125,7 @@ typedef struct {
 - (NSString*)   currentStateName;
 - (void)        resetFlags;
 - (void)        setGateValveIsOpen:(int)aState;
+- (NSString*)   sourceIsInState;
 
 #pragma mark ***Remote Commands
 - (void)        sendDeploymentCommand;
@@ -152,7 +153,7 @@ typedef struct {
 @property (assign,nonatomic) BOOL             isRetracting;
 @property (assign,nonatomic) BOOL             firstTime;
 @property (assign,nonatomic) int              gateValveIsOpen;
-@property (assign,nonatomic) int              sourceInMirrorTrack;
+@property (assign,nonatomic) int              sourceIsIn;
 @property (assign,nonatomic) int              slot;
 @property (assign,nonatomic) int              currentState;
 @property (assign,nonatomic) float            runningTime;
@@ -161,11 +162,10 @@ typedef struct {
 
 @end
 
-
 extern NSString* ORMJDSourceModeChanged;
 extern NSString* ORMJDSourceStateChanged;
 extern NSString* ORMJDSourceIsMovingChanged;
 extern NSString* ORMJDSourceIsConnectedChanged;
 extern NSString* ORMJDSourcePatternChanged;
 extern NSString* ORMJDSourceGateValveChanged;
-
+extern NSString* ORMJDSourceIsInChanged;
