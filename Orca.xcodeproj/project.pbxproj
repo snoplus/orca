@@ -1436,6 +1436,10 @@
 		84519C6E0B5C0B0900B08915 /* GoToLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84519C6B0B5C0B0900B08915 /* GoToLine.m */; };
 		84522B9610CD723E0077DDFF /* adcMeter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84522B9510CD723E0077DDFF /* adcMeter.tif */; };
 		84522D4910CD90600077DDFF /* adcHorizontalBar.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84522D4810CD90600077DDFF /* adcHorizontalBar.tif */; };
+		845313D31B9886F400FCEEE5 /* ORRemoteCommander.h in Headers */ = {isa = PBXBuildFile; fileRef = 845313D11B9886F400FCEEE5 /* ORRemoteCommander.h */; };
+		845313D41B9886F400FCEEE5 /* ORRemoteCommander.m in Sources */ = {isa = PBXBuildFile; fileRef = 845313D21B9886F400FCEEE5 /* ORRemoteCommander.m */; };
+		845313D71B98A45200FCEEE5 /* ORMJDSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 845313D51B98A45200FCEEE5 /* ORMJDSource.h */; };
+		845313D81B98A45200FCEEE5 /* ORMJDSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 845313D61B98A45200FCEEE5 /* ORMJDSource.m */; };
 		84538DF40803462500615B6D /* OR1DHistoDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84538DF20803462500615B6D /* OR1DHistoDecoders.m */; };
 		84538DF50803462500615B6D /* OR1DHistoDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84538DF30803462500615B6D /* OR1DHistoDecoders.h */; };
 		84538DFE0803462F00615B6D /* OR2DHistoDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84538DFC0803462F00615B6D /* OR2DHistoDecoders.h */; };
@@ -4769,6 +4773,10 @@
 		84519C6B0B5C0B0900B08915 /* GoToLine.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = GoToLine.m; path = "Source/Objects/Misc Objects/Views/TextFinder/GoToLine.m"; sourceTree = SOURCE_ROOT; };
 		84522B9510CD723E0077DDFF /* adcMeter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = adcMeter.tif; sourceTree = "<group>"; };
 		84522D4810CD90600077DDFF /* adcHorizontalBar.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = adcHorizontalBar.tif; sourceTree = "<group>"; };
+		845313D11B9886F400FCEEE5 /* ORRemoteCommander.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRemoteCommander.h; sourceTree = "<group>"; };
+		845313D21B9886F400FCEEE5 /* ORRemoteCommander.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRemoteCommander.m; sourceTree = "<group>"; };
+		845313D51B98A45200FCEEE5 /* ORMJDSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDSource.h; sourceTree = "<group>"; };
+		845313D61B98A45200FCEEE5 /* ORMJDSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDSource.m; sourceTree = "<group>"; };
 		84538DF20803462500615B6D /* OR1DHistoDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = OR1DHistoDecoders.m; path = "Source/Objects/Data Processing/Histogram Objects/Histogram1D/OR1DHistoDecoders.m"; sourceTree = SOURCE_ROOT; };
 		84538DF30803462500615B6D /* OR1DHistoDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR1DHistoDecoders.h; path = "Source/Objects/Data Processing/Histogram Objects/Histogram1D/OR1DHistoDecoders.h"; sourceTree = SOURCE_ROOT; };
 		84538DFC0803462F00615B6D /* OR2DHistoDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2DHistoDecoders.h; path = "Source/Objects/Data Processing/Histogram Objects/Histogram2D/OR2DHistoDecoders.h"; sourceTree = SOURCE_ROOT; };
@@ -8505,6 +8513,7 @@
 				847597450B5EF26500123411 /* SQL */,
 				8471D4721588DF3C0039894D /* RemoteSocket */,
 				840F5ABD1222C03800D49A75 /* Camera */,
+				845313D01B9886B800FCEEE5 /* RemoteCommander */,
 			);
 			name = "Misc Objects";
 			path = "Source/Objects/Misc Objects";
@@ -9436,6 +9445,15 @@
 				8439D65E05BF31550077EFF2 /* SelectionView.nib */,
 			);
 			path = HardwareWizard;
+			sourceTree = "<group>";
+		};
+		845313D01B9886B800FCEEE5 /* RemoteCommander */ = {
+			isa = PBXGroup;
+			children = (
+				845313D11B9886F400FCEEE5 /* ORRemoteCommander.h */,
+				845313D21B9886F400FCEEE5 /* ORRemoteCommander.m */,
+			);
+			path = RemoteCommander;
 			sourceTree = "<group>";
 		};
 		84539C470807247A00615B6D /* RemoteRunControl */ = {
@@ -13061,6 +13079,8 @@
 				84E966CE11848BEF008D9119 /* MajoranaModel.m */,
 				8475D8151A3665BC00EE4DE4 /* ORMJDInterlocks.h */,
 				8475D8161A3665BC00EE4DE4 /* ORMJDInterlocks.m */,
+				845313D51B98A45200FCEEE5 /* ORMJDSource.h */,
+				845313D61B98A45200FCEEE5 /* ORMJDSource.m */,
 				841EBDE51831645E00450A3C /* ORMJDSegmentGroup.h */,
 				841EBDE61831645E00450A3C /* ORMJDSegmentGroup.m */,
 			);
@@ -14512,6 +14532,7 @@
 				840E00140944B29000049827 /* ORProcessNub.h in Headers */,
 				840E00160944B29000049827 /* ORInputElement.h in Headers */,
 				840E00180944B29000049827 /* ORSPDTRelayController.h in Headers */,
+				845313D71B98A45200FCEEE5 /* ORMJDSource.h in Headers */,
 				840E001A0944B29000049827 /* ORSPDTRelayModel.h in Headers */,
 				840E001F0944B29000049827 /* ORSPSTRelayController.h in Headers */,
 				840E00210944B29000049827 /* ORSPSTRelayModel.h in Headers */,
@@ -15010,6 +15031,7 @@
 				849F0A9318D0973B00FF3F36 /* ORDT5720Model.h in Headers */,
 				84762012118CD53D00016A8D /* OR1dFit.h in Headers */,
 				84762014118CD53D00016A8D /* OR1dFitController.h in Headers */,
+				845313D31B9886F400FCEEE5 /* ORRemoteCommander.h in Headers */,
 				84762016118CD53D00016A8D /* OR1dRoi.h in Headers */,
 				84762018118CD53D00016A8D /* OR1dRoiController.h in Headers */,
 				8476201A118CD53D00016A8D /* OR2dRoi.h in Headers */,
@@ -16678,6 +16700,7 @@
 				84B51981191D285A003A580B /* ORBurstMonitorModel.m in Sources */,
 				849DE3F008F597410052AFC6 /* ORK3655Controller.m in Sources */,
 				849DE3F208F597410052AFC6 /* ORK3655Model.m in Sources */,
+				845313D41B9886F400FCEEE5 /* ORRemoteCommander.m in Sources */,
 				849DE73808F6F1FA0052AFC6 /* ORMacController.m in Sources */,
 				849DE73A08F6F1FA0052AFC6 /* ORMacModel.m in Sources */,
 				848CD35D08FB511B0046CD9D /* NSSplitView+Extensions.m in Sources */,
@@ -16792,6 +16815,7 @@
 				844BF49B0B1B85560047C9BF /* KatrinDetectorView.m in Sources */,
 				844384C40B273F9C00A94E26 /* ORAdcInfoProviding.m in Sources */,
 				84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */,
+				845313D81B98A45200FCEEE5 /* ORMJDSource.m in Sources */,
 				849B25EF0B2F34FA0007484F /* PrespectrometerController.m in Sources */,
 				849B25F10B2F34FA0007484F /* PrespectrometerView.m in Sources */,
 				849B25F30B2F34FA0007484F /* PrespectrometerModel.m in Sources */,
