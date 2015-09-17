@@ -50,6 +50,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     self = [super init];
     [self registerNotificationObservers];
     unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
+    automaticToggle = nil; //SV
 
     return self;
 }
@@ -504,6 +505,71 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     return (remoteRunInProgress == eYES) || [runControl isRunning];
 }
 
+//SV
+- (BOOL) timerIsRunning
+{
+    return [automaticToggle isValid];
+}
+
+//SV
+- (void) setTimer:(double) days
+{
+    timeInterval = days;
+    NSLog(@"Time interval set to %.3f day(s)\n", days);
+}
+
+//SV
+- (void) scheduledToggle:(NSTimer*) timer
+{
+    NSLog(@"TOGGLING NOW\n");
+    if ([self runIsInProgress]) {[self toggleSystems];}
+}
+
+//SV
+- (void) waitForEndOfRun:(NSTimer*) timer
+{
+    NSLog(@"Scheduled sentry system toggle\n");
+    automaticToggle = nil;
+    if ([self runIsInProgress])
+    {
+        double timeLeft = [runControl timeToGo] - 5;
+        if (timeLeft > 5)
+        {
+            NSLog(@"Waiting for local run to end\n");
+            NSTimer* waitTimer;
+            waitTimer = [NSTimer scheduledTimerWithTimeInterval:timeLeft target:self selector:@selector(scheduledToggle:) userInfo:nil repeats:NO];
+        }
+        else
+        {
+            NSLog(@"TOGGLING NOW\n");
+            if ([self runIsInProgress]) {[self toggleSystems];}
+        }
+    }
+    else {[self startTimer];}
+}
+
+//SV
+- (void) startTimer
+{
+    if (![automaticToggle isValid])
+    {
+        if (timeInterval <= 0) {[self setTimer:7];} //7 days is default
+        NSLog(@"Starting sentry timer\n");
+        automaticToggle = [NSTimer scheduledTimerWithTimeInterval:(timeInterval*86400) target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO];
+    }
+}
+
+//SV
+- (void) stopTimer
+{
+    if ([automaticToggle isValid])
+    {
+        NSLog(@"Stopping sentry timer\n");
+        [automaticToggle invalidate];
+        automaticToggle = nil;
+    }
+}
+    
 #pragma mark ***Run Stuff
 - (void) start
 {
@@ -511,6 +577,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setSentryIsRunning:YES];
     [self setSentryType:eNeither];
     [self setNextState:eStarting stepTime:1];
+    automaticToggle = nil; //SV
     [self step];
 }
 
@@ -520,6 +587,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setNextState:eStopping stepTime:1];
     [self step];
     [[ORGlobal sharedGlobal] removeRunVeto:@"Secondary"];
+    [self stopTimer]; //SV
 }
 
 #pragma mark ***Archival
@@ -796,6 +864,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             [self clearAllAlarms];
             [self setRemoteMachineReachable:eBeingChecked];
             [self setNextState:eCheckRemoteMachine stepTime:.3];
+            [self startTimer]; //SV
             break;
             
         case eCheckRemoteMachine:
@@ -865,6 +934,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
             else {
                 //the connection was dropped (other mac crashed) or other mac appears hung.
                 [self takeOverRunning];
+                [self startTimer]; //SV
             }
             break;
   
@@ -930,12 +1000,14 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
                [self appendToSentryLog:@"Stopping local run."];
                [runControl haltRun];
                 [self setNextState:eWaitForLocalRunStop stepTime:.1];
+                [self stopTimer]; //SV
             }
             else if (remoteRunInProgress == eYES){
                 wasLocalRun = NO;
                 [self appendToSentryLog:@"Stopping remote run."];
                 [self sendCmd:@"[RunControl haltRun];"];
                 [self setNextState:eWaitForRemoteRunStop stepTime:2];
+                [self startTimer]; //SV
             }
             break;
             
@@ -1144,6 +1216,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setSentryIsRunning:NO];
     [self setSentryType:eNeither];
     [self setNextState:eIdle stepTime:.2];
+    [self stopTimer]; //SV
 }
 
 - (void) takeOverRunning:(BOOL)quiet

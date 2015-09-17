@@ -54,6 +54,8 @@
     IBOutlet NSTextField*   missedHeartBeatsCountField;
     IBOutlet NSTextField*   sbcRebootCountField;
     IBOutlet NSTextField*   sentryRunningField;
+    IBOutlet NSTextField*   sentryScheduler; //SV
+    IBOutlet NSButton*      automaticToggleSelector; //SV
 	IBOutlet NSButton*      updateShapersButton;
 
     //items in the  HW map tab view
@@ -71,6 +73,8 @@
     NSSize focalPlaneSize;
     NSSize sentrySize;
     NSSize testDectorSize;
+    
+    BOOL scheduleState;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -117,6 +121,8 @@
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
 - (IBAction) readSecondaryMapFileAction:(id)sender;
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
+- (IBAction) schedulerOnOff:(id)sender; //SV
+- (IBAction) updatedTimeInterval:(id)sender; //SV
 
 #pragma mark ¥¥¥Test Detector Map Actions
 - (IBAction) secondaryAdcClassNameAction:(id)sender;

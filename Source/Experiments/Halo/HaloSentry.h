@@ -117,6 +117,9 @@ enum eHaloStatus {
     NSString* sbcRootPwd;
     NSMutableArray* unPingableSBCs;
     NSMutableArray* sentryLog;
+    
+    NSTimer* automaticToggle; //SV
+    double timeInterval; //SV
 }
 
 #pragma mark ***Initialization
@@ -173,6 +176,12 @@ enum eHaloStatus {
 - (NSString*) stateName;
 - (NSString*) report;
 - (NSString*) diskStatus;
+- (BOOL) timerIsRunning; //SV
+- (void) scheduledToggle:(NSTimer*) timer; //SV
+- (void) setTimer:(double) seconds; //SV
+- (void) scheduledToggle:(NSTimer*) timer; //SV
+- (void) startTimer; //SV
+- (void) stopTimer; //SV
 
 #pragma mark ***Run Stuff
 - (void) start;

@@ -33,6 +33,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"Halo"];
+    scheduleState = true;
     return self;
 }
 
@@ -387,6 +388,8 @@
     BOOL aRunIsInProgress   = [[model haloSentry] runIsInProgress];
    	BOOL anyAddresses       = ([[model emailList] count]>0);
     BOOL localRunInProgress = [[ORGlobal sharedGlobal] runInProgress];
+    BOOL validTimeInterval  = [[sentryScheduler stringValue] length]>0  && [sentryScheduler doubleValue]>0; //SV
+    BOOL sentryStateIsSecondary = [[[model haloSentry] sentryTypeName] isEqualToString:@"Secondary"]; //SV
     
 	[heartBeatIndexPU setEnabled:anyAddresses];
  
@@ -399,6 +402,9 @@
     [toggleButton        setEnabled:!locked & aRunIsInProgress];
     [sbcPasswordField    setEnabled:!locked & aRunIsInProgress];
     [updateShapersButton setEnabled:!locked & !localRunInProgress];
+    [automaticToggleSelector setEnabled:sentryRunning && !sentryStateIsSecondary && validTimeInterval]; //SV
+    [automaticToggleSelector setTitle:[[model haloSentry] timerIsRunning]?@"Stop":@"Start"]; //SV
+    [sentryScheduler setEnabled:!locked & ![[model haloSentry] timerIsRunning]]; //SV
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
@@ -644,6 +650,29 @@
 {
     [[model haloSentry] clearStats];
 
+}
+
+//SV
+- (IBAction) updatedTimeInterval:(id)sender
+{
+    [[model haloSentry] setTimer:[sentryScheduler doubleValue]];
+    [self updateButtons];
+}
+
+//SV
+- (IBAction)schedulerOnOff:(id)sender
+{
+    scheduleState = ![[model haloSentry] timerIsRunning];
+    if (!scheduleState && [[model haloSentry] sentryIsRunning])
+    {
+        [[model haloSentry] stopTimer];
+    }
+    if (scheduleState && [[model haloSentry] sentryIsRunning] && [[sentryScheduler stringValue] length]>0  && [sentryScheduler doubleValue]>0)
+    {
+        [[model haloSentry] startTimer];
+    }
+    
+    [self updateButtons];
 }
 
 #pragma mark •••Data Source
