@@ -531,9 +531,11 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             if(gateValveIsOpen == kMJDSource_True)NSLog(@"Module %d Source GV is OPEN\n",slot+1);
             else if(gateValveIsOpen == kMJDSource_False)NSLog(@"Module %d Source GV is CLOSED\n",slot+1);
             else    NSLog(@"Module %d Source GV state is UNKNOWN\n",slot+1);
+            NSLog(@"Module %d Source GV adc value: %.2f\n",slot+1,gvAdc);
             if(sourceIsIn == kMJDSource_True)NSLog(@"Module %d Source is IN\n",slot+1);
             else if(sourceIsIn == kMJDSource_False)NSLog(@"Module %d Source is OUT\n",slot+1);
             else    NSLog(@"Module %d Source state is UNKNOWN\n",slot+1);
+            NSLog(@"Module %d Source Track adc value: %.2f\n",slot+1,ledAdc);
             self.order = nil;
             oneTimeGVVerbose = NO;
         }
