@@ -57,6 +57,13 @@
                      selector : @selector(connectionChanged:)
                          name : ORRSRemoteConnectedChanged
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(queueCountChanged:)
+                         name : ORRemoteSocketQueueCountChanged
+                       object : model];
+    
+    
 }
 
 - (void) updateWindow
@@ -66,6 +73,12 @@
 	[self remotePortChanged:nil];
     [self remoteSocketLockChanged:nil];
     [self connectionChanged:nil];
+    [self queueCountChanged:nil];
+}
+
+- (void) queueCountChanged:(NSNotification*)aNote
+{
+    [queueCountField setIntValue:[model queueCount]];
 }
 
 - (void) connectionChanged:(NSNotification*)aNote

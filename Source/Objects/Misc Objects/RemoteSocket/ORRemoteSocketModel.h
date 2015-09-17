@@ -20,11 +20,14 @@
 #pragma mark ***Imported Files
 
 @class NetSocket;
+@class ORRemoteCommander;
 
 #define SCCDefaultConnectionTimeout 30
 @interface ORRemoteSocketModel : OrcaObject
 {
 @private
+    double                  queueCount;
+    NSOperationQueue*       queue;
     NetSocket*              socket;
 	NSString*				remoteHost;
 	int						remotePort;
@@ -53,15 +56,19 @@
 - (void)        processMessage:(NSString*)message;
 - (NetSocket*)  socket;
 - (void)        setSocket:(NetSocket*)aSocket;
+- (BOOL)        queueEmpty;
+- (void)        setQueueCount:(NSNumber*)n;
+- (int)         queueCount;
 
 #pragma mark ***Socket Methods
 - (void)    connect;
 - (void)	disconnect;
-- (BOOL)	sendData:(NSData*)data;
-- (BOOL)	sendString:(NSString*)string;
-- (BOOL)	sendString:(NSString*)string withEncoding:(NSStringEncoding)encoding;
+- (void)	sendString:(NSString*)string;
+- (void)    sendStrings:(NSArray*)cmdArray;
+- (void)    sendStrings:(NSArray*)cmdArray delegate:(id)aDelegate;
 - (id)		responseForKey:(NSString*)aKey;
 - (BOOL)	responseExistsForKey:(NSString*)aKey;
+- (void)    mainThreadSendString:(NSString*)aString;
 
 #pragma mark ***Delegate Methods
 
@@ -74,3 +81,15 @@ extern NSString* ORRSRemotePortChanged;
 extern NSString* ORRSRemoteHostChanged;
 extern NSString* ORRemoteSocketLock;
 extern NSString* ORRSRemoteConnectedChanged;
+extern NSString* ORRemoteSocketQueueCountChanged;
+
+
+@interface ORResponseWaitOp : NSOperation
+{
+    ORRemoteCommander*      delegate;
+    NSArray*                cmds;
+    ORRemoteSocketModel*    remObj;
+}
+- (id)   initWithRemoteObj:(ORRemoteSocketModel*)aRemObj commands:(NSArray*)aCmd delegate:(ORRemoteCommander*)aDelegate;
+- (void) main;
+@end

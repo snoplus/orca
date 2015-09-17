@@ -24,6 +24,7 @@
     IBOutlet NSTextField* remoteHostField;
 	IBOutlet NSTextField* remotePortField;
     IBOutlet NSButton*    remoteSocketLockButton;
+    IBOutlet NSTextField* queueCountField;
 }
 
 #pragma mark ***Interface Management
@@ -31,6 +32,7 @@
 - (void) remotePortChanged:(NSNotification*)aNote;
 - (void) remoteSocketLockChanged:(NSNotification*)aNote;
 - (void) connectionChanged:(NSNotification*)aNote;
+- (void) queueCountChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) remoteHostNameAction:(id)sender;
