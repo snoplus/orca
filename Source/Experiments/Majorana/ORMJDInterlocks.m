@@ -24,7 +24,7 @@
 #import "ORRemoteSocketModel.h"
 #import "ORAlarm.h"
 
-//do NOT change this list without changing the enum states in the .h file
+//do NOT change this list without changing the enum states in the .h filef
 static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
     { kMJDInterlocks_Idle,               @"State Machine"},
     { kMJDInterlocks_Ping,               @"Ping Vac System"},
@@ -44,7 +44,7 @@ static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
 
 @implementation ORMJDInterlocks
 
-@synthesize delegate,isRunning,currentState,stateStatus,slot,finalReport,remoteOpStatus;
+@synthesize delegate,isRunning,currentState,stateStatus,slot,finalReport;
 
 NSString* ORMJDInterlocksIsRunningChanged = @"ORMJDInterlocksIsRunningChanged";
 NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
@@ -64,11 +64,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     self.delegate    = nil;
     self.stateStatus = nil;
     self.finalReport = nil;
-    self.remoteOpStatus = nil;
     [interlockFailureAlarm clearAlarm];
     [interlockFailureAlarm release];
-    [queue cancelAllOperations];
-    [queue release];
     [super dealloc];
 }
 
@@ -102,9 +99,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     self.remoteOpStatus = nil;
     retryCount          = 0;
     
-    [queue cancelAllOperations];
-    [queue release];
-    queue=nil;
     currentState = kMJDInterlocks_Idle;
     [self setupStateArray]; //info for display in dialog
     NSLog(@"HV Interlocks procedure reset for %@\n",[self moduleName]);
@@ -270,7 +264,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         
         //send the HV Bias state to the Vac system
         case kMJDInterlocks_UpdateVacSystem:
-            if([queue operationCount]!=0){
+            if(![[delegate remoteSocket:slot] queueEmpty]){
                 [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
             }
             else if(remoteOpStatus){
@@ -317,14 +311,14 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 self.remoteOpStatus=nil;
             }
             else {
-                if([queue operationCount]==0){
+                if([[delegate remoteSocket:slot] queueEmpty]){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                                             [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setDetectorsBiased:%d];",hvIsOn],
                                             [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",2*[delegate pollTime]],
                                             
                                             nil];
-                    [self sendCommands:cmds];
+                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
                 }
             }
@@ -332,7 +326,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         //HV is ON... see if we need to unbias
         case kMJDInterlocks_GetShouldUnBias:
-            if([queue operationCount]!=0){
+            if(![[delegate remoteSocket:slot] queueEmpty]){
                 [self setState:kMJDInterlocks_GetShouldUnBias status:@"Trying Connection" color:normalColor];
             }
             else if(remoteOpStatus){
@@ -377,10 +371,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 self.remoteOpStatus=nil;
             }
             else {
-                if([queue operationCount]==0){
+                if([[delegate remoteSocket:slot] queueEmpty]){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"shouldUnBias = [ORMJDVacuumModel,1 shouldUnbiasDetector];", nil];
-                    [self sendCommands:cmds];
+                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_GetShouldUnBias status:@"Trying Connection" color:normalColor];
                 }
             }
@@ -389,7 +383,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             
         //HV is off... see if we would be allowed to bias HV
         case kMJDInterlocks_GetOKToBias:
-            if([queue operationCount]!=0){
+            if(![[delegate remoteSocket:slot] queueEmpty]){
                 [self setState:kMJDInterlocks_GetOKToBias status:@"Trying Connection" color:normalColor];
             }
             else if(remoteOpStatus){
@@ -432,10 +426,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 self.remoteOpStatus=nil;
             }
             else {
-                if([queue operationCount]==0){
+                if([[delegate remoteSocket:slot] queueEmpty]){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:@"okToBias = [ORMJDVacuumModel,1 okToBiasDetector];", nil];
-                    [self sendCommands:cmds];
+                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_GetOKToBias status:@"Trying Connection" color:normalColor];
                 }
             }
@@ -526,61 +520,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
         interlockFailureAlarm = nil;
     }
 }
-
 @end
 
 
 @implementation ORMJDInterlocks (Tasks)
-- (void) sendCommand:(NSString*)aCmd
-{
-    [self sendCommands:[NSArray arrayWithObject:aCmd]];
-}
-
-- (void) sendCommands:(NSArray*)cmdArray
-{
-    if(!queue){
-        queue = [[NSOperationQueue alloc] init];
-        [queue setMaxConcurrentOperationCount:1]; //can only do one at a time
-    }
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
-    [remObj setConnectionTimeout:5];
-    if(![remObj isConnected])[remObj connect];
-
-    ORResponseWaitOp* anOp = [[ORResponseWaitOp alloc] initWithRemoteObj:remObj commands:cmdArray delegate:self];
-    [queue addOperation:anOp];
-    [anOp release];
-}
-
-- (BOOL) sendCommandWithResponse:(NSString*)aCmd
-{
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
-    if(![remObj isConnected])[remObj connect]; //might be connect already and waiting
-    BOOL isConnected = [remObj isConnected];
-    if(isConnected){
-        [remObj sendString:aCmd];
-        //send and DO NOT disconnect.
-        return YES;
-    }
-    else return NO;
-}
-
-- (id) getResponseForKey:(NSString*)aKey
-{
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
-    if([remObj responseExistsForKey:aKey]){
-        id response = [remObj responseForKey:aKey];
-        [remObj disconnect];
-        return response;
-    }
-    else return nil;
-}
-
-- (void) disconnect
-{
-    ORRemoteSocketModel* remObj = [delegate remoteSocket:slot];
-    if([remObj isConnected])[remObj disconnect];
-}
-
 - (void) ping
 {
     if(!pingTask){
@@ -603,11 +546,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
 }
 
-- (BOOL) pingTaskRunning    { return pingTask != nil;}
-- (BOOL) pingedSuccessfully { return pingedSuccessfully; }
-- (void) tasksCompleted:(id)sender
-{
-}
+- (BOOL) pingTaskRunning            { return pingTask != nil;}
+- (BOOL) pingedSuccessfully         { return pingedSuccessfully; }
+- (void) tasksCompleted:(id)sender  { }
 - (void) taskFinished:(NSTask*)aTask
 {
     if(aTask == pingTask){
@@ -630,83 +571,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     else if([text rangeOfString:@"No route to host"].location != NSNotFound){
         pingedSuccessfully = NO;
     }
-}
-
-@end
-
-@implementation ORResponseWaitOp
-
-@synthesize doneWithLoop;
-
-- (id) initWithRemoteObj:(ORRemoteSocketModel*)aRemObj commands:(NSArray*)cmdArray delegate:(ORMJDInterlocks*)aDelegate
-{
-    self = [super init];
-    delegate = aDelegate;
-    remObj = [aRemObj retain];
-    cmds = [cmdArray retain];
-    return self;
-}
-- (void) dealloc
-{
-    [cmds release];
-    [remObj release];
-    [super dealloc];
-}
-
-- (void) main
-{
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    
-    NSTimeInterval startTime = [NSDate timeIntervalSinceReferenceDate];
-    while (![self isCancelled]){
-        NSTimeInterval totalTime = [NSDate timeIntervalSinceReferenceDate] - startTime;
-        if(totalTime>10 || [remObj isConnected]){
-            break;
-        }
-        [NSThread sleepForTimeInterval:.1];
-    }
-    
-    NSMutableDictionary* result = [NSMutableDictionary dictionary];
-    if([remObj isConnected]){
-        for(id aCmd in cmds){
-            if([self isCancelled])break;
-            [remObj sendString:aCmd];
-            
-            NSString* aKey = nil;
-            NSArray* parts = [aCmd componentsSeparatedByString:@"="];
-            if([parts count]==2){
-                aKey = [[parts objectAtIndex:0] trimSpacesFromEnds];
-            }
-            NSTimeInterval startTime = [NSDate timeIntervalSinceReferenceDate];
-            while (![self isCancelled]){
-                NSTimeInterval totalTime = [NSDate timeIntervalSinceReferenceDate] - startTime;
-                if(totalTime>10)break;
-                if(aKey){
-                    if([remObj responseExistsForKey:aKey]){
-                        id aValue = [remObj responseForKey:aKey];
-                        [result setObject:aValue forKey:aKey];
-                        break;
-                    }
-                }
-                if([remObj responseExistsForKey:@"Error"]){
-                    id aValue = [remObj responseForKey:@"Error"];  //clear the error
-                    [result setObject:aValue forKey:@"Error"];
-                    break;
-                }
-                if([remObj responseExistsForKey:@"Success"]){
-                    [remObj responseForKey:@"Success"]; //clear the success flag
-                    break;
-                }
-                [NSThread sleepForTimeInterval:.1];
-            }
-        }
-        [result setObject:[NSNumber numberWithBool:YES] forKey:@"connected"];
-    }
-    else [result setObject:[NSNumber numberWithBool:NO] forKey:@"connected"];
-    [delegate setRemoteOpStatus:result];
-    
-    [remObj disconnect];
-    [pool release];
 }
 @end
 

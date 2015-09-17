@@ -33,6 +33,7 @@
 #import "ORTimeRate.h"
 #import "ORMJDInterlocks.h"
 #import "ORVME64CrateModel.h"
+#import "ORMJDSource.h"
 
 NSString* MajoranaModelIgnorePanicOnBChanged        = @"MajoranaModelIgnorePanicOnBChanged";
 NSString* MajoranaModelIgnorePanicOnAChanged        = @"MajoranaModelIgnorePanicOnAChanged";
@@ -44,7 +45,6 @@ NSString* ORMajoranaModelLastConstraintCheckChanged = @"ORMajoranaModelLastConst
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 #define MJDStringMapFile(aPath)		[NSString stringWithFormat:@"%@_StringMap",	aPath]
-
 
 @interface  MajoranaModel (private)
 - (void)     checkConstraints;
@@ -64,7 +64,12 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         [mjdInterlocks[i] release];
         [rampHVAlarm[i]   clearAlarm];
         [rampHVAlarm[i]   release];
+
+        [mjdSource[i] setDelegate:nil];
+        [mjdSource[i] release];
+
     }
+    
     [stringMap release];
     [super dealloc];
 }
@@ -432,11 +437,23 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     return mjdInterlocks[index];
 }
 
+- (id) mjdSource:(int)index
+{
+    if(index>=0 && index<2){
+        if(!mjdSource[index]){
+            mjdSource[index] = [[ORMJDSource alloc] initWithDelegate:self slot:index];
+        }
+        return mjdSource[index];
+    }
+    else return nil;
+}
+
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock     { return @"MajoranaMapLock";      }
 - (NSString*) vetoMapLock           { return @"MajoranaVetoMapLock";  }
 - (NSString*) experimentDetectorLock{ return @"MajoranaDetectorLock"; }
 - (NSString*) experimentDetailsLock	{ return @"MajoranaDetailsLock";  }
+- (NSString*) calibrationLock       { return @"MajoranaCalibrationLock";  }
 
 - (void) setViewType:(int)aViewType
 {
@@ -561,6 +578,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     int i;
     for(i=0;i<2;i++){
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
+        mjdSource[i] = [[ORMJDSource alloc] initWithDelegate:self slot:i];
     }
     pollTime  = [decoder decodeIntForKey:	@"pollTime"];
     stringMap = [[decoder decodeObjectForKey:@"stringMap"] retain];
@@ -833,6 +851,26 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
             }
         }
     }
+}
+
+- (void) deploySource:(int)index
+{
+    if(index>=0 && index<2)[mjdSource[index] startDeployment];
+}
+
+- (void) retractSource:(int)index
+{
+    if(index>=0 && index<2)[mjdSource[index] startRetraction];
+}
+
+- (void) stopSource:(int)index
+{
+    if(index>=0 && index<2)[mjdSource[index] stopSource];
+}
+
+- (void) checkSourceGateValve:(int)index
+{
+    if(index>=0 && index<2)[mjdSource[index] checkGateValve];
 }
 
 @end

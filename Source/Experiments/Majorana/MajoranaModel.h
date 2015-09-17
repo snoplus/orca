@@ -36,6 +36,7 @@
 @class ORRemoteSocketModel;
 @class ORAlarm;
 @class ORMJDInterlocks;
+@class ORMJDSource;
 
 @interface MajoranaModel :  ORExperimentModel <OROrderedObjHolding>
 {
@@ -47,7 +48,8 @@
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
     
-    ORMJDInterlocks* mjdInterlocks[2];
+    ORMJDInterlocks*    mjdInterlocks[2];
+    ORMJDSource*        mjdSource[2];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -83,6 +85,7 @@
 - (NSString*) vetoMapLock;
 - (NSString*) experimentDetectorLock;
 - (NSString*) experimentDetailsLock;
+- (NSString*) calibrationLock;
 
 #pragma mark ¥¥¥OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects;
@@ -96,10 +99,16 @@
 - (int) slotForObj:(id)anObj;
 - (int) numberSlotsNeededFor:(id)anObj;
 
+#pragma mark ¥¥¥Source
+- (id)   mjdSource:(int)index;
+- (void) deploySource:(int)index;
+- (void) retractSource:(int)index;
+- (void) stopSource:(int)index;
+- (void) checkSourceGateValve:(int)index;
+
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
-
 
 @end
 

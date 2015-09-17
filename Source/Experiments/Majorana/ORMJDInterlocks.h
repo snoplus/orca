@@ -17,6 +17,7 @@
 //express or implied, or assume any liability or responsibility
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORRemoteCommander.h"
 
 @class MajoranaModel;
 @class ORRemoteSocketModel;
@@ -38,11 +39,11 @@ enum {
 };
 
 typedef struct {
-    int state;
-    NSString* name;
-}MJDInterlocksStateInfo;
+    int         state;
+    NSString*   name;
+} MJDInterlocksStateInfo;
 
-@interface ORMJDInterlocks : NSObject
+@interface ORMJDInterlocks : ORRemoteCommander
 {
     MajoranaModel*      delegate;
     int                 slot;
@@ -59,8 +60,6 @@ typedef struct {
     BOOL                okToBias;
     BOOL                shouldUnBias;
     BOOL                lockHVDialog;
-    NSOperationQueue*   queue;
-    NSDictionary*       remoteOpStatus;
     ORAlarm*            interlockFailureAlarm;
 }
 
@@ -85,7 +84,6 @@ typedef struct {
 
 @property (assign) MajoranaModel*             delegate;
 @property (assign,nonatomic) BOOL             isRunning;
-@property (retain) NSDictionary*              remoteOpStatus;
 @property (assign,nonatomic) int              currentState;
 @property (assign,nonatomic) int              slot;
 @property (retain,nonatomic) NSMutableArray*  stateStatus;
@@ -99,27 +97,8 @@ typedef struct {
 - (BOOL) pingedSuccessfully;
 - (void) tasksCompleted:(id)sender;
 - (void) taskFinished:(NSTask*)aTask;
-- (void) sendCommand:(NSString*)aCmd;
-- (void) sendCommands:(NSArray*)aCmds;
-- (BOOL) sendCommandWithResponse:(NSString*)aCmd;
-- (id) getResponseForKey:(NSString*)aKey
-;
-- (void) disconnect;
-
 @end
 
 extern NSString* ORMJDInterlocksIsRunningChanged;
 extern NSString* ORMJDInterlocksStateChanged;
 
-
-@interface ORResponseWaitOp : NSOperation
-{
-    ORMJDInterlocks*        delegate;
-    NSArray*                cmds;
-    ORRemoteSocketModel*    remObj;
-    BOOL                    doneWithLoop;
-}
-- (id)   initWithRemoteObj:(ORRemoteSocketModel*)aRemObj commands:(NSArray*)aCmd delegate:(ORMJDInterlocks*)aDelegate;
-- (void) main;
-@property (assign) BOOL doneWithLoop;
-@end

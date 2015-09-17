@@ -32,6 +32,7 @@
 #import "ORCompositePlotView.h"
 #import "ORiSegHVCard.h"
 #import "ORMJDInterlocks.h"
+#import "ORMJDSource.h"
 
 @implementation MajoranaController
 #pragma mark ¥¥¥Initialization
@@ -62,7 +63,8 @@
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(580,530);
 	detectorMapViewSize	 = NSMakeSize(750,730);
-	vetoMapViewSize		 = NSMakeSize(460,565);
+    vetoMapViewSize		 = NSMakeSize(580,565);
+    calibrationViewSize	 = NSMakeSize(580,320);
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
     [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
     blankView = [[NSView alloc] init];
@@ -96,7 +98,6 @@
 	[aPlot1 release];
     [(ORPlot*)[valueHistogramsPlot plotWithTag: 10] setName:@"Detectors"];
     [valueHistogramsPlot setShowLegend:YES];
-    
 }
 
 
@@ -186,7 +187,42 @@
                      selector : @selector(updateLastConstraintCheck:)
                          name : ORMajoranaModelLastConstraintCheckChanged
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sourceStateChanged:)
+                         name : ORMJDSourceStateChanged
+                        object: nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(sourceIsMovingChanged:)
+                         name : ORMJDSourceIsMovingChanged
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(sourceIsConnectedChanged:)
+                         name : ORMJDSourceIsConnectedChanged
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(sourceModeChanged:)
+                         name : ORMJDSourceModeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sourcePatternChanged:)
+                         name : ORMJDSourcePatternChanged
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(sourceGatevalveChanged:)
+                         name : ORMJDSourceGateValveChanged
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(calibrationLockChanged:)
+                         name : [model calibrationLock]
+                       object : nil];
+
     
     
 }
@@ -215,7 +251,120 @@
     [module1InterlockTable reloadData];
     [module2InterlockTable reloadData];
     [self updateLastConstraintCheck:nil];
+    [self sourceStateChanged:nil];
+    
+    //Source
+    [self calibrationLockChanged:nil];
+    [self sourceIsMovingChanged:nil];
+    [self sourceIsConnectedChanged:nil];
+    [self sourceModeChanged:nil];
+    [self sourcePatternChanged:nil];
+    [self sourceGatevalveChanged:nil];
 }
+
+- (void) sourceGatevalveChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [gateValveStateField0 setStringValue:[self sourceGateValveState:0]];
+        [gateValveStateField1 setStringValue:[self sourceGateValveState:1]];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0])[gateValveStateField0 setStringValue:[self sourceGateValveState:0]];
+        else                                     [gateValveStateField1 setStringValue:[self sourceGateValveState:1]];
+    }
+    [self updateCalibrationButtons];
+}
+
+- (void) sourcePatternChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [patternField0 setStringValue:[self order:0]];
+        [patternField1 setStringValue:[self order:1]];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0])[patternField0 setStringValue:[self order:0]];
+        else                                     [patternField1 setStringValue:[self order:1]];
+    }
+}
+
+- (NSString*) sourceGateValveState:(int)index
+{
+    return [[model mjdSource:index] gateValveState];
+}
+
+- (NSString*) order:(int)index
+{
+    ORMJDSource* sourceObj = [model mjdSource:index];
+    NSString* order = [sourceObj order];
+    if([order length]==0)order = @"";
+    if([order length]>30)order = [order substringFromIndex:[order length]-30];
+    return order;
+}
+
+- (void) sourceModeChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [modeField0 setStringValue:[[model mjdSource:0] modeString]];
+        [modeField1 setStringValue:[[model mjdSource:1] modeString]];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0])[modeField0 setStringValue:[[model mjdSource:0] modeString]];
+        else                                     [modeField1 setStringValue:[[model mjdSource:1] modeString]];
+    }
+    
+    [self updateCalibrationButtons];
+}
+
+- (void) sourceIsMovingChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [isMovingField0 setStringValue:[[model mjdSource:0] movingState]];
+        [isMovingField1 setStringValue:[[model mjdSource:1] movingState]];
+        if([[model mjdSource:0] isMoving] == kMJDSource_True)   [progress0 startAnimation:nil];
+        else                                                    [progress0 stopAnimation:nil];
+        if([[model mjdSource:1] isMoving] == kMJDSource_True)   [progress1 startAnimation:nil];
+        else                                                    [progress1 stopAnimation:nil];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0]){
+            [isMovingField0 setStringValue:[[model mjdSource:0] movingState]];
+            if([[model mjdSource:0] isMoving] == kMJDSource_True)   [progress0 startAnimation:nil];
+            else                                                    [progress0 stopAnimation:nil];
+        }
+        else {
+            [isMovingField1 setStringValue:[[model mjdSource:1] movingState]];
+            if([[model mjdSource:1] isMoving] == kMJDSource_True)   [progress1 startAnimation:nil];
+            else                                                    [progress1 stopAnimation:nil];
+        }
+    }
+    [self updateCalibrationButtons];
+}
+
+- (void) sourceIsConnectedChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [isConnectedField0 setStringValue:[[model mjdSource:0] movingState]];
+        [isConnectedField1 setStringValue:[[model mjdSource:1] movingState]];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0]) [isConnectedField0 setStringValue:[[model mjdSource:0] connectedState]];
+        else                                      [isConnectedField1 setStringValue:[[model mjdSource:1] connectedState]];
+    }
+    [self updateCalibrationButtons];
+}
+- (void) sourceStateChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [sourceStateField0 setStringValue:[[model mjdSource:0] currentStateName]];
+        [sourceStateField1 setStringValue:[[model mjdSource:1] currentStateName]];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0])[sourceStateField0 setStringValue:[[model mjdSource:0] currentStateName]];
+        else                                     [sourceStateField1 setStringValue:[[model mjdSource:1] currentStateName]];
+    }
+    [self updateCalibrationButtons];
+ }
+
 - (void) updateLastConstraintCheck:(NSNotification*)aNote
 {
     if([model lastConstraintCheck]) [lastTimeCheckedField setStringValue:[[model lastConstraintCheck] stdDescription]];
@@ -244,6 +393,8 @@
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:[model vetoMapLock] to:secure];
     [vetoMapLockButton setEnabled: secure];
+    [gSecurity setLock:[model calibrationLock] to:secure];
+    [calibrationLockButton setEnabled: secure];
 }
 
 -(void) groupChanged:(NSNotification*)note
@@ -270,6 +421,13 @@
     [readSecondaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
     [saveSecondaryMapFileButton setEnabled:!lockedOrRunningMaintenance];
 	[secondaryAdcClassNamePopup setEnabled:!lockedOrRunningMaintenance];
+}
+
+- (void) calibrationLockChanged:(NSNotification*)aNotification
+{
+    BOOL locked = [gSecurity isLocked:[model calibrationLock]];
+    [calibrationLockButton setState: locked];
+    [self updateCalibrationButtons];
 }
 
 - (void) secondaryAdcClassNameChanged:(NSNotification*)aNote
@@ -361,6 +519,34 @@
     }
 }
 
+#pragma mark ¥¥¥Calibration Interface Management
+- (void) updateCalibrationButtons
+{
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model calibrationLock]];
+    
+    BOOL running0     = [[model mjdSource:0] currentState]!= kMJDSource_Idle;
+    BOOL isDeploying0 = [[model mjdSource:0] isDeploying];
+    BOOL isRetacting0 = [[model mjdSource:0] isRetracting];
+   // BOOL gvStateKnown0 = [[model mjdSource:0] gateValveIsOpen]!=kMJDSource_Unknown;
+    
+    BOOL running1     = [[model mjdSource:1] currentState]!= kMJDSource_Idle;
+    BOOL isRetacting1 = [[model mjdSource:1] isRetracting];
+    BOOL isDeploying1 = [[model mjdSource:1] isDeploying];
+//    BOOL gvStateKnown1 = [[model mjdSource:1] gateValveIsOpen]!=kMJDSource_Unknown;
+    
+    [deploySourceButton0    setEnabled:!lockedOrRunningMaintenance && (!running0 || (!isDeploying0 && isRetacting0))];
+    [retractSourceButton0   setEnabled:!lockedOrRunningMaintenance && (!running0 || (isDeploying0 && !isRetacting0))];
+    [stopSourceButton0      setEnabled:!lockedOrRunningMaintenance && (isDeploying0 || isRetacting0)];
+    [checkSourceGateValveButton0 setEnabled:!lockedOrRunningMaintenance && (!running0 && !isDeploying0 && !isRetacting0)];
+    [closeGVButton0         setEnabled:!lockedOrRunningMaintenance && (!running0 && !isDeploying0 && !isRetacting0)];
+     
+    [deploySourceButton1    setEnabled:!lockedOrRunningMaintenance && (!running1 || (!isDeploying1 && isRetacting1))];
+    [retractSourceButton1   setEnabled:!lockedOrRunningMaintenance && (!running1 || (isDeploying1 && !isRetacting1))];
+    [stopSourceButton1      setEnabled:!lockedOrRunningMaintenance && (isDeploying1 || isRetacting1)];
+    [checkSourceGateValveButton1 setEnabled:!lockedOrRunningMaintenance && (!running1 && !isDeploying1 && !isRetacting1)];
+    [closeGVButton1         setEnabled:!lockedOrRunningMaintenance && (!running0 && !isDeploying0 && !isRetacting0)];
+}
+
 #pragma mark ¥¥¥Details Interface Management
 - (void) refreshSegmentTables:(NSNotification*)aNote
 {
@@ -376,8 +562,8 @@
 
 	[detailsLockButton setState: locked];
     [initButton setEnabled: !lockedOrRunningMaintenance];
-
 }
+
 #pragma mark ***Actions
 - (void) ignorePanicOnBAction:(id)sender
 {
@@ -465,6 +651,37 @@
     [model setPollTime:[model pollTime]];
 }
 
+- (IBAction) checkSourceGateValve0:(id)sender   {[model checkSourceGateValve:0];}
+- (IBAction) deploySourceAction0:(id)sender     {[model deploySource:0];}
+- (IBAction) retractSourceAction0:(id)sender    {[model retractSource:0];}
+- (IBAction) stopSourceAction0:(id)sender       {[model stopSource:0];}
+- (IBAction) closeGateValve0:(id)sender         {[self confirmCloseGateValve:0];}
+
+- (IBAction) checkSourceGateValve1:(id)sender   {[model checkSourceGateValve:1];}
+- (IBAction) deploySourceAction1:(id)sender     {[model deploySource:1];}
+- (IBAction) retractSourceAction1:(id)sender    {[model retractSource:1];}
+- (IBAction) stopSourceAction1:(id)sender       {[model stopSource:1];}
+- (IBAction) closeGateValve1:(id)sender         {[self confirmCloseGateValve:1];}
+
+- (void) confirmCloseGateValve:(int)index
+{
+    NSString* s1 = [NSString stringWithFormat:@"Really Close Module %d Source Gatevalve?",index];
+    
+    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText:s1];
+    [alert setInformativeText:@"An attempt will be made to confirm that the source is retracted, but you should manually check its position before proceeding!"];
+    [alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Close It"]];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    
+    [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
+        if(result == NSAlertFirstButtonReturn){
+            [[model mjdSource:index] closeGateValve];
+        }
+    }];
+  
+}
+
 - (IBAction) pollTimeAction:(id)sender
 {
     [[model mjdInterlocks:0] reset:YES];
@@ -506,6 +723,12 @@
 {
     [gSecurity tryToSetLock:[model vetoMapLock] to:[sender intValue] forWindow:[self window]];
 }
+
+- (IBAction) calibrationLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:[model calibrationLock] to:[sender intValue] forWindow:[self window]];
+}
+
 
 - (IBAction) readSecondaryMapFileAction:(id)sender
 {
@@ -589,6 +812,11 @@
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:vetoMapViewSize];
 		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 5){
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:calibrationViewSize];
+        [[self window] setContentView:tabView];
     }
 	int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.MajoranaController.selectedtab"];

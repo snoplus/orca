@@ -57,12 +57,41 @@
     IBOutlet NSTextField*   ignore1Field;
     IBOutlet NSTextField*   ignore2Field;
     
+    //items in the Calibration tab view
+    IBOutlet NSButton*      checkSourceGateValveButton0;
+    IBOutlet NSButton*      deploySourceButton0;
+    IBOutlet NSButton*      retractSourceButton0;
+    IBOutlet NSButton*      stopSourceButton0;
+    IBOutlet NSButton*      closeGVButton0;
+    IBOutlet NSTextField*	sourceStateField0;
+    IBOutlet NSTextField*   isMovingField0;
+    IBOutlet NSTextField*   isConnectedField0;
+    IBOutlet NSTextField*   modeField0;
+    IBOutlet NSTextField*   patternField0;
+    IBOutlet NSProgressIndicator*    progress0;
+    IBOutlet NSTextField*   gateValveStateField0;
+    
+    IBOutlet NSButton*      checkSourceGateValveButton1;
+    IBOutlet NSButton*      deploySourceButton1;
+    IBOutlet NSButton*      retractSourceButton1;
+    IBOutlet NSButton*      stopSourceButton1;
+    IBOutlet NSButton*      closeGVButton1;
+    IBOutlet NSTextField*	sourceStateField1;
+    IBOutlet NSTextField*   isMovingField1;
+    IBOutlet NSTextField*   isConnectedField1;
+    IBOutlet NSTextField*   modeField1;
+    IBOutlet NSTextField*   patternField1;
+    IBOutlet NSProgressIndicator*    progress1;
+    IBOutlet NSTextField*   gateValveStateField1;
+    IBOutlet NSButton*      calibrationLockButton;
+    
 	NSView *blankView;
     NSSize detectorSize;
     NSSize subComponentViewSize;
     NSSize detailsSize;
     NSSize detectorMapViewSize;
     NSSize vetoMapViewSize;
+    NSSize calibrationViewSize;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -81,9 +110,23 @@
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote;
 - (void) setDetectorTitle;
 - (void) viewTypeChanged:(NSNotification*)aNote;
+- (void) sourceStateChanged:(NSNotification*)aNote;
+- (void) sourceIsMovingChanged:(NSNotification*)aNote;
+- (void) sourceModeChanged:(NSNotification*)aNote;
+- (void) sourcePatternChanged:(NSNotification*)aNote;
+- (void) sourceGatevalveChanged:(NSNotification*)aNote;
+- (void) calibrationLockChanged:(NSNotification*)aNote;
+- (NSString*) order:(int)index;
+- (NSString*) sourceGateValveState:(int)index;
+
+
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 #endif
+
+#pragma mark ¥¥¥Calibration Interface Management
+- (void) updateCalibrationButtons;
+
 #pragma mark ***Actions
 - (IBAction) ignorePanicOnBAction:(id)sender;
 - (IBAction) ignorePanicOnAAction:(id)sender;
@@ -96,6 +139,21 @@
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) resetInterLocksOnModule0:(id)sender;
 - (IBAction) resetInterLocksOnModule1:(id)sender;
+
+- (IBAction) deploySourceAction0:(id)sender;
+- (IBAction) retractSourceAction0:(id)sender;
+- (IBAction) stopSourceAction0:(id)sender;
+- (IBAction) checkSourceGateValve0:(id)sender;
+- (IBAction) closeGateValve0:(id)sender;
+
+- (IBAction) deploySourceAction1:(id)sender;
+- (IBAction) retractSourceAction1:(id)sender;
+- (IBAction) stopSourceAction1:(id)sender;
+- (IBAction) checkSourceGateValve1:(id)sender;
+- (IBAction) closeGateValve1:(id)sender;
+
+- (IBAction) calibrationLockAction:(id)sender;
+- (void)     confirmCloseGateValve:(int)index;
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 
