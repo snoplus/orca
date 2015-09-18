@@ -223,6 +223,10 @@
                          name : [model calibrationLock]
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(sourceIsInChanged:)
+                         name : ORMJDSourceIsInChanged
+                       object : nil];
     
     
 }
@@ -260,6 +264,20 @@
     [self sourceModeChanged:nil];
     [self sourcePatternChanged:nil];
     [self sourceGatevalveChanged:nil];
+    [self sourceIsInChanged:nil];
+}
+
+- (void) sourceIsInChanged:(NSNotification*)aNote
+{
+    if(!aNote){
+        [sourceIsInField1 setStringValue:[self sourceIsInState:0]];
+        [sourceIsInField0 setStringValue:[self sourceIsInState:1]];
+    }
+    else {
+        if([aNote object] == [model mjdSource:0])[sourceIsInField0 setStringValue:[self sourceIsInState:0]];
+        else                                     [sourceIsInField1 setStringValue:[self sourceIsInState:1]];
+    }
+    [self updateCalibrationButtons];
 }
 
 - (void) sourceGatevalveChanged:(NSNotification*)aNote
@@ -286,6 +304,12 @@
         else                                     [patternField1 setStringValue:[self order:1]];
     }
 }
+
+- (NSString*) sourceIsInState:(int)index
+{
+    return [[model mjdSource:index] sourceIsInState];
+}
+
 
 - (NSString*) sourceGateValveState:(int)index
 {

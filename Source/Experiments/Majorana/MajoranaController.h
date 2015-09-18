@@ -70,6 +70,7 @@
     IBOutlet NSTextField*   patternField0;
     IBOutlet NSProgressIndicator*    progress0;
     IBOutlet NSTextField*   gateValveStateField0;
+    IBOutlet NSTextField*   sourceIsInField0;
     
     IBOutlet NSButton*      checkSourceGateValveButton1;
     IBOutlet NSButton*      deploySourceButton1;
@@ -83,6 +84,8 @@
     IBOutlet NSTextField*   patternField1;
     IBOutlet NSProgressIndicator*    progress1;
     IBOutlet NSTextField*   gateValveStateField1;
+    IBOutlet NSTextField*   sourceIsInField1;
+
     IBOutlet NSButton*      calibrationLockButton;
     
 	NSView *blankView;
@@ -115,9 +118,11 @@
 - (void) sourceModeChanged:(NSNotification*)aNote;
 - (void) sourcePatternChanged:(NSNotification*)aNote;
 - (void) sourceGatevalveChanged:(NSNotification*)aNote;
+- (void) sourceIsInChanged:(NSNotification*)aNote;
 - (void) calibrationLockChanged:(NSNotification*)aNote;
 - (NSString*) order:(int)index;
 - (NSString*) sourceGateValveState:(int)index;
+- (NSString*) sourceIsInField:(int)index;
 
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
