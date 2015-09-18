@@ -553,9 +553,18 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             self.order = [NSMutableString string];
         }
         else {
-            if ((stateA != stateAOld) && (stateAOld > 0))[order appendString:@"A"];
-            if ((stateB != stateBOld) && (stateBOld > 0))[order appendString:@"B"];
-            if ((stateC != stateCOld) && (stateCOld > 0))[order appendString:@"C"];
+            if ((stateA != stateAOld) && (stateAOld > 0)){
+                [order appendString:@"A"];
+                NSLog(@"Module %d %@ source, Sensor: %@\n",slot+1,isDeploying==kMJDSource_True?@"Deploying":@"Retracting",order);
+            }
+            if ((stateB != stateBOld) && (stateBOld > 0)){
+                [order appendString:@"B"];
+                NSLog(@"Module %d %@ source, Sensor: %@\n",slot+1,isDeploying==kMJDSource_True?@"Deploying":@"Retracting",order);
+            }
+            if ((stateC != stateCOld) && (stateCOld > 0)){
+                [order appendString:@"C"];
+                NSLog(@"Module %d %@ source, Sensor: %@\n",slot+1,isDeploying==kMJDSource_True?@"Deploying":@"Retracting",order);
+            }
             [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDSourcePatternChanged object:self];
             
             stateAOld = stateA;
