@@ -373,7 +373,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         case kMJDSource_VerifyInMirrorTrack:
             if(sourceIsIn != kMJDSource_Unknown){
                 nextTime = kNormalStepTime; //go back to the faster stepping
-                if(sourceIsIn == kMJDSource_True){
+                if(sourceIsIn == kMJDSource_False){
                     [self setCurrentState:kMJDSource_CloseGV];
                 }
                 else {
