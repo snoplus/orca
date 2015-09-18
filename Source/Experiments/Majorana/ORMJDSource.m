@@ -23,7 +23,7 @@
 #import "ORRemoteSocketModel.h"
 #import "ORAlarm.h"
 
-#define kNormalStepTime 0.2
+#define kNormalStepTime 0.3
 #define kLongStepTime   1.0
 
 //do NOT change this list without changing the enum states in the .h filef
@@ -504,16 +504,16 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     
 
     //position and gatevalve info
-    if([remoteOpStatus objectForKey:@"stateA"] &&
-       [remoteOpStatus objectForKey:@"stateB"] &&
-       [remoteOpStatus objectForKey:@"stateC"] &&
-       [remoteOpStatus objectForKey:@"gateValveAdc"] &&
-       [remoteOpStatus objectForKey:@"ledAdc"]
+    if([remoteOpStatus objectForKey:@"A"] &&
+       [remoteOpStatus objectForKey:@"B"] &&
+       [remoteOpStatus objectForKey:@"C"] &&
+       [remoteOpStatus objectForKey:@"GV"] &&
+       [remoteOpStatus objectForKey:@"LED"]
        ){
  
         float kGVAdcOffset = 0.3;
         
-        float  gvAdc = [[remoteOpStatus objectForKey:@"gateValveAdc"]floatValue];
+        float  gvAdc = [[remoteOpStatus objectForKey:@"GV"]floatValue];
         if((gvAdc - kGVAdcOffset)>0.1)  self.gateValveIsOpen = kMJDSource_True;
         else {
             self.gateValveIsOpen = kMJDSource_False;
@@ -523,7 +523,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         }
         
         float kLEDAdcOffset = 1.6;
-        float  ledAdc = [[remoteOpStatus objectForKey:@"ledAdc"]floatValue];
+        float  ledAdc = [[remoteOpStatus objectForKey:@"LED"]floatValue];
         if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True;
         else                             self.sourceIsIn = kMJDSource_False;
         
@@ -541,9 +541,9 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         }
         
 
-        stateA = [[remoteOpStatus objectForKey:@"stateA"]intValue];
-        stateB = [[remoteOpStatus objectForKey:@"stateB"]intValue];
-        stateC = [[remoteOpStatus objectForKey:@"stateC"]intValue];
+        stateA = [[remoteOpStatus objectForKey:@"A"]intValue];
+        stateB = [[remoteOpStatus objectForKey:@"B"]intValue];
+        stateC = [[remoteOpStatus objectForKey:@"C"]intValue];
       
         if(firstTime){
             firstTime = NO;
@@ -735,7 +735,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 {
     NSLog(@"Module %d Starting source deployment\n",slot+1);
 
-    NSString* motionCmd = @"PM-1,C,SA1M350,LM0,I1M-45000,L0,R";
+    NSString* motionCmd = @"PM-1,C,SA1M150,LM0,I1M-45000,L0,R";
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORVXMModel,1 enableMotor:0];",
                             @"[ORVXMModel,1 setUseCmdQueue:0];",
@@ -748,7 +748,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 - (void) sendRetractionCommand
 {
     NSLog(@"Module %d Starting source retraction\n",slot+1);
-    NSString* motionCmd = @"PM-1,C,SA1M350,LM0,I1M45000,L0,R";
+    NSString* motionCmd = @"PM-1,C,SA1M150,LM0,I1M45000,L0,R";
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORVXMModel,1 enableMotor:0];",
                             @"[ORVXMModel,1 setUseCmdQueue:0];",
@@ -824,11 +824,11 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 - (void) readArduino
 {
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
-                            @"stateA    = [ORArduinoUNOModel,1 pinStateIn:3];",
-                            @"stateB    = [ORArduinoUNOModel,1 pinStateIn:6];",
-                            @"stateC    = [ORArduinoUNOModel,1 pinStateIn:9];",
-                            @"gateValveAdc = [ORArduinoUNOModel,1 adc:0];",
-                            @"ledAdc = [ORArduinoUNOModel,1 adc:5];",
+                            @"A = [ORArduinoUNOModel,1 pinStateIn:3];",
+                            @"B = [ORArduinoUNOModel,1 pinStateIn:6];",
+                            @"C = [ORArduinoUNOModel,1 pinStateIn:9];",
+                            @"GV = [ORArduinoUNOModel,1 adc:0];",
+                            @"LED =[ORArduinoUNOModel,1 adc:5];",
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
