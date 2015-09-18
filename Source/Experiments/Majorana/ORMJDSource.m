@@ -735,7 +735,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 {
     NSLog(@"Module %d Starting source deployment\n",slot+1);
 
-    NSString* motionCmd = @"PM-1,C,SA1M350,LM0,I1M-45000,L0,R";
+    NSString* motionCmd = @"PM-1,C,SA1M175,LM0,I1M-45000,L0,R";
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORVXMModel,1 enableMotor:0];",
                             @"[ORVXMModel,1 setUseCmdQueue:0];",
@@ -748,7 +748,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 - (void) sendRetractionCommand
 {
     NSLog(@"Module %d Starting source retraction\n",slot+1);
-    NSString* motionCmd = @"PM-1,C,SA1M350,LM0,I1M45000,L0,R";
+    NSString* motionCmd = @"PM-1,C,SA1M175,LM0,I1M45000,L0,R";
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORVXMModel,1 enableMotor:0];",
                             @"[ORVXMModel,1 setUseCmdQueue:0];",
