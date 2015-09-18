@@ -792,20 +792,21 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 		rawData.bytes[lowBtyeIndex] = data[4];
 		[self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
 		
-		
-		//do a runing average for the temperature
-		float temp;
-		rawData.bytes[highBtyeIndex] = data[14] & rMask;
-		rawData.bytes[lowBtyeIndex] = data[15];
-		temp = rawData.unpacked * (330./4095.) - 50.;
-		float k  = 2/(300.+1.);
-		temperatureAverage = temp * k+temperatureAverage*(1-k);
-		
-		if((throttle == 0) || (throttle%300 == 0)){			
-			[self setTemperature:temperatureAverage];
-		}
-		throttle++;
-		
+        if(packetLength>15){
+            //do a runing average for the temperature
+            float temp;
+            rawData.bytes[highBtyeIndex] = data[14] & rMask;
+            rawData.bytes[lowBtyeIndex] = data[15];
+            temp = rawData.unpacked * (330./4095.) - 50.;
+            float k  = 2/(300.+1.);
+            temperatureAverage = temp * k+temperatureAverage*(1-k);
+            
+            if((throttle == 0) || (throttle%300 == 0)){			
+                [self setTemperature:temperatureAverage];
+            }
+            throttle++;
+        }
+        
 		[self setTotalxyz];
 		
 		[self incTraceIndex];
@@ -893,8 +894,18 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 					NSString* theString = [[[NSString alloc] initWithData:inComingData encoding:NSASCIIStringEncoding] autorelease];
 					[self setSerialNumber:theString];
 					[self setIsAccelOnly: [theString hasPrefix:@"acc"]];
-					[self setNodeVersion: [[theString substringWithRange:NSMakeRange(3,1)] intValue]];
-					[self setPacketLength:nodeVersion>=6?16:15];
+                    
+                    if([[theString substringWithRange:NSMakeRange(7,1)] intValue] >= 1){
+                        [self setNodeVersion:10];
+                    }
+                    else {
+                        [self setNodeVersion: [[theString substringWithRange:NSMakeRange(3,1)] intValue]];
+                    }
+                    if(nodeVersion>=10)[self setPacketLength:21];
+					else [self setPacketLength:nodeVersion>=6?16:15];
+                    if(packetLength>15){
+                        [self setTemperature:0];
+                    }
 				}
 				else {
 					[self setSerialNumber:@"--"];
