@@ -23,7 +23,7 @@
 #import "ORRemoteSocketModel.h"
 #import "ORAlarm.h"
 
-#define kFastStepTime   0.1
+#define kFastStepTime   0.15
 #define kNormalStepTime 0.2
 #define kLongStepTime   1.0
 
