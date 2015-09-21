@@ -23,6 +23,7 @@
 #import "ORRemoteSocketModel.h"
 #import "ORAlarm.h"
 
+#define kFastStepTime   0.1
 #define kNormalStepTime 0.3
 #define kLongStepTime   1.0
 
@@ -351,10 +352,12 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
            
         case kMJDSource_MonitorDeployment:
             [self readArduino];
+            nextTime = kFastStepTime;
             break;
             
         case kMJDSource_MonitorRetraction:
            [self readArduino];
+            nextTime = kFastStepTime;
             break;
             
         //special (for now NOT integrated into the full state machine)

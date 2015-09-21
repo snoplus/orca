@@ -546,29 +546,31 @@
 #pragma mark ¥¥¥Calibration Interface Management
 - (void) updateCalibrationButtons
 {
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[model calibrationLock]];
+    BOOL locked         = [gSecurity isLocked:[model calibrationLock]];
     
-    BOOL running0     = [[model mjdSource:0] currentState]!= kMJDSource_Idle;
-    BOOL isDeploying0 = [[model mjdSource:0] isDeploying];
-    BOOL isRetacting0 = [[model mjdSource:0] isRetracting];
-   // BOOL gvStateKnown0 = [[model mjdSource:0] gateValveIsOpen]!=kMJDSource_Unknown;
-    
-    BOOL running1     = [[model mjdSource:1] currentState]!= kMJDSource_Idle;
-    BOOL isRetacting1 = [[model mjdSource:1] isRetracting];
-    BOOL isDeploying1 = [[model mjdSource:1] isDeploying];
-//    BOOL gvStateKnown1 = [[model mjdSource:1] gateValveIsOpen]!=kMJDSource_Unknown;
-    
-    [deploySourceButton0    setEnabled:!lockedOrRunningMaintenance && (!running0 || (!isDeploying0 && isRetacting0))];
-    [retractSourceButton0   setEnabled:!lockedOrRunningMaintenance && (!running0 || (isDeploying0 && !isRetacting0))];
-    [stopSourceButton0      setEnabled:!lockedOrRunningMaintenance && (isDeploying0 || isRetacting0)];
-    [checkSourceGateValveButton0 setEnabled:!lockedOrRunningMaintenance && (!running0 && !isDeploying0 && !isRetacting0)];
-    [closeGVButton0         setEnabled:!lockedOrRunningMaintenance && (!running0 && !isDeploying0 && !isRetacting0)];
+    BOOL running0       = [[model mjdSource:0] currentState]!= kMJDSource_Idle;
+    BOOL isDeploying0   = [[model mjdSource:0] isDeploying];
+    BOOL isRetacting0   = [[model mjdSource:0] isRetracting];
+    BOOL sourceIn0      = [[model mjdSource:0] sourceIsIn] == kMJDSource_True;
+    BOOL gvStateKnown0  = [[model mjdSource:0] gateValveIsOpen]!=kMJDSource_Unknown;
+  
+    BOOL running1       = [[model mjdSource:1] currentState]!= kMJDSource_Idle;
+    BOOL isRetacting1   = [[model mjdSource:1] isRetracting];
+    BOOL isDeploying1   = [[model mjdSource:1] isDeploying];
+    BOOL sourceIn1      = [[model mjdSource:1] sourceIsIn] == kMJDSource_True;
+    BOOL gvStateKnown1  = [[model mjdSource:1] gateValveIsOpen]!=kMJDSource_Unknown;
+   
+    [deploySourceButton0    setEnabled:!locked && (!running0 || (!isDeploying0 && isRetacting0))];
+    [retractSourceButton0   setEnabled:!locked && (!running0 || (isDeploying0 && !isRetacting0))];
+    [stopSourceButton0      setEnabled:!locked && (isDeploying0 || isRetacting0)];
+    [checkSourceGateValveButton0 setEnabled:!locked && !running0 && !isDeploying0 && !isRetacting0];
+    [closeGVButton0         setEnabled:!locked && !sourceIn0 && !running0 && !isDeploying0 && !isRetacting0 && gvStateKnown0];
      
-    [deploySourceButton1    setEnabled:!lockedOrRunningMaintenance && (!running1 || (!isDeploying1 && isRetacting1))];
-    [retractSourceButton1   setEnabled:!lockedOrRunningMaintenance && (!running1 || (isDeploying1 && !isRetacting1))];
-    [stopSourceButton1      setEnabled:!lockedOrRunningMaintenance && (isDeploying1 || isRetacting1)];
-    [checkSourceGateValveButton1 setEnabled:!lockedOrRunningMaintenance && (!running1 && !isDeploying1 && !isRetacting1)];
-    [closeGVButton1         setEnabled:!lockedOrRunningMaintenance && (!running0 && !isDeploying0 && !isRetacting0)];
+    [deploySourceButton1    setEnabled:!locked && (!running1 || (!isDeploying1 && isRetacting1))];
+    [retractSourceButton1   setEnabled:!locked && (!running1 || (isDeploying1 && !isRetacting1))];
+    [stopSourceButton1      setEnabled:!locked && (isDeploying1 || isRetacting1)];
+    [checkSourceGateValveButton1 setEnabled:!locked && !running1 && !isDeploying1 && !isRetacting1];
+    [closeGVButton1         setEnabled:!locked && !sourceIn1 && !running1 && !isDeploying1 && !isRetacting1 && gvStateKnown1];
 }
 
 #pragma mark ¥¥¥Details Interface Management
