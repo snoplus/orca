@@ -310,6 +310,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                     [self turnOffGVPower];
                     if(isRetracting)[self setCurrentState:kMJDSource_StartRetraction];
                     else            [self setCurrentState:kMJDSource_StartDeployment];
+                    nextTime = 3;
                 }
                 else {
                     if(elapsedTime>5) [self setCurrentState:kMJDSource_GVOpenError];
@@ -363,6 +364,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         //special (for now NOT integrated into the full state machine)
         case kMJDSource_StartCloseGVSequence:
             [self startArduino];
+            nextTime = 3;
             elapsedTime = 0;
             [self setCurrentState:kMJDSource_GetMirrorTrack];
             break;
@@ -621,6 +623,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 {
     oneTimeGVVerbose = YES;
     [self startArduino];
+    [ORTimer delay:1];
     [self readArduino];
     [self stopArduino];
 }
@@ -821,8 +824,9 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 writeOutput:10 state:0];",   //power off the gate valve
                             nil];
-    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
+    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
 }
+
 
 - (void) readArduino
 {
