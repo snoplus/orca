@@ -109,6 +109,8 @@
 #pragma mark ***Motor Commands
 - (void) manualStart;
 - (void) removeAllCmds;
+- (void) enableMotor:(int)i;
+- (void) disableMotor:(int)i;
 
 - (void) move:(int)motorIndex to:(float)aPosition speed:(int)aSpeed;
 - (void) move:(int)motorIndex dx:(float)aPosition;

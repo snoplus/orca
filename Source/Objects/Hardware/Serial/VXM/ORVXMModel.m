@@ -708,6 +708,19 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
     [self stopAllMotion];
 }
+- (void) enableMotor:(int)i
+{
+    if(i>=0 && i<kNumVXMMotors){
+        [[self motor:i] setMotorEnabled:YES];
+    }
+}
+
+- (void) disableMotor:(int)i
+{
+    if(i>=0 && i<kNumVXMMotors){
+        [[self motor:i] setMotorEnabled:NO];
+    }
+}
 
 #pragma mark ***Data Records
 - (unsigned long) dataId { return dataId; }
