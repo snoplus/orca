@@ -357,6 +357,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
     delegate    = aDelegate;
     remObj      = [aRemObj retain];
     cmds        = [cmdArray retain];
+    [self  setQueuePriority:NSOperationQueuePriorityVeryHigh];
     return self;
 }
 
@@ -414,7 +415,6 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
                     [remObj responseForKey:@"Success"]; //clear the success flag
                     break;
                 }
-                [NSThread sleepForTimeInterval:.02];
             }
         }
         [result setObject:[NSNumber numberWithBool:YES] forKey:@"connected"];
