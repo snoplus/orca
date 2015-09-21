@@ -449,15 +449,15 @@
 	double aValue = 0;
 	int set = [aPlotter tag];
 	if([model showDeltaFromAve]){
-		if(set == 2)		aValue =  [model axDeltaAveAt:i];
+		if(set == 0)		aValue =  [model axDeltaAveAt:i];
 		else if(set == 1)	aValue =  [model ayDeltaAveAt:i];
-		else if(set == 0)	aValue =  [model azDeltaAveAt:i];
+		else if(set == 2)	aValue =  [model azDeltaAveAt:i];
 		else if(set == 3)	aValue =  [model xyzDeltaAveAt:i];
 	}
 	else {
-		if(set == 2)		aValue =  [model axAt:i];
+		if(set == 0)		aValue =  [model axAt:i];
 		else if(set == 1)	aValue =  [model ayAt:i];
-		else if(set == 0)	aValue =  [model azAt:i];
+		else if(set == 2)	aValue =  [model azAt:i];
 		else if(set == 3)	aValue =  [model totalxyzAt:i];
 	}
 	*xValue = i;
