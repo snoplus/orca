@@ -71,8 +71,8 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 };
 
 static MotionNodeCalibrations motionNodeCalibration[3] = {
-	{-2.528, 0.001205},//y
-	{-2.536, 0.00123}, //z
+	{-2.536, 0.00123}, //y
+	{-2.528, 0.00123},//z
 	{-2.497, 0.00123}, //x
 };
 
@@ -778,12 +778,12 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
             // accel 0
             rawData.bytes[highBtyeIndex] = (data[2] >> 4) & rMask;
             rawData.bytes[lowBtyeIndex] = data[1];			
-            [self setAz:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
+            [self setAy:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
             
             // accel 1
             rawData.bytes[highBtyeIndex] = data[3] & rMask;
             rawData.bytes[lowBtyeIndex] = ((data[2] << 4) & lMask) | ((data[3] >> 4) & rMask);
-            [self setAy:motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept];
+            [self setAz:-(motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept)];
             
             // accel 2
             rawData.bytes[highBtyeIndex] = (data[5] >> 4) & rMask;
