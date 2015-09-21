@@ -774,23 +774,22 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 			unsigned char bytes[2];
 		}rawData;
 		
-		
-		// accel 0
-		rawData.bytes[highBtyeIndex] = (data[2] >> 4) & rMask;
-		rawData.bytes[lowBtyeIndex] = data[1];			
-		[self setAy:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
-		
-		// accel 1
-		rawData.bytes[highBtyeIndex] = data[3] & rMask;
-		rawData.bytes[lowBtyeIndex] = ((data[2] << 4) & lMask) | ((data[3] >> 4) & rMask);
-		[self setAz:-(motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept)];
-		
-		// accel 2
-		rawData.bytes[highBtyeIndex] = (data[5] >> 4) & rMask;
-		rawData.bytes[lowBtyeIndex] = data[4];
-		[self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
-		
-        if(packetLength>15){
+        if(nodeVersion<10){
+            // accel 0
+            rawData.bytes[highBtyeIndex] = (data[2] >> 4) & rMask;
+            rawData.bytes[lowBtyeIndex] = data[1];			
+            [self setAz:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
+            
+            // accel 1
+            rawData.bytes[highBtyeIndex] = data[3] & rMask;
+            rawData.bytes[lowBtyeIndex] = ((data[2] << 4) & lMask) | ((data[3] >> 4) & rMask);
+            [self setAy:motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept];
+            
+            // accel 2
+            rawData.bytes[highBtyeIndex] = (data[5] >> 4) & rMask;
+            rawData.bytes[lowBtyeIndex] = data[4];
+            [self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
+            
             //do a runing average for the temperature
             float temp;
             rawData.bytes[highBtyeIndex] = data[14] & rMask;
@@ -799,10 +798,30 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
             float k  = 2/(300.+1.);
             temperatureAverage = temp * k+temperatureAverage*(1-k);
             
-            if((throttle == 0) || (throttle%300 == 0)){			
+            if((throttle == 0) || (throttle%300 == 0)){
                 [self setTemperature:temperatureAverage];
             }
             throttle++;
+
+        }
+        else {
+            // accel 0
+            rawData.bytes[highBtyeIndex] = data[2];
+            rawData.bytes[lowBtyeIndex]  = data[1];
+            rawData.unpacked -= 13200;
+            [self setAz:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
+            
+            // accel 1
+            rawData.bytes[highBtyeIndex] = data[4];
+            rawData.bytes[lowBtyeIndex]  = data[3];
+            rawData.unpacked -= 13200;
+            [self setAy:motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept];
+            
+            // accel 2
+            rawData.bytes[highBtyeIndex] = data[6];
+            rawData.bytes[lowBtyeIndex]  = data[5];
+            rawData.unpacked -= 13200;
+            [self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
         }
         
 		[self setTotalxyz];
