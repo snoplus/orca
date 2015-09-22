@@ -23,21 +23,22 @@
 #import "ORRemoteSocketModel.h"
 #import "ORAlarm.h"
 
-#define kFastStepTime   0.1
-#define kNormalStepTime 0.3
-#define kLongStepTime   1.0
+#define kFastStepTime       0.1
+#define kNormalStepTime     0.3
+#define kLongStepTime       1.0
+#define kVeryLongStepTime   3.0
 
 //do NOT change this list without changing the enum states in the .h filef
 static MJDSourceStateInfo state_info [kMJDSource_NumStates] = {
     { kMJDSource_Idle,                  @"Idle"},
-    { kMJDSource_StartArduino,          @"Start Arduino"},
+    { kMJDSource_SetupArduinoIO,        @"Setup Arduino I/O"},
+    { kMJDSource_SetInitialOutputs,     @"Write Arduino Outputs"},
     { kMJDSource_OpenGV,                @"Opening GV"},
     { kMJDSource_OpenGV1,               @"Open GV - Close 10"},
     { kMJDSource_OpenGV2,               @"Open GV - Open 10"},
     { kMJDSource_GetGVOpenPosition,     @"Checking Gatevalve"},
     { kMJDSource_VerifyGVOpen,          @"Verifying Gatevalve"},
     { kMJDSource_StartDeployment,       @"Deployment Started"},
-    { kMJDSource_QueryMotion,           @"Query Motion"},
     { kMJDSource_VerifyMotion,          @"Verifying Motion"},
     { kMJDSource_MonitorDeployment,     @"Monitoring Deployment"},
 
@@ -50,6 +51,7 @@ static MJDSourceStateInfo state_info [kMJDSource_NumStates] = {
     
     //special (for now)
     { kMJDSource_StartCloseGVSequence,  @"Start Close GV Seq"},
+    { kMJDSource_SetupArduinoToCloseGV, @"Setup Arduino For Closing GV"},
     { kMJDSource_GetMirrorTrack,        @"Check Source Out"},
     { kMJDSource_VerifyInMirrorTrack,   @"Verify Source Out"},
     { kMJDSource_CloseGV,               @"Closing GV"},
@@ -60,6 +62,13 @@ static MJDSourceStateInfo state_info [kMJDSource_NumStates] = {
     { kMJDSource_MirrorTrackError,      @"Error"},
     //--------
     
+    //GV Check -- manually executed
+    { kGVCheckStartArduino,             @"Setup Ardunio for GV Check"},
+    { kGVCheckWriteOutputs,             @"Turn on electronics"},
+    { kGVCheckReadAdcs,                 @"Reading Adcs"},
+    { kGVCheckDone,                     @"Done -- See Status Log"},
+    //--------
+
     { kMJDSource_GVOpenError,           @"Error"},
     { kMJDSource_GVCloseError,          @"Error"},
     { kMJDSource_ConnectionError,       @"Error"},
@@ -110,7 +119,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     self.order          = [NSMutableString stringWithString:@""];
     counter             = 0;
     elapsedTime         = 0;
-    [self setCurrentState:kMJDSource_StartArduino];
+    [self setCurrentState:kMJDSource_SetupArduinoIO];
     [self performSelector:@selector(step) withObject:nil afterDelay:.1];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDSourceModeChanged object:self];
@@ -128,7 +137,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     counter           = 0;
     elapsedTime          = 0;
    
-    [self setCurrentState:kMJDSource_StartArduino];
+    [self setCurrentState:kMJDSource_SetupArduinoIO];
     [self performSelector:@selector(step) withObject:nil afterDelay:0];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDSourceModeChanged object:self];
@@ -271,12 +280,19 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(step) object:nil];
     switch (currentState){
-        case kMJDSource_StartArduino:
-            [self startArduino];
+        case kMJDSource_SetupArduinoIO:
+            [self setUpArduinoIO];
+            [self setCurrentState:kMJDSource_SetInitialOutputs];   //it should be open already. verify it.
+            nextTime = kLongStepTime;
+           break;
+        
+        case kMJDSource_SetInitialOutputs:
+            [self setArduinoOutputs];
             if(self.isDeploying)[self setCurrentState:kMJDSource_OpenGV]; //start GV opening sequence
             else                [self setCurrentState:kMJDSource_GetGVOpenPosition];   //it should be open already. verify it.
-            break;
- 
+            nextTime = kVeryLongStepTime;
+        break;
+
         case kMJDSource_OpenGV:
             [self turnOnGVPower];
             [self setCurrentState:kMJDSource_OpenGV1];
@@ -322,11 +338,13 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
            
         case kMJDSource_StartDeployment:
             [self sendDeploymentCommand];
+            [self readArduino];
             [self setCurrentState:kMJDSource_VerifyMotion];
             break;
             
         case kMJDSource_StartRetraction:
             [self sendRetractionCommand];
+            [self readArduino];
             [self setCurrentState:kMJDSource_VerifyMotion];
             break;
 
@@ -336,6 +354,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             break;
             
         case kMJDSource_VerifyMotion:
+            [self readArduino];
             if(isMoving == kMJDSource_True){
                 if(isDeploying) [self setCurrentState:kMJDSource_MonitorDeployment];
                 else            [self setCurrentState:kMJDSource_MonitorRetraction];
@@ -363,11 +382,19 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             
         //special (for now NOT integrated into the full state machine)
         case kMJDSource_StartCloseGVSequence:
-            [self startArduino];
-            nextTime = 3;
+            [self setUpArduinoIO];
+            nextTime = kVeryLongStepTime;
             elapsedTime = 0;
             [self setCurrentState:kMJDSource_GetMirrorTrack];
             break;
+
+        case kMJDSource_SetupArduinoToCloseGV:
+            [self setArduinoOutputs];
+            nextTime = kVeryLongStepTime;
+            elapsedTime = 0;
+            [self setCurrentState:kMJDSource_GetMirrorTrack];
+        break;
+
         
         case kMJDSource_GetMirrorTrack:
             nextTime = kLongStepTime; //allow some more time before the next step
@@ -431,7 +458,38 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
             
         //---
-            
+        
+        //--Check GV States
+        case kGVCheckStartArduino:
+            nextTime = kLongStepTime; //allow some more time before the next step
+            [self setUpArduinoIO];
+            [self setCurrentState:kGVCheckWriteOutputs];
+            break;
+        
+        case kGVCheckWriteOutputs:
+            nextTime = kVeryLongStepTime; //allow some more time before the next step
+            [self setArduinoOutputs];
+            [self setCurrentState:kGVCheckReadAdcs];
+            break;
+        
+        case kGVCheckReadAdcs:
+            NSLog(@"Module %d Getting Arduino ADC values\n",slot+1);
+            nextTime = kLongStepTime; //allow some more time before the next step
+            oneTimeGVVerbose = YES;
+            [self readArduino];
+            [self setCurrentState:kGVCheckDone];
+            break;
+        
+        case kGVCheckDone:
+            [self stopArduino];
+            [self setCurrentState:kMJDSource_Idle];
+            break;
+
+        //-----------------
+        
+        
+        
+        
         //Error Conditions
         case kMJDSource_GVOpenError:
             [self resetFlags];
@@ -621,11 +679,9 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 //a manual call
 - (void) checkGateValve
 {
-    oneTimeGVVerbose = YES;
-    [self startArduino];
-    [ORTimer delay:1];
-    [self readArduino];
-    [self stopArduino];
+    NSLog(@"Module %d Checking Status\n",slot+1);
+    [self setCurrentState:kGVCheckStartArduino];
+    [self performSelector:@selector(step) withObject:nil afterDelay:.1];
 }
 
 - (void) turnOffGVPower
@@ -784,9 +840,41 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
 
+- (void) setUpArduinoIO
+{
+    NSLog(@"Module %d configure Arduino I/O\n",slot+1);
+    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
+                            @"[ORArduinoUNOModel,1 setPollTime:9999];",          //fastest polling
+                            @"[ORArduinoUNOModel,1 setPin:3  type:0];",         //set to input
+                            @"[ORArduinoUNOModel,1 setPin:4  type:1];",         //set to output
+                            @"[ORArduinoUNOModel,1 setPin:5  type:1];",         //set to output
+                            @"[ORArduinoUNOModel,1 setPin:6  type:0];",         //set to input
+                            @"[ORArduinoUNOModel,1 setPin:9  type:0];",         //set to input
+                            @"[ORArduinoUNOModel,1 setPin:7  type:1];",         //set to output
+                            @"[ORArduinoUNOModel,1 setPin:8  type:1];",         //set to output
+                            @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
+                            nil];
+    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
+}
+
+
+- (void) setArduinoOutputs
+{
+    NSLog(@"Module %d set Arduino outputs\n",slot+1);
+    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
+                            @"[ORArduinoUNOModel,1 writeOutput:4 state:1];",    //switch it on, gives 5V to emitter
+                            @"[ORArduinoUNOModel,1 writeOutput:5 state:1];",    //switch it on, gives 5V to collector
+                            @"[ORArduinoUNOModel,1 writeOutput:7 state:1];",    //switch it on, gives 5V to emitter
+                            @"[ORArduinoUNOModel,1 writeOutput:8 state:1];",    //switch it on, gives 5V to collector
+                            @"[ORArduinoUNOModel,1 writeOutput:10 state:0];",   //power off the gate valve
+                            nil];
+    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
+}
+
+
 - (void) stopArduino
 {
-    NSLog(@"Module %d stop Arduino\n",slot+1);
+    NSLog(@"Module %d turn off Arduino outputs\n",slot+1);
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORArduinoUNOModel,1 writeOutput:4 state:0];",    //switch off emitter
                             @"[ORArduinoUNOModel,1 writeOutput:5 state:0];",    //switch off collector
@@ -797,35 +885,12 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 setPin:7  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:8  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:10 type:0];",         //set to input
-                            @"[ORArduinoUNOModel,1 init];",
-                            @"[ORArduinoUNOModel,1 setPollTime:0];",         //stop polling
+                            @"[ORArduinoUNOModel,1 setPollTime:1];",         //stop polling
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
 
 
-- (void) startArduino
-{
-    NSLog(@"Module %d configure Arduino\n",slot+1);
-    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
-                            @"[ORArduinoUNOModel,1 setPollTime:9999];",          //fastest polling
-                            @"[ORArduinoUNOModel,1 setPin:3  type:0];",         //set to input
-                            @"[ORArduinoUNOModel,1 setPin:4  type:1];",         //set to output
-                            @"[ORArduinoUNOModel,1 setPin:5  type:1];",         //set to output
-                            @"[ORArduinoUNOModel,1 setPin:6  type:0];",         //set to input
-                            @"[ORArduinoUNOModel,1 setPin:9  type:0];",         //set to input
-                            @"[ORArduinoUNOModel,1 setPin:7  type:1];",         //set to output
-                            @"[ORArduinoUNOModel,1 setPin:8  type:1];",         //set to output
-                            @"[ORArduinoUNOModel,1 writeOutput:4 state:1];",    //switch it on, gives 5V to emitter
-                            @"[ORArduinoUNOModel,1 writeOutput:5 state:1];",    //switch it on, gives 5V to collector
-                            @"[ORArduinoUNOModel,1 writeOutput:7 state:1];",    //switch it on, gives 5V to emitter
-                            @"[ORArduinoUNOModel,1 writeOutput:8 state:1];",    //switch it on, gives 5V to collector
-                            //gv safety
-                            @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
-                            @"[ORArduinoUNOModel,1 writeOutput:10 state:0];",   //power off the gate valve
-                            nil];
-    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
-}
 
 
 - (void) readArduino

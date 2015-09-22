@@ -26,7 +26,8 @@
 enum {
     kMJDSource_Idle,
     
-    kMJDSource_StartArduino,
+    kMJDSource_SetupArduinoIO,
+    kMJDSource_SetInitialOutputs,
     kMJDSource_OpenGV,
     kMJDSource_OpenGV1,
     kMJDSource_OpenGV2,
@@ -34,7 +35,6 @@ enum {
     kMJDSource_VerifyGVOpen,
     
     kMJDSource_StartDeployment,
-    kMJDSource_QueryMotion,
     
     kMJDSource_VerifyMotion,
     kMJDSource_MonitorDeployment,
@@ -48,6 +48,7 @@ enum {
     
     //special (for now)
     kMJDSource_StartCloseGVSequence,
+    kMJDSource_SetupArduinoToCloseGV,
     kMJDSource_GetMirrorTrack,
     kMJDSource_VerifyInMirrorTrack,
     kMJDSource_CloseGV,
@@ -57,6 +58,14 @@ enum {
     kMJDSource_VerifyGVClosed,
     kMJDSource_MirrorTrackError,
     //--------
+    
+    //check GV sequence (separate, executed manually)
+    kGVCheckStartArduino,
+    kGVCheckWriteOutputs,
+    kGVCheckReadAdcs,
+    kGVCheckDone,
+    //-----------------
+
     
     kMJDSource_GVOpenError,
     kMJDSource_GVCloseError,
@@ -132,7 +141,8 @@ typedef struct {
 - (void)        sendRetractionCommand;
 - (void)        queryMotion;
 - (void)        stopMotion;
-- (void)        startArduino;
+- (void)        setUpArduinoIO;
+- (void)        setArduinoOutputs;
 - (void)        stopArduino;
 - (void)        readArduino;
 - (NSString*)   gateValveState;
