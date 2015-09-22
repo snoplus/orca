@@ -690,6 +690,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 writeOutput:10 state:0];",   //power off the gate valve
+                            @"[ORArduinoUNOModel,1 initHardware];",
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
@@ -700,7 +701,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
                             @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 writeOutput:10 state:1];",   //power ON the gate valve
-                            nil];
+                            @"[ORArduinoUNOModel,1 initHardware];",
+                           nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
 
@@ -853,6 +855,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 setPin:7  type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 setPin:8  type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
+                            @"[ORArduinoUNOModel,1 initHardware];",
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
 }
@@ -867,6 +870,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 writeOutput:7 state:1];",    //switch it on, gives 5V to emitter
                             @"[ORArduinoUNOModel,1 writeOutput:8 state:1];",    //switch it on, gives 5V to collector
                             @"[ORArduinoUNOModel,1 writeOutput:10 state:0];",   //power off the gate valve
+                            @"[ORArduinoUNOModel,1 initHardware];",
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
 }
@@ -880,12 +884,14 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 writeOutput:5 state:0];",    //switch off collector
                             @"[ORArduinoUNOModel,1 writeOutput:7 state:0];",    //switch off emitter
                             @"[ORArduinoUNOModel,1 writeOutput:8 state:0];",    //switch off collector
+                            @"[ORArduinoUNOModel,1 initHardware];"
                             @"[ORArduinoUNOModel,1 setPin:4  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:5  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:7  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:8  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:10 type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPollTime:1];",         //stop polling
+                            @"[ORArduinoUNOModel,1 initHardware];",
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
