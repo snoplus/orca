@@ -838,10 +838,10 @@ NSString* ORArduinoUNOModelControlValueChanged		= @"ORArduinoUNOModelControlValu
 		else if([[parts objectAtIndex:0]intValue] == kCmdWriteOutputs){
 			[[self undoManager] disableUndoRegistration];
 			if([parts count] >= 2){
-				unsigned int outputMask = [[parts objectAtIndex:1] unsignedIntValue];
+                unsigned int writeMask  = [[parts objectAtIndex:2] unsignedIntValue];
 				int i;
 				for(i=2;i<kNumArduinoUNOPins;i++){
-					BOOL state = ((outputMask & (0x1<<i))>0);
+					BOOL state = ((writeMask & (0x1<<i))>0);
 					[self setPin:i stateOut:state];
 				}
 			}
