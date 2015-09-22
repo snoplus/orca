@@ -338,13 +338,11 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
            
         case kMJDSource_StartDeployment:
             [self sendDeploymentCommand];
-            [self readArduino];
             [self setCurrentState:kMJDSource_VerifyMotion];
             break;
             
         case kMJDSource_StartRetraction:
             [self sendRetractionCommand];
-            [self readArduino];
             [self setCurrentState:kMJDSource_VerifyMotion];
             break;
 
@@ -354,7 +352,6 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             break;
             
         case kMJDSource_VerifyMotion:
-            [self readArduino];
             if(isMoving == kMJDSource_True){
                 if(isDeploying) [self setCurrentState:kMJDSource_MonitorDeployment];
                 else            [self setCurrentState:kMJDSource_MonitorRetraction];
@@ -461,7 +458,6 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         
         //--Check GV States
         case kGVCheckStartArduino:
-            nextTime = kLongStepTime; //allow some more time before the next step
             [self setUpArduinoIO];
             [self setCurrentState:kGVCheckWriteOutputs];
             break;
@@ -481,6 +477,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             break;
         
         case kGVCheckDone:
+            nextTime = kLongStepTime; //allow some more time before the next step
             [self stopArduino];
             [self setCurrentState:kMJDSource_Idle];
             break;
@@ -680,6 +677,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 - (void) checkGateValve
 {
     NSLog(@"Module %d Checking Status\n",slot+1);
+    self.sourceIsIn         = kMJDSource_Unknown;
+    self.gateValveIsOpen    = kMJDSource_Unknown;
     [self setCurrentState:kGVCheckStartArduino];
     [self performSelector:@selector(step) withObject:nil afterDelay:.1];
 }
@@ -846,7 +845,6 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 {
     NSLog(@"Module %d configure Arduino I/O\n",slot+1);
     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
-                            @"[ORArduinoUNOModel,1 setPollTime:9999];",          //fastest polling
                             @"[ORArduinoUNOModel,1 setPin:3  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:4  type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 setPin:5  type:1];",         //set to output
@@ -855,7 +853,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 setPin:7  type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 setPin:8  type:1];",         //set to output
                             @"[ORArduinoUNOModel,1 setPin:10 type:1];",         //set to output
-                            @"[ORArduinoUNOModel,1 initHardware];",
+                            @"[ORArduinoUNOModel,1 setPollTime:9999];",          //fastest polling
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]]; //call twice to add in some delay
 }
@@ -891,7 +889,6 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                             @"[ORArduinoUNOModel,1 setPin:8  type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPin:10 type:0];",         //set to input
                             @"[ORArduinoUNOModel,1 setPollTime:1];",         //stop polling
-                            @"[ORArduinoUNOModel,1 initHardware];",
                             nil];
     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
 }
