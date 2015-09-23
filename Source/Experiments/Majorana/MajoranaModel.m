@@ -499,6 +499,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) setVmeCrateHVConstraint:(int)aVmeCrate state:(BOOL)aState
 {
+    if(aVmeCrate>=2)return;
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
     ORMPodCrateModel* hvCrateObj[2] = {nil,nil};
