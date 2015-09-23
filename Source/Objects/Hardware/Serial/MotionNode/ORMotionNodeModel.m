@@ -810,7 +810,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
             // accel 0
             rawData.bytes[0] = data[1];
             rawData.bytes[1] = data[2];
-            [self setAz:motionNodeCalibrationV10[0].slope * rawData.unpacked + motionNodeCalibrationV10[0].intercept];
+            [self setAy:motionNodeCalibrationV10[0].slope * rawData.unpacked + motionNodeCalibrationV10[0].intercept];
             
             // accel 1
             rawData.bytes[0] = data[3];
@@ -820,7 +820,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
             // accel 2
             rawData.bytes[0] = data[5];
             rawData.bytes[1] = data[6];
-            [self setAy:motionNodeCalibrationV10[2].slope * rawData.unpacked + motionNodeCalibrationV10[2].intercept];
+            [self setAz:motionNodeCalibrationV10[2].slope * rawData.unpacked + motionNodeCalibrationV10[2].intercept];
         }
         
 		[self setTotalxyz];
