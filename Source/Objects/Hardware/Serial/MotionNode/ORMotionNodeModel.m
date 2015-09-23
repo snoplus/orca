@@ -70,10 +70,15 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	{kMotionNodeClosePort,		@"",		-1,		NO}
 };
 
-static MotionNodeCalibrations motionNodeCalibration[3] = {
+static MotionNodeCalibrations motionNodeCalibrationPreV10[3] = {
 	{-2.536, 0.00123}, //y
 	{-2.528, 0.00123},//z
 	{-2.497, 0.00123}, //x
+};
+static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
+    {2.500,-1.88E-4}, //z
+    {2.485,-1.88E-4},//x
+    {2.547,-1.93E-4}, //y
 };
 
 @interface ORMotionNodeModel (private)
@@ -714,8 +719,16 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 			data[1] = ((type&0x3)<<16) | ([self uniqueIdNumber]&0xfff); // xtrace
 			data[2] = ut_Time;
 			int i;
-			float slope		= motionNodeCalibration[type].slope;
-			float intercept = motionNodeCalibration[type].intercept;
+            float slope;
+            float intercept;
+            if(nodeVersion<10){
+                slope	  = motionNodeCalibrationPreV10[type].slope;
+                intercept = motionNodeCalibrationPreV10[type].intercept;
+            }
+            else {
+                slope	  = motionNodeCalibrationV10[type].slope;
+                intercept = motionNodeCalibrationV10[type].intercept;
+            }
 			for(i=0;i<shipLen;i++){
 				if(type==0)		data[3+i] = (xTrace[(backIndex+i)%kModeNodeTraceLength] - intercept)/slope;
 				else if(type==1)data[3+i] = (yTrace[(backIndex+i)%kModeNodeTraceLength] - intercept)/slope;
@@ -752,48 +765,38 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
 
 - (void) processPacket:(NSData*)thePacket
 {
-	if([thePacket length]==0)return;
+
+    union {
+        short unpacked;
+        unsigned char bytes[2];
+    }rawData;
+
+    if([thePacket length]==0)return;
     
 	char* data = (char*)[thePacket bytes];
 	
-	const unsigned char lMask = 0xF0;
-	const unsigned char rMask = 0x0F;
-	
-	if (data[0] == 0x31) {
-		
-#		if defined(__BIG_ENDIAN__)
-		const int highBtyeIndex = 0;
-		const int lowBtyeIndex  = 1;
-#		else
-		const int highBtyeIndex = 1;
-		const int lowBtyeIndex  = 0;
-#		endif // __BIG_ENDIAN__
-		
-		union {
-			short unpacked;
-			unsigned char bytes[2];
-		}rawData;
-		
+	if (data[0] == 0x31) { //first byte of valid packet is '1'
         if(nodeVersion<10){
-            // accel 0
-            rawData.bytes[highBtyeIndex] = (data[2] >> 4) & rMask;
-            rawData.bytes[lowBtyeIndex] = data[1];			
-            [self setAy:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
+            
+           // accel 0
+            rawData.bytes[0] = data[1];
+            rawData.bytes[1] = (data[2] >> 4) & 0x0F;
+            [self setAy:motionNodeCalibrationPreV10[0].slope * rawData.unpacked + motionNodeCalibrationPreV10[0].intercept];
             
             // accel 1
-            rawData.bytes[highBtyeIndex] = data[3] & rMask;
-            rawData.bytes[lowBtyeIndex] = ((data[2] << 4) & lMask) | ((data[3] >> 4) & rMask);
-            [self setAz:-(motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept)];
+            rawData.bytes[0] = ((data[2] << 4) & 0xF0) | ((data[3] >> 4) & 0x0F);
+            rawData.bytes[1] = data[3] & 0x0F;
+            [self setAz:-(motionNodeCalibrationPreV10[1].slope * rawData.unpacked + motionNodeCalibrationPreV10[1].intercept)];
             
             // accel 2
-            rawData.bytes[highBtyeIndex] = (data[5] >> 4) & rMask;
-            rawData.bytes[lowBtyeIndex] = data[4];
-            [self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
+            rawData.bytes[0] = data[4];
+            rawData.bytes[1] = (data[5] >> 4) & 0x0F;
+            [self setAx:motionNodeCalibrationPreV10[2].slope * rawData.unpacked + motionNodeCalibrationPreV10[2].intercept];
             
             //do a runing average for the temperature
             float temp;
-            rawData.bytes[highBtyeIndex] = data[14] & rMask;
-            rawData.bytes[lowBtyeIndex] = data[15];
+            rawData.bytes[0] = data[15];
+            rawData.bytes[1] = data[14] & 0x0F;
             temp = rawData.unpacked * (330./4095.) - 50.;
             float k  = 2/(300.+1.);
             temperatureAverage = temp * k+temperatureAverage*(1-k);
@@ -802,26 +805,22 @@ static MotionNodeCalibrations motionNodeCalibration[3] = {
                 [self setTemperature:temperatureAverage];
             }
             throttle++;
-
         }
         else {
             // accel 0
-            rawData.bytes[highBtyeIndex] = data[2];
-            rawData.bytes[lowBtyeIndex]  = data[1];
-            rawData.unpacked -= 13200;
-            [self setAz:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
+            rawData.bytes[0] = data[1];
+            rawData.bytes[1] = data[2];
+            [self setAz:motionNodeCalibrationV10[0].slope * rawData.unpacked + motionNodeCalibrationV10[0].intercept];
             
             // accel 1
-            rawData.bytes[highBtyeIndex] = data[4];
-            rawData.bytes[lowBtyeIndex]  = data[3];
-            rawData.unpacked -= 13200;
-            [self setAy:motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept];
+            rawData.bytes[0] = data[3];
+            rawData.bytes[1] = data[4];
+            [self setAx:motionNodeCalibrationV10[1].slope * rawData.unpacked + motionNodeCalibrationV10[1].intercept];
             
             // accel 2
-            rawData.bytes[highBtyeIndex] = data[6];
-            rawData.bytes[lowBtyeIndex]  = data[5];
-            rawData.unpacked -= 13200;
-            [self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
+            rawData.bytes[0] = data[5];
+            rawData.bytes[1] = data[6];
+            [self setAy:motionNodeCalibrationV10[2].slope * rawData.unpacked + motionNodeCalibrationV10[2].intercept];
         }
         
 		[self setTotalxyz];
