@@ -1337,11 +1337,11 @@ struct {
     int crate = [digitizerObj crateNumber];
     int slot = [digitizerObj slot];
 
-    
+    id connectedObj = [self connectedObjectName];
     
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class])                forKey:@"Class Name"];
-    [objDictionary setObject:[self connectedObjectName]                     forKey:@"ConnectedTo"];
+    if(connectedObj!=nil)[objDictionary setObject:connectedObj              forKey:@"ConnectedTo"];
     [objDictionary setObject:[NSNumber numberWithInt:crate]                 forKey:@"crate"];
     [objDictionary setObject:[NSNumber numberWithInt:slot]                  forKey:@"slot"];
 
@@ -1358,7 +1358,9 @@ struct {
         [objDictionary setObject:[NSNumber numberWithInt:finalAttenuated[i]] forKey:[NSString stringWithFormat:@"finalAttenuated%d",i]];
     }
     for(i=0;i<kMJDPreAmpAdcChannels;i++){
-        [objDictionary setObject:detectorName[i] forKey:[NSString stringWithFormat:@"detectorName%d",i]];
+        NSString* detName = detectorName[i];
+        if([detName length]==0)detName = @"";
+        [objDictionary setObject:detName forKey:[NSString stringWithFormat:@"detectorName%d",i]];
     }
     [objDictionary setObject:[NSNumber numberWithInt:loopForever]   forKey:@"loopForever"];
     [objDictionary setObject:[NSNumber numberWithInt:pulseCount]    forKey:@"pulseCount"];
