@@ -137,6 +137,9 @@ typedef struct MotionNodeCalibrations {
 - (float) ayDeltaAveAt:(int)i;
 - (float) azDeltaAveAt:(int)i;
 - (float) xyzDeltaAveAt:(int)i;
+- (float) ax;
+- (float) ay;
+- (float) az;
 
 - (int) packetLength;
 - (void) setPacketLength:(int)aPacketLength;

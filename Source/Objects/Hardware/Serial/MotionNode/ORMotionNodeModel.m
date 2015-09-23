@@ -742,6 +742,9 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 		[self setLastRecordShipped:[NSDate date]];
 	}
 }
+- (float) ax {return ax;}
+- (float) ay {return ay;}
+- (float) az {return az;}
 
 @end
 
