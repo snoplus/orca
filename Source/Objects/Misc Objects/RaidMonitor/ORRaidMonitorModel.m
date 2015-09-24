@@ -348,7 +348,6 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     
     [self checkAlarms];
     
-    NSLog(@"%@\n",resultDict);
     [self postCouchDBRecord];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRaidMonitorModelResultDictionaryChanged object:self];
