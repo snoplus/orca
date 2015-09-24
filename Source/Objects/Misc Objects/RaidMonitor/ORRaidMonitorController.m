@@ -95,16 +95,40 @@
 {
     [self fillIn:lastCheckedField   with:@"lastChecked"];
     [self fillIn:scriptRanField     with:@"scriptRan"];
-    [self fillIn:availableField     with:@"Avail"];
-    [self fillIn:sizeField          with:@"Size"];
-    [self fillIn:usedPercentField   with:@"Used%"];
-    [self fillIn:usedField          with:@"Used"];
-    [self fillIn:devicesField       with:@"Disks"];
-    [self fillIn:numFailedField     with:@"Failed Disks"];
-    [self fillIn:numCriticalField   with:@"Critical Disks"];
-    [self fillIn:virtualDrivesField with:@"Virtual Drives"];
-    [self fillIn:numOfflineField    with:@"Offline"];
-    [self fillIn:numDegradedField   with:@"Degraded"];
+    
+    [self fillIn:statusField        with:@"Status"       from:@"/Data/mjddata"];
+    [self fillIn:usedField          with:@"Used"         from:@"/Data/mjddata"];
+    [self fillIn:availableField     with:@"Available"    from:@"/Data/mjddata"];
+    [self fillIn:usedPercentField   with:@"Used_percent" from:@"/Data/mjddata"];
+
+    [self fillInDisk:disk0          index:0 with:@"raidDrive0"];
+    [self fillInDisk:disk1          index:1 with:@"raidDrive1"];
+    [self fillInDisk:disk2          index:2 with:@"raidDrive2"];
+    [self fillInDisk:disk3          index:3 with:@"raidDrive3"];
+    [self fillInDisk:disk4          index:4 with:@"raidDrive4"];
+    [self fillInDisk:disk5          index:5 with:@"raidDrive5"];
+    [self fillInDisk:disk6          index:6 with:@"raidDrive6"];
+    [self fillInDisk:disk7          index:7 with:@"raidDrive7"];
+    [self fillInDisk:disk8          index:8 with:@"raidDrive8"];
+    [self fillInDisk:disk9          index:9 with:@"raidDrive9"];
+    [self fillInDisk:disk10         index:10 with:@"raidDrive10"];
+    [self fillInDisk:disk11         index:11 with:@"raidDrive11"];
+}
+
+- (void) fillInDisk:(NSTextField*)aField index:(int)anIndex with:(NSString*)aDiskKey
+{
+    NSDictionary* resultDict = [model resultDictionary];
+    NSDictionary* diskDict = [resultDict objectForKey:aDiskKey];
+    NSString* status    = [diskDict objectForKey:@"Status"];
+    NSString* operation = [diskDict objectForKey:@"Operation"];
+    if(!status)status = @"?";
+    if(!operation)operation = @"?";
+    
+    NSString* s = [NSString stringWithFormat:@"%2d: %@/%@",anIndex,operation,status];
+    NSColor* aColor = [NSColor blackColor];
+    if([status isEqualToString:@"Offline"])aColor = [NSColor redColor];
+    [aField setStringValue: s];
+    [aField setTextColor:aColor];
 }
 
 - (void) fillIn:(NSTextField*)aField with:(NSString*)aString
@@ -113,8 +137,18 @@
     NSString* s = [resultDict objectForKey:aString];
     if([s length]==0)s = @"?";
     [aField setStringValue: s];
-    
 }
+
+- (void) fillIn:(NSTextField*)aField with:(NSString*)aString from:(NSString*)dictionaryKey
+{
+    NSDictionary* resultDict = [model resultDictionary];
+    NSDictionary* subDictionary = [resultDict objectForKey:dictionaryKey];
+    NSString* s = [subDictionary objectForKey:aString];
+    if([s length]==0)s = @"?";
+    [aField setStringValue: s];
+ 
+}
+
 - (void) localPathChanged:(NSNotification*)aNote
 {
 	[localPathField setStringValue: [model localPath]];

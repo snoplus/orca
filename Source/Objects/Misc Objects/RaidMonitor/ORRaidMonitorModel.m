@@ -208,9 +208,9 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
     [contents writeToFile:path atomically:NO encoding:NSASCIIStringEncoding error:nil];
     
     [fileMover setMoveParams:path
-                              to:@"~/shutmedown.tempfile"
-                      remoteHost:[self ipAddress]
-                        userName:[self userName]
+                          to:@"~/shutmedown.tempfile"
+                  remoteHost:[self ipAddress]
+                    userName:[self userName]
                     passWord:[self password]];
     
     [fileMover setVerbose:YES];
@@ -269,9 +269,8 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
 {
     
     NSString* fullLocalPath = [localPath stringByExpandingTildeInPath];
-    NSStringEncoding* en=nil;
-    NSString* contents = [NSString stringWithContentsOfFile:fullLocalPath usedEncoding:en error:nil];
-    
+    NSString* contents = [NSString stringWithContentsOfFile:fullLocalPath encoding:NSASCIIStringEncoding error:nil];
+
     if([contents length]==0){
         [resultDict release];
         resultDict = nil;
@@ -289,70 +288,90 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         noConnectionAlarm = nil;
     }
     
+    [resultDict removeObjectForKey:@"MountPoints"];
+    [resultDict removeObjectForKey:@"scriptRan"];
+    
     if(!dateFormatter){
         dateFormatter = [[NSDateFormatter alloc] init];
+        if(!dateFormatter)NSLog(@"nil dateFormatter\n");
         dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
     }
     if(!dateConvertFormatter){
         dateConvertFormatter = [[NSDateFormatter alloc] init];
-        dateConvertFormatter.dateFormat = @"eee MM dd HH:mm:ss zzz yyyy";
+        dateConvertFormatter.dateFormat = @"eee MMM dd HH:mm:ss zzz yyyy";
     }
 
     if(!resultDict) resultDict = [[NSMutableDictionary dictionary]retain];
 
-    NSArray* lines = [contents componentsSeparatedByString:@"\n"];
-    int lineNumber = 0;
+    NSArray* lines = [contents componentsSeparatedByString:@"{"];
     for(id aLine in lines){
-        lineNumber++;
-        if(lineNumber == 2) continue;
-        if(lineNumber == 3) continue;
-        if([aLine rangeOfString:@"Usage"].location      != NSNotFound) continue;
-        if([aLine rangeOfString:@"Filesystem"].location != NSNotFound) continue;
-        if([aLine rangeOfString:@""].location           != NSNotFound) continue;
-        aLine = [aLine removeExtraSpaces];
-        if([aLine length]==0)continue;
+        if([aLine length]<=1)continue;
+        aLine = [aLine stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        aLine = [aLine stringByReplacingOccurrencesOfString:@"}" withString:@""];
+        aLine = [aLine stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+        aLine = [aLine stringByReplacingOccurrencesOfString:@"\"" withString:@""];
 
-        if(lineNumber ==1){
-            //must be the time line
-            //first get the time last stored so we know if we are over due or not
-            NSDate* scriptLastRan = [dateConvertFormatter dateFromString:aLine];
-            [resultDict setObject:[dateFormatter stringFromDate:scriptLastRan] forKey:@"scriptRan"];
-
-            NSTimeInterval dt = -[scriptLastRan timeIntervalSinceNow];
-            if(fabs(dt)>60*60){
-                if(!scriptNotRunningAlarm){
-                    NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Status Script NOT Running",[self uniqueIdNumber]];
-                    scriptNotRunningAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
-                    [scriptNotRunningAlarm setSticky:YES];
-                    [scriptNotRunningAlarm setHelpString:@"Check the status script on the RAID system. It has not reported status more than an hour."];
-                    [scriptNotRunningAlarm postAlarm];
-                }
-                else {
-                    [scriptNotRunningAlarm clearAlarm];
-                    [scriptNotRunningAlarm release];
-                    scriptNotRunningAlarm = nil;
-                }
-            }
-        }
-        else if(lineNumber == [lines count]-1){
-            NSArray* parts = [aLine componentsSeparatedByString:@" "];
-            if([parts count] == 6){
-                [resultDict setObject:[parts objectAtIndex:0] forKey:@"Filesystem"];
-                [resultDict setObject:[parts objectAtIndex:1] forKey:@"Size"];
-                [resultDict setObject:[parts objectAtIndex:2] forKey:@"Used"];
-                [resultDict setObject:[parts objectAtIndex:3] forKey:@"Avail"];
-                [resultDict setObject:[parts objectAtIndex:4] forKey:@"Used%"];
-                [resultDict setObject:[parts objectAtIndex:5] forKey:@"Mount Point"];
-            }
+        if([aLine rangeOfString:@"Date"].location != NSNotFound){
+            NSString* ds = [aLine substringFromIndex:7];
+            NSDate* scriptLastRan = [dateConvertFormatter dateFromString:ds];
+            NSString* scriptLastRanString = [dateFormatter stringFromDate:scriptLastRan];
+            if(scriptLastRanString)[resultDict setObject:scriptLastRanString forKey:@"scriptRan"];
+            
+            [resultDict setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"lastChecked"];
         }
         else {
-            NSArray* parts = [aLine componentsSeparatedByString:@":"];
-            if([parts count] == 2){
-                [resultDict setObject:[parts objectAtIndex:1] forKey:[[parts objectAtIndex:0] trimSpacesFromEnds]];
+            aLine = [aLine stringByReplacingOccurrencesOfString:@" " withString:@""];
+            aLine = [aLine stringByReplacingOccurrencesOfString:@"Slot:81:"  withString:@"raidDrive:"];
+            aLine = [aLine stringByReplacingOccurrencesOfString:@"Slot:252:" withString:@"virtualDrive:"];
+            NSArray* parts  = [aLine componentsSeparatedByString:@","];
+            NSMutableDictionary* partDictionary = [NSMutableDictionary dictionary];
+            for(id aPart in parts){
+                NSArray* items = [aPart componentsSeparatedByString:@":"];
+                if([items count] ==2){
+                    [partDictionary setObject:[items objectAtIndex:1] forKey:[items objectAtIndex:0]];
+                }
+            }
+            if([aLine rangeOfString:@"Mount_point"].location != NSNotFound){
+                NSString* mountPoint = [partDictionary objectForKey:@"Mount_point"];
+                [resultDict setObject:partDictionary forKey:mountPoint];
+            }
+            else if([aLine rangeOfString:@"raidDrive"].location != NSNotFound){
+                int slot = [[partDictionary objectForKey:@"raidDrive"]intValue];
+                [resultDict setObject:partDictionary forKey:[NSString stringWithFormat:@"raidDrive%d",slot]];
+            }
+            else if([aLine rangeOfString:@"virtualDrive"].location != NSNotFound){
+                int slot = [[partDictionary objectForKey:@"virtualDrive"]intValue];
+                [resultDict setObject:partDictionary forKey:[NSString stringWithFormat:@"virtualDrive%d",slot]];
             }
         }
     }
     
+    [self checkAlarms];
+    
+    NSLog(@"%@\n",resultDict);
+    [self postCouchDBRecord];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRaidMonitorModelResultDictionaryChanged object:self];
+}
+
+- (void) checkAlarms
+{
+    
+    NSTimeInterval dt = -[[resultDict objectForKey:@"scriptRanNSDate"] timeIntervalSinceNow];
+    if(fabs(dt)>60*60){
+        if(!scriptNotRunningAlarm){
+            NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Status Script NOT Running",[self uniqueIdNumber]];
+            scriptNotRunningAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+            [scriptNotRunningAlarm setSticky:YES];
+            [scriptNotRunningAlarm setHelpString:@"Check the status script on the RAID system. It has not reported status more than an hour."];
+            [scriptNotRunningAlarm postAlarm];
+        }
+        else {
+            [scriptNotRunningAlarm clearAlarm];
+            [scriptNotRunningAlarm release];
+            scriptNotRunningAlarm = nil;
+        }
+    }
     if([[resultDict objectForKey:@"Used%"]floatValue]>=90){
         if(!diskFullAlarm){
             NSString* alarmName = [NSString stringWithFormat:@"RAID%ld > 90%% Used",[self uniqueIdNumber]];
@@ -367,10 +386,11 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         [diskFullAlarm release];
         diskFullAlarm = nil;
     }
+
     int criticalCount = [[resultDict objectForKey:@"Critical Disks"]intValue];
     int failedCount   = [[resultDict objectForKey:@"Failed Disks"]intValue];
     int degradedCount = [[resultDict objectForKey:@"Degraded"]intValue];
-
+    
     if( (criticalCount>1) || (failedCount>1) || (degradedCount>1)){
         if(!badDiskAlarm){
             NSString* alarmName = [NSString stringWithFormat:@"RAID%ld Disk Problems",[self uniqueIdNumber]];
@@ -386,26 +406,13 @@ NSString* ORRaidMonitorLock                     = @"ORRaidMonitorLock";
         badDiskAlarm = nil;
     }
 
-    
-    [resultDict setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"lastChecked"];
-    
-    [self postCouchDBRecord];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRaidMonitorModelResultDictionaryChanged object:self];
 }
-
 @end
 
 @implementation ORRaidMonitorModel (private)
 - (void) postCouchDBRecord
 {
     NSMutableDictionary* values = [NSMutableDictionary dictionaryWithDictionary:resultDict];
-    if([[values allKeys] count]>0){
-        [values setObject:@"YES" forKey:@"valid"];
-        [values setObject:[NSNumber numberWithInt:60*60] forKey:@"pollTime"];
-    }
-    else [values setObject:@"NO" forKey:@"valid"];
-
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 

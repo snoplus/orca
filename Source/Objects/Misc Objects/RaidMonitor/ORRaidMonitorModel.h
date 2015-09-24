@@ -59,6 +59,7 @@
 - (void)        setPassword:(NSString*)aPassword;
 - (NSString*)   userName;
 - (void)        setUserName:(NSString*)aUserName;
+- (void)        checkAlarms;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

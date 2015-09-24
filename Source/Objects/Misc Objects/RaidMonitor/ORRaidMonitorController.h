@@ -31,7 +31,7 @@
     IBOutlet NSButton*          lockButton;
     
     IBOutlet NSTextField*       availableField;
-    IBOutlet NSTextField*       sizeField;
+    IBOutlet NSTextField*       statusField;
     IBOutlet NSTextField*       usedPercentField;
     IBOutlet NSTextField*       usedField;
     
@@ -39,10 +39,18 @@
     IBOutlet NSTextField*       numFailedField;
     IBOutlet NSTextField*       numCriticalField;
 
-    IBOutlet NSTextField*       virtualDrivesField;
-    IBOutlet NSTextField*       numOfflineField;
-    IBOutlet NSTextField*       numDegradedField;
-
+    IBOutlet NSTextField*       disk0;
+    IBOutlet NSTextField*       disk1;
+    IBOutlet NSTextField*       disk2;
+    IBOutlet NSTextField*       disk3;
+    IBOutlet NSTextField*       disk4;
+    IBOutlet NSTextField*       disk5;
+    IBOutlet NSTextField*       disk6;
+    IBOutlet NSTextField*       disk7;
+    IBOutlet NSTextField*       disk8;
+    IBOutlet NSTextField*       disk9;
+    IBOutlet NSTextField*       disk10;
+    IBOutlet NSTextField*       disk11;
 
 }
 
@@ -52,6 +60,8 @@
 
 #pragma mark •••Interface Management
 - (void) fillIn:(NSTextField*)aField with:(NSString*)aString;
+- (void) fillIn:(NSTextField*)aField with:(NSString*)aString from:(NSString*)dictionaryKey;
+- (void) fillInDisk:(NSTextField*)aField index:(int)anIndex with:(NSString*)aKey;
 - (void) resultDictionaryChanged:(NSNotification*)aNote;
 - (void) localPathChanged:(NSNotification*)aNote;
 - (void) remotePathChanged:(NSNotification*)aNote;
