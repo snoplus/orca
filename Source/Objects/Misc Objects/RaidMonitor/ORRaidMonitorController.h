@@ -35,10 +35,6 @@
     IBOutlet NSTextField*       usedPercentField;
     IBOutlet NSTextField*       usedField;
     
-    IBOutlet NSTextField*       devicesField;
-    IBOutlet NSTextField*       numFailedField;
-    IBOutlet NSTextField*       numCriticalField;
-
     IBOutlet NSTextField*       disk0;
     IBOutlet NSTextField*       disk1;
     IBOutlet NSTextField*       disk2;
@@ -51,7 +47,6 @@
     IBOutlet NSTextField*       disk9;
     IBOutlet NSTextField*       disk10;
     IBOutlet NSTextField*       disk11;
-
 }
 
 - (id)   init;

@@ -27,12 +27,10 @@
                 <outlet property="passwordField" destination="140" id="156"/>
                 <outlet property="remotePathField" destination="164" id="172"/>
                 <outlet property="scriptRanField" destination="190" id="261"/>
-                <outlet property="sizeField" destination="194" id="207"/>
                 <outlet property="statusField" destination="194" id="OEt-i9-FS9"/>
                 <outlet property="usedField" destination="249" id="253"/>
                 <outlet property="usedPercentField" destination="200" id="252"/>
                 <outlet property="userNameField" destination="135" id="157"/>
-                <outlet property="virtualDrivesField" destination="234" id="241"/>
                 <outlet property="window" destination="132" id="158"/>
             </connections>
         </customObject>
