@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="XL3_LinkController">
@@ -68,13 +68,20 @@
                 <outlet property="hvCMOSRateIgnoreStepper" destination="4251" id="4512"/>
                 <outlet property="hvCMOSRateLimitField" destination="4229" id="4505"/>
                 <outlet property="hvCMOSRateLimitStepper" destination="4242" id="4506"/>
+                <outlet property="hvOffButton" destination="4207" id="DW1-2B-OVH"/>
+                <outlet property="hvOnButton" destination="4209" id="7aH-JM-VfW"/>
                 <outlet property="hvPowerSupplyMatrix" destination="4292" id="4485"/>
+                <outlet property="hvRampDownButton" destination="4212" id="Mjb-sm-WIw"/>
+                <outlet property="hvRampUpButton" destination="4213" id="crz-jF-SlV"/>
                 <outlet property="hvRelayCloseButton" destination="4060" id="4521"/>
                 <outlet property="hvRelayMaskHighField" destination="4196" id="4328"/>
                 <outlet property="hvRelayMaskLowField" destination="4056" id="4327"/>
                 <outlet property="hvRelayMaskMatrix" destination="4342" id="4408"/>
                 <outlet property="hvRelayOpenButton" destination="4065" id="4522"/>
                 <outlet property="hvRelayStatusField" destination="4322" id="4326"/>
+                <outlet property="hvStepDownButton" destination="4225" id="u0j-OG-kSP"/>
+                <outlet property="hvStepUpButton" destination="4226" id="3CC-g8-yx2"/>
+                <outlet property="hvStopRampButton" destination="4211" id="jdS-vX-rCj"/>
                 <outlet property="hvTargetValueField" destination="4495" id="4500"/>
                 <outlet property="hvTargetValueStepper" destination="4274" id="4501"/>
                 <outlet property="monIsPollingCMOSRatesButton" destination="3962" id="4027"/>
@@ -1844,7 +1851,7 @@
                                                     <button verticalHuggingPriority="750" id="4211">
                                                         <rect key="frame" x="169" y="79" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Pause" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4216">
+                                                        <buttonCell key="cell" type="push" title="Stop Ramp" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4216">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
@@ -1875,9 +1882,9 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="4225">
-                                                        <rect key="frame" x="324" y="107" width="105" height="28"/>
+                                                        <rect key="frame" x="320" y="107" width="114" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Step DOWN" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4228">
+                                                        <buttonCell key="cell" type="push" title="Step DOWN 50V" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4228">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
@@ -1888,7 +1895,7 @@
                                                     <button verticalHuggingPriority="750" id="4226">
                                                         <rect key="frame" x="10" y="109" width="105" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Step UP" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4227">
+                                                        <buttonCell key="cell" type="push" title="Step UP 50V" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4227">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>

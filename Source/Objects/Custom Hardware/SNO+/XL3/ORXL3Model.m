@@ -97,6 +97,7 @@ extern NSString* ORSNOPRequestHVStatus;
 - (void) doBasicOp;
 - (NSString*) stringDate;
 - (void) _pollXl3;
+- (void) _hvInit;
 - (void) _hvXl3;
 - (void) sendCommandWithDict:(NSDictionary*)argDict;
 - (void) initCrateDone:(NSDictionary*)resp;
@@ -648,6 +649,50 @@ snotDb = _snotDb;
     if (aPollStatus) pollStatus = [aPollStatus copy];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelPollStatusChanged object:self];        
+}
+
+- (BOOL) hvEverUpdated
+{
+    return hvEverUpdated;
+    
+}
+
+- (void) setHvEverUpdated:(BOOL)ever
+{
+    hvEverUpdated = ever;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+}
+
+- (BOOL) hvSwitchEverUpdated
+{
+    return hvSwitchEverUpdated;
+}
+
+- (void) setHvSwitchEverUpdated:(BOOL)ever
+{
+    hvSwitchEverUpdated = ever;
+}
+
+- (BOOL) hvARamping
+{
+    return hvARamping;
+}
+
+- (void) setHvARamping:(BOOL)ramping
+{
+    hvARamping = ramping;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+}
+
+- (BOOL) hvBRamping
+{
+    return hvBRamping;
+}
+
+- (void) setHvBRamping:(BOOL)ramping
+{
+    hvBRamping = ramping;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
 }
 
 - (BOOL) hvASwitch
@@ -1366,10 +1411,11 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
     }
     
-    //hack to start the HV monitoring automiatically on init
-    [self setHVSwitch:YES forPowerSupply:0];
-    [self setHVSwitch:YES forPowerSupply:1];
+    [self setHvEverUpdated:NO];
+    [self setHvSwitchEverUpdated:NO];
     
+    [[[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil] start];
+     
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	return self;
@@ -3249,6 +3295,7 @@ void SwapLongBlock(void* p, int32_t n)
         SwapLongBlock(payload.payload, sizeof(hv_readback_results_t)/4);
     }
     memcpy(status, payload.payload, sizeof(hv_readback_results_t));
+    [self setHvEverUpdated:YES];
 }
 
 //used from polling loop and/or ORCA script
@@ -3299,6 +3346,8 @@ void SwapLongBlock(void* p, int32_t n)
             [pdata release];
             pdata = nil;
         }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
     }
 }
 
@@ -3428,6 +3477,9 @@ void SwapLongBlock(void* p, int32_t n)
     
     *aIsOn = aValue & 0x1;
     *bIsOn = (aValue >> 16) & 0x1;
+    
+    [self setHvSwitchEverUpdated:YES];
+    
 }
 
 - (void) readHVSwitchOn
@@ -3442,6 +3494,9 @@ void SwapLongBlock(void* p, int32_t n)
         NSLog(@"%@ error in readHVSwitchOn\n", [[self xl3Link] crateName]);
         return;
     }
+    
+    [self setHvASwitch:switchAIsOn];
+    [self setHvBSwitch:switchBIsOn];
 
     NSLog(@"%@ switch A is %@, switch B is %@.\n",[[self xl3Link] crateName], switchAIsOn?@"ON":@"OFF", switchBIsOn?@"ON":@"OFF");
 }
@@ -4315,6 +4370,33 @@ void SwapLongBlock(void* p, int32_t n)
     [pollPool release];
 }
 
+- (void) _hvInit
+{
+    NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
+    NSLog(@"Attempting to readout HV status from XL3\n");
+    while (![self hvEverUpdated] || ![self hvSwitchEverUpdated]) {
+        if ([self xl3Link] && [[self xl3Link] isConnected]) {
+            [self readHVSwitchOn];
+            [self readHVStatus];
+            if ([self hvASwitch]) {
+                [self setHvAVoltageDACSetValue:[self hvAVoltageReadValue]* 4096/3000.];
+                [self setHvANextStepValue:[self hvAVoltageReadValue]* 4096/3000.];
+            }
+            if ([self hvBSwitch]) {
+                [self setHvBVoltageDACSetValue:[self hvBVoltageReadValue]* 4096/3000.];
+                [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
+            }
+            if (!hvThread) {
+                hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
+                [hvThread start];
+            }
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
+        }
+        sleep(1);
+    }
+    [hvPool release];
+}
+
 - (void) _hvXl3
 {
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
@@ -4333,6 +4415,7 @@ void SwapLongBlock(void* p, int32_t n)
     //unsigned long cmosLimit;
     
     while (!isTimeToQuit) {
+        bool aUp = false, bUp = false, changing = false;
         if ([self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
             unsigned long aValueToSet = [self hvANextStepValue];
             
@@ -4345,12 +4428,11 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvPanicFlag] && [self hvANextStepValue] < [self hvAVoltageDACSetValue] - 100 / 3000. * 4096) {
                 aValueToSet = [self hvAVoltageDACSetValue] - 100 / 3000. * 4096;
             }
-            if (aValueToSet > [self hvAVoltageTargetValue]) {
+            if (aValueToSet > [self hvAVoltageTargetValue]) { //never go above target (?)
                 aValueToSet = [self hvAVoltageTargetValue];
             }
-            if (aValueToSet > [self hvAVoltageDACSetValue] + 10 / 3000. * 4096) {
-                NSLog(@"%@ HV voltage calculation screwed. stopping\n", [[self xl3Link] crateName]);
-            }
+            aUp = aValueToSet > [self hvAVoltageDACSetValue];
+            if ([self hvAVoltageDACSetValue] != aValueToSet) changing = true;
             @try {
                 [self setHVDacA:aValueToSet dacB:[self hvBVoltageDACSetValue]];
                 //assume it worked
@@ -4375,12 +4457,11 @@ void SwapLongBlock(void* p, int32_t n)
             if ([self hvPanicFlag] && [self hvBNextStepValue] < [self hvBVoltageDACSetValue] - 100 / 3000. * 4096) {
                 aValueToSet = [self hvBVoltageDACSetValue] - 100 / 3000. * 4096;
             }
-            if (aValueToSet > [self hvBVoltageTargetValue]) {
+            if (aValueToSet > [self hvBVoltageTargetValue]) { // never go above target (?)
                 aValueToSet = [self hvBVoltageTargetValue];
             }
-            if (aValueToSet > [self hvBVoltageDACSetValue] + 10 / 3000. * 4096) {
-                NSLog(@"%@ HV B voltage calculation screwed. stopping\n", [[self xl3Link] crateName]);
-            }
+            bUp = aValueToSet > [self hvBVoltageDACSetValue];
+            if ([self hvAVoltageDACSetValue] != aValueToSet) changing = true;
             @try {
                 [self setHVDacA:[self hvAVoltageDACSetValue] dacB:aValueToSet];
                 //assume it worked
@@ -4390,15 +4471,10 @@ void SwapLongBlock(void* p, int32_t n)
                 NSLog(@"%@ HV B failed to set HV!\n", [[self xl3Link] crateName]);
             }
         }
-
-        if (([self hvANextStepValue] != [self hvAVoltageDACSetValue]) ||
-            ([self hvBNextStepValue] != [self hvBVoltageDACSetValue])) {
-
-            usleep(500000);
-            //try to read back HV even in panic mode, do not care what it is
-            //if (![self hvPanicFlag]) [self readHVStatus];
-            [self readHVStatus];
-        }
+        
+        //wait for supplies to update before doing anything
+        usleep(500000);
+        if (changing) [self readHVStatus];
 
         //while ([self hvCMOSReadsCounter] < 3) { //or panic flag
         //    usleep(100000);
@@ -4406,17 +4482,13 @@ void SwapLongBlock(void* p, int32_t n)
         
         //monitoring loop updates
         if (![self hvPanicFlag]) {
-            if ([self hvASwitch] && fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
-                NSLog(@"%@ HVA read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
-                usleep(100000);
+            if ([self hvASwitch] && aUp && fabs([self hvAVoltageReadValue] / 3000. * 4096 - [self hvAVoltageDACSetValue]) > 100) {
+                NSLog(@"%@ HVA read value differs from the set one. stopping!\nPress Ramp UP to continue.", [[self xl3Link] crateName]);
                 [self setHvANextStepValue:[self hvAVoltageDACSetValue]];
-                if (![self hvBSwitch]) isTimeToQuit = YES;
             }
-            if ([self hvBSwitch] && fabs([self hvBVoltageReadValue] / 3000. * 4096 - [self hvBVoltageDACSetValue]) > 100) {
-                NSLog(@"%@ HVB read value differs from the set one. stopping!\nPress HV ON to continue.", [[self xl3Link] crateName]);
-                usleep(100000);
+            if ([self hvBSwitch] && bUp && fabs([self hvBVoltageReadValue] / 3000. * 4096 - [self hvBVoltageDACSetValue]) > 100) {
+                NSLog(@"%@ HVB read value differs from the set one. stopping!\nPress Ramp UP to continue.", [[self xl3Link] crateName]);
                 [self setHvBNextStepValue:[self hvBVoltageDACSetValue]];
-                if (![self hvASwitch]) isTimeToQuit = YES;
             }
             
             /*
@@ -4433,6 +4505,9 @@ void SwapLongBlock(void* p, int32_t n)
             }
              */
         }
+        
+        [self setHvARamping:([self hvANextStepValue] != [self hvAVoltageDACSetValue])];
+        [self setHvBRamping:([self hvBNextStepValue] != [self hvBVoltageDACSetValue])];
                 
         //if panic mode switch off power supply when done
         if ([self hvPanicFlag] && [self hvASwitch] && [self hvAVoltageDACSetValue] == 0){
