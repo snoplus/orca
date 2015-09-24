@@ -123,6 +123,7 @@
 - (IBAction) saveSecondaryMapFileAction:(id)sender;
 - (IBAction) schedulerOnOff:(id)sender; //SV
 - (IBAction) updatedTimeInterval:(id)sender; //SV
+- (IBAction) heartBeatIndexAction:(id)sender;
 
 #pragma mark ¥¥¥Test Detector Map Actions
 - (IBAction) secondaryAdcClassNameAction:(id)sender;
