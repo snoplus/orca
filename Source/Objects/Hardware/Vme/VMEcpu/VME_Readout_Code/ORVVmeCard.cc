@@ -2,6 +2,7 @@
 #include "ORVVmeCard.hh"
 #include "TUVMEDeviceManager.hh"
 #include "TUVMEDevice.hh"
+#include <unistd.h>
 
 TUVMEDevice* ORVVmeCard::fDevice = NULL;
 std::set<ORVCard*> ORVVmeCard::fAllDevices; 
