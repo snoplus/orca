@@ -3219,6 +3219,9 @@
 		CE0216BF1512139A00456EB7 /* ORnEDMCoilModel.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216BA1512139A00456EB7 /* ORnEDMCoilModel.h */; };
 		CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216BB1512139A00456EB7 /* ORnEDMCoilModel.m */; };
 		CE0216C2151223DA00456EB7 /* nEDMCoil.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE0216C1151223D900456EB7 /* nEDMCoil.gif */; };
+		CE0A214B1BBD257B0072EFE0 /* ORThread.cc in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */; };
+		CE0A214C1BBD257B0072EFE0 /* ORThread.hh in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; };
+		CE0A214D1BBD265F0072EFE0 /* ORScopedLock.hh in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; };
 		CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */; };
 		CE0F58471BBD22F400534026 /* ORXyCom564Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */; };
 		CE0F58481BBD22F400534026 /* ORXyCom564Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; };
@@ -3252,6 +3255,8 @@
 		CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */; };
 		CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */; };
 		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
+		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; settings = {ASSET_TAGS = (); }; };
+		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; settings = {ASSET_TAGS = (); }; };
 		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; settings = {ASSET_TAGS = (); }; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
@@ -3554,6 +3559,9 @@
 			dstPath = SBC_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				CE0A214D1BBD265F0072EFE0 /* ORScopedLock.hh in SBC_Code Copy */,
+				CE0A214B1BBD257B0072EFE0 /* ORThread.cc in SBC_Code Copy */,
+				CE0A214C1BBD257B0072EFE0 /* ORThread.hh in SBC_Code Copy */,
 				847D771210B7977700893F3A /* killScript in SBC_Code Copy */,
 				848A160A10BB00F3002A80D0 /* makeScript in SBC_Code Copy */,
 				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
@@ -6721,6 +6729,9 @@
 		CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVXI11HardwareFinderController.h; sourceTree = "<group>"; };
 		CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVXI11HardwareFinderController.m; sourceTree = "<group>"; };
 		CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = VXI11HardwareFinder.nib; sourceTree = "<group>"; };
+		CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORScopedLock.hh; sourceTree = "<group>"; };
+		CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORThread.cc; sourceTree = "<group>"; };
+		CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORThread.hh; sourceTree = "<group>"; };
 		CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORXyCom564Readout.cc; sourceTree = "<group>"; };
 		CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORXyCom564Readout.hh; sourceTree = "<group>"; };
 		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -10492,6 +10503,9 @@
 		8493CC3B0C99FA0700B46CD4 /* SBC_Code */ = {
 			isa = PBXGroup;
 			children = (
+				CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */,
+				CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */,
+				CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */,
 				847D76F810B795DE00893F3A /* killScript */,
 				847D76FD10B7963D00893F3A /* makeScript */,
 				847D76F910B795DE00893F3A /* Makefile */,
@@ -14963,6 +14977,7 @@
 				84AB101E1057D6990069D5E2 /* ORiTransGasSensorModel.h in Headers */,
 				84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */,
 				848BF510107255F8005779A2 /* PMC_Link.h in Headers */,
+				CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */,
 				8421064D1085A28E00C3AA81 /* ORAdeiLoader.h in Headers */,
 				84D34B0410B1D6C90013473E /* ORSIS3302Controller.h in Headers */,
 				84D34B0610B1D6C90013473E /* ORSIS3302Decoders.h in Headers */,
@@ -15186,6 +15201,7 @@
 				84CA8B0614608A340072BB24 /* ORTimeRoi.h in Headers */,
 				84CA8B0814608A340072BB24 /* ORTimeRoiController.h in Headers */,
 				CE7328AE1466EEDE00A50AE9 /* ORVXI11HardwareFinder.h in Headers */,
+				CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */,
 				CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */,
 				CE6CCDD314672C670099238D /* vxi11_user.h in Headers */,
 				CE6CCDE2146732D90099238D /* vxi11.h in Headers */,
