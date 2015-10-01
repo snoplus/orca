@@ -89,7 +89,7 @@
         [creditsField replaceCharactersInRange:NSMakeRange( 0, 0 )
                                        withRTF:[creditsString RTFFromRange:
                                            NSMakeRange( 0, [creditsString length] )
-                            documentAttributes:nil]];
+                            documentAttributes:[NSDictionary dictionary]]];
 
         // Setup the copyright field
         copyrightString = [localInfoDict objectForKey:@"NSHumanReadableCopyright"];
