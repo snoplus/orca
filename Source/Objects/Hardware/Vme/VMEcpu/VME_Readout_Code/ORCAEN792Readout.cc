@@ -1,6 +1,6 @@
 #include "ORCAEN792Readout.hh"
 #include <errno.h>
-
+#include <sys/time.h>
 
 #define ShiftAndExtract(aValue,aShift,aMask) (((aValue)>>(aShift)) & (aMask))
 #define v792BufferSizeInLongs 1024
@@ -18,12 +18,14 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
     uint16_t status2;
     int32_t result;
 	uint32_t dataId             = GetHardwareMask()[0];
-	uint32_t locationMask       = ((GetCrate() & 0x0f)<<21) | ((GetSlot() & 0x0000001f)<<16);
     //uint32_t modelType          = GetDeviceSpecificData()[0];
     uint32_t status1Address     = GetDeviceSpecificData()[1];
     uint32_t status2Address     = GetDeviceSpecificData()[2];
 	uint32_t fifoAddress        = GetDeviceSpecificData()[3];
 	//uint32_t bufferSizeInLongs  = GetDeviceSpecificData()[4];
+    uint8_t  shipTimeStamp      = GetDeviceSpecificData()[5];
+    
+    uint32_t locationMask       = ((GetCrate() & 0x0f)<<21) | ((GetSlot() & 0x0000001f)<<16) | (shipTimeStamp & 0x1);
 	
     uint32_t addressModifier = 0x09;
 	
@@ -33,7 +35,11 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
         return false;
 	}
     uint8_t bufferIsFull    =  (status2 & 0x0004) >> 2;
-	
+    
+    uint32_t orcaPartLength;
+    if(shipTimeStamp)   orcaPartLength = 5;
+    else                orcaPartLength = 3;
+    
 	if(bufferIsFull){
 		//wow, the buffer is full. We will use dma to read out the whole buffer and decoder it locally into events
 		uint32_t buffer[v792BufferSizeInLongs];
@@ -49,6 +55,18 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 			int32_t numMemorizedChannels;
 			int32_t numDecoded;
 			int32_t savedDataIndex = dataIndex;
+            
+            struct timeval ts;
+            int32_t secs  = 0;
+            int32_t mSecs = 0;
+            if(shipTimeStamp){
+                if(gettimeofday(&ts,NULL) == 0){
+                    secs  = ts.tv_sec;
+                    mSecs = ts.tv_usec;
+                }
+            }
+
+            
 			uint32_t i;
 			for(i=0;i<v792BufferSizeInLongs;i++){
 				
@@ -69,8 +87,13 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 						doingEvent = 1;
 						ensureDataCanHold(numMemorizedChannels + 3);
 						//load the ORCA header
-						data[dataIndex++] = dataId | (numMemorizedChannels + 3);
+                        
+                        data[dataIndex++] = dataId | (numMemorizedChannels + orcaPartLength);
 						data[dataIndex++] = locationMask;
+                        if(shipTimeStamp){
+                            data[dataIndex++] = secs;
+                            data[dataIndex++] = mSecs;
+                        }
 						break;
 						
 					case 0: 
@@ -132,7 +155,16 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
         
 		uint8_t dataIsReady     =  status1 & 0x0001;
 		if (dataIsReady) {
-			
+            struct timeval ts;
+            int32_t secs  = 0;
+            int32_t mSecs = 0;
+            if(shipTimeStamp){
+                if(gettimeofday(&ts,NULL) == 0){
+                    secs  = ts.tv_sec;
+                    mSecs = ts.tv_usec;
+                }
+            }
+
 			//OK, at least one data value is ready, first value read should be a header
 			uint32_t dataWord;
 			result = VMERead(fifoAddress, addressModifier, sizeof(dataWord), dataWord);
@@ -145,8 +177,15 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 					
 					//save the location in case we have to dump the data because of an error
                     int32_t savedDataIndex = dataIndex;
-					data[dataIndex++] = dataId | (numMemorizedChannels + 3);
+                    
+                    
+					data[dataIndex++] = dataId | (numMemorizedChannels + orcaPartLength);
 					data[dataIndex++] = locationMask;
+                    if(shipTimeStamp){
+                        data[dataIndex++] = secs;
+                        data[dataIndex++] = mSecs;
+                    }
+                    
 					uint8_t dataOK = true;
 					for(i=0;i<numMemorizedChannels;i++){
 						result = VMERead(fifoAddress, addressModifier, sizeof(dataWord), dataWord);
