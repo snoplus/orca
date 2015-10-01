@@ -3341,7 +3341,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 
 - (void) writeADCOffsets
 {
-    unsigned long writeValue = 0;
+    //unsigned long writeValue = 0;
     unsigned long writeData = 0;
     
     unsigned long addr, adc;
