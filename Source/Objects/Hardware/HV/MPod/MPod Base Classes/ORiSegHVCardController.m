@@ -798,7 +798,7 @@
 		s2 = @"Really Turn OFF ALL Channels?";
 	}
 	else {
-		s1 = [NSString stringWithFormat:@"Turn ON %d Channel%@",numberOnChannels,numberOnChannels>1?@"s":@""];
+		s1 = [NSString stringWithFormat:@"Turn OFF %d Channel%@",numberOnChannels,numberOnChannels>1?@"s":@""];
 		s2 = [NSString stringWithFormat:@"Really Turn OFF %d Channel%@ (%d Channel%@ already OFF)",
 			  numberOnChannels,
 			  numberOnChannels>1?@"s":@"",
