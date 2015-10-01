@@ -3220,6 +3220,8 @@
 		CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216BB1512139A00456EB7 /* ORnEDMCoilModel.m */; };
 		CE0216C2151223DA00456EB7 /* nEDMCoil.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE0216C1151223D900456EB7 /* nEDMCoil.gif */; };
 		CE0D70B4146812E000B241D8 /* hardwareFinder.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */; };
+		CE0F58471BBD22F400534026 /* ORXyCom564Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */; };
+		CE0F58481BBD22F400534026 /* ORXyCom564Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; };
 		CE10F0111451674C0084C15D /* ORXYCom200Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F005145167450084C15D /* ORXYCom200Controller.h */; };
 		CE10F0121451674C0084C15D /* ORXYCom200Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = CE10F006145167460084C15D /* ORXYCom200Controller.m */; };
 		CE10F0131451674C0084C15D /* ORXYCom200Model.h in Headers */ = {isa = PBXBuildFile; fileRef = CE10F007145167460084C15D /* ORXYCom200Model.h */; };
@@ -3250,6 +3252,7 @@
 		CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */; };
 		CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */; };
 		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
+		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; settings = {ASSET_TAGS = (); }; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -3467,6 +3470,8 @@
 			dstPath = VME_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				CE0F58471BBD22F400534026 /* ORXyCom564Readout.cc in VME_Copy */,
+				CE0F58481BBD22F400534026 /* ORXyCom564Readout.hh in VME_Copy */,
 				362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */,
 				84C3B28E17CBCC1A002916F5 /* MJDCmds.h in VME_Copy */,
 				84997897174BEAF000BFEE3E /* ORPollingTimeStampReadout.hh in VME_Copy */,
@@ -6716,6 +6721,8 @@
 		CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVXI11HardwareFinderController.h; sourceTree = "<group>"; };
 		CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVXI11HardwareFinderController.m; sourceTree = "<group>"; };
 		CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = VXI11HardwareFinder.nib; sourceTree = "<group>"; };
+		CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORXyCom564Readout.cc; sourceTree = "<group>"; };
+		CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORXyCom564Readout.hh; sourceTree = "<group>"; };
 		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		CEB1A5C414673AB6001381E6 /* vxi11_user.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vxi11_user.m; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
@@ -10550,6 +10557,8 @@
 		8493CC7D0C99FA4B00B46CD4 /* VME_Readout_Code */ = {
 			isa = PBXGroup;
 			children = (
+				CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */,
+				CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */,
 				43ADFE5610B6DBCF0044617C /* HW_Specific.icc */,
 				43ADFE5710B6DBCF0044617C /* HWMakefile.mk */,
 				840B00721206F556009095A4 /* goScript */,
@@ -14398,6 +14407,7 @@
 				84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */,
 				843CDF65071C9DB3009D7D30 /* ORRandomPulserController.h in Headers */,
 				843CDF67071C9DB3009D7D30 /* ORRandomPulserModel.h in Headers */,
+				CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */,
 				849191800725B43500F454F1 /* ORToolbarFactory.h in Headers */,
 				8484811B07288C26009EDCE2 /* ORDotImage.h in Headers */,
 				8484843C072D7818009EDCE2 /* ORShaperController.h in Headers */,
