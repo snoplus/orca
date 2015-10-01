@@ -77,7 +77,7 @@ enum {
 	ORRateGroup*	qdcRateGroup;
     int modelType;
 	unsigned long   onlineMask;
-	unsigned long   dataIdN;
+    unsigned long   dataIdN;
 	unsigned long   location;
     unsigned short  iPed;
     BOOL            overflowSuppressEnable;
@@ -91,10 +91,13 @@ enum {
     int             totalCycleZTime;
     BOOL            isRunning;
     BOOL            useHWReset;
-    
+    BOOL            shipTimeStamp;
+   
 }
 
 #pragma mark ***Accessors
+- (BOOL)            shipTimeStamp;
+- (void)            setShipTimeStamp:(BOOL)aShipTimeStamp;
 - (BOOL)            useHWReset;
 - (void)            setUseHWReset:(BOOL)aValue;
 - (int)             totalCycleZTime;
@@ -174,6 +177,7 @@ enum {
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORCaen792ModelShipTimeStampChanged;
 extern NSString* ORCaen792ModelUseHWResetChanged;
 extern NSString* ORCaen792ModelTotalCycleZTimeChanged;
 extern NSString* ORCaen792ModelPercentZeroOffChanged;
