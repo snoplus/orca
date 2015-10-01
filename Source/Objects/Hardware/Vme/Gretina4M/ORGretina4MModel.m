@@ -2686,6 +2686,8 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     configStruct->card_info[index].deviceSpecificData[1]	= [self baseAddress] + 0x1000; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[2]	= 0x0B; // fifoAM
     configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + 0x04; // fifoReset Address
+    configStruct->card_info[index].deviceSpecificData[4]	= location; //crate, card, serial number
+    
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
