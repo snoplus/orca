@@ -3219,6 +3219,8 @@
 		CE0216BF1512139A00456EB7 /* ORnEDMCoilModel.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216BA1512139A00456EB7 /* ORnEDMCoilModel.h */; };
 		CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216BB1512139A00456EB7 /* ORnEDMCoilModel.m */; };
 		CE0216C2151223DA00456EB7 /* nEDMCoil.gif in Resources */ = {isa = PBXBuildFile; fileRef = CE0216C1151223D900456EB7 /* nEDMCoil.gif */; };
+		CE0A21481BBD25300072EFE0 /* ORVProcess.cc in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */; };
+		CE0A21491BBD25300072EFE0 /* ORVProcess.hh in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; };
 		CE0A214B1BBD257B0072EFE0 /* ORThread.cc in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */; };
 		CE0A214C1BBD257B0072EFE0 /* ORThread.hh in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; };
 		CE0A214D1BBD265F0072EFE0 /* ORScopedLock.hh in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; };
@@ -3257,6 +3259,7 @@
 		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
 		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; settings = {ASSET_TAGS = (); }; };
 		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; settings = {ASSET_TAGS = (); }; };
+		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; settings = {ASSET_TAGS = (); }; };
 		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; settings = {ASSET_TAGS = (); }; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
@@ -3562,6 +3565,8 @@
 				CE0A214D1BBD265F0072EFE0 /* ORScopedLock.hh in SBC_Code Copy */,
 				CE0A214B1BBD257B0072EFE0 /* ORThread.cc in SBC_Code Copy */,
 				CE0A214C1BBD257B0072EFE0 /* ORThread.hh in SBC_Code Copy */,
+				CE0A21481BBD25300072EFE0 /* ORVProcess.cc in SBC_Code Copy */,
+				CE0A21491BBD25300072EFE0 /* ORVProcess.hh in SBC_Code Copy */,
 				847D771210B7977700893F3A /* killScript in SBC_Code Copy */,
 				848A160A10BB00F3002A80D0 /* makeScript in SBC_Code Copy */,
 				84D351AB10B578470013473E /* loginScript in SBC_Code Copy */,
@@ -6732,6 +6737,8 @@
 		CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORScopedLock.hh; sourceTree = "<group>"; };
 		CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORThread.cc; sourceTree = "<group>"; };
 		CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORThread.hh; sourceTree = "<group>"; };
+		CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORVProcess.cc; sourceTree = "<group>"; };
+		CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORVProcess.hh; sourceTree = "<group>"; };
 		CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORXyCom564Readout.cc; sourceTree = "<group>"; };
 		CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORXyCom564Readout.hh; sourceTree = "<group>"; };
 		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -10506,6 +10513,8 @@
 				CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */,
 				CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */,
 				CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */,
+				CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */,
+				CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */,
 				847D76F810B795DE00893F3A /* killScript */,
 				847D76FD10B7963D00893F3A /* makeScript */,
 				847D76F910B795DE00893F3A /* Makefile */,
@@ -14244,6 +14253,7 @@
 				84B51980191D285A003A580B /* ORBurstMonitorModel.h in Headers */,
 				8434A19D055B3287002D3102 /* ORVmeIOCard.h in Headers */,
 				8434A19E055B3287002D3102 /* OrcaObject.h in Headers */,
+				CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */,
 				8434A19F055B3287002D3102 /* OrcaObjectController.h in Headers */,
 				8434A1A0055B3287002D3102 /* OrcaObjectFactory.h in Headers */,
 				8434A1A4055B3287002D3102 /* OR617Model.h in Headers */,

@@ -35,6 +35,7 @@
 #include <sys/time.h>
 #include "SBC_Readout.h"
 #include "HW_Readout.h"
+#include "ORVProcess.hh"
 #include "readout_code.h"
 #include "SBC_Job.h"
 #include <sys/time.h>
@@ -256,6 +257,10 @@ int32_t main(int32_t argc, char *argv[])
         /* This releases hardware. */
         ReleaseHardware();
 
+		/* Calls any generic jobs that have requested notification on socket
+         * close. */
+		doGenericJobSocketClose();
+
         /* Test to see if we're exitting completely. */
         if(timeToExit)break;    
     }
@@ -320,6 +325,7 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 		case kSBC_PacketOptions:	setPacketOptions(aPacket);	break;
 		case kSBC_KillJob:			killJob(aPacket);			break;
 		case kSBC_JobStatus:		jobStatus(aPacket);			break;
+		case kSBC_GenericJob:		doGenericJob(aPacket);		break;
         case kSBC_Exit:             timeToExit = 1;				break;
     }
 }
@@ -565,7 +571,10 @@ int32_t readBuffer(SBC_Packet* aPacket)
         p += bytesRead;
         numberBytesinPacket -= bytesRead;
     }
-    aPacket->message[0] = '\0';
+    if (!(aPacket->cmdHeader.destination == kSBC_Command && 
+          aPacket->cmdHeader.cmdID == kSBC_GenericJob )) {
+      aPacket->message[0] = '\0';
+    }
     if(needToSwap){
         //only swap the size and the header struct
         //the payload will be swapped by the user routines as needed.
