@@ -85,7 +85,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 						numMemorizedChannels = ShiftAndExtract(dataWord,8,0x3f);
 						numDecoded = 0;
 						doingEvent = 1;
-						ensureDataCanHold(numMemorizedChannels + 3);
+						ensureDataCanHold(numMemorizedChannels + orcaPartLength);
 						//load the ORCA header
                         
                         data[dataIndex++] = dataId | (numMemorizedChannels + orcaPartLength);
@@ -173,7 +173,7 @@ bool ORCAEN792Readout::Readout(SBC_LAM_Data* lamData)
 				int32_t i;
 				if((numMemorizedChannels>0)){
 					//make sure the data buffer can hold our data. Note that we do NOT ship the end of block. 
-					ensureDataCanHold(numMemorizedChannels + 3);
+					ensureDataCanHold(numMemorizedChannels + orcaPartLength);
 					
 					//save the location in case we have to dump the data because of an error
                     int32_t savedDataIndex = dataIndex;
