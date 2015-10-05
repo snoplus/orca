@@ -18,11 +18,9 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
     uint32_t fifoAddress      = GetDeviceSpecificData()[1];
     uint32_t fifoAddressMod   = GetDeviceSpecificData()[2];
     uint32_t fifoResetAddress = GetDeviceSpecificData()[3];
-    uint32_t serialNumber     = GetDeviceSpecificData()[4] & 0xffff;
+    uint32_t location         = GetDeviceSpecificData()[4];
     uint32_t dataId           = GetHardwareMask()[0];
     uint32_t slot             = GetSlot(); 
-    uint32_t crate            = GetCrate(); 
-    uint32_t location         = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16) || serialNumber;
 
     int32_t  result;
     uint32_t fifoState = 0;
