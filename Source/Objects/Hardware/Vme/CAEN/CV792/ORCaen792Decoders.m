@@ -50,11 +50,11 @@
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
 {
     short i;
-    long* ptr = (long*) aSomeData;
+    long* ptr   = (long*) aSomeData;
 	long length = ExtractLength(ptr[0]);
-    int crate = ShiftAndExtract(ptr[1],21,0xf);
-    int card  = ShiftAndExtract(ptr[1],16,0x1f);
-    BOOL timeStampsIncluded = ptr[1]&0x1;
+    int crate   = ShiftAndExtract(ptr[1],21,0xf);
+    int card    = ShiftAndExtract(ptr[1],16,0x1f);
+    BOOL timeStampsIncluded = ShiftAndExtract(ptr[1],0,0x1);
     
 	NSString* crateKey = [self getCrateKey:crate];
 	NSString* cardKey  = [self getCardKey: card];
@@ -108,8 +108,10 @@
     BOOL timeStampsIncluded = ptr[1]&0x1;
     
     int dataStartIndex;
-    if(timeStampsIncluded)  dataStartIndex = 4;
-    else                    dataStartIndex = 2;
+    if(timeStampsIncluded){
+        dataStartIndex  = 4;
+    }
+    else dataStartIndex = 2;
 	
     NSString* restOfString = [NSString string];
     int i;
@@ -121,8 +123,12 @@
 			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
         }
     }
-	
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];               
+    if(timeStampsIncluded){
+        NSString* seconds         = [NSString stringWithFormat:@"Seconds      = %lu\n",ptr[2]];
+        NSString* microseconds    = [NSString stringWithFormat:@"Microseconds = %lu\n",ptr[3]];
+        return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,len,crate,card,seconds,microseconds,restOfString];
+    }
+    else return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];
 }
 
 - (unsigned short) channel: (unsigned long) pDataValue
