@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
@@ -12,7 +12,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Catalog" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -3346,7 +3346,7 @@ Relay</string>
                                                                 </textFieldCell>
                                                             </textField>
                                                             <button toolTip="SNOModel" id="26792" customClass="ObjectFactory">
-                                                                <rect key="frame" x="562" y="24" width="84" height="151"/>
+                                                                <rect key="frame" x="562" y="58" width="84" height="151"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <animations/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="SNO" imagePosition="above" alignment="center" state="on" inset="2" id="26793">
@@ -3357,7 +3357,7 @@ Relay</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="SNOPModel" id="26794" customClass="ObjectFactory">
-                                                                <rect key="frame" x="471" y="36" width="87" height="140"/>
+                                                                <rect key="frame" x="471" y="69" width="87" height="140"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <animations/>
                                                                 <buttonCell key="cell" type="bevel" title="SNO+ Controller" bezelStyle="regularSquare" image="SNOP" imagePosition="above" alignment="center" state="on" inset="2" id="26795">
@@ -3469,6 +3469,14 @@ Relay</string>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <animations/>
                                                                 <buttonCell key="cell" type="bevel" title="Symmetricom XL-GPS" bezelStyle="regularSquare" image="XLGPSIcon" imagePosition="above" alignment="center" state="on" inset="2" id="26799">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system" size="10"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="TUBiiModel" id="jTn-zs-vEk" customClass="ObjectFactory">
+                                                                <rect key="frame" x="514" y="-1" width="95" height="71"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="tubii" imagePosition="above" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Ocp-qx-s4p">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
@@ -3785,5 +3793,6 @@ Relay</string>
         <image name="prespectrometer" width="72" height="48"/>
         <image name="rangeTimer" width="67" height="66"/>
         <image name="resistor" width="95" height="43"/>
+        <image name="tubii" width="402" height="348"/>
     </resources>
 </document>
