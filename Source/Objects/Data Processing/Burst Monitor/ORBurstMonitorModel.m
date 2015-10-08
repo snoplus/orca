@@ -768,7 +768,7 @@ double facto(unsigned long long num)
                                                 }
                                                 NSLog(@"BG parameters are time of %f, gamma of %i, alpha of %i, expect %f,%f, errs %f,%f \n", tbackground, numgamma, numalpha, rategamma*tbackground, ratealpha*tbackground, errgamma, erralpha );
                                                 double inprob = 0;
-                                                if(egamma + fabs(numgamma - egamma) < 150) //factorial will work
+                                                if(egamma + fabs(numgamma - egamma) < 100) //factorial will work
                                                 {
                                                     for(n=0; n<(numgamma + 2*egamma); n++)
                                                     {
@@ -1330,7 +1330,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //calc chan prob
     double exChan =999.999;
     int novaState = 0;
-    if((multInBurst > 4 && rSec > 0.01 && adcP > 0.00001 && gammaP > 0.00001 && alphaP > 0.00001) || (multInBurst > 5 && Rrms > 500 && adcP > 0.00001 && gammaP > 0.00001 && alphaP > 0.00001))
+    if(multInBurst > 5 && rSec > 0.01 && adcP > 0.001 && gammaP > 0.00001 && alphaP > 0.00001)
     {
         novaState = 3;
     }
@@ -1369,7 +1369,14 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         NSInteger dateint = yy + mmo + dd;
         NSInteger timeint = ss + mmi + hh;
         NSString* burstcommand = @"";
-        burstcommand = [burstcommand stringByAppendingFormat:@"cd snews/coinccode/ ; ./cping all %i %i 0 9", dateint, timeint];
+        NSInteger level = 2; //Good alarm, auto.  0=test 1=possible 2=good 3=confirmed -1=retraction
+        if([[runbits objectAtIndex:5] intValue] || adcP<0.01 || gammaP<0.01 || alphaP<0.01 || Rrms<453)
+        {
+            level = 1;
+            NSLog(@"Level reduced to 1 (possible)\n");
+        }
+        NSInteger signif = (multInBurst-0.74)*0.850; //cbmod current background and best (round) fit with likelyhood as of oct 8 2015 with logaritmic rounding
+        burstcommand = [burstcommand stringByAppendingFormat:@"cd snews/coinccode/ ; ./ctestgcli %i %i 0 %i %i 9", dateint, timeint, level, signif];  //maybe add nanoseconds? 9 is halo
         NSLog(@"burstcommand witha a space on each side: | %@ |\n", burstcommand);
         NSTask* Cping;
         Cping =[[NSTask alloc] init];
@@ -1382,6 +1389,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         if(1-[[runbits objectAtIndex:6] intValue])  //Send to local machine  //mod change to ping again
         {
             NSLog(@"No pulse sent to snews because run type is not 'SNEWS'\n");
+            NSLog(@"Parameters (d,t,l,s) were %i %i %i %i\n", dateint, timeint, level, signif);
             [Cping setLaunchPath: @"/usr/bin/printf"];
             [Cping setArguments: [NSArray arrayWithObjects: @"test string one\n", nil]];
         }
