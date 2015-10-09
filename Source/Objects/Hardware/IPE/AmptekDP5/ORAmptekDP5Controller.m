@@ -437,9 +437,49 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
                          name : ORAmptekDP5ModelDropFirstSpectrumChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(acquisitionTimeChanged:)
+                         name : ORAmptekDP5ModelAcquisitionTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(realTimeChanged:)
+                         name : ORAmptekDP5ModelRealTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(fastCounterChanged:)
+                         name : ORAmptekDP5ModelFastCounterChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(slowCounterChanged:)
+                         name : ORAmptekDP5ModelSlowCounterChanged
+						object: model];
+
 }
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Interface Management
+
+- (void) slowCounterChanged:(NSNotification*)aNote
+{
+	[slowCounterTextField setIntValue: [model slowCounter]];
+}
+
+- (void) fastCounterChanged:(NSNotification*)aNote
+{
+	[fastCounterTextField setIntValue: [model fastCounter]];
+}
+
+- (void) realTimeChanged:(NSNotification*)aNote
+{
+	[realTimeTextField setIntValue: [model realTime]];
+}
+
+- (void) acquisitionTimeChanged:(NSNotification*)aNote
+{
+	[acquisitionTimeTextField setIntValue: [model acquisitionTime]];
+}
 
 - (void) dropFirstSpectrumChanged:(NSNotification*)aNote
 {
@@ -988,6 +1028,10 @@ return;
 	[self isPollingSpectrumChanged:nil];
 	[self autoReadbackSetpointChanged:nil];
 	[self dropFirstSpectrumChanged:nil];
+	[self acquisitionTimeChanged:nil];
+	[self realTimeChanged:nil];
+	[self fastCounterChanged:nil];
+	[self slowCounterChanged:nil];
 }
 
 - (void) setWindowTitle
@@ -1151,7 +1195,8 @@ return;
 
 - (void) dropFirstSpectrumCBAction:(id)sender
 {
-    //DEBUG OUTPUT:        NSLog(@"   %@::%@: UNDER CONSTRUCTION %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
+    //DEBUG OUTPUT:       
+     NSLog(@"   %@::%@: UNDER CONSTRUCTION %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender intValue]);//TODO: DEBUG testing ...-tb-
 
 	[model setDropFirstSpectrum:[sender intValue]];	
 }

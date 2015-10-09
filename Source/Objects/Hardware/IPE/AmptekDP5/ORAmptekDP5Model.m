@@ -568,6 +568,10 @@ void* receiveFromDataReplyServerThreadFunctionXXX (void* p)
 
 #pragma mark ***External Strings
 
+NSString* ORAmptekDP5ModelSlowCounterChanged = @"ORAmptekDP5ModelSlowCounterChanged";
+NSString* ORAmptekDP5ModelFastCounterChanged = @"ORAmptekDP5ModelFastCounterChanged";
+NSString* ORAmptekDP5ModelRealTimeChanged = @"ORAmptekDP5ModelRealTimeChanged";
+NSString* ORAmptekDP5ModelAcquisitionTimeChanged = @"ORAmptekDP5ModelAcquisitionTimeChanged";
 NSString* ORAmptekDP5ModelDropFirstSpectrumChanged = @"ORAmptekDP5ModelDropFirstSpectrumChanged";
 NSString* ORAmptekDP5ModelAutoReadbackSetpointChanged = @"ORAmptekDP5ModelAutoReadbackSetpointChanged";
 NSString* ORAmptekDP5ModelCommandTableChanged = @"ORAmptekDP5ModelCommandTableChanged";
@@ -818,33 +822,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 
-- (BOOL) dropFirstSpectrum
-{
-    return dropFirstSpectrum;
-}
 
-- (void) setDropFirstSpectrum:(BOOL)aDropFirstSpectrum
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDropFirstSpectrum:dropFirstSpectrum];
-    
-    dropFirstSpectrum = aDropFirstSpectrum;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelDropFirstSpectrumChanged object:self];
-}
-
-- (BOOL) autoReadbackSetpoint
-{
-    return autoReadbackSetpoint;
-}
-
-- (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setAutoReadbackSetpoint:autoReadbackSetpoint];
-    
-    autoReadbackSetpoint = aAutoReadbackSetpoint;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelAutoReadbackSetpointChanged object:self];
-}
 #if 0
 - (NSData*) lastRequest
 {
@@ -1195,8 +1173,121 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 
 
+- (int) spectrumRequestRate
+{
+    return spectrumRequestRate;
+}
+
+- (void) setSpectrumRequestRate:(int)aSpectrumRequestRate
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpectrumRequestRate:spectrumRequestRate];
+    
+    spectrumRequestRate = aSpectrumRequestRate;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSpectrumRequestRateChanged object:self];
+}
 
 
+//this is the pid2 of the "Spectrum Request Packets", section 4.1.2, p.20, of DP5  Programmers Guide
+- (int) spectrumRequestType
+{
+    return spectrumRequestType;
+}
+
+- (void) setSpectrumRequestType:(int)aSpectrumRequestType
+{
+    if(aSpectrumRequestType<1) aSpectrumRequestType=1;
+    if(aSpectrumRequestType>4) aSpectrumRequestType=4;
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] setSpectrumRequestType:spectrumRequestType];
+    
+    spectrumRequestType = aSpectrumRequestType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSpectrumRequestTypeChanged object:self];
+}
+
+
+
+
+
+
+
+- (BOOL) dropFirstSpectrum
+{
+    return dropFirstSpectrum;
+}
+
+- (void) setDropFirstSpectrum:(BOOL)aDropFirstSpectrum
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDropFirstSpectrum:dropFirstSpectrum];
+    
+    dropFirstSpectrum = aDropFirstSpectrum;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelDropFirstSpectrumChanged object:self];
+}
+
+- (BOOL) autoReadbackSetpoint
+{
+    return autoReadbackSetpoint;
+}
+
+- (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoReadbackSetpoint:autoReadbackSetpoint];
+    
+    autoReadbackSetpoint = aAutoReadbackSetpoint;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelAutoReadbackSetpointChanged object:self];
+}
+
+
+- (int) slowCounter
+{
+    return slowCounter;
+}
+
+- (void) setSlowCounter:(int)aSlowCounter
+{
+    slowCounter = aSlowCounter;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSlowCounterChanged object:self];
+}
+
+- (int) fastCounter
+{
+    return fastCounter;
+}
+
+- (void) setFastCounter:(int)aFastCounter
+{
+    fastCounter = aFastCounter;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelFastCounterChanged object:self];
+}
+
+- (int) realTime
+{
+    return realTime;
+}
+
+- (void) setRealTime:(int)aRealTime
+{
+    realTime = aRealTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelRealTimeChanged object:self];
+}
+
+- (int) acquisitionTime
+{
+    return acquisitionTime;
+}
+
+- (void) setAcquisitionTime:(int)aAcquisitionTime
+{
+    acquisitionTime = aAcquisitionTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelAcquisitionTimeChanged object:self];
+}
 
 
 
@@ -1258,40 +1349,6 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
 
 }
 
-
-
-- (int) spectrumRequestRate
-{
-    return spectrumRequestRate;
-}
-
-- (void) setSpectrumRequestRate:(int)aSpectrumRequestRate
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSpectrumRequestRate:spectrumRequestRate];
-    
-    spectrumRequestRate = aSpectrumRequestRate;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSpectrumRequestRateChanged object:self];
-}
-
-
-//this is the pid2 of the "Spectrum Request Packets", section 4.1.2, p.20, of DP5  Programmers Guide
-- (int) spectrumRequestType
-{
-    return spectrumRequestType;
-}
-
-- (void) setSpectrumRequestType:(int)aSpectrumRequestType
-{
-    if(aSpectrumRequestType<1) aSpectrumRequestType=1;
-    if(aSpectrumRequestType>4) aSpectrumRequestType=4;
-    
-    [[[self undoManager] prepareWithInvocationTarget:self] setSpectrumRequestType:spectrumRequestType];
-    
-    spectrumRequestType = aSpectrumRequestType;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAmptekDP5ModelSpectrumRequestTypeChanged object:self];
-}
 
 - (int) numSpectrumBins
 {
@@ -2591,7 +2648,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kAccTimeOffset])) );
             //NSLog(@"    kAccTimeOffset: %i (0x%08x)\n",var32,var32);
-            NSLog(@"    kAccTimeOffset: %i x 100 mS  + %i mS (0x%08x)\n",/*dp5Packet[statusOffset + kAccTimeOffset],*/ var32>>8,var32 & 0xf,var32);
+            NSLog(@"    kAccTimeOffset: %i x 100 mS  + %i mS (0x%08x)\n",/*dp5Packet[statusOffset + kAccTimeOffset],*/ var32>>8,var32 & 0xff,var32);
             
             var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kRealtimeOffset])) );
             NSLog(@"    kRealtimeOffset: %i  x 1 mS (0x%08x)\n",var32,var32);
@@ -2604,6 +2661,32 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             
         }
         
+        //update status display
+        if(hasStatus){
+            uint32_t var32=0;
+            uint16_t var16=0; var16=0;
+            uint8_t var8=0;
+            //NSLog(@"STATUS:    (statusOffset: %i)\n",statusOffset);
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kFastCountOffset])) );
+            [self setFastCounter: var32];
+            //NSLog(@"    kFastCountOffset: %i (0x%08x)\n",var32,var32);
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kSlowCountOffset])) );
+            [self setSlowCounter: var32];
+            //NSLog(@"    kSlowCountOffset: %i (0x%08x)\n",var32,var32);
+            
+            var8 =*( (uint8_t*) (&(dp5Packet[statusOffset + kAccTimeOffset])) );
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kAccTimeOffset])) );
+            //NSLog(@"    kAccTimeOffset: %i (0x%08x)\n",var32,var32);
+            //NSLog(@"    kAccTimeOffset: %i x 100 mS  + %i mS (0x%08x)\n",/*dp5Packet[statusOffset + kAccTimeOffset],*/ var32>>8,var32 & 0xff,var32);
+            var32 >>= 8;
+            [self setAcquisitionTime: var32 * 100 + var8];
+            
+            var32=*( (uint32_t*) (&(dp5Packet[statusOffset + kRealtimeOffset])) );
+            [self setRealTime: var32];
+            //NSLog(@"    kRealtimeOffset: %i  x 1 mS (0x%08x)\n",var32,var32);
+            
+            
+        }
         
         
         //ship the packet 
@@ -2649,6 +2732,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
             [pdata release];
             pdata = nil;
             
+        }else{
             needToDropFirstSpectrum = FALSE; //dropped one
         }
 
@@ -5021,8 +5105,6 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 //TODO: UNDER construction -tb-
 	actualPageIndex = 0;
 	eventCounter    = 0;
-	first = YES;
-    needToDropFirstSpectrum = dropFirstSpectrum;//Amptek -tb-
 	lastDisplaySec = 0;
 	lastDisplayCounter = 0;
 	lastDisplayRate = 0;
@@ -5034,6 +5116,11 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	    ////TODO: remove SLT stuff -tb-   2014 [pmcLink runTaskStarted:aDataPacket userInfo:userInfo];
     }
 #endif	
+
+    //
+	first = YES;
+    needToDropFirstSpectrum = dropFirstSpectrum;//Amptek -tb-
+     NSLog(@"   %@::%@:  needToDropFirstSpectrum %i dropFirstSpectrum %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),needToDropFirstSpectrum,dropFirstSpectrum);//TODO: DEBUG testing ...-tb-
 
     //readout/poll loop
     if(spectrumRequestRate > 0){
@@ -5159,7 +5246,6 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         }
 
 
-
         
 	}
 	else {// the first time
@@ -5174,7 +5260,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
         
         
         
-    sleep(3);
+            //sleep(3);
         
         
         
@@ -5207,6 +5293,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
             [self setIsPollingSpectrum:YES];
 
         //}
+        if(needToDropFirstSpectrum) [self requestSpectrum];//request the to-be-dropped spectrum
 
 
 	}
