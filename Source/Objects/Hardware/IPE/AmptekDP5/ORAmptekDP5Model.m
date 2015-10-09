@@ -5120,7 +5120,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
     //
 	first = YES;
     needToDropFirstSpectrum = dropFirstSpectrum;//Amptek -tb-
-     NSLog(@"   %@::%@:  needToDropFirstSpectrum %i dropFirstSpectrum %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),needToDropFirstSpectrum,dropFirstSpectrum);//TODO: DEBUG testing ...-tb-
+     //NSLog(@"   %@::%@:  needToDropFirstSpectrum %i dropFirstSpectrum %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),needToDropFirstSpectrum,dropFirstSpectrum);//TODO: DEBUG testing ...-tb-
 
     //readout/poll loop
     if(spectrumRequestRate > 0){
