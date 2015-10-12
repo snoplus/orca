@@ -478,16 +478,20 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 			if([lastFile length]){
 				NSLog(@"Trying to open: %@\n",lastFile);
                 if(relaunched)NSLog(@"This is an auto-relaunch using [%@]\n",NSApplicationRelaunchDaemon);
-				NSURL* asURL = [NSURL fileURLWithPath:lastFile];
-				if(![[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:asURL display:YES error:&fileOpenError]){
-					[self closeSplashWindow];
-					NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
-					NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
-					ORRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
-				}
-				else {
-					NSLog(@"Opened Configuration: %@\n",lastFile);
-				}
+                [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL fileURLWithPath:lastFile]
+                                                                                       display:YES
+                                                                             completionHandler:^(NSDocument* document, BOOL documentWasAlreadyOpen, NSError*  anError){
+                                                                                 if(anError!=nil) {
+                                                                                         [self closeSplashWindow];
+                                                                                         NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
+                                                                                         NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
+                                                                                         ORRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
+
+                                                                                     }
+                                                                             }
+                 
+                 ];
+
 			}
             [[NSUserDefaults standardUserDefaults] removeObjectForKey: @"forceLoad"];
 			if([[[NSUserDefaults standardUserDefaults] objectForKey: OROrcaSecurityEnabled] boolValue]){
