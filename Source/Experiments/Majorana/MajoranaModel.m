@@ -488,12 +488,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 		int vmeCrate = [[seg objectForKey:@"kVME"] intValue];           //pull out the crate
         if(vmeCrate == aVmeCrate){
             int hvCrate = [[seg objectForKey:@"kHVCrate"]intValue];    //pull out the crate
+            int hvCard  = [[seg objectForKey:@"kHVCard"]intValue];    //pull out the card
             if(hvCrate<2){
-               if([hvCrateObj[hvCrate] hvOnAnyChannel])return YES;
+                ORiSegHVCard* card = [hvCrateObj[hvCrate] cardInSlot:hvCard];
+                if([card hvOnAnyChannel])return YES;
             }
         }
     }
-        
     return NO;
 }
 
