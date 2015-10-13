@@ -282,14 +282,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self setState:kMJDInterlocks_GetShouldUnBias     status:@"Skipped" color:normalColor];
                         [self setCurrentState:kMJDInterlocks_GetOKToBias];
                     }
-                    
-                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
-                                            [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setDetectorsBiased:%d];",hvIsOn],
-                                            [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",2*[delegate pollTime]],
-                                            
-                                            nil];
-                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
-                    
                 }
                 else {
                     if(retryCount>=kAllowedConnectionRetry){
@@ -317,6 +309,18 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     }
                 }
                 self.remoteOpStatus=nil;
+            }
+            else {
+                if([[delegate remoteSocket:slot] queueEmpty]){
+                    self.remoteOpStatus=nil;
+                    NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
+                                            [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setDetectorsBiased:%d];",hvIsOn],
+                                            [NSString stringWithFormat:@"[ORMJDVacuumModel,1 setHvUpdateTime:%d];",2*[delegate pollTime]],
+                                            
+                                            nil];
+                    [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
+                    [self setState:kMJDInterlocks_UpdateVacSystem status:@"Trying Connection" color:normalColor];
+                }
             }
             break;
             
