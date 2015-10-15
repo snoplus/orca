@@ -1173,19 +1173,19 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"EventState is %i \n", eventState); //mod remove
     if(eventState == 3)
     {
-        [mailer setSubject:@"(Test) HALO Burst: SN candidate"];
+        [mailer setSubject:@"HALO Burst: SN candidate"];
 	}
     else if(eventState == 2)
     {
-        [mailer setSubject:@"(Test) HALO Burst: Spallation"];
+        [mailer setSubject:@"HALO Burst: Spallation"];
 	}
     else if(eventState == 1)
     {
-        [mailer setSubject:@"(Test) HALO Burst: Coincidence"];
+        [mailer setSubject:@"HALO Burst: Coincidence"];
 	}
     else
     {
-        [mailer setSubject:@"(Test) HALO Bursy: Other"];
+        [mailer setSubject:@"HALO Burst: Other"];
     }
     [mailer setBody:theContent];
 	[mailer send:self];
@@ -1444,7 +1444,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         theTriage = [theTriage stringByAppendingString:@"SN candidate!"];
         if([[runbits objectAtIndex:6] intValue])
         {
-            theContent = [theContent stringByAppendingString:@"SN candidate!  Ping sent to snews (test mode cuts are weaker) \n"];
+            theContent = [theContent stringByAppendingString:@"SN candidate!  Ping sent to snews \n"];
         }
         else
         {
@@ -1503,7 +1503,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         int count = [aQueue count];
         theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=1?@" <---":@""];
     }
-    
+    if(novaState == 3){  //if supernova candidate
+        [emailList insertObject:@"HALO_full@snolab.ca"  atIndex:0]; //add halo full, HALO_full@snolab.ca
+    }
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
     for(id address in emailList) theContent = [theContent stringByAppendingFormat:@"%@\n",address];
@@ -1512,7 +1514,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"theContent in delayedBurstEvent is: \n %@", theContent);
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
     [self sendMail:userInfo state:novaState];
-    
+    if(novaState == 3){
+        [emailList removeObjectAtIndex:0]; //clean up extra email addressses
+    }
     //flush all queues to the disk fle
     NSString* fileSuffix = [NSString stringWithFormat:@"Burst_%d_",burstCount];
     [runUserInfo setObject:fileSuffix forKey:kFileSuffix];
