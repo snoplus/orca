@@ -3100,7 +3100,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
             
             BOOL fourChannel, twoChannel,oneChannel, chanA, chanB, chanC, chanD;
             
-            NSMutableString* mode = [[NSMutableString alloc] init]; // FIX does this need to be released?
+            NSMutableString* mode = [[NSMutableString alloc]init]; // FIX does this need to be released? (--MAH--YES. I fixed by adding a release at the bottom. 10/12/15)
             
             switch (adcMode) {
                 case 0:
@@ -3199,7 +3199,7 @@ static SIS3305GammaRegisterInformation register_information[kNumSIS3305ReadRegs]
 */
   //          3:0    ADC Mode
             NSLog(@"ADC%d mode: %@ \n",adc,mode);
-
+            [mode release];
         }
         
     }

@@ -3014,7 +3014,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG    
         NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
-    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    NSMutableString *stringCommand = [[[NSMutableString alloc] initWithCapacity:100]autorelease];
     int i; //row index
     for(i=0; i<num; i++){
         [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
@@ -3072,7 +3072,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG    
         NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
-    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    NSMutableString *stringCommand = [[[NSMutableString alloc] initWithCapacity:100]autorelease];
     int i; //row index
     for(i=0; i<num; i++){
         [stringCommand appendString:[[commandTable objectAtIndex:i] objectForKey:@"Name"] ];
@@ -3100,7 +3100,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG    
         NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
-    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    NSMutableString *stringCommand = [[[NSMutableString alloc] initWithCapacity:100]autorelease];
     int i; //row index
     for(i=0; i<num; i++){
         if([[[commandTable objectAtIndex:i] objectForKey:@"Init"] boolValue]){
@@ -3133,7 +3133,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG    
         NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
-    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    NSMutableString *stringCommand = [[[NSMutableString alloc] initWithCapacity:100]autorelease];
         [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Name"] ];
         [stringCommand appendString:@"=???;"];
 
@@ -3157,7 +3157,7 @@ NSString* ORAmptekDP5V4cpuLock							= @"ORAmptekDP5V4cpuLock";
     //DEBUG    
         NSLog(@"Called %@::%@ items in list: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),num);//TODO: DEBUG -tb-
         
-    NSMutableString *stringCommand = [[NSMutableString alloc] initWithCapacity:100];
+    NSMutableString *stringCommand = [[[NSMutableString alloc] initWithCapacity:100]autorelease];
         [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Name"] ];
         [stringCommand appendString:@"="];
         [stringCommand appendString:[[commandTable objectAtIndex:row] objectForKey:@"Setpoint"]];
