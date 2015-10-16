@@ -69,7 +69,6 @@
                 <outlet property="selectionStringTextView" destination="376" id="949"/>
                 <outlet property="sentryLockButton" destination="2750" id="2871"/>
                 <outlet property="sentryRunningField" destination="2977" id="2979"/>
-                <outlet property="sentryScheduler" destination="qZz-3T-XgC" id="wh6-t3-ZMU"/>
                 <outlet property="sentryTypeField" destination="2808" id="2822"/>
                 <outlet property="startButton" destination="2865" id="2869"/>
                 <outlet property="startRunButton" destination="1253" id="1260"/>
