@@ -51,6 +51,7 @@ NSString* otherSystemIP = @"192.168.1.10";
     smellieDelay = 0;
     tellieDelay = 0;
     genericDelay = 0;
+    trigMask=0;
     
     return self;
 }
@@ -176,6 +177,12 @@ NSString* otherSystemIP = @"192.168.1.10";
     [self connectToPort:command];
 }
 
+- (void) stopSmelliePulser:(BOOL)button
+{
+    NSString* command=@"smelliepulser 0 0 \r\n";
+    [self connectToPort:command];
+}
+
 - (void) setTellieRate:(float)value
 {
     tellieRate = value;
@@ -198,6 +205,12 @@ NSString* otherSystemIP = @"192.168.1.10";
     [self connectToPort:command];
 }
 
+- (void) stopTelliePulser:(BOOL)button
+{
+    NSString* command=@"telliepulser 0 0 \r\n";
+    [self connectToPort:command];
+}
+
 - (void) setPulserRate:(float)value
 {
     pulserRate = value;
@@ -217,6 +230,12 @@ NSString* otherSystemIP = @"192.168.1.10";
     command= [command stringByAppendingString:argument1];
     command= [command stringByAppendingString:argument2];
     command = [command stringByAppendingString:endl];
+    [self connectToPort:command];
+}
+
+- (void) stopPulser:(BOOL)button
+{
+    NSString* command=@"syncpulser 0 0 \r\n";
     [self connectToPort:command];
 }
 
@@ -259,6 +278,21 @@ NSString* otherSystemIP = @"192.168.1.10";
 {
     NSString* command=@"syncdelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", genericDelay];
+    NSString* endl=@" \r\n";
+    command= [command stringByAppendingString:argument];
+    command = [command stringByAppendingString:endl];
+    [self connectToPort:command];
+}
+
+- (void) setTrigMask:(unsigned long)value
+{
+    trigMask = value;
+}
+
+- (void) loadTrigMask:(BOOL)button
+{
+    NSString* command=@"trigMask ";
+    NSString* argument=[NSString stringWithFormat:@"%i", trigMask];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument];
     command = [command stringByAppendingString:endl];

@@ -328,6 +328,12 @@
 		5B5A40551A79385C00543633 /* ORSISRegisterDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */; };
 		5B5A40561A79385C00543633 /* SIS3305.nib in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404D1A79385C00543633 /* SIS3305.nib */; };
 		5B5A40571A79385C00543633 /* SIS3305Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 5B5A404E1A79385C00543633 /* SIS3305Card.gif */; };
+		652B28E21BC7203000AC9E61 /* tubii.gif in Resources */ = {isa = PBXBuildFile; fileRef = 652B28E11BC7203000AC9E61 /* tubii.gif */; };
+		652B28E91BC7212100AC9E61 /* TUBiiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 652B28E41BC7212100AC9E61 /* TUBiiController.h */; };
+		652B28EA1BC7212100AC9E61 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 652B28E51BC7212100AC9E61 /* TUBiiController.m */; };
+		652B28EB1BC7212100AC9E61 /* TUBiiController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 652B28E61BC7212100AC9E61 /* TUBiiController.xib */; };
+		652B28EC1BC7212100AC9E61 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 652B28E71BC7212100AC9E61 /* TUBiiModel.h */; };
+		652B28ED1BC7212100AC9E61 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 652B28E81BC7212100AC9E61 /* TUBiiModel.m */; };
 		6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E071B2F4241002E2DD7 /* SNOP.xib */; };
 		6B325E0A1B2F42C8002E2DD7 /* SNOCrate.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */; };
 		6B325E0C1B2F42D8002E2DD7 /* SNORack.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */; };
@@ -3881,6 +3887,12 @@
 		5B5A404C1A79385C00543633 /* ORSISRegisterDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSISRegisterDefs.h; sourceTree = "<group>"; };
 		5B5A404D1A79385C00543633 /* SIS3305.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3305.nib; sourceTree = "<group>"; };
 		5B5A404E1A79385C00543633 /* SIS3305Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = SIS3305Card.gif; sourceTree = "<group>"; };
+		652B28E11BC7203000AC9E61 /* tubii.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = tubii.gif; path = TUBii/tubii.gif; sourceTree = "<group>"; };
+		652B28E41BC7212100AC9E61 /* TUBiiController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TUBiiController.h; path = TUBii/TUBiiController.h; sourceTree = "<group>"; };
+		652B28E51BC7212100AC9E61 /* TUBiiController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TUBiiController.m; path = TUBii/TUBiiController.m; sourceTree = "<group>"; };
+		652B28E61BC7212100AC9E61 /* TUBiiController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TUBiiController.xib; path = TUBii/TUBiiController.xib; sourceTree = "<group>"; };
+		652B28E71BC7212100AC9E61 /* TUBiiModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TUBiiModel.h; path = TUBii/TUBiiModel.h; sourceTree = "<group>"; };
+		652B28E81BC7212100AC9E61 /* TUBiiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TUBiiModel.m; path = TUBii/TUBiiModel.m; sourceTree = "<group>"; };
 		6B325E071B2F4241002E2DD7 /* SNOP.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOP.xib; sourceTree = "<group>"; };
 		6B325E091B2F42C8002E2DD7 /* SNOCrate.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOCrate.xib; sourceTree = "<group>"; };
 		6B325E0B1B2F42D8002E2DD7 /* SNORack.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNORack.xib; sourceTree = "<group>"; };
@@ -7334,6 +7346,19 @@
 				5B5A404E1A79385C00543633 /* SIS3305Card.gif */,
 			);
 			path = SIS3305;
+			sourceTree = "<group>";
+		};
+		652B28E31BC7210900AC9E61 /* TUBii */ = {
+			isa = PBXGroup;
+			children = (
+				652B28E41BC7212100AC9E61 /* TUBiiController.h */,
+				652B28E51BC7212100AC9E61 /* TUBiiController.m */,
+				652B28E61BC7212100AC9E61 /* TUBiiController.xib */,
+				652B28E71BC7212100AC9E61 /* TUBiiModel.h */,
+				652B28E81BC7212100AC9E61 /* TUBiiModel.m */,
+				652B28E11BC7203000AC9E61 /* tubii.gif */,
+			);
+			name = TUBii;
 			sourceTree = "<group>";
 		};
 		6B40D6401B2B79170000F7C1 /* Camera */ = {
@@ -10948,6 +10973,7 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				652B28E31BC7210900AC9E61 /* TUBii */,
 				6B40D65A1B2B79960000F7C1 /* ResistorDB */,
 				6B40D6401B2B79170000F7C1 /* Camera */,
 				DBEC755318EB9E9B0077D493 /* ELLIE */,
@@ -14356,6 +14382,7 @@
 				84B4329505E52B1B0084845B /* ORSecurity.h in Headers */,
 				84CF3B2105E6B2B800C5C320 /* UKPrefsPanel.h in Headers */,
 				84CF3B4005E6BF2300C5C320 /* ORPlacardScrollView.h in Headers */,
+				652B28E91BC7212100AC9E61 /* TUBiiController.h in Headers */,
 				2ACEE0E20612266000CAD497 /* ThresholdCalibrationChannel.h in Headers */,
 				2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */,
 				84ABE7A319C896CE00BD8DC7 /* ORDataProcessing.h in Headers */,
@@ -15051,6 +15078,7 @@
 				84762035118CD53D00016A8D /* ORPlotWithROI.h in Headers */,
 				84762037118CD53D00016A8D /* ORTimeAxis.h in Headers */,
 				84762039118CD53D00016A8D /* ORTimeLine.h in Headers */,
+				652B28EC1BC7212100AC9E61 /* TUBiiModel.h in Headers */,
 				8476203B118CD53D00016A8D /* ORTimeLinePlot.h in Headers */,
 				8476203D118CD53D00016A8D /* ORTimeSeriesPlot.h in Headers */,
 				8476203F118CD53D00016A8D /* ORVectorPlot.h in Headers */,
@@ -15594,6 +15622,7 @@
 				84A95191077B6C8C00CAD99D /* Analyze.gif in Resources */,
 				84A95192077B6C8C00CAD99D /* Clear.gif in Resources */,
 				84A95193077B6C8C00CAD99D /* LogLin.gif in Resources */,
+				652B28EB1BC7212100AC9E61 /* TUBiiController.xib in Resources */,
 				841DA0DD0781F0740099BBF6 /* edu.washington.npl.orca.TwoDHisto.plist in Resources */,
 				841DA0E20781F0740099BBF6 /* TwoDHisto.nib in Resources */,
 				841DA0F00781F09B0099BBF6 /* edu.washington.npl.orca.OneDHisto.plist in Resources */,
@@ -15811,6 +15840,7 @@
 				842538520BC6E006004C8065 /* HP6622a.tif in Resources */,
 				842539FC0BCD7BFE004C8065 /* ORCARootService.nib in Resources */,
 				9CD6DD880BE83F1B007096CE /* edu.washington.npl.orca.PlotFFT.plist in Resources */,
+				652B28E21BC7203000AC9E61 /* tubii.gif in Resources */,
 				9CD6DD8D0BE83F1B007096CE /* PlotFFT.nib in Resources */,
 				849DA7000BF276AC00044320 /* RawPlot.gif in Resources */,
 				849DA70E0BF4DB3000044320 /* edu.washington.npl.orca.PlotTimeSeries.plist in Resources */,
@@ -16460,6 +16490,7 @@
 				8434A2EF055B3287002D3102 /* NcdMuxModel.m in Sources */,
 				8434A2F0055B3287002D3102 /* NcdMuxHWModel.m in Sources */,
 				8434A2F1055B3287002D3102 /* ORVmeIPCard.m in Sources */,
+				652B28ED1BC7212100AC9E61 /* TUBiiModel.m in Sources */,
 				8434A2F2055B3287002D3102 /* NcdMuxBoxModel.m in Sources */,
 				8434A2F4055B3287002D3102 /* NcdMuxBoxController.m in Sources */,
 				8434A2F6055B3287002D3102 /* ORFileIOHelpers.m in Sources */,
@@ -17064,6 +17095,7 @@
 				840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */,
 				84098F570F964F0100036BE8 /* ORPDcuController.m in Sources */,
 				84098F590F964F0100036BE8 /* ORPDcuDecoders.m in Sources */,
+				652B28EA1BC7212100AC9E61 /* TUBiiController.m in Sources */,
 				84098F5B0F964F0100036BE8 /* ORPDcuModel.m in Sources */,
 				84BC88DF0F9CDB5600336DF1 /* ORSerialPortController.m in Sources */,
 				842FCCB6197849C700B89723 /* OREHS8260pModel.m in Sources */,

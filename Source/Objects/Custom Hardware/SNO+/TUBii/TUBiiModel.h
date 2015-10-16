@@ -19,6 +19,7 @@
     float smellieDelay;
     float tellieDelay;
     float genericDelay;
+    unsigned long trigMask;
     NetSocket *nsocket;
 
     int serverSocket;
@@ -36,13 +37,19 @@
 @property (nonatomic) float smellieDelay;
 @property (nonatomic) float tellieDelay;
 @property (nonatomic) float genericDelay;
+@property (nonatomic) unsigned long trigMask;
 - (void) connectSocket:(BOOL)aFlag;
 - (void) connectToPort:(NSString*)command;
 - (void) fireSmelliePulser:(BOOL)button;
 - (void) fireTelliePulser:(BOOL)button;
 - (void) firePulser:(BOOL)button;
+- (void) stopSmelliePulser:(BOOL)button;
+- (void) stopTelliePulser:(BOOL)button;
+- (void) stopPulser:(BOOL)button;
 - (void) loadSmellieDelay:(BOOL)button;
 - (void) loadTellieDelay:(BOOL)button;
 - (void) loadDelay:(BOOL)button;
+- (void) setTrigMask:(unsigned long)trigMask;
+- (void) loadTrigMask:(BOOL)button;
 
 @end
