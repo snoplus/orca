@@ -1773,19 +1773,19 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <button toolTip="Start or Stop this sentry" verticalHuggingPriority="750" id="2865">
-                                                        <rect key="frame" x="203" y="18" width="121" height="19"/>
+                                                        <rect key="frame" x="195" y="12" width="121" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="roundRect" title="Start This Sentry" bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2866">
+                                                        <buttonCell key="cell" type="roundTextured" title="Start This Sentry" bezelStyle="texturedRounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2866">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="startStopSentry:" target="-2" id="o1D-yu-mtQ"/>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="2977">
-                                                        <rect key="frame" x="101" y="21" width="87" height="14"/>
+                                                        <rect key="frame" x="101" y="15" width="87" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="2978">
@@ -1795,7 +1795,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Q0J-vJ-Dzx">
-                                                        <rect key="frame" x="219" y="57" width="57" height="14"/>
+                                                        <rect key="frame" x="256" y="55" width="57" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="day(s)" id="tPJ-vr-s2Z">
@@ -1805,7 +1805,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="qZz-3T-XgC">
-                                                        <rect key="frame" x="150" y="54" width="64" height="19"/>
+                                                        <rect key="frame" x="215" y="52" width="34" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" placeholderString="" drawsBackground="YES" id="xNJ-gL-SME">
@@ -1818,21 +1818,11 @@
                                                             <action selector="toggleIntervalAction:" target="-2" id="NLS-Wa-ZW9"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="T7h-H5-3Dz">
-                                                        <rect key="frame" x="14" y="57" width="153" height="14"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Automatic Toggle Every:" id="oKU-a3-Vur">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button verticalHuggingPriority="750" id="H1f-70-fC5">
-                                                        <rect key="frame" x="266" y="55" width="50" height="17"/>
+                                                        <rect key="frame" x="17" y="52" width="53" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="roundRect" title="On" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="7H4-iN-qSr">
+                                                        <buttonCell key="cell" type="roundTextured" title="On" bezelStyle="texturedRounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="7H4-iN-qSr">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
@@ -1841,12 +1831,30 @@
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="2980">
-                                                        <rect key="frame" x="55" y="21" width="41" height="14"/>
+                                                        <rect key="frame" x="55" y="15" width="41" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Sentry:" id="2981">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="LJw-2c-dkW">
+                                                        <rect key="frame" x="17" y="39" width="299" height="5"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="T7h-H5-3Dz">
+                                                        <rect key="frame" x="76" y="55" width="136" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Automatic Toggle Every:" id="oKU-a3-Vur">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
@@ -2018,7 +2026,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button toolTip="Move the run to the other system" id="2849">
-                                            <rect key="frame" x="15" y="189" width="175" height="45"/>
+                                            <rect key="frame" x="15" y="189" width="214" height="45"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <buttonCell key="cell" type="bevel" title="Toggle Systems..." bezelStyle="regularSquare" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2850">
@@ -2164,12 +2172,12 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button verticalHuggingPriority="750" id="2947">
-                                            <rect key="frame" x="580" y="156" width="84" height="19"/>
+                                            <rect key="frame" x="580" y="155" width="84" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
-                                            <buttonCell key="cell" type="roundRect" title="Clear Stats" bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2948">
+                                            <buttonCell key="cell" type="roundTextured" title="Clear Stats" bezelStyle="texturedRounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2948">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="cellTitle"/>
+                                                <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="clearStatsAction:" target="-2" id="2950"/>
@@ -2183,12 +2191,12 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button toolTip="Push Shaper settings to other machine" verticalHuggingPriority="750" id="2955">
-                                                        <rect key="frame" x="18" y="13" width="131" height="19"/>
+                                                        <rect key="frame" x="18" y="12" width="131" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="roundRect" title="Push HW settings..." bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2956">
+                                                        <buttonCell key="cell" type="roundTextured" title="Push HW settings..." bezelStyle="texturedRounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2956">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="updateRemoteShapersAction:" target="-2" id="2959"/>
