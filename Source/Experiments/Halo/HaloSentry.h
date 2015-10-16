@@ -118,8 +118,8 @@ enum eHaloStatus {
     NSMutableArray* unPingableSBCs;
     NSMutableArray* sentryLog;
     
-    NSTimer* automaticToggle; //SV
-    double timeInterval; //SV
+    NSTimer* toggleTimer; //SV
+    float toggleInterval;    //SV
 }
 
 #pragma mark ***Initialization
@@ -176,12 +176,15 @@ enum eHaloStatus {
 - (NSString*) stateName;
 - (NSString*) report;
 - (NSString*) diskStatus;
-- (BOOL) timerIsRunning; //SV
-- (void) scheduledToggle:(NSTimer*) timer; //SV
-- (void) setTimer:(double) seconds; //SV
-- (void) scheduledToggle:(NSTimer*) timer; //SV
+- (BOOL) toggleTimerIsRunning; //SV
+- (void) startStopToggleTimer;
+
+- (void) doScheduledToggle; //SV
+- (float) toggleInterval;
+- (void) setToggleInterval:(float) seconds; //SV
 - (void) startTimer; //SV
 - (void) stopTimer; //SV
+- (void) waitForEndOfRun;
 
 #pragma mark ***Run Stuff
 - (void) start;
@@ -254,3 +257,4 @@ extern NSString* HaloSentryIsConnectedChanged;
 extern NSString* HaloSentryRemoteStateChanged;
 extern NSString* HaloSentryMissedHeartbeat;
 extern NSString* HaloSentrySbcRootPwdChanged;
+extern NSString* HaloSentryToggleIntervalChanged;

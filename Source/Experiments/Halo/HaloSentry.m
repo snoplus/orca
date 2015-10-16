@@ -33,12 +33,13 @@ NSString* HaloSentryIsPrimaryChanged = @"HaloSentryIsPrimaryChanged";
 NSString* HaloSentryIsRunningChanged = @"HaloSentryIsRunningChanged";
 NSString* HaloSentryStateChanged     = @"HaloSentryStateChanged";
 NSString* HaloSentryTypeChanged      = @"HaloSentryTypeChanged";
-NSString* HaloSentryIsConnectedChanged = @"HaloSentryIsConnectedChanged";
-NSString* HaloSentryRemoteStateChanged = @"HaloSentryRemoteStateChanged";
-NSString* HaloSentryStealthMode2Changed = @"HaloSentryStealthMode2Changed";
-NSString* HaloSentryStealthMode1Changed = @"HaloSentryStealthMode1Changed";
-NSString* HaloSentryMissedHeartbeat     = @"HaloSentryMissedHeartbeat";
-NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
+NSString* HaloSentryIsConnectedChanged  = @"HaloSentryIsConnectedChanged";
+NSString* HaloSentryRemoteStateChanged  = @"HaloSentryRemoteStateChanged";
+NSString* HaloSentryStealthMode2Changed     = @"HaloSentryStealthMode2Changed";
+NSString* HaloSentryStealthMode1Changed     = @"HaloSentryStealthMode1Changed";
+NSString* HaloSentryMissedHeartbeat         = @"HaloSentryMissedHeartbeat";
+NSString* HaloSentrySbcRootPwdChanged       = @"HaloSentrySbcRootPwdChanged";
+NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged";
 
 #define kRemotePort 4667
 
@@ -50,7 +51,6 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     self = [super init];
     [self registerNotificationObservers];
     unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain];
-    automaticToggle = nil; //SV
 
     return self;
 }
@@ -71,6 +71,8 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [pingTask release];
     [sbcRootPwd release];
     [sentryLog release];
+    [toggleTimer invalidate];
+    [toggleTimer release];
     
     [self clearAllAlarms];
     
@@ -505,68 +507,89 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     return (remoteRunInProgress == eYES) || [runControl isRunning];
 }
 
-//SV
-- (BOOL) timerIsRunning
+- (void) startStopToggleTimer
 {
-    return [automaticToggle isValid];
+    BOOL scheduleState = ![self toggleTimerIsRunning];
+    if (!scheduleState && [self sentryIsRunning] || toggleInterval==0){
+        [self stopTimer];
+    }
+    if (scheduleState && [self sentryIsRunning] && toggleInterval>0){
+        [self startTimer];
+    }
+    //we'll use this notification to force an update on the dialog
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
+}
+    
+
+//SV
+- (BOOL) toggleTimerIsRunning
+{
+    return [toggleTimer isValid];
+}
+
+- (float)toggleInterval
+{
+    return toggleInterval;
 }
 
 //SV
-- (void) setTimer:(double) days
+- (void) setToggleInterval:(float) days
 {
-    timeInterval = days;
-    NSLog(@"Time interval set to %.3f day(s)\n", days);
+    if(days < 0)days = 0;
+
+    [[[self undoManager] prepareWithInvocationTarget:self] setToggleInterval:toggleInterval];
+    toggleInterval = days;
+    NSLog(@"Toggle interval set to %.3f day(s)\n", days);
+    [[NSNotificationCenter defaultCenter] postNotificationName:HaloSentryToggleIntervalChanged object:self];
 }
 
 //SV
-- (void) scheduledToggle:(NSTimer*) timer
+- (void) doScheduledToggle
 {
     NSLog(@"TOGGLING NOW\n");
     if ([self runIsInProgress]) {[self toggleSystems];}
 }
 
 //SV
-- (void) waitForEndOfRun:(NSTimer*) timer
+- (void) waitForEndOfRun
 {
     NSLog(@"Scheduled sentry system toggle\n");
-    automaticToggle = nil;
-    if ([self runIsInProgress])
-    {
+    [toggleTimer invalidate];
+    [toggleTimer release];
+    toggleTimer = nil;
+    if ([self runIsInProgress]){
         double timeLeft = [runControl timeToGo] - 5;
-        if (timeLeft > 5)
-        {
+        if (timeLeft > 5){
             NSLog(@"Waiting for local run to end\n");
-            NSTimer* waitTimer;
-            waitTimer = [NSTimer scheduledTimerWithTimeInterval:timeLeft target:self selector:@selector(scheduledToggle:) userInfo:nil repeats:NO];
+            [self performSelector:@selector(doScheduledToggle) withObject:nil afterDelay:timeLeft];
         }
-        else
-        {
+        else {
             NSLog(@"TOGGLING NOW\n");
             if ([self runIsInProgress]) {[self toggleSystems];}
         }
     }
-    else {[self startTimer];}
+    else [self startTimer];
 }
 
 //SV
 - (void) startTimer
 {
-    if (![automaticToggle isValid])
-    {
-        if (timeInterval <= 0) {[self setTimer:7];} //7 days is default
+    if ([toggleTimer isValid]){
+        if (toggleInterval <= 0) [self setToggleInterval:7]; //7 days is default
         NSLog(@"Starting sentry timer\n");
-        automaticToggle = [NSTimer scheduledTimerWithTimeInterval:(timeInterval*86400) target:self selector:@selector(waitForEndOfRun:) userInfo:nil repeats:NO];
+        [toggleTimer release];
+        toggleTimer = [[NSTimer scheduledTimerWithTimeInterval:(toggleInterval*86400) target:self selector:@selector(waitForEndOfRun) userInfo:nil repeats:NO] retain];
     }
 }
 
 //SV
 - (void) stopTimer
 {
-    if ([automaticToggle isValid])
-    {
+    if (![toggleTimer isValid]){
         NSLog(@"Stopping sentry timer\n");
-        [automaticToggle invalidate];
-        automaticToggle = nil;
+        [toggleTimer invalidate];
+        [toggleTimer release];
+        toggleTimer = nil;
     }
 }
     
@@ -577,7 +600,9 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setSentryIsRunning:YES];
     [self setSentryType:eNeither];
     [self setNextState:eStarting stepTime:1];
-    automaticToggle = nil; //SV
+    [toggleTimer invalidate];
+    [toggleTimer release];
+    toggleTimer = nil; //SV
     [self step];
 }
 
@@ -601,6 +626,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [self setStealthMode2:  [decoder decodeBoolForKey:   @"stealthMode2"]];
     [self setStealthMode1:  [decoder decodeBoolForKey:   @"stealthMode1"]];
     [self setSbcRootPwd:    [decoder decodeObjectForKey: @"sbcRootPwd"]];
+    [self setToggleInterval:[decoder decodeFloatForKey: @"toggleInterval"]];
     
     wasRunning = [decoder decodeBoolForKey: @"wasRunning"];
     [[self undoManager] enableUndoRegistration];
@@ -618,6 +644,7 @@ NSString* HaloSentrySbcRootPwdChanged   = @"HaloSentrySbcRootPwdChanged";
     [encoder encodeBool:stealthMode1    forKey: @"stealthMode1"];
     [encoder encodeBool:wasRunning      forKey: @"wasRunning"];
     [encoder encodeObject:sbcRootPwd    forKey: @"sbcRootPwd"];
+    [encoder encodeFloat:toggleInterval forKey: @"toggleInterval"];
 }
 
 - (NSUndoManager *)undoManager
