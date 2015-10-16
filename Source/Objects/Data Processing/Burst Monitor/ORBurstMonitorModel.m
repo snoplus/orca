@@ -1503,8 +1503,8 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         int count = [aQueue count];
         theContent = [theContent stringByAppendingFormat:@"Channel: %@ Number Events: %d %@\n",aKey,[aQueue count],count>=1?@" <---":@""];
     }
-    if(novaState == 3){  //if supernova candidate
-        [emailList insertObject:@"HALO_full@snolab.ca"  atIndex:0]; //add halo full, HALO_full@snolab.ca
+    if(novaState == 3 && [[runbits objectAtIndex:6] intValue]){  //if supernova candidate
+        [emailList insertObject:@"halo_snews_burst@snolab.ca"  atIndex:0]; //add halo full, HALO_full@snolab.ca
     }
     theContent = [theContent stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
     theContent = [theContent stringByAppendingString:@"The following people received this message:\n"];
@@ -1514,9 +1514,23 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"theContent in delayedBurstEvent is: \n %@", theContent);
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self cleanupAddresses:emailList],@"Address",theContent,@"Message",nil];
     [self sendMail:userInfo state:novaState];
-    if(novaState == 3){
+    if(novaState == 3 && [[runbits objectAtIndex:6] intValue]){
         [emailList removeObjectAtIndex:0]; //clean up extra email addressses
     }
+    
+    //write file with burst data
+    NSString* allBurstData = [NSString stringWithFormat:@"{\"novaState\":\"%i\",\"dateSec\":\"%f\",\"dateMic\":\"%i\",\"runNum\":\"%i\",\"runType\":\"%@\",\"Ncount\":\"%i\",\"Nmult\":\"%i\",\"Nchan\":\"%i\",\"ENchan\":\"%f\",\"pNchan\":\"%f\",'N':\"%i\",\"adcP\":\"%f\",\"gammaP\":\"%f\",\"alphaP\":\"%f\",\"Xcenter\":\"%i\",\"Xrms\":\"%f\",\"Ycenter\":\"%i\",\"Yrms\":\"%f\",\"phi\":\"%f\",\"Rcenter\":\"%f\",\"Rrms\":\"%f\",\"Pcenter\":\"%f\",\"durSec\":\"%f\",\"rSec\":\"%f\",\"burstNum\":\"%i\"}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    
+    //////stringWithFormat:@"{'novaState':'%i','dateSec':'%f','dateMic':'%i','runNum':'%i','runType':'%@','Ncount':'%i','Nmult':'%i','Nchan':'%i','ENchan':'%f','pNchan':'%f','N':'%i','adcP':'%f','gammaP':'%f','alphaP':'%f','Xcenter':'%i','Xrms':'%f','Ycenter':'%i','Yrms':'%f','phi':'%f','Rcenter':'%f','Rrms':'%f','Pcenter':'%f','durSec':'%f','rSec':'%f','burstNum':'%i'}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    if(0){ //write the file when we want to do that
+        NSError* fileWriteErr;
+        NSFileManager* fileman = nil;
+        NSString* currentDir = [fileman currentDirectoryPath];
+        BOOL ok = [allBurstData writeToFile:@"/Users/HALO/flname.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
+        NSLog(@"file write okness is %i\n", ok);
+        NSLog(@"look for the file at %@\n", currentDir);
+    }
+    
     //flush all queues to the disk fle
     NSString* fileSuffix = [NSString stringWithFormat:@"Burst_%d_",burstCount];
     [runUserInfo setObject:fileSuffix forKey:kFileSuffix];
