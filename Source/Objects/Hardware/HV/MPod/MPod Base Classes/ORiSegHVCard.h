@@ -91,7 +91,8 @@ enum{
 	ORTimeRate*		currentHistory[16];
     BOOL			shipRecords;
     NSMutableDictionary* hvConstraints;
-    ORAlarm* safetyLoopNotGoodAlarm;
+    ORAlarm*        safetyLoopNotGoodAlarm;
+    BOOL            doNotPostSafetyLoopAlarm;
 }
 
 #pragma mark ***Initialization
@@ -154,6 +155,9 @@ enum{
 - (BOOL) constraintsInPlace;
 - (void) requestMaxValues:(int)aChannel;
 - (NSString*) getModuleString;
+
+- (BOOL) doNotPostSafetyLoopAlarm;
+- (void) setDoNotPostSafetyLoopAlarm:(BOOL)aState;
 
 #pragma mark ¥¥¥Data Records
 - (unsigned long) dataId;
@@ -246,4 +250,5 @@ extern NSString* ORiSegHVCardExceptionCountChanged;
 extern NSString* ORiSegHVCardConstraintsChanged;
 extern NSString* ORiSegHVCardRequestHVMaxValues;
 extern NSString* ORiSegHVCardChanNameChanged;
+extern NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged;
 

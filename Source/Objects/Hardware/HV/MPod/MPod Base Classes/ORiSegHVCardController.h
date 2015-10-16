@@ -67,6 +67,7 @@
     //module status
     IBOutlet NSTextField*   moduleStatusField;
     IBOutlet NSButton*      moduleClearButton;
+    IBOutlet NSButton*      doNotPostSafetyLoopAlarmCB;
 	
 	IBOutlet ORCompositeTimeLineView*   currentPlotter;
 	IBOutlet ORCompositeTimeLineView*   voltagePlotter;
@@ -77,6 +78,7 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) updateButtons;
+- (void) doNotPostSafetyLoopAlarmChanged:(NSNotification*)aNote;
 - (void) constraintsChanged:(NSNotification*)aNote;
 - (void) timeoutHappened:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
@@ -111,6 +113,7 @@
 - (IBAction) incChannelAction:(id)sender;
 - (IBAction) decChannelAction:(id)sender;
 - (IBAction) listConstraintsAction:(id)sender;
+- (IBAction) doNotPostSafetyLoopAlarmAction:(id)sender;
 
 #pragma mark •••Actions for All
 - (IBAction) powerAllOnAction:(id)sender;

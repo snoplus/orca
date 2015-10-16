@@ -195,6 +195,12 @@
                          name : ORiSegHVCardChanNameChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(doNotPostSafetyLoopAlarmChanged:)
+                         name : ORiSegHVCardDoNotPostSafetyAlarmChanged
+                        object: model];
+    
+    
 }
 
 - (void) updateWindow
@@ -212,10 +218,16 @@
 	[self shipRecordsChanged:nil];
 	[self constraintsChanged:nil];
 	[self maxVoltageChanged:nil];
-	[self chanNameChanged:nil];
+    [self chanNameChanged:nil];
+    [self doNotPostSafetyLoopAlarmChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) doNotPostSafetyLoopAlarmChanged:(NSNotification*)aNote
+{
+    [doNotPostSafetyLoopAlarmCB setIntValue:[model doNotPostSafetyLoopAlarm]];
+}
+
 - (void) maxVoltageChanged:(NSNotification*)aNote
 {
     [maxVoltageField setStringValue:[NSString stringWithFormat:@"Max: %d",[model maxVoltage:[model selectedChannel]]]];
@@ -739,6 +751,11 @@
 	[model clearPanicChannel:[model selectedChannel]];
 	[model clearEventsChannel:[model selectedChannel]];
     [model clearModule];
+}
+
+- (IBAction) doNotPostSafetyLoopAlarmAction:(id)sender
+{
+    [model setDoNotPostSafetyLoopAlarm:[sender intValue]];
 }
 
 #pragma mark •••Actions for All
