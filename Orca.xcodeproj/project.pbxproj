@@ -2748,6 +2748,12 @@
 		84D0592E08FF367A00A99A83 /* goBack.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D0592C08FF367A00A99A83 /* goBack.tif */; };
 		84D0593F08FF39EA00A99A83 /* goBackPressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D0593D08FF39EA00A99A83 /* goBackPressed.tif */; };
 		84D05976090017B200A99A83 /* ORContainerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B0CFBD08FC60BC00EBE23C /* ORContainerModel.m */; };
+		84D153611BD53D2A005EC269 /* OnCallList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D1535B1BD53D2A005EC269 /* OnCallList.nib */; settings = {ASSET_TAGS = (); }; };
+		84D153621BD53D2A005EC269 /* OnCallList.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D1535C1BD53D2A005EC269 /* OnCallList.tif */; settings = {ASSET_TAGS = (); }; };
+		84D153631BD53D2A005EC269 /* OROnCallListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D1535D1BD53D2A005EC269 /* OROnCallListController.h */; settings = {ASSET_TAGS = (); }; };
+		84D153641BD53D2A005EC269 /* OROnCallListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1535E1BD53D2A005EC269 /* OROnCallListController.m */; settings = {ASSET_TAGS = (); }; };
+		84D153651BD53D2A005EC269 /* OROnCallListModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D1535F1BD53D2A005EC269 /* OROnCallListModel.h */; settings = {ASSET_TAGS = (); }; };
+		84D153661BD53D2A005EC269 /* OROnCallListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D153601BD53D2A005EC269 /* OROnCallListModel.m */; settings = {ASSET_TAGS = (); }; };
 		84D258680FA7340B00626276 /* MotionNode.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D2585D0FA7340B00626276 /* MotionNode.gif */; };
 		84D258690FA7340B00626276 /* MotionNode.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D2585E0FA7340B00626276 /* MotionNode.nib */; };
 		84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D258600FA7340B00626276 /* NoMotionNodeDriverHelp.plist */; };
@@ -3257,9 +3263,9 @@
 		CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */; };
 		CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */; };
 		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
+		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; settings = {ASSET_TAGS = (); }; };
 		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; settings = {ASSET_TAGS = (); }; };
 		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; settings = {ASSET_TAGS = (); }; };
 		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; settings = {ASSET_TAGS = (); }; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
@@ -6193,6 +6199,12 @@
 		84CFB09B042A80BE005F64B1 /* ORDataFileController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDataFileController.m; path = "Source/Objects/Data Processing/Data Storage/ORDataFileController.m"; sourceTree = SOURCE_ROOT; };
 		84D0592D08FF367A00A99A83 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/goBack.tif; sourceTree = "<group>"; };
 		84D0593E08FF39EA00A99A83 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/goBackPressed.tif; sourceTree = "<group>"; };
+		84D1535B1BD53D2A005EC269 /* OnCallList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = OnCallList.nib; sourceTree = "<group>"; };
+		84D1535C1BD53D2A005EC269 /* OnCallList.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = OnCallList.tif; sourceTree = "<group>"; };
+		84D1535D1BD53D2A005EC269 /* OROnCallListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROnCallListController.h; sourceTree = "<group>"; };
+		84D1535E1BD53D2A005EC269 /* OROnCallListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROnCallListController.m; sourceTree = "<group>"; };
+		84D1535F1BD53D2A005EC269 /* OROnCallListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OROnCallListModel.h; sourceTree = "<group>"; };
+		84D153601BD53D2A005EC269 /* OROnCallListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OROnCallListModel.m; sourceTree = "<group>"; };
 		84D2585D0FA7340B00626276 /* MotionNode.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MotionNode.gif; path = Source/Objects/Hardware/Serial/MotionNode/MotionNode.gif; sourceTree = SOURCE_ROOT; };
 		84D2585E0FA7340B00626276 /* MotionNode.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MotionNode.nib; path = Source/Objects/Hardware/Serial/MotionNode/MotionNode.nib; sourceTree = SOURCE_ROOT; };
 		84D258600FA7340B00626276 /* NoMotionNodeDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NoMotionNodeDriverHelp.plist; sourceTree = "<group>"; };
@@ -6734,11 +6746,11 @@
 		CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVXI11HardwareFinderController.h; sourceTree = "<group>"; };
 		CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVXI11HardwareFinderController.m; sourceTree = "<group>"; };
 		CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = VXI11HardwareFinder.nib; sourceTree = "<group>"; };
+		CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORVProcess.cc; sourceTree = "<group>"; };
+		CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORVProcess.hh; sourceTree = "<group>"; };
 		CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORScopedLock.hh; sourceTree = "<group>"; };
 		CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORThread.cc; sourceTree = "<group>"; };
 		CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORThread.hh; sourceTree = "<group>"; };
-		CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORVProcess.cc; sourceTree = "<group>"; };
-		CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORVProcess.hh; sourceTree = "<group>"; };
 		CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORXyCom564Readout.cc; sourceTree = "<group>"; };
 		CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORXyCom564Readout.hh; sourceTree = "<group>"; };
 		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -8505,6 +8517,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				84D1535A1BD53D2A005EC269 /* OnCallList */,
 				844CBDC31866010F0012AA3B /* RaidMonitor */,
 				B3808A931700F85C0019C27D /* CouchDBListener */,
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
@@ -12693,6 +12706,19 @@
 			path = "Source/Objects/Data Processing/Data Storage";
 			sourceTree = SOURCE_ROOT;
 		};
+		84D1535A1BD53D2A005EC269 /* OnCallList */ = {
+			isa = PBXGroup;
+			children = (
+				84D153601BD53D2A005EC269 /* OROnCallListModel.m */,
+				84D1535F1BD53D2A005EC269 /* OROnCallListModel.h */,
+				84D1535E1BD53D2A005EC269 /* OROnCallListController.m */,
+				84D1535D1BD53D2A005EC269 /* OROnCallListController.h */,
+				84D1535C1BD53D2A005EC269 /* OnCallList.tif */,
+				84D1535B1BD53D2A005EC269 /* OnCallList.nib */,
+			);
+			path = OnCallList;
+			sourceTree = "<group>";
+		};
 		84D258590FA7340B00626276 /* MotionNode */ = {
 			isa = PBXGroup;
 			children = (
@@ -14728,6 +14754,7 @@
 				8493CC810C99FA4B00B46CD4 /* ORVmecpuModel.h in Headers */,
 				8493CC860C99FA4B00B46CD4 /* HW_Readout.h in Headers */,
 				84D967770CA03E50000C0C76 /* ORScriptController.h in Headers */,
+				84D153651BD53D2A005EC269 /* OROnCallListModel.h in Headers */,
 				84D967790CA03E50000C0C76 /* ORScriptModel.h in Headers */,
 				84F46F370CA44255007EFADA /* ORIpeCard.h in Headers */,
 				84F46F390CA44255007EFADA /* ORIpeCardDecoder.h in Headers */,
@@ -15344,6 +15371,7 @@
 				84DA76C416B803E00045F22A /* ORAdcRateModel.h in Headers */,
 				84C00CC016B82350003D1504 /* ORFixedValueController.h in Headers */,
 				84B5197E191D285A003A580B /* ORBurstMonitorController.h in Headers */,
+				84D153631BD53D2A005EC269 /* OROnCallListController.h in Headers */,
 				84C00CC216B82350003D1504 /* ORFixedValueModel.h in Headers */,
 				849B9D7516DD044F003F3037 /* ORSIS3320Controller.h in Headers */,
 				849B9D7716DD044F003F3037 /* ORSIS3320Decoders.h in Headers */,
@@ -15627,6 +15655,7 @@
 				849F4C750768DA930087E9A8 /* DataExplorer.nib in Resources */,
 				84A9518F077B6C8C00CAD99D /* Controls.gif in Resources */,
 				84A95190077B6C8C00CAD99D /* ClearROI.gif in Resources */,
+				84D153611BD53D2A005EC269 /* OnCallList.nib in Resources */,
 				84A95191077B6C8C00CAD99D /* Analyze.gif in Resources */,
 				84A95192077B6C8C00CAD99D /* Clear.gif in Resources */,
 				84A95193077B6C8C00CAD99D /* LogLin.gif in Resources */,
@@ -16082,6 +16111,7 @@
 				84D8CB4810447492005585C5 /* AutoTester.nib in Resources */,
 				84D8CB4E10447A57005585C5 /* AutoTester.gif in Resources */,
 				84AB0F3D1056DA4E0069D5E2 /* ModBus.nib in Resources */,
+				84D153621BD53D2A005EC269 /* OnCallList.tif in Resources */,
 				84AB10081057D5290069D5E2 /* ModBus.tif in Resources */,
 				84AB101C1057D6990069D5E2 /* iTransGasSensor.nib in Resources */,
 				84AB101D1057D6990069D5E2 /* iTransGasSensor.tif in Resources */,
@@ -16752,6 +16782,7 @@
 				8408A4BE09071C6A004A3B34 /* ORHV2132Controller.m in Sources */,
 				8408A4C009071C6A004A3B34 /* ORHV2132Model.m in Sources */,
 				84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */,
+				84D153641BD53D2A005EC269 /* OROnCallListController.m in Sources */,
 				84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */,
 				840E00050944B29000049827 /* ORProcessController.m in Sources */,
 				840E00070944B29000049827 /* ORProcessModel.m in Sources */,
@@ -17414,6 +17445,7 @@
 				8471D47A1588DF3C0039894D /* ORRemoteSocketController.m in Sources */,
 				84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */,
 				84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */,
+				84D153661BD53D2A005EC269 /* OROnCallListModel.m in Sources */,
 				84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */,
 				84FEB88D15A31F42005D798C /* ORL2301Decoders.m in Sources */,
 				84FEB88F15A31F42005D798C /* ORL2301Model.m in Sources */,
