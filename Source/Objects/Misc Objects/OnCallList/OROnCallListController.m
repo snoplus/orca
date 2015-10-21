@@ -36,6 +36,9 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
+    [messageField setFocusRingType:NSFocusRingTypeNone];
+    [onCallListView setFocusRingType:NSFocusRingTypeNone];
+
     [self updateWindow];
 }
 
@@ -102,11 +105,13 @@
 - (void) forceReload
 {
 	[onCallListView reloadData];
+    [self setButtonStates];
 }
 
 - (void) messageChanged:(NSNotification*)aNote
 {
     [messageField setStringValue:[model message]];
+    [self setButtonStates];
 }
 
 - (void) listLockChanged:(NSNotification*)aNote
@@ -126,10 +131,31 @@
 {
     BOOL locked = [gSecurity isLocked:OROnCallListListLock];
 	
-	[addPersonButton setEnabled:!locked];
-	[removePersonButton setEnabled:!locked];
-	[saveButton setEnabled:!locked];
-	[restoreButton setEnabled:!locked];
+	[addPersonButton setEnabled:    !locked];
+	[removePersonButton setEnabled: !locked];
+	[saveButton setEnabled:         !locked];
+	[restoreButton setEnabled:      !locked];
+    
+    OROnCallPerson* primary     = [model primaryPerson];
+   
+    NSString* name = nil;
+    if(primary)name = [primary name];
+    else {
+        OROnCallPerson* secondary   = [model secondaryPerson];
+        if(secondary)name = [secondary name];
+        else {
+            OROnCallPerson* tertiary    = [model tertiaryPerson];
+            if(tertiary)name = [tertiary name];
+        }
+    }
+    if(name){
+        [sendMessageButton setTitle:name];
+        [sendMessageButton setEnabled:[[model message]length]];
+    }
+    else {
+        [sendMessageButton setTitle:@"--"];
+        [sendMessageButton setEnabled:NO];
+    }
 }
 
 - (void) personAdded:(NSNotification*)aNote
@@ -316,5 +342,7 @@
 	}
 	else return 0;
 }
+
+
 @end
 

@@ -32,11 +32,9 @@ NSString* OROnCallListModelReloadTable      = @"OROnCallListModelReloadTable";
 NSString* OROnCallListPeopleNotifiedChanged = @"OROnCallListPeopleNotifiedChanged";
 NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 
-//#define kOnCallAlarmWaitTime        3*60
-//#define kOnCallAcknowledgeWaitTime 10*60
+#define kOnCallAlarmWaitTime        3*60
+#define kOnCallAcknowledgeWaitTime 10*60
 
-#define kOnCallAlarmWaitTime        5.
-#define kOnCallAcknowledgeWaitTime 10.
 
 @implementation OROnCallListModel
 
@@ -79,6 +77,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 
 - (void) setMessage:(NSString*)aString
 {
+    if(!aString)aString = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setMessage:message];
     [aString copy];
     [message autorelease];
@@ -128,6 +127,36 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
             }
         }
     }
+    //now the roles are:
+    OROnCallPerson* primary     = [self primaryPerson];
+    OROnCallPerson* secondary   = [self secondaryPerson];
+    OROnCallPerson* tertiary    = [self tertiaryPerson];
+    //find new primary
+    if(!primary && (secondary || tertiary)){
+        if(secondary)   [secondary setValue:[NSNumber numberWithInt:1] forKey:kPersonRole];
+        else            [tertiary  setValue:[NSNumber numberWithInt:1] forKey:kPersonRole];
+    }
+    
+    //find new secondary
+    secondary   = [self secondaryPerson];
+    tertiary    = [self tertiaryPerson];
+    if(!secondary && tertiary){
+        [tertiary  setValue:[NSNumber numberWithInt:2] forKey:kPersonRole];
+    }
+    
+    //with a new role(s) we reset the notification if needed
+    NSArray* allAlarms  = [[ORAlarmCollection sharedAlarmCollection] alarms];
+    for(id anAlarm in allAlarms){
+        if(![anAlarm acknowledged] && [anAlarm severity]>kSetupAlarm){
+            [notificationTimer invalidate];
+            [notificationTimer release];
+            notificationTimer = nil;
+            [self startContactProcess];
+            break;
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
+
 }
 
 - (void) registerNotificationObservers
@@ -154,27 +183,31 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     ORAlarm* theAlarm = [aNote object];
     if([theAlarm severity]>kSetupAlarm){
-        if(!notificationTimer){
-            notificationTimer = [[NSTimer scheduledTimerWithTimeInterval:kOnCallAlarmWaitTime target:self selector:@selector(notifyPrimary:) userInfo:nil repeats:NO] retain];
-            OROnCallPerson* primary     = [self primaryPerson];
-            OROnCallPerson* secondary   = [self secondaryPerson];
-            OROnCallPerson* tertiary    = [self tertiaryPerson];
-            NSDate* contactDate = [[NSDate date] dateByAddingTimeInterval:kOnCallAcknowledgeWaitTime];
-            if(primary){
-                [primary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
-                if(secondary)       [secondary setStatus:@"Next on deck"];
-                else if(tertiary)   [tertiary  setStatus:@"Next on deck"];
-            }
-            else if(secondary){
-                [secondary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
-                if(tertiary)   [tertiary  setStatus:@"Next on deck"];
-           }
-            else if(tertiary){
-                [tertiary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
-            }
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPeopleNotifiedChanged object:self];
+        [self startContactProcess];
     }
+}
+- (void) startContactProcess
+{
+    if(!notificationTimer){
+        notificationTimer = [[NSTimer scheduledTimerWithTimeInterval:kOnCallAlarmWaitTime target:self selector:@selector(notifyPrimary:) userInfo:nil repeats:NO] retain];
+        OROnCallPerson* primary     = [self primaryPerson];
+        OROnCallPerson* secondary   = [self secondaryPerson];
+        OROnCallPerson* tertiary    = [self tertiaryPerson];
+        NSDate* contactDate = [[NSDate date] dateByAddingTimeInterval:kOnCallAcknowledgeWaitTime];
+        if(primary){
+            [primary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
+            if(secondary)       [secondary setStatus:@"Next on deck"];
+            else if(tertiary)   [tertiary  setStatus:@"Next on deck"];
+        }
+        else if(secondary){
+            [secondary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
+            if(tertiary)   [tertiary  setStatus:@"Next on deck"];
+        }
+        else if(tertiary){
+            [tertiary setStatus:[NSString stringWithFormat:@"Will Contact: %@",[contactDate descriptionFromTemplate:@"HH:mm:ss"]]];
+        }
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListPeopleNotifiedChanged object:self];
 }
 
 - (void) sendMessageToOnCallPerson
@@ -481,7 +514,10 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
             [mailer send:self];
         }
     }
-    else NSLog(@"No contact info available for %@\n",[self name]);
+    else {
+        [self setStatus:@"No Address"];
+        NSLog(@"No contact info available for %@\n",[self name]);
+    }
 }
 
 - (void) mailSent:(NSString*)to

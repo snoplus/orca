@@ -49,6 +49,7 @@
 - (void) removePersonAtIndex:(int) anIndex;
 - (id)   personAtIndex:      (int)anIndex;
 - (void) personTakingNewRole:(id)aPerson;
+- (void) startContactProcess;
 - (unsigned long) onCallListCount;
 - (OROnCallPerson*) primaryPerson;
 - (OROnCallPerson*) secondaryPerson;
