@@ -74,7 +74,7 @@
 	[notifyCenter addObserver : self
                      selector : @selector(forceReload)
                          name : OROnCallListModelReloadTable
-						object: model];
+						object: nil];
 	
     [notifyCenter addObserver : self
                      selector : @selector(lastFileChanged:)

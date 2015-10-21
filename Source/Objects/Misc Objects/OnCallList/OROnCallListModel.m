@@ -440,13 +440,16 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 
 - (void) takeOffCall
 {
-    [data setObject:[NSNumber numberWithInt:kOffCall] forKey:kPersonRole];
+    [data setValue:[NSNumber numberWithInt:kOffCall] forKey:kPersonRole];
 }
 
 - (void) setValue:(id)anObject forKey:(id)aKey
 {
     if(!anObject)anObject = @"";
+    [[[[ORGlobal sharedGlobal] undoManager] prepareWithInvocationTarget:self] setValue:[data objectForKey:aKey] forKey:aKey];
+
     [data setObject:anObject forKey:aKey];
+    [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelReloadTable object:self];
 }
 
 - (id) valueForKey:(id)aKey
@@ -472,7 +475,7 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     self = [super init];
     self.data    = [decoder decodeObjectForKey:@"data"];
-    return self;
+   return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*)encoder
