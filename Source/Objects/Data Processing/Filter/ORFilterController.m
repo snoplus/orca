@@ -273,7 +273,8 @@
 		default:break;
 	}
 	if([stringToInsert length]){
-		[scriptView insertText:stringToInsert];
+        NSRange insertRange = [scriptView selectedRange];
+        if(insertRange.location != NSNotFound) [scriptView insertText:stringToInsert replacementRange:insertRange];
 	}
 }
 
