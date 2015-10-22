@@ -64,14 +64,15 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 - (BOOL) solitaryObject     { return YES; }
 - (void) setUpImage         { [self setImage:[NSImage imageNamed:@"OnCallList"]]; }
 - (void) makeMainController { [self linkToController:@"OROnCallListController"];  }
+- (NSString*) helpURL       { return @"Subsystems/On_Call_List.html";             }
 
 #pragma mark ***Accessors
 
 - (void) setLastFile:(NSString*)aPath
 {
-    [aPath copy];
     [lastFile autorelease];
-    lastFile = aPath;
+    lastFile = [aPath copy];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListModelLastFileChanged object:self];
 }
 
@@ -79,9 +80,8 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
 {
     if(!aString)aString = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setMessage:message];
-    [aString copy];
     [message autorelease];
-    message = aString;
+    message = [aString copy];
     [[NSNotificationCenter defaultCenter] postNotificationName:OROnCallListMessageChanged object:self];
 }
 
@@ -492,6 +492,8 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
             [mailer setSubject:computerName()];
             [mailer setBody:[[[NSAttributedString alloc] initWithString:aMessage] autorelease]];
             [mailer send:self];
+            NSLog(@"On Call Message: %@\n",aMessage);
+            NSLog(@"Sent to %@\n",[self name]);
         }
     }
     else NSLog(@"No contact info available for %@\n",[self name]);
@@ -515,6 +517,8 @@ NSString* OROnCallListMessageChanged        = @"OROnCallListMessageChanged";
             [mailer setSubject:computerName()];
             [mailer setBody:[[[NSAttributedString alloc] initWithString:s] autorelease]];
             [mailer send:self];
+            NSLog(@"On Call Message: %@\n",s);
+            NSLog(@"Sent to %@\n",[self name]);
         }
     }
     else {
