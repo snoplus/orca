@@ -195,13 +195,11 @@ kPEDCrateMask
 - (void) stopMTCPedestalsFixedTimeSBC;
 - (void) enableSingleShotMTCPedestalsFixedTimeSBC;
 - (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
-- (void) loadTheMTCADacsUsingSBC;
 - (void) tellReadoutSBC:(unsigned int) cmd;
 @end
 
 @interface ORMTCModel (LocalAdapter)
 - (void) loadXilinxUsingLocalAdapter:(NSData*) theData;
-- (void) loadTheMTCADacsUsingLocalAdapter;
 @end
 
 @implementation ORMTCModel
@@ -2170,14 +2168,60 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadTheMTCADacs
 {
+    short index, bitIndex, dacIndex;
+    unsigned short dacValues[14];
+    unsigned long aValue = 0;
 
-	if([self adapterIsSBC]){
-		[self loadTheMTCADacsUsingSBC];
-		//[self loadTheMTCADacsUsingLocalAdapter];
+    @try {
+	// STEP 3: load the DAC values from the database into dacValues[14]
+	for (index = 0; index < 14 ; index++) {
+	    dacValues[index] = [self dacValueByIndex:index];
 	}
-	else {
-		[self loadTheMTCADacsUsingLocalAdapter];
+	
+	// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
+	[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
+	
+	// STEP 5: now parallel load the 16bit word into the serial shift register
+	// STEP 5a: the first 4 bits are loaded zeros 
+	aValue = 0UL;
+	for (index = 0; index < 4 ; index++) {
+	    // data bit, with DACSEL high, clock low
+	    [self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+	    
+	    // clock high
+	    [self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+	    
+	    // clock low
+	    [self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
 	}
+	
+	//STEP 5b:  now build the word and load the next 12 bits, load MSB first
+	for (bitIndex = 11; bitIndex >= 0 ; bitIndex--) {
+	    aValue = 0UL;
+		
+	    for (dacIndex = 0; dacIndex < 14 ; dacIndex++) {
+		    if (dacValues[dacIndex] & (1UL << bitIndex))
+			    aValue |= (1UL << dacIndex);
+	    }
+	    
+	    // data bit, with DACSEL high, clock low
+	    [self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+	    
+	    // clock high
+	    [self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
+	    
+	    // clock low
+	    [self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
+	}
+	
+	// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
+	[self write:kMtcDacCntReg value:0];
+	NSLog(@"Loaded the MTC/A DACs\n");
+    }
+    @catch(NSException* localException) {
+	NSLog(@"Could not load the MTC/A DACs!\n");		
+	[localException raise];
+    }
 }
 
 - (BOOL) adapterIsSBC
@@ -2596,75 +2640,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) loadTheMTCADacsUsingLocalAdapter
-{
-	//-------------- variables -----------------
-
-	short	index, bitIndex, dacIndex;
-	unsigned short	dacValues[14];
-	unsigned long   aValue = 0;
-
-
-	//-------------- variables -----------------
-
-	@try {
-		
-		// STEP 3: load the DAC values from the database into dacValues[14]
-		for (index = 0; index < 14 ; index++){
-			dacValues[index] = [self dacValueByIndex:index];
-		}
-		
-		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
-		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
-		
-		// STEP 5: now parallel load the 16bit word into the serial shift register
-		// STEP 5a: the first 4 bits are loaded zeros 
-		aValue = 0UL;
-		for (index = 0; index < 4 ; index++){
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		//STEP 5b:  now build the word and load the next 12 bits, load MSB first
-		for (bitIndex = 11; bitIndex >= 0 ; bitIndex--){
-			
-			aValue = 0UL;
-			
-			for (dacIndex = 0; dacIndex < 14 ; dacIndex++){
-				
-				if ( dacValues[dacIndex] & (1UL << bitIndex) )
-					aValue |= (1UL << dacIndex);
-			}
-			
-			// data bit, with DACSEL high, clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-			
-			// clock high
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL | MTC_DAC_CNT_DACCLK];
-			
-			// clock low
-			[self write:kMtcDacCntReg value:aValue | MTC_DAC_CNT_DACSEL];
-		}
-		
-		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
-		[self write:kMtcDacCntReg value:0];
-		NSLog(@"Loaded the MTC/A DACs\n");
-		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
-}
-
-
 @end
 
 @implementation ORMTCModel (SBC)
@@ -2845,38 +2820,6 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 	
 	return gtidDiff;
-}
-
-- (void) loadTheMTCADacsUsingSBC
-{	
-	short index;
-	long errorCode = 0;
-
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcLoadMTCADacs;
-	aPacket.cmdHeader.numberBytesinPayload	= 14*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	for (index = 0; index < 14 ; index++){
-		payloadPtr[index] = [self dacValueByIndex:index];
-	}
-	
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-		unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-		errorCode = responsePtr[0];
-		if(errorCode){
-			NSLog(@"SBC failed to load the MTCA DACs.\n");
-		}
-		else {
-			NSLog(@"Loaded the MTCA DACs through SBC.\n");
-		}
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the MTC/A DACs!\n");		
-		[localException raise];
-	}
 }
 
 - (void) tellReadoutSBC:(unsigned int) cmd
