@@ -201,7 +201,6 @@
 - (IBAction) nHitViewTypeAction:(id)sender;
 - (IBAction) settingsLoadDBFile:(id) sender;
 - (IBAction) settingsDefValFile:(id) sender;
-- (IBAction) settingsXilinxFile:(id) sender;
 - (IBAction) settingsMTCDAction:(id) sender;
 - (IBAction) settingsNHitAction:(id) sender;
 - (IBAction) settingsESumAction:(id) sender;
