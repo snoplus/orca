@@ -28,6 +28,7 @@
 #import <sys/socket.h>
 #import <sys/select.h>
 #import <sys/errno.h>
+#include "anet.h"
 
 
 NSString* XL3_LinkConnectionChanged     = @"XL3_LinkConnectionChanged";
@@ -218,16 +219,6 @@ readFifoFlag = _readFifoFlag;
 {
 	autoConnect = anAutoConnect;
 	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkAutoConnectChanged object: self];
-}
-
-- (int)  serverSocket
-{
-	return serverSocket;
-}
-
-- (void) setServerSocket:(int) aSocket
-{
-	serverSocket = aSocket;
 }
 
 - (int)  workingSocket
@@ -662,48 +653,31 @@ readFifoFlag = _readFifoFlag;
 
 - (void) connectSocket
 {
-	if(!serverSocket && ([IPNumber length]!=0) && (portNumber!=0)){
-		@try {
-			[NSThread detachNewThreadSelector:@selector(connectToPort) toTarget:self withObject:nil];
-
-			//[self setIsConnected: YES];
-			//[self setTimeConnected:[NSCalendarDate date]];
-			
-		}
-		@catch (NSException* localException) {
-			NSLog(@"Socket creation failed for %@ on port %d\n", [self crateName], portNumber);
-			if(serverSocket){
-				close(serverSocket);
-				serverSocket = 0;
-			}
-			[self setIsConnected: NO];
-			[self setTimeConnected:nil];
-			
-			@throw localException;
-		}
+    if(portNumber) {
+	@try {
+	    [NSThread detachNewThreadSelector:@selector(connectToPort) toTarget:self withObject:nil];
+	} @catch (NSException* localException) {
+	    NSLog(@"Socket creation failed for %@ on port %d\n", [self crateName], portNumber);
+	    [self setIsConnected: NO];
+	    [self setTimeConnected:nil];
+		    
+	    @throw localException;
 	}
-	else {
-		NSLog(@"XL3 Link failed to call connect for socketfd: %@, IPNumber: %@, and portNumber: %d\n",
-		      serverSocket?@"ALLOCATED!":@"ok", IPNumber, portNumber);
-	}
+    } else {
+	NSLog(@"xl3: no port number for crate %d!\n", [self crateName]);
+    }
 }
 
 - (void) disconnectSocket
 {
-	if(serverSocket){
-		close(serverSocket);
-		serverSocket = 0;
-	}
-	
-	if(workingSocket){
-		close(workingSocket);
-		workingSocket = 0;
-	}
-		
-	[self setIsConnected: NO];
-	[self setTimeConnected:nil];
-	NSLog(@"Disconnected %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
-	//[[delegate crate] disconnected];	 
+    if(workingSocket) {
+	close(workingSocket);
+	workingSocket = 0;
+    }
+	    
+    [self setIsConnected: NO];
+    [self setTimeConnected:nil];
+    NSLog(@"Disconnected %@ <%@> port: %d\n", [self crateName], IPNumber, portNumber);
 }
 
 static void SwapLongBlock(void* p, int32_t n)
@@ -722,136 +696,86 @@ static void SwapLongBlock(void* p, int32_t n)
 
 - (void) connectToPort
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
+    char err[ANET_ERR_LEN];
 
-	struct sockaddr_in my_addr;
-	struct sockaddr_in their_addr;
-	socklen_t sin_size;
-	int32_t yes=1;
+    NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 
-	//start try block here if we know how to handle the exceptions, ORCA gets killed now
-	@try {
-		if ((serverSocket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
-			[NSException raise:@"Socket failed" format:@"Couldn't get a socket for local XL3 Port %lu", portNumber];
-		//todo: try harder...
-		//???TCP_NODELAY for the moment done with recv
-		if (setsockopt(serverSocket,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1)
-			[NSException raise:@"Socket options failed" format:@"Couldn't set socket options for local XL3 Port %lu", portNumber];
-			
-		my_addr.sin_family = AF_INET;         // host byte order
-		my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
-		memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
-			
-		my_addr.sin_port = htons(portNumber);     // short, network byte order
-		if (bind(serverSocket, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
-			[NSException raise:@"Bind failed" format:@"Couldn't bind to local XL3 Port %lu, %s", portNumber, strerror(errno)];
-		
-		if (listen(serverSocket, 1) == -1)
-			[NSException raise:@"Listen failed" format:@"Couldn't listen on local XL3 port %lu\n", portNumber];
+    connectState = kWaiting;
+    [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
 
-		connectState = kWaiting;
-		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
-
-		//a single connection allowed only, no fork.
-		sin_size = sizeof(struct sockaddr_in);
-		workingSocket = 0;
-		if ((workingSocket = accept(serverSocket, (struct sockaddr *)&their_addr, &sin_size)) == -1) {
-			//if not socket connection was kill by UI... do something meaningful
-			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];		
-			if ([self serverSocket]) {
-				[NSException raise:@"Connection failed" format:@"Couldn't accept connection on local XL3 port %lu\n", portNumber];
-			}
-			else {
-				//disconnected by UI...
-                [self setIsConnected: NO];
-			}
-		}
-        else {
-            [self setIsConnected:YES];
-        }
+    /* connect to the XL3 server */
+    if ((workingSocket = anetTcpConnect(err, "localhost", portNumber + 100)) == ANET_ERR) {
+	NSLog(@"%@: %s\n", [self crateName], err);
+	
+	if (workingSocket) {
+	    close(workingSocket);
+	    workingSocket = 0;
 	}
-	@catch (NSException* localException) {
-		NSLog(@"XL3 socket failed with exception: %@ with reason: %@\n", [localException name], [localException reason]);
-		
-		if (serverSocket) {
-			close(serverSocket);
-			serverSocket = 0;
-		}
-		if (workingSocket) {
-			close(workingSocket);
-			workingSocket = 0;
-		}
-		NSLog(@"XL3 disconnected from local port %d\n", [self portNumber]);
-		connectState = kDisconnected;
-		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
-		[self setIsConnected:NO];
-        //something went really bad, throttle the bad
-        [NSThread sleepForTimeInterval:1.0];
+	connectState = kDisconnected;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
+	[self setIsConnected:NO];
+        [NSThread sleepForTimeInterval:10.0];
+    } else {
+	[self setIsConnected:YES];
     }
 	
     if ([self isConnected]) {
         connectState = kConnected;
         [[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
-        //[self getRunInfoBlock];
-        //[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
         NSLog(@"%@ connected on local port %d\n",[self crateName], [self portNumber]);
     }
 
-	fd_set fds;
-	int selectionResult = 0;
-	struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 2000;
+    fd_set fds;
+    int selectionResult = 0;
+    struct timeval tv;
+    tv.tv_sec  = 0;
+    tv.tv_usec = 2000;
 
-	char aPacket[XL3_PACKET_SIZE];
-	unsigned long bundle_count = 0;
+    char aPacket[XL3_PACKET_SIZE];
+    unsigned long bundle_count = 0;
 
-	time_t t0 = time(0);
+    time_t t0 = time(0);
     BOOL go = [self isConnected];
     
-	while(go) { //yes, this is correct
-		if (!workingSocket) {
-			NSLog(@"%@ not connected <%@> port: %d\n", [self crateName], IPNumber, portNumber);
-			break;
-		}
+    while(go) { //yes, this is correct
+	if (!workingSocket) {
+	    NSLog(@"%@ not connected <%@> port: %d\n", [self crateName], IPNumber, portNumber);
+	    break;
+	}
 				
-		FD_ZERO(&fds);
-		FD_SET(workingSocket, &fds);
-		selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
-		if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
+	FD_ZERO(&fds);
+	FD_SET(workingSocket, &fds);
+	selectionResult = select(workingSocket + 1, &fds, NULL, NULL, &tv);
+	if (selectionResult == -1 && !(errno == EAGAIN || errno == EINTR)) {
             usleep(500);
-			//[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.005]];
             
-			if (workingSocket || serverSocket) {
-				NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
-			}
-			break;
-		}
+	    if (workingSocket) {
+		NSLog(@"Error reading XL3 <%@> port: %d\n", IPNumber, portNumber);
+	    }
+	    break;
+	}
 
-        if ([self errorTimeOutSeconds] && (time(0) - t0) > [self errorTimeOutSeconds]) {
-            //[self performSelectorOnMainThread:@selector(disconnectSocket) withObject:nil waitUntilDone:YES];
-            break;
-        }
+        //if ([self errorTimeOutSeconds] && (time(0) - t0) > [self errorTimeOutSeconds]) {
+        //    break;
+        //}
 
-		if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
-			@try {
-				[coreSocketLock lock];
-				[self readPacket:aPacket];
-				[coreSocketLock unlock];
+	if (selectionResult > 0 && FD_ISSET(workingSocket, &fds)) {
+	    @try {
+		[coreSocketLock lock];
+		[self readPacket:aPacket];
+		[coreSocketLock unlock];
             }
-			@catch (NSException* localException) {
+	    @catch (NSException* localException) {
                 [coreSocketLock unlock];
-				if (serverSocket || workingSocket) {
-					NSLog(@"Couldn't read from XL3 <%@> port:%d\n", IPNumber, portNumber);
-				}
-				break;
-			}
+		if (workingSocket) {
+		    NSLog(@"Couldn't read from XL3 <%@> port:%d\n", IPNumber, portNumber);
+		}
+		break;
+	    }
 
             //reset the timer
             t0 = time(0);
             
-            //NSLog(@"Read packet:  packet_type: 0x%x, packet_num: 0x%x\n", ((XL3_Packet*) aPacket)->cmdHeader.packet_type, ((XL3_Packet*) aPacket)->cmdHeader.packet_num);
-
             if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == MEGA_BUNDLE_ID) {
                 //packet_num?
                 unsigned short packet_num = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
@@ -927,7 +851,6 @@ static void SwapLongBlock(void* p, int32_t n)
                 [msg appendFormat:@"\n"];
                 NSLog(msg);
             }
-
             else if (((XL3_Packet*) aPacket)->cmdHeader.packet_type == SCREWED_ID) {
                 NSMutableString* msg = [NSMutableString stringWithFormat:@"%@ screwed for slot:\n", [self crateName]];
                 unsigned i, error;
@@ -937,14 +860,11 @@ static void SwapLongBlock(void* p, int32_t n)
                     [msg appendFormat:@"%2d: 0x%x\n", i, error];
                 }
                 NSLog(msg);
-            }
-
-            else {	//cmd response
+            } else {	//cmd response
                 unsigned short packetNum = ((XL3_Packet*) aPacket)->cmdHeader.packet_num;
                 unsigned short packetType = ((XL3_Packet*) aPacket)->cmdHeader.packet_type;
                 
                 if (needToSwap) packetNum = swapShort(packetNum);
-                //NSLog(@"%@ packet type: %d and packetNum: %d, xl3 megabundle count: %d, NSNumber value: %dß\n", [self crateName], packetType, packetNum, bundle_count, [[NSNumber numberWithUnsignedShort:packetType] unsignedShortValue]);
                 
                 NSData* packetData = [[NSData alloc] initWithBytes:aPacket length:XL3_PACKET_SIZE];
                 NSNumber* packetNNum = [[NSNumber alloc] initWithUnsignedShort:packetNum];
@@ -987,23 +907,19 @@ static void SwapLongBlock(void* p, int32_t n)
         } //select
     } //while
 
-	if (serverSocket || workingSocket) {
-		if (serverSocket) {
-			close(serverSocket);
-			serverSocket = 0;
-		}
-		if (workingSocket) {
-			close(workingSocket);
-			workingSocket = 0;
-		}
-	
-		NSLog(@"%@ disconnected from local port %d\n", [self crateName], [self portNumber]);
-		connectState = kDisconnected;
-		[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
-		[self setIsConnected:NO];
+    if (workingSocket) {
+	if (workingSocket) {
+		close(workingSocket);
+		workingSocket = 0;
 	}
 
-	[pool release];
+	NSLog(@"%@ disconnected from local port %d\n", [self crateName], [self portNumber]);
+	connectState = kDisconnected;
+	[[NSNotificationCenter defaultCenter] postNotificationName:XL3_LinkConnectStateChanged object: self];
+	[self setIsConnected:NO];
+    }
+
+    [pool release];
 
     if ([self autoConnect]) {
         [self performSelectorOnMainThread:@selector(connectSocket) withObject:nil waitUntilDone:NO];
@@ -1072,7 +988,7 @@ static void SwapLongBlock(void* p, int32_t n)
 	}
 	@catch (NSException* localException) {
 		[coreSocketLock unlock];
-		if (serverSocket || workingSocket) {
+		if (workingSocket) {
 			NSLog(@"Couldn't write to XL3 <%@> port:%d\n", IPNumber, portNumber);
 		}
 		@throw localException;
