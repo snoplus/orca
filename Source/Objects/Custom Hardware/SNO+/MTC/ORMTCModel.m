@@ -190,8 +190,6 @@ kPEDCrateMask
 @end
 
 @interface ORMTCModel (SBC)
-- (void) fireMTCPedestalsFixedTimeSBC;
-- (void) stopMTCPedestalsFixedTimeSBC;
 - (void) enableSingleShotMTCPedestalsFixedTimeSBC;
 - (unsigned long) singleShotMTCPedestalsFixedTimeSBC:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
 - (void) tellReadoutSBC:(unsigned int) cmd;
@@ -2024,44 +2022,48 @@ resetFifoOnStart = _resetFifoOnStart;
     [self enablePulser];
 }
 
-//starts an SBC job
 - (void) fireMTCPedestalsFixedTime
 {
-    if([self adapterIsSBC]){
-	[self enableSingleShotMTCPedestalsFixedTime];
-	[self fireMTCPedestalsFixedTimeSBC];
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed" userInfo:Nil];
+	    [exception raise];
+	}
     }
-    else {
-	NSLog(@"Implemented for SBC only");
-    }	
+
+    @try {
+	/* enable SOFTGT */
+	[self setSingleGTWordMask:MTC_SOFT_GT_MASK];
+
+	NSLog(@"mtc: rate = %.2f\n", [self fixedPulserRateDelay]);
+	redisReply *r = redisCommand(context, "multi_soft_gt %d %d", [self fixedPulserRateCount], (int)[self fixedPulserRateDelay]);
+
+	if (r == NULL) {
+	    NSString *err = [NSString stringWithUTF8String:context->errstr];
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	    [exception raise];
+	}
+
+	if (r->type == REDIS_REPLY_ERROR) {
+	    NSString *err = [NSString stringWithUTF8String:r->str];
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	    [exception raise];
+	}
+
+	if (r->type != REDIS_REPLY_STATUS) {
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type" userInfo:Nil];
+	    [exception raise];
+	}
+    } @catch (NSException * e) {
+	NSLog(@"Error enabling pedestals fixed time.!");
+	NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+	return;
+    }
 }
 
-//kills the SBC job
 - (void) stopMTCPedestalsFixedTime
 {
-	if([self adapterIsSBC]){
-		[self stopMTCPedestalsFixedTimeSBC];
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}
-}
-
-- (void) enableSingleShotMTCPedestalsFixedTime
-{
-	if([self adapterIsSBC]){
-		@try {
-			[self enableSingleShotMTCPedestalsFixedTimeSBC];
-			[self setGlobalTriggerWordMask];
-		}
-		@catch (NSException * e) {
-			NSLog(@"Error enabling pedestals fixed time.!");
-			NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-		}
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}		
+    NSLog(@"mtc: not implemented\n");
 }
 
 //single shot blocking SBC command for ORCA macros only (no GUI)
@@ -2504,80 +2506,6 @@ resetFifoOnStart = _resetFifoOnStart;
 @end
 
 @implementation ORMTCModel (SBC)
-//this is the SBC job variant suited for the mixed physics and pedestal runs
-- (void) fireMTCPedestalsFixedTimeSBC
-{
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSNO;
-	aPacket.cmdHeader.cmdID			= kSNOMtcFirePedestalJobFixedTime;
-	aPacket.cmdHeader.numberBytesinPayload	= 3*sizeof(long);
-	
-	unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-	payloadPtr[0] = [self fixedPulserRateCount];
-    //the delay is rate in Hz indeed, and we need multiples of 100 nsec for SBC
-    if ([self fixedPulserRateDelay] == 0) {
-        NSLog(@"MTCD: pulser rate of 0 Hz requested and ignored.\n");
-        return;
-    }
-	payloadPtr[1] = (unsigned long) (1./[self fixedPulserRateDelay] * 1e7); //100 nsec delay between pulses indeed, sorry
-    payloadPtr[2] = 0x2; //enable pulser
-    if ([self isPedestalEnabledInCSR]) {
-        payloadPtr[2] |= 1; //enable ped
-    }
-
-	@try {
-		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-        
-        SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
-		long running = responsePtr->running;
-		if(running){
-			NSLog(@"Firing pedestals fixed time.\n");
-			//start progress indicator
-			//schedule to stop it
-			//[[self sbcLink] monitorJobFor:self statusSelector:@selector(xilinxLoadStatus:)];
-		}
-		else {
-			NSLog(@"SBC failed to fire pedestals fixed time.\n");
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"SBC failed to fire pedestals fixed time.\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
-}
-
-- (void) stopMTCPedestalsFixedTimeSBC
-{
-	//kill job
-
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination		= kSBC_Process;
-	aPacket.cmdHeader.cmdID			= kSBC_KillJob;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
-	
-	@try {
-//		[self send:&aPacket receive:&aPacket];
-		
-		SBC_JobStatusStruct* p	= (SBC_JobStatusStruct*)aPacket.payload;
-//		if([jobDelegate respondsToSelector:statusSelector]){
-//			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket.message];
-//			[self setJobStatus:aJobStatus];
-//			//NSLog(@"monitor job ok: job %s running with message: %s\n", [aJobStatus running]?"is":"is not", [aJobStatus message]);
-//			[jobDelegate performSelector:statusSelector withObject:jobStatus];
-//		}
-		if(p->running) { 
-			NSLog(@"SBC failed to stop firing pedestals fixed time.\n");
-		} else {
-			NSLog(@"Pedestals stopped.\n");
-			//stop progress indicator
-		}
-	}
-	@catch(NSException* e) {
-		NSLog(@"SBC failed to stop firing pedestals fixed time.\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
-}
-
 - (void) enableSingleShotMTCPedestalsFixedTimeSBC
 {
 	long errorCode = 0;
