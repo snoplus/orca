@@ -72,7 +72,6 @@
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
 	IBOutlet NSMatrix*		nHitViewTypeMatrix;
- 	IBOutlet NSTextField*	xilinxFilePathField;
 	IBOutlet NSButton*		settingsLockButton;
 	IBOutlet NSTextField*	lastFileLoadedField;
  	IBOutlet NSTextField*	lockOutWidthField;

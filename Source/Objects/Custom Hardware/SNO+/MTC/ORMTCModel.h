@@ -129,8 +129,6 @@
 - (void) setESumViewType:(int)aESumViewType;
 - (int) nHitViewType;
 - (void) setNHitViewType:(int)aNHitViewType;
-- (NSString*) xilinxFilePath;
-- (void) setXilinxFilePath:(NSString*)aDefaultFile;
 - (NSString*) defaultFile;
 - (void) setDefaultFile:(NSString*)aDefaultFile;
 - (NSString*) lastFile;
