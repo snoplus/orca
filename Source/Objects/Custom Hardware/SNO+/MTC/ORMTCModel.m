@@ -243,8 +243,13 @@ resetFifoOnStart = _resetFifoOnStart;
     context = redisConnectWithTimeout("sbc-teststand.sp.snolab.ca", 4001, timeout);
 
     NSLog(@"mtc: connecting...\n");
-    if (context == NULL || context->err) {
+    if (context == NULL) {
 	NSLog(@"mtc: failed to connect\n");
+	return -1;
+    } else if (context->err) {
+	NSLog(@"mtc: %s\n", context->errstr);
+	redisFree(context);
+	context = NULL;
 	return -1;
     }
     NSLog(@"mtc: connected!\n");
@@ -1134,26 +1139,28 @@ resetFifoOnStart = _resetFifoOnStart;
 {
     if (context == NULL) {
 	if ([self connect] == -1) {
-	    NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed"];
-	    [err raise];
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed" userInfo:Nil];
+	    [exception raise];
 	}
     }
 
     redisReply *r = redisCommand(context, "mtcd_read %d", reg[aReg].addressOffset);
 
     if (r == NULL) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:context->errstr];
-	[err raise];
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	[exception raise];
     }
 
     if (r->type == REDIS_REPLY_ERROR) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:r->str];
-	[err raise];
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	[exception raise];
     }
 
     if (r->type != REDIS_REPLY_INTEGER) {
-	NSException *err = [NSExceptoin exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
-	[err raise];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type" userInfo:Nil];
+	[exception raise];
     }
 
     return r->integer;
@@ -1163,26 +1170,28 @@ resetFifoOnStart = _resetFifoOnStart;
 {
     if (context == NULL) {
 	if ([self connect] == -1) {
-	    NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed"];
-	    [err raise];
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed" userInfo:Nil];
+	    [exception raise];
 	}
     }
 
     redisReply *r = redisCommand(context, "mtcd_write %d %d", reg[aReg].addressOffset, aValue);
 
     if (r == NULL) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:context->errstr];
-	[err raise];
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	[exception raise];
     }
 
     if (r->type == REDIS_REPLY_ERROR) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:r->str];
-	[err raise];
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	[exception raise];
     }
 
     if (r->type != REDIS_REPLY_STATUS) {
-	NSException *err = [NSExceptoin exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
-	[err raise];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type" userInfo:Nil];
+	[exception raise];
     }
 }
 
@@ -2198,7 +2207,7 @@ resetFifoOnStart = _resetFifoOnStart;
     }
 
     if (r->type != REDIS_REPLY_STATUS) {
-	NSException *err = [NSExceptoin exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
 	[err raise];
     }
 }

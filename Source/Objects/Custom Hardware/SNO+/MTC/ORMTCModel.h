@@ -114,7 +114,7 @@
 
 #pragma mark •••Initialization
 - (id) init;
-- (void) connect;
+- (int) connect;
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
