@@ -35,6 +35,7 @@
 #import "ORRunModel.h"
 #import "ORCaen1720Model.h"
 #import "ORRunController.h"
+#include "hiredis.h"
 
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
@@ -234,6 +235,21 @@ resetFifoOnStart = _resetFifoOnStart;
 	[self setFixedPulserRateCount: 1];
 	[self setFixedPulserRateDelay: 10];
     return self;
+}
+
+- (int) connect
+{
+    struct timeval timeout = {1, 0}; // 1 second
+    context = redisConnectWithTimeout("sbc-teststand.sp.snolab.ca", 4001, timeout);
+
+    NSLog(@"mtc: connecting...\n");
+    if (context == NULL || context->err) {
+	NSLog(@"mtc: failed to connect\n");
+	return -1;
+    }
+    NSLog(@"mtc: connected!\n");
+
+    return 0; // success!
 }
 
 - (void) dealloc
@@ -1116,34 +1132,58 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (unsigned long) read:(int)aReg
 {
-	unsigned long theValue = 0;
-	@try {
-		[[self adapter] readLongBlock:&theValue
-							atAddress:[self baseAddress]+reg[aReg].addressOffset
-							numToRead:1
-						   withAddMod:reg[aReg].addressModifier
-						usingAddSpace:reg[aReg].addressSpace];
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed"];
+	    [err raise];
 	}
-	@catch(NSException* localException) {
-		NSLog(@"Couldn't read the MTC %@!\n",reg[aReg].regName);
-		[localException raise];
-	}
-	return theValue;
+    }
+
+    redisReply *r = redisCommand(context, "mtcd_read %d", reg[aReg].addressOffset);
+
+    if (r == NULL) {
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:context->errstr];
+	[err raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:r->str];
+	[err raise];
+    }
+
+    if (r->type != REDIS_REPLY_INTEGER) {
+	NSException *err = [NSExceptoin exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
+	[err raise];
+    }
+
+    return r->integer;
 }
 
 - (void) write:(int)aReg value:(unsigned long)aValue
 {
-	@try {
-		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress]+reg[aReg].addressOffset
-							numToWrite:1
-							withAddMod:reg[aReg].addressModifier
-						 usingAddSpace:reg[aReg].addressSpace];
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed"];
+	    [err raise];
 	}
-	@catch(NSException* localException) {
-		NSLog(@"Couldn't write %d to the MTC %@!\n",aValue,reg[aReg].regName);
-		[localException raise];
-	}
+    }
+
+    redisReply *r = redisCommand(context, "mtcd_write %d %d", reg[aReg].addressOffset, aValue);
+
+    if (r == NULL) {
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:context->errstr];
+	[err raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:r->str];
+	[err raise];
+    }
+
+    if (r->type != REDIS_REPLY_STATUS) {
+	NSException *err = [NSExceptoin exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
+	[err raise];
+    }
 }
 
 - (void) setBits:(int)aReg mask:(unsigned long)aMask
@@ -2138,18 +2178,29 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) loadMTCXilinx
 {
-	NSData* theData = [NSData dataWithContentsOfFile:[self xilinxFilePath]];
-	if(![theData length]){
-		NSLog(@"Couldn't open the MTC Xilinx file %@!\n",[self xilinxFilePath]);
-		[NSException raise:@"Couldn't open Xilinx File" format:	@"%@",[self xilinxFilePath]];	
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed"];
+	    [err raise];
 	}
-	
-	if([self adapterIsSBC]){
-		[self loadXilinxUsingSBC:theData];
-	}
-	else {
-		[self loadXilinxUsingLocalAdapter:theData];
-	}
+    }
+
+    redisReply *r = redisCommand(context, "load_xilinx");
+
+    if (r == NULL) {
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:context->errstr];
+	[err raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSException *err = [NSException exceptionWithName:@"mtc" reason:r->str];
+	[err raise];
+    }
+
+    if (r->type != REDIS_REPLY_STATUS) {
+	NSException *err = [NSExceptoin exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
+	[err raise];
+    }
 }
 
 - (void) setTubRegister

@@ -26,6 +26,7 @@
 #import "ORDataTaker.h"
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
+#include "hiredis.h"
 
 @class ORMTC_DB;
 @class ORReadOutList;
@@ -85,6 +86,7 @@
     BOOL _mtcStatusDataAvailable;
     unsigned long _mtcStatusNumEventsInMem;
     BOOL _resetFifoOnStart;
+    redisContext *context;
 }
 
 @property (nonatomic,assign) BOOL isPulserFixedRate;
@@ -112,6 +114,7 @@
 
 #pragma mark •••Initialization
 - (id) init;
+- (void) connect;
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
