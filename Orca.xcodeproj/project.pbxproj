@@ -234,6 +234,9 @@
 		362B1A4F1BE8425700EC706F /* sds.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A331BE8425700EC706F /* sds.h */; };
 		362B1A501BE8425700EC706F /* win32.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A341BE8425700EC706F /* win32.h */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
+		365202E51BE918E6005A1F60 /* anet.c in Sources */ = {isa = PBXBuildFile; fileRef = 365202E21BE918E6005A1F60 /* anet.c */; };
+		365202E61BE918E6005A1F60 /* anet.h in Headers */ = {isa = PBXBuildFile; fileRef = 365202E31BE918E6005A1F60 /* anet.h */; };
+		365202E71BE918E6005A1F60 /* fmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 365202E41BE918E6005A1F60 /* fmacros.h */; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
 		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
 		4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4322E9B117830004008E78A4 /* GLUT.framework */; };
@@ -3854,6 +3857,9 @@
 		362B1A331BE8425700EC706F /* sds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sds.h; sourceTree = "<group>"; };
 		362B1A341BE8425700EC706F /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32.h; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
+		365202E21BE918E6005A1F60 /* anet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = anet.c; sourceTree = "<group>"; };
+		365202E31BE918E6005A1F60 /* anet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = anet.h; sourceTree = "<group>"; };
+		365202E41BE918E6005A1F60 /* fmacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmacros.h; sourceTree = "<group>"; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
 		4322E9B117830004008E78A4 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../System/Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
@@ -11079,6 +11085,9 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				365202E21BE918E6005A1F60 /* anet.c */,
+				365202E31BE918E6005A1F60 /* anet.h */,
+				365202E41BE918E6005A1F60 /* fmacros.h */,
 				362B1A171BE8425700EC706F /* hiredis */,
 				6B40D65A1B2B79960000F7C1 /* ResistorDB */,
 				6B40D6401B2B79170000F7C1 /* Camera */,
@@ -14868,6 +14877,7 @@
 				CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */,
 				84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */,
 				84AB8BB60D2314A500EC39F2 /* ORCmdHistory.h in Headers */,
+				365202E61BE918E6005A1F60 /* anet.h in Headers */,
 				84AB8BC20D2314CD00EC39F2 /* crate_lib.h in Headers */,
 				84AB8BC50D2314CD00EC39F2 /* ORC111CController.h in Headers */,
 				84D29FE71843EAC800D320DB /* OROpSequence.h in Headers */,
@@ -15503,6 +15513,7 @@
 				8497E609180C5A1E00CE974A /* ORA3818View.h in Headers */,
 				8497E612180C640D00CE974A /* ORV2718Controller.h in Headers */,
 				8497E614180C640D00CE974A /* ORV2718Model.h in Headers */,
+				365202E71BE918E6005A1F60 /* fmacros.h in Headers */,
 				2D7731A5181188F400070A4A /* ORLanNetio230Controller.h in Headers */,
 				2D7731A7181188F400070A4A /* ORLanNetio230Model.h in Headers */,
 				844CBDCB1866010F0012AA3B /* ORRaidMonitorModel.h in Headers */,
@@ -17393,6 +17404,7 @@
 				2D24A8D5126F516D00BA2E2E /* ORIpeSimulationDecoder.m in Sources */,
 				2D24A8D7126F516D00BA2E2E /* ORIpeSimulationModel.m in Sources */,
 				84EBBE6B1282E2B700234313 /* ORArchive.m in Sources */,
+				365202E51BE918E6005A1F60 /* anet.c in Sources */,
 				84D8566212B1702400660530 /* MonspectrometerController.m in Sources */,
 				84D8566412B1702400660530 /* MonspectrometerModel.m in Sources */,
 				84D8566612B1702400660530 /* MonspectrometerView.m in Sources */,
