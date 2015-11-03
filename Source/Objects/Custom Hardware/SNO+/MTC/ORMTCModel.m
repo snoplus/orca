@@ -2189,26 +2189,28 @@ resetFifoOnStart = _resetFifoOnStart;
 {
     if (context == NULL) {
 	if ([self connect] == -1) {
-	    NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed"];
-	    [err raise];
+	    NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed" userInfo:Nil];
+	    [exception raise];
 	}
     }
 
     redisReply *r = redisCommand(context, "load_xilinx");
 
     if (r == NULL) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:context->errstr];
-	[err raise];
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	[exception raise];
     }
 
     if (r->type == REDIS_REPLY_ERROR) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:r->str];
-	[err raise];
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
+	[exception raise];
     }
 
     if (r->type != REDIS_REPLY_STATUS) {
-	NSException *err = [NSException exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type"];
-	[err raise];
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: unexpected reply type" userInfo:Nil];
+	[exception raise];
     }
 }
 
