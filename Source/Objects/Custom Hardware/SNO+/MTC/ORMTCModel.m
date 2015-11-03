@@ -1943,95 +1943,97 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) stopMTCPedestalsFixedRate
 {
-	@try {
-		[self disablePulser];
-		[self disablePedestal];
-	}
-	@catch(NSException* e) {
-		NSLog(@"MTC failed to stop pedestals!\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
+    @try {
+	[self disablePulser];
+	[self disablePedestal];
+    } @catch(NSException* e) {
+	NSLog(@"MTC failed to stop pedestals!\n");
+	NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+    }
 }
 
 - (void) continueMTCPedestalsFixedRate
 {
-	@try {
-        if ([self isPedestalEnabledInCSR]) {
-            [self enablePedestal];
-        }
-		[self enablePulser];
-	}
-	@catch(NSException* e) {
-		NSLog(@"MTC failed to continue pedestals!\n");
-		NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-	}
+    @try {
+	if ([self isPedestalEnabledInCSR]) [self enablePedestal];
+	[self enablePulser];
+    } @catch(NSException* e) {
+	    NSLog(@"MTC failed to continue pedestals!\n");
+	    NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
+    }
 }
 
 - (void) fireMTCPedestalsFixedRate
 {
-	//Fire Pedestal pulses at a pecified period in ms, with a specifed 
-	//GT coarse delay, GT Lockout Width, pedestal width in ns and a 
-	//specified crate mask set in MTC Databse. Trigger mask is EXT_8.
+    // Fire Pedestal pulses at a pecified period in ms, with a specifed 
+    // GT coarse delay, GT Lockout Width, pedestal width in ns and a 
+    // specified crate mask set in MTC Databse. Trigger mask is EXT_8.
     
-    //get the run controller
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    runControl = [objs objectAtIndex:0];
-    //access the run control and only allow this to happen if a run is going
-    if([runControl isRunning]){
-            @try {
-                [self basicMTCPedestalGTrigSetup];				//STEP 1: Perfom the basic setup for pedestals and gtrigs
-                [self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
-            }
-            @catch(NSException* e) {
-                NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
-                NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            }
-    }
-    else{
-        NSLog(@"MTC failed to fire pedestals because there is no run going!\n");
+    @try {
+	// STEP 1: Perfom the basic setup for pedestals and gtrigs
+	[self basicMTCPedestalGTrigSetup];
+
+	// STEP 2 : Setup pulser rate and enable
+	[self setupPulserRateAndEnable:floatDBValue(kPulserPeriod)];
+    } @catch(NSException* e) {
+	NSLog(@"MTC failed to fire pedestals at the specified settings!\n");
+	NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
     }
 }
 
 - (void) basicMTCPedestalGTrigSetup
 {
-	
-	@try {
-		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
-        if ([self isPedestalEnabledInCSR]) {
-            [self enablePedestal];											// STEP 1 : Enable Pedestal
-        }
-		[self setPedestalCrateMask];									// STEP 2: Mask in crates for pedestals (PMSK)
-		[self setGTCrateMask];											// STEP 3: Mask  Mask in crates fo GTRIGs (GMSK)
-		[self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 4: Set thSet the GTRIG/PED delay in ns
-		[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];		// STEP 5: Set the GT lockout width in ns	
-		[self setThePedestalWidth: uLongDBValue(kPedestalWidth)];		// STEP 6:Set the Pedestal width in ns
-		[self setSingleGTWordMask: uLongDBValue(kGtMask)];				// STEP 7:Mask in global trigger word(MASK)
+    @try {
+	if ([self isPedestalEnabledInCSR]) {
+	    // STEP 1 : Enable Pedestal
+	    [self enablePedestal];
 	}
-	@catch(NSException* localException) {
-		NSLog(@"Failure during MTC pedestal setup!\n");
-		[localException raise];
-		
-	}
+
+	// STEP 2: Mask in crates for pedestals (PMSK)
+	[self setPedestalCrateMask];
+
+	// STEP 3: Mask  Mask in crates fo GTRIGs (GMSK)
+	[self setGTCrateMask];
+
+	// STEP 4: Set thSet the GTRIG/PED delay in ns
+	[self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)];
+
+	// STEP 5: Set the GT lockout width in ns	
+	[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];
+
+	// STEP 6:Set the Pedestal width in ns
+	[self setThePedestalWidth: uLongDBValue(kPedestalWidth)];
+
+	// STEP 7:Mask in global trigger word(MASK)
+	[self setSingleGTWordMask: uLongDBValue(kGtMask)];
+    } @catch(NSException* localException) {
+	NSLog(@"Failure during MTC pedestal setup!\n");
+	[localException raise];
+    }
 }
 
 - (void) setupPulserRateAndEnable:(float) pulserPeriodVal
 {
-	[self setThePulserRate:pulserPeriodVal];	// STEP 1: Setup the pulser rate [pulser period in ms]
-	[self loadEnablePulser];			// STEP 2 : Load Enable Pulser
-	[self enablePulser];				// STEP 3 : Enable Pulser	
+    // STEP 1: Setup the pulser rate [pulser period in ms]
+    [self setThePulserRate:pulserPeriodVal];
+
+    // STEP 2 : Load Enable Pulser
+    [self loadEnablePulser];
+
+    // STEP 3 : Enable Pulser
+    [self enablePulser];
 }
 
 //starts an SBC job
 - (void) fireMTCPedestalsFixedTime
 {
-	if([self adapterIsSBC]){
-		[self enableSingleShotMTCPedestalsFixedTime];
-		[self fireMTCPedestalsFixedTimeSBC];
-	}
-	else {
-		NSLog(@"Implemented for SBC only");
-	}	
+    if([self adapterIsSBC]){
+	[self enableSingleShotMTCPedestalsFixedTime];
+	[self fireMTCPedestalsFixedTimeSBC];
+    }
+    else {
+	NSLog(@"Implemented for SBC only");
+    }	
 }
 
 //kills the SBC job
