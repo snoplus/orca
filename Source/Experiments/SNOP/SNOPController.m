@@ -1034,4 +1034,74 @@ smellieRunFile;
 }
 
 
+//***Standard runs***
+//ECA
+- (IBAction)loadValues:(id)sender {
+    
+    //Push global variables to model
+    
+    //setter needs a NSNumber* as argument
+    NSNumber* value = [NSNumber numberWithInt:[ECApatternPopUpButton indexOfSelectedItem]+1];
+    //NSLog(@"Set pattern_number to %i \n", [value intValue]);
+    [model setECA_pattern_number:value];
+    value = [NSNumber numberWithInt:[ECAtypePopUpButton indexOfSelectedItem]+1];
+    //NSLog(@"Set eca_type to %i \n", [value intValue]);
+    [model setECA_type:value];
+    value = [NSNumber numberWithInt:[TSlopePatternTextField intValue]];
+    //NSLog(@"Set tslope_pattern to %i \n", [value intValue]);
+    [model setECA_tslope_pattern:value];
+    value = [NSNumber numberWithInt:[subTimeTextField intValue]];
+    //NSLog(@"Set sub_run_time to %i \n", [value intValue]);
+    [model setECA_subrun_time:value];
+    value = [NSNumber numberWithInt:[coarseDelayTextField intValue]];
+    //NSLog(@"Set coarse_delay to %i \n", [value intValue]);
+    [model setECA_coarse_delay:value];
+    value = [NSNumber numberWithInt:[fineDelayTextField intValue]];
+    //NSLog(@"Set fine_delay to %i \n", [value intValue]);
+    [model setECA_fine_delay:value];
+    value = [NSNumber numberWithInt:[pedestalWidthTextField intValue]];
+    //NSLog(@"Set pedestal_width to %i \n", [value intValue]);
+    [model setECA_pedestal_width:value];
+    value = [NSNumber numberWithInt:[pulserRateTextField intValue]];
+    //NSLog(@"Set pulser_rate to %i \n", [value intValue]);
+    [model setECA_pulser_rate:value];
+    
+    
+    [ECApatternCheckBox setBackgroundColor:[NSColor greenColor]];
+    [ECAtypeCheckBox setBackgroundColor:[NSColor greenColor]];
+    [subTimeTextField setBackgroundColor:[NSColor greenColor]];
+    [TSlopePatternTextField setBackgroundColor:[NSColor greenColor]];
+    [coarseDelayTextField setBackgroundColor:[NSColor greenColor]];
+    [fineDelayTextField setBackgroundColor:[NSColor greenColor]];
+    [pedestalWidthTextField setBackgroundColor:[NSColor greenColor]];
+    [pulserRateTextField setBackgroundColor:[NSColor greenColor]];
+    
+    //[self pushvaluestomodel];
+    // Ship the global variables to the ORCA script
+    [model loadVariablesInScript:@"StandardRun_ECA"];
+    
+}
+
+- (IBAction) ECACheckValues:(id)sender {
+    
+    if( [ [model ECA_pulser_rate] intValue ] != [pulserRateTextField intValue] )
+        [pulserRateTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_subrun_time] intValue ] != [subTimeTextField intValue] )
+        [subTimeTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_tslope_pattern] intValue ] != [TSlopePatternTextField intValue] )
+        [TSlopePatternTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_coarse_delay] intValue ] != [coarseDelayTextField intValue] )
+        [coarseDelayTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_fine_delay] intValue ] != [fineDelayTextField intValue] )
+        [fineDelayTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_pedestal_width] intValue ] != [pedestalWidthTextField intValue] )
+        [pedestalWidthTextField setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_pattern_number] intValue ] != [ECApatternPopUpButton indexOfSelectedItem] + 1)
+        [ECApatternCheckBox setBackgroundColor:[NSColor orangeColor]];
+    if( [ [model ECA_type] intValue ] != [ECAtypePopUpButton indexOfSelectedItem] + 1)
+        [ECAtypeCheckBox setBackgroundColor:[NSColor orangeColor]];
+    
+}
+
+
 @end

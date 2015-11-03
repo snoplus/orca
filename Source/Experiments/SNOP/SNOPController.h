@@ -101,6 +101,24 @@
     NSThread *eStopPollingThread;
     
     NSMutableDictionary *snopRunTypeMaskDic; 
+
+    
+    //*****Standard runs*****//
+    //ECA
+    IBOutlet NSPopUpButton *ECApatternPopUpButton;
+    IBOutlet NSTextField *ECApatternCheckBox;
+    IBOutlet NSPopUpButton *ECAtypePopUpButton;
+    IBOutlet NSTextField *ECAtypeCheckBox;
+    IBOutlet NSTextField *TSlopePatternTextField;
+    IBOutlet NSTextField *subTimeTextField;
+    IBOutlet NSTextField *coarseDelayTextField;
+    IBOutlet NSTextField *fineDelayTextField;
+    IBOutlet NSTextField *pedestalWidthTextField;
+    IBOutlet NSTextField *pulserRateTextField;
+    IBOutlet NSButton *loadValuesButton;
+    
+    NSTextField *ECApulserRateTFAction;
+
     
 }
 
@@ -109,6 +127,8 @@
 @property (nonatomic,retain) NSMutableDictionary *snopRunTypeMaskDic;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
 @property (nonatomic,retain) NSNumber *runTypeMask;
+//Standard runs
+@property (assign) IBOutlet NSButton *loadValuesButton;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -160,6 +180,10 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
 -(void) fetchRunMaskSettings;
+
+//Standard runs
+- (IBAction) loadValues:(id)sender;
+- (IBAction) ECACheckValues:(id)sender;
 
 @end
 @interface ORDetectorView (SNO)

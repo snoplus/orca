@@ -22,10 +22,12 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
+#import "ORScriptIDEModel.h"
 
 @class ORDataPacket;
 @class ORDataSet;
 @class ORCouchDB;
+@class ORRunModel;
 
 @protocol snotDbDelegate <NSObject>
 @required
@@ -102,6 +104,19 @@
     
     bool isEmergencyStopEnabled;
     bool isEStopPolling;
+    
+    //Standard runs stuff
+    NSNumber *_ECA_pattern_number;
+    NSNumber *_ECA_type;
+    NSNumber *_ECA_tslope_pattern;
+    NSNumber *_ECA_subrun_time;
+    NSNumber *_ECA_coarse_delay;
+    NSNumber *_ECA_fine_delay;
+    NSNumber *_ECA_pedestal_width;
+    NSNumber *_ECA_pulser_rate;
+    ORScriptIDEModel *SR_script;
+    ORRunModel* runControl;
+    
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -138,6 +153,16 @@
 @property (copy) NSDictionary* runDocument;
 @property (copy) NSDictionary* configDocument;
 @property (copy) NSDictionary* mtcConfigDoc;
+
+//Standard runs
+@property (nonatomic,copy) NSNumber *ECA_pattern_number;
+@property (nonatomic,copy) NSNumber *ECA_type;
+@property (nonatomic,copy) NSNumber *ECA_tslope_pattern;
+@property (nonatomic,copy) NSNumber *ECA_subrun_time;
+@property (nonatomic,copy) NSNumber *ECA_coarse_delay;
+@property (nonatomic,copy) NSNumber *ECA_fine_delay;
+@property (nonatomic,copy) NSNumber *ECA_pedestal_width;
+@property (nonatomic,copy) NSNumber *ECA_pulser_rate;
 
 - (void) initSmellieRunDocsDic;
 - (void) initOrcaDBConnectionHistory;
@@ -210,6 +235,11 @@
 - (NSMutableDictionary*)smellieTestFct;
 -(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
 -(void) testerHv;
+
+//Standard runs functions
+-(void) loadVariablesInScript:(NSString*)userscriptname;
+-(void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue;
+
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
