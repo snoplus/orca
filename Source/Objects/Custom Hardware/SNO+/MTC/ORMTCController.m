@@ -295,7 +295,8 @@
 	[stopPedestalsButton		setEnabled: !sequenceRunning && [model isPulserFixedRate]];
 	[continuePedestalsButton	setEnabled: !sequenceRunning && [model isPulserFixedRate]];
 	[fireFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
-	[stopFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
+	[stopFixedTimePedestalsButton	setEnabled: NO];
+	//[stopFixedTimePedestalsButton	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
 	[fixedTimePedestalsCountField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];
 	[fixedTimePedestalsDelayField	setEnabled: !sequenceRunning && ![model isPulserFixedRate]];	
     //and set thresholds
