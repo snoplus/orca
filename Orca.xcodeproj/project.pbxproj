@@ -205,6 +205,34 @@
 		2DD81EA816A6E4B100F50F0F /* ipe4tbtools.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */; };
 		2DD81EB316A6E5D300F50F0F /* ipe4tbtools.cpp in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */; };
 		2DE91C6719DC8C2B005C1A11 /* amptek-logo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */; };
+		362B1A351BE8425700EC706F /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 362B1A181BE8425700EC706F /* .gitignore */; };
+		362B1A361BE8425700EC706F /* .travis.yml in Resources */ = {isa = PBXBuildFile; fileRef = 362B1A191BE8425700EC706F /* .travis.yml */; };
+		362B1A371BE8425700EC706F /* ae.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A1B1BE8425700EC706F /* ae.h */; };
+		362B1A381BE8425700EC706F /* glib.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A1C1BE8425700EC706F /* glib.h */; };
+		362B1A391BE8425700EC706F /* ivykis.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A1D1BE8425700EC706F /* ivykis.h */; };
+		362B1A3A1BE8425700EC706F /* libev.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A1E1BE8425700EC706F /* libev.h */; };
+		362B1A3B1BE8425700EC706F /* libevent.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A1F1BE8425700EC706F /* libevent.h */; };
+		362B1A3C1BE8425700EC706F /* libuv.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A201BE8425700EC706F /* libuv.h */; };
+		362B1A3D1BE8425700EC706F /* macosx.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A211BE8425700EC706F /* macosx.h */; };
+		362B1A3E1BE8425700EC706F /* qt.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A221BE8425700EC706F /* qt.h */; };
+		362B1A3F1BE8425700EC706F /* async.c in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A231BE8425700EC706F /* async.c */; };
+		362B1A401BE8425700EC706F /* async.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A241BE8425700EC706F /* async.h */; };
+		362B1A411BE8425700EC706F /* CHANGELOG.md in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A251BE8425700EC706F /* CHANGELOG.md */; };
+		362B1A421BE8425700EC706F /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 362B1A261BE8425700EC706F /* COPYING */; };
+		362B1A431BE8425700EC706F /* dict.c in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A271BE8425700EC706F /* dict.c */; };
+		362B1A441BE8425700EC706F /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A281BE8425700EC706F /* dict.h */; };
+		362B1A451BE8425700EC706F /* fmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A291BE8425700EC706F /* fmacros.h */; };
+		362B1A461BE8425700EC706F /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A2A1BE8425700EC706F /* hiredis.c */; };
+		362B1A471BE8425700EC706F /* hiredis.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A2B1BE8425700EC706F /* hiredis.h */; };
+		362B1A481BE8425700EC706F /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A2C1BE8425700EC706F /* Makefile */; };
+		362B1A491BE8425700EC706F /* net.c in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A2D1BE8425700EC706F /* net.c */; };
+		362B1A4A1BE8425700EC706F /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A2E1BE8425700EC706F /* net.h */; };
+		362B1A4B1BE8425700EC706F /* read.c in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A2F1BE8425700EC706F /* read.c */; };
+		362B1A4C1BE8425700EC706F /* read.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A301BE8425700EC706F /* read.h */; };
+		362B1A4D1BE8425700EC706F /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A311BE8425700EC706F /* README.md */; };
+		362B1A4E1BE8425700EC706F /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 362B1A321BE8425700EC706F /* sds.c */; };
+		362B1A4F1BE8425700EC706F /* sds.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A331BE8425700EC706F /* sds.h */; };
+		362B1A501BE8425700EC706F /* win32.h in Headers */ = {isa = PBXBuildFile; fileRef = 362B1A341BE8425700EC706F /* win32.h */; };
 		362F928B1681A05100F3ACB4 /* SNO.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 362F928A16819FCE00F3ACB4 /* SNO.cc */; };
 		43135802195C5D89007B1F15 /* ORGretinaTriggerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */; };
 		43135804195C5DA3007B1F15 /* ORGretinaTriggerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */; };
@@ -3257,10 +3285,10 @@
 		CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */; };
 		CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */; };
 		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
-		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; settings = {ASSET_TAGS = (); }; };
+		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; };
+		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; };
+		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; };
+		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -3797,6 +3825,34 @@
 		2DD81EA416A6E49700F50F0F /* ipe4tbtools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipe4tbtools.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.h; sourceTree = "<group>"; };
 		2DD81EB216A6E5D300F50F0F /* ipe4tbtools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ipe4tbtools.cpp; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/ipe4tbtools.cpp; sourceTree = "<group>"; };
 		2DE91C6619DC8C2B005C1A11 /* amptek-logo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "amptek-logo.gif"; sourceTree = "<group>"; };
+		362B1A181BE8425700EC706F /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		362B1A191BE8425700EC706F /* .travis.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .travis.yml; sourceTree = "<group>"; };
+		362B1A1B1BE8425700EC706F /* ae.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ae.h; sourceTree = "<group>"; };
+		362B1A1C1BE8425700EC706F /* glib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glib.h; sourceTree = "<group>"; };
+		362B1A1D1BE8425700EC706F /* ivykis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ivykis.h; sourceTree = "<group>"; };
+		362B1A1E1BE8425700EC706F /* libev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libev.h; sourceTree = "<group>"; };
+		362B1A1F1BE8425700EC706F /* libevent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libevent.h; sourceTree = "<group>"; };
+		362B1A201BE8425700EC706F /* libuv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libuv.h; sourceTree = "<group>"; };
+		362B1A211BE8425700EC706F /* macosx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macosx.h; sourceTree = "<group>"; };
+		362B1A221BE8425700EC706F /* qt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qt.h; sourceTree = "<group>"; };
+		362B1A231BE8425700EC706F /* async.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = async.c; sourceTree = "<group>"; };
+		362B1A241BE8425700EC706F /* async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async.h; sourceTree = "<group>"; };
+		362B1A251BE8425700EC706F /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		362B1A261BE8425700EC706F /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
+		362B1A271BE8425700EC706F /* dict.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dict.c; sourceTree = "<group>"; };
+		362B1A281BE8425700EC706F /* dict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dict.h; sourceTree = "<group>"; };
+		362B1A291BE8425700EC706F /* fmacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmacros.h; sourceTree = "<group>"; };
+		362B1A2A1BE8425700EC706F /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hiredis.c; sourceTree = "<group>"; };
+		362B1A2B1BE8425700EC706F /* hiredis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hiredis.h; sourceTree = "<group>"; };
+		362B1A2C1BE8425700EC706F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		362B1A2D1BE8425700EC706F /* net.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = net.c; sourceTree = "<group>"; };
+		362B1A2E1BE8425700EC706F /* net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
+		362B1A2F1BE8425700EC706F /* read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read.c; sourceTree = "<group>"; };
+		362B1A301BE8425700EC706F /* read.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = read.h; sourceTree = "<group>"; };
+		362B1A311BE8425700EC706F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		362B1A321BE8425700EC706F /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sds.c; sourceTree = "<group>"; };
+		362B1A331BE8425700EC706F /* sds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sds.h; sourceTree = "<group>"; };
+		362B1A341BE8425700EC706F /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32.h; sourceTree = "<group>"; };
 		362F928A16819FCE00F3ACB4 /* SNO.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SNO.cc; sourceTree = "<group>"; };
 		43135801195C5D89007B1F15 /* ORGretinaTriggerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGretinaTriggerModel.m; sourceTree = "<group>"; };
 		43135803195C5DA3007B1F15 /* ORGretinaTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGretinaTriggerModel.h; sourceTree = "<group>"; };
@@ -6734,11 +6790,11 @@
 		CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVXI11HardwareFinderController.h; sourceTree = "<group>"; };
 		CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVXI11HardwareFinderController.m; sourceTree = "<group>"; };
 		CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = VXI11HardwareFinder.nib; sourceTree = "<group>"; };
+		CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORVProcess.cc; sourceTree = "<group>"; };
+		CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORVProcess.hh; sourceTree = "<group>"; };
 		CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORScopedLock.hh; sourceTree = "<group>"; };
 		CE85B6B31BBD1BEC0093ECD0 /* ORThread.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORThread.cc; sourceTree = "<group>"; };
 		CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORThread.hh; sourceTree = "<group>"; };
-		CE85B6AE1BBD1B880093ECD0 /* ORVProcess.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORVProcess.cc; sourceTree = "<group>"; };
-		CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORVProcess.hh; sourceTree = "<group>"; };
 		CE85B6B81BBD1C4F0093ECD0 /* ORXyCom564Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORXyCom564Readout.cc; sourceTree = "<group>"; };
 		CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORXyCom564Readout.hh; sourceTree = "<group>"; };
 		CE8626971467337900EF6466 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -7290,6 +7346,49 @@
 				2DD0C8A9193FBAE3009112B2 /* SLTv4GeneralOperations.h */,
 			);
 			path = KatrinSLTv4_Readout_Code;
+			sourceTree = "<group>";
+		};
+		362B1A171BE8425700EC706F /* hiredis */ = {
+			isa = PBXGroup;
+			children = (
+				362B1A181BE8425700EC706F /* .gitignore */,
+				362B1A191BE8425700EC706F /* .travis.yml */,
+				362B1A1A1BE8425700EC706F /* adapters */,
+				362B1A231BE8425700EC706F /* async.c */,
+				362B1A241BE8425700EC706F /* async.h */,
+				362B1A251BE8425700EC706F /* CHANGELOG.md */,
+				362B1A261BE8425700EC706F /* COPYING */,
+				362B1A271BE8425700EC706F /* dict.c */,
+				362B1A281BE8425700EC706F /* dict.h */,
+				362B1A291BE8425700EC706F /* fmacros.h */,
+				362B1A2A1BE8425700EC706F /* hiredis.c */,
+				362B1A2B1BE8425700EC706F /* hiredis.h */,
+				362B1A2C1BE8425700EC706F /* Makefile */,
+				362B1A2D1BE8425700EC706F /* net.c */,
+				362B1A2E1BE8425700EC706F /* net.h */,
+				362B1A2F1BE8425700EC706F /* read.c */,
+				362B1A301BE8425700EC706F /* read.h */,
+				362B1A311BE8425700EC706F /* README.md */,
+				362B1A321BE8425700EC706F /* sds.c */,
+				362B1A331BE8425700EC706F /* sds.h */,
+				362B1A341BE8425700EC706F /* win32.h */,
+			);
+			path = hiredis;
+			sourceTree = "<group>";
+		};
+		362B1A1A1BE8425700EC706F /* adapters */ = {
+			isa = PBXGroup;
+			children = (
+				362B1A1B1BE8425700EC706F /* ae.h */,
+				362B1A1C1BE8425700EC706F /* glib.h */,
+				362B1A1D1BE8425700EC706F /* ivykis.h */,
+				362B1A1E1BE8425700EC706F /* libev.h */,
+				362B1A1F1BE8425700EC706F /* libevent.h */,
+				362B1A201BE8425700EC706F /* libuv.h */,
+				362B1A211BE8425700EC706F /* macosx.h */,
+				362B1A221BE8425700EC706F /* qt.h */,
+			);
+			path = adapters;
 			sourceTree = "<group>";
 		};
 		436972B51B42DBE6008D57B5 /* CV1730 */ = {
@@ -10980,6 +11079,7 @@
 		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
 			isa = PBXGroup;
 			children = (
+				362B1A171BE8425700EC706F /* hiredis */,
 				6B40D65A1B2B79960000F7C1 /* ResistorDB */,
 				6B40D6401B2B79170000F7C1 /* Camera */,
 				DBEC755318EB9E9B0077D493 /* ELLIE */,
@@ -14454,6 +14554,7 @@
 				841DA0F20781F09B0099BBF6 /* OR1DHisto.h in Headers */,
 				841DA0F40781F09B0099BBF6 /* OR1DHistoController.h in Headers */,
 				841DA60007820BB70099BBF6 /* ORCamacCrateController.h in Headers */,
+				362B1A3E1BE8425700EC706F /* qt.h in Headers */,
 				841DA60207820BB70099BBF6 /* ORCamacCrateModel.h in Headers */,
 				841DA667078211E70099BBF6 /* ORCC32Controller.h in Headers */,
 				841DA669078211E70099BBF6 /* ORCC32Model.h in Headers */,
@@ -14725,6 +14826,7 @@
 				8493CC730C99FA3100B46CD4 /* AcqirisDC440Cmds.h in Headers */,
 				8493CC760C99FA3100B46CD4 /* AcqirisDC440.h in Headers */,
 				8493CC780C99FA3100B46CD4 /* HW_Readout.h in Headers */,
+				362B1A441BE8425700EC706F /* dict.h in Headers */,
 				8493CC810C99FA4B00B46CD4 /* ORVmecpuModel.h in Headers */,
 				8493CC860C99FA4B00B46CD4 /* HW_Readout.h in Headers */,
 				84D967770CA03E50000C0C76 /* ORScriptController.h in Headers */,
@@ -14847,6 +14949,7 @@
 				84CEA3710EA4EB2E0060076A /* ORFec32Model.h in Headers */,
 				84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */,
 				84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */,
+				362B1A3D1BE8425700EC706F /* macosx.h in Headers */,
 				8473B9E40EA7BB6A00B89FF0 /* ORFecPmtsView.h in Headers */,
 				8491E6CA0EB9E1900084BAD6 /* ORXL1Controller.h in Headers */,
 				8491F4760EC0CDEF0084BAD6 /* ORPmtImage.h in Headers */,
@@ -14875,6 +14978,7 @@
 				84F5D68A1A167120009DC7EC /* NSDate+Extensions.h in Headers */,
 				84499B7B0F13BB6E004B855B /* ORMksPdr2000Decoders.h in Headers */,
 				84499B7D0F13BB6E004B855B /* ORMksPdr2000Model.h in Headers */,
+				362B1A4A1BE8425700EC706F /* net.h in Headers */,
 				84499CC80F13E457004B855B /* ORCTITempController.h in Headers */,
 				84499CCA0F13E457004B855B /* ORCTITempDecoders.h in Headers */,
 				84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */,
@@ -14901,6 +15005,7 @@
 				84B28D250F4C614000E2B056 /* ORXYScannerModel.h in Headers */,
 				84B28D3F0F4C63A000E2B056 /* ORLakeShore210Controller.h in Headers */,
 				84B28D410F4C63A000E2B056 /* ORLakeShore210Decoders.h in Headers */,
+				362B1A501BE8425700EC706F /* win32.h in Headers */,
 				84B28D430F4C63A000E2B056 /* ORLakeShore210Model.h in Headers */,
 				84B28D7C0F4C658500E2B056 /* ORNplpCMeterController.h in Headers */,
 				84B28D7E0F4C658500E2B056 /* ORNplpCMeterDecoders.h in Headers */,
@@ -14952,6 +15057,7 @@
 				840823CC0F9F83DC007E6061 /* ORFlippedView.h in Headers */,
 				84D2586C0FA7340B00626276 /* ORMotionNodeController.h in Headers */,
 				84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */,
+				362B1A4C1BE8425700EC706F /* read.h in Headers */,
 				84CC16D00FAF157000CEE642 /* ORMCA927Controller.h in Headers */,
 				84CC16D20FAF157000CEE642 /* ORMCA927Model.h in Headers */,
 				84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */,
@@ -15013,6 +15119,7 @@
 				848A147B10BAE3D6002A80D0 /* ORFileReader.h in Headers */,
 				848A147F10BAE3F8002A80D0 /* ORHeaderCollector.h in Headers */,
 				848A148310BAE404002A80D0 /* ORRecordIndexer.h in Headers */,
+				362B1A401BE8425700EC706F /* async.h in Headers */,
 				848A148710BAE40E002A80D0 /* ORDecoderOperation.h in Headers */,
 				848A149D10BAE43A002A80D0 /* ORDecoder.h in Headers */,
 				84E6E5DB10BC570800187AF6 /* ORSISRegisterDefs.h in Headers */,
@@ -15026,11 +15133,14 @@
 				84ACBA6510D44258003B9735 /* ORProcessView.h in Headers */,
 				84EE83FA10D6C52A00BBCBE5 /* ORPMCReadWriteCommand.h in Headers */,
 				849013C410E27B13007591B5 /* ORPlotLinkController.h in Headers */,
+				362B1A471BE8425700EC706F /* hiredis.h in Headers */,
 				849013C610E27B13007591B5 /* ORPlotLinkModel.h in Headers */,
 				8411A1DB10F6848100CD9544 /* NSWindow+Extensions.h in Headers */,
 				8411A93211063ACC00CD9544 /* ORUsbDeviceModel.h in Headers */,
+				362B1A3B1BE8425700EC706F /* libevent.h in Headers */,
 				842FCCB5197849C700B89723 /* OREHS8260pModel.h in Headers */,
 				84DCB61A110E116E0062A95C /* ORiTransGasSensorDecoder.h in Headers */,
+				362B1A4F1BE8425700EC706F /* sds.h in Headers */,
 				84693F731121BB4C008B5DB2 /* ORRunNotesController.h in Headers */,
 				84693F751121BB4C008B5DB2 /* ORRunNotesModel.h in Headers */,
 				848285B1112C5AD700BA30ED /* ORVHS4030Controller.h in Headers */,
@@ -15084,6 +15194,7 @@
 				84762031118CD53D00016A8D /* ORPlotAttributeStrings.h in Headers */,
 				84762033118CD53D00016A8D /* ORPlotView.h in Headers */,
 				84762035118CD53D00016A8D /* ORPlotWithROI.h in Headers */,
+				362B1A371BE8425700EC706F /* ae.h in Headers */,
 				84762037118CD53D00016A8D /* ORTimeAxis.h in Headers */,
 				84762039118CD53D00016A8D /* ORTimeLine.h in Headers */,
 				8476203B118CD53D00016A8D /* ORTimeLinePlot.h in Headers */,
@@ -15278,6 +15389,7 @@
 				6B40D6641B2B79960000F7C1 /* ResistorDBViewController.h in Headers */,
 				8491303515334EAA00597004 /* ORBitProcessorModel.h in Headers */,
 				8491303715334EAA00597004 /* ORTwoBitProcessorController.h in Headers */,
+				362B1A3C1BE8425700EC706F /* libuv.h in Headers */,
 				8491303915334EAA00597004 /* ORTwoBitProcessorModel.h in Headers */,
 				84913AC515376BBF00597004 /* ORMJDPreAmpDecoders.h in Headers */,
 				84913CA21538698000597004 /* OROutputCallBackController.h in Headers */,
@@ -15291,6 +15403,7 @@
 				84F3085615483A4000663573 /* ORMks660BModel.h in Headers */,
 				8418301D156153D2004EC81F /* ORTM700Controller.h in Headers */,
 				84183021156153D2004EC81F /* ORTM700Model.h in Headers */,
+				362B1A451BE8425700EC706F /* fmacros.h in Headers */,
 				8418376C156FC7AF004EC81F /* ORDetectorRamper.h in Headers */,
 				8418481F157FA478004EC81F /* ORCV830Controller.h in Headers */,
 				84184821157FA478004EC81F /* ORCV830Decoders.h in Headers */,
@@ -15304,9 +15417,11 @@
 				84FEB88C15A31F42005D798C /* ORL2301Decoders.h in Headers */,
 				84FEB88E15A31F42005D798C /* ORL2301Model.h in Headers */,
 				2D51C60C15B5A115000F0ACD /* OREdelweissFLTController.h in Headers */,
+				362B1A381BE8425700EC706F /* glib.h in Headers */,
 				2D51C60E15B5A115000F0ACD /* OREdelweissFLTDecoder.h in Headers */,
 				2D51C61015B5A115000F0ACD /* OREdelweissFLTDefs.h in Headers */,
 				84D29FE31843EAC800D320DB /* ORRemoteSocketStep.h in Headers */,
+				362B1A391BE8425700EC706F /* ivykis.h in Headers */,
 				2D51C61115B5A115000F0ACD /* OREdelweissFLTModel.h in Headers */,
 				848604C615C2CAFC00E3A209 /* ORSerialPortWithQueueModel.h in Headers */,
 				8432B6C115D92D4700C5FB5D /* ORMJDPumpCartController.h in Headers */,
@@ -15357,6 +15472,7 @@
 				849978711746C7C100BFEE3E /* ORPollingTimeStampModel.h in Headers */,
 				84997878174A6B1D00BFEE3E /* ORPollingTimeStampReadout.hh in Headers */,
 				8499788D174BA11400BFEE3E /* OREHS130nController.h in Headers */,
+				362B1A3A1BE8425700EC706F /* libev.h in Headers */,
 				84997891174BA11400BFEE3E /* OREHS130nModel.h in Headers */,
 				84D29FEB1843EAC800D320DB /* OROpSequenceQueue.h in Headers */,
 				84997895174BA2F600BFEE3E /* ORiSegHVCard.h in Headers */,
@@ -15624,6 +15740,7 @@
 				8402797007397B8700972B07 /* Bit3.nib in Resources */,
 				8402797107397B8700972B07 /* Bit3Card.gif in Resources */,
 				849F4C740768DA920087E9A8 /* DataExplorer.gif in Resources */,
+				362B1A421BE8425700EC706F /* COPYING in Resources */,
 				849F4C750768DA930087E9A8 /* DataExplorer.nib in Resources */,
 				84A9518F077B6C8C00CAD99D /* Controls.gif in Resources */,
 				84A95190077B6C8C00CAD99D /* ClearROI.gif in Resources */,
@@ -16383,6 +16500,7 @@
 				844CBDCF1866010F0012AA3B /* RaidMonitor.gif in Resources */,
 				844CBDD01866010F0012AA3B /* RaidMonitor.nib in Resources */,
 				844CBDD11866010F0012AA3B /* scpExpectGetScript in Resources */,
+				362B1A351BE8425700EC706F /* .gitignore in Resources */,
 				DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */,
 				DB704A1618EBA61E00839B42 /* ellie.xib in Resources */,
 				2DD0C4CE192E4F9E009112B2 /* OpSequence.nib in Resources */,
@@ -16390,6 +16508,7 @@
 				2DD0C8C3193FBAE4009112B2 /* KatrinV4SLT.nib in Resources */,
 				2DD0C8C4193FBAE4009112B2 /* KatrinV4SLTCard.gif in Resources */,
 				2DD0C97A1940BC78009112B2 /* UserConfirm.nib in Resources */,
+				362B1A361BE8425700EC706F /* .travis.yml in Resources */,
 				2DD0C97B1940BC78009112B2 /* UserRequest.nib in Resources */,
 				2DD0C97C1940BC78009112B2 /* UserStatus.nib in Resources */,
 				2D29452E199E6A9400F68093 /* AmptekDP5.nib in Resources */,
@@ -16497,6 +16616,7 @@
 				8434A2F0055B3287002D3102 /* NcdMuxHWModel.m in Sources */,
 				8434A2F1055B3287002D3102 /* ORVmeIPCard.m in Sources */,
 				8434A2F2055B3287002D3102 /* NcdMuxBoxModel.m in Sources */,
+				362B1A4D1BE8425700EC706F /* README.md in Sources */,
 				8434A2F4055B3287002D3102 /* NcdMuxBoxController.m in Sources */,
 				8434A2F6055B3287002D3102 /* ORFileIOHelpers.m in Sources */,
 				8434A2F9055B3287002D3102 /* ORDataPacket.m in Sources */,
@@ -16545,6 +16665,7 @@
 				8434A335055B3287002D3102 /* ORRateGroup.m in Sources */,
 				8434A336055B3287002D3102 /* ORValueBar.m in Sources */,
 				8434A337055B3287002D3102 /* NcdDetector.m in Sources */,
+				362B1A481BE8425700EC706F /* Makefile in Sources */,
 				8434A338055B3287002D3102 /* NcdTube.m in Sources */,
 				8434A339055B3287002D3102 /* ORGenericView.m in Sources */,
 				8434A33C055B3287002D3102 /* ORTimeRate.m in Sources */,
@@ -16553,6 +16674,7 @@
 				8434A33F055B3287002D3102 /* ORCaenDataDecoder.m in Sources */,
 				8434A340055B3287002D3102 /* ORCaen775Model.m in Sources */,
 				8434A343055B3287002D3102 /* ORCaenCardController.m in Sources */,
+				362B1A461BE8425700EC706F /* hiredis.c in Sources */,
 				8434A344055B3287002D3102 /* ORCaen785Controller.m in Sources */,
 				8434A346055B3287002D3102 /* ORCaen785Model.m in Sources */,
 				8434A347055B3287002D3102 /* ORHWWizardController.m in Sources */,
@@ -16568,6 +16690,7 @@
 				8434A355055B3287002D3102 /* ORCommandCenterController.m in Sources */,
 				844E494B057529A6005F11A0 /* ORTaskMaster.m in Sources */,
 				844E49F3057538B1005F11A0 /* ORTask.m in Sources */,
+				362B1A4E1BE8425700EC706F /* sds.c in Sources */,
 				8483E56E058652E400C28344 /* ORDataController.m in Sources */,
 				843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */,
 				847CCA69058E8C75003522C8 /* ORQueue.m in Sources */,
@@ -16661,6 +16784,7 @@
 				841DAA5D07838C9A0099BBF6 /* ORDGF4cModel.m in Sources */,
 				841DAAC507846CC20099BBF6 /* ORCamacControllerCard.m in Sources */,
 				84D9809A0795C5AC0074A035 /* ORAD811Model.m in Sources */,
+				362B1A3F1BE8425700EC706F /* async.c in Sources */,
 				84D9809C0795C5AC0074A035 /* ORAD811Controller.m in Sources */,
 				84D980F60795DCC80074A035 /* ORAD811Decoders.m in Sources */,
 				84D98264079605CD0074A035 /* ORL2551Model.m in Sources */,
@@ -16751,6 +16875,7 @@
 				84D05976090017B200A99A83 /* ORContainerModel.m in Sources */,
 				8408A4BE09071C6A004A3B34 /* ORHV2132Controller.m in Sources */,
 				8408A4C009071C6A004A3B34 /* ORHV2132Model.m in Sources */,
+				362B1A4B1BE8425700EC706F /* read.c in Sources */,
 				84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */,
 				84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */,
 				840E00050944B29000049827 /* ORProcessController.m in Sources */,
@@ -16854,6 +16979,7 @@
 				845313D81B98A45200FCEEE5 /* ORMJDSource.m in Sources */,
 				849B25EF0B2F34FA0007484F /* PrespectrometerController.m in Sources */,
 				849B25F10B2F34FA0007484F /* PrespectrometerView.m in Sources */,
+				362B1A411BE8425700EC706F /* CHANGELOG.md in Sources */,
 				849B25F30B2F34FA0007484F /* PrespectrometerModel.m in Sources */,
 				84F69CF80B331BBA000BE0CA /* ORSegmentGroup.m in Sources */,
 				84A5A22A0B35D8B0002EC2AA /* ORDetectorView.m in Sources */,
@@ -17120,6 +17246,7 @@
 				84B74CEC0FEBE9B90033E658 /* ORCaen965Model.m in Sources */,
 				84A1ACAE0FF3A4EE00D7F946 /* ORPlotPublisher.m in Sources */,
 				84A1B18A0FF3CE7400D7F946 /* ApplicationSupport.m in Sources */,
+				362B1A431BE8425700EC706F /* dict.c in Sources */,
 				84D7913E0FFA4CD000DC81D2 /* ORKeithley6487Controller.m in Sources */,
 				84D791400FFA4CD000DC81D2 /* ORKeithley6487Decoders.m in Sources */,
 				84D791420FFA4CD000DC81D2 /* ORKeithley6487Model.m in Sources */,
@@ -17241,6 +17368,7 @@
 				84AC14E11B70E2460071C4EF /* ORMjdFileReader.m in Sources */,
 				840F5AC71222C03800D49A75 /* ORCameraController.m in Sources */,
 				840F5AC91222C03800D49A75 /* ORCameraModel.m in Sources */,
+				362B1A491BE8425700EC706F /* net.c in Sources */,
 				84065D971226B600004E8970 /* ORPxi8336MacController.m in Sources */,
 				84065D991226B600004E8970 /* ORPxi8336MacModel.m in Sources */,
 				84065F1C1226E18E004E8970 /* ORPxiCrate6Controller.m in Sources */,
