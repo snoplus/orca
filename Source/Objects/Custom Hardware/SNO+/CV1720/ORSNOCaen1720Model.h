@@ -24,6 +24,8 @@
 #import "ORHWWizard.h"
 #import "ORCaenDataDecoder.h"
 #import "SBC_Config.h"
+#include <stdint.h>
+#include <hiredis.h>
 
 typedef struct  {
 	NSString*       regName;
@@ -133,6 +135,7 @@ enum {
 	unsigned long   location;
 	unsigned long	eventSizeReg;
 	unsigned long	dataReg;
+    redisContext *context;
 }
 
 @property (assign, nonatomic)   BOOL    continuousMode;
@@ -184,11 +187,12 @@ enum {
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
 #pragma mark ***Register - General routines
+- (int)				connect;
 - (void)			read;
 - (void)			write;
 - (void)			report;
-- (void)			read:(unsigned short) pReg returnValue:(unsigned long*) pValue;
-- (void)			write:(unsigned short) pReg sendValue:(unsigned long) pValue;
+- (uint32_t)			read:(uint32_t) pReg;
+- (void)			write:(uint32_t) pReg sendValue:(uint32_t) pValue;
 - (short)			getNumberRegisters;
 - (void)			generateSoftwareTrigger;
 - (void)			softwareReset;
@@ -223,7 +227,7 @@ enum {
 - (unsigned short)	threshold:(unsigned short) aChnl;
 - (void)			setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
 - (void)			writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue;
-- (void)			readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue;
+- (uint32_t)			readChan:(unsigned short)chan reg:(unsigned short) pReg;
 - (void)			writeDacs;
 - (void)			writeDac:(unsigned short) pChan;
 - (float)			convertDacToVolts:(unsigned short)aDacValue;

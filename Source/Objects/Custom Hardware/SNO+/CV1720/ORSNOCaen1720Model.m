@@ -28,6 +28,8 @@
 #import "ORRateGroup.h"
 #import "VME_HW_Definitions.h"
 #import "ORRunModel.h"
+#include <stdint.h>
+#include <hiredis.h>
 
 
 // Address information for this unit.
@@ -136,6 +138,26 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
     [[self undoManager] enableUndoRegistration];
     
     return self;
+}
+
+- (int) connect
+{
+    struct timeval timeout = {1, 0}; // 1 second
+    context = redisConnectWithTimeout("sbc-teststand.sp.snolab.ca", 4001, timeout);
+
+    NSLog(@"caen: connecting...\n");
+    if (context == NULL) {
+	NSLog(@"caen: failed to connect\n");
+	return -1;
+    } else if (context->err) {
+	NSLog(@"caen: %s\n", context->errstr);
+	redisFree(context);
+	context = NULL;
+	return -1;
+    }
+    NSLog(@"caen: connected!\n");
+
+    return 0; // success!
 }
 
 - (void) dealloc 
@@ -573,7 +595,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 	 userInfo:userInfo];
 }
 
-- (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
+- (uint32_t) readChan:(unsigned short)chan reg:(unsigned short) pReg
 {
     // Make sure that register is valid
     if (pReg >= [self getNumberRegisters]) {
@@ -586,13 +608,33 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (read not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
     
-    // Perform the read operation.
-    [[self adapter] readLongBlock:pValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
+	    [exception raise];
+	}
+    }
+
+    redisReply *r = redisCommand(context, "caen_read %d", [self getAddressOffset:pReg] + chan*0x100);
+
+    if (r == NULL) {
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type != REDIS_REPLY_INTEGER) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
+	[exception raise];
+    }
+
+    return r->integer;
 }
 
 - (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue
@@ -609,17 +651,31 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (write not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
     
-    // Do actual write
-    @try {
-		[[self adapter] writeLongBlock:&theValue
-							 atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-		
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
+	    [exception raise];
 	}
-	@catch(NSException* localException) {
-	}
+    }
+
+    redisReply *r = redisCommand(context, "caen_write %d %d", [self getAddressOffset:pReg] + chan*0x100, pValue);
+
+    if (r == NULL) {
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type != REDIS_REPLY_STATUS) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
+	[exception raise];
+    }
 }
 
 - (unsigned short) threshold:(unsigned short) aChnl
@@ -667,12 +723,12 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
             
             // Loop through the thresholds and read them.
             for(i = start; i <= end; i++){
-				[self readChan:i reg:theRegIndex returnValue:&theValue];
+				theValue = [self readChan:i reg:theRegIndex];
                 NSLog(@"%@ %2d = 0x%04lx\n", reg[theRegIndex].regName,i, theValue);
             }
         }
 		else {
-			[self read:theRegIndex returnValue:&theValue];
+			theValue = [self read:theRegIndex];
 			NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
 		}
         
@@ -737,7 +793,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 }
 
 
-- (void) read:(unsigned short) pReg returnValue:(unsigned long*) pValue
+- (uint32_t) read:(uint32_t) pReg
 {
     // Make sure that register is valid
     if (pReg >= [self getNumberRegisters]) {
@@ -749,17 +805,37 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
        && [self getAccessType:pReg] != kReadWrite) {
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (read not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
-    
-    // Perform the read operation.
-    [[self adapter] readLongBlock:pValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
+
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
+	    [exception raise];
+	}
+    }
+
+    redisReply *r = redisCommand(context, "caen_read %d", [self getAddressOffset:pReg]);
+
+    if (r == NULL) {
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type != REDIS_REPLY_INTEGER) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
+	[exception raise];
+    }
+
+    return r->integer;
 }
 
-- (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
+- (void) write:(uint32_t) pReg sendValue:(uint32_t) pValue
 {
     // Check that register is a valid register.
     if (pReg >= [self getNumberRegisters]){
@@ -772,29 +848,39 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (write not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
     
-    // Do actual write
-    @try {
-		[[self adapter] writeLongBlock:&pValue
-							 atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
-		
+    if (context == NULL) {
+	if ([self connect] == -1) {
+	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
+	    [exception raise];
 	}
-	@catch(NSException* localException) {
-	}
+    }
+
+    redisReply *r = redisCommand(context, "caen_write %d %d", [self getAddressOffset:pReg], pValue);
+
+    if (r == NULL) {
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type != REDIS_REPLY_STATUS) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
+	[exception raise];
+    }
 }
 
 
 - (void) writeThreshold:(unsigned short) pChan
 {
-    unsigned long 	threshold = [self threshold:pChan];
+    unsigned long threshold = [self threshold:pChan];
     
-    [[self adapter] writeLongBlock:&threshold
-                         atAddress:[self baseAddress] + reg[kThresholds].addressOffset + (pChan * 0x100)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self writeChan:pChan reg:kThresholds sendValue:threshold];
 }
 
 - (void) writeOverUnderThresholds
@@ -802,11 +888,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 	int i;
 	for(i=0;i<8;i++){
 		unsigned long aValue = overUnderThreshold[i];
-		[[self adapter] writeLongBlock:&aValue
-							 atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+		[self writeChan:i reg:kNumOUThreshold sendValue:aValue];
 	}
 }
 
@@ -814,12 +896,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 {
 	int i;
 	for(i=0;i<8;i++){
-		unsigned long value;
-		[[self adapter] readLongBlock:&value
-							atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-							numToRead:1
-						   withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
+		unsigned long value = [self readChan:i reg:kNumOUThreshold];
 	}
 }
 
@@ -834,59 +911,42 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 - (void) writeDac:(unsigned short) pChan
 {
     unsigned long 	aValue = [self dac:pChan];
-    
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kDacs].addressOffset + (pChan * 0x100)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+
+    [self writeChan:pChan reg:kDacs sendValue:aValue];
 }
 
 - (void) generateSoftwareTrigger
 {
-	unsigned long dummy = 0;
-    [[self adapter] writeLongBlock:&dummy
-                         atAddress:[self baseAddress] + reg[kSWTrigger].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    [self write:kSWTrigger sendValue:0];
 }
 
 - (void) writeChannelConfiguration
 {
 	unsigned long mask = [self channelConfigMask];
-	[[self adapter] writeLongBlock:&mask
-                         atAddress:[self baseAddress] + reg[kChanConfig].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+	[self write:kChanConfig sendValue:mask];
 }
 
 - (void) writeCustomSize
 {
 	unsigned long aValue = [self isCustomSize]?[self customSize]:0UL;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kCustomSize].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+	[self write:kCustomSize sendValue:aValue];
 }
 
 - (void) report
 {
 	unsigned long enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
-	[self read:kChanEnableMask returnValue:&enabled];
-	[self read:kTrigSrcEnblMask returnValue:&triggerSrc];
+	enabled = [self read:kChanEnableMask];
+	triggerSrc = [self read:kTrigSrcEnblMask];
 	int chan;
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Chan Enabled Thres  NumOver Status Buffers  Offset trigSrc\n");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
 	for(chan=0;chan<8;chan++){
-		[self readChan:chan reg:kThresholds returnValue:&threshold];
-		[self readChan:chan reg:kNumOUThreshold returnValue:&numOU];
-		[self readChan:chan reg:kStatus returnValue:&status];
-		[self readChan:chan reg:kBufferOccupancy returnValue:&bufferOccupancy];
-		[self readChan:chan reg:kDacs returnValue:&dacValue];
+		threshold = [self readChan:chan reg:kThresholds];
+		numOU = [self readChan:chan reg:kNumOUThreshold];
+		status = [self readChan:chan reg:kStatus];
+		bufferOccupancy = [self readChan:chan reg:kBufferOccupancy];
+		dacValue = [self readChan:chan reg:kDacs];
 		NSString* statusString = @"";
 		if(status & 0x20)			statusString = @"Error";
 		else if(status & 0x04)		statusString = @"Busy ";
@@ -903,7 +963,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
 	
 	unsigned long aValue;
-	[self read:kBufferOrganization returnValue:&aValue];
+	aValue = [self read:kBufferOrganization];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"# Buffer Blocks : %d\n",(long)powf(2.,(float)aValue));
 	
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Software Trigger: %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
@@ -911,15 +971,15 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Trigger nHit    : %d\n",(triggerSrc&0x00c000000) >> 24);
 	
 	
-	[self read:kAcqControl returnValue:&aValue];
+	aValue = [self read:kAcqControl];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run Mode        : %@\n",Caen1720RunModeString[aValue&0x3]);
 	
-	[self read:kCustomSize returnValue:&aValue];
+	aValue = [self read:kCustomSize];
 	if(aValue)NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : %d\n",aValue);
 	else      NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : Disabled\n");
 	
-	[self read:kAcqStatus returnValue:&aValue];
+	aValue = [self read:kAcqStatus];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Bypass      : %@\n",aValue&0x40?@"YES":@"NO");
@@ -928,7 +988,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Ready    : %@\n",aValue&0x08?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run             : %@\n",aValue&0x04?@"ON":@"OFF");
 	
-	[self read:kEventStored returnValue:&aValue];
+	aValue = [self read:kEventStored];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Stored   : %d\n",aValue);
 	
 } 
@@ -973,121 +1033,67 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 
 - (void) softwareReset
 {
-	unsigned long aValue = 0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kSWReset].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kSWReset aValue:0];
 }
 
 - (void) clearAllMemory
 {
-	unsigned long aValue = 0;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kSWClear].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kSWClear aValue:0];
 }
 
 - (void) writeTriggerCount
 {
-	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    /* is this correct? */
+    uint32_t aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
+    [self write:kTrigSrcEnblMask sendValue:aValue];
 }
 
 
 - (void) writeTriggerSource
 {
-	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    uint32_t aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
+    [self write:kTrigSrcEnblMask sendValue:aValue];
 }
 
 - (void) writeTriggerOut
 {
-	unsigned long aValue = triggerOutMask;
-	[[self adapter] writeLongBlock:&aValue
-			     atAddress:[self baseAddress] + reg[kFPTrigOutEnblMask].addressOffset
-			    numToWrite:1
-			    withAddMod:[self addressModifier]
-			 usingAddSpace:0x01];
+    [self write:kFPTrigOutEnblMask sendValue:triggerOutMask];
 }
 
 - (void) writeFrontPanelControl
 {
-	unsigned long aValue = frontPanelControlMask;
-	[[self adapter] writeLongBlock:&aValue
-			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
-			    numToWrite:1
-			    withAddMod:[self addressModifier]
-			 usingAddSpace:0x01];
+    [self write:kFPIOControl sendValue:frontPanelControlMask];
 }
 
 - (void) readFrontPanelControl
 {
 	unsigned long aValue = 0;
-	[[self adapter] readLongBlock:&aValue
-			     atAddress:[self baseAddress] + reg[kFPIOControl].addressOffset
-			    numToRead:1
-			    withAddMod:[self addressModifier]
-			 usingAddSpace:0x01];
-	
+	aValue = [self read:kFPIOControl];
 	[self setFrontPanelControlMask:aValue];
 }
 
 
 - (void) writeBufferOrganization
 {
-	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);	
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+	unsigned long aValue = eventSize;
+	[self write:kBufferOrganization sendValue:aValue];
 }
 
 - (void) writeChannelEnabledMask
 {
 	unsigned long aValue = enabledMask;
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kChanEnableMask].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+	[self write:kChanEnableMask sendValue:aValue];
 }
 
 - (void) writePostTriggerSetting
 {
-	[[self adapter] writeLongBlock:&postTriggerSetting
-                         atAddress:[self baseAddress] + reg[kPostTrigSetting].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    [self write:kPostTrigSetting sendValue:postTriggerSetting];
 }
 
 - (void) writeAcquistionControl:(BOOL)start
 {
-	unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x3);
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kAcqControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	
+    unsigned long aValue = (countAllTriggers<<3) | (start<<2) | (acquisitionMode&0x3);
+    [self write:kAcqControl sendValue:aValue];
 }
 
 - (void) writeNumberBLTEvents:(BOOL)enable
@@ -1095,34 +1101,23 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
     //we must start in a safe mode with 1 event, the numberBLTEvents is passed to SBC
     //unsigned long aValue = (enable) ? numberBLTEventsToReadout : 0;
     unsigned long aValue = (enable) ? 1 : 0;
-    
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kBLTEventNum].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+
+    [self write:kBLTEventNum sendValue:aValue];
 }
 
 - (void) writeEnableBerr:(BOOL)enable
 {
     unsigned long aValue;
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
+    aValue = [self read:kVMEControl];
 
-	//we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
-	if ( enable ) aValue |= 0x30;
-	else aValue &= 0xFFCF;
-	//if ( enable ) aValue |= 0x10;
-	//else aValue &= 0xFFEF;
-    
-	[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+    //we set both bit4: BERR and bit5: ALIGN64 for MBLT64 to work correctly with SBC
+    if (enable) {
+	aValue |= 0x30;
+    } else {
+	aValue &= 0xFFCF;
+    }
+
+    [self write:kVMEControl sendValue:aValue];
 }
 
 - (void) checkBufferAlarm
