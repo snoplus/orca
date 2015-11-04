@@ -1,5 +1,5 @@
 //
-//ORCaen1720Model.m
+//ORSNOCaen1720Model.m
 //Orca
 //
 //Created by Mark Howe on Mon Apr 14 2008.
@@ -19,7 +19,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORCaen1720Model.h"
+#import "ORSNOCaen1720Model.h"
 #import "ORVmeCrateModel.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
@@ -35,7 +35,7 @@
 #define k792DefaultAddressModifier 	0x09
 #define kNumberBLTEventsToReadout   12 //most BLTEvent numbers don't make sense, make sure you know what you change
 
-NSString* ORCaen1720ModelEventSizeChanged = @"ORCaen1720ModelEventSizeChanged";
+NSString* ORSNOCaen1720ModelEventSizeChanged = @"ORSNOCaen1720ModelEventSizeChanged";
 static NSString* Caen1720RunModeString[4] = {
 @"Register-Controlled",
 @"S-In Controlled",
@@ -94,33 +94,33 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 
 #define kEventReadyMask 0x8
 
-NSString* ORCaen1720ModelEnabledMaskChanged                 = @"ORCaen1720ModelEnabledMaskChanged";
-NSString* ORCaen1720ModelPostTriggerSettingChanged          = @"ORCaen1720ModelPostTriggerSettingChanged";
-NSString* ORCaen1720ModelTriggerSourceMaskChanged           = @"ORCaen1720ModelTriggerSourceMaskChanged";
-NSString* ORCaen1720ModelTriggerOutMaskChanged		    = @"ORCaen1720ModelTriggerOutMaskChanged";
-NSString* ORCaen1720ModelFrontPanelControlMaskChanged	    = @"ORCaen1720ModelFrontPanelControlMaskChanged";
-NSString* ORCaen1720ModelCoincidenceLevelChanged            = @"ORCaen1720ModelCoincidenceLevelChanged";
-NSString* ORCaen1720ModelAcquisitionModeChanged             = @"ORCaen1720ModelAcquisitionModeChanged";
-NSString* ORCaen1720ModelCountAllTriggersChanged            = @"ORCaen1720ModelCountAllTriggersChanged";
-NSString* ORCaen1720ModelCustomSizeChanged                  = @"ORCaen1720ModelCustomSizeChanged";
-NSString* ORCaen1720ModelIsCustomSizeChanged                = @"ORCaen1720ModelIsCustomSizeChanged";
-NSString* ORCaen1720ModelIsFixedSizeChanged                 = @"ORCaen1720ModelIsFixedSizeChanged";
-NSString* ORCaen1720ModelChannelConfigMaskChanged           = @"ORCaen1720ModelChannelConfigMaskChanged";
-NSString* ORCaen1720ModelNumberBLTEventsToReadoutChanged    = @"ORCaen1720ModelNumberBLTEventsToReadoutChanged";
-NSString* ORCaen1720ChnlDacChanged                          = @"ORCaen1720ChnlDacChanged";
-NSString* ORCaen1720OverUnderThresholdChanged               = @"ORCaen1720OverUnderThresholdChanged";
-NSString* ORCaen1720Chnl                                    = @"ORCaen1720Chnl";
-NSString* ORCaen1720ChnlThresholdChanged                    = @"ORCaen1720ChnlThresholdChanged";
-NSString* ORCaen1720SelectedChannelChanged                  = @"ORCaen1720SelectedChannelChanged";
-NSString* ORCaen1720SelectedRegIndexChanged                 = @"ORCaen1720SelectedRegIndexChanged";
-NSString* ORCaen1720WriteValueChanged                       = @"ORCaen1720WriteValueChanged";
-NSString* ORCaen1720BasicLock                               = @"ORCaen1720BasicLock";
-NSString* ORCaen1720SettingsLock                            = @"ORCaen1720SettingsLock";
-NSString* ORCaen1720RateGroupChanged                        = @"ORCaen1720RateGroupChanged";
-NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelBufferCheckChanged";
-NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelContinuousModeChanged";
+NSString* ORSNOCaen1720ModelEnabledMaskChanged                 = @"ORSNOCaen1720ModelEnabledMaskChanged";
+NSString* ORSNOCaen1720ModelPostTriggerSettingChanged          = @"ORSNOCaen1720ModelPostTriggerSettingChanged";
+NSString* ORSNOCaen1720ModelTriggerSourceMaskChanged           = @"ORSNOCaen1720ModelTriggerSourceMaskChanged";
+NSString* ORSNOCaen1720ModelTriggerOutMaskChanged		    = @"ORSNOCaen1720ModelTriggerOutMaskChanged";
+NSString* ORSNOCaen1720ModelFrontPanelControlMaskChanged	    = @"ORSNOCaen1720ModelFrontPanelControlMaskChanged";
+NSString* ORSNOCaen1720ModelCoincidenceLevelChanged            = @"ORSNOCaen1720ModelCoincidenceLevelChanged";
+NSString* ORSNOCaen1720ModelAcquisitionModeChanged             = @"ORSNOCaen1720ModelAcquisitionModeChanged";
+NSString* ORSNOCaen1720ModelCountAllTriggersChanged            = @"ORSNOCaen1720ModelCountAllTriggersChanged";
+NSString* ORSNOCaen1720ModelCustomSizeChanged                  = @"ORSNOCaen1720ModelCustomSizeChanged";
+NSString* ORSNOCaen1720ModelIsCustomSizeChanged                = @"ORSNOCaen1720ModelIsCustomSizeChanged";
+NSString* ORSNOCaen1720ModelIsFixedSizeChanged                 = @"ORSNOCaen1720ModelIsFixedSizeChanged";
+NSString* ORSNOCaen1720ModelChannelConfigMaskChanged           = @"ORSNOCaen1720ModelChannelConfigMaskChanged";
+NSString* ORSNOCaen1720ModelNumberBLTEventsToReadoutChanged    = @"ORSNOCaen1720ModelNumberBLTEventsToReadoutChanged";
+NSString* ORSNOCaen1720ChnlDacChanged                          = @"ORSNOCaen1720ChnlDacChanged";
+NSString* ORSNOCaen1720OverUnderThresholdChanged               = @"ORSNOCaen1720OverUnderThresholdChanged";
+NSString* ORSNOCaen1720Chnl                                    = @"ORSNOCaen1720Chnl";
+NSString* ORSNOCaen1720ChnlThresholdChanged                    = @"ORSNOCaen1720ChnlThresholdChanged";
+NSString* ORSNOCaen1720SelectedChannelChanged                  = @"ORSNOCaen1720SelectedChannelChanged";
+NSString* ORSNOCaen1720SelectedRegIndexChanged                 = @"ORSNOCaen1720SelectedRegIndexChanged";
+NSString* ORSNOCaen1720WriteValueChanged                       = @"ORSNOCaen1720WriteValueChanged";
+NSString* ORSNOCaen1720BasicLock                               = @"ORSNOCaen1720BasicLock";
+NSString* ORSNOCaen1720SettingsLock                            = @"ORSNOCaen1720SettingsLock";
+NSString* ORSNOCaen1720RateGroupChanged                        = @"ORSNOCaen1720RateGroupChanged";
+NSString* ORSNOCaen1720ModelBufferCheckChanged                 = @"ORSNOCaen1720ModelBufferCheckChanged";
+NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720ModelContinuousModeChanged";
 
-@implementation ORCaen1720Model
+@implementation ORSNOCaen1720Model
 
 #pragma mark ***Initialization
 - (id) init //designated initializer
@@ -165,7 +165,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     eventSize = aEventSize;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelEventSizeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelEventSizeChanged object:self];
 }
 
 - (int)	bufferState
@@ -208,7 +208,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     waveFormRateGroup = newRateGroup;
     
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720RateGroupChanged
+	 postNotificationName:ORSNOCaen1720RateGroupChanged
 	 object:self];    
 }
 
@@ -228,7 +228,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720SelectedRegIndexChanged
+	 postNotificationName:ORSNOCaen1720SelectedRegIndexChanged
 	 object:self];
 }
 
@@ -248,7 +248,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720SelectedChannelChanged
+	 postNotificationName:ORSNOCaen1720SelectedChannelChanged
 	 object:self];
 }
 
@@ -267,7 +267,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720WriteValueChanged
+	 postNotificationName:ORSNOCaen1720WriteValueChanged
 	 object:self];
 }
 
@@ -282,7 +282,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     enabledMask = aEnabledMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelEnabledMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelEnabledMaskChanged object:self];
 }
 
 - (unsigned long) postTriggerSetting
@@ -296,7 +296,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     postTriggerSetting = aPostTriggerSetting;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelPostTriggerSettingChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelPostTriggerSettingChanged object:self];
 }
 
 - (unsigned long) triggerSourceMask
@@ -310,7 +310,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     triggerSourceMask = aTriggerSourceMask;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelTriggerSourceMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelTriggerSourceMaskChanged object:self];
 }
 
 - (unsigned long) triggerOutMask
@@ -325,7 +325,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	//do not step into the reserved area
 	triggerOutMask = aTriggerOutMask & 0xc00000ff;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelTriggerOutMaskChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelTriggerOutMaskChanged object:self];
 }
 
 - (unsigned long) frontPanelControlMask
@@ -339,7 +339,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	
 	frontPanelControlMask = aFrontPanelControlMask;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelFrontPanelControlMaskChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelFrontPanelControlMaskChanged object:self];
 }
 
 - (unsigned short) coincidenceLevel
@@ -353,7 +353,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     coincidenceLevel = aCoincidenceLevel;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCoincidenceLevelChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelCoincidenceLevelChanged object:self];
 }
 
 - (unsigned short) acquisitionMode
@@ -367,7 +367,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     acquisitionMode = aMode;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelAcquisitionModeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelAcquisitionModeChanged object:self];
 }
 
 - (BOOL) countAllTriggers
@@ -381,7 +381,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     countAllTriggers = aCountAllTriggers;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCountAllTriggersChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelCountAllTriggersChanged object:self];
 }
 
 - (unsigned long) customSize
@@ -395,7 +395,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     customSize = aCustomSize;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCustomSizeChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelCustomSizeChanged object:self];
 }
 
 - (BOOL) isCustomSize
@@ -409,7 +409,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	
 	isCustomSize = aIsCustomSize;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelIsCustomSizeChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelIsCustomSizeChanged object:self];
 }
 
 - (BOOL) isFixedSize
@@ -423,7 +423,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	
 	isFixedSize = aIsFixedSize;
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelIsFixedSizeChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelIsFixedSizeChanged object:self];
 }
 
 - (unsigned short) channelConfigMask
@@ -443,7 +443,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 	//we do the sequential memory access only
 	channelConfigMask |= (1L<<4);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelChannelConfigMaskChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelChannelConfigMaskChanged object:self];
 }
 
 - (unsigned long) numberBLTEventsToReadout
@@ -457,7 +457,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     numberBLTEventsToReadout = numBLTEvents;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelNumberBLTEventsToReadoutChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelNumberBLTEventsToReadoutChanged object:self];
 }
 
 - (void) setUpImage
@@ -467,7 +467,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 
 - (void) makeMainController
 {
-    [self linkToController:@"ORCaen1720Controller"];
+    [self linkToController:@"ORSNOCaen1720Controller"];
 }
 
 - (BOOL) continuousMode
@@ -481,7 +481,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     continuousMode = aContinuousMode;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelContinuousModeChanged object:self];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelContinuousModeChanged object:self];    
 }
 
 #pragma mark ***Register - General routines
@@ -539,11 +539,11 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     // Create a dictionary object that stores a pointer to this object and the channel that was changed.
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCaen1720Chnl];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORSNOCaen1720Chnl];
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720ChnlDacChanged
+	 postNotificationName:ORSNOCaen1720ChnlDacChanged
 	 object:self
 	 userInfo:userInfo];
 }
@@ -564,11 +564,11 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     // Create a dictionary object that stores a pointer to this object and the channel that was changed.
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCaen1720Chnl];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORSNOCaen1720Chnl];
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720OverUnderThresholdChanged
+	 postNotificationName:ORSNOCaen1720OverUnderThresholdChanged
 	 object:self
 	 userInfo:userInfo];
 }
@@ -638,11 +638,11 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     
     // Create a dictionary object that stores a pointer to this object and the channel that was changed.
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
-    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORCaen1720Chnl];
+    [userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:ORSNOCaen1720Chnl];
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCaen1720ChnlThresholdChanged
+	 postNotificationName:ORSNOCaen1720ChnlThresholdChanged
 	 object:self
 	 userInfo:userInfo];
 }
@@ -1154,7 +1154,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 		[bufferFullAlarm release];
 		bufferFullAlarm = nil;
 	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelBufferCheckChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCaen1720ModelBufferCheckChanged object:self];
 }
 
 #pragma mark ***DataTaker
@@ -1177,7 +1177,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCaen1720WaveformDecoder",				@"decoder",
+								 @"ORSNOCaen1720WaveformDecoder",				@"decoder",
 								 [NSNumber numberWithLong:dataId],           @"dataId",
 								 [NSNumber numberWithBool:YES],              @"variable",
 								 [NSNumber numberWithLong:-1],               @"length",
@@ -1369,13 +1369,13 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
     self = [super initWithCoder:aDecoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setEventSize:[aDecoder decodeIntForKey:@"ORCaen1720ModelEventSize"]];
-    [self setEnabledMask:[aDecoder decodeIntForKey:@"ORCaen1720ModelEnabledMask"]];
-    [self setPostTriggerSetting:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelPostTriggerSetting"]];
-    [self setTriggerSourceMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelTriggerSourceMask"]];
-	[self setTriggerOutMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelTriggerOutMask"]];
-	[self setFrontPanelControlMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelFrontPanelControlMask"]];
-    [self setCoincidenceLevel:[aDecoder decodeIntForKey:@"ORCaen1720ModelCoincidenceLevel"]];
+    [self setEventSize:[aDecoder decodeIntForKey:@"ORSNOCaen1720ModelEventSize"]];
+    [self setEnabledMask:[aDecoder decodeIntForKey:@"ORSNOCaen1720ModelEnabledMask"]];
+    [self setPostTriggerSetting:[aDecoder decodeInt32ForKey:@"ORSNOCaen1720ModelPostTriggerSetting"]];
+    [self setTriggerSourceMask:[aDecoder decodeInt32ForKey:@"ORSNOCaen1720ModelTriggerSourceMask"]];
+	[self setTriggerOutMask:[aDecoder decodeInt32ForKey:@"ORSNOCaen1720ModelTriggerOutMask"]];
+	[self setFrontPanelControlMask:[aDecoder decodeInt32ForKey:@"ORSNOCaen1720ModelFrontPanelControlMask"]];
+    [self setCoincidenceLevel:[aDecoder decodeIntForKey:@"ORSNOCaen1720ModelCoincidenceLevel"]];
     [self setAcquisitionMode:[aDecoder decodeIntForKey:@"acquisitionMode"]];
     [self setCountAllTriggers:[aDecoder decodeBoolForKey:@"countAllTriggers"]];
     [self setCustomSize:[aDecoder decodeInt32ForKey:@"customSize"]];
@@ -1407,13 +1407,13 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
-	[anEncoder encodeInt:eventSize forKey:@"ORCaen1720ModelEventSize"];
-	[anEncoder encodeInt:enabledMask forKey:@"ORCaen1720ModelEnabledMask"];
-	[anEncoder encodeInt32:postTriggerSetting forKey:@"ORCaen1720ModelPostTriggerSetting"];
-	[anEncoder encodeInt32:triggerSourceMask forKey:@"ORCaen1720ModelTriggerSourceMask"];
-	[anEncoder encodeInt32:triggerOutMask forKey:@"ORCaen1720ModelTriggerOutMask"];
-	[anEncoder encodeInt32:frontPanelControlMask forKey:@"ORCaen1720ModelFrontPanelControlMask"];
-	[anEncoder encodeInt:coincidenceLevel forKey:@"ORCaen1720ModelCoincidenceLevel"];
+	[anEncoder encodeInt:eventSize forKey:@"ORSNOCaen1720ModelEventSize"];
+	[anEncoder encodeInt:enabledMask forKey:@"ORSNOCaen1720ModelEnabledMask"];
+	[anEncoder encodeInt32:postTriggerSetting forKey:@"ORSNOCaen1720ModelPostTriggerSetting"];
+	[anEncoder encodeInt32:triggerSourceMask forKey:@"ORSNOCaen1720ModelTriggerSourceMask"];
+	[anEncoder encodeInt32:triggerOutMask forKey:@"ORSNOCaen1720ModelTriggerOutMask"];
+	[anEncoder encodeInt32:frontPanelControlMask forKey:@"ORSNOCaen1720ModelFrontPanelControlMask"];
+	[anEncoder encodeInt:coincidenceLevel forKey:@"ORSNOCaen1720ModelCoincidenceLevel"];
 	[anEncoder encodeInt:acquisitionMode forKey:@"acquisitionMode"];
 	[anEncoder encodeBool:countAllTriggers forKey:@"countAllTriggers"];
 	[anEncoder encodeInt32:customSize forKey:@"customSize"];
@@ -1481,7 +1481,7 @@ NSString* ORCaen1720ModelContinuousModeChanged              = @"ORCaen1720ModelC
 
 @end
 
-@implementation ORCaen1720DecoderForCAEN : ORCaenDataDecoder
+@implementation ORSNOCaen1720DecoderForCAEN : ORCaenDataDecoder
 - (NSString*) identifier
 {
     return @"CAEN 1720 Digitizer";

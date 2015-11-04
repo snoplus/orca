@@ -1,5 +1,5 @@
 //
-//ORCaen1720Decoder.m
+//ORSNOCaen1720Decoder.m
 //Orca
 //
 //Created by Mark Howe on Mon Apr 14 2008.
@@ -18,10 +18,10 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#import "ORCaen1720Decoder.h"
+#import "ORSNOCaen1720Decoder.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
-#import "ORCaen1720Model.h"
+#import "ORSNOCaen1720Model.h"
 #import <time.h>
 
 /*
@@ -35,7 +35,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ....Followed by the event as described in the manual
 */
 
-@implementation ORCaen1720WaveformDecoder
+@implementation ORSNOCaen1720WaveformDecoder
 
 - (id) init
 {
@@ -127,11 +127,11 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
             if(getRatesFromDecodeStage && !skipRateCounts){
                 NSString* aKey = [crateKey stringByAppendingString:cardKey];
                 if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
-                ORCaen1720Model* obj = [actualCards objectForKey:aKey];
+                ORSNOCaen1720Model* obj = [actualCards objectForKey:aKey];
                 if(!obj){
-                    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen1720Model")];
+                    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSNOCaen1720Model")];
                     NSEnumerator* e = [listOfCards objectEnumerator];
-                    ORCaen1720Model* aCard;
+                    ORSNOCaen1720Model* aCard;
                     while(aCard = [e nextObject]){
                         if([aCard crateNumber] == crate && [aCard slot] == card){
                             [actualCards setObject:aCard forKey:aKey];
