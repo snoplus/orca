@@ -13,6 +13,8 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 #define kGretina4MFIFO30KFull		0x1000000
 #define kGretina4MFIFOFull          0x2000000
     
+#define kUseDMA  false
+    
     uint32_t baseAddress      = GetBaseAddress();  
     uint32_t fifoStateAddress = GetDeviceSpecificData()[0];
     uint32_t fifoAddress      = GetDeviceSpecificData()[1];
@@ -26,7 +28,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
     uint32_t fifoState = 0;
     result = VMERead(fifoStateAddress,
                      GetAddressModifier(),
-                     (uint32_t) 0x4,
+                     (uint32_t) 4,
                      fifoState);
     if (result != sizeof(fifoState)){
         LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",fifoStateAddress,strerror(errno));
@@ -42,21 +44,31 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
         for(i=0;i<numEventsToRead;i++){
             ensureDataCanHold(1024+2);
      
-            int32_t savedIndex = dataIndex;
-            data[dataIndex++]  = dataId | 1026;
-            data[dataIndex++]  = location;
-            
-            result = DMARead(fifoAddress,fifoAddressMod, (uint32_t) 4, (uint8_t*)(&data[dataIndex]),1024*4);
-        
-            if ((result < 0) || (data[dataIndex] != kGretinaPacketSeparator)) {
+            int32_t savedIndex      = dataIndex;
+            data[dataIndex++]       = dataId | 1026;
+            data[dataIndex++]       = location;
+            int32_t firstDataIndex  = dataIndex;
+
+            if(kUseDMA){
+                result = DMARead(fifoAddress,fifoAddressMod, 4, (uint8_t*)(&data[dataIndex]),1024*4);
+                dataIndex+=1024;
+            }
+            else {
+                //non-DMA for testing
+                int32_t j;
+                for(j=0;j<1024;j++){
+                    uint32_t aValue = 0;
+                    result = VMERead(fifoAddress,GetAddressModifier(),4, aValue);
+                    if (result != sizeof(int32_t))break;
+                    data[dataIndex++] = aValue;
+                }
+            }
+            if ((result < 0) || (data[firstDataIndex] != kGretinaPacketSeparator)) {
                 dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
                 if(result < 0)  LogBusErrorForCard(slot,"Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
                 else            LogBusErrorForCard(slot,"No Separator: Gretina4 0x%04x %s",baseAddress,strerror(errno));
                 clearFifo(fifoResetAddress);
                 break;
-            }
-            else {
-                dataIndex+=1024;
             }
         }
     }
