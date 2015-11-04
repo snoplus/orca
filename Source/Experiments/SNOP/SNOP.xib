@@ -41,7 +41,7 @@
                 <outlet property="initButton" destination="1211" id="1218"/>
                 <outlet property="lastRunNumber" destination="3651" id="3782"/>
                 <outlet property="lastRunType" destination="3749" id="3783"/>
-                <outlet property="loadValuesButton" destination="7l7-OA-Ohy" id="1j7-RR-x1U"/>
+                <outlet property="loadValuesButton" destination="7l7-OA-Ohy" id="zJx-p8-gp5"/>
                 <outlet property="loadedSmellieApproxTimeLabel" destination="3570" id="3597"/>
                 <outlet property="loadedSmellieFibresLabel" destination="3574" id="3599"/>
                 <outlet property="loadedSmellieLasersLabel" destination="3572" id="3598"/>
@@ -76,6 +76,8 @@
                 <outlet property="runModeMatrix" destination="1340" id="1356"/>
                 <outlet property="runNumberField" destination="1259" id="1262"/>
                 <outlet property="runStatusField" destination="1257" id="1263"/>
+                <outlet property="runsLockButton" destination="URx-nh-GMP" id="E2u-gI-0d3"/>
+                <outlet property="runsLockTextField" destination="FfB-Ej-uUK" id="k18-EV-EOz"/>
                 <outlet property="savePrimaryMapFileButton" destination="290" id="1231"/>
                 <outlet property="selectionStringTextView" destination="376" id="949"/>
                 <outlet property="smellieBuildCustomRun" destination="3524" id="3586"/>
@@ -1292,7 +1294,7 @@
                                                 <tabViewItem label="TELLIE" identifier="" id="3099">
                                                     <view key="view" id="3100">
                                                         <rect key="frame" x="10" y="25" width="535" height="308"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button verticalHuggingPriority="750" id="3637">
                                                                 <rect key="frame" x="412" y="100" width="64" height="32"/>
@@ -1525,7 +1527,7 @@
                                                 <tabViewItem label="SMELLIE" identifier="" id="3101">
                                                     <view key="view" id="3102">
                                                         <rect key="frame" x="10" y="25" width="535" height="308"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <comboBox verticalHuggingPriority="750" id="3519">
                                                                 <rect key="frame" x="17" y="275" width="279" height="22"/>
@@ -1817,7 +1819,7 @@
                                                 <tabViewItem label="MANUAL" identifier="" id="3103">
                                                     <view key="view" id="3104">
                                                         <rect key="frame" x="10" y="25" width="535" height="308"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="3113">
                                                                 <rect key="frame" x="63" y="219" width="29" height="26"/>
@@ -2264,6 +2266,26 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <button id="URx-nh-GMP">
+                                            <rect key="frame" x="296" y="469" width="36" height="33"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="HE1-OC-JMz">
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="runsLockAction:" target="-2" id="MFs-mm-seY"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" id="FfB-Ej-uUK">
+                                            <rect key="frame" x="327" y="475" width="146" height="13"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Not in Maintenance Run." id="Rbi-wI-exf">
+                                                <font key="font" metaFont="label"/>
+                                                <color key="textColor" red="0.063412726000000003" green="0.15111595" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>

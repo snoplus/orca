@@ -181,6 +181,7 @@
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
 - (void) updatePedestalMasks:(unsigned int)pattern;
+- (void) hvMasterTriggersOFF;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
@@ -258,3 +259,4 @@ extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
 extern NSString* SNOPRunTypeChangedNotification;
+extern NSString* SNOPRunsLockNotification;

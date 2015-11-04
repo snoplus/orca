@@ -137,7 +137,6 @@ smellieRunFile;
                          name : ORELLIERunFinished
                         object: nil];
     
-    
     [notifyCenter addObserver: self
                      selector: @selector(runNumberChanged:)
                          name: ORRunNumberChangedNotification
@@ -152,6 +151,11 @@ smellieRunFile;
                      selector:@selector(runTypeChanged:)
                          name:SNOPRunTypeChangedNotification
                        object:self];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runsLockChanged:)
+                         name : SNOPRunsLockNotification
+                       object : nil];
     
     //TODO: add the notification for changedRunType on SNO+
     /*[notifyCenter addObserver:self
@@ -174,6 +178,7 @@ smellieRunFile;
     //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
     [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
+    [self runsLockChanged:nil];
 }
 
 -(void) fetchRunMaskSettings
@@ -676,9 +681,9 @@ smellieRunFile;
 
 - (IBAction)hvMasterTriggersOFF:(id)sender
 {
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
     
-    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+    [model hvMasterTriggersOFF];
+
 }
 
 - (IBAction)hvMasterTriggersON:(id)sender
@@ -1033,6 +1038,30 @@ smellieRunFile;
     //TODO:Make a note in the datastream that this happened 
 }
 
+- (IBAction) runsLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:SNOPRunsLockNotification to:[sender intValue] forWindow:[self window]];
+}
+
+- (void) runsLockChanged:(NSNotification*)aNotification
+{
+    BOOL runInProgress				= [gOrcaGlobals runInProgress];
+    BOOL locked						= [gSecurity isLocked:SNOPRunsLockNotification];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:SNOPRunsLockNotification];
+    
+    //[softwareTriggerButton setEnabled: !locked && !runInProgress];
+    [runsLockButton setState: locked];
+    
+    //Enable or disable fields
+    [loadValuesButton setEnabled:!locked && !runInProgress];
+    
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+        if(runInProgress && ![gSecurity isLocked:SNOPRunsLockNotification])
+            s = @"Not in Maintenance Run.";
+    }
+    [runsLockTextField setStringValue:s];
+}
 
 //***Standard runs***
 //ECA
@@ -1078,7 +1107,7 @@ smellieRunFile;
     
     //[self pushvaluestomodel];
     // Ship the global variables to the ORCA script
-    [model loadVariablesInScript:@"StandardRun_ECA"];
+    [model loadVariablesInScript:@"ECA_singleRun"];
     
 }
 

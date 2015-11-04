@@ -47,6 +47,7 @@ static NSString* SNOPDbConnector	= @"SNOPDbConnector";
 NSString* ORSNOPModelOrcaDBIPAddressChanged = @"ORSNOPModelOrcaDBIPAddressChanged";
 NSString* ORSNOPModelDebugDBIPAddressChanged = @"ORSNOPModelDebugDBIPAddressChanged";
 NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
+NSString* SNOPRunsLockNotification = @"SNOPRunsLockNotification";
 
 #define kOrcaRunDocumentAdded   @"kOrcaRunDocumentAdded"
 #define kOrcaRunDocumentUpdated @"kOrcaRunDocumentUpdated"
@@ -994,6 +995,14 @@ ECA_pulser_rate = _ECA_pulser_rate;
     
 }
 
+
+- (void)hvMasterTriggersOFF
+{
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(setIsPollingXl3:) withObject:NO];
+    
+    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvTriggersOFF)];
+}
+
 - (void) getSmellieRunListInfo
 {
     //Collect a series of objects from the ORMTCModel
@@ -1096,9 +1105,9 @@ ECA_pulser_rate = _ECA_pulser_rate;
     if(!SR_script){  //It didn't found the script
         NSLog(@"ORCA script %@ not found. \n", userscriptname);
     }
-    else if([[SR_script scriptName] isEqualToString:@"StandardRun_ECA"]){
+    else if([[SR_script scriptName] isEqualToString:@"ECA_singleRun"]){
         //Set global variables
-        //NSLog(@"Set values in %@ ORCA script. \n",userscriptname);
+        NSLog(@"Set values in %@ ORCA script. \n",userscriptname);
         [self addGlobalVariable:@0 withName:@"pattern_number" withValue:[self ECA_pattern_number]];
         [self addGlobalVariable:@1 withName:@"eca_type" withValue:[self ECA_type]];
         [self addGlobalVariable:@2 withName:@"tslope_pattern" withValue:[self ECA_tslope_pattern]];
@@ -1117,6 +1126,7 @@ ECA_pulser_rate = _ECA_pulser_rate;
 - (void) addGlobalVariable:(NSNumber*)varindex withName:(NSString*)varname withValue:(NSNumber*)varvalue
 {
     
+    NSLog(@"Adding new global variable: %@ = %@ \n",varname, varvalue);
     //Add new global variable in case it doesn't already exist
     if([varindex integerValue] + 1 > [[SR_script inputValues] count]){
         [SR_script addInputValue];

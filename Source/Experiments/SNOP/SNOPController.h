@@ -102,7 +102,9 @@
     
     NSMutableDictionary *snopRunTypeMaskDic; 
 
-    
+    IBOutlet NSButton* runsLockButton;
+    IBOutlet NSTextField* runsLockTextField;
+
     //*****Standard runs*****//
     //ECA
     IBOutlet NSPopUpButton *ECApatternPopUpButton;
@@ -180,6 +182,8 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
 -(void) fetchRunMaskSettings;
+
+- (IBAction) runsLockAction:(id)sender;
 
 //Standard runs
 - (IBAction) loadValues:(id)sender;
