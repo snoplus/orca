@@ -451,7 +451,6 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{698, 26}, {110, 96}}</string>
 												<reference key="NSSuperview" ref="119775354"/>
-												<reference key="NSNextKeyView"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="999214538">
 													<int key="NSCellFlags">-2080374784</int>
@@ -1622,7 +1621,7 @@
 																		<reference key="NSControlView" ref="849773237"/>
 																		<int key="NSButtonFlags">-2046017536</int>
 																		<int key="NSButtonFlags2">2</int>
-																		<object class="NSCustomResource" key="NSNormalImage" id="265497376">
+																		<object class="NSCustomResource" key="NSNormalImage" id="719273317">
 																			<string key="NSClassName">NSImage</string>
 																			<string key="NSResourceName">Caen1720Card</string>
 																		</object>
@@ -9653,7 +9652,7 @@ ZSBjb250cm9sbGVyLg</string>
 																	<string key="NSFrame">{{404, 62}, {37, 140}}</string>
 																	<reference key="NSSuperview" ref="564808900"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="163376883"/>
+																	<reference key="NSNextKeyView" ref="71618994"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="317644066">
 																		<int key="NSCellFlags">-2080374784</int>
@@ -9678,14 +9677,15 @@ ZSBjb250cm9sbGVyLg</string>
 																	</object>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																</object>
-																<object class="NSButton" id="345526274">
+																<object class="NSButton" id="71618994">
 																	<reference key="NSNextResponder" ref="564808900"/>
 																	<int key="NSvFlags">268</int>
 																	<string key="NSFrame">{{438, 62}, {37, 140}}</string>
 																	<reference key="NSSuperview" ref="564808900"/>
 																	<reference key="NSWindow"/>
+																	<reference key="NSNextKeyView" ref="163376883"/>
 																	<bool key="NSEnabled">YES</bool>
-																	<object class="NSButtonCell" key="NSCell" id="740860963">
+																	<object class="NSButtonCell" key="NSCell" id="439826801">
 																		<int key="NSCellFlags">-2080374784</int>
 																		<int key="NSCellFlags2">134217728</int>
 																		<string key="NSContents">CAEN</string>
@@ -9694,10 +9694,10 @@ ZSBjb250cm9sbGVyLg</string>
 																			<double key="NSSize">10</double>
 																			<int key="NSfFlags">1044</int>
 																		</object>
-																		<reference key="NSControlView" ref="345526274"/>
+																		<reference key="NSControlView" ref="71618994"/>
 																		<int key="NSButtonFlags">-2046017536</int>
 																		<int key="NSButtonFlags2">2</int>
-																		<reference key="NSNormalImage" ref="265497376"/>
+																		<reference key="NSNormalImage" ref="719273317"/>
 																		<string key="NSAlternateContents"/>
 																		<string key="NSKeyEquivalent"/>
 																		<int key="NSPeriodicDelay">400</int>
@@ -9990,7 +9990,6 @@ ZSBjb250cm9sbGVyLg</string>
 																	<string key="NSFrame">{{679, -3}, {116, 102}}</string>
 																	<reference key="NSSuperview" ref="564808900"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="249636675"/>
 																	<bool key="NSEnabled">YES</bool>
 																	<object class="NSButtonCell" key="NSCell" id="279570591">
 																		<int key="NSCellFlags">-2080374784</int>
@@ -10135,7 +10134,7 @@ ZSBjb250cm9sbGVyLg</string>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="913918342"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2560, 1417}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMinSize">{213, 129}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -15033,7 +15032,7 @@ ZSBjb250cm9sbGVyLg</string>
 							<reference ref="203318388"/>
 							<reference ref="163376883"/>
 							<reference ref="130589322"/>
-							<reference ref="345526274"/>
+							<reference ref="71618994"/>
 						</array>
 						<reference key="parent" ref="690175184"/>
 					</object>
@@ -15458,16 +15457,16 @@ ZSBjb250cm9sbGVyLg</string>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">Y9H-DM-skk</string>
-						<reference key="object" ref="345526274"/>
+						<reference key="object" ref="71618994"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="740860963"/>
+							<reference ref="439826801"/>
 						</array>
 						<reference key="parent" ref="564808900"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">sbi-re-BDa</string>
-						<reference key="object" ref="740860963"/>
-						<reference key="parent" ref="345526274"/>
+						<reference key="object" ref="439826801"/>
+						<reference key="parent" ref="71618994"/>
 					</object>
 				</array>
 			</object>
@@ -19828,8 +19827,8 @@ ZSBjb250cm9sbGVyLg</string>
 					<string key="NS.key.0">ToolTip</string>
 					<object class="IBToolTipAttribute" key="NS.object.0">
 						<string key="name">ToolTip</string>
-						<reference key="object" ref="345526274"/>
-						<string key="toolTip">OSNOCaen1720Model</string>
+						<reference key="object" ref="71618994"/>
+						<string key="toolTip">ORSNOCaen1720Model</string>
 					</object>
 				</object>
 				<string key="Y9H-DM-skk.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
