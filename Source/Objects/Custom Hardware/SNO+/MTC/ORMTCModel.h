@@ -114,7 +114,12 @@
 
 #pragma mark •••Initialization
 - (id) init;
-- (int) connect;
+- (void) connect;
+- (void) disconnect;
+- (redisReply *) command: (char *)fmt, ...;
+- (redisReply *) vcommand: (char *)fmt args:(va_list)ap;
+- (int) intCommand: (char *)fmt, ...;
+- (void) okCommand: (char *)fmt, ...;
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
