@@ -13,3 +13,4 @@ Libraries/.svn*
 Frameworks/.svn*
 English.lproj/.svn*
 DerivedData*
+*.swp
