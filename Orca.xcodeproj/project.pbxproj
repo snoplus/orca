@@ -237,12 +237,6 @@
 		365202E51BE918E6005A1F60 /* anet.c in Sources */ = {isa = PBXBuildFile; fileRef = 365202E21BE918E6005A1F60 /* anet.c */; };
 		365202E61BE918E6005A1F60 /* anet.h in Headers */ = {isa = PBXBuildFile; fileRef = 365202E31BE918E6005A1F60 /* anet.h */; };
 		365202E71BE918E6005A1F60 /* fmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 365202E41BE918E6005A1F60 /* fmacros.h */; };
-		365202F71BEA6176005A1F60 /* .ORSNOCaen1720Controller.h.swp in Resources */ = {isa = PBXBuildFile; fileRef = 365202E91BEA6176005A1F60 /* .ORSNOCaen1720Controller.h.swp */; };
-		365202F81BEA6176005A1F60 /* .ORSNOCaen1720Controller.m.swp in Resources */ = {isa = PBXBuildFile; fileRef = 365202EA1BEA6176005A1F60 /* .ORSNOCaen1720Controller.m.swp */; };
-		365202F91BEA6176005A1F60 /* .ORSNOCaen1720Decoder.h.swp in Resources */ = {isa = PBXBuildFile; fileRef = 365202EB1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.h.swp */; };
-		365202FA1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.m.swp in Resources */ = {isa = PBXBuildFile; fileRef = 365202EC1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.m.swp */; };
-		365202FB1BEA6176005A1F60 /* .ORSNOCaen1720Model.h.swp in Resources */ = {isa = PBXBuildFile; fileRef = 365202ED1BEA6176005A1F60 /* .ORSNOCaen1720Model.h.swp */; };
-		365202FC1BEA6176005A1F60 /* .ORSNOCaen1720Model.m.swp in Resources */ = {isa = PBXBuildFile; fileRef = 365202EE1BEA6176005A1F60 /* .ORSNOCaen1720Model.m.swp */; };
 		365202FD1BEA6176005A1F60 /* ORSNOCaen1720Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 365202EF1BEA6176005A1F60 /* ORSNOCaen1720Controller.h */; };
 		365202FE1BEA6176005A1F60 /* ORSNOCaen1720Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 365202F01BEA6176005A1F60 /* ORSNOCaen1720Controller.m */; };
 		365202FF1BEA6176005A1F60 /* ORSNOCaen1720Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 365202F11BEA6176005A1F60 /* ORSNOCaen1720Decoder.h */; };
@@ -3874,12 +3868,6 @@
 		365202E21BE918E6005A1F60 /* anet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = anet.c; sourceTree = "<group>"; };
 		365202E31BE918E6005A1F60 /* anet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = anet.h; sourceTree = "<group>"; };
 		365202E41BE918E6005A1F60 /* fmacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmacros.h; sourceTree = "<group>"; };
-		365202E91BEA6176005A1F60 /* .ORSNOCaen1720Controller.h.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .ORSNOCaen1720Controller.h.swp; sourceTree = "<group>"; };
-		365202EA1BEA6176005A1F60 /* .ORSNOCaen1720Controller.m.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .ORSNOCaen1720Controller.m.swp; sourceTree = "<group>"; };
-		365202EB1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.h.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .ORSNOCaen1720Decoder.h.swp; sourceTree = "<group>"; };
-		365202EC1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.m.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .ORSNOCaen1720Decoder.m.swp; sourceTree = "<group>"; };
-		365202ED1BEA6176005A1F60 /* .ORSNOCaen1720Model.h.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .ORSNOCaen1720Model.h.swp; sourceTree = "<group>"; };
-		365202EE1BEA6176005A1F60 /* .ORSNOCaen1720Model.m.swp */ = {isa = PBXFileReference; lastKnownFileType = file; path = .ORSNOCaen1720Model.m.swp; sourceTree = "<group>"; };
 		365202EF1BEA6176005A1F60 /* ORSNOCaen1720Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCaen1720Controller.h; sourceTree = "<group>"; };
 		365202F01BEA6176005A1F60 /* ORSNOCaen1720Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNOCaen1720Controller.m; sourceTree = "<group>"; };
 		365202F11BEA6176005A1F60 /* ORSNOCaen1720Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCaen1720Decoder.h; sourceTree = "<group>"; };
@@ -7428,12 +7416,6 @@
 		365202E81BEA6176005A1F60 /* CV1720 */ = {
 			isa = PBXGroup;
 			children = (
-				365202E91BEA6176005A1F60 /* .ORSNOCaen1720Controller.h.swp */,
-				365202EA1BEA6176005A1F60 /* .ORSNOCaen1720Controller.m.swp */,
-				365202EB1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.h.swp */,
-				365202EC1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.m.swp */,
-				365202ED1BEA6176005A1F60 /* .ORSNOCaen1720Model.h.swp */,
-				365202EE1BEA6176005A1F60 /* .ORSNOCaen1720Model.m.swp */,
 				365202EF1BEA6176005A1F60 /* ORSNOCaen1720Controller.h */,
 				365202F01BEA6176005A1F60 /* ORSNOCaen1720Controller.m */,
 				365202F11BEA6176005A1F60 /* ORSNOCaen1720Decoder.h */,
@@ -15678,7 +15660,6 @@
 				849415861B330FEB00ED42F8 /* onOffPendingBox.tif in Resources */,
 				840C80001955E1D300E36622 /* RelaunchOrca in Resources */,
 				8434A244055B3287002D3102 /* Credits.rtf in Resources */,
-				365202F91BEA6176005A1F60 /* .ORSNOCaen1720Decoder.h.swp in Resources */,
 				8434A246055B3287002D3102 /* InfoPlist.strings in Resources */,
 				8434A247055B3287002D3102 /* AboutBox.nib in Resources */,
 				8434A248055B3287002D3102 /* StatusWindow.nib in Resources */,
@@ -15887,7 +15868,6 @@
 				848627AE08E4B5EB00301049 /* GpibEnetBox.tif in Resources */,
 				848627B308E4BC4800301049 /* HPPulserIcon.tif in Resources */,
 				848629CE08E4C4CA00301049 /* OrcaLeft.tif in Resources */,
-				365202FA1BEA6176005A1F60 /* .ORSNOCaen1720Decoder.m.swp in Resources */,
 				848629CF08E4C4CA00301049 /* OrcaRight.tif in Resources */,
 				8476004C18DF1EB40097E790 /* warning.tif in Resources */,
 				84862BB708E8650900301049 /* Tek754DOscilloscope.tif in Resources */,
@@ -16038,7 +16018,6 @@
 				6B40D6611B2B79960000F7C1 /* resistor.png in Resources */,
 				84A4E8290C187A3E00CBC222 /* IP220.gif in Resources */,
 				84A4E82A0C187A3E00CBC222 /* IP220.nib in Resources */,
-				365202F71BEA6176005A1F60 /* .ORSNOCaen1720Controller.h.swp in Resources */,
 				84A4E89C0C287CA900CBC222 /* USBtoGPIB.gif in Resources */,
 				84A4E89D0C287CA900CBC222 /* USBtoGPIB.nib in Resources */,
 				84A4EE6F0C2C5D0A00CBC222 /* AcqirisDC440.gif in Resources */,
@@ -16146,7 +16125,6 @@
 				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
 				84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */,
 				84C37D2B0EF834DD00E77E09 /* SNO.gif in Resources */,
-				365202F81BEA6176005A1F60 /* .ORSNOCaen1720Controller.m.swp in Resources */,
 				84C37D2C0EF834DD00E77E09 /* SNO.nib in Resources */,
 				84E18D640F0A7EFA0096F0F3 /* SingleStep.tif in Resources */,
 				365203031BEA6176005A1F60 /* SNOCaen1720.nib in Resources */,
@@ -16416,7 +16394,6 @@
 				841C4DF5141FA72800F95B50 /* Met237.nib in Resources */,
 				841C4DF6141FA72800F95B50 /* Met237.tif in Resources */,
 				CE10F0191451674C0084C15D /* PISlashTChip.nib in Resources */,
-				365202FC1BEA6176005A1F60 /* .ORSNOCaen1720Model.m.swp in Resources */,
 				CE10F01A1451674C0084C15D /* XYCom200.nib in Resources */,
 				CE10F01B1451674C0084C15D /* XYCom200Card.gif in Resources */,
 				CE10F01C1451674C0084C15D /* XYCom564.nib in Resources */,
@@ -16546,7 +16523,6 @@
 				8499788C174BA11400BFEE3E /* EHS130n.tif in Resources */,
 				84BF74BE17590CB000AF1F56 /* 3DScanPlatform.nib in Resources */,
 				B3808A8C1700F84B0019C27D /* CouchDBListener.nib in Resources */,
-				365202FB1BEA6176005A1F60 /* .ORSNOCaen1720Model.h.swp in Resources */,
 				B3805611172BE4A100B5B134 /* Changesfeed.tif in Resources */,
 				43D7CB98177DD0C100ED4736 /* 3DScanPlatform.tiff in Resources */,
 				432D17EC17820CD500557918 /* AngularComponent.mtl in Resources */,

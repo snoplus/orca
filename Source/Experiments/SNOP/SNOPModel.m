@@ -67,6 +67,9 @@ NSString* SNOPRunTypeChangedNotification = @"SNOPRunTypeChangedNotification";
 
 @implementation SNOPModel
 
+@synthesize MTCHostName;
+@synthesize XL3HostName;
+
 @synthesize
 orcaDBUserName = _orcaDBUserName,
 smellieRunNameLabel = _smellieRunNameLabel,
@@ -824,6 +827,8 @@ mtcConfigDoc = _mtcConfigDoc;
     
     [self setViewType:[decoder decodeIntForKey:@"viewType"]];
 
+    self.MTCHostName = [decoder decodeObjectForKey:@"ORSNOPModelMTCHostName"];
+    self.XL3HostName = [decoder decodeObjectForKey:@"ORSNOPModelXL3HostName"];
     self.orcaDBUserName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBUserName"];
     self.orcaDBPassword = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBPassword"];
     self.orcaDBName = [decoder decodeObjectForKey:@"ORSNOPModelOrcaDBName"];
@@ -846,6 +851,8 @@ mtcConfigDoc = _mtcConfigDoc;
     [super encodeWithCoder:encoder];
     [encoder encodeInt:viewType forKey:@"viewType"];
 
+    [encoder encodeObject:self.MTCHostName forKey:@"ORSNOPModelMTCHostName"];
+    [encoder encodeObject:self.XL3HostName forKey:@"ORSNOPModelXL3HostName"];
     [encoder encodeObject:self.orcaDBUserName forKey:@"ORSNOPModelOrcaDBUserName"];
     [encoder encodeObject:self.orcaDBPassword forKey:@"ORSNOPModelOrcaDBPassword"];
     [encoder encodeObject:self.orcaDBName forKey:@"ORSNOPModelOrcaDBName"];

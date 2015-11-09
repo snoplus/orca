@@ -36,6 +36,7 @@
 #import "ORCaen1720Model.h"
 #import "ORRunController.h"
 #include "hiredis.h"
+#import "SNOPModel.h"
 
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
@@ -231,7 +232,23 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) connect
 {
     struct timeval timeout = {1, 0}; // 1 second
-    context = redisConnectWithTimeout("sbc-teststand.sp.snolab.ca", 4001, timeout);
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* sno;
+    if ([objs count]) {
+        sno = [objs objectAtIndex:0];
+    } else {
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"couldn't find SNOPModel"  userInfo:Nil];
+        [exception raise];
+    }
+
+    const char *host = [[sno MTCHostName] UTF8String];
+
+    if (host == NULL) {
+	NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc hostname == NULL"  userInfo:Nil];
+        [exception raise];
+    }
+
+    context = redisConnectWithTimeout(host, 4001, timeout);
 
     NSLog(@"mtc: connecting...\n");
     if (context == NULL) {

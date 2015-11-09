@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
             <connections>
+                <outlet property="MTCHostTextField" destination="2RD-kP-gtE" id="Ka8-XU-3fv"/>
+                <outlet property="XL3HostTextField" destination="f82-ZF-HIx" id="H78-RZ-r05"/>
                 <outlet property="captureDateField" destination="423" id="424"/>
                 <outlet property="captureStateButton" destination="383" id="416"/>
                 <outlet property="cardCheckView" destination="1000" id="1002"/>
@@ -2478,7 +2480,7 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="13" headerView="2599" id="1200">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="15"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="183" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.77501147999999997" green="1" blue="0.83125859000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -2753,7 +2755,7 @@
                             <tabViewItem label="CouchDB" identifier="" id="2638">
                                 <view key="view" autoresizesSubviews="NO" id="2639">
                                     <rect key="frame" x="10" y="25" width="789" height="605"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="OrcaDB" borderType="line" id="2651">
                                             <rect key="frame" x="14" y="432" width="371" height="151"/>
@@ -3934,6 +3936,56 @@
                                                 </column>
                                             </cells>
                                         </matrix>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Settings" identifier="" id="sJH-2z-Pk0">
+                                <view key="view" id="4fP-5x-HLU">
+                                    <rect key="frame" x="10" y="25" width="789" height="605"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField verticalHuggingPriority="750" id="2RD-kP-gtE">
+                                            <rect key="frame" x="217" y="463" width="96" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="qGp-1k-UDz">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="changeMTCHostname:" target="-2" id="vh9-ps-Cog"/>
+                                            </connections>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="f82-ZF-HIx">
+                                            <rect key="frame" x="217" y="408" width="96" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="xCp-sS-2SW">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="changeXL3HostName:" target="-2" id="A0O-Rg-Z1p"/>
+                                            </connections>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="DNs-ah-NYQ">
+                                            <rect key="frame" x="50" y="466" width="150" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="MTC Server Hostname" id="aDY-Kv-FJJ">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="2y6-O2-mVh">
+                                            <rect key="frame" x="50" y="411" width="150" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="XL3 Server Hostname" id="cPS-Ux-9wf">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>

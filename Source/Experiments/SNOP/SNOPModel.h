@@ -44,6 +44,10 @@
 {
 	int viewType;
 
+    /* host names for MTC, XL3, Log, and Data servers */
+    NSString* MTCHostName;
+    NSString* XL3HostName;
+
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
     NSString* _orcaDBName;
@@ -107,6 +111,9 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
 @property (nonatomic,retain) NSMutableDictionary* snopRunTypeMask;
 @property (nonatomic,retain) NSNumber* runTypeMask;
+
+@property (nonatomic,copy) NSString* MTCHostName;
+@property (nonatomic,copy) NSString* XL3HostName;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;

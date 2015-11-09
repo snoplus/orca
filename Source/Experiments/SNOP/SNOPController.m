@@ -52,6 +52,13 @@ smellieRunFile;
     self = [super initWithWindowNibName:@"SNOP"];
     return self;
 }
+- (IBAction)changeMTCHostname:(id)sender {
+    [model setMTCHostName:[MTCHostTextField stringValue]];
+}
+
+- (IBAction)changeXL3HostName:(id)sender {
+    [model setXL3HostName:[MTCHostTextField stringValue]];
+}
 
 -(void)windowDidLoad
 {
@@ -165,7 +172,9 @@ smellieRunFile;
 - (void) updateWindow
 {
     [super updateWindow];
-	[self viewTypeChanged:nil];
+    [MTCHostTextField setStringValue:[model MTCHostName]];
+    [XL3HostTextField setStringValue:[model XL3HostName]];
+    [self viewTypeChanged:nil];
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
