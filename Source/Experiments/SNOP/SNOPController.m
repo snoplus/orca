@@ -1054,6 +1054,14 @@ smellieRunFile;
     
     //Enable or disable fields
     [loadValuesButton setEnabled:!locked && !runInProgress];
+    [ECApatternPopUpButton setEnabled:!locked && !runInProgress];
+    [ECAtypePopUpButton setEnabled:!locked && !runInProgress];
+    [TSlopePatternTextField setEnabled:!locked && !runInProgress];
+    [subTimeTextField setEnabled:!locked && !runInProgress];
+    [coarseDelayTextField setEnabled:!locked && !runInProgress];
+    [fineDelayTextField setEnabled:!locked && !runInProgress];
+    [pedestalWidthTextField setEnabled:!locked && !runInProgress];
+    [pulserRateTextField setEnabled:!locked && !runInProgress];
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
