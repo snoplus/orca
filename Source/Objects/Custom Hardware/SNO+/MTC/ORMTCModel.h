@@ -234,8 +234,8 @@
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
 - (void) zeroTheGTCounter;
 - (double) get10MHzSeconds;
-- (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue;
-- (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue;
+- (void) setThe10MHzCounterLow:(uint32_t) lowerValue high:(uint32_t) upperValue;
+- (void) getThe10MHzCounterLow:(uint32_t*) lowerValue high:(uint32_t*) upperValue;
 - (void) setTheLockoutWidth:(unsigned short) theLockoutWidthValue;
 - (void) setThePedestalWidth:(unsigned short) thePedestalWidthValue;
 - (void) setThePrescaleValue;

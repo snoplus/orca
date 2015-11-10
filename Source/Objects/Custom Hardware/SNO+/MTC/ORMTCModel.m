@@ -1570,7 +1570,7 @@ resetFifoOnStart = _resetFifoOnStart;
     [self setThe10MHzCounterLow:uLongDBValue(kLow10MhzClock) high:uLongDBValue(kHigh10MhzClock)];
 }
 
-- (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue
+- (void) setThe10MHzCounterLow:(uint32_t) lowerValue high:(uint32_t) upperValue
 {
     uint64_t count = ((uint64_t)upperValue << 32) | lowerValue;
 
@@ -1585,7 +1585,7 @@ resetFifoOnStart = _resetFifoOnStart;
 }
 
 
-- (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue
+- (void) getThe10MHzCounterLow:(uint32_t *) lowerValue high:(uint32_t *) upperValue
 {
 	*lowerValue = 0;
 	*upperValue  = 0;
