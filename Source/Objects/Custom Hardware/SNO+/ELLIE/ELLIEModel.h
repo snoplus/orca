@@ -83,7 +83,6 @@
 -(void) startTellieRun;
 -(void) stopTellieRun;
 
-
 @end
 
 extern NSString* ELLIEAllLasersChanged;

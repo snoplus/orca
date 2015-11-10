@@ -156,9 +156,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 //This function polls the TELLIE hardware using an XMLPRC Server and requests the response from the hardware
 -(void) pollTellieFibre
 {
-    NSString *responseFromTellie = [[NSString alloc] init];
+    //NSString *responseFromTellie = [[NSString alloc] init];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
+    NSString *responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
@@ -237,9 +237,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void) stopTellieFibre:(NSArray*)fireCommands
 {
-    NSString *responseFromTellie = [[NSString alloc] init];
+    //NSString *responseFromTellie = [[[NSString alloc] init] autorelease];
     //NSArray * nullCommandArguments = @[@"0",@"0",@"0"];
-    responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
+    NSString *responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
 }
 
@@ -350,15 +350,17 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         strDate = aDate;
     NSString* result = [snotDateFormatter stringFromDate:strDate];
     [snotDateFormatter release];
-    strDate = nil;
-    return [[result retain] autorelease];
+    //strDate = nil;
+    
+    //return [[result retain] autorelease]; - I don't understand this line
+    return result;
 }
 
 //Push the information from the GUI into a couchDB database
 -(void) _pushEllieCustomRunToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    //NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init]; - I don't think we need this
+    NSMutableDictionary* runDocDict = [[NSMutableDictionary dictionaryWithCapacity:100] autorelease];
     
     //Collect a series of objects from the SNOPModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
@@ -377,7 +379,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:runDocDict tag:kSmellieRunDocumentAdded];
     
-    [runDocPool release];
+    //[runDocPool drain];
 }
 
 //unix version of the date
@@ -395,12 +397,14 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     NSString* result = [NSString stringWithFormat:@"%f",[strDate timeIntervalSince1970]];
     //[snotDateFormatter release];
     strDate = nil;
-    return [[result retain] autorelease];
+    
+    //return [[result retain] autorelease]; - I don't understand this line
+    return result;
 }
 
 -(void) _pushSmellieRunDocument
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
+    //NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init]; - Don't think we need this
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:100];
     
     //Collect a series of objects from the SNOPModel
@@ -411,7 +415,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [objs3 objectAtIndex:0];
     
     NSString* docType = [NSMutableString stringWithFormat:@"smellie_run"];
-    
     NSString* smellieRunNameLabel = [aSnotModel smellieRunNameLabel];
     
     //Fetch the run index that is being used
@@ -431,13 +434,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:@"smellie"] addDocument:runDocDict tag:kSmellieSubRunDocumentAdded];
     
-    [runDocPool release];
+    //[runDocPool drain];
 }
 
 -(void) _pushInitialTellieRunDocument
 {
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
+    NSMutableDictionary* runDocDict = [[[NSMutableDictionary alloc] initWithCapacity:10] autorelease];
     
 
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -445,7 +448,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     
     NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
     
-    NSMutableArray *subRunArray = [[NSMutableArray alloc] initWithCapacity:10];
+    NSMutableArray *subRunArray = [[[NSMutableArray alloc] initWithCapacity:10] autorelease];
     
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
@@ -465,7 +468,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [NSThread sleepForTimeInterval:0.1];
     }
     
-    [runDocPool release];
+    [runDocPool drain];
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
@@ -501,17 +504,11 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     @catch (NSException *e) {
         NSLog(@"Error in pin readout %@",e);
     }
-    NSMutableArray * subRunInfo = [[NSMutableArray alloc] initWithCapacity:10];
-    subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-
-    
+    NSMutableArray * subRunInfo = [[[runDocDict objectForKey:@"sub_run_info"] mutableCopy] autorelease];
     [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
-
-    
     self.tellieRunDoc = runDocDict;
-    
     
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
@@ -521,21 +518,21 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                        tag:kTellieRunDocumentUpdated];
     }
     
-    [runDocPool release];
+    [runDocPool drain];
 }
 
 -(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
 {
     NSAutoreleasePool* configDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* configDocDic = [NSMutableDictionary dictionaryWithCapacity:100];
+    NSMutableDictionary* configDocDic = [[NSMutableDictionary dictionaryWithCapacity:100] autorelease];
     
     //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    NSArray*  objs = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")] autorelease];
     
     //Initialise the SNOPModel
     SNOPModel* aSnotModel = [objs objectAtIndex:0];
     
-    NSString* docType = [NSMutableString stringWithFormat:@"%@",aDocType];
+    NSString* docType = [[NSMutableString stringWithFormat:@"%@",aDocType] autorelease];
     
     NSLog(@"document_type: %@",docType);
     
@@ -546,7 +543,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     //self.runDocument = runDocDict;
     [[aSnotModel orcaDbRefWithEntryDB:aSnotModel withDB:aCouchDBName] addDocument:configDocDic tag:kSmellieRunDocumentAdded];
     
-    [configDocPool release];
+    [configDocPool drain];
 }
 
 -(void) smellieDBpush:(NSMutableDictionary*)dbDic
@@ -610,7 +607,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; //Not sure what this is doing? Ed
     [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
     [pool release];
     
@@ -765,6 +762,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
     }
     
+    [ret release];
     return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 }
 
@@ -788,8 +786,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     currentConfigurationVersion = [self fetchRecentVersion];
     
     //fetch the data associated with the current configuration
-    NSMutableDictionary *configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    NSMutableDictionary *configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     NSMutableDictionary *laserHeadToSepiaMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
     int laserHeadIndex =0;
@@ -806,7 +803,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     } //end of looping through each laserHeadIndex
     
     NSMutableDictionary *laserHeadToGainControlMapping = [[NSMutableDictionary alloc] initWithCapacity:10];
-    laserHeadIndex =0;
     for(laserHeadIndex =0; laserHeadIndex < 6; laserHeadIndex++){
         
         for (id specificConfigValue in configForSmellie){
