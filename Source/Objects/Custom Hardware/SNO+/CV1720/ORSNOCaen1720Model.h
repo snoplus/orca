@@ -187,7 +187,12 @@ enum {
 - (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
 #pragma mark ***Register - General routines
-- (int)				connect;
+- (void) connect;
+- (void) disconnect;
+- (redisReply *) command: (char *)fmt, ...;
+- (redisReply *) vcommand: (char *)fmt args:(va_list)ap;
+- (int) intCommand: (char *)fmt, ...;
+- (void) okCommand: (char *)fmt, ...;
 - (void)			read;
 - (void)			write;
 - (void)			report;

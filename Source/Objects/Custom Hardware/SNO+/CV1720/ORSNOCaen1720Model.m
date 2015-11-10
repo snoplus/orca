@@ -30,6 +30,7 @@
 #import "ORRunModel.h"
 #include <stdint.h>
 #include <hiredis.h>
+#import "SNOPModel.h"
 
 
 // Address information for this unit.
@@ -140,24 +141,119 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
     return self;
 }
 
-- (int) connect
+- (void) connect
 {
     struct timeval timeout = {1, 0}; // 1 second
-    context = redisConnectWithTimeout("sbc-teststand.sp.snolab.ca", 4001, timeout);
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    SNOPModel* sno;
+    if ([objs count]) {
+        sno = [objs objectAtIndex:0];
+    } else {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"couldn't find SNOPModel"  userInfo:Nil];
+        [exception raise];
+    }
+
+    const char *host = [[sno MTCHostName] UTF8String];
+
+    if (host == NULL) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"mtc hostname == NULL"  userInfo:Nil];
+        [exception raise];
+    }
+
+    context = redisConnectWithTimeout(host, 4001, timeout);
 
     NSLog(@"caen: connecting...\n");
     if (context == NULL) {
-	NSLog(@"caen: failed to connect\n");
-	return -1;
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
+	[exception raise];
     } else if (context->err) {
-	NSLog(@"caen: %s\n", context->errstr);
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
 	redisFree(context);
 	context = NULL;
-	return -1;
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
     }
     NSLog(@"caen: connected!\n");
+}
 
-    return 0; // success!
+- (void) disconnect
+{
+    if (context) redisFree(context);
+    NSLog(@"caen: disconnected.\n");
+}
+
+- (redisReply *) vcommand: (char *)fmt args:(va_list) ap
+{
+    if (context == NULL) [self connect];
+
+    redisReply *r = redisvCommand(context, fmt, ap);
+
+    if (r == NULL) {
+	NSString *err = [NSString stringWithUTF8String:context->errstr];
+	freeReplyObject(r);
+	redisFree(context);
+	context = NULL;
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    if (r->type == REDIS_REPLY_ERROR) {
+	NSString *err = [NSString stringWithUTF8String:r->str];
+	freeReplyObject(r);
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
+	[exception raise];
+    }
+
+    return r;
+}
+    
+- (redisReply *) command: (char *)fmt, ...
+{
+    /* Sends a command to the MTC server. Takes a variable number of arguments with
+     * a format similar to printf().
+     *
+     *   redisReply *r = [self command:"caen_read 0x34"];
+     *   freeReplyObject(r);
+     *
+     * Replies should be freed by calling the freeReplyObject() function.;
+     */
+    va_list ap;
+    va_start(ap, fmt);
+    redisReply *r = [self vcommand:fmt args:ap];
+    va_end(ap);
+    return r;
+}
+
+- (int) intCommand: (char *)fmt, ...
+{
+    va_list ap;
+    va_start(ap, fmt);
+    redisReply *r = [self vcommand:fmt args:ap];
+    va_end(ap);
+
+    if (r->type != REDIS_REPLY_INTEGER) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"unexpected response type" userInfo:Nil];
+	[exception raise];
+    }
+
+    int integer = r->integer;
+    freeReplyObject(r);
+    return integer;
+}
+
+- (void) okCommand: (char *)fmt, ...
+{
+    va_list ap;
+    va_start(ap, fmt);
+    redisReply *r = [self vcommand:fmt args:ap];
+    va_end(ap);
+
+    if (r->type != REDIS_REPLY_STATUS) {
+	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"unexpected response type" userInfo:Nil];
+	[exception raise];
+    }
+
+    freeReplyObject(r);
 }
 
 - (void) dealloc 
@@ -608,33 +704,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (read not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
     
-    if (context == NULL) {
-	if ([self connect] == -1) {
-	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
-	    [exception raise];
-	}
-    }
-
-    redisReply *r = redisCommand(context, "caen_read %d", [self getAddressOffset:pReg] + chan*0x100);
-
-    if (r == NULL) {
-	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type == REDIS_REPLY_ERROR) {
-	NSString *err = [NSString stringWithUTF8String:r->str];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type != REDIS_REPLY_INTEGER) {
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
-	[exception raise];
-    }
-
-    return r->integer;
+    return [self intCommand:"caen_read %d", [self getAddressOffset:pReg] + chan*0x100];
 }
 
 - (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue
@@ -651,31 +721,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (write not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
     
-    if (context == NULL) {
-	if ([self connect] == -1) {
-	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
-	    [exception raise];
-	}
-    }
-
-    redisReply *r = redisCommand(context, "caen_write %d %d", [self getAddressOffset:pReg] + chan*0x100, pValue);
-
-    if (r == NULL) {
-	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type == REDIS_REPLY_ERROR) {
-	NSString *err = [NSString stringWithUTF8String:r->str];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type != REDIS_REPLY_STATUS) {
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
-	[exception raise];
-    }
+    [self okCommand:"caen_write %d %d", [self getAddressOffset:pReg] + chan*0x100, pValue];
 }
 
 - (unsigned short) threshold:(unsigned short) aChnl
@@ -806,33 +852,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (read not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
 
-    if (context == NULL) {
-	if ([self connect] == -1) {
-	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
-	    [exception raise];
-	}
-    }
-
-    redisReply *r = redisCommand(context, "caen_read %d", [self getAddressOffset:pReg]);
-
-    if (r == NULL) {
-	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type == REDIS_REPLY_ERROR) {
-	NSString *err = [NSString stringWithUTF8String:r->str];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type != REDIS_REPLY_INTEGER) {
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
-	[exception raise];
-    }
-
-    return r->integer;
+    return [self intCommand:"caen_read %d", [self getAddressOffset:pReg]];
 }
 
 - (void) write:(uint32_t) pReg sendValue:(uint32_t) pValue
@@ -848,31 +868,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [NSException raise:@"Illegal Operation" format:@"Illegal operation (write not allowed) on reg [%@] %@",[self getRegisterName:pReg],[self identifier]];
     }
     
-    if (context == NULL) {
-	if ([self connect] == -1) {
-	    NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
-	    [exception raise];
-	}
-    }
-
-    redisReply *r = redisCommand(context, "caen_write %d %d", [self getAddressOffset:pReg], pValue);
-
-    if (r == NULL) {
-	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type == REDIS_REPLY_ERROR) {
-	NSString *err = [NSString stringWithUTF8String:r->str];
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
-	[exception raise];
-    }
-
-    if (r->type != REDIS_REPLY_STATUS) {
-	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: unexpected reply type" userInfo:Nil];
-	[exception raise];
-    }
+    [self okCommand:"caen_write %d %d", [self getAddressOffset:pReg], pValue];
 }
 
 
