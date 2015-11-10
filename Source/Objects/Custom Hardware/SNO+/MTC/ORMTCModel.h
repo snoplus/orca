@@ -258,7 +258,6 @@
 - (void) setupPulserRateAndEnable:(float) pulserPeriodVal;
 - (void) fireMTCPedestalsFixedTime;
 - (void) stopMTCPedestalsFixedTime;
-- (void) enableSingleShotMTCPedestalsFixedTime;
 - (void) singleShotMTCPedestalsFixedTime;
 - (unsigned long) singleShotMTCPedestalsFixedTime:(unsigned long) pedestalCount withDelay:(unsigned long) usecDelay;
 - (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals;
