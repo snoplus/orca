@@ -234,7 +234,6 @@
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
 - (void) zeroTheGTCounter;
 - (double) get10MHzSeconds;
-- (unsigned long) getMtcTime;
 - (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue;
 - (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue;
 - (void) setTheLockoutWidth:(unsigned short) theLockoutWidthValue;

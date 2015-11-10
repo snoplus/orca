@@ -1553,72 +1553,35 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (double) get10MHzSeconds
 {
-	//get the 10MHz clock time expressed in seconds relative to SNO time zero
-	unsigned long	lower, upper;
-	double theValue = 0;
-	@try {
-		[self getThe10MHzCounterLow:&lower high:&upper];
-		theValue =  ((double) 4294967296.0 * (double)upper + (double)lower) * 1e-7;
-	}
-	@catch(NSException* localException) {
-		[localException raise];
-	}
-	return theValue;
-}
-
-- (unsigned long) getMtcTime
-{
-	//--get the 10MHz clock. seconds since 01/01/1904
-	static unsigned long theSecondsToAdd = 0;
-	
- 	if( theSecondsToAdd == 0 ) {
-		theSecondsToAdd =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSDate dateUsingYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
- 	}
-	
-    return theSecondsToAdd + (unsigned long)[self get10MHzSeconds];
-	
+    /* Get the 10MHz clock time expressed in seconds since 1/1/2010.
+     *
+     * Note: we don't add leap seconds, because we can't know beforehand when
+     * these will occur. This means that the counter is not strictly increasing.
+     * If a leap second occurs between syncs, then the time will be off by
+     * 1 second.
+     */
+    uint32_t lower, upper;
+    [self getThe10MHzCounterLow:&lower high:&upper];
+    return ((double) 4294967296.0 * (double)upper + (double)lower) * 1e-7;
 }
 
 - (void) load10MHzClock
 {
-	[self setThe10MHzCounterLow:uLongDBValue(kLow10MhzClock) high:uLongDBValue(kHigh10MhzClock)];
+    [self setThe10MHzCounterLow:uLongDBValue(kLow10MhzClock) high:uLongDBValue(kHigh10MhzClock)];
 }
 
-// SetThe10MHzCounter
 - (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue
 {
-	unsigned long	aValue;
-	
-	@try {
-		
-		// Now load the serial shift register	
-		short j;
-		for (j = 52; j >= 0; j--){							
-			
-			aValue = 0UL;
-			
-			if ( j < 32) {
-				if ( (1UL << j ) & lowerValue ) aValue |= ( 1UL << 1 );		// build the data word
-			}
- 			else {
-				if ( (1UL << (j - 32) ) & upperValue ) aValue |= ( 1UL << 1 );		// build the data word
-			}
-			[self write:kMtcSerialReg value:aValue + MTC_SERIAL_REG_SEN];	// Bit 0 is always high
-			[self write:kMtcSerialReg value:aValue + MTC_SERIAL_SHFTCLK10];	// clock in data value, BIT 0 = high
-		}
-		
-		// Now load enable by clearing and setting the appropriate bit		
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
-		NSLog(@"Loaded 10MHz counter\n");
-		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not load the 10MHz counter!\n");
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];
-	}
+    uint64_t count = ((uint64_t)upperValue << 32) | lowerValue;
+
+    @try {
+        [self okCommand:"load_10mhz_clock %d\n", count];
+	NSLog(@"Loaded 10MHz counter\n");
+    } @catch(NSException* localException) {
+        NSLog(@"Could not load the 10MHz counter!\n");
+        NSLog(@"Exception: %@\n",localException);
+        [localException raise];
+    }
 }
 
 
