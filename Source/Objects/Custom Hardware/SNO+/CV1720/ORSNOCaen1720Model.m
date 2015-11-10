@@ -1037,14 +1037,6 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
     [self write:kSWClear aValue:0];
 }
 
-- (void) writeTriggerCount
-{
-    /* is this correct? */
-    uint32_t aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
-    [self write:kTrigSrcEnblMask sendValue:aValue];
-}
-
-
 - (void) writeTriggerSource
 {
     uint32_t aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
