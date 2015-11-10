@@ -46,9 +46,6 @@
 	//standard Ops
 	IBOutlet NSButton*		standardOpsLockButton;
 	IBOutlet NSButton*		initMtcButton;
-	IBOutlet NSButton*		initNoXilinxButton;
-	IBOutlet NSButton*		initNo10MHzButton;
-	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
 	IBOutlet NSButton*		load10MhzCounterButton;
 	IBOutlet NSButton*		setFineDelayButton;
 	IBOutlet NSButton*		setCoarseDelayButton;
@@ -65,7 +62,6 @@
 	IBOutlet NSButton*		continuousButton;
 	IBOutlet NSButton*		stopTriggerZeroButton;
 	IBOutlet NSProgressIndicator* initProgressBar;
-	IBOutlet NSTextField*	initProgressField;
 	IBOutlet NSMatrix*		isPulserFixedRateMatrix;
     IBOutlet NSMatrix* pulserFeedsMatrix;
 	
@@ -177,9 +173,6 @@
 
 //MTC Init Ops
 - (IBAction) standardInitMTC:(id) sender;
-- (IBAction) standardInitMTCnoXilinx:(id) sender;
-- (IBAction) standardInitMTCno10MHz:(id) sender;
-- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
 - (IBAction) standardLoad10MHzCounter:(id) sender;
 - (IBAction) standardLoadMTCADacs:(id) sender;
 - (IBAction) standardSetCoarseDelay:(id) sender;

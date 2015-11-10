@@ -28,11 +28,7 @@
                 <outlet property="globalTriggerMaskMatrix" destination="2986" id="4448"/>
                 <outlet property="high10MhzClockField" destination="1818" id="2511"/>
                 <outlet property="initMtcButton" destination="1436" id="3868"/>
-                <outlet property="initNo10MHzButton" destination="1440" id="3870"/>
-                <outlet property="initNoXilinxButton" destination="1438" id="3871"/>
-                <outlet property="initNoXilinxNo100MHzButton" destination="1442" id="3872"/>
                 <outlet property="initProgressBar" destination="3885" id="3890"/>
-                <outlet property="initProgressField" destination="3886" id="3891"/>
                 <outlet property="isPulserFixedRateMatrix" destination="4091" id="4096"/>
                 <outlet property="lastFileLoadedField" destination="2059" id="2942"/>
                 <outlet property="load10MhzCounterButton" destination="4155" id="4432"/>
@@ -610,7 +606,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" id="1436">
-                                                        <rect key="frame" x="13" y="103" width="160" height="28"/>
+                                                        <rect key="frame" x="13" y="101" width="160" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Initialize" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3939">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -620,57 +616,10 @@
                                                             <action selector="standardInitMTC:" target="-2" id="2240"/>
                                                         </connections>
                                                     </button>
-                                                    <button verticalHuggingPriority="750" id="1438">
-                                                        <rect key="frame" x="13" y="79" width="160" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Init (no Xilinx)" bezelStyle="rounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3940">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="standardInitMTCnoXilinx:" target="-2" id="2241"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="1440">
-                                                        <rect key="frame" x="13" y="55" width="160" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Init (no10MHz)" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3941">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="standardInitMTCno10MHz:" target="-2" id="2242"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="1442">
-                                                        <rect key="frame" x="13" y="31" width="160" height="28"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Init (no Xilinx, no10MHz)" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3942">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="standardInitMTCnoXilinxno10MHz:" target="-2" id="2243"/>
-                                                        </connections>
-                                                    </button>
                                                     <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="bar" id="3885">
-                                                        <rect key="frame" x="23" y="14" width="104" height="12"/>
+                                                        <rect key="frame" x="23" y="64" width="145" height="12"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </progressIndicator>
-                                                    <textField verticalHuggingPriority="750" id="3886">
-                                                        <rect key="frame" x="133" y="9" width="38" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="3943">
-                                                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="#,##0%" negativeFormat="#,##0%" numberStyle="percent" paddingCharacter="*" minimumIntegerDigits="1" maximumIntegerDigits="309" decimalSeparator="." groupingSeparator="" currencyDecimalSeparator="." plusSign="+" minusSign="-" notANumberSymbol="NaN" perMillSymbol="‰" percentSymbol="%" exponentSymbol="E" positivePrefix="" positiveSuffix="%" negativePrefix="-" negativeSuffix="%" id="3888">
-                                                                <integer key="multiplier" value="100"/>
-                                                                <nil key="negativeInfinitySymbol"/>
-                                                                <nil key="positiveInfinitySymbol"/>
-                                                            </numberFormatter>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>

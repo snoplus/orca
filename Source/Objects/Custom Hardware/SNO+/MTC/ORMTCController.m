@@ -77,8 +77,6 @@
     [tabView setFocusRingType:NSFocusRingTypeNone];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 
-	[initProgressField setHidden:YES];
-	
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
@@ -277,9 +275,6 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCLock] | sequenceRunning;
 
 	[initMtcButton				setEnabled: !lockedOrRunningMaintenance];
-	[initNoXilinxButton			setEnabled: !lockedOrRunningMaintenance];
-	[initNo10MHzButton			setEnabled: !lockedOrRunningMaintenance];
-	[initNoXilinxNo100MHzButton setEnabled: !lockedOrRunningMaintenance];
 	//[load10MhzCounterButton		setEnabled: !lockedOrRunningMaintenance];
 	//[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
 	//[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
@@ -318,8 +313,6 @@
 	sequenceRunning = YES;
 	[initProgressBar startAnimation:self];
 	[initProgressBar setDoubleValue:0];
-	[initProgressField setHidden:NO];
-	[initProgressField setDoubleValue:0];
 	[self updateButtons];
     //hack to unlock UI if the sequence couldn't finish and didn't raise an exception (MTCD feature)
     [self performSelector:@selector(sequenceStopped:) withObject:nil afterDelay:5];
@@ -328,7 +321,6 @@
 - (void) sequenceStopped:(NSNotification*)aNote
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[initProgressField setHidden:YES];
 	[initProgressBar setDoubleValue:0];
 	[initProgressBar stopAnimation:self];
 	sequenceRunning = NO;
@@ -339,7 +331,6 @@
 {
 	double progress = [[[aNote userInfo] objectForKey:@"progress"] floatValue];
 	[initProgressBar setDoubleValue:progress];
-	[initProgressField setFloatValue:progress/100.];
 }
 
 - (void) eSumViewTypeChanged:(NSNotification*)aNote
@@ -724,22 +715,7 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-	[model initializeMtc:YES load10MHzClock:YES]; 
-}
-
-- (IBAction) standardInitMTCnoXilinx:(id) sender 
-{
-	[model initializeMtc:NO load10MHzClock:YES]; 
-}
-
-- (IBAction) standardInitMTCno10MHz:(id) sender 
-{
-	[model initializeMtc:YES load10MHzClock:NO]; 
-}
-
-- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
-{
-	[model initializeMtc:NO load10MHzClock:NO]; 
+	[model initializeMtc]; 
 }
 
 - (IBAction) standardLoad10MHzCounter:(id) sender 

@@ -217,7 +217,7 @@
 - (unsigned long) getMTC_FineDelay;
 - (void) sendMTC_SoftGt;
 - (void) sendMTC_SoftGt:(BOOL) setGTMask;
-- (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock;
+- (void) initializeMtc;
 - (void) initializeMtcDone;
 - (void) clearGlobalTriggerWordMask;
 - (void) setGlobalTriggerWordMask;

@@ -1320,38 +1320,33 @@ resetFifoOnStart = _resetFifoOnStart;
 	
 }
 
-- (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
+- (void) initializeMtc
 {
-	ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
+    ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
 
-	@try {		
-		NSLog(@"Starting MTC init process....(load Xilinx: %@) (10MHzClock: %@)\n",loadTheMTCXilinxFile?@"YES":@"NO",loadThe10MHzClock?@"YES":@"NO");
-		
-		if (loadTheMTCXilinxFile) [[seq forTarget:self] loadMTCXilinx];				// STEP 1 : Load the Xilinx
-		[[seq forTarget:self] clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
-		[[seq forTarget:self] clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
-		[[seq forTarget:self] clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
-		[[seq forTarget:self] loadTheMTCADacs];										// STEP 5: Load the DACs	
-		[[seq forTarget:self] clearTheControlRegister];								// STEP 6: Clear the Control Register
-		[[seq forTarget:self] zeroTheGTCounter];									// STEP 7: Clear the GT Counter
-		[[seq forTarget:self] setTheLockoutWidth:uShortDBValue(kLockOutWidth)];		// STEP 8: Set the Lockout Width	
-		[[seq forTarget:self] setThePrescaleValue];									// STEP 9:  Load the NHIT 100 LO prescale value
-		[[seq forTarget:self] setThePulserRate:floatDBValue(kPulserPeriod)];		// STEP 10: Load the Pulser
-		[[seq forTarget:self] setThePedestalWidth:uLongDBValue(kPedestalWidth)];	// STEP 11: Set the Pedestal Width
-		[[seq forTarget:self] setupPulseGTDelaysCoarse:uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 12: Setup the Pulse GT Delays
-		if( loadThe10MHzClock)[[seq forTarget:self] setMtcTime];					// STEP 13: Load the 10MHz Counter
-		[[seq forTarget:self] resetTheMemory];										// STEP 14: Reset the Memory	 
-		//[[seq forTarget:self] setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
-		[[seq forTarget:self] initializeMtcDone];
-		[seq startSequence];
-		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n", 
-			  loadTheMTCXilinxFile?@"with":@"no", loadThe10MHzClock?@"load":@"don't load");
-		NSLog(@"Exception: %@\n",localException);
-		[seq stopSequence];
-	}
+    @try {              
+        NSLog(@"Starting MTC init process....\n");
+                
+        [[seq forTarget:self] clearGlobalTriggerWordMask];                                                      // STEP 2: Clear the GT Word Mask
+        [[seq forTarget:self] clearPedestalCrateMask];                                                          // STEP 3: Clear the Pedestal Crate Mask
+        [[seq forTarget:self] clearGTCrateMask];                                                                        // STEP 4: Clear the GT Crate Mask
+        [[seq forTarget:self] loadTheMTCADacs];                                                                         // STEP 5: Load the DACs        
+        [[seq forTarget:self] clearTheControlRegister];                                                         // STEP 6: Clear the Control Register
+        [[seq forTarget:self] zeroTheGTCounter];                                                                        // STEP 7: Clear the GT Counter
+        [[seq forTarget:self] setTheLockoutWidth:uShortDBValue(kLockOutWidth)];         // STEP 8: Set the Lockout Width        
+        [[seq forTarget:self] setThePrescaleValue];                                                                     // STEP 9:  Load the NHIT 100 LO prescale value
+        [[seq forTarget:self] setThePulserRate:floatDBValue(kPulserPeriod)];            // STEP 10: Load the Pulser
+        [[seq forTarget:self] setThePedestalWidth:uLongDBValue(kPedestalWidth)];        // STEP 11: Set the Pedestal Width
+        [[seq forTarget:self] setupPulseGTDelaysCoarse:uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 12: Setup the Pulse GT Delays
+        [[seq forTarget:self] resetTheMemory];                                                                          // STEP 14: Reset the Memory     
+        [[seq forTarget:self] initializeMtcDone];
+        [seq startSequence];
+                
+    } @catch(NSException* localException) {
+        NSLog(@"***Initialization of the MTC failed!***\n");
+        NSLog(@"Exception: %@\n",localException);
+        [seq stopSequence];
+    }
 }
 
 - (void) initializeMtcDone
