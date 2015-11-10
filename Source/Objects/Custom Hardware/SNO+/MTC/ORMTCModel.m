@@ -2284,70 +2284,27 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat
 {
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatResetMtcat;
-        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = mtcat;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Reset MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed reset MTCA+ num: %d\n", mtcat);
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [self okCommand:"mtca_reset %d", mtcat];
+    } @catch(NSException* e) {
+        NSLog(@"mtc: failed reset MTCA+ num: %d\n", mtcat);
+        NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}
 }
 
 
 - (void) mtcatResetAll
 {
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatResetAll;
-        aPacket.cmdHeader.numberBytesinPayload	= 1*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = 0;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Reset All MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed reset all MTCA+\n");
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [self okCommand:"mtca_reset_all"];
+    } @catch(NSException* e) {
+        NSLog(@"mtc: failed reset all MTCA+\n");
+        NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}
 }
 
 - (void) mtcatLoadCrateMasks
 {
-    //TODO move to SBC
     [self mtcatResetAll];
     [self mtcatLoadCrateMask:[self mtcaN100Mask] toMtcat:0];
     [self mtcatLoadCrateMask:[self mtcaN20Mask] toMtcat:1];
@@ -2360,7 +2317,6 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) mtcatClearCrateMasks
 {
-    //TODO move to SBC
     [self mtcatResetAll];
     [self mtcatLoadCrateMask:0 toMtcat:0];
     [self mtcatLoadCrateMask:0 toMtcat:1];
@@ -2378,36 +2334,15 @@ resetFifoOnStart = _resetFifoOnStart;
         return;
     }
 
-    if([self adapterIsSBC]){
-        long errorCode = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOMtcatLoadCrateMask;
-        aPacket.cmdHeader.numberBytesinPayload	= 2*sizeof(long);
-        
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = mask;
-        payloadPtr[1] = mtcat;
-        
-        @try {
-            [[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            errorCode = responsePtr[0];
-            if(errorCode){
-                @throw [NSException exceptionWithName:@"Load CrateMask to MTCA+ error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }
-        }
-        @catch(NSException* e) {
-            NSLog(@"SBC failed loading MTCA+ mask\n");
-            NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
-            //@throw e;
-        }
+    @try {
+        [self okCommand:"mtca_load_crate_mask %d %d", mask, mtcat];
+
         char* mtcats[] = {"N100", "N20", "EHI", "ELO", "OELO", "OEHI", "OWLN"};
         NSLog(@"MTCA: set %s crate mask to 0x%08x\n", mtcats[mtcat], mask);
+    } @catch(NSException* e) {
+        NSLog(@"mtc: failed loading MTCA+ mask\n");
+        NSLog(@"Error: %@ with reason: %@\n", [e name], [e reason]);
     }
-	else {
-        NSLog(@"Not implemented. Requires SBC with LabJack\n");
-	}    
 }
 
 
