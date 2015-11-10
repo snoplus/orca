@@ -233,7 +233,6 @@
 - (void) resetTheMemory;
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue;
 - (void) zeroTheGTCounter;
-- (void) setMtcTime;
 - (double) get10MHzSeconds;
 - (unsigned long) getMtcTime;
 - (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue;
