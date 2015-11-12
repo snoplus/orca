@@ -1521,12 +1521,44 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     //write file with burst data
     NSString* allBurstData = [NSString stringWithFormat:@"{\"novaState\":\"%i\",\"dateSec\":\"%f\",\"dateMic\":\"%i\",\"runNum\":\"%i\",\"runType\":\"%@\",\"Ncount\":\"%i\",\"Nmult\":\"%i\",\"Nchan\":\"%i\",\"ENchan\":\"%f\",\"pNchan\":\"%f\",'N':\"%i\",\"adcP\":\"%f\",\"gammaP\":\"%f\",\"alphaP\":\"%f\",\"Xcenter\":\"%i\",\"Xrms\":\"%f\",\"Ycenter\":\"%i\",\"Yrms\":\"%f\",\"phi\":\"%f\",\"Rcenter\":\"%f\",\"Rrms\":\"%f\",\"Pcenter\":\"%f\",\"durSec\":\"%f\",\"rSec\":\"%f\",\"burstNum\":\"%i\"}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
     
+    NSTask* getrev;
+    getrev =[[NSTask alloc] init];
+    NSPipe* piperev;
+    piperev = [NSPipe pipe];
+    [getrev setStandardOutput: piperev];
+    
+    [getrev setLaunchPath: @"/usr/bin/curl"];  //curl is there
+    //[getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", 1, @"|", @"cut", @"-d", @"\",\"", @"-f", 2, @"|", @"cut", @"-d", @"\":\"", @"-f", 2, nil]]; //gets bad access
+    [getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", @"1", @"|", @"cut", @"-d", @"\",\"", @"-f", @"2", @"|", @"cut", @"-d", @"\":\"", @"-f", @"2", nil]];  //was 10.0.3.1, 127.0.0.1 might be this comp
+    NSFileHandle* revfile;
+    NSData *revdata;
+    NSString *revstring;
+    @try{
+    [getrev launch]; //find the rev!!!
+    NSLog(@"part 0\n"); //got here with end card8channel0, and with } end
+    
+    //[getrev waitUntilExit]; //waits like 60 seconds for 10.0.3.1 on lu daq, freezes before without this
+    //NSLog(@"part 1\n");
+    [getrev terminate]; //needs this to work
+    [getrev release];
+    //NSLog(@"part 2\n");
+    revfile =[piperev fileHandleForReading];  //maybe need declare here
+    revdata = [revfile readDataToEndOfFile];
+    //NSLog(@"part 3\n");
+    revstring = [[NSString alloc] initWithData:revdata encoding:NSUTF8StringEncoding];
+    allBurstData = [revstring stringByAppendingString:allBurstData];
+    NSLog(@"part 4\n");
+    }
+    @catch(NSException* exc)
+    {
+        NSLog(@"Could not contact couchDB to get revision number.  Exception is %@", exc);
+    }
     //////stringWithFormat:@"{'novaState':'%i','dateSec':'%f','dateMic':'%i','runNum':'%i','runType':'%@','Ncount':'%i','Nmult':'%i','Nchan':'%i','ENchan':'%f','pNchan':'%f','N':'%i','adcP':'%f','gammaP':'%f','alphaP':'%f','Xcenter':'%i','Xrms':'%f','Ycenter':'%i','Yrms':'%f','phi':'%f','Rcenter':'%f','Rrms':'%f','Pcenter':'%f','durSec':'%f','rSec':'%f','burstNum':'%i'}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
-    if(0){ //write the file when we want to do that
+    if(1){ //write the file when we want to do that
         NSError* fileWriteErr;
         NSFileManager* fileman = nil;
         NSString* currentDir = [fileman currentDirectoryPath];
-        BOOL ok = [allBurstData writeToFile:@"/Users/HALO/flname.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
+        BOOL ok = [allBurstData writeToFile:@"/Users/HALO/lastburst.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
         NSLog(@"file write okness is %i\n", ok);
         NSLog(@"look for the file at %@\n", currentDir);
     }
