@@ -1725,7 +1725,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) setupGTFineDelay
 {
-	[self setupGTFineDelay:[self dbIntByIndex:kFineDelay]];
+    [self setupGTFineDelay:[self dbIntByIndex:kFineDelay]];
 }
 
 - (void) setupGTFineDelay:(unsigned short) aValue
@@ -1742,88 +1742,27 @@ resetFifoOnStart = _resetFifoOnStart;
 	}
 }
 
-- (void) setThePulserRate:(float) thePulserPeriodValue
+- (void) setThePulserRate:(float) rate
 {
-	@try {
-		[self setThePulserRate:thePulserPeriodValue setToInfinity:NO];
-		NSLog(@"Set GT Pusler rate\n");			
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not set GT Pusler rate!\n");			
-		NSLog(@"Exception: %@\n",localException);
-		[localException raise];			
-		
-	}
-}
-
-- (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity
-{
-	unsigned long	pulserShiftValue = 0xffffff;
-	
-	@try {
-		// STEP 1: Load the shift register
-		if(setToInfinity)pulserShiftValue =  0;  
-		else {
-            if (thePulserPeriodValue < 0.05) {
-                pulserShiftValue = 0xffffff;
-            }
-            else {
-                // calculate the value to be shifted into SMTC_SERIAL_REG
-                //float pulserShiftFValue =  (thePulserPeriodValue/0.001280) - 1.0;  // max pulser period = (0.00128ms * 0x00ffffff) = 21474.8532ms
-                // the pulser period value is rate now
-                float pulserShiftFValue =  (1000.0/thePulserPeriodValue/0.001280) - 1.0;
-                pulserShiftValue = (unsigned long)pulserShiftFValue;
-            }
-		}
-		
-		// STEP 2: Now serially shift into SMTC_SERIAL_REG the value 'pulserShiftValue'
-		short j;
-		for ( j = 23; j >= 0; j--){							
-			
-			unsigned long aValue = 0UL;
-			if ( (1UL << j ) & pulserShiftValue ) aValue |= ( 1UL << 1 );		// build the data word
-			
-			[self write:kMtcSerialReg value:aValue + 1]; // Bit 0 is always high
-			// clock in data value, BIT 0 = high
-			[self write:kMtcSerialReg value:((aValue | MTC_SERIAL_SHFTCLKPS) | 0x000000001)]; 	
-			
-		}		
-		
-		float frequencyValue = (float)( 781.25/((float)pulserShiftValue + 1.0) );					// in KHz
-		if (frequencyValue < 0.001)		NSLog(@"Pulser frequency set @ %3.3f mHz.\n",(frequencyValue * 1000000.0));
-		else if (frequencyValue <= 1.0)	NSLog(@"Pulser frequency set @ %3.3f Hz.\n",(frequencyValue * 1000.0));
-		else if (frequencyValue > 1.0)	NSLog(@"Pulser frequency set @ %3.4f kHz.\n",frequencyValue);
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Could not setup the MTC pulser frequency!\n");
-		[localException raise];
-	}
-}
-
-- (void) loadEnablePulser
-{
-	@try {
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-		NSLog(@"loaded/enabled the pulser!\n");		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Unable to load/enable the pulser!\n");		
-		[localException raise];	
-	}
+    @try {
+        [self okCommand:"set_pulser_freq %f\n", rate];
+        NSLog(@"Set GT Pusler rate\n");                 
+    } @catch(NSException* localException) {
+        NSLog(@"Could not set GT Pusler rate!\n");                      
+        NSLog(@"Exception: %@\n",localException);
+        [localException raise];                 
+    }
 }
 
 - (void) enablePulser
 {
-	@try {
-		[self setBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
-		NSLog(@"Enabled Pulser.\n");		
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Unable to enable the pulser!\n");		
-		[localException raise];	
-	}
+    @try {
+        [self setBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
+        NSLog(@"Enabled Pulser.\n");            
+    } @catch(NSException* localException) {
+        NSLog(@"Unable to enable the pulser!\n");               
+        [localException raise]; 
+    }
 }
 
 - (void) disablePulser
