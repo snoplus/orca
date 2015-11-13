@@ -1537,7 +1537,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [getrev launch]; //find the rev!!!
     NSLog(@"part 0\n"); //got here with end card8channel0, and with } end
     
-    //[getrev waitUntilExit]; //waits like 60 seconds for 10.0.3.1 on lu daq, freezes before without this
+    [getrev waitUntilExit]; //waits like 60 seconds for 10.0.3.1 on lu daq, freezes before without this
     //NSLog(@"part 1\n");
     [getrev terminate]; //needs this to work
     [getrev release];
@@ -1551,14 +1551,15 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     @catch(NSException* exc)
     {
-        NSLog(@"Could not contact couchDB to get revision number.  Exception is %@", exc);
+        NSLog(@"Could not contact couchDB to get revision number.  Exception is %@\n", exc);
     }
+    NSLog(@"allburstdata is %@\n", allBurstData);
     //////stringWithFormat:@"{'novaState':'%i','dateSec':'%f','dateMic':'%i','runNum':'%i','runType':'%@','Ncount':'%i','Nmult':'%i','Nchan':'%i','ENchan':'%f','pNchan':'%f','N':'%i','adcP':'%f','gammaP':'%f','alphaP':'%f','Xcenter':'%i','Xrms':'%f','Ycenter':'%i','Yrms':'%f','phi':'%f','Rcenter':'%f','Rrms':'%f','Pcenter':'%f','durSec':'%f','rSec':'%f','burstNum':'%i'}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
     if(1){ //write the file when we want to do that
         NSError* fileWriteErr;
         NSFileManager* fileman = nil;
         NSString* currentDir = [fileman currentDirectoryPath];
-        BOOL ok = [allBurstData writeToFile:@"/Users/HALO/lastburst.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
+        BOOL ok = [allBurstData writeToFile:@"/Users/daq/lastburst.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
         NSLog(@"file write okness is %i\n", ok);
         NSLog(@"look for the file at %@\n", currentDir);
     }
