@@ -53,6 +53,15 @@
 	IBOutlet ORLongTermView*	longTermView;
 	IBOutlet NSSlider*		sensitivitySlider;
 	IBOutlet NSTextField*	sensitivityField;
+    
+    IBOutlet NSTextField*   historyFolderField;
+    IBOutlet NSButton*      setHistoryFolderButton;
+//    IBOutlet NSPopUpButton* keepFileIntervalPU;
+//    IBOutlet NSTextField*   traceSizeField;
+//    IBOutlet NSPopUpButton* saveFileIntervalPU;
+//    IBOutlet NSPopUpButton* updateIntervalPU;
+//    IBOutlet NSButton*      viewCurrentButton;
+//    IBOutlet NSButton*      viewPastHistoryButton;
 }
 
 #pragma mark ***Interface Management
@@ -101,6 +110,13 @@
 
 - (int)	numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
+
+//- (IBAction) keepFileIntervalAction:(id)sender;
+//- (IBAction) saveFileIntervalAction:(id)sender;
+//- (IBAction) updateIntervalAction:(id)sender;
+
+
+- (IBAction) setHistoryFolderAction:(id)sender;
 
 @end
 

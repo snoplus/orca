@@ -149,6 +149,11 @@
                          name : ORMotionNodeModelTotalShippedChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(historyFolderChanged:)
+                         name : ORMotionNodeModelHistoryFolderChanged
+						object: model];
+	
 	[serialPortController registerNotificationObservers];
 
 }
@@ -210,6 +215,7 @@
 	[self outOfBandChanged:nil];
 	[self lastRecordShippedChanged:nil];
 	[self totalShippedChanged:nil];
+    [self historyFolderChanged:nil];
 	[serialPortController updateWindow];
 
 }
@@ -352,6 +358,9 @@
 	[shipThresholdField setEnabled: portOpen && !locked && [model shipExcursions]];
 	[shipThresholdSlider setEnabled: portOpen && !locked && [model shipExcursions]];
 	[shipExcursionsCB setEnabled: portOpen && !locked];
+    
+    [setHistoryFolderButton setEnabled: !locked ];
+
 	
 	[serialPortController updateButtons:locked];
 }
@@ -370,6 +379,12 @@
 {
 	return [gSecurity isLocked:ORMotionNodeModelLock];
 }
+
+- (void) historyFolderChanged:(NSNotification*)aNote
+{
+	[historyFolderField setStringValue: [[model historyFolder] stringByAbbreviatingWithTildeInPath]];
+}
+
 
 #pragma mark •••Actions
 
@@ -489,6 +504,31 @@
 	return [model longTermDataAtLine:m point:i];
 }
 
+
+- (IBAction) setHistoryFolderAction:(id)sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:YES];
+    [openPanel setCanChooseFiles:NO];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+	[openPanel setCanCreateDirectories:YES];
+    NSString* startingDir;
+    if([model historyFolder]){
+        startingDir = [model historyFolder];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+    }
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* folderName = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model setHistoryFolder:folderName];
+        }
+    }];
+    
+}
 
 @end
 

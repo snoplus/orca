@@ -95,6 +95,16 @@ typedef struct MotionNodeCalibrations {
     int				totalShipped;
 	int				excursionIndex;
 	float			longTraceValueToKeep;
+    
+    NSString*		historyFolder;
+//    int				keepFileInterval;
+//    int				saveFileInterval;
+//    int             updateInterval;
+//    NSDate*			timeStarted;
+    NSMutableData*         trace;
+    int             ptrIndex;
+    unsigned long*  ptr;
+    NSString*       serialID;
 }
 
 #pragma mark ***Initialization
@@ -152,6 +162,18 @@ typedef struct MotionNodeCalibrations {
 - (id) lastRequest;
 - (void) setLastRequest:(id)aCmd;
 
+//- (unsigned long) calculatedFileSizeBytes;
+//- (int) updateInterval;
+//- (void) setUpdateInterval:(int) anInterval;
+//- (int) keepFileInterval;
+//- (void) setKeepFileInterval:(int)aKeepFileInterval;
+//- (int) saveFileInterval;
+//- (void) setSaveFileInterval:(int)aSaveFileInterval;
+- (NSString*) historyFolder;
+- (void) setHistoryFolder:(NSString*)aHistoryFolder;
+//- (NSDate*) timeStarted;
+//- (void) setTimeStarted:(NSDate*)aTimeStarted;
+
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -204,4 +226,7 @@ extern NSString* ORMotionNodeModelLock;
 extern NSString* ORMotionNodeModelSerialNumberChanged;
 extern NSString* ORMotionNodeModelDisplayComponentsChanged;
 extern NSString* ORMotionNodeModelUpdateLongTermTrace;
-
+extern NSString* ORMotionNodeModelHistoryFolderChanged;
+//extern NSString* ORMotionNodeModelSaveFileIntervalChanged;
+//extern NSString* ORMotionNodeModelUpdateIntervalChanged;
+//extern NSString* ORMotionNodeModelKeepFileIntervalChanged;

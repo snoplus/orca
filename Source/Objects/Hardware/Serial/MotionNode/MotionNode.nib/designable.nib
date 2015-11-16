@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORMotionNodeController">
             <connections>
                 <outlet property="autoStartCB" destination="816" id="818"/>
                 <outlet property="displayComponentsMatrix" destination="691" id="704"/>
+                <outlet property="historyFolderField" destination="Dxz-13-u6k" id="b52-az-uyT"/>
                 <outlet property="isAccelOnlyField" destination="523" id="530"/>
                 <outlet property="lastRecordShippedField" destination="852" id="856"/>
                 <outlet property="lockButton" destination="152" id="409"/>
@@ -19,6 +20,7 @@
                 <outlet property="sensitivityField" destination="775" id="780"/>
                 <outlet property="sensitivitySlider" destination="771" id="773"/>
                 <outlet property="serialPortController" destination="511" id="514"/>
+                <outlet property="setHistoryFolderButton" destination="yme-VQ-jCi" id="ngI-bp-FWJ"/>
                 <outlet property="shipExcursionsCB" destination="828" id="832"/>
                 <outlet property="shipThresholdField" destination="826" id="830"/>
                 <outlet property="shipThresholdSlider" destination="824" id="831"/>
@@ -54,7 +56,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" focusRingType="none" inset="2" id="871">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system" size="10"/>
+                            <font key="font" size="10" name="LucidaGrande"/>
                         </buttonCell>
                         <connections>
                             <action selector="settingLockAction:" target="-2" id="410"/>
@@ -422,6 +424,107 @@
                                     </subviews>
                                 </view>
                             </tabViewItem>
+                            <tabViewItem label="History" identifier="2" id="g3j-Tk-ZEi">
+                                <view key="view" id="xWL-bE-iGB">
+                                    <rect key="frame" x="10" y="25" width="761" height="206"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField verticalHuggingPriority="750" id="IbC-02-tgY">
+                                            <rect key="frame" x="14" y="37" width="40" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Recent" id="bk1-wq-dB8">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="32T-zI-BNx">
+                                            <rect key="frame" x="14" y="186" width="40" height="14"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Older" id="tJF-f8-UxF">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="oPg-EJ-gA2">
+                                            <rect key="frame" x="1" y="100" width="45" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="1 Min Traces" id="TaQ-SI-hdh">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <customView id="P9S-Qb-dam" customClass="ORLongTermView">
+                                            <rect key="frame" x="63" y="37" width="215" height="163"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <connections>
+                                                <outlet property="dataSource" destination="-2" id="rPH-ch-4su"/>
+                                            </connections>
+                                        </customView>
+                                        <slider focusRingType="none" verticalHuggingPriority="750" id="1X4-ff-PQP">
+                                            <rect key="frame" x="152" y="17" width="226" height="15"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <sliderCell key="cell" controlSize="small" continuous="YES" state="on" focusRingType="none" alignment="left" minValue="1" maxValue="1000" doubleValue="150" tickMarkPosition="above" sliderType="linear" id="afu-Tf-3no">
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </sliderCell>
+                                            <connections>
+                                                <action selector="longTermSensitivityAction:" target="-2" id="YZI-NL-WPk"/>
+                                            </connections>
+                                        </slider>
+                                        <textField verticalHuggingPriority="750" id="pzr-Tq-Sss">
+                                            <rect key="frame" x="109" y="14" width="38" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="43D-Re-zUF">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" id="k0k-Hi-KLK">
+                                            <rect key="frame" x="44" y="14" width="68" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Values x" id="im7-IP-svt">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <button id="zfX-4O-GXc">
+                                            <rect key="frame" x="292" y="43" width="88" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Differential" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="1Kp-zO-uoU">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showLongTermDeltaAction:" target="-2" id="SfH-ie-sxS"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" id="yme-VQ-jCi">
+                                            <rect key="frame" x="618" y="42" width="131" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Set History Folder..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FuB-EC-LZ7">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="setHistoryFolderAction:" target="-2" id="Zey-1M-pzJ"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" id="Dxz-13-u6k">
+                                            <rect key="frame" x="486" y="18" width="246" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Idle" id="m0P-ay-gmb">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
                         </tabViewItems>
                     </tabView>
                     <button focusRingType="none" verticalHuggingPriority="750" id="683">
@@ -554,6 +657,105 @@
                 <outlet property="portControlsView" destination="510" id="513"/>
             </connections>
         </customObject>
+        <popUpButton verticalHuggingPriority="750" id="Tn6-9t-62Q">
+            <rect key="frame" x="0.0" y="0.0" width="127" height="22"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <popUpButtonCell key="cell" type="push" title="Every Half Hour" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4ye-if-Zrf" id="SYX-mv-CW9">
+                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                <font key="font" metaFont="smallSystem"/>
+                <menu key="menu" title="OtherViews" id="Zdd-Oz-hWI">
+                    <items>
+                        <menuItem title="Every Half Hour" state="on" id="4ye-if-Zrf"/>
+                        <menuItem title="Every Hour" id="bIO-NQ-DsC"/>
+                        <menuItem title="Every Day" id="lkN-D4-vc9"/>
+                    </items>
+                </menu>
+            </popUpButtonCell>
+        </popUpButton>
+        <popUpButton verticalHuggingPriority="750" id="R99-t5-Ycg">
+            <rect key="frame" x="0.0" y="0.0" width="127" height="22"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <popUpButtonCell key="cell" type="push" title="Forever" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="g0d-6I-Y5a" id="RjJ-Pb-yVh">
+                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                <font key="font" metaFont="smallSystem"/>
+                <menu key="menu" title="OtherViews" id="OVz-SK-MIr">
+                    <items>
+                        <menuItem title="Forever" state="on" id="g0d-6I-Y5a"/>
+                        <menuItem title="Back One Day" id="v4e-Pe-062"/>
+                        <menuItem title="Back One Week" id="r0K-XD-5Sr"/>
+                    </items>
+                </menu>
+            </popUpButtonCell>
+        </popUpButton>
+        <textField verticalHuggingPriority="750" id="Vf5-zM-Eui">
+            <rect key="frame" x="0.0" y="0.0" width="102" height="14"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Save To Disk:" id="p6m-0X-SZt">
+                <font key="font" metaFont="smallSystem"/>
+                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+            </textFieldCell>
+        </textField>
+        <textField verticalHuggingPriority="750" id="CJZ-Bq-bhe">
+            <rect key="frame" x="0.0" y="0.0" width="127" height="14"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Keep History Files:" id="x4t-go-i7d">
+                <font key="font" metaFont="smallSystem"/>
+                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+            </textFieldCell>
+        </textField>
+        <button verticalHuggingPriority="750" id="HCW-e8-WYK">
+            <rect key="frame" x="0.0" y="0.0" width="131" height="28"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <buttonCell key="cell" type="push" title="View Past File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="S6P-NI-pTB">
+                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                <font key="font" metaFont="smallSystem"/>
+            </buttonCell>
+        </button>
+        <button verticalHuggingPriority="750" id="VFt-W1-5CQ">
+            <rect key="frame" x="0.0" y="0.0" width="131" height="28"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <buttonCell key="cell" type="push" title="Set History Folder..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Vx7-yS-WHx">
+                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                <font key="font" metaFont="smallSystem"/>
+            </buttonCell>
+        </button>
+        <button verticalHuggingPriority="750" id="CD4-0c-w2o">
+            <rect key="frame" x="0.0" y="0.0" width="131" height="28"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <buttonCell key="cell" type="push" title="Current File" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="feN-aR-e2H">
+                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                <font key="font" metaFont="smallSystem"/>
+            </buttonCell>
+        </button>
+        <textField verticalHuggingPriority="750" id="Odc-lZ-JTg">
+            <rect key="frame" x="0.0" y="0.0" width="246" height="17"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Idle" id="ndy-iO-9Ph">
+                <font key="font" metaFont="smallSystem"/>
+                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+            </textFieldCell>
+        </textField>
+        <textField verticalHuggingPriority="750" id="jXX-Ky-0eh">
+            <rect key="frame" x="0.0" y="0.0" width="86" height="17"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="YjB-i1-LLU">
+                <font key="font" metaFont="smallSystem"/>
+                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+            </textFieldCell>
+        </textField>
+        <textField verticalHuggingPriority="750" id="QPz-rv-Ao5">
+            <rect key="frame" x="0.0" y="0.0" width="49" height="17"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="~ Size:" id="Xb0-z5-Xxa">
+                <font key="font" metaFont="smallSystem"/>
+                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+            </textFieldCell>
+        </textField>
     </objects>
     <resources>
         <image name="Locked" width="33" height="36"/>
