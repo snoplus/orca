@@ -1519,7 +1519,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     
     //write file with burst data
-    NSString* allBurstData = [NSString stringWithFormat:@"{\"novaState\":\"%i\",\"dateSec\":\"%f\",\"dateMic\":\"%i\",\"runNum\":\"%i\",\"runType\":\"%@\",\"Ncount\":\"%i\",\"Nmult\":\"%i\",\"Nchan\":\"%i\",\"ENchan\":\"%f\",\"pNchan\":\"%f\",'N':\"%i\",\"adcP\":\"%f\",\"gammaP\":\"%f\",\"alphaP\":\"%f\",\"Xcenter\":\"%i\",\"Xrms\":\"%f\",\"Ycenter\":\"%i\",\"Yrms\":\"%f\",\"phi\":\"%f\",\"Rcenter\":\"%f\",\"Rrms\":\"%f\",\"Pcenter\":\"%f\",\"durSec\":\"%f\",\"rSec\":\"%f\",\"burstNum\":\"%i\"}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    NSString* allBurstData = [NSString stringWithFormat:@"\",\"novaState\":\"%i\",\"dateSec\":\"%f\",\"dateMic\":\"%i\",\"runNum\":\"%i\",\"runType\":\"%@\",\"Ncount\":\"%i\",\"Nmult\":\"%i\",\"Nchan\":\"%i\",\"ENchan\":\"%f\",\"pNchan\":\"%f\",'N':\"%i\",\"adcP\":\"%f\",\"gammaP\":\"%f\",\"alphaP\":\"%f\",\"Xcenter\":\"%i\",\"Xrms\":\"%f\",\"Ycenter\":\"%i\",\"Yrms\":\"%f\",\"phi\":\"%f\",\"Rcenter\":\"%f\",\"Rrms\":\"%f\",\"Pcenter\":\"%f\",\"durSec\":\"%f\",\"rSec\":\"%f\",\"burstNum\":\"%i\"}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
     
     NSTask* getrev;
     getrev =[[NSTask alloc] init];
@@ -1528,11 +1528,13 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     [getrev setStandardOutput: piperev];
     
     [getrev setLaunchPath: @"/usr/bin/curl"];  //curl is there
-    //[getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", 1, @"|", @"cut", @"-d", @"\",\"", @"-f", 2, @"|", @"cut", @"-d", @"\":\"", @"-f", 2, nil]]; //gets bad access
-    [getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", @"1", @"|", @"cut", @"-d", @"\",\"", @"-f", @"2", @"|", @"cut", @"-d", @"\":\"", @"-f", @"2", nil]];  //was 10.0.3.1, 127.0.0.1 might be this comp
+    ////[getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", 1, @"|", @"cut", @"-d", @"\",\"", @"-f", 2, @"|", @"cut", @"-d", @"\":\"", @"-f", 2, nil]]; //gets bad access
+    ////[getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", @"|", @"cut", @"-d", @"\"}\"", @"-f", @"1", @"|", @"cut", @"-d", @"\",\"", @"-f", @"2", @"|", @"cut", @"-d", @"\":\"", @"-f", @"2", nil]];  //this returns min args return on DAQ1 somehow
+    [getrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"GET", @"http://10.0.3.1:5984/shapers/card8channel0", nil]];
     NSFileHandle* revfile;
     NSData *revdata;
     NSString *revstring;
+    NSString* bursttextstr = @"{\"_id\":\"bursttext\",\"_rev\":\"";
     @try{
     [getrev launch]; //find the rev!!!
     NSLog(@"part 0\n"); //got here with end card8channel0, and with } end
@@ -1546,15 +1548,32 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     revdata = [revfile readDataToEndOfFile];
     //NSLog(@"part 3\n");
     revstring = [[NSString alloc] initWithData:revdata encoding:NSUTF8StringEncoding];
-    allBurstData = [revstring stringByAppendingString:allBurstData];
+    //revstring = [revstring stringByAppendingString:@"{\"_id\":\"card8channel0\",\"_rev\":\"37-5b3dc887d615db963492927bfb3fb124\",\"Run\":\"3832\",\"Card\":\"8\",\"Channel\":\"0\",\"Centroids\":\"187.524,324.44,457.7,593.55,727.29,860.39,994.6,1127.99,1262.36,1396.07\",\"Standard_deviation_centroids\":\"1.15036,0.316961,0.299833,0.30639,0.336242,0.317772,0.294958,0.277667,0.333023,0.325655\",\"Fit_parameter 0\":\"-2.43283\",\"Error_param 0\":\"0.643567\",\"Fit_parameter 1\":\"9.61408\",\"Error_param 1\":\"0.0160168\",\"Fit_parameter 2\":\"-0.000254695\",\"Error_param 2\":\"8.90062e-05\",\"Reduced_chisquare\":\"3.91508\"}"]; //Set to this for test
+    NSLog(@"early allburstdata is %@\n", allBurstData);
+    NSLog(@"early revstring is %@\n", revstring);
+    NSRange revnumstart = [revstring rangeOfString:@"rev\":\""]; //12 lengnth, need 4 char for run number
+    NSRange revnumend =[revstring rangeOfString:@"\",\"Run\":\""];
+    int revnumlen = revnumend.location - (revnumstart.location + 6);
+    NSRange revRange = NSMakeRange((revnumstart.location + 6), revnumlen);
+    revstring = [revstring substringWithRange:revRange];
+    bursttextstr = [bursttextstr stringByAppendingString:revstring];
+    bursttextstr = [bursttextstr stringByAppendingString:allBurstData];
+    //allBurstData = [revstring stringByAppendingString:allBurstData];
     NSLog(@"part 4\n");
     }
     @catch(NSException* exc)
     {
         NSLog(@"Could not contact couchDB to get revision number.  Exception is %@\n", exc);
     }
-    NSLog(@"allburstdata is %@\n", allBurstData);
+    NSLog(@"bursttextstr is %@\n", bursttextstr);
     //////stringWithFormat:@"{'novaState':'%i','dateSec':'%f','dateMic':'%i','runNum':'%i','runType':'%@','Ncount':'%i','Nmult':'%i','Nchan':'%i','ENchan':'%f','pNchan':'%f','N':'%i','adcP':'%f','gammaP':'%f','alphaP':'%f','Xcenter':'%i','Xrms':'%f','Ycenter':'%i','Yrms':'%f','phi':'%f','Rcenter':'%f','Rrms':'%f','Pcenter':'%f','durSec':'%f','rSec':'%f','burstNum':'%i'}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    /// return from min args {"_id":"card8channel0","_rev":"37-5b3dc887d615db963492927bfb3fb124","Run":"3832","Card":"8","Channel":"0","Centroids":"187.524,324.44,457.7,593.55,727.29,860.39,994.6,1127.99,1262.36,1396.07","Standard_deviation_centroids":"1.15036,0.316961,0.299833,0.30639,0.336242,0.317772,0.294958,0.277667,0.333023,0.325655","Fit_parameter 0":"-2.43283","Error_param 0":"0.643567","Fit_parameter 1":"9.61408","Error_param 1":"0.0160168","Fit_parameter 2":"-0.000254695","Error_param 2":"8.90062e-05","Reduced_chisquare":"3.91508"}
+    //Stuff needed to fix this
+    /// NSRange runnumtitle = [runglob rangeOfString:@"RunNumber = "]; //12 lengnth, need 4 char for run number
+    ///NSRange runRange = NSMakeRange((runnumtitle.location+12), 4); ///109 4 for runnumber
+    ///NSString* runnumstr = [runglob substringWithRange:runRange];
+    //NSLog(@"string is %@\n",runnumstr);
+    //runnum = [runnumstr intValue];
     if(1){ //write the file when we want to do that
         NSError* fileWriteErr;
         NSFileManager* fileman = nil;
