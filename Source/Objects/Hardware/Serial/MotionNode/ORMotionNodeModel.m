@@ -116,7 +116,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 //- (int) updateIntervalSeconds;
 //- (unsigned long) saveIntervalInSeconds;
 - (void) saveTraceToHistory:(unsigned long)aTimeStamp;
-- (void) cleanupHistory;
+- (void) closeOutHistoryFile;
 - (void) addToHistoryX:(unsigned short)xAcc y:(unsigned short)yAcc z:(unsigned short)zAcc;
 @end
 
@@ -200,7 +200,9 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 {
     [self stopDevice];
     [serialPort close];
+    [self closeOutHistoryFile];
 }
+
 - (void) runStarting:(NSNotification*)aNote
 {
 	if(autoStart){
@@ -1227,16 +1229,16 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     historyPtr[historyIndex].z = zAcc;
     historyIndex++;
     if(historyIndex >= kMaxHistoryLength){
-        MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
-        header->endTime                  = [[NSDate date] timeIntervalSince1970];   //see... filled it in
-        header->numDataPoints            = historyIndex;                            //see... filled it in
-        [self saveTraceToHistory:header->startTime];
-        [self cleanupHistory];
+        [self closeOutHistoryFile];
     }
 }
     
-- (void) cleanupHistory
+- (void) closeOutHistoryFile
 {
+    MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
+    header->endTime                  = [[NSDate date] timeIntervalSince1970];   //see... filled it in
+    header->numDataPoints            = historyIndex;                            //see... filled it in
+    [self saveTraceToHistory:header->startTime];
     [historyTrace release];
     historyTrace = nil;
 }
