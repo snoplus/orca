@@ -47,12 +47,8 @@ NSString* ORMotionNodeModelVersionChanged				= @"ORMotionNodeModelVersionChanged
 NSString* ORMotionNodeModelLock							= @"ORMotionNodeModelLock";
 NSString* ORMotionNodeModelSerialNumberChanged			= @"ORMotionNodeModelSerialNumberChanged";
 NSString* ORMotionNodeModelUpdateLongTermTrace			= @"ORMotionNodeModelUpdateLongTermTrace";
-
 NSString* ORMotionNodeModelHistoryFolderChanged         = @"ORMotionNodeModelHistoryFolderChanged";
-//NSString* ORMotionNodeModelSaveFileIntervalChanged      = @"ORMotionNodeModelSaveFileIntervalChanged";
-//NSString* ORMotionNodeModelUpdateIntervalChanged        = @"ORMotionNodeModelUpdateIntervalChanged";
-//NSString* ORMotionNodeModelKeepFileIntervalChanged      = @"ORMotionNodeModelKeepFileIntervalChanged";
-//NSString* ORMotionNodeModelTimeStartedChanged           = @"ORMotionNodeModelTimeStartedChanged";
+NSString* ORMotionNodeModelUpdateHistoryPlot            = @"ORMotionNodeModelUpdateHistoryPlot";
 
 #define kMotionNodeDriverPath1 @"/Library/Extensions/SiLabsUSBDriver.kext"
 #define kMotionNodeDriverPath2 @"/Library/Extensions/SiLabsUSBDriver64.kext"
@@ -63,11 +59,20 @@ NSString* ORMotionNodeModelHistoryFolderChanged         = @"ORMotionNodeModelHis
 #define kSlope		 (4.0/4095.0)
 #define kIntercept	 (-2.0)
 
+//----------------------------
+//data shipped in data stream
 #define kPtPerSec 100
 #define kSecToShip 5
 #define kPerTrigger 1 //sec
+//----------------------------
 
-#define kNumLongs ((int) 30*100) //see addFrame
+//----------------------------
+//history file
+#define kNumHeaderWords    3
+#define kNumSecPerFile     10
+#define kTotalNumValues    ((kNumSecPerFile*kPtPerSec)*3)
+#define kMaxHistoryLength  (kNumHeaderWords + kTotalNumValues)
+//----------------------------
 
 
 static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
@@ -110,7 +115,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 //- (unsigned long) saveIntervalInSeconds;
 - (void) saveTraceToHistory:(unsigned long)aTimeStamp;
 - (void) cleanupHistory;
-- (void) addFrame:(float)anX :(float)anY :(float)anZ;
+- (void) addToHistoryX:(float)anX y:(float)anY z:(float)anZ;
 @end
 
 
@@ -138,7 +143,8 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 	[inComingData release];
 	[serialNumber release];
 	[localLock release];
-		
+    [oldHistoryData release];
+
 	if(longTermTrace){
 		int i;
 		for (i = 0; i < kNumMin; i++) free(longTermTrace[i]);
@@ -578,10 +584,6 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [encoder encodeInt:longTermSensitivity	forKey:@"longTermSensitivity"];
     [encoder encodeBool:showDeltaFromAve	forKey:@"showDeltaFromAve"];
     [encoder encodeBool:displayComponents	forKey: @"displayComponents"];
-    
-//    [encoder encodeInt:keepFileInterval forKey:@"keepFileInterval"];
-//  	[encoder encodeInt:saveFileInterval forKey:@"saveFileInterval"];
-//  	[encoder encodeInt:updateInterval		forKey:@"updateInterval"];
     [encoder encodeObject:historyFolder		forKey:@"historyFolder"];
 }
 
@@ -784,6 +786,78 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (float) ay {return ay;}
 - (float) az {return az;}
 
+- (void) viewPastHistory:(NSString*)filePath
+{
+    if(oldHistoryData) [oldHistoryData release];
+    oldHistoryData = [[NSData dataWithContentsOfFile:[filePath stringByExpandingTildeInPath]] retain];
+    unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
+    if(ptr){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelUpdateHistoryPlot
+                                                            object:self];
+        
+        
+        unsigned long* module = ptr[0];
+        NSDate* t1 = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[1]];
+        NSDate* t2 = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[2]];
+        int num = [oldHistoryData length]/sizeof(long) - 3;
+        NSLog(@"num points: %d\n",num);
+        NSLog(@"module: %d\n",module);
+        NSLog(@"start: %@\n",[t1 stdDescription]);
+        NSLog(@"end: %@\n",[t2 stdDescription]);
+    }
+    else NSLog(@"[%@] file not found\n",filePath);
+}
+
+- (int) numPointsInOldHistory
+{
+    return ([oldHistoryData length]/sizeof(long)-3)/3;
+}
+
+- (NSTimeInterval) oldHistoryStartTime
+{
+    if(oldHistoryData){
+        unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
+        return (NSTimeInterval)ptr[1];
+    }
+    else return 0;
+}
+- (NSTimeInterval) oldHistoryEndTime
+{
+    if(oldHistoryData){
+        unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
+        return (NSTimeInterval)ptr[2];
+    }
+    else return 0;
+}
+- (float) oldHistoryValue:(int)index
+{
+    if(oldHistoryData){
+        //these have to come out in reverse order
+        union {
+            float asFloat;
+            unsigned long asLong;
+        }packedValue;
+        int maxNum = [self numPointsInOldHistory]*3;
+        index = index*3 + 2; //point to the x index
+        int convertedIndex = maxNum - index - 1;
+        unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
+        if(convertedIndex>3){
+            
+            packedValue.asLong = ptr[convertedIndex];
+            float x = packedValue.asFloat;
+            
+            packedValue.asLong = ptr[convertedIndex-1];
+            float y = packedValue.asFloat;
+            
+            packedValue.asLong = ptr[convertedIndex-2];
+            float z = packedValue.asFloat;
+        
+            return 1.0 - sqrtf(x*x + y*y + z*z);
+        }
+    }
+    return 0;
+}
+
 @end
 
 @implementation ORMotionNodeModel (private)
@@ -864,7 +938,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
             [self setAz:motionNodeCalibrationV10[2].slope * rawData.unpacked + motionNodeCalibrationV10[2].intercept];
         }
         
-        [self addFrame:ax :ay :az];
+        [self addToHistoryX:ax y:ay z:az];
         
 		[self setTotalxyz];
 		
@@ -1093,99 +1167,128 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 	}
 }
 
-- (void) addFrame:(float)anX :(float)anY :(float)anZ
+- (void) addToHistoryX:(float)xAcc y:(float)yAcc z:(float)zAcc
 {
     union {
         float asFloat;
         unsigned long asLong;
-    }timeValue;
-
-    NSDate* now = [NSDate date];
-    timeValue.asFloat = [now timeIntervalSince1970];
+    }packedValue;
     
-    if(!trace){
-        ptrIndex = 0;
-        trace  = [[NSMutableData alloc] init];
-        [trace setLength:((kNumLongs*3)+3) * sizeof(unsigned long)];
-        ptr = (unsigned long*)[trace bytes];
-        [self setTraceID:timeValue.asLong];
+    if(!historyTrace){
+        historyTrace  = [[NSMutableData alloc] init];
+        [historyTrace setLength:kMaxHistoryLength * sizeof(unsigned long)];
+        historyPtr = (unsigned long*)[historyTrace bytes];
+        
+        //history file has the format (all values encoded as longs):
+        //uniqueIdNumber
+        //startime  (unix time)
+        //endTime   (unix time)
+        //x
+        //y
+        //z
+        
+        historyIndex = 0;
+        historyPtr[historyIndex++] = [self uniqueIdNumber];
+        historyPtr[historyIndex++] = (unsigned long)[[NSDate date] timeIntervalSince1970];
+        stopTimeIndex = historyIndex++;           //save a slot for the endtime
     }
     
-    ptr[ptrIndex++] = anX;
-    ptr[ptrIndex++] = anY;
-    ptr[ptrIndex++] = anZ;
+    packedValue.asFloat = xAcc;
+    historyPtr[historyIndex++] = packedValue.asLong;
     
-    if(ptrIndex>(kNumLongs*3+2)-1){
-        ptr[2] = timeValue.asLong;                              //End time stamp
-        [self saveTraceToHistory:ptr[1]];
+    packedValue.asFloat = yAcc;
+    historyPtr[historyIndex++] = packedValue.asLong;
+    
+    packedValue.asFloat = zAcc;
+    historyPtr[historyIndex++] = packedValue.asLong;
+    
+    if(historyIndex > kMaxHistoryLength-1){
+        historyPtr[stopTimeIndex] = (unsigned long)[[NSDate date] timeIntervalSince1970];
+        [self saveTraceToHistory:historyPtr[1]];
         [self cleanupHistory];
     }
-}
-
-- (void) setTraceID:(unsigned long) aTime
-{
-    NSString* aString1 = [serialID stringByReplacingOccurrencesOfString:@"acc" withString:@""];
-    NSString* aString2 = [aString1 stringByReplacingOccurrencesOfString:@"-" withString:@""];
-    ptr[ptrIndex++] = [aString2 unsignedLongValue];
-    ptr[ptrIndex++] = aTime;
-    ptrIndex++;                                                 //saving a space for the end time stamp
 }
     
 - (void) cleanupHistory
 {
-    [trace release];
-    trace = nil;
+    [historyTrace release];
+    historyTrace = nil;
 }
 
 - (void) saveTraceToHistory:(unsigned long) aTimeStamp
 {
-   
-    NSString* fileName = [NSString stringWithFormat:@"%lu", aTimeStamp];
-    NSString* path = [historyFolder stringByAppendingPathComponent:fileName];
-    [trace writeToFile:[path stringByExpandingTildeInPath]
+    
+    NSDate* startDate   = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)historyPtr[1]];
+
+    NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+    [dateFormatter setDateFormat:@"yyyy/MM/dd"];
+    NSString* filePath = [dateFormatter stringFromDate:startDate];
+    
+    [dateFormatter setDateFormat:@"HH_mm"];
+    NSString* fileName = [dateFormatter stringFromDate:startDate];
+    
+    filePath      = [historyFolder stringByAppendingPathComponent:filePath];
+    [self ensureExists:filePath];
+    
+    [historyTrace writeToFile:[[filePath stringByAppendingPathComponent:fileName] stringByExpandingTildeInPath]
             atomically:YES];
     [self postCouchDBRecord];
-
  }
+
+- (NSString*) ensureExists:(NSString*)folderName
+{
+    NSFileManager* fm = [NSFileManager defaultManager];
+    NSString* tmpDir = [folderName stringByExpandingTildeInPath];
+    if(![fm fileExistsAtPath:tmpDir]){
+        [fm createDirectoryAtPath:tmpDir withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    return tmpDir;
+}
+
 - (void) postCouchDBRecord
 {
-//    loop over trace
-//    string with n lines of total\n
-//    "value\n.value\n...."
-    
     union {
         float asFloat;
         unsigned long asLong;
-    }scalarTrace;
+    }packedData;
     
-    NSString* string = [NSString stringWithFormat:@""];
+    NSMutableString* traceAsString = [NSMutableString stringWithCapacity:1024*1024];
     
+    unsigned long* ptr = (unsigned long*)[historyTrace bytes];
+    unsigned long  num = [historyTrace length]/sizeof(long);
     
+    int index = 0;
+    if(num>6){
+        unsigned long module = ptr[index++];
+        unsigned long t1     = ptr[index++];
+        unsigned long t2     = ptr[index++];
+        
+        do {
+            packedData.asLong = ptr[index++];
+            float x = packedData.asFloat;
+            if(index>num)break;
+            
+            packedData.asLong = ptr[index++];
+            float y = packedData.asFloat;
+            if(index>num)break;
+           
+            packedData.asLong = ptr[index++];
+            float z = packedData.asFloat;
+            if(index>num)break;
+           
+            float mag = 1 - sqrtf(x*x + y*y + z*z);
+            [traceAsString appendFormat:@"%.4f,", mag];
+            
+        }while(index<num);
+
     
-    for(int i=3;i < ((kNumLongs*3+3)-1); i=i+3){
-        
-        scalarTrace.asLong = ptr[i];
-        float x = scalarTrace.asFloat;
-        scalarTrace.asLong = ptr[i+1];
-        float y = scalarTrace.asFloat;
-        scalarTrace.asLong = ptr[i+2];
-        float z = scalarTrace.asFloat;
-        
-        
-        float mag = sqrt(x*x + y*y + z*z);
-        string = [string stringByAppendingString:[NSString stringWithFormat:@"%1.6f \n ", (float) mag]];
-       // NSString* jdfks = [NSString stringWithFormat:@"%1.6f",ptr[4] ];
-        y = scalarTrace.asFloat;
-        
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                                traceAsString, @"trace",
+                                [NSNumber numberWithInt:module],@"module",
+                                [NSNumber numberWithUnsignedLong:t1],@"startTime",
+                                [NSNumber numberWithUnsignedLong:t2],@"endTime",
+                                nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
     }
-    
-    NSString* timestamp = [NSString stringWithFormat:@"%lu",ptr[1]];
-    
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            string, @"trace",
-                            timestamp,@"timestamp",
-                            serialID,@"serial",
-                              nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 @end

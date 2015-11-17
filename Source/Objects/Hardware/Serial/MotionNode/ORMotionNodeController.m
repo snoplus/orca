@@ -26,6 +26,9 @@
 #import "ORXYPlot.h"
 #import "ORAxis.h"
 #import "ORLongTermView.h"
+#import "ORCompositePlotView.h"
+#import "ORTimeLinePlot.h"
+#import "ORTimeAxis.h"
 
 @implementation ORMotionNodeController
 - (id) init
@@ -152,7 +155,12 @@
     [notifyCenter addObserver : self
                      selector : @selector(historyFolderChanged:)
                          name : ORMotionNodeModelHistoryFolderChanged
-						object: model];
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateHistoryPlot:)
+                         name : ORMotionNodeModelUpdateHistoryPlot
+                        object: model];
 	
 	[serialPortController registerNotificationObservers];
 
@@ -189,6 +197,19 @@
 	[tracePlot addPlot: aPlot];
 	[aPlot release];
 	
+    [[plotter0 yAxis] setRngLow:-2 withHigh:2];
+    [[plotter0 yAxis] setRngLimitsLow:-2 withHigh:2 withMinRng:.0001];
+    
+    [[plotter0 xAxis] setRngLow:0.0 withHigh:30000];
+    [[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:300000. withMinRng:200];
+    
+    ORTimeLinePlot* historyPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
+    [plotter0 addPlot: historyPlot];
+    [historyPlot release];
+    
+    
+    [(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
+
 	[super awakeFromNib];
 }
 
@@ -216,8 +237,13 @@
 	[self lastRecordShippedChanged:nil];
 	[self totalShippedChanged:nil];
     [self historyFolderChanged:nil];
+    [self updateHistoryPlot:nil];
 	[serialPortController updateWindow];
 
+}
+- (void) updateHistoryPlot:(NSNotification*)aNote
+{
+    [plotter0 setNeedsDisplay:YES];
 }
 
 - (void) totalShippedChanged:(NSNotification*)aNote
@@ -266,7 +292,8 @@
 
 - (void) startTimeChanged:(NSNotification*)aNote
 {
-	if([model startTime])[startTimeField setObjectValue: [model startTime]];
+    NSDate* st = [((ORMotionNodeModel*)model) startTime];
+	if(st)[startTimeField setObjectValue: st];
 	else [startTimeField setObjectValue: @""];
 }
 
@@ -448,38 +475,61 @@
 
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	if([model displayComponents]){
-		if(set == 3) return 0;
-		else return kModeNodeTraceLength;
-	}
-	else {
-		if(set < 3) return 0;
-		else return kModeNodeTraceLength;
-	}
+    if(aPlotter == [plotter0 topPlot]){
+        return [model numPointsInOldHistory]; 
+    }
+    else {
+        int set = [aPlotter tag];
+        if([model displayComponents]){
+            if(set == 3) return 0;
+            else return kModeNodeTraceLength;
+        }
+        else {
+            if(set < 3) return 0;
+            else return kModeNodeTraceLength;
+        }
+    }
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	double aValue = 0;
-	int set = [aPlotter tag];
-	if([model showDeltaFromAve]){
-		if(set == 0)		aValue =  [model axDeltaAveAt:i];
-		else if(set == 1)	aValue =  [model ayDeltaAveAt:i];
-		else if(set == 2)	aValue =  [model azDeltaAveAt:i];
-		else if(set == 3)	aValue =  [model xyzDeltaAveAt:i];
-	}
-	else {
-		if(set == 0)		aValue =  [model axAt:i];
-		else if(set == 1)	aValue =  [model ayAt:i];
-		else if(set == 2)	aValue =  [model azAt:i];
-		else if(set == 3)	aValue =  [model totalxyzAt:i];
-	}
-	*xValue = i;
-	*yValue = aValue;
+    if(aPlotter == [plotter0 topPlot]){
+        if(i==0){
+            int n = [model numPointsInOldHistory];
+            if(n!=0){
+                deltaTime           = ([model oldHistoryEndTime]-[model oldHistoryStartTime])/(NSTimeInterval)n;
+                [(ORTimeAxis*)[plotter0 xAxis] setStartTime: [model oldHistoryEndTime]];
+            }
+        }
+        *xValue = [model oldHistoryEndTime] - (i*deltaTime);
+        *yValue = [model oldHistoryValue:i];
+        
+        if(i<20){
+            NSLog(@"%f,%f,%f\n",deltaTime,*xValue,*yValue);
+        }
+        
+    }
+    else {
+        double aValue = 0;
+        int set = [aPlotter tag];
+        if([model showDeltaFromAve]){
+            if(set == 0)		aValue =  [model axDeltaAveAt:i];
+            else if(set == 1)	aValue =  [model ayDeltaAveAt:i];
+            else if(set == 2)	aValue =  [model azDeltaAveAt:i];
+            else if(set == 3)	aValue =  [model xyzDeltaAveAt:i];
+        }
+        else {
+            if(set == 0)		aValue =  [model axAt:i];
+            else if(set == 1)	aValue =  [model ayAt:i];
+            else if(set == 2)	aValue =  [model azAt:i];
+            else if(set == 3)	aValue =  [model totalxyzAt:i];
+        }
+        *xValue = i;
+        *yValue = aValue;
+    }
 }
 
-- (int) startingLineInLongTermView:(id)aView 
+- (int) startingLineInLongTermView:(id)aView
 {
 	return [model startingLine];
 }
@@ -514,12 +564,8 @@
     [openPanel setPrompt:@"Choose"];
 	[openPanel setCanCreateDirectories:YES];
     NSString* startingDir;
-    if([model historyFolder]){
-        startingDir = [model historyFolder];
-    }
-    else {
-        startingDir = NSHomeDirectory();
-    }
+    if([model historyFolder])startingDir = [model historyFolder];
+    else                     startingDir = NSHomeDirectory();
     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton){
@@ -527,7 +573,27 @@
             [model setHistoryFolder:folderName];
         }
     }];
-    
+}
+
+- (IBAction) viewPastHistoryAction:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    [openPanel setCanCreateDirectories:NO];
+    NSString* startingDir;
+    if([model historyFolder])startingDir = [model historyFolder];
+    else                     startingDir = NSHomeDirectory();
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            NSString* path = [[[openPanel URL] path] stringByAbbreviatingWithTildeInPath];
+            [model viewPastHistory:path];
+            [plotter0 setNeedsDisplay:YES];
+        }
+    }];
 }
 
 @end

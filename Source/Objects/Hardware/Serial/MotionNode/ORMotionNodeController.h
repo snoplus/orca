@@ -23,6 +23,7 @@
 @class ORSerialPortController;
 @class ORPlotView;
 @class ORLongTermView;
+@class ORCompositeTimeLineView;
 
 @interface ORMotionNodeController : OrcaObjectController 
 {
@@ -56,12 +57,12 @@
     
     IBOutlet NSTextField*   historyFolderField;
     IBOutlet NSButton*      setHistoryFolderButton;
-//    IBOutlet NSPopUpButton* keepFileIntervalPU;
-//    IBOutlet NSTextField*   traceSizeField;
-//    IBOutlet NSPopUpButton* saveFileIntervalPU;
-//    IBOutlet NSPopUpButton* updateIntervalPU;
-//    IBOutlet NSButton*      viewCurrentButton;
-//    IBOutlet NSButton*      viewPastHistoryButton;
+    IBOutlet NSButton*      viewPastHistoryButton;
+    IBOutlet ORCompositeTimeLineView*   plotter0;
+    
+    //some cached values
+    NSTimeInterval deltaTime;
+    NSTimeInterval oldHistoryStartTime;
 }
 
 #pragma mark ***Interface Management
@@ -87,6 +88,7 @@
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) dispayComponentsChanged:(NSNotification*)aNote;
 - (void) updateLongTermView:(NSNotification*)aNote;
+- (void) updateHistoryPlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) shipExcursionsAction:(id)sender;
@@ -101,6 +103,7 @@
 - (IBAction) start:(id)sender;
 - (IBAction) stop:(id)sender;
 - (IBAction) displayComponentsAction:(id)sender;
+- (IBAction) viewPastHistoryAction:(id)sender;
 
 - (int) maxLinesInLongTermView:(id)aLongTermView;
 - (int) startingLineInLongTermView:(id)aLongTermView;
@@ -111,9 +114,6 @@
 - (int)	numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 
-//- (IBAction) keepFileIntervalAction:(id)sender;
-//- (IBAction) saveFileIntervalAction:(id)sender;
-//- (IBAction) updateIntervalAction:(id)sender;
 
 
 - (IBAction) setHistoryFolderAction:(id)sender;
