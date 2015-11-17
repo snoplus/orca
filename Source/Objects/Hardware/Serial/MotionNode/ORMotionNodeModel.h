@@ -45,12 +45,25 @@ typedef struct MotionNodeCalibrations {
 	float  slope;
 } MotionNodeCalibrations; 
 
+typedef struct MotionNodeHistoryData {
+    unsigned short x;
+    unsigned short y;
+    unsigned short z;
+}MotionNodeHistoryData;
 
-#define kModeNodeTraceLength 1500
+typedef struct MotionNodeHistoryHeader {
+    unsigned long           moduleID;
+    NSTimeInterval          endTime;
+    NSTimeInterval          startTime;
+    MotionNodeCalibrations  calibrations[3];
+    unsigned long numDataPoints;
+    //numDataPoints * MotionNodeData structs to follow
+} MotionNodeHistoryHeader;
 
-#define kModeNodeLongTraceLength 1000
-#define kModeNodePtsToCombine (6000/kModeNodeLongTraceLength)
-#define kNumMin 60
+#define kModeNodeTraceLength        1500
+#define kModeNodeLongTraceLength    1000
+#define kModeNodePtsToCombine       (6000/kModeNodeLongTraceLength)
+#define kNumMin                     60
 
 @interface ORMotionNodeModel : ORSerialPortModel {
 	unsigned long	dataId;
@@ -87,7 +100,8 @@ typedef struct MotionNodeCalibrations {
 	BOOL			cycledOnce;
     BOOL			showLongTermDelta;
 	BOOL			scheduledToShip;
-    BOOL			autoStart;
+    BOOL			autoStart; //with Run
+    BOOL			autoStartWithOrca;
     float			shipThreshold;
     BOOL			shipExcursions;
     BOOL			outOfBand;
@@ -100,7 +114,7 @@ typedef struct MotionNodeCalibrations {
     int             stopTimeIndex;
     NSMutableData*  historyTrace;
     int             historyIndex;
-    unsigned long*  historyPtr;
+    MotionNodeHistoryData*  historyPtr;
     
     NSData*         oldHistoryData;
     
@@ -110,8 +124,11 @@ typedef struct MotionNodeCalibrations {
 
 #pragma mark ***Initialization
 - (void) registerNotificationObservers;
+- (void) orcaIsTerminating:(NSNotification*)aNote;
 - (void) runStarting:(NSNotification*)aNote;
 - (void) runStopping:(NSNotification*)aNote;
+- (void) delayedOpen;
+- (void) delayedStart;
 
 #pragma mark ***Accessors
 - (int) totalShipped;
@@ -126,6 +143,8 @@ typedef struct MotionNodeCalibrations {
 - (void) setShipThreshold:(float)aShipThreshold;
 - (BOOL) autoStart;
 - (void) setAutoStart:(BOOL)aAutoStart;
+- (BOOL) autoStartWithOrca;
+- (void) setAutoStartWithOrca:(BOOL)aAutoStart;
 - (BOOL) showLongTermDelta;
 - (void) setShowLongTermDelta:(BOOL)aShowLongTermDelta;
 - (int) longTermSensitivity;
@@ -210,6 +229,7 @@ extern NSString* ORMotionNodeModelOutOfBandChanged;
 extern NSString* ORMotionNodeModelShipExcursionsChanged;
 extern NSString* ORMotionNodeModelShipThresholdChanged;
 extern NSString* ORMotionNodeModelAutoStartChanged;
+extern NSString* ORMotionNodeModelAutoStartWithOrcaChanged;
 extern NSString* ORMotionNodeModelShowLongTermDeltaChanged;
 extern NSString* ORMotionNodeModelLongTermSensitivityChanged;
 extern NSString* ORMotionNodeModelStartTimeChanged;

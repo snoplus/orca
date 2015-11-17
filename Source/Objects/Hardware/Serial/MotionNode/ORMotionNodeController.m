@@ -37,134 +37,6 @@
     return self;
 }
 
-- (void) registerNotificationObservers
-{
-    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
-    [ super registerNotificationObservers ];
-    	
-	[notifyCenter addObserver : self
-					 selector : @selector(lockChanged:)
-						 name : ORRunStatusChangedNotification
-					   object : nil];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(lockChanged:)
-						 name : ORMotionNodeModelLock
-						object: nil];
-		
-    [notifyCenter addObserver : self
-                     selector : @selector(serialNumberChanged:)
-                         name : ORMotionNodeModelSerialNumberChanged
-						object: nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(versionChanged:)
-                         name : ORMotionNodeModelVersionChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(isAccelOnlyChanged:)
-                         name : ORMotionNodeModelIsAccelOnlyChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(packetLengthChanged:)
-                         name : ORMotionNodeModelPacketLengthChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(traceIndexChanged:)
-                         name : ORMotionNodeModelTraceIndexChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(nodeRunningChanged:)
-                         name : ORMotionNodeModelNodeRunningChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(portStateChanged:)
-                         name : ORSerialPortStateChanged
-                       object : [model serialPort]];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(temperatureChanged:)
-                         name : ORMotionNodeModelTemperatureChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dispayComponentsChanged:)
-                         name : ORMotionNodeModelDisplayComponentsChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(showDeltaFromAveChanged:)
-                         name : ORMotionNodeModelShowDeltaFromAveChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(updateLongTermView:)
-                         name : ORMotionNodeModelUpdateLongTermTrace
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(startTimeChanged:)
-                         name : ORMotionNodeModelStartTimeChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(longTermSensitivityChanged:)
-                         name : ORMotionNodeModelLongTermSensitivityChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(showLongTermDeltaChanged:)
-                         name : ORMotionNodeModelShowLongTermDeltaChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(autoStartChanged:)
-                         name : ORMotionNodeModelAutoStartChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(shipThresholdChanged:)
-                         name : ORMotionNodeModelShipThresholdChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(shipExcursionsChanged:)
-                         name : ORMotionNodeModelShipExcursionsChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(outOfBandChanged:)
-                         name : ORMotionNodeModelOutOfBandChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(lastRecordShippedChanged:)
-                         name : ORMotionNodeModelLastRecordShippedChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(totalShippedChanged:)
-                         name : ORMotionNodeModelTotalShippedChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(historyFolderChanged:)
-                         name : ORMotionNodeModelHistoryFolderChanged
-                        object: model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(updateHistoryPlot:)
-                         name : ORMotionNodeModelUpdateHistoryPlot
-                        object: model];
-	
-	[serialPortController registerNotificationObservers];
-
-}
 
 - (void) awakeFromNib
 {
@@ -201,7 +73,7 @@
     [[plotter0 yAxis] setRngLimitsLow:-2 withHigh:2 withMinRng:.0001];
     
     [[plotter0 xAxis] setRngLow:0.0 withHigh:30000];
-    [[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:300000. withMinRng:200];
+    [[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:300000. withMinRng:5];
     
     ORTimeLinePlot* historyPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
     [plotter0 addPlot: historyPlot];
@@ -211,6 +83,139 @@
     [(ORTimeAxis*)[plotter0 xAxis] setStartTime: [[NSDate date] timeIntervalSince1970]];
 
 	[super awakeFromNib];
+}
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];
+    [ super registerNotificationObservers ];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORMotionNodeModelLock
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(serialNumberChanged:)
+                         name : ORMotionNodeModelSerialNumberChanged
+                        object: nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(versionChanged:)
+                         name : ORMotionNodeModelVersionChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(isAccelOnlyChanged:)
+                         name : ORMotionNodeModelIsAccelOnlyChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(packetLengthChanged:)
+                         name : ORMotionNodeModelPacketLengthChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(traceIndexChanged:)
+                         name : ORMotionNodeModelTraceIndexChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(nodeRunningChanged:)
+                         name : ORMotionNodeModelNodeRunningChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(portStateChanged:)
+                         name : ORSerialPortStateChanged
+                       object : [model serialPort]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(temperatureChanged:)
+                         name : ORMotionNodeModelTemperatureChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(dispayComponentsChanged:)
+                         name : ORMotionNodeModelDisplayComponentsChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(showDeltaFromAveChanged:)
+                         name : ORMotionNodeModelShowDeltaFromAveChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateLongTermView:)
+                         name : ORMotionNodeModelUpdateLongTermTrace
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(startTimeChanged:)
+                         name : ORMotionNodeModelStartTimeChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(longTermSensitivityChanged:)
+                         name : ORMotionNodeModelLongTermSensitivityChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(showLongTermDeltaChanged:)
+                         name : ORMotionNodeModelShowLongTermDeltaChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStartChanged:)
+                         name : ORMotionNodeModelAutoStartChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStartWithOrcaChanged:)
+                         name : ORMotionNodeModelAutoStartWithOrcaChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(shipThresholdChanged:)
+                         name : ORMotionNodeModelShipThresholdChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(shipExcursionsChanged:)
+                         name : ORMotionNodeModelShipExcursionsChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(outOfBandChanged:)
+                         name : ORMotionNodeModelOutOfBandChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lastRecordShippedChanged:)
+                         name : ORMotionNodeModelLastRecordShippedChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(totalShippedChanged:)
+                         name : ORMotionNodeModelTotalShippedChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(historyFolderChanged:)
+                         name : ORMotionNodeModelHistoryFolderChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updateHistoryPlot:)
+                         name : ORMotionNodeModelUpdateHistoryPlot
+                        object: model];
+    
+    [serialPortController registerNotificationObservers];
+    
 }
 
 - (void) updateWindow
@@ -230,7 +235,8 @@
 	[self startTimeChanged:nil];
 	[self longTermSensitivityChanged:nil];
 	[self showLongTermDeltaChanged:nil];
-	[self autoStartChanged:nil];
+    [self autoStartChanged:nil];
+    [self autoStartWithOrcaChanged:nil];
 	[self shipThresholdChanged:nil];
 	[self shipExcursionsChanged:nil];
 	[self outOfBandChanged:nil];
@@ -277,7 +283,10 @@
 {
 	[autoStartCB setIntValue: [model autoStart]];
 }
-
+- (void) autoStartWithOrcaChanged:(NSNotification*)aNote
+{
+    [autoStartWithOrcaCB setIntValue: [model autoStartWithOrca]];
+}
 - (void) showLongTermDeltaChanged:(NSNotification*)aNote
 {
 	[showLongTermDeltaCB setIntValue: [model showLongTermDelta]];
@@ -430,6 +439,11 @@
 	[model setAutoStart:[sender intValue]];	
 }
 
+- (void) autoStartWithOrcaAction:(id)sender
+{
+    [model setAutoStartWithOrca:[sender intValue]];
+}
+
 - (void) showLongTermDeltaAction:(id)sender
 {
 	[model setShowLongTermDelta:[sender intValue]];	
@@ -498,6 +512,7 @@
             int n = [model numPointsInOldHistory];
             if(n!=0){
                 deltaTime           = ([model oldHistoryEndTime]-[model oldHistoryStartTime])/(NSTimeInterval)n;
+                NSLog(@"deltaTime: %f\n",deltaTime);
                 [(ORTimeAxis*)[plotter0 xAxis] setStartTime: [model oldHistoryEndTime]];
             }
         }
@@ -505,7 +520,7 @@
         *yValue = [model oldHistoryValue:i];
         
         if(i<20){
-            NSLog(@"%f,%f,%f\n",deltaTime,*xValue,*yValue);
+            NSLog(@"%f,%f\n",*xValue,*yValue);
         }
         
     }

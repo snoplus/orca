@@ -9,6 +9,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="ORMotionNodeController">
             <connections>
                 <outlet property="autoStartCB" destination="816" id="818"/>
+                <outlet property="autoStartWithOrcaCB" destination="7hz-DX-jLB" id="X0Q-8S-wh1"/>
                 <outlet property="displayComponentsMatrix" destination="691" id="704"/>
                 <outlet property="historyFolderField" destination="Dxz-13-u6k" id="b52-az-uyT"/>
                 <outlet property="isAccelOnlyField" destination="523" id="530"/>
@@ -273,15 +274,27 @@
                                             </connections>
                                         </matrix>
                                         <button toolTip="Start when ORCA run is started. It will continue running...." id="816">
-                                            <rect key="frame" x="454" y="17" width="82" height="18"/>
+                                            <rect key="frame" x="87" y="24" width="82" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <animations/>
-                                            <buttonCell key="cell" type="check" title="Auto Start" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="884">
+                                            <buttonCell key="cell" type="check" title="With Run" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="884">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="autoStartAction:" target="-2" id="819"/>
+                                            </connections>
+                                        </button>
+                                        <button toolTip="Start when ORCA run is started. It will continue running...." id="7hz-DX-jLB">
+                                            <rect key="frame" x="87" y="7" width="82" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <buttonCell key="cell" type="check" title="With ORCA" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="csw-3g-HjJ">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="autoStartWithOrcaAction:" target="-2" id="voy-Oy-JJN"/>
                                             </connections>
                                         </button>
                                         <button toolTip="Start when ORCA run is started. It will continue running...." id="828">
@@ -374,6 +387,16 @@
                                                 <outlet property="viewToScale" destination="911" id="926"/>
                                             </connections>
                                         </customView>
+                                        <textField focusRingType="none" verticalHuggingPriority="750" id="Ghl-SX-fQs">
+                                            <rect key="frame" x="88" y="40" width="63" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="AutoStart:" id="urh-To-SaL">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                     <animations/>
                                 </view>

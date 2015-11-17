@@ -34,7 +34,8 @@
 	IBOutlet NSButton*		shipExcursionsCB;
 	IBOutlet NSSlider*		shipThresholdSlider;
 	IBOutlet NSTextField*	shipThresholdField;
-	IBOutlet NSButton*		autoStartCB;
+    IBOutlet NSButton*		autoStartCB;
+    IBOutlet NSButton*		autoStartWithOrcaCB;
 	IBOutlet NSButton*		showLongTermDeltaCB;
 	IBOutlet NSTextField*   startTimeField;
 	IBOutlet NSButton*		showDeltaFromAveCB;
@@ -72,6 +73,7 @@
 - (void) shipExcursionsChanged:(NSNotification*)aNote;
 - (void) shipThresholdChanged:(NSNotification*)aNote;
 - (void) autoStartChanged:(NSNotification*)aNote;
+- (void) autoStartWithOrcaChanged:(NSNotification*)aNote;
 - (void) showLongTermDeltaChanged:(NSNotification*)aNote;
 - (void) longTermSensitivityChanged:(NSNotification*)aNote;
 - (void) startTimeChanged:(NSNotification*)aNote;
@@ -94,6 +96,7 @@
 - (IBAction) shipExcursionsAction:(id)sender;
 - (IBAction) shipThresholdAction:(id)sender;
 - (IBAction) autoStartAction:(id)sender;
+- (IBAction) autoStartWithOrcaAction:(id)sender;
 - (IBAction) showLongTermDeltaAction:(id)sender;
 - (IBAction) longTermSensitivityAction:(id)sender;
 - (IBAction) showDeltaFromAveAction:(id)sender;

@@ -33,6 +33,7 @@ NSString* ORMotionNodeModelOutOfBandChanged				= @"ORMotionNodeModelOutOfBandCha
 NSString* ORMotionNodeModelShipExcursionsChanged		= @"ORMotionNodeModelShipExcursionsChanged";
 NSString* ORMotionNodeModelShipThresholdChanged			= @"ORMotionNodeModelShipThresholdChanged";
 NSString* ORMotionNodeModelAutoStartChanged				= @"ORMotionNodeModelAutoStartChanged";
+NSString* ORMotionNodeModelAutoStartWithOrcaChanged		= @"ORMotionNodeModelAutoStartWithOrcaChanged";
 NSString* ORMotionNodeModelShowLongTermDeltaChanged		= @"ORMotionNodeModelShowLongTermDeltaChanged";
 NSString* ORMotionNodeModelLongTermSensitivityChanged	= @"ORMotionNodeModelLongTermSensitivityChanged";
 NSString* ORMotionNodeModelStartTimeChanged				= @"ORMotionNodeModelStartTimeChanged";
@@ -68,10 +69,8 @@ NSString* ORMotionNodeModelUpdateHistoryPlot            = @"ORMotionNodeModelUpd
 
 //----------------------------
 //history file
-#define kNumHeaderWords    3
-#define kNumSecPerFile     10
-#define kTotalNumValues    ((kNumSecPerFile*kPtPerSec)*3)
-#define kMaxHistoryLength  (kNumHeaderWords + kTotalNumValues)
+#define kNumSecPerFile     (30*60)
+#define kMaxHistoryLength    (kNumSecPerFile*kPtPerSec)
 //----------------------------
 
 
@@ -82,6 +81,9 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	{kMotionNodeStart,			@"xxx\0",	-1,		YES},
 	{kMotionNodeClosePort,		@"",		-1,		NO}
 };
+
+static int preV10Convert[3] = {2,0,1}; // make x,y,z be 0,1,2
+static int v10Convert[3]    = {1,2,0};
 
 static MotionNodeCalibrations motionNodeCalibrationPreV10[3] = {
 	{-2.536, 0.00123}, //y
@@ -115,7 +117,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 //- (unsigned long) saveIntervalInSeconds;
 - (void) saveTraceToHistory:(unsigned long)aTimeStamp;
 - (void) cleanupHistory;
-- (void) addToHistoryX:(float)anX y:(float)anY z:(float)anZ;
+- (void) addToHistoryX:(unsigned short)xAcc y:(unsigned short)yAcc z:(unsigned short)zAcc;
 @end
 
 
@@ -158,6 +160,19 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) awakeAfterDocumentLoaded
 {
 	[self createLongTermTraceStorage];
+    if(autoStartWithOrca){
+        [self performSelector:@selector(delayedOpen) withObject:self afterDelay:5];
+    }
+}
+- (void) delayedOpen
+{
+    if(![serialPort isOpen])[self openPort:YES];
+    [self performSelector:@selector(delayedStart) withObject:self afterDelay:1];
+}
+
+- (void) delayedStart
+{
+    if(!nodeRunning)[self startDevice];
 }
 
 - (void) registerNotificationObservers
@@ -173,8 +188,19 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
                      selector : @selector(runStopping:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+   
+    [notifyCenter addObserver : self
+                     selector : @selector(orcaIsTerminating:)
+                         name : @"ORAppTerminating"
+                       object : nil];
+    
+    
 }
-
+- (void) orcaIsTerminating:(NSNotification*)aNote
+{
+    [self stopDevice];
+    [serialPort close];
+}
 - (void) runStarting:(NSNotification*)aNote
 {
 	if(autoStart){
@@ -189,6 +215,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) runStopping:(NSNotification*)aNote
 {
 	if(scheduledToShip)[self shipXYZTrace];
+    if(autoStart && !autoStartWithOrca)[self stopDevice];
 }
 
 - (void) setUpImage
@@ -296,11 +323,22 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) setAutoStart:(BOOL)aAutoStart
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAutoStart:autoStart];
-    
     autoStart = aAutoStart;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelAutoStartChanged object:self];
 }
+
+- (BOOL) autoStartWithOrca
+{
+    return autoStartWithOrca;
+}
+
+- (void) setAutoStartWithOrca:(BOOL)aAutoStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoStartWithOrca:autoStartWithOrca];
+    autoStartWithOrca = aAutoStart;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelAutoStartWithOrcaChanged object:self];
+}
+
 
 - (BOOL) showLongTermDelta
 {
@@ -310,9 +348,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) setShowLongTermDelta:(BOOL)aShowLongTermDelta
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShowLongTermDelta:showLongTermDelta];
-    
     showLongTermDelta = aShowLongTermDelta;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelShowLongTermDeltaChanged object:self];
 }
 
@@ -323,13 +359,10 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 
 - (void) setLongTermSensitivity:(int)aSensitivity
 {
-	
 	if(aSensitivity<=0)aSensitivity = 1;
 	else if(aSensitivity>1000)aSensitivity = 1000;
     [[[self undoManager] prepareWithInvocationTarget:self] setLongTermSensitivity:longTermSensitivity];
-    
     longTermSensitivity = aSensitivity;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelLongTermSensitivityChanged object:self];
 }
 
@@ -355,9 +388,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) setShowDeltaFromAve:(BOOL)aShowDeltaFromAve
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShowDeltaFromAve:showDeltaFromAve];
-    
     showDeltaFromAve = aShowDeltaFromAve;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelShowDeltaFromAveChanged object:self];
 }
 
@@ -558,6 +589,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [self setShipExcursions:		[decoder decodeBoolForKey:@"shipExcursions"]];
     [self setShipThreshold:			[decoder decodeFloatForKey:@"shipThreshold"]];
     [self setAutoStart:				[decoder decodeBoolForKey:@"autoStart"]];
+    [self setAutoStartWithOrca:     [decoder decodeBoolForKey:@"autoStartWithOrca"]];
     [self setShowLongTermDelta:		[decoder decodeBoolForKey:@"showLongTermDelta"]];
     [self setLongTermSensitivity:	[decoder decodeIntForKey:@"longTermSensitivity"]];
     [self setShowDeltaFromAve:		[decoder decodeBoolForKey:@"showDeltaFromAve"]];
@@ -580,6 +612,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [encoder encodeBool:shipExcursions		forKey:@"shipExcursions"];
     [encoder encodeFloat:shipThreshold		forKey:@"shipThreshold"];
     [encoder encodeBool:autoStart			forKey:@"autoStart"];
+    [encoder encodeBool:autoStartWithOrca	forKey:@"autoStartWithOrca"];
     [encoder encodeBool:showLongTermDelta	forKey:@"showLongTermDelta"];
     [encoder encodeInt:longTermSensitivity	forKey:@"longTermSensitivity"];
     [encoder encodeBool:showDeltaFromAve	forKey:@"showDeltaFromAve"];
@@ -761,12 +794,12 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
             float slope;
             float intercept;
             if(nodeVersion<10){
-                slope	  = motionNodeCalibrationPreV10[type].slope;
-                intercept = motionNodeCalibrationPreV10[type].intercept;
+                slope	  = motionNodeCalibrationPreV10[preV10Convert[type]].slope;
+                intercept = motionNodeCalibrationPreV10[preV10Convert[type]].intercept;
             }
             else {
-                slope	  = motionNodeCalibrationV10[type].slope;
-                intercept = motionNodeCalibrationV10[type].intercept;
+                slope	  = motionNodeCalibrationV10[v10Convert[type]].slope;
+                intercept = motionNodeCalibrationV10[v10Convert[type]].intercept;
             }
 			for(i=0;i<shipLen;i++){
 				if(type==0)		data[3+i] = (xTrace[(backIndex+i)%kModeNodeTraceLength] - intercept)/slope;
@@ -782,6 +815,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 	}
 }
 
+
 - (float) ax {return ax;}
 - (float) ay {return ay;}
 - (float) az {return az;}
@@ -790,42 +824,35 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 {
     if(oldHistoryData) [oldHistoryData release];
     oldHistoryData = [[NSData dataWithContentsOfFile:[filePath stringByExpandingTildeInPath]] retain];
-    unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
-    if(ptr){
+    if(oldHistoryData){
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelUpdateHistoryPlot
                                                             object:self];
-        
-        
-        unsigned long* module = ptr[0];
-        NSDate* t1 = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[1]];
-        NSDate* t2 = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)ptr[2]];
-        int num = [oldHistoryData length]/sizeof(long) - 3;
-        NSLog(@"num points: %d\n",num);
-        NSLog(@"module: %d\n",module);
-        NSLog(@"start: %@\n",[t1 stdDescription]);
-        NSLog(@"end: %@\n",[t2 stdDescription]);
     }
     else NSLog(@"[%@] file not found\n",filePath);
 }
 
 - (int) numPointsInOldHistory
 {
-    return ([oldHistoryData length]/sizeof(long)-3)/3;
+    if(oldHistoryData){
+        MotionNodeHistoryHeader* header = (MotionNodeHistoryHeader*)[oldHistoryData bytes];
+        return header->numDataPoints;
+    }
+    else return 0;
 }
 
 - (NSTimeInterval) oldHistoryStartTime
 {
     if(oldHistoryData){
-        unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
-        return (NSTimeInterval)ptr[1];
+        MotionNodeHistoryHeader* header = (MotionNodeHistoryHeader*)[oldHistoryData bytes];
+        return header->startTime;
     }
     else return 0;
 }
 - (NSTimeInterval) oldHistoryEndTime
 {
     if(oldHistoryData){
-        unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
-        return (NSTimeInterval)ptr[2];
+        MotionNodeHistoryHeader* header = (MotionNodeHistoryHeader*)[oldHistoryData bytes];
+        return header->endTime;
     }
     else return 0;
 }
@@ -833,27 +860,17 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 {
     if(oldHistoryData){
         //these have to come out in reverse order
-        union {
-            float asFloat;
-            unsigned long asLong;
-        }packedValue;
-        int maxNum = [self numPointsInOldHistory]*3;
-        index = index*3 + 2; //point to the x index
-        int convertedIndex = maxNum - index - 1;
-        unsigned long* ptr = (unsigned long*)[oldHistoryData bytes];
-        if(convertedIndex>3){
-            
-            packedValue.asLong = ptr[convertedIndex];
-            float x = packedValue.asFloat;
-            
-            packedValue.asLong = ptr[convertedIndex-1];
-            float y = packedValue.asFloat;
-            
-            packedValue.asLong = ptr[convertedIndex-2];
-            float z = packedValue.asFloat;
+        int numPoints      = [self numPointsInOldHistory];
+        int convertedIndex = numPoints - index - 1;
         
-            return 1.0 - sqrtf(x*x + y*y + z*z);
-        }
+        MotionNodeHistoryHeader*  header    = (MotionNodeHistoryHeader*)[oldHistoryData bytes];
+        MotionNodeHistoryData*    dataPtr   = (MotionNodeHistoryData*)([oldHistoryData bytes] + sizeof(MotionNodeHistoryHeader));
+        
+        float x = header->calibrations[0].slope*dataPtr[convertedIndex].x + header->calibrations[0].intercept;
+        float y = header->calibrations[1].slope*dataPtr[convertedIndex].y + header->calibrations[1].intercept;
+        float z = header->calibrations[2].slope*dataPtr[convertedIndex].z + header->calibrations[2].intercept;
+        
+        return 1.0 - sqrtf(x*x + y*y + z*z);
     }
     return 0;
 }
@@ -891,22 +908,31 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 	char* data = (char*)[thePacket bytes];
 	
 	if (data[0] == 0x31) { //first byte of valid packet is '1'
+        
+        unsigned short rawX;
+        unsigned short rawY;
+        unsigned short rawZ;
+        
         if(nodeVersion<10){
+            
             
            // accel 0
             rawData.bytes[0] = data[1];
             rawData.bytes[1] = (data[2] >> 4) & 0x0F;
-            [self setAy:motionNodeCalibrationPreV10[0].slope * rawData.unpacked + motionNodeCalibrationPreV10[0].intercept];
+            rawY = rawData.unpacked;
+            [self setAy:motionNodeCalibrationPreV10[preV10Convert[0]].slope * rawY + motionNodeCalibrationPreV10[preV10Convert[0]].intercept];
             
             // accel 1
             rawData.bytes[0] = ((data[2] << 4) & 0xF0) | ((data[3] >> 4) & 0x0F);
             rawData.bytes[1] = data[3] & 0x0F;
-            [self setAz:-(motionNodeCalibrationPreV10[1].slope * rawData.unpacked + motionNodeCalibrationPreV10[1].intercept)];
+            rawZ = rawData.unpacked;
+           [self setAz:-(motionNodeCalibrationPreV10[preV10Convert[1]].slope * rawZ + motionNodeCalibrationPreV10[preV10Convert[1]].intercept)];
             
             // accel 2
             rawData.bytes[0] = data[4];
             rawData.bytes[1] = (data[5] >> 4) & 0x0F;
-            [self setAx:motionNodeCalibrationPreV10[2].slope * rawData.unpacked + motionNodeCalibrationPreV10[2].intercept];
+            rawX = rawData.unpacked;
+            [self setAx:motionNodeCalibrationPreV10[preV10Convert[2]].slope * rawX + motionNodeCalibrationPreV10[preV10Convert[2]].intercept];
             
             //do a runing average for the temperature
             float temp;
@@ -925,20 +951,23 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
             // accel 0
             rawData.bytes[0] = data[1];
             rawData.bytes[1] = data[2];
-            [self setAy:motionNodeCalibrationV10[0].slope * rawData.unpacked + motionNodeCalibrationV10[0].intercept];
+            rawY = rawData.unpacked;
+            [self setAy:motionNodeCalibrationV10[v10Convert[0]].slope * rawY + motionNodeCalibrationV10[v10Convert[0]].intercept];
             
             // accel 1
             rawData.bytes[0] = data[3];
             rawData.bytes[1] = data[4];
-            [self setAx:motionNodeCalibrationV10[1].slope * rawData.unpacked + motionNodeCalibrationV10[1].intercept];
+            rawX = rawData.unpacked;
+            [self setAx:motionNodeCalibrationV10[v10Convert[1]].slope * rawX + motionNodeCalibrationV10[v10Convert[1]].intercept];
             
             // accel 2
             rawData.bytes[0] = data[5];
             rawData.bytes[1] = data[6];
-            [self setAz:motionNodeCalibrationV10[2].slope * rawData.unpacked + motionNodeCalibrationV10[2].intercept];
+            rawZ = rawData.unpacked;
+            [self setAz:motionNodeCalibrationV10[v10Convert[2]].slope * rawZ + motionNodeCalibrationV10[v10Convert[2]].intercept];
         }
         
-        [self addToHistoryX:ax y:ay z:az];
+        [self addToHistoryX:rawX y:rawY z:rawZ];
         
 		[self setTotalxyz];
 		
@@ -1167,44 +1196,41 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 	}
 }
 
-- (void) addToHistoryX:(float)xAcc y:(float)yAcc z:(float)zAcc
+- (void) addToHistoryX:(unsigned short)xAcc y:(unsigned short)yAcc z:(unsigned short)zAcc
 {
-    union {
-        float asFloat;
-        unsigned long asLong;
-    }packedValue;
-    
     if(!historyTrace){
         historyTrace  = [[NSMutableData alloc] init];
-        [historyTrace setLength:kMaxHistoryLength * sizeof(unsigned long)];
-        historyPtr = (unsigned long*)[historyTrace bytes];
+        [historyTrace setLength: sizeof(MotionNodeHistoryHeader) + kMaxHistoryLength * sizeof(MotionNodeHistoryData)];
+        MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
         
-        //history file has the format (all values encoded as longs):
-        //uniqueIdNumber
-        //startime  (unix time)
-        //endTime   (unix time)
-        //x
-        //y
-        //z
-        
+        header->moduleID        = [self uniqueIdNumber];
+        header->endTime         = 0; //we will fill this in at the end
+        header->startTime       = [[NSDate date] timeIntervalSince1970];
+        header->numDataPoints   = 0; //will fill this in as we go
+        int i;
+        for(i=0;i<3;i++){
+            if(nodeVersion<10){
+                header->calibrations[i].slope	  = motionNodeCalibrationPreV10[preV10Convert[i]].slope;
+                header->calibrations[i].intercept = motionNodeCalibrationPreV10[preV10Convert[i]].intercept;
+            }
+            else {
+                header->calibrations[i].slope	  = motionNodeCalibrationV10[v10Convert[i]].slope;
+                header->calibrations[i].intercept = motionNodeCalibrationV10[v10Convert[i]].intercept;
+            }
+        }
         historyIndex = 0;
-        historyPtr[historyIndex++] = [self uniqueIdNumber];
-        historyPtr[historyIndex++] = (unsigned long)[[NSDate date] timeIntervalSince1970];
-        stopTimeIndex = historyIndex++;           //save a slot for the endtime
+        historyPtr = (MotionNodeHistoryData*)([historyTrace bytes] + sizeof(MotionNodeHistoryHeader));
     }
     
-    packedValue.asFloat = xAcc;
-    historyPtr[historyIndex++] = packedValue.asLong;
-    
-    packedValue.asFloat = yAcc;
-    historyPtr[historyIndex++] = packedValue.asLong;
-    
-    packedValue.asFloat = zAcc;
-    historyPtr[historyIndex++] = packedValue.asLong;
-    
-    if(historyIndex > kMaxHistoryLength-1){
-        historyPtr[stopTimeIndex] = (unsigned long)[[NSDate date] timeIntervalSince1970];
-        [self saveTraceToHistory:historyPtr[1]];
+    historyPtr[historyIndex].x = xAcc;
+    historyPtr[historyIndex].y = yAcc;
+    historyPtr[historyIndex].z = zAcc;
+    historyIndex++;
+    if(historyIndex >= kMaxHistoryLength){
+        MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
+        header->endTime                  = [[NSDate date] timeIntervalSince1970];   //see... filled it in
+        header->numDataPoints            = historyIndex;                            //see... filled it in
+        [self saveTraceToHistory:header->startTime];
         [self cleanupHistory];
     }
 }
@@ -1218,7 +1244,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) saveTraceToHistory:(unsigned long) aTimeStamp
 {
     
-    NSDate* startDate   = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)historyPtr[1]];
+    NSDate* startDate   = [NSDate dateWithTimeIntervalSince1970:aTimeStamp];
 
     NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
     [dateFormatter setDateFormat:@"yyyy/MM/dd"];
@@ -1247,48 +1273,36 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 
 - (void) postCouchDBRecord
 {
-    union {
-        float asFloat;
-        unsigned long asLong;
-    }packedData;
     
     NSMutableString* traceAsString = [NSMutableString stringWithCapacity:1024*1024];
     
-    unsigned long* ptr = (unsigned long*)[historyTrace bytes];
-    unsigned long  num = [historyTrace length]/sizeof(long);
+    MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
     
-    int index = 0;
-    if(num>6){
-        unsigned long module = ptr[index++];
-        unsigned long t1     = ptr[index++];
-        unsigned long t2     = ptr[index++];
+    int index              = 0;
+    unsigned long module   = header->moduleID;
+    NSTimeInterval started = header->startTime;
+    NSTimeInterval ended   = header->endTime;
+    unsigned long  num     = header->numDataPoints;
+    
+    do {
+        float x = header->calibrations[0].slope*historyPtr[index].x + header->calibrations[2].intercept;
+        float y = header->calibrations[1].slope*historyPtr[index].y + header->calibrations[0].intercept;
+        float z = header->calibrations[2].slope*historyPtr[index].z + header->calibrations[1].intercept;
+        index++;
         
-        do {
-            packedData.asLong = ptr[index++];
-            float x = packedData.asFloat;
-            if(index>num)break;
-            
-            packedData.asLong = ptr[index++];
-            float y = packedData.asFloat;
-            if(index>num)break;
-           
-            packedData.asLong = ptr[index++];
-            float z = packedData.asFloat;
-            if(index>num)break;
-           
-            float mag = 1 - sqrtf(x*x + y*y + z*z);
-            [traceAsString appendFormat:@"%.4f,", mag];
-            
-        }while(index<num);
+        float mag = 1 - sqrtf(x*x + y*y + z*z);
+        [traceAsString appendFormat:@"%.4f,", mag];
+    } while(index<num);
 
-    
-        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                                traceAsString, @"trace",
-                                [NSNumber numberWithInt:module],@"module",
-                                [NSNumber numberWithUnsignedLong:t1],@"startTime",
-                                [NSNumber numberWithUnsignedLong:t2],@"endTime",
-                                nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
-    }
+
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                            traceAsString,                      @"trace",
+                            [NSNumber numberWithInt:module],    @"module",
+                            [NSNumber numberWithInt:num],       @"numPoints",
+                            [NSNumber numberWithFloat:started], @"startTime",
+                            [NSNumber numberWithFloat:ended],   @"endTime",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+
 }
 @end
