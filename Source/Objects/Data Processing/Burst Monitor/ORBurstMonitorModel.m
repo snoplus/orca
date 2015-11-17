@@ -1568,17 +1568,12 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSLog(@"bursttextstr is %@\n", bursttextstr);
     //////stringWithFormat:@"{'novaState':'%i','dateSec':'%f','dateMic':'%i','runNum':'%i','runType':'%@','Ncount':'%i','Nmult':'%i','Nchan':'%i','ENchan':'%f','pNchan':'%f','N':'%i','adcP':'%f','gammaP':'%f','alphaP':'%f','Xcenter':'%i','Xrms':'%f','Ycenter':'%i','Yrms':'%f','phi':'%f','Rcenter':'%f','Rrms':'%f','Pcenter':'%f','durSec':'%f','rSec':'%f','burstNum':'%i'}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
     /// return from min args {"_id":"card8channel0","_rev":"37-5b3dc887d615db963492927bfb3fb124","Run":"3832","Card":"8","Channel":"0","Centroids":"187.524,324.44,457.7,593.55,727.29,860.39,994.6,1127.99,1262.36,1396.07","Standard_deviation_centroids":"1.15036,0.316961,0.299833,0.30639,0.336242,0.317772,0.294958,0.277667,0.333023,0.325655","Fit_parameter 0":"-2.43283","Error_param 0":"0.643567","Fit_parameter 1":"9.61408","Error_param 1":"0.0160168","Fit_parameter 2":"-0.000254695","Error_param 2":"8.90062e-05","Reduced_chisquare":"3.91508"}
-    //Stuff needed to fix this
-    /// NSRange runnumtitle = [runglob rangeOfString:@"RunNumber = "]; //12 lengnth, need 4 char for run number
-    ///NSRange runRange = NSMakeRange((runnumtitle.location+12), 4); ///109 4 for runnumber
-    ///NSString* runnumstr = [runglob substringWithRange:runRange];
-    //NSLog(@"string is %@\n",runnumstr);
-    //runnum = [runnumstr intValue];
+
     if(1){ //write the file when we want to do that
         NSError* fileWriteErr;
         NSFileManager* fileman = nil;
         NSString* currentDir = [fileman currentDirectoryPath];
-        BOOL ok = [allBurstData writeToFile:@"/Users/daq/lastburst.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
+        BOOL ok = [bursttextstr writeToFile:@"/Users/daq/lastburst.txt" atomically:1 encoding:NSASCIIStringEncoding error:&fileWriteErr]; //Encoding that dont work: NSUnicodeStringEncoding
         NSLog(@"file write okness is %i\n", ok);
         NSLog(@"look for the file at %@\n", currentDir);
     }
