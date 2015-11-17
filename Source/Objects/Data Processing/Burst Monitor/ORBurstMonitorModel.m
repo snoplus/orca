@@ -1534,7 +1534,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     NSFileHandle* revfile;
     NSData *revdata;
     NSString *revstring;
-    NSString* bursttextstr = @"{\"_id\":\"bursttext\",\"_rev\":\"";
+    NSString* bursttextstr = @"{\"_id\":\"burstevents\",\"_rev\":\"";
     @try{
     [getrev launch]; //find the rev!!!
     NSLog(@"part 0\n"); //got here with end card8channel0, and with } end
