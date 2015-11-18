@@ -446,9 +446,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 - (void) updateTellieDocument:(NSDictionary*)subRunDoc
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* runDocDict = [[self.tellieRunDoc mutableCopy] autorelease];
-    NSMutableDictionary* subRunDocDict = [[self.tellieSubRunSettings mutableCopy] autorelease];
+    NSMutableDictionary* runDocDict = [self.tellieRunDoc mutableCopy];
+    NSMutableDictionary* subRunDocDict = [self.tellieSubRunSettings mutableCopy];
     
     [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
     @try{
@@ -457,7 +456,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     @catch (NSException *e) {
         NSLog(@"Error in pin readout %@",e);
     }
-    NSMutableArray * subRunInfo = [[[runDocDict objectForKey:@"sub_run_info"] mutableCopy] autorelease];
+    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
     [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
     
@@ -470,8 +469,9 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
                                 documentId:[runDocDict objectForKey:@"_id"]
                                        tag:kTellieRunDocumentUpdated];
     }
-    
-    [runDocPool drain];
+    [subRunInfo release];
+    [runDocDict release];
+    [subRunDocDict release];
 }
 
 -(void) _pushEllieConfigDocToDB:(NSString*)aCouchDBName runFiletoPush:(NSMutableDictionary*)customRunFile withDocType:(NSString*)aDocType
