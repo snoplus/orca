@@ -69,11 +69,13 @@
 	[tracePlot addPlot: aPlot];
 	[aPlot release];
 	
-    [[plotter0 yAxis] setRngLow:-2 withHigh:2];
+    [[plotter0 yAxis] setRngDefaultsLow:-5E-3 withHigh:+5E-3];
+    [[plotter0 yAxis] setInteger:NO];
     [[plotter0 yAxis] setRngLimitsLow:-2 withHigh:2 withMinRng:.0001];
     
-    [[plotter0 xAxis] setRngLow:0.0 withHigh:30000];
-    [[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:300000. withMinRng:5];
+    double maxPoints = [model maxHistoryLength];
+    [[plotter0 xAxis] setRngDefaultsLow:0.0 withHigh:maxPoints];
+    [[plotter0 xAxis] setRngLimitsLow:0.0 withHigh:maxPoints withMinRng:5];
     
     ORTimeLinePlot* historyPlot= [[ORTimeLinePlot alloc] initWithTag:0 andDataSource:self];
     [plotter0 addPlot: historyPlot];
@@ -168,7 +170,12 @@
                      selector : @selector(showLongTermDeltaChanged:)
                          name : ORMotionNodeModelShowLongTermDeltaChanged
                         object: model];
-    
+
+    [notifyCenter addObserver : self
+                     selector : @selector(keepHistoryChanged:)
+                         name : ORMotionNodeModelKeepHistoryChanged
+                        object: model];
+
     [notifyCenter addObserver : self
                      selector : @selector(autoStartChanged:)
                          name : ORMotionNodeModelAutoStartChanged
@@ -235,6 +242,7 @@
 	[self startTimeChanged:nil];
 	[self longTermSensitivityChanged:nil];
 	[self showLongTermDeltaChanged:nil];
+    [self keepHistoryChanged:nil];
     [self autoStartChanged:nil];
     [self autoStartWithOrcaChanged:nil];
 	[self shipThresholdChanged:nil];
@@ -277,6 +285,10 @@
 {
 	[shipThresholdSlider setFloatValue: [model shipThreshold]];
 	[shipThresholdField setFloatValue: [model shipThreshold]];
+}
+- (void) keepHistoryChanged:(NSNotification*)aNote
+{
+    [keepHistoryCB setIntValue: [model keepHistory]];
 }
 
 - (void) autoStartChanged:(NSNotification*)aNote
@@ -432,6 +444,10 @@
 - (void) shipThresholdAction:(id)sender
 {
 	[model setShipThreshold:[sender floatValue]];	
+}
+- (void) keepHistoryAction:(id)sender
+{
+    [model setKeepHistory:[sender intValue]];
 }
 
 - (void) autoStartAction:(id)sender

@@ -34,6 +34,7 @@
 	IBOutlet NSButton*		shipExcursionsCB;
 	IBOutlet NSSlider*		shipThresholdSlider;
 	IBOutlet NSTextField*	shipThresholdField;
+    IBOutlet NSButton*		keepHistoryCB;
     IBOutlet NSButton*		autoStartCB;
     IBOutlet NSButton*		autoStartWithOrcaCB;
 	IBOutlet NSButton*		showLongTermDeltaCB;
@@ -72,6 +73,7 @@
 - (void) outOfBandChanged:(NSNotification*)aNote;
 - (void) shipExcursionsChanged:(NSNotification*)aNote;
 - (void) shipThresholdChanged:(NSNotification*)aNote;
+- (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) autoStartChanged:(NSNotification*)aNote;
 - (void) autoStartWithOrcaChanged:(NSNotification*)aNote;
 - (void) showLongTermDeltaChanged:(NSNotification*)aNote;
@@ -95,6 +97,7 @@
 #pragma mark •••Actions
 - (IBAction) shipExcursionsAction:(id)sender;
 - (IBAction) shipThresholdAction:(id)sender;
+- (IBAction) keepHistoryAction:(id)sender;
 - (IBAction) autoStartAction:(id)sender;
 - (IBAction) autoStartWithOrcaAction:(id)sender;
 - (IBAction) showLongTermDeltaAction:(id)sender;
@@ -107,6 +110,7 @@
 - (IBAction) stop:(id)sender;
 - (IBAction) displayComponentsAction:(id)sender;
 - (IBAction) viewPastHistoryAction:(id)sender;
+- (IBAction) setHistoryFolderAction:(id)sender;
 
 - (int) maxLinesInLongTermView:(id)aLongTermView;
 - (int) startingLineInLongTermView:(id)aLongTermView;
@@ -116,10 +120,6 @@
 
 - (int)	numberPointsInPlot:(id)aPlotter;
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
-
-
-
-- (IBAction) setHistoryFolderAction:(id)sender;
 
 @end
 

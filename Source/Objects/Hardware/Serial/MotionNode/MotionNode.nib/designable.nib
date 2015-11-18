@@ -13,6 +13,7 @@
                 <outlet property="displayComponentsMatrix" destination="691" id="704"/>
                 <outlet property="historyFolderField" destination="Dxz-13-u6k" id="b52-az-uyT"/>
                 <outlet property="isAccelOnlyField" destination="523" id="530"/>
+                <outlet property="keepHistoryCB" destination="Rc3-wh-ge7" id="Z0k-bs-REl"/>
                 <outlet property="lastRecordShippedField" destination="852" id="856"/>
                 <outlet property="lockButton" destination="152" id="409"/>
                 <outlet property="longTermView" destination="760" id="761"/>
@@ -538,6 +539,18 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button toolTip="If checked all data will be logged to the history file" id="Rc3-wh-ge7">
+                                            <rect key="frame" x="526" y="32" width="90" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <buttonCell key="cell" type="check" title="Keep History" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="x44-lr-X7a">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="keepHistoryAction:" target="-2" id="RzB-rV-mFb"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <animations/>
                                 </view>

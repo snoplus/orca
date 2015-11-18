@@ -50,6 +50,7 @@ NSString* ORMotionNodeModelSerialNumberChanged			= @"ORMotionNodeModelSerialNumb
 NSString* ORMotionNodeModelUpdateLongTermTrace			= @"ORMotionNodeModelUpdateLongTermTrace";
 NSString* ORMotionNodeModelHistoryFolderChanged         = @"ORMotionNodeModelHistoryFolderChanged";
 NSString* ORMotionNodeModelUpdateHistoryPlot            = @"ORMotionNodeModelUpdateHistoryPlot";
+NSString* ORMotionNodeModelKeepHistoryChanged           = @"ORMotionNodeModelKeepHistoryChanged";
 
 #define kMotionNodeDriverPath1 @"/Library/Extensions/SiLabsUSBDriver.kext"
 #define kMotionNodeDriverPath2 @"/Library/Extensions/SiLabsUSBDriver64.kext"
@@ -341,7 +342,17 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelAutoStartWithOrcaChanged object:self];
 }
 
+- (BOOL) keepHistory
+{
+    return keepHistory;
+}
 
+- (void) setKeepHistory:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setKeepHistory:keepHistory];
+    keepHistory = aFlag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelKeepHistoryChanged object:self];
+}
 - (BOOL) showLongTermDelta
 {
     return showLongTermDelta;
@@ -592,6 +603,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [self setShipThreshold:			[decoder decodeFloatForKey:@"shipThreshold"]];
     [self setAutoStart:				[decoder decodeBoolForKey:@"autoStart"]];
     [self setAutoStartWithOrca:     [decoder decodeBoolForKey:@"autoStartWithOrca"]];
+    [self setKeepHistory:           [decoder decodeBoolForKey:@"keepHistory"]];
     [self setShowLongTermDelta:		[decoder decodeBoolForKey:@"showLongTermDelta"]];
     [self setLongTermSensitivity:	[decoder decodeIntForKey:@"longTermSensitivity"]];
     [self setShowDeltaFromAve:		[decoder decodeBoolForKey:@"showDeltaFromAve"]];
@@ -613,6 +625,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:shipExcursions		forKey:@"shipExcursions"];
     [encoder encodeFloat:shipThreshold		forKey:@"shipThreshold"];
+    [encoder encodeBool:keepHistory         forKey:@"keepHistory"];
     [encoder encodeBool:autoStart			forKey:@"autoStart"];
     [encoder encodeBool:autoStartWithOrca	forKey:@"autoStartWithOrca"];
     [encoder encodeBool:showLongTermDelta	forKey:@"showLongTermDelta"];
@@ -876,7 +889,10 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     }
     return 0;
 }
-
+- (unsigned long)maxHistoryLength
+{
+    return kMaxHistoryLength;
+}
 @end
 
 @implementation ORMotionNodeModel (private)
@@ -1200,6 +1216,11 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 
 - (void) addToHistoryX:(unsigned short)xAcc y:(unsigned short)yAcc z:(unsigned short)zAcc
 {
+    if(!keepHistory){
+        [self closeOutHistoryFile];
+        return;
+    }
+    
     if(!historyTrace){
         historyTrace  = [[NSMutableData alloc] init];
         [historyTrace setLength: sizeof(MotionNodeHistoryHeader) + kMaxHistoryLength * sizeof(MotionNodeHistoryData)];
@@ -1235,12 +1256,14 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     
 - (void) closeOutHistoryFile
 {
-    MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
-    header->endTime                  = [[NSDate date] timeIntervalSince1970];   //see... filled it in
-    header->numDataPoints            = historyIndex;                            //see... filled it in
-    [self saveTraceToHistory:header->startTime];
-    [historyTrace release];
-    historyTrace = nil;
+    if(historyTrace){
+        MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
+        header->endTime                  = [[NSDate date] timeIntervalSince1970];   //see... filled it in
+        header->numDataPoints            = historyIndex;                            //see... filled it in
+        [self saveTraceToHistory:header->startTime];
+        [historyTrace release];
+        historyTrace = nil;
+    }
 }
 
 - (void) saveTraceToHistory:(unsigned long) aTimeStamp

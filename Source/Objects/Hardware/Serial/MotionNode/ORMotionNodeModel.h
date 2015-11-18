@@ -109,7 +109,7 @@ typedef struct MotionNodeHistoryHeader {
     int				totalShipped;
 	int				excursionIndex;
 	float			longTraceValueToKeep;
-    
+    BOOL            keepHistory;
     NSString*		historyFolder;
     int             stopTimeIndex;
     NSMutableData*  historyTrace;
@@ -190,6 +190,9 @@ typedef struct MotionNodeHistoryHeader {
 - (float) oldHistoryValue:(int)index;
 - (NSTimeInterval) oldHistoryStartTime;
 - (NSTimeInterval) oldHistoryEndTime;
+- (unsigned long)maxHistoryLength;
+- (BOOL) keepHistory;
+- (void) setKeepHistory:(BOOL)aFlag;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -246,3 +249,4 @@ extern NSString* ORMotionNodeModelDisplayComponentsChanged;
 extern NSString* ORMotionNodeModelUpdateLongTermTrace;
 extern NSString* ORMotionNodeModelHistoryFolderChanged;
 extern NSString* ORMotionNodeModelUpdateHistoryPlot;
+extern NSString* ORMotionNodeModelKeepHistoryChanged;
