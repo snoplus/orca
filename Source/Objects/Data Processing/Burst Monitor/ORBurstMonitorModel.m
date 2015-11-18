@@ -1579,16 +1579,32 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     //send the file to docdb
     NSTask* sendrev;
+    NSFileHandle* sendfile;
+    NSData *senddata;
+    NSString *sendstring;
     sendrev =[[NSTask alloc] init];
     NSPipe* pipesend;
     pipesend = [NSPipe pipe];
+    @try{
     [sendrev setStandardOutput: pipesend];
     [sendrev setLaunchPath: @"/usr/bin/curl"];
     [sendrev setArguments: [NSArray arrayWithObjects: @"-s", @"-X", @"PUT", @"http://10.0.3.1:5984/bursts/burstevents", @"-d", @"@/Users/daq/lastburst.txt", @"-H", @"\"Content-Type: application/json\"", nil]];
     ///curl -s -X PUT http://10.0.3.1:5984/DATABASE_NAME/DOCUMENT_NAME -d @/PATH/TO/TEXT/FILE.txt -H "Content-Type: application/json"
     NSLog(@" Now Sending the burst data to couch\n");
     [sendrev launch];
+    [sendrev waitUntilExit];
+    [sendrev terminate];
+    [sendrev release];
     NSLog(@"Done Sending the burst data to couch\n");
+    sendfile =[pipesend fileHandleForReading];  //maybe need declare here
+    senddata = [sendfile readDataToEndOfFile];
+    sendstring = [[NSString alloc] initWithData:senddata encoding:NSUTF8StringEncoding];
+    }
+    @catch(NSException* exc)
+    {
+        NSLog(@"Could not send text file to couchdb.  Exception is %@\n", exc);
+    }
+
     
     //flush all queues to the disk fle
     NSString* fileSuffix = [NSString stringWithFormat:@"Burst_%d_",burstCount];
