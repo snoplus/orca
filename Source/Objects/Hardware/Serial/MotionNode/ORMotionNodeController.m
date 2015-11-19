@@ -528,17 +528,11 @@
             int n = [model numPointsInOldHistory];
             if(n!=0){
                 deltaTime           = ([model oldHistoryEndTime]-[model oldHistoryStartTime])/(NSTimeInterval)n;
-                NSLog(@"deltaTime: %f\n",deltaTime);
                 [(ORTimeAxis*)[plotter0 xAxis] setStartTime: [model oldHistoryEndTime]];
             }
         }
         *xValue = [model oldHistoryEndTime] - (i*deltaTime);
         *yValue = [model oldHistoryValue:i];
-        
-        if(i<20){
-            NSLog(@"%f,%f\n",*xValue,*yValue);
-        }
-        
     }
     else {
         double aValue = 0;
