@@ -390,7 +390,7 @@
                                         </customView>
                                         <textField focusRingType="none" verticalHuggingPriority="750" id="Ghl-SX-fQs">
                                             <rect key="frame" x="88" y="40" width="63" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="AutoStart:" id="urh-To-SaL">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -511,7 +511,7 @@
                                         </button>
                                         <button verticalHuggingPriority="750" id="gJv-wk-hZ6">
                                             <rect key="frame" x="12" y="26" width="131" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <buttonCell key="cell" type="push" title="View History File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ccq-sz-0JV">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
