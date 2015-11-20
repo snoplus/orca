@@ -1577,7 +1577,9 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         NSLog(@"file write okness is %i\n", ok);
         NSLog(@"look for the file at %@\n", currentDir);
     }
-    //send the file to docdb
+    //send the file to couchdb
+    system("Users/daq/burstcouch.sh");
+    /*
     NSTask* sendrev;
     NSFileHandle* sendfile;
     NSData *senddata;
@@ -1599,12 +1601,13 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     sendfile =[pipesend fileHandleForReading];  //maybe need declare here
     senddata = [sendfile readDataToEndOfFile];
     sendstring = [[NSString alloc] initWithData:senddata encoding:NSUTF8StringEncoding];
+    NSLog(@"Send to couch result: %@\n", sendstring);
     }
     @catch(NSException* exc)
     {
         NSLog(@"Could not send text file to couchdb.  Exception is %@\n", exc);
     }
-
+    */
     
     //flush all queues to the disk fle
     NSString* fileSuffix = [NSString stringWithFormat:@"Burst_%d_",burstCount];
