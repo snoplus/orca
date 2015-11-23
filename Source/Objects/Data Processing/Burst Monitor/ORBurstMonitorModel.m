@@ -1420,18 +1420,19 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
         chanpvalue = 999.999;
     }
     //make runtype string
-    NSString* theRuntypes = @"";
-    if([[runbits objectAtIndex:0] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Maintenance"];
-    if([[runbits objectAtIndex:1] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Supernova"];
-    if([[runbits objectAtIndex:2] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"Calibration"];
-    if([[runbits objectAtIndex:3] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Underground"];
-    if([[runbits objectAtIndex:4] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Front Shielding"];
-    if([[runbits objectAtIndex:5] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Unusual Condition"];
-    if([[runbits objectAtIndex:6] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", SNEWS"];
-    if([[runbits objectAtIndex:7] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Pulser"];
-    if([[runbits objectAtIndex:8] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in Storage"];
-    if([[runbits objectAtIndex:9] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in Area"];
-    if([[runbits objectAtIndex:10] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", Source in HALO"];
+    NSString* theRuntypes = @"[";
+    if([[runbits objectAtIndex:0] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"\"Maintenance\""];
+    if([[runbits objectAtIndex:1] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"\"Supernova\""];
+    if([[runbits objectAtIndex:2] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@"\"Calibration\""];
+    if([[runbits objectAtIndex:3] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Underground\""];
+    if([[runbits objectAtIndex:4] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Front Shielding\""];
+    if([[runbits objectAtIndex:5] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Unusual Condition\""];
+    if([[runbits objectAtIndex:6] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"SNEWS\""];
+    if([[runbits objectAtIndex:7] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Pulser\""];
+    if([[runbits objectAtIndex:8] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Source in Storage\""];
+    if([[runbits objectAtIndex:9] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Source in Area\""];
+    if([[runbits objectAtIndex:10] intValue] == 1) theRuntypes = [theRuntypes stringByAppendingString:@", \"Source in HALO\""];
+    theRuntypes = [theRuntypes stringByAppendingString:@"]"];
     //send email to announce the burst
     int numMicTillBurst = (1000000*fmod(numSecTillBurst,1));
     NSLog(@"Novastate is now %i \n", novaState); ////////////////////////////////////////////////////////////
@@ -1519,7 +1520,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
     }
     
     //write file with burst data
-    NSString* allBurstData = [NSString stringWithFormat:@"\",\"novaState\":%i,\"dateSec\":%f,\"dateMic\":%i,\"runNum\":%i,\"runType\":\"%@\",\"Ncount\":%i,\"Nmult\":%i,\"Nchan\":%i,\"ENchan\":%f,\"pNchan\":%f,\"N\":%i,\"adcP\":%f,\"gammaP\":%f,\"alphaP\":%f,\"Xcenter\":%i,\"Xrms\":%f,\"Ycenter\":%i,\"Yrms\":%f,\"phi\":%f,\"Rcenter\":%f,\"Rrms\":%f,\"Pcenter\":%f,\"durSec\":%f,\"rSec\":%f,\"burstNum\":%i}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
+    NSString* allBurstData = [NSString stringWithFormat:@"\",\"novaState\":%i,\"dateSec\":%f,\"dateMic\":%i,\"runNum\":%i,\"runType\":%@,\"Ncount\":%i,\"Nmult\":%i,\"Nchan\":%i,\"ENchan\":%f,\"pNchan\":%f,\"N\":%i,\"adcP\":%f,\"gammaP\":%f,\"alphaP\":%f,\"Xcenter\":%i,\"Xrms\":%f,\"Ycenter\":%i,\"Yrms\":%f,\"phi\":%f,\"Rcenter\":%f,\"Rrms\":%f,\"Pcenter\":%f,\"durSec\":%f,\"rSec\":%f,\"burstNum\":%i}",novaState,numSecTillBurst,numMicTillBurst,runnum,theRuntypes,countsInBurst,multInBurst,numBurstChan,exChan,chanpvalue,peakN+lowN,adcP,gammaP,alphaP,Xcenter,Xrms,Ycenter,Yrms,phi,Rcenter,Rrms,exp(-0.5*rSqrNorm),durSec,rSec,burstCount];
     
     NSTask* getrev;
     getrev =[[NSTask alloc] init];
