@@ -13,7 +13,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 #define kGretina4MFIFO30KFull		0x1000000
 #define kGretina4MFIFOFull          0x2000000
     
-#define kUseDMA  false
+#define kUseDMA  true
     
     uint32_t baseAddress      = GetBaseAddress();  
     uint32_t fifoStateAddress = GetDeviceSpecificData()[0];
