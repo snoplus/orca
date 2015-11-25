@@ -46,15 +46,15 @@ typedef struct MotionNodeCalibrations {
 } MotionNodeCalibrations; 
 
 typedef struct MotionNodeHistoryData {
-    unsigned short x;
-    unsigned short y;
-    unsigned short z;
+     short x;
+     short y;
+     short z;
 }MotionNodeHistoryData;
 
 typedef struct MotionNodeHistoryHeader {
     unsigned long           moduleID;
-    NSTimeInterval          endTime;
-    NSTimeInterval          startTime;
+    double                  endTime;
+    double                  startTime;
     MotionNodeCalibrations  calibrations[3];
     unsigned long numDataPoints;
     //numDataPoints * MotionNodeData structs to follow

@@ -1222,13 +1222,14 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     }
     
     if(!historyTrace){
-        historyTrace  = [[NSMutableData alloc] init];
-        [historyTrace setLength: sizeof(MotionNodeHistoryHeader) + kMaxHistoryLength * sizeof(MotionNodeHistoryData)];
+        unsigned long numBytes = sizeof(MotionNodeHistoryHeader) + kMaxHistoryLength * sizeof(MotionNodeHistoryData);
+        historyTrace  = [[NSMutableData alloc] initWithCapacity:numBytes];
+        [historyTrace setLength: numBytes];
         MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
         
         header->moduleID        = [self uniqueIdNumber];
-        header->endTime         = 0; //we will fill this in at the end
         header->startTime       = [[NSDate date] timeIntervalSince1970];
+        header->endTime         = 0; //we will fill this in at the end
         header->numDataPoints   = 0; //will fill this in as we go
         int i;
         for(i=0;i<3;i++){
@@ -1263,6 +1264,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
         [self saveTraceToHistory:header->startTime];
         [historyTrace release];
         historyTrace = nil;
+        historyIndex = 0;
     }
 }
 
@@ -1298,34 +1300,26 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 
 - (void) postCouchDBRecord
 {
-    
-    NSMutableString* traceAsString = [NSMutableString stringWithCapacity:1024*1024];
-    
     MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
     
-    int index              = 0;
-    unsigned long module   = header->moduleID;
-    NSTimeInterval started = header->startTime;
-    NSTimeInterval ended   = header->endTime;
-    unsigned long  num     = header->numDataPoints;
+    unsigned long num       = header->numDataPoints;
+    NSMutableArray* trace   = [NSMutableArray arrayWithCapacity:num];
     
-    do {
-        float x = header->calibrations[0].slope*historyPtr[index].x + header->calibrations[2].intercept;
-        float y = header->calibrations[1].slope*historyPtr[index].y + header->calibrations[0].intercept;
-        float z = header->calibrations[2].slope*historyPtr[index].z + header->calibrations[1].intercept;
-        index++;
-        
+    int index;
+    for(index=0;index<num;index++){
+        float x = header->calibrations[0].slope*historyPtr[index].x + header->calibrations[0].intercept;
+        float y = header->calibrations[1].slope*historyPtr[index].y + header->calibrations[1].intercept;
+        float z = header->calibrations[2].slope*historyPtr[index].z + header->calibrations[2].intercept;        
         float mag = 1 - sqrtf(x*x + y*y + z*z);
-        [traceAsString appendFormat:@"%.4f,", mag];
-    } while(index<num);
-
+        [trace addObject:[NSNumber numberWithFloat:mag]];
+    }
 
     NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            traceAsString,                      @"trace",
-                            [NSNumber numberWithInt:module],    @"module",
-                            [NSNumber numberWithInt:num],       @"numPoints",
-                            [NSNumber numberWithFloat:started], @"startTime",
-                            [NSNumber numberWithFloat:ended],   @"endTime",
+                            trace,                                              @"trace",
+                            [NSNumber numberWithInt:   header->moduleID],       @"module",
+                            [NSNumber numberWithInt:   header->numDataPoints],  @"numPoints",
+                            [NSNumber numberWithDouble: header->startTime],      @"startTime",
+                            [NSNumber numberWithDouble: header->endTime],        @"endTime",
                             nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 
