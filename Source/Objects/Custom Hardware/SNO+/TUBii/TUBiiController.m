@@ -22,7 +22,46 @@
     
     return self;
 }
-
+- (void) awakeFromNib
+{
+    blankView = [[NSView alloc] init];
+    [tabView setFocusRingType:NSFocusRingTypeNone];
+    
+    PulserAndDelays_size = NSMakeSize(400, 350);
+    Triggers_size = NSMakeSize(560, 510);
+    Tubii_size = NSMakeSize(400, 350);
+    Analog_size = NSMakeSize(400, 350);
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+}
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+{
+    NSLog(@"I got called");
+    int tabIndex = [aTabView indexOfTabViewItem:item];
+    if (tabIndex==0)
+    {
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:PulserAndDelays_size];
+        [[self window] setContentView:tabView];
+    }
+    else if (tabIndex==1)
+    {
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:Triggers_size];
+        [[self window] setContentView:tabView];
+    }
+    else if (tabIndex==2)
+    {
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:Tubii_size];
+        [[self window] setContentView:tabView];
+    }
+    else if (tabIndex==3)
+    {
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:Analog_size];
+        [[self window] setContentView:tabView];
+    }
+}
 // GUI actions. CTRL-drag handles from the IB into this file.
 - (IBAction)SmellieFire:(id)sender {
     NSLog(@"TUBii: SMELLIE pulser ON: %i\n", [sender state]);
@@ -129,6 +168,20 @@
 }
 - (IBAction)TrigMaskLoad:(id)sender {
     [model loadTrigMask:[sender state]];
+}
+- (IBAction)CaenMaskLoad:(id)sender {
+    
+}
+- (IBAction)CAEN_0:(id)sender {
+    [sender sizeToFit];
+    if([[sender selectedCell] tag]==0)
+    {
+        NSLog(@"THINGY1");
+    }
+    else
+    {
+        NSLog(@"THING2");
+    }
 }
 
 @end
