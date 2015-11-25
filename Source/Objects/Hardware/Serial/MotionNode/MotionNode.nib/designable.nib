@@ -499,7 +499,7 @@
                                     <subviews>
                                         <button verticalHuggingPriority="750" id="yme-VQ-jCi">
                                             <rect key="frame" x="618" y="26" width="131" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <buttonCell key="cell" type="push" title="Set History Folder..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FuB-EC-LZ7">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -507,18 +507,6 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="setHistoryFolderAction:" target="-2" id="Zey-1M-pzJ"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" id="gJv-wk-hZ6">
-                                            <rect key="frame" x="12" y="26" width="131" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <animations/>
-                                            <buttonCell key="cell" type="push" title="View History File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ccq-sz-0JV">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="viewPastHistoryAction:" target="-2" id="mUh-E7-ekm"/>
                                             </connections>
                                         </button>
                                         <customView id="bRy-OD-lij" customClass="ORCompositeTimeLineView">
@@ -531,7 +519,7 @@
                                         </customView>
                                         <textField verticalHuggingPriority="750" id="Dxz-13-u6k">
                                             <rect key="frame" x="423" y="7" width="323" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Idle" id="m0P-ay-gmb">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -549,6 +537,18 @@
                                             </buttonCell>
                                             <connections>
                                                 <action selector="keepHistoryAction:" target="-2" id="RzB-rV-mFb"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" id="gJv-wk-hZ6">
+                                            <rect key="frame" x="12" y="26" width="131" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <buttonCell key="cell" type="push" title="View History File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ccq-sz-0JV">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="viewPastHistoryAction:" target="-2" id="mUh-E7-ekm"/>
                                             </connections>
                                         </button>
                                     </subviews>
