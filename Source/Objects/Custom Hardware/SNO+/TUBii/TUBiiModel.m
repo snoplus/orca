@@ -18,6 +18,16 @@ NSString* otherSystemIP = @"192.168.80.25";
 
 @implementation TUBiiModel
 
+@synthesize trigMask;
+@synthesize NPulses;
+@synthesize smellieRate;
+@synthesize tellieRate;
+@synthesize pulserRate;
+@synthesize smellieNPulses;
+@synthesize tellieNPulses;
+@synthesize smellieDelay;
+@synthesize tellieDelay;
+@synthesize genericDelay;
 
 - (void) setUpImage
 {
@@ -40,9 +50,10 @@ NSString* otherSystemIP = @"192.168.80.25";
 // Initialize the model.
 // Note that this is initWithCoder and not just init, and we
 // call the superclass initWithCoder too!
-- (id) initWithCoder:(NSCoder *)aCoder {
-    self = [super initWithCoder:aCoder];
+- (id) init {
     
+    [super init];
+
     // Initialize model member variables
     smellieRate = 0;
     tellieRate = 0;
@@ -54,39 +65,13 @@ NSString* otherSystemIP = @"192.168.80.25";
     tellieDelay = 0;
     genericDelay = 0;
     trigMask=0;
+
     
     return self;
 }
 
-- (float) smellieRate
-{
-    return smellieRate;
-}
 
-- (float) tellieRate
-{
-    return tellieRate;
-}
 
-- (float) pulserRate
-{
-    return pulserRate;
-}
-
-- (float) smellieDelay
-{
-    return smellieDelay;
-}
-
-- (float) tellieDelay
-{
-    return tellieDelay;
-}
-
-- (float) genericDelay
-{
-    return genericDelay;
-}
 
 - (void) sendCmd:(NSString*)aCmd
 {
@@ -157,15 +142,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [nsocket setDelegate:self];
 }
 
-- (void) setSmellieRate:(float)value
-{
-    smellieRate = value;
-}
-
-- (void) setSmellieNPulses:(int)value
-{
-    smellieNPulses = value;
-}
 
 - (void) fireSmelliePulser:(BOOL)button
 {
@@ -185,15 +161,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-- (void) setTellieRate:(float)value
-{
-    tellieRate = value;
-}
-
-- (void) setTellieNPulses:(int)value
-{
-    tellieNPulses = value;
-}
 
 - (void) fireTelliePulser:(BOOL)button
 {
@@ -213,15 +180,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-- (void) setPulserRate:(float)value
-{
-    pulserRate = value;
-}
-
-- (void) setNPulses:(int)value
-{
-    NPulses = value;
-}
 
 - (void) firePulser:(BOOL)button
 {
@@ -241,11 +199,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-- (void) setSmellieDelay:(float)value
-{
-    smellieDelay = value;
-}
-
 - (void) loadSmellieDelay:(BOOL)button
 {
     NSString* command=@"smelliedelay ";
@@ -256,10 +209,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-- (void) setTellieDelay:(float)value
-{
-    tellieDelay = value;
-}
 
 - (void) loadTellieDelay:(BOOL)button
 {
@@ -271,10 +220,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-- (void) setGenericDelay:(float)value
-{
-    genericDelay = value;
-}
 
 - (void) loadDelay:(BOOL)button
 {
@@ -286,10 +231,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-- (void) setTrigMask:(unsigned long)value
-{
-    trigMask = value;
-}
 
 - (void) loadTrigMask:(BOOL)button
 {

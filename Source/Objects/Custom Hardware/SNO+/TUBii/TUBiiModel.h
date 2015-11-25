@@ -48,6 +48,7 @@ typedef NS_OPTIONS(NSUInteger,CAEN_GAIN_MASK)
 	int workingSocket;
     unsigned long portNumber;
     int	connectState;
+    char* strHostName;//="192.168.1.10";
 }
 
 @property (nonatomic) float smellieRate;
