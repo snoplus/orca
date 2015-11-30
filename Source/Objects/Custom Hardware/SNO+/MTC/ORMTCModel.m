@@ -217,18 +217,98 @@ resetFifoOnStart = _resetFifoOnStart;
 - (id) init //designated initializer
 {
     self = [super init];
-	
+        
     [[self undoManager] disableUndoRegistration];
-	[self setTriggerName:@"Trigger"];
+    [self setTriggerName:@"Trigger"];
     
     ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:triggerName];
     [self setTriggerGroup:r1];
     [r1 release];
-	
+        
     [[self undoManager] enableUndoRegistration];
-	[self setFixedPulserRateCount: 1];
-	[self setFixedPulserRateDelay: 10];
+    [self setFixedPulserRateCount: 1];
+    [self setFixedPulserRateDelay: 10];
+    [self registerNotificationObservers];
     return self;
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter *notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver:self
+                  selector: @selector(runStarting:)
+                  name: ORRunAboutToStartNotification
+                  object: nil];
+
+    [notifyCenter addObserver:self
+                  selector: @selector(runStarted:)
+                  name: ORRunStartedNotification
+                  object: nil];
+
+    [notifyCenter addObserver:self
+                  selector: @selector(runStopping:)
+                  name: ORRunAboutToStopNotification
+                  object: nil];
+}
+
+- (void) runStarting:(NSNotification*)aNote
+{
+    /* The run is about to start, so we send a queue_run_start command to the
+     * MTC server. This turns off the readout while hardware changes are being
+     * made.
+     */
+    [self okCommand:"queue_run_start"];
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    /* This method is called after a run has already started. All hardware changes
+     * have been made, so we send the run_start command to the MTC server which 
+     * enables the readout to resume and sends a run header record to the builder
+     */
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+
+    if (![objs count]) {
+        NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"no run model!" userInfo:Nil];
+        [exception raise];
+    }
+
+    ORRunModel* runControl = [objs objectAtIndex:0];
+
+    objs = [[self document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+
+    if (![objs count]) {
+        NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"no SNOP model!" userInfo:Nil];
+        [exception raise];
+    }
+
+    SNOPModel *sno = [objs objectAtIndex:0];
+
+    [self okCommand:"run_start %d %d %d", [runControl runNumber], [runControl runType], [sno sourceMask]];
+}
+
+- (void) runStopping:(NSNotification*)aNote
+{
+    /* The run has stopped. If this is a hard run stop, send run stop
+     * to MTC server, which notifies the builder of a hard run stop. Otherwise,
+     * do nothing.
+     */
+    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+
+    if (![objs count]) {
+        NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"no run model!" userInfo:Nil];
+        [exception raise];
+    }
+
+    ORRunModel* runControl = [objs objectAtIndex:0];
+    if (![runControl nextRunWillQuickStart]) {
+        @try {
+            [self okCommand:"run_stop"];
+        } @catch (NSException *exception) {
+            NSLog(@"mtc: run stop failed\n");
+        }
+    }
 }
 
 - (void) connect
@@ -933,56 +1013,12 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//subclasses can override
-    NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControl;
-    if ([objs count]) {
-        runControl = [objs objectAtIndex:0];
-        if ([runControl nextRunWillQuickStart]) {
-            //keep it running
-        }
-        else {
-            if([self adapterIsSBC]){
-                @try {
-                    //[self clearGlobalTriggerWordMask];
-                    [self tellReadoutSBC:kSNOMtcTellReadoutHardEnd];
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-                }
-            }
-            else {
-                @try {
-                    [self clearGlobalTriggerWordMask];
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-                }
-            }
-        }
-    }
-    else {
-        @try {
-            [self clearGlobalTriggerWordMask];
-        }
-        @catch (NSException *exception) {
-        NSLog(@"MTCD clear trigger mask at the end of a run failed.\n");
-        }
-    }
+    /* run stop code moved to runStopping method */
 }
 
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-/*
-    NSEnumerator* e = [dataTakers objectEnumerator];
-    id obj;
-    while(obj = [e nextObject]){
-		[obj runTaskStopped:aDataPacket userInfo:userInfo];
-    }
-	
-    [dataTakers release];
-*/
 }
 
 - (void) saveReadOutList:(NSFileHandle*)aFile
@@ -1117,6 +1153,8 @@ resetFifoOnStart = _resetFifoOnStart;
     }
     [[self undoManager] enableUndoRegistration];
 	
+    [self registerNotificationObservers];
+
     return self;
 }
 

@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORExperimentModel.h"
 #import "ORVmeCardDecoder.h"
+#include <stdint.h>
 
 @class ORDataPacket;
 @class ORDataSet;
@@ -90,6 +91,8 @@
         unsigned long long runMask;
         unsigned long gtCrateMask;
     } _rhdrStruct;
+
+    uint32_t sourceMask;
     
     NSDictionary* _runDocument;
     NSDictionary* _configDocument;
@@ -191,6 +194,7 @@
 
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups;
+- (uint32_t) sourceMask;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;

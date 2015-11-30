@@ -114,6 +114,11 @@
 
 #pragma mark •••Initialization
 - (id) init;
+- (void) registerNotificationObservers;
+- (void) runStarting:(NSNotification*)aNote;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopping:(NSNotification*)aNote;
+/* mtc server */
 - (void) connect;
 - (void) disconnect;
 - (redisReply *) command: (char *)fmt, ...;

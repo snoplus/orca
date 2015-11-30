@@ -404,6 +404,11 @@ mtcConfigDoc = _mtcConfigDoc;
 
 #pragma mark ¥¥¥Accessors
 
+- (uint32_t) sourceMask
+{
+    return sourceMask;
+}
+
 - (void) clearOrcaDBConnectionHistory
 {
 	self.orcaDBConnectionHistory = nil;
