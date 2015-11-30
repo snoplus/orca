@@ -160,16 +160,16 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
         [exception raise];
     }
 
+    NSLog(@"caen: connecting to MTC server at %s on port %d...\n", host, 4001);
+
     context = redisConnectWithTimeout(host, 4001, timeout);
 
-    NSLog(@"caen: connecting...\n");
     if (context == NULL) {
 	NSException *exception = [NSException exceptionWithName:@"caen" reason:@"caen: connect failed" userInfo:Nil];
 	[exception raise];
     } else if (context->err) {
 	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	redisFree(context);
-	context = NULL;
+        [self disconnect];
 	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
 	[exception raise];
     }
@@ -178,7 +178,10 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 
 - (void) disconnect
 {
-    if (context) redisFree(context);
+    if (context) {
+        redisFree(context);
+        context = NULL;
+    }
     NSLog(@"caen: disconnected.\n");
 }
 
@@ -191,8 +194,7 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
     if (r == NULL) {
 	NSString *err = [NSString stringWithUTF8String:context->errstr];
 	freeReplyObject(r);
-	redisFree(context);
-	context = NULL;
+        [self disconnect];
 	NSException *exception = [NSException exceptionWithName:@"caen" reason:err userInfo:Nil];
 	[exception raise];
     }
@@ -1029,12 +1031,12 @@ NSString* ORSNOCaen1720ModelContinuousModeChanged              = @"ORSNOCaen1720
 
 - (void) softwareReset
 {
-    [self write:kSWReset aValue:0];
+    [self write:kSWReset sendValue:0];
 }
 
 - (void) clearAllMemory
 {
-    [self write:kSWClear aValue:0];
+    [self write:kSWClear sendValue:0];
 }
 
 - (void) writeTriggerSource
