@@ -38,6 +38,8 @@
 #include "hiredis.h"
 #import "SNOPModel.h"
 
+#define MTC_PORT 4001
+
 #pragma mark •••Definitions
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
 NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
@@ -231,7 +233,11 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) connect
 {
+    /* Connect to the MTC server. Try to connect for 1 second, and if not raise
+     * an exception. */
+
     struct timeval timeout = {1, 0}; // 1 second
+    /* The MTC host name is stored in the SNOPModel. */
     NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     SNOPModel* sno;
     if ([objs count]) {
@@ -248,16 +254,16 @@ resetFifoOnStart = _resetFifoOnStart;
         [exception raise];
     }
 
-    context = redisConnectWithTimeout(host, 4001, timeout);
+    NSLog(@"mtc: connecting to MTC server at %s on port %d...\n", host, MTC_PORT);
 
-    NSLog(@"mtc: connecting...\n");
+    context = redisConnectWithTimeout(host, MTC_PORT, timeout);
+
     if (context == NULL) {
 	NSException *exception = [NSException exceptionWithName:@"mtc" reason:@"mtc: connect failed" userInfo:Nil];
 	[exception raise];
     } else if (context->err) {
 	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	redisFree(context);
-	context = NULL;
+        [self disconnect];
 	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
 	[exception raise];
     }
@@ -266,7 +272,10 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) disconnect
 {
-    if (context) redisFree(context);
+    if (context) {
+        redisFree(context);
+        context = NULL;
+    }
     NSLog(@"mtc: disconnected.\n");
 }
 
@@ -278,9 +287,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
     if (r == NULL) {
 	NSString *err = [NSString stringWithUTF8String:context->errstr];
-	freeReplyObject(r);
-	redisFree(context);
-	context = NULL;
+        [self disconnect];
 	NSException *exception = [NSException exceptionWithName:@"mtc" reason:err userInfo:Nil];
 	[exception raise];
     }
@@ -1218,7 +1225,7 @@ resetFifoOnStart = _resetFifoOnStart;
 
 - (void) write:(int)aReg value:(unsigned long)aValue
 {
-    [self command:"mtcd_write %d %d", reg[aReg].addressOffset, aValue];
+    [self okCommand:"mtcd_write %d %d", reg[aReg].addressOffset, aValue];
 }
 
 - (void) setBits:(int)aReg mask:(unsigned long)aMask
