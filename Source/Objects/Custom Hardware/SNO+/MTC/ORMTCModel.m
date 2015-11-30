@@ -1575,7 +1575,7 @@ resetFifoOnStart = _resetFifoOnStart;
     uint64_t count = ((uint64_t)upperValue << 32) | lowerValue;
 
     @try {
-        [self okCommand:"load_10mhz_clock %d\n", count];
+        [self okCommand:"load_10mhz_clock %d", count];
 	NSLog(@"Loaded 10MHz counter\n");
     } @catch(NSException* localException) {
         NSLog(@"Could not load the 10MHz counter!\n");
@@ -1745,7 +1745,7 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) setThePulserRate:(float) rate
 {
     @try {
-        [self okCommand:"set_pulser_freq %f\n", rate];
+        [self okCommand:"set_pulser_freq %f", rate];
         NSLog(@"Set GT Pusler rate\n");                 
     } @catch(NSException* localException) {
         NSLog(@"Could not set GT Pusler rate!\n");                      
@@ -1877,9 +1877,6 @@ resetFifoOnStart = _resetFifoOnStart;
     // STEP 1: Setup the pulser rate [pulser period in ms]
     [self setThePulserRate:pulserPeriodVal];
 
-    // STEP 2 : Load Enable Pulser
-    [self loadEnablePulser];
-
     // STEP 3 : Enable Pulser
     [self enablePulser];
 }
@@ -1944,13 +1941,9 @@ resetFifoOnStart = _resetFifoOnStart;
 - (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals
 {
 	@try {
-		short j;
-		for (j = 23; j >= 0; j--){							
-			unsigned long aValue = 0UL;
-			[self write:kMtcSerialReg value:aValue | MTC_SERIAL_REG_SEN];
-			[self write:kMtcSerialReg value:aValue | MTC_SERIAL_SHFTCLKPS];
-		}
-		[self loadEnablePulser];
+                /* set the pulser rate to 0, which enables the SOFT_GT
+                 * trigger signal to act as a delayed PULSE_GT for pedestals */
+                [self setThePulserRate:0];
 		[self enablePulser];
 		[self basicMTCPedestalGTrigSetup];
 		
