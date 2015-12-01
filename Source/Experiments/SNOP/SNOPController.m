@@ -41,9 +41,7 @@ NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 
 @synthesize
 runStopImg = _runStopImg,
-runTypeMask,
 smellieRunFileList,
-snopRunTypeMaskDic,
 smellieRunFile;
 
 #pragma mark ¥¥¥Initialization
@@ -62,21 +60,6 @@ smellieRunFile;
 
 -(void)windowDidLoad
 {
-    
-    /*if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
-        maskValue |= (0x1UL << i);
-    }*/
-    
-    //build run type dictionary from the runTypes in the GUI
-    self.snopRunTypeMaskDic = nil; //reset the current GUI information
-    NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithCapacity:20];
-    int i;
-    for(i=0;i<31;i++){
-        NSButtonCell* test = [globalRunTypesMatrix cellAtRow:i column:0];
-        [temp setObject:[NSString stringWithFormat:@"empty"] forKey:[test title]];
-    }
-    
-    self.snopRunTypeMaskDic = temp;
 }
 
 
@@ -87,20 +70,20 @@ smellieRunFile;
 
 -(void) awakeFromNib
 {
-	detectorSize		= NSMakeSize(820,640);
-	detailsSize		= NSMakeSize(820,640);//NSMakeSize(450,589);
-	focalPlaneSize		= NSMakeSize(820,640);//NSMakeSize(450,589);
-	couchDBSize		= NSMakeSize(820,640);//(620,595);//NSMakeSize(450,480);
-	hvMasterSize		= NSMakeSize(820,640);
-	runsSize		= NSMakeSize(820,640);
-	
-	blankView = [[NSView alloc] init];
+    detectorSize            = NSMakeSize(820,640);
+    detailsSize             = NSMakeSize(820,640);
+    focalPlaneSize          = NSMakeSize(820,640);
+    couchDBSize             = NSMakeSize(820,640);
+    hvMasterSize            = NSMakeSize(820,640);
+    runsSize                = NSMakeSize(820,640);
+        
+    blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
-	[self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
-    //pull the information from the SMELLIE DB
+    // pull the information from the SMELLIE DB
     [model getSmellieRunListInfo];
-	[super awakeFromNib];
+    [super awakeFromNib];
     [self performSelector:@selector(updateWindow)withObject:self afterDelay:0.1];
 }
 
@@ -154,19 +137,6 @@ smellieRunFile;
                      selector: @selector(runStatusChanged:)
                          name: ORRunStatusChangedNotification
                        object: theRunControl];
-    
-    [notifyCenter addObserver:self
-                     selector:@selector(runTypeChanged:)
-                         name:SNOPRunTypeChangedNotification
-                       object:self];
-    
-    //TODO: add the notification for changedRunType on SNO+
-    /*[notifyCenter addObserver:self
-                     selector:@selector(runTypesChanged:)
-                         name:nil
-                       object:nil];*/
-    
-    
 }
 
 - (void) updateWindow
@@ -178,24 +148,6 @@ smellieRunFile;
     [self hvStatusChanged:nil];
     [self dbOrcaDBIPChanged:nil];
     [self dbDebugDBIPChanged:nil];
-    [self fetchNhitSettings];
-    [self fetchRunMaskSettings];
-    //[self runNumberChanged:nil]; //update the run number
-    [self runStatusChanged:nil]; //update the run status
-}
-
--(void) fetchRunMaskSettings
-{
-    int i;
-    for(i=0;i<31;i++){
-        unsigned long mask = 0;
-        mask = [[model runTypeMask] unsignedLongValue];
-        //read the bitmask from the run mask
-        int valueToSetInMatrix = (int) ((mask >> i) & 0x1UL);
-        [[globalRunTypesMatrix cellAtRow:i column:0] setIntValue:valueToSetInMatrix];
-        
-    }
-    //[globalRunTypesMatrix
 }
 
 -(IBAction)setTellie:(id)sender
@@ -212,59 +164,6 @@ smellieRunFile;
 
 }
 
--(void)fetchNhitSettings
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    if([objs count]){
-        ORMTCModel* theMtcModel = [objs objectAtIndex:0];
-        int col,row;
-        for(col=0;col<4;col++){
-            for(row=0;row<6;row++){
-                int index = kNHit100HiThreshold + row + (col * 6);
-                int mtcaIndex = kESumLowThreshold + row + (col * 4);
-                if((col == 0) && (row==0)){
-                    [n100Hi setIntValue:[theMtcModel dbFloatByIndex: index]];
-                    [esumhi setIntValue:[theMtcModel dbFloatByIndex:mtcaIndex]];
-                }
-                else if((col == 0) && (row==1)){
-                    [n100med setIntValue:[theMtcModel dbFloatByIndex: index]];
-                }
-                else if((col == 0) && (row==3)){
-                    [n20hi setIntValue:[theMtcModel dbFloatByIndex: index]];
-                }
-                else if((col == 0) && (row==5)){
-                    [owln setIntValue:[theMtcModel dbFloatByIndex: index]];
-                }
-                else if((col == 0) && (row==2)){
-                    [n100Lo setIntValue:[theMtcModel dbFloatByIndex: index]]; 
-                }
-                else{
-                    //do nothing
-                }
-            }
-        }
-    }
-    else {
-        NSLogColor([NSColor redColor],@"Must have an MTC in the configuration\n");
-    }
-}
-
-- (void) runNumberChanged:(NSNotification*)aNotification
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    [currentRunNumber setIntValue:[theRunControl runNumber]];
-    [lastRunNumber setIntValue:[theRunControl runNumber] - 1];
-}
-
--(void) runTypeChanged:(NSNotification*)aNote
-{
-    [lastRunType setIntValue:[[model runTypeMask] intValue]]; //update the old run types
-    //[currentRunType setIntValue:[aNote intValue]]; //update the current Run Type
-    
-}
-
-
 - (IBAction) startRunAction:(id)sender
 {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -274,7 +173,6 @@ smellieRunFile;
         [[theRunControl document] saveDocument:nil];
     }
 	else [self startRun];
-    [currentStatus setStringValue:[self getStartingString]];
     
     NSLog(@"Sender: %@",[sender title]);
     
@@ -305,7 +203,6 @@ smellieRunFile;
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [theRunControl setForceRestart:YES];
     [theRunControl performSelector:@selector(stopRun) withObject:nil afterDelay:0];
-    [currentStatus setStringValue:[self getRestartingString]];
     
     NSLog(@"Sender: %@",[sender title]);
     
@@ -329,43 +226,10 @@ smellieRunFile;
     
 }
 
-
-- (IBAction)changedRunTypeMatrixAction:(id)sender
-{    
-    //write in the new runType mask
-    unsigned long maskValue = 0;
-    int i;
-    //only goes up to 31 because there is some strange problem with objective c recasting implictly an unsigned long as a long
-    for(i=0;i<31;i++){
-        if([[globalRunTypesMatrix cellAtRow:i column:0] intValue] == 1){
-            NSButtonCell* test = [globalRunTypesMatrix cellAtRow:i column:0];
-            [snopRunTypeMaskDic setObject:[NSNumber numberWithInt:[[globalRunTypesMatrix cellAtRow:i column:0] intValue]] forKey:[test title]];
-            //set the actual bit mask
-            maskValue |= (0x1UL << i);
-        }
-    }
-    
-    //self.runTypeMask = nil;
-    NSNumber* maskValueForStore = [NSNumber numberWithUnsignedLong:maskValue];
-    self.runTypeMask = maskValueForStore;
-    
-    [model setRunTypeMask:maskValueForStore];
-    
-    //A bit of test code to see a 32-bit word
-    /*NSMutableString *str = [NSMutableString stringWithFormat:@""];
-    for(NSInteger numberCopy = maskValue; numberCopy > 0; numberCopy >>= 1)
-    {
-        // Prepend "0" or "1", depending on the bit
-        [str insertString:((numberCopy & 1) ? @"1" : @"0") atIndex:0];
-    }*/
-}
-
-
 - (IBAction)stopRunAction:(id)sender {
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
     [theRunControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
-    [currentStatus setStringValue:[self getStoppingString]];
     
     //reset the run Type to be undefined
     //[model setRunType:kRunUndefined];
@@ -376,64 +240,6 @@ smellieRunFile;
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     ORRunModel* theRunControl = [objs objectAtIndex:0];
 	[theRunControl performSelector:@selector(startRun)withObject:nil afterDelay:.1];
-}
-
-- (void) runStatusChanged:(NSNotification*)aNotification{
-    
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    if([theRunControl runningState] == eRunInProgress){
-		if(![theRunControl runPaused])[currentStatus setStringValue:[[ORGlobal sharedGlobal] runModeString]];
-		else [currentStatus setStringValue:@"Paused"];
-	}
-	else if([theRunControl runningState] == eRunStopped){
-		[currentStatus setStringValue:@"Stopped"];
-	}
-	else if([theRunControl runningState] == eRunStarting || [theRunControl runningState] == eRunStopping || [theRunControl runningState] == eRunBetweenSubRuns){
-		if([theRunControl runningState] == eRunStarting)[currentStatus setStringValue:[self getStartingString]];
-		else {
-			if([theRunControl runningState] == eRunBetweenSubRuns)	[currentStatus setStringValue:[self getBetweenSubrunsString]];
-			else                                                    [currentStatus setStringValue:[self getStoppingString]];
-		}
-	}
-}
-
-- (NSString*) getStartingString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Starting...";
-    else s = @"Starting (Waiting)";
-    return s;
-}
-
-- (NSString*) getRestartingString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Restart...";
-    else s = @"Restarting (Waiting)";
-    return s;
-}
-- (NSString*) getStoppingString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Stopping...";
-    else s = @"Stopping (Waiting)";
-    return s;
-}
-- (NSString*) getBetweenSubrunsString
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* theRunControl = [objs objectAtIndex:0];
-    NSString* s;
-    if([theRunControl waitRequestersCount]==0)s = @"Between Sub Runs..";
-    else s = @"'TweenSubRuns (Waiting)";
-    return s;
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote

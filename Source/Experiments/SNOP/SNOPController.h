@@ -30,36 +30,13 @@
     IBOutlet NSTextField *MTCHostTextField;
     IBOutlet NSTextField *XL3HostTextField;
     NSView *blankView;
-    NSSize detectorSize;
-    NSSize detailsSize;
-    NSSize focalPlaneSize;
-    NSSize couchDBSize;
-    NSSize hvMasterSize;
-    NSSize runsSize;
-    
+
     IBOutlet NSComboBox *orcaDBIPAddressPU;
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
     
-    //Run Types Information
-    IBOutlet NSMatrix*  globalRunTypesMatrix;
-    
     //Xl3 Mode
     IBOutlet NSMatrix * globalxl3Mode;
-    
-    //Run information
-    IBOutlet NSTextField* currentRunNumber;
-    IBOutlet NSTextField* currentRunType;
-    IBOutlet NSTextField* currentStatus;
-    IBOutlet NSTextField* lastRunNumber;
-    IBOutlet NSTextField* lastRunType;
-
-    IBOutlet NSTextField *n100Hi;
-    IBOutlet NSTextField *n100med;
-    IBOutlet NSTextField *n20hi;
-    IBOutlet NSTextField *esumhi;
-    IBOutlet NSTextField *owln;
-    IBOutlet NSTextField *n100Lo;
     
     //smellie buttons ---------
     IBOutlet NSComboBox *smellieRunFileNameField;
@@ -91,17 +68,11 @@
     NSMutableDictionary *smellieRunFileList;
     NSDictionary *smellieRunFile;
     NSThread *smellieThread;
-    NSNumber * runTypeMask;
-    
-    NSMutableDictionary *snopRunTypeMaskDic; 
-    
 }
 
 @property (nonatomic,retain) NSImage* runStopImg;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
-@property (nonatomic,retain) NSMutableDictionary *snopRunTypeMaskDic;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
-@property (nonatomic,retain) NSNumber *runTypeMask;
 
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
@@ -147,7 +118,6 @@
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;
 -(void) windowDidLoad;
--(void) fetchRunMaskSettings;
 
 @end
 @interface ORDetectorView (SNO)

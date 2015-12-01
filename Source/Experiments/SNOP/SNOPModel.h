@@ -102,13 +102,9 @@
     
     bool _smellieDBReadInProgress;
     bool _smellieDocUploaded;
-    NSMutableDictionary * snopRunTypeMask;
-    NSNumber * runTypeMask;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
-@property (nonatomic,retain) NSMutableDictionary* snopRunTypeMask;
-@property (nonatomic,retain) NSNumber* runTypeMask;
 
 @property (nonatomic,copy) NSString* MTCHostName;
 @property (nonatomic,copy) NSString* XL3HostName;
@@ -202,14 +198,9 @@
 - (ORCouchDB*) debugDbRef:(id)aCouchDelegate;
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
 
-//run type definition functions
-- (void) setSnopRunTypeMask:(NSMutableDictionary*)aRunType;
-- (NSMutableDictionary*) getSnopRunTypeMask;
-
 //smellie functions -------
 - (void) getSmellieRunListInfo;
 - (NSMutableDictionary*)smellieTestFct;
--(BOOL)isRunTypeMaskedIn:(NSString*)aRunType;
 @end
 
 @interface SNOPDecoderForRHDR : ORVmeCardDecoder {
@@ -227,4 +218,3 @@
 extern NSString* ORSNOPModelViewTypeChanged;
 extern NSString* ORSNOPModelOrcaDBIPAddressChanged;
 extern NSString* ORSNOPModelDebugDBIPAddressChanged;
-extern NSString* SNOPRunTypeChangedNotification;
