@@ -30,7 +30,13 @@
     IBOutlet NSTextField *MTCHostTextField;
     IBOutlet NSTextField *XL3HostTextField;
     NSView *blankView;
-
+    NSSize detectorSize;
+    NSSize detailsSize;
+    NSSize focalPlaneSize;
+    NSSize couchDBSize;
+    NSSize hvMasterSize;
+    NSSize runsSize;
+    
     IBOutlet NSComboBox *orcaDBIPAddressPU;
     IBOutlet NSComboBox *debugDBIPAddressPU;
     IBOutlet NSMatrix* hvStatusMatrix;
