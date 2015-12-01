@@ -87,19 +87,11 @@
     IBOutlet NSButton *newPhysicsRunButton;
     IBOutlet NSButton *newMaintainenceRunButton;
     
-    //eStop buttons
-    IBOutlet NSButton *emergyencyStopEnabled;
-    IBOutlet NSButton *eStopButton;
-    
-    IBOutlet NSTextField *pollingStatus;
-    
-    
     NSImage* _runStopImg;
     NSMutableDictionary *smellieRunFileList;
     NSDictionary *smellieRunFile;
     NSThread *smellieThread;
     NSNumber * runTypeMask;
-    NSThread *eStopPollingThread;
     
     NSMutableDictionary *snopRunTypeMaskDic; 
     
@@ -122,8 +114,6 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) viewTypeAction:(id)sender;
-
-- (IBAction) eStop:(id)sender;
 
 - (IBAction) orcaDBIPAddressAction:(id)sender;
 - (IBAction) orcaDBClearHistoryAction:(id)sender;
@@ -148,9 +138,6 @@
 - (IBAction) startSmellieRunAction:(id)sender;
 - (IBAction) stopSmellieRunAction:(id)sender;
 - (IBAction) emergencySmellieStopAction:(id)sender;
-
-//eStop functions
-- (IBAction) enmergencyStopToggle:(id)sender;
 
 //xl3 mode sttaus
 - (IBAction)updatexl3Mode:(id)sender;

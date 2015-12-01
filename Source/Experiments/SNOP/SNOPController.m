@@ -182,7 +182,6 @@ smellieRunFile;
     [self fetchRunMaskSettings];
     //[self runNumberChanged:nil]; //update the run number
     [self runStatusChanged:nil]; //update the run status
-    [model setIsEmergencyStopEnabled:TRUE]; //enable the emergency stop
 }
 
 -(void) fetchRunMaskSettings
@@ -956,34 +955,6 @@ smellieRunFile;
     
     //[theELLIEModel release];
     
-}
-
-- (IBAction) enmergencyStopToggle:(id)sender
-{
-    /*if([emergyencyStopEnabled state] == 1){
-        [model setIsEmergencyStopEnabled:true];
-    }
-    else{
-        [model setIsEmergencyStopEnabled:false];
-    }*/
-    [model setIsEmergencyStopEnabled:(bool)[sender state]];
-}
-
--(IBAction)eStop:(id)sender
-{
-    if([model isEStopPolling]){
-        //cancel the E stop polling and change button
-        [eStopButton setTitle:@"Start Polling"];
-        [pollingStatus setStringValue:@"Not Polling"];
-        [model setIsEStopPolling:NO];
-    }
-    else{
-        [eStopButton setTitle:@"Stop Polling"];
-        [pollingStatus setStringValue:@"Polling"];
-        [model setIsEStopPolling:YES];
-        [model eStopPolling];
-    }
-
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender

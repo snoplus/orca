@@ -11,8 +11,6 @@
                 <outlet property="currentRunNumber" destination="3752" id="3779"/>
                 <outlet property="currentRunType" destination="3753" id="3780"/>
                 <outlet property="currentStatus" destination="3733" id="3781"/>
-                <outlet property="eStopButton" destination="3990" id="3995"/>
-                <outlet property="emergyencyStopEnabled" destination="3988" id="3992"/>
                 <outlet property="esumhi" destination="3708" id="3860"/>
                 <outlet property="globalRunTypesMatrix" destination="3935" id="3978"/>
                 <outlet property="globalxl3Mode" destination="4194" id="4216"/>
@@ -33,7 +31,6 @@
                 <outlet property="n20hi" destination="3706" id="3859"/>
                 <outlet property="newMaintainenceRunButton" destination="3913" id="3924"/>
                 <outlet property="owln" destination="3714" id="3861"/>
-                <outlet property="pollingStatus" destination="3998" id="4000"/>
                 <outlet property="smellieBuildCustomRun" destination="3524" id="3586"/>
                 <outlet property="smellieChangeConfiguration" destination="3531" id="3587"/>
                 <outlet property="smellieEmergencyStop" destination="3554" id="3609"/>
@@ -2574,58 +2571,6 @@
                                                             <action selector="hvMasterPanicAction:" target="-2" id="2915"/>
                                                         </connections>
                                                     </button>
-                                                </subviews>
-                                            </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </box>
-                                        <box autoresizesSubviews="NO" title="Emergency Stop" borderType="line" id="3987">
-                                            <rect key="frame" x="571" y="215" width="191" height="120"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="189" height="104"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button id="3988">
-                                                        <rect key="frame" x="23" y="72" width="129" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Enabled" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="3989">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="enmergencyStopToggle:" target="-2" id="3994"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="3990">
-                                                        <rect key="frame" x="19" y="34" width="116" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Start Polling" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3991">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="titleBar" size="12"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="eStop:" target="-2" id="3993"/>
-                                                        </connections>
-                                                    </button>
-                                                    <textField verticalHuggingPriority="750" id="3996">
-                                                        <rect key="frame" x="22" y="14" width="47" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Status:" id="3997">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" id="3998">
-                                                        <rect key="frame" x="72" y="14" width="74" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Not Polling" id="3999">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>

@@ -94,8 +94,6 @@ smellieDocUploaded = _smellieDocUploaded,
 configDocument  = _configDocument,
 snopRunTypeMask = snopRunTypeMask,
 runTypeMask= runTypeMask,
-isEStopPolling = isEStopPolling,
-isEmergencyStopEnabled = isEmergencyStopEnabled,
 mtcConfigDoc = _mtcConfigDoc;
 
 @synthesize smellieRunHeaderDocList;
@@ -716,90 +714,6 @@ mtcConfigDoc = _mtcConfigDoc;
         return [anSBC sbcLink];
     }
     return nil;
-}
-
--(void) testerHv
-{
-    __block bool hvStatus =TRUE;
-    
-    dispatch_queue_t eStopQueue = dispatch_queue_create("eStopQueue", NULL);
-    
-    dispatch_async(eStopQueue, ^{
-        while (hvStatus) {
-            sleep(3.0); //3s
-        
-            if(!isEStopPolling) break;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                hvStatus = (BOOL)[self eStopPoll];
-            });
-        
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            if(isEStopPolling){
-            
-                if(isEmergencyStopEnabled ){
-                
-                    NSLog(@"PANIC DOWN\n");
-                    [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")] makeObjectsPerformSelector:@selector(hvPanicDown)];
-                    [self setIsEStopPolling:NO];
-                }
-                else{
-                    NSLog(@"Panic Down enabled but automatic shutdown is not enabled\n");
-                }
-            }
-            else{
-                NSLog(@"Emergency Stop has stopped polling");
-            }
-        });
-    });
-}
-
--(void) eStopPolling
-{
-    NSLog(@"Started Polling Emergency Stop...");
-    [self testerHv];
-}
-
--(BOOL) eStopPoll
-{
-   SBC_Link *sbcLink = [self sbcLink];
-   long hvStatus = 1;
-    if( sbcLink != nil )
-    {
-        //NSLog(@"Made SBC Link.\n");
-        //long hvStatus = 0;
-        SBC_Packet aPacket;
-        aPacket.cmdHeader.destination = kSNO;
-        aPacket.cmdHeader.cmdID = kSNOReadHVStop;
-        aPacket.cmdHeader.numberBytesinPayload = 1 * sizeof( long );
-        unsigned long* payloadPtr = (unsigned long*) aPacket.payload;
-        payloadPtr[0] = 0;
-        @try
-        {
-            [sbcLink send: &aPacket receive: &aPacket];
-            unsigned long* responsePtr = (unsigned long*) aPacket.payload;
-            hvStatus = responsePtr[0];
-            //NSLog(@"hv_status %ld",hvStatus);
-            /*if( errorCode )
-            {
-                @throw [NSException exceptionWithName:@"Reset All Camera error" reason:@"SBC and/or LabJack failed.\n" userInfo:nil];
-            }*/
-        }
-        @catch( NSException* e )
-        {
-            NSLog( @"SBC failed pol hv\n" );
-            NSLog( @"Error: %@ with reason: %@\n", [e name], [e reason] );
-            //@throw e;
-        }
-    
-    } //end of if statement
-    //return (BOOL)hvStatus ;
-    //NSLog(@"status");
-    return (BOOL)hvStatus;
-        
 }
 
 - (NSString*) experimentDetailsLock
