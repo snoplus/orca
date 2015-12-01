@@ -1479,22 +1479,6 @@
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
-                                                <tabViewItem label="MANUAL" identifier="" id="3103">
-                                                    <view key="view" id="3104">
-                                                        <rect key="frame" x="10" y="25" width="535" height="308"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
-                                                        <subviews>
-                                                            <button horizontalHuggingPriority="750" verticalHuggingPriority="750" id="3113">
-                                                                <rect key="frame" x="63" y="219" width="29" height="26"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3114">
-                                                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                </buttonCell>
-                                                            </button>
-                                                        </subviews>
-                                                    </view>
-                                                </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
                                     </subviews>
