@@ -437,22 +437,25 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) _pushInitialTellieRunDocument
 {
     NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
+    NSMutableDictionary* runDocDict = [[[NSMutableDictionary alloc] initWithCapacity:10] autorelease];
     
-
-    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    
+    NSArray*  objs3 = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")] autorelease];
     runControl = [objs3 objectAtIndex:0];
     
-    NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
+    NSString* docType = [[NSMutableString stringWithFormat:@"tellie_run"] autorelease];
     
     NSMutableArray *subRunArray = [[NSMutableArray alloc] initWithCapacity:10];
     
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"pass"];
+    [runDocDict setObject:[NSNumber numberWithBool:YES] forKey:@"Production"];
+    [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"Comment"];
     [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
     [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
-    [runDocDict setObject:[NSNumber numberWithInt:[runControl runNumber]] forKey:@"run"];
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil] forKey:@"run_range"];
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
     
     self.tellieRunDoc = runDocDict;
@@ -465,7 +468,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
         [NSThread sleepForTimeInterval:0.1];
     }
     
-    [runDocPool release];
+    //[runDocPool release];
+    [runDocPool drain];
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
