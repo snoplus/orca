@@ -436,16 +436,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void) _pushInitialTellieRunDocument
 {
-    NSAutoreleasePool* runDocPool = [[NSAutoreleasePool alloc] init];
-    NSMutableDictionary* runDocDict = [[[NSMutableDictionary alloc] initWithCapacity:10] autorelease];
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
     
-    
-    NSArray*  objs3 = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")] autorelease];
+    NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
     
-    NSString* docType = [[NSMutableString stringWithFormat:@"tellie_run"] autorelease];
-    
-    NSMutableArray *subRunArray = [[NSMutableArray alloc] initWithCapacity:10];
+    NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
+    NSMutableArray *subRunArray = [NSMutableArray arrayWithCapacity:10];
     
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
@@ -467,9 +464,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     while ([timeout timeIntervalSinceNow] > 0 && ![self.tellieRunDoc objectForKey:@"_id"]) {
         [NSThread sleepForTimeInterval:0.1];
     }
-    
-    //[runDocPool release];
-    [runDocPool drain];
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
