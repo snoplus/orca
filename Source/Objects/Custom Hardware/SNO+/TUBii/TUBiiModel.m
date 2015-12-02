@@ -120,30 +120,36 @@ NSString* otherSystemIP = @"192.168.1.10";
     
     NSLog(@"Making a socket!\n");
     NSLog(@"Sending command %@\n",command);
-    hSocketCommand=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-        
-    if(hSocketCommand == -1)
-        [NSException raise:@"Could not make a socket.\n"];
-        
+    @try{hSocketCommand=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);}
+    @catch(NSException* localException){
+        NSLog(@"Could not make a socket.\n");
+        return;
+    }
+    NSLog(@"so far\n");
     pHostInfo= gethostbyname(strHostName);
-    if(pHostInfo == NULL)
+    if(pHostInfo == NULL){
         [NSException raise:@"No such host.\n"];
-        
+        return;
+    }
+    
     bzero((char *) &address, sizeof(address));
     address.sin_family = AF_INET;         // host byte order
     bcopy((char *) pHostInfo->h_addr, (char *) &address.sin_addr.s_addr, pHostInfo->h_length);
     address.sin_port = htons(portNumber);     // short, network byte order
 
-    if(connect(hSocketCommand,(struct sockaddr*) &address, sizeof(address)) == -1)
+    if(connect(hSocketCommand,(struct sockaddr*) &address, sizeof(address)) == -1){
         [NSException raise:@"Could not connect to host.\n"];
+        return;
+    }
 
     char* chcomm= [command UTF8String];
     write(hSocketCommand,chcomm,255);
     
-    if(close(hSocketCommand) == -1)
+    if(close(hSocketCommand) == -1){
         [NSException raise:@"Could not close socket.\n"];
+        return;
+    }
 }
-
 
 
 - (void) setSocket:(NetSocket*)aSocket
