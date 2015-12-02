@@ -283,6 +283,7 @@ enum {
     int             digitizerCount;
     int             digitizerLockCount;
     BOOL            linkWasLost;
+    BOOL            setupNIMOutputDone;
 }
 
 - (id) init;
@@ -380,6 +381,7 @@ enum {
 - (BOOL) allGretinaCardsIdle;
 
 - (void) setToInternalClock;
+- (void) pulseNIMOutput;
 
 // Register access
 - (void) dumpFpgaRegisters;
