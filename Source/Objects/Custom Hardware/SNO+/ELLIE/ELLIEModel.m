@@ -436,27 +436,28 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 
 -(void) _pushInitialTellieRunDocument
 {
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
-    
+    /* Creates and uploads an initial run document to the CouchDB. A dictionary repesenting the doc is additionally saved as a memeber variable, this dict is updated with subrun info as it becomes availbale. If the document fails to upload, raises an exception */
+
+    // Get run control object
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
-    
-    NSString* docType = [NSMutableString stringWithFormat:@"tellie_run"];
-    NSMutableArray *subRunArray = [NSMutableArray arrayWithCapacity:10];
-    
-    [runDocDict setObject:docType forKey:@"type"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"pass"];
-    [runDocDict setObject:[NSNumber numberWithBool:YES] forKey:@"Production"];
-    [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"Comment"];
-    [runDocDict setObject:[NSString stringWithFormat:@"%lu",[runControl runNumber]] forKey:@"index"];
-    [runDocDict setObject:[self stringUnixFromDate:nil] forKey:@"issue_time_unix"];
-    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"issue_time_iso"];
-    [runDocDict setObject:[NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil] forKey:@"run_range"];
-    [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
-    
+
+    //Build dictionary
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+    runDocDict[@"type"] = @"tellie_run";
+    runDocDict[@"version"] = @"0";
+    runDocDict[@"pass"] = @"0";
+    runDocDict[@"production"] = [NSNumber numberWithBool:YES];
+    runDocDict[@"comment"] = @"";
+    runDocDict[@"index"] = [NSString stringWithFormat:@"%lu",[runControl runNumber]];
+    runDocDict[@"issue_time_unix"] = [self stringUnixFromDate:nil];
+    runDocDict[@"issue_time_iso"] = [self stringDateFromDate:nil];
+    runDocDict[@"run_range"] = [NSMutableArray arrayWithObjects:[runControl runNumber],[runControl runNumber], nil];
+    runDocDict[@"sub_run_info"] = subRunArray;
     self.tellieRunDoc = runDocDict;
     
+    //Post and update kTellieRunDocumentAdded bool
     [[self orcaDbRefWithEntryDB:self withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
     //wait for main thread to receive acknowledgement from couchdb
