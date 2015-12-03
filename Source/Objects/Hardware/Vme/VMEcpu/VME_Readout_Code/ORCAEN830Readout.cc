@@ -12,13 +12,6 @@ bool ORCAEN830Readout::Start()
     uint32_t enabledMask = GetDeviceSpecificData()[0];
     if(enabledMask & (0x1)) chan0Enabled = true;
     else                    chan0Enabled = false;
-    
-    //test
-    uint32_t baseAdd            = GetBaseAddress();
-    uint32_t addressModifier    = GetAddressModifier();
-    uint32_t dummyWord = 0xdeadbeef;
-    VMEWrite(baseAdd + 0x1200,addressModifier, sizeof(dummyWord),dummyWord);
-
 	return true;
 }
 
@@ -52,18 +45,6 @@ bool ORCAEN830Readout::Readout(SBC_LAM_Data* lamData)
 				uint32_t eventBufferOffset	= GetDeviceSpecificData()[3];
 				uint32_t numEnabledChannels	= GetDeviceSpecificData()[4];
 				
-                uint32_t dummyWord;
-                if(VMERead(baseAdd + 0x1200,addressModifier, sizeof(dummyWord),dummyWord)!= sizeof(dummyWord)){
-                    if(dummyWord!=0xdeadbeef){
-                        LogBusErrorForCard(GetSlot(),"Bad Dummy Read: V830 0x%08x",dummyWord);
-                        dummyWord = 0xdeadbeef;
-                        VMEWrite(baseAdd + 0x1200,addressModifier, sizeof(dummyWord),dummyWord);
-                   }
-               }
-                else {
-                    LogBusErrorForCard(GetSlot(),"Dummy Read: V830 0x%04x %s",baseAdd+0x1200,strerror(errno));
-                }
-                
 				for(uint32_t event=0;event<numEvents;event++){
 					ensureDataCanHold(5+numEnabledChannels); //event size
 					data[dataIndex++] = dataId | (5+numEnabledChannels);
