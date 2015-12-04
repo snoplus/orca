@@ -1,6 +1,6 @@
 //
-//  testTests.m
-//  testTests
+//  checkerTests.m
+//  checkerTests
 //
 //  Created by Edward Leming on 04/12/2015.
 //  Copyright (c) 2015 Edward Leming. All rights reserved.
@@ -9,11 +9,11 @@
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
 
-@interface testTests : XCTestCase
+@interface checkerTests : XCTestCase
 
 @end
 
-@implementation testTests
+@implementation checkerTests
 
 - (void)setUp {
     [super setUp];
