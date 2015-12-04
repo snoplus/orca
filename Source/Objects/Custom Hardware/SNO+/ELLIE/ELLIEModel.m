@@ -436,7 +436,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) _pushInitialTellieRunDocument
 {
     /* Creates and uploads an initial run document to the CouchDB. A dictionary repesenting the doc is additionally saved as a memeber variable, this dict is updated with subrun info as it becomes availbale. If the document fails to upload, raises an exception */
-
+    
     // Get run control object
     NSArray*  objs3 = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     runControl = [objs3 objectAtIndex:0];
