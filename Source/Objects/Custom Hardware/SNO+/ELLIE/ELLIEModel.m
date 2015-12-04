@@ -78,7 +78,6 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 - (void) makeMainController
 {
     [self linkToController:@"ELLIEController"];
-    
 }
 
 - (void) wakeUp
@@ -461,9 +460,13 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [[self orcaDbRefWithEntryDB:self withDB:@"tellie"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     
     //wait for main thread to receive acknowledgement from couchdb
-    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:2.0];
-    while ([timeout timeIntervalSinceNow] > 0 && ![self.tellieRunDoc objectForKey:@"_id"]) {
+    NSInteger timeoutLimit = 2;
+    NSDate* timeout = [NSDate dateWithTimeIntervalSinceNow:timeoutLimit];
+    while (![self.tellieRunDoc objectForKey:@"_id"]) {
         [NSThread sleepForTimeInterval:0.1];
+        if ([timeout timeIntervalSinceNow] > 0) {
+            [NSException raise:@"Timeout exception" format:@"Initial tellieRunDoc took > %d s to post", timeoutLimit];
+        }
     }
 }
 
