@@ -188,19 +188,20 @@
     CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
     CAEN_GAIN_MASK GainMask = [model caenGainMask];
 
+
     BOOL err = YES;
     err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>>0];
     err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>>1];
     err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>>2];
     err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>>3];
-    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>>8];
-    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>>9];
-    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>>10];
-    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>>11];
-    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>>12];
-    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>>13];
-    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>>14];
-    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>>15];
+    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>>0];
+    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>>1];
+    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>>2];
+    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>>3];
+    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>>4];
+    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>>5];
+    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>>6];
+    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>>7];
     if (err==NO) {
         NSLog(@"Error in CaenMatchHardware");
     }
@@ -211,7 +212,6 @@
 {
     CAEN_CHANNEL_MASK ChannelMask =0;
     CAEN_GAIN_MASK GainMask=0;
-    
     ChannelMask |= [[caenChannelSelect_0 selectedCell] tag ]*channelSel_0;
     ChannelMask |= [[caenChannelSelect_1 selectedCell] tag ]*channelSel_1;
     ChannelMask |= [[caenChannelSelect_2 selectedCell] tag ]*channelSel_2;
@@ -224,7 +224,7 @@
     GainMask |= [[caenGainSelect_5 selectedCell] tag ]*gainSel_5;
     GainMask |= [[caenGainSelect_6 selectedCell] tag ]*gainSel_6;
     GainMask |= [[caenGainSelect_7 selectedCell] tag ]*gainSel_7;
-    NSLog(@"Sending to TUBii CAEN MAsk %i, %i\n",ChannelMask,GainMask);
+    NSLog(@"Sending to TUBii CAEN Mask %i, %i\n",ChannelMask,GainMask);
     [model setCaenMasks:ChannelMask GainMask:GainMask];
 }
 
