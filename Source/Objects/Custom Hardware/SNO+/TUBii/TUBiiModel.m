@@ -11,9 +11,13 @@
 #import "netdb.h"
 
 #define kRemotePort 4001
-NSString* otherSystemIP = @"192.168.1.10";
+NSString* otherSystemIP = @"192.168.80.25";
+
+
+
 
 @implementation TUBiiModel
+
 
 - (void) setUpImage
 {
@@ -23,9 +27,7 @@ NSString* otherSystemIP = @"192.168.1.10";
     NSSize halfSize = [img size];
     halfSize.height = (int)(halfSize.height / 2);
     halfSize.width  = (int)(halfSize.width  / 2);
-    [img setScalesWhenResized:YES];
     [img setSize:halfSize];
-    
     [self setImage:img];
 }
 
@@ -113,7 +115,7 @@ NSString* otherSystemIP = @"192.168.1.10";
 {
     struct sockaddr_in address;
     struct hostent* pHostInfo;
-    char* strHostName="192.168.1.10";
+    char* strHostName="192.168.1.25";
 
     int hSocketCommand;
     portNumber=4001;
@@ -292,11 +294,28 @@ NSString* otherSystemIP = @"192.168.1.10";
 - (void) loadTrigMask:(BOOL)button
 {
     NSString* command=@"trigMask ";
-    NSString* argument=[NSString stringWithFormat:@"%i", trigMask];
+    NSString* argument=[NSString stringWithFormat:@"%lu", trigMask];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument];
     command = [command stringByAppendingString:endl];
     [self connectToPort:command];
 }
 
+-(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
+            GainMask:(CAEN_GAIN_MASK) aGainMask;
+{
+    caenChannelMask=aChannelMask;
+    caenGainMask = aGainMask;
+}
+
+
+-(CAEN_CHANNEL_MASK) caenChannelMask
+{
+    return caenChannelMask;
+}
+
+-(CAEN_GAIN_MASK) caenGainMask
+{
+    return caenGainMask;
+}
 @end

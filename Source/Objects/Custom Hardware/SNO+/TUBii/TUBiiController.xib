@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <development version="6300" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="TUBiiController">
             <connections>
-                <outlet property="tabView" destination="6do-sA-qTS" id="9j7-si-JH9"/>
-                <outlet property="test" destination="se5-gp-TjO" id="ckK-tQ-7mF"/>
+                <outlet property="caenChannelSelect_0" destination="lNP-09-du4" id="jbn-vy-nCM"/>
+                <outlet property="caenChannelSelect_1" destination="J9p-uT-6Hp" id="5GA-Rk-fiv"/>
+                <outlet property="caenChannelSelect_2" destination="9kc-gb-knD" id="I1i-kc-pC8"/>
+                <outlet property="caenChannelSelect_3" destination="B53-lg-RM3" id="FhC-0Y-IE2"/>
+                <outlet property="caenGainSelect_0" destination="aqg-CE-a2D" id="neZ-jW-Ty8"/>
+                <outlet property="caenGainSelect_1" destination="nIq-5b-d9Q" id="l9K-CH-JrR"/>
+                <outlet property="caenGainSelect_2" destination="B40-uq-gVg" id="ZPm-1h-iEL"/>
+                <outlet property="caenGainSelect_3" destination="8dE-u0-lxl" id="TPB-l6-zA5"/>
+                <outlet property="caenGainSelect_4" destination="W6O-Jv-c1U" id="0ND-El-rUc"/>
+                <outlet property="caenGainSelect_5" destination="Zx1-Q2-Eum" id="ZGr-t4-Akm"/>
+                <outlet property="caenGainSelect_6" destination="EHc-7k-VaY" id="dmc-I6-6ym"/>
+                <outlet property="caenGainSelect_7" destination="kzS-4A-YVq" id="dAK-cs-6hZ"/>
+                <outlet property="tabView" destination="6do-sA-qTS" id="emF-3W-0n8"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -17,22 +29,22 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="635" height="528"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="3840" height="2137"/>
+            <rect key="contentRect" x="196" y="240" width="614" height="445"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="635" height="528"/>
+                <rect key="frame" x="0.0" y="0.0" width="614" height="445"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView fixedFrame="YES" controlSize="small" translatesAutoresizingMaskIntoConstraints="NO" id="6do-sA-qTS">
-                        <rect key="frame" x="-2" y="41" width="624" height="490"/>
+                        <rect key="frame" x="13" y="10" width="588" height="438"/>
                         <tabViewItems>
                             <tabViewItem label="Pulsers &amp; Delays" identifier="1" id="8WF-ET-0MY">
                                 <view key="view" id="cdC-ig-bsI">
-                                    <rect key="frame" x="10" y="25" width="604" height="452"/>
+                                    <rect key="frame" x="10" y="25" width="218" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="SMELLIE Delay (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="vOS-VC-6kO">
-                                            <rect key="frame" x="235" y="402" width="127" height="53"/>
+                                            <rect key="frame" x="235" y="-50" width="127" height="53"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="37"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -54,7 +66,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="TELLIE Delay (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="6yC-tW-nse">
-                                            <rect key="frame" x="235" y="355" width="127" height="50"/>
+                                            <rect key="frame" x="235" y="-97" width="127" height="50"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="34"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -76,7 +88,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Delay (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Q1j-pJ-aaJ">
-                                            <rect key="frame" x="235" y="311" width="127" height="46"/>
+                                            <rect key="frame" x="235" y="-141" width="127" height="46"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -98,7 +110,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2dc-sE-HyT">
-                                            <rect key="frame" x="374" y="407" width="82" height="32"/>
+                                            <rect key="frame" x="374" y="-45" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oEj-pB-Z0I">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -108,7 +120,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tyI-gE-Ncq">
-                                            <rect key="frame" x="374" y="359" width="82" height="32"/>
+                                            <rect key="frame" x="374" y="-93" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5fb-4I-fdV">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -118,7 +130,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OOZ-fN-swp">
-                                            <rect key="frame" x="374" y="314" width="82" height="32"/>
+                                            <rect key="frame" x="374" y="-138" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="q3l-RY-eLB">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -128,7 +140,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eYl-tz-T1R">
-                                            <rect key="frame" x="13" y="408" width="96" height="22"/>
+                                            <rect key="frame" x="13" y="-44" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="qaT-DO-Ghb">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -139,7 +151,7 @@
                                             </connections>
                                         </textField>
                                         <button toolTip="TUBiiOn" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TPn-U3-bkd">
-                                            <rect key="frame" x="116" y="402" width="82" height="32"/>
+                                            <rect key="frame" x="116" y="-50" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Fire" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="uwd-2J-eiz">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -149,7 +161,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UhB-a0-2WE">
-                                            <rect key="frame" x="116" y="295" width="82" height="32"/>
+                                            <rect key="frame" x="116" y="-157" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Fire" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kM9-BL-QGE">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -159,7 +171,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="SMELLIE Rate (Hz)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="LtY-m8-vnV">
-                                            <rect key="frame" x="3" y="402" width="114" height="48"/>
+                                            <rect key="frame" x="3" y="-50" width="114" height="48"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="112" height="32"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -168,7 +180,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" ambiguous="YES" misplaced="YES" title="TELLIE Rate (Hz)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3GE-7Q-6ml">
-                                            <rect key="frame" x="6" y="292" width="111" height="47"/>
+                                            <rect key="frame" x="6" y="-160" width="111" height="47"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="109" height="31"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -180,7 +192,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulser Rate (Hz)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="wmj-OT-yKc">
-                                            <rect key="frame" x="3" y="198" width="109" height="46"/>
+                                            <rect key="frame" x="3" y="-254" width="109" height="46"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="107" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -211,7 +223,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VbD-Qo-b4Y">
-                                            <rect key="frame" x="116" y="201" width="82" height="32"/>
+                                            <rect key="frame" x="116" y="-251" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Fire" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fyB-X4-PVY">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -221,7 +233,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nze-KV-Zag">
-                                            <rect key="frame" x="13" y="302" width="96" height="22"/>
+                                            <rect key="frame" x="13" y="-150" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="iFK-ov-3Fj">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -232,7 +244,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="47k-aZ-HKz">
-                                            <rect key="frame" x="13" y="361" width="96" height="22"/>
+                                            <rect key="frame" x="13" y="-91" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="TkW-mh-mQG">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -243,7 +255,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fKC-UQ-UiO">
-                                            <rect key="frame" x="13" y="256" width="96" height="22"/>
+                                            <rect key="frame" x="13" y="-196" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="0sZ-JN-VMk">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -254,7 +266,7 @@
                                             </connections>
                                         </textField>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2Uw-wx-DaL">
-                                            <rect key="frame" x="12" y="163" width="96" height="22"/>
+                                            <rect key="frame" x="12" y="-289" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="0" drawsBackground="YES" id="QbI-BH-Ges">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -265,7 +277,7 @@
                                             </connections>
                                         </textField>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="SMELLIE nPulses" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iTi-8Y-34c">
-                                            <rect key="frame" x="6" y="350" width="111" height="50"/>
+                                            <rect key="frame" x="6" y="-102" width="111" height="50"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="109" height="34"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -274,7 +286,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="TELLIE nPulses" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="n70-p9-VHY">
-                                            <rect key="frame" x="6" y="248" width="111" height="46"/>
+                                            <rect key="frame" x="6" y="-204" width="111" height="46"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="109" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -283,7 +295,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="nPulses" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="vZc-od-BEx">
-                                            <rect key="frame" x="3" y="154" width="114" height="47"/>
+                                            <rect key="frame" x="3" y="-298" width="114" height="47"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="112" height="31"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -292,7 +304,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wz9-6c-bqw">
-                                            <rect key="frame" x="116" y="250" width="82" height="32"/>
+                                            <rect key="frame" x="116" y="-202" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nt8-Gr-O9b">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -302,7 +314,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VS9-rD-5cU">
-                                            <rect key="frame" x="116" y="157" width="82" height="32"/>
+                                            <rect key="frame" x="116" y="-295" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tz6-PL-mfM">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -312,7 +324,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Sbd-z1-cDn">
-                                            <rect key="frame" x="116" y="355" width="82" height="32"/>
+                                            <rect key="frame" x="116" y="-97" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dDv-Rm-ReY">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -326,11 +338,11 @@
                             </tabViewItem>
                             <tabViewItem label="Triggers" identifier="2" id="Z1o-ot-g3o">
                                 <view key="view" id="V8F-IY-uB4">
-                                    <rect key="frame" x="10" y="25" width="604" height="452"/>
+                                    <rect key="frame" x="10" y="25" width="568" height="400"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oLy-3Y-DUA">
-                                            <rect key="frame" x="11" y="98" width="108" height="32"/>
+                                            <rect key="frame" x="11" y="46" width="108" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load Mask" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cXB-Pf-unk">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -340,7 +352,7 @@
                                             </connections>
                                         </button>
                                         <matrix verticalHuggingPriority="750" fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yhg-sx-P1v">
-                                            <rect key="frame" x="35" y="158" width="61" height="288"/>
+                                            <rect key="frame" x="35" y="106" width="61" height="288"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="61" height="18"/>
                                             <buttonCell key="prototype" type="check" title="0" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fzb-fS-RuK">
@@ -472,27 +484,27 @@
                             </tabViewItem>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
                                 <view key="view" id="tgY-du-t2x">
-                                    <rect key="frame" x="10" y="25" width="604" height="452"/>
+                                    <rect key="frame" x="10" y="25" width="568" height="400"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Analog" identifier="" id="eZN-gI-gx9">
-                                <view key="view" id="y5f-eX-O1H">
-                                    <rect key="frame" x="10" y="25" width="604" height="452"/>
+                                <view key="view" ambiguous="YES" id="y5f-eX-O1H">
+                                    <rect key="frame" x="10" y="25" width="568" height="400"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A6P-hJ-pOg">
-                                            <rect key="frame" x="210" y="57" width="126" height="32"/>
+                                            <rect key="frame" x="354" y="5" width="126" height="32"/>
                                             <buttonCell key="cell" type="push" title="Send to TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iVo-AI-xmb">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="CaenMaskLoad:" target="-2" id="czT-0k-OQD"/>
+                                                <action selector="CaenLoadMask:" target="-2" id="kVy-if-R2z"/>
                                             </connections>
                                         </button>
                                         <box fixedFrame="YES" title="Gain Path Select" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="VEN-HT-PJR">
-                                            <rect key="frame" x="213" y="103" width="347" height="343"/>
+                                            <rect key="frame" x="213" y="51" width="347" height="343"/>
                                             <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="345" height="324"/>
@@ -505,7 +517,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aqg-CE-a2D">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="5" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aqg-CE-a2D">
                                                                     <rect key="frame" x="11" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -540,7 +552,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B40-uq-gVg">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="7" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B40-uq-gVg">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -575,7 +587,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dE-u0-lxl">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="8" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dE-u0-lxl">
                                                                     <rect key="frame" x="11" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -610,7 +622,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W6O-Jv-c1U">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="9" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W6O-Jv-c1U">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -645,7 +657,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zx1-Q2-Eum">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="10" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zx1-Q2-Eum">
                                                                     <rect key="frame" x="11" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -680,7 +692,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EHc-7k-VaY">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="11" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EHc-7k-VaY">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -715,7 +727,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kzS-4A-YVq">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="12" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kzS-4A-YVq">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -750,7 +762,7 @@
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nIq-5b-d9Q">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="6" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nIq-5b-d9Q">
                                                                     <rect key="frame" x="12" y="14" width="124" height="38"/>
                                                                     <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -785,7 +797,7 @@
                                             <font key="titleFont" metaFont="system"/>
                                         </box>
                                         <box autoresizesSubviews="NO" ambiguous="YES" misplaced="YES" title="CAEN Channel Select" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="27y-82-mB6">
-                                            <rect key="frame" x="14" y="103" width="190" height="342"/>
+                                            <rect key="frame" x="14" y="51" width="190" height="342"/>
                                             <userGuides>
                                                 <userLayoutGuide location="78" affinity="minX"/>
                                             </userGuides>
@@ -799,10 +811,10 @@
                                                             <rect key="frame" x="1" y="1" width="156" height="42"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C0 or C1) should go into CAEN Channel 0" verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lNP-09-du4">
+                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C0 or C1) should go into CAEN Channel 0" verticalHuggingPriority="750" fixedFrame="YES" tag="1" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lNP-09-du4">
                                                                     <rect key="frame" x="18" y="14" width="120" height="18"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="40" height="18"/>
+                                                                    <size key="cellSize" width="39" height="18"/>
                                                                     <size key="intercellSpacing" width="4" height="2"/>
                                                                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="xoB-po-sCq">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -810,21 +822,18 @@
                                                                     </buttonCell>
                                                                     <cells>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C0" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="dsr-MF-oA2">
+                                                                            <buttonCell type="radio" title="A0" imagePosition="left" alignment="left" state="on" inset="2" id="dsr-MF-oA2">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C1" imagePosition="left" alignment="left" inset="2" id="iTE-f1-OFx">
+                                                                            <buttonCell type="radio" title="A8" imagePosition="left" alignment="left" tag="1" inset="2" id="iTE-f1-OFx">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
-                                                                    <connections>
-                                                                        <action selector="CAEN_0:" target="-2" id="JpK-xZ-MID"/>
-                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -837,10 +846,10 @@
                                                             <rect key="frame" x="1" y="1" width="156" height="42"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C2 or C3) should go into CAEN Channel 1" verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J9p-uT-6Hp">
+                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C2 or C3) should go into CAEN Channel 1" verticalHuggingPriority="750" fixedFrame="YES" tag="2" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="J9p-uT-6Hp">
                                                                     <rect key="frame" x="18" y="14" width="120" height="18"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="40" height="18"/>
+                                                                    <size key="cellSize" width="39" height="18"/>
                                                                     <size key="intercellSpacing" width="4" height="2"/>
                                                                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="4Ht-7X-nYL">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -848,13 +857,13 @@
                                                                     </buttonCell>
                                                                     <cells>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C2" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="GiS-e2-1xS">
+                                                                            <buttonCell type="radio" title="A2" imagePosition="left" alignment="left" state="on" inset="2" id="GiS-e2-1xS">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C3" imagePosition="left" alignment="left" inset="2" id="UNk-AQ-PpH">
+                                                                            <buttonCell type="radio" title="A9" imagePosition="left" alignment="left" tag="1" inset="2" id="UNk-AQ-PpH">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -872,10 +881,10 @@
                                                             <rect key="frame" x="1" y="1" width="156" height="42"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C6 or C7) should go into CAEN Channel 3" verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B53-lg-RM3">
+                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C6 or C7) should go into CAEN Channel 3" verticalHuggingPriority="750" fixedFrame="YES" tag="4" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B53-lg-RM3">
                                                                     <rect key="frame" x="18" y="14" width="120" height="18"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="40" height="18"/>
+                                                                    <size key="cellSize" width="47" height="18"/>
                                                                     <size key="intercellSpacing" width="4" height="2"/>
                                                                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="QCM-Fp-ozh">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -883,13 +892,13 @@
                                                                     </buttonCell>
                                                                     <cells>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C6" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="yak-vP-PeR">
+                                                                            <buttonCell type="radio" title="A6" imagePosition="left" alignment="left" state="on" inset="2" id="yak-vP-PeR">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C7" imagePosition="left" alignment="left" inset="2" id="Eqb-pc-SsE">
+                                                                            <buttonCell type="radio" title="A11" imagePosition="left" alignment="left" tag="1" inset="2" id="Eqb-pc-SsE">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -903,7 +912,7 @@
                                                     </box>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I2A-LO-NoM">
                                                         <rect key="frame" x="38" y="6" width="113" height="68"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="CAEN Channels 4-7 are fixed to TUBii Channels C8-C12" id="cc9-3K-aS8">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="CAEN Channels 4-7 are fixed to TUBii Channels A4-A7" id="cc9-3K-aS8">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -915,10 +924,10 @@
                                                             <rect key="frame" x="1" y="1" width="156" height="42"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C4 or C5) should go into CAEN Channel 2" verticalHuggingPriority="750" fixedFrame="YES" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9kc-gb-knD">
+                                                                <matrix toolTip="Select which of the two TUBii analog inputs (C4 or C5) should go into CAEN Channel 2" verticalHuggingPriority="750" fixedFrame="YES" tag="3" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9kc-gb-knD">
                                                                     <rect key="frame" x="18" y="14" width="120" height="18"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                    <size key="cellSize" width="40" height="18"/>
+                                                                    <size key="cellSize" width="47" height="18"/>
                                                                     <size key="intercellSpacing" width="4" height="2"/>
                                                                     <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="exM-4U-xo5">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -926,13 +935,13 @@
                                                                     </buttonCell>
                                                                     <cells>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C4" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="hXR-ka-Y5k">
+                                                                            <buttonCell type="radio" title="A4" imagePosition="left" alignment="left" state="on" inset="2" id="hXR-ka-Y5k">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="C5" imagePosition="left" alignment="left" inset="2" id="hRu-UM-ZNg">
+                                                                            <buttonCell type="radio" title="A10" imagePosition="left" alignment="left" tag="1" inset="2" id="hRu-UM-ZNg">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
@@ -956,6 +965,16 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <font key="titleFont" metaFont="cellTitle"/>
                                         </box>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-qe-xfg">
+                                            <rect key="frame" x="117" y="5" width="142" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" toolTip="Make UI match the state of the hardware" imageScaling="proportionallyDown" inset="2" id="L2t-LY-qcy">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="CaenMatchHardware:" target="-2" id="xGT-3H-lH2"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -965,28 +984,9 @@
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+                <outlet property="initialFirstResponder" destination="LtY-m8-vnV" id="Z2b-4m-3gF"/>
             </connections>
-            <point key="canvasLocation" x="430.5" y="445"/>
+            <point key="canvasLocation" x="403" y="195.5"/>
         </window>
-        <tabView id="ndf-UC-chY">
-            <rect key="frame" x="0.0" y="0.0" width="177" height="124"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <font key="font" metaFont="system"/>
-            <tabViewItems>
-                <tabViewItem label="Tab" identifier="1" id="wiJ-KK-xtf">
-                    <view key="view" id="9Qd-T2-RTd">
-                        <rect key="frame" x="10" y="33" width="157" height="78"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    </view>
-                </tabViewItem>
-                <tabViewItem label="View" identifier="2" id="N8N-BC-eRi">
-                    <view key="view" id="hJJ-sX-Q63">
-                        <rect key="frame" x="10" y="33" width="157" height="78"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    </view>
-                </tabViewItem>
-            </tabViewItems>
-            <point key="canvasLocation" x="303.5" y="69"/>
-        </tabView>
     </objects>
 </document>
