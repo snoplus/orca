@@ -29,7 +29,7 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="240" width="614" height="445"/>
+            <rect key="contentRect" x="196" y="320" width="614" height="445"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="614" height="445"/>
@@ -493,7 +493,7 @@
                                     <rect key="frame" x="10" y="25" width="568" height="400"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A6P-hJ-pOg">
+                                        <button toolTip="Make the hardware match the current state of the GUI" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A6P-hJ-pOg">
                                             <rect key="frame" x="354" y="5" width="126" height="32"/>
                                             <buttonCell key="cell" type="push" title="Send to TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iVo-AI-xmb">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -511,7 +511,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 0" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="zrw-AU-UxX">
-                                                        <rect key="frame" x="-1" y="236" width="162" height="78"/>
+                                                        <rect key="frame" x="7" y="236" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -546,7 +546,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 2" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="SKI-Hf-bWI">
-                                                        <rect key="frame" x="-1" y="87" width="162" height="78"/>
+                                                        <rect key="frame" x="7" y="87" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -581,7 +581,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 3" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3se-oC-GaP">
-                                                        <rect key="frame" x="-1" y="14" width="162" height="78"/>
+                                                        <rect key="frame" x="7" y="14" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -616,7 +616,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 4" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="JoE-Pz-BDd">
-                                                        <rect key="frame" x="168" y="236" width="162" height="78"/>
+                                                        <rect key="frame" x="176" y="236" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -651,7 +651,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 5" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="2Jd-UZ-YBc">
-                                                        <rect key="frame" x="168" y="163" width="162" height="78"/>
+                                                        <rect key="frame" x="176" y="163" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -686,7 +686,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 6" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="cVh-ap-S53">
-                                                        <rect key="frame" x="168" y="87" width="162" height="78"/>
+                                                        <rect key="frame" x="176" y="87" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -721,7 +721,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 7" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="DVZ-iZ-kbn">
-                                                        <rect key="frame" x="168" y="14" width="162" height="78"/>
+                                                        <rect key="frame" x="176" y="14" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -756,7 +756,7 @@
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <box autoresizesSubviews="NO" fixedFrame="YES" title="CAEN Channel 1" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="BbY-PC-CYx">
-                                                        <rect key="frame" x="-1" y="163" width="162" height="78"/>
+                                                        <rect key="frame" x="7" y="163" width="162" height="78"/>
                                                         <string key="toolTip">Select the gain path each analog signal goes through before going to the CAEN. Attenuating will guarantee the signal fits in the CAEN dynamic range. Non-Attenuating doesn't change the signal within that range.</string>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="160" height="62"/>
@@ -965,7 +965,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <font key="titleFont" metaFont="cellTitle"/>
                                         </box>
-                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-qe-xfg">
+                                        <button toolTip="Make the GUI show the current state of the hardware" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ejp-qe-xfg">
                                             <rect key="frame" x="117" y="5" width="142" height="32"/>
                                             <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" toolTip="Make UI match the state of the hardware" imageScaling="proportionallyDown" inset="2" id="L2t-LY-qcy">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
