@@ -39,16 +39,16 @@
     [tabView setFocusRingType:NSFocusRingTypeNone];
     
     PulserAndDelays_size = NSMakeSize(400, 350);
-    Triggers_size = NSMakeSize(560, 510);
+    Triggers_size = NSMakeSize(400, 350);
     Tubii_size = NSMakeSize(400, 350);
-    Analog_size = NSMakeSize(400, 350);
+    Analog_size = NSMakeSize(615, 445);
+    [tabView setDelegate:self];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [self CaenMatchHardware:(self)];
     [[self caenChannelSelect_3] setEnabled:NO];
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    NSLog(@"I got called");
     int tabIndex = [aTabView indexOfTabViewItem:item];
     if (tabIndex==0)
     {

@@ -9,7 +9,7 @@
 #import "OrcaObjectController.h"
 
 
-@interface TUBiiController : OrcaObjectController {
+@interface TUBiiController : OrcaObjectController <NSTabViewDelegate> {
     NSView *blankView;
     NSSize PulserAndDelays_size;
     NSSize Triggers_size;
