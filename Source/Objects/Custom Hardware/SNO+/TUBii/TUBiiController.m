@@ -11,14 +11,25 @@
 
 @implementation TUBiiController
 
+@synthesize caenChannelSelect_0;
+@synthesize caenChannelSelect_1;
+@synthesize caenChannelSelect_2;
+@synthesize caenChannelSelect_3;
+@synthesize caenGainSelect_0;
+@synthesize caenGainSelect_1;
+@synthesize caenGainSelect_2;
+@synthesize caenGainSelect_3;
+@synthesize caenGainSelect_4;
+@synthesize caenGainSelect_5;
+@synthesize caenGainSelect_6;
+@synthesize caenGainSelect_7;
+@synthesize tabView;
+
 - (id)init
 {
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
     self = [super initWithWindowNibName:@"TUBiiController"];
-    
-    // Not automatic, apparently
-    // Try extern-ing the names in the model
-    //[self registerNotificationObservers];
+
     
     return self;
 }
@@ -32,6 +43,8 @@
     Tubii_size = NSMakeSize(400, 350);
     Analog_size = NSMakeSize(400, 350);
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
+    [self CaenMatchHardware:(self)];
+    [[self caenChannelSelect_3] setEnabled:NO];
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
@@ -169,19 +182,52 @@
 - (IBAction)TrigMaskLoad:(id)sender {
     [model loadTrigMask:[sender state]];
 }
-- (IBAction)CaenMaskLoad:(id)sender {
+
+- (IBAction)CaenMatchHardware:(id)sender{
+  
+    CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
+    CAEN_GAIN_MASK GainMask = [model caenGainMask];
+
+    BOOL err = YES;
+    err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>>0];
+    err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>>1];
+    err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>>2];
+    err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>>3];
+    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>>8];
+    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>>9];
+    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>>10];
+    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>>11];
+    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>>12];
+    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>>13];
+    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>>14];
+    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>>15];
+    if (err==NO) {
+        NSLog(@"Error in CaenMatchHardware");
+    }
     
 }
-- (IBAction)CAEN_0:(id)sender {
-    [sender sizeToFit];
-    if([[sender selectedCell] tag]==0)
-    {
-        NSLog(@"THINGY1");
-    }
-    else
-    {
-        NSLog(@"THING2");
-    }
+
+- (IBAction)CaenLoadMask:(id)sender
+{
+    CAEN_CHANNEL_MASK ChannelMask =0;
+    CAEN_GAIN_MASK GainMask=0;
+    
+    ChannelMask |= [[caenChannelSelect_0 selectedCell] tag ]*channelSel_0;
+    ChannelMask |= [[caenChannelSelect_1 selectedCell] tag ]*channelSel_1;
+    ChannelMask |= [[caenChannelSelect_2 selectedCell] tag ]*channelSel_2;
+    ChannelMask |= [[caenChannelSelect_3 selectedCell] tag ]*channelSel_3;
+    GainMask |= [[caenGainSelect_0 selectedCell] tag ]*gainSel_0;
+    GainMask |= [[caenGainSelect_1 selectedCell] tag ]*gainSel_1;
+    GainMask |= [[caenGainSelect_2 selectedCell] tag ]*gainSel_2;
+    GainMask |= [[caenGainSelect_3 selectedCell] tag ]*gainSel_3;
+    GainMask |= [[caenGainSelect_4 selectedCell] tag ]*gainSel_4;
+    GainMask |= [[caenGainSelect_5 selectedCell] tag ]*gainSel_5;
+    GainMask |= [[caenGainSelect_6 selectedCell] tag ]*gainSel_6;
+    GainMask |= [[caenGainSelect_7 selectedCell] tag ]*gainSel_7;
+    NSLog(@"Sending to TUBii CAEN MAsk %i, %i\n",ChannelMask,GainMask);
+    [model setCaenMasks:ChannelMask GainMask:GainMask];
 }
+
+
 
 @end
