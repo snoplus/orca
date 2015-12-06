@@ -798,9 +798,6 @@
                                         </box>
                                         <box autoresizesSubviews="NO" ambiguous="YES" misplaced="YES" title="CAEN Channel Select" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="27y-82-mB6">
                                             <rect key="frame" x="14" y="51" width="190" height="342"/>
-                                            <userGuides>
-                                                <userLayoutGuide location="78" affinity="minX"/>
-                                            </userGuides>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="188" height="324"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
