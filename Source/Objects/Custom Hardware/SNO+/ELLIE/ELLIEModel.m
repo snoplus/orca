@@ -442,8 +442,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [objs3 objectAtIndex:0];
 
     //Build dictionary
-    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
-    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+    NSMutableDictionary* runDocDict = [[NSMutableDictionary alloc] initWithCapacity:10];
+    NSMutableArray* subRunArray = [[NSMutableArray alloc] initWithCapacity:10];
     runDocDict[@"type"] = @"tellie_run";
     runDocDict[@"version"] = @"0";
     runDocDict[@"pass"] = @"0";
@@ -468,6 +468,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
             [NSException raise:@"Timeout exception" format:@"Initial tellieRunDoc took > %d s to post", timeoutLimit];
         }
     }
+    [runDocDict release];
+    [subRunArray release];
 }
 
 - (ORCouchDB*) orcaDbRefWithEntryDB:(id)aCouchDelegate withDB:(NSString*)entryDB;
