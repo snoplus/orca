@@ -25,8 +25,7 @@
 @synthesize caenGainSelect_7;
 @synthesize tabView;
 
-- (id)init
-{
+- (id)init{
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
     self = [super initWithWindowNibName:@"TUBii"];
 
@@ -134,6 +133,7 @@
     NSLog(@"TUBii: Pulser rate: %f Hz\n",value);
     [model setPulserRate:value];
 }
+
 - (IBAction)NPules:(id)sender {
     int value = [sender intValue];
     NSLog(@"TUBii: Number of pulses: %i\n",value);
@@ -192,7 +192,6 @@
     CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
     CAEN_GAIN_MASK GainMask = [model caenGainMask];
 
-
     BOOL err = YES;
     err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>>0];
     err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>>1];
@@ -211,9 +210,7 @@
     }
     
 }
-
-- (IBAction)CaenLoadMask:(id)sender
-{
+- (IBAction)CaenLoadMask:(id)sender{
     CAEN_CHANNEL_MASK ChannelMask =0;
     CAEN_GAIN_MASK GainMask=0;
     ChannelMask |= [[caenChannelSelect_0 selectedCell] tag ]*channelSel_0;
@@ -231,7 +228,5 @@
     NSLog(@"Sending to TUBii CAEN Mask %i, %i\n",ChannelMask,GainMask);
     [model setCaenMasks:ChannelMask GainMask:GainMask];
 }
-
-
 
 @end
