@@ -15,8 +15,7 @@
     NSSize Triggers_size;
     NSSize Tubii_size;
     NSSize Analog_size;
-
-
+    NSSize GTDelays_size;
     NSTabView *tabView;
     NSArray *caenSelectionCollection;
  
@@ -36,20 +35,20 @@
 
 // These references to UI elements are created by CTRL-dragging them into this
 // header file. Note the connection dots on the left.
-@property (assign) IBOutlet NSTabView *tabView;
+@property (assign,weak) IBOutlet NSTabView *tabView;
 
-@property (assign) IBOutlet NSMatrix *caenChannelSelect_0;
-@property (assign) IBOutlet NSMatrix *caenChannelSelect_1;
-@property (assign) IBOutlet NSMatrix *caenChannelSelect_2;
-@property (assign) IBOutlet NSMatrix *caenChannelSelect_3;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_0;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_1;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_2;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_3;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_4;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_5;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_6;
-@property (assign) IBOutlet NSMatrix *caenGainSelect_7;
+@property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_0;
+@property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_1;
+@property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_2;
+@property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_3;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_0;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_1;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_2;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_3;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_4;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_5;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_6;
+@property (assign,weak) IBOutlet NSMatrix *caenGainSelect_7;
 
 
 
