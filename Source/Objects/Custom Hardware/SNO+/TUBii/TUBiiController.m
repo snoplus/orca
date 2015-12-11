@@ -30,25 +30,22 @@
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
     self = [super initWithWindowNibName:@"TUBii"];
 
-    
     return self;
 }
-- (void) awakeFromNib
-{
-    blankView = [[NSView alloc] init];
+- (void) awakeFromNib{
     [tabView setFocusRingType:NSFocusRingTypeNone];
     
     PulserAndDelays_size = NSMakeSize(400, 350);
     Triggers_size = NSMakeSize(400, 350);
     Tubii_size = NSMakeSize(400, 350);
     Analog_size = NSMakeSize(615, 445);
+    GTDelays_size = NSMakeSize(450, 200);
     [tabView setDelegate:self];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     [self CaenMatchHardware:(self)];
     [[self caenChannelSelect_3] setEnabled:NO];
 }
-- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
-{
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
     int tabIndex = [aTabView indexOfTabViewItem:item];
     if (tabIndex==0)
     {
@@ -74,7 +71,14 @@
         [self resizeWindowToSize:Analog_size];
         [[self window] setContentView:tabView];
     }
+    else if (tabIndex==4)
+    {
+        [[self window] setContentView:blankView];
+        [self resizeWindowToSize:GTDelays_size];
+        [[self window] setContentView:tabView];
+    }
 }
+
 // GUI actions. CTRL-drag handles from the IB into this file.
 - (IBAction)SmellieFire:(id)sender {
     NSLog(@"TUBii: SMELLIE pulser ON: %i\n", [sender state]);
