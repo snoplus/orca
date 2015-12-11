@@ -28,7 +28,7 @@
 - (id)init
 {
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
-    self = [super initWithWindowNibName:@"TUBiiController"];
+    self = [super initWithWindowNibName:@"TUBii"];
 
     
     return self;

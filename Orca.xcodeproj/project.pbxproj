@@ -331,7 +331,7 @@
 		652B28E21BC7203000AC9E61 /* tubii.gif in Resources */ = {isa = PBXBuildFile; fileRef = 652B28E11BC7203000AC9E61 /* tubii.gif */; };
 		652B28E91BC7212100AC9E61 /* TUBiiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 652B28E41BC7212100AC9E61 /* TUBiiController.h */; };
 		652B28EA1BC7212100AC9E61 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 652B28E51BC7212100AC9E61 /* TUBiiController.m */; };
-		652B28EB1BC7212100AC9E61 /* TUBiiController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 652B28E61BC7212100AC9E61 /* TUBiiController.xib */; };
+		652B28EB1BC7212100AC9E61 /* TUBii.xib in Resources */ = {isa = PBXBuildFile; fileRef = 652B28E61BC7212100AC9E61 /* TUBii.xib */; };
 		652B28EC1BC7212100AC9E61 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 652B28E71BC7212100AC9E61 /* TUBiiModel.h */; };
 		652B28ED1BC7212100AC9E61 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 652B28E81BC7212100AC9E61 /* TUBiiModel.m */; };
 		6B325E081B2F4241002E2DD7 /* SNOP.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E071B2F4241002E2DD7 /* SNOP.xib */; };
@@ -3914,7 +3914,7 @@
 		652B28E11BC7203000AC9E61 /* tubii.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = tubii.gif; path = TUBii/tubii.gif; sourceTree = "<group>"; };
 		652B28E41BC7212100AC9E61 /* TUBiiController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TUBiiController.h; path = TUBii/TUBiiController.h; sourceTree = "<group>"; };
 		652B28E51BC7212100AC9E61 /* TUBiiController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TUBiiController.m; path = TUBii/TUBiiController.m; sourceTree = "<group>"; };
-		652B28E61BC7212100AC9E61 /* TUBiiController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TUBiiController.xib; path = TUBii/TUBiiController.xib; sourceTree = "<group>"; };
+		652B28E61BC7212100AC9E61 /* TUBii.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TUBii.xib; path = TUBii/TUBii.xib; sourceTree = "<group>"; };
 		652B28E71BC7212100AC9E61 /* TUBiiModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TUBiiModel.h; path = TUBii/TUBiiModel.h; sourceTree = "<group>"; };
 		652B28E81BC7212100AC9E61 /* TUBiiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TUBiiModel.m; path = TUBii/TUBiiModel.m; sourceTree = "<group>"; };
 		6B325E071B2F4241002E2DD7 /* SNOP.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOP.xib; sourceTree = "<group>"; };
@@ -7390,7 +7390,7 @@
 			children = (
 				652B28E41BC7212100AC9E61 /* TUBiiController.h */,
 				652B28E51BC7212100AC9E61 /* TUBiiController.m */,
-				652B28E61BC7212100AC9E61 /* TUBiiController.xib */,
+				652B28E61BC7212100AC9E61 /* TUBii.xib */,
 				652B28E71BC7212100AC9E61 /* TUBiiModel.h */,
 				652B28E81BC7212100AC9E61 /* TUBiiModel.m */,
 				652B28E11BC7203000AC9E61 /* tubii.gif */,
@@ -15687,7 +15687,7 @@
 				84A95191077B6C8C00CAD99D /* Analyze.gif in Resources */,
 				84A95192077B6C8C00CAD99D /* Clear.gif in Resources */,
 				84A95193077B6C8C00CAD99D /* LogLin.gif in Resources */,
-				652B28EB1BC7212100AC9E61 /* TUBiiController.xib in Resources */,
+				652B28EB1BC7212100AC9E61 /* TUBii.xib in Resources */,
 				841DA0DD0781F0740099BBF6 /* edu.washington.npl.orca.TwoDHisto.plist in Resources */,
 				841DA0E20781F0740099BBF6 /* TwoDHisto.nib in Resources */,
 				841DA0F00781F09B0099BBF6 /* edu.washington.npl.orca.OneDHisto.plist in Resources */,
