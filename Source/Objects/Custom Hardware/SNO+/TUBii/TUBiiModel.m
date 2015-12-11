@@ -65,7 +65,7 @@ NSString* otherSystemIP = @"192.168.80.25";
     tellieDelay = 0;
     genericDelay = 0;
     trigMask=0;
-
+    strHostName="192.168.80.25";
     
     return self;
 }
@@ -95,12 +95,11 @@ NSString* otherSystemIP = @"192.168.80.25";
     }
 }
 
-
 - (void) connectToPort:(NSString*)command
 {
     struct sockaddr_in address;
     struct hostent* pHostInfo;
-    char* strHostName="192.168.1.25";
+
 
     int hSocketCommand;
     portNumber=4001;
