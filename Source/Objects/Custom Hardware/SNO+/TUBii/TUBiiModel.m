@@ -45,6 +45,9 @@ NSString* otherSystemIP = @"192.168.1.10";
     smellieRate = 0;
     tellieRate = 0;
     pulserRate = 0;
+    smelliePulseWidth = 0;
+    telliePulseWidth = 0;
+    pulseWidth = 0;
     smellieNPulses=0;
     tellieNPulses=0;
     NPulses=0;
@@ -69,6 +72,21 @@ NSString* otherSystemIP = @"192.168.1.10";
 - (float) pulserRate
 {
     return pulserRate;
+}
+
+- (float) smelliePulseWidth
+{
+    return smelliePulseWidth;
+}
+
+- (float) telliePulseWidth
+{
+    return telliePulseWidth;
+}
+
+- (float) pulseWidth
+{
+    return pulseWidth;
 }
 
 - (float) smellieDelay
@@ -113,14 +131,14 @@ NSString* otherSystemIP = @"192.168.1.10";
 {
     struct sockaddr_in address;
     struct hostent* pHostInfo;
-    char* strHostName="192.168.1.10";
+    char* strHostName="192.168.80.25";
 
     int hSocketCommand;
     portNumber=4001;
     
     NSLog(@"Making a socket!\n");
     NSLog(@"Sending command %@\n",command);
-    @try{hSocketCommand=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);}
+    /*@try{hSocketCommand=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);}
     @catch(NSException* localException){
         NSLog(@"Could not make a socket.\n");
         return;
@@ -148,7 +166,7 @@ NSString* otherSystemIP = @"192.168.1.10";
     if(close(hSocketCommand) == -1){
         [NSException raise:@"Could not close socket.\n"];
         return;
-    }
+    }*/
 }
 
 
@@ -166,6 +184,11 @@ NSString* otherSystemIP = @"192.168.1.10";
     smellieRate = value;
 }
 
+- (void) setSmelliePulseWidth:(float)value
+{
+    smelliePulseWidth = value;
+}
+
 - (void) setSmellieNPulses:(int)value
 {
     smellieNPulses = value;
@@ -175,23 +198,30 @@ NSString* otherSystemIP = @"192.168.1.10";
 {
     NSString* command=@"smelliepulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", smellieRate];
-    NSString* argument2=[NSString stringWithFormat:@" %i", smellieNPulses];
+    NSString* argument2=[NSString stringWithFormat:@" %f", smelliePulseWidth];
+    NSString* argument3=[NSString stringWithFormat:@" %i", smellieNPulses];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument1];
     command= [command stringByAppendingString:argument2];
+    command= [command stringByAppendingString:argument3];
     command = [command stringByAppendingString:endl];
     [self connectToPort:command];
 }
 
 - (void) stopSmelliePulser:(BOOL)button
 {
-    NSString* command=@"smelliepulser 0 0 \r\n";
+    NSString* command=@"smelliepulser 0 0 0\r\n";
     [self connectToPort:command];
 }
 
 - (void) setTellieRate:(float)value
 {
     tellieRate = value;
+}
+
+- (void) setTelliePulseWidth:(float)value
+{
+    telliePulseWidth = value;
 }
 
 - (void) setTellieNPulses:(int)value
@@ -203,23 +233,30 @@ NSString* otherSystemIP = @"192.168.1.10";
 {
     NSString* command=@"telliepulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", tellieRate];
-    NSString* argument2=[NSString stringWithFormat:@" %i", tellieNPulses];
+    NSString* argument2=[NSString stringWithFormat:@" %f", telliePulseWidth];
+    NSString* argument3=[NSString stringWithFormat:@" %i", tellieNPulses];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument1];
     command= [command stringByAppendingString:argument2];
+    command= [command stringByAppendingString:argument3];
     command = [command stringByAppendingString:endl];
     [self connectToPort:command];
 }
 
 - (void) stopTelliePulser:(BOOL)button
 {
-    NSString* command=@"telliepulser 0 0 \r\n";
+    NSString* command=@"telliepulser 0 0 0\r\n";
     [self connectToPort:command];
 }
 
 - (void) setPulserRate:(float)value
 {
     pulserRate = value;
+}
+
+- (void) setPulseWidth:(float)value
+{
+    pulseWidth = value;
 }
 
 - (void) setNPulses:(int)value
@@ -229,19 +266,21 @@ NSString* otherSystemIP = @"192.168.1.10";
 
 - (void) firePulser:(BOOL)button
 {
-    NSString* command=@"syncpulser ";
+    NSString* command=@"genericpulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", pulserRate];
-    NSString* argument2=[NSString stringWithFormat:@" %i", NPulses];
+    NSString* argument2=[NSString stringWithFormat:@" %f", pulseWidth];
+    NSString* argument3=[NSString stringWithFormat:@" %i", NPulses];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument1];
     command= [command stringByAppendingString:argument2];
+    command= [command stringByAppendingString:argument3];
     command = [command stringByAppendingString:endl];
     [self connectToPort:command];
 }
 
 - (void) stopPulser:(BOOL)button
 {
-    NSString* command=@"syncpulser 0 0 \r\n";
+    NSString* command=@"genericpulser 0 0 0\r\n";
     [self connectToPort:command];
 }
 
@@ -282,7 +321,7 @@ NSString* otherSystemIP = @"192.168.1.10";
 
 - (void) loadDelay:(BOOL)button
 {
-    NSString* command=@"syncdelay ";
+    NSString* command=@"genericdelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", genericDelay];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument];
