@@ -40,7 +40,7 @@
 		0F5F66A41CCD36E2001FF7A4 /* tubii.gif in Resources */ = {isa = PBXBuildFile; fileRef = 0F5F669E1CCD36E2001FF7A4 /* tubii.gif */; settings = {ASSET_TAGS = (); }; };
 		0F5F66A51CCD36E2001FF7A4 /* TUBiiController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F5F669F1CCD36E2001FF7A4 /* TUBiiController.h */; settings = {ASSET_TAGS = (); }; };
 		0F5F66A61CCD36E2001FF7A4 /* TUBiiController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F66A01CCD36E2001FF7A4 /* TUBiiController.m */; settings = {ASSET_TAGS = (); }; };
-		0F5F66A71CCD36E2001FF7A4 /* TUBiiController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0F5F66A11CCD36E2001FF7A4 /* TUBiiController.xib */; settings = {ASSET_TAGS = (); }; };
+		0F5F66A71CCD36E2001FF7A4 /* TUBii.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0F5F66A11CCD36E2001FF7A4 /* TUBii.xib */; settings = {ASSET_TAGS = (); }; };
 		0F5F66A81CCD36E2001FF7A4 /* TUBiiModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0F5F66A21CCD36E2001FF7A4 /* TUBiiModel.h */; settings = {ASSET_TAGS = (); }; };
 		0F5F66A91CCD36E2001FF7A4 /* TUBiiModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F5F66A31CCD36E2001FF7A4 /* TUBiiModel.m */; settings = {ASSET_TAGS = (); }; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
@@ -3750,7 +3750,7 @@
 		0F5F669E1CCD36E2001FF7A4 /* tubii.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = tubii.gif; sourceTree = "<group>"; };
 		0F5F669F1CCD36E2001FF7A4 /* TUBiiController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUBiiController.h; sourceTree = "<group>"; };
 		0F5F66A01CCD36E2001FF7A4 /* TUBiiController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUBiiController.m; sourceTree = "<group>"; };
-		0F5F66A11CCD36E2001FF7A4 /* TUBiiController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TUBiiController.xib; sourceTree = "<group>"; };
+		0F5F66A11CCD36E2001FF7A4 /* TUBii.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TUBii.xib; sourceTree = "<group>"; };
 		0F5F66A21CCD36E2001FF7A4 /* TUBiiModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUBiiModel.h; sourceTree = "<group>"; };
 		0F5F66A31CCD36E2001FF7A4 /* TUBiiModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUBiiModel.m; sourceTree = "<group>"; };
 		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
@@ -7132,7 +7132,7 @@
 				0F5F669E1CCD36E2001FF7A4 /* tubii.gif */,
 				0F5F669F1CCD36E2001FF7A4 /* TUBiiController.h */,
 				0F5F66A01CCD36E2001FF7A4 /* TUBiiController.m */,
-				0F5F66A11CCD36E2001FF7A4 /* TUBiiController.xib */,
+				0F5F66A11CCD36E2001FF7A4 /* TUBii.xib */,
 				0F5F66A21CCD36E2001FF7A4 /* TUBiiModel.h */,
 				0F5F66A31CCD36E2001FF7A4 /* TUBiiModel.m */,
 			);
@@ -16427,7 +16427,7 @@
 				9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */,
 				844CD8FD18CA974E00F47A5B /* CouchUpdateHandler.txt in Resources */,
 				9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */,
-				0F5F66A71CCD36E2001FF7A4 /* TUBiiController.xib in Resources */,
+				0F5F66A71CCD36E2001FF7A4 /* TUBii.xib in Resources */,
 				9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */,
 				844445770E81311500A1440D /* IpeV4FLT.nib in Resources */,
 				844445780E81311500A1440D /* IpeV4FLTCard.gif in Resources */,
