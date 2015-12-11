@@ -26,9 +26,37 @@ typedef NS_OPTIONS(NSUInteger,CAEN_GAIN_MASK)
     gainSel_5 = 1<<5,
     gainSel_6 = 1<<6,
     gainSel_7 = 1<<7
-    
 };
-
+typedef NS_OPTIONS(NSUInteger,CONTROL_REG_MASK)
+{
+    clkSel = 1<<0,      //1 indicates FOX is default clk TUB is backup. O is vice versa
+    lockoutSel = 1<<1,  //1 is MTCD supplies LO
+    ecalEnable = 1<<2,  //1 is for when an ECAL is being done. GT is routed to MTCD's EXT_Async
+    scaler_LZB = 1<<3,  //Scaler Lead Zero Blanking
+    scaler_T = 1<<4,    //Scaler Test* when low scaler is test mode
+    scaler_I = 1<<5    //Scaler Inhibit* when low counting is inhibited
+};
+typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
+{
+    ExtTrig0 = 1<<0,
+    ExtTrig1 = 1<<1,
+    ExtTrig2 = 1<<2,
+    ExtTrig3 = 1<<3,
+    ExtTrig4 = 1<<4,
+    ExtTrig5 = 1<<5,
+    ExtTrig6 = 1<<6,
+    ExtTrig7 = 1<<7,
+    ExtTrig8 = 1<<8,
+    ExtTrig9 = 1<<9,
+    ExtTrig10 = 1<<10,
+    ExtTrig11 = 1<<11,
+    ExtTrig12 = 1<<12,
+    ExtTrig13 = 1<<13,
+    ExtTrig14 = 1<<14,
+    ExtTrig15 = 1<<15,
+    Mimic1 = 1<<16,
+    Mimic2 = 1<<17
+};
 @interface TUBiiModel : OrcaObject{
     float smellieRate;
     float tellieRate;
@@ -40,7 +68,10 @@ typedef NS_OPTIONS(NSUInteger,CAEN_GAIN_MASK)
     float tellieDelay;
     float genericDelay;
     unsigned long trigMask;
-    
+    float MTCAMimic1_Threshold;
+    float DGT_DelayLength;
+    float LO_DelayLength;
+
     CAEN_CHANNEL_MASK caenChannelMask;
     CAEN_GAIN_MASK caenGainMask;
     NetSocket *nsocket;
