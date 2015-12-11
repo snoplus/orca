@@ -74,6 +74,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 
     CAEN_CHANNEL_MASK caenChannelMask;
     CAEN_GAIN_MASK caenGainMask;
+
     NetSocket *nsocket;
     int serverSocket;
 	int workingSocket;

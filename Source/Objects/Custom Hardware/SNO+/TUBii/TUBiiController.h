@@ -17,7 +17,6 @@
     NSSize Analog_size;
     NSSize GTDelays_size;
     NSTabView *tabView;
-    NSArray *caenSelectionCollection;
  
   NSMatrix *caenChannelSelect_3;
   NSMatrix *caenChannelSelect_2;

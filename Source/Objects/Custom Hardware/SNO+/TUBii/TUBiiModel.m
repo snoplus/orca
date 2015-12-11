@@ -130,8 +130,6 @@ NSString* otherSystemIP = @"192.168.80.25";
         [NSException raise:@"Could not close socket.\n"];
 }
 
-
-
 - (void) setSocket:(NetSocket*)aSocket
 {
     [aSocket retain];
@@ -140,7 +138,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     
     [nsocket setDelegate:self];
 }
-
 
 - (void) fireSmelliePulser:(BOOL)button
 {
@@ -160,7 +157,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-
 - (void) fireTelliePulser:(BOOL)button
 {
     NSString* command=@"telliepulser ";
@@ -178,7 +174,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     NSString* command=@"telliepulser 0 0 \r\n";
     [self connectToPort:command];
 }
-
 
 - (void) firePulser:(BOOL)button
 {
@@ -219,7 +214,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     [self connectToPort:command];
 }
 
-
 - (void) loadDelay:(BOOL)button
 {
     NSString* command=@"syncdelay ";
@@ -229,7 +223,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     [self connectToPort:command];
 }
-
 
 - (void) loadTrigMask:(BOOL)button
 {
@@ -247,7 +240,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     caenChannelMask=aChannelMask;
     caenGainMask = aGainMask;
 }
-
 
 -(CAEN_CHANNEL_MASK) caenChannelMask
 {
