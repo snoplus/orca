@@ -34,9 +34,9 @@
 - (void) awakeFromNib{
     [tabView setFocusRingType:NSFocusRingTypeNone];
     
-    PulserAndDelays_size = NSMakeSize(400, 350);
-    Triggers_size = NSMakeSize(400, 350);
-    Tubii_size = NSMakeSize(400, 350);
+    PulserAndDelays_size = NSMakeSize(400, 400);
+    Triggers_size = NSMakeSize(530, 575);
+    Tubii_size = NSMakeSize(450, 400);
     Analog_size = NSMakeSize(615, 445);
     GTDelays_size = NSMakeSize(450, 200);
     [tabView setDelegate:self];
