@@ -320,6 +320,9 @@
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
+                                            <connections>
+                                                <action selector="SmelliePulseWidth:" target="-2" id="sw5-RJ-gbs"/>
+                                            </connections>
                                         </textField>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iKb-XH-VuJ">
                                             <rect key="frame" x="6" y="433" width="114" height="51"/>
@@ -337,6 +340,9 @@
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
+                                            <connections>
+                                                <action selector="TelliePulseWidth:" target="-2" id="3Kc-KV-GqZ"/>
+                                            </connections>
                                         </textField>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="7F8-OG-Ucu">
                                             <rect key="frame" x="3" y="279" width="114" height="51"/>
@@ -374,6 +380,9 @@
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
+                                            <connections>
+                                                <action selector="PulseWidth:" target="-2" id="c8O-eb-Qh0"/>
+                                            </connections>
                                         </textField>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="NxO-2P-aGJ">
                                             <rect key="frame" x="235" y="279" width="127" height="51"/>
