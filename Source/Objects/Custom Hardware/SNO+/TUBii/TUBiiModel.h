@@ -79,7 +79,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 	int workingSocket;
     unsigned long portNumber;
     int	connectState;
-    char* strHostName;//="192.168.1.10";
+    char* strHostName;//="192.168.80.25";
 }
 
 @property (nonatomic) float smellieRate;
