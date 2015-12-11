@@ -61,6 +61,9 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     float smellieRate;
     float tellieRate;
     float pulserRate;
+    float smelliePulseWidth;
+    float telliePulseWidth;
+    float pulseWidth;
     int smellieNPulses;
     int tellieNPulses;
     int NPulses;
@@ -86,6 +89,9 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) float smellieRate;
 @property (nonatomic) float tellieRate;
 @property (nonatomic) float pulserRate;
+@property (nonatomic) float smelliePulseWidth;
+@property (nonatomic) float telliePulseWidth;
+@property (nonatomic) float pulseWidth;
 @property (nonatomic) int smellieNPulses;
 @property (nonatomic) int tellieNPulses;
 @property (nonatomic) int NPulses;

@@ -116,6 +116,11 @@
     NSLog(@"TUBii: SMELLIE number of pulses: %i\n",value);
     [model setSmellieNPulses:value];
 }
+- (IBAction)SmelliePulseWidth:(id)sender {
+    float value = [sender floatValue];
+    NSLog(@"TUBii: SMELLIE Pulse width: %f s\n",value);
+    [model setSmelliePulseWidth:value];
+}
 
 - (IBAction)TellieRate:(id)sender {
     float value = [sender floatValue];
@@ -126,6 +131,11 @@
     int value = [sender intValue];
     NSLog(@"TUBii: TELLIE number of pulses: %i\n",value);
     [model setTellieNPulses:value];
+}
+- (IBAction)TelliePulseWidth:(id)sender {
+    float value = [sender floatValue];
+    NSLog(@"TUBii: TELLIE Pulse width: %f s\n",value);
+    [model setTelliePulseWidth:value];
 }
 
 - (IBAction)PulserRate:(id)sender {
@@ -138,6 +148,11 @@
     int value = [sender intValue];
     NSLog(@"TUBii: Number of pulses: %i\n",value);
     [model setNPulses:value];
+}
+- (IBAction)PulseWidth:(id)sender {
+    float value = [sender floatValue];
+    NSLog(@"TUBii: Pulse width: %f s\n",value);
+    [model setPulseWidth:value];
 }
 
 - (IBAction)SmellieDelay:(id)sender {
