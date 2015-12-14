@@ -599,7 +599,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 - (void) pulseNIMOutput
 {
     //this routine will send out a single pulse on both NIM outputs
-    if(!setupNIMOutputDone){
+    //if(!setupNIMOutputDone){
         setupNIMOutputDone = YES;
         unsigned short regValue = [self readRegister:kAuxIOCrl]; //get the orginal value
         regValue |= 0x5000; //set both NIM outputs to Any Trigger b0101
@@ -607,7 +607,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 
         [self writeRegister:kTrigMask withValue:0x1];
         [self writeRegister:kAuxTriggerWidth withValue:0xff]; //set to max width ~50µs
-    }
+   // }
     
     [self writeRegister:kPulsedCtl1 withValue:0x80000]; //generate 1 manual trigger)
     
