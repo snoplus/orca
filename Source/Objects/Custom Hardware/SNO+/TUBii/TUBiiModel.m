@@ -31,6 +31,8 @@ NSString* otherSystemIP = @"192.168.80.25";
 @synthesize smellieDelay;
 @synthesize tellieDelay;
 @synthesize genericDelay;
+@synthesize speakerMask;
+@synthesize counterMask;
 
 - (void) setUpImage
 {

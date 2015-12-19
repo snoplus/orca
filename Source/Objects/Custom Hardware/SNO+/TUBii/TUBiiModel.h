@@ -74,6 +74,8 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     float MTCAMimic1_Threshold;
     float DGT_DelayLength;
     float LO_DelayLength;
+    NSUInteger speakerMask;
+    NSUInteger counterMask;
 
     CAEN_CHANNEL_MASK caenChannelMask;
     CAEN_GAIN_MASK caenGainMask;
@@ -101,6 +103,8 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) unsigned long trigMask;
 @property (nonatomic) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic) CAEN_GAIN_MASK caenGainMask;
+@property (nonatomic) NSUInteger speakerMask;
+@property (nonatomic) NSUInteger counterMask;
 
 - (void) connectSocket:(BOOL)aFlag;
 - (void) connectToPort:(NSString*)command;
