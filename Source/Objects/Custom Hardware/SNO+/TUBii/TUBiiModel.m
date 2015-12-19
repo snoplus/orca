@@ -57,8 +57,7 @@ NSString* otherSystemIP = @"192.168.80.25";
 // call the superclass initWithCoder too!
 - (id) init {
     
-    [super init];
-
+    self = [super init];
     // Initialize model member variables
     smellieRate = 0;
     tellieRate = 0;

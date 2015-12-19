@@ -55,8 +55,13 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     ExtTrig14 = 1<<14,
     ExtTrig15 = 1<<15,
     Mimic1 = 1<<16,
-    Mimic2 = 1<<17
+    Mimic2 = 1<<17,
+    Burst = 1<<18,
+    Prescale = 1<<19,
+    Combo = 1<<20,
+    GT = 1<<21
 };
+
 @interface TUBiiModel : OrcaObject{
     float smellieRate;
     float tellieRate;
