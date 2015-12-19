@@ -11,6 +11,7 @@
 
 @implementation TUBiiController
 
+
 @synthesize caenChannelSelect_0;
 @synthesize caenChannelSelect_1;
 @synthesize caenChannelSelect_2;
@@ -37,6 +38,7 @@
 - (id)init{
     // Initialize by launching the GUI, referenced by the name of the xib/nib file
     self = [super initWithWindowNibName:@"TUBii"];
+
 
     return self;
 }
@@ -226,7 +228,7 @@
     [model loadTrigMask:[sender state]];
 }
 
-- (IBAction)CaenMatchHardware:(id)sender{
+- (IBAction)CaenMatchHardware:(id)sender {
   
     CAEN_CHANNEL_MASK ChannelMask = [model caenChannelMask];
     CAEN_GAIN_MASK GainMask = [model caenGainMask];
@@ -249,7 +251,7 @@
     }
     
 }
-- (IBAction)CaenLoadMask:(id)sender{
+- (IBAction)CaenLoadMask:(id)sender {
     CAEN_CHANNEL_MASK ChannelMask =0;
     CAEN_GAIN_MASK GainMask=0;
     ChannelMask |= [[caenChannelSelect_0 selectedCell] tag ]*channelSel_0;
@@ -267,8 +269,31 @@
     NSLog(@"Sending to TUBii CAEN Mask %i, %i\n",ChannelMask,GainMask);
     [model setCaenMasks:ChannelMask GainMask:GainMask];
 }
-- (IBAction)SpeakerMatchHardware:(id)sender
-{
+
+- (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high {
+    NSUInteger maskVal = 0;
+    for (int i=low; i<high; i++) {
+        if([[aMatrix cellWithTag:i] intValue]>0)
+        {
+            maskVal |= (1<<i);
+        }
+    }
+    return maskVal;
+}
+- (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix {
+    for (int i=low;i<high;i++)
+    {
+        if((maskVal & 1<<i) >0)
+        {
+            [[aMatrix cellWithTag:i] setState:1];
+        }
+        else
+        {
+            [[aMatrix cellWithTag:i] setState:0];
+        }
+    }
+}
+- (IBAction)SpeakerMatchHardware:(id)sender {
     NSUInteger maskVal =0;
     NSMatrix *maskSelect_1 =nil;
     NSMatrix *maskSelect_2 =nil;
@@ -292,8 +317,7 @@
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:maskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:22 ToCheckBoxes:maskSelect_2];
 }
-- (IBAction)SpeakerLoadMask:(id)sender;
-{
+- (IBAction)SpeakerLoadMask:(id)sender {
     NSUInteger maskVal=0;
     NSMatrix *maskSelect_1 =nil;
     NSMatrix *maskSelect_2 =nil;
@@ -320,59 +344,28 @@
     }
 
 }
-- (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
-{
-    NSUInteger maskVal = 0;
-    for (int i=low; i<high; i++) {
-        if([[aMatrix cellWithTag:i] intValue]>0)
-        {
-            maskVal |= (1<<i);
-        }
-    }
-    return maskVal;
-}
-- (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix ;
-{
-    for (int i=low;i<high;i++)
-    {
-        if((maskVal & 1<<i) >0)
-        {
-            [[aMatrix cellWithTag:i] setState:1];
-        }
-        else
-        {
-            [[aMatrix cellWithTag:i] setState:0];
-        }
-    }
-}
-
--(IBAction)SpeakerCheckBoxChanged:(id)sender
-{
+- (IBAction)SpeakerCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_2 FromBit:16 ToBit:22];
     [SpeakerMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
 }
--(IBAction)SpeakerFieldChanged:(id)sender
-{
+- (IBAction)SpeakerFieldChanged:(id)sender {
     NSUInteger maskVal =[SpeakerMaskField integerValue];
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:SpeakerMaskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:22 ToCheckBoxes:SpeakerMaskSelect_2];
 }
--(IBAction)CounterCheckBoxChanged:(id)sender
-{
+- (IBAction)CounterCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:22];
     [CounterMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
 }
--(IBAction)CounterFieldChanged:(id)sender
-{
+- (IBAction)CounterFieldChanged:(id)sender {
     NSUInteger maskVal =[CounterMaskField integerValue];
 
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:CounterMaskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:22 ToCheckBoxes:CounterMaskSelect_2];
 }
-- (IBAction)SpeakerCounterCheckAll:(id)sender;
-{
+- (IBAction)SpeakerCounterCheckAll:(id)sender {
     NSUInteger maskVal;
     NSMatrix *maskSelect_1 =nil;
     NSMatrix *maskSelect_2 =nil;
@@ -399,8 +392,7 @@
     [maskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
 
 }
-- (IBAction)SpeakerCounterUnCheckAll:(id)sender;
-{
+- (IBAction)SpeakerCounterUnCheckAll:(id)sender {
     NSMatrix *maskSelect_1 =nil;
     NSMatrix *maskSelect_2 =nil;
     NSTextField *maskField =nil;

@@ -40,7 +40,11 @@
     NSMatrix *CounterMaskSelect_1;
     NSMatrix *CounterMaskSelect_2;
     NSTextField *CounterMaskField;
+    
+    NSTextField *DGT_Field;
+    NSTextField *LO_Field;
 }
+-(id) init;
 
 // These references to UI elements are created by CTRL-dragging them into this
 // header file. Note the connection dots on the left.
@@ -58,29 +62,26 @@
 @property (assign,weak) IBOutlet NSMatrix *caenGainSelect_5;
 @property (assign,weak) IBOutlet NSMatrix *caenGainSelect_6;
 @property (assign,weak) IBOutlet NSMatrix *caenGainSelect_7;
-
-
-- (IBAction)CaenMatchHardware:(id)sender;
-- (IBAction)CaenLoadMask:(id)sender;
-- (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
-- (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
-
-
 @property (assign,weak) IBOutlet NSMatrix *SpeakerMaskSelect_1;
 @property (assign,weak) IBOutlet NSMatrix *SpeakerMaskSelect_2;
 @property (assign,weak) IBOutlet NSTextField *SpeakerMaskField;
+@property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_1;
+@property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_2;
+@property (assign,weak) IBOutlet NSTextField *CounterMaskField;
+
+- (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
+- (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
+
+- (IBAction)CaenMatchHardware:(id)sender;
+- (IBAction)CaenLoadMask:(id)sender;
+
 - (IBAction)SpeakerMatchHardware:(id)sender;
 - (IBAction)SpeakerLoadMask:(id)sender;
-- (IBAction)CheckBoxChagned:(id)sender;
+- (IBAction)SpeakerCheckBoxChanged:(id)sender;
 - (IBAction)SpeakerFieldChanged:(id)sender;
 - (IBAction)SpeakerCounterCheckAll:(id)sender;
 - (IBAction)SpeakerCounterUnCheckAll:(id)sender;
 
-@property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_1;
-@property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_2;
-@property (assign,weak) IBOutlet NSTextField *CounterMaskField;
 - (IBAction)CounterCheckBoxChanged:(id)sender;
 - (IBAction)CounterFieldChanged:(id)sender;
--(id) init;
-
 @end
