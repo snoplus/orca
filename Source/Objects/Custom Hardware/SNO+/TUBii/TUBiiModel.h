@@ -29,12 +29,12 @@ typedef NS_OPTIONS(NSUInteger,CAEN_GAIN_MASK)
 };
 typedef NS_OPTIONS(NSUInteger,CONTROL_REG_MASK)
 {
-    clkSel = 1<<0,      //1 indicates FOX is default clk TUB is backup. O is vice versa
-    lockoutSel = 1<<1,  //1 is MTCD supplies LO
-    ecalEnable = 1<<2,  //1 is for when an ECAL is being done. GT is routed to MTCD's EXT_Async
-    scaler_LZB = 1<<3,  //Scaler Lead Zero Blanking
-    scaler_T = 1<<4,    //Scaler Test* when low scaler is test mode
-    scaler_I = 1<<5    //Scaler Inhibit* when low counting is inhibited
+    clkSel_Bit = 1<<0,      //1 indicates FOX is default clk TUB is backup. O is vice versa
+    lockoutSel_Bit = 1<<1,  //1 indicates MTCD supplies LO. 0 means TUBii supplies it.
+    ecalEnable_Bit = 1<<2,  //1 is for when an ECAL is being done. GT is routed to MTCD's EXT_Async
+    scalerLZB_Bit = 1<<3,  //Scaler Lead Zero Blanking
+    scalerT_Bit = 1<<4,    //Scaler Test* when low scaler is test mode
+    scalerI_Bit = 1<<5    //Scaler Inhibit* when low counting is inhibited
 };
 typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 {
@@ -79,8 +79,11 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     float MTCAMimic1_Threshold;
     float DGT_DelayLength;
     float LO_DelayLength;
+    NSUInteger DGTBits;
+    NSUInteger LOBits;
     NSUInteger speakerMask;
     NSUInteger counterMask;
+    CONTROL_REG_MASK controlReg;
 
     CAEN_CHANNEL_MASK caenChannelMask;
     CAEN_GAIN_MASK caenGainMask;
@@ -108,8 +111,11 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) unsigned long trigMask;
 @property (nonatomic) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic) CAEN_GAIN_MASK caenGainMask;
+@property (nonatomic) NSUInteger DGTBits;
+@property (nonatomic) NSUInteger LOBits;
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
+@property (nonatomic) CONTROL_REG_MASK controlReg;
 
 - (void) connectSocket:(BOOL)aFlag;
 - (void) connectToPort:(NSString*)command;

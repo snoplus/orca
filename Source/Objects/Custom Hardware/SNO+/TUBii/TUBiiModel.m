@@ -31,8 +31,12 @@ NSString* otherSystemIP = @"192.168.80.25";
 @synthesize smellieDelay;
 @synthesize tellieDelay;
 @synthesize genericDelay;
+@synthesize DGTBits;
+@synthesize LOBits;
 @synthesize speakerMask;
 @synthesize counterMask;
+@synthesize controlReg;
+
 
 - (void) setUpImage
 {
@@ -72,6 +76,8 @@ NSString* otherSystemIP = @"192.168.80.25";
     tellieDelay = 0;
     genericDelay = 0;
     trigMask=0;
+    LO_DelayLength = 0;
+    DGT_DelayLength = 0;
     strHostName="192.168.80.25";
     
     return self;

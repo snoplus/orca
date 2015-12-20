@@ -43,6 +43,10 @@
     
     NSTextField *DGT_Field;
     NSTextField *LO_Field;
+    NSSlider *LO_Slider;
+    NSSlider *DGT_Slider;
+    NSMatrix *LO_SrcSelect;
+
 }
 -(id) init;
 
@@ -68,9 +72,18 @@
 @property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_1;
 @property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_2;
 @property (assign,weak) IBOutlet NSTextField *CounterMaskField;
+@property (assign,weak) IBOutlet NSTextField *DGT_Field;
+@property (assign,weak) IBOutlet NSSlider *LO_Slider;
+@property (assign,weak) IBOutlet NSSlider *DGT_Slider;
+@property (assign,weak) IBOutlet NSTextField *LO_Field;
+
+@property (assign,weak) IBOutlet NSMatrix *LO_SrcSelect;
 
 - (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
+
+- (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
+- (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal;
 
 - (IBAction)CaenMatchHardware:(id)sender;
 - (IBAction)CaenLoadMask:(id)sender;
@@ -84,4 +97,14 @@
 
 - (IBAction)CounterCheckBoxChanged:(id)sender;
 - (IBAction)CounterFieldChanged:(id)sender;
+
+- (IBAction)GTDelaysMatchHardware:(id)sender;
+- (IBAction)GTDelaysLoadMask:(id)sender;
+- (IBAction)LOSrcSelectChanged:(id)sender;
+- (IBAction)LODelayLengthTextFieldChagned:(id)sender;
+- (IBAction)LODelayLengthSliderChagned:(id)sender;
+
+
+
+
 @end
