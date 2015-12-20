@@ -11,7 +11,6 @@
 
 @implementation TUBiiController
 
-
 @synthesize caenChannelSelect_0;
 @synthesize caenChannelSelect_1;
 @synthesize caenChannelSelect_2;
@@ -33,6 +32,12 @@
 @synthesize CounterMaskSelect_2;
 @synthesize CounterMaskField;
 
+@synthesize  LO_Field;
+@synthesize DGT_Field;
+@synthesize LO_SrcSelect;
+@synthesize LO_Slider;
+@synthesize DGT_Slider;
+
 @synthesize tabView;
 
 - (id)init{
@@ -49,7 +54,7 @@
     Triggers_size = NSMakeSize(530, 575);
     Tubii_size = NSMakeSize(450, 400);
     Analog_size = NSMakeSize(615, 445);
-    GTDelays_size = NSMakeSize(450, 200);
+    GTDelays_size = NSMakeSize(500, 250);
     SpeakerCounter_size = NSMakeSize(575,550);
     [tabView setDelegate:self];
 
@@ -62,7 +67,9 @@
     [CounterMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
 
     [self CaenMatchHardware:(self)];
-    [[self caenChannelSelect_3] setEnabled:NO];
+    [[self caenChannelSelect_3] setEnabled:NO];//Not working on board
+
+    [self GTDelaysMatchHardware:self];
 }
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item{
     int tabIndex = [aTabView indexOfTabViewItem:item];
@@ -365,6 +372,7 @@
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:CounterMaskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:22 ToCheckBoxes:CounterMaskSelect_2];
 }
+
 - (IBAction)SpeakerCounterCheckAll:(id)sender {
     NSUInteger maskVal;
     NSMatrix *maskSelect_1 =nil;
@@ -415,5 +423,89 @@
     [maskSelect_2 deselectAllCells];
 
     [maskField setStringValue:[NSString stringWithFormat:@"%i",0]];
+}
+
+- (IBAction)GTDelaysLoadMask:(id)sender{
+    float LO_Delay = [LO_Field floatValue];
+    float DGT_Delay = [DGT_Field floatValue];
+    CONTROL_REG_MASK ControlReg;
+    [model setLOBits:[self ConvertValueToBits:LO_Delay NBits:8 MinVal:0 MaxVal:1275]];
+    [model setDGTBits:[self ConvertValueToBits:DGT_Delay NBits:8 MinVal:0 MaxVal:510]];
+
+    if([[LO_SrcSelect selectedCell] tag] ==1){
+        ControlReg = [model controlReg] | lockoutSel_Bit;
+    }
+    else{
+        ControlReg = [model controlReg] & ~lockoutSel_Bit;
+    }
+    [model setControlReg: ControlReg];
+    NSLog(@"Control Reg = %i\n",ControlReg);
+    NSLog(@"DGT Delay = %.0f, LO Delay = %.0f\n",DGT_Delay,LO_Delay);
+    NSLog(@"DGT Bits = %i, LO Bits = %i\n",[model DGTBits],[model LOBits]);
+}
+- (IBAction)GTDelaysMatchHardware:(id)sender{
+    float LO_Delay = [self ConvertBitsToValue:[model LOBits] NBits:8 MinVal:0 MaxVal:1275];
+    [LO_Slider setFloatValue:LO_Delay];
+    [LO_Field setIntegerValue:LO_Delay];
+    float DGT_Delay = [self ConvertBitsToValue:[model DGTBits] NBits:8 MinVal:0 MaxVal:510];
+    [DGT_Slider setFloatValue:DGT_Delay];
+    [DGT_Field setIntegerValue:DGT_Delay];
+    if (([model controlReg] & lockoutSel_Bit)>0){
+        [[self LO_SrcSelect] selectCellWithTag:1];
+    }
+    else{
+        [[self LO_SrcSelect] selectCellWithTag:2];
+    }
+    [self LOSrcSelectChanged:self];
+    NSLog(@"Control Reg = %i\n",[model controlReg]);
+    NSLog(@"DGT Delay = %.0f, LO Delay = %.0f\n",DGT_Delay,LO_Delay);
+    NSLog(@"DGT Bits = %i, LO Bits = %i\n",[model DGTBits],[model LOBits]);
+
+}
+
+- (IBAction)LOSrcSelectChanged:(id)sender {
+    if([[LO_SrcSelect selectedCell] tag]==1){ //MTCD is selected
+        [LO_Field setEnabled:NO];
+        [LO_Slider setEnabled:NO];
+    }
+    else { //TUBii is selected
+        [LO_Field setEnabled:YES];
+        [LO_Slider setEnabled:YES];
+    }
+}
+- (IBAction)LODelayLengthTextFieldChagned:(id)sender{
+    NSTextField *field = nil;
+    NSSlider *slider = nil;
+    if ([sender tag]==1){
+        field = LO_Field;
+        slider = LO_Slider;
+    }
+    else {
+        field = DGT_Field;
+        slider = DGT_Slider;
+    }
+    float val = [field floatValue];
+    [slider setFloatValue:val];
+}
+- (IBAction)LODelayLengthSliderChagned:(id)sender{
+    NSTextField *field = nil;
+    NSSlider *slider = nil;
+    if ([sender tag]==1){
+        field = LO_Field;
+        slider = LO_Slider;
+    }
+    else {
+        field = DGT_Field;
+        slider = DGT_Slider;
+    }
+    [field setStringValue:[NSString stringWithFormat:@"%i",[slider integerValue]]];
+}
+- (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
+    float stepSize = (maxVal - minVal)/(pow(2, nBits)-1.0);
+    return bits*stepSize;
+}
+- (NSUInteger) ConvertValueToBits: (float) value NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
+    float stepSize = (maxVal - minVal)/(pow(2,nBits)-1.0);
+    return value/stepSize;
 }
 @end
