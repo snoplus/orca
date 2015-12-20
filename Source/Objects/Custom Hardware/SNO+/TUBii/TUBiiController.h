@@ -19,6 +19,8 @@
     NSSize SpeakerCounter_size;
     NSTabView *tabView;
 
+    NSMatrix *TrigMaskSelect;
+
     NSMatrix *caenChannelSelect_3;
     NSMatrix *caenChannelSelect_2;
     NSMatrix *caenChannelSelect_1;
@@ -54,6 +56,7 @@
 // header file. Note the connection dots on the left.
 @property (assign,weak) IBOutlet NSTabView *tabView;
 
+@property (assign,weak) IBOutlet NSMatrix *TrigMaskSelect;
 @property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_0;
 @property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_1;
 @property (assign,weak) IBOutlet NSMatrix *caenChannelSelect_2;
