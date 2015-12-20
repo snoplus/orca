@@ -11,6 +11,8 @@
 
 @implementation TUBiiController
 
+@synthesize TrigMaskSelect;
+
 @synthesize caenChannelSelect_0;
 @synthesize caenChannelSelect_1;
 @synthesize caenChannelSelect_2;
@@ -32,7 +34,7 @@
 @synthesize CounterMaskSelect_2;
 @synthesize CounterMaskField;
 
-@synthesize  LO_Field;
+@synthesize LO_Field;
 @synthesize DGT_Field;
 @synthesize LO_SrcSelect;
 @synthesize LO_Slider;
@@ -50,7 +52,7 @@
 - (void) awakeFromNib{
     [tabView setFocusRingType:NSFocusRingTypeNone];
     
-    PulserAndDelays_size = NSMakeSize(400, 400);
+    PulserAndDelays_size = NSMakeSize(500, 350);
     Triggers_size = NSMakeSize(530, 575);
     Tubii_size = NSMakeSize(450, 400);
     Analog_size = NSMakeSize(615, 445);
@@ -207,20 +209,16 @@
 }
 
 - (IBAction)TrigMaskSet:(id)sender {
-    unsigned long mask = 0;
-    int i;
-    for(i=0;i<16;i++){
-        if([[sender cellWithTag:i] intValue]){
-            mask |= (1L << i);
-            NSLog(@"%i YES \n",i);
-        }
-    }
-    NSLog(@"TUBii: Trigger mask: %lu\n",mask);
-    [model setTrigMask:mask];
 
 }
+- (IBAction)TrigMaskMatchHardware:(id)sender {
+    NSUInteger maskVal = [model trigMask];
+    [self SendBitInfo:maskVal FromBit:0 ToBit:21 ToCheckBoxes:TrigMaskSelect];
+}
 - (IBAction)TrigMaskLoad:(id)sender {
-    [model loadTrigMask:[sender state]];
+    NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:TrigMaskSelect FromBit:0 ToBit:21];
+    NSLog(@"TUBii: Trigger mask: %lu\n",maskVal);
+    [model setTrigMask:maskVal];
 }
 
 - (IBAction)CaenMatchHardware:(id)sender {
