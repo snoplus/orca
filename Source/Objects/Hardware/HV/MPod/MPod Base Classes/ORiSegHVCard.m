@@ -45,6 +45,8 @@ NSString* ORiSegHVCardConstraintsChanged		= @"ORiSegHVCardConstraintsChanged";
 NSString* ORiSegHVCardRequestHVMaxValues		= @"ORiSegHVCardRequestHVMaxValues";
 NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged";
 NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafetyAlarmChanged";
+NSString* ORiSegHVCardRequestCustomInfo		    = @"ORiSegHVCardRequestCustomInfo";
+NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChanged";
 
 @implementation ORiSegHVCard
 
@@ -304,6 +306,7 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
         [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardSelectedChannelChanged object:self];
         
         [self requestMaxValues:selectedChannel];
+        [self requestCustomInfo:selectedChannel];
         
     }
 }
@@ -319,6 +322,20 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
         [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRequestHVMaxValues object:self userInfo:userInfo];
     }
 }
+
+- (void) requestCustomInfo:(int)aChannel
+{
+    if([self channelInBounds:aChannel]){
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:[self crateNumber]],      @"crate",
+                                  [NSNumber numberWithInt:[self slot]],             @"card",
+                                  [NSNumber numberWithInt:aChannel],                @"channel",
+                                  nil];
+        [self setCustomInfo:aChannel string:@""]; //assume no request returned
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardRequestCustomInfo object:self userInfo:userInfo];
+    }
+}
+
 
 - (NSString*) getModuleString
 {
@@ -826,7 +843,23 @@ NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafet
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardMaxVoltageChanged object:self];
 	}
 }
+- (NSString*) customInfo:(short)chan
+{
+   	if([self channelInBounds:chan]){
+        if([customInfo[chan] length])return customInfo[chan];
+    }
+    return @"";
+}
 
+- (void) setCustomInfo:(short)chan string:(NSString*)aString
+{
+    if([self channelInBounds:chan]){
+        if([aString length]==0)aString=@"";
+        [customInfo[chan] autorelease];
+        customInfo[chan] = [aString copy];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardCustomInfoChanged object:self];
+    }
+}
 - (int) target:(short)chan
 {
 	if([self channelInBounds:chan])return target[chan];

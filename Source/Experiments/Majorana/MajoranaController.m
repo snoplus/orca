@@ -957,10 +957,12 @@
         else {
             aSegment = [[model segmentGroup:0] segment:rowIndex*2];
             [aSegment setObject:anObject forKey:[aTableColumn identifier]];
-            if([[aTableColumn identifier] isEqualToString:@"kMaxVoltage"]){
+            if([[aTableColumn identifier] isEqualToString:@"kMaxVoltage"] ||
+               [[aTableColumn identifier] isEqualToString:@"kPreAmpDigitizer"] ||
+               [[aTableColumn identifier] isEqualToString:@"kPreAmpChan"]){
                 [self forceHVUpdate:rowIndex*2];
             }
-            [aSegment setObject:[NSNumber numberWithInt:rowIndex] forKey:@"kDetector"];
+           [aSegment setObject:[NSNumber numberWithInt:rowIndex] forKey:@"kDetector"];
             [aSegment setObject:[NSNumber numberWithInt:rowIndex*2] forKey:@"kSegmentNumber"];
           
             aSegment = [[model segmentGroup:0] segment:rowIndex*2+1];
@@ -1017,6 +1019,15 @@
         if([aHVCard slot]        != cardNum) continue;
         [aHVCard setMaxVoltage:chanNum withValue:[[[aSegment params] objectForKey:@"kMaxVoltage"] intValue] ];
         [aHVCard setChan:chanNum name:[[aSegment params] objectForKey:@"kDetectorName"]];
+        
+        id preAmpChan       = [[aSegment params] objectForKey:@"kPreAmpChan"];
+        id preAmpDigitizer  = [[aSegment params] objectForKey:@"kPreAmpDigitizer"];
+        //get here and it's a match
+        if(preAmpChan && preAmpDigitizer){
+            [aHVCard setCustomInfo:chanNum string:[NSString stringWithFormat:@"PreAmp: %d,%d",[preAmpDigitizer intValue],[preAmpChan intValue]]];
+        }
+
+        
         break;
     }
 }

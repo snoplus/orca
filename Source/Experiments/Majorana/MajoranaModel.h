@@ -69,6 +69,7 @@
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem;
 - (id) mjdInterlocks:(int)index;
 - (void) hvInfoRequest:(NSNotification*)aNote;
+- (void) customInfoRequest:(NSNotification*)aNote;
 - (void) setDetectorStringPositions;
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
 

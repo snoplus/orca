@@ -118,6 +118,48 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                      selector : @selector(hvInfoRequest:)
                          name : ORiSegHVCardRequestHVMaxValues
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(customInfoRequest:)
+                         name : ORiSegHVCardRequestCustomInfo
+                       object : nil];
+
+}
+- (void) customInfoRequest:(NSNotification*)aNote
+{
+    if([[aNote object] isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
+        ORiSegHVCard* anHVCard = [aNote object];
+        id userInfo     = [aNote userInfo];
+        int aCrate      = [[userInfo objectForKey:@"crate"]     intValue];
+        int aCard       = [[userInfo objectForKey:@"card"]      intValue];
+        int aChannel    = [[userInfo objectForKey:@"channel"]   intValue];
+        BOOL foundIt    = NO;
+        int aSet;
+        for(aSet =0;aSet<2;aSet++){
+            ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
+            int numSegments = [self numberSegmentsInGroup:aSet];
+            int i;
+            for(i = 0; i<numSegments; i++){
+                NSDictionary* params = [[segmentGroup segment:i]params];
+                if(!params)break;
+                if([[params objectForKey:@"kHVCrate"]intValue] != aCrate)continue;
+                if([[params objectForKey:@"kHVCard"]intValue] != aCard)continue;
+                if([[params objectForKey:@"kHVChan"]intValue] != aChannel)continue;
+                id preAmpChan       = [params objectForKey:@"kPreAmpChan"];
+                id preAmpDigitizer  = [params objectForKey:@"kPreAmpDigitizer"];
+                //get here and it's a match
+                if(preAmpChan && preAmpDigitizer){
+                    [anHVCard setCustomInfo:aChannel string:[NSString stringWithFormat:@"PreAmp: %d,%d",[preAmpDigitizer intValue],[preAmpChan intValue]]];
+                }
+                foundIt = YES;
+                break;
+            }
+        }
+        if(!foundIt){
+            [anHVCard setCustomInfo:aChannel string:@""];
+        }
+    }
+   
 }
 
 - (void) hvInfoRequest:(NSNotification*)aNote
