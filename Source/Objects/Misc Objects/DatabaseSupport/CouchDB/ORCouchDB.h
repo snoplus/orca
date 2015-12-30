@@ -88,7 +88,7 @@
 - (id) send:(NSString*)httpString type:(NSString*)aType;
 - (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody;
 - (NSString*) revision:(NSString*)anID;
-- (NSString*) dataBase;
+- (NSString*) database;
 @property (copy)	NSString*			username;
 @property (copy)	NSString*			pwd;
 
