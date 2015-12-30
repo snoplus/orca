@@ -1445,7 +1445,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) waitForRunToStop
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitForRunToStop) object:nil];
-	
     //wait for runthread to exit
     if(dataTakingThreadRunning){
 		timeToStopTakingData= YES;
@@ -1528,14 +1527,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	//closeout run will wait until the processing thread is done.
 	[nextObject closeOutRun:runInfo];
 	
-	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-		NSLog(@"Run %d stopped.\n",_currentRun);
-	}
-	else {
-		NSLog(@"Offline Run stopped.\n");
-	}
-	NSLog(@"---------------------------------------\n");
-			
 	[self setRunningState:eRunStopped];
 	
 	[dataTypeAssigner release];
@@ -1548,11 +1539,22 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[self undoManager] enableUndoRegistration];
 
     
+    if(![self offlineRun])  NSLog(@"Run %d stopped.\n",[self runNumber]);
+    else                    NSLog(@"Offline Run stopped.\n");
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFlushLogsNotification
+                                                        object: self
+                                                      userInfo: runInfo];
+
+    
 	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
 		[self restartRun];
 	}
+    
+
+
 }
 
 - (void) sendHeartBeat:(NSTimer*)aTimer
