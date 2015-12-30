@@ -97,6 +97,7 @@ static const int currentVersion = 1;           // Current version
     [md5Queue cancelAllOperations];
     [md5Queue release];
     [openFilePath release];
+    [startTime release];
     [super dealloc];
 }
 
@@ -165,6 +166,12 @@ static const int currentVersion = 1;           // Current version
                      selector : @selector(runAboutToStart:)
                          name : ORRunAboutToStartNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(closeOutLogFiles:)
+                         name : ORFlushLogsNotification
+                       object : nil];
+    
     
 }
 
@@ -478,7 +485,8 @@ static const int currentVersion = 1;           // Current version
     runMode = [[userInfo objectForKey:kRunMode] intValue];
     if(runMode == kNormalRun){
         //open file and write headers
-
+        [startTime release];
+        startTime = [[NSDate date] retain];
         [self setFileName:[self formRunName:userInfo]];
 		
         if(fileName){
@@ -586,55 +594,55 @@ static const int currentVersion = 1;           // Current version
         }
     }
     
-    int statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
-    if(runMode == kNormalRun){
-	    //start a copy of the Status File
-	    NSString* statusFileName = [NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]];
-        
-        [statusFolder ensureExists:[statusFolder finalDirectoryName]];
-        NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
-	    NSFileManager* fm = [NSFileManager defaultManager];
-	    [fm createFileAtPath:fullStatusFileName contents:nil attributes:nil];
-	    NSFileHandle* statusFilePointer = [NSFileHandle fileHandleForWritingAtPath:fullStatusFileName];
-	    
-	    NSLog(@"Copied Status to: %@\n",[fullStatusFileName stringByAbbreviatingWithTildeInPath]);
-	    statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
-	    
-	    @try {
-            NSString* text = [[ORStatusController sharedStatusController] substringWithRange:NSMakeRange(statusStart, statusEnd - statusStart)];
-            [statusFilePointer writeData:[text dataUsingEncoding:NSASCIIStringEncoding]];
-		}
-		@catch(NSException* localException) {
-		}
-		
-		@try {
-			[statusFilePointer writeData:[@"\n\n----------------------------------------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
-			[statusFilePointer writeData:[@"------------------Error Summary---------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
-			[statusFilePointer writeData:[@"----------------------------------------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
-			NSString* errorSummary = [[ORStatusController sharedStatusController] errorSummary];
-			if([errorSummary length] == 0){
-				[statusFilePointer writeData:[@"No Errors in Error Log.\n" dataUsingEncoding:NSASCIIStringEncoding]];
-			}
-			else [statusFilePointer writeData:[errorSummary dataUsingEncoding:NSASCIIStringEncoding]];
-		}
-		@catch(NSException* localException) {
-		}
-		
-		[statusFilePointer closeFile];
-		
-		if([statusFolder copyEnabled]){	
-			[statusFolder queueFileForSending:fullStatusFileName];
-		}
-	}
-	statusStart = statusEnd; 
-	
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORDataFileStatusChangedNotification
-	 object: self];
-	
+ 	
 	[openFilePath release];
 	openFilePath = nil;
 	percentFull = 0;
+}
+
+- (void) closeOutLogFiles:(NSNotification*)aNote
+{
+    NSDictionary* userInfo = [aNote userInfo];
+    int statusEnd;
+    if(runMode == kNormalRun){
+        
+        //start a copy of the Status File
+        NSString* statusFileName = [NSString stringWithFormat:@"%@.log",[self formRunName:userInfo]];
+        
+        [statusFolder ensureExists:[statusFolder finalDirectoryName]];
+        NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
+        NSFileManager* fm = [NSFileManager defaultManager];
+        [fm createFileAtPath:fullStatusFileName contents:nil attributes:nil];
+        NSFileHandle* statusFilePointer = [NSFileHandle fileHandleForWritingAtPath:fullStatusFileName];
+        
+        
+        NSLog(@"------------------Error Summary---------------------\n");
+        NSLog(@"%@",[[ORStatusController sharedStatusController] errorSummary]);
+        NSLog(@"----------------------------------------------------\n");
+
+        statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
+                
+        @try {
+           NSString* text = [[ORStatusController sharedStatusController] substringWithRange:NSMakeRange(statusStart, statusEnd - statusStart)];
+            
+            [statusFilePointer writeData:[text dataUsingEncoding:NSASCIIStringEncoding]];
+        }
+        @catch(NSException* localException) {
+        }
+        [statusFilePointer closeFile];
+        
+        if([statusFolder copyEnabled]){
+            NSLog(@"Copied Status to: %@\n",[fullStatusFileName stringByAbbreviatingWithTildeInPath]);
+            [statusFolder queueFileForSending:fullStatusFileName];
+        }
+    }
+    else {
+        statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
+    }
+    statusStart = statusEnd; 
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileStatusChangedNotification object: self];
+
 }
 
 - (void) sendFile:(NSString*)fullFileName
@@ -941,7 +949,10 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	else s = [NSString stringWithFormat:@"Run%@%d",fileSuffix,runNumber];
 	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];
 	if(useDatedFileNames){
-		NSDate* theDate = [NSDate date];
+        NSDate* theDate;
+        if(startTime) theDate = startTime;
+        else          theDate = [NSDate date];
+		theDate = [NSDate date];
 		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
 	}
 	return s;
