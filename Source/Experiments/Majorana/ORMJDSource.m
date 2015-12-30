@@ -586,7 +586,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
         //float kLEDAdcOffset = 1.6; -- old
         float kLEDAdcOffset = 1.0;
         float  ledAdc = [[remoteOpStatus objectForKey:@"LED"]floatValue];
-        if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True;
+        //if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True; --old
+        if((ledAdc - kLEDAdcOffset)<0.2) self.sourceIsIn = kMJDSource_True;
         else                             self.sourceIsIn = kMJDSource_False;
         
         if(oneTimeGVVerbose){
