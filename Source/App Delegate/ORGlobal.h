@@ -138,6 +138,7 @@ extern NSString* ORRequestRunHalt;
 extern NSString* ORRunVetosChanged;
 extern NSString* ORAddRunStateChangeWait;
 extern NSString* ORReleaseRunStateChangeWait;
+extern NSString* ORFlushLogsNotification;
 
 extern NSString* ORHardwareEnvironmentNoisy;
 extern NSString* ORHardwareEnvironmentQuiet;
