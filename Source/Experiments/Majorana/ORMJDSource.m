@@ -571,7 +571,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
        [remoteOpStatus objectForKey:@"LED"]
        ){
  
-        float kGVAdcOffset = 0.3;
+        //float kGVAdcOffset = 0.3; -- old
+        float kGVAdcOffset = 1.0;
         
         float  gvAdc = [[remoteOpStatus objectForKey:@"GV"]floatValue];
         if((gvAdc - kGVAdcOffset)>0.1)  self.gateValveIsOpen = kMJDSource_True;
@@ -582,7 +583,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             }
         }
         
-        float kLEDAdcOffset = 1.6;
+        //float kLEDAdcOffset = 1.6; -- old
+        float kLEDAdcOffset = 1.0;
         float  ledAdc = [[remoteOpStatus objectForKey:@"LED"]floatValue];
         if((ledAdc - kLEDAdcOffset)>0.2) self.sourceIsIn = kMJDSource_True;
         else                             self.sourceIsIn = kMJDSource_False;
@@ -633,7 +635,8 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
 
             if([order length]>=5){
                 if(isRetracting){
-                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBBA"] )||
+                    //if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBBA"] )|| //old...
+                    if(([[order substringFromIndex: [order length] - 5] isEqualToString: @"CCBAB"] )||
                        ([[order substringFromIndex: [order length] - 5] isEqualToString: @"CBCAB" ])){
                         [self setCurrentState:kMJDSource_StopMotion];
                         NSLog(@"Module %d Source fully retracted\n",slot+1);
