@@ -78,7 +78,6 @@
 - (void) scheduleCouchDBUpdate;
 - (void) postToCouchDB;
 - (NSString*) fullID;
-- (NSRecursiveLock*) printLock;
 
 #pragma mark ¥¥¥Data Source Methods
 - (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;
