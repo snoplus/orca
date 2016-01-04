@@ -155,8 +155,7 @@ NSString* otherSystemIP = @"192.168.80.25";
     [nsocket setDelegate:self];
 }
 
-- (void) fireSmelliePulser:(BOOL)button
-{
+- (void) fireSmelliePulser {
     NSString* command=@"smelliepulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", smellieRate];
     NSString* argument2=[NSString stringWithFormat:@" %f", smelliePulseWidth];
@@ -166,17 +165,15 @@ NSString* otherSystemIP = @"192.168.80.25";
     command= [command stringByAppendingString:argument2];
     command= [command stringByAppendingString:argument3];
     command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
+    //[self connectToPort:command];
 }
 
-- (void) stopSmelliePulser:(BOOL)button
-{
+- (void) stopSmelliePulser {
     NSString* command=@"smelliepulser 0 0 0\r\n";
     [self connectToPort:command];
 }
 
-- (void) fireTelliePulser:(BOOL)button
-{
+- (void) fireTelliePulser{
     NSString* command=@"telliepulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", tellieRate];
     NSString* argument2=[NSString stringWithFormat:@" %f", telliePulseWidth];
@@ -186,17 +183,15 @@ NSString* otherSystemIP = @"192.168.80.25";
     command= [command stringByAppendingString:argument2];
     command= [command stringByAppendingString:argument3];
     command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
+    //[self connectToPort:command];
 }
 
-- (void) stopTelliePulser:(BOOL)button
-{
+- (void) stopTelliePulser {
     NSString* command=@"telliepulser 0 0 0\r\n";
     [self connectToPort:command];
 }
 
-- (void) firePulser:(BOOL)button
-{
+- (void) firePulser{
     NSString* command=@"genericpulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", pulserRate];
     NSString* argument2=[NSString stringWithFormat:@" %f", pulseWidth];
@@ -206,44 +201,40 @@ NSString* otherSystemIP = @"192.168.80.25";
     command= [command stringByAppendingString:argument2];
     command= [command stringByAppendingString:argument3];
     command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
+    //[self connectToPort:command];
 }
 
-- (void) stopPulser:(BOOL)button
-{
+- (void) stopPulser {
     NSString* command=@"genericpulser 0 0 0\r\n";
     [self connectToPort:command];
 }
 
-- (void) loadSmellieDelay:(BOOL)button
-{
+- (void) loadSmellieDelay {
     NSString* command=@"smelliedelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", smellieDelay];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument];
     command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
+    //[self connectToPort:command];
 }
 
 
-- (void) loadTellieDelay:(BOOL)button
-{
+- (void) loadTellieDelay {
     NSString* command=@"telliedelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", tellieDelay];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument];
     command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
+    //[self connectToPort:command];
 }
 
-- (void) loadDelay:(BOOL)button
-{
+- (void) loadDelay {
     NSString* command=@"genericdelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", genericDelay];
     NSString* endl=@" \r\n";
     command= [command stringByAppendingString:argument];
     command = [command stringByAppendingString:endl];
-    [self connectToPort:command];
+    //[self connectToPort:command];
 }
 
 - (void) loadTrigMask:(BOOL)button
@@ -259,7 +250,7 @@ NSString* otherSystemIP = @"192.168.80.25";
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 {
-    caenChannelMask=aChannelMask;
+    caenChannelMask = aChannelMask;
     caenGainMask = aGainMask;
 }
 

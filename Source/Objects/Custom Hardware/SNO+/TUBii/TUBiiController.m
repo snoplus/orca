@@ -120,100 +120,51 @@
 }
 
 // GUI actions. CTRL-drag handles from the IB into this file.
-- (IBAction)SmellieFire:(id)sender {
-    NSLog(@"TUBii: SMELLIE pulser ON: %i\n", [sender state]);
-    [model fireSmelliePulser:[sender state]];
-}
-- (IBAction)SmellieStop:(id)sender {
-    NSLog(@"TUBii: SMELLIE pulser STOP: %i\n", [sender state]);
-    [model stopSmelliePulser:[sender state]];
-}
-- (IBAction)TellieFire:(id)sender {
-    NSLog(@"TUBii: TELLIE pulser ON: %i\n", [sender state]);
-    [model fireTelliePulser:[sender state]];
-}
-- (IBAction)TellieStop:(id)sender {
-    NSLog(@"TUBii: TELLIE pulser STOP: %i\n", [sender state]);
-    [model stopTelliePulser:[sender state]];
-}
 - (IBAction)PulserFire:(id)sender {
-    NSLog(@"TUBii: Pulser ON: %i\n", [sender state]);
-    [model firePulser:[sender state]];
+    if ([sender tag] == 1){
+        NSLog(@"TUBii: SMELLIE pulser ON. Rate = %.2f, Width = %.2f, NPulses = %d.\n",[model smellieRate],[model smelliePulseWidth],[model smellieNPulses]);
+        [model fireSmelliePulser];
+    }
+    else if([sender tag] == 2){
+        NSLog(@"TUBii: TELLIE pulser ON. Rate = %.2f, Width = %.2f, NPulses = %d.\n",[model tellieRate],[model telliePulseWidth],[model tellieNPulses]);
+        [model fireTelliePulser];
+    }
+    else if([sender tag] == 3){
+        NSLog(@"TUBii: Generic pulser ON. Rate = %.2f, Width = %.2f, NPulses = %d.\n",[model pulserRate],[model pulseWidth],[model NPulses]);
+        [model firePulser];
+    }
+    return;
 }
 - (IBAction)PulserStop:(id)sender {
-    NSLog(@"TUBii: Pulser STOP: %i\n", [sender state]);
-    [model stopPulser:[sender state]];
-}
-- (IBAction)SmellieRate:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: SMELLIE rate: %f Hz\n",value);
-    [model setSmellieRate:value];
-}
-- (IBAction)SmellieNPulses:(id)sender {
-    int value = [sender intValue];
-    NSLog(@"TUBii: SMELLIE number of pulses: %i\n",value);
-    [model setSmellieNPulses:value];
-}
-- (IBAction)SmelliePulseWidth:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: SMELLIE Pulse width: %f s\n",value);
-    [model setSmelliePulseWidth:value];
-}
-- (IBAction)TellieRate:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: TELLIE rate: %f Hz\n",value);
-    [model setTellieRate:value];
-}
-- (IBAction)TellieNPulses:(id)sender {
-    int value = [sender intValue];
-    NSLog(@"TUBii: TELLIE number of pulses: %i\n",value);
-    [model setTellieNPulses:value];
-}
-- (IBAction)TelliePulseWidth:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: TELLIE Pulse width: %f s\n",value);
-    [model setTelliePulseWidth:value];
-}
-- (IBAction)PulserRate:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: Pulser rate: %f Hz\n",value);
-    [model setPulserRate:value];
-}
-- (IBAction)NPules:(id)sender {
-    int value = [sender intValue];
-    NSLog(@"TUBii: Number of pulses: %i\n",value);
-    [model setNPulses:value];
-}
-- (IBAction)PulseWidth:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: Pulse width: %f s\n",value);
-    [model setPulseWidth:value];
-}
-- (IBAction)SmellieDelay:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: SMELLIE Delay Length: %f ns\n",value);
-    [model setSmellieDelay:value];
-}
-- (IBAction)LoadSmellieDelay:(id)sender {
-    [model loadSmellieDelay:[sender state]];
-}
-- (IBAction)TellieDelay:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: TELLIE Delay Length: %f ns\n",value);
-    [model setTellieDelay:value];
-}
-- (IBAction)LoadTellieDelay:(id)sender {
-    [model loadTellieDelay:[sender state]];
-}
-- (IBAction)DelayLength:(id)sender {
-    float value = [sender floatValue];
-    NSLog(@"TUBii: Delay length: %f ns\n",value);
-    [model setGenericDelay:value];
+    if([sender tag] == 1){
+        NSLog(@"TUBii: SMELLIE pulser STOP\n");
+        [model stopSmelliePulser];
+    }
+    else if([sender tag] == 2){
+        NSLog(@"TUBii: TELLIE pulser STOP\n");
+        [model stopTelliePulser];
+    }
+    else if([sender tag] == 3){
+        NSLog(@"TUBii: Pulser STOP\n");
+        [model stopPulser];
+    }
+    return;
 }
 - (IBAction)LoadDelay:(id)sender {
-    [model loadDelay:[sender state]];
+    if([sender tag] == 1){
+        NSLog(@"TUBii: Smellie delay = %0.2f\n",[model smellieDelay]);
+        [model loadSmellieDelay];
+    }
+    else if([sender tag] == 2){
+        NSLog(@"TUBii: Tellie delay = %0.2f\n",[model tellieDelay]);
+        [model loadTellieDelay];
+    }
+    else if([sender tag] == 3){
+        NSLog(@"TUBii: Generic delay = %0.2f\n",[model genericDelay]);
+        [model loadDelay];
+    }
+    return;
 }
-
 - (IBAction)TrigMaskSet:(id)sender {
 
 }

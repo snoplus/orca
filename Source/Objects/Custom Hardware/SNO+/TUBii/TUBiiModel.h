@@ -121,15 +121,15 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 
 - (void) connectSocket:(BOOL)aFlag;
 - (void) connectToPort:(NSString*)command;
-- (void) fireSmelliePulser:(BOOL)button;
-- (void) fireTelliePulser:(BOOL)button;
-- (void) firePulser:(BOOL)button;
-- (void) stopSmelliePulser:(BOOL)button;
-- (void) stopTelliePulser:(BOOL)button;
-- (void) stopPulser:(BOOL)button;
-- (void) loadSmellieDelay:(BOOL)button;
-- (void) loadTellieDelay:(BOOL)button;
-- (void) loadDelay:(BOOL)button;
+- (void) fireSmelliePulser;
+- (void) fireTelliePulser;
+- (void) firePulser;
+- (void) stopSmelliePulser;
+- (void) stopTelliePulser;
+- (void) stopPulser;
+- (void) loadSmellieDelay;
+- (void) loadTellieDelay;
+- (void) loadDelay;
 - (void) setTrigMask:(unsigned long)trigMask;
 - (void) loadTrigMask:(BOOL)button;
 
