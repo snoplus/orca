@@ -755,7 +755,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
-+(NSNumber*) fetchRecentVersion
+-(NSNumber*) fetchRecentVersion
 {
     /*
      Query smellie config documenets on the smelliedb to find the most recent config versioning
@@ -791,7 +791,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     return currentVersionNumber;
 }
 
-+(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
+-(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
 {
     /*
      Fetch the current configuration document of a given version number.
