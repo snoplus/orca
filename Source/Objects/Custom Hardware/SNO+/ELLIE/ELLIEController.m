@@ -4,6 +4,9 @@
 //
 //  Created by Chris Jones on 01/04/2014.
 //
+//  Revision history:
+//  Ed Leming 04/01/2016 -  Removed global variables to move logic to
+//                          ELLIEModel
 //
 
 #import "ELLIEController.h"
@@ -14,7 +17,6 @@
 
 
 @implementation ELLIEController
-    NSMutableDictionary *laserHeadDic;
     NSMutableDictionary *configForSmellie;
     BOOL *laserHeadSelected;
     BOOL *fibreSwitchOutputSelected;
@@ -34,13 +36,13 @@
     
     //this function operates under the assumption that there is an initial file already in place
     NSNumber *currentConfigurationVersion = [[NSNumber alloc] initWithInt:0];
-    
+        
     //fetch the current version of the smellie configuration
-    currentConfigurationVersion = [self fetchRecentVersion];
+    ELLIEModel* aELLIEModel = [[ELLIEModel alloc] init];
+    currentConfigurationVersion = [aELLIEModel fetchRecentVersion];
     
     //fetch the data associated with the current configuration
-    configForSmellie = [[NSMutableDictionary alloc] initWithCapacity:10];
-    configForSmellie = [[self fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
+    configForSmellie = [[aELLIEModel fetchCurrentConfigurationForVersion:currentConfigurationVersion] mutableCopy];
     
     //increment the current version of the incrementation
     currentConfigurationVersion = [NSNumber numberWithInt:[currentConfigurationVersion intValue] + 1];
@@ -81,18 +83,10 @@
         NSLog(@"CouchDB for ELLIE isn't connected properly. Please reload the ELLIE Gui and check the database connections\n");
         NSLog(@"Reason for error %@ \n",e);
     }
-        
-    //load most recent smellie config file 
-    laserHeadDic = [[NSMutableDictionary alloc] initWithCapacity:100];
-        
-    //NSMutableDictionary *smellieRunInfo = [[NSMutableDictionary alloc] init];
-    //NSLog(@"Value of smellie %@",[smellieRunInfo objectForKey:@"run_name"]);
-    //[smellieRunName release];
-    
+
     /*Setting up TELLIE GUI */
     [self initialiseTellie];
-
-
+    
     return self;
 }
 
@@ -928,68 +922,6 @@
         NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
     }
 
-}
-
-
--(NSNumber*) fetchRecentVersion
-{
-    
-    //Collect a series of objects from the SNOPModel
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    
-    //Initialise the SNOPModel
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/fetchMostRecentConfigVersion?descending=True&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSNumber *currentVersionNumber;
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        @try{
-            //format the json response
-            NSString *stringValueOfCurrentVersion = [NSString stringWithFormat:@"%@",[[[json valueForKey:@"rows"] valueForKey:@"value"]objectAtIndex:0]];
-            currentVersionNumber = [NSNumber numberWithInt:[stringValueOfCurrentVersion intValue]];
-            //NSLog(@"parsedNumber%@",currentVersionNumber);
-            //NSLog(@"parsedString %@",stringValueOfCurrentVersion);
-            //NSLog(@"valueforkey2=%@", [[json valueForKey:@"rows"] valueForKey:@"value"]);
-        }
-        @catch (NSException *e) {
-            NSLog(@"Error in fetching the SMELLIE CONFIGURATION FILE: %@ . Please fix this before changing the configuration file",e);
-        }
-    }
-    else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-
-    return currentVersionNumber;
-}
-
--(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
-{
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    SNOPModel* aSnotModel = [objs objectAtIndex:0];
-    //NSDictionary* currentConfig;
-    
-    NSString *urlString = [NSString stringWithFormat:@"http://%@:%u/smellie/_design/smellieMainQuery/_view/pullEllieConfigHeaders?key=[%i]&limit=1",[aSnotModel orcaDBIPAddress],[aSnotModel orcaDBPort],[currentVersion intValue]];
-    
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSData *data = [NSData dataWithContentsOfURL:url];
-    NSString *ret = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSError *error =  nil;
-    NSMutableDictionary *currentConfig = [NSJSONSerialization JSONObjectWithData:[ret dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    if(!error){
-        NSLog(@"sucessful query with config version %i\n",[currentVersion intValue]);
-
-    }
-    else{
-        NSLog(@"Error querying couchDB, please check the connection is correct %@",error);
-    }
-
-    [ret release];
-    return [[[[currentConfig objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"] objectForKey:@"configuration_info"];
 }
 
 //Submit Smellie configuration file to the Database

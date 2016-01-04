@@ -77,6 +77,8 @@
 -(void) testFunction;
 -(void) setLaserFrequency20Mhz;
 -(void) fetchSmellieConfigurationInformation;
+-(NSNumber*) fetchRecentVersion;
+-(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion;
 
 //TELLIE Control Functions
 -(void) pollTellieFibre;

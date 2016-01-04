@@ -116,7 +116,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     /* 
      Start run using run control object and push initial TELLIE run doc to telliedb.
      
-    Possible additions:
+     Possible additions:
         Use SNOPModel to check if tellie run type is masked in
      */
     
@@ -135,7 +135,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 {
     /*
      Use run control object to stop a tellie run.
-     */
+    */
     
     //add run control object
     NSArray*  runControlObjsArray = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -149,8 +149,8 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) pollTellieFibre
 {
     /*
-    Poll the TELLIE hardware using an XMLRPC server and requests the response from the
-    hardware.
+     Poll the TELLIE hardware using an XMLRPC server and requests the response from the
+     hardware.
     */
     
     NSString* responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_readout_script.py" withCmdLineArgs:nil];
@@ -238,7 +238,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
 -(void) stopTellieFibre:(NSArray*)fireCommands
 {
     /*
-        Call tellie stop script. The script itself is stored on the DAQ1 machine.
+     Call tellie stop script. The script itself is stored on the DAQ1 machine.
     */
     NSString *responseFromTellie =[self callPythonScript:@"/Users/snotdaq/Desktop/orca-python/tellie/tellie_stop_script.py" withCmdLineArgs:nil];
     NSLog(@"Response from Tellie: %@\n",responseFromTellie);
@@ -755,7 +755,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     [runControl performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
--(NSNumber*) fetchRecentVersion
++(NSNumber*) fetchRecentVersion
 {
     /*
      Query smellie config documenets on the smelliedb to find the most recent config versioning
@@ -791,7 +791,7 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     return currentVersionNumber;
 }
 
--(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
++(NSMutableDictionary*) fetchCurrentConfigurationForVersion:(NSNumber*)currentVersion
 {
     /*
      Fetch the current configuration document of a given version number.
