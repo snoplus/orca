@@ -138,4 +138,6 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 
+- (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:aLOMask;
+
 @end

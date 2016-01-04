@@ -452,9 +452,8 @@
     float LO_Delay = [LO_Field floatValue];
     float DGT_Delay = [DGT_Field floatValue];
     CONTROL_REG_MASK ControlReg;
-    [model setLOBits:[self ConvertValueToBits:LO_Delay NBits:8 MinVal:0 MaxVal:1275]];
-    [model setDGTBits:[self ConvertValueToBits:DGT_Delay NBits:8 MinVal:0 MaxVal:510]];
-
+    [model setGTDelaysBits: [self ConvertValueToBits:DGT_Delay NBits:8 MinVal:0 MaxVal:510]
+                    LOBits: [self ConvertValueToBits:LO_Delay NBits:8 MinVal:0 MaxVal:1275]];
     if([[LO_SrcSelect selectedCell] tag] ==1){
         ControlReg = [model controlReg] | lockoutSel_Bit;
     }

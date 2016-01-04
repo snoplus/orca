@@ -31,8 +31,6 @@ NSString* otherSystemIP = @"192.168.80.25";
 @synthesize smellieDelay;
 @synthesize tellieDelay;
 @synthesize genericDelay;
-@synthesize DGTBits;
-@synthesize LOBits;
 @synthesize speakerMask;
 @synthesize counterMask;
 @synthesize controlReg;
@@ -84,9 +82,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     
     return self;
 }
-
-
-
 
 - (void) sendCmd:(NSString*)aCmd
 {
@@ -276,5 +271,15 @@ NSString* otherSystemIP = @"192.168.80.25";
 -(CAEN_GAIN_MASK) caenGainMask
 {
     return caenGainMask;
+}
+- (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(id)aLOMask {
+    DGTBits = aDGTMask;
+    LOBits = aLOMask;
+}
+- (NSUInteger) DGTBits{
+    return DGTBits;
+}
+- (NSUInteger) LOBits{
+    return LOBits;
 }
 @end
