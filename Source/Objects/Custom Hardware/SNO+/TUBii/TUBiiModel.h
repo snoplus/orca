@@ -110,10 +110,10 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) float tellieDelay;
 @property (nonatomic) float genericDelay;
 @property (nonatomic) unsigned long trigMask;
-@property (nonatomic) CAEN_CHANNEL_MASK caenChannelMask;
-@property (nonatomic) CAEN_GAIN_MASK caenGainMask;
-@property (nonatomic) NSUInteger DGTBits;
-@property (nonatomic) NSUInteger LOBits;
+@property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
+@property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
+@property (nonatomic,readonly) NSUInteger DGTBits;
+@property (nonatomic,readonly) NSUInteger LOBits;
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
 @property (nonatomic) CONTROL_REG_MASK controlReg;
@@ -133,8 +133,6 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (void) setTrigMask:(unsigned long)trigMask;
 - (void) loadTrigMask:(BOOL)button;
 
-- (CAEN_CHANNEL_MASK) caenChannelMask;
-- (CAEN_GAIN_MASK) caenGainMask;
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 
