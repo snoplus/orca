@@ -36,7 +36,7 @@ NSString* otherSystemIP = @"192.168.80.25";
 @synthesize speakerMask;
 @synthesize counterMask;
 @synthesize controlReg;
-
+@synthesize forcedUpdates;
 
 - (void) setUpImage
 {
@@ -79,6 +79,8 @@ NSString* otherSystemIP = @"192.168.80.25";
     LO_DelayLength = 0;
     DGT_DelayLength = 0;
     strHostName="192.168.80.25";
+    nsocket = [[NetSocket alloc] init];
+    forcedUpdates = [[NSNumber alloc]initWithBool:NO];
     
     return self;
 }

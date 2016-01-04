@@ -33,6 +33,11 @@
 @synthesize CounterMaskSelect_1;
 @synthesize CounterMaskSelect_2;
 @synthesize CounterMaskField;
+@synthesize CounterAdvancedOptionsBox;
+@synthesize CounterMaskSelectBox;
+@synthesize CounterLZBSelect;
+@synthesize CounterTestModeSelect;
+@synthesize CounterInhibitSelect;
 
 @synthesize LO_Field;
 @synthesize DGT_Field;
@@ -67,6 +72,7 @@
     maskVal = [self GetBitInfoFromCheckBoxes:CounterMaskSelect_1 FromBit:0 ToBit:16];
     maskVal |= [self GetBitInfoFromCheckBoxes:CounterMaskSelect_2 FromBit:16 ToBit:22];
     [CounterMaskField setStringValue:[NSString stringWithFormat:@"%i",maskVal]];
+    [CounterAdvancedOptionsBox setHidden:YES];
 
     [self CaenMatchHardware:(self)];
     [[self caenChannelSelect_3] setEnabled:NO];//Not working on board
@@ -310,6 +316,13 @@
     [self SendBitInfo:maskVal FromBit:0 ToBit:16 ToCheckBoxes:maskSelect_1];
     [self SendBitInfo:maskVal FromBit:16 ToBit:22 ToCheckBoxes:maskSelect_2];
 }
+- (IBAction)CounterMatchHardware:(id)sender {
+    [self SpeakerMatchHardware:sender];
+    CONTROL_REG_MASK ControlRegVal = [model controlReg];
+    [CounterLZBSelect setState: ControlRegVal & scalerLZB_Bit > 0 ? 1:0 ];
+    [CounterTestModeSelect setState: ControlRegVal & scalerT_Bit > 0 ? 1:0 ];
+    [CounterInhibitSelect setState: ControlRegVal & scalerI_Bit > 0 ? 1:0 ];
+}
 - (IBAction)SpeakerLoadMask:(id)sender {
     NSUInteger maskVal=0;
     NSMatrix *maskSelect_1 =nil;
@@ -336,6 +349,15 @@
         [model setCounterMask:maskVal];
     }
 
+}
+- (IBAction)CounterLoadMask:(id)sender{
+    [self SpeakerLoadMask:sender];
+    CONTROL_REG_MASK newControlReg = [model controlReg];
+    newControlReg =  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
+    newControlReg |=  [CounterTestModeSelect intValue] ==1 ? scalerT_Bit : 0;
+    newControlReg |=  [CounterInhibitSelect intValue] ==1 ? scalerI_Bit : 0;
+    NSLog(@"New Control Reg Value = %d",newControlReg);
+    [model setControlReg:newControlReg];
 }
 - (IBAction)SpeakerCheckBoxChanged:(id)sender {
     NSUInteger maskVal = [self GetBitInfoFromCheckBoxes:SpeakerMaskSelect_1 FromBit:0 ToBit:16];
@@ -410,6 +432,21 @@
 
     [maskField setStringValue:[NSString stringWithFormat:@"%i",0]];
 }
+- (IBAction)AdvancedOptionsButtonChanged:(id)sender{
+    if([sender state] == NSOffState){
+        [CounterAdvancedOptionsBox setHidden:YES];
+        [self resizeWindowToSize:SpeakerCounter_size];
+    }
+    else{
+        [CounterAdvancedOptionsBox setHidden:NO];
+        NSSize newSize = SpeakerCounter_size;
+        newSize.height += 100;
+        if(self.window.frame.size.height < newSize.height){
+            [self resizeWindowToSize:newSize];
+        }
+    }
+}
+
 
 - (IBAction)GTDelaysLoadMask:(id)sender{
     float LO_Delay = [LO_Field floatValue];

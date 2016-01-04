@@ -94,6 +94,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     unsigned long portNumber;
     int	connectState;
     char* strHostName;//="192.168.80.25";
+    NSNumber *forcedUpdates;
 }
 
 @property (nonatomic) float smellieRate;
@@ -116,6 +117,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) NSUInteger speakerMask;
 @property (nonatomic) NSUInteger counterMask;
 @property (nonatomic) CONTROL_REG_MASK controlReg;
+@property (assign,nonatomic) NSNumber *forcedUpdates;
 
 - (void) connectSocket:(BOOL)aFlag;
 - (void) connectToPort:(NSString*)command;
