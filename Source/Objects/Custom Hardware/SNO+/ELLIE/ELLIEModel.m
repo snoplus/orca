@@ -998,14 +998,18 @@ smellieDBReadInProgress = _smellieDBReadInProgress;
     runControl = [objs3 objectAtIndex:0];
     
     //Save the current settings of the detector
-    currentOrcaSettingsForSmellie  = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* tmpCurrentOrcaSettingsForSmellie  = [[NSMutableDictionary alloc] init];
     NSLog(@"SMELLIE_RUN:Mtcd coarse delay set to %f ns\n",[theMTCModel dbFloatByIndex:kCoarseDelay]);
     NSNumber * mtcCoarseDelay = [NSNumber numberWithUnsignedLong:[theMTCModel dbFloatByIndex:kCoarseDelay]];
-    [currentOrcaSettingsForSmellie setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
+    [tmpCurrentOrcaSettingsForSmellie setObject:mtcCoarseDelay forKey:@"mtcd_coarse_delay"];
     
     NSLog(@"SMELLIE_RUN:Mtcd pulser rate set to %f Hz\n",[theMTCModel dbFloatByIndex:kPulserPeriod]);
     NSNumber * mtcPulserPeriod = [NSNumber numberWithFloat:[theMTCModel dbFloatByIndex:kPulserPeriod]];
-    [currentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
+    [tmpCurrentOrcaSettingsForSmellie setObject:mtcPulserPeriod forKey:@"mtcd_pulser_period"];
+    
+    //Set property variable and delete tmpVar.
+    self.currentOrcaSettingsForSmellie = tmpCurrentOrcaSettingsForSmellie;
+    [tmpCurrentOrcaSettingsForSmellie release];
     
     //Set the Mtcd for smellie settings
     //NSLog(@"SMELLIE_RUN:Setting the mtcd coarse delay to 900ns \n",[[NSNumber numberWithUnsignedShort:900] unsignedShortValue]);
