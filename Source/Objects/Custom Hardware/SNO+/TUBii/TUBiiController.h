@@ -42,6 +42,11 @@
     NSMatrix *CounterMaskSelect_1;
     NSMatrix *CounterMaskSelect_2;
     NSTextField *CounterMaskField;
+    NSBox *CounterAdvancedOptionsBox;
+    NSBox *CounterMaskSelectBox;
+    NSButton *CounterLZBSelect;
+    NSButton *CounterTestModeSelect;
+    NSButton *CounterInhibitSelect;
     
     NSTextField *DGT_Field;
     NSTextField *LO_Field;
@@ -75,6 +80,12 @@
 @property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_1;
 @property (assign,weak) IBOutlet NSMatrix *CounterMaskSelect_2;
 @property (assign,weak) IBOutlet NSTextField *CounterMaskField;
+@property (assign,weak) IBOutlet NSBox *CounterAdvancedOptionsBox;
+@property (assign,weak) IBOutlet NSBox *CounterMaskSelectBox;
+@property (assign,weak) IBOutlet NSButton *CounterLZBSelect;
+@property (assign,weak) IBOutlet NSButton *CounterTestModeSelect;
+@property (assign,weak) IBOutlet NSButton *CounterInhibitSelect;
+
 @property (assign,weak) IBOutlet NSTextField *DGT_Field;
 @property (assign,weak) IBOutlet NSSlider *LO_Slider;
 @property (assign,weak) IBOutlet NSSlider *DGT_Slider;
@@ -92,7 +103,9 @@
 - (IBAction)CaenLoadMask:(id)sender;
 
 - (IBAction)SpeakerMatchHardware:(id)sender;
+- (IBAction)CounterMatchHardware:(id)sender;
 - (IBAction)SpeakerLoadMask:(id)sender;
+- (IBAction)CounterLoadMask:(id)sender;
 - (IBAction)SpeakerCheckBoxChanged:(id)sender;
 - (IBAction)SpeakerFieldChanged:(id)sender;
 - (IBAction)SpeakerCounterCheckAll:(id)sender;
@@ -100,6 +113,7 @@
 
 - (IBAction)CounterCheckBoxChanged:(id)sender;
 - (IBAction)CounterFieldChanged:(id)sender;
+- (IBAction)AdvancedOptionsButtonChanged:(id)sender;
 
 - (IBAction)GTDelaysMatchHardware:(id)sender;
 - (IBAction)GTDelaysLoadMask:(id)sender;
