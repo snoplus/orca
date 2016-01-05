@@ -952,7 +952,6 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
         NSDate* theDate;
         if(startTime) theDate = startTime;
         else          theDate = [NSDate date];
-		theDate = [NSDate date];
 		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
 	}
 	return s;
