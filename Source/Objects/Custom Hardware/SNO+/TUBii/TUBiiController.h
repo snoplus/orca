@@ -120,6 +120,7 @@
 - (IBAction)LOSrcSelectChanged:(id)sender;
 - (IBAction)LODelayLengthTextFieldChagned:(id)sender;
 - (IBAction)LODelayLengthSliderChagned:(id)sender;
+- (IBAction)ResetClock:(id)sender;
 
 
 

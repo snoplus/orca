@@ -45,17 +45,17 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="320" width="747" height="712"/>
+            <rect key="contentRect" x="196" y="320" width="621" height="635"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <view key="contentView" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="747" height="712"/>
+                <rect key="frame" x="0.0" y="0.0" width="621" height="635"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView fixedFrame="YES" controlSize="small" translatesAutoresizingMaskIntoConstraints="NO" id="6do-sA-qTS">
-                        <rect key="frame" x="13" y="19" width="595" height="696"/>
+                        <rect key="frame" x="13" y="-58" width="595" height="696"/>
                         <tabViewItems>
                             <tabViewItem label="Pulsers &amp; Delays" identifier="1" id="8WF-ET-0MY">
-                                <view key="view" ambiguous="YES" id="cdC-ig-bsI">
+                                <view key="view" id="cdC-ig-bsI">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -710,7 +710,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
-                                <view key="view" id="tgY-du-t2x">
+                                <view key="view" ambiguous="YES" id="tgY-du-t2x">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -817,7 +817,7 @@
                                         <matrix verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iur-DA-0o0">
                                             <rect key="frame" x="47" y="336" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="89" height="18"/>
+                                            <size key="cellSize" width="66.433943089430898" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" inset="2" id="3zt-51-xz5">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -2065,10 +2065,14 @@
                                         </matrix>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q5h-u3-mbU">
                                             <rect key="frame" x="219" y="580" width="115" height="32"/>
+                                            <string key="toolTip">Resets the TUBii clock monitoring system. Clicking this will temporarily kill the 100Mhz clock, do not click unless you know what you're doing.</string>
                                             <buttonCell key="cell" type="push" title="Reset Clock" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tfR-Ix-MHL">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="ResetClock:" target="-2" id="JIq-Au-eit"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                 </view>
@@ -2080,7 +2084,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
             </connections>
-            <point key="canvasLocation" x="409.5" y="341"/>
+            <point key="canvasLocation" x="346.5" y="302.5"/>
         </window>
     </objects>
 </document>
