@@ -195,6 +195,12 @@
                          name : ORiSegHVCardChanNameChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(doNotPostSafetyLoopAlarmChanged:)
+                         name : ORiSegHVCardDoNotPostSafetyAlarmChanged
+                        object: model];
+    
+    
 }
 
 - (void) updateWindow
@@ -212,10 +218,16 @@
 	[self shipRecordsChanged:nil];
 	[self constraintsChanged:nil];
 	[self maxVoltageChanged:nil];
-	[self chanNameChanged:nil];
+    [self chanNameChanged:nil];
+    [self doNotPostSafetyLoopAlarmChanged:nil];
 }
 
 #pragma mark •••Interface Management
+- (void) doNotPostSafetyLoopAlarmChanged:(NSNotification*)aNote
+{
+    [doNotPostSafetyLoopAlarmCB setIntValue:[model doNotPostSafetyLoopAlarm]];
+}
+
 - (void) maxVoltageChanged:(NSNotification*)aNote
 {
     [maxVoltageField setStringValue:[NSString stringWithFormat:@"Max: %d",[model maxVoltage:[model selectedChannel]]]];
@@ -741,6 +753,11 @@
     [model clearModule];
 }
 
+- (IBAction) doNotPostSafetyLoopAlarmAction:(id)sender
+{
+    [model setDoNotPostSafetyLoopAlarm:[sender intValue]];
+}
+
 #pragma mark •••Actions for All
 - (IBAction) powerAllOnAction:(id)sender
 {
@@ -798,7 +815,7 @@
 		s2 = @"Really Turn OFF ALL Channels?";
 	}
 	else {
-		s1 = [NSString stringWithFormat:@"Turn ON %d Channel%@",numberOnChannels,numberOnChannels>1?@"s":@""];
+		s1 = [NSString stringWithFormat:@"Turn OFF %d Channel%@",numberOnChannels,numberOnChannels>1?@"s":@""];
 		s2 = [NSString stringWithFormat:@"Really Turn OFF %d Channel%@ (%d Channel%@ already OFF)",
 			  numberOnChannels,
 			  numberOnChannels>1?@"s":@"",

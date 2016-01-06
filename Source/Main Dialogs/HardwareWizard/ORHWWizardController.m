@@ -142,10 +142,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [self securityStateChanged:nil];
     [self actionChanged:nil];
     
+    [actionTableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
     [actionTableView setAllowsMultipleSelection:NO];
-    [actionTableView setAllowsEmptySelection:YES];
+    
+    [selectionTableView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
     [selectionTableView setAllowsMultipleSelection:NO];
-    [selectionTableView setAllowsEmptySelection:YES];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -1063,7 +1064,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     //fill with nil objects at start, will fill in below.
     NSArray* containers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:containerClass]; 
     [self setControlArray:[NSMutableArray array]];
-    for(i=0;i<MAX([containerSelection maxValue],[containers count]);i++){
+    int maxContainerTag = 0;
+    for( id containerObj in containers){
+        if([containerObj stationNumber]>maxContainerTag){
+            maxContainerTag = [containerObj stationNumber];
+        }
+    }
+    
+    for(i=0;i<maxContainerTag+1;i++){
         [controlArray addObject:[NSNull null]];
     }
     if(![controlArray count]){
@@ -1072,9 +1080,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     
     if([containers count]){
         
-        NSEnumerator* e = [containers objectEnumerator];
-        id containerObj;
-        while( containerObj = [e nextObject]){
+        for(id containerObj in containers){
             int containerTag = [containerObj stationNumber];
             [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
 			//set up this container's objects

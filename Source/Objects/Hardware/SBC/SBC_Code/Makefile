@@ -27,7 +27,7 @@ $(TARGET): $(OBJECTS)
 
 
 clean :
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET) *.o .depend
 
 #ifneq ($(MAKECMDGOALS), clean)
 -include .depend

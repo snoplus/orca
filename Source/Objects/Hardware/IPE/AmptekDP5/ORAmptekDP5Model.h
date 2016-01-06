@@ -55,8 +55,6 @@ typedef struct AmptekDP5ASCIICommandsStruct {
 	int 	        init;
 	NSString*       comment;
 	int				id;
-    BOOL autoReadbackSetpoint;
-    BOOL dropFirstSpectrum;
 } AmptekDP5ASCIICommandsStruct; 
 
 enum AmptekDP5ASCIICommandEnum {
@@ -310,6 +308,10 @@ enum AmptekDP5ASCIICommandEnum {
     BOOL useCommandQueue;
     BOOL dropFirstSpectrum;
     BOOL autoReadbackSetpoint;
+    int acquisitionTime;
+    int realTime;
+    int fastCounter;
+    int slowCounter;
     
     BOOL needToDropFirstSpectrum;
 
@@ -334,10 +336,16 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) queueStringCommand:(NSString*)aCommand;
 
 #pragma mark ‚Äö√Ñ¬¢‚Äö√Ñ¬¢‚Äö√Ñ¬¢Accessors
+- (int) slowCounter;
+- (void) setSlowCounter:(int)aSlowCounter;
+- (int) fastCounter;
+- (void) setFastCounter:(int)aFastCounter;
+- (int) realTime;
+- (void) setRealTime:(int)aRealTime;
+- (int) acquisitionTime;
+- (void) setAcquisitionTime:(int)aAcquisitionTime;
 - (BOOL) dropFirstSpectrum;
 - (void) setDropFirstSpectrum:(BOOL)aDropFirstSpectrum;
-- (BOOL) autoReadbackSetpoint;
-- (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aLastRequest;
 //- (NSData*) lastRequest;
@@ -366,10 +374,21 @@ enum AmptekDP5ASCIICommandEnum {
 - (void) commonScriptMethodSectionBegin;
 
 //Scripts really shouldn't call any other methods unless you -REALLY- know what you're doing!
+- (int) spectrumRequestRate;
+- (void) setSpectrumRequestRate:(int)aSpectrumRequestRate;
+- (int) spectrumRequestType;
+- (void) setSpectrumRequestType:(int)aSpectrumRequestType;
+
 - (BOOL) loadCommandTableFile:(NSString*) filename;
-- (BOOL) saveAsCommandTableFile:(NSString*) filename;
+- (BOOL) saveAsCommandTableFile:(NSString*) filename; 
+- (BOOL) autoReadbackSetpoint;
+- (void) setAutoReadbackSetpoint:(BOOL)aAutoReadbackSetpoint;
+
+
 
 - (void) commonScriptMethodSectionEnd;
+
+//-------------end of common script methods---------------------------------
 
 //dont use in scripts:
 
@@ -377,10 +396,6 @@ enum AmptekDP5ASCIICommandEnum {
 - (int) isPollingSpectrum;
 - (void) setIsPollingSpectrum:(int)aIsPollingSpectrum;
 - (void) requestSpectrumTimedWorker;
-- (int) spectrumRequestRate;
-- (void) setSpectrumRequestRate:(int)aSpectrumRequestRate;
-- (int) spectrumRequestType;
-- (void) setSpectrumRequestType:(int)aSpectrumRequestType;
 - (int) numSpectrumBins;
 - (void) setNumSpectrumBins:(int)aNumSpectrumBins;
 - (NSString*) textCommand;
@@ -717,6 +732,10 @@ enum AmptekDP5ASCIICommandEnum {
 
 @end
 
+extern NSString* ORAmptekDP5ModelSlowCounterChanged;
+extern NSString* ORAmptekDP5ModelFastCounterChanged;
+extern NSString* ORAmptekDP5ModelRealTimeChanged;
+extern NSString* ORAmptekDP5ModelAcquisitionTimeChanged;
 extern NSString* ORAmptekDP5ModelDropFirstSpectrumChanged;
 extern NSString* ORAmptekDP5ModelAutoReadbackSetpointChanged;
 extern NSString* ORAmptekDP5ModelCommandTableChanged;

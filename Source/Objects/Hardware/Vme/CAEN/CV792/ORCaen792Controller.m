@@ -111,9 +111,18 @@
                          name : ORCaen792ModelTotalCycleZTimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipTimeStampChanged:)
+                         name : ORCaen792ModelShipTimeStampChanged
+                        object: model];
+    
 }
 
 #pragma mark ***Interface Management
+- (void) shipTimeStampChanged:(NSNotification*)aNote
+{
+    [shipTimeStampCB setIntValue: [model shipTimeStamp]];
+}
 
 - (void) totalCycleZTimeChanged:(NSNotification*)aNote
 {
@@ -147,6 +156,7 @@
 	[self cycleZeroSuppressionChanged:nil];
 	[self percentZeroOffChanged:nil];
 	[self totalCycleZTimeChanged:nil];
+    [self shipTimeStampChanged:nil];
 }
 
 - (void) useHWResetChanged:(NSNotification*)aNote
@@ -297,7 +307,6 @@
     [model setUseHWReset:[sender intValue]];
 }
 
-
 - (IBAction) slidingScaleEnableAction:(id)sender
 {
 	[model setSlidingScaleEnable:[[sender selectedCell]tag]];
@@ -327,12 +336,12 @@
     [model initBoard];
 }
 
-- (void) iPedAction:(id)sender
+- (IBAction) iPedAction:(id)sender
 {
 	[model setIPed:[sender intValue]];	
 }
 
-- (void) modelTypePUAction:(id)sender
+- (IBAction) modelTypePUAction:(id)sender
 {
 	[model setModelType:[sender indexOfSelectedItem]];
 }
@@ -351,6 +360,10 @@
 - (IBAction) setToDefaults:(id) sender
 {
     [model setToDefaults];
+}
+- (IBAction) shipTimeStampAction:(id)sender
+{
+    [model setShipTimeStamp:[sender intValue]];
 }
 
 @end

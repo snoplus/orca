@@ -23,6 +23,7 @@
 @class ORSerialPortController;
 @class ORPlotView;
 @class ORLongTermView;
+@class ORCompositeTimeLineView;
 
 @interface ORMotionNodeController : OrcaObjectController 
 {
@@ -33,7 +34,9 @@
 	IBOutlet NSButton*		shipExcursionsCB;
 	IBOutlet NSSlider*		shipThresholdSlider;
 	IBOutlet NSTextField*	shipThresholdField;
-	IBOutlet NSButton*		autoStartCB;
+    IBOutlet NSButton*		keepHistoryCB;
+    IBOutlet NSButton*		autoStartCB;
+    IBOutlet NSButton*		autoStartWithOrcaCB;
 	IBOutlet NSButton*		showLongTermDeltaCB;
 	IBOutlet NSTextField*   startTimeField;
 	IBOutlet NSButton*		showDeltaFromAveCB;
@@ -53,6 +56,15 @@
 	IBOutlet ORLongTermView*	longTermView;
 	IBOutlet NSSlider*		sensitivitySlider;
 	IBOutlet NSTextField*	sensitivityField;
+    
+    IBOutlet NSTextField*   historyFolderField;
+    IBOutlet NSButton*      setHistoryFolderButton;
+    IBOutlet NSButton*      viewPastHistoryButton;
+    IBOutlet ORCompositeTimeLineView*   plotter0;
+    
+    //some cached values
+    NSTimeInterval deltaTime;
+    NSTimeInterval oldHistoryStartTime;
 }
 
 #pragma mark ***Interface Management
@@ -61,7 +73,9 @@
 - (void) outOfBandChanged:(NSNotification*)aNote;
 - (void) shipExcursionsChanged:(NSNotification*)aNote;
 - (void) shipThresholdChanged:(NSNotification*)aNote;
+- (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) autoStartChanged:(NSNotification*)aNote;
+- (void) autoStartWithOrcaChanged:(NSNotification*)aNote;
 - (void) showLongTermDeltaChanged:(NSNotification*)aNote;
 - (void) longTermSensitivityChanged:(NSNotification*)aNote;
 - (void) startTimeChanged:(NSNotification*)aNote;
@@ -78,11 +92,14 @@
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) dispayComponentsChanged:(NSNotification*)aNote;
 - (void) updateLongTermView:(NSNotification*)aNote;
+- (void) updateHistoryPlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) shipExcursionsAction:(id)sender;
 - (IBAction) shipThresholdAction:(id)sender;
+- (IBAction) keepHistoryAction:(id)sender;
 - (IBAction) autoStartAction:(id)sender;
+- (IBAction) autoStartWithOrcaAction:(id)sender;
 - (IBAction) showLongTermDeltaAction:(id)sender;
 - (IBAction) longTermSensitivityAction:(id)sender;
 - (IBAction) showDeltaFromAveAction:(id)sender;
@@ -92,6 +109,8 @@
 - (IBAction) start:(id)sender;
 - (IBAction) stop:(id)sender;
 - (IBAction) displayComponentsAction:(id)sender;
+- (IBAction) viewPastHistoryAction:(id)sender;
+- (IBAction) setHistoryFolderAction:(id)sender;
 
 - (int) maxLinesInLongTermView:(id)aLongTermView;
 - (int) startingLineInLongTermView:(id)aLongTermView;

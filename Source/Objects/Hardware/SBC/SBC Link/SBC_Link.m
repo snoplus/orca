@@ -2379,7 +2379,9 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
 	//Note there are NO locks on this method, but it is private and can only be called from this object. Care must
 	//be taken that thread locks are provided at a higher level.
-	aPacket->message[0] = '\0';
+    if (!(aPacket->cmdHeader.destination == kSBC_Command && aPacket->cmdHeader.cmdID == kSBC_GenericJob )) {
+        aPacket->message[0] = '\0';
+    }
 	if(!aSocket)	[NSException raise:@"Write Error" format:@"SBC Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
 	
 	

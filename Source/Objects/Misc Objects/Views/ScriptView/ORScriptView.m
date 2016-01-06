@@ -340,7 +340,11 @@
 {
     NSPasteboard *pb = [sender draggingPasteboard];
     NSString* s = [pb stringForType:NSStringPboardType];
-	[self insertText:s];
+	//[self insertText:s];
+    NSRange insertRange = [self selectedRange];
+    if(insertRange.location != NSNotFound){
+        [self insertText:s replacementRange:insertRange];
+    }
 	return YES;
 }
 

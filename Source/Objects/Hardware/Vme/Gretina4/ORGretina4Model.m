@@ -2386,6 +2386,7 @@ static struct {
     configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[3]	= 0x0B; // fifoAM
     configStruct->card_info[index].deviceSpecificData[4]	= 0x1FFFF; // size of FIFO
+    configStruct->card_info[index].deviceSpecificData[5]	= location; // crate,card,serial
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

@@ -36,6 +36,7 @@
 	IBOutlet NSTextField*   iPedField;
     IBOutlet NSMatrix*      onlineMaskMatrixA;
     IBOutlet NSMatrix*      onlineMaskMatrixB;
+    IBOutlet NSButton*      shipTimeStampCB;
 }
 
 #pragma mark ***Initialization
@@ -45,6 +46,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) shipTimeStampChanged:(NSNotification*)aNote;
 - (void) useHWResetChanged:(NSNotification*)aNote;
 - (void) totalCycleZTimeChanged:(NSNotification*)aNote;
 - (void) percentZeroOffChanged:(NSNotification*)aNote;
@@ -64,6 +66,7 @@
 
 
 #pragma mark ***Actions
+- (IBAction) shipTimeStampAction:(id)sender;
 - (IBAction) useHWResetAction:(id)sender;
 - (IBAction) totalCycleZTimeAction:(id)sender;
 - (IBAction) percentZeroOffAction:(id)sender;

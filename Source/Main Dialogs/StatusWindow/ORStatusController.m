@@ -510,13 +510,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (IBAction) insertDate:(id)sender
 {
 	NSString* theDate = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm"];
-	[logBookField insertText:theDate];
+    
+    [logBookField insertText:theDate replacementRange:NSMakeRange([[statusView string] length],0)];
 }
 
 - (IBAction) insertConfigurationName:(id)sender
 {
 	NSString* theConfigFile = [NSString stringWithFormat:@"Configuration File: %@",[[[(ORAppDelegate*)[NSApp delegate] document] fileURL] path]];
-	[logBookField insertText: theConfigFile];
+	[logBookField insertText: theConfigFile replacementRange:NSMakeRange([[statusView string] length],0)];
 }
 
 - (IBAction) insertRunNumber:(id)sender
@@ -529,7 +530,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	else {
 		theRun = @"No Run Control Obj";
 	}
-	[logBookField insertText:theRun];
+	[logBookField insertText:theRun replacementRange:NSMakeRange([[statusView string] length],0)];
 }
 
 - (IBAction) mailContent:(id)sender

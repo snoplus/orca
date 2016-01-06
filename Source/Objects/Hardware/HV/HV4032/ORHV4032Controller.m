@@ -241,7 +241,11 @@
 		NSEnumerator* e = [[model supplies] objectEnumerator];
 		ORHV4032Supply* s;
 		while(s = [e nextObject]){
-			[self updateTwoStateCheckbox:[controlMatrix cellWithTag:[s supply]] setting:[s controlled]];
+            BOOL value      = [s controlled];
+            NSCell* control = [controlMatrix cellWithTag:[s supply]];
+            if (value != [control state]) {
+                [control setState:(value ? NSOnState : NSOffState)];
+           }
 		}
 	}
 	[self updateButtons];   

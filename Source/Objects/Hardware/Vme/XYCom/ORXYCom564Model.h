@@ -21,6 +21,8 @@
 #import "ORVmeIOCard.h"
 #import "ORAdcProcessing.h"
 #import "ORDataTaker.h"
+#import "SBC_Config.h"
+#import "SBC_Link.h"
 
 
 #pragma mark •••Register Definitions
@@ -175,6 +177,7 @@ typedef enum {
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

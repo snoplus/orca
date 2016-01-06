@@ -44,6 +44,7 @@ NSString* ORiSegHVCardExceptionCountChanged     = @"ORiSegHVCardExceptionCountCh
 NSString* ORiSegHVCardConstraintsChanged		= @"ORiSegHVCardConstraintsChanged";
 NSString* ORiSegHVCardRequestHVMaxValues		= @"ORiSegHVCardRequestHVMaxValues";
 NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged";
+NSString* ORiSegHVCardDoNotPostSafetyAlarmChanged = @"ORiSegHVCardDoNotPostSafetyAlarmChanged";
 
 @implementation ORiSegHVCard
 
@@ -163,6 +164,22 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
      object:self];
 }
 
+- (BOOL) doNotPostSafetyLoopAlarm
+{
+    return doNotPostSafetyLoopAlarm;
+}
+
+- (void) setDoNotPostSafetyLoopAlarm:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDoNotPostSafetyLoopAlarm:doNotPostSafetyLoopAlarm];
+    doNotPostSafetyLoopAlarm = aState;
+    if(aState){
+        [safetyLoopNotGoodAlarm clearAlarm];
+        [safetyLoopNotGoodAlarm release];
+        safetyLoopNotGoodAlarm = nil;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORiSegHVCardDoNotPostSafetyAlarmChanged object:self];
+}
 
 - (void) setRdParamsFrom:(NSDictionary*)aDictionary
 {
@@ -203,7 +220,7 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 
         int moduleEvents = [self moduleFailureEvents];
         
-        if(moduleEvents & moduleEventSafetyLoopNotGood){
+        if(!doNotPostSafetyLoopAlarm && (moduleEvents & moduleEventSafetyLoopNotGood)){
             if(!safetyLoopNotGoodAlarm){
                 NSString* s = [NSString stringWithFormat:@"%@ Safety Loop Not Good", [self fullID] ];
                 safetyLoopNotGoodAlarm = [[ORAlarm alloc] initWithName:s  severity: kHardwareAlarm];
@@ -905,7 +922,9 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
     
     [self setShipRecords:		[decoder decodeBoolForKey:	@"shipRecords"]];
     [self setSelectedChannel:	[decoder decodeIntForKey:	@"selectedChannel"]];
-	[self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
+    [self setRiseRate:			[decoder decodeFloatForKey:	@"riseRate"]];
+    [self setDoNotPostSafetyLoopAlarm:			[decoder decodeBoolForKey:	@"doNotPostSafetyLoopAlarm"]];
+    
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
 		//[self setHwGoal:i withValue: [decoder decodeIntForKey:	[@"hwGoal" stringByAppendingFormat:@"%d",i]]];
@@ -921,9 +940,11 @@ NSString* ORiSegHVCardChanNameChanged           = @"ORiSegHVCardChanNameChanged"
 {
     [super encodeWithCoder:encoder];
     
-	[encoder encodeBool:shipRecords		forKey:@"shipRecords"];
-	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
-	[encoder encodeFloat:riseRate		forKey:@"riseRate"];
+	[encoder encodeBool:shipRecords                 forKey:@"shipRecords"];
+	[encoder encodeInt:selectedChannel              forKey:@"selectedChannel"];
+    [encoder encodeFloat:riseRate                   forKey:@"riseRate"];
+    [encoder encodeBool:doNotPostSafetyLoopAlarm	forKey:@"doNotPostSafetyLoopAlarm"];
+    
 	int i;
  	for(i=0;i<[self numberOfChannels];i++){
 		//[encoder encodeInt:hwGoal[i] forKey:[@"hwGoal" stringByAppendingFormat:@"%d",i]];

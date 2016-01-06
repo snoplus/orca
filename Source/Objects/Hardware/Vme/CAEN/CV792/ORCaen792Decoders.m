@@ -22,6 +22,19 @@
 #import "ORDataSet.h"
 #import "ORCaen792Model.h"
 
+//------------------------------------------------------------------
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//^^^^ ^^^^ ^^^^ ^^-----------------------data id
+//                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs 
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+//        ^ ^^^---------------------------crate
+//             ^ ^^^^---------------------card
+//                                      ^-this bit set if timestamp option selected
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-seconds since Jan 1,1970       (OPTIONAL...only included if timestamp option selected)
+//xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx-microseconds since last second (OPTIONAL...only included if timestamp option selected)
+//data from the data buffer follows as per the manual
+
+
 @implementation ORCAEN792DecoderForQdc
 - (id) init
 {
@@ -37,16 +50,21 @@
 - (unsigned long) decodeData:(void*) aSomeData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*) aDataSet
 {
     short i;
-    long* ptr = (long*) aSomeData;
+    long* ptr   = (long*) aSomeData;
 	long length = ExtractLength(ptr[0]);
-    int crate = ShiftAndExtract(ptr[1],21,0xf);
-    int card  = ShiftAndExtract(ptr[1],16,0x1f);
+    int crate   = ShiftAndExtract(ptr[1],21,0xf);
+    int card    = ShiftAndExtract(ptr[1],16,0x1f);
+    BOOL timeStampsIncluded = ShiftAndExtract(ptr[1],0,0x1);
     
 	NSString* crateKey = [self getCrateKey:crate];
 	NSString* cardKey  = [self getCardKey: card];
     NSString* dataKey  = [self dataKey];
     
-    for( i = 2; i < length; i++ ){
+    int dataStartIndex;
+    if(timeStampsIncluded)  dataStartIndex = 4;
+    else                    dataStartIndex = 2;
+    
+    for( i = dataStartIndex; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
@@ -87,10 +105,17 @@
     NSString* len	=[NSString stringWithFormat: @"# QDC = %lu\n",length-2];
     NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21)&0x0000000f];
     NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16)&0x0000001f];    
+    BOOL timeStampsIncluded = ptr[1]&0x1;
+    
+    int dataStartIndex;
+    if(timeStampsIncluded){
+        dataStartIndex  = 4;
+    }
+    else dataStartIndex = 2;
 	
     NSString* restOfString = [NSString string];
     int i;
-    for( i = 2; i < length; i++ ){
+    for( i = dataStartIndex; i < length; i++ ){
 		int dataType = ShiftAndExtract(ptr[i],24,0x7);
 		if(dataType == 0x0){
 			int qdcValue = ShiftAndExtract(ptr[i],0,0xfff);
@@ -98,8 +123,12 @@
 			restOfString = [restOfString stringByAppendingFormat:@"Chan  = %d  Value = %d\n",channel,qdcValue];
         }
     }
-	
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];               
+    if(timeStampsIncluded){
+        NSString* seconds         = [NSString stringWithFormat:@"Seconds      = %lu\n",ptr[2]];
+        NSString* microseconds    = [NSString stringWithFormat:@"Microseconds = %lu\n",ptr[3]];
+        return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,len,crate,card,seconds,microseconds,restOfString];
+    }
+    else return [NSString stringWithFormat:@"%@%@%@%@%@",title,len,crate,card,restOfString];
 }
 
 - (unsigned short) channel: (unsigned long) pDataValue

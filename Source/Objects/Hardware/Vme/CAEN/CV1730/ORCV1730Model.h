@@ -236,11 +236,10 @@ enum {
 - (void)			writeDac:(unsigned short) pChan;
 - (void)			writeGains;
 - (void)			writeGain:(unsigned short) pChan;
-- (void)			writePulseWidths;
+- (void)			writePulseWidth;
 - (void)			writePulseWidth:(unsigned short) pChan;
-- (void)			writePulseTypes;
-- (void)			writePulsetype:(unsigned short) pChan;
-
+- (void)			writePulseType;
+- (void)			writePulseType:(unsigned short) pChan;
 
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;

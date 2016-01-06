@@ -2,6 +2,7 @@
 #include "SBC_Readout.h"
 #include "readout_code.h"
 #include "VME_HW_Definitions.h" 
+#include <unistd.h>
 bool ORVMETrigger32Readout::Readout(SBC_LAM_Data* lamData)
 {
     uint32_t baseAddress, low_word, high_word, statusReg;

@@ -196,8 +196,12 @@
                      selector : @selector(secondaryMapLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
     
+    [notifyCenter addObserver : self
+                     selector : @selector(toggleIntervalChanged:)
+                         name : HaloSentryToggleIntervalChanged
+                       object : nil];
+   
 }
 
 - (void) updateWindow
@@ -219,6 +223,7 @@
 	[self secondaryMapFileChanged:nil];
 	[self secondaryAdcClassNameChanged:nil];
 	[self secondaryMapLockChanged:nil];
+    [self toggleIntervalChanged:nil];
 	[secondaryValuesView reloadData];
 }
 
@@ -381,6 +386,12 @@
 	[secondaryAdcClassNamePopup setEnabled:!lockedOrRunningMaintenance];
 }
 
+- (void) toggleIntervalChanged:(NSNotification*)aNotification
+{
+    [toggleIntervalField setFloatValue:[[model haloSentry] toggleInterval]];
+    [self updateButtons];
+}
+
 - (void) updateButtons
 {
     BOOL locked             = [gSecurity isLocked:HaloModelSentryLock];
@@ -388,9 +399,8 @@
     BOOL aRunIsInProgress   = [[model haloSentry] runIsInProgress];
    	BOOL anyAddresses       = ([[model emailList] count]>0);
     BOOL localRunInProgress = [[ORGlobal sharedGlobal] runInProgress];
-    BOOL validTimeInterval  = [[sentryScheduler stringValue] length]>0  && [sentryScheduler doubleValue]>0; //SV
     BOOL sentryStateIsSecondary = [[[model haloSentry] sentryTypeName] isEqualToString:@"Secondary"]; //SV
-    
+    BOOL toggleIntervalValid     = [[model haloSentry] toggleInterval]>0;
 	[heartBeatIndexPU setEnabled:anyAddresses];
  
     [stealthMode2CB      setEnabled:!locked && !sentryRunning];
@@ -402,9 +412,9 @@
     [toggleButton        setEnabled:!locked & aRunIsInProgress];
     [sbcPasswordField    setEnabled:!locked & aRunIsInProgress];
     [updateShapersButton setEnabled:!locked & !localRunInProgress];
-    [automaticToggleSelector setEnabled:sentryRunning && !sentryStateIsSecondary && validTimeInterval]; //SV
-    [automaticToggleSelector setTitle:[[model haloSentry] timerIsRunning]?@"Stop":@"Start"]; //SV
-    [sentryScheduler setEnabled:!locked & ![[model haloSentry] timerIsRunning]]; //SV
+    [automaticToggleSelector setEnabled:sentryRunning && !sentryStateIsSecondary && toggleIntervalValid]; //SV
+    [automaticToggleSelector setTitle:[[model haloSentry] toggleTimerIsRunning]?@"Stop":@"Start"]; //SV
+    [toggleIntervalField setEnabled:!locked & ![[model haloSentry] toggleTimerIsRunning]]; //SV
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem
@@ -653,26 +663,16 @@
 }
 
 //SV
-- (IBAction) updatedTimeInterval:(id)sender
+- (IBAction) toggleIntervalAction:(id)sender
 {
-    [[model haloSentry] setTimer:[sentryScheduler doubleValue]];
-    [self updateButtons];
+    [[model haloSentry] setToggleInterval:[sender floatValue]];
 }
 
 //SV
-- (IBAction)schedulerOnOff:(id)sender
+- (IBAction)startStopToggleTimerAction:(id)sender
 {
-    scheduleState = ![[model haloSentry] timerIsRunning];
-    if (!scheduleState && [[model haloSentry] sentryIsRunning])
-    {
-        [[model haloSentry] stopTimer];
-    }
-    if (scheduleState && [[model haloSentry] sentryIsRunning] && [[sentryScheduler stringValue] length]>0  && [sentryScheduler doubleValue]>0)
-    {
-        [[model haloSentry] startTimer];
-    }
-    
-    [self updateButtons];
+    [[model haloSentry] startStopToggleTimer];
+
 }
 
 #pragma mark •••Data Source

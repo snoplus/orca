@@ -78,6 +78,7 @@ NSString* ORCaen792ModelZeroSuppressThresResChanged   = @"ORCaen792ModelZeroSupp
 NSString* ORCaen792ModelZeroSuppressEnableChanged     = @"ORCaen792ModelZeroSuppressEnableChanged";
 NSString* ORCaen792ModelOverflowSuppressEnableChanged = @"ORCaen792ModelOverflowSuppressEnableChanged";
 NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChangedNotification";
+NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTimeStampChanged";
 
 // Bit Set 2 Register Masks
 #define kTestMem        0x0001
@@ -145,6 +146,20 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 }
 
 #pragma mark ***Accessors
+-(BOOL) shipTimeStamp
+{
+    return shipTimeStamp;
+}
+
+- (void) setShipTimeStamp:(BOOL)aShipTimeStamp
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipTimeStamp:shipTimeStamp];
+    
+    shipTimeStamp = aShipTimeStamp;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelShipTimeStampChanged object:self];
+}
+
 - (int) totalCycleZTime
 {
     return totalCycleZTime;
@@ -590,8 +605,8 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 #pragma mark ***DataTaker
 - (void) setDataIds:(id)assigner
 {
-    dataId  = [assigner assignDataIds:kLongForm];
-    dataIdN = [assigner assignDataIds:kLongForm];
+    dataId      = [assigner assignDataIds:kLongForm];
+    dataIdN     = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherObj
@@ -601,9 +616,9 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 }
 
 - (unsigned long) dataIdN { return dataIdN; }
-- (void) setDataIdN: (unsigned long) DataId
+- (void) setDataIdN: (unsigned long) aValue
 {
-    dataIdN = DataId;
+    dataIdN = aValue;
 }
 
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
@@ -611,7 +626,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
     // Set options
- 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
+ 	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16) && (shipTimeStamp & 0x1); //doesn't change so do it here.
 
     [self initBoard];
     
@@ -658,7 +673,14 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 					unsigned long dataRecord[0xffff];
 					//we fill in dataRecord[0] below once we know the final size
 					dataRecord[1] = location;
-					int index = 2;
+                    int index = 2;
+                    if(shipTimeStamp) {
+                        struct timeval ts;
+                        if(gettimeofday(&ts,NULL) ==0){
+                            dataRecord[index++] = ts.tv_sec;
+                            dataRecord[index++] = ts.tv_usec;
+                        }
+                    }
 					for(i=0;i<numMemorizedChannels;i++){
 						[controller readLongBlock:&dataValue
 										atAddress:bufferAddress
@@ -670,12 +692,8 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 							dataRecord[index] = dataValue;
 							index++;
                             int channel;
-                            if([self modelType] == kModel792){
-                                channel = ShiftAndExtract(dataValue,16,0x3f);
-                            }
-                            else {
-                                channel = ShiftAndExtract(dataValue,17,0xF);
-                            }
+                            if([self modelType] == kModel792)   channel = ShiftAndExtract(dataValue,16,0x3f);
+                            else                                channel = ShiftAndExtract(dataValue,17,0xF);
 
                             if(channel>=0 && channel<32) eventCounter[channel]++;
 						}
@@ -697,8 +715,9 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 							dataRecord[index] = dataValue; //we don't ship the end of block for now
 							index++;
 							//got a end of block fill in the ORCA header and ship the data
-							if(modelType == kModel792) dataRecord[0] = dataId  | index; //see.... filled it in here....
-							else					   dataRecord[0] = dataIdN | index; //see.... filled it in here....
+                            if(modelType == kModel792) dataRecord[0] = dataId  | index; //see.... filled it in here....
+                            else					   dataRecord[0] = dataIdN | index; //see.... filled it in here....
+                            
 							[aDataPacket addLongsToFrameBuffer:dataRecord length:index];
 						}
 						else {
@@ -774,8 +793,8 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 {
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id = kCaen792; //should be unique
-	if(modelType == kModel792)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
-	else						configStruct->card_info[index].hw_mask[0] 	 = dataIdN;
+    if(modelType == kModel792)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+    else						configStruct->card_info[index].hw_mask[0] 	 = dataIdN;
 	configStruct->card_info[index].slot 	 = [self slot];
 	configStruct->card_info[index].crate 	 = [self crateNumber];
 	configStruct->card_info[index].add_mod 	 = [self addressModifier];
@@ -784,7 +803,8 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 	configStruct->card_info[index].deviceSpecificData[1] = [self baseAddress]+reg[kStatusRegister1].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[2] = [self baseAddress]+reg[kStatusRegister2].addressOffset;
 	configStruct->card_info[index].deviceSpecificData[3] = [self baseAddress]+reg[kOutputBuffer].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[4] = [self getDataBufferSize]/sizeof(long);
+    configStruct->card_info[index].deviceSpecificData[4] = [self getDataBufferSize]/sizeof(long);
+    configStruct->card_info[index].deviceSpecificData[5] = shipTimeStamp;
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;
@@ -802,6 +822,8 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 								 [NSNumber numberWithLong:-1],              @"length",
 								 nil];
 	[dataDictionary setObject:aDictionary forKey:@"Qdc"];
+ 
+
     
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
                    @"ORCAEN792NDecoderForQdc",                  @"decoder",
@@ -810,6 +832,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
                    [NSNumber numberWithLong:-1],				@"length",
                    nil];
 	[dataDictionary setObject:aDictionary forKey:@"QdcN"];
+
     
     return dataDictionary;
 }
@@ -834,6 +857,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [self setIPed:                  [aDecoder decodeIntForKey:  @"iPed"]];
     [self setModelType:             [aDecoder decodeIntForKey:  @"modelType"]];
    	[self setOnlineMask:            [aDecoder decodeInt32ForKey:@"onlineMask"]];
+    [self setShipTimeStamp:         [aDecoder decodeBoolForKey:@"shipTimeStamp"]];
 
     [self setQdcRateGroup:[aDecoder decodeObjectForKey:@"qdcRateGroup"]];
     
@@ -866,6 +890,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
 	[anEncoder encodeInt:  modelType              forKey:@"modelType"];
 	[anEncoder encodeInt32:onlineMask             forKey:@"onlineMask"];
     [anEncoder encodeObject: qdcRateGroup         forKey:@"qdcRateGroup"];
+    [anEncoder encodeBool: shipTimeStamp          forKey:@"shipTimeStamp"];
 }
 
 #pragma mark ¥¥¥AdcProviding Protocol
@@ -942,6 +967,7 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
     [objDictionary setObject:[NSNumber numberWithBool:overflowSuppressEnable] forKey:@"overflowSuppressEnable"];
     [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressEnable]     forKey:@"zeroSuppressEnable"];
     [objDictionary setObject:[NSNumber numberWithBool:eventCounterInc]        forKey:@"eventCounterInc"];
+    [objDictionary setObject:[NSNumber numberWithBool:shipTimeStamp]          forKey:@"shipTimeStamp"];
 
     return objDictionary;
 }
@@ -968,7 +994,6 @@ NSString* ORCaen792RateGroupChangedNotification       = @"ORCaen792RateGroupChan
         timeUntilNextCycle = totalCycleZTime * (1. - (percentZeroOff/100.));
     }
     [self performSelector:@selector(doCycle) withObject:nil afterDelay:timeUntilNextCycle];
-
 }
 
 - (void) stopCyclingZeroSuppression

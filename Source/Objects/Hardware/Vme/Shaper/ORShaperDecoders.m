@@ -39,7 +39,6 @@
 //^^^^ ^^^^ ^^^^ ^^-----------------------data id
 //                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs (2 if no timestamp,4 with timestamp
 //xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-//^^^^ ^^^--------------------------------data id
 //        ^ ^^^---------------------------crate
 //             ^ ^^^^---------------------card
 //                    ^^^^----------------channel

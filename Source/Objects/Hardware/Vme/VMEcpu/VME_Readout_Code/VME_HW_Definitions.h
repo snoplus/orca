@@ -48,5 +48,6 @@
 #define kSIS3305   26
 #define kGretina4A 27
 #define kCaen1730  28
+#define kXyCom564  29
 
 #endif

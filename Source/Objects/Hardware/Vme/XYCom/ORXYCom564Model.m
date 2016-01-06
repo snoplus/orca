@@ -22,6 +22,9 @@
 #import "ORVmeCrateModel.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
+#import "SBC_Cmds.h"
+#import "ORVmecpuModel.h"
+#import "VME_HW_Definitions.h"
 
 #pragma mark ***Notification Strings
 NSString* ORXYCom564Lock					= @"ORXYCom564Lock";
@@ -705,6 +708,32 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 }
 
 
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+
+    /* The current hardware specific data is:               *
+     *                                                      *
+     * 0: ADScan offset from base                           *
+     * 1: number of channels                                *
+     * 2: how many points to average                        *
+     * 3: ship data (yes when running, no when polling)     */
+
+    configStruct->total_cards++;
+    configStruct->card_info[index].hw_type_id	= kXyCom564; //should be unique
+    configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
+    configStruct->card_info[index].slot			= [self slot];
+    configStruct->card_info[index].crate		= [self crateNumber];
+    configStruct->card_info[index].add_mod		= [self addressModifier];
+    configStruct->card_info[index].base_add		= [self baseAddress];
+    configStruct->card_info[index].deviceSpecificData[0]	= mIOXY564Reg[kADScan].offset; // autoreadout register
+    configStruct->card_info[index].deviceSpecificData[1]	= kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]); //numberOfChannelsToRead
+    configStruct->card_info[index].deviceSpecificData[2]	= [self averageValueNumber]; // how many points to average
+    configStruct->card_info[index].deviceSpecificData[3]	= !pollRunning; // When we are polling, do not ship data
+
+    configStruct->card_info[index].next_Card_Index 	= index+1;
+
+    return index+1;
+}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder

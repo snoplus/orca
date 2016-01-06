@@ -932,6 +932,11 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
     }
 }
 
+- (void) writePulseType:(unsigned short) pChan
+{
+ 
+}
+
 - (void) writeChannelConfiguration
 {
     unsigned long mask = 0x0;
@@ -1160,6 +1165,11 @@ NSString* ORCV1730SelfTriggerLogicChanged                 = @"ORCV1730SelfTrigge
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	
+}
+
+- (void) generateSoftwareTrigger
+{
+    //TBD
 }
 
 - (void) writeAcquistionControl:(BOOL)start
