@@ -184,18 +184,18 @@
     CAEN_GAIN_MASK GainMask = [model caenGainMask];
 
     BOOL err = YES;
-    err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>>0];
-    err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>>1];
-    err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>>2];
-    err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>>3];
-    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>>0];
-    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>>1];
-    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>>2];
-    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>>3];
-    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>>4];
-    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>>5];
-    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>>6];
-    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>>7];
+    err &= [caenChannelSelect_0 selectCellWithTag:(ChannelMask & channelSel_0)>0];
+    err &= [caenChannelSelect_1 selectCellWithTag:(ChannelMask & channelSel_1)>0];
+    err &= [caenChannelSelect_2 selectCellWithTag:(ChannelMask & channelSel_2)>0];
+    err &= [caenChannelSelect_3 selectCellWithTag:(ChannelMask & channelSel_3)>0];
+    err &= [caenGainSelect_0 selectCellWithTag:(GainMask & gainSel_0)>0];
+    err &= [caenGainSelect_1 selectCellWithTag:(GainMask & gainSel_1)>0];
+    err &= [caenGainSelect_2 selectCellWithTag:(GainMask & gainSel_2)>0];
+    err &= [caenGainSelect_3 selectCellWithTag:(GainMask & gainSel_3)>0];
+    err &= [caenGainSelect_4 selectCellWithTag:(GainMask & gainSel_4)>0];
+    err &= [caenGainSelect_5 selectCellWithTag:(GainMask & gainSel_5)>0];
+    err &= [caenGainSelect_6 selectCellWithTag:(GainMask & gainSel_6)>0];
+    err &= [caenGainSelect_7 selectCellWithTag:(GainMask & gainSel_7)>0];
     if (err==NO) {
         NSLog(@"Error in CaenMatchHardware");
     }
