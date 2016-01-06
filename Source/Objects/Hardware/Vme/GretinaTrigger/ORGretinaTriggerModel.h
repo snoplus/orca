@@ -411,6 +411,10 @@ enum {
 - (void) syncDataIdsWith:(id)anotherObj;
 - (void) shipDataRecord;
 
+#pragma mark •••Reports
+- (void) printMasterDiagnosticReport;
+- (void) printRouterDiagnosticReport;
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;

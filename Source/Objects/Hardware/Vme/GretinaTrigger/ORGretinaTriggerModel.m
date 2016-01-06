@@ -1113,8 +1113,6 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
     [self setLocked:lockState];
     
-
-    
     return lockState;
 }
 
@@ -1149,6 +1147,48 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     }
 }
 
+- (void) printMasterDiagnosticReport
+{
+    int i;
+    if([self isMaster]){
+        for(i=0;i<8;i++){
+            ORConnector* otherConnector = [linkConnector[i] connector];
+            if([otherConnector identifer] == 'L'){
+                ORGretinaTriggerModel* routerObj = [otherConnector objectLink];
+                [routerObj printRouterDiagnosticReport];
+            }
+        }
+    }
+    else {
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on a Router card./n",NSStringFromSelector(_cmd));
+    }
+}
+
+- (void) printRouterDiagnosticReport
+{
+    if(![self isMaster]){
+        int i;
+        for(i=0;i<8;i++){
+            if([linkConnector[i]  identifer] != 'L'){
+                ORGretina4MModel* digitizerObj   = [[linkConnector[i] connector] objectLink];
+                if(digitizerObj){
+                    if(![digitizerObj isLocked]){
+                        NSLogColor([NSColor redColor],@"%@: NOT Lock./n",[digitizerObj fullID]);
+                    }
+                    else {
+                        NSLog(@"%@: Locked./n",[digitizerObj fullID]);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        NSLogColor([NSColor redColor],@"Illegal call. Do not call %@ on the Master Trigger card./n",NSStringFromSelector(_cmd));
+    }
+}
+
+
+
 - (BOOL) isLocked
 {
     [self setMiscStatReg:       [self readRegister:kMiscStatus]];
@@ -1172,6 +1212,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         
         if([self isMaster] && linkWasLost){
             NSLogColor([NSColor redColor],@"%@: Trigger card was locked but lock was lost.\n",[self fullID]);
+            [self printMasterDiagnosticReport];
         }
         [self shipDataRecord]; //ship a record to show the new state
 
