@@ -136,10 +136,10 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 - (void) loadDelay;
 - (void) setTrigMask:(unsigned long)trigMask;
 - (void) loadTrigMask:(BOOL)button;
-
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
             GainMask:(CAEN_GAIN_MASK) aGainMask;
-
 - (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:aLOMask;
+- (void) ResetClock;
+
 
 @end

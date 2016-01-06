@@ -301,7 +301,7 @@
     }
 
 }
-- (IBAction)CounterLoadMask:(id)sender{
+- (IBAction)CounterLoadMask:(id)sender {
     [self SpeakerLoadMask:sender];
     CONTROL_REG_MASK newControlReg = [model controlReg];
     newControlReg =  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
@@ -399,7 +399,7 @@
 }
 
 
-- (IBAction)GTDelaysLoadMask:(id)sender{
+- (IBAction)GTDelaysLoadMask:(id)sender {
     float LO_Delay = [LO_Field floatValue];
     float DGT_Delay = [DGT_Field floatValue];
     CONTROL_REG_MASK ControlReg;
@@ -416,7 +416,7 @@
     NSLog(@"DGT Delay = %.0f, LO Delay = %.0f\n",DGT_Delay,LO_Delay);
     NSLog(@"DGT Bits = %i, LO Bits = %i\n",[model DGTBits],[model LOBits]);
 }
-- (IBAction)GTDelaysMatchHardware:(id)sender{
+- (IBAction)GTDelaysMatchHardware:(id)sender {
     float LO_Delay = [self ConvertBitsToValue:[model LOBits] NBits:8 MinVal:0 MaxVal:1275];
     [LO_Slider setFloatValue:LO_Delay];
     [LO_Field setIntegerValue:LO_Delay];
@@ -446,7 +446,7 @@
         [LO_Slider setEnabled:YES];
     }
 }
-- (IBAction)LODelayLengthTextFieldChagned:(id)sender{
+- (IBAction)LODelayLengthTextFieldChagned:(id)sender {
     NSTextField *field = nil;
     NSSlider *slider = nil;
     if ([sender tag]==1){
@@ -460,7 +460,7 @@
     float val = [field floatValue];
     [slider setFloatValue:val];
 }
-- (IBAction)LODelayLengthSliderChagned:(id)sender{
+- (IBAction)LODelayLengthSliderChagned:(id)sender {
     NSTextField *field = nil;
     NSSlider *slider = nil;
     if ([sender tag]==1){
@@ -472,6 +472,11 @@
         slider = DGT_Slider;
     }
     [field setStringValue:[NSString stringWithFormat:@"%i",[slider integerValue]]];
+}
+
+- (IBAction)ResetClock:(id)sender {
+    NSLog(@"Clock reset signal sent \n");
+    [model ResetClock];
 }
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
     float stepSize = (maxVal - minVal)/(pow(2, nBits)-1.0);

@@ -167,12 +167,10 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     //[self connectToPort:command];
 }
-
 - (void) stopSmelliePulser {
     NSString* command=@"smelliepulser 0 0 0\r\n";
     [self connectToPort:command];
 }
-
 - (void) fireTelliePulser{
     NSString* command=@"telliepulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", tellieRate];
@@ -185,12 +183,10 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     //[self connectToPort:command];
 }
-
 - (void) stopTelliePulser {
     NSString* command=@"telliepulser 0 0 0\r\n";
     [self connectToPort:command];
 }
-
 - (void) firePulser{
     NSString* command=@"genericpulser ";
     NSString* argument1=[NSString stringWithFormat:@"%f", pulserRate];
@@ -203,12 +199,10 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     //[self connectToPort:command];
 }
-
 - (void) stopPulser {
     NSString* command=@"genericpulser 0 0 0\r\n";
     [self connectToPort:command];
 }
-
 - (void) loadSmellieDelay {
     NSString* command=@"smelliedelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", smellieDelay];
@@ -217,8 +211,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     //[self connectToPort:command];
 }
-
-
 - (void) loadTellieDelay {
     NSString* command=@"telliedelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", tellieDelay];
@@ -227,7 +219,6 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     //[self connectToPort:command];
 }
-
 - (void) loadDelay {
     NSString* command=@"genericdelay ";
     NSString* argument=[NSString stringWithFormat:@"%f", genericDelay];
@@ -236,9 +227,7 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     //[self connectToPort:command];
 }
-
-- (void) loadTrigMask:(BOOL)button
-{
+- (void) loadTrigMask {
     NSString* command=@"trigMask ";
     NSString* argument=[NSString stringWithFormat:@"%lu", trigMask];
     NSString* endl=@" \r\n";
@@ -246,21 +235,21 @@ NSString* otherSystemIP = @"192.168.80.25";
     command = [command stringByAppendingString:endl];
     [self connectToPort:command];
 }
+- (void) ResetClock {
+    //Insert code to send ResetClock signal to
+    //the MZ here.
+}
 
 -(void) setCaenMasks: (CAEN_CHANNEL_MASK)aChannelMask
-            GainMask:(CAEN_GAIN_MASK) aGainMask;
-{
+            GainMask:(CAEN_GAIN_MASK) aGainMask; {
     caenChannelMask = aChannelMask;
     caenGainMask = aGainMask;
 }
-
--(CAEN_CHANNEL_MASK) caenChannelMask
-{
+-(CAEN_CHANNEL_MASK) caenChannelMask {
     return caenChannelMask;
 }
 
--(CAEN_GAIN_MASK) caenGainMask
-{
+-(CAEN_GAIN_MASK) caenGainMask {
     return caenGainMask;
 }
 - (void) setGTDelaysBits:(NSUInteger)aDGTMask LOBits:(id)aLOMask {
