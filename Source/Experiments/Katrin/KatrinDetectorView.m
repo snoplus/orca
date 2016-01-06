@@ -18,7 +18,7 @@
 #import "ORSegmentGroup.h"
 #import "ORDetectorSegment.h"
 #import "ORAxis.h"
-
+#import "KatrinModel.h"
 #define crateX 48.
 #define crateY 265.
 #define crateW 313.
