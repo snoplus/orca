@@ -407,7 +407,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
                 }
                 else {
                     if(elapsedTime>5) [self setCurrentState:kMJDSource_MirrorTrackError];
-                    else            [self setCurrentState:kMJDSource_GetMirrorTrack];
+                    else              [self setCurrentState:kMJDSource_GetMirrorTrack];
                 }
             }
             else if(elapsedTime>5)[self setCurrentState:kMJDSource_MirrorTrackError];
@@ -426,7 +426,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
            break;
             
         case kMJDSource_CloseGV2:
-            nextTime = kLongStepTime;
+            nextTime = kVeryLongStepTime;
             [self closeGateValveStepTwo];
             [self setCurrentState:kMJDSource_GetGVClosePosition];
             elapsedTime = 0;
