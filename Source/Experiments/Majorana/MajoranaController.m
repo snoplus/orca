@@ -69,6 +69,11 @@
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
     [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
     
+    [secondaryTableView setFocusRingType:NSFocusRingTypeNone];
+    [stringMapTableView setFocusRingType:NSFocusRingTypeNone];
+    [specialChannelsTableView setFocusRingType:NSFocusRingTypeNone];
+
+    
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	[subComponentsView setGroup:model];
