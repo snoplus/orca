@@ -589,6 +589,9 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) rampDownHV:(int)aCrate vac:(int)aVacSystem
 {
+    if(aVacSystem==0 && ignorePanicOnA)return;
+    if(aVacSystem==1 && ignorePanicOnB)return;
+    
     if(!rampHVAlarm[aVacSystem]){
         rampHVAlarm[aVacSystem] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Panic HV (Vac %c)",'A'+aVacSystem] severity:(kEmergencyAlarm)];
         [rampHVAlarm[aVacSystem] setSticky:NO];
@@ -601,8 +604,6 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
        [rampHVAlarm[aVacSystem] postAlarm];
     }
     
-    if(aVacSystem==0 && ignorePanicOnA)return;
-    if(aVacSystem==1 && ignorePanicOnB)return;
     
     //tricky .. we have to location the HV crates based on the hv map using the VME crate (group 0).
     //But we don't care about the Veto system (group 1).
