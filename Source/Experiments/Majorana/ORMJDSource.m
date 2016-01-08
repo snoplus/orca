@@ -382,7 +382,7 @@ NSString* ORMJDSourceIsInChanged            = @"ORMJDSourceIsInChanged";
             [self setUpArduinoIO];
             nextTime = kVeryLongStepTime;
             elapsedTime = 0;
-            [self setCurrentState:kMJDSource_GetMirrorTrack];
+            [self setCurrentState:kMJDSource_SetupArduinoToCloseGV];
             break;
 
         case kMJDSource_SetupArduinoToCloseGV:
