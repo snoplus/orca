@@ -28,6 +28,7 @@
 #define kNumDetectors       2*35*2 //2 cryostats of 35 detectors * 2 (low and hi channels)
 #define kNumVetoSegments    32
 #define kMaxNumStrings      14
+#define kNumSpecialChannels      24
 
 //component tag numbers
 #define kVacAComponent			0
@@ -44,6 +45,7 @@
     int             pollTime;
     NSDate*         lastConstraintCheck;
     NSMutableArray* stringMap;
+    NSMutableArray* specialMap;
     ORAlarm*        rampHVAlarm[2];
     BOOL            ignorePanicOnA;
     BOOL            ignorePanicOnB;
@@ -71,6 +73,7 @@
 - (void) hvInfoRequest:(NSNotification*)aNote;
 - (void) customInfoRequest:(NSNotification*)aNote;
 - (void) setDetectorStringPositions;
+- (NSString*) detectorLocation:(int)index;
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
 
 #pragma mark ¥¥¥Segment Group Methods
@@ -78,8 +81,13 @@
 - (NSString*) getValueForPartStartingWith:(NSString*)aLabel parts:(NSArray*)parts;
 - (id)   stringMap:(int)i objectForKey:(id)aKey;
 - (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey;
-- (NSString*) mapFileAsString;
+- (NSString*) stringMapFileAsString;
+- (NSString*) specialMapFileAsString;
 - (BOOL) validateDetector:(int)aDetectorIndex;
+- (id)   specialMap:(int)i objectForKey:(id)aKey;
+- (void) specialMap:(int)i setObject:(id)anObject forKey:(id)aKey;
+- (void) initDigitizers;
+- (void) initVeto;
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
 - (NSString*) experimentMapLock;

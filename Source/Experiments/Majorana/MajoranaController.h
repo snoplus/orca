@@ -42,10 +42,12 @@
     IBOutlet NSTableView*	secondaryTableView;
 	IBOutlet NSButton*		vetoMapLockButton;
     IBOutlet NSTableView*	stringMapTableView;
+    IBOutlet NSTableView*	specialChannelsTableView;
 
     //items in the  details tab view
     IBOutlet NSTableView*	secondaryValuesView;
     IBOutlet NSTabView*     viewTabView;
+    IBOutlet NSButton*		initVetoButton;
 
     //items in the  subComponet tab view
     IBOutlet ORGroupView*   subComponentsView;
@@ -107,7 +109,7 @@
 - (void) vetoMapLockChanged:(NSNotification*)aNote;
 - (void) groupChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
-- (void) stringMapChanged:(NSNotification*)aNote;
+- (void) auxTablesChanged:(NSNotification*)aNote;
 - (void) forceHVUpdate:(int)segIndex;
 - (void) ignorePanicOnBChanged:(NSNotification*)aNote;
 - (void) ignorePanicOnAChanged:(NSNotification*)aNote;
@@ -133,6 +135,8 @@
 - (void) updateCalibrationButtons;
 
 #pragma mark ***Actions
+- (IBAction) initDigitizerAction:(id)sender;
+- (IBAction) initVetoAction:(id)sender;
 - (IBAction) ignorePanicOnBAction:(id)sender;
 - (IBAction) ignorePanicOnAAction:(id)sender;
 - (IBAction) viewTypeAction:(id)sender;

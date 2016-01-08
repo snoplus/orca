@@ -23,4 +23,5 @@
 #pragma mark •••Map Methods
 - (void) readMap:(NSString*)aPath;
 - (void) saveMapFileAs:(NSString*)newFileName;
+- (NSString*) segmentLocation:(int)aSegmentIndex;
 @end

@@ -62,11 +62,13 @@
 	detectorSize		 = NSMakeSize(770,770);
 	detailsSize			 = NSMakeSize(560,600);
 	subComponentViewSize = NSMakeSize(580,530);
-	detectorMapViewSize	 = NSMakeSize(750,730);
+	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
     calibrationViewSize	 = NSMakeSize(580,320);
+    
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
     [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
+    
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	[subComponentsView setGroup:model];
@@ -84,7 +86,6 @@
 
     [primaryAdcClassNamePopup   selectItemAtIndex:1];
     [secondaryAdcClassNamePopup selectItemAtIndex:1];
-    
     
 	ORTimeLinePlot* aPlot = [[ORTimeLinePlot alloc] initWithTag:1 andDataSource:self];
 	[aPlot setLineColor:[NSColor blueColor]];
@@ -164,7 +165,7 @@
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(stringMapChanged:)
+                     selector : @selector(auxTablesChanged:)
                          name : ORMJDAuxTablesChanged
 						object: model];
 
@@ -227,8 +228,6 @@
                      selector : @selector(sourceIsInChanged:)
                          name : ORMJDSourceIsInChanged
                        object : nil];
-    
-    
 }
 
 - (void) updateWindow
@@ -238,7 +237,7 @@
 	[self viewTypeChanged:nil];
     //detector
     [self secondaryColorAxisAttributesChanged:nil];
-    [self stringMapChanged:nil];
+    [self auxTablesChanged:nil];
 
 	//veto hw map
     [self vetoMapLockChanged:nil];
@@ -405,10 +404,11 @@
    }
 }
 
-- (void) stringMapChanged:(NSNotification*)aNote
+- (void) auxTablesChanged:(NSNotification*)aNote
 {
 	[stringMapTableView reloadData];
 	[detectorView makeAllSegments];
+    [specialChannelsTableView reloadData];
 }
 
 - (void) checkGlobalSecurity
@@ -427,6 +427,7 @@
 		[subComponentsView setNeedsDisplay:YES];
 	}
 }
+
 - (void) pollTimeChanged:(NSNotification*)aNotification
 {
 	[pollTimePopup selectItemAtIndex:[model pollTime]];
@@ -483,7 +484,6 @@
 }
 
 #pragma mark ¥¥¥Interface Management
-
 - (void) ignorePanicOnBChanged:(NSNotification*)aNote
 {
 	[ignorePanicOnBCB setIntValue: [model ignorePanicOnB]];
@@ -501,6 +501,7 @@
 	[super specialUpdate:aNote];
 	[secondaryTableView reloadData];
 	[secondaryValuesView reloadData];
+    [specialChannelsTableView reloadData];
 }
 
 - (void) segmentGroupChanged:(NSNotification*)aNote
@@ -535,7 +536,7 @@
 - (void) mapFileRead:(NSNotification*)mapFileRead
 {
 	[super mapFileRead:mapFileRead];
-	[self stringMapChanged:nil];
+	[self auxTablesChanged:nil];
     int n = [[model segmentGroup:0] numSegments];
     int i;
     for(i=0;i<n;i++){
@@ -587,7 +588,8 @@
     BOOL locked = [gSecurity isLocked:[model experimentDetailsLock]];
 
 	[detailsLockButton setState: locked];
-    [initButton setEnabled: !lockedOrRunningMaintenance];
+    [initButton setEnabled:     !lockedOrRunningMaintenance];
+    [initVetoButton setEnabled: !lockedOrRunningMaintenance];
 }
 
 #pragma mark ***Actions
@@ -663,7 +665,14 @@
     [userInfo release];
 }
 #endif
-
+- (IBAction) initDigitizerAction:(id)sender
+{
+    [model initDigitizers];
+}
+- (IBAction) initVetoAction:(id)sender
+{
+    [model initVeto];
+}
 
 - (IBAction) resetInterLocksOnModule0:(id)sender
 {
@@ -848,6 +857,26 @@
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.MajoranaController.selectedtab"];
 }
 
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+{
+    if( aTableView == secondaryTableView ||
+       aTableView == secondaryValuesView){
+        return [[model segmentGroup:1] numSegments];
+    }
+    else if((aTableView == module1InterlockTable) || (aTableView == module2InterlockTable) ){
+        int module;
+        if(aTableView == module1InterlockTable) module = 0;
+        else                                    module = 1;
+        ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:module];
+        return [mjdInterLocks numStates];
+    }
+    
+    else if(aTableView == stringMapTableView)       return kMaxNumStrings;
+    else if(aTableView == specialChannelsTableView) return kNumSpecialChannels;
+    
+    
+    else return [super numberOfRowsInTableView:aTableView]/2;
+}
 
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
@@ -875,7 +904,7 @@
             return [[model segmentGroup:0] segment:rowIndex*2+1 objectForKey:@"threshold"];
         }
         else if([[aTableColumn identifier] isEqualToString:@"kDetectorNumber"]){
-            return [NSNumber numberWithInt:rowIndex];
+            return [model detectorLocation:rowIndex];
         }
         else {
             return [[model segmentGroup:0] segment:rowIndex*2 objectForKey:[aTableColumn identifier]];
@@ -886,25 +915,31 @@
             return [NSNumber numberWithInt:rowIndex];
         }
         else if([[aTableColumn identifier] isEqualToString:@"threshold"]){
-            return [[model segmentGroup:0] segment:rowIndex objectForKey:@"threshold"];
+            return [[model segmentGroup:1] segment:rowIndex objectForKey:@"threshold"];
         }
 		else return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
 	}
     
     else if(aTableView == stringMapTableView){
         if([[aTableColumn identifier] isEqualToString:@"kStringNum"]){
-            int stringIndex = [[model stringMap:rowIndex objectForKey:[aTableColumn identifier]]intValue];
-            NSString* stringId = [NSString stringWithFormat:@"%d",stringIndex];
-            return stringId;
+            return [NSNumber numberWithInt:rowIndex];
         }
 		else return [model stringMap:rowIndex objectForKey:[aTableColumn identifier]];
 	}
+    
+    else if(aTableView == specialChannelsTableView){
+        if([[aTableColumn identifier] isEqualToString:@"kIndex"]){
+            return [NSNumber numberWithInt:rowIndex];
+        }
+        else return [model specialMap:rowIndex objectForKey:[aTableColumn identifier]];
+    }
+
     else if(aTableView == module1InterlockTable){
         ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:0];
-        
         if([[aTableColumn identifier] isEqualToString:@"name"]) return [mjdInterLocks stateName:rowIndex];
         else                                                    return [mjdInterLocks stateStatus:rowIndex];
     }
+    
     else if(aTableView == module2InterlockTable){
         ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:1];
         if([[aTableColumn identifier] isEqualToString:@"name"]) return [mjdInterLocks stateName:rowIndex];
@@ -914,25 +949,6 @@
 	else return nil;
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
-{
-	if( aTableView == secondaryTableView ||
-        aTableView == secondaryValuesView){
-        return [[model segmentGroup:1] numSegments];
-    }
-    else if((aTableView == module1InterlockTable) || (aTableView == module2InterlockTable) ){
-        int module;
-        if(aTableView == module1InterlockTable) module = 0;
-        else                                    module = 1;
-        ORMJDInterlocks* mjdInterLocks = [model mjdInterlocks:module];
-        return [mjdInterLocks numStates];
-    }
-
-    else if(aTableView == stringMapTableView)return kMaxNumStrings;
-
-
-	else return [super numberOfRowsInTableView:aTableView]/2;
-}
 
 - (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
@@ -976,7 +992,10 @@
     else if(aTableView == stringMapTableView){
 		[model stringMap:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
 	}
-    
+    else if(aTableView == specialChannelsTableView){
+        [model specialMap:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+    }
+ 
 	else if(aTableView == primaryValuesView){
         if([[aTableColumn identifier] isEqualToString:@"loThreshold"]){
             aSegment = [[model segmentGroup:0] segment:rowIndex*2];

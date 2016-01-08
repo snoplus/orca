@@ -188,7 +188,23 @@
 	[self setMapFile:newFileName];
     
 }
-
+- (NSString*) segmentLocation:(int)aSegmentIndex
+{
+    ORDetectorSegment* loGainSeg = [segments objectAtIndex:aSegmentIndex];
+    ORDetectorSegment* hiGainSeg = [segments objectAtIndex:aSegmentIndex+1];
+    NSString* loGainLine = [loGainSeg paramsAsString];
+    NSString* hiGainLine = [hiGainSeg paramsAsString];
+    NSArray* loGainPart  = [loGainLine componentsSeparatedByString:@","];
+    NSArray* hiGainPart  = [hiGainLine componentsSeparatedByString:@","];
+    NSString* aLine =   [NSString stringWithFormat:@"%@,%@    Low:%@   Hi:%@",
+                         [loGainPart objectAtIndex:1],  //VME
+                         [loGainPart objectAtIndex:2],  //Card
+                         [loGainPart objectAtIndex:3],  //Lo Chan
+                         [hiGainPart objectAtIndex:3]  //fold in the hi gain channel
+                         ];
+    
+    return aLine;
+}
 - (NSString*) paramsAsString
 {
     NSMutableString* theContents = [NSMutableString string];

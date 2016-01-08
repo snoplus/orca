@@ -45,10 +45,12 @@ NSString* ORMajoranaModelLastConstraintCheckChanged = @"ORMajoranaModelLastConst
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 #define MJDStringMapFile(aPath)		[NSString stringWithFormat:@"%@_StringMap",	aPath]
+#define MJDSpecialMapFile(aPath)    [NSString stringWithFormat:@"%@_SpecialMap",aPath]
 
 @interface  MajoranaModel (private)
 - (void)     checkConstraints;
 - (void)     validateStringMap;
+- (void)     validateSpecialMap;
 - (NSArray*) linesInFile:(NSString*)aPath;
 @end
 
@@ -71,6 +73,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     }
     
     [stringMap release];
+    [specialMap release];
     [super dealloc];
 }
 
@@ -292,10 +295,17 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 	[[segmentGroups objectAtIndex:0] addParametersToDictionary:objDictionary useName:@"DetectorGeometry" addInGroupName:NO];
 	[[segmentGroups objectAtIndex:1] addParametersToDictionary:objDictionary useName:@"VetoGeometry" addInGroupName:NO];
     
-    NSString* theContents = [self mapFileAsString];
-    if([theContents length]) [objDictionary setObject:theContents forKey:@"StringGeometry"];
+    NSString* stringMapContents = [self stringMapFileAsString];
+    if([stringMapContents length]){
+        stringMapContents = [stringMapContents stringByAppendingString:@"\n"];
+        [objDictionary setObject:stringMapContents forKey:@"StringGeometry"];
+    }
+    NSString* specialMapContents = [self specialMapFileAsString];
+    if([specialMapContents length]){
+        specialMapContents = [specialMapContents stringByAppendingString:@"\n"];
+        [objDictionary setObject:specialMapContents forKey:@"SpecialStrings"];
+    }
 
-    
     [aDictionary setObject:objDictionary forKey:[self className]];
 
     return aDictionary;
@@ -372,12 +382,18 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
         [values setObject:aDictionary forKey:[segmentGroup groupName]];
     }
+    
     NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
-    NSArray* stringMapEntries = [[self mapFileAsString] componentsSeparatedByString:@"\n"];
+    NSArray* stringMapEntries = [[self stringMapFileAsString] componentsSeparatedByString:@"\n"];
     [aDictionary setObject:stringMapEntries forKey: @"geometry"];
     [values setObject:aDictionary           forKey:@"Strings"];
-    
+  
+    aDictionary= [NSMutableDictionary dictionary];
+    NSArray* specialMapEntries = [[self specialMapFileAsString] componentsSeparatedByString:@"\n"];
+    [aDictionary setObject:specialMapEntries forKey: @"list"];
+    [values setObject:aDictionary           forKey:@"SpecialChannels"];
 
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
 }
 
@@ -624,10 +640,12 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         mjdInterlocks[i] = [[ORMJDInterlocks alloc] initWithDelegate:self slot:i];
         mjdSource[i] = [[ORMJDSource alloc] initWithDelegate:self slot:i];
     }
-    pollTime  = [decoder decodeIntForKey:	@"pollTime"];
-    stringMap = [[decoder decodeObjectForKey:@"stringMap"] retain];
+    pollTime   = [decoder  decodeIntForKey:	@"pollTime"];
+    stringMap  = [[decoder decodeObjectForKey:@"stringMap"] retain];
+    specialMap = [[decoder decodeObjectForKey:@"specialMap"] retain];
 
-	[self validateStringMap];
+    [self validateStringMap];
+    [self validateSpecialMap];
     [self setDetectorStringPositions];
 	[[self undoManager] enableUndoRegistration];
 
@@ -639,9 +657,10 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [super encodeWithCoder:encoder];
     [encoder encodeBool:ignorePanicOnB forKey:@"ignorePanicOnB"];
     [encoder encodeBool:ignorePanicOnA forKey:@"ignorePanicOnA"];
-    [encoder encodeInt:viewType     forKey: @"viewType"];
-	[encoder encodeInt:pollTime		forKey: @"pollTime"];
-    [encoder encodeObject:stringMap	forKey: @"stringMap"];
+    [encoder encodeInt:viewType        forKey: @"viewType"];
+	[encoder encodeInt:pollTime		   forKey: @"pollTime"];
+    [encoder encodeObject:stringMap	   forKey: @"stringMap"];
+    [encoder encodeObject:specialMap   forKey: @"specialMap"];
 }
 
 - (NSString*) reformatSelectionString:(NSString*)aString forSet:(int)aSet
@@ -724,11 +743,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) readAuxFiles:(NSString*)aPath
 {
-	aPath = MJDStringMapFile([aPath stringByDeletingPathExtension]);
+    NSFileManager* fm = [NSFileManager defaultManager];
+	NSString* path = MJDStringMapFile([aPath stringByDeletingPathExtension]);
     
-	NSFileManager* fm = [NSFileManager defaultManager];
-	if([fm fileExistsAtPath:aPath]){
-		NSArray* lines  = [self linesInFile:aPath];
+	if([fm fileExistsAtPath:path]){
+		NSArray* lines  = [self linesInFile:path];
 		for(id aLine in lines){
 			if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
 				NSArray* parts =  [aLine componentsSeparatedByString:@","];
@@ -753,18 +772,54 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 			}
 		}
 	}
+    
+    path = MJDSpecialMapFile([aPath stringByDeletingPathExtension]);
+    
+    if([fm fileExistsAtPath:path]){
+        NSArray* lines  = [self linesInFile:path];
+        for(id aLine in lines){
+            if([aLine length] && [aLine characterAtIndex:0] != '#'){ //skip comments
+                NSArray* parts =  [aLine componentsSeparatedByString:@","];
+                if([parts count]>=9){
+                    
+                    int index = [[parts objectAtIndex:0] intValue];
+                    NSMutableDictionary* dict = [specialMap objectAtIndex:index];
+                    [dict setObject:[parts objectAtIndex:0] forKey:@"kIndex"];
+                    [dict setObject:[parts objectAtIndex:1] forKey:@"kDescription"];
+                    [dict setObject:[parts objectAtIndex:2] forKey:@"kVME"];
+                    [dict setObject:[parts objectAtIndex:3] forKey:@"kCard"];
+                    [dict setObject:[parts objectAtIndex:4] forKey:@"kChannel"];
+                    [dict setObject:[parts objectAtIndex:5] forKey:@"kPreAmpDigitizer"];
+                    [dict setObject:[parts objectAtIndex:6] forKey:@"kPreAmpChan"];
+                    [dict setObject:[parts objectAtIndex:7] forKey:@"kCableLabel"];
+                    [dict setObject:[parts objectAtIndex:8] forKey:@"kSpecialType"];
+                }
+            }
+        }
+    }
+    else {
+        [specialMap release];
+        specialMap = nil;
+        [self validateSpecialMap];
+    }
 }
 
 - (void) saveAuxFiles:(NSString*)aPath
 {
-	aPath = MJDStringMapFile([aPath stringByDeletingPathExtension]);
-	NSFileManager*   fm       = [NSFileManager defaultManager];
-	if([fm fileExistsAtPath: aPath])[fm removeItemAtPath:aPath error:nil];
-	NSData* data = [[self mapFileAsString] dataUsingEncoding:NSASCIIStringEncoding];
-	[fm createFileAtPath:aPath contents:data attributes:nil];
+    NSFileManager*   fm       = [NSFileManager defaultManager];
+
+	NSString* stringMapPath = MJDStringMapFile([aPath stringByDeletingPathExtension]);
+	if([fm fileExistsAtPath: stringMapPath])[fm removeItemAtPath:stringMapPath error:nil];
+	NSData* data = [[self stringMapFileAsString] dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:stringMapPath contents:data attributes:nil];
+
+    NSString* specialMapPath = MJDSpecialMapFile([aPath stringByDeletingPathExtension]);
+    if([fm fileExistsAtPath: specialMapPath])[fm removeItemAtPath:specialMapPath error:nil];
+    data = [[self specialMapFileAsString] dataUsingEncoding:NSASCIIStringEncoding];
+    [fm createFileAtPath:specialMapPath contents:data attributes:nil];
 }
 
-- (NSString*) mapFileAsString
+- (NSString*) stringMapFileAsString
 {
    	NSMutableString* stringRep = [NSMutableString string];
     [stringRep appendFormat:@"Index,Det1,Det2,Det3,Det4,Det5,Name\n"];
@@ -787,14 +842,30 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     return stringRep;
 }
 
-#pragma mark ¥¥¥String Map Access Methods
-- (id) stringMap:(int)i objectForKey:(id)aKey
+- (NSString*) specialMapFileAsString
 {
-	if(i>=0 && i<kMaxNumStrings){
-		return [[stringMap objectAtIndex:i] objectForKey:aKey];
-	}
-	else return @"";
+   	NSMutableString* stringRep = [NSMutableString string];
+    [stringRep appendFormat:@"Index,Description,VME,Slot,Chan,PADig,PAChan,Type\n"];
+    for(id item in specialMap){
+        
+        [stringRep appendFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@\n",
+         [item objectForKey:@"kIndex"],
+         [item objectForKey:@"kDescription"],
+         [item objectForKey:@"kVME"],
+         [item objectForKey:@"kCard"],
+         [item objectForKey:@"kChannel"],
+         [item objectForKey:@"kPreAmpDigitizer"],
+         [item objectForKey:@"kPreAmpChan"],
+         [item objectForKey:@"kCableLabel"],
+         [item objectForKey:@"kSpecialType"]
+         ];
+    }
+    [stringRep deleteCharactersInRange:NSMakeRange([stringRep length]-1,1)];
+    return stringRep;
 }
+
+
+#pragma mark ¥¥¥String Map Access Methods
 
 - (BOOL) validateDetector:(int)aDetectorIndex
 {
@@ -821,6 +892,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     return NO;
 }
 
+- (id) stringMap:(int)i objectForKey:(id)aKey
+{
+    if(i>=0 && i<kMaxNumStrings){
+        return [[stringMap objectAtIndex:i] objectForKey:aKey];
+    }
+    else return @"";
+}
 - (void) stringMap:(int)i setObject:(id)anObject forKey:(id)aKey
 {
 	if(i>=0 && i<kMaxNumStrings){
@@ -832,6 +910,25 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 		
 	}
 }
+
+- (id) specialMap:(int)i objectForKey:(id)aKey
+{
+    if(i>=0 && i<kNumSpecialChannels){
+        return [[specialMap objectAtIndex:i] objectForKey:aKey];
+    }
+    else return @"";
+}
+- (void) specialMap:(int)i setObject:(id)anObject forKey:(id)aKey
+{
+    if(i>=0 && i<kNumSpecialChannels){
+        id entry = [specialMap objectAtIndex:i];
+        id oldValue = [self specialMap:i objectForKey:aKey];
+        if(oldValue)[[[self undoManager] prepareWithInvocationTarget:self] specialMap:i setObject:oldValue forKey:aKey];
+        [entry setObject:anObject forKey:aKey];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDAuxTablesChanged object:self userInfo:nil];
+    }
+}
+
 
 #pragma mark ¥¥¥CardHolding Protocol
 - (int) maxNumberOfObjects              { return 2; }
@@ -896,6 +993,11 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
         }
     }
 }
+- (NSString*) detectorLocation:(int)index
+{
+    ORMJDSegmentGroup* segmentGroup = (ORMJDSegmentGroup*)[self segmentGroup:0];
+    return [segmentGroup segmentLocation:index];
+}
 
 - (void) deploySource:(int)index
 {
@@ -915,6 +1017,27 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 - (void) checkSourceGateValve:(int)index
 {
     if(index>=0 && index<2)[mjdSource[index] checkGateValve];
+}
+
+- (void) initDigitizers
+{
+    @try {
+        [[[segmentGroups objectAtIndex:0]hwCards] makeObjectsPerformSelector:@selector(initBoard)];
+        NSLog(@"%@ Digitizers inited\n",[self className]);
+    }
+    @catch (NSException * e) {
+        NSLogColor([NSColor redColor],@"%@ Digitizers init failed\n",[self className]);
+    }
+}
+- (void) initVeto
+{
+    @try {
+        [[[segmentGroups objectAtIndex:1]hwCards] makeObjectsPerformSelector:@selector(initBoard)];
+        NSLog(@"%@ Veto inited\n",[self className]);
+    }
+    @catch (NSException * e) {
+        NSLogColor([NSColor redColor],@"%@ Veto init failed\n",[self className]);
+    }
 }
 
 @end
@@ -942,23 +1065,47 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (void) validateStringMap
 {
-	if(!stringMap){
-		stringMap = [[NSMutableArray array] retain];
-		int i;
-		for(i=0;i<14;i++){
-			[stringMap addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							   [NSNumber numberWithInt:i], @"kStringNum",
-							      @"-",						 @"kDet1",
+    if(!stringMap){
+        stringMap = [[NSMutableArray array] retain];
+        int i;
+        for(i=0;i<kMaxNumStrings;i++){
+            [stringMap addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:i], @"kStringNum",
+                                  @"-",						 @"kDet1",
                                   @"-",						 @"kDet2",
                                   @"-",						 @"kDet3",
                                   @"-",						 @"kDet4",
                                   @"-",						 @"kDet5",
                                   @"-",                      @"kStringName",
                                   nil]];
-		}
-	}
+        }
+    }
 }
 
+- (void) validateSpecialMap
+{
+    if([specialMap count]<kNumSpecialChannels){
+        [specialMap release];
+        specialMap = nil;
+    }
+    if(!specialMap){
+        specialMap = [[NSMutableArray array] retain];
+        int i;
+        for(i=0;i<kNumSpecialChannels;i++){
+            [specialMap addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:i], @"kIndex",
+                                  @"-",						 @"kDescription",
+                                  @"-",						 @"kVME",
+                                  @"-",						 @"kCard",
+                                  @"-",						 @"kChannel",
+                                  @"-",						 @"kPreAmpDigitizer",
+                                  @"-",                      @"kPreAmpChan",
+                                  @"-",                      @"kCableLabel",
+                                  @"-",                      @"kSpecialType",
+                                  nil]];
+        }
+    }
+}
 
 - (NSArray*) linesInFile:(NSString*)aPath
 {
