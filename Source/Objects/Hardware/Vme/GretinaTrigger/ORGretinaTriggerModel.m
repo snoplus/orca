@@ -574,7 +574,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
         if([self isMaster]){
             @try {
                 [self readRegister:kBoardID];
-                [self pulseNIMOutput];
+               // [self pulseNIMOutput];
                 [self initClockDistribution];
             }
             @catch(NSException* e){
