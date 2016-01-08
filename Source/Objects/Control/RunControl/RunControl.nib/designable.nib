@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -70,7 +70,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Run Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -302,7 +302,7 @@
                                         <action selector="openShutDownScript:" target="-2" id="2187"/>
                                     </connections>
                                 </button>
-                                <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" minValue="16" maxValue="100" doubleValue="16" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="2101">
+                                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" minValue="16" maxValue="100" doubleValue="16" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="2101">
                                     <rect key="frame" x="164" y="186" width="16" height="16"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 </progressIndicator>
@@ -358,17 +358,6 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button id="64">
-                                    <rect key="frame" x="8" y="92" width="51" height="18"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <buttonCell key="cell" type="check" title="Run:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="2589">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="timedRunCBAction:" target="-2" id="71"/>
-                                    </connections>
-                                </button>
                                 <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="bar" id="73">
                                     <rect key="frame" x="15" y="73" width="215" height="12"/>
                                     <autoresizingMask key="autoresizingMask"/>
@@ -501,6 +490,17 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <imageCell key="cell" enabled="NO" refusesFirstResponder="YES" alignment="left" image="notice" id="2592"/>
                                 </imageView>
+                                <button id="64">
+                                    <rect key="frame" x="8" y="92" width="51" height="18"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <buttonCell key="cell" type="check" title="Run:" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="2589">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="timedRunCBAction:" target="-2" id="71"/>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -622,7 +622,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button toolTip="Slow Start With Full Init" id="2495">
+                    <button id="2495">
                         <rect key="frame" x="20" y="318" width="77" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="square" title="Start Run" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" inset="2" id="2598">
@@ -633,7 +633,7 @@
                             <action selector="startRunAction:" target="-2" id="2520"/>
                         </connections>
                     </button>
-                    <button toolTip="Slow Start With Full Init" id="2497">
+                    <button toolTip="Stops the current run and starts a new one" id="2497">
                         <rect key="frame" x="108" y="318" width="77" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="square" title="New Run" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" inset="2" id="2599">
@@ -644,7 +644,7 @@
                             <action selector="newRunAction:" target="-2" id="2519"/>
                         </connections>
                     </button>
-                    <button toolTip="Slow Start With Full Init" id="2499">
+                    <button id="2499">
                         <rect key="frame" x="195" y="318" width="77" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="square" title="Stop Run" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" inset="2" id="2600">
@@ -660,7 +660,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="2762" id="2760">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="2761">
                                 <items>
                                     <menuItem title="Item 1" state="on" id="2762"/>
@@ -673,7 +673,7 @@
                             <action selector="selectedRunTypeScriptPUAction:" target="-2" id="2766"/>
                         </connections>
                     </popUpButton>
-                    <button toolTip="Slow Start With Full Init" id="2504">
+                    <button id="2504">
                         <rect key="frame" x="335" y="318" width="93" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="square" title="End Sub Run" bezelStyle="shadowlessSquare" alignment="center" state="on" borderStyle="border" inset="2" id="2601">
@@ -684,7 +684,7 @@
                             <action selector="prepareForSubRunAction:" target="-2" id="2534"/>
                         </connections>
                     </button>
-                    <button toolTip="Slow Start With Full Init" id="2506">
+                    <button id="2506">
                         <rect key="frame" x="436" y="318" width="100" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="square" title="New Sub Run " bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" inset="2" id="2602">
@@ -708,7 +708,7 @@
                         <rect key="frame" x="332" y="364" width="203" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Sub Run Control" id="2772">
-                            <font key="font" metaFont="titleBar" size="12"/>
+                            <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -1048,7 +1048,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="2640" id="2638">
-                                <rect key="frame" x="0.0" y="0.0" width="398" height="133"/>
+                                <rect key="frame" x="0.0" y="0.0" width="397" height="19"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" red="0.82194808519999996" green="1" blue="0.83289847829999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -1093,7 +1093,7 @@
                         <rect key="frame" x="1" y="135" width="398" height="15"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="37" horizontal="NO" id="2641">
+                    <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="2641">
                         <rect key="frame" x="224" y="17" width="15" height="102"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
