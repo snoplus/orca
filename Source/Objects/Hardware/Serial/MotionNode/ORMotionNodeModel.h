@@ -80,6 +80,9 @@ typedef struct MotionNodeHistoryHeader {
     float			ax;
     float			ay;
     float			az;
+    float           atotal;
+    float           amean;
+    int             saveIndex;
     int				traceIndex;
     int				longTraceIndex;
     int				longTraceMinIndex;
@@ -170,6 +173,7 @@ typedef struct MotionNodeHistoryHeader {
 - (float) ax;
 - (float) ay;
 - (float) az;
+
 
 - (int) packetLength;
 - (void) setPacketLength:(int)aPacketLength;
