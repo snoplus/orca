@@ -1271,7 +1271,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     }
     else {
       if (saveIndex>3){    //at the end of event and min 3 data points
-          [self postCouchDBRecord2:saveIndex]
+          [self postCouchDBRecord2:saveIndex];
           saveIndex = 0;
        }
     }
