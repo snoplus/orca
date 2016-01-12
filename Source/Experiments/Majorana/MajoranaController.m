@@ -903,13 +903,13 @@
 	}
     else if(aTableView == primaryValuesView){
         if([[aTableColumn identifier] isEqualToString:@"loThreshold"]){
-            return [[model segmentGroup:0] segment:rowIndex*2 objectForKey:@"threshold"];
+            return [[model segmentGroup:0] segment:2*rowIndex objectForKey:@"threshold"];
         }
         else if([[aTableColumn identifier] isEqualToString:@"hiThreshold"]){
-            return [[model segmentGroup:0] segment:rowIndex*2+1 objectForKey:@"threshold"];
+            return [[model segmentGroup:0] segment:2*rowIndex+1 objectForKey:@"threshold"];
         }
         else if([[aTableColumn identifier] isEqualToString:@"kDetectorNumber"]){
-            return [model detectorLocation:rowIndex];
+            return [model detectorLocation:2*rowIndex];
         }
         else {
             return [[model segmentGroup:0] segment:rowIndex*2 objectForKey:[aTableColumn identifier]];
