@@ -178,8 +178,8 @@
                                             <rect key="frame" x="141" y="47" width="56" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="56" height="27"/>
-                                            <size key="intercellSpacing" width="8" height="8"/>
+                                            <size key="cellSize" width="16.490234375" height="24"/>
+                                            <size key="intercellSpacing" width="8" height="0.0"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="v82-fW-zOj">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -204,8 +204,8 @@
                                             <rect key="frame" x="341" y="47" width="79" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="79" height="27"/>
-                                            <size key="intercellSpacing" width="8" height="8"/>
+                                            <size key="cellSize" width="34.669921875" height="24"/>
+                                            <size key="intercellSpacing" width="8" height="0.0"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="i2L-tK-h5D">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -232,8 +232,8 @@
                                             <rect key="frame" x="229" y="47" width="79" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="79" height="27"/>
-                                            <size key="intercellSpacing" width="8" height="8"/>
+                                            <size key="cellSize" width="34.669921875" height="24"/>
+                                            <size key="intercellSpacing" width="8" height="0.0"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="BaT-iP-kQB">
                                                 <font key="font" metaFont="label"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
