@@ -334,7 +334,6 @@
 		6B325E0E1B2F4306002E2DD7 /* XL1.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0D1B2F4306002E2DD7 /* XL1.xib */; };
 		6B325E101B2F431C002E2DD7 /* XL3_Link.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */; };
 		6B325E121B2F4334002E2DD7 /* MTC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E111B2F4334002E2DD7 /* MTC.xib */; };
-		6B325E141B2F4344002E2DD7 /* Fec32.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E131B2F4344002E2DD7 /* Fec32.xib */; };
 		6B325E161B2F435A002E2DD7 /* FecDaughterCard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B325E151B2F435A002E2DD7 /* FecDaughterCard.xib */; };
 		6B40D6471B2B79170000F7C1 /* CameraPic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6411B2B79170000F7C1 /* CameraPic.jpg */; };
 		6B40D6481B2B79170000F7C1 /* SNOPCamera.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */; };
@@ -2036,6 +2035,12 @@
 		8494D85C13393D8A00DD5F9E /* ORRunListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494D85613393D8A00DD5F9E /* ORRunListModel.m */; };
 		8494D85D13393D8A00DD5F9E /* RunList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8494D85713393D8A00DD5F9E /* RunList.nib */; };
 		8494D85E13393D8A00DD5F9E /* RunList.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494D85813393D8A00DD5F9E /* RunList.tif */; };
+		8494F8D01C440E2C00A35F8B /* MJDDewarScale.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8494F8CA1C440E2C00A35F8B /* MJDDewarScale.nib */; };
+		8494F8D11C440E2C00A35F8B /* MJDDewarScale.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8494F8CB1C440E2C00A35F8B /* MJDDewarScale.tif */; };
+		8494F8D21C440E2C00A35F8B /* ORMJDDewarScaleController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494F8CC1C440E2C00A35F8B /* ORMJDDewarScaleController.h */; };
+		8494F8D31C440E2C00A35F8B /* ORMJDDewarScaleController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494F8CD1C440E2C00A35F8B /* ORMJDDewarScaleController.m */; };
+		8494F8D41C440E2C00A35F8B /* ORMJDDewarScaleModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8494F8CE1C440E2C00A35F8B /* ORMJDDewarScaleModel.h */; };
+		8494F8D51C440E2C00A35F8B /* ORMJDDewarScaleModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8494F8CF1C440E2C00A35F8B /* ORMJDDewarScaleModel.m */; };
 		849516B610C95382001C8112 /* ORStateLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849516B010C95382001C8112 /* ORStateLabelController.h */; };
 		849516B710C95382001C8112 /* ORStateLabelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849516B110C95382001C8112 /* ORStateLabelController.m */; };
 		849516B810C95382001C8112 /* ORStateLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849516B210C95382001C8112 /* ORStateLabelModel.h */; };
@@ -2748,12 +2753,12 @@
 		84D0592E08FF367A00A99A83 /* goBack.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D0592C08FF367A00A99A83 /* goBack.tif */; };
 		84D0593F08FF39EA00A99A83 /* goBackPressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D0593D08FF39EA00A99A83 /* goBackPressed.tif */; };
 		84D05976090017B200A99A83 /* ORContainerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B0CFBD08FC60BC00EBE23C /* ORContainerModel.m */; };
-		84D153611BD53D2A005EC269 /* OnCallList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D1535B1BD53D2A005EC269 /* OnCallList.nib */; settings = {ASSET_TAGS = (); }; };
-		84D153621BD53D2A005EC269 /* OnCallList.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D1535C1BD53D2A005EC269 /* OnCallList.tif */; settings = {ASSET_TAGS = (); }; };
-		84D153631BD53D2A005EC269 /* OROnCallListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D1535D1BD53D2A005EC269 /* OROnCallListController.h */; settings = {ASSET_TAGS = (); }; };
-		84D153641BD53D2A005EC269 /* OROnCallListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1535E1BD53D2A005EC269 /* OROnCallListController.m */; settings = {ASSET_TAGS = (); }; };
-		84D153651BD53D2A005EC269 /* OROnCallListModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D1535F1BD53D2A005EC269 /* OROnCallListModel.h */; settings = {ASSET_TAGS = (); }; };
-		84D153661BD53D2A005EC269 /* OROnCallListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D153601BD53D2A005EC269 /* OROnCallListModel.m */; settings = {ASSET_TAGS = (); }; };
+		84D153611BD53D2A005EC269 /* OnCallList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D1535B1BD53D2A005EC269 /* OnCallList.nib */; };
+		84D153621BD53D2A005EC269 /* OnCallList.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D1535C1BD53D2A005EC269 /* OnCallList.tif */; };
+		84D153631BD53D2A005EC269 /* OROnCallListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D1535D1BD53D2A005EC269 /* OROnCallListController.h */; };
+		84D153641BD53D2A005EC269 /* OROnCallListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D1535E1BD53D2A005EC269 /* OROnCallListController.m */; };
+		84D153651BD53D2A005EC269 /* OROnCallListModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D1535F1BD53D2A005EC269 /* OROnCallListModel.h */; };
+		84D153661BD53D2A005EC269 /* OROnCallListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D153601BD53D2A005EC269 /* OROnCallListModel.m */; };
 		84D258680FA7340B00626276 /* MotionNode.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D2585D0FA7340B00626276 /* MotionNode.gif */; };
 		84D258690FA7340B00626276 /* MotionNode.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D2585E0FA7340B00626276 /* MotionNode.nib */; };
 		84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D258600FA7340B00626276 /* NoMotionNodeDriverHelp.plist */; };
@@ -3263,10 +3268,10 @@
 		CE7328B01466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7328AB1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.h */; };
 		CE7328B11466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7328AC1466EEDE00A50AE9 /* ORVXI11HardwareFinderController.m */; };
 		CE7328B21466EEDE00A50AE9 /* VXI11HardwareFinder.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE7328AD1466EEDE00A50AE9 /* VXI11HardwareFinder.nib */; };
-		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; settings = {ASSET_TAGS = (); }; };
-		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; settings = {ASSET_TAGS = (); }; };
+		CE85B6B11BBD1B880093ECD0 /* ORVProcess.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6AF1BBD1B880093ECD0 /* ORVProcess.hh */; };
+		CE85B6B51BBD1BEC0093ECD0 /* ORScopedLock.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B21BBD1BEC0093ECD0 /* ORScopedLock.hh */; };
+		CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B41BBD1BEC0093ECD0 /* ORThread.hh */; };
+		CE85B6BB1BBD1C4F0093ECD0 /* ORXyCom564Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = CE85B6B91BBD1C4F0093ECD0 /* ORXyCom564Readout.hh */; };
 		CEB1A5C514673AB6001381E6 /* vxi11_user.m in Sources */ = {isa = PBXBuildFile; fileRef = CEB1A5C414673AB6001381E6 /* vxi11_user.m */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -3911,7 +3916,6 @@
 		6B325E0D1B2F4306002E2DD7 /* XL1.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = XL1.xib; sourceTree = "<group>"; };
 		6B325E0F1B2F431C002E2DD7 /* XL3_Link.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = XL3_Link.xib; sourceTree = "<group>"; };
 		6B325E111B2F4334002E2DD7 /* MTC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MTC.xib; sourceTree = "<group>"; };
-		6B325E131B2F4344002E2DD7 /* Fec32.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Fec32.xib; sourceTree = "<group>"; };
 		6B325E151B2F435A002E2DD7 /* FecDaughterCard.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FecDaughterCard.xib; sourceTree = "<group>"; };
 		6B40D6411B2B79170000F7C1 /* CameraPic.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = CameraPic.jpg; sourceTree = "<group>"; };
 		6B40D6421B2B79170000F7C1 /* SNOPCamera.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SNOPCamera.xib; sourceTree = "<group>"; };
@@ -5401,6 +5405,12 @@
 		8494D85613393D8A00DD5F9E /* ORRunListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunListModel.m; path = Source/Objects/Control/RunList/ORRunListModel.m; sourceTree = SOURCE_ROOT; };
 		8494D85713393D8A00DD5F9E /* RunList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunList.nib; path = Source/Objects/Control/RunList/RunList.nib; sourceTree = SOURCE_ROOT; };
 		8494D85813393D8A00DD5F9E /* RunList.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunList.tif; path = Source/Objects/Control/RunList/RunList.tif; sourceTree = SOURCE_ROOT; };
+		8494F8CA1C440E2C00A35F8B /* MJDDewarScale.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MJDDewarScale.nib; sourceTree = "<group>"; };
+		8494F8CB1C440E2C00A35F8B /* MJDDewarScale.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MJDDewarScale.tif; sourceTree = "<group>"; };
+		8494F8CC1C440E2C00A35F8B /* ORMJDDewarScaleController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDDewarScaleController.h; sourceTree = "<group>"; };
+		8494F8CD1C440E2C00A35F8B /* ORMJDDewarScaleController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDDewarScaleController.m; sourceTree = "<group>"; };
+		8494F8CE1C440E2C00A35F8B /* ORMJDDewarScaleModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMJDDewarScaleModel.h; sourceTree = "<group>"; };
+		8494F8CF1C440E2C00A35F8B /* ORMJDDewarScaleModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMJDDewarScaleModel.m; sourceTree = "<group>"; };
 		849516B010C95382001C8112 /* ORStateLabelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORStateLabelController.h; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelController.h"; sourceTree = SOURCE_ROOT; };
 		849516B110C95382001C8112 /* ORStateLabelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORStateLabelController.m; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelController.m"; sourceTree = SOURCE_ROOT; };
 		849516B210C95382001C8112 /* ORStateLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORStateLabelModel.h; path = "Source/Objects/Misc Objects/StateLabel/ORStateLabelModel.h"; sourceTree = SOURCE_ROOT; };
@@ -10781,6 +10791,19 @@
 			path = Source/Objects/Control/RunList;
 			sourceTree = SOURCE_ROOT;
 		};
+		8494F8C91C440E2C00A35F8B /* MJDDewarScale */ = {
+			isa = PBXGroup;
+			children = (
+				8494F8CA1C440E2C00A35F8B /* MJDDewarScale.nib */,
+				8494F8CB1C440E2C00A35F8B /* MJDDewarScale.tif */,
+				8494F8CC1C440E2C00A35F8B /* ORMJDDewarScaleController.h */,
+				8494F8CD1C440E2C00A35F8B /* ORMJDDewarScaleController.m */,
+				8494F8CE1C440E2C00A35F8B /* ORMJDDewarScaleModel.h */,
+				8494F8CF1C440E2C00A35F8B /* ORMJDDewarScaleModel.m */,
+			);
+			path = MJDDewarScale;
+			sourceTree = "<group>";
+		};
 		849516AF10C95382001C8112 /* StateLabel */ = {
 			isa = PBXGroup;
 			children = (
@@ -11640,6 +11663,7 @@
 				2D77319A181188F400070A4A /* LanNetio230 */,
 				84B28D600F4C658400E2B056 /* NplPicoCoulombMeter */,
 				EFEBD88B1327588F00C96C86 /* SymmetricomXLGPS */,
+				8494F8C91C440E2C00A35F8B /* MJDDewarScale */,
 			);
 			name = Internet;
 			path = Source/Objects/Hardware/Internet;
@@ -12589,7 +12613,6 @@
 		84CEA3620EA4EB2E0060076A /* Fec32 */ = {
 			isa = PBXGroup;
 			children = (
-				6B325E131B2F4344002E2DD7 /* Fec32.xib */,
 				84CEA3630EA4EB2E0060076A /* Fec32.gif */,
 				84CEA3650EA4EB2E0060076A /* Fec32Card.gif */,
 				84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */,
@@ -14463,6 +14486,7 @@
 				8484843C072D7818009EDCE2 /* ORShaperController.h in Headers */,
 				847946D107330E5300C5E1FA /* ORPciBit3Commands.h in Headers */,
 				847946D207330E5300C5E1FA /* ORPciBit3Controller.h in Headers */,
+				8494F8D21C440E2C00A35F8B /* ORMJDDewarScaleController.h in Headers */,
 				847946D407330E5300C5E1FA /* ORPciBit3Model.h in Headers */,
 				847946D607330E5300C5E1FA /* ORPciBit3View.h in Headers */,
 				8402797207397B8700972B07 /* ORBit3Controller.h in Headers */,
@@ -14567,6 +14591,7 @@
 				849DE73708F6F1FA0052AFC6 /* ORMacController.h in Headers */,
 				842FCCB3197849C700B89723 /* OREHS8260pDecoders.h in Headers */,
 				849DE73908F6F1FA0052AFC6 /* ORMacModel.h in Headers */,
+				8494F8D41C440E2C00A35F8B /* ORMJDDewarScaleModel.h in Headers */,
 				848CD35C08FB511B0046CD9D /* NSSplitView+Extensions.h in Headers */,
 				84B0CFC108FC60BC00EBE23C /* ORContainerModel.h in Headers */,
 				84B0CFC208FC60BC00EBE23C /* ORContainerController.h in Headers */,
@@ -15611,7 +15636,6 @@
 				84CF3B2405E6B60700C5C320 /* Appearance.tif in Resources */,
 				84CF3B2605E6B85800C5C320 /* Startup.tif in Resources */,
 				844E5CD706236ACD0051849B /* CommandCenter.gif in Resources */,
-				6B325E141B2F4344002E2DD7 /* Fec32.xib in Resources */,
 				844E5CD806236ACD0051849B /* TaskMaster.gif in Resources */,
 				848463B80625D76A00128299 /* SmartFolder.nib in Resources */,
 				84FFCAA60636D5B10069432F /* C792.gif in Resources */,
@@ -16078,6 +16102,7 @@
 				84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */,
 				84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */,
 				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
+				8494F8D11C440E2C00A35F8B /* MJDDewarScale.tif in Resources */,
 				84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */,
 				848D8E590FD83C0800A48832 /* Help.tiff in Resources */,
 				8408ACC00FD9A7F500B0206D /* DataChain1.png in Resources */,
@@ -16089,6 +16114,7 @@
 				8408B2270FDD560200B0206D /* cPCI.png in Resources */,
 				8408B23D0FDD579800B0206D /* IPE.png in Resources */,
 				8408B2830FDD5A9D00B0206D /* IPEV4.png in Resources */,
+				8494F8D01C440E2C00A35F8B /* MJDDewarScale.nib in Resources */,
 				84B74AD00FEAAB460033E658 /* ftpExpectScript in Resources */,
 				84B74CE70FEBE9B90033E658 /* Caen965.gif in Resources */,
 				84B74CE80FEBE9B90033E658 /* Caen965.nib in Resources */,
@@ -16745,6 +16771,7 @@
 				2A41A2B6089AB2A0003D77DD /* ORScalerSum.m in Sources */,
 				2A943A6508A8194B00D04541 /* ORSerialPort.m in Sources */,
 				2A943A6708A8194B00D04541 /* ORSerialPortAdditions.m in Sources */,
+				8494F8D31C440E2C00A35F8B /* ORMJDDewarScaleController.m in Sources */,
 				2A943A6908A8194B00D04541 /* ORSerialPortList.m in Sources */,
 				2A943A6B08A8194B00D04541 /* ORStandardEnumerator.m in Sources */,
 				2A4553E408BCE9A3004BB15E /* ORTDC3377Controller.m in Sources */,
@@ -17180,6 +17207,7 @@
 				84D34B0510B1D6C90013473E /* ORSIS3302Controller.m in Sources */,
 				436972C31B42DBE6008D57B5 /* ORCV1730Decoder.m in Sources */,
 				84D34B0710B1D6C90013473E /* ORSIS3302Decoders.m in Sources */,
+				8494F8D51C440E2C00A35F8B /* ORMJDDewarScaleModel.m in Sources */,
 				84D34B0910B1D6C90013473E /* ORSIS3302Model.m in Sources */,
 				848A147C10BAE3D6002A80D0 /* ORFileReader.m in Sources */,
 				848A148010BAE3F8002A80D0 /* ORHeaderCollector.m in Sources */,
@@ -18012,6 +18040,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
@@ -18048,6 +18077,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_VERSION = "";
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
@@ -18067,6 +18097,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_VERSION = "";
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
