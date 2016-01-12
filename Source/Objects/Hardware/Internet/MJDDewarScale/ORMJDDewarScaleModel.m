@@ -382,8 +382,10 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
 {
     NSMutableDictionary* couchRecord = [NSMutableDictionary dictionary];
     NSArray* levels = [NSArray arrayWithObjects:[NSNumber numberWithFloat:value[0]],[NSNumber numberWithFloat:value[1]],nil];
+    NSArray* weights = [NSArray arrayWithObjects:[NSNumber numberWithFloat:weight[0]],[NSNumber numberWithFloat:weight[1]],nil];
     [couchRecord setObject:[NSNumber numberWithInt:30] forKey:@"pollTime"];
     [couchRecord setObject:levels forKey:@"Levels"];
+    [couchRecord setObject:weights forKey:@"Weights"];
     [couchRecord setObject:[NSNumber numberWithBool:dataValid] forKey:@"dataValid"];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:couchRecord];
