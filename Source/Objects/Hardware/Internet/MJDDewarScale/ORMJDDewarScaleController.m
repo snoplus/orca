@@ -198,6 +198,7 @@
 - (void) valuesChanged:(NSNotification*)aNote
 {
     [self updateValueMatrix:valueMatrix        getter:@selector(value:)];
+    [self updateValueMatrix:weightMatrix        getter:@selector(weight:)];
 }
 
 - (void) connectionChanged:(NSNotification*)aNote

@@ -29,6 +29,7 @@
     IBOutlet NSTextField*   dataValidField;
     IBOutlet NSTableView*   processTableView;
     IBOutlet NSMatrix*      valueMatrix;
+    IBOutlet NSMatrix*      weightMatrix;
 	IBOutlet ORCompositeTimeLineView*   plotter0;
 }
 

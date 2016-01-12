@@ -15,8 +15,8 @@
                 <outlet property="nextPollField" destination="1010" id="1014"/>
                 <outlet property="plotter0" destination="AKU-yQ-V0K" id="ICq-el-SFv"/>
                 <outlet property="processTableView" destination="1056" id="1067"/>
-                <outlet property="timedOutField" destination="1015" id="1018"/>
                 <outlet property="valueMatrix" destination="A9a-8S-YXi" id="ztZ-dd-slY"/>
+                <outlet property="weightMatrix" destination="wzc-qX-hxh" id="QP6-Md-ngf"/>
                 <outlet property="window" destination="5" id="7"/>
             </connections>
         </customObject>
@@ -169,17 +169,17 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="bfq-M5-O03">
-                                            <rect key="frame" x="201" y="84" width="169" height="5"/>
+                                            <rect key="frame" x="135" y="92" width="285" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             <font key="titleFont" metaFont="system"/>
                                         </box>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="ZBf-0F-FqI">
-                                            <rect key="frame" x="207" y="28" width="56" height="54"/>
+                                            <rect key="frame" x="141" y="36" width="56" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="56" height="23"/>
+                                            <size key="cellSize" width="56" height="27"/>
                                             <size key="intercellSpacing" width="8" height="8"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="v82-fW-zOj">
                                                 <font key="font" metaFont="label"/>
@@ -201,27 +201,11 @@
                                                 </column>
                                             </cells>
                                         </matrix>
-                                        <textField verticalHuggingPriority="750" id="HpY-Gi-evz">
-                                            <rect key="frame" x="205" y="90" width="179" height="25"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Dewar   Level (%)" id="aHF-0V-3ax">
-                                                <font key="font" metaFont="system" size="21"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="9gN-TE-Xj5">
-                                            <rect key="frame" x="274" y="19" width="5" height="96"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="system"/>
-                                        </box>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="A9a-8S-YXi">
-                                            <rect key="frame" x="285" y="28" width="79" height="54"/>
+                                            <rect key="frame" x="341" y="36" width="79" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="79" height="23"/>
+                                            <size key="cellSize" width="79" height="27"/>
                                             <size key="intercellSpacing" width="8" height="8"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="i2L-tK-h5D">
                                                 <font key="font" metaFont="label"/>
@@ -245,6 +229,57 @@
                                                 </column>
                                             </cells>
                                         </matrix>
+                                        <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="wzc-qX-hxh">
+                                            <rect key="frame" x="229" y="36" width="79" height="54"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="cellSize" width="79" height="27"/>
+                                            <size key="intercellSpacing" width="8" height="8"/>
+                                            <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="BaT-iP-kQB">
+                                                <font key="font" metaFont="label"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <cells>
+                                                <column>
+                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" title=".0" id="We3-OL-X1O">
+                                                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###.0" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="veN-qH-1p8"/>
+                                                        <font key="font" size="20" name=".AppleSystemUIFont"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" tag="1" title="1.0" id="Eem-2z-eTK">
+                                                        <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###.0" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="i7g-l9-Mc8"/>
+                                                        <font key="font" size="20" name=".AppleSystemUIFont"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </column>
+                                            </cells>
+                                        </matrix>
+                                        <textField verticalHuggingPriority="750" id="HpY-Gi-evz">
+                                            <rect key="frame" x="139" y="98" width="328" height="25"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Dewar   Weight(lbs)  Level (%)" id="aHF-0V-3ax">
+                                                <font key="font" metaFont="system" size="21"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="9gN-TE-Xj5">
+                                            <rect key="frame" x="208" y="27" width="5" height="96"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="system"/>
+                                        </box>
+                                        <box horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="afm-eZ-dOX">
+                                            <rect key="frame" x="325" y="27" width="5" height="96"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="system"/>
+                                        </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>

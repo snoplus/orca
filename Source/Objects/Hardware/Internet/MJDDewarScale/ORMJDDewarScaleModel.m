@@ -128,7 +128,11 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
     if(i>=0 && i<kNumMJDDewarScaleChannels)return value[i];
     else return 0;
 }
-
+- (float) weight:(int)i
+{
+    if(i>=0 && i<kNumMJDDewarScaleChannels)return weight[i];
+    else return 0;
+}
 - (void) setDataValid:(BOOL)aState
 {
     dataValid = aState;
@@ -188,12 +192,13 @@ NSString* ORMJDDewarScaleValueChanged           = @"ORMJDDewarScaleValueChanged"
                             if([parts count]>=4){
                                 int aScale = [[parts objectAtIndex:1] intValue];
                                 int adc = [[parts objectAtIndex:3] intValue];
-                                float weight = 0.7423*adc - 398.88;
-                                float aValue = ((weight - 23.0)/307.0)*100.;
+                                float lbs = 0.7423*adc - 398.88;
+                                float aValue = ((lbs - 23.0)/307.0)*100.;
                                 if(aScale>=0 && aScale <kNumMJDDewarScaleChannels){
                                     valueCount++;
                                     if(aValue!=value[aScale]){
-                                        value[aScale] = aValue;
+                                        value[aScale]  = aValue;
+                                        weight[aScale] = lbs;
                                         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
                                         [userInfo setObject:[NSNumber numberWithInt:aScale] forKey: @"Channel"];
                                         [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDDewarScaleValueChanged object:self userInfo:userInfo];

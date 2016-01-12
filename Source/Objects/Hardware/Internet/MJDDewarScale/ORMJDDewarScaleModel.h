@@ -36,6 +36,7 @@
     BOOL                 dataValid;
     ORAlarm*             dataInValidAlarm;
     float                value[kNumMJDDewarScaleChannels];
+    float                weight[kNumMJDDewarScaleChannels];
     float                lowLimit[kNumMJDDewarScaleChannels];
     float                hiLimit[kNumMJDDewarScaleChannels];
     unsigned int         pollTime;
@@ -52,6 +53,7 @@
 #pragma mark ***Utilities
 - (void) pollHardware;
 - (float) value:(int)aChannel;
+- (float) weight:(int)aChannel;
 
 - (void) checkAlarms;
 
