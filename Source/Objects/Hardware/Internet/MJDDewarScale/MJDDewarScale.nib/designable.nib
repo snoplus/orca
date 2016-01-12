@@ -201,10 +201,10 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="A9a-8S-YXi">
-                                            <rect key="frame" x="341" y="47" width="79" height="54"/>
+                                            <rect key="frame" x="341" y="47" width="107" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="34.669921875" height="24"/>
+                                            <size key="cellSize" width="107" height="27"/>
                                             <size key="intercellSpacing" width="8" height="0.0"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="i2L-tK-h5D">
                                                 <font key="font" metaFont="label"/>
@@ -213,13 +213,13 @@
                                             </textFieldCell>
                                             <cells>
                                                 <column>
-                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" title=".0" id="Aec-Qf-aUW">
+                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" title="-" id="Aec-Qf-aUW">
                                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###.0" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="I7b-SL-tNb"/>
                                                         <font key="font" size="20" name=".AppleSystemUIFont"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" tag="1" title="1.0" id="Rg1-Lw-9Zb">
+                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" tag="1" title="-" id="Rg1-Lw-9Zb">
                                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###.0" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="jom-RN-vZ9"/>
                                                         <font key="font" size="20" name=".AppleSystemUIFont"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -229,10 +229,10 @@
                                             </cells>
                                         </matrix>
                                         <matrix verticalHuggingPriority="750" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="wzc-qX-hxh">
-                                            <rect key="frame" x="229" y="47" width="79" height="54"/>
+                                            <rect key="frame" x="229" y="47" width="90" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="34.669921875" height="24"/>
+                                            <size key="cellSize" width="90" height="27"/>
                                             <size key="intercellSpacing" width="8" height="0.0"/>
                                             <textFieldCell key="prototype" sendsActionOnEndEditing="YES" alignment="right" tag="-1" title="0" id="BaT-iP-kQB">
                                                 <font key="font" metaFont="label"/>
@@ -241,13 +241,13 @@
                                             </textFieldCell>
                                             <cells>
                                                 <column>
-                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" title=".0" id="We3-OL-X1O">
+                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" title="-" id="We3-OL-X1O">
                                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###.0" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="veN-qH-1p8"/>
                                                         <font key="font" size="20" name=".AppleSystemUIFont"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" tag="1" title="1.0" id="Eem-2z-eTK">
+                                                    <textFieldCell sendsActionOnEndEditing="YES" alignment="center" tag="1" title="-" id="Eem-2z-eTK">
                                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="###.0" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" minimumFractionDigits="1" maximumFractionDigits="1" id="i7g-l9-Mc8"/>
                                                         <font key="font" size="20" name=".AppleSystemUIFont"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
