@@ -20,6 +20,8 @@
                 <outlet property="LO_Field" destination="02V-nh-qDt" id="yqV-Jv-WEM"/>
                 <outlet property="LO_Slider" destination="zq5-Yh-wDu" id="OSd-sM-W4d"/>
                 <outlet property="LO_SrcSelect" destination="C9v-Fy-6fe" id="9Uz-J4-W1o"/>
+                <outlet property="MTCAMimic_Slider" destination="pqj-Ug-WPp" id="akJ-iT-XSn"/>
+                <outlet property="MTCAMimic_TextField" destination="aT0-4c-Du2" id="isV-pl-Em6"/>
                 <outlet property="SpeakerMaskField" destination="AQh-yw-DbT" id="c9W-9d-4ub"/>
                 <outlet property="SpeakerMaskSelect_1" destination="6lV-eq-FNs" id="IyP-4D-Vv3"/>
                 <outlet property="SpeakerMaskSelect_2" destination="G7o-87-J17" id="tAD-S5-dpk"/>
@@ -56,11 +58,11 @@
                         <tabViewItems>
                             <tabViewItem label="Pulsers &amp; Delays" identifier="1" id="8WF-ET-0MY">
                                 <view key="view" id="cdC-ig-bsI">
-                                    <rect key="frame" x="10" y="25" width="575" height="658"/>
+                                    <rect key="frame" x="10" y="25" width="389" height="0.0"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="SMELLIE Delay (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="vOS-VC-6kO">
-                                            <rect key="frame" x="251" y="594" width="127" height="51"/>
+                                            <rect key="frame" x="251" y="-64" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -86,7 +88,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="TELLIE Delay (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="6yC-tW-nse">
-                                            <rect key="frame" x="251" y="549" width="127" height="51"/>
+                                            <rect key="frame" x="251" y="-109" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -112,7 +114,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Delay (ns)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="Q1j-pJ-aaJ">
-                                            <rect key="frame" x="251" y="504" width="127" height="51"/>
+                                            <rect key="frame" x="251" y="-154" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -138,7 +140,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button toolTip="Begin emitting Smellie pulses as specified by dialog's to the right." verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="TPn-U3-bkd">
-                                            <rect key="frame" x="133" y="597" width="82" height="32"/>
+                                            <rect key="frame" x="133" y="-61" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Fire" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="uwd-2J-eiz">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -148,7 +150,7 @@
                                             </connections>
                                         </button>
                                         <button toolTip="Begin emitting Tellie pulses as specified by dialog's to the right." verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="UhB-a0-2WE">
-                                            <rect key="frame" x="130" y="449" width="82" height="32"/>
+                                            <rect key="frame" x="130" y="-209" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Fire" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kM9-BL-QGE">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -158,7 +160,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="SMELLIE Rate (Hz)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="LtY-m8-vnV">
-                                            <rect key="frame" x="14" y="594" width="117" height="51"/>
+                                            <rect key="frame" x="14" y="-64" width="117" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="115" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -184,7 +186,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="TELLIE Rate (Hz)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="3GE-7Q-6ml">
-                                            <rect key="frame" x="16" y="446" width="114" height="51"/>
+                                            <rect key="frame" x="16" y="-212" width="114" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="112" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -210,7 +212,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulser Rate (Hz)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="wmj-OT-yKc">
-                                            <rect key="frame" x="251" y="446" width="127" height="51"/>
+                                            <rect key="frame" x="251" y="-212" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -236,7 +238,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="SMELLIE nPulses" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iTi-8Y-34c">
-                                            <rect key="frame" x="16" y="504" width="114" height="51"/>
+                                            <rect key="frame" x="16" y="-154" width="114" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="112" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -262,7 +264,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="TELLIE nPulses" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="n70-p9-VHY">
-                                            <rect key="frame" x="14" y="353" width="117" height="51"/>
+                                            <rect key="frame" x="14" y="-305" width="117" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="115" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -288,7 +290,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button toolTip="Stop emitting Smellie pulses" verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="wz9-6c-bqw">
-                                            <rect key="frame" x="133" y="400" width="82" height="32"/>
+                                            <rect key="frame" x="133" y="-258" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nt8-Gr-O9b">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -298,7 +300,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="iKb-XH-VuJ">
-                                            <rect key="frame" x="16" y="549" width="114" height="51"/>
+                                            <rect key="frame" x="16" y="-109" width="114" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="112" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -324,7 +326,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="7F8-OG-Ucu">
-                                            <rect key="frame" x="14" y="397" width="117" height="51"/>
+                                            <rect key="frame" x="14" y="-261" width="117" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="115" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -350,7 +352,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="nPulses" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="vZc-od-BEx">
-                                            <rect key="frame" x="251" y="353" width="127" height="51"/>
+                                            <rect key="frame" x="251" y="-305" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -376,7 +378,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" fixedFrame="YES" title="Pulse Width (s)" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="NxO-2P-aGJ">
-                                            <rect key="frame" x="251" y="397" width="127" height="51"/>
+                                            <rect key="frame" x="251" y="-261" width="127" height="51"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="125" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -402,7 +404,7 @@
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button toolTip="Stop emitting Smellie pulses" verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="Sbd-z1-cDn">
-                                            <rect key="frame" x="133" y="552" width="82" height="32"/>
+                                            <rect key="frame" x="133" y="-106" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dDv-Rm-ReY">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -412,7 +414,7 @@
                                             </connections>
                                         </button>
                                         <button toolTip="Send specified delay value to Smellie delay." verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="2dc-sE-HyT">
-                                            <rect key="frame" x="389" y="597" width="82" height="32"/>
+                                            <rect key="frame" x="389" y="-61" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oEj-pB-Z0I">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -422,7 +424,7 @@
                                             </connections>
                                         </button>
                                         <button toolTip="Send specified delay value to Tellie delay." verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="tyI-gE-Ncq">
-                                            <rect key="frame" x="389" y="552" width="82" height="32"/>
+                                            <rect key="frame" x="389" y="-106" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5fb-4I-fdV">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -432,7 +434,7 @@
                                             </connections>
                                         </button>
                                         <button toolTip="Send specified delay value to generic delay." verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="OOZ-fN-swp">
-                                            <rect key="frame" x="389" y="507" width="82" height="32"/>
+                                            <rect key="frame" x="389" y="-151" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Load" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="q3l-RY-eLB">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -442,7 +444,7 @@
                                             </connections>
                                         </button>
                                         <button toolTip="Begin emitting generic pulses as specified by dialog's to the right." verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="VbD-Qo-b4Y">
-                                            <rect key="frame" x="389" y="449" width="82" height="32"/>
+                                            <rect key="frame" x="389" y="-209" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Fire" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fyB-X4-PVY">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -452,7 +454,7 @@
                                             </connections>
                                         </button>
                                         <button toolTip="Stop emitting generic pulses" verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="VS9-rD-5cU">
-                                            <rect key="frame" x="389" y="400" width="82" height="32"/>
+                                            <rect key="frame" x="389" y="-258" width="82" height="32"/>
                                             <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Tz6-PL-mfM">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -830,7 +832,7 @@
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <buttonCell type="radio" title="On" imagePosition="left" alignment="left" inset="2" id="tQF-nw-PCr">
+                                                    <buttonCell type="radio" title="On" imagePosition="left" alignment="left" tag="1" inset="2" id="tQF-nw-PCr">
                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                         <font key="font" metaFont="system"/>
                                                     </buttonCell>
@@ -840,6 +842,9 @@
                                                     </buttonCell>
                                                 </column>
                                             </cells>
+                                            <connections>
+                                                <action selector="ECAEnableChanged:" target="-2" id="nVg-wW-Xza"/>
+                                            </connections>
                                         </matrix>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1cM-md-sqV">
                                             <rect key="frame" x="216" y="574" width="113" height="18"/>
@@ -852,6 +857,52 @@
                                                 <binding destination="-2" name="value" keyPath="self.model.forcedUpdates" id="pXZ-qk-XVw"/>
                                             </connections>
                                         </button>
+                                        <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aT0-4c-Du2">
+                                            <rect key="frame" x="218" y="513" width="96" height="22"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Oqe-di-PJY">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <action selector="MTCAMimicTextFieldChanged:" target="-2" id="DKy-cU-EZ8"/>
+                                            </connections>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hA8-kt-ZBl">
+                                            <rect key="frame" x="215" y="538" width="179" height="17"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="MTCA Mimic 1 Threshold (V)" id="evR-Uk-HCn">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y0d-CH-SpX">
+                                            <rect key="frame" x="195" y="438" width="142" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Match Hardware" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Rpl-wp-AkP">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="MTCAMimicMatchHardware:" target="-2" id="hia-xk-LFM"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QcI-C1-5mH">
+                                            <rect key="frame" x="202" y="405" width="128" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Send To TUBii" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="XRz-mj-rcS">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="MTCAMimicLoadValue:" target="-2" id="MTd-Tx-WfD"/>
+                                            </connections>
+                                        </button>
+                                        <slider verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pqj-Ug-WPp">
+                                            <rect key="frame" x="152" y="482" width="228" height="23"/>
+                                            <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-5" maxValue="5" doubleValue="5" tickMarkPosition="above" numberOfTickMarks="4096" allowsTickMarkValuesOnly="YES" sliderType="linear" id="rOi-Fi-BZE"/>
+                                            <connections>
+                                                <action selector="MTCAMimicSliderChanged:" target="-2" id="pf5-vj-a7a"/>
+                                            </connections>
+                                        </slider>
                                     </subviews>
                                 </view>
                             </tabViewItem>

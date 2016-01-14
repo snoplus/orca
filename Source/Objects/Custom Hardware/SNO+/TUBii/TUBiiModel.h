@@ -80,7 +80,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     float tellieDelay;
     float genericDelay;
     unsigned long trigMask;
-    float MTCAMimic1_Threshold;
+    double MTCAMimic1_Threshold;
     float DGT_DelayLength;
     float LO_DelayLength;
     NSUInteger DGTBits;
@@ -114,6 +114,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) float tellieDelay;
 @property (nonatomic) float genericDelay;
 @property (nonatomic) unsigned long trigMask;
+@property (nonatomic,assign) double MTCAMimic1_Threshold;
 @property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
 @property (nonatomic,readonly) NSUInteger DGTBits;

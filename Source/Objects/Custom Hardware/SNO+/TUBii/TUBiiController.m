@@ -45,6 +45,9 @@
 @synthesize LO_Slider;
 @synthesize DGT_Slider;
 
+@synthesize MTCAMimic_Slider;
+@synthesize MTCAMimic_TextField;
+
 @synthesize tabView;
 
 - (id)init{
@@ -478,6 +481,27 @@
     NSLog(@"Clock reset signal sent \n");
     [model ResetClock];
 }
+
+- (IBAction)MTCAMimicTextFieldChanged:(id)sender {
+    [MTCAMimic_Slider setFloatValue:[MTCAMimic_TextField floatValue]];
+}
+
+- (IBAction)MTCAMimicSliderChanged:(id)sender {
+    [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",[MTCAMimic_Slider floatValue]]];
+}
+
+- (IBAction)MTCAMimicMatchHardware:(id)sender {
+    double value = [model MTCAMimic1_Threshold];
+    [MTCAMimic_Slider setFloatValue:value];
+    [MTCAMimic_TextField setStringValue:[NSString stringWithFormat:@"%.3f",value]];
+}
+
+- (IBAction)MTCAMimicLoadValue:(id)sender {
+    double value = [MTCAMimic_TextField floatValue];
+    [model setMTCAMimic1_Threshold:value];
+    NSLog(@"MTCA Mimic1 DAC = %0.3fV\n",value);
+}
+
 - (float) ConvertBitsToValue:(NSUInteger)bits NBits: (int) nBits MinVal: (float) minVal MaxVal: (float) maxVal{
     float stepSize = (maxVal - minVal)/(pow(2, nBits)-1.0);
     return bits*stepSize;

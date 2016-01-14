@@ -47,12 +47,16 @@
     NSButton *CounterLZBSelect;
     NSButton *CounterTestModeSelect;
     NSButton *CounterInhibitSelect;
+    NSMatrix *ECA_EnableButton;
     
     NSTextField *DGT_Field;
     NSTextField *LO_Field;
     NSSlider *LO_Slider;
     NSSlider *DGT_Slider;
     NSMatrix *LO_SrcSelect;
+
+    NSSlider *MTCAMimic_Slider;
+    NSTextField *MTCAMimic_TextField;
 
 }
 -(id) init;
@@ -90,8 +94,10 @@
 @property (assign,weak) IBOutlet NSSlider *LO_Slider;
 @property (assign,weak) IBOutlet NSSlider *DGT_Slider;
 @property (assign,weak) IBOutlet NSTextField *LO_Field;
-
 @property (assign,weak) IBOutlet NSMatrix *LO_SrcSelect;
+
+@property (assign) IBOutlet NSSlider *MTCAMimic_Slider;
+@property (assign) IBOutlet NSTextField *MTCAMimic_TextField;
 
 - (NSUInteger) GetBitInfoFromCheckBoxes: (NSMatrix*)aMatrix FromBit:(int)low ToBit: (int)high;
 - (void) SendBitInfo:(NSUInteger) maskVal FromBit:(int)low ToBit:(int) high ToCheckBoxes: (NSMatrix*) aMatrix;
@@ -122,7 +128,11 @@
 - (IBAction)LODelayLengthSliderChagned:(id)sender;
 - (IBAction)ResetClock:(id)sender;
 
+- (IBAction)ECAEnableChanged:(id)sender;
+- (IBAction)MTCAMimicTextFieldChanged:(id)sender;
+- (IBAction)MTCAMimicSliderChanged:(id)sender;
 
-
+- (IBAction)MTCAMimicMatchHardware:(id)sender;
+- (IBAction)MTCAMimicLoadValue:(id)sender;
 
 @end
