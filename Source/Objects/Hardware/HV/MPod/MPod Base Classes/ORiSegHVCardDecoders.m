@@ -61,7 +61,6 @@ Followed by the rest of the channel values
 	int numChannels = ShiftAndExtract(ptr[1],4,0x1F);
 	
     unsigned long onMask = ptr[2];
-    theString = [theString stringByAppendingFormat:@"On Mask: 0x%lx\n",onMask];
 
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCrateKey:crate]];
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCardKey:card]];
@@ -72,14 +71,14 @@ Followed by the rest of the channel values
 		float asFloat;
 		unsigned long asLong;
 	}theData;
-	theString = [theString stringByAppendingFormat:@"--------------------------\n"];
+	theString = [theString stringByAppendingFormat:@"-Actual Values-\n"];
 	int theChan;
 	for(theChan=0;theChan<numChannels;theChan++){
-		theString = [theString stringByAppendingFormat:@"Channel %d\n",theChan];
+		theString = [theString stringByAppendingFormat:@"Channel %d (%@)\n",theChan,(onMask & (0x1<<theChan))?@"ON":@"OFF"];
 		theData.asLong = ptr[5+theChan]; //act Voltage
-		theString = [theString stringByAppendingFormat:@"Act Voltage (%d): %c%.2f V\n",theChan,polarity?'+':'-',theData.asFloat];
+		theString = [theString stringByAppendingFormat:@"Voltage: %c%.2f V\n",polarity?'+':'-',theData.asFloat];
 		theData.asLong = ptr[6+theChan]; //act Current
-		theString = [theString stringByAppendingFormat:@"Act Current (%d): %.3f mA\n",theChan,theData.asFloat*1000000.];
+		theString = [theString stringByAppendingFormat:@"Current: %.3f mA\n",theData.asFloat*1000000.];
 	}
 	return theString;
 }
