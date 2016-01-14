@@ -2,8 +2,8 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
+        <development version="5100" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORCatalogController">
@@ -163,7 +163,7 @@
                                         <box title="Depreciated--Use the Bit3 Controller if possible" id="291">
                                             <rect key="frame" x="163" y="137" width="281" height="121"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <view key="contentView" id="VxN-pc-b5z">
+                                            <view key="contentView">
                                                 <rect key="frame" x="2" y="2" width="277" height="105"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -210,7 +210,7 @@
                                         <box title="Universal--works with 617/620/810 HW" id="293">
                                             <rect key="frame" x="163" y="58" width="281" height="74"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <view key="contentView" id="P4a-0z-3L5">
+                                            <view key="contentView">
                                                 <rect key="frame" x="2" y="2" width="277" height="58"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
