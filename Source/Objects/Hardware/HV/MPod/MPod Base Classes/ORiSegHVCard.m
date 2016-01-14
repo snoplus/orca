@@ -1080,9 +1080,10 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
         for(i=0;i<[self numberOfChannels];i++){
             if([self isOn:i])onMask |= (0x1<<i);
         }
-        
-		unsigned long data[21];
-		data[0] = dataId | 21;
+        int n = 5+[self numberOfChannels]*2;
+
+		unsigned long data[n];
+		data[0] = dataId | n;
 		data[1] = (([self crateNumber] & 0xf) << 20) |
         (([self slot]&0xf)<<16)            |
         (([self numberOfChannels])<<4)     |
@@ -1102,7 +1103,6 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementCurrent"];
 			data[6+i] = theData.asLong;
 		}
-        int n = 5+[self numberOfChannels]*2;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
                                                             object:[NSData dataWithBytes:data length:sizeof(long)*n]];	}
 }
