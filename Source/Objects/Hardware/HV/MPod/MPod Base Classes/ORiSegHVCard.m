@@ -1073,14 +1073,21 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 		time_t	ut_Time;
 		time(&ut_Time);
 		
+        
+        
 		int i;
+        unsigned long onMask = 0x0;
+        for(i=0;i<[self numberOfChannels];i++){
+            if([self isOn:i])onMask |= (0x1<<i);
+        }
+        
 		unsigned long data[21];
 		data[0] = dataId | 21;
 		data[1] = (([self crateNumber] & 0xf) << 20) |
         (([self slot]&0xf)<<16)            |
         (([self numberOfChannels])<<4)     |
         ([self polarity] & 0x1);
-		data[2] = 0x0; //spare
+        data[2] = onMask;
 		data[3] = 0x0; //spare
 		data[4] = ut_Time;
 		

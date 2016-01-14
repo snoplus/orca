@@ -32,7 +32,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ---------------^^^^--------------------- Card number
 ----------------------------^ ^^^^------ number of channels
 --------------------------------------^- Polarity (1 == pos, 0 == neg)
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Spare
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -ON Mask
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Spare
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time in seconds since Jan 1, 1970
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  actual Voltage encoded as a float (chan 0)
@@ -60,6 +60,9 @@ Followed by the rest of the channel values
 	int polarity= ptr[1] & 0x1;
 	int numChannels = ShiftAndExtract(ptr[1],4,0x1F);
 	
+    unsigned long onMask = ptr[2];
+    theString = [theString stringByAppendingFormat:@"On Mask: 0x%lx\n",onMask];
+
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCrateKey:crate]];
 	theString = [theString stringByAppendingFormat:@"%@\n",[self getCardKey:card]];
 
@@ -74,7 +77,7 @@ Followed by the rest of the channel values
 	for(theChan=0;theChan<numChannels;theChan++){
 		theString = [theString stringByAppendingFormat:@"Channel %d\n",theChan];
 		theData.asLong = ptr[5+theChan]; //act Voltage
-		theString = [theString stringByAppendingFormat:@"Act Voltage (%c%d): %.2f V\n",polarity?'+':'-',theChan,theData.asFloat];
+		theString = [theString stringByAppendingFormat:@"Act Voltage (%d): %c%.2f V\n",theChan,polarity?'+':'-',theData.asFloat];
 		theData.asLong = ptr[6+theChan]; //act Current
 		theString = [theString stringByAppendingFormat:@"Act Current (%d): %.3f mA\n",theChan,theData.asFloat*1000000.];
 	}
