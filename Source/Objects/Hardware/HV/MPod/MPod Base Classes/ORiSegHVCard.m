@@ -28,6 +28,7 @@
 #import "ORSNMP.h"
 #import "ORMPodCrate.h"
 #import "ORAlarm.h"
+#import "ORDataPacket.h"
 
 NSString* ORiSegHVCardShipRecordsChanged		= @"ORiSegHVCardShipRecordsChanged";
 NSString* ORiSegHVCardMaxCurrentChanged         = @"ORiSegHVCardMaxCurrentChanged";
@@ -62,6 +63,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
 		[voltageHistory[i] release];
@@ -119,6 +121,23 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	return @"??"; //subclasses should override
 }
 
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarted:)
+                         name : ORRunStartedNotification
+                       object : nil];
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+    [self shipDataRecords];
+}
+
+#pragma mark ***Accessors
+
 - (BOOL) polarity
 {
 	return kPositivePolarity;
@@ -131,7 +150,6 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 }
 
 
-#pragma mark ***Accessors
 - (id)	adapter
 {
 	id anAdapter = [guardian adapter];
@@ -932,16 +950,24 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     [self setDataId:[anotherCard dataId]];
 }
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORiSegHVCard"];
+}
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    int n = 5+[self numberOfChannels]*2;
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORiSegHVCardDecoderForHV",			@"decoder",
 								 [NSNumber numberWithLong:dataId],      @"dataId",
 								 [NSNumber numberWithBool:NO],          @"variable",
-								 [NSNumber numberWithLong:21],			@"length",
+								 [NSNumber numberWithLong:n],			@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Waveform"];
+    [dataDictionary setObject:aDictionary forKey:@"State"];
     
     return dataDictionary;
 }
@@ -960,11 +986,12 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
-		//[self setHwGoal:i withValue: [decoder decodeIntForKey:	[@"hwGoal" stringByAppendingFormat:@"%d",i]]];
 		[self setTarget:i withValue: [decoder decodeIntForKey:		[@"target" stringByAppendingFormat:@"%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey: [@"maxCurrent" stringByAppendingFormat:@"%d",i]]];
 	}
 	[[self undoManager] enableUndoRegistration];
+    
+    [self registerNotificationObservers];
     
     return self;
 }
@@ -980,7 +1007,6 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     
 	int i;
  	for(i=0;i<[self numberOfChannels];i++){
-		//[encoder encodeInt:hwGoal[i] forKey:[@"hwGoal" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:target[i] forKey:[@"target" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeFloat:maxCurrent[i] forKey:[@"maxCurrent" stringByAppendingFormat:@"%d",i]];
 	}
@@ -1062,17 +1088,16 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 			float asFloat;
 			unsigned long asLong;
 		}theData;
-        
 		for(i=0;i<[self numberOfChannels];i++){
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
 			data[5+i] = theData.asLong;
 			
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementCurrent"];
 			data[6+i] = theData.asLong;
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-																object:[NSData dataWithBytes:data length:sizeof(long)*21]];
 		}
-	}
+        int n = 5+[self numberOfChannels]*2;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                            object:[NSData dataWithBytes:data length:sizeof(long)*n]];	}
 }
 #pragma mark ¥¥¥Convenience Methods
 - (float) voltage:(short)aChannel

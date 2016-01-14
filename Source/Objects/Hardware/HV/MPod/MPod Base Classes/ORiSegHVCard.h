@@ -24,6 +24,7 @@
 
 @class ORTimeRate;
 @class ORAlarm;
+@class ORDataPacket;
 
 #define kPositivePolarity 1
 #define kNegativePolarity 0
@@ -103,6 +104,8 @@ enum{
 - (void) setUpImage;
 - (void) makeMainController;
 - (BOOL) polarity;
+- (void) registerNotificationObservers;
+- (void) runStarted:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (id)				adapter;
@@ -168,6 +171,7 @@ enum{
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
 
 #pragma mark ***Polling
