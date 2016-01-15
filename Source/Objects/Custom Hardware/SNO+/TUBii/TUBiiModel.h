@@ -83,6 +83,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
     double MTCAMimic1_Threshold;
     float DGT_DelayLength;
     float LO_DelayLength;
+    BOOL ECAMode;
     NSUInteger DGTBits;
     NSUInteger LOBits;
     NSUInteger speakerMask;
@@ -115,6 +116,7 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
 @property (nonatomic) float genericDelay;
 @property (nonatomic) unsigned long trigMask;
 @property (nonatomic,assign) double MTCAMimic1_Threshold;
+@property (nonatomic) BOOL ECAMode;
 @property (nonatomic,readonly) CAEN_CHANNEL_MASK caenChannelMask;
 @property (nonatomic,readonly) CAEN_GAIN_MASK caenGainMask;
 @property (nonatomic,readonly) NSUInteger DGTBits;
@@ -141,6 +143,4 @@ typedef NS_OPTIONS(NSUInteger, TRIG_MASK)
             GainMask:(CAEN_GAIN_MASK) aGainMask;
 - (void) setGTDelaysBits: (NSUInteger) aDGTMask LOBits:aLOMask;
 - (void) ResetClock;
-
-
 @end
