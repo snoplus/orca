@@ -20,8 +20,8 @@
 
 - (void) connect;
 - (void) disconnect;
-- (redisReply*) vcommand: (char*) fmt args:(va_list) args;
-- (redisReply*) command: (char *) fmt, ...;
-- (void) okCommand: (char *) fmt, ...;
-- (int) intCommand: (char *) fmt, ...;
+- (redisReply*) vcommand: (const char*) fmt args:(va_list) args;
+- (redisReply*) command: (const char *) fmt, ...;
+- (void) okCommand: (const char *) fmt, ...;
+- (int) intCommand: (const char *) fmt, ...;
 @end

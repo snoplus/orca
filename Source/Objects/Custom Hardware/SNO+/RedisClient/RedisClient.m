@@ -21,32 +21,40 @@
 }
 - (id)initWithHostName: (NSString*) _host withPort: (int) _port{
     self = [super init];
+
     if (self) {
         host = _host;
         port = _port;
         timeout = 1000; // Initialize timeout to 1 second
     }
+
     return self;
 }
 - (void) connect {
-    // Separate the seconds and microseconds value
-    // timeout is in milliseconds
-    struct timeval tv = {timeout/1000, (timeout%1000)*1000};
+    /* timeout for connect is 1 second */
+    struct timeval tv = {1, 0};
+
     context = redisConnectWithTimeout([host UTF8String], port, tv);
+
     if (context == NULL) {
         NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                         reason:@"Connection failed" 
-                         userInfo: nil];
+                              reason:@"Connection failed" 
+                              userInfo: nil];
         [excep raise];
-    }
-    else if (context->err) {
+    } else if (context->err) {
        NSString *err = [NSString stringWithUTF8String:context->errstr]; 
        [self disconnect];
        NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                         reason:err
-                         userInfo: nil];
+                             reason:err
+                             userInfo: nil];
         [excep raise];
     }
+
+    /* successfully connected */
+    /* set the timeout on the socket */
+    tv.tv_sec = timeout/1000;
+    tv.tv_usec = (timeout % 1000)*1000;
+    redisSetTimeout(context, tv);
 }
 - (void) disconnect{
    if(context) {
@@ -54,17 +62,17 @@
        context = NULL;
    }
 }
-- (redisReply*) vcommand:(char *)fmt args:(va_list)ap{
-    if (context == NULL) {
-        [self connect];
-    }
+- (redisReply*) vcommand:(const char *)fmt args:(va_list)ap{
+    if (context == NULL) [self connect];
+
     redisReply *r = redisvCommand(context,fmt,ap);
+
     if (r == NULL) {
         NSString *err = [NSString stringWithUTF8String:context->errstr];
         [self disconnect];
         NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                           reason:err 
-                           userInfo:nil];
+                              reason:err 
+                              userInfo:nil];
         [excep raise];
     }
     
@@ -72,13 +80,13 @@
         NSString *err = [NSString stringWithUTF8String:r->str];
         freeReplyObject(r);
         NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                             reason:err
-                             userInfo:nil];
+                              reason:err
+                              userInfo:nil];
         [excep raise];
     }
     return r;
 }
-- (redisReply*) command: (char *) fmt, ... {
+- (redisReply*) command: (const char *) fmt, ... {
     /*
      *  Sends a command to host using the Redis protocol. 
      *  Takes a variable number of arguements with a similar format to printf().
@@ -95,30 +103,34 @@
     va_end(ap);
     return r;
 }
-- (void) okCommand: (char *) fmt, ... {
+- (void) okCommand: (const char *) fmt, ... {
     va_list ap;
     va_start(ap,fmt);
     redisReply *r = [self vcommand:fmt args:ap];
     va_end(ap);
+
     if (r->type != REDIS_REPLY_STATUS) {
         NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                           reason:@"unexpected response type" 
-                           userInfo:nil];
+                              reason:@"unexpected response type" 
+                              userInfo:nil];
         [excep raise];
     }
+
     freeReplyObject(r);
 }
-- (int) intCommand: (char *) fmt, ... {
+- (int) intCommand: (const char *) fmt, ... {
     va_list ap;
     va_start(ap,fmt);
     redisReply *r = [self vcommand:fmt args:ap];
     va_end(ap);
+
     if (r->type != REDIS_REPLY_INTEGER) {
         NSException *excep = [NSException exceptionWithName:@"RedisClient"
-                           reason:@"unexpected response type" 
-                           userInfo:nil];
+                              reason:@"unexpected response type" 
+                              userInfo:nil];
         [excep raise];
     }
+
     int responseVal = r->integer;
     freeReplyObject(r);
     return responseVal;
