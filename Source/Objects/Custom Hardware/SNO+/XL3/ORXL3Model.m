@@ -4561,8 +4561,21 @@ void SwapLongBlock(void* p, int32_t n)
         }
                 
         if (!hvASwitch && !hvBSwitch) isTimeToQuit = YES;
+        
         usleep(100000);
+        
+        if (![[self xl3Link] isConnected]) isTimeToQuit = YES;
     }
+    
+    //If termination was due to disconnect. Go back into safe state and wait for reconnect
+    if (![[self xl3Link] isConnected]) {
+        [self setHvEverUpdated:NO];
+        [self setHvSwitchEverUpdated:NO];
+        
+        //Start thread to wait for the XL3 to connect and be initilized
+        [[[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil] start];
+    }
+    
     [hvPool release];
 }
 
