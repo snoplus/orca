@@ -120,27 +120,14 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 - (void) checkForDriver;
 - (void) createLongTermTraceStorage;
 - (void) flushCheck;
-
-//- (int) updateIntervalSeconds;
-//- (unsigned long) saveIntervalInSeconds;
 - (void) saveTraceToHistory:(unsigned long)aTimeStamp;
 - (void) closeOutHistoryFile;
 - (void) addToHistoryX:(unsigned short)xAcc y:(unsigned short)yAcc z:(unsigned short)zAcc;
-- (void) postCouchDBRecord;
-- (void) postCouchDBRecord2:(int) numberDataPoints;
-
+- (void) postSpecialToCouch;
 @end
 
 
 @implementation ORMotionNodeModel
-- (id) init
-{
-	self = [super init];
-	[self checkForDriver];
-	[self createLongTermTraceStorage];
-	shipThreshold = .2;
-	return self;
-}
 
 - (void) dealloc
 {
@@ -157,7 +144,8 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
 	[serialNumber release];
 	[localLock release];
     [oldHistoryData release];
-
+    [specialTrace release];
+    [specialStartTime release];
 	if(longTermTrace){
 		int i;
 		for (i = 0; i < kNumMin; i++) free(longTermTrace[i]);
@@ -609,23 +597,25 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setShipExcursions:		[decoder decodeBoolForKey:@"shipExcursions"]];
-    [self setShipThreshold:			[decoder decodeFloatForKey:@"shipThreshold"]];
-    [self setAutoStart:				[decoder decodeBoolForKey:@"autoStart"]];
-    [self setAutoStartWithOrca:     [decoder decodeBoolForKey:@"autoStartWithOrca"]];
-    [self setKeepHistory:           [decoder decodeBoolForKey:@"keepHistory"]];
-    [self setShowLongTermDelta:		[decoder decodeBoolForKey:@"showLongTermDelta"]];
-    [self setLongTermSensitivity:	[decoder decodeIntForKey:@"longTermSensitivity"]];
-    [self setShowDeltaFromAve:		[decoder decodeBoolForKey:@"showDeltaFromAve"]];
-    [self setDisplayComponents:		[decoder decodeBoolForKey:@"displayComponents"]];
-    
-    [self setHistoryFolder:		[decoder decodeObjectForKey:@"historyFolder"]];
+    [self setShipExcursions:		[decoder decodeBoolForKey:   @"shipExcursions"]];
+    [self setShipThreshold:			[decoder decodeFloatForKey:  @"shipThreshold"]];
+    [self setAutoStart:				[decoder decodeBoolForKey:   @"autoStart"]];
+    [self setAutoStartWithOrca:     [decoder decodeBoolForKey:   @"autoStartWithOrca"]];
+    [self setKeepHistory:           [decoder decodeBoolForKey:   @"keepHistory"]];
+    [self setShowLongTermDelta:		[decoder decodeBoolForKey:   @"showLongTermDelta"]];
+    [self setLongTermSensitivity:	[decoder decodeIntForKey:    @"longTermSensitivity"]];
+    [self setShowDeltaFromAve:		[decoder decodeBoolForKey:   @"showDeltaFromAve"]];
+    [self setDisplayComponents:	 	[decoder decodeBoolForKey:   @"displayComponents"]];
+    [self setHistoryFolder:		    [decoder decodeObjectForKey: @"historyFolder"]];
 	
     [[self undoManager] enableUndoRegistration];    
 	cmdQueue = [[ORSafeQueue alloc] init];
-	
+    
+    specialTrace = [[NSMutableArray arrayWithCapacity:1000] retain];
+
 	[self checkForDriver];
 	[self createLongTermTraceStorage];
+    shipThreshold = .2;
 	
     return self;
 }
@@ -641,7 +631,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [encoder encodeBool:showLongTermDelta	forKey:@"showLongTermDelta"];
     [encoder encodeInt:longTermSensitivity	forKey:@"longTermSensitivity"];
     [encoder encodeBool:showDeltaFromAve	forKey:@"showDeltaFromAve"];
-    [encoder encodeBool:displayComponents	forKey: @"displayComponents"];
+    [encoder encodeBool:displayComponents	forKey:@"displayComponents"];
     [encoder encodeObject:historyFolder		forKey:@"historyFolder"];
 }
 
@@ -1254,37 +1244,54 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
         }
         historyIndex = 0;
         historyPtr = (MotionNodeHistoryData*)([historyTrace bytes] + sizeof(MotionNodeHistoryHeader));
+        [specialStartTime release];
+        specialStartTime = [[NSDate date] retain];
     }
-    atotal = sqrt(ax*ax + ay*ay + az*az);
-    
+    //keep a running average
+    float atotal = sqrt(ax*ax + ay*ay + az*az);
     amean = (amean*historyIndex+atotal)/(historyIndex+1);
     
+    //the every value into the history
     historyPtr[historyIndex].x = xAcc;
     historyPtr[historyIndex].y = yAcc;
     historyPtr[historyIndex].z = zAcc;
     historyIndex++;
     
-    //collect all events until events is gone
+    //accumulate the running average every once in awhile, but only if no event happening
     if(fabs(amean-atotal)>0.02){
-        //NSLog(@" %g  %g %i\n",atotal,amean,saveIndex);
-        saveIndex++;
-    }
+        if(!eventInProgress){
+            [self postSpecialToCouch]; //flush and start event
+            eventInProgress = YES;
+         }
+        else {
+            postEventCount = 0;
+        }
+        [specialTrace addObject: [NSNumber numberWithFloat:atotal]];
+  }
     else {
-      if (saveIndex>3){    //at the end of event and min 3 data points
-          [self postCouchDBRecord2:saveIndex];
-          saveIndex = 0;
-       }
+        if(!eventInProgress){
+            if(!(historyIndex%100)){ //about every second
+                [specialTrace addObject: [NSNumber numberWithFloat:amean]];
+                if([specialTrace count]>60){
+                    [self postSpecialToCouch];
+                }
+            }
+        }
+        else {
+            [specialTrace addObject: [NSNumber numberWithFloat:atotal]];
+            postEventCount++;
+            if(postEventCount>3){
+                //go past end of event
+                postEventCount=0;
+                [self postSpecialToCouch];
+                eventInProgress = NO;
+           }
+        }
     }
-    
-    if(!(historyIndex % kIndexToDatabase)){
-        //NSLog(@" %15 .15g time \n",([[NSDate date] timeIntervalSince1970]));
-       [self postCouchDBRecord];
-    }
-    if(historyIndex >= kMaxHistoryLength){
-        [self closeOutHistoryFile];
-    }
+
+    if(historyIndex >= kMaxHistoryLength)   [self closeOutHistoryFile];
 }
-    
+
 - (void) closeOutHistoryFile
 {
     if(historyTrace){
@@ -1294,7 +1301,6 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
         [self saveTraceToHistory:header->startTime];
         [historyTrace release];
         historyTrace = nil;
-        historyIndex = 0;
     }
 }
 
@@ -1315,7 +1321,6 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     
     [historyTrace writeToFile:[[filePath stringByAppendingPathComponent:fileName] stringByExpandingTildeInPath]
             atomically:YES];
-    //[self postCouchDBRecord]; old place to save to database
  }
 
 - (NSString*) ensureExists:(NSString*)folderName
@@ -1328,61 +1333,34 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     return tmpDir;
 }
 
-//regular readout
-//post to database just last two points with rough timing
-- (void) postCouchDBRecord
-{
-    MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
-    
-    unsigned long num       = header->numDataPoints;
-    NSMutableArray* trace   = [NSMutableArray arrayWithCapacity:2];
-    
-    int index;
-    for(index=num-2;index<num;index++){
-        float x = header->calibrations[0].slope*historyPtr[index].x + header->calibrations[0].intercept;
-        float y = header->calibrations[1].slope*historyPtr[index].y + header->calibrations[1].intercept;
-        float z = header->calibrations[2].slope*historyPtr[index].z + header->calibrations[2].intercept;        
-        float mag = 1 - sqrtf(x*x + y*y + z*z);
-        [trace addObject:[NSNumber numberWithFloat:mag]];
-    }
-
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            trace,                                              @"trace",
-                            [NSNumber numberWithInt:   header->moduleID],       @"module",
-                            [NSNumber numberWithInt:   2],  @"numPoints",
-                            [NSNumber numberWithDouble: ([[NSDate date] timeIntervalSince1970])],      @"startTime",
-                            [NSNumber numberWithDouble: ([[NSDate date] timeIntervalSince1970])+1/kPtPerSec],        @"endTime",
-                            nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
-
-}
-
 //special data readout
-//post to database just last 100 data points points with rough timing
-- (void) postCouchDBRecord2:(int) numberDataPoints
+- (void) postSpecialToCouch
 {
-    MotionNodeHistoryHeader*  header = (MotionNodeHistoryHeader*)[historyTrace bytes];
-    
-    unsigned long num       = header->numDataPoints;
-    NSMutableArray* trace   = [NSMutableArray arrayWithCapacity:numberDataPoints];
-    
-    int index;
-    for(index=num-numberDataPoints;index<num;index++){
-        float x = header->calibrations[0].slope*historyPtr[index].x + header->calibrations[0].intercept;
-        float y = header->calibrations[1].slope*historyPtr[index].y + header->calibrations[1].intercept;
-        float z = header->calibrations[2].slope*historyPtr[index].z + header->calibrations[2].intercept;
-        float mag = 1 - sqrtf(x*x + y*y + z*z);
-        [trace addObject:[NSNumber numberWithFloat:mag]];
+    if([specialTrace count]){
+        
+        NSTimeInterval t1 = [specialStartTime timeIntervalSince1970];
+        NSTimeInterval t2 = [[NSDate date] timeIntervalSince1970];
+        
+        NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [self fullID],               @"name",
+                                    @"Seismic",                  @"title",
+                                    [[specialTrace copy] autorelease],                    @"trace",
+                                    [NSNumber numberWithInt:    [self uniqueIdNumber]],   @"module",
+                                    [NSNumber numberWithInt:    eventInProgress],         @"highResolution",
+                                    [NSNumber numberWithInt:    [specialTrace count]],    @"numPoints",
+                                    [NSNumber numberWithDouble: t1],        @"startTime",
+                                    [NSNumber numberWithDouble: t2],        @"endTime",
+                                    [NSNumber numberWithDouble: t2-t1],     @"deltaTime",
+                                    nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddHistoryAdcRecord" object:self userInfo:values];
+        [specialTrace removeAllObjects];
+        
+        NSLog(@"%.2f\n",t2-t1);
+        
+        [specialStartTime release];
+        specialStartTime = [[NSDate date] retain];
+
     }
-    
-    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
-                            trace,                                              @"trace",
-                            [NSNumber numberWithInt:   header->moduleID],       @"module",
-                            [NSNumber numberWithInt:   numberDataPoints],  @"numPoints",
-                            [NSNumber numberWithDouble: ([[NSDate date] timeIntervalSince1970])],      @"startTime",
-                            [NSNumber numberWithDouble: ([[NSDate date] timeIntervalSince1970])+numberDataPoints/kPtPerSec],        @"endTime",
-                            nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
-    
 }
+
 @end

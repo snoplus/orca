@@ -80,9 +80,7 @@ typedef struct MotionNodeHistoryHeader {
     float			ax;
     float			ay;
     float			az;
-    float           atotal;
     float           amean;
-    int             saveIndex;
     int				traceIndex;
     int				longTraceIndex;
     int				longTraceMinIndex;
@@ -90,6 +88,7 @@ typedef struct MotionNodeHistoryHeader {
 	float			yTrace[kModeNodeTraceLength];
 	float			zTrace[kModeNodeTraceLength];
 	float			xyzTrace[kModeNodeTraceLength];
+    NSMutableArray* specialTrace;
 	float**			longTermTrace;
 	int				throttle;
 	float			temperatureAverage;
@@ -114,9 +113,13 @@ typedef struct MotionNodeHistoryHeader {
 	float			longTraceValueToKeep;
     BOOL            keepHistory;
     NSString*		historyFolder;
-    int             stopTimeIndex;
     NSMutableData*  historyTrace;
     int             historyIndex;
+    int             averageIndex;
+    NSDate*         specialStartTime;
+    BOOL            eventInProgress;
+    int             postEventCount;
+    
     MotionNodeHistoryData*  historyPtr;
     
     NSData*         oldHistoryData;
