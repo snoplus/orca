@@ -78,7 +78,8 @@
     [CounterAdvancedOptionsBox setHidden:YES];
 
     [self CaenMatchHardware:(self)];
-    [[self caenChannelSelect_3] setEnabled:NO];//Not working on board
+    [[self caenChannelSelect_3] setEnabled:NO];//Not currently working on board
+    [caenGainSelect_4 setEnabled:NO]; //Not currently working on board.
 
     [self GTDelaysMatchHardware:self];
 }
@@ -471,12 +472,20 @@
         field = DGT_Field;
         slider = DGT_Slider;
     }
-    [field setStringValue:[NSString stringWithFormat:@"%i",[slider integerValue]]];
+    [field setIntegerValue:[slider integerValue]];
 }
 
 - (IBAction)ResetClock:(id)sender {
     NSLog(@"Clock reset signal sent \n");
     [model ResetClock];
+}
+- (IBAction)ECAEnableChanged:(id)sender {
+    if([[ECA_EnableButton selectedCell] tag]==1){ //ECA mode On is selected
+        [model setECAMode: YES];
+    }
+    else { //ECA mode Off is selected
+        [model setECAMode: NO];
+    }
 }
 
 - (IBAction)MTCAMimicTextFieldChanged:(id)sender {

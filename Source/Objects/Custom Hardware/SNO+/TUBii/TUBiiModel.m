@@ -35,6 +35,7 @@ NSString* otherSystemIP = @"192.168.80.25";
 @synthesize counterMask;
 @synthesize controlReg;
 @synthesize forcedUpdates;
+@synthesize ECAMode;
 @synthesize MTCAMimic1_Threshold;
 
 - (void) setUpImage
