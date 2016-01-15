@@ -16,10 +16,12 @@
 - (void) setTimeout: (long) _timeout
 {
     timeout = _timeout;
-    struct timeval tv;
-    tv.tv_sec = timeout/1000;
-    tv.tv_usec = (timeout % 1000)*1000;
-    redisSetTimeout(context, tv);
+    if (context) {
+        struct timeval tv;
+        tv.tv_sec = timeout/1000;
+        tv.tv_usec = (timeout % 1000)*1000;
+        redisSetTimeout(context, tv);
+    }
 }
 
 - (long) timeout
