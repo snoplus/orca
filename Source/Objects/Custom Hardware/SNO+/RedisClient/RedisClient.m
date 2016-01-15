@@ -31,7 +31,7 @@
 
 - (instancetype)init
 {
-    self = [self initWithHostName: @"" withPort: DEFUALT_PORT];
+    self = [self initWithHostName: @"" withPort: -1];
     return self;
 }
 - (id)initWithHostName: (NSString*) _host withPort: (int) _port{
