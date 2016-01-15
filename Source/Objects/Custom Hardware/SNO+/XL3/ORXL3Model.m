@@ -3278,6 +3278,7 @@ void SwapLongBlock(void* p, int32_t n)
 // gui into the correct state.
 - (void) safeSpawnHvInit
 {
+    @synchronized(self) {
     //Kill the HV thread if it exists
     if (hvThread) {
         if (![hvThread isFinished]) {
@@ -3303,6 +3304,7 @@ void SwapLongBlock(void* p, int32_t n)
     //Start thread to wait for the XL3 to connect and be initilized
     hvInitThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil];
     [hvInitThread start];
+    }
 }
 
 - (void) readHVStatus:(hv_readback_results_t*)status
