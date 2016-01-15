@@ -712,7 +712,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
-                                <view key="view" ambiguous="YES" id="tgY-du-t2x">
+                                <view key="view" id="tgY-du-t2x">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -1513,7 +1513,7 @@
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Speaker &amp; Counter" identifier="" id="qvg-PS-ArU">
-                                <view key="view" id="ayJ-xc-snR">
+                                <view key="view" ambiguous="YES" id="ayJ-xc-snR">
                                     <rect key="frame" x="10" y="25" width="575" height="658"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
