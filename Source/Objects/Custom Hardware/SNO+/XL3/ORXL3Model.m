@@ -4445,7 +4445,7 @@ void SwapLongBlock(void* p, int32_t n)
     NSAutoreleasePool* hvPool = [[NSAutoreleasePool alloc] init];
     [self setHvPanicFlag:NO];
     
-    NSLog(@"%@ s	tarting HV control thread\n",[[self xl3Link] crateName]);
+    NSLog(@"%@ starting HV control thread\n",[[self xl3Link] crateName]);
     
     BOOL isTimeToQuit = NO;
 
@@ -4567,14 +4567,7 @@ void SwapLongBlock(void* p, int32_t n)
         if (![[self xl3Link] isConnected]) isTimeToQuit = YES;
     }
     
-    //If termination was due to disconnect. Go back into safe state and wait for reconnect
-    if (![[self xl3Link] isConnected]) {
-        [self setHvEverUpdated:NO];
-        [self setHvSwitchEverUpdated:NO];
-        
-        //Start thread to wait for the XL3 to connect and be initilized
-        [[[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil] start];
-    }
+    NSLog(@"%@ exiting HV control thread\n",[[self xl3Link] crateName]);
     
     [hvPool release];
 }
