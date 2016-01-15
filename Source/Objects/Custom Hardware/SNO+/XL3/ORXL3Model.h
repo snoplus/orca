@@ -130,6 +130,7 @@ enum {
     unsigned long _hvNominalVoltageA;
     unsigned long _hvNominalVoltageB;
     BOOL _hvPanicFlag;
+    NSThread* hvInitThread;
     NSThread* hvThread;
     NSDateFormatter* xl3DateFormatter;
     float _xl3VltThreshold[12];
@@ -353,6 +354,7 @@ enum {
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn;
 - (void) readHVSwitchOn;
 
+- (void) safeSpawnHvInit;
 - (void) setHVSwitch:(BOOL)aOn forPowerSupply:(unsigned char)sup;
 - (void) hvPanicDown;
 - (void) hvMasterPanicDown;

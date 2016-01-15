@@ -1411,11 +1411,7 @@ void SwapLongBlock(void* p, int32_t n)
         memcpy(&safe_bundle[i], &aConfigBundle, sizeof(mb_t));
     }
     
-    [self setHvEverUpdated:NO];
-    [self setHvSwitchEverUpdated:NO];
-    
-    //Start thread to wait for the XL3 to connect and be initilized
-    [[[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil] start];
+    [self safeSpawnHvInit];
      
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -3277,6 +3273,38 @@ void SwapLongBlock(void* p, int32_t n)
     }
 }
 
+// This will reset the HV control logic completely.
+// Call this to wait for an XL3 to connect, read back the status, and get the
+// gui into the correct state.
+- (void) safeSpawnHvInit
+{
+    //Kill the HV thread if it exists
+    if (hvThread) {
+        if (![hvThread isFinished]) {
+            [hvThread cancel];
+        }
+        [hvThread release];
+        hvThread = nil;
+    }
+    
+    //Kill the HV Init thread if it exists
+    if (hvInitThread) {
+        if (![hvInitThread isFinished]) {
+            [hvInitThread cancel];
+        }
+        [hvInitThread release];
+        hvInitThread = nil;
+    }
+    
+    //Set the HV control to a safe state
+    [self setHvEverUpdated:NO];
+    [self setHvSwitchEverUpdated:NO];
+    
+    //Start thread to wait for the XL3 to connect and be initilized
+    hvInitThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvInit) object:nil];
+    [hvInitThread start];
+}
+
 - (void) readHVStatus:(hv_readback_results_t*)status
 {
 	XL3_PayloadStruct payload;
@@ -4410,11 +4438,16 @@ void SwapLongBlock(void* p, int32_t n)
                 [self setHvBNextStepValue:[self hvBVoltageReadValue]* 4096/3000.];
             }
             
-            //finally launch a new HV thread (there should not be one running, but best practice to check)
-            if (!hvThread) {
-                hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
-                [hvThread start];
+            //finally launch a new HV thread
+            if (hvThread) {
+                if (![hvThread isFinished]) {
+                    [hvThread cancel];
+                }
+                [hvThread release];
+                hvThread = nil;
             }
+            hvThread = [[NSThread alloc] initWithTarget:self selector:@selector(_hvXl3) object:nil];
+            [hvThread start];
             
             //let everyone know that we now have HV control
             [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];
@@ -4564,6 +4597,7 @@ void SwapLongBlock(void* p, int32_t n)
         
         usleep(100000);
         
+        //We can't do anything if the XL3 disconnects anyway
         if (![[self xl3Link] isConnected]) isTimeToQuit = YES;
     }
     

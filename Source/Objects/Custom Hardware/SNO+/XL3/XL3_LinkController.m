@@ -775,8 +775,7 @@ static NSDictionary* xl3Ops;
         [model setHvEverUpdated:NO];
         [model setHvSwitchEverUpdated:NO];
         //Start thread to wait for the XL3 to connect and be initilized
-        [[[NSThread alloc] initWithTarget:model selector:@selector(_hvInit) object:nil] start];
-        
+        [model safeSpawnHvInit];
         [toggleConnectButton setTitle:@"Connect"];
         
     }
