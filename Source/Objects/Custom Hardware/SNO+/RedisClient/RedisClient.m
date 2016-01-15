@@ -34,6 +34,7 @@
     self = [self initWithHostName: @"" withPort: -1];
     return self;
 }
+
 - (id)initWithHostName: (NSString*) _host withPort: (int) _port{
     self = [super init];
 
@@ -45,6 +46,7 @@
 
     return self;
 }
+
 - (void) connect {
     /* timeout for connect is 1 second */
     struct timeval tv = {1, 0};
@@ -71,12 +73,14 @@
     tv.tv_usec = (timeout % 1000)*1000;
     redisSetTimeout(context, tv);
 }
+
 - (void) disconnect{
    if(context) {
        redisFree(context);
        context = NULL;
    }
 }
+
 - (redisReply*) vcommand:(const char *)fmt args:(va_list)ap{
     if (context == NULL) [self connect];
 
@@ -101,6 +105,7 @@
     }
     return r;
 }
+
 - (redisReply*) command: (const char *) fmt, ... {
     /*
      *  Sends a command to host using the Redis protocol. 
@@ -118,6 +123,7 @@
     va_end(ap);
     return r;
 }
+
 - (void) okCommand: (const char *) fmt, ... {
     va_list ap;
     va_start(ap,fmt);
@@ -133,6 +139,7 @@
 
     freeReplyObject(r);
 }
+
 - (int) intCommand: (const char *) fmt, ... {
     va_list ap;
     va_start(ap,fmt);
@@ -150,4 +157,5 @@
     freeReplyObject(r);
     return responseVal;
 }
+
 @end
