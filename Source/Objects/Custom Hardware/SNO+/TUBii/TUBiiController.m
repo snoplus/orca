@@ -273,9 +273,10 @@
 - (IBAction)CounterMatchHardware:(id)sender {
     [self SpeakerMatchHardware:sender];
     CONTROL_REG_MASK ControlRegVal = [model controlReg];
-    [CounterLZBSelect setState: ControlRegVal & scalerLZB_Bit > 0 ? 1:0 ];
-    [CounterTestModeSelect setState: ControlRegVal & scalerT_Bit > 0 ? 1:0 ];
-    [CounterInhibitSelect setState: ControlRegVal & scalerI_Bit > 0 ? 1:0 ];
+
+    [CounterLZBSelect setState: (ControlRegVal & scalerLZB_Bit) > 0 ? NSOnState : NSOffState ];
+    [CounterTestModeSelect setState: (ControlRegVal & scalerT_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
+    [CounterInhibitSelect setState: (ControlRegVal & scalerI_Bit) > 0 ? NSOffState : NSOnState ]; //Unchecked = bit high
 }
 - (IBAction)SpeakerLoadMask:(id)sender {
     NSUInteger maskVal=0;
@@ -308,9 +309,9 @@
     [self SpeakerLoadMask:sender];
     CONTROL_REG_MASK newControlReg = [model controlReg];
     newControlReg =  [CounterLZBSelect intValue] ==1 ? scalerLZB_Bit : 0;
-    newControlReg |=  [CounterTestModeSelect intValue] ==1 ? scalerT_Bit : 0;
-    newControlReg |=  [CounterInhibitSelect intValue] ==1 ? scalerI_Bit : 0;
-    NSLog(@"New Control Reg Value = %d",newControlReg);
+    newControlReg |=  [CounterTestModeSelect intValue] ==1 ? 0 : scalerT_Bit;
+    newControlReg |=  [CounterInhibitSelect intValue] ==1 ? 0 : scalerI_Bit;
+    NSLog(@"New Control Reg Value = %d\n",newControlReg);
     [model setControlReg:newControlReg];
 }
 - (IBAction)SpeakerCheckBoxChanged:(id)sender {
@@ -433,10 +434,6 @@
         [[self LO_SrcSelect] selectCellWithTag:2];
     }
     [self LOSrcSelectChanged:self];
-    NSLog(@"Control Reg = %i\n",[model controlReg]);
-    NSLog(@"DGT Delay = %.0f, LO Delay = %.0f\n",DGT_Delay,LO_Delay);
-    NSLog(@"DGT Bits = %i, LO Bits = %i\n",[model DGTBits],[model LOBits]);
-
 }
 
 - (IBAction)LOSrcSelectChanged:(id)sender {
